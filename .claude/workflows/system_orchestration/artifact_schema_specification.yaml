@@ -33,6 +33,64 @@ applies_to_manifest_version: "1.1"
 applies_to_plan_version: "1.0"
 
 # =============================================================================
+# SECTION 0 — DIRECTORY ARGUMENT EXCEPTION SET
+# =============================================================================
+#
+# This specification primarily governs canonical artifact files. Deterministic
+# predicates that validate structured workflow state must target named canonical
+# JSON artifacts, not directories. Directory paths are permitted only in the
+# narrowly defined exception cases below.
+#
+# Allowed directory argument categories:
+#
+# 1. Source admissibility directories
+#    These are externally supplied source collections for which no single
+#    canonical file can be mandated at gate-evaluation time:
+#      - docs/tier2b_topic_and_call_sources/work_programmes/
+#      - docs/tier2b_topic_and_call_sources/call_extracts/
+#      - docs/tier2a_instrument_schemas/application_forms/
+#      - docs/tier2a_instrument_schemas/evaluation_forms/
+#
+#    These directories are valid only for coarse source-presence checks such as
+#    dir_non_empty(path). They do not constitute canonical artifacts and do not
+#    satisfy structured state requirements on their own.
+#
+# 2. External integration directories
+#    These are externally populated exchange locations whose contents are
+#    validated by contract, not by run ownership:
+#      - docs/integrations/lump_sum_budget_planner/received/
+#      - docs/integrations/lump_sum_budget_planner/validation/
+#
+#    These directories are valid for:
+#      - dir_non_empty(path)
+#      - interface_contract_conforms(response_path, contract_path)
+#      - coverage predicates that intentionally join canonical workflow artifacts
+#        against externally supplied budget response collections
+#
+# 3. Collection-scope directories
+#    These are structured collections of per-file artifacts rather than a single
+#    canonical file:
+#      - docs/tier5_deliverables/proposal_sections/
+#
+#    This directory is valid for collection-level predicates such as
+#    all_sections_drafted, all_sections_have_traceability_footer, and semantic
+#    predicates that evaluate section sets as a whole.
+#
+# 4. Semantic scope roots
+#    Semantic predicates may receive tier-root or collection-root directories as
+#    scope arguments when constitutional or cross-tier judgment requires the
+#    agent to inspect multiple files. These scope paths are not canonical
+#    artifacts and must not be used by deterministic predicates in place of a
+#    canonical file.
+#
+# Rule:
+# - If a predicate validates a structured artifact field, schema, timeline,
+#   cycle, gate output, or ownership condition, it must point to a named
+#   canonical file unless it falls into one of the exception classes above.
+
+
+
+# =============================================================================
 # SECTION 1 — TIER 4 PHASE OUTPUT CANONICAL ARTIFACTS
 # =============================================================================
 #

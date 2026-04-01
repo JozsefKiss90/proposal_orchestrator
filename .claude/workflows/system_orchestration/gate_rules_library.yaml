@@ -17,6 +17,21 @@
 #   1. file  2. gate_pass  3. schema  4. source_ref  5. coverage
 #   6. cycle  7. timeline  8. semantic
 # Semantic predicates are only invoked if all deterministic predicates pass.
+#
+# Deterministic path invariant:
+# Deterministic predicates must reference canonical artifact JSON files unless
+# the predicate belongs to the allowed directory exception set defined in
+# artifact_schema_specification.yaml SECTION 0. Allowed directory arguments are
+# limited to source admissibility directories, external integration directories,
+# and collection-scope directories explicitly defined there.
+#
+# Semantic scope rule:
+# Semantic predicates may accept canonical artifact paths or scope directories
+# when the judgment requires inspection of multiple files across a tier or a
+# section collection. Scope-directory arguments do not assert directory truth by
+# themselves; they define the file set the agent may inspect. Any semantic
+# result produced from a scope directory must enumerate the inspected files in
+# artifacts_inspected.
 
 library_version: "1.0"
 manifest_version: "1.1"

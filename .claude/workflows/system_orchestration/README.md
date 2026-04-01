@@ -68,6 +68,8 @@ The workflow executes as a DAG. All gates are blocking. Gate failure is a valid 
 
 **Parallel paths:** Phase 4 and Phase 5 can proceed concurrently after Phase 3. Phase 6 requires Phases 3, 4, and 5. Phase 5 requires both Phase 2 and Phase 3 gates to have passed (edges e02_to_05 + e03_to_05 with additional_condition: phase_03_gate); it is not independently parallel after Phase 2.
 
+**Directory argument rule:** Directory paths appear in the workflow package only in narrowly defined cases: source admissibility checks, external integration checks, section-collection predicates, and semantic scope arguments. Deterministic validation of structured workflow state operates on canonical artifact JSON files, not directories.
+
 ---
 
 ## Phase 7 Semantic Correction (v1.0 → v1.1)
