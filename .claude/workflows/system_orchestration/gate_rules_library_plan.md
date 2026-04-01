@@ -30,10 +30,12 @@ This file is co-located with the rest of the system_orchestration package. It is
 
 ```yaml
 library_version: "1.0"
+manifest_version: "1.1"            # version of manifest.compile.yaml this library was authored against
+constitution_version: "<git-sha>"  # SHA or date-stamp of CLAUDE.md at authoring time; used for audit
 source_package: .claude/workflows/system_orchestration/
-constitutional_authority: CLAUDE.md
 gate_rules:
   - gate_id: <gate_id_from_manifest>
+    gate_kind: entry | exit         # entry: evaluated before node execution; exit: evaluated after
     evaluated_at: <node_id and entry/exit>
     predicates:
       - predicate_id: <unique_within_gate>
@@ -45,6 +47,10 @@ gate_rules:
 ```
 
 The `prose_condition` field is mandatory. It creates an explicit link between each executable predicate and the governance prose it implements. This field is the migration bridge: when Approach B is adopted, the manifest condition entry gains a `predicate_refs` list pointing to these predicate IDs.
+
+`manifest_version` and `constitution_version` are mandatory library-level fields. Their purpose is version coupling: a GateResult is only meaningful in relation to the rules that produced it. A runner must refuse to load a library whose `manifest_version` does not match the `manifest.compile.yaml` version it is running. `constitution_version` is carried into every GateResult for long-term replay and auditing — if the constitution changes between runs, a historical GateResult can be interpreted in the context of the constitutional rules that were in force when it was produced.
+
+`gate_kind` is mandatory per gate entry. See §6.5 for how the runner uses it to determine failure propagation and restart behavior.
 
 ---
 
@@ -77,6 +83,36 @@ The runner must evaluate types in this order for each gate:
 8. `semantic` — judgment-requiring checks (invoked only if all preceding types pass)
 
 This ordering is mandatory. Semantic predicates are expensive (require agent invocation) and often depend on the same artifacts checked by deterministic predicates. A gate that fails a `file` check must not invoke an agent for semantic evaluation.
+
+**Failure categories for deterministic predicates:**
+
+Every failed deterministic predicate must be classified with one of the five `failure_category` values below. The category is returned by the predicate implementation itself — the runner must not infer it after the fact. The category is recorded in the GateResult (§6.2) and is the primary triage signal for the human operator.
+
+| `failure_category` | When it applies | Operator action |
+|--------------------|-----------------|-----------------|
+| `MISSING_MANDATORY_INPUT` | A required artifact file or directory does not exist | Supply the missing artifact before re-running (re-run the producing phase or external system) |
+| `MALFORMED_ARTIFACT` | Artifact exists but is not valid JSON, is empty, or is missing a required top-level field | The producing agent has a defect or was interrupted; regenerate the artifact |
+| `CROSS_ARTIFACT_INCONSISTENCY` | Content in one artifact is inconsistent with content in another (coverage, cycle, timeline failures) | Identify which artifact is wrong, correct it, and re-run the phase that produced it |
+| `POLICY_VIOLATION` | Artifact is structurally valid but violates a workflow or constitutional rule (e.g., source refs absent, ethics omitted, WP count exceeded) | Review produced content; correct the agent's behavior before re-running |
+| `STALE_UPSTREAM_MISMATCH` | An artifact exists but its `run_id` does not match the current run, or a freshness bound is violated | Re-evaluate the upstream gate under the current run before proceeding |
+
+Expected mapping from predicate type to `failure_category`:
+
+| Predicate type | Likely `failure_category` |
+|----------------|---------------------------|
+| `file` — path absent | `MISSING_MANDATORY_INPUT` |
+| `file` — path present but empty or invalid JSON | `MALFORMED_ARTIFACT` |
+| `schema` — required field absent or null | `MALFORMED_ARTIFACT` |
+| `schema` — field present but value violates a rule | `POLICY_VIOLATION` |
+| `source_ref` | `POLICY_VIOLATION` |
+| `coverage` | `CROSS_ARTIFACT_INCONSISTENCY` |
+| `cycle` | `CROSS_ARTIFACT_INCONSISTENCY` |
+| `timeline` | `CROSS_ARTIFACT_INCONSISTENCY` |
+| `gate_pass` — gate result file absent | `MISSING_MANDATORY_INPUT` |
+| `gate_pass` — run_id mismatch or freshness violation | `STALE_UPSTREAM_MISMATCH` |
+| `artifact_owned_by_run` | `STALE_UPSTREAM_MISMATCH` |
+
+Predicate implementations must determine which sub-case applies and return the appropriate `failure_category`. A predicate that returns no `failure_category` on failure is considered malformed and the runner must treat it as an evaluation error, not a gate pass.
 
 ---
 
@@ -408,43 +444,64 @@ For each gate, the predicates are listed in evaluation order. `prose_condition` 
 ```
 runner.evaluate_gate(gate_id, run_id, repo_root) -> GateResult
 
-1. Load gate_rules_library.yaml
-2. Retrieve predicate list for gate_id; fail if gate_id not found
-3. Partition predicates into deterministic (types: file, gate_pass, schema,
-   source_ref, coverage, cycle, timeline) and semantic (type: semantic)
-4. Sort deterministic predicates by type in the order defined in §3
-5. Compute input_fingerprint: hash the combined content of all required_inputs
-   for this gate's owning phase as they exist on disk at evaluation time
-6. Evaluate each deterministic predicate against the live repo state,
-   passing run_id to gate_pass_recorded predicates and artifact_owned_by_run
-   predicates; pass input_fingerprint to gate_pass_recorded predicates
-   - On any failure: record failed predicate; continue evaluating remaining
-     deterministic predicates to collect all failures in one pass
-7. If any deterministic predicate failed:
-   - Declare gate failure
-   - Write GateResult to Tier 4 (see §6.2)
-   - Return without invoking semantic predicates
-8. If all deterministic predicates passed:
-   - Invoke each semantic predicate via its designated agent/skill
-   - Collect structured semantic results; reject any finding without
-     violated_rule and evidence_path fields (treat as evaluation error)
-9. If any semantic predicate failed:
-   - Declare gate failure
+1.  Load gate_rules_library.yaml; verify library_version matches expected;
+    verify manifest_version matches the running manifest.compile.yaml version.
+    Abort if either version check fails.
+2.  Retrieve gate entry for gate_id; abort if not found.
+    Read gate_kind (entry | exit) from the gate entry; see §6.5.
+3.  Partition predicates into deterministic (types: file, gate_pass, schema,
+    source_ref, coverage, cycle, timeline) and semantic (type: semantic).
+4.  Sort deterministic predicates by type in the order defined in §3.
+5.  Compute input_artifact_fingerprints: hash the content of each individual
+    required_input artifact as it exists on disk. Compute input_fingerprint
+    as a combined hash over all individual fingerprints (order-stable, e.g.,
+    sorted by path). Record both in the GateResult.
+6.  Evaluate each deterministic predicate against the live repo state,
+    passing run_id to gate_pass_recorded and artifact_owned_by_run predicates;
+    pass input_fingerprint to gate_pass_recorded predicates.
+    - On any failure: record failed predicate including its failure_category;
+      continue evaluating remaining deterministic predicates to collect all
+      failures in one pass.
+7.  If any deterministic predicate failed:
+    - Declare gate failure.
+    - Apply gate_kind failure propagation (see §6.5).
+    - Write GateResult to Tier 4 (see §6.2).
+    - Return without invoking semantic predicates.
+8.  If all deterministic predicates passed:
+    - Invoke each semantic predicate via its designated agent/skill.
+    - Collect structured semantic results; reject any finding without
+      violated_rule and evidence_path fields (treat as evaluation error).
+9.  If any semantic predicate failed:
+    - Declare gate failure; apply gate_kind failure propagation.
 10. If all predicates passed:
-    - Declare gate pass
-11. Write GateResult to Tier 4 (see §6.2), including run_id and input_fingerprint
-12. Return GateResult
+    - Declare gate pass; apply gate_kind pass propagation (see §6.5).
+11. Write GateResult to Tier 4 (see §6.2), including run_id, input_fingerprint,
+    input_artifact_fingerprints, manifest_version, library_version, and
+    constitution_version.
+12. Return GateResult.
 ```
 
 ### 6.2 GateResult Schema
 
 ```yaml
+# Version coupling block — mandatory; all four fields required
 gate_id: <str>
-run_id: <str>                    # must match the DAG-runner startup run_id
-input_fingerprint: <str>         # hash of combined required_inputs content at evaluation time
+gate_kind: entry | exit            # from library; determines failure propagation (§6.5)
+run_id: <str>                      # must match the DAG-runner startup run_id
+manifest_version: <str>            # from library manifest_version; records which manifest governed this evaluation
+library_version: <str>             # from library library_version; records which predicate set was used
+constitution_version: <str>        # from library constitution_version; records which CLAUDE.md was in force
+
+# Fingerprinting block — mandatory for exit gates; entry gates omit input_artifact_fingerprints
+input_fingerprint: <str>           # combined hash over all required_inputs at evaluation time
+input_artifact_fingerprints:       # per-artifact hashes for audit and replay
+  <path>: <sha256-hex>
+  ...                              # one entry per required_input artifact
+
 evaluated_at: <ISO 8601 timestamp>
 repo_root: <str>
 status: pass | fail
+
 deterministic_predicates:
   passed: [<predicate_id>, ...]
   failed:
@@ -452,8 +509,10 @@ deterministic_predicates:
       type: <predicate_type>
       function: <str>
       args: { ... }
+      failure_category: MISSING_MANDATORY_INPUT | MALFORMED_ARTIFACT | CROSS_ARTIFACT_INCONSISTENCY | POLICY_VIOLATION | STALE_UPSTREAM_MISMATCH
       fail_message: <str>
       prose_condition: <str>
+
 semantic_predicates:
   passed: [<predicate_id>, ...]
   failed:
@@ -467,11 +526,17 @@ semantic_predicates:
           evidence_path: <str>     # path to artifact containing the violation; required
           severity: critical | major
       fail_message: <str>
-skipped_semantic: <bool>   # true if gate failed on deterministic predicates
-report_written_to: <path>  # Tier 4 gate result artifact path
+
+skipped_semantic: <bool>           # true if gate failed on deterministic predicates
+report_written_to: <path>          # Tier 4 gate result artifact path
 ```
 
-`run_id` and `input_fingerprint` are mandatory fields. A GateResult without both fields is malformed and must be rejected by `gate_pass_recorded`. A GateResult with `status: pass` but a mismatched `run_id` is a stale artifact and must not satisfy any downstream `gate_pass_recorded` predicate.
+**Mandatory field rules:**
+
+- `run_id`, `manifest_version`, `library_version`, `constitution_version`: mandatory in all GateResults. A GateResult missing any of these is malformed and must be rejected by `gate_pass_recorded` and by any audit tool.
+- `input_fingerprint` and `input_artifact_fingerprints`: mandatory for exit gates. For entry gates, these fingerprint the source documents being checked (not phase outputs); they are still required, as they record the state of the source tree at the time admissibility was granted.
+- `failure_category`: mandatory in every failed deterministic predicate entry. A GateResult with a failed predicate lacking `failure_category` is malformed.
+- A GateResult with `status: pass` but a mismatched `run_id` relative to the current run is a stale artifact and must not satisfy any downstream `gate_pass_recorded` predicate. A GateResult with a mismatched `manifest_version` or `library_version` relative to the current library is suspect and must be flagged for operator review before being treated as authoritative.
 
 ### 6.3 Gate Result Artifact Location
 
@@ -501,6 +566,44 @@ Gates with `mandatory: true` and `bypass_prohibited: true` (currently only `gate
 - If `dir_non_empty(docs/integrations/lump_sum_budget_planner/received/)` fails on gate_09, the runner must emit a `HARD_BLOCK` result code in addition to the standard `fail` status
 - A `HARD_BLOCK` must propagate to all downstream nodes immediately; no downstream node may be placed in a queued or pending state
 - The runner must surface the `HARD_BLOCK` to the human operator with the specific missing artifact paths
+
+`HARD_BLOCK` is a special case of the `blocked_at_exit` node state defined in §6.5. It additionally freezes all downstream nodes in `pending` state without evaluating their entry gates, and it inhibits any implicit restart of Phase 8 nodes until the budget gate passes.
+
+---
+
+### 6.5 Entry-Gate and Exit-Gate Semantics
+
+The `gate_kind` field in the library distinguishes two functionally different roles. Entry and exit gates share the same predicate evaluation logic but differ in when they run, what their failure means for execution state, and how the runner should handle restart.
+
+**Entry gates** (currently only `gate_01_source_integrity`):
+
+- Evaluated **before** the node begins execution.
+- The node has produced no outputs at evaluation time.
+- **Failure propagation:** The node is placed in `blocked_at_entry` state. No execution occurs. The node's output directory must not be written to. All outgoing edges from the node are blocked. Peer nodes not downstream of this node are unaffected.
+- **Restart behavior:** After the operator supplies the missing source documents, the runner re-evaluates the entry gate without clearing any prior state (there is none). If the gate passes, the node is released to execute.
+- **Fingerprinting:** The `input_artifact_fingerprints` for an entry gate capture the source documents being checked (Tier 2B work programmes, Tier 3 call binding), not phase outputs. These fingerprints record the source tree state at the time admissibility was granted.
+
+**Exit gates** (all other gates):
+
+- Evaluated **after** the node has completed execution.
+- The node's canonical artifact(s) exist (or should exist, their absence being a `MISSING_MANDATORY_INPUT` failure) at evaluation time.
+- **Failure propagation:** The node is placed in `blocked_at_exit` state. The canonical artifact is preserved (not deleted) for operator inspection. The artifact is marked internally as `status: invalid` within the run's state. Outgoing edges are blocked. Peer nodes that share only upstream gates (not the failed node's outputs) continue unaffected.
+- **Restart behavior:** After the operator or agent corrects the producing phase, the node is re-run from scratch under the same `run_id`. The canonical artifact is overwritten (not appended to). The prior `blocked_at_exit` gate result is superseded by the new exit gate result at the same path.
+- **Fingerprinting:** The `input_artifact_fingerprints` capture the phase's `required_inputs` as they existed when the phase executed.
+
+**Node state model:**
+
+| State | Meaning |
+|-------|---------|
+| `pending` | Node is queued; entry gate not yet evaluated |
+| `running` | Node is executing; exit gate not yet evaluated |
+| `blocked_at_entry` | Entry gate failed; node has not executed; no outputs exist |
+| `blocked_at_exit` | Exit gate failed; node executed; outputs exist but are marked invalid |
+| `released` | Exit gate passed; outgoing edges are traversable by downstream nodes |
+
+The runner must record each node's state in the run manifest alongside the GateResult. Node state is distinct from gate status: a gate can have `status: fail` while the node is in `blocked_at_exit`; the gate result explains why, and the node state governs what the runner does next.
+
+**Interaction with `HARD_BLOCK` (§6.4):** `HARD_BLOCK` is a specialisation of `blocked_at_exit` for `mandatory: true, bypass_prohibited: true` gates. It additionally inhibits entry gate evaluation for all downstream nodes (placing them in `pending` with a `HARD_BLOCK_UPSTREAM` reason), preventing any work from beginning in Phase 8 until the budget gate passes.
 
 ---
 
@@ -547,12 +650,73 @@ The field-level schemas for each canonical artifact (data types, required vs. op
 
 ---
 
+### 7.5 Artifact Provenance Classification
+
+All artifacts evaluated by predicates belong to one of four provenance classes. The runner must classify each artifact before evaluating predicates against it. Provenance determines which predicates apply, how `artifact_owned_by_run` failures are resolved, and what a gate failure means in operational terms.
+
+**The four provenance classes:**
+
+| Class | Description | `run_id` field | Examples |
+|-------|-------------|----------------|---------|
+| `run_produced` | Created by an agent in the current run | Present; matches current `run_id` | Tier 4 phase output canonical artifacts; Tier 5 deliverable artifacts; gate result artifacts |
+| `inherited` | Created by an agent in a prior valid run; explicitly approved for reuse in the current run via the run's reuse policy | Present; does not match current `run_id`; reuse policy entry exists with `status: approved` | A phase output from a prior run the operator has declared stable for the current run |
+| `manually_placed` | No `run_id` field, or `run_id` equals the sentinel value `"manual"` | Absent or `"manual"` | Tier 3 project data; Tier 1/2 source documents; Tier 3 call binding files |
+| `external_integration` | Received from an external system; no `run_id` can be mandated | Not required | `received/` and `validation/` directories in the integration path |
+
+**Provenance expectations per artifact category:**
+
+| Artifact category | Expected provenance class | Enforcement |
+|-------------------|--------------------------|-------------|
+| Tier 1/2 source documents | `manually_placed` | Not checked by predicates; assumed stable; content checked by source_ref predicates |
+| Tier 3 project data | `manually_placed` | Not checked by predicates; content checked by schema and source_ref predicates |
+| Tier 4 phase output canonical artifacts | `run_produced` or `inherited` | `artifact_owned_by_run` (passes for `run_produced`; escalates to reuse policy check for `inherited`) |
+| Gate result artifacts | `run_produced` | `gate_pass_recorded` (verifies run_id, input_fingerprint, and freshness) |
+| Tier 5 deliverable artifacts | `run_produced` | `artifact_owned_by_run` |
+| Integration `received/` directory | `external_integration` | `dir_non_empty` + `interface_contract_conforms`; no run_id check |
+| Integration `validation/` directory | `external_integration` | `dir_non_empty`; no run_id check |
+
+**Inherited artifacts and the reuse policy:**
+
+When `artifact_owned_by_run` fails because an artifact's `run_id` does not match the current run, the runner must check the current run's **reuse policy** before declaring a `STALE_UPSTREAM_MISMATCH` failure. The reuse policy is a file written at DAG startup (alongside the run manifest) that explicitly lists artifacts from prior runs that the operator has approved for reuse in the current run. Structure:
+
+```yaml
+reuse_policy_for_run: <current_run_id>
+approved_artifacts:
+  - path: <canonical_artifact_path>
+    original_run_id: <prior_run_id>
+    reason: "<operator-supplied justification>"
+    status: approved
+```
+
+An artifact listed with `status: approved` is treated as `inherited` and satisfies `artifact_owned_by_run`. The GateResult for any gate that depends on an inherited artifact must include:
+
+```yaml
+inherited_artifacts:
+  - path: <canonical_artifact_path>
+    original_run_id: <prior_run_id>
+    reuse_approved_by: <current_run_id>
+```
+
+This makes the inheritance explicit and auditable in every GateResult that relied on it.
+
+**Manually-placed artifacts in gate-critical paths:**
+
+A Tier 4 or Tier 5 canonical artifact with no `run_id` field and no reuse policy entry is treated as `manually_placed`. If it appears in a gate-critical path (i.e., a predicate targets it), `artifact_owned_by_run` must fail with `failure_category: STALE_UPSTREAM_MISMATCH`. Manually-placed artifacts in gate-critical paths must not silently pass ownership checks. The operator must either re-run the producing phase (making the artifact `run_produced`) or explicitly add it to the reuse policy (making it `inherited`).
+
+This applies equally to Tier 5 deliverables: a proposal section that was manually written outside the workflow and dropped into `proposal_sections/` is `manually_placed`. It cannot satisfy `artifact_owned_by_run`. The corresponding gate will fail until the operator registers it as `inherited`.
+
+**Provenance and `dir_non_empty` for external integration directories:**
+
+`received/` and `validation/` are `external_integration` artifacts. They cannot carry `run_id` fields. The runner must not attempt to classify them as `manually_placed` simply because `run_id` is absent. Their provenance class is determined by their directory path matching the external integration path pattern, not by field inspection. `dir_non_empty` is the correct and intentional check for these directories; the structural validity check is performed by `interface_contract_conforms`. No reuse policy, freshness bound, or run ownership check applies to external integration artifacts.
+
+---
+
 ## 8. Implementation Sequence
 
 The following sequence minimises blocked work and enables incremental testing. Each step produces something independently testable.
 
 **Step 1 — Artifact schema specification**
-Author the artifact schema document that defines the exact JSON structure each phase output artifact must follow (see §7). Without this, predicate functions cannot be implemented with stable contracts. This is the critical path prerequisite.
+Author the artifact schema document that defines the exact JSON structure each phase output artifact must follow (see §7). The schema must include: all mandatory fields from §7.2; the mandatory `schema_id` and `run_id` top-level fields for all Tier 4 and Tier 5 canonical artifacts; the `status: invalid` sentinel value for artifacts in `blocked_at_exit` state; and the reuse policy file schema from §7.5. Without this, predicate functions cannot be implemented with stable contracts. This is the critical path prerequisite.
 
 **Step 2 — Library file scaffolding**
 Create `gate_rules_library.yaml` with all 12 gate entries and all predicate entries fully populated with `predicate_id`, `type`, `function`, `args`, `fail_message`, and `prose_condition`. Leave implementation of the predicate functions to subsequent steps. The library file is data; it can be authored before any code is written.
@@ -579,13 +743,24 @@ Implement `no_dependency_cycles`. This requires parsing the `dependency_map` fro
 Implement `timeline_within_duration`, `all_milestones_have_criteria`, `wp_count_within_limit`, `critical_path_present`. These are arithmetic checks on parsed Gantt data.
 
 **Step 10 — Runner evaluate_gate function**
-Implement the runner integration described in §6.1. Establish `run_id` at DAG startup (a UUID or timestamp-based identifier, written to a run manifest file at the start of execution). Pass `run_id` into every `evaluate_gate` call. The runner must compute `input_fingerprint` before evaluating each gate, stamp `run_id` and `input_fingerprint` into every GateResult, and reject GateResult artifacts that are missing either field. Wire the runner to load the library, partition predicates by type, evaluate in order, and write GateResult artifacts.
+Implement the runner integration described in §6.1. At DAG startup: establish `run_id` (UUID); verify library `manifest_version` matches the running manifest; write the run manifest file recording `run_id`, `manifest_version`, `library_version`, `constitution_version`; write an empty reuse policy file (the operator may populate it before run begins). Pass `run_id` into every `evaluate_gate` call. The runner must: compute `input_artifact_fingerprints` (per-artifact hashes) and `input_fingerprint` (combined hash) before evaluating each gate; stamp `run_id`, `manifest_version`, `library_version`, `constitution_version`, both fingerprint fields, and `gate_kind` into every GateResult; reject GateResult artifacts that are missing any mandatory field; apply `gate_kind` failure propagation per §6.5 on every gate failure; implement the node state model (`pending`, `running`, `blocked_at_entry`, `blocked_at_exit`, `released`) and write node state to the run manifest alongside each GateResult.
 
 **Step 11 — Semantic predicate dispatch layer**
 Implement the semantic predicate dispatch layer: the runner calls the designated agent or skill with the specified artifact paths, receives a structured result conforming to the semantic predicate result schema, and integrates it into the GateResult. At this point all 12 gates are fully executable.
 
 **Step 12 — Test fixtures**
-Author test fixtures for each gate: one fixture representing a passing state and one representing each category of failure (missing artifact, malformed artifact, coverage gap, cycle, scope conflict). These fixtures allow the predicate functions to be tested in isolation and the runner to be tested end-to-end.
+Author test fixtures for each gate covering all failure dimensions added in this plan. For each gate, the minimum fixture set is:
+
+- **Pass state:** all canonical artifacts present, run_id matching, correct structure, all coverage satisfied.
+- **Missing mandatory input:** canonical artifact absent; verify `failure_category: MISSING_MANDATORY_INPUT` and `blocked_at_entry` or `blocked_at_exit` per gate_kind.
+- **Malformed artifact:** artifact present but empty or missing a required field; verify `failure_category: MALFORMED_ARTIFACT`.
+- **Stale artifact (run_id mismatch):** artifact present with a different `run_id`, not in reuse policy; verify `failure_category: STALE_UPSTREAM_MISMATCH`.
+- **Inherited artifact:** artifact present with a different `run_id`, listed in reuse policy with `status: approved`; verify predicate passes and GateResult records `inherited_artifacts`.
+- **Cross-artifact inconsistency:** two artifacts are out of sync (e.g., a WP in Phase 3 missing from budget); verify `failure_category: CROSS_ARTIFACT_INCONSISTENCY`.
+- **Policy violation:** artifact content violates a rule (e.g., no source refs, ethics omitted); verify `failure_category: POLICY_VIOLATION`.
+- **Version mismatch:** GateResult from prior run with different `manifest_version`; verify `gate_pass_recorded` rejects it.
+- **Entry gate vs. exit gate:** verify that `blocked_at_entry` leaves the output directory unwritten; verify that `blocked_at_exit` preserves the (invalid) canonical artifact.
+- **HARD_BLOCK propagation:** verify that a `gate_09_budget_consistency` failure freezes all Phase 8 node states in `pending` with `HARD_BLOCK_UPSTREAM` reason.
 
 ---
 
