@@ -10,7 +10,11 @@
       "Bash(python /c/Code/proposal_orchestator/.claude/workflows/_append4.py)",
       "Bash(python /c/Code/proposal_orchestator/.claude/workflows/_append5.py)",
       "Bash(python /c/Code/proposal_orchestator/.claude/workflows/_append6.py)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(python -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(python -m pytest --version)",
+      "Bash(python -m pytest tests/runner/predicates/test_file_predicates.py -v)",
+      "Bash(python:*)"
     ]
   }
 }

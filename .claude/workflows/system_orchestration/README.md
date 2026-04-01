@@ -31,7 +31,31 @@ system_orchestration/
 │   ├── phase_06_implementation_architecture.yaml
 │   ├── phase_07_budget_gate.yaml     # Phase 7 semantic correction applied (see below)
 │   └── phase_08_drafting_review.yaml # Contains substeps 08a–08d
-└── manifest.compile.yaml             # Compiled DAG manifest (DAG-runner entry point)
+├── manifest.compile.yaml             # Compiled DAG manifest (DAG-runner entry point)
+├── artifact_schema_specification.yaml  # Field-level schemas for all 13 canonical artifact types
+├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
+└── gate_rules_library_plan.md        # Implementation plan (reference only)
+```
+
+The runner implementation lives at the repository root (not inside this package directory):
+
+```
+runner/                               # DAG-runner implementation package
+├── __init__.py                       # Runner package root / implementation sequence note
+├── paths.py                          # Repository-root discovery and path resolution
+├── versions.py                       # Manifest/library/constitution version constants
+├── gate_result_registry.py           # §6.3 gate result path table (gate_id → tier4-relative path)
+├── upstream_inputs.py                # Gate freshness: gate_id → upstream required input paths
+└── predicates/
+    ├── __init__.py                   # Predicate API exports
+    ├── types.py                      # PredicateResult + failure-category constants
+    ├── file_predicates.py            # Step 3: exists, non_empty, non_empty_json, dir_non_empty
+    └── gate_pass_predicates.py       # Step 4: gate_pass_recorded
+tests/
+├── conftest.py                       # repo_root fixture
+└── runner/predicates/
+    ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
+    └── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
 ```
 
 ---
@@ -70,6 +94,56 @@ The workflow executes as a DAG. All gates are blocking. Gate failure is a valid 
 
 **Directory argument rule:** Directory paths appear in the workflow package only in narrowly defined cases: source admissibility checks, external integration checks, section-collection predicates, and semantic scope arguments. Deterministic validation of structured workflow state operates on canonical artifact JSON files, not directories.
 
+## Runner Implementation Status
+
+The workflow package is now partially executable.
+
+**Completed implementation steps**
+- **Step 1 — Artifact schema specification** completed in `artifact_schema_specification.yaml`
+- **Step 2 — Gate rules library scaffolding** completed in `gate_rules_library.yaml`
+- **Step 3 — File predicates** completed in `runner/predicates/file_predicates.py`
+- **Step 4 — Gate-pass predicate** completed in `runner/predicates/gate_pass_predicates.py`
+
+**Current executable predicate layer**
+The following predicates are implemented and tested:
+
+File predicates (Step 3):
+- `exists(path)`
+- `non_empty(path)`
+- `non_empty_json(path)`
+- `dir_non_empty(path)`
+
+Gate-pass predicate (Step 4):
+- `gate_pass_recorded(gate_id, run_id, tier4_root, *, repo_root=None)`
+
+Supporting modules added in Step 4:
+- `runner/versions.py` — `MANIFEST_VERSION`, `LIBRARY_VERSION`, `CONSTITUTION_VERSION` constants
+- `runner/gate_result_registry.py` — maps gate_id → tier4-relative canonical gate result path (§6.3)
+- `runner/upstream_inputs.py` — maps gate_id → upstream artifact paths for freshness checking
+
+All five failure categories are in use across the implemented predicates:
+- `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
+- `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps
+- `STALE_UPSTREAM_MISMATCH` — run_id mismatch, manifest_version mismatch, freshness violation
+- `POLICY_VIOLATION` — recorded gate status is not "pass"
+- `CROSS_ARTIFACT_INCONSISTENCY` — (reserved for Steps 5–7)
+
+**Current non-goals**
+The repository does **not** yet implement:
+- schema predicates
+- source reference predicates
+- coverage predicates
+- cycle predicates
+- timeline predicates
+- semantic predicate dispatch
+- full `evaluate_gate(...)`
+- GateResult artifact writing
+- run manifest / reuse policy runtime handling
+
+**Test status**
+- Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
+- Step 4 gate-pass predicate: 9 tests in `tests/runner/predicates/test_gate_pass_predicates.py`
+
 ---
 
 ## Phase 7 Semantic Correction (v1.0 → v1.1)
@@ -107,6 +181,8 @@ The monolithic `system_orchestration.yaml` (v1.0) contained a `hold_behavior` ke
 ## Migration Note
 
 The monolithic `.claude/workflows/system_orchestration.yaml` (v1.0) is superseded by this package. It is retained as a historical reference. When operating this system:
+
+The package now also includes an incremental runner implementation under `runner/`; this code is subordinate to the workflow/package contracts and does not replace `manifest.compile.yaml` as the orchestration entry point.
 
 - Use `manifest.compile.yaml` as the DAG-runner entry point.
 - Use the source files in this directory for reading, amending, and auditing.
