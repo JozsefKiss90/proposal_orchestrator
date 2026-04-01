@@ -1,0 +1,102 @@
+id: phase_01_call_analysis
+phase: 1
+name: "Call Analysis"
+purpose: >
+  Parse the selected work programme and call topic to extract evaluation
+  criteria, expected outcomes, expected impacts, scope requirements, eligibility
+  conditions, and evaluation priority weights. Establish the compliance frame
+  for all downstream phases.
+agent: call_analyzer
+skills:
+  - call-requirements-extraction
+  - evaluation-matrix-builder
+  - instrument-schema-normalization
+  - topic-scope-check
+  - gate-enforcement
+depends_on: []
+required_inputs:
+  mandatory:
+    - path: docs/tier3_project_instantiation/call_binding/selected_call.json
+      role: "Call identifier, topic code, instrument type, and work programme area"
+      validation: "Must be non-empty; absence halts workflow at Phase 1 entry"
+    - path: docs/tier2b_topic_and_call_sources/work_programmes/
+      role: "Work programme source documents containing expected outcomes, impacts, and scope"
+      validation: "At least one document matching the selected call area must be present"
+    - path: docs/tier2b_topic_and_call_sources/call_extracts/
+      role: "Call-specific extract or topic text for targeted constraint extraction"
+      validation: "At least one document matching the selected topic code must be present"
+    - path: docs/tier2a_instrument_schemas/application_forms/
+      role: "Application form template for the resolved instrument type"
+      validation: "A template matching the instrument type in selected_call.json must be present"
+    - path: docs/tier2a_instrument_schemas/evaluation_forms/
+      role: "Evaluation form for the resolved instrument type"
+      validation: "A template matching the instrument type in selected_call.json must be present"
+outputs:
+  tier2b_extracted:
+    - path: docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+      content: >
+        Binding call constraints: submission window, eligibility conditions,
+        consortium composition rules, page limits, and any other mandatory
+        requirements. Every constraint must carry a source section reference.
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      content: >
+        Call-specific expected outcomes, faithfully reproduced from the work
+        programme or call extract. Every outcome carries a source section reference.
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      content: >
+        Call-specific expected impacts, faithfully reproduced from the source.
+        Every impact carries a source section reference.
+    - path: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      content: >
+        Thematic and activity scope boundaries for the selected call topic.
+        Every scope boundary carries a source section reference.
+    - path: docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+      content: >
+        Formal eligibility conditions as specified in the call documents.
+        Every condition carries a source section reference.
+    - path: docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+      content: >
+        Evaluation criterion weights, sub-criterion emphasis, or priority signals
+        as specified in the call documents or evaluation form.
+  tier2a_extracted:
+    - path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      content: >
+        Instrument section schema: section identifiers, mandatory fields, page limits,
+        and structural constraints for the resolved instrument type.
+    - path: docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
+      content: >
+        Evaluator scoring logic per section and sub-criterion from the active
+        evaluation form.
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      content: >
+        Evaluation matrix (criteria, sub-criteria, weights, scoring thresholds);
+        compliance checklist (mandatory requirements from call and Tier 1);
+        resolved instrument type with Tier 2A template references;
+        Phase 1 gate status report.
+instructions:
+  - "Read selected_call.json from Tier 3 call_binding to identify the call identifier, topic code, and instrument type."
+  - "Resolve the instrument type to its Tier 2A application form and evaluation form; fail if either is absent."
+  - "Extract all call constraints from Tier 2B work programme and call extract documents; write to extracted/."
+  - "Extract expected outcomes, expected impacts, and scope requirements faithfully; do not paraphrase."
+  - "Carry source section references for every extracted element."
+  - "Build the evaluation matrix from the Tier 2A evaluation form and Tier 2B priority weights."
+  - "Build the compliance checklist covering mandatory call and Tier 1 requirements."
+  - "Write all Tier 4 artifacts before declaring Phase 1 complete."
+  - "Do not proceed to Phase 2 until all six Tier 2B extracted files are non-empty."
+validation:
+  must_confirm:
+    - "Call identifier and topic code are resolved and non-ambiguous"
+    - "Instrument type is identified and an application form exists in Tier 2A"
+    - "An evaluation form exists in Tier 2A for the identified instrument"
+    - "All six Tier 2B extracted files are populated and non-empty"
+    - "Each extracted item carries a source section reference"
+gate_condition:
+  all_of:
+    - "All six Tier 2B extracted JSON files are non-empty with source section references"
+    - "selected_call.json is confirmed populated and consistent with Tier 2B source"
+    - "Instrument type resolved to a Tier 2A application form and evaluation form"
+    - "Evaluation matrix and compliance checklist written to Tier 4 phase output"
+  fail_behavior: >
+    Declare gate failure. Write failure report to phase1_call_analysis/.
+    Do not proceed to Phase 2. Surface to human operator.

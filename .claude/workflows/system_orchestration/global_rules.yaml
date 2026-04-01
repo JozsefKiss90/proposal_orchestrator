@@ -1,0 +1,32 @@
+global_rules:
+  deterministic: true
+  fail_on_missing_required_inputs: true
+  require_tier_traceability: true
+  write_durable_outputs_to_tier4: true
+  forbid_project_fact_fabrication: true
+  forbid_call_constraint_fabrication: true
+  forbid_budget_estimate_invention: true
+  require_budget_gate_before_finalization: true
+  require_constitutional_compliance_check: true
+  evaluation_target: "evaluator-oriented proposal deliverables"
+  authority_model: "constitution-first"
+  workflow_mode: "phase-based, gate-driven"
+  project_assumptions_default: "none unless populated in Tier 3"
+  overwrite_validated_checkpoints: false
+  agent_memory_status: "operational aid only; not constitutional source truth"
+  conflict_resolution: >
+    Conflicts between tiers must be logged in the decision log and surfaced
+    to the human operator. Silent resolution by a lower-priority authority
+    is prohibited.
+  gate_failure_behavior: >
+    Gate failures must be declared explicitly. A declared gate failure is a
+    valid and correct output. Fabricated completion is a constitutional violation.
+  forbidden_patterns:
+    - "Using Grant Agreement Annex templates as proposal structural schemas"
+    - "Inventing call constraints absent from Tier 2B"
+    - "Inventing project facts absent from Tier 3"
+    - "Bypassing the budget gate to finalize budget-dependent content"
+    - "Storing durable decisions only in agent memory"
+    - "Silently reordering phases or weakening gate conditions"
+    - "Finalizing proposal text from incomplete or contradictory source state without flagging"
+    - "Treating CLAUDE.md as advisory or optional"

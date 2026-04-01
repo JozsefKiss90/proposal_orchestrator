@@ -1,0 +1,77 @@
+id: phase_05_impact_architecture
+phase: 5
+name: "Impact Architecture"
+purpose: >
+  Construct the impact narrative: define the pathway from project outputs to
+  expected outcomes to broader impacts, mapped against the call expected impact
+  criteria. Define KPIs, dissemination and exploitation logic, and sustainability
+  mechanisms.
+agent: impact_architect
+skills:
+  - impact-pathway-mapper
+  - dissemination-exploitation-communication-check
+  - proposal-section-traceability-check
+  - gate-enforcement
+depends_on:
+  - phase_02_concept_refinement
+  - phase_03_wp_design_and_dependency_mapping
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      role: "Refined concept and topic mapping for impact grounding"
+      validation: "Phase 2 gate must have passed"
+    - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      role: "WP structure providing the project activities that generate outputs"
+      validation: "Phase 3 gate must have passed"
+    - path: docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+      role: "Project-level intended outcomes"
+      validation: "Must be non-empty"
+    - path: docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      role: "Project-level intended impacts"
+      validation: "Must be non-empty"
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      role: "Call-specified expected outcomes for impact pathway mapping"
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      role: "Call-specified expected impacts for impact pathway mapping"
+    - path: docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+      role: "Criterion weights to inform emphasis and KPI specificity"
+outputs:
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      content: >
+        Full impact architecture: output-to-outcome pathway per project output;
+        outcome-to-impact pathway per outcome; cross-reference of each call
+        expected impact to at least one project output; KPI set (specific,
+        measurable, time-bound, traceable to WPs); dissemination and exploitation
+        plan structure; communication strategy summary; sustainability mechanism;
+        target group definitions; validation status report.
+instructions:
+  - "Define the impact pathway from activities to outputs, outputs to outcomes, outcomes to impacts."
+  - "For every expected impact in Tier 2B, identify at least one project output contributing to it."
+  - "Flag any expected impact with no traceable project output as a gap; do not fabricate coverage."
+  - "For each impact claim, identify the mechanism: which WP, which deliverable, which activity."
+  - "Define KPIs that are specific, measurable, time-bound, and traceable to named WP deliverables."
+  - "Do not use generic programme-level impact language; all claims must be project-specific."
+  - "Define dissemination: what is disseminated, to whom, through which channels, at which point."
+  - "Define exploitation: how project outputs will be used or developed beyond the grant period."
+  - "Define the communication strategy: public-facing activities, target audiences, objectives."
+  - "Define sustainability: how results will persist or be maintained after funding ends."
+  - "Ensure all impact claims are proportionate to the project scale as indicated in Tier 3."
+validation:
+  must_confirm:
+    - "Every call expected impact has at least one mapped project output"
+    - "Every KPI is traceable to a named WP deliverable"
+    - "Dissemination, exploitation, and communication plans are present"
+    - "Sustainability mechanism is defined"
+    - "No impact claim is asserted without a traceable project mechanism"
+gate_condition:
+  all_of:
+    - "All call expected impacts have at least one mapped project output"
+    - "KPI set is defined and traceable to WP deliverables"
+    - "Dissemination and exploitation logic is defined"
+    - "Sustainability mechanism is defined"
+    - "Full impact architecture written to Tier 4"
+  fail_behavior: >
+    Declare gate failure. Write unmapped expected impacts and missing elements
+    to phase5_impact_architecture/. Do not proceed to Phase 8. Surface to
+    human operator.

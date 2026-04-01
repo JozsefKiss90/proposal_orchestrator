@@ -1,0 +1,115 @@
+quality_gates:
+
+  - id: gate_01_source_integrity
+    name: "Source Integrity"
+    description: >
+      All required Tier 2B source documents and Tier 3 call binding data are
+      present and non-empty before the workflow starts. The selected call is
+      resolvable to a work programme area with a source document.
+    evaluated_at: phase_01_call_analysis entry
+    fail_action: "Halt workflow; report missing sources to human operator"
+
+  - id: gate_02_call_alignment
+    name: "Call Alignment"
+    description: >
+      The project concept is demonstrably aligned with the identified call scope,
+      expected outcomes, and expected impacts. Topic mapping is complete and
+      carries source references. No unresolved scope conflict exists.
+    evaluated_at: phase_02_concept_refinement exit
+    fail_action: "Block Phase 3 and Phase 5; report scope conflicts"
+
+  - id: gate_03_concept_coherence
+    name: "Concept Coherence"
+    description: >
+      The concept note and project summary are internally coherent. Objectives
+      are specific and measurable. The project rationale is grounded in Tier 3
+      data and aligned with Tier 2B call framing.
+    evaluated_at: phase_02_concept_refinement exit
+    fail_action: "Block Phase 3; flag incoherence for human review"
+
+  - id: gate_04_wp_coherence
+    name: "Work Package Coherence"
+    description: >
+      All WPs have objectives, tasks, deliverables, responsible leads, and
+      declared dependencies. WP count complies with instrument limits. All
+      assigned partners exist in Tier 3. Dependency map is acyclic.
+    evaluated_at: phase_03_wp_design_and_dependency_mapping exit
+    fail_action: "Block Phase 4, Phase 5, and Phase 6; report structural non-compliances"
+
+  - id: gate_05_dependency_coherence
+    name: "Dependency Coherence"
+    description: >
+      The inter-WP and inter-task dependency map is complete, acyclic, and
+      consistent with the project logic. No critical path dependency is
+      unresolved. The map is written to Tier 4 as a durable artifact.
+    evaluated_at: phase_03_wp_design_and_dependency_mapping exit
+    fail_action: "Block Phase 4; flag dependency cycles for resolution"
+
+  - id: gate_06_schedule_completeness
+    name: "Schedule Completeness"
+    description: >
+      All tasks are assigned to months within project duration. All milestones
+      have verifiable achievement criteria. Timeline is consistent with the
+      dependency map. Critical path fits within project duration.
+    evaluated_at: phase_04_gantt_and_milestones exit
+    fail_action: "Block Phase 6; report scheduling conflicts and duration violations"
+
+  - id: gate_07_impact_specificity
+    name: "Impact Specificity"
+    description: >
+      Every call expected impact has at least one traceable project output.
+      All KPIs are specific, measurable, and traceable to WP deliverables.
+      No generic programme-level impact language is asserted without
+      project-specific grounding.
+    evaluated_at: phase_05_impact_architecture exit
+    fail_action: "Block Phase 8; report unmapped expected impacts"
+
+  - id: gate_08_implementation_consistency
+    name: "Implementation Consistency"
+    description: >
+      Risk register is populated. Ethics self-assessment is explicitly present.
+      Governance and decision-making matrix is defined. All instrument-mandated
+      implementation sections are addressed. All management roles assigned to
+      Tier 3 consortium members.
+    evaluated_at: phase_06_implementation_architecture exit
+    fail_action: "Block Phase 7; report omitted sections and missing assignments"
+
+  - id: gate_09_budget_consistency
+    name: "Budget Consistency"
+    description: >
+      An external budget response is present and validated. Budget WP breakdown
+      is consistent with Phase 3 WP structure. Partner allocations are consistent
+      with Tier 3 consortium roles. No blocking structural inconsistency exists.
+      Absence of required budget artifacts is a gate failure, not a hold state.
+    evaluated_at: phase_07_budget_gate exit
+    mandatory: true
+    bypass_prohibited: true
+    fail_action: "Block Phase 8 finalization entirely; report blocking inconsistencies and required corrections"
+
+  - id: gate_10_part_b_completeness
+    name: "Part B Completeness"
+    description: >
+      All sections required by the active application form are drafted and present.
+      Each section is traceable to named Tier 1-4 sources. No section depends on
+      missing or unvalidated data without explicit flagging.
+    evaluated_at: phase_08b_assembly exit
+    fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+
+  - id: gate_11_review_closure
+    name: "Review Closure"
+    description: >
+      All critical review findings from the evaluator review are resolved or
+      explicitly logged as unresolvable with reason. The revision log is present.
+      The final export is produced.
+    evaluated_at: phase_08d_revision exit
+    fail_action: "Block final export; report unresolved critical findings"
+
+  - id: gate_12_constitutional_compliance
+    name: "Constitutional Compliance"
+    description: >
+      The proposal deliverables do not contain content that violates CLAUDE.md
+      prohibitions: no fabricated project facts, no fabricated call constraints,
+      no budget-dependent content finalised before budget gate, no grant agreement
+      annex schema used as proposal structure.
+    evaluated_at: phase_08d_revision exit
+    fail_action: "Block final export; log constitutional violation; surface to human operator"

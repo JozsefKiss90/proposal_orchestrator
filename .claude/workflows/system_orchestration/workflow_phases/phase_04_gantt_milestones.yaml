@@ -1,0 +1,65 @@
+id: phase_04_gantt_and_milestones
+phase: 4
+name: "Gantt and Milestones"
+purpose: >
+  Produce the project timeline: assign all tasks to months, define milestone
+  events with verifiable achievement criteria, confirm the timeline fits within
+  project duration, and verify the critical path is consistent with the Phase 3
+  dependency map.
+agent: gantt_designer
+skills:
+  - milestone-consistency-check
+  - gate-enforcement
+  - decision-log-update
+depends_on:
+  - phase_03_wp_design_and_dependency_mapping
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      role: "Full WP structure with tasks, deliverables, milestones, and dependency map"
+      validation: "Phase 3 gate must have passed"
+    - path: docs/tier3_project_instantiation/call_binding/selected_call.json
+      role: "Project duration in months as specified in the call"
+      validation: "Duration field must be present and non-null"
+    - path: docs/tier3_project_instantiation/consortium/roles.json
+      role: "Partner roles for milestone responsibility assignment"
+outputs:
+  tier3_updated:
+    - path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+      content: "Populated milestone records: identifiers, due months, verifiable criteria, responsible WP"
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      content: >
+        Gantt structure: all tasks with start month, end month, duration,
+        responsible partner; milestone table with verifiable criteria; critical
+        path summary; timeline compliance confirmation against call-specified
+        project duration; identified scheduling conflicts or critical path risks.
+instructions:
+  - "Assign start and end months to every task from Phase 3."
+  - "Ensure task scheduling respects the dependency map; no task starts before prerequisites complete."
+  - "Ensure all task end months fall within the call-specified project duration."
+  - "Confirm all deliverable due months are consistent with the task schedule."
+  - "Confirm all milestone due months are consistent with task and deliverable schedule."
+  - "Identify the critical path as the longest dependency chain from start to end."
+  - "Flag any milestone whose verifiable criterion is not testable at the stated due month."
+  - "Flag scheduling conflicts where dependencies cannot be satisfied within project duration."
+  - "Do not change project duration to fit an oversized WP structure; flag the violation instead."
+validation:
+  must_confirm:
+    - "Every task from Phase 3 has assigned start and end months"
+    - "All task start months respect upstream dependencies"
+    - "All deliverables have due months consistent with task schedule"
+    - "All milestones have verifiable achievement criteria"
+    - "Timeline fits within call-specified project duration"
+    - "No unresolved critical path dependency"
+gate_condition:
+  all_of:
+    - "All tasks assigned to months within project duration"
+    - "All milestones have verifiable criteria and due months"
+    - "Critical path identified and consistent with dependency map"
+    - "milestones_seed.json populated in Tier 3"
+    - "Gantt structure and milestone table written to Tier 4"
+  fail_behavior: >
+    Declare gate failure. Write scheduling conflicts and duration violations to
+    phase4_gantt_milestones/. Phase 5 may proceed independently if it depends
+    only on Phase 2 outputs. Do not proceed to Phase 6. Surface to human operator.

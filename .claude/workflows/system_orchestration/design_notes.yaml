@@ -1,0 +1,103 @@
+design_notes:
+
+  universal_design_rationale:
+    - >
+      This workflow is intentionally universal and programme-agnostic. It does not
+      embed assumptions about any specific call, instrument, consortium, or project.
+      All specificity enters through Tier 2B population (call specificity) and Tier 3
+      population (project specificity). The same workflow governs proposal preparation
+      across RIA, IA, CSA, MSCA variants, ERC instruments, EIC, COFUND, and future
+      instrument types without structural modification.
+    - >
+      Additional instruments and calls are supported by adding source documents to
+      Tier 2A and Tier 2B respectively. The constitutional phase logic, gate
+      conditions, and agent obligations remain unchanged.
+
+  workflow_as_authoritative_specification:
+    - >
+      This workflow is an authoritative orchestration specification, not an
+      implementation mirror. It defines the intended system including agents and
+      skills that may not yet be fully implemented. Agents and skills defined in
+      this catalog are implementation targets. The workflow governs how the system
+      must behave when implemented.
+    - >
+      When implementing an agent or skill, the implementer must read the relevant
+      catalog entry and produce behavior consistent with the defined role,
+      reads_from, writes_to, and must_not constraints.
+
+  evaluator_orientation:
+    - >
+      The entire system is optimized for evaluation success, not grant administration
+      readiness. Proposal sections are written to address evaluator scoring criteria
+      as defined by the applicable evaluation form (Tier 2A) and call-specific
+      priorities (Tier 2B). Grant agreement annex formatting requirements are not
+      evaluation criteria and must not drive proposal structure.
+    - >
+      Any proposal writing agent that produces content structured for a grant
+      agreement annex rather than an application form section is in violation of
+      this workflow and of CLAUDE.md.
+
+  tier3_as_project_container:
+    - >
+      Project-specific content must not be embedded in this workflow, in agent
+      definitions, or in skill definitions. All project-specific facts live in
+      Tier 3 and are read by agents at runtime. A fresh project begins by populating
+      Tier 3; it does not require changes to this workflow file.
+    - >
+      Tier 3 partial population is a managed state, not an error. When Tier 3 is
+      partially populated, the system operates in a constrained mode and must declare
+      which phases can and cannot proceed given the available data.
+
+  dependency_mapping_formalization:
+    - >
+      Dependency mapping is formalized as a required sub-task of Phase 3, not an
+      ad hoc post-processing step. The dependency map produced in Phase 3 is a
+      required input to Phase 4 (Gantt scheduling) and Phase 6 (implementation
+      narrative). Its absence from Tier 4 at the end of Phase 3 is a gate failure.
+
+  phase_8_substep_rationale:
+    - >
+      Phase 8 is decomposed into four sequential substeps (8a through 8d) because
+      drafting, assembly, review, and revision have distinct agent responsibilities,
+      distinct gate conditions, and distinct output types. Merging them into a single
+      step would obscure the structural requirement that revision actions must be
+      grounded in a formal evaluator review, not applied speculatively.
+
+  budget_gate_design:
+    - >
+      The budget gate is a validation gate, not a computation phase. This repository
+      does not perform budget computation. Phase 7 validates structural consistency
+      between the external budget response and the WP/consortium design.
+    - >
+      SEMANTIC CORRECTION (v1.1): The monolithic file v1.0 distinguished a "budget hold"
+      state (response absent but request prepared) from gate failure (response present
+      but inconsistent). This distinction was removed in v1.1 because it conflicted with
+      CLAUDE.md §8.4, which requires the budget gate to pass before Phase 8 finalization,
+      and §7, which defines the Phase 7 gate condition as requiring a validated budget
+      response. The absence of required budget artifacts in received/ now always compiles
+      to a blocking gate failure. Partial Phase 8 preparation while awaiting an external
+      budget response is not a constitutionally permitted mode of operation: Phase 8
+      finalization requires the budget gate to have passed.
+
+  constitutional_subordination:
+    - >
+      This workflow is subordinate to CLAUDE.md. If any provision of this workflow
+      is found to conflict with CLAUDE.md, CLAUDE.md governs. The conflict must be
+      logged and this workflow must be amended in the next revision cycle to remove
+      the inconsistency. This workflow does not amend or supersede CLAUDE.md by
+      virtue of being more specific or more recently written.
+
+  package_model_rationale:
+    - >
+      This workflow is maintained as a package of concern-separated YAML source files
+      under .claude/workflows/system_orchestration/ rather than as a monolithic file.
+      Each top-level concern (meta, global_rules, tier_bindings, quality_gates,
+      agent_catalog, skill_catalog, state_rules, integration_rules, design_notes,
+      and individual phase files) is maintained independently to support targeted
+      amendment, diff-readable change history, and DAG-runner consumption via the
+      compiled manifest.compile.yaml.
+    - >
+      The compiled manifest is the DAG-runner entry point. It is generated from the
+      source package files and must not be manually edited without regenerating it
+      from the sources. The monolithic system_orchestration.yaml remains as a
+      reference artifact from v1.0 but is superseded by this package as of v1.1.

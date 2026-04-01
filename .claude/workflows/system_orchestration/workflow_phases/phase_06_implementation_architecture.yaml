@@ -1,0 +1,85 @@
+id: phase_06_implementation_architecture
+phase: 6
+name: "Implementation Architecture"
+purpose: >
+  Define the implementation approach: management structure, decision-making,
+  quality assurance, risk management, ethics self-assessment, and all
+  instrument-mandated implementation elements. Translate WP and timeline
+  structure into a coherent implementation narrative.
+agent: implementation_architect
+skills:
+  - governance-model-builder
+  - risk-register-builder
+  - milestone-consistency-check
+  - constitutional-compliance-check
+  - gate-enforcement
+depends_on:
+  - phase_03_wp_design_and_dependency_mapping
+  - phase_04_gantt_and_milestones
+  - phase_05_impact_architecture
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      role: "WP structure for partner-role and management architecture grounding"
+      validation: "Phase 3 gate must have passed"
+    - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      role: "Timeline and milestones for monitoring and quality assurance logic"
+      validation: "Phase 4 gate must have passed"
+    - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      role: "Impact logic for exploitation governance and sustainability design"
+      validation: "Phase 5 gate must have passed"
+    - path: docs/tier3_project_instantiation/consortium/partners.json
+      role: "Partner composition for management structure design"
+      validation: "Must be non-empty"
+    - path: docs/tier3_project_instantiation/consortium/roles.json
+      role: "Partner roles for governance and decision-making matrix"
+      validation: "Must be non-empty"
+    - path: docs/tier3_project_instantiation/consortium/capabilities.json
+      role: "Partner capabilities for credibility of role assignments"
+    - path: docs/tier3_project_instantiation/architecture_inputs/risks.json
+      role: "Identified project risks for risk register population"
+      validation: "Must be non-empty; absence is a gate failure"
+    - path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      role: "Compliance obligations mandated by the instrument"
+    - path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      role: "Instrument-mandated implementation sections (ethics, gender plan, etc.)"
+outputs:
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      content: >
+        Management structure narrative; decision-making and governance matrix;
+        quality assurance and monitoring plan; populated risk register with
+        likelihood, impact, mitigation, and monitoring per risk; ethics
+        self-assessment explicitly stated; gender and diversity plan if
+        instrument-mandated; partner role assignments with capability
+        justifications; implementation narrative coherence summary.
+instructions:
+  - "Design management structure from Tier 3 consortium data; do not redesign the consortium."
+  - "Define a governance body with membership, meeting frequency, and decision scope."
+  - "Define a decision-making matrix: who decides what, under what conditions, with what escalation."
+  - "Define a quality assurance plan: internal review milestones, deliverable review process."
+  - "Populate the risk register from Tier 3 risks.json: assign likelihood, impact, mitigation, and monitoring per risk."
+  - "Identify any material risk not covered in risks.json; add to register and flag for Tier 3 update."
+  - "Perform ethics self-assessment: explicitly state whether the project involves human subjects, personal data, dual-use risks, or other ethics flags. Do not omit."
+  - "If the instrument schema mandates a gender and diversity plan, produce one; do not omit it."
+  - "Ensure all partner role assignments are consistent with Tier 3 consortium data and Phase 3 WP assignments."
+  - "Ensure all management milestones from Phase 4 are reflected in the monitoring plan."
+validation:
+  must_confirm:
+    - "All instrument-mandated implementation sections are addressed"
+    - "Risk register is populated with at least the risks from Tier 3 risks.json"
+    - "Ethics self-assessment is explicitly stated and not omitted"
+    - "Governance and decision-making matrix is defined"
+    - "All management roles assigned to named Tier 3 consortium partners"
+gate_condition:
+  all_of:
+    - "Risk register is populated"
+    - "Ethics self-assessment is explicitly present (not omitted)"
+    - "Governance matrix is defined"
+    - "All management roles assigned to Tier 3 consortium members"
+    - "All instrument-mandated implementation sections addressed per Tier 2A schema"
+    - "Implementation architecture written to Tier 4"
+  fail_behavior: >
+    Declare gate failure. Write omitted sections and missing elements to
+    phase6_implementation_architecture/. Do not proceed to Phase 7. Surface
+    to human operator.

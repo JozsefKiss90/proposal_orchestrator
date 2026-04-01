@@ -1,0 +1,79 @@
+id: phase_02_concept_refinement
+phase: 2
+name: "Concept Refinement"
+purpose: >
+  Align the project concept with confirmed call scope, expected outcomes, and
+  evaluation priorities. Refine concept note vocabulary and framing without
+  altering scientific substance. Produce the topic mapping and compliance
+  profile that govern downstream phases.
+agent: concept_refiner
+skills:
+  - concept-alignment-check
+  - topic-scope-check
+  - proposal-section-traceability-check
+  - decision-log-update
+depends_on:
+  - phase_01_call_analysis
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      role: "Phase 1 outputs: evaluation matrix, compliance checklist, extracted constraints"
+      validation: "Phase 1 gate must have passed"
+    - path: docs/tier3_project_instantiation/project_brief/concept_note.md
+      role: "Source concept for alignment and refinement"
+      validation: "Must be non-empty; absence is a gate failure"
+    - path: docs/tier3_project_instantiation/project_brief/project_summary.json
+      role: "Structured project summary with provisional objectives"
+      validation: "Must be non-empty"
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      role: "Call-specific expected outcomes for alignment check"
+    - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      role: "Call-specific expected impacts for alignment check"
+    - path: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      role: "Topic scope boundaries for concept scope validation"
+  conditional:
+    - path: docs/tier3_project_instantiation/project_brief/strategic_positioning.md
+      condition: "Read if present; populate if absent and concept provides sufficient basis"
+    - path: docs/tier3_project_instantiation/source_materials/
+      condition: "Read all available source materials to ground concept refinement in project evidence"
+outputs:
+  tier3_updated:
+    - path: docs/tier3_project_instantiation/call_binding/topic_mapping.json
+      content: >
+        Mapping from project objectives to call expected outcomes and impacts;
+        each mapping carries source reference from Tier 2B and project evidence
+        source from Tier 3.
+    - path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      content: >
+        Eligibility confirmed, instrument confirmed, scope alignment status,
+        identified compliance gaps requiring attention.
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      content: >
+        Refined concept summary with call alignment evidence; topic mapping
+        rationale; strategic differentiation statement; scope conflicts and
+        their resolution; validation status report.
+instructions:
+  - "Do not invent a new project concept; work from the concept note in Tier 3."
+  - "Read concept note and project summary against Tier 2B extracted constraints."
+  - "Identify vocabulary, framing, and emphasis gaps between concept and call expected outcomes."
+  - "Refine to use call-consistent terminology without altering scientific substance."
+  - "Confirm project objectives address at least one expected outcome per evaluation sub-criterion."
+  - "Produce topic mapping: for each call expected outcome, identify which project objective addresses it."
+  - "Flag any expected outcome the concept does not address; do not fabricate coverage."
+  - "Record all decisions and gap resolutions in the Tier 4 decision log."
+validation:
+  must_confirm:
+    - "Topic mapping complete with at least one objective mapped per mandatory expected outcome"
+    - "Compliance profile populated and flags any unresolved eligibility concerns"
+    - "No unresolved scope conflict between concept and Tier 2B"
+gate_condition:
+  all_of:
+    - "topic_mapping.json is non-empty and all mappings carry source references"
+    - "compliance_profile.json is non-empty"
+    - "No unresolved scope conflicts between concept and Tier 2B"
+    - "Phase 2 summary written to Tier 4"
+  fail_behavior: >
+    Declare gate failure. Log scope conflicts and missing mappings in decision
+    log. Write failure report to phase2_concept_refinement/. Do not proceed
+    to Phase 3. Surface to human operator.

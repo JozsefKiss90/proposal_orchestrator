@@ -1,0 +1,190 @@
+id: phase_08_drafting_and_review
+phase: 8
+name: "Drafting and Review"
+purpose: >
+  Produce evaluator-oriented proposal section drafts for all application form
+  sections; assemble into a coherent whole; conduct evaluator-style review
+  against applicable evaluation criteria; integrate revisions; produce final
+  export. This phase has four sequential substeps.
+depends_on:
+  - phase_01_call_analysis
+  - phase_02_concept_refinement
+  - phase_03_wp_design_and_dependency_mapping
+  - phase_04_gantt_and_milestones
+  - phase_05_impact_architecture
+  - phase_06_implementation_architecture
+  - phase_07_budget_gate
+substeps:
+
+  - id: phase_08a_section_drafting
+    name: "Section Drafting"
+    purpose: >
+      Draft each proposal section required by the active application form,
+      drawing on Tier 3 and Tier 4 phase outputs. Each section must be written
+      in evaluator-oriented language targeting the applicable evaluation criterion.
+    agent: proposal_writer
+    skills:
+      - proposal-section-traceability-check
+      - evaluator-criteria-review
+      - constitutional-compliance-check
+    required_inputs:
+      - path: docs/tier2a_instrument_schemas/application_forms/
+        role: "Active application form template defining sections, fields, and constraints"
+      - path: docs/tier2a_instrument_schemas/evaluation_forms/
+        role: "Active evaluation form defining evaluator scoring logic per section"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+        role: "Evaluation matrix and compliance checklist"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+        role: "Refined concept for Excellence section"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+        role: "WP structure for Implementation section"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+        role: "Timeline and milestones for Implementation section"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+        role: "Impact architecture for Impact section"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+        role: "Governance, risk, and implementation narrative"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+        role: "Budget gate pass confirmation; required before budget-dependent sections are finalized"
+        validation: "Budget gate must have passed; absence is a finalization block"
+    outputs:
+      - path: docs/tier5_deliverables/proposal_sections/
+        content: >
+          Individual section drafts named by section identifier from the active
+          application form. Each section includes a traceability footer identifying
+          the Tier 1-4 sources that ground the section content.
+      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+        content: "Section drafting status log with completion status per section"
+    instructions:
+      - "Identify all sections required by the active application form from Tier 2A."
+      - "Draft each section in the order defined by the application form."
+      - "For each section, read the corresponding evaluation criterion from the evaluation form before writing."
+      - "Write to address the evaluator scoring logic, not grant annex reporting requirements."
+      - "Every factual claim must be traceable to a named Tier 3 source or Tier 4 phase output."
+      - "Do not introduce claims not grounded in Tier 1-4 state."
+      - "Do not reference budget figures not validated through the budget gate."
+      - "Flag any section that cannot be completed due to missing Tier 3 data; do not fill gaps with fabricated content."
+      - "Append a traceability footer to each section identifying the primary source artifacts."
+
+  - id: phase_08b_assembly
+    name: "Assembly"
+    purpose: >
+      Assemble all drafted sections into a structurally coherent draft following
+      the section order prescribed by the active application form. Verify
+      cross-section consistency of terminology, objectives, WP references,
+      partner names, and quantitative claims.
+    agent: proposal_writer
+    skills:
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    depends_on_substep: phase_08a_section_drafting
+    required_inputs:
+      - path: docs/tier5_deliverables/proposal_sections/
+        role: "Individual section drafts from Phase 8a"
+      - path: docs/tier2a_instrument_schemas/application_forms/
+        role: "Section order and assembly requirements"
+    outputs:
+      - path: docs/tier5_deliverables/assembled_drafts/
+        content: >
+          Assembled proposal draft in application form section order;
+          cross-section consistency log identifying terminology inconsistencies,
+          numerical discrepancies, or contradictions across sections.
+    instructions:
+      - "Assemble sections in the order prescribed by the active application form."
+      - "Check that all partner names are consistent across sections."
+      - "Check that all WP references, task names, and deliverable identifiers are consistent."
+      - "Check that all quantitative claims (budget figures, person-months, KPI values) are consistent."
+      - "Check that objectives in Excellence match the objectives driving the WP structure in Implementation."
+      - "Check that impact claims in Impact are grounded in outputs of WPs in Implementation."
+      - "Flag and log any inconsistency; do not silently normalise contradictions."
+
+  - id: phase_08c_evaluator_review
+    name: "Evaluator-Style Review"
+    purpose: >
+      Simulate evaluator assessment of the assembled draft against applicable
+      evaluation criteria and scoring logic. Produce prioritised revision
+      guidance before finalization.
+    agent: evaluator_reviewer
+    skills:
+      - evaluator-criteria-review
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    depends_on_substep: phase_08b_assembly
+    required_inputs:
+      - path: docs/tier5_deliverables/assembled_drafts/
+        role: "Assembled proposal draft"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+        role: "Evaluation matrix and evaluation criteria with weightings"
+      - path: docs/tier2a_instrument_schemas/evaluation_forms/
+        role: "Scoring logic and sub-criterion structure"
+    outputs:
+      - path: docs/tier5_deliverables/review_packets/
+        content: >
+          Evaluator review report: per-criterion assessment; weaknesses
+          categorized by severity (critical/major/minor); cross-cutting issues;
+          prioritised revision action list.
+      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+        content: "Review report summary and revision action list"
+    instructions:
+      - "Review each section against the scoring logic of its applicable evaluation criterion."
+      - "Assess clarity, credibility, coherence, specificity, and compliance."
+      - "Flag: unsupported claims, vague impact language, missing mandatory elements, cross-section inconsistencies."
+      - "Categorise each weakness by severity: critical (likely to prevent passing), major (likely to reduce score significantly), minor (style or completeness)."
+      - "Provide a prioritised revision action list: critical first, then major, then minor."
+      - "Do not revise the draft in this substep; produce the review report only."
+      - "Distinguish Confirmed, Inferred, Assumed, and Unresolved elements in the review."
+
+  - id: phase_08d_revision
+    name: "Revision Cycle"
+    purpose: >
+      Apply revision actions from the evaluator review to the assembled draft.
+      Resolve critical and major weaknesses while preserving structural
+      consistency. Produce the final revised draft for export.
+    agent: revision_integrator
+    skills:
+      - proposal-section-traceability-check
+      - evaluator-criteria-review
+      - constitutional-compliance-check
+      - decision-log-update
+      - checkpoint-publish
+    depends_on_substep: phase_08c_evaluator_review
+    required_inputs:
+      - path: docs/tier5_deliverables/assembled_drafts/
+        role: "Assembled draft to be revised"
+      - path: docs/tier5_deliverables/review_packets/
+        role: "Review report with prioritised revision actions"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+        role: "Budget gate confirmation to prevent budget-contradicting revisions"
+    outputs:
+      - path: docs/tier5_deliverables/assembled_drafts/
+        content: "Revised proposal draft incorporating all critical and major revision actions"
+      - path: docs/tier5_deliverables/final_exports/
+        content: "Final export of the revised proposal ready for submission formatting"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+        content: "Revision log: which actions were applied, how, and any residual minor issues"
+      - path: docs/tier4_orchestration_state/checkpoints/
+        content: "Phase 8 checkpoint confirming workflow completion and final state"
+    instructions:
+      - "Apply critical revision actions first."
+      - "Apply major revision actions second."
+      - "For each revision, ensure the change does not create a new inconsistency with other sections."
+      - "Do not introduce content that contradicts the validated budget or Tier 3 project facts."
+      - "Do not resolve a gap by fabricating content; flag unresolvable gaps in the revision log."
+      - "After critical and major revisions, produce a revision log confirming what was changed."
+      - "Publish the Phase 8 checkpoint to Tier 4 checkpoints/."
+      - "Write the final export to Tier 5 final_exports/."
+
+gate_condition:
+  all_of:
+    - "All sections required by active application form present in proposal_sections/"
+    - "Assembled draft present in assembled_drafts/"
+    - "Review packet present in review_packets/"
+    - "All critical revision actions resolved or explicitly logged as unresolvable with reason"
+    - "Final export present in final_exports/"
+    - "Phase 8 checkpoint published to Tier 4 checkpoints/"
+    - "No section contains content contradicted by a higher tier"
+    - "Budget gate confirmation present and no section contradicts the validated budget"
+  fail_behavior: >
+    Declare gate failure. Write unresolved critical issues and missing sections
+    to phase8_drafting_review/. Do not mark proposal as complete. Surface to
+    human operator.

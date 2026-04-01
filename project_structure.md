@@ -1,13 +1,14 @@
 
-
     Directory: C:\Code\proposal_orchestator
 
 
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-d-----     2026. 03. 31.     15:10                .claude
+d-----     2026. 03. 31.     19:36                .claude
+d--h--     2026. 03. 31.     19:43                .git
 d-----     2026. 03. 31.     15:06                docs
--a----     2026. 03. 31.     15:08              0 project_structure.md
+-a----     2026. 03. 31.     15:28          31581 CLAUDE.md
+-a----     2026. 03. 31.     15:12          21575 project_structure.md
 
 
     Directory: C:\Code\proposal_orchestator\.claude
@@ -21,8 +22,51 @@ d-----     2026. 03. 31.     15:10                cache
 d-----     2026. 03. 31.     15:10                logs
 d-----     2026. 03. 31.     15:10                runs
 d-----     2026. 03. 31.     15:10                skills
-d-----     2026. 03. 31.     15:10                workflows
--a----     2026. 03. 31.     15:10            440 settings.local.json
+d-----     2026. 03. 31.     19:58                workflows
+-a----     2026. 03. 31.     19:36           1008 settings.local.json
+
+
+    Directory: C:\Code\proposal_orchestator\.claude\workflows
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 03. 31.     20:39                system_orchestration
+-a----     2026. 03. 31.     19:36         111086 system_orchestration.yaml
+
+
+    Directory: C:\Code\proposal_orchestator\.claude\workflows\system_orchestration
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 03. 31.     20:21                workflow_phases
+-a----     2026. 03. 31.     20:23          18194 agent_catalog.yaml
+-a----     2026. 03. 31.     20:36           5814 design_notes.yaml
+-a----     2026. 03. 31.     19:59           1625 global_rules.yaml
+-a----     2026. 03. 31.     20:25           4397 integration_rules.yaml
+-a----     2026. 03. 31.     20:38          24007 manifest.compile.yaml
+-a----     2026. 03. 31.     19:58           3948 meta.yaml
+-a----     2026. 03. 31.     20:22           5575 quality_gates.yaml
+-a----     2026. 03. 31.     20:39           6014 README.md
+-a----     2026. 03. 31.     20:24          16561 skill_catalog.yaml
+-a----     2026. 03. 31.     20:25           3339 state_rules.yaml
+-a----     2026. 03. 31.     20:02           6631 tier_bindings.yaml
+
+
+    Directory: C:\Code\proposal_orchestator\.claude\workflows\system_orchestration\workflow_phases
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 03. 31.     20:02           5928 phase_01_call_analysis.yaml
+-a----     2026. 03. 31.     20:03           4315 phase_02_concept_refinement.yaml
+-a----     2026. 03. 31.     20:03           4847 phase_03_wp_design.yaml
+-a----     2026. 03. 31.     20:04           3526 phase_04_gantt_milestones.yaml
+-a----     2026. 03. 31.     20:04           4354 phase_05_impact_architecture.yaml
+-a----     2026. 03. 31.     20:20           4965 phase_06_implementation_architecture.yaml
+-a----     2026. 03. 31.     20:20           6076 phase_07_budget_gate.yaml
+-a----     2026. 03. 31.     20:21          10659 phase_08_drafting_review.yaml
 
 
     Directory: C:\Code\proposal_orchestator\docs

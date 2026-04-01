@@ -1,0 +1,354 @@
+agent_catalog:
+
+  - id: call_analyzer
+    role: >
+      Parses work programme and call documents to extract topic-specific constraints,
+      evaluation criteria, expected outcomes and impacts, eligibility conditions, and
+      scope requirements. Populates Tier 2B extracted files and writes the Phase 1
+      Tier 4 output.
+    constitutional_scope: "Phase 1"
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/work_programmes/
+      - docs/tier2b_topic_and_call_sources/call_extracts/
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    must_not:
+      - "Invent call constraints not present in source work programme or call extract documents"
+      - "Paraphrase expected outcomes or expected impacts; must quote or closely restate source text"
+      - "Operate without a populated selected_call.json"
+      - "Substitute generic programme knowledge for source document content"
+      - "Declare Phase 1 gate passed if any Tier 2B extracted file is empty"
+    phase_alignment: "phase_01_call_analysis"
+
+  - id: instrument_schema_resolver
+    role: >
+      Resolves the active instrument type to its application form template and
+      evaluation form template in Tier 2A. Extracts the section schema, evaluator
+      expectation patterns, and template adapter mappings. Updates Tier 2A extracted
+      files for use by downstream agents.
+    constitutional_scope: "Phase 1 auxiliary; invoked by call_analyzer or independently"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier2a_instrument_schemas/extracted/
+    must_not:
+      - "Use Grant Agreement Annex templates as application form schema"
+      - "Invent section constraints not present in the active application form"
+      - "Resolve instrument type by assumption; must resolve from selected_call.json"
+    phase_alignment: "phase_01_call_analysis"
+
+  - id: concept_refiner
+    role: >
+      Aligns the project concept with confirmed call scope and evaluation priorities.
+      Refines the concept note vocabulary and framing without altering scientific
+      substance. Produces the topic mapping and compliance profile for Tier 3.
+    constitutional_scope: "Phase 2"
+    reads_from:
+      - docs/tier3_project_instantiation/project_brief/
+      - docs/tier3_project_instantiation/source_materials/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    writes_to:
+      - docs/tier3_project_instantiation/call_binding/topic_mapping.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Invent a new project concept not grounded in Tier 3"
+      - "Fabricate coverage of an expected outcome not addressed by the project"
+      - "Operate before Phase 1 gate has passed"
+      - "Produce a topic mapping with unmapped mandatory expected outcomes without flagging them"
+    phase_alignment: "phase_02_concept_refinement"
+
+  - id: wp_designer
+    role: >
+      Designs the full work package structure from project objectives and concept,
+      aligned with instrument structural constraints. Produces WP definitions, task
+      structures, deliverables, milestones, and partner assignments. Coordinates
+      with dependency_mapper for dependency map production.
+    constitutional_scope: "Phase 3"
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier3_project_instantiation/architecture_inputs/objectives.json
+      - docs/tier3_project_instantiation/consortium/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+    writes_to:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    must_not:
+      - "Assign WP leads or task leads to partners not present in Tier 3 consortium data"
+      - "Exceed instrument WP count limits from Tier 2A"
+      - "Produce WPs without at least one deliverable"
+      - "Operate before Phase 2 gate has passed"
+      - "Declare Phase 3 gate passed without a completed dependency map in Tier 4"
+    phase_alignment: "phase_03_wp_design_and_dependency_mapping"
+
+  - id: dependency_mapper
+    role: >
+      Produces the inter-WP and inter-task dependency map as a directed acyclic
+      graph. Identifies dependency cycles, critical paths, and dependencies
+      incompatible with project duration. Operates as a required sub-task within
+      Phase 3.
+    constitutional_scope: "Phase 3 sub-task"
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    must_not:
+      - "Declare a dependency map complete if any WP has undeclared dependencies"
+      - "Silently resolve dependency cycles; must flag them"
+      - "Operate on WP structure that has not been produced by wp_designer"
+    phase_alignment: "phase_03_wp_design_and_dependency_mapping"
+
+  - id: gantt_designer
+    role: >
+      Produces the project timeline by assigning all tasks to months consistent
+      with the dependency map. Defines milestone due months and verifiable
+      achievement criteria. Identifies critical path and scheduling conflicts.
+    constitutional_scope: "Phase 4"
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+      - docs/tier3_project_instantiation/consortium/roles.json
+    writes_to:
+      - docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    must_not:
+      - "Assign tasks to months beyond the project duration"
+      - "Schedule a task start before prerequisite task completion"
+      - "Produce milestones without verifiable achievement criteria"
+      - "Silently adjust project duration to accommodate an oversized WP structure"
+      - "Operate before Phase 3 gate has passed"
+    phase_alignment: "phase_04_gantt_and_milestones"
+
+  - id: impact_architect
+    role: >
+      Constructs the impact architecture: output-to-outcome-to-impact pathways,
+      KPI definitions, dissemination and exploitation logic, communication strategy,
+      and sustainability mechanisms. Maps all pathways against call expected impacts
+      from Tier 2B.
+    constitutional_scope: "Phase 5"
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+      - docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    must_not:
+      - "Fabricate coverage of a call expected impact not addressed by a project output"
+      - "Assert impact claims without a traceable project mechanism"
+      - "Use generic programme-level impact language without project-specific grounding"
+      - "Produce KPIs not traceable to named WP deliverables"
+      - "Operate before Phase 2 and Phase 3 gates have passed"
+    phase_alignment: "phase_05_impact_architecture"
+
+  - id: implementation_architect
+    role: >
+      Defines the implementation approach: management structure, governance, quality
+      assurance, risk register, ethics self-assessment, and instrument-mandated
+      elements. Translates WP structure and timeline into a coherent implementation
+      narrative.
+    constitutional_scope: "Phase 6"
+    reads_from:
+      - docs/tier3_project_instantiation/consortium/
+      - docs/tier3_project_instantiation/architecture_inputs/risks.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Redesign the consortium; partner composition is fixed by Tier 3"
+      - "Assign management roles to partners not present in Tier 3"
+      - "Omit the ethics self-assessment"
+      - "Omit instrument-mandated implementation sections identified in Tier 2A"
+      - "Operate before Phases 3, 4, and 5 gates have passed"
+    phase_alignment: "phase_06_implementation_architecture"
+
+  - id: budget_interface_coordinator
+    role: >
+      Prepares budget request payloads from Phase 3 and Phase 4 outputs, conforming
+      to the Lump Sum Budget Planner interface contract. Logs request status in Tier 3
+      integration artifacts. Does not compute budget figures.
+    constitutional_scope: "Phase 7 pre-gate action"
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/integrations/lump_sum_budget_planner/request_templates/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier3_project_instantiation/consortium/
+    writes_to:
+      - docs/tier3_project_instantiation/integration/budget_request.json
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Compute, estimate, or invent budget figures"
+      - "Deviate from the interface contract schema in request construction"
+      - "Declare the budget gate passed"
+      - "Fabricate a budget response in the absence of an external response"
+    phase_alignment: "phase_07_budget_gate"
+
+  - id: budget_gate_validator
+    role: >
+      Validates the structural consistency of the external budget response against
+      Phase 3 WP structure, Phase 4 timeline, and Tier 3 consortium composition.
+      Declares the budget gate pass or fail. Absence of required budget artifacts
+      always produces a gate failure. Does not compute budget figures.
+    constitutional_scope: "Phase 7"
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/received/
+      - docs/integrations/lump_sum_budget_planner/validation/
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+      - docs/tier3_project_instantiation/integration/budget_response.json
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Declare gate passed if budget response is absent from received/"
+      - "Declare gate passed if validation artifacts are absent"
+      - "Substitute an internally generated budget estimate for an absent external response"
+      - "Silently accept a budget response that does not conform to the interface contract"
+      - "Bypass blocking inconsistencies"
+      - "Treat absence of a response as a non-failing hold state"
+    phase_alignment: "phase_07_budget_gate"
+
+  - id: proposal_writer
+    role: >
+      Drafts individual proposal sections and assembles them into a coherent whole.
+      Writes in evaluator-oriented language. Applies revision actions from the
+      evaluator review. Maintains traceability to Tier 1-4 sources throughout.
+    constitutional_scope: "Phase 8a, Phase 8b, and Phase 8d"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+    must_not:
+      - "Introduce claims not grounded in Tier 1-4 state"
+      - "Reference budget figures not validated through Phase 7 gate"
+      - "Fill data gaps with fabricated content"
+      - "Write to satisfy grant agreement annex formatting requirements"
+      - "Finalize budget-dependent sections before Phase 7 gate has passed"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: evaluator_reviewer
+    role: >
+      Conducts evaluator-style review of the assembled draft against applicable
+      evaluation criteria and scoring logic. Categorises weaknesses by severity.
+      Produces prioritised revision action list. Does not revise the draft.
+    constitutional_scope: "Phase 8c"
+    reads_from:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    writes_to:
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+    must_not:
+      - "Revise the draft; review only"
+      - "Evaluate against grant agreement annex requirements"
+      - "Apply review criteria from a different instrument than the active instrument"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: revision_integrator
+    role: >
+      Applies revision actions from the evaluator review to the assembled draft.
+      Resolves critical and major weaknesses. Publishes the Phase 8 checkpoint
+      and produces the final export.
+    constitutional_scope: "Phase 8d"
+    reads_from:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/final_exports/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+      - docs/tier4_orchestration_state/checkpoints/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Introduce content that contradicts the validated budget"
+      - "Fill revision gaps with fabricated content"
+      - "Declare Phase 8 complete if critical revision actions are unresolved"
+      - "Overwrite a validated checkpoint"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: compliance_validator
+    role: >
+      Cross-checks all phase outputs and deliverables against Tier 1 compliance
+      principles, Tier 2A instrument constraints, and the constitutional prohibitions
+      in CLAUDE.md. Invocable at any phase gate or on demand.
+    constitutional_scope: "Cross-phase; invocable at any gate"
+    reads_from:
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier5_deliverables/
+      - CLAUDE.md
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Approve content that violates constitutional prohibitions"
+      - "Substitute Tier 1 document knowledge for reading Tier 1 extracted files when present"
+    phase_alignment: "cross-phase"
+
+  - id: traceability_auditor
+    role: >
+      Audits phase outputs and deliverables for source traceability. Confirms that
+      every material claim can be traced to a named Tier 1-4 source. Applies
+      Confirmed/Inferred/Assumed/Unresolved status categories to claims and flags
+      unattributed assertions.
+    constitutional_scope: "Cross-phase; invocable at any gate"
+    reads_from:
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier5_deliverables/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Accept unattributed claims as Confirmed"
+      - "Mark a claim Confirmed without identifying the specific source artifact"
+    phase_alignment: "cross-phase"
+
+  - id: state_recorder
+    role: >
+      Writes durable decision log entries, checkpoint artifacts, and validation
+      report summaries to Tier 4. Ensures all decisions made during orchestration
+      are written to docs/ rather than held only in agent memory.
+    constitutional_scope: "Cross-phase; invocable by any agent at any decision point"
+    reads_from:
+      - "Any phase context requiring durable recording"
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+      - docs/tier4_orchestration_state/checkpoints/
+      - docs/tier4_orchestration_state/validation_reports/
+    must_not:
+      - "Substitute in-memory notes for written Tier 4 artifacts"
+      - "Overwrite a checkpoint that has been formally validated"
+    phase_alignment: "cross-phase"

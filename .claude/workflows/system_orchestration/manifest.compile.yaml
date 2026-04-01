@@ -1,0 +1,648 @@
+# ==============================================================
+# COMPILED MANIFEST — system_orchestration v1.1
+# DAG-runner entry point. Generated from package source files.
+# Do not manually edit. To amend, edit source files and recompile.
+# Source package: .claude/workflows/system_orchestration/
+# Constitutional authority: CLAUDE.md (authority_hierarchy_position: 8)
+# ==============================================================
+
+name: system_orchestration
+version: "1.1"
+compiled_from: .claude/workflows/system_orchestration/
+constitutional_authority: CLAUDE.md
+
+# ============================================================
+# EXECUTION MODEL
+# ============================================================
+
+execution_model:
+  type: DAG
+  evaluation_strategy: gate-first
+  fail_mode: blocking
+  gate_semantics: >
+    All gates are blocking. A gate failure halts the downstream subgraph.
+    Fabricated completion is a constitutional violation. Declared failure
+    is a valid and correct output.
+  budget_gate_semantics: >
+    Phase 7 is a mandatory, bypass-prohibited gate. Absent budget artifacts
+    always produce a blocking gate failure. There is no non-failing hold state.
+  phase_ordering: strict
+  allow_phase_skip: false
+  allow_gate_bypass: false
+  rerun_policy: deterministic_from_documented_inputs
+
+# ============================================================
+# NODE REGISTRY
+# Each node = one canonical phase (or substep for Phase 8)
+# ============================================================
+
+node_registry:
+
+  - node_id: n01_call_analysis
+    phase_id: phase_01_call_analysis
+    phase_number: 1
+    name: "Call Analysis"
+    source_file: workflow_phases/phase_01_call_analysis.yaml
+    agent: call_analyzer
+    skills:
+      - call-requirements-extraction
+      - evaluation-matrix-builder
+      - instrument-schema-normalization
+      - topic-scope-check
+      - gate-enforcement
+    entry_gate: gate_01_source_integrity
+    exit_gate: phase_01_gate
+    terminal: false
+
+  - node_id: n02_concept_refinement
+    phase_id: phase_02_concept_refinement
+    phase_number: 2
+    name: "Concept Refinement"
+    source_file: workflow_phases/phase_02_concept_refinement.yaml
+    agent: concept_refiner
+    skills:
+      - concept-alignment-check
+      - topic-scope-check
+      - proposal-section-traceability-check
+      - decision-log-update
+    exit_gate: phase_02_gate
+    terminal: false
+
+  - node_id: n03_wp_design
+    phase_id: phase_03_wp_design_and_dependency_mapping
+    phase_number: 3
+    name: "Work Package Design and Dependency Mapping"
+    source_file: workflow_phases/phase_03_wp_design.yaml
+    agent: wp_designer
+    sub_agent: dependency_mapper
+    skills:
+      - work-package-normalization
+      - wp-dependency-analysis
+      - milestone-consistency-check
+      - instrument-schema-normalization
+      - gate-enforcement
+    exit_gate: phase_03_gate
+    terminal: false
+
+  - node_id: n04_gantt_milestones
+    phase_id: phase_04_gantt_and_milestones
+    phase_number: 4
+    name: "Gantt and Milestones"
+    source_file: workflow_phases/phase_04_gantt_milestones.yaml
+    agent: gantt_designer
+    skills:
+      - milestone-consistency-check
+      - gate-enforcement
+      - decision-log-update
+    exit_gate: phase_04_gate
+    terminal: false
+
+  - node_id: n05_impact_architecture
+    phase_id: phase_05_impact_architecture
+    phase_number: 5
+    name: "Impact Architecture"
+    source_file: workflow_phases/phase_05_impact_architecture.yaml
+    agent: impact_architect
+    skills:
+      - impact-pathway-mapper
+      - dissemination-exploitation-communication-check
+      - proposal-section-traceability-check
+      - gate-enforcement
+    exit_gate: phase_05_gate
+    terminal: false
+
+  - node_id: n06_implementation_architecture
+    phase_id: phase_06_implementation_architecture
+    phase_number: 6
+    name: "Implementation Architecture"
+    source_file: workflow_phases/phase_06_implementation_architecture.yaml
+    agent: implementation_architect
+    skills:
+      - governance-model-builder
+      - risk-register-builder
+      - milestone-consistency-check
+      - constitutional-compliance-check
+      - gate-enforcement
+    exit_gate: phase_06_gate
+    terminal: false
+
+  - node_id: n07_budget_gate
+    phase_id: phase_07_budget_gate
+    phase_number: 7
+    name: "Budget Gate"
+    source_file: workflow_phases/phase_07_budget_gate.yaml
+    agent: budget_gate_validator
+    pre_gate_agent: budget_interface_coordinator
+    skills:
+      - budget-interface-validation
+      - gate-enforcement
+      - decision-log-update
+      - constitutional-compliance-check
+    exit_gate: gate_09_budget_consistency
+    mandatory: true
+    bypass_prohibited: true
+    absent_artifacts_behavior: blocking_gate_failure
+    terminal: false
+
+  - node_id: n08a_section_drafting
+    phase_id: phase_08a_section_drafting
+    phase_number: 8
+    substep: a
+    name: "Section Drafting"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: proposal_writer
+    skills:
+      - proposal-section-traceability-check
+      - evaluator-criteria-review
+      - constitutional-compliance-check
+    exit_gate: gate_10_part_b_completeness
+    terminal: false
+
+  - node_id: n08b_assembly
+    phase_id: phase_08b_assembly
+    phase_number: 8
+    substep: b
+    name: "Assembly"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: proposal_writer
+    skills:
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    exit_gate: gate_10_part_b_completeness
+    terminal: false
+
+  - node_id: n08c_evaluator_review
+    phase_id: phase_08c_evaluator_review
+    phase_number: 8
+    substep: c
+    name: "Evaluator-Style Review"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: evaluator_reviewer
+    skills:
+      - evaluator-criteria-review
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    exit_gate: gate_11_review_closure
+    terminal: false
+
+  - node_id: n08d_revision
+    phase_id: phase_08d_revision
+    phase_number: 8
+    substep: d
+    name: "Revision Cycle"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: revision_integrator
+    skills:
+      - proposal-section-traceability-check
+      - evaluator-criteria-review
+      - constitutional-compliance-check
+      - decision-log-update
+      - checkpoint-publish
+    exit_gate: gate_12_constitutional_compliance
+    terminal: true
+
+# ============================================================
+# EDGE REGISTRY
+# Directed edges defining the DAG execution order.
+# An edge is traversable only when the source node's exit gate has passed.
+# ============================================================
+
+edge_registry:
+
+  - edge_id: e01_to_02
+    from_node: n01_call_analysis
+    to_node: n02_concept_refinement
+    gate_condition: phase_01_gate
+    description: "Phase 1 gate must pass before concept refinement begins"
+
+  - edge_id: e02_to_03
+    from_node: n02_concept_refinement
+    to_node: n03_wp_design
+    gate_condition: phase_02_gate
+    description: "Phase 2 gate must pass before WP design begins"
+
+  - edge_id: e02_to_05
+    from_node: n02_concept_refinement
+    to_node: n05_impact_architecture
+    gate_condition: phase_02_gate
+    description: "Phase 5 may proceed after Phase 2 gate, provided Phase 3 gate also passes"
+    additional_condition: phase_03_gate
+    description_full: "Phase 5 requires both Phase 2 and Phase 3 gates to have passed"
+
+  - edge_id: e03_to_04
+    from_node: n03_wp_design
+    to_node: n04_gantt_milestones
+    gate_condition: phase_03_gate
+    description: "Phase 3 gate must pass before Gantt design begins"
+
+  - edge_id: e03_to_05
+    from_node: n03_wp_design
+    to_node: n05_impact_architecture
+    gate_condition: phase_03_gate
+    description: "Phase 3 gate is a prerequisite for Phase 5"
+
+  - edge_id: e03_to_06
+    from_node: n03_wp_design
+    to_node: n06_implementation_architecture
+    gate_condition: phase_03_gate
+    description: "Phase 3 gate is a prerequisite for Phase 6"
+
+  - edge_id: e04_to_06
+    from_node: n04_gantt_milestones
+    to_node: n06_implementation_architecture
+    gate_condition: phase_04_gate
+    description: "Phase 4 gate must pass before implementation architecture begins"
+
+  - edge_id: e05_to_06
+    from_node: n05_impact_architecture
+    to_node: n06_implementation_architecture
+    gate_condition: phase_05_gate
+    description: "Phase 5 gate must pass before implementation architecture begins"
+
+  - edge_id: e06_to_07
+    from_node: n06_implementation_architecture
+    to_node: n07_budget_gate
+    gate_condition: phase_06_gate
+    description: "Phase 6 gate must pass before budget gate evaluation"
+
+  - edge_id: e07_to_08a
+    from_node: n07_budget_gate
+    to_node: n08a_section_drafting
+    gate_condition: gate_09_budget_consistency
+    mandatory_gate: true
+    bypass_prohibited: true
+    description: "Budget gate must pass (not hold, not partial) before any Phase 8 activity begins"
+
+  - edge_id: e08a_to_08b
+    from_node: n08a_section_drafting
+    to_node: n08b_assembly
+    gate_condition: gate_10_part_b_completeness
+    description: "All sections must be drafted before assembly"
+
+  - edge_id: e08b_to_08c
+    from_node: n08b_assembly
+    to_node: n08c_evaluator_review
+    gate_condition: gate_10_part_b_completeness
+    description: "Assembly must complete before evaluator review"
+
+  - edge_id: e08c_to_08d
+    from_node: n08c_evaluator_review
+    to_node: n08d_revision
+    gate_condition: gate_11_review_closure
+    description: "Review must complete before revision cycle"
+
+# ============================================================
+# GATE REGISTRY
+# All quality gates with their evaluation points and actions.
+# ============================================================
+
+gate_registry:
+
+  - gate_id: gate_01_source_integrity
+    name: "Source Integrity"
+    source_file: quality_gates.yaml
+    evaluated_at: n01_call_analysis entry
+    blocking_nodes:
+      - n01_call_analysis
+    fail_action: "Halt workflow; report missing sources to human operator"
+    bypass_prohibited: false
+
+  - gate_id: phase_01_gate
+    name: "Phase 1 Gate"
+    evaluated_at: n01_call_analysis exit
+    conditions:
+      - "All six Tier 2B extracted JSON files are non-empty with source section references"
+      - "selected_call.json is confirmed populated and consistent with Tier 2B source"
+      - "Instrument type resolved to a Tier 2A application form and evaluation form"
+      - "Evaluation matrix and compliance checklist written to Tier 4 phase output"
+    blocking_edges:
+      - e01_to_02
+    fail_action: "Declare gate failure; write report to phase1_call_analysis/; do not proceed to Phase 2"
+    bypass_prohibited: false
+
+  - gate_id: phase_02_gate
+    name: "Phase 2 Gate"
+    evaluated_at: n02_concept_refinement exit
+    conditions:
+      - "topic_mapping.json is non-empty and all mappings carry source references"
+      - "compliance_profile.json is non-empty"
+      - "No unresolved scope conflicts between concept and Tier 2B"
+      - "Phase 2 summary written to Tier 4"
+    blocking_edges:
+      - e02_to_03
+      - e02_to_05
+    fail_action: "Declare gate failure; write report to phase2_concept_refinement/; do not proceed to Phase 3"
+    bypass_prohibited: false
+
+  - gate_id: phase_03_gate
+    name: "Phase 3 Gate"
+    evaluated_at: n03_wp_design exit
+    conditions:
+      - "Full WP structure written to Tier 4"
+      - "Dependency map written to Tier 4"
+      - "All WPs have at least one deliverable and a responsible lead"
+      - "WP count compliant with Tier 2A instrument constraints"
+      - "No dependency cycles in the dependency map"
+      - "All assigned partners present in Tier 3 consortium data"
+    blocking_edges:
+      - e03_to_04
+      - e03_to_05
+      - e03_to_06
+    fail_action: "Declare gate failure; write gap report to phase3_wp_design/; do not proceed to Phase 4 or Phase 5"
+    bypass_prohibited: false
+
+  - gate_id: phase_04_gate
+    name: "Phase 4 Gate"
+    evaluated_at: n04_gantt_milestones exit
+    conditions:
+      - "All tasks assigned to months within project duration"
+      - "All milestones have verifiable criteria and due months"
+      - "Critical path identified and consistent with dependency map"
+      - "milestones_seed.json populated in Tier 3"
+      - "Gantt structure and milestone table written to Tier 4"
+    blocking_edges:
+      - e04_to_06
+    fail_action: "Declare gate failure; write scheduling conflicts to phase4_gantt_milestones/; do not proceed to Phase 6"
+    bypass_prohibited: false
+
+  - gate_id: phase_05_gate
+    name: "Phase 5 Gate"
+    evaluated_at: n05_impact_architecture exit
+    conditions:
+      - "All call expected impacts have at least one mapped project output"
+      - "KPI set is defined and traceable to WP deliverables"
+      - "Dissemination and exploitation logic is defined"
+      - "Sustainability mechanism is defined"
+      - "Full impact architecture written to Tier 4"
+    blocking_edges:
+      - e05_to_06
+    fail_action: "Declare gate failure; write unmapped impacts to phase5_impact_architecture/; do not proceed to Phase 8"
+    bypass_prohibited: false
+
+  - gate_id: phase_06_gate
+    name: "Phase 6 Gate"
+    evaluated_at: n06_implementation_architecture exit
+    conditions:
+      - "Risk register is populated"
+      - "Ethics self-assessment is explicitly present (not omitted)"
+      - "Governance matrix is defined"
+      - "All management roles assigned to Tier 3 consortium members"
+      - "All instrument-mandated implementation sections addressed per Tier 2A schema"
+      - "Implementation architecture written to Tier 4"
+    blocking_edges:
+      - e06_to_07
+    fail_action: "Declare gate failure; write omitted sections to phase6_implementation_architecture/; do not proceed to Phase 7"
+    bypass_prohibited: false
+
+  - gate_id: gate_09_budget_consistency
+    name: "Budget Consistency (Phase 7 Gate)"
+    evaluated_at: n07_budget_gate exit
+    mandatory: true
+    bypass_prohibited: true
+    absent_artifacts_behavior: blocking_gate_failure
+    conditions:
+      - "Non-empty budget response artifact present in integrations/received/"
+      - "Validation artifact present in integrations/validation/"
+      - "Interface contract conformance confirmed"
+      - "All Phase 3 WPs have corresponding budget entries"
+      - "All consortium partners have corresponding budget allocations"
+      - "No blocking inconsistency logged without resolution"
+      - "Budget gate assessment written to Tier 4"
+    blocking_edges:
+      - e07_to_08a
+    fail_action: >
+      Declare gate failure. Write blocking inconsistencies and missing artifacts to
+      phase7_budget_gate/. Block Phase 8 entirely. Surface to human operator.
+      Absent budget artifacts are not a hold state; they are a gate failure.
+
+  - gate_id: gate_10_part_b_completeness
+    name: "Part B Completeness"
+    evaluated_at: n08b_assembly exit
+    conditions:
+      - "All sections required by active application form present in proposal_sections/"
+      - "Assembled draft present in assembled_drafts/"
+      - "Each section traceable to named Tier 1-4 sources"
+    blocking_edges:
+      - e08b_to_08c
+    fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+    bypass_prohibited: false
+
+  - gate_id: gate_11_review_closure
+    name: "Review Closure"
+    evaluated_at: n08c_evaluator_review exit
+    conditions:
+      - "Review packet present in review_packets/"
+      - "All critical findings categorised by severity"
+      - "Prioritised revision action list produced"
+    blocking_edges:
+      - e08c_to_08d
+    fail_action: "Block revision cycle; report incomplete review"
+    bypass_prohibited: false
+
+  - gate_id: gate_12_constitutional_compliance
+    name: "Constitutional Compliance"
+    evaluated_at: n08d_revision exit
+    conditions:
+      - "All sections required by active application form present"
+      - "Review packet present"
+      - "All critical revision actions resolved or logged as unresolvable with reason"
+      - "Final export present in final_exports/"
+      - "Phase 8 checkpoint published"
+      - "No section contains content contradicted by a higher tier"
+      - "Budget gate confirmation present and no section contradicts the validated budget"
+      - "No constitutional prohibitions from CLAUDE.md Section 13 are violated"
+    blocking_edges: []
+    fail_action: "Block final export; log constitutional violation; surface to human operator"
+    bypass_prohibited: false
+
+# ============================================================
+# ARTIFACT REGISTRY
+# All durable artifacts written by phase nodes, keyed by path.
+# Includes tier, producing phase, and consuming phases.
+# ============================================================
+
+artifact_registry:
+
+  # Tier 2B extracted artifacts (Phase 1)
+  - artifact_id: a_t2b_call_constraints
+    path: docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement, n03_wp_design]
+
+  - artifact_id: a_t2b_expected_outcomes
+    path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement, n05_impact_architecture]
+
+  - artifact_id: a_t2b_expected_impacts
+    path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement, n05_impact_architecture]
+
+  - artifact_id: a_t2b_scope_requirements
+    path: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement]
+
+  - artifact_id: a_t2b_eligibility_conditions
+    path: docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement, n06_implementation_architecture]
+
+  - artifact_id: a_t2b_evaluation_priority_weights
+    path: docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+    tier: tier2b_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n05_impact_architecture]
+
+  # Tier 2A extracted artifacts (Phase 1)
+  - artifact_id: a_t2a_section_schema_registry
+    path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    tier: tier2a_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n03_wp_design, n06_implementation_architecture, n08a_section_drafting]
+
+  - artifact_id: a_t2a_evaluator_expectation_registry
+    path: docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
+    tier: tier2a_extracted
+    produced_by: n01_call_analysis
+    consumed_by: [n08a_section_drafting, n08c_evaluator_review]
+
+  # Tier 4 phase output artifacts
+  - artifact_id: a_t4_phase1
+    path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    tier: tier4_phase_output
+    produced_by: n01_call_analysis
+    consumed_by: [n02_concept_refinement, n08a_section_drafting, n08c_evaluator_review]
+    gate_dependency: phase_01_gate
+
+  - artifact_id: a_t4_phase2
+    path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+    tier: tier4_phase_output
+    produced_by: n02_concept_refinement
+    consumed_by: [n03_wp_design, n05_impact_architecture, n08a_section_drafting]
+    gate_dependency: phase_02_gate
+
+  - artifact_id: a_t4_phase3
+    path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    tier: tier4_phase_output
+    produced_by: n03_wp_design
+    consumed_by: [n04_gantt_milestones, n05_impact_architecture, n06_implementation_architecture, n07_budget_gate, n08a_section_drafting]
+    gate_dependency: phase_03_gate
+
+  - artifact_id: a_t4_phase4
+    path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    tier: tier4_phase_output
+    produced_by: n04_gantt_milestones
+    consumed_by: [n06_implementation_architecture, n07_budget_gate, n08a_section_drafting]
+    gate_dependency: phase_04_gate
+
+  - artifact_id: a_t4_phase5
+    path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    tier: tier4_phase_output
+    produced_by: n05_impact_architecture
+    consumed_by: [n06_implementation_architecture, n08a_section_drafting]
+    gate_dependency: phase_05_gate
+
+  - artifact_id: a_t4_phase6
+    path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    tier: tier4_phase_output
+    produced_by: n06_implementation_architecture
+    consumed_by: [n07_budget_gate, n08a_section_drafting]
+    gate_dependency: phase_06_gate
+
+  - artifact_id: a_t4_phase7
+    path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    tier: tier4_phase_output
+    produced_by: n07_budget_gate
+    consumed_by: [n08a_section_drafting, n08d_revision]
+    gate_dependency: gate_09_budget_consistency
+    mandatory: true
+    bypass_prohibited: true
+
+  - artifact_id: a_t4_phase8
+    path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+    tier: tier4_phase_output
+    produced_by: [n08a_section_drafting, n08b_assembly, n08c_evaluator_review, n08d_revision]
+    consumed_by: []
+
+  # Tier 3 artifacts updated during workflow
+  - artifact_id: a_t3_topic_mapping
+    path: docs/tier3_project_instantiation/call_binding/topic_mapping.json
+    tier: tier3_updated
+    produced_by: n02_concept_refinement
+    consumed_by: [n03_wp_design, n05_impact_architecture]
+
+  - artifact_id: a_t3_compliance_profile
+    path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+    tier: tier3_updated
+    produced_by: n02_concept_refinement
+    consumed_by: [n06_implementation_architecture]
+
+  - artifact_id: a_t3_milestones_seed
+    path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+    tier: tier3_updated
+    produced_by: n04_gantt_milestones
+    consumed_by: []
+
+  - artifact_id: a_t3_budget_request
+    path: docs/tier3_project_instantiation/integration/budget_request.json
+    tier: tier3_integration
+    produced_by: n07_budget_gate
+    consumed_by: []
+    note: "Produced by budget_interface_coordinator pre-gate action; not a gate condition"
+
+  # Integration artifacts
+  - artifact_id: a_int_budget_received
+    path: docs/integrations/lump_sum_budget_planner/received/
+    tier: integration_inbound
+    produced_by: external_system
+    consumed_by: [n07_budget_gate]
+    required_for_gate: gate_09_budget_consistency
+    absent_behavior: blocking_gate_failure
+
+  - artifact_id: a_int_budget_validation
+    path: docs/integrations/lump_sum_budget_planner/validation/
+    tier: integration_validation
+    produced_by: n07_budget_gate
+    consumed_by: [n07_budget_gate]
+    required_for_gate: gate_09_budget_consistency
+
+  # Tier 5 deliverable artifacts
+  - artifact_id: a_t5_proposal_sections
+    path: docs/tier5_deliverables/proposal_sections/
+    tier: tier5_deliverable
+    produced_by: n08a_section_drafting
+    consumed_by: [n08b_assembly]
+
+  - artifact_id: a_t5_assembled_drafts
+    path: docs/tier5_deliverables/assembled_drafts/
+    tier: tier5_deliverable
+    produced_by: [n08b_assembly, n08d_revision]
+    consumed_by: [n08c_evaluator_review, n08d_revision]
+
+  - artifact_id: a_t5_review_packets
+    path: docs/tier5_deliverables/review_packets/
+    tier: tier5_deliverable
+    produced_by: n08c_evaluator_review
+    consumed_by: [n08d_revision]
+
+  - artifact_id: a_t5_final_exports
+    path: docs/tier5_deliverables/final_exports/
+    tier: tier5_deliverable
+    produced_by: n08d_revision
+    consumed_by: []
+    terminal: true
+
+  # Checkpoint artifacts
+  - artifact_id: a_t4_checkpoint_phase8
+    path: docs/tier4_orchestration_state/checkpoints/
+    tier: tier4_checkpoint
+    produced_by: n08d_revision
+    consumed_by: []
+    immutable_after_creation: true
