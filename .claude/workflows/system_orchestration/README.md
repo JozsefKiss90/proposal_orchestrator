@@ -66,7 +66,7 @@ The workflow executes as a DAG. All gates are blocking. Gate failure is a valid 
 | 8c — Evaluator Review | n08c | evaluator_reviewer | gate_11_review_closure |
 | 8d — Revision | n08d | revision_integrator | gate_12_constitutional_compliance |
 
-**Parallel paths:** Phases 3 and 5 can proceed concurrently after Phase 2. Phase 4 and Phase 5 can proceed concurrently after Phase 3. Phase 6 requires Phases 3, 4, and 5.
+**Parallel paths:** Phase 4 and Phase 5 can proceed concurrently after Phase 3. Phase 6 requires Phases 3, 4, and 5. Phase 5 requires both Phase 2 and Phase 3 gates to have passed (edges e02_to_05 + e03_to_05 with additional_condition: phase_03_gate); it is not independently parallel after Phase 2.
 
 ---
 
