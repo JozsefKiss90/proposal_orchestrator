@@ -50,12 +50,16 @@ runner/                               # DAG-runner implementation package
     ├── __init__.py                   # Predicate API exports
     ├── types.py                      # PredicateResult + failure-category constants
     ├── file_predicates.py            # Step 3: exists, non_empty, non_empty_json, dir_non_empty
-    └── gate_pass_predicates.py       # Step 4: gate_pass_recorded
+    ├── gate_pass_predicates.py       # Step 4: gate_pass_recorded
+    ├── schema_predicates.py          # Step 5: §4.2 schema predicates + §4.8 canonical field predicates
+    └── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
 tests/
 ├── conftest.py                       # repo_root fixture
 └── runner/predicates/
     ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
-    └── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
+    ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
+    ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
+    └── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
 ```
 
 ---
@@ -103,6 +107,8 @@ The workflow package is now partially executable.
 - **Step 2 — Gate rules library scaffolding** completed in `gate_rules_library.yaml`
 - **Step 3 — File predicates** completed in `runner/predicates/file_predicates.py`
 - **Step 4 — Gate-pass predicate** completed in `runner/predicates/gate_pass_predicates.py`
+- **Step 5 — Schema predicates** completed in `runner/predicates/schema_predicates.py`
+- **Step 6 — Source reference predicates** completed in `runner/predicates/source_ref_predicates.py`
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -121,21 +127,40 @@ Supporting modules added in Step 4:
 - `runner/gate_result_registry.py` — maps gate_id → tier4-relative canonical gate result path (§6.3)
 - `runner/upstream_inputs.py` — maps gate_id → upstream artifact paths for freshness checking
 
+Schema predicates — §4.2 (Step 5):
+- `json_field_present(path, field)`
+- `json_fields_present(path, fields)`
+- `instrument_type_matches_schema(call_path, schema_path)`
+- `interface_contract_conforms(response_path, contract_path)`
+
+Canonical field predicates — §4.8 (Step 5):
+- `risk_register_populated(path)`
+- `ethics_assessment_explicit(path)`
+- `governance_matrix_present(path)`
+- `no_blocking_inconsistencies(path)`
+- `budget_gate_confirmation_present(path)`
+- `findings_categorised_by_severity(path)`
+- `revision_action_list_present(path)`
+- `all_critical_revisions_resolved(path)`
+- `checkpoint_published(path)`
+
+Source reference predicates — §4.3 (Step 6):
+- `source_refs_present(path)`
+- `all_mappings_have_source_refs(path)`
+
 All five failure categories are in use across the implemented predicates:
 - `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
-- `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps
+- `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps, null required values, unsupported container type, non-dict array element
 - `STALE_UPSTREAM_MISMATCH` — run_id mismatch, manifest_version mismatch, freshness violation
-- `POLICY_VIOLATION` — recorded gate status is not "pass"
-- `CROSS_ARTIFACT_INCONSISTENCY` — (reserved for Steps 5–7)
+- `POLICY_VIOLATION` — gate status not "pass", sentinel ethics value, unresolved inconsistencies, invalid severity enum, budget gate not passed, unresolved critical revisions without reason, checkpoint not published, missing/blank source references
+- `CROSS_ARTIFACT_INCONSISTENCY` — (reserved for Steps 7–8)
 
 **Current non-goals**
 The repository does **not** yet implement:
-- schema predicates
-- source reference predicates
-- coverage predicates
-- cycle predicates
-- timeline predicates
-- semantic predicate dispatch
+- coverage predicates (Step 7)
+- cycle predicates (Step 8)
+- timeline predicates (Step 9)
+- semantic predicate dispatch (Step 10)
 - full `evaluate_gate(...)`
 - GateResult artifact writing
 - run manifest / reuse policy runtime handling
@@ -143,6 +168,8 @@ The repository does **not** yet implement:
 **Test status**
 - Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
 - Step 4 gate-pass predicate: 9 tests in `tests/runner/predicates/test_gate_pass_predicates.py`
+- Step 5 schema predicates: 65 tests in `tests/runner/predicates/test_schema_predicates.py`
+- Step 6 source reference predicates: 28 tests in `tests/runner/predicates/test_source_ref_predicates.py`
 
 ---
 
