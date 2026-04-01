@@ -246,7 +246,7 @@ The following rules govern budget data handling throughout the system and are no
 
 **8.3** No agent may invent, substitute, approximate, or silently generate budget figures. If a budget response has not been received and validated, any proposal content that depends on budget-confirmed effort allocations, resource claims, or cost justifications must be flagged as incomplete and must not be finalized.
 
-**8.4** The budget gate (Phase 7) must pass before Phase 8 reaches completion. Partial drafting may proceed before the budget gate in preparation, but no proposal section that references specific budget figures, effort allocations, or resource commitments may be marked as final before the gate passes.
+**8.4** The budget gate (Phase 7) must pass before any Phase 8 activity begins. Phase 8 is fully blocked — including preparatory drafting — until the budget gate passes. Absent budget artifacts in `docs/integrations/lump_sum_budget_planner/received/` constitute a blocking gate failure, not a hold state. No Phase 8 substep (drafting, assembly, evaluator review, or revision) may commence before gate_09 confirms that a validated budget response is present and structurally consistent with the work package and consortium design.
 
 **8.5** The interface contract at `docs/integrations/lump_sum_budget_planner/interface_contract.json` defines the schema and exchange protocol for budget requests and responses. All requests must conform to the interface contract. Responses that do not conform to the interface contract must be rejected and flagged, not silently accepted.
 
@@ -326,7 +326,7 @@ The following actions are constitutionally prohibited. Any agent, skill, workflo
 
 **13.3** Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3.
 
-**13.4** Bypassing the budget gate (Phase 7) to finalize proposal content that depends on budget-confirmed resource or effort claims.
+**13.4** Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed. Absent budget artifacts are a blocking gate failure. No Phase 8 substep may begin until gate_09 is satisfied. This prohibition covers all modes of Phase 8 execution without exception.
 
 **13.5** Storing durable decisions only in agent memory without writing them to Tier 4.
 
