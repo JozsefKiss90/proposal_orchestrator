@@ -1,0 +1,1402 @@
+# Gate Rules Library
+# Horizon Europe Proposal Orchestration System
+#
+# Approach A side-car rules library — maps each gate_id to executable predicates.
+# The manifest (manifest.compile.yaml) is not modified by this file.
+# The runner loads this library at evaluation time and resolves predicates
+# against the live repository state.
+#
+# See gate_rules_library_plan.md for the full specification.
+# See artifact_schema_specification.yaml for field-level artifact schemas.
+#
+# ${run_id} in args fields is a runtime parameter injected by the runner at
+# evaluate_gate call time. It is not a static value. The runner must substitute
+# the current run's UUID before passing args to any predicate function.
+#
+# Predicate evaluation order within each gate (mandatory per §3 of plan):
+#   1. file  2. gate_pass  3. schema  4. source_ref  5. coverage
+#   6. cycle  7. timeline  8. semantic
+# Semantic predicates are only invoked if all deterministic predicates pass.
+
+library_version: "1.0"
+manifest_version: "1.1"
+constitution_version: "21430b0"
+source_package: ".claude/workflows/system_orchestration/"
+
+gate_rules:
+
+  # ===========================================================================
+  # GATE 01 — gate_01_source_integrity
+  # Kind: entry  |  Node: n01  |  Phase: 1 — Call Analysis
+  # Evaluated before Phase 1 begins execution.
+  # Checks that all source documents and call binding data are present before
+  # the call_analyzer agent is invoked.
+  # ===========================================================================
+  - gate_id: gate_01_source_integrity
+    gate_kind: entry
+    evaluated_at: "n01 entry"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      - predicate_id: g01_p01
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier3_project_instantiation/call_binding/selected_call.json"
+        fail_message: >
+          selected_call.json is absent or empty. The target call cannot be
+          identified. Populate docs/tier3_project_instantiation/call_binding/selected_call.json
+          before starting Phase 1.
+        prose_condition: "selected_call.json must be present and non-empty"
+
+      - predicate_id: g01_p02
+        type: schema
+        function: json_fields_present
+        args:
+          path: "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          fields:
+            - call_id
+            - topic_code
+            - instrument_type
+            - work_programme_area
+        fail_message: >
+          selected_call.json is missing one or more required fields: call_id,
+          topic_code, instrument_type, work_programme_area. All four fields must
+          be non-null before Phase 1 can begin.
+        prose_condition: "Call identifier, topic code, and instrument type must be present"
+
+      - predicate_id: g01_p03
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/tier2b_topic_and_call_sources/work_programmes/"
+        fail_message: >
+          No work programme documents found in
+          docs/tier2b_topic_and_call_sources/work_programmes/. At least one
+          source work programme document must be present for Phase 1 call
+          analysis to proceed.
+        prose_condition: "At least one work programme document must be present"
+
+      - predicate_id: g01_p04
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/tier2b_topic_and_call_sources/call_extracts/"
+        fail_message: >
+          No call extract documents found in
+          docs/tier2b_topic_and_call_sources/call_extracts/. A call extract
+          matching the selected topic code must be present before Phase 1
+          can begin.
+        prose_condition: "At least one call extract matching the topic code must be present"
+
+      - predicate_id: g01_p05
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/tier2a_instrument_schemas/application_forms/"
+        fail_message: >
+          No application form templates found in
+          docs/tier2a_instrument_schemas/application_forms/. An application
+          form template for the resolved instrument type must be present.
+        prose_condition: "An application form template for the resolved instrument type must be present"
+
+      - predicate_id: g01_p06
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/tier2a_instrument_schemas/evaluation_forms/"
+        fail_message: >
+          No evaluation form templates found in
+          docs/tier2a_instrument_schemas/evaluation_forms/. An evaluation
+          form for the resolved instrument type must be present.
+        prose_condition: "An evaluation form for the resolved instrument type must be present"
+
+
+  # ===========================================================================
+  # GATE 02 — phase_01_gate
+  # Kind: exit  |  Node: n01  |  Phase: 1 — Call Analysis
+  # Evaluated after Phase 1 completes.
+  # Confirms all six Tier 2B extracted files are populated, have source refs,
+  # the instrument type resolves to a schema, and the phase output is written.
+  # ===========================================================================
+  - gate_id: phase_01_gate
+    gate_kind: exit
+    evaluated_at: "n01 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- file predicates (Tier 2B extracted files) ---
+      - predicate_id: g02_p01
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"
+        fail_message: >
+          call_constraints.json is absent or empty in Tier 2B extracted/.
+          Phase 1 must populate all six extracted files from the source work
+          programme documents.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+        fail_message: >
+          expected_outcomes.json is absent or empty in Tier 2B extracted/.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p03
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+        fail_message: >
+          expected_impacts.json is absent or empty in Tier 2B extracted/.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p04
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+        fail_message: >
+          scope_requirements.json is absent or empty in Tier 2B extracted/.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p05
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json"
+        fail_message: >
+          eligibility_conditions.json is absent or empty in Tier 2B extracted/.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p06
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json"
+        fail_message: >
+          evaluation_priority_weights.json is absent or empty in Tier 2B extracted/.
+        prose_condition: "All six Tier 2B extracted JSON files are non-empty"
+
+      - predicate_id: g02_p14
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          section_schema_registry.json is absent or empty. The Tier 2A
+          section schema registry must be populated for instrument type
+          resolution to succeed.
+        prose_condition: "Instrument type resolved to a Tier 2A application form and evaluation form"
+
+      - predicate_id: g02_p15
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
+        fail_message: >
+          evaluator_expectation_registry.json is absent or empty. The Tier 2A
+          evaluator expectation registry must be populated for Phase 1 to
+          complete.
+        prose_condition: "Instrument type resolved to a Tier 2A evaluation form"
+
+      - predicate_id: g02_p16
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+        fail_message: >
+          call_analysis_summary.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/.
+          Phase 1 must write its canonical output before this gate can pass.
+        prose_condition: "Evaluation matrix and compliance checklist written to Tier 4 phase output"
+
+      - predicate_id: g02_p17
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+          run_id: "${run_id}"
+        fail_message: >
+          call_analysis_summary.json exists but its run_id field does not match
+          the current run. This is a stale artifact from a prior run. Re-run
+          Phase 1 under the current run, or add the artifact to the reuse policy.
+        prose_condition: "Evaluation matrix and compliance checklist written to Tier 4 phase output"
+
+      # --- schema predicates ---
+      - predicate_id: g02_p13
+        type: schema
+        function: instrument_type_matches_schema
+        args:
+          call_path: "docs/tier3_project_instantiation/call_binding/selected_call.json"
+          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          The instrument_type in selected_call.json does not match any entry
+          in section_schema_registry.json. Verify the instrument_type value
+          and ensure the schema registry is populated for that instrument.
+        prose_condition: "Instrument type resolved to a Tier 2A application form and evaluation form"
+
+      # --- source_ref predicates ---
+      - predicate_id: g02_p07
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"
+        fail_message: >
+          call_constraints.json contains items without source_section or
+          source_document fields. Every extracted constraint must be traceable
+          to a named section in the source work programme document.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+      - predicate_id: g02_p08
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+        fail_message: >
+          expected_outcomes.json contains items without source_section or
+          source_document fields.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+      - predicate_id: g02_p09
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+        fail_message: >
+          expected_impacts.json contains items without source_section or
+          source_document fields.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+      - predicate_id: g02_p10
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+        fail_message: >
+          scope_requirements.json contains items without source_section or
+          source_document fields.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+      - predicate_id: g02_p11
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json"
+        fail_message: >
+          eligibility_conditions.json contains items without source_section or
+          source_document fields.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+      - predicate_id: g02_p12
+        type: source_ref
+        function: source_refs_present
+        args:
+          path: "docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json"
+        fail_message: >
+          evaluation_priority_weights.json contains items without source_section
+          or source_document fields.
+        prose_condition: "All six Tier 2B extracted JSON files have source section references"
+
+
+  # ===========================================================================
+  # GATE 03 — phase_02_gate
+  # Kind: exit  |  Node: n02  |  Phase: 2 — Concept Refinement
+  # Evaluated after Phase 2 completes.
+  # Confirms Phase 1 passed, topic mapping is present with source refs,
+  # compliance profile is written, phase output is owned by the current run,
+  # and no unresolved scope conflicts remain.
+  # ===========================================================================
+  - gate_id: phase_02_gate
+    gate_kind: exit
+    evaluated_at: "n02 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g03_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_01_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_01_gate has not passed for the current run. Phase 2 cannot
+          complete until Phase 1 has passed its exit gate. Re-run Phase 1
+          or verify the gate result artifact at
+          docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json.
+        prose_condition: "Phase 1 gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g03_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier3_project_instantiation/call_binding/topic_mapping.json"
+        fail_message: >
+          topic_mapping.json is absent or empty. Phase 2 must produce and
+          write a topic mapping before this gate can pass.
+        prose_condition: "topic_mapping.json is non-empty"
+
+      - predicate_id: g03_p04
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+        fail_message: >
+          compliance_profile.json is absent or empty. Phase 2 must populate
+          the compliance profile in Tier 3 call_binding/ before this gate
+          can pass.
+        prose_condition: "compliance_profile.json is non-empty"
+
+      - predicate_id: g03_p05
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+        fail_message: >
+          concept_refinement_summary.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/.
+          Phase 2 must write its canonical output before this gate can pass.
+        prose_condition: "Phase 2 summary written to Tier 4"
+
+      - predicate_id: g03_p07
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+          run_id: "${run_id}"
+        fail_message: >
+          concept_refinement_summary.json exists but its run_id does not
+          match the current run. Re-run Phase 2 or add this artifact to the
+          reuse policy.
+        prose_condition: "Phase 2 summary written to Tier 4"
+
+      # --- source_ref predicates ---
+      - predicate_id: g03_p03
+        type: source_ref
+        function: all_mappings_have_source_refs
+        args:
+          path: "docs/tier3_project_instantiation/call_binding/topic_mapping.json"
+        fail_message: >
+          topic_mapping.json contains mapping entries that are missing
+          tier2b_source_ref or tier3_evidence_ref fields. Every mapping
+          must carry both a Tier 2B source reference and a Tier 3 project
+          evidence reference.
+        prose_condition: "All mappings carry source references"
+
+      # --- semantic predicates ---
+      - predicate_id: g03_p06
+        type: semantic
+        function: no_unresolved_scope_conflicts
+        args:
+          phase2_path: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+          scope_path: "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+        fail_message: >
+          Unresolved scope conflicts remain between the Phase 2 refined concept
+          and Tier 2B scope requirements. All scope conflicts must be resolved
+          or logged as explicitly unresolvable before Phase 3 can proceed.
+        prose_condition: "No unresolved scope conflicts between concept and Tier 2B"
+
+
+  # ===========================================================================
+  # GATE 04 — phase_03_gate
+  # Kind: exit  |  Node: n03  |  Phase: 3 — WP Design and Dependency Mapping
+  # Evaluated after Phase 3 completes.
+  # Confirms Phase 2 passed, WP structure is written and owned by current run,
+  # dependency map is present, all WPs have deliverables and leads, WP count
+  # is within instrument limit, dependency graph is acyclic, and all assigned
+  # partners exist in Tier 3.
+  # ===========================================================================
+  - gate_id: phase_03_gate
+    gate_kind: exit
+    evaluated_at: "n03 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g04_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_02_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_02_gate has not passed for the current run. Phase 3 cannot
+          complete until Phase 2 has passed its exit gate.
+        prose_condition: "Phase 2 gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g04_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        fail_message: >
+          wp_structure.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/.
+          Phase 3 must write its canonical WP structure artifact before this
+          gate can pass.
+        prose_condition: "Full WP structure written to Tier 4"
+
+      - predicate_id: g04_p02b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          run_id: "${run_id}"
+        fail_message: >
+          wp_structure.json exists but its run_id does not match the current
+          run. Re-run Phase 3 or add this artifact to the reuse policy.
+        prose_condition: "Full WP structure written to Tier 4"
+
+      # --- schema predicates ---
+      - predicate_id: g04_p03
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          field: "dependency_map"
+        fail_message: >
+          wp_structure.json is missing the dependency_map field. The dependency
+          map is a mandatory output of Phase 3 and is required as input to
+          Phases 4 and 6.
+        prose_condition: "Dependency map written to Tier 4"
+
+      # --- coverage predicates ---
+      - predicate_id: g04_p04
+        type: coverage
+        function: all_wps_have_deliverable_and_lead
+        args:
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        fail_message: >
+          One or more work packages in wp_structure.json are missing a
+          deliverable or a responsible lead partner. Every WP must have at
+          least one deliverable and a non-null lead_partner field.
+        prose_condition: "All WPs have at least one deliverable and a responsible lead"
+
+      - predicate_id: g04_p07
+        type: coverage
+        function: all_partners_in_tier3
+        args:
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          partners_path: "docs/tier3_project_instantiation/consortium/partners.json"
+        fail_message: >
+          One or more partners assigned as lead or contributor in wp_structure.json
+          do not exist in docs/tier3_project_instantiation/consortium/partners.json.
+          All WP-assigned partners must be present in Tier 3 consortium data.
+        prose_condition: "All assigned partners present in Tier 3 consortium data"
+
+      # --- cycle predicates ---
+      - predicate_id: g04_p06
+        type: cycle
+        function: no_dependency_cycles
+        args:
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        fail_message: >
+          A dependency cycle was detected in the dependency_map of
+          wp_structure.json. The inter-WP and inter-task dependency graph
+          must be a directed acyclic graph (DAG). Resolve the cycle before
+          Phase 4 and Phase 6 can proceed.
+        prose_condition: "No dependency cycles in the dependency map"
+
+      # --- timeline predicates ---
+      - predicate_id: g04_p05
+        type: timeline
+        function: wp_count_within_limit
+        args:
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          The number of work packages in wp_structure.json exceeds the maximum
+          WP count specified in section_schema_registry.json for the active
+          instrument type. Reduce the WP count to comply with Tier 2A
+          instrument constraints.
+        prose_condition: "WP count compliant with Tier 2A instrument constraints"
+
+
+  # ===========================================================================
+  # GATE 05 — phase_04_gate
+  # Kind: exit  |  Node: n04  |  Phase: 4 — Gantt and Milestones
+  # Evaluated after Phase 4 completes.
+  # Confirms Phase 3 passed, Gantt artifact is written and owned by current run,
+  # all tasks are assigned to months within project duration, all milestones
+  # have verifiable criteria, critical path is present, and milestones_seed
+  # has been populated in Tier 3.
+  # ===========================================================================
+  - gate_id: phase_04_gate
+    gate_kind: exit
+    evaluated_at: "n04 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g05_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_03_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_03_gate has not passed for the current run. Phase 4 cannot
+          complete until Phase 3 has passed its exit gate.
+        prose_condition: "Phase 3 gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g05_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+        fail_message: >
+          gantt.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/.
+          Phase 4 must write its canonical Gantt artifact before this gate
+          can pass.
+        prose_condition: "Gantt structure and milestone table written to Tier 4"
+
+      - predicate_id: g05_p02b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+          run_id: "${run_id}"
+        fail_message: >
+          gantt.json exists but its run_id does not match the current run.
+          Re-run Phase 4 or add this artifact to the reuse policy.
+        prose_condition: "Gantt structure and milestone table written to Tier 4"
+
+      - predicate_id: g05_p07
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+        fail_message: >
+          milestones_seed.json is absent or empty in
+          docs/tier3_project_instantiation/architecture_inputs/. Phase 4
+          must populate milestones_seed.json in Tier 3 before this gate
+          can pass.
+        prose_condition: "milestones_seed.json populated in Tier 3"
+
+      # --- coverage predicates ---
+      - predicate_id: g05_p03
+        type: coverage
+        function: all_tasks_have_months
+        args:
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        fail_message: >
+          One or more task_ids present in wp_structure.json are absent from
+          gantt.json, or have null start_month or end_month. Every task
+          defined in the Phase 3 WP structure must appear in the Gantt with
+          non-null month assignments.
+        prose_condition: "All tasks assigned to months within project duration"
+
+      # --- timeline predicates ---
+      - predicate_id: g05_p04
+        type: timeline
+        function: timeline_within_duration
+        args:
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+          call_path: "docs/tier3_project_instantiation/call_binding/selected_call.json"
+        fail_message: >
+          One or more tasks in gantt.json have an end_month that exceeds the
+          project_duration_months specified in selected_call.json. The timeline
+          must fit within the call-specified project duration.
+        prose_condition: "All tasks assigned to months within project duration"
+
+      - predicate_id: g05_p05
+        type: timeline
+        function: all_milestones_have_criteria
+        args:
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+        fail_message: >
+          One or more milestones in gantt.json are missing a due_month or
+          verifiable_criterion field. Every milestone must have a concrete,
+          non-empty verifiable criterion and a non-null due month.
+        prose_condition: "All milestones have verifiable criteria and due months"
+
+      - predicate_id: g05_p06
+        type: timeline
+        function: critical_path_present
+        args:
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+        fail_message: >
+          gantt.json is missing the critical_path field or the field is empty.
+          The Phase 4 output must identify the critical path through the project
+          schedule.
+        prose_condition: "Critical path identified and consistent with dependency map"
+
+
+  # ===========================================================================
+  # GATE 06 — phase_05_gate
+  # Kind: exit  |  Node: n05  |  Phase: 5 — Impact Architecture
+  # Evaluated after Phase 5 completes.
+  # Requires BOTH Phase 2 and Phase 3 gates to have passed (Phase 5 is not
+  # independently parallel after Phase 2; see README.md parallel paths note).
+  # Confirms impact architecture artifact is written and owned, all call
+  # expected impacts are mapped, all KPIs are traceable to WP deliverables,
+  # and dissemination, exploitation, and sustainability fields are present.
+  # ===========================================================================
+  - gate_id: phase_05_gate
+    gate_kind: exit
+    evaluated_at: "n05 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g06_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_02_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_02_gate has not passed for the current run. Phase 5 requires
+          Phase 2 to have passed before its exit gate can be evaluated.
+        prose_condition: "Phase 2 gate must have passed"
+
+      - predicate_id: g06_p02
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_03_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_03_gate has not passed for the current run. Phase 5 requires
+          Phase 3 to have passed (in addition to Phase 2) before its exit
+          gate can be evaluated. Phase 5 is not independently parallel
+          after Phase 2 alone.
+        prose_condition: "Phase 3 gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g06_p03
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+        fail_message: >
+          impact_architecture.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/.
+          Phase 5 must write its canonical output before this gate can pass.
+        prose_condition: "Full impact architecture written to Tier 4"
+
+      - predicate_id: g06_p03b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          run_id: "${run_id}"
+        fail_message: >
+          impact_architecture.json exists but its run_id does not match the
+          current run. Re-run Phase 5 or add this artifact to the reuse policy.
+        prose_condition: "Full impact architecture written to Tier 4"
+
+      # --- schema predicates ---
+      - predicate_id: g06_p06
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          field: "dissemination_plan"
+        fail_message: >
+          impact_architecture.json is missing the dissemination_plan field.
+          Phase 5 must define the dissemination approach as a structured
+          field in the canonical artifact.
+        prose_condition: "Dissemination and exploitation logic is defined"
+
+      - predicate_id: g06_p07
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          field: "exploitation_plan"
+        fail_message: >
+          impact_architecture.json is missing the exploitation_plan field.
+          Phase 5 must define the exploitation approach as a structured
+          field in the canonical artifact.
+        prose_condition: "Dissemination and exploitation logic is defined"
+
+      - predicate_id: g06_p08
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          field: "sustainability_mechanism"
+        fail_message: >
+          impact_architecture.json is missing the sustainability_mechanism
+          field. Phase 5 must define how project outputs will be sustained
+          after the project ends.
+        prose_condition: "Sustainability mechanism is defined"
+
+      # --- coverage predicates ---
+      - predicate_id: g06_p04
+        type: coverage
+        function: all_impacts_mapped
+        args:
+          impact_path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          expected_impacts_path: "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+        fail_message: >
+          One or more expected impact identifiers in Tier 2B expected_impacts.json
+          do not appear in impact_architecture.json with at least one mapped
+          project output. Every call expected impact must have a traceable
+          project output.
+        prose_condition: "All call expected impacts have at least one mapped project output"
+
+      - predicate_id: g06_p05
+        type: coverage
+        function: kpis_traceable_to_wps
+        args:
+          impact_path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        fail_message: >
+          One or more KPIs in impact_architecture.json reference a
+          deliverable_id that does not exist in wp_structure.json. Every KPI
+          must be traceable to a named deliverable from the Phase 3 WP output.
+        prose_condition: "KPI set is defined and traceable to WP deliverables"
+
+
+  # ===========================================================================
+  # GATE 07 — phase_06_gate
+  # Kind: exit  |  Node: n06  |  Phase: 6 — Implementation Architecture
+  # Evaluated after Phase 6 completes.
+  # Requires Phases 3, 4, and 5 to have passed. Confirms implementation
+  # architecture artifact is written and owned, risk register is populated,
+  # ethics assessment is explicitly present, governance matrix is defined,
+  # all management roles are assigned to Tier 3 consortium members, and
+  # all instrument-mandated implementation sections are addressed.
+  # ===========================================================================
+  - gate_id: phase_06_gate
+    gate_kind: exit
+    evaluated_at: "n06 exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g07_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_03_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_03_gate has not passed for the current run. Phase 6 requires
+          Phases 3, 4, and 5 to have all passed.
+        prose_condition: "Phase 3 gate must have passed"
+
+      - predicate_id: g07_p02
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_04_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_04_gate has not passed for the current run. Phase 6 requires
+          Phases 3, 4, and 5 to have all passed.
+        prose_condition: "Phase 4 gate must have passed"
+
+      - predicate_id: g07_p03
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_05_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_05_gate has not passed for the current run. Phase 6 requires
+          Phases 3, 4, and 5 to have all passed.
+        prose_condition: "Phase 5 gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g07_p04
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        fail_message: >
+          implementation_architecture.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/.
+          Phase 6 must write its canonical output before this gate can pass.
+        prose_condition: "Implementation architecture written to Tier 4"
+
+      - predicate_id: g07_p04b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+          run_id: "${run_id}"
+        fail_message: >
+          implementation_architecture.json exists but its run_id does not
+          match the current run. Re-run Phase 6 or add this artifact to the
+          reuse policy.
+        prose_condition: "Implementation architecture written to Tier 4"
+
+      # --- schema predicates ---
+      - predicate_id: g07_p05
+        type: schema
+        function: risk_register_populated
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        fail_message: >
+          The risk_register in implementation_architecture.json is absent,
+          empty, or contains entries with null likelihood, impact, or
+          mitigation fields. A fully populated risk register is mandatory
+          for Phase 6 gate passage.
+        prose_condition: "Risk register is populated"
+
+      - predicate_id: g07_p06
+        type: schema
+        function: ethics_assessment_explicit
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        fail_message: >
+          The ethics_assessment field in implementation_architecture.json is
+          absent, null, empty, or equal to a placeholder sentinel value.
+          The ethics self-assessment must be explicitly present with a
+          non-empty self_assessment_statement field. Omission is a gate
+          failure; "N/A" without explanation is a gate failure.
+        prose_condition: "Ethics self-assessment is explicitly present (not omitted)"
+
+      - predicate_id: g07_p07
+        type: schema
+        function: governance_matrix_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        fail_message: >
+          The governance_matrix in implementation_architecture.json is absent
+          or contains no entries. At least one governance body must be defined
+          with composition and decision scope.
+        prose_condition: "Governance matrix is defined"
+
+      # --- coverage predicates ---
+      - predicate_id: g07_p08
+        type: coverage
+        function: all_management_roles_in_tier3
+        args:
+          impl_path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+          partners_path: "docs/tier3_project_instantiation/consortium/partners.json"
+        fail_message: >
+          One or more management roles in implementation_architecture.json
+          reference a partner_id that does not exist in Tier 3 partners.json.
+          All management roles must be assigned to Tier 3 consortium members.
+        prose_condition: "All management roles assigned to Tier 3 consortium members"
+
+      - predicate_id: g07_p09
+        type: coverage
+        function: instrument_sections_addressed
+        args:
+          impl_path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          One or more mandatory implementation sections listed in
+          section_schema_registry.json for the active instrument type are
+          not present in implementation_architecture.json with status:
+          addressed. All instrument-mandated implementation sections must
+          be addressed.
+        prose_condition: "All instrument-mandated implementation sections addressed per Tier 2A schema"
+
+
+  # ===========================================================================
+  # GATE 08 — gate_09_budget_consistency
+  # Kind: exit  |  Node: n07  |  Phase: 7 — Budget Gate
+  # mandatory: true  |  bypass_prohibited: true
+  # Evaluated after Phase 7 completes.
+  # This is the only mandatory bypass-prohibited gate. A failure of the
+  # dir_non_empty check on received/ triggers a HARD_BLOCK that freezes all
+  # Phase 8 nodes. See §6.4 of the plan for HARD_BLOCK semantics.
+  # No Phase 8 substep may commence until this gate passes.
+  # ===========================================================================
+  - gate_id: gate_09_budget_consistency
+    gate_kind: exit
+    evaluated_at: "n07 exit"
+    mandatory: true
+    bypass_prohibited: true
+    hard_block_on_missing_received_dir: true
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g08_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "phase_06_gate"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          phase_06_gate has not passed for the current run. The budget gate
+          cannot be evaluated until Phase 6 has passed its exit gate.
+        prose_condition: "Phase 6 gate must have passed"
+
+      # --- file predicates ---
+      # NOTE: Failure of g08_p02 triggers HARD_BLOCK per §6.4. The runner
+      # must check mandatory and bypass_prohibited before evaluating this gate
+      # and must emit a HARD_BLOCK result code on g08_p02 failure in addition
+      # to the standard fail status. All downstream Phase 8 nodes are frozen.
+      - predicate_id: g08_p02
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/integrations/lump_sum_budget_planner/received/"
+        fail_message: >
+          No budget response artifacts found in
+          docs/integrations/lump_sum_budget_planner/received/. A validated
+          external budget response is mandatory. Absent budget artifacts
+          are a HARD BLOCK: all Phase 8 nodes are frozen until this gate
+          passes. This gate is mandatory and bypass-prohibited per CLAUDE.md
+          §8.4 and §13.4.
+        prose_condition: "Non-empty budget response artifact present in integrations/received/"
+
+      - predicate_id: g08_p03
+        type: file
+        function: dir_non_empty
+        args:
+          path: "docs/integrations/lump_sum_budget_planner/validation/"
+        fail_message: >
+          No validation artifacts found in
+          docs/integrations/lump_sum_budget_planner/validation/. A
+          validation artifact confirming interface contract conformance
+          must be present alongside the budget response.
+        prose_condition: "Validation artifact present in integrations/validation/"
+
+      - predicate_id: g08_p08
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        fail_message: >
+          budget_gate_assessment.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/.
+          Phase 7 must write its canonical assessment artifact before this
+          gate can pass.
+        prose_condition: "Budget gate assessment written to Tier 4"
+
+      - predicate_id: g08_p09
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+          run_id: "${run_id}"
+        fail_message: >
+          budget_gate_assessment.json exists but its run_id does not match
+          the current run. Re-run Phase 7 or add this artifact to the
+          reuse policy.
+        prose_condition: "Budget gate assessment written to Tier 4"
+
+      # --- schema predicates ---
+      - predicate_id: g08_p04
+        type: schema
+        function: interface_contract_conforms
+        args:
+          response_path: "docs/integrations/lump_sum_budget_planner/received/"
+          contract_path: "docs/integrations/lump_sum_budget_planner/interface_contract.json"
+        fail_message: >
+          One or more files in integrations/received/ do not conform to the
+          interface contract at interface_contract.json. Non-conforming budget
+          responses must be rejected and flagged; they cannot be used as the
+          basis for budget gate passage.
+        prose_condition: "Interface contract conformance confirmed"
+
+      - predicate_id: g08_p07
+        type: schema
+        function: no_blocking_inconsistencies
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        fail_message: >
+          budget_gate_assessment.json contains one or more blocking_inconsistencies
+          entries with resolution: unresolved. All blocking structural
+          inconsistencies between the budget response and the WP/consortium
+          design must be resolved before this gate can pass.
+        prose_condition: "No blocking inconsistency logged without resolution"
+
+      # --- coverage predicates ---
+      - predicate_id: g08_p05
+        type: coverage
+        function: wp_budget_coverage_match
+        args:
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          budget_path: "docs/integrations/lump_sum_budget_planner/received/"
+        fail_message: >
+          One or more WP identifiers from wp_structure.json are absent from
+          the budget response in integrations/received/. Every Phase 3 WP
+          must have a corresponding budget entry in the external budget response.
+        prose_condition: "All Phase 3 WPs have corresponding budget entries"
+
+      - predicate_id: g08_p06
+        type: coverage
+        function: partner_budget_coverage_match
+        args:
+          partners_path: "docs/tier3_project_instantiation/consortium/partners.json"
+          budget_path: "docs/integrations/lump_sum_budget_planner/received/"
+        fail_message: >
+          One or more consortium partners in Tier 3 partners.json do not have
+          a corresponding effort or cost allocation in the budget response.
+          Every partner must have a budget allocation.
+        prose_condition: "All consortium partners have corresponding budget allocations"
+
+
+  # ===========================================================================
+  # GATE 09 — gate_10_part_b_completeness
+  # Kind: exit  |  Node: n08b  |  Phase: 8b — Assembly
+  # Evaluated after Phase 8b (assembly) completes.
+  # Requires budget gate (gate_09) to have passed. Confirms all instrument-
+  # required sections are drafted, assembled draft is written and owned,
+  # and every section has a traceability footer.
+  # ===========================================================================
+  - gate_id: gate_10_part_b_completeness
+    gate_kind: exit
+    evaluated_at: "n08b exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g09_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_09_budget_consistency"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_09_budget_consistency has not passed for the current run.
+          No Phase 8 activity — including assembly — may proceed until the
+          budget gate passes. This is a constitutional requirement per
+          CLAUDE.md §8.4 and §13.4.
+        prose_condition: "Budget gate must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g09_p03
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/assembled_drafts/assembled_draft.json"
+        fail_message: >
+          assembled_draft.json is absent or empty in
+          docs/tier5_deliverables/assembled_drafts/. Phase 8b must write
+          the assembled draft artifact before this gate can pass.
+        prose_condition: "Assembled draft present in assembled_drafts/"
+
+      - predicate_id: g09_p03b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/assembled_drafts/assembled_draft.json"
+          run_id: "${run_id}"
+        fail_message: >
+          assembled_draft.json exists but its run_id does not match the
+          current run. Re-run Phase 8b or add this artifact to the reuse policy.
+        prose_condition: "Assembled draft present in assembled_drafts/"
+
+      # --- coverage predicates ---
+      - predicate_id: g09_p02
+        type: coverage
+        function: all_sections_drafted
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          One or more sections required by the active instrument schema
+          (section_schema_registry.json) do not have a corresponding artifact
+          in docs/tier5_deliverables/proposal_sections/. Every mandatory
+          section must be drafted before assembly can be gated.
+        prose_condition: "All sections required by active application form present in proposal_sections/"
+
+      - predicate_id: g09_p04
+        type: coverage
+        function: all_sections_have_traceability_footer
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+        fail_message: >
+          One or more section artifacts in docs/tier5_deliverables/proposal_sections/
+          are missing a traceability_footer field or the field is empty. Every
+          section must declare its Tier 1-4 sources in a non-empty
+          traceability_footer.
+        prose_condition: "Each section traceable to named Tier 1-4 sources"
+
+
+  # ===========================================================================
+  # GATE 10 — gate_11_review_closure
+  # Kind: exit  |  Node: n08c  |  Phase: 8c — Evaluator Review
+  # Evaluated after Phase 8c (evaluator review) completes.
+  # Confirms gate_10 passed, review packet is written and owned, all findings
+  # are categorised by severity, and a revision action list is present.
+  # ===========================================================================
+  - gate_id: gate_11_review_closure
+    gate_kind: exit
+    evaluated_at: "n08c exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g10_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_10_part_b_completeness"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_10_part_b_completeness has not passed for the current run.
+          Phase 8c (evaluator review) cannot complete until Phase 8b
+          (assembly) has passed its exit gate.
+        prose_condition: "gate_10 must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g10_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/review_packets/review_packet.json"
+        fail_message: >
+          review_packet.json is absent or empty in
+          docs/tier5_deliverables/review_packets/. Phase 8c must write
+          the review packet artifact before this gate can pass.
+        prose_condition: "Review packet present in review_packets/"
+
+      - predicate_id: g10_p02b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/review_packets/review_packet.json"
+          run_id: "${run_id}"
+        fail_message: >
+          review_packet.json exists but its run_id does not match the
+          current run. Re-run Phase 8c or add this artifact to the reuse policy.
+        prose_condition: "Review packet present in review_packets/"
+
+      # --- schema predicates ---
+      - predicate_id: g10_p03
+        type: schema
+        function: findings_categorised_by_severity
+        args:
+          path: "docs/tier5_deliverables/review_packets/review_packet.json"
+        fail_message: >
+          One or more findings entries in review_packet.json are missing
+          the severity field or have a value outside {critical, major, minor}.
+          The evaluator_reviewer agent must categorise every finding by
+          severity before this gate can pass.
+        prose_condition: "All critical findings categorised by severity"
+
+      - predicate_id: g10_p04
+        type: schema
+        function: revision_action_list_present
+        args:
+          path: "docs/tier5_deliverables/review_packets/review_packet.json"
+        fail_message: >
+          The revision_actions array in review_packet.json is absent or
+          empty. Phase 8c must produce a non-empty prioritised revision
+          action list from the evaluator review.
+        prose_condition: "Prioritised revision action list produced"
+
+
+  # ===========================================================================
+  # GATE 11 — gate_12_constitutional_compliance
+  # Kind: exit  |  Node: n08d  |  Phase: 8d — Revision
+  # Evaluated after Phase 8d (revision) completes.
+  # This is the final gate. Confirms gate_11 passed, all sections are present,
+  # all critical revisions are resolved, final export and checkpoint are written,
+  # budget gate confirmation is present in the assessment, and the full set of
+  # constitutional compliance semantic checks passes.
+  # ===========================================================================
+  - gate_id: gate_12_constitutional_compliance
+    gate_kind: exit
+    evaluated_at: "n08d exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      # --- gate_pass predicates ---
+      - predicate_id: g11_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_11_review_closure"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_11_review_closure has not passed for the current run.
+          Phase 8d (revision) cannot complete until Phase 8c (evaluator
+          review) has passed its exit gate.
+        prose_condition: "gate_11 must have passed"
+
+      # --- file predicates ---
+      - predicate_id: g11_p03
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/review_packets/review_packet.json"
+        fail_message: >
+          review_packet.json is absent or empty. The review packet must
+          be present at final gate evaluation; it is a required input to
+          Phase 8d revision.
+        prose_condition: "Review packet present"
+
+      - predicate_id: g11_p05
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/final_exports/final_export.json"
+        fail_message: >
+          final_export.json is absent or empty in
+          docs/tier5_deliverables/final_exports/. Phase 8d must produce
+          the final export artifact before this gate can pass.
+        prose_condition: "Final export present in final_exports/"
+
+      - predicate_id: g11_p05b
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/final_exports/final_export.json"
+          run_id: "${run_id}"
+        fail_message: >
+          final_export.json exists but its run_id does not match the
+          current run. Re-run Phase 8d or add this artifact to the reuse policy.
+        prose_condition: "Final export present in final_exports/"
+
+      # --- schema predicates ---
+      - predicate_id: g11_p04
+        type: schema
+        function: all_critical_revisions_resolved
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json"
+        fail_message: >
+          One or more revision_actions entries in drafting_review_status.json
+          have severity: critical and status: unresolved without a non-empty
+          reason field. All critical revision actions must be resolved or
+          explicitly logged as unresolvable with a stated reason before the
+          final export can be gated.
+        prose_condition: "All critical revision actions resolved or explicitly logged as unresolvable with reason"
+
+      - predicate_id: g11_p06
+        type: schema
+        function: checkpoint_published
+        args:
+          path: "docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json"
+        fail_message: >
+          phase8_checkpoint.json is absent, invalid JSON, or does not contain
+          status: published. The Phase 8 checkpoint must be published by the
+          runner before gate_12 can pass.
+        prose_condition: "Phase 8 checkpoint published"
+
+      - predicate_id: g11_p07
+        type: schema
+        function: budget_gate_confirmation_present
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        fail_message: >
+          The gate_pass_declaration field in budget_gate_assessment.json is
+          absent or does not equal "pass". The budget gate confirmation must
+          be positively present in the Phase 7 assessment artifact at the
+          time of final gate evaluation.
+        prose_condition: "Budget gate confirmation present"
+
+      # --- coverage predicates ---
+      - predicate_id: g11_p02
+        type: coverage
+        function: all_sections_drafted
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        fail_message: >
+          One or more sections required by the active instrument schema are
+          absent from docs/tier5_deliverables/proposal_sections/ at final
+          gate evaluation. All mandatory sections must be present in the
+          final export.
+        prose_condition: "All sections required by active application form present"
+
+      # --- semantic predicates (invoked only if all deterministic predicates pass) ---
+      - predicate_id: g11_p08
+        type: semantic
+        function: no_cross_tier_contradictions
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          tier3_path: "docs/tier3_project_instantiation/"
+        fail_message: >
+          One or more Tier 5 proposal sections contain claims that contradict
+          confirmed Tier 3 project facts. Violations must be reported with
+          violated_rule and evidence_path per CLAUDE.md §12.2.
+        prose_condition: "No section contains content contradicted by a higher tier — CLAUDE.md §11.4, §13.3"
+
+      - predicate_id: g11_p09
+        type: semantic
+        function: no_unsupported_tier5_claims
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          tier3_path: "docs/tier3_project_instantiation/"
+        fail_message: >
+          One or more Tier 5 proposal sections assert project facts (partner
+          name, capability, role, objective, prior experience, budget figure,
+          team size, equipment) that are absent from Tier 3. No project fact
+          may be invented. Violations per CLAUDE.md §13.3.
+        prose_condition: "No invented project facts in Tier 5 — CLAUDE.md §13.3"
+
+      - predicate_id: g11_p10
+        type: semantic
+        function: no_budget_gate_contradiction
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          phase7_path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        fail_message: >
+          One or more Tier 5 sections reference specific budget figures,
+          effort allocations, or resource commitments not present in the
+          validated budget response. No budget-dependent content may be
+          finalised before and without the budget gate. Violations per
+          CLAUDE.md §8.4, §13.4.
+        prose_condition: "No budget-dependent finalisation before gate pass — CLAUDE.md §8.4, §13.4"
+
+      - predicate_id: g11_p11
+        type: semantic
+        function: no_higher_tier_contradiction
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          tier2a_path: "docs/tier2a_instrument_schemas/extracted/"
+          tier2b_path: "docs/tier2b_topic_and_call_sources/extracted/"
+        fail_message: >
+          One or more Tier 5 sections assert call constraints, scope
+          boundaries, expected outcomes, or expected impacts not traceable
+          to Tier 2A or Tier 2B source documents. No call constraint may
+          be invented. Violations per CLAUDE.md §13.2, §11.3.
+        prose_condition: "No invented call constraints or undercutting of higher tier — CLAUDE.md §13.2, §11.3"
+
+      - predicate_id: g11_p12
+        type: semantic
+        function: no_forbidden_schema_authority
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+        fail_message: >
+          One or more Tier 5 sections appear to be structured according to
+          a Grant Agreement Annex template rather than the active application
+          form (Tier 2A). Annex templates govern post-award reporting, not
+          proposal writing. Violations per CLAUDE.md §13.1.
+        prose_condition: "No Grant Agreement Annex schema used as proposal structure — CLAUDE.md §13.1"
+
+      - predicate_id: g11_p13
+        type: semantic
+        function: no_gap_masked_as_confirmed
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+        fail_message: >
+          One or more Tier 5 sections present content with Confirmed
+          validation status where the underlying Tier 4 phase output
+          classifies the source as Unresolved or Assumed. Gaps must be
+          flagged, not papered over. Violations per CLAUDE.md §12.2.
+        prose_condition: "No Unresolved content presented as Confirmed — CLAUDE.md §12.2"

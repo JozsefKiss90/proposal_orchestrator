@@ -1,0 +1,2446 @@
+# Artifact Schema Specification
+# Horizon Europe Proposal Orchestration System
+#
+# Applies to: system_orchestration package v1.1
+# Referenced by: gate_rules_library_plan.md §7, §8 Step 1
+# Constitutional authority: CLAUDE.md (subordinate to)
+# Relation to gate_rules_library_plan.md: implements §7.4
+#
+# This document defines the field-level schemas for every canonical artifact
+# evaluated by gate predicates. It is the contractual prerequisite for all
+# predicate function implementations (Steps 5–9 of the implementation sequence).
+#
+# Canonical file names and mandatory gate-relevant fields are sourced from
+# §7.2 of gate_rules_library_plan.md. This specification must not introduce
+# canonical file names or gate-relevant field names that conflict with §7.2
+# without amending that plan.
+#
+# Schema ID convention: orch.<tier>.<artifact_name>.v<version>
+# The schema_id field in each artifact must exactly match the schema_id_value
+# defined here. A predicate that reads a canonical artifact and finds a
+# mismatching schema_id must fail with failure_category: MALFORMED_ARTIFACT.
+#
+# artifact_status sentinel: All Tier 4 phase output canonical artifacts and
+# Tier 5 deliverable artifacts carry an optional artifact_status field.
+# The runner stamps this field when an exit gate fails (blocked_at_exit),
+# setting it to "invalid". When the producing phase is re-run and the exit
+# gate passes, the runner stamps artifact_status: "valid". Predicates must
+# not be blocked by an absent artifact_status field; absence implies the
+# artifact has not yet been evaluated by a gate.
+
+schema_specification_version: "1.0"
+applies_to_manifest_version: "1.1"
+applies_to_plan_version: "1.0"
+
+# =============================================================================
+# SECTION 1 — TIER 4 PHASE OUTPUT CANONICAL ARTIFACTS
+# =============================================================================
+#
+# One canonical artifact per phase output directory (see §7.1, §7.2).
+# All are provenance class: run_produced (or inherited via reuse policy).
+# All require schema_id and run_id as top-level fields.
+# All may carry the runner-managed artifact_status field.
+
+tier4_phase_output_schemas:
+
+  # ---------------------------------------------------------------------------
+  # 1.1 call_analysis_summary.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json
+  # Produced by: call_analyzer agent (Phase 1)
+  # Consumed by: phase_01_gate predicates; downstream phases reading Tier 2B
+  # ---------------------------------------------------------------------------
+  call_analysis_summary:
+    schema_id_value: "orch.phase1.call_analysis_summary.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: >
+          Must equal "orch.phase1.call_analysis_summary.v1". Any other value
+          is treated as schema mismatch by the runner.
+
+      run_id:
+        type: string
+        required: true
+        description: >
+          UUID established at DAG-runner startup. Must match the current run_id
+          for artifact_owned_by_run to pass.
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+        description: >
+          Runner-managed field. Set to "invalid" when the exit gate for this
+          phase fails (blocked_at_exit). Set to "valid" when the gate passes.
+          Absence means the artifact has not yet been evaluated.
+
+      resolved_instrument_type:
+        type: string
+        required: true
+        description: >
+          The instrument type resolved from selected_call.json (e.g., "RIA",
+          "IA", "CSA", "MSCA-PF", "ERC-ADG", "EIC-Accelerator"). Must match
+          an entry in tier2a_instrument_schemas/extracted/section_schema_registry.json.
+          Used by instrument_type_matches_schema predicate.
+
+      evaluation_matrix:
+        type: object
+        required: true
+        description: >
+          Structured mapping of evaluation criteria to their weights and
+          source references. Must not be empty ({}).
+        item_schema:
+          criterion_id:
+            type: string
+            required: true
+            description: Identifier matching the active evaluation form criterion label.
+          criterion_name:
+            type: string
+            required: true
+          weight:
+            type: number
+            required: false
+            description: Numeric weight as specified in the evaluation form; null if unweighted.
+          source_section:
+            type: string
+            required: true
+            description: >
+              Section identifier in the Tier 2B source document from which
+              this criterion is extracted. Required for source_refs_present
+              predicate to pass.
+          source_document:
+            type: string
+            required: true
+            description: File name or path of the Tier 2B source document.
+
+      compliance_checklist:
+        type: array
+        required: true
+        description: >
+          List of eligibility and compliance requirements extracted from Tier 2B.
+          Must not be empty.
+        item_schema:
+          requirement_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          status:
+            type: string
+            required: true
+            enum: [confirmed, requires_review, not_applicable]
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+      call_analysis_notes:
+        type: string
+        required: false
+        description: >
+          Optional free-text notes on the analysis. Not gate-evaluated.
+
+  # ---------------------------------------------------------------------------
+  # 1.2 concept_refinement_summary.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json
+  # Produced by: concept_refiner agent (Phase 2)
+  # Consumed by: phase_02_gate predicates; phase_05_gate gate_pass_recorded
+  # ---------------------------------------------------------------------------
+  concept_refinement_summary:
+    schema_id_value: "orch.phase2.concept_refinement_summary.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase2.concept_refinement_summary.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      topic_mapping_rationale:
+        type: object
+        required: true
+        description: >
+          Explains how each call topic and expected outcome maps to the
+          project concept. Must not be empty. Each entry must carry a
+          Tier 2B source reference and a Tier 3 project evidence reference,
+          satisfying the all_mappings_have_source_refs predicate.
+          The canonical topic_mapping.json in Tier 3 is the primary
+          mapping artifact; this field records the rationale behind it.
+        item_schema:
+          topic_element_id:
+            type: string
+            required: true
+            description: Identifier of the expected outcome or scope element from Tier 2B.
+          mapping_to_concept:
+            type: string
+            required: true
+            description: How the project concept addresses this topic element.
+          tier2b_source_ref:
+            type: string
+            required: true
+            description: >
+              Section or file in Tier 2B that defines this topic element.
+              Required for source_ref predicates.
+          tier3_evidence_ref:
+            type: string
+            required: true
+            description: >
+              Path or field in Tier 3 project data that provides project
+              evidence for this mapping.
+
+      scope_conflict_log:
+        type: array
+        required: true
+        description: >
+          Log of scope conflicts identified during concept refinement.
+          Must be an array (empty array is valid when no conflicts exist).
+          Unresolved conflicts block the phase_02_gate semantic predicate.
+        item_schema:
+          conflict_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          resolution_status:
+            type: string
+            required: true
+            enum: [resolved, unresolved]
+          resolution_note:
+            type: string
+            required: false
+            description: >
+              Required when resolution_status is "resolved". Documents
+              how the conflict was resolved.
+          tier2b_source_ref:
+            type: string
+            required: true
+
+      strategic_differentiation:
+        type: string
+        required: true
+        description: >
+          Narrative explaining how the project differentiates itself within
+          the call scope. Must not be empty or a placeholder string.
+          Used by no_unresolved_scope_conflicts semantic predicate.
+
+  # ---------------------------------------------------------------------------
+  # 1.3 wp_structure.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+  # Produced by: wp_designer + dependency_mapper agents (Phase 3)
+  # Consumed by: phase_03_gate predicates; phases 4, 5, 6 (downstream inputs)
+  # ---------------------------------------------------------------------------
+  wp_structure:
+    schema_id_value: "orch.phase3.wp_structure.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase3.wp_structure.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      work_packages:
+        type: array
+        required: true
+        description: >
+          Complete WP structure. Must be non-empty. Each WP must have
+          at least one deliverable and a non-null lead_partner for
+          all_wps_have_deliverable_and_lead to pass.
+        item_schema:
+          wp_id:
+            type: string
+            required: true
+            description: >
+              Unique identifier, e.g., "WP1", "WP2". Used as join key
+              in coverage predicates across phases 4, 5, 6, and 7.
+          title:
+            type: string
+            required: true
+          objectives:
+            type: array
+            required: true
+            description: List of strings; must be non-empty.
+            item_type: string
+          lead_partner:
+            type: string
+            required: true
+            description: >
+              Partner identifier matching an entry in Tier 3 partners.json.
+              all_partners_in_tier3 verifies this field against Tier 3.
+          contributing_partners:
+            type: array
+            required: false
+            item_type: string
+            description: >
+              List of contributing partner identifiers. Each must exist
+              in Tier 3 partners.json.
+          tasks:
+            type: array
+            required: true
+            description: Must be non-empty.
+            item_schema:
+              task_id:
+                type: string
+                required: true
+                description: >
+                  Unique across the whole WP structure. Used as join key
+                  in all_tasks_have_months predicate.
+              title:
+                type: string
+                required: true
+              responsible_partner:
+                type: string
+                required: true
+              contributing_partners:
+                type: array
+                required: false
+                item_type: string
+          deliverables:
+            type: array
+            required: true
+            description: >
+              Must be non-empty (all_wps_have_deliverable_and_lead requires ≥1).
+              deliverable_id is used as join key in kpis_traceable_to_wps.
+            item_schema:
+              deliverable_id:
+                type: string
+                required: true
+              title:
+                type: string
+                required: true
+              type:
+                type: string
+                required: true
+                enum: [report, dataset, software, other]
+              due_month:
+                type: integer
+                required: true
+                description: Month number within project duration (1-based).
+              responsible_partner:
+                type: string
+                required: true
+          dependencies:
+            type: array
+            required: true
+            description: >
+              Intra-WP dependencies on other WPs. Each entry declares
+              that this WP depends on the listed WP being complete or
+              partially complete. Used in no_dependency_cycles and
+              dependency_map population.
+            item_schema:
+              depends_on_wp_id:
+                type: string
+                required: true
+              dependency_type:
+                type: string
+                required: true
+                enum: [finish_to_start, start_to_start, data_input, partial_output]
+              notes:
+                type: string
+                required: false
+
+      dependency_map:
+        type: object
+        required: true
+        description: >
+          Explicit directed graph representation of WP-to-WP and task-to-task
+          dependencies. Must be non-null and non-empty. Used by no_dependency_cycles
+          and as input to phase_04_gantt scheduling. The map is separate from
+          the per-WP dependencies array above to allow the dependency_mapper
+          agent to add cross-WP task edges not capturable at the WP level.
+        fields:
+          nodes:
+            type: array
+            required: true
+            description: List of node identifiers (wp_ids and task_ids).
+            item_type: string
+          edges:
+            type: array
+            required: true
+            description: >
+              Directed edges. An edge (source → target) means source must
+              complete before target begins. no_dependency_cycles verifies
+              this graph is a DAG.
+            item_schema:
+              from:
+                type: string
+                required: true
+              to:
+                type: string
+                required: true
+              edge_type:
+                type: string
+                required: true
+                enum: [finish_to_start, start_to_start, data_input, partial_output]
+
+      partner_role_matrix:
+        type: array
+        required: true
+        description: >
+          Cross-reference matrix of partners and their WP roles. Must be
+          non-empty. Used by coverage predicates in phases 6 and 7.
+        item_schema:
+          partner_id:
+            type: string
+            required: true
+          wps_as_lead:
+            type: array
+            required: true
+            item_type: string
+          wps_as_contributor:
+            type: array
+            required: true
+            item_type: string
+
+  # ---------------------------------------------------------------------------
+  # 1.4 gantt.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
+  # Produced by: gantt_designer agent (Phase 4)
+  # Consumed by: phase_04_gate predicates; phase_06 (implementation)
+  # ---------------------------------------------------------------------------
+  gantt:
+    schema_id_value: "orch.phase4.gantt.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase4.gantt.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      tasks:
+        type: array
+        required: true
+        description: >
+          Complete task schedule. Every task_id present in wp_structure.json
+          must appear here with non-null start_month and end_month for
+          all_tasks_have_months to pass.
+        item_schema:
+          task_id:
+            type: string
+            required: true
+            description: >
+              Must match a task_id in wp_structure.json work_packages[].tasks[].
+              Join key for all_tasks_have_months coverage predicate.
+          wp_id:
+            type: string
+            required: true
+            description: Parent WP identifier. Must match a wp_id in wp_structure.json.
+          start_month:
+            type: integer
+            required: true
+            description: >
+              1-based month number within the project duration.
+              Must be ≥ 1 and ≤ end_month.
+          end_month:
+            type: integer
+            required: true
+            description: >
+              1-based month number within the project duration.
+              Must be ≤ project_duration_months from selected_call.json
+              for timeline_within_duration to pass.
+          responsible_partner:
+            type: string
+            required: true
+            description: Must match a partner_id in Tier 3 partners.json.
+
+      milestones:
+        type: array
+        required: true
+        description: >
+          Complete milestone list. Every entry must have due_month and
+          verifiable_criterion for all_milestones_have_criteria to pass.
+        item_schema:
+          milestone_id:
+            type: string
+            required: true
+            description: Unique identifier, e.g., "MS1", "MS2".
+          title:
+            type: string
+            required: true
+          due_month:
+            type: integer
+            required: true
+            description: >
+              1-based month number. Must be non-null.
+              all_milestones_have_criteria verifies this field is present.
+          verifiable_criterion:
+            type: string
+            required: true
+            description: >
+              Concrete, externally verifiable statement of what constitutes
+              achievement of this milestone. Must not be empty or a
+              placeholder string. all_milestones_have_criteria verifies
+              this field is present and non-empty.
+          responsible_wp:
+            type: string
+            required: true
+            description: WP identifier responsible for this milestone.
+
+      critical_path:
+        type: array
+        required: true
+        description: >
+          Ordered list of task_ids and milestone_ids forming the critical
+          path through the project schedule. Must be non-empty for
+          critical_path_present to pass. The runner verifies this field
+          is non-empty; it does not recompute the critical path.
+        item_type: string
+
+  # ---------------------------------------------------------------------------
+  # 1.5 impact_architecture.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json
+  # Produced by: impact_architect agent (Phase 5)
+  # Consumed by: phase_05_gate predicates; phase_08 drafting
+  # ---------------------------------------------------------------------------
+  impact_architecture:
+    schema_id_value: "orch.phase5.impact_architecture.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase5.impact_architecture.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      impact_pathways:
+        type: array
+        required: true
+        description: >
+          Complete impact pathway set. Every expected_impact_id from Tier 2B
+          expected_impacts.json must appear in at least one pathway for
+          all_impacts_mapped to pass.
+        item_schema:
+          pathway_id:
+            type: string
+            required: true
+          expected_impact_id:
+            type: string
+            required: true
+            description: >
+              Must match an impact identifier in Tier 2B expected_impacts.json.
+              Join key for all_impacts_mapped coverage predicate.
+          project_outputs:
+            type: array
+            required: true
+            description: >
+              List of deliverable_ids from wp_structure.json that produce
+              outputs contributing to this impact pathway. Must be non-empty
+              for all_impacts_mapped to count this pathway as satisfying
+              the expected impact.
+            item_type: string
+          outcomes:
+            type: array
+            required: true
+            description: Intermediate outcomes on the path from outputs to impact.
+            item_schema:
+              outcome_id:
+                type: string
+                required: true
+              description:
+                type: string
+                required: true
+              timeframe:
+                type: string
+                required: false
+          impact_narrative:
+            type: string
+            required: true
+            description: Evaluator-facing narrative for this pathway.
+          tier2b_source_ref:
+            type: string
+            required: true
+            description: Section in Tier 2B defining the expected impact.
+
+      kpis:
+        type: array
+        required: true
+        description: >
+          Key Performance Indicators. Every KPI must reference a deliverable_id
+          from wp_structure.json for kpis_traceable_to_wps to pass.
+        item_schema:
+          kpi_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          baseline:
+            type: string
+            required: false
+          target:
+            type: string
+            required: true
+          measurement_method:
+            type: string
+            required: true
+          traceable_to_deliverable:
+            type: string
+            required: true
+            description: >
+              deliverable_id from wp_structure.json. Must match an existing
+              deliverable_id for kpis_traceable_to_wps to pass.
+          due_month:
+            type: integer
+            required: false
+
+      dissemination_plan:
+        type: object
+        required: true
+        description: >
+          Structured dissemination approach. Must not be null or empty.
+          json_field_present verifies this field is present and non-null.
+        fields:
+          activities:
+            type: array
+            required: true
+            item_schema:
+              activity_type:
+                type: string
+                required: true
+              target_audience:
+                type: string
+                required: true
+              responsible_partner:
+                type: string
+                required: true
+              timing:
+                type: string
+                required: false
+          open_access_policy:
+            type: string
+            required: true
+
+      exploitation_plan:
+        type: object
+        required: true
+        description: >
+          Structured exploitation approach. Must not be null or empty.
+          json_field_present verifies this field is present and non-null.
+        fields:
+          activities:
+            type: array
+            required: true
+            item_schema:
+              activity_type:
+                type: string
+                required: true
+              expected_result:
+                type: string
+                required: true
+              responsible_partner:
+                type: string
+                required: true
+              timing:
+                type: string
+                required: false
+          ipr_strategy:
+            type: string
+            required: false
+
+      sustainability_mechanism:
+        type: object
+        required: true
+        description: >
+          How project outputs will be sustained after the project ends.
+          Must not be null or empty. json_field_present verifies this field.
+        fields:
+          description:
+            type: string
+            required: true
+          responsible_partners:
+            type: array
+            required: true
+            item_type: string
+          post_project_timeline:
+            type: string
+            required: false
+
+  # ---------------------------------------------------------------------------
+  # 1.6 implementation_architecture.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json
+  # Produced by: implementation_architect agent (Phase 6)
+  # Consumed by: phase_06_gate predicates; phase_07 (budget gate inputs)
+  # ---------------------------------------------------------------------------
+  implementation_architecture:
+    schema_id_value: "orch.phase6.implementation_architecture.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase6.implementation_architecture.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      risk_register:
+        type: array
+        required: true
+        description: >
+          Populated risk register. Must be non-empty for risk_register_populated
+          to pass. Each entry must have non-null likelihood, impact, and
+          mitigation fields.
+        item_schema:
+          risk_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          category:
+            type: string
+            required: true
+            enum: [technical, financial, organisational, ethical, external, other]
+          likelihood:
+            type: string
+            required: true
+            enum: [low, medium, high]
+            description: >
+              Must be non-null. risk_register_populated verifies this field
+              is present and non-null on every entry.
+          impact:
+            type: string
+            required: true
+            enum: [low, medium, high]
+            description: Must be non-null. Verified by risk_register_populated.
+          mitigation:
+            type: string
+            required: true
+            description: >
+              Must be non-empty string. risk_register_populated verifies
+              this field is present and non-null on every entry.
+          responsible_partner:
+            type: string
+            required: false
+
+      ethics_assessment:
+        type: object
+        required: true
+        description: >
+          Ethics self-assessment. Must not be null, empty string, or the
+          sentinel placeholder value "N/A" for ethics_assessment_explicit
+          to pass. Explicit "not applicable" declarations must be present
+          with a stated reason, not an empty or absent field.
+        fields:
+          ethics_issues_identified:
+            type: boolean
+            required: true
+            description: >
+              True if any ethics issues are identified. False is a valid value
+              when no issues apply, but the field must be explicitly present.
+          issues:
+            type: array
+            required: true
+            description: >
+              Non-empty when ethics_issues_identified is true.
+              May be empty array when ethics_issues_identified is false.
+            item_schema:
+              issue_id:
+                type: string
+                required: true
+              description:
+                type: string
+                required: true
+              mitigation:
+                type: string
+                required: true
+          self_assessment_statement:
+            type: string
+            required: true
+            description: >
+              Explicit statement of the ethics self-assessment position.
+              Must not be empty. This is the field that ethics_assessment_explicit
+              verifies is present, non-null, not empty, and not a placeholder.
+
+      governance_matrix:
+        type: array
+        required: true
+        description: >
+          Decision-making governance structure. Must be non-empty for
+          governance_matrix_present to pass.
+        item_schema:
+          body_name:
+            type: string
+            required: true
+            description: Name of the governance body or decision-making entity.
+          composition:
+            type: array
+            required: true
+            item_type: string
+            description: List of partner identifiers or role names.
+          decision_scope:
+            type: string
+            required: true
+          meeting_frequency:
+            type: string
+            required: false
+          escalation_path:
+            type: string
+            required: false
+
+      management_roles:
+        type: array
+        required: true
+        description: >
+          Management roles assigned to consortium members. Every role
+          must reference a partner_id present in Tier 3 partners.json
+          for all_management_roles_in_tier3 to pass.
+        item_schema:
+          role_id:
+            type: string
+            required: true
+          role_name:
+            type: string
+            required: true
+          assigned_to:
+            type: string
+            required: true
+            description: >
+              partner_id matching an entry in Tier 3 partners.json.
+              all_management_roles_in_tier3 verifies this against Tier 3.
+          responsibilities:
+            type: array
+            required: true
+            item_type: string
+
+      instrument_sections_addressed:
+        type: array
+        required: true
+        description: >
+          List of mandatory implementation sections from the active instrument
+          schema, each with a status indicating whether it has been addressed.
+          instrument_sections_addressed predicate verifies all mandatory sections
+          in section_schema_registry.json are present with status: addressed.
+        item_schema:
+          section_id:
+            type: string
+            required: true
+            description: >
+              Section identifier from section_schema_registry.json
+              for the active instrument type.
+          section_name:
+            type: string
+            required: true
+          status:
+            type: string
+            required: true
+            enum: [addressed, not_applicable, deferred]
+          location_reference:
+            type: string
+            required: false
+            description: Where in the proposal this section is addressed.
+
+  # ---------------------------------------------------------------------------
+  # 1.7 budget_gate_assessment.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json
+  # Produced by: budget_gate_validator agent (Phase 7)
+  # Consumed by: gate_09_budget_consistency predicates; gate_12 (budget confirmation check)
+  # ---------------------------------------------------------------------------
+  budget_gate_assessment:
+    schema_id_value: "orch.phase7.budget_gate_assessment.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase7.budget_gate_assessment.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      gate_pass_declaration:
+        type: string
+        required: true
+        enum: [pass, fail]
+        description: >
+          The budget_gate_validator agent's declaration of whether the budget gate
+          condition is met. budget_gate_confirmation_present predicate verifies
+          this field equals "pass". This field must reflect the validated state
+          of the external budget response, not an estimate.
+
+      budget_response_reference:
+        type: string
+        required: true
+        description: >
+          File name or path of the budget response file(s) in
+          docs/integrations/lump_sum_budget_planner/received/ that was
+          validated. Ensures traceability to the specific external response.
+
+      validation_artifact_reference:
+        type: string
+        required: true
+        description: >
+          File name or path of the validation artifact in
+          docs/integrations/lump_sum_budget_planner/validation/ that
+          confirms interface contract conformance.
+
+      wp_coverage_results:
+        type: array
+        required: true
+        description: >
+          Coverage check results: every WP in Phase 3 output vs. budget response.
+          Used to satisfy wp_budget_coverage_match predicate (the predicate reads
+          the source artifacts directly; this field documents the agent's findings).
+        item_schema:
+          wp_id:
+            type: string
+            required: true
+          present_in_budget:
+            type: boolean
+            required: true
+          budget_line_reference:
+            type: string
+            required: false
+          inconsistencies:
+            type: array
+            required: true
+            item_type: string
+
+      partner_coverage_results:
+        type: array
+        required: true
+        description: >
+          Coverage check results: every partner in Tier 3 vs. budget response.
+          Documents the agent's findings for partner_budget_coverage_match.
+        item_schema:
+          partner_id:
+            type: string
+            required: true
+          present_in_budget:
+            type: boolean
+            required: true
+          budget_line_reference:
+            type: string
+            required: false
+          inconsistencies:
+            type: array
+            required: true
+            item_type: string
+
+      blocking_inconsistencies:
+        type: array
+        required: true
+        description: >
+          All structural inconsistencies found between the budget response and
+          the WP/consortium design. no_blocking_inconsistencies predicate fails
+          if any entry has resolution: unresolved. Must be an array (empty when
+          gate_pass_declaration is pass with no inconsistencies).
+        item_schema:
+          inconsistency_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          severity:
+            type: string
+            required: true
+            enum: [blocking, non_blocking]
+          resolution:
+            type: string
+            required: true
+            enum: [resolved, unresolved]
+          resolution_note:
+            type: string
+            required: false
+            description: Required when resolution is "resolved".
+
+  # ---------------------------------------------------------------------------
+  # 1.8 drafting_review_status.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json
+  # Produced by: proposal_writer + revision_integrator agents (Phase 8)
+  # Consumed by: gate_12_constitutional_compliance predicates
+  # ---------------------------------------------------------------------------
+  drafting_review_status:
+    schema_id_value: "orch.phase8.drafting_review_status.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase8.drafting_review_status.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      section_completion_log:
+        type: array
+        required: true
+        description: >
+          Log of drafting status per section. Each section in the active
+          instrument schema must have an entry.
+        item_schema:
+          section_id:
+            type: string
+            required: true
+          section_name:
+            type: string
+            required: true
+          status:
+            type: string
+            required: true
+            enum: [drafted, assembled, reviewed, revised, final]
+          artifact_path:
+            type: string
+            required: true
+            description: Path to the proposal section artifact in docs/tier5_deliverables/proposal_sections/.
+          data_gaps_flagged:
+            type: boolean
+            required: true
+
+      revision_actions:
+        type: array
+        required: true
+        description: >
+          Revision actions arising from the evaluator review. Used by
+          all_critical_revisions_resolved predicate: no entry may have
+          severity: critical and status: unresolved without a non-empty reason.
+        item_schema:
+          action_id:
+            type: string
+            required: true
+          section_id:
+            type: string
+            required: true
+          severity:
+            type: string
+            required: true
+            enum: [critical, major, minor]
+          description:
+            type: string
+            required: true
+          status:
+            type: string
+            required: true
+            enum: [resolved, unresolved]
+          reason:
+            type: string
+            required: false
+            description: >
+              Required when severity is critical and status is unresolved.
+              Must be non-empty in that case. Documents why the critical
+              revision cannot be resolved.
+          source_finding_id:
+            type: string
+            required: false
+            description: References the finding_id in review_packet.json.
+
+      revision_log:
+        type: array
+        required: true
+        description: >
+          Chronological log of revision actions taken. Must be non-empty
+          once Phase 8d is complete.
+        item_schema:
+          log_entry_id:
+            type: string
+            required: true
+          action_id:
+            type: string
+            required: true
+          change_description:
+            type: string
+            required: true
+          section_affected:
+            type: string
+            required: true
+          performed_at:
+            type: string
+            required: true
+            description: ISO 8601 timestamp.
+
+  # ---------------------------------------------------------------------------
+  # 1.9 phase8_checkpoint.json
+  # Path: docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json
+  # Produced by: runner after gate_12_constitutional_compliance passes
+  # Consumed by: gate_12 checkpoint_published predicate
+  # ---------------------------------------------------------------------------
+  phase8_checkpoint:
+    schema_id_value: "orch.checkpoints.phase8_checkpoint.v1"
+    canonical_path: "docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.checkpoints.phase8_checkpoint.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      status:
+        type: string
+        required: true
+        enum: [published]
+        description: >
+          Must equal "published" for checkpoint_published predicate to pass.
+          The runner writes this field only after all Phase 8 gates have passed.
+          No other value is valid for a gate-satisfying checkpoint.
+
+      published_at:
+        type: string
+        required: true
+        description: ISO 8601 timestamp of checkpoint publication.
+
+      gate_results_confirmed:
+        type: array
+        required: true
+        description: >
+          List of gate_ids whose results were confirmed at checkpoint time.
+          Must include gate_09_budget_consistency, gate_10_part_b_completeness,
+          gate_11_review_closure, gate_12_constitutional_compliance.
+        item_type: string
+
+
+# =============================================================================
+# SECTION 2 — TIER 5 DELIVERABLE CANONICAL ARTIFACTS
+# =============================================================================
+#
+# Provenance class: run_produced for all three. All require schema_id and run_id.
+
+tier5_deliverable_schemas:
+
+  # ---------------------------------------------------------------------------
+  # 2.1 assembled_draft.json
+  # Path: docs/tier5_deliverables/assembled_drafts/assembled_draft.json
+  # Produced by: proposal_writer agent (Phase 8b)
+  # Consumed by: gate_10_part_b_completeness predicates
+  # ---------------------------------------------------------------------------
+  assembled_draft:
+    schema_id_value: "orch.tier5.assembled_draft.v1"
+    canonical_path: "docs/tier5_deliverables/assembled_drafts/assembled_draft.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.assembled_draft.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      sections:
+        type: array
+        required: true
+        description: >
+          Ordered array of assembled proposal sections. Each entry references
+          a section artifact in docs/tier5_deliverables/proposal_sections/.
+          Must be non-empty.
+        item_schema:
+          section_id:
+            type: string
+            required: true
+          section_name:
+            type: string
+            required: true
+          order:
+            type: integer
+            required: true
+            description: 1-based rendering order.
+          artifact_path:
+            type: string
+            required: true
+            description: >
+              Path to the proposal section artifact. Used by
+              all_sections_have_traceability_footer to locate the file.
+          word_count:
+            type: integer
+            required: false
+          page_limit_declared:
+            type: integer
+            required: false
+
+      consistency_log:
+        type: array
+        required: true
+        description: >
+          Log of cross-section consistency checks performed during assembly.
+          Must be non-empty. Each entry documents what was checked and the
+          result. Empty array indicates assembly was not validated.
+        item_schema:
+          check_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          sections_checked:
+            type: array
+            required: true
+            item_type: string
+          status:
+            type: string
+            required: true
+            enum: [consistent, inconsistency_flagged, resolved]
+          inconsistency_note:
+            type: string
+            required: false
+
+  # ---------------------------------------------------------------------------
+  # 2.2 review_packet.json
+  # Path: docs/tier5_deliverables/review_packets/review_packet.json
+  # Produced by: evaluator_reviewer agent (Phase 8c)
+  # Consumed by: gate_11_review_closure and gate_12_constitutional_compliance predicates
+  # ---------------------------------------------------------------------------
+  review_packet:
+    schema_id_value: "orch.tier5.review_packet.v1"
+    canonical_path: "docs/tier5_deliverables/review_packets/review_packet.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.review_packet.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      findings:
+        type: array
+        required: true
+        description: >
+          Evaluator review findings. Every entry must have a non-null severity
+          field for findings_categorised_by_severity to pass. The severity
+          values are the primary triage signal for the revision_integrator.
+        item_schema:
+          finding_id:
+            type: string
+            required: true
+          section_id:
+            type: string
+            required: true
+          criterion:
+            type: string
+            required: true
+            description: >
+              The evaluation criterion from the active evaluation form (Tier 2A)
+              against which this finding is made.
+          description:
+            type: string
+            required: true
+          severity:
+            type: string
+            required: true
+            enum: [critical, major, minor]
+            description: >
+              Must be non-null and drawn from {critical, major, minor}.
+              findings_categorised_by_severity verifies all entries have
+              this field present and drawn from the enum.
+          evidence:
+            type: string
+            required: false
+            description: Quoted text from the draft that illustrates the finding.
+          recommendation:
+            type: string
+            required: false
+
+      revision_actions:
+        type: array
+        required: true
+        description: >
+          Prioritised revision action list produced by the evaluator_reviewer
+          agent. revision_action_list_present verifies this array is non-empty.
+          Each entry maps to an action_id in drafting_review_status.json.
+        item_schema:
+          action_id:
+            type: string
+            required: true
+          finding_id:
+            type: string
+            required: true
+          priority:
+            type: integer
+            required: true
+            description: 1-based priority order for revision work.
+          action_description:
+            type: string
+            required: true
+          target_section:
+            type: string
+            required: true
+          severity:
+            type: string
+            required: true
+            enum: [critical, major, minor]
+
+  # ---------------------------------------------------------------------------
+  # 2.3 final_export.json
+  # Path: docs/tier5_deliverables/final_exports/final_export.json
+  # Produced by: proposal_writer agent (Phase 8d on completion)
+  # Consumed by: gate_12_constitutional_compliance predicates
+  # ---------------------------------------------------------------------------
+  final_export:
+    schema_id_value: "orch.tier5.final_export.v1"
+    canonical_path: "docs/tier5_deliverables/final_exports/final_export.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.final_export.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      export_format:
+        type: string
+        required: true
+        enum: [pdf, docx, json_bundle]
+        description: Format of the exported proposal document.
+
+      export_path:
+        type: string
+        required: true
+        description: >
+          Relative path to the exported proposal file within
+          docs/tier5_deliverables/final_exports/.
+
+      section_index:
+        type: array
+        required: true
+        description: >
+          Index of all sections included in the final export, in rendering order.
+        item_schema:
+          section_id:
+            type: string
+            required: true
+          section_name:
+            type: string
+            required: true
+          artifact_path:
+            type: string
+            required: true
+          page_range:
+            type: string
+            required: false
+
+      exported_at:
+        type: string
+        required: true
+        description: ISO 8601 timestamp of final export production.
+
+
+# =============================================================================
+# SECTION 3 — PROPOSAL SECTION ARTIFACTS
+# =============================================================================
+#
+# Path pattern: docs/tier5_deliverables/proposal_sections/<section_id>.json
+# One file per section required by the active instrument schema.
+# Provenance class: run_produced (or inherited via reuse policy).
+# all_sections_have_traceability_footer reads the traceability_footer field.
+# all_sections_drafted verifies that a file exists for each section_id
+# listed as mandatory in section_schema_registry.json.
+
+tier5_proposal_section_schema:
+  schema_id_value: "orch.tier5.proposal_section.v1"
+  canonical_path_pattern: "docs/tier5_deliverables/proposal_sections/<section_id>.json"
+  provenance_class: run_produced
+
+  fields:
+    schema_id:
+      type: string
+      required: true
+      description: Must equal "orch.tier5.proposal_section.v1".
+
+    run_id:
+      type: string
+      required: true
+
+    artifact_status:
+      type: string
+      required: false
+      enum: [valid, invalid]
+
+    section_id:
+      type: string
+      required: true
+      description: >
+        Must match the section_id in section_schema_registry.json for the
+        active instrument. The file name must equal "<section_id>.json".
+
+    section_name:
+      type: string
+      required: true
+
+    content:
+      type: string
+      required: true
+      description: >
+        The full text of the proposal section. Must not be empty.
+        Evaluator-oriented prose conforming to Tier 2A application form
+        requirements and Tier 2B call framing.
+
+    word_count:
+      type: integer
+      required: true
+
+    validation_status:
+      type: object
+      required: true
+      description: >
+        Validation status of key claims in this section. Used by semantic
+        predicates no_gap_masked_as_confirmed and no_unsupported_tier5_claims.
+        Every material claim should be categorised per CLAUDE.md §12.2.
+      fields:
+        overall_status:
+          type: string
+          required: true
+          enum: [confirmed, inferred, assumed, unresolved]
+          description: >
+            Highest-risk status across all claims in this section.
+            A section with any Unresolved claim must have overall_status: unresolved.
+        claim_statuses:
+          type: array
+          required: true
+          description: Per-claim status breakdown.
+          item_schema:
+            claim_id:
+              type: string
+              required: true
+            claim_summary:
+              type: string
+              required: true
+            status:
+              type: string
+              required: true
+              enum: [confirmed, inferred, assumed, unresolved]
+            source_ref:
+              type: string
+              required: false
+              description: Tier 1-4 source for confirmed/inferred claims.
+            assumption_declared:
+              type: boolean
+              required: false
+              description: True when status is assumed; indicates explicit declaration in content.
+
+    traceability_footer:
+      type: object
+      required: true
+      description: >
+        Traceability record linking this section to its Tier 1-4 sources.
+        all_sections_have_traceability_footer verifies this field is present
+        and non-empty. A section with an empty or null traceability_footer
+        fails the gate predicate.
+      fields:
+        primary_sources:
+          type: array
+          required: true
+          description: >
+            Must be non-empty. Each entry identifies a Tier 1-4 source file
+            used in drafting this section.
+          item_schema:
+            tier:
+              type: integer
+              required: true
+              enum: [1, 2, 3, 4]
+            source_path:
+              type: string
+              required: true
+            relevant_fields:
+              type: array
+              required: false
+              item_type: string
+        no_unsupported_claims_declaration:
+          type: boolean
+          required: true
+          description: >
+            Agent declaration that no claim in this section is unsupported
+            by Tier 1-4 data. False or absent triggers semantic predicate
+            no_unsupported_tier5_claims to inspect this section.
+
+
+# =============================================================================
+# SECTION 4 — GATE RESULT ARTIFACTS (13th canonical artifact type)
+# =============================================================================
+#
+# All gate result files conform to the GateResult schema defined in
+# gate_rules_library_plan.md §6.2. This section specifies the schema_id
+# and records the canonical paths from §6.3.
+#
+# Provenance class: run_produced for all gate results.
+# The gate_pass_recorded predicate reads these artifacts.
+
+gate_result_schema:
+  schema_id_value: "orch.gate_result.v1"
+  provenance_class: run_produced
+  description: >
+    Schema for all gate result artifacts written by the runner.
+    Canonical paths are defined in gate_rules_library_plan.md §6.3.
+    The schema_id field must equal "orch.gate_result.v1" in every
+    gate result file. A gate_pass_recorded predicate that reads a gate
+    result file and finds a different schema_id must fail with
+    failure_category: MALFORMED_ARTIFACT.
+
+  canonical_paths:
+    gate_01_source_integrity: "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_01_result.json"
+    phase_01_gate: "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json"
+    phase_02_gate: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json"
+    phase_03_gate: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json"
+    phase_04_gate: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json"
+    phase_05_gate: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json"
+    phase_06_gate: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json"
+    gate_09_budget_consistency: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json"
+    gate_10_part_b_completeness: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10_result.json"
+    gate_11_review_closure: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json"
+    gate_12_constitutional_compliance: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json"
+
+  fields:
+    schema_id:
+      type: string
+      required: true
+      description: Must equal "orch.gate_result.v1".
+
+    gate_id:
+      type: string
+      required: true
+
+    gate_kind:
+      type: string
+      required: true
+      enum: [entry, exit]
+
+    run_id:
+      type: string
+      required: true
+      description: >
+        Must match the current DAG-runner run_id for gate_pass_recorded to
+        treat this as a current-run result. Mismatched run_id → STALE_UPSTREAM_MISMATCH.
+
+    manifest_version:
+      type: string
+      required: true
+
+    library_version:
+      type: string
+      required: true
+
+    constitution_version:
+      type: string
+      required: true
+
+    input_fingerprint:
+      type: string
+      required: true
+      description: >
+        Combined SHA-256 hash over all required_input artifact contents,
+        computed order-stably (sorted by path). Required in all GateResults
+        (entry and exit). gate_pass_recorded verifies this field is present.
+
+    input_artifact_fingerprints:
+      type: object
+      required: true
+      description: >
+        Map of artifact path → SHA-256 hex hash. One entry per required_input
+        artifact evaluated by this gate. Required in all GateResults.
+      item_value_type: string
+      description_of_keys: Canonical artifact paths.
+
+    evaluated_at:
+      type: string
+      required: true
+      description: >
+        ISO 8601 timestamp of gate evaluation. gate_pass_recorded verifies
+        this timestamp is not older than the mtime of any required_input
+        artifact (freshness bound).
+
+    repo_root:
+      type: string
+      required: true
+
+    status:
+      type: string
+      required: true
+      enum: [pass, fail]
+
+    hard_block:
+      type: boolean
+      required: false
+      description: >
+        True only for gate_09_budget_consistency failures where
+        dir_non_empty on received/ fails. Triggers HARD_BLOCK propagation
+        per §6.4. Absent when not applicable.
+
+    deterministic_predicates:
+      type: object
+      required: true
+      fields:
+        passed:
+          type: array
+          required: true
+          item_type: string
+          description: List of predicate_ids that passed.
+        failed:
+          type: array
+          required: true
+          description: >
+            List of failed predicate entries. Each entry must include
+            failure_category; absence makes the GateResult malformed.
+          item_schema:
+            predicate_id:
+              type: string
+              required: true
+            type:
+              type: string
+              required: true
+            function:
+              type: string
+              required: true
+            args:
+              type: object
+              required: true
+            failure_category:
+              type: string
+              required: true
+              enum: [MISSING_MANDATORY_INPUT, MALFORMED_ARTIFACT, CROSS_ARTIFACT_INCONSISTENCY, POLICY_VIOLATION, STALE_UPSTREAM_MISMATCH]
+            fail_message:
+              type: string
+              required: true
+            prose_condition:
+              type: string
+              required: true
+
+    semantic_predicates:
+      type: object
+      required: true
+      fields:
+        passed:
+          type: array
+          required: true
+          item_type: string
+        failed:
+          type: array
+          required: true
+          item_schema:
+            predicate_id:
+              type: string
+              required: true
+            function:
+              type: string
+              required: true
+            agent:
+              type: string
+              required: true
+            constitutional_rule:
+              type: string
+              required: true
+              description: E.g. "CLAUDE.md §13.3". Required; absence makes the GateResult malformed.
+            findings:
+              type: array
+              required: true
+              item_schema:
+                claim:
+                  type: string
+                  required: true
+                violated_rule:
+                  type: string
+                  required: true
+                  description: Named constitutional section. Required per §4.9.
+                evidence_path:
+                  type: string
+                  required: true
+                  description: Path to artifact containing the violation. Required per §4.9.
+                severity:
+                  type: string
+                  required: true
+                  enum: [critical, major]
+            fail_message:
+              type: string
+              required: true
+
+    skipped_semantic:
+      type: boolean
+      required: true
+      description: >
+        True when gate failed on deterministic predicates and semantic
+        predicates were not invoked.
+
+    inherited_artifacts:
+      type: array
+      required: false
+      description: >
+        Present when any artifact evaluated by this gate was provenance
+        class: inherited. Records the inheritance for auditability.
+      item_schema:
+        path:
+          type: string
+          required: true
+        original_run_id:
+          type: string
+          required: true
+        reuse_approved_by:
+          type: string
+          required: true
+          description: Current run_id under whose reuse policy the artifact was approved.
+
+    report_written_to:
+      type: string
+      required: true
+      description: Canonical path where this gate result was written.
+
+
+# =============================================================================
+# SECTION 5 — OPERATIONAL ARTIFACTS
+# =============================================================================
+#
+# These artifacts are written by the runner at DAG startup.
+# They are not consumed by gate predicates directly but are read by the
+# artifact_owned_by_run logic and the reuse policy resolution path.
+
+operational_artifact_schemas:
+
+  # ---------------------------------------------------------------------------
+  # 5.1 Run Manifest
+  # Path: docs/tier4_orchestration_state/run_manifests/<run_id>.json
+  # Written by: runner at DAG startup
+  # ---------------------------------------------------------------------------
+  run_manifest:
+    schema_id_value: "orch.operational.run_manifest.v1"
+    canonical_path_pattern: "docs/tier4_orchestration_state/run_manifests/<run_id>.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.operational.run_manifest.v1".
+
+      run_id:
+        type: string
+        required: true
+        description: UUID generated at DAG startup. Immutable for the lifetime of the run.
+
+      manifest_version:
+        type: string
+        required: true
+        description: Version of manifest.compile.yaml governing this run.
+
+      library_version:
+        type: string
+        required: true
+        description: Version of gate_rules_library.yaml loaded for this run.
+
+      constitution_version:
+        type: string
+        required: true
+        description: Git SHA or datestamp of CLAUDE.md in force at run start.
+
+      started_at:
+        type: string
+        required: true
+        description: ISO 8601 timestamp of DAG runner startup.
+
+      repo_root:
+        type: string
+        required: true
+
+      node_states:
+        type: array
+        required: true
+        description: >
+          Current state of each DAG node. Updated by the runner as nodes
+          transition between states. This is the authoritative node state record.
+        item_schema:
+          node_id:
+            type: string
+            required: true
+          state:
+            type: string
+            required: true
+            enum: [pending, running, blocked_at_entry, blocked_at_exit, released]
+          gate_result_path:
+            type: string
+            required: false
+            description: Path to the gate result artifact; set when a gate has been evaluated.
+          blocked_reason:
+            type: string
+            required: false
+            description: >
+              Present when state is blocked_at_entry or blocked_at_exit.
+              For HARD_BLOCK downstream propagation, value is "HARD_BLOCK_UPSTREAM".
+          last_updated_at:
+            type: string
+            required: true
+            description: ISO 8601 timestamp of last state transition.
+
+  # ---------------------------------------------------------------------------
+  # 5.2 Reuse Policy
+  # Path: docs/tier4_orchestration_state/run_manifests/<run_id>_reuse_policy.yaml
+  # Written by: runner at DAG startup (initially empty); operator may populate before run
+  # Structure specified in gate_rules_library_plan.md §7.5
+  # ---------------------------------------------------------------------------
+  reuse_policy:
+    canonical_path_pattern: "docs/tier4_orchestration_state/run_manifests/<run_id>_reuse_policy.yaml"
+    provenance_class: manually_placed
+    description: >
+      YAML file (not JSON). Operator-authored before run start.
+      Authorises specific prior-run artifacts for reuse in the current run.
+      The runner reads this at startup and at each artifact_owned_by_run
+      evaluation where run_id does not match.
+
+    fields:
+      reuse_policy_for_run:
+        type: string
+        required: true
+        description: Must match the current run_id. Prevents accidental cross-run reuse.
+
+      approved_artifacts:
+        type: array
+        required: true
+        description: >
+          List of artifacts approved for reuse. Empty array means no reuse
+          is authorised. The runner must not treat an absent field as an
+          empty array; the field must be explicitly present.
+        item_schema:
+          path:
+            type: string
+            required: true
+            description: Canonical artifact path as defined in §7.2.
+          original_run_id:
+            type: string
+            required: true
+            description: The run_id embedded in the artifact being reused.
+          reason:
+            type: string
+            required: true
+            description: Operator-supplied justification. Must not be empty.
+          status:
+            type: string
+            required: true
+            enum: [approved]
+            description: >
+              Only "approved" is a valid status. Any other value means the
+              entry is not active and artifact_owned_by_run must fail.
+
+
+# =============================================================================
+# SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS
+# =============================================================================
+#
+# Tier 3 artifacts are provenance class: manually_placed.
+# They do not carry run_id or schema_id (not produced by agents).
+# Predicates read specific fields from these files; this section defines
+# the expected field structure.
+
+tier3_source_schemas:
+
+  # ---------------------------------------------------------------------------
+  # 6.1 selected_call.json
+  # Path: docs/tier3_project_instantiation/call_binding/selected_call.json
+  # Read by: gate_01_source_integrity (schema predicate), timeline predicates
+  # ---------------------------------------------------------------------------
+  selected_call:
+    canonical_path: "docs/tier3_project_instantiation/call_binding/selected_call.json"
+    provenance_class: manually_placed
+    description: >
+      Identifies the call the project is targeting. Populated by the human
+      operator or project team before workflow execution begins.
+
+    fields:
+      call_id:
+        type: string
+        required: true
+        description: >
+          Official call identifier, e.g., "HORIZON-CL4-2024-DIGITAL-EMERGING-01".
+          Required by json_fields_present predicate in gate_01.
+      topic_code:
+        type: string
+        required: true
+        description: >
+          Topic code within the call, e.g., "HORIZON-CL4-2024-DIGITAL-EMERGING-01-01".
+          Required by json_fields_present predicate in gate_01.
+      instrument_type:
+        type: string
+        required: true
+        description: >
+          Instrument type abbreviation. Required by json_fields_present predicate
+          in gate_01 and used by instrument_type_matches_schema predicate.
+          Must match a value in section_schema_registry.json.
+          Examples: RIA, IA, CSA, MSCA-PF, ERC-ADG, EIC-Accelerator.
+      work_programme_area:
+        type: string
+        required: true
+        description: >
+          The Horizon Europe cluster or programme area, e.g., "Cluster 4:
+          Digital, Industry and Space". Required by json_fields_present predicate.
+      project_duration_months:
+        type: integer
+        required: true
+        description: >
+          Maximum project duration in months as specified in the call.
+          Used by timeline_within_duration predicate to verify all task
+          end_months are ≤ this value.
+      budget_ceiling_eur:
+        type: number
+        required: false
+        description: Maximum grant amount in EUR as specified in the call.
+      opening_date:
+        type: string
+        required: false
+        description: ISO 8601 date.
+      deadline:
+        type: string
+        required: false
+        description: ISO 8601 date.
+
+  # ---------------------------------------------------------------------------
+  # 6.2 topic_mapping.json
+  # Path: docs/tier3_project_instantiation/call_binding/topic_mapping.json
+  # Read by: phase_02_gate source_ref predicate (all_mappings_have_source_refs)
+  # ---------------------------------------------------------------------------
+  topic_mapping:
+    canonical_path: "docs/tier3_project_instantiation/call_binding/topic_mapping.json"
+    provenance_class: manually_placed
+    description: >
+      Maps each call topic element (expected outcome, scope requirement) to
+      the project concept. Produced during Phase 2 and written to Tier 3.
+      all_mappings_have_source_refs requires every entry to carry both
+      a Tier 2B source reference and a Tier 3 project evidence reference.
+
+    fields:
+      mappings:
+        type: array
+        required: true
+        item_schema:
+          topic_element_id:
+            type: string
+            required: true
+          tier2b_source_ref:
+            type: string
+            required: true
+            description: >
+              Section or file in Tier 2B. Required for all_mappings_have_source_refs.
+          tier3_evidence_ref:
+            type: string
+            required: true
+            description: >
+              Path or field in Tier 3 project data. Required for
+              all_mappings_have_source_refs.
+          mapping_description:
+            type: string
+            required: true
+
+  # ---------------------------------------------------------------------------
+  # 6.3 compliance_profile.json
+  # Path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+  # Read by: phase_02_gate (non_empty_json check); phase_06 (implementation)
+  # ---------------------------------------------------------------------------
+  compliance_profile:
+    canonical_path: "docs/tier3_project_instantiation/call_binding/compliance_profile.json"
+    provenance_class: manually_placed
+
+    fields:
+      eligibility_confirmed:
+        type: boolean
+        required: true
+      ethics_review_required:
+        type: boolean
+        required: true
+      gender_plan_required:
+        type: boolean
+        required: true
+      open_science_requirements:
+        type: array
+        required: true
+        item_type: string
+      notes:
+        type: string
+        required: false
+
+  # ---------------------------------------------------------------------------
+  # 6.4 partners.json
+  # Path: docs/tier3_project_instantiation/consortium/partners.json
+  # Read by: all_partners_in_tier3, all_management_roles_in_tier3,
+  #          partner_budget_coverage_match predicates
+  # ---------------------------------------------------------------------------
+  partners:
+    canonical_path: "docs/tier3_project_instantiation/consortium/partners.json"
+    provenance_class: manually_placed
+    description: >
+      Consortium partner registry. The partner_id field is the join key
+      used by multiple coverage predicates.
+
+    fields:
+      partners:
+        type: array
+        required: true
+        item_schema:
+          partner_id:
+            type: string
+            required: true
+            description: >
+              Unique identifier used as the join key in all_partners_in_tier3,
+              all_management_roles_in_tier3, and partner_budget_coverage_match.
+              Must be stable across phases.
+          legal_name:
+            type: string
+            required: true
+          country:
+            type: string
+            required: true
+          organisation_type:
+            type: string
+            required: true
+            enum: [university, research_institute, sme, large_company, public_body, ngo, other]
+          is_coordinator:
+            type: boolean
+            required: true
+          contact_name:
+            type: string
+            required: false
+
+  # ---------------------------------------------------------------------------
+  # 6.5 milestones_seed.json
+  # Path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+  # Read by: phase_04_gate (non_empty_json check)
+  # Written by: gantt_designer agent during Phase 4 (population from seed)
+  # ---------------------------------------------------------------------------
+  milestones_seed:
+    canonical_path: "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+    provenance_class: manually_placed
+    description: >
+      Seed milestone list populated by the gantt_designer agent during Phase 4.
+      phase_04_gate verifies this file is non-empty (non_empty_json predicate).
+      After Phase 4 populates it, it becomes manually_placed with agent-written content.
+
+    fields:
+      milestones:
+        type: array
+        required: true
+        item_schema:
+          milestone_id:
+            type: string
+            required: true
+          title:
+            type: string
+            required: true
+          due_month:
+            type: integer
+            required: true
+          verifiable_criterion:
+            type: string
+            required: true
+
+
+# =============================================================================
+# SECTION 7 — TIER 2B EXTRACTED FILE SCHEMAS
+# =============================================================================
+#
+# Tier 2B extracted files are manually_placed (extracted from source documents
+# by the call_analyzer agent and written to Tier 2B extracted/).
+# source_refs_present predicate verifies every item carries a source_section
+# and source_document field. These schemas define the minimum field structure.
+
+tier2b_extracted_schemas:
+
+  common_item_fields:
+    description: >
+      Every item in every Tier 2B extracted array must carry these fields
+      for source_refs_present to pass.
+    source_section:
+      type: string
+      required: true
+      description: Section identifier in the source work programme or call extract document.
+    source_document:
+      type: string
+      required: true
+      description: File name of the Tier 2B source document.
+
+  call_constraints:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"
+    provenance_class: manually_placed
+    fields:
+      constraints:
+        type: array
+        required: true
+        description: Must be non-empty. Each item must carry source_section and source_document.
+        item_schema:
+          constraint_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          constraint_type:
+            type: string
+            required: true
+            enum: [eligibility, scope, methodological, partnership, reporting, other]
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+  expected_outcomes:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+    provenance_class: manually_placed
+    fields:
+      outcomes:
+        type: array
+        required: true
+        item_schema:
+          outcome_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+  expected_impacts:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+    provenance_class: manually_placed
+    fields:
+      impacts:
+        type: array
+        required: true
+        description: >
+          Each impact_id is the join key for all_impacts_mapped predicate.
+          Every item must carry source_section and source_document.
+        item_schema:
+          impact_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          impact_type:
+            type: string
+            required: true
+            enum: [scientific, societal, economic, policy, technological, environmental]
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+  scope_requirements:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+    provenance_class: manually_placed
+    fields:
+      requirements:
+        type: array
+        required: true
+        item_schema:
+          requirement_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          mandatory:
+            type: boolean
+            required: true
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+  eligibility_conditions:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json"
+    provenance_class: manually_placed
+    fields:
+      conditions:
+        type: array
+        required: true
+        item_schema:
+          condition_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          condition_type:
+            type: string
+            required: true
+            enum: [consortium_composition, trl_level, budget_limit, geographic, open_access, other]
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+  evaluation_priority_weights:
+    canonical_path: "docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json"
+    provenance_class: manually_placed
+    fields:
+      criteria:
+        type: array
+        required: true
+        item_schema:
+          criterion_id:
+            type: string
+            required: true
+          criterion_name:
+            type: string
+            required: true
+          weight:
+            type: number
+            required: false
+          priority_notes:
+            type: string
+            required: false
+          source_section:
+            type: string
+            required: true
+          source_document:
+            type: string
+            required: true
+
+
+# =============================================================================
+# SECTION 8 — TIER 2A EXTRACTED FILE SCHEMAS
+# =============================================================================
+#
+# Tier 2A extracted files are manually_placed (extracted from application form
+# and evaluation form templates). instrument_type_matches_schema and
+# all_sections_drafted predicates read section_schema_registry.json.
+
+tier2a_extracted_schemas:
+
+  section_schema_registry:
+    canonical_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+    provenance_class: manually_placed
+    description: >
+      Registry of instrument types and their mandatory sections. Used by
+      instrument_type_matches_schema, all_sections_drafted, wp_count_within_limit,
+      and instrument_sections_addressed predicates.
+
+    fields:
+      instruments:
+        type: array
+        required: true
+        item_schema:
+          instrument_type:
+            type: string
+            required: true
+            description: >
+              Matches the instrument_type field in selected_call.json.
+              instrument_type_matches_schema verifies a match exists here.
+          sections:
+            type: array
+            required: true
+            description: Mandatory sections for this instrument type.
+            item_schema:
+              section_id:
+                type: string
+                required: true
+              section_name:
+                type: string
+                required: true
+              mandatory:
+                type: boolean
+                required: true
+              section_type:
+                type: string
+                required: true
+                enum: [proposal_section, implementation_section, cover_page, annexe]
+              page_limit:
+                type: integer
+                required: false
+              word_limit:
+                type: integer
+                required: false
+          max_work_packages:
+            type: integer
+            required: false
+            description: >
+              Maximum number of WPs for this instrument. wp_count_within_limit
+              reads this field to verify the Phase 3 WP count.
+          evaluation_form_ref:
+            type: string
+            required: true
+            description: File name of the evaluation form template in tier2a_instrument_schemas/evaluation_forms/.
+
+  evaluator_expectation_registry:
+    canonical_path: "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
+    provenance_class: manually_placed
+    description: >
+      Registry of evaluator expectations per criterion per instrument type.
+      Read by call_analyzer during Phase 1 to build the evaluation matrix.
+
+    fields:
+      instruments:
+        type: array
+        required: true
+        item_schema:
+          instrument_type:
+            type: string
+            required: true
+          criteria:
+            type: array
+            required: true
+            item_schema:
+              criterion_id:
+                type: string
+                required: true
+              criterion_name:
+                type: string
+                required: true
+              threshold_score:
+                type: number
+                required: false
+              evaluator_expectations:
+                type: array
+                required: true
+                item_type: string
+
+
+# =============================================================================
+# SECTION 9 — SCHEMA ID REGISTRY
+# =============================================================================
+#
+# Quick-reference index of all schema_id values and their owning artifact.
+# The runner uses this to verify schema_id fields at predicate evaluation time.
+
+schema_id_registry:
+  - schema_id: "orch.phase1.call_analysis_summary.v1"
+    artifact: call_analysis_summary.json
+    section: "1.1"
+  - schema_id: "orch.phase2.concept_refinement_summary.v1"
+    artifact: concept_refinement_summary.json
+    section: "1.2"
+  - schema_id: "orch.phase3.wp_structure.v1"
+    artifact: wp_structure.json
+    section: "1.3"
+  - schema_id: "orch.phase4.gantt.v1"
+    artifact: gantt.json
+    section: "1.4"
+  - schema_id: "orch.phase5.impact_architecture.v1"
+    artifact: impact_architecture.json
+    section: "1.5"
+  - schema_id: "orch.phase6.implementation_architecture.v1"
+    artifact: implementation_architecture.json
+    section: "1.6"
+  - schema_id: "orch.phase7.budget_gate_assessment.v1"
+    artifact: budget_gate_assessment.json
+    section: "1.7"
+  - schema_id: "orch.phase8.drafting_review_status.v1"
+    artifact: drafting_review_status.json
+    section: "1.8"
+  - schema_id: "orch.checkpoints.phase8_checkpoint.v1"
+    artifact: phase8_checkpoint.json
+    section: "1.9"
+  - schema_id: "orch.tier5.assembled_draft.v1"
+    artifact: assembled_draft.json
+    section: "2.1"
+  - schema_id: "orch.tier5.review_packet.v1"
+    artifact: review_packet.json
+    section: "2.2"
+  - schema_id: "orch.tier5.final_export.v1"
+    artifact: final_export.json
+    section: "2.3"
+  - schema_id: "orch.tier5.proposal_section.v1"
+    artifact: "<section_id>.json (proposal_sections/)"
+    section: "3"
+  - schema_id: "orch.gate_result.v1"
+    artifact: gate_result.json / gate_NN_result.json
+    section: "4"
+  - schema_id: "orch.operational.run_manifest.v1"
+    artifact: "<run_id>.json (run_manifests/)"
+    section: "5.1"
