@@ -52,14 +52,16 @@ runner/                               # DAG-runner implementation package
     ├── file_predicates.py            # Step 3: exists, non_empty, non_empty_json, dir_non_empty
     ├── gate_pass_predicates.py       # Step 4: gate_pass_recorded
     ├── schema_predicates.py          # Step 5: §4.2 schema predicates + §4.8 canonical field predicates
-    └── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
+    ├── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
+    └── coverage_predicates.py        # Step 7: §4.4 coverage / cross-artifact join predicates
 tests/
 ├── conftest.py                       # repo_root fixture
 └── runner/predicates/
     ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
     ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
     ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
-    └── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
+    ├── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
+    └── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
 ```
 
 ---
@@ -109,6 +111,7 @@ The workflow package is now partially executable.
 - **Step 4 — Gate-pass predicate** completed in `runner/predicates/gate_pass_predicates.py`
 - **Step 5 — Schema predicates** completed in `runner/predicates/schema_predicates.py`
 - **Step 6 — Source reference predicates** completed in `runner/predicates/source_ref_predicates.py`
+- **Step 7 — Coverage predicates** completed in `runner/predicates/coverage_predicates.py`
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -148,16 +151,28 @@ Source reference predicates — §4.3 (Step 6):
 - `source_refs_present(path)`
 - `all_mappings_have_source_refs(path)`
 
+Coverage predicates — §4.4 (Step 7):
+- `wp_budget_coverage_match(wp_path, budget_path)`
+- `partner_budget_coverage_match(partners_path, budget_path)`
+- `all_impacts_mapped(impact_path, expected_impacts_path)`
+- `kpis_traceable_to_wps(impact_path, wp_path)`
+- `all_sections_drafted(sections_path, schema_path)`
+- `all_partners_in_tier3(wp_path, partners_path)`
+- `all_management_roles_in_tier3(impl_path, partners_path)`
+- `all_tasks_have_months(gantt_path, wp_path)`
+- `instrument_sections_addressed(impl_path, schema_path)`
+- `all_sections_have_traceability_footer(sections_path)`
+- `all_wps_have_deliverable_and_lead(wp_path)`
+
 All five failure categories are in use across the implemented predicates:
 - `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
 - `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps, null required values, unsupported container type, non-dict array element
 - `STALE_UPSTREAM_MISMATCH` — run_id mismatch, manifest_version mismatch, freshness violation
 - `POLICY_VIOLATION` — gate status not "pass", sentinel ethics value, unresolved inconsistencies, invalid severity enum, budget gate not passed, unresolved critical revisions without reason, checkpoint not published, missing/blank source references
-- `CROSS_ARTIFACT_INCONSISTENCY` — (reserved for Steps 7–8)
+- `CROSS_ARTIFACT_INCONSISTENCY` — cross-file join failures (missing WP/partner/task/impact/section coverage), internal WP structure violations
 
 **Current non-goals**
 The repository does **not** yet implement:
-- coverage predicates (Step 7)
 - cycle predicates (Step 8)
 - timeline predicates (Step 9)
 - semantic predicate dispatch (Step 10)
@@ -170,6 +185,7 @@ The repository does **not** yet implement:
 - Step 4 gate-pass predicate: 9 tests in `tests/runner/predicates/test_gate_pass_predicates.py`
 - Step 5 schema predicates: 65 tests in `tests/runner/predicates/test_schema_predicates.py`
 - Step 6 source reference predicates: 28 tests in `tests/runner/predicates/test_source_ref_predicates.py`
+- Step 7 coverage predicates: 71 tests in `tests/runner/predicates/test_coverage_predicates.py`
 
 ---
 
