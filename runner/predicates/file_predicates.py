@@ -1,5 +1,6 @@
 """
 Step 3 — File predicates.
+Step 10 extension — artifact_owned_by_run.
 
 Implements the four pure filesystem predicates defined in
 gate_rules_library_plan.md §4.1:
@@ -8,6 +9,10 @@ gate_rules_library_plan.md §4.1:
     non_empty(path)
     non_empty_json(path)
     dir_non_empty(path)
+
+Step 10 adds:
+
+    artifact_owned_by_run(path, run_id, *, reuse_policy_path=None, repo_root=None)
 
 All functions accept a ``repo_root`` keyword argument.  Paths that are
 relative strings are resolved via ``runner.paths.resolve_repo_path``.
@@ -46,6 +51,7 @@ from runner.paths import resolve_repo_path
 from runner.predicates.types import (
     MALFORMED_ARTIFACT,
     MISSING_MANDATORY_INPUT,
+    STALE_UPSTREAM_MISMATCH,
     PredicateResult,
 )
 
@@ -406,5 +412,147 @@ def dir_non_empty(
         details={
             "path": str(resolved),
             "non_empty_file_count": len(non_empty_files),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# artifact_owned_by_run  (Step 10)
+# ---------------------------------------------------------------------------
+
+
+def artifact_owned_by_run(
+    path: PathLike,
+    run_id: str,
+    *,
+    reuse_policy_path: Optional[PathLike] = None,
+    repo_root: Optional[Path] = None,
+) -> PredicateResult:
+    """
+    Verify that a canonical artifact was produced by the current run.
+
+    Contract (gate_rules_library_plan.md §7 and Step 10)
+    ------------------------------------------------------
+    Pass conditions:
+        * path exists and is a readable JSON file
+        * the artifact's top-level ``run_id`` field equals *run_id*, OR
+        * the artifact path appears in the reuse policy's ``approved_artifacts``
+          list (approved inherited artifact from a prior run)
+
+    Failure categories
+    ------------------
+    ``MISSING_MANDATORY_INPUT``
+        The artifact file does not exist.
+    ``MALFORMED_ARTIFACT``
+        The file cannot be read or parsed as a JSON object.
+    ``STALE_UPSTREAM_MISMATCH``
+        The artifact exists but its ``run_id`` does not match the current
+        run and it has not been approved in the reuse policy.
+
+    Reuse policy
+    ------------
+    When *reuse_policy_path* is provided and the artifact's run_id mismatches,
+    the predicate checks ``approved_artifacts`` in the reuse policy JSON.
+    If the path appears there (as a string key, matched against the resolved
+    path or the original path argument), the predicate passes with an
+    ``approved_via_reuse_policy: true`` flag in details.
+
+    Parameters
+    ----------
+    path:
+        Repository-relative or absolute path to the canonical artifact file.
+    run_id:
+        The current run's UUID string.
+    reuse_policy_path:
+        Optional path to the run's ``reuse_policy.json`` file.
+    repo_root:
+        Repository root for resolving relative paths.
+    """
+    resolved = resolve_repo_path(path, repo_root)
+
+    if not resolved.exists():
+        return PredicateResult(
+            passed=False,
+            failure_category=MISSING_MANDATORY_INPUT,
+            reason=f"Artifact not found: {resolved}",
+            details={"path": str(resolved)},
+        )
+
+    if resolved.is_dir():
+        return PredicateResult(
+            passed=False,
+            failure_category=MISSING_MANDATORY_INPUT,
+            reason=(
+                f"Expected a JSON artifact file but found a directory: {resolved}.  "
+                "artifact_owned_by_run requires a canonical artifact file path."
+            ),
+            details={"path": str(resolved), "is_dir": True},
+        )
+
+    try:
+        text = resolved.read_text(encoding="utf-8-sig")
+        artifact = json.loads(text)
+    except (json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=f"Cannot read artifact as JSON: {exc}",
+            details={"path": str(resolved), "error": str(exc)},
+        )
+
+    if not isinstance(artifact, dict):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"Artifact top-level value must be a JSON object; "
+                f"got {type(artifact).__name__}: {resolved}"
+            ),
+            details={"path": str(resolved), "actual_type": type(artifact).__name__},
+        )
+
+    artifact_run_id = artifact.get("run_id")
+    if artifact_run_id == run_id:
+        return PredicateResult(
+            passed=True,
+            details={"path": str(resolved), "run_id": run_id},
+        )
+
+    # Mismatch: check reuse policy before failing
+    if reuse_policy_path is not None:
+        policy_resolved = resolve_repo_path(reuse_policy_path, repo_root)
+        if policy_resolved.exists():
+            try:
+                policy = json.loads(
+                    policy_resolved.read_text(encoding="utf-8-sig")
+                )
+                approved: list = policy.get("approved_artifacts", [])
+                # Match against original path arg or resolved path string
+                if str(path) in approved or str(resolved) in approved:
+                    return PredicateResult(
+                        passed=True,
+                        details={
+                            "path": str(resolved),
+                            "approved_via_reuse_policy": True,
+                            "artifact_run_id": artifact_run_id,
+                            "current_run_id": run_id,
+                        },
+                    )
+            except Exception:
+                pass  # policy read failure falls through to stale mismatch
+
+    return PredicateResult(
+        passed=False,
+        failure_category=STALE_UPSTREAM_MISMATCH,
+        reason=(
+            f"Artifact run_id {artifact_run_id!r} does not match current run "
+            f"{run_id!r}: {resolved}.  Re-run the producing phase under the "
+            "current run_id, or add this artifact path to the reuse policy's "
+            "approved_artifacts list."
+        ),
+        details={
+            "path": str(resolved),
+            "artifact_run_id": artifact_run_id,
+            "expected_run_id": run_id,
         },
     )

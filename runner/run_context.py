@@ -1,0 +1,288 @@
+"""
+Run context: initialization, manifest management, node state, reuse policy.
+
+Each DAG run has a dedicated subdirectory under ``.claude/runs/<run_id>/``
+that contains:
+
+* ``run_manifest.json`` — run identity, versions, node state map, and
+  any HARD_BLOCK metadata written during gate evaluation.
+* ``reuse_policy.json`` — list of artifact paths approved for reuse across
+  runs (populated by operator approval; initially empty).
+
+The :class:`RunContext` is the single point of truth for node state during
+a run.  The gate evaluator reads and updates it after each gate evaluation.
+
+Node states (gate_rules_library_plan.md §6.5)
+---------------------------------------------
+``pending``
+    Node is queued; its entry gate has not yet been evaluated.
+``running``
+    Node is executing; its exit gate has not yet been evaluated.
+``blocked_at_entry``
+    Entry gate failed; node has not executed; no outputs exist.
+``blocked_at_exit``
+    Exit gate failed; node executed; outputs exist but are marked invalid.
+``released``
+    Exit gate passed; outgoing edges are traversable.
+
+Runner-internal transitional state (Step 10 scope)
+---------------------------------------------------
+``deterministic_pass_semantic_pending``
+    All deterministic predicates for the gate passed, but semantic
+    predicates exist and have not yet been evaluated (Step 11 is not
+    implemented).  This is a runner-internal state.  Downstream work must
+    not proceed from a node in this state.
+
+HARD_BLOCK propagation state
+-----------------------------
+``hard_block_upstream``
+    Set on Phase 8 nodes when ``gate_09_budget_consistency`` fails with a
+    HARD_BLOCK (missing ``received/`` directory).  Downstream nodes may
+    not begin.
+"""
+
+from __future__ import annotations
+
+import json
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+
+from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+#: Repo-relative directory for per-run state.
+RUNS_DIR_REL: str = ".claude/runs"
+
+RUN_MANIFEST_FILENAME: str = "run_manifest.json"
+REUSE_POLICY_FILENAME: str = "reuse_policy.json"
+
+#: All valid node-state values (permanent + runner-internal).
+NODE_STATES: frozenset[str] = frozenset(
+    {
+        "pending",
+        "running",
+        "blocked_at_entry",
+        "blocked_at_exit",
+        "released",
+        "deterministic_pass_semantic_pending",
+        "hard_block_upstream",
+    }
+)
+
+#: Phase 8 node IDs that are frozen when gate_09 issues a HARD_BLOCK.
+PHASE_8_NODE_IDS: frozenset[str] = frozenset({"n08a", "n08b", "n08c", "n08d"})
+
+
+# ---------------------------------------------------------------------------
+# RunContext
+# ---------------------------------------------------------------------------
+
+
+class RunContext:
+    """
+    Manages per-run state: node states, run manifest, and reuse policy.
+
+    Create a new run with :meth:`initialize`.
+    Load an existing run with :meth:`load`.
+    Persist state with :meth:`save`.
+    """
+
+    def __init__(
+        self,
+        run_id: str,
+        repo_root: Path,
+        manifest_data: dict,
+        reuse_policy: dict,
+    ) -> None:
+        self.run_id: str = run_id
+        self.repo_root: Path = repo_root
+        self._manifest: dict = manifest_data
+        self._reuse_policy: dict = reuse_policy
+
+    # ------------------------------------------------------------------
+    # Factory methods
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def initialize(
+        cls,
+        repo_root: Path,
+        run_id: Optional[str] = None,
+    ) -> "RunContext":
+        """
+        Create a fresh run context, write the run manifest and reuse policy.
+
+        Parameters
+        ----------
+        repo_root:
+            Repository root directory.
+        run_id:
+            Explicit run UUID.  When ``None``, a fresh UUID v4 is generated.
+
+        Returns
+        -------
+        RunContext
+            Initialized and persisted context for the new run.
+        """
+        if run_id is None:
+            run_id = str(uuid.uuid4())
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        manifest_data: dict = {
+            "run_id": run_id,
+            "manifest_version": MANIFEST_VERSION,
+            "library_version": LIBRARY_VERSION,
+            "constitution_version": CONSTITUTION_VERSION,
+            "repo_root": str(repo_root),
+            "created_at": now_iso,
+            "node_states": {},
+        }
+        reuse_policy: dict = {
+            "reuse_policy_for_run": run_id,
+            "approved_artifacts": [],
+        }
+
+        ctx = cls(run_id, repo_root, manifest_data, reuse_policy)
+        ctx.save()
+        return ctx
+
+    @classmethod
+    def load(cls, repo_root: Path, run_id: str) -> "RunContext":
+        """
+        Load an existing run context from disk.
+
+        Parameters
+        ----------
+        repo_root:
+            Repository root directory.
+        run_id:
+            UUID of the run to load.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the run manifest does not exist.
+        """
+        runs_dir = repo_root / RUNS_DIR_REL / run_id
+        manifest_path = runs_dir / RUN_MANIFEST_FILENAME
+        policy_path = runs_dir / REUSE_POLICY_FILENAME
+
+        if not manifest_path.exists():
+            raise FileNotFoundError(
+                f"Run manifest not found: {manifest_path}.  "
+                f"Call RunContext.initialize(repo_root, run_id={run_id!r}) first."
+            )
+
+        manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        if policy_path.exists():
+            reuse_policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        else:
+            reuse_policy = {
+                "reuse_policy_for_run": run_id,
+                "approved_artifacts": [],
+            }
+
+        return cls(run_id, repo_root, manifest_data, reuse_policy)
+
+    # ------------------------------------------------------------------
+    # Paths
+    # ------------------------------------------------------------------
+
+    @property
+    def run_dir(self) -> Path:
+        """Directory for this run's state files."""
+        return self.repo_root / RUNS_DIR_REL / self.run_id
+
+    @property
+    def run_manifest_path(self) -> Path:
+        """Absolute path to ``run_manifest.json``."""
+        return self.run_dir / RUN_MANIFEST_FILENAME
+
+    @property
+    def reuse_policy_path(self) -> Path:
+        """Absolute path to ``reuse_policy.json``."""
+        return self.run_dir / REUSE_POLICY_FILENAME
+
+    # ------------------------------------------------------------------
+    # Node state
+    # ------------------------------------------------------------------
+
+    def get_node_state(self, node_id: str) -> str:
+        """Return the current state of *node_id* (default: ``"pending"``)."""
+        return self._manifest["node_states"].get(node_id, "pending")
+
+    def set_node_state(self, node_id: str, state: str) -> None:
+        """
+        Update the state of *node_id* in the in-memory manifest.
+
+        Call :meth:`save` to persist.
+        """
+        self._manifest["node_states"][node_id] = state
+
+    # ------------------------------------------------------------------
+    # Reuse policy
+    # ------------------------------------------------------------------
+
+    def is_artifact_approved(self, artifact_path: str) -> bool:
+        """
+        Return ``True`` if *artifact_path* is listed in ``approved_artifacts``.
+
+        Both the original string argument and any normalised form may match.
+        """
+        approved: list = self._reuse_policy.get("approved_artifacts", [])
+        return str(artifact_path) in approved
+
+    # ------------------------------------------------------------------
+    # HARD_BLOCK propagation
+    # ------------------------------------------------------------------
+
+    def mark_hard_block_downstream(
+        self, reason: str = "HARD_BLOCK_UPSTREAM"
+    ) -> None:
+        """
+        Set all Phase 8 node IDs to ``"hard_block_upstream"`` and record the
+        reason in the manifest.
+
+        Called when ``gate_09_budget_consistency`` fails with a HARD_BLOCK
+        (§6.4 of the plan).  Does **not** call :meth:`save`; the caller is
+        responsible for persisting.
+        """
+        for node_id in PHASE_8_NODE_IDS:
+            self._manifest["node_states"][node_id] = "hard_block_upstream"
+        self._manifest["hard_block_reason"] = reason
+        self._manifest["hard_block_gate"] = "gate_09_budget_consistency"
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self) -> None:
+        """
+        Write the run manifest and reuse policy to disk.
+
+        Creates the run directory if it does not exist.
+        """
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+        self.run_manifest_path.write_text(
+            json.dumps(self._manifest, indent=2),
+            encoding="utf-8",
+        )
+        self.reuse_policy_path.write_text(
+            json.dumps(self._reuse_policy, indent=2),
+            encoding="utf-8",
+        )
+
+    # ------------------------------------------------------------------
+    # Inspection
+    # ------------------------------------------------------------------
+
+    def to_dict(self) -> dict:
+        """Return a copy of the run manifest dict."""
+        return dict(self._manifest)

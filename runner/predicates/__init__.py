@@ -4,6 +4,9 @@ Gate predicate implementations for the DAG runner.
 Public API (Step 3 — file predicates):
     exists, non_empty, non_empty_json, dir_non_empty
 
+Public API (Step 10 extension — ownership predicate):
+    artifact_owned_by_run
+
 Public API (Step 4 — gate-pass predicate):
     gate_pass_recorded
 
@@ -40,6 +43,7 @@ GateResult writer (Step 10).
 """
 
 from runner.predicates.file_predicates import (
+    artifact_owned_by_run,
     dir_non_empty,
     exists,
     non_empty,
@@ -104,11 +108,12 @@ __all__ = [
     "CROSS_ARTIFACT_INCONSISTENCY",
     "POLICY_VIOLATION",
     "STALE_UPSTREAM_MISMATCH",
-    # file predicates (Step 3)
+    # file predicates (Step 3 + Step 10)
     "exists",
     "non_empty",
     "non_empty_json",
     "dir_non_empty",
+    "artifact_owned_by_run",
     # gate-pass predicate (Step 4)
     "gate_pass_recorded",
     # schema predicates (Step 5 — §4.2)

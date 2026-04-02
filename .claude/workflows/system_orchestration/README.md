@@ -46,10 +46,13 @@ runner/                               # DAG-runner implementation package
 ├── versions.py                       # Manifest/library/constitution version constants
 ├── gate_result_registry.py           # §6.3 gate result path table (gate_id → tier4-relative path)
 ├── upstream_inputs.py                # Gate freshness: gate_id → upstream required input paths
+├── gate_library.py                   # Step 10: GateLibrary loader/validator
+├── run_context.py                    # Step 10: RunContext (run manifest + reuse policy)
+├── gate_evaluator.py                 # Step 10: evaluate_gate() main entry point
 └── predicates/
     ├── __init__.py                   # Predicate API exports
     ├── types.py                      # PredicateResult + failure-category constants
-    ├── file_predicates.py            # Step 3: exists, non_empty, non_empty_json, dir_non_empty
+    ├── file_predicates.py            # Step 3+10: exists, non_empty, non_empty_json, dir_non_empty, artifact_owned_by_run
     ├── gate_pass_predicates.py       # Step 4: gate_pass_recorded
     ├── schema_predicates.py          # Step 5: §4.2 schema predicates + §4.8 canonical field predicates
     ├── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
@@ -58,14 +61,18 @@ runner/                               # DAG-runner implementation package
     └── timeline_predicates.py        # Step 9: §4.6 timeline predicates
 tests/
 ├── conftest.py                       # repo_root fixture
-└── runner/predicates/
-    ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
-    ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
-    ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
-    ├── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
-    ├── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
-    ├── test_cycle_predicates.py      # Step 8 unit tests
-    └── test_timeline_predicates.py   # Step 9 unit tests
+└── runner/
+    ├── test_gate_library.py          # Step 10 unit tests: GateLibrary (23 tests)
+    ├── test_run_context.py           # Step 10 unit tests: RunContext (26 tests)
+    ├── test_gate_evaluator.py        # Step 10 unit tests: evaluate_gate + helpers (40 tests)
+    └── predicates/
+        ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
+        ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
+        ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
+        ├── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
+        ├── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
+        ├── test_cycle_predicates.py      # Step 8 unit tests (30 tests)
+        └── test_timeline_predicates.py   # Step 9 unit tests (52 tests)
 ```
 
 ---
@@ -118,6 +125,11 @@ The workflow package is now partially executable.
 - **Step 7 — Coverage predicates** completed in `runner/predicates/coverage_predicates.py`
 - **Step 8 — Cycle predicate** completed in `runner/predicates/cycle_predicates.py`
 - **Step 9 — Timeline predicates** completed in `runner/predicates/timeline_predicates.py`
+- **Step 10 — Runner evaluate_gate integration** completed:
+  - `runner/gate_library.py` — GateLibrary loader/validator (version checks, structural validation)
+  - `runner/run_context.py` — RunContext (run manifest, reuse policy, node state, HARD_BLOCK propagation)
+  - `runner/gate_evaluator.py` — evaluate_gate() entry point (predicate dispatch, fingerprinting, GateResult writing, node-state updates)
+  - `runner/predicates/file_predicates.py` extended with `artifact_owned_by_run`
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -179,6 +191,15 @@ Timeline predicates — §4.6 (Step 9):
 - `wp_count_within_limit(wp_path, schema_path)`
 - `critical_path_present(gantt_path)`
 
+Ownership predicate — §7 (Step 10):
+- `artifact_owned_by_run(path, run_id, *, reuse_policy_path=None, repo_root=None)`
+
+Runner integration — (Step 10):
+- `runner.gate_library.GateLibrary.load(library_path, *, repo_root, expected_manifest_version)` — loads and validates `gate_rules_library.yaml`; raises `ManifestVersionMismatchError` on version conflict
+- `runner.run_context.RunContext.initialize(repo_root, run_id)` — creates `.claude/runs/<run_id>/run_manifest.json` and `reuse_policy.json`
+- `runner.run_context.RunContext.load(repo_root, run_id)` — loads existing run state
+- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path)` — evaluates all deterministic predicates, writes GateResult to Tier 4, updates node state
+
 All five failure categories are in use across the implemented predicates:
 - `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
 - `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps, null required values, unsupported container type, non-dict array element
@@ -188,10 +209,8 @@ All five failure categories are in use across the implemented predicates:
 
 **Current non-goals**
 The repository does **not** yet implement:
-- semantic predicate dispatch (Step 10)
-- full `evaluate_gate(...)`
-- GateResult artifact writing
-- run manifest / reuse policy runtime handling
+- semantic predicate dispatch (Step 11)
+- DAG scheduler / node execution loop
 
 **Test status**
 - Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
@@ -199,6 +218,12 @@ The repository does **not** yet implement:
 - Step 5 schema predicates: 65 tests in `tests/runner/predicates/test_schema_predicates.py`
 - Step 6 source reference predicates: 28 tests in `tests/runner/predicates/test_source_ref_predicates.py`
 - Step 7 coverage predicates: 71 tests in `tests/runner/predicates/test_coverage_predicates.py`
+- Step 8 cycle predicate: 30 tests in `tests/runner/predicates/test_cycle_predicates.py`
+- Step 9 timeline predicates: 52 tests in `tests/runner/predicates/test_timeline_predicates.py`
+- Step 10 GateLibrary: 23 tests in `tests/runner/test_gate_library.py`
+- Step 10 RunContext: 26 tests in `tests/runner/test_run_context.py`
+- Step 10 evaluate_gate + helpers: 40 tests in `tests/runner/test_gate_evaluator.py`
+- **Total: 399 tests, all passing**
 
 ---
 
