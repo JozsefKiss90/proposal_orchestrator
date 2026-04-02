@@ -27,6 +27,13 @@ Public API (Step 7 — coverage predicates, §4.4):
     instrument_sections_addressed, all_sections_have_traceability_footer,
     all_wps_have_deliverable_and_lead
 
+Public API (Step 8 — cycle predicate, §4.5):
+    no_dependency_cycles
+
+Public API (Step 9 — timeline predicates, §4.6):
+    timeline_within_duration, all_milestones_have_criteria,
+    wp_count_within_limit, critical_path_present
+
 All predicates return a ``PredicateResult``.  The ``failure_category``
 field on a failing result is the primary triage signal consumed by the
 GateResult writer (Step 10).
@@ -70,6 +77,13 @@ from runner.predicates.coverage_predicates import (
     kpis_traceable_to_wps,
     partner_budget_coverage_match,
     wp_budget_coverage_match,
+)
+from runner.predicates.cycle_predicates import no_dependency_cycles
+from runner.predicates.timeline_predicates import (
+    all_milestones_have_criteria,
+    critical_path_present,
+    timeline_within_duration,
+    wp_count_within_limit,
 )
 from runner.predicates.types import (
     CROSS_ARTIFACT_INCONSISTENCY,
@@ -127,4 +141,11 @@ __all__ = [
     "instrument_sections_addressed",
     "all_sections_have_traceability_footer",
     "all_wps_have_deliverable_and_lead",
+    # cycle predicate (Step 8 — §4.5)
+    "no_dependency_cycles",
+    # timeline predicates (Step 9 — §4.6)
+    "timeline_within_duration",
+    "all_milestones_have_criteria",
+    "wp_count_within_limit",
+    "critical_path_present",
 ]

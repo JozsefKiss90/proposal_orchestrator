@@ -53,7 +53,9 @@ runner/                               # DAG-runner implementation package
     ├── gate_pass_predicates.py       # Step 4: gate_pass_recorded
     ├── schema_predicates.py          # Step 5: §4.2 schema predicates + §4.8 canonical field predicates
     ├── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
-    └── coverage_predicates.py        # Step 7: §4.4 coverage / cross-artifact join predicates
+    ├── coverage_predicates.py        # Step 7: §4.4 coverage / cross-artifact join predicates
+    ├── cycle_predicates.py           # Step 8: §4.5 cycle predicate
+    └── timeline_predicates.py        # Step 9: §4.6 timeline predicates
 tests/
 ├── conftest.py                       # repo_root fixture
 └── runner/predicates/
@@ -61,7 +63,9 @@ tests/
     ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
     ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
     ├── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
-    └── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
+    ├── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
+    ├── test_cycle_predicates.py      # Step 8 unit tests
+    └── test_timeline_predicates.py   # Step 9 unit tests
 ```
 
 ---
@@ -112,6 +116,8 @@ The workflow package is now partially executable.
 - **Step 5 — Schema predicates** completed in `runner/predicates/schema_predicates.py`
 - **Step 6 — Source reference predicates** completed in `runner/predicates/source_ref_predicates.py`
 - **Step 7 — Coverage predicates** completed in `runner/predicates/coverage_predicates.py`
+- **Step 8 — Cycle predicate** completed in `runner/predicates/cycle_predicates.py`
+- **Step 9 — Timeline predicates** completed in `runner/predicates/timeline_predicates.py`
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -164,6 +170,15 @@ Coverage predicates — §4.4 (Step 7):
 - `all_sections_have_traceability_footer(sections_path)`
 - `all_wps_have_deliverable_and_lead(wp_path)`
 
+Cycle predicate — §4.5 (Step 8):
+- `no_dependency_cycles(wp_path)`
+
+Timeline predicates — §4.6 (Step 9):
+- `timeline_within_duration(gantt_path, call_path)`
+- `all_milestones_have_criteria(gantt_path)`
+- `wp_count_within_limit(wp_path, schema_path)`
+- `critical_path_present(gantt_path)`
+
 All five failure categories are in use across the implemented predicates:
 - `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
 - `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps, null required values, unsupported container type, non-dict array element
@@ -173,8 +188,6 @@ All five failure categories are in use across the implemented predicates:
 
 **Current non-goals**
 The repository does **not** yet implement:
-- cycle predicates (Step 8)
-- timeline predicates (Step 9)
 - semantic predicate dispatch (Step 10)
 - full `evaluate_gate(...)`
 - GateResult artifact writing
