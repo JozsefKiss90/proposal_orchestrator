@@ -13,7 +13,7 @@ Implementation sequence (per gate_rules_library_plan.md §8):
   Step 8  — Cycle predicate          [IMPLEMENTED]
   Step 9  — Timeline predicates      [IMPLEMENTED]
   Step 10 — Runner evaluate_gate     [IMPLEMENTED]
-  Step 11 — Semantic dispatch        [pending]
+  Step 11 — Semantic dispatch        [IMPLEMENTED]
 
 Constitutional authority: subordinate to CLAUDE.md and
 gate_rules_library_plan.md. This package must not redefine gate logic,

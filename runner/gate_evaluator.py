@@ -1,24 +1,33 @@
 """
-evaluate_gate() — deterministic gate evaluation entry point (Step 10).
+evaluate_gate() — gate evaluation entry point (Steps 10 + 11).
 
 This module is the public entry point for running a single gate.  It:
 
 1. Loads and validates the gate rules library.
 2. Initialises or loads the run context (manifest + reuse policy).
-3. Retrieves the gate entry and partitions predicates.
+3. Retrieves the gate entry and partitions predicates into deterministic
+   and semantic sets.
 4. Computes per-artifact and combined input fingerprints.
-5. Evaluates every deterministic predicate, collecting **all** failures.
-6. Writes a GateResult JSON artifact to the canonical Tier 4 path.
-7. Updates node state in the run manifest.
-8. Applies HARD_BLOCK propagation for ``gate_09_budget_consistency``.
-9. Returns the GateResult as a Python dict.
+5. Evaluates every deterministic predicate, collecting **all** failures
+   (no fast-fail).
+6. If any deterministic predicate fails, skips semantic evaluation, sets
+   ``skipped_semantic: True``, and writes a failing GateResult.
+7. If all deterministic predicates pass, dispatches each semantic predicate
+   via ``dispatch_semantic_predicate()`` (Step 11 — Claude API invocation).
+   All semantic results are collected; pass/fail/malformed are each handled.
+8. Writes a GateResult JSON artifact to the canonical Tier 4 path.
+9. Updates node state in the run manifest (``released`` / ``blocked_at_exit``
+   / ``blocked_at_entry`` / ``hard_block_upstream``).
+10. Applies HARD_BLOCK propagation for ``gate_09_budget_consistency``.
+11. Returns the GateResult as a Python dict.
 
-Semantic predicates are **not** invoked in this step.  When all deterministic
-predicates pass but the gate has semantic predicates, the result records
-``status: "semantic_evaluation_pending"`` and node state is set to
-``"deterministic_pass_semantic_pending"``.  This is a conservative, non-silent
-placeholder that prevents false gate passes and clearly signals that Step 11
-semantic dispatch has not been implemented yet.
+Semantic predicates are invoked via ``runner.semantic_dispatch.invoke_agent``,
+which reads artifact files from disk, constructs system/user prompts embedding
+artifact content and the applicable constitutional rule, and calls the Claude
+API (``claude-sonnet-4-6``).  Unknown function names and non-parseable API
+responses produce a ``_dispatch_error`` sentinel that intentionally fails
+``validate_semantic_result()``, surfacing as ``failure_reason:
+"semantic_result_malformed"`` in the GateResult.
 
 See gate_rules_library_plan.md §6 for the full specification.
 """
@@ -87,6 +96,7 @@ from runner.predicates.timeline_predicates import (
 )
 from runner.predicates.types import PredicateResult
 from runner.run_context import RunContext
+from runner.semantic_dispatch import dispatch_semantic_predicate, validate_semantic_result
 from runner.upstream_inputs import UPSTREAM_REQUIRED_INPUTS
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
 
@@ -500,18 +510,61 @@ def evaluate_gate(
         skipped_semantic = True
         semantic_section: dict = {"passed": [], "failed": [], "skipped": True}
     elif semantic_preds:
-        # Deterministic pass but semantic predicates exist: Step 11 not implemented
-        overall_status = "semantic_evaluation_pending"
+        # ------------------------------------------------------------------
+        # Step 11: dispatch and evaluate semantic predicates
+        # ------------------------------------------------------------------
         skipped_semantic = False
+        passed_sem_ids: list[str] = []
+        failed_sem_entries: list[dict] = []
+
+        for sem_pred in semantic_preds:
+            raw = dispatch_semantic_predicate(sem_pred, run_id, repo_root)
+            is_valid, validation_err = validate_semantic_result(raw)
+
+            if not is_valid:
+                # Malformed result or dispatch error — treat as gate failure
+                failed_sem_entries.append(
+                    {
+                        "predicate_id": raw.get(
+                            "predicate_id",
+                            sem_pred.get("predicate_id", "<unknown>"),
+                        ),
+                        "function": raw.get(
+                            "function",
+                            sem_pred.get("function", "<unknown>"),
+                        ),
+                        "failure_reason": "semantic_result_malformed",
+                        "validation_error": validation_err,
+                        "_dispatch_error": raw.get("_dispatch_error", False),
+                        "_dispatch_error_reason": raw.get(
+                            "_dispatch_error_reason", ""
+                        ),
+                    }
+                )
+            elif raw["status"] == "pass":
+                passed_sem_ids.append(raw["predicate_id"])
+            else:
+                # status == "fail": record with full finding detail
+                failed_sem_entries.append(
+                    {
+                        "predicate_id": raw["predicate_id"],
+                        "function": raw["function"],
+                        "failure_reason": "semantic_fail",
+                        "constitutional_rule": raw.get(
+                            "constitutional_rule", ""
+                        ),
+                        "findings": raw.get("findings", []),
+                        "fail_message": raw.get("fail_message", ""),
+                        "artifacts_inspected": raw.get(
+                            "artifacts_inspected", []
+                        ),
+                    }
+                )
+
+        overall_status = "fail" if failed_sem_entries else "pass"
         semantic_section = {
-            "passed": [],
-            "failed": [],
-            "pending": [p.get("predicate_id") for p in semantic_preds],
-            "note": (
-                "Semantic predicate dispatch is not yet implemented (Step 10 scope). "
-                "All deterministic predicates passed.  Gate cannot be declared "
-                "fully passed until semantic predicates are evaluated (Step 11)."
-            ),
+            "passed": passed_sem_ids,
+            "failed": failed_sem_entries,
         }
     else:
         # Full deterministic pass, no semantic predicates: gate passes
@@ -582,9 +635,6 @@ def evaluate_gate(
             run_ctx.set_node_state(node_id, "blocked_at_exit")
     elif overall_status == "pass":
         run_ctx.set_node_state(node_id, "released")
-    elif overall_status == "semantic_evaluation_pending":
-        # Conservative: do not release; record pending state
-        run_ctx.set_node_state(node_id, "deterministic_pass_semantic_pending")
 
     run_ctx.save()
 

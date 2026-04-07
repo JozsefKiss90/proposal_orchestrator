@@ -48,7 +48,8 @@ runner/                               # DAG-runner implementation package
 ├── upstream_inputs.py                # Gate freshness: gate_id → upstream required input paths
 ├── gate_library.py                   # Step 10: GateLibrary loader/validator
 ├── run_context.py                    # Step 10: RunContext (run manifest + reuse policy)
-├── gate_evaluator.py                 # Step 10: evaluate_gate() main entry point
+├── gate_evaluator.py                 # Step 10+11: evaluate_gate() main entry point (deterministic + semantic dispatch)
+├── semantic_dispatch.py              # Step 11: Semantic predicate dispatch layer
 └── predicates/
     ├── __init__.py                   # Predicate API exports
     ├── types.py                      # PredicateResult + failure-category constants
@@ -64,7 +65,8 @@ tests/
 └── runner/
     ├── test_gate_library.py          # Step 10 unit tests: GateLibrary (23 tests)
     ├── test_run_context.py           # Step 10 unit tests: RunContext (26 tests)
-    ├── test_gate_evaluator.py        # Step 10 unit tests: evaluate_gate + helpers (40 tests)
+    ├── test_gate_evaluator.py        # Step 10+11 unit tests: evaluate_gate + semantic integration (50 tests)
+    ├── test_semantic_dispatch.py     # Step 11 unit tests: dispatch + agent invocation + validation (61 tests)
     └── predicates/
         ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
         ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
@@ -130,6 +132,9 @@ The workflow package is now partially executable.
   - `runner/run_context.py` — RunContext (run manifest, reuse policy, node state, HARD_BLOCK propagation)
   - `runner/gate_evaluator.py` — evaluate_gate() entry point (predicate dispatch, fingerprinting, GateResult writing, node-state updates)
   - `runner/predicates/file_predicates.py` extended with `artifact_owned_by_run`
+- **Step 11 — Semantic predicate dispatch layer** completed (agent-invocation corrective pass applied):
+  - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, calls Claude API, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
+  - `runner/gate_evaluator.py` extended — semantic dispatch loop integrated; malformed/fail/pass routing; node state `released`/`blocked_at_exit` set after semantic evaluation; `skipped_semantic` flag when deterministic predicates fail
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -198,7 +203,21 @@ Runner integration — (Step 10):
 - `runner.gate_library.GateLibrary.load(library_path, *, repo_root, expected_manifest_version)` — loads and validates `gate_rules_library.yaml`; raises `ManifestVersionMismatchError` on version conflict
 - `runner.run_context.RunContext.initialize(repo_root, run_id)` — creates `.claude/runs/<run_id>/run_manifest.json` and `reuse_policy.json`
 - `runner.run_context.RunContext.load(repo_root, run_id)` — loads existing run state
-- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path)` — evaluates all deterministic predicates, writes GateResult to Tier 4, updates node state
+- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path)` — evaluates all deterministic predicates, dispatches semantic predicates, writes GateResult to Tier 4, updates node state
+
+Semantic dispatch — (Step 11):
+- `runner.semantic_dispatch.validate_semantic_result(result)` — validates a semantic predicate result dict against the §4.9 contract; returns `(True,"")` or `(False, reason)`
+- `runner.semantic_dispatch.dispatch_semantic_predicate(pred_entry, run_id, repo_root)` — delegates to `invoke_agent()`; unknown functions return a sentinel dispatch-error result that intentionally fails validation
+- `runner.semantic_dispatch.invoke_agent(pred_entry, run_id, repo_root)` — reads artifact files from disk, constructs system/user prompts embedding artifact content and the constitutional rule, calls the Claude API (`claude-sonnet-4-6`), parses the JSON response, and overrides `predicate_id` and `artifacts_inspected` from ground truth; unknown functions and non-dict/non-parseable responses produce a `_dispatch_error` sentinel
+- `SemanticPredicateConfig` — frozen dataclass: `function`, `agent`, `constitutional_rule`, `description`; replaces the old callable-registry pattern
+- `SEMANTIC_REGISTRY` — 7 registered entries (configuration only; no local handler callables):
+  - `no_unresolved_scope_conflicts` — agent: `concept_refiner`; rule: CLAUDE.md §7 Phase 2 gate
+  - `no_cross_tier_contradictions` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §11.4, §13.3
+  - `no_unsupported_tier5_claims` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.3
+  - `no_budget_gate_contradiction` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §8.4, §13.4
+  - `no_higher_tier_contradiction` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.2, §11.3
+  - `no_forbidden_schema_authority` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.1
+  - `no_gap_masked_as_confirmed` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §12.2
 
 All five failure categories are in use across the implemented predicates:
 - `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
@@ -209,21 +228,21 @@ All five failure categories are in use across the implemented predicates:
 
 **Current non-goals**
 The repository does **not** yet implement:
-- semantic predicate dispatch (Step 11)
 - DAG scheduler / node execution loop
 
 **Test status**
 - Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
 - Step 4 gate-pass predicate: 9 tests in `tests/runner/predicates/test_gate_pass_predicates.py`
-- Step 5 schema predicates: 65 tests in `tests/runner/predicates/test_schema_predicates.py`
+- Step 5 schema predicates: 71 tests in `tests/runner/predicates/test_schema_predicates.py`
 - Step 6 source reference predicates: 28 tests in `tests/runner/predicates/test_source_ref_predicates.py`
 - Step 7 coverage predicates: 71 tests in `tests/runner/predicates/test_coverage_predicates.py`
 - Step 8 cycle predicate: 30 tests in `tests/runner/predicates/test_cycle_predicates.py`
 - Step 9 timeline predicates: 52 tests in `tests/runner/predicates/test_timeline_predicates.py`
 - Step 10 GateLibrary: 23 tests in `tests/runner/test_gate_library.py`
 - Step 10 RunContext: 26 tests in `tests/runner/test_run_context.py`
-- Step 10 evaluate_gate + helpers: 40 tests in `tests/runner/test_gate_evaluator.py`
-- **Total: 399 tests, all passing**
+- Step 10+11 evaluate_gate + semantic integration: 50 tests in `tests/runner/test_gate_evaluator.py`
+- Step 11 semantic dispatch + agent invocation + validation: 61 tests in `tests/runner/test_semantic_dispatch.py`
+- **Total: 476 tests, all passing**
 
 ---
 

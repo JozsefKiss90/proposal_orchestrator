@@ -1420,21 +1420,32 @@ def all_critical_revisions_resolved(
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
     """
-    Pass iff no ``revision_actions`` entry is critical, unresolved, and
-    lacks a non-empty reason.
+    Pass iff the ``revision_actions`` array is present, is a list, and
+    contains no entry that is both critical and unresolved without a
+    non-empty ``reason``.
 
     Contract (gate_rules_library_plan.md §4.8)
     -------------------------------------------
     Pass condition:
         * valid JSON object
-        * no ``revision_actions`` entry has ALL of:
+        * ``revision_actions`` field is present (``required: true`` per
+          artifact_schema_specification.yaml §1.8)
+        * ``revision_actions`` value is a list (``type: array`` per schema)
+        * no entry in the list has ALL of:
             - ``severity == "critical"``
             - ``status == "unresolved"``
-            - ``reason`` absent or empty
+            - ``reason`` absent, null, empty, or blank
 
     Per the plan and artifact_schema_specification.yaml §1.8:
     unresolved critical items are acceptable ONLY when explicitly logged
     as unresolvable with a non-empty ``reason`` field.
+
+    Empty list handling
+    -------------------
+    An empty ``revision_actions`` list passes this predicate.  The
+    non-empty-list requirement is enforced separately by
+    ``revision_action_list_present()``.  These two predicates have
+    distinct, non-overlapping contracts.
 
     Canonical artifact
     ------------------
@@ -1446,10 +1457,11 @@ def all_critical_revisions_resolved(
     ``MISSING_MANDATORY_INPUT``
         Path does not exist.
     ``MALFORMED_ARTIFACT``
-        Invalid JSON or non-object JSON.
+        Invalid JSON, non-object JSON, ``revision_actions`` field absent,
+        or ``revision_actions`` value is not a list.
     ``POLICY_VIOLATION``
         One or more critical revision actions remain unresolved without a
-        stated reason.
+        non-empty reason.
 
     Parameters
     ----------
@@ -1463,14 +1475,33 @@ def all_critical_revisions_resolved(
     if err is not None:
         return err
 
-    # Absent field: nothing to resolve — pass
-    actions = parsed.get("revision_actions", [])
+    # revision_actions is required by the artifact schema (§1.8).
+    if "revision_actions" not in parsed:
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"Required field 'revision_actions' is absent in {resolved}.  "
+                "artifact_schema_specification.yaml §1.8 declares this field "
+                "required: true."
+            ),
+            details={"path": str(resolved), "missing_field": "revision_actions"},
+        )
+
+    actions = parsed["revision_actions"]
     if not isinstance(actions, list):
         return PredicateResult(
-            passed=True,
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"Field 'revision_actions' must be a list (type: array per "
+                f"artifact_schema_specification.yaml §1.8); "
+                f"got {type(actions).__name__} in {resolved}."
+            ),
             details={
                 "path": str(resolved),
-                "note": "revision_actions is not a list; no critical resolution check performed",
+                "field": "revision_actions",
+                "actual_type": type(actions).__name__,
             },
         )
 

@@ -1,12 +1,12 @@
 """
-Unit tests for Step 10 — runner/gate_evaluator.py.
+Unit tests for Steps 10 and 11 — runner/gate_evaluator.py.
 
 Tests cover:
     - Deterministic gate evaluation (pass / fail / multi-failure collection)
     - GateResult writing and mandatory-field presence
     - Canonical gate-result path resolution
     - Node-state transitions (entry / exit / pass)
-    - Semantic-pending boundary (non-false-pass)
+    - Step 11 semantic dispatch integration (pass, fail, malformed, unknown fn)
     - HARD_BLOCK for gate_09_budget_consistency
     - Input fingerprinting (stable / change-sensitive)
     - artifact_owned_by_run integration (via evaluate_gate and directly)
@@ -23,6 +23,7 @@ import json
 import uuid
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -96,14 +97,65 @@ def _exists_pred(path_str: str) -> dict:
 
 
 def _semantic_pred() -> dict:
-    """Return a synthetic semantic predicate stub."""
+    """Return a synthetic semantic predicate with an UNKNOWN function name.
+
+    After Step 11 this will produce a dispatch error → gate fails with
+    failure_reason='semantic_result_malformed'.
+    """
     return {
         "predicate_id": "p_sem_quality",
         "type": "semantic",
-        "function": "agent_quality_check",
+        "function": "agent_quality_check",   # not in SEMANTIC_REGISTRY
         "args": {},
         "prose_condition": "Quality meets bar",
         "fail_message": "Quality check failed",
+    }
+
+
+def _sem_pred(func: str, pred_id: str = "p_no_ga", **args: str) -> dict:
+    """Return a known semantic predicate dict for the given function name."""
+    return {
+        "predicate_id": pred_id,
+        "type": "semantic",
+        "function": func,
+        "args": args,
+        "prose_condition": f"Predicate {func}",
+        "fail_message": f"{func} violation detected",
+    }
+
+
+def _syn_sem_pass(pred_id: str = "p_no_ga") -> dict:
+    """Synthetic pass result suitable for mocking dispatch_semantic_predicate."""
+    return {
+        "predicate_id": pred_id,
+        "function": "no_forbidden_schema_authority",
+        "status": "pass",
+        "agent": "constitutional_compliance_check",
+        "constitutional_rule": "CLAUDE.md §13.1",
+        "artifacts_inspected": ["/some/path"],
+        "findings": [],
+        "fail_message": "",
+    }
+
+
+def _syn_sem_fail(pred_id: str = "p_no_ga") -> dict:
+    """Synthetic fail result with one finding, for mocking."""
+    return {
+        "predicate_id": pred_id,
+        "function": "no_forbidden_schema_authority",
+        "status": "fail",
+        "agent": "constitutional_compliance_check",
+        "constitutional_rule": "CLAUDE.md §13.1",
+        "artifacts_inspected": ["/some/path"],
+        "findings": [
+            {
+                "claim": "Section uses GA annex structure",
+                "violated_rule": "CLAUDE.md §13.1",
+                "evidence_path": "/docs/tier5/section.json",
+                "severity": "critical",
+            }
+        ],
+        "fail_message": "GA annex structure detected.",
     }
 
 
@@ -532,10 +584,18 @@ class TestNodeStateTransitions:
 # ---------------------------------------------------------------------------
 
 
-class TestSemanticPendingBoundary:
-    def test_semantic_predicates_not_invoked_when_deterministic_passes(
+class TestSemanticDispatchIntegration:
+    """Step 11: semantic predicates are dispatched and results integrated."""
+
+    # ------------------------------------------------------------------
+    # Unknown function → dispatch error → gate fail (malformed)
+    # No patch needed: unknown function is rejected before API call.
+    # ------------------------------------------------------------------
+
+    def test_unknown_semantic_function_causes_gate_fail(
         self, tmp_path: Path, run_id: str
     ) -> None:
+        """_semantic_pred() uses 'agent_quality_check' which is not in SEMANTIC_REGISTRY."""
         target = tmp_path / "f.json"
         _write_json(target, {})
         lib_path = _write_library(
@@ -550,10 +610,9 @@ class TestSemanticPendingBoundary:
             ],
         )
         result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
-        # Status must NOT be "pass" — semantic predicates exist but aren't evaluated
-        assert result["status"] == "semantic_evaluation_pending"
+        assert result["status"] == "fail"
 
-    def test_semantic_pending_status_is_not_false_pass(
+    def test_unknown_semantic_function_records_malformed_reason(
         self, tmp_path: Path, run_id: str
     ) -> None:
         target = tmp_path / "f.json"
@@ -568,9 +627,18 @@ class TestSemanticPendingBoundary:
             ],
         )
         result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
-        assert result["status"] != "pass"
+        failed = result["semantic_predicates"]["failed"]
+        assert len(failed) == 1
+        assert failed[0]["failure_reason"] == "semantic_result_malformed"
+        assert failed[0].get("_dispatch_error") is True
 
-    def test_semantic_pending_node_state(self, tmp_path: Path, run_id: str) -> None:
+    # ------------------------------------------------------------------
+    # Known semantic predicate → mocked dispatch → gate pass
+    # ------------------------------------------------------------------
+
+    def test_deterministic_pass_plus_semantic_pass_gives_gate_pass(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
         target = tmp_path / "f.json"
         _write_json(target, {})
         lib_path = _write_library(
@@ -579,16 +647,20 @@ class TestSemanticPendingBoundary:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n06 exit",
-                    predicates=[_exists_pred("f.json"), _semantic_pred()],
+                    evaluated_at="n02 exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
                 )
             ],
         )
-        evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
-        ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n06") == "deterministic_pass_semantic_pending"
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_pass("p_no_ga")
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        assert result["status"] == "pass"
 
-    def test_semantic_pending_result_records_pending_predicate_ids(
+    def test_full_pass_sets_released_node_state(
         self, tmp_path: Path, run_id: str
     ) -> None:
         target = tmp_path / "f.json"
@@ -598,14 +670,361 @@ class TestSemanticPendingBoundary:
             [
                 _gate_entry(
                     _GATE_SEM,
-                    predicates=[_exists_pred("f.json"), _semantic_pred()],
+                    gate_kind="exit",
+                    evaluated_at="n03 exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_pass("p_no_ga")
+            evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        ctx = RunContext.load(tmp_path, run_id)
+        assert ctx.get_node_state("n03") == "released"
+
+    def test_semantic_pass_section_populated_in_gate_result(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga_01"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_pass("p_no_ga_01")
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        sem = result["semantic_predicates"]
+        assert "p_no_ga_01" in sem["passed"]
+        assert sem["failed"] == []
+
+    # ------------------------------------------------------------------
+    # Known semantic predicate → mocked dispatch → gate fail
+    # ------------------------------------------------------------------
+
+    def test_deterministic_pass_plus_semantic_fail_gives_gate_fail(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    gate_kind="exit",
+                    evaluated_at="n04 exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_fail("p_no_ga")
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        assert result["status"] == "fail"
+
+    def test_semantic_fail_sets_blocked_at_exit(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    gate_kind="exit",
+                    evaluated_at="n05 exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_fail("p_no_ga")
+            evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        ctx = RunContext.load(tmp_path, run_id)
+        assert ctx.get_node_state("n05") == "blocked_at_exit"
+
+    def test_semantic_fail_recorded_with_findings_in_gate_result(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_ga_check"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_fail("p_ga_check")
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        failed = result["semantic_predicates"]["failed"]
+        assert len(failed) == 1
+        assert failed[0]["predicate_id"] == "p_ga_check"
+        assert failed[0]["failure_reason"] == "semantic_fail"
+        assert failed[0]["constitutional_rule"] == "CLAUDE.md §13.1"
+        assert len(failed[0]["findings"]) >= 1
+
+    def test_semantic_findings_persisted_to_tier4_gate_result(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
+                )
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_fail("p_no_ga")
+            evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        written_path = _fallback_result_path(_GATE_SEM, tmp_path)
+        on_disk = json.loads(written_path.read_text())
+        failed = on_disk["semantic_predicates"]["failed"]
+        assert failed[0]["findings"][0]["violated_rule"] == "CLAUDE.md §13.1"
+        assert failed[0]["findings"][0]["evidence_path"]
+
+    # ------------------------------------------------------------------
+    # Deterministic fail still skips semantic
+    # No patch needed: semantic evaluation is skipped before dispatch.
+    # ------------------------------------------------------------------
+
+    def test_deterministic_fail_skips_semantic_evaluation(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        # No f.json → deterministic fails; semantic must be skipped
+        sections = tmp_path / "sections"
+        sections.mkdir()
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    predicates=[
+                        _exists_pred("missing.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
                 )
             ],
         )
         result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
-        sem_section = result["semantic_predicates"]
-        assert "pending" in sem_section
-        assert "p_sem_quality" in sem_section["pending"]
+        assert result["status"] == "fail"
+        assert result["skipped_semantic"] is True
+
+    # ------------------------------------------------------------------
+    # Multiple semantic predicates — mixed pass/fail collected
+    # ------------------------------------------------------------------
+
+    def test_multiple_semantic_predicates_mixed_pass_fail(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred(
+                            "no_forbidden_schema_authority", pred_id="p_no_ga"
+                        ),
+                        _sem_pred(
+                            "no_unsupported_tier5_claims", pred_id="p_no_unsup"
+                        ),
+                    ],
+                )
+            ],
+        )
+
+        def _side_effect(pred_entry: dict, run_id: str, repo_root: Path) -> dict:
+            if pred_entry["predicate_id"] == "p_no_ga":
+                return _syn_sem_fail("p_no_ga")
+            return _syn_sem_pass("p_no_unsup")
+
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.side_effect = _side_effect
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        assert result["status"] == "fail"
+        sem = result["semantic_predicates"]
+        assert "p_no_unsup" in sem["passed"]
+        assert any(f["predicate_id"] == "p_no_ga" for f in sem["failed"])
+
+    # ------------------------------------------------------------------
+    # Gate-specific coverage: phase_02_gate and gate_12_constitutional_compliance
+    # ------------------------------------------------------------------
+
+    def test_phase02_gate_semantic_predicate_path(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        """phase_02_gate uses no_unresolved_scope_conflicts — exercise that path."""
+        phase2 = tmp_path / "concept_refinement_summary.json"
+        _write_json(phase2, {"run_id": run_id, "scope_conflicts": []})
+        scope = tmp_path / "scope_requirements.json"
+        _write_json(scope, {})
+
+        lib_path = _write_library(
+            tmp_path,
+            [
+                {
+                    "gate_id": "phase_02_gate",
+                    "gate_kind": "exit",
+                    "evaluated_at": "n02 exit",
+                    "predicates": [
+                        {
+                            "predicate_id": "g03_p06",
+                            "type": "semantic",
+                            "function": "no_unresolved_scope_conflicts",
+                            "args": {
+                                "phase2_path": "concept_refinement_summary.json",
+                                "scope_path": "scope_requirements.json",
+                            },
+                            "prose_condition": "No scope conflicts",
+                            "fail_message": "Scope conflicts present",
+                        }
+                    ],
+                }
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_pass("g03_p06")
+            result = evaluate_gate(
+                "phase_02_gate", run_id, tmp_path, library_path=lib_path
+            )
+        assert result["status"] == "pass"
+        assert "g03_p06" in result["semantic_predicates"]["passed"]
+
+    def test_gate12_constitutional_compliance_semantic_path(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        """gate_12_constitutional_compliance uses no_forbidden_schema_authority."""
+        sections = tmp_path / "sections"
+        sections.mkdir()
+        _write_json(sections / "part_b.json", {"title": "OK section"})
+
+        lib_path = _write_library(
+            tmp_path,
+            [
+                {
+                    "gate_id": "gate_12_constitutional_compliance",
+                    "gate_kind": "exit",
+                    "evaluated_at": "n08d exit",
+                    "predicates": [
+                        {
+                            "predicate_id": "g11_p12",
+                            "type": "semantic",
+                            "function": "no_forbidden_schema_authority",
+                            "args": {"sections_path": str(sections)},
+                            "prose_condition": "No GA annex structure",
+                            "fail_message": "GA annex detected",
+                        }
+                    ],
+                }
+            ],
+        )
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = _syn_sem_pass("g11_p12")
+            result = evaluate_gate(
+                "gate_12_constitutional_compliance",
+                run_id,
+                tmp_path,
+                library_path=lib_path,
+            )
+        assert result["status"] == "pass"
+
+    # ------------------------------------------------------------------
+    # End-to-end executor chain: evaluate_gate → dispatch → invoke_agent → API
+    # Patches anthropic at the semantic_dispatch module level, NOT at
+    # dispatch_semantic_predicate, proving the full call chain is wired.
+    # ------------------------------------------------------------------
+
+    def test_full_executor_chain_reaches_claude_api(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        """evaluate_gate delegates through dispatch_semantic_predicate → invoke_agent → API.
+
+        Mocking anthropic (not dispatch_semantic_predicate) verifies that the
+        executor boundary is real: evaluate_gate cannot pass without the Claude
+        API mock returning a valid §4.9 result.
+        """
+        target = tmp_path / "f.json"
+        _write_json(target, {"content": "clean section"})
+
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    gate_kind="exit",
+                    evaluated_at="n06 exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred(
+                            "no_forbidden_schema_authority",
+                            "p_chain_test",
+                            sections_path="f.json",
+                        ),
+                    ],
+                )
+            ],
+        )
+
+        api_payload = {
+            "predicate_id": "p_chain_test",
+            "function": "no_forbidden_schema_authority",
+            "status": "pass",
+            "agent": "constitutional_compliance_check",
+            "constitutional_rule": "CLAUDE.md §13.1",
+            "artifacts_inspected": [str(tmp_path / "f.json")],
+            "findings": [],
+            "fail_message": "",
+        }
+
+        with patch("runner.semantic_dispatch.anthropic") as mock_mod:
+            client = MagicMock()
+            mock_mod.Anthropic.return_value = client
+            msg = MagicMock()
+            msg.content[0].text = json.dumps(api_payload)
+            client.messages.create.return_value = msg
+
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+
+        assert result["status"] == "pass"
+        assert "p_chain_test" in result["semantic_predicates"]["passed"]
+        # Confirm the API was invoked (not short-circuited at a higher level)
+        assert client.messages.create.called
 
 
 # ---------------------------------------------------------------------------

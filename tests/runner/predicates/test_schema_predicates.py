@@ -717,45 +717,54 @@ class TestRevisionActionListPresent:
 
 
 class TestAllCriticalRevisionsResolved:
-    def test_pass_no_unresolved_criticals(self, tmp_path):
-        p = _write(
-            tmp_path,
-            "status.json",
-            {
-                "revision_actions": [
-                    {
-                        "action_id": "A1",
-                        "section_id": "S1",
-                        "severity": "critical",
-                        "description": "Fix this",
-                        "status": "resolved",
-                    }
-                ]
-            },
-        )
+    # ------------------------------------------------------------------
+    # Structural validation — MALFORMED_ARTIFACT (corrective patch)
+    # ------------------------------------------------------------------
+
+    def test_fail_field_absent(self, tmp_path):
+        """revision_actions is required: true per schema §1.8 — absent → MALFORMED."""
+        p = _write(tmp_path, "status.json", {"section_completion_log": []})
+        result = all_critical_revisions_resolved(p)
+        assert not result.passed
+        assert result.failure_category == MALFORMED_ARTIFACT
+
+    def test_fail_field_absent_details(self, tmp_path):
+        p = _write(tmp_path, "status.json", {"section_completion_log": []})
+        result = all_critical_revisions_resolved(p)
+        assert result.details.get("missing_field") == "revision_actions"
+
+    def test_fail_wrong_type_string(self, tmp_path):
+        """revision_actions is type: array per schema — string → MALFORMED."""
+        p = _write(tmp_path, "status.json", {"revision_actions": "oops"})
+        result = all_critical_revisions_resolved(p)
+        assert not result.passed
+        assert result.failure_category == MALFORMED_ARTIFACT
+
+    def test_fail_wrong_type_dict(self, tmp_path):
+        """revision_actions is type: array per schema — object → MALFORMED."""
+        p = _write(tmp_path, "status.json", {"revision_actions": {}})
+        result = all_critical_revisions_resolved(p)
+        assert not result.passed
+        assert result.failure_category == MALFORMED_ARTIFACT
+
+    def test_fail_wrong_type_details_contain_actual_type(self, tmp_path):
+        p = _write(tmp_path, "status.json", {"revision_actions": "oops"})
+        result = all_critical_revisions_resolved(p)
+        assert result.details.get("actual_type") == "str"
+
+    # ------------------------------------------------------------------
+    # Empty list — pass (non-empty requirement belongs to revision_action_list_present)
+    # ------------------------------------------------------------------
+
+    def test_pass_empty_list(self, tmp_path):
+        """Empty revision_actions list has no violations — passes."""
+        p = _write(tmp_path, "status.json", {"revision_actions": []})
         result = all_critical_revisions_resolved(p)
         assert result.passed
 
-    def test_pass_unresolved_critical_with_reason(self, tmp_path):
-        """Unresolved critical with non-empty reason is acceptable per plan."""
-        p = _write(
-            tmp_path,
-            "status.json",
-            {
-                "revision_actions": [
-                    {
-                        "action_id": "A1",
-                        "section_id": "S1",
-                        "severity": "critical",
-                        "description": "Unresolvable scope conflict",
-                        "status": "unresolved",
-                        "reason": "Call scope closed before resolution possible",
-                    }
-                ]
-            },
-        )
-        result = all_critical_revisions_resolved(p)
-        assert result.passed
+    # ------------------------------------------------------------------
+    # Policy logic — POLICY_VIOLATION
+    # ------------------------------------------------------------------
 
     def test_fail_unresolved_critical_without_reason(self, tmp_path):
         p = _write(
@@ -779,7 +788,7 @@ class TestAllCriticalRevisionsResolved:
         assert result.failure_category == POLICY_VIOLATION
         assert "A2" in result.details["unresolved_critical_ids"]
 
-    def test_fail_unresolved_critical_with_empty_reason(self, tmp_path):
+    def test_fail_unresolved_critical_with_blank_reason(self, tmp_path):
         p = _write(
             tmp_path,
             "status.json",
@@ -800,14 +809,53 @@ class TestAllCriticalRevisionsResolved:
         assert not result.passed
         assert result.failure_category == POLICY_VIOLATION
 
-    def test_pass_field_absent(self, tmp_path):
-        """No revision_actions field: nothing to violate."""
-        p = _write(tmp_path, "status.json", {"section_completion_log": []})
+    # ------------------------------------------------------------------
+    # Pass cases — policy logic
+    # ------------------------------------------------------------------
+
+    def test_pass_unresolved_critical_with_reason(self, tmp_path):
+        """Unresolved critical with non-empty reason is acceptable per plan."""
+        p = _write(
+            tmp_path,
+            "status.json",
+            {
+                "revision_actions": [
+                    {
+                        "action_id": "A1",
+                        "section_id": "S1",
+                        "severity": "critical",
+                        "description": "Unresolvable scope conflict",
+                        "status": "unresolved",
+                        "reason": "Call scope closed before resolution possible",
+                    }
+                ]
+            },
+        )
         result = all_critical_revisions_resolved(p)
         assert result.passed
 
-    def test_pass_non_critical_unresolved_allowed(self, tmp_path):
-        """Major/minor unresolved without reason: not a violation."""
+    def test_pass_critical_resolved(self, tmp_path):
+        """Critical entry with status resolved — no violation."""
+        p = _write(
+            tmp_path,
+            "status.json",
+            {
+                "revision_actions": [
+                    {
+                        "action_id": "A1",
+                        "section_id": "S1",
+                        "severity": "critical",
+                        "description": "Fix this",
+                        "status": "resolved",
+                    }
+                ]
+            },
+        )
+        result = all_critical_revisions_resolved(p)
+        assert result.passed
+
+    def test_pass_non_critical_unresolved_without_reason(self, tmp_path):
+        """Major/minor unresolved without reason: not governed by this predicate."""
         p = _write(
             tmp_path,
             "status.json",
@@ -818,6 +866,25 @@ class TestAllCriticalRevisionsResolved:
                         "section_id": "S4",
                         "severity": "major",
                         "description": "Minor formatting",
+                        "status": "unresolved",
+                    }
+                ]
+            },
+        )
+        result = all_critical_revisions_resolved(p)
+        assert result.passed
+
+    def test_pass_minor_unresolved_without_reason(self, tmp_path):
+        p = _write(
+            tmp_path,
+            "status.json",
+            {
+                "revision_actions": [
+                    {
+                        "action_id": "A5",
+                        "section_id": "S5",
+                        "severity": "minor",
+                        "description": "Typo",
                         "status": "unresolved",
                     }
                 ]
