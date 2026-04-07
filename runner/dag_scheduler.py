@@ -1,6 +1,6 @@
 """
-DAG Scheduler — Steps 1–3: ManifestGraph, DAGScheduler core loop, and
-stall detection / abort.
+DAG Scheduler — Steps 1–4: ManifestGraph, DAGScheduler core loop,
+stall detection / abort, and RunSummary persistence.
 
 Node ID convention
 ------------------
@@ -38,36 +38,83 @@ Step 3 scope (stall detection and run-abort)
 ``_settle_stalled_nodes()`` and ``RunAbortedError``.
 
 After the dispatch loop exits, any node still ``pending`` is permanently
-stalled because at least one upstream gate condition can never be satisfied.
-``_settle_stalled_nodes()`` identifies these nodes and the specific
-unsatisfied conditions.  ``run()`` raises ``RunAbortedError`` (carrying the
-result dict) when any pending nodes remain so that callers receive a clean,
-inspectable failure rather than a silent stall.
+stalled.  ``run()`` raises ``RunAbortedError`` when any pending nodes remain.
 
-Note: ``RunAbortedError`` attaches the result dict directly to the exception
-because ``RunSummary`` (Step 4) is not yet implemented.  Step 4 will replace
-this mechanism with proper ``RunSummary`` persistence to disk before raising.
+Step 4 scope (RunSummary persistence)
+--------------------------------------
+``RunSummary`` — a typed dataclass that captures the full run outcome.
 
-Deferred to Steps 4–5:
-``RunSummary``, ``runner/__main__.py``, node body execution, parallelism.
+``RunSummary.build()`` derives the summary from ``RunContext``,
+``ManifestGraph``, scheduler bookkeeping (dispatched nodes, evaluated gates,
+timestamps), and the stall report from ``_settle_stalled_nodes()``.
+
+``RunSummary.write()`` persists ``run_summary.json`` to
+``.claude/runs/<run_id>/`` **before** ``run()`` returns or raises.  This
+replaces the Step 3 "exception carries result dict" pattern:
+``RunAbortedError`` now carries the ``RunSummary`` object on ``.summary``
+and exposes a backward-compatible ``.result`` dict via ``summary.to_dict()``.
+
+``run()`` returns ``RunSummary`` (not a plain dict).  ``RunSummary`` supports
+dict-style ``[key]`` and ``in`` access via ``__getitem__`` / ``__contains__``
+so that existing Step 2/3 tests that index the return value continue to work
+unchanged.
+
+Deferred to Step 5:
+``runner/__main__.py``, node body execution, parallelism.
 """
 
 from __future__ import annotations
 
+import json
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import yaml
 
 from runner.gate_evaluator import evaluate_gate
+from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.paths import find_repo_root
 from runner.run_context import RunContext
+from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
+
+# ---------------------------------------------------------------------------
+# Module constants
+# ---------------------------------------------------------------------------
 
 #: The gate whose failure triggers Phase 8 HARD_BLOCK propagation.
 _HARD_BLOCK_GATE: str = "gate_09_budget_consistency"
+
+#: Tier-4 root relative to repo root (mirrors gate_evaluator.TIER4_ROOT_REL).
+_TIER4_ROOT_REL: str = "docs/tier4_orchestration_state"
+
+#: Sub-path under Tier 4 used for gate IDs not in GATE_RESULT_PATHS.
+_FALLBACK_GATE_RESULT_SUB: str = "gate_results"
+
+#: Filename of the run summary artifact written by RunSummary.write().
+RUN_SUMMARY_FILENAME: str = "run_summary.json"
+
+
+# ---------------------------------------------------------------------------
+# Module-level helpers
+# ---------------------------------------------------------------------------
+
+
+def _gate_result_repo_path(gate_id: str) -> str:
+    """
+    Return the repo-relative canonical path for a gate result JSON file.
+
+    Uses :data:`runner.gate_result_registry.GATE_RESULT_PATHS` for
+    registered gate IDs; falls back to
+    ``docs/tier4_orchestration_state/gate_results/<gate_id>.json``.
+    """
+    if gate_id in GATE_RESULT_PATHS:
+        return f"{_TIER4_ROOT_REL}/{GATE_RESULT_PATHS[gate_id]}"
+    return f"{_TIER4_ROOT_REL}/{_FALLBACK_GATE_RESULT_SUB}/{gate_id}.json"
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -78,26 +125,321 @@ class DAGSchedulerError(Exception):
     """Raised for manifest structure or graph configuration errors."""
 
 
+# ---------------------------------------------------------------------------
+# RunSummary
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class RunSummary:
+    """
+    Durable summary of a completed or aborted DAG run.
+
+    Written to ``.claude/runs/<run_id>/run_summary.json`` at the end of
+    every ``run()`` call, whether the run succeeded, partially passed,
+    failed, or aborted.
+
+    Attributes (plan schema)
+    ------------------------
+    run_id:
+        UUID of the run.
+    manifest_version, library_version, constitution_version:
+        Version strings from ``runner.versions``.
+    started_at, completed_at:
+        UTC ISO-8601 timestamps for when ``run()`` entered the dispatch
+        loop and when the summary was built.
+    overall_status:
+        One of ``"pass"``, ``"partial_pass"``, ``"fail"``, ``"aborted"``.
+    terminal_nodes_reached:
+        Node IDs whose final state is ``"released"`` **and** which are
+        marked ``terminal: true`` in the manifest.
+    stalled_nodes:
+        Stall-detail dicts from ``_settle_stalled_nodes()`` — one entry per
+        node that remained ``pending`` after the dispatch loop.
+    hard_blocked_nodes:
+        Node IDs in ``"hard_block_upstream"`` state.
+    node_states:
+        Full ``{node_id: state}`` map for every node in the graph, in
+        manifest registry order.
+    gate_results_index:
+        ``{gate_id: repo_relative_path}`` for every gate evaluated during
+        the run.
+
+    Extra implementation fields (not in plan schema)
+    -------------------------------------------------
+    dispatched_nodes:
+        Ordered list of node IDs dispatched during the run.
+
+    Backward-compatible access
+    --------------------------
+    ``summary["key"]`` and ``"key" in summary`` are supported via
+    ``__getitem__`` / ``__contains__`` (both delegate to ``to_dict()``).
+    ``to_dict()`` also includes derived compat fields: ``released_nodes``,
+    ``blocked_nodes``, ``pending_nodes``, ``stalled``, ``aborted``,
+    ``stall_report``.
+    """
+
+    # Plan schema fields
+    run_id: str
+    manifest_version: str
+    library_version: str
+    constitution_version: str
+    started_at: str
+    completed_at: str
+    overall_status: str
+    terminal_nodes_reached: list[str]
+    stalled_nodes: list[dict]
+    hard_blocked_nodes: list[str]
+    node_states: dict[str, str]
+    gate_results_index: dict[str, str]
+    # Extra implementation field
+    dispatched_nodes: list[str]
+
+    # ------------------------------------------------------------------
+    # Factory
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def build(
+        cls,
+        *,
+        ctx: RunContext,
+        graph: ManifestGraph,
+        dispatched_nodes: list[str],
+        evaluated_gates: list[str],
+        stalled_nodes: list[dict],
+        started_at: str,
+        completed_at: str,
+    ) -> RunSummary:
+        """
+        Derive a ``RunSummary`` from scheduler state after ``run()`` exits.
+
+        Parameters
+        ----------
+        ctx:
+            The (most recently reloaded) ``RunContext`` for the run.
+        graph:
+            The ``ManifestGraph`` for this run.
+        dispatched_nodes:
+            Ordered list of node IDs dispatched during the run (from the
+            scheduler's internal tracking).
+        evaluated_gates:
+            Ordered list of gate IDs passed to ``evaluate_gate()`` during
+            the run, in evaluation order.  Used to build
+            ``gate_results_index``.
+        stalled_nodes:
+            Output of ``_settle_stalled_nodes()`` — stall-detail dicts.
+        started_at:
+            UTC ISO-8601 timestamp recorded at the start of ``run()``.
+        completed_at:
+            UTC ISO-8601 timestamp recorded just before building the summary.
+
+        Returns
+        -------
+        RunSummary
+            Fully populated summary ready to write to disk.
+        """
+        all_node_ids = graph.node_ids()
+
+        # Full node-state map in manifest registry order.
+        node_states: dict[str, str] = {
+            nid: ctx.get_node_state(nid) for nid in all_node_ids
+        }
+
+        # Derived state lists.
+        pending = [n for n, s in node_states.items() if s == "pending"]
+        hard_blocked = [
+            n for n, s in node_states.items() if s == "hard_block_upstream"
+        ]
+        terminal_nodes = [n for n in all_node_ids if graph.is_terminal(n)]
+        terminal_reached = [
+            n for n in terminal_nodes if node_states.get(n) == "released"
+        ]
+
+        # ------------------------------------------------------------------
+        # overall_status (dag_scheduler_plan.md §4, RunSummary schema)
+        # ------------------------------------------------------------------
+        if pending:
+            overall_status = "aborted"
+        elif not terminal_nodes:
+            # No terminal nodes defined — check for any blocking failures.
+            blocked_states = {"blocked_at_entry", "blocked_at_exit", "hard_block_upstream"}
+            has_failures = any(s in blocked_states for s in node_states.values())
+            overall_status = "fail" if has_failures else "pass"
+        elif len(terminal_reached) == len(terminal_nodes):
+            overall_status = "pass"
+        elif terminal_reached:
+            overall_status = "partial_pass"
+        else:
+            overall_status = "fail"
+
+        # ------------------------------------------------------------------
+        # gate_results_index: map each evaluated gate_id to its canonical path
+        # ------------------------------------------------------------------
+        # Preserve evaluation order; deduplicate while keeping first occurrence.
+        seen: set[str] = set()
+        gate_results_index: dict[str, str] = {}
+        for gid in evaluated_gates:
+            if gid not in seen:
+                gate_results_index[gid] = _gate_result_repo_path(gid)
+                seen.add(gid)
+
+        return cls(
+            run_id=ctx.run_id,
+            manifest_version=MANIFEST_VERSION,
+            library_version=LIBRARY_VERSION,
+            constitution_version=CONSTITUTION_VERSION,
+            started_at=started_at,
+            completed_at=completed_at,
+            overall_status=overall_status,
+            terminal_nodes_reached=terminal_reached,
+            stalled_nodes=stalled_nodes,
+            hard_blocked_nodes=hard_blocked,
+            node_states=node_states,
+            gate_results_index=gate_results_index,
+            dispatched_nodes=list(dispatched_nodes),
+        )
+
+    # ------------------------------------------------------------------
+    # Serialisation
+    # ------------------------------------------------------------------
+
+    def to_dict(self) -> dict:
+        """
+        Return a dict representation of this summary.
+
+        Includes all plan-schema fields, the extra ``dispatched_nodes``
+        field, and several backward-compatible derived fields so that
+        callers that previously indexed a plain ``result`` dict continue
+        to work without modification.
+
+        Backward-compat fields (derived; not written as separate plan-schema
+        keys, but included for callers that still reference them):
+
+        * ``released_nodes`` — nodes in ``"released"`` state (graph order).
+        * ``blocked_nodes`` — nodes in ``"blocked_at_entry"`` or
+          ``"blocked_at_exit"`` (graph order).
+        * ``pending_nodes`` — nodes in ``"pending"`` state (graph order).
+        * ``stalled`` — ``True`` when ``overall_status == "aborted"``.
+        * ``aborted`` — same as ``stalled``.
+        * ``stall_report`` — alias for ``stalled_nodes``.
+        """
+        _blocked_states = ("blocked_at_entry", "blocked_at_exit")
+        is_aborted = self.overall_status == "aborted"
+        return {
+            # --- Plan schema ---
+            "run_id": self.run_id,
+            "manifest_version": self.manifest_version,
+            "library_version": self.library_version,
+            "constitution_version": self.constitution_version,
+            "started_at": self.started_at,
+            "completed_at": self.completed_at,
+            "overall_status": self.overall_status,
+            "terminal_nodes_reached": list(self.terminal_nodes_reached),
+            "stalled_nodes": list(self.stalled_nodes),
+            "hard_blocked_nodes": list(self.hard_blocked_nodes),
+            "node_states": dict(self.node_states),
+            "gate_results_index": dict(self.gate_results_index),
+            # --- Extra implementation field ---
+            "dispatched_nodes": list(self.dispatched_nodes),
+            # --- Backward-compat derived fields ---
+            "released_nodes": [
+                n for n, s in self.node_states.items() if s == "released"
+            ],
+            "blocked_nodes": [
+                n for n, s in self.node_states.items() if s in _blocked_states
+            ],
+            "pending_nodes": [
+                n for n, s in self.node_states.items() if s == "pending"
+            ],
+            "stalled": is_aborted,
+            "aborted": is_aborted,
+            "stall_report": list(self.stalled_nodes),  # alias
+        }
+
+    def write(self, run_dir: Path) -> Path:
+        """
+        Write ``run_summary.json`` to *run_dir* and return its path.
+
+        Creates *run_dir* if it does not exist.  Only plan-schema fields and
+        ``dispatched_nodes`` are written (backward-compat derived fields are
+        omitted from the JSON file to keep it clean).
+        """
+        path = run_dir / RUN_SUMMARY_FILENAME
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Write only the plan-schema + implementation fields, not the
+        # backward-compat aliases that exist only for in-process access.
+        schema_dict = {
+            "run_id": self.run_id,
+            "manifest_version": self.manifest_version,
+            "library_version": self.library_version,
+            "constitution_version": self.constitution_version,
+            "started_at": self.started_at,
+            "completed_at": self.completed_at,
+            "overall_status": self.overall_status,
+            "terminal_nodes_reached": self.terminal_nodes_reached,
+            "stalled_nodes": self.stalled_nodes,
+            "hard_blocked_nodes": self.hard_blocked_nodes,
+            "node_states": self.node_states,
+            "gate_results_index": self.gate_results_index,
+            "dispatched_nodes": self.dispatched_nodes,
+        }
+        path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
+        return path
+
+    # ------------------------------------------------------------------
+    # Dict-compatible access (backward compat for Step 2/3 tests)
+    # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # Convenience properties (derived from node_states)
+    # ------------------------------------------------------------------
+
+    @property
+    def pending_nodes(self) -> list[str]:
+        """Node IDs in ``"pending"`` state (graph order)."""
+        return [n for n, s in self.node_states.items() if s == "pending"]
+
+    # ------------------------------------------------------------------
+    # Dict-compatible access (backward compat for Step 2/3 tests)
+    # ------------------------------------------------------------------
+
+    def __getitem__(self, key: str) -> Any:
+        """Enable ``summary["key"]`` access by delegating to ``to_dict()``."""
+        return self.to_dict()[key]
+
+    def __contains__(self, key: object) -> bool:
+        """Enable ``"key" in summary`` by delegating to ``to_dict()``."""
+        return key in self.to_dict()
+
+
+# ---------------------------------------------------------------------------
+# Exceptions (continued — RunAbortedError references RunSummary)
+# ---------------------------------------------------------------------------
+
+
 class RunAbortedError(DAGSchedulerError):
     """Raised when run() detects that no progress is possible and at least
     one non-terminal node is unsettled (remains ``pending``).
 
+    ``run_summary.json`` is written to disk **before** this exception is
+    raised so that the run outcome is durable even in the aborted case.
+
     Attributes
     ----------
+    summary:
+        The :class:`RunSummary` built at the end of the aborted run.
+        This is the authoritative payload for Step 4 onwards.
     result:
-        The lightweight run result dict (same shape as the dict returned by
-        a successful ``run()`` call, extended with ``stall_report`` and
-        ``aborted``).  Callers can inspect this for diagnostic purposes
-        without needing ``RunSummary``.
-
-        Step 4 (``RunSummary``) will replace this "exception carries result"
-        mechanism with proper ``RunSummary`` persistence to disk before
-        raising.
+        ``summary.to_dict()`` — retained for backward compatibility with
+        callers and tests that previously accessed ``exc.result["key"]``.
+        Both attributes are always consistent.
     """
 
-    def __init__(self, message: str, result: dict) -> None:
+    def __init__(self, message: str, summary: RunSummary) -> None:
         super().__init__(message)
-        self.result = result
+        self.summary = summary
+        self.result: dict = summary.to_dict()  # backward compat
 
 
 # ---------------------------------------------------------------------------
@@ -496,7 +838,14 @@ class DAGScheduler:
     Step 3 scope
     ------------
     Implements ``_settle_stalled_nodes()`` and ``RunAbortedError`` raising
-    in ``run()``.  ``RunSummary`` is deferred to Step 4.
+    in ``run()``.
+
+    Step 4 scope
+    ------------
+    ``run()`` builds and writes a :class:`RunSummary` before returning or
+    raising.  Returns a ``RunSummary`` (not a plain dict).  ``RunAbortedError``
+    now carries ``.summary`` (the authoritative payload) and a backward-
+    compatible ``.result`` dict.
     """
 
     def __init__(
@@ -512,12 +861,15 @@ class DAGScheduler:
         self.repo_root: Path = Path(repo_root)
         self.library_path: Optional[Path] = library_path
         self.manifest_path: Optional[Path] = manifest_path
+        #: Accumulates every gate ID passed to evaluate_gate() during run().
+        #: Populated by _dispatch_node() and consumed by RunSummary.build().
+        self._evaluated_gates: list[str] = []
 
     # ------------------------------------------------------------------
     # Public entry point
     # ------------------------------------------------------------------
 
-    def run(self) -> dict:
+    def run(self) -> RunSummary:
         """
         Execute all nodes in dependency order until no node is ready.
 
@@ -528,50 +880,28 @@ class DAGScheduler:
         * all nodes are settled (released / blocked / hard_blocked), or
         * no further node becomes ready (upstream failure stall).
 
-        After the loop, :meth:`_settle_stalled_nodes` is called to build a
-        structured report of any permanently stalled nodes.
+        After the loop, :meth:`_settle_stalled_nodes` is called, a
+        :class:`RunSummary` is built, and ``run_summary.json`` is written
+        to ``.claude/runs/<run_id>/`` before this method returns or raises.
 
         Returns
         -------
-        dict
-            A lightweight result dict (when no nodes remain pending) with:
-
-            ``run_id``
-                UUID of the current run.
-            ``dispatched_nodes``
-                Ordered list of node IDs dispatched during this run.
-            ``released_nodes``
-                Node IDs whose final state is ``"released"``.
-            ``blocked_nodes``
-                Node IDs in ``"blocked_at_entry"`` or ``"blocked_at_exit"``.
-            ``hard_blocked_nodes``
-                Node IDs in ``"hard_block_upstream"``.
-            ``pending_nodes``
-                Node IDs still ``"pending"`` when the loop exited
-                (empty list on a successful run).
-            ``stall_report``
-                List of stall-detail dicts from
-                :meth:`_settle_stalled_nodes` (empty list on success).
-            ``stalled``
-                ``True`` when pending nodes remain (synonymous with
-                ``aborted`` — kept for backward compatibility).
-            ``aborted``
-                ``True`` when the run was aborted due to stalled nodes.
+        RunSummary
+            Summary of the completed run.  Supports ``summary["key"]`` and
+            ``"key" in summary`` for backward compatibility with tests that
+            previously indexed the plain result dict.
 
         Raises
         ------
         RunAbortedError
-            When any nodes remain ``pending`` after the loop exits,
-            indicating that no further progress is possible.  The exception
-            carries the same result dict (with ``aborted=True``) on
-            :attr:`RunAbortedError.result` so callers can inspect the run
-            state without ``RunSummary`` (Step 4).
-
-            Step 4 (``RunSummary``) will write the summary to disk before
-            raising and replace the "exception carries result" pattern.
+            When any nodes remain ``pending`` after the loop exits.
+            ``run_summary.json`` is written **before** raising.  The
+            exception carries ``.summary`` (the :class:`RunSummary`) and a
+            backward-compatible ``.result`` dict (``summary.to_dict()``).
         DAGSchedulerError
             If a dispatched node has no exit gate defined.
         """
+        started_at: str = datetime.now(timezone.utc).isoformat()
         dispatched: list[str] = []
 
         while True:
@@ -597,44 +927,33 @@ class DAGScheduler:
         # ------------------------------------------------------------------
         stall_report = self._settle_stalled_nodes()
 
-        all_nodes = self.graph.node_ids()
-        released = [n for n in all_nodes if self.ctx.get_node_state(n) == "released"]
-        blocked = [
-            n
-            for n in all_nodes
-            if self.ctx.get_node_state(n) in ("blocked_at_entry", "blocked_at_exit")
-        ]
-        hard_blocked = [
-            n for n in all_nodes if self.ctx.get_node_state(n) == "hard_block_upstream"
-        ]
-        pending = [n for n in all_nodes if self.ctx.get_node_state(n) == "pending"]
+        # ------------------------------------------------------------------
+        # Step 4: build RunSummary and write to disk
+        # ------------------------------------------------------------------
+        completed_at: str = datetime.now(timezone.utc).isoformat()
 
-        aborted = len(pending) > 0
+        summary = RunSummary.build(
+            ctx=self.ctx,
+            graph=self.graph,
+            dispatched_nodes=dispatched,
+            evaluated_gates=self._evaluated_gates,
+            stalled_nodes=stall_report,
+            started_at=started_at,
+            completed_at=completed_at,
+        )
+        summary.write(self.ctx.run_dir)
 
-        result: dict = {
-            "run_id": self.ctx.run_id,
-            "dispatched_nodes": dispatched,
-            "released_nodes": released,
-            "blocked_nodes": blocked,
-            "hard_blocked_nodes": hard_blocked,
-            "pending_nodes": pending,
-            "stall_report": stall_report,
-            "stalled": aborted,  # kept for backward compatibility
-            "aborted": aborted,
-        }
-
-        if aborted:
-            # Step 4 (RunSummary) will replace this mechanism: it will
-            # persist run_summary.json to disk before raising.
+        if summary.overall_status == "aborted":
             stalled_ids = [e["node_id"] for e in stall_report]
             raise RunAbortedError(
-                f"Run {self.ctx.run_id!r} aborted: {len(pending)} node(s) "
-                f"remain pending with no further progress possible.  "
+                f"Run {self.ctx.run_id!r} aborted: "
+                f"{len(summary.pending_nodes)} node(s) remain pending with "
+                f"no further progress possible.  "
                 f"Stalled nodes: {stalled_ids!r}",
-                result,
+                summary,
             )
 
-        return result
+        return summary
 
     # ------------------------------------------------------------------
     # Stall detection
@@ -754,6 +1073,7 @@ class DAGScheduler:
                 library_path=self.library_path,
                 manifest_path=self.manifest_path,
             )
+            self._evaluated_gates.append(entry_gate_id)
             self._reload_ctx()
 
             if entry_result.get("status") != "pass":
@@ -778,6 +1098,7 @@ class DAGScheduler:
             library_path=self.library_path,
             manifest_path=self.manifest_path,
         )
+        self._evaluated_gates.append(exit_gate_id)
         self._reload_ctx()
 
         if exit_result.get("status") == "pass":

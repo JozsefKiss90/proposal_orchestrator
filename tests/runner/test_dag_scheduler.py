@@ -1,5 +1,5 @@
 """
-Tests for runner.dag_scheduler (DAG scheduler Steps 1–3).
+Tests for runner.dag_scheduler (DAG scheduler Steps 1–4).
 
 Step 2 coverage:
   1.  single-node: entry gate passes, exit gate passes → released
@@ -630,6 +630,10 @@ class TestKwargsPassthrough:
 
 class TestRunResultDict:
     def test_result_contains_all_required_keys(self, tmp_path: Path) -> None:
+        """
+        run() now returns a RunSummary.  Verify required keys are present
+        in to_dict() (which backs __getitem__ / __contains__).
+        """
         sched = _make_scheduler(tmp_path, _single_node_manifest())
         with patch(_EG_TARGET, return_value=_GATE_PASS):
             result = sched.run()
@@ -643,8 +647,9 @@ class TestRunResultDict:
             "pending_nodes",
             "stalled",
         }
-        assert required_keys.issubset(result.keys()), (
-            f"Missing keys: {required_keys - result.keys()!r}"
+        result_dict = result.to_dict()
+        assert required_keys.issubset(result_dict.keys()), (
+            f"Missing keys: {required_keys - result_dict.keys()!r}"
         )
 
     def test_run_id_matches_context(self, tmp_path: Path) -> None:
@@ -1227,3 +1232,546 @@ class TestNoFalseAbort:
 
         assert "stall_report" in result
         assert "aborted" in result
+
+
+# ===========================================================================
+# Step 4 — RunSummary structure, persistence, overall_status, gate index
+# ===========================================================================
+
+import json as _json  # local alias to avoid shadowing if any
+
+from runner.dag_scheduler import RunSummary
+from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
+
+
+# ---------------------------------------------------------------------------
+# Helpers: additional manifest builders for Step 4 scenarios
+# ---------------------------------------------------------------------------
+
+
+def _two_terminal_manifest() -> dict:
+    """
+    Fork: n01 → n02 (terminal) and n01 → n03 (terminal).
+    Used for partial_pass tests (n02 passes, n03 fails → one terminal reached).
+    """
+    return {
+        "name": "test",
+        "version": "1.1",
+        "node_registry": [
+            {"node_id": "n01", "exit_gate": "g01", "terminal": False},
+            {"node_id": "n02", "exit_gate": "g02", "terminal": True},
+            {"node_id": "n03", "exit_gate": "g03", "terminal": True},
+        ],
+        "edge_registry": [
+            {"edge_id": "e1", "from_node": "n01", "to_node": "n02", "gate_condition": "g01"},
+            {"edge_id": "e2", "from_node": "n01", "to_node": "n03", "gate_condition": "g01"},
+        ],
+    }
+
+
+def _read_summary_json(run_dir: Path) -> dict:
+    """Read and parse the run_summary.json written inside *run_dir*."""
+    path = run_dir / "run_summary.json"
+    assert path.exists(), f"run_summary.json not found at {path}"
+    return _json.loads(path.read_text(encoding="utf-8"))
+
+
+# ---------------------------------------------------------------------------
+# RunSummary structure
+# ---------------------------------------------------------------------------
+
+
+class TestRunSummaryStructure:
+    """run() returns a RunSummary with all required plan-schema fields."""
+
+    _PLAN_SCHEMA_KEYS = {
+        "run_id",
+        "manifest_version",
+        "library_version",
+        "constitution_version",
+        "started_at",
+        "completed_at",
+        "overall_status",
+        "terminal_nodes_reached",
+        "stalled_nodes",
+        "hard_blocked_nodes",
+        "node_states",
+        "gate_results_index",
+    }
+
+    def test_run_returns_run_summary_instance(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert isinstance(result, RunSummary)
+
+    def test_summary_has_all_plan_schema_fields(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        d = result.to_dict()
+        assert self._PLAN_SCHEMA_KEYS.issubset(d.keys())
+
+    def test_summary_version_fields_match_constants(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.manifest_version == MANIFEST_VERSION
+        assert result.library_version == LIBRARY_VERSION
+        assert result.constitution_version == CONSTITUTION_VERSION
+
+    def test_summary_run_id_matches_context(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="schema-id")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.run_id == "schema-id"
+
+    def test_summary_node_states_contains_all_graph_nodes(
+        self, tmp_path: Path
+    ) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert set(result.node_states.keys()) == {
+            "n01_call_analysis",
+            "n02_concept_refinement",
+        }
+
+    def test_summary_dispatched_nodes_present(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.dispatched_nodes == [
+            "n01_call_analysis",
+            "n02_concept_refinement",
+        ]
+
+
+# ---------------------------------------------------------------------------
+# run_summary.json persistence
+# ---------------------------------------------------------------------------
+
+
+class TestRunSummaryPersistence:
+    def test_summary_file_written_on_successful_run(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="write-pass")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "write-pass"
+        assert (run_dir / "run_summary.json").exists()
+
+    def test_summary_file_written_on_aborted_run(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="write-abort"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError):
+                sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "write-abort"
+        assert (run_dir / "run_summary.json").exists()
+
+    def test_written_json_contains_plan_schema_keys(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="json-keys")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "json-keys"
+        d = _read_summary_json(run_dir)
+        plan_keys = {
+            "run_id", "manifest_version", "library_version", "constitution_version",
+            "started_at", "completed_at", "overall_status",
+            "terminal_nodes_reached", "stalled_nodes", "hard_blocked_nodes",
+            "node_states", "gate_results_index",
+        }
+        assert plan_keys.issubset(d.keys())
+
+    def test_written_json_matches_returned_summary(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _single_node_manifest(), run_id="json-match"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            summary = sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "json-match"
+        d = _read_summary_json(run_dir)
+        assert d["run_id"] == summary.run_id
+        assert d["overall_status"] == summary.overall_status
+        assert d["node_states"] == summary.node_states
+
+    def test_written_json_path_returned_by_write(self, tmp_path: Path) -> None:
+        """RunSummary.write() returns the path of the written file."""
+        graph = ManifestGraph.load(_write_manifest(tmp_path, _single_node_manifest()))
+        ctx = RunContext.initialize(tmp_path, "write-path")
+        summary = RunSummary.build(
+            ctx=ctx,
+            graph=graph,
+            dispatched_nodes=[],
+            evaluated_gates=[],
+            stalled_nodes=[],
+            started_at="2026-01-01T00:00:00+00:00",
+            completed_at="2026-01-01T00:00:01+00:00",
+        )
+        written_path = summary.write(ctx.run_dir)
+        assert written_path.name == "run_summary.json"
+        assert written_path.exists()
+
+    def test_summary_written_before_exception_on_abort(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        The summary file must exist on disk when RunAbortedError is caught.
+        """
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="before-exc"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            try:
+                sched.run()
+            except RunAbortedError:
+                pass  # file must already be written
+
+        run_dir = tmp_path / ".claude" / "runs" / "before-exc"
+        assert (run_dir / "run_summary.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# overall_status
+# ---------------------------------------------------------------------------
+
+
+class TestOverallStatus:
+    def test_pass_on_full_release(self, tmp_path: Path) -> None:
+        """All terminal nodes reached → overall_status == "pass"."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.overall_status == "pass"
+
+    def test_fail_on_single_node_blocked_at_exit(self, tmp_path: Path) -> None:
+        """No terminal nodes + blocked failure → overall_status == "fail"."""
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        assert result.overall_status == "fail"
+
+    def test_fail_on_single_node_blocked_at_entry(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path,
+            _single_node_manifest(entry_gate="gate_01_source_integrity"),
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        assert result.overall_status == "fail"
+
+    def test_aborted_on_stalled_run(self, tmp_path: Path) -> None:
+        """Pending nodes remain → overall_status == "aborted"."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert exc_info.value.summary.overall_status == "aborted"
+
+    def test_partial_pass_on_fork_with_one_terminal_released(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        Fork: n01 released, n02 (terminal) released, n03 (terminal) blocked
+        → partial_pass.
+        The mock alternates pass/fail: n01 passes, n02 passes, n03 fails.
+        """
+        call_count = [0]
+
+        def _alternating(gate_id, run_id, repo_root, **kwargs):
+            call_count[0] += 1
+            # g01 (n01 exit) → pass; g02 (n02 exit) → pass; g03 (n03 exit) → fail
+            if gate_id == "g03":
+                return _GATE_FAIL
+            return _GATE_PASS
+
+        sched = _make_scheduler(
+            tmp_path, _two_terminal_manifest(), run_id="partial"
+        )
+        with patch(_EG_TARGET, side_effect=_alternating):
+            result = sched.run()
+
+        assert result.overall_status == "partial_pass"
+        assert "n02" in result.terminal_nodes_reached
+        assert "n03" not in result.terminal_nodes_reached
+
+    def test_pass_on_empty_graph(self, tmp_path: Path) -> None:
+        """An empty graph has no failures → overall_status == "pass"."""
+        data = {
+            "name": "t",
+            "version": "1.1",
+            "node_registry": [],
+            "edge_registry": [],
+        }
+        mp = _write_manifest(tmp_path, data)
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "empty-status")
+        sched = DAGScheduler(graph, ctx, tmp_path)
+        with patch(_EG_TARGET):
+            result = sched.run()
+
+        assert result.overall_status == "pass"
+
+    def test_fail_on_hard_block_with_no_terminal_nodes(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        gate_09 failure → hard_block_upstream on Phase 8 nodes → no terminal
+        nodes in manifest → overall_status == "fail".
+        """
+        sched = _make_scheduler(
+            tmp_path, _gate09_node_manifest(), run_id="hb-status"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        assert result.overall_status == "fail"
+
+
+# ---------------------------------------------------------------------------
+# Stalled / hard-blocked reporting in RunSummary
+# ---------------------------------------------------------------------------
+
+
+class TestSummaryBlockingReporting:
+    def test_stalled_nodes_in_summary_after_abort(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="sum-stall"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        summary = exc_info.value.summary
+        stalled_ids = [e["node_id"] for e in summary.stalled_nodes]
+        assert "n02_concept_refinement" in stalled_ids
+
+    def test_hard_blocked_nodes_in_summary(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _gate09_node_manifest(), run_id="sum-hb"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        for p8 in PHASE_8_NODE_IDS:
+            assert p8 in result.hard_blocked_nodes
+
+    def test_hard_blocked_not_in_stalled_nodes(self, tmp_path: Path) -> None:
+        """hard_block_upstream nodes must not appear in stalled_nodes."""
+        sched = _make_scheduler(
+            tmp_path, _gate09_node_manifest(), run_id="sum-hb-sep"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        stalled_ids = [e["node_id"] for e in result.stalled_nodes]
+        for p8 in PHASE_8_NODE_IDS:
+            assert p8 not in stalled_ids
+
+
+# ---------------------------------------------------------------------------
+# RunAbortedError carries RunSummary
+# ---------------------------------------------------------------------------
+
+
+class TestRunAbortedErrorCarriesSummary:
+    def test_exception_has_summary_attribute(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert isinstance(exc_info.value.summary, RunSummary)
+
+    def test_summary_and_result_are_consistent(self, tmp_path: Path) -> None:
+        """exc.result must equal exc.summary.to_dict() for backward compat."""
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="compat"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        exc = exc_info.value
+        assert exc.result["run_id"] == exc.summary.run_id
+        assert exc.result["overall_status"] == exc.summary.overall_status
+        assert exc.result["overall_status"] == "aborted"
+
+    def test_summary_file_exists_when_exception_caught(
+        self, tmp_path: Path
+    ) -> None:
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="file-on-exc"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError):
+                sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "file-on-exc"
+        assert (run_dir / "run_summary.json").exists()
+
+    def test_aborted_summary_overall_status_in_json(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="aborted-json"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError):
+                sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "aborted-json"
+        d = _read_summary_json(run_dir)
+        assert d["overall_status"] == "aborted"
+
+
+# ---------------------------------------------------------------------------
+# gate_results_index
+# ---------------------------------------------------------------------------
+
+
+class TestGateResultsIndex:
+    def test_index_present_in_summary(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _single_node_manifest(), run_id="gri-present"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert isinstance(result.gate_results_index, dict)
+
+    def test_index_contains_evaluated_exit_gate(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _single_node_manifest(), run_id="gri-exit"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        # phase_01_gate is the exit gate for n01_call_analysis
+        assert "phase_01_gate" in result.gate_results_index
+
+    def test_index_contains_entry_gate_when_evaluated(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path,
+            _single_node_manifest(entry_gate="gate_01_source_integrity"),
+            run_id="gri-entry",
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert "gate_01_source_integrity" in result.gate_results_index
+        assert "phase_01_gate" in result.gate_results_index
+
+    def test_registered_gate_uses_canonical_tier4_path(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        A gate_id in GATE_RESULT_PATHS must map to the correct Tier 4 path.
+        """
+        sched = _make_scheduler(
+            tmp_path, _single_node_manifest(), run_id="gri-canonical"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        expected_suffix = GATE_RESULT_PATHS["phase_01_gate"]
+        path_str = result.gate_results_index["phase_01_gate"]
+        assert path_str.startswith("docs/tier4_orchestration_state/")
+        assert path_str.endswith(expected_suffix)
+
+    def test_unregistered_gate_uses_fallback_path(self, tmp_path: Path) -> None:
+        """
+        A gate_id not in GATE_RESULT_PATHS uses the fallback sub-path.
+        This exercises synthetic test gates like "g01".
+        """
+        data = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [
+                {"node_id": "n01", "exit_gate": "synthetic_gate_xyz", "terminal": False}
+            ],
+            "edge_registry": [],
+        }
+        sched = _make_scheduler(tmp_path, data, run_id="gri-fallback")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert "synthetic_gate_xyz" in result.gate_results_index
+        path_str = result.gate_results_index["synthetic_gate_xyz"]
+        assert "gate_results/synthetic_gate_xyz.json" in path_str
+
+    def test_empty_graph_has_empty_index(self, tmp_path: Path) -> None:
+        data = {
+            "name": "t",
+            "version": "1.1",
+            "node_registry": [],
+            "edge_registry": [],
+        }
+        mp = _write_manifest(tmp_path, data)
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "gri-empty")
+        sched = DAGScheduler(graph, ctx, tmp_path)
+        with patch(_EG_TARGET):
+            result = sched.run()
+
+        assert result.gate_results_index == {}
+
+    def test_index_in_written_json(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(
+            tmp_path, _single_node_manifest(), run_id="gri-json"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            sched.run()
+
+        run_dir = tmp_path / ".claude" / "runs" / "gri-json"
+        d = _read_summary_json(run_dir)
+        assert "gate_results_index" in d
+        assert isinstance(d["gate_results_index"], dict)
+
+
+# ---------------------------------------------------------------------------
+# Timestamps
+# ---------------------------------------------------------------------------
+
+
+class TestTimestamps:
+    def test_started_at_and_completed_at_present(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="ts-keys")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.started_at
+        assert result.completed_at
+
+    def test_timestamps_are_iso8601_strings(self, tmp_path: Path) -> None:
+        from datetime import datetime
+
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="ts-fmt")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        # Should parse without error
+        datetime.fromisoformat(result.started_at)
+        datetime.fromisoformat(result.completed_at)
+
+    def test_started_at_not_after_completed_at(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="ts-order")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result.started_at <= result.completed_at
+
