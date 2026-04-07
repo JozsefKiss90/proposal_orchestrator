@@ -1,11 +1,11 @@
 """
-Tests for runner.dag_scheduler.DAGScheduler (DAG scheduler Step 2).
+Tests for runner.dag_scheduler (DAG scheduler Steps 1–3).
 
-Covers:
+Step 2 coverage:
   1.  single-node: entry gate passes, exit gate passes → released
   2.  single-node: entry gate fails → blocked_at_entry, never reaches exit
   3.  two-node linear: first released → second dispatched and released
-  4.  two-node linear: first exit gate fails → second stays pending, stalled=True
+  4.  two-node linear: first exit gate fails → second stays pending → RunAbortedError
   5.  dispatch order follows manifest registry order
   6.  run() stops when no nodes are ready
   7.  gate_09_budget_consistency failure triggers mark_hard_block_downstream()
@@ -13,11 +13,25 @@ Covers:
   9.  _dispatch_node() forwards library_path and manifest_path to evaluate_gate()
   10. run() result dict reports correct released / blocked / pending / hard_blocked
 
-Additional invariant tests:
+Step 2 additional invariant tests:
   - node with no exit gate raises DAGSchedulerError
   - run() with no nodes in graph produces empty result
   - single-node with no entry gate skips straight to exit gate evaluation
   - ctx.mark_hard_block_downstream() called even when evaluate_gate is mocked
+
+Step 3 coverage:
+  - _settle_stalled_nodes() returns empty list when all nodes are settled
+  - _settle_stalled_nodes() returns one entry per stalled pending node
+  - stall report includes gate_id and source_node_state for each unsatisfied condition
+  - pending node with multiple unsatisfied incoming conditions reports all of them
+  - run() raises RunAbortedError when pending nodes remain
+  - RunAbortedError.result carries the full lightweight result dict
+  - aborted result dict includes pending_nodes, stall_report, hard_blocked_nodes
+  - gate_09 failure → hard_block_upstream nodes (not stalled pending)
+  - both hard-blocked and independently stalled nodes are distinguished in abort result
+  - hard-blocked nodes are not touched by _settle_stalled_nodes()
+  - run() does not raise when all nodes are settled, even if some are blocked
+  - abort is driven by pending nodes, not by released/blocked nodes
 
 All tests use patched evaluate_gate and synthetic manifests / RunContext
 instances backed by tmp_path.  No live repository artifacts are read.
@@ -32,7 +46,12 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 import yaml
 
-from runner.dag_scheduler import DAGScheduler, DAGSchedulerError, ManifestGraph
+from runner.dag_scheduler import (
+    DAGScheduler,
+    DAGSchedulerError,
+    ManifestGraph,
+    RunAbortedError,
+)
 from runner.run_context import PHASE_8_NODE_IDS, RunContext
 
 
@@ -306,7 +325,12 @@ class TestTwoNodeLinearBothPass:
 
 
 # ---------------------------------------------------------------------------
-# 4. Two-node linear: first exit gate fails → second stays pending, stalled
+# 4. Two-node linear: first exit gate fails → second stays pending → abort
+#
+# Step 3 contract: run() raises RunAbortedError instead of returning when
+# pending nodes remain.  These tests were updated from the Step 2 versions
+# (which checked result["stalled"]) to use pytest.raises and inspect
+# exc.result instead.
 # ---------------------------------------------------------------------------
 
 
@@ -314,30 +338,35 @@ class TestTwoNodeLinearFirstFails:
     def test_n2_remains_pending(self, tmp_path: Path) -> None:
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
-        assert "n02_concept_refinement" in result["pending_nodes"]
+        assert "n02_concept_refinement" in exc_info.value.result["pending_nodes"]
 
     def test_n1_is_blocked_at_exit(self, tmp_path: Path) -> None:
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
-        assert "n01_call_analysis" in result["blocked_nodes"]
+        assert "n01_call_analysis" in exc_info.value.result["blocked_nodes"]
 
     def test_n2_never_dispatched(self, tmp_path: Path) -> None:
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
-        assert "n02_concept_refinement" not in result["dispatched_nodes"]
+        assert "n02_concept_refinement" not in exc_info.value.result["dispatched_nodes"]
 
     def test_stalled_true(self, tmp_path: Path) -> None:
+        """stalled=True is preserved in exc.result for backward compatibility."""
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
-        assert result["stalled"] is True
+        assert exc_info.value.result["stalled"] is True
 
 
 # ---------------------------------------------------------------------------
@@ -401,14 +430,19 @@ class TestRunStopsWhenNoReady:
         assert result["stalled"] is False
 
     def test_run_stops_after_upstream_blocks(self, tmp_path: Path) -> None:
-        """Once upstream fails, no downstream node becomes ready; loop stops."""
+        """Once upstream fails, no downstream node becomes ready; loop stops.
+
+        Step 3: run() raises RunAbortedError; the call count and pending list
+        are inspected via exc.result.
+        """
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL) as mock_eg:
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
         # evaluate_gate called exactly once (for n01's exit gate only)
         assert mock_eg.call_count == 1
-        assert result["pending_nodes"] == ["n02_concept_refinement"]
+        assert exc_info.value.result["pending_nodes"] == ["n02_concept_refinement"]
 
 
 # ---------------------------------------------------------------------------
@@ -632,10 +666,16 @@ class TestRunResultDict:
         assert result["pending_nodes"] == []
 
     def test_blocked_nodes_correct_after_exit_fail(self, tmp_path: Path) -> None:
+        """
+        Two-node linear fail: n01 blocked, n02 pending → RunAbortedError.
+        Step 3: inspect exc.result for the node state breakdown.
+        """
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
-            result = sched.run()
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
+        result = exc_info.value.result
         assert result["blocked_nodes"] == ["n01_call_analysis"]
         assert result["released_nodes"] == []
         assert result["pending_nodes"] == ["n02_concept_refinement"]
@@ -735,3 +775,455 @@ class TestEdgeCases:
         with patch(_EG_TARGET, return_value=_GATE_PASS):
             result = sched.run()
         assert result["run_id"] == "run-xyz"
+
+
+# ===========================================================================
+# Step 3 — _settle_stalled_nodes() and RunAbortedError
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# Helpers: additional synthetic manifest builders used by Step 3 tests
+# ---------------------------------------------------------------------------
+
+
+def _three_node_fork_join_manifest(
+    n1: str = "n01",
+    n2: str = "n02",
+    n3: str = "n03",
+) -> dict:
+    """
+    Fork-join: n01 → n03 and n02 → n03.
+    n03 requires both n01 and n02 to be released.
+    Used to test multiple unsatisfied incoming conditions on one stalled node.
+    """
+    return {
+        "name": "test",
+        "version": "1.1",
+        "node_registry": [
+            {"node_id": n1, "exit_gate": "g01", "terminal": False},
+            {"node_id": n2, "exit_gate": "g02", "terminal": False},
+            {"node_id": n3, "exit_gate": "g03", "terminal": True},
+        ],
+        "edge_registry": [
+            {"edge_id": "e1", "from_node": n1, "to_node": n3, "gate_condition": "g01"},
+            {"edge_id": "e2", "from_node": n2, "to_node": n3, "gate_condition": "g02"},
+        ],
+    }
+
+
+def _mixed_stall_and_hard_block_manifest() -> dict:
+    """
+    Manifest with:
+    - n01 → n02 (linear chain; n01 may fail to stall n02)
+    - n07_budget_gate → n08a_section_drafting (gate_09 triggers HARD_BLOCK)
+
+    Used to verify that hard_blocked nodes and stalled nodes are
+    independently tracked and do not interfere.
+    """
+    return {
+        "name": "test",
+        "version": "1.1",
+        "node_registry": [
+            {
+                "node_id": "n01_call_analysis",
+                "exit_gate": "phase_01_gate",
+                "terminal": False,
+            },
+            {
+                "node_id": "n02_concept_refinement",
+                "exit_gate": "phase_02_gate",
+                "terminal": False,
+            },
+            {
+                "node_id": "n07_budget_gate",
+                "exit_gate": "gate_09_budget_consistency",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08a_section_drafting",
+                "exit_gate": "gate_10_part_b_completeness",
+                "terminal": True,
+            },
+        ],
+        "edge_registry": [
+            {
+                "edge_id": "e01",
+                "from_node": "n01_call_analysis",
+                "to_node": "n02_concept_refinement",
+                "gate_condition": "phase_01_gate",
+            },
+            {
+                "edge_id": "e07",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08a_section_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
+# _settle_stalled_nodes() unit tests (call the method directly)
+# ---------------------------------------------------------------------------
+
+
+class TestSettleStalledNodes:
+    """Tests for DAGScheduler._settle_stalled_nodes() in isolation."""
+
+    def test_returns_empty_when_all_nodes_released(self, tmp_path: Path) -> None:
+        """When every node is released there are no stalled nodes."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            sched.run()
+
+        # run() returned normally (no exception) → call _settle_stalled_nodes
+        # on the post-run context directly to verify it returns [].
+        report = sched._settle_stalled_nodes()
+        assert report == []
+
+    def test_returns_empty_when_only_blocked_nodes_remain(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        A single node whose exit gate failed is blocked_at_exit (settled),
+        not pending.  _settle_stalled_nodes must return [].
+        """
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            sched.run()  # single-node fail → blocked_at_exit → no abort
+
+        report = sched._settle_stalled_nodes()
+        assert report == []
+
+    def test_returns_one_entry_for_two_node_linear_stall(
+        self, tmp_path: Path
+    ) -> None:
+        """n01 fails → n02 is stalled pending → report has exactly one entry."""
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="stall-1"
+        )
+        # Drive the dispatch manually: dispatch n01 only (fails) so n02 stays pending.
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            sched.ctx.set_node_state("n01_call_analysis", "running")
+            sched.ctx.save()
+            sched._dispatch_node("n01_call_analysis")
+        # n01 is now blocked_at_exit; n02 is still pending.
+        report = sched._settle_stalled_nodes()
+        assert len(report) == 1
+        assert report[0]["node_id"] == "n02_concept_refinement"
+
+    def test_stall_report_includes_gate_id(self, tmp_path: Path) -> None:
+        """The unsatisfied condition entry must record the gate_id."""
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="stall-gid"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            sched.ctx.set_node_state("n01_call_analysis", "running")
+            sched.ctx.save()
+            sched._dispatch_node("n01_call_analysis")
+
+        report = sched._settle_stalled_nodes()
+        assert len(report) == 1
+        cond = report[0]["unsatisfied_conditions"][0]
+        assert cond["gate_id"] == "phase_01_gate"
+
+    def test_stall_report_includes_source_node_state(self, tmp_path: Path) -> None:
+        """The unsatisfied condition entry must record the source node's actual state."""
+        sched = _make_scheduler(
+            tmp_path, _two_node_linear_manifest(), run_id="stall-state"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            sched.ctx.set_node_state("n01_call_analysis", "running")
+            sched.ctx.save()
+            sched._dispatch_node("n01_call_analysis")
+
+        report = sched._settle_stalled_nodes()
+        cond = report[0]["unsatisfied_conditions"][0]
+        assert cond["source_node_id"] == "n01_call_analysis"
+        assert cond["source_node_state"] == "blocked_at_exit"
+
+    def test_multiple_unsatisfied_conditions_all_reported(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        Fork-join: n03 requires both n01 (g01) and n02 (g02).
+        When both n01 and n02 fail, n03's stall report must list both
+        unsatisfied conditions.
+        """
+        manifest = _three_node_fork_join_manifest()
+        sched = _make_scheduler(tmp_path, manifest, run_id="multi-cond")
+
+        # Drive dispatches manually: both n01 and n02 fail.
+        for nid in ("n01", "n02"):
+            with patch(_EG_TARGET, return_value=_GATE_FAIL):
+                sched.ctx.set_node_state(nid, "running")
+                sched.ctx.save()
+                sched._dispatch_node(nid)
+
+        report = sched._settle_stalled_nodes()
+        assert len(report) == 1
+        stalled = report[0]
+        assert stalled["node_id"] == "n03"
+        gate_ids = {c["gate_id"] for c in stalled["unsatisfied_conditions"]}
+        assert gate_ids == {"g01", "g02"}
+
+    def test_hard_blocked_nodes_excluded_from_stall_report(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        hard_block_upstream nodes are settled (not pending) and must not
+        appear in the stall report.
+        """
+        sched = _make_scheduler(
+            tmp_path, _gate09_node_manifest(), run_id="hb-excl"
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            sched.run()  # n07 fails, Phase 8 nodes hard_block_upstream → no abort
+
+        report = sched._settle_stalled_nodes()
+        stalled_ids = [e["node_id"] for e in report]
+        for p8_id in PHASE_8_NODE_IDS:
+            assert p8_id not in stalled_ids, (
+                f"hard_block_upstream node {p8_id!r} must not appear in stall report"
+            )
+
+
+# ---------------------------------------------------------------------------
+# RunAbortedError raising in run()
+# ---------------------------------------------------------------------------
+
+
+class TestRunAbortedErrorRaised:
+    def test_run_raises_when_pending_nodes_remain(self, tmp_path: Path) -> None:
+        """run() must raise RunAbortedError when at least one node stays pending."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError):
+                sched.run()
+
+    def test_exception_carries_result_dict(self, tmp_path: Path) -> None:
+        """RunAbortedError.result must be a dict (not None)."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert isinstance(exc_info.value.result, dict)
+
+    def test_aborted_result_contains_pending_nodes(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        result = exc_info.value.result
+        assert "pending_nodes" in result
+        assert "n02_concept_refinement" in result["pending_nodes"]
+
+    def test_aborted_result_contains_stall_report(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        result = exc_info.value.result
+        assert "stall_report" in result
+        assert isinstance(result["stall_report"], list)
+        assert len(result["stall_report"]) == 1
+        assert result["stall_report"][0]["node_id"] == "n02_concept_refinement"
+
+    def test_aborted_result_contains_hard_blocked_nodes(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        When gate_09 fails (HARD_BLOCK) AND a separate upstream failure
+        also stalls a node, the abort result must include hard_blocked_nodes.
+        """
+        sched = _make_scheduler(
+            tmp_path,
+            _mixed_stall_and_hard_block_manifest(),
+            run_id="hb-mixed",
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        result = exc_info.value.result
+        assert "hard_blocked_nodes" in result
+        # n08a_section_drafting should be hard_block_upstream
+        assert "n08a_section_drafting" in result["hard_blocked_nodes"]
+
+    def test_aborted_result_aborted_flag_is_true(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert exc_info.value.result["aborted"] is True
+
+    def test_exception_message_names_stalled_nodes(self, tmp_path: Path) -> None:
+        """RunAbortedError message should reference the stalled node IDs."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert "n02_concept_refinement" in str(exc_info.value)
+
+
+# ---------------------------------------------------------------------------
+# HARD_BLOCK + stall interplay
+# ---------------------------------------------------------------------------
+
+
+class TestHardBlockAndStallInterplay:
+    def test_gate09_failure_leaves_no_pending_phase8_nodes(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        When gate_09 fails, Phase 8 nodes become hard_block_upstream (not
+        pending), so no RunAbortedError is raised from the _gate09_node_manifest.
+        """
+        sched = _make_scheduler(
+            tmp_path, _gate09_node_manifest(), run_id="hb-no-abort"
+        )
+        # Must NOT raise — all nodes are settled after HARD_BLOCK.
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        assert result["aborted"] is False
+        assert result["hard_blocked_nodes"] != []
+
+    def test_mixed_stall_and_hard_block_abort_distinguishes_them(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        In a run with both a HARD_BLOCK path and an independent stalled path,
+        the abort result must show:
+        - hard_blocked_nodes (Phase 8 frozen nodes)
+        - pending_nodes (genuinely stalled upstream-failure victims)
+        - stall_report (detailing the stalled node's unsatisfied conditions)
+        """
+        sched = _make_scheduler(
+            tmp_path,
+            _mixed_stall_and_hard_block_manifest(),
+            run_id="hb-mixed2",
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        result = exc_info.value.result
+        # n02_concept_refinement is stalled (pending) because n01 failed
+        assert "n02_concept_refinement" in result["pending_nodes"]
+        # n08a_section_drafting is hard_blocked (not pending)
+        assert "n08a_section_drafting" in result["hard_blocked_nodes"]
+        assert "n08a_section_drafting" not in result["pending_nodes"]
+        # stall_report only mentions the truly stalled node
+        stalled_ids = [e["node_id"] for e in result["stall_report"]]
+        assert "n02_concept_refinement" in stalled_ids
+        assert "n08a_section_drafting" not in stalled_ids
+
+    def test_hard_blocked_nodes_not_in_stall_report(self, tmp_path: Path) -> None:
+        """
+        _settle_stalled_nodes() must not include hard_block_upstream nodes
+        in the stall report; those nodes are settled, not pending.
+        """
+        sched = _make_scheduler(
+            tmp_path,
+            _mixed_stall_and_hard_block_manifest(),
+            run_id="hb-report",
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        stall_ids = [e["node_id"] for e in exc_info.value.result["stall_report"]]
+        for p8_id in PHASE_8_NODE_IDS:
+            assert p8_id not in stall_ids
+
+
+# ---------------------------------------------------------------------------
+# No false abort
+# ---------------------------------------------------------------------------
+
+
+class TestNoFalseAbort:
+    def test_no_abort_when_all_nodes_released(self, tmp_path: Path) -> None:
+        """Full-pass run must return normally without raising."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()  # must not raise
+
+        assert result["aborted"] is False
+        assert result["pending_nodes"] == []
+
+    def test_no_abort_single_node_blocked_at_entry(self, tmp_path: Path) -> None:
+        """A single node blocked_at_entry is settled; no RunAbortedError."""
+        sched = _make_scheduler(
+            tmp_path,
+            _single_node_manifest(entry_gate="gate_01_source_integrity"),
+        )
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()  # must not raise
+
+        assert result["aborted"] is False
+        assert result["blocked_nodes"] == ["n01_call_analysis"]
+        assert result["pending_nodes"] == []
+
+    def test_no_abort_single_node_blocked_at_exit(self, tmp_path: Path) -> None:
+        """A single node blocked_at_exit is settled; no RunAbortedError."""
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()  # must not raise
+
+        assert result["aborted"] is False
+        assert result["blocked_nodes"] == ["n01_call_analysis"]
+        assert result["pending_nodes"] == []
+
+    def test_no_abort_on_empty_graph(self, tmp_path: Path) -> None:
+        """An empty graph has no pending nodes; run() returns normally."""
+        data = {"name": "t", "version": "1.1", "node_registry": [], "edge_registry": []}
+        mp = _write_manifest(tmp_path, data)
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "empty-run")
+        sched = DAGScheduler(graph, ctx, tmp_path)
+        with patch(_EG_TARGET):
+            result = sched.run()
+
+        assert result["aborted"] is False
+        assert result["pending_nodes"] == []
+
+    def test_abort_driven_by_pending_not_by_blocked(self, tmp_path: Path) -> None:
+        """
+        Blocked (settled) nodes must not trigger an abort.
+        Only genuinely pending nodes matter for the abort decision.
+        """
+        # Single node, exit gate fails → blocked_at_exit (settled, not pending)
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="no-abort")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            result = sched.run()
+
+        # blocked_at_exit is settled → aborted=False
+        assert result["aborted"] is False
+        assert result["stalled"] is False
+
+    def test_stall_report_empty_on_full_pass(self, tmp_path: Path) -> None:
+        """On a full-pass run, stall_report must be an empty list."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert result["stall_report"] == []
+
+    def test_result_contains_stall_report_key_on_success(
+        self, tmp_path: Path
+    ) -> None:
+        """stall_report key must be present even on a successful run."""
+        sched = _make_scheduler(tmp_path, _single_node_manifest())
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        assert "stall_report" in result
+        assert "aborted" in result

@@ -1,5 +1,6 @@
 """
-DAG Scheduler — Steps 1 & 2: ManifestGraph and DAGScheduler core loop.
+DAG Scheduler — Steps 1–3: ManifestGraph, DAGScheduler core loop, and
+stall detection / abort.
 
 Node ID convention
 ------------------
@@ -32,9 +33,23 @@ updated state.  Where ``evaluate_gate()`` is mocked in tests, the scheduler
 explicitly enforces the intended terminal state so that the two code-paths
 produce identical observable behaviour.
 
-Deferred to Steps 3–5:
-``_settle_stalled_nodes()``, ``RunAbortedError``, ``RunSummary``,
-``runner/__main__.py``, node body execution, parallelism.
+Step 3 scope (stall detection and run-abort)
+--------------------------------------------
+``_settle_stalled_nodes()`` and ``RunAbortedError``.
+
+After the dispatch loop exits, any node still ``pending`` is permanently
+stalled because at least one upstream gate condition can never be satisfied.
+``_settle_stalled_nodes()`` identifies these nodes and the specific
+unsatisfied conditions.  ``run()`` raises ``RunAbortedError`` (carrying the
+result dict) when any pending nodes remain so that callers receive a clean,
+inspectable failure rather than a silent stall.
+
+Note: ``RunAbortedError`` attaches the result dict directly to the exception
+because ``RunSummary`` (Step 4) is not yet implemented.  Step 4 will replace
+this mechanism with proper ``RunSummary`` persistence to disk before raising.
+
+Deferred to Steps 4–5:
+``RunSummary``, ``runner/__main__.py``, node body execution, parallelism.
 """
 
 from __future__ import annotations
@@ -61,6 +76,28 @@ _HARD_BLOCK_GATE: str = "gate_09_budget_consistency"
 
 class DAGSchedulerError(Exception):
     """Raised for manifest structure or graph configuration errors."""
+
+
+class RunAbortedError(DAGSchedulerError):
+    """Raised when run() detects that no progress is possible and at least
+    one non-terminal node is unsettled (remains ``pending``).
+
+    Attributes
+    ----------
+    result:
+        The lightweight run result dict (same shape as the dict returned by
+        a successful ``run()`` call, extended with ``stall_report`` and
+        ``aborted``).  Callers can inspect this for diagnostic purposes
+        without needing ``RunSummary``.
+
+        Step 4 (``RunSummary``) will replace this "exception carries result"
+        mechanism with proper ``RunSummary`` persistence to disk before
+        raising.
+    """
+
+    def __init__(self, message: str, result: dict) -> None:
+        super().__init__(message)
+        self.result = result
 
 
 # ---------------------------------------------------------------------------
@@ -455,8 +492,11 @@ class DAGScheduler:
     Step 2 scope
     ------------
     Implements ``__init__``, ``run()``, and ``_dispatch_node()``.
-    ``_settle_stalled_nodes()``, ``RunAbortedError``, and ``RunSummary``
-    are deferred to Steps 3–4.
+
+    Step 3 scope
+    ------------
+    Implements ``_settle_stalled_nodes()`` and ``RunAbortedError`` raising
+    in ``run()``.  ``RunSummary`` is deferred to Step 4.
     """
 
     def __init__(
@@ -488,10 +528,13 @@ class DAGScheduler:
         * all nodes are settled (released / blocked / hard_blocked), or
         * no further node becomes ready (upstream failure stall).
 
+        After the loop, :meth:`_settle_stalled_nodes` is called to build a
+        structured report of any permanently stalled nodes.
+
         Returns
         -------
         dict
-            A lightweight result dict containing:
+            A lightweight result dict (when no nodes remain pending) with:
 
             ``run_id``
                 UUID of the current run.
@@ -504,10 +547,30 @@ class DAGScheduler:
             ``hard_blocked_nodes``
                 Node IDs in ``"hard_block_upstream"``.
             ``pending_nodes``
-                Node IDs still ``"pending"`` when the loop exited.
+                Node IDs still ``"pending"`` when the loop exited
+                (empty list on a successful run).
+            ``stall_report``
+                List of stall-detail dicts from
+                :meth:`_settle_stalled_nodes` (empty list on success).
             ``stalled``
-                ``True`` when pending nodes remain but none was ready —
-                an upstream failure prevented further progress.
+                ``True`` when pending nodes remain (synonymous with
+                ``aborted`` — kept for backward compatibility).
+            ``aborted``
+                ``True`` when the run was aborted due to stalled nodes.
+
+        Raises
+        ------
+        RunAbortedError
+            When any nodes remain ``pending`` after the loop exits,
+            indicating that no further progress is possible.  The exception
+            carries the same result dict (with ``aborted=True``) on
+            :attr:`RunAbortedError.result` so callers can inspect the run
+            state without ``RunSummary`` (Step 4).
+
+            Step 4 (``RunSummary``) will write the summary to disk before
+            raising and replace the "exception carries result" pattern.
+        DAGSchedulerError
+            If a dispatched node has no exit gate defined.
         """
         dispatched: list[str] = []
 
@@ -529,6 +592,11 @@ class DAGScheduler:
                 # _dispatch_node reloads self.ctx; subsequent is_ready()
                 # calls use the updated state directly.
 
+        # ------------------------------------------------------------------
+        # Step 3: stall detection
+        # ------------------------------------------------------------------
+        stall_report = self._settle_stalled_nodes()
+
         all_nodes = self.graph.node_ids()
         released = [n for n in all_nodes if self.ctx.get_node_state(n) == "released"]
         blocked = [
@@ -541,15 +609,93 @@ class DAGScheduler:
         ]
         pending = [n for n in all_nodes if self.ctx.get_node_state(n) == "pending"]
 
-        return {
+        aborted = len(pending) > 0
+
+        result: dict = {
             "run_id": self.ctx.run_id,
             "dispatched_nodes": dispatched,
             "released_nodes": released,
             "blocked_nodes": blocked,
             "hard_blocked_nodes": hard_blocked,
             "pending_nodes": pending,
-            "stalled": len(pending) > 0,
+            "stall_report": stall_report,
+            "stalled": aborted,  # kept for backward compatibility
+            "aborted": aborted,
         }
+
+        if aborted:
+            # Step 4 (RunSummary) will replace this mechanism: it will
+            # persist run_summary.json to disk before raising.
+            stalled_ids = [e["node_id"] for e in stall_report]
+            raise RunAbortedError(
+                f"Run {self.ctx.run_id!r} aborted: {len(pending)} node(s) "
+                f"remain pending with no further progress possible.  "
+                f"Stalled nodes: {stalled_ids!r}",
+                result,
+            )
+
+        return result
+
+    # ------------------------------------------------------------------
+    # Stall detection
+    # ------------------------------------------------------------------
+
+    def _settle_stalled_nodes(self) -> list[dict]:
+        """
+        Identify nodes that are permanently stalled after the dispatch loop.
+
+        A node is stalled when its state is still ``"pending"`` after the
+        loop exits.  This means at least one required upstream source node
+        never reached ``"released"`` state, so the ready condition (§2.2 of
+        the plan) can never be satisfied.
+
+        This method is **read-only**: it does not mutate any node state and
+        does not introduce new state strings.  Hard-blocked nodes
+        (``"hard_block_upstream"``) are already settled and are excluded.
+
+        Returns
+        -------
+        list[dict]
+            One dict per stalled node (in manifest registry order), each with:
+
+            ``node_id``
+                Canonical manifest node ID of the stalled node.
+            ``unsatisfied_conditions``
+                List of dicts — one per :class:`IncomingCondition` whose
+                source is not ``"released"`` — each containing:
+
+                * ``gate_id`` — the gate that was never satisfied
+                * ``source_node_id`` — the upstream node that should have
+                  been released
+                * ``source_node_state`` — its actual current state
+
+            An entry node (no incoming edges) that somehow remains pending
+            will appear with an empty ``unsatisfied_conditions`` list; this
+            indicates a scheduler invariant violation and must not occur in
+            normal operation.
+        """
+        report: list[dict] = []
+        for node_id in self.graph.node_ids():
+            if self.ctx.get_node_state(node_id) != "pending":
+                continue
+            unsatisfied: list[dict] = []
+            for cond in self.graph.incoming_conditions(node_id):
+                src_state = self.ctx.get_node_state(cond.source_node_id)
+                if src_state != "released":
+                    unsatisfied.append(
+                        {
+                            "gate_id": cond.gate_id,
+                            "source_node_id": cond.source_node_id,
+                            "source_node_state": src_state,
+                        }
+                    )
+            report.append(
+                {
+                    "node_id": node_id,
+                    "unsatisfied_conditions": unsatisfied,
+                }
+            )
+        return report
 
     # ------------------------------------------------------------------
     # Node dispatch
