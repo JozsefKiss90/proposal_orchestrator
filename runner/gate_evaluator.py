@@ -405,10 +405,14 @@ def evaluate_gate(
     -----
     * All deterministic predicate failures are collected in one pass; no
       fast-fail on first failure.
-    * Semantic predicates are **not** invoked in Step 10.  When all
-      deterministic predicates pass but semantic predicates are present,
-      the result has ``status: "semantic_evaluation_pending"`` and the
-      caller must not treat this as a full gate pass.
+    * If any deterministic predicate fails, semantic evaluation is skipped
+      and ``skipped_semantic`` is set ``True`` in the result.
+    * If all deterministic predicates pass, semantic predicates are
+      dispatched through :func:`dispatch_semantic_predicate` (the Step 11
+      semantic layer).  Malformed semantic results are treated as gate
+      failure and recorded as ``semantic_result_malformed``.
+    * A gate passes only when all required deterministic **and** semantic
+      predicates pass.
     * HARD_BLOCK for ``gate_09_budget_consistency`` is flagged in the
       result and propagated to Phase 8 nodes in the run manifest.
     """

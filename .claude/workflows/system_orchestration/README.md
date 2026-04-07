@@ -67,6 +67,12 @@ tests/
     ├── test_run_context.py           # Step 10 unit tests: RunContext (26 tests)
     ├── test_gate_evaluator.py        # Step 10+11 unit tests: evaluate_gate + semantic integration (50 tests)
     ├── test_semantic_dispatch.py     # Step 11 unit tests: dispatch + agent invocation + validation (61 tests)
+    ├── test_gate_scenarios.py        # Step 12 integration tests: per-gate fixture scenarios (27 tests)
+    ├── fixtures/
+    │   ├── __init__.py
+    │   ├── repo_builders.py          # Step 12: synthetic repo root, RunContext, gate library builders
+    │   ├── artifact_writers.py       # Step 12: canonical Tier 3/4/5 artifact writers
+    │   └── gate_result_writers.py    # Step 12: pre-fabricated gate result writers
     └── predicates/
         ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
         ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
@@ -132,6 +138,11 @@ The workflow package is now partially executable.
   - `runner/run_context.py` — RunContext (run manifest, reuse policy, node state, HARD_BLOCK propagation)
   - `runner/gate_evaluator.py` — evaluate_gate() entry point (predicate dispatch, fingerprinting, GateResult writing, node-state updates)
   - `runner/predicates/file_predicates.py` extended with `artifact_owned_by_run`
+- **Step 12 — Test fixtures** completed:
+  - `tests/runner/fixtures/repo_builders.py` — synthetic repo root builder, RunContext helpers, gate library and predicate dict builders
+  - `tests/runner/fixtures/artifact_writers.py` — canonical Tier 3/4/5 artifact writers (all phase outputs, integration artifacts)
+  - `tests/runner/fixtures/gate_result_writers.py` — pre-fabricated gate result writers (pass/fail, version-controllable)
+  - `tests/runner/test_gate_scenarios.py` — 27 integration scenario tests covering all 11 gates and all 10 failure dimensions from the plan
 - **Step 11 — Semantic predicate dispatch layer** completed (agent-invocation corrective pass applied):
   - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, calls Claude API, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
   - `runner/gate_evaluator.py` extended — semantic dispatch loop integrated; malformed/fail/pass routing; node state `released`/`blocked_at_exit` set after semantic evaluation; `skipped_semantic` flag when deterministic predicates fail
@@ -242,7 +253,8 @@ The repository does **not** yet implement:
 - Step 10 RunContext: 26 tests in `tests/runner/test_run_context.py`
 - Step 10+11 evaluate_gate + semantic integration: 50 tests in `tests/runner/test_gate_evaluator.py`
 - Step 11 semantic dispatch + agent invocation + validation: 61 tests in `tests/runner/test_semantic_dispatch.py`
-- **Total: 476 tests, all passing**
+- Step 12 gate fixture scenarios: 27 tests in `tests/runner/test_gate_scenarios.py`
+- **Total: 503 tests, all passing**
 
 ---
 
