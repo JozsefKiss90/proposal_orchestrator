@@ -75,7 +75,15 @@ NODE_STATES: frozenset[str] = frozenset(
 )
 
 #: Phase 8 node IDs that are frozen when gate_09 issues a HARD_BLOCK.
-PHASE_8_NODE_IDS: frozenset[str] = frozenset({"n08a", "n08b", "n08c", "n08d"})
+#: These must match the canonical node_id values in manifest.compile.yaml exactly.
+PHASE_8_NODE_IDS: frozenset[str] = frozenset(
+    {
+        "n08a_section_drafting",
+        "n08b_assembly",
+        "n08c_evaluator_review",
+        "n08d_revision",
+    }
+)
 
 
 # ---------------------------------------------------------------------------

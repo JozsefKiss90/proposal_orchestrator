@@ -1,25 +1,34 @@
 """
-evaluate_gate() — gate evaluation entry point (Steps 10 + 11).
+evaluate_gate() — gate evaluation entry point (Steps 10 + 11, Approach B).
 
 This module is the public entry point for running a single gate.  It:
 
 1. Loads and validates the gate rules library.
 2. Initialises or loads the run context (manifest + reuse policy).
-3. Retrieves the gate entry and partitions predicates into deterministic
-   and semantic sets.
-4. Computes per-artifact and combined input fingerprints.
-5. Evaluates every deterministic predicate, collecting **all** failures
+3. Retrieves gate metadata (gate_kind, flags) from the library entry.
+4. Resolves predicates via Approach B when the compiled manifest is available:
+   reads ``predicate_refs`` from each manifest condition, then resolves each
+   predicate_id to its full definition from the library (implementation
+   registry).  Falls back to Approach A (library gate entry ``predicates``
+   list) when the manifest is absent or the gate has no ``predicate_refs``.
+5. Computes per-artifact and combined input fingerprints.
+6. Evaluates every deterministic predicate, collecting **all** failures
    (no fast-fail).
-6. If any deterministic predicate fails, skips semantic evaluation, sets
+7. If any deterministic predicate fails, skips semantic evaluation, sets
    ``skipped_semantic: True``, and writes a failing GateResult.
-7. If all deterministic predicates pass, dispatches each semantic predicate
+8. If all deterministic predicates pass, dispatches each semantic predicate
    via ``dispatch_semantic_predicate()`` (Step 11 — Claude API invocation).
    All semantic results are collected; pass/fail/malformed are each handled.
-8. Writes a GateResult JSON artifact to the canonical Tier 4 path.
-9. Updates node state in the run manifest (``released`` / ``blocked_at_exit``
-   / ``blocked_at_entry`` / ``hard_block_upstream``).
-10. Applies HARD_BLOCK propagation for ``gate_09_budget_consistency``.
-11. Returns the GateResult as a Python dict.
+9. Writes a GateResult JSON artifact to the canonical Tier 4 path.
+10. Updates node state in the run manifest (``released`` / ``blocked_at_exit``
+    / ``blocked_at_entry`` / ``hard_block_upstream``).
+11. Applies HARD_BLOCK propagation for ``gate_09_budget_consistency``.
+12. Returns the GateResult as a Python dict.
+
+Approach B predicate resolution (step 4):
+  manifest.compile.yaml → predicate_refs → library.get_predicate(id)
+  The manifest is the **composition source**; the library is the
+  **implementation registry**.  See gate_rules_library_plan.md §9.
 
 Semantic predicates are invoked via ``runner.semantic_dispatch.invoke_agent``,
 which reads artifact files from disk, constructs system/user prompts embedding
@@ -45,6 +54,7 @@ from runner.gate_library import (
     GateLibraryError,
     LIBRARY_REL_PATH,
 )
+from runner.manifest_reader import ManifestReader, ManifestReaderError
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.coverage_predicates import (
@@ -378,9 +388,10 @@ def evaluate_gate(
     repo_root: Union[str, Path],
     *,
     library_path: Optional[Path] = None,
+    manifest_path: Optional[Path] = None,
 ) -> dict:
     """
-    Evaluate all deterministic predicates for *gate_id* and write a GateResult.
+    Evaluate all predicates for *gate_id* and write a GateResult.
 
     Parameters
     ----------
@@ -395,6 +406,13 @@ def evaluate_gate(
         Optional explicit path to the gate rules library YAML.  When
         ``None``, the library is loaded from
         ``repo_root / LIBRARY_REL_PATH``.  Primarily used in tests.
+    manifest_path:
+        Optional explicit path to ``manifest.compile.yaml``.  When
+        ``None``, the manifest is loaded from
+        ``repo_root / MANIFEST_REL_PATH`` if it exists.  When the manifest
+        is absent or raises :exc:`ManifestReaderError`, predicate
+        composition falls back to the library gate entry (Approach A).
+        Primarily used in tests.
 
     Returns
     -------
@@ -403,6 +421,13 @@ def evaluate_gate(
 
     Notes
     -----
+    * **Approach B (default when manifest present):** predicate composition
+      is read from ``manifest.compile.yaml`` ``predicate_refs`` lists; each
+      predicate ID is resolved to its full definition via
+      :meth:`GateLibrary.get_predicate`.
+    * **Approach A fallback (manifest absent or gate has no predicate_refs):**
+      predicates are taken directly from the library gate entry ``predicates``
+      list.
     * All deterministic predicate failures are collected in one pass; no
       fast-fail on first failure.
     * If any deterministic predicate fails, semantic evaluation is skipped
@@ -446,9 +471,31 @@ def evaluate_gate(
     reuse_policy_path: Path = run_ctx.reuse_policy_path
 
     # ------------------------------------------------------------------
-    # 4. Partition and sort predicates
+    # 4. Resolve predicates (Approach B via manifest; fallback to library)
     # ------------------------------------------------------------------
-    all_predicates: list[dict] = gate_entry.get("predicates") or []
+    #
+    # Approach B: read predicate_refs from manifest gate conditions, then
+    # resolve each predicate_id to its full definition from the library.
+    # The manifest is the composition source; the library is the registry.
+    #
+    # Approach A fallback: the library gate entry's ``predicates`` list is
+    # used when the manifest is absent or the gate has no predicate_refs
+    # (e.g. tests that do not create a manifest in the synthetic repo root).
+    _predicate_refs: Optional[list[str]] = None
+    try:
+        _manifest_rdr = ManifestReader.load(manifest_path, repo_root=repo_root)
+        _predicate_refs = _manifest_rdr.get_predicate_refs(gate_id)
+    except ManifestReaderError:
+        _predicate_refs = None  # manifest absent or unreadable — use fallback
+
+    if _predicate_refs is not None:
+        # Approach B: resolve each predicate_id from the library
+        all_predicates: list[dict] = [
+            lib.get_predicate(pid) for pid in _predicate_refs
+        ]
+    else:
+        # Approach A fallback: library gate entry provides the predicates list
+        all_predicates = gate_entry.get("predicates") or []
 
     deterministic_preds = [
         p for p in all_predicates if p.get("type") in DETERMINISTIC_TYPES

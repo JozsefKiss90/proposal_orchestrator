@@ -169,7 +169,7 @@ def _gate_entry(
     gate: dict = {
         "gate_id": gate_id,
         "gate_kind": gate_kind,
-        "evaluated_at": evaluated_at or f"n01 {gate_kind}",
+        "evaluated_at": evaluated_at or f"n01_call_analysis {gate_kind}",
         "predicates": predicates or [],
     }
     gate.update(extras)
@@ -309,7 +309,7 @@ class TestFingerprinting:
                 _gate_entry(
                     _GATE_PASS,
                     gate_kind="exit",
-                    evaluated_at="n01 exit",
+                    evaluated_at="n01_call_analysis exit",
                     predicates=[_exists_pred("marker.json")],
                 )
             ],
@@ -338,7 +338,7 @@ class TestEvaluateGatePass:
                 _gate_entry(
                     _GATE_PASS,
                     gate_kind="exit",
-                    evaluated_at="n01 exit",
+                    evaluated_at="n01_call_analysis exit",
                     predicates=[_exists_pred("myfile.json")],
                 )
             ],
@@ -423,7 +423,7 @@ class TestEvaluateGatePass:
                 _gate_entry(
                     known_gate_id,
                     gate_kind="exit",
-                    evaluated_at="n01 exit",
+                    evaluated_at="n01_call_analysis exit",
                     predicates=[],
                 )
             ],
@@ -512,14 +512,14 @@ class TestNodeStateTransitions:
                 _gate_entry(
                     _GATE_ENTRY,
                     gate_kind="entry",
-                    evaluated_at="n05 entry",
+                    evaluated_at="n05_impact_architecture entry",
                     predicates=[_exists_pred("missing.json")],
                 )
             ],
         )
         evaluate_gate(_GATE_ENTRY, run_id, tmp_path, library_path=lib_path)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n05") == "blocked_at_entry"
+        assert ctx.get_node_state("n05_impact_architecture") == "blocked_at_entry"
 
     def test_exit_gate_failure_sets_blocked_at_exit(
         self, tmp_path: Path, run_id: str
@@ -530,14 +530,14 @@ class TestNodeStateTransitions:
                 _gate_entry(
                     _GATE_FAIL,
                     gate_kind="exit",
-                    evaluated_at="n03 exit",
+                    evaluated_at="n03_wp_design exit",
                     predicates=[_exists_pred("missing.json")],
                 )
             ],
         )
         evaluate_gate(_GATE_FAIL, run_id, tmp_path, library_path=lib_path)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n03") == "blocked_at_exit"
+        assert ctx.get_node_state("n03_wp_design") == "blocked_at_exit"
 
     def test_deterministic_pass_sets_released(
         self, tmp_path: Path, run_id: str
@@ -550,14 +550,14 @@ class TestNodeStateTransitions:
                 _gate_entry(
                     _GATE_PASS,
                     gate_kind="exit",
-                    evaluated_at="n02 exit",
+                    evaluated_at="n02_concept_refinement exit",
                     predicates=[_exists_pred("present.json")],
                 )
             ],
         )
         evaluate_gate(_GATE_PASS, run_id, tmp_path, library_path=lib_path)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n02") == "released"
+        assert ctx.get_node_state("n02_concept_refinement") == "released"
 
     def test_node_state_persisted_to_manifest(
         self, tmp_path: Path, run_id: str
@@ -568,7 +568,7 @@ class TestNodeStateTransitions:
                 _gate_entry(
                     _GATE_FAIL,
                     gate_kind="exit",
-                    evaluated_at="n04 exit",
+                    evaluated_at="n04_gantt_milestones exit",
                     predicates=[_exists_pred("missing.json")],
                 )
             ],
@@ -576,7 +576,7 @@ class TestNodeStateTransitions:
         evaluate_gate(_GATE_FAIL, run_id, tmp_path, library_path=lib_path)
         # Load context from disk (not in-memory)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n04") == "blocked_at_exit"
+        assert ctx.get_node_state("n04_gantt_milestones") == "blocked_at_exit"
 
 
 # ---------------------------------------------------------------------------
@@ -604,7 +604,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n01 exit",
+                    evaluated_at="n01_call_analysis exit",
                     predicates=[_exists_pred("f.json"), _semantic_pred()],
                 )
             ],
@@ -647,7 +647,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n02 exit",
+                    evaluated_at="n02_concept_refinement exit",
                     predicates=[
                         _exists_pred("f.json"),
                         _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
@@ -671,7 +671,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n03 exit",
+                    evaluated_at="n03_wp_design exit",
                     predicates=[
                         _exists_pred("f.json"),
                         _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
@@ -683,7 +683,7 @@ class TestSemanticDispatchIntegration:
             mock_d.return_value = _syn_sem_pass("p_no_ga")
             evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n03") == "released"
+        assert ctx.get_node_state("n03_wp_design") == "released"
 
     def test_semantic_pass_section_populated_in_gate_result(
         self, tmp_path: Path, run_id: str
@@ -724,7 +724,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n04 exit",
+                    evaluated_at="n04_gantt_milestones exit",
                     predicates=[
                         _exists_pred("f.json"),
                         _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
@@ -748,7 +748,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n05 exit",
+                    evaluated_at="n05_impact_architecture exit",
                     predicates=[
                         _exists_pred("f.json"),
                         _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
@@ -760,7 +760,7 @@ class TestSemanticDispatchIntegration:
             mock_d.return_value = _syn_sem_fail("p_no_ga")
             evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
         ctx = RunContext.load(tmp_path, run_id)
-        assert ctx.get_node_state("n05") == "blocked_at_exit"
+        assert ctx.get_node_state("n05_impact_architecture") == "blocked_at_exit"
 
     def test_semantic_fail_recorded_with_findings_in_gate_result(
         self, tmp_path: Path, run_id: str
@@ -901,7 +901,7 @@ class TestSemanticDispatchIntegration:
                 {
                     "gate_id": "phase_02_gate",
                     "gate_kind": "exit",
-                    "evaluated_at": "n02 exit",
+                    "evaluated_at": "n02_concept_refinement exit",
                     "predicates": [
                         {
                             "predicate_id": "g03_p06",
@@ -940,7 +940,7 @@ class TestSemanticDispatchIntegration:
                 {
                     "gate_id": "gate_12_constitutional_compliance",
                     "gate_kind": "exit",
-                    "evaluated_at": "n08d exit",
+                    "evaluated_at": "n08d_revision exit",
                     "predicates": [
                         {
                             "predicate_id": "g11_p12",
@@ -988,7 +988,7 @@ class TestSemanticDispatchIntegration:
                 _gate_entry(
                     _GATE_SEM,
                     gate_kind="exit",
-                    evaluated_at="n06 exit",
+                    evaluated_at="n06_implementation_architecture exit",
                     predicates=[
                         _exists_pred("f.json"),
                         _sem_pred(
@@ -1037,7 +1037,7 @@ class TestHardBlock:
         return {
             "gate_id": "gate_09_budget_consistency",
             "gate_kind": "exit",
-            "evaluated_at": "n07 exit",
+            "evaluated_at": "n07_budget_gate exit",
             "hard_block_on_missing_received_dir": True,
             "predicates": [
                 {
@@ -1169,7 +1169,7 @@ class TestArtifactOwnedByRun:
                 _gate_entry(
                     gate_id,
                     gate_kind="exit",
-                    evaluated_at="n01 exit",
+                    evaluated_at="n01_call_analysis exit",
                     predicates=[
                         {
                             "predicate_id": "p_ownership",

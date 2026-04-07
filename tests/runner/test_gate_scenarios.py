@@ -208,7 +208,7 @@ class TestGate01SourceIntegrity:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_01_source_integrity", "entry", "n01", preds)],
+            [gate_entry("gate_01_source_integrity", "entry", "n01_call_analysis", preds)],
         )
 
     def test_pass_all_sources_present(self, tmp_path: Path) -> None:
@@ -224,7 +224,7 @@ class TestGate01SourceIntegrity:
 
         assert result["status"] == "pass"
         assert result["gate_kind"] == "entry"
-        assert _get_node_state(repo_root, run_id, "n01") == "released"
+        assert _get_node_state(repo_root, run_id, "n01_call_analysis") == "released"
         # No failed predicates
         assert result["deterministic_predicates"]["failed"] == []
 
@@ -266,7 +266,7 @@ class TestGate01SourceIntegrity:
         assert result["status"] == "fail"
         assert result["gate_kind"] == "entry"
         # Node state must be blocked_at_entry — not blocked_at_exit
-        state = _get_node_state(repo_root, run_id, "n01")
+        state = _get_node_state(repo_root, run_id, "n01_call_analysis")
         assert state == "blocked_at_entry", f"Expected blocked_at_entry, got {state!r}"
 
         # Phase output directory must NOT have been written by the gate evaluator
@@ -296,7 +296,7 @@ class TestPhase01Gate:
         ]
         return write_library(
             repo_root,
-            [gate_entry("phase_01_gate", "exit", "n01", preds)],
+            [gate_entry("phase_01_gate", "exit", "n01_call_analysis", preds)],
         )
 
     def test_malformed_extracted_artifact(self, tmp_path: Path) -> None:
@@ -318,7 +318,7 @@ class TestPhase01Gate:
         cat = _first_failed_category(result)
         assert cat == MALFORMED_ARTIFACT, f"Expected MALFORMED_ARTIFACT, got {cat!r}"
         # Exit gate failure → blocked_at_exit
-        assert _get_node_state(repo_root, run_id, "n01") == "blocked_at_exit"
+        assert _get_node_state(repo_root, run_id, "n01_call_analysis") == "blocked_at_exit"
 
     def test_missing_source_refs_is_policy_violation(self, tmp_path: Path) -> None:
         """
@@ -379,7 +379,7 @@ class TestPhase02Gate:
             )
         return write_library(
             repo_root,
-            [gate_entry("phase_02_gate", "exit", "n02", preds)],
+            [gate_entry("phase_02_gate", "exit", "n02_concept_refinement", preds)],
         )
 
     def test_inherited_artifact_accepted_via_reuse_policy(self, tmp_path: Path) -> None:
@@ -471,7 +471,7 @@ class TestPhase02Gate:
         failed_sem = result["semantic_predicates"]["failed"]
         assert len(failed_sem) == 1
         assert failed_sem[0]["failure_reason"] == "semantic_fail"
-        assert _get_node_state(repo_root, run_id, "n02") == "blocked_at_exit"
+        assert _get_node_state(repo_root, run_id, "n02_concept_refinement") == "blocked_at_exit"
 
 
 # ===========================================================================
@@ -496,7 +496,7 @@ class TestPhase03Gate:
         ]
         return write_library(
             repo_root,
-            [gate_entry("phase_03_gate", "exit", "n03", preds)],
+            [gate_entry("phase_03_gate", "exit", "n03_wp_design", preds)],
         )
 
     def test_stale_artifact_rejected(self, tmp_path: Path) -> None:
@@ -528,7 +528,7 @@ class TestPhase03Gate:
             f"got {[f['failure_category'] for f in failed]}"
         )
         # Exit gate → blocked_at_exit
-        assert _get_node_state(repo_root, run_id, "n03") == "blocked_at_exit"
+        assert _get_node_state(repo_root, run_id, "n03_wp_design") == "blocked_at_exit"
 
 
 # ===========================================================================
@@ -558,7 +558,7 @@ class TestPhase04Gate:
         ]
         return write_library(
             repo_root,
-            [gate_entry("phase_04_gate", "exit", "n04", preds)],
+            [gate_entry("phase_04_gate", "exit", "n04_gantt_milestones", preds)],
         )
 
     def test_timeline_inconsistency_exceeds_duration(self, tmp_path: Path) -> None:
@@ -614,7 +614,7 @@ class TestPhase05Gate:
         ]
         return write_library(
             repo_root,
-            [gate_entry("phase_05_gate", "exit", "n05", preds)],
+            [gate_entry("phase_05_gate", "exit", "n05_impact_architecture", preds)],
         )
 
     def test_missing_dissemination_plan_is_malformed_artifact(self, tmp_path: Path) -> None:
@@ -672,7 +672,7 @@ class TestPhase06Gate:
         ]
         return write_library(
             repo_root,
-            [gate_entry("phase_06_gate", "exit", "n06", preds)],
+            [gate_entry("phase_06_gate", "exit", "n06_implementation_architecture", preds)],
         )
 
     def test_unknown_management_partner_is_cross_artifact_inconsistency(
@@ -729,7 +729,7 @@ class TestGate09BudgetConsistency:
                 gate_entry(
                     "gate_09_budget_consistency",
                     "exit",
-                    "n07",
+                    "n07_budget_gate",
                     preds,
                     mandatory=True,
                     bypass_prohibited=True,
@@ -815,7 +815,7 @@ class TestGate10PartBCompleteness:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_10_part_b_completeness", "exit", "n08b", preds)],
+            [gate_entry("gate_10_part_b_completeness", "exit", "n08b_assembly", preds)],
         )
 
     def test_missing_required_section_is_cross_artifact_inconsistency(
@@ -876,7 +876,7 @@ class TestGate11ReviewClosure:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_11_review_closure", "exit", "n08c", preds)],
+            [gate_entry("gate_11_review_closure", "exit", "n08c_evaluator_review", preds)],
         )
 
     def test_empty_revision_actions_is_malformed_artifact(self, tmp_path: Path) -> None:
@@ -963,7 +963,7 @@ class TestGate12ConstitutionalCompliance:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_12_constitutional_compliance", "exit", "n08d", preds)],
+            [gate_entry("gate_12_constitutional_compliance", "exit", "n08d_revision", preds)],
         )
 
     def _setup_passing_deterministic_state(self, repo_root: Path, run_id: str) -> None:
@@ -1060,7 +1060,7 @@ class TestGate12ConstitutionalCompliance:
             )
 
         assert result["status"] == "pass"
-        assert _get_node_state(repo_root, run_id, "n08d") == "released"
+        assert _get_node_state(repo_root, run_id, "n08d_revision") == "released"
 
 
 # ===========================================================================
@@ -1101,7 +1101,7 @@ class TestVersionMismatch:
         preds = [pred_gate_pass("p_check", "phase_01_gate")]
         lib = write_library(
             repo_root,
-            [gate_entry("phase_02_gate", "exit", "n02", preds)],
+            [gate_entry("phase_02_gate", "exit", "n02_concept_refinement", preds)],
         )
 
         result = evaluate_gate("phase_02_gate", run_id, repo_root, library_path=lib)
@@ -1139,13 +1139,13 @@ class TestPhase03GatePass:
         ]
         lib = write_library(
             repo_root,
-            [gate_entry("phase_03_gate", "exit", "n03", preds)],
+            [gate_entry("phase_03_gate", "exit", "n03_wp_design", preds)],
         )
 
         result = evaluate_gate("phase_03_gate", run_id, repo_root, library_path=lib)
 
         assert result["status"] == "pass"
-        assert _get_node_state(repo_root, run_id, "n03") == "released"
+        assert _get_node_state(repo_root, run_id, "n03_wp_design") == "released"
 
 
 class TestPhase04GatePass:
@@ -1175,7 +1175,7 @@ class TestPhase04GatePass:
         ]
         lib = write_library(
             repo_root,
-            [gate_entry("phase_04_gate", "exit", "n04", preds)],
+            [gate_entry("phase_04_gate", "exit", "n04_gantt_milestones", preds)],
         )
 
         result = evaluate_gate("phase_04_gate", run_id, repo_root, library_path=lib)
@@ -1206,7 +1206,7 @@ class TestPhase06GatePass:
         ]
         lib = write_library(
             repo_root,
-            [gate_entry("phase_06_gate", "exit", "n06", preds)],
+            [gate_entry("phase_06_gate", "exit", "n06_implementation_architecture", preds)],
         )
 
         result = evaluate_gate("phase_06_gate", run_id, repo_root, library_path=lib)
@@ -1246,7 +1246,7 @@ class TestGate09BudgetPass:
                 gate_entry(
                     "gate_09_budget_consistency",
                     "exit",
-                    "n07",
+                    "n07_budget_gate",
                     preds,
                     mandatory=True,
                     bypass_prohibited=True,
@@ -1280,7 +1280,7 @@ class TestGate11Pass:
         ]
         lib = write_library(
             repo_root,
-            [gate_entry("gate_11_review_closure", "exit", "n08c", preds)],
+            [gate_entry("gate_11_review_closure", "exit", "n08c_evaluator_review", preds)],
         )
 
         result = evaluate_gate("gate_11_review_closure", run_id, repo_root, library_path=lib)

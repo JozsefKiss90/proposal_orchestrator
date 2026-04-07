@@ -1,14 +1,19 @@
-
     Directory: C:\Code\proposal_orchestator
 
 
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-d-----     2026. 03. 31.     19:36                .claude
-d--h--     2026. 03. 31.     19:43                .git
+d-----     2026. 04. 02.     22:13                .claude
+d--h--     2026. 04. 07.     13:23                .git
+d-----     2026. 04. 01.     15:16                .pytest_cache
 d-----     2026. 03. 31.     15:06                docs
--a----     2026. 03. 31.     15:28          31581 CLAUDE.md
--a----     2026. 03. 31.     15:12          21575 project_structure.md
+d-----     2026. 04. 07.     13:45                runner
+d-----     2026. 04. 01.     15:16                tests
+-a----     2026. 04. 01.     13:10              0 .gitignore
+-a----     2026. 04. 01.     12:48          31987 CLAUDE.md
+-a----     2026. 04. 02.     18:53              0 progress.md
+-a----     2026. 03. 31.     20:52          23922 project_structure.md
+-a----     2026. 04. 01.     15:06             82 pyproject.toml
 
 
     Directory: C:\Code\proposal_orchestator\.claude
@@ -23,7 +28,7 @@ d-----     2026. 03. 31.     15:10                logs
 d-----     2026. 03. 31.     15:10                runs
 d-----     2026. 03. 31.     15:10                skills
 d-----     2026. 03. 31.     19:58                workflows
--a----     2026. 03. 31.     19:36           1008 settings.local.json
+-a----     2026. 04. 02.     22:13           1364 settings.local.json
 
 
     Directory: C:\Code\proposal_orchestator\.claude\workflows
@@ -31,7 +36,7 @@ d-----     2026. 03. 31.     19:58                workflows
 
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-d-----     2026. 03. 31.     20:39                system_orchestration
+d-----     2026. 04. 07.     15:16                system_orchestration
 -a----     2026. 03. 31.     19:36         111086 system_orchestration.yaml
 
 
@@ -42,13 +47,17 @@ Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 d-----     2026. 03. 31.     20:21                workflow_phases
 -a----     2026. 03. 31.     20:23          18194 agent_catalog.yaml
+-a----     2026. 04. 01.     14:54          88009 artifact_schema_specification.yaml
+-a----     2026. 04. 07.     15:16          15578 dag_scheduler_plan.md
 -a----     2026. 03. 31.     20:36           5814 design_notes.yaml
+-a----     2026. 04. 01.     14:54          63791 gate_rules_library.yaml
+-a----     2026. 04. 01.     13:54          73847 gate_rules_library_plan.md
 -a----     2026. 03. 31.     19:59           1625 global_rules.yaml
 -a----     2026. 03. 31.     20:25           4397 integration_rules.yaml
--a----     2026. 03. 31.     20:38          24007 manifest.compile.yaml
+-a----     2026. 04. 07.     13:43          28244 manifest.compile.yaml
 -a----     2026. 03. 31.     19:58           3948 meta.yaml
--a----     2026. 03. 31.     20:22           5575 quality_gates.yaml
--a----     2026. 03. 31.     20:39           6014 README.md
+-a----     2026. 04. 07.     13:41          12691 quality_gates.yaml
+-a----     2026. 04. 07.     15:16          25533 README.md
 -a----     2026. 03. 31.     20:24          16561 skill_catalog.yaml
 -a----     2026. 03. 31.     20:25           3339 state_rules.yaml
 -a----     2026. 03. 31.     20:02           6631 tier_bindings.yaml
@@ -67,6 +76,34 @@ Mode                 LastWriteTime         Length Name
 -a----     2026. 03. 31.     20:20           4965 phase_06_implementation_architecture.yaml
 -a----     2026. 03. 31.     20:20           6076 phase_07_budget_gate.yaml
 -a----     2026. 03. 31.     20:21          10659 phase_08_drafting_review.yaml
+
+
+    Directory: C:\Code\proposal_orchestator\.pytest_cache
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 01.     15:16                v
+-a----     2026. 04. 01.     15:16             39 .gitignore
+-a----     2026. 04. 01.     15:16            191 CACHEDIR.TAG
+-a----     2026. 04. 01.     15:16            310 README.md
+
+
+    Directory: C:\Code\proposal_orchestator\.pytest_cache\v
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 02.     22:29                cache
+
+
+    Directory: C:\Code\proposal_orchestator\.pytest_cache\v\cache
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 07.     13:47            127 lastfailed
+-a----     2026. 04. 07.     14:04          65653 nodeids
 
 
     Directory: C:\Code\proposal_orchestator\docs
@@ -536,3 +573,178 @@ d-----     2026. 03. 31.     14:52                assembled_drafts
 d-----     2026. 03. 31.     14:52                final_exports
 d-----     2026. 03. 31.     14:52                proposal_sections
 d-----     2026. 03. 31.     14:52                review_packets
+
+
+    Directory: C:\Code\proposal_orchestator\runner
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 02.     14:40                predicates
+d-----     2026. 04. 07.     13:45                __pycache__
+-a----     2026. 04. 07.     13:45          27729 gate_evaluator.py
+-a----     2026. 04. 07.     13:43           9591 gate_library.py
+-a----     2026. 04. 01.     15:32           2196 gate_result_registry.py
+-a----     2026. 04. 07.     13:44           7138 manifest_reader.py
+-a----     2026. 04. 01.     15:07           2690 paths.py
+-a----     2026. 04. 02.     13:37           9689 run_context.py
+-a----     2026. 04. 02.     22:30          21602 semantic_dispatch.py
+-a----     2026. 04. 01.     15:32           5398 upstream_inputs.py
+-a----     2026. 04. 01.     15:32            569 versions.py
+-a----     2026. 04. 02.     18:20            939 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\runner\predicates
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 02.     14:41                __pycache__
+-a----     2026. 04. 01.     22:16          60603 coverage_predicates.py
+-a----     2026. 04. 02.     12:45          14380 cycle_predicates.py
+-a----     2026. 04. 02.     13:35          19402 file_predicates.py
+-a----     2026. 04. 01.     15:33          12903 gate_pass_predicates.py
+-a----     2026. 04. 02.     14:40          56248 schema_predicates.py
+-a----     2026. 04. 01.     18:24          23276 source_ref_predicates.py
+-a----     2026. 04. 02.     13:11          29302 timeline_predicates.py
+-a----     2026. 04. 01.     15:08           6030 types.py
+-a----     2026. 04. 02.     13:36           5063 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\runner\predicates\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 01.     22:18          37957 coverage_predicates.cpython-310.pyc
+-a----     2026. 04. 02.     12:51           9872 cycle_predicates.cpython-310.pyc
+-a----     2026. 04. 02.     13:44          13838 file_predicates.cpython-310.pyc
+-a----     2026. 04. 01.     15:49           8256 gate_pass_predicates.cpython-310.pyc
+-a----     2026. 04. 02.     14:41          36997 schema_predicates.cpython-310.pyc
+-a----     2026. 04. 01.     18:25          18349 source_ref_predicates.cpython-310.pyc
+-a----     2026. 04. 02.     13:13          20762 timeline_predicates.cpython-310.pyc
+-a----     2026. 04. 01.     15:16           4223 types.cpython-310.pyc
+-a----     2026. 04. 02.     13:44           3943 __init__.cpython-310.pyc
+
+
+    Directory: C:\Code\proposal_orchestator\runner\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 07.     13:45          18035 gate_evaluator.cpython-310.pyc
+-a----     2026. 04. 07.     13:45           7782 gate_library.cpython-310.pyc
+-a----     2026. 04. 01.     15:49           1841 gate_result_registry.cpython-310.pyc
+-a----     2026. 04. 07.     13:45           6479 manifest_reader.cpython-310.pyc
+-a----     2026. 04. 01.     15:16           2739 paths.cpython-310.pyc
+-a----     2026. 04. 02.     13:44           8096 run_context.cpython-310.pyc
+-a----     2026. 04. 02.     22:30          15963 semantic_dispatch.cpython-310.pyc
+-a----     2026. 04. 01.     15:49           3562 upstream_inputs.cpython-310.pyc
+-a----     2026. 04. 01.     15:49            776 versions.cpython-310.pyc
+-a----     2026. 04. 02.     22:29           1087 __init__.cpython-310.pyc
+
+
+    Directory: C:\Code\proposal_orchestator\tests
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 07.     13:51                runner
+d-----     2026. 04. 01.     15:16                __pycache__
+-a----     2026. 04. 01.     15:09            312 conftest.py
+-a----     2026. 04. 01.     15:08              0 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 07.     12:38                fixtures
+d-----     2026. 04. 02.     14:41                predicates
+d-----     2026. 04. 07.     14:04                __pycache__
+-a----     2026. 04. 03.      0:25          46771 test_gate_evaluator.py
+-a----     2026. 04. 07.     13:51          12641 test_gate_library.py
+-a----     2026. 04. 07.     12:38          50060 test_gate_scenarios.py
+-a----     2026. 04. 07.     13:47          15778 test_manifest_reader.py
+-a----     2026. 04. 02.     13:43           9984 test_run_context.py
+-a----     2026. 04. 02.     22:21          28320 test_semantic_dispatch.py
+-a----     2026. 04. 01.     15:09              0 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner\fixtures
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 07.     12:38                __pycache__
+-a----     2026. 04. 07.     12:38          23368 artifact_writers.py
+-a----     2026. 04. 07.     12:33           4308 gate_result_writers.py
+-a----     2026. 04. 07.     12:32          11302 repo_builders.py
+-a----     2026. 04. 07.     12:31             55 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner\fixtures\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 07.     12:38          19455 artifact_writers.cpython-310.pyc
+-a----     2026. 04. 07.     12:36           3471 gate_result_writers.cpython-310.pyc
+-a----     2026. 04. 07.     12:36          10329 repo_builders.cpython-310.pyc
+-a----     2026. 04. 07.     12:36            215 __init__.cpython-310.pyc
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner\predicates
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 02.     14:41                __pycache__
+-a----     2026. 04. 01.     22:18          39563 test_coverage_predicates.py
+-a----     2026. 04. 02.     12:46          15863 test_cycle_predicates.py
+-a----     2026. 04. 01.     15:10          19137 test_file_predicates.py
+-a----     2026. 04. 01.     15:34           9246 test_gate_pass_predicates.py
+-a----     2026. 04. 02.     14:41          35634 test_schema_predicates.py
+-a----     2026. 04. 01.     18:25          16845 test_source_ref_predicates.py
+-a----     2026. 04. 02.     13:12          30044 test_timeline_predicates.py
+-a----     2026. 04. 01.     15:09              0 __init__.py
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner\predicates\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 01.     22:18          49759 test_coverage_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 02.     12:51          25840 test_cycle_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     15:16          36467 test_file_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     15:49          13651 test_gate_pass_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 02.     14:41          47383 test_schema_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     18:25          22092 test_source_ref_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 02.     13:13          43821 test_timeline_predicates.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     15:16            157 __init__.cpython-310.pyc
+
+
+    Directory: C:\Code\proposal_orchestator\tests\runner\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 03.      0:25          47241 test_gate_evaluator.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 07.     14:04          15102 test_gate_library.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 07.     13:50           8986 test_gate_library.cpython-310.pyc
+-a----     2026. 04. 07.     12:38          53115 test_gate_scenarios.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 07.     13:47          17298 test_manifest_reader.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 02.     13:44          17792 test_run_context.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 02.     22:29          39765 test_semantic_dispatch.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     15:16            146 __init__.cpython-310.pyc
+
+
+    Directory: C:\Code\proposal_orchestator\tests\__pycache__
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 01.     15:16            657 conftest.cpython-310-pytest-9.0.2.pyc
+-a----     2026. 04. 01.     15:16            139 __init__.cpython-310.pyc

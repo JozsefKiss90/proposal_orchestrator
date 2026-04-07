@@ -49,7 +49,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_01_source_integrity
     gate_kind: entry
-    evaluated_at: "n01 entry"
+    evaluated_at: "n01_call_analysis entry"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -137,7 +137,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_01_gate
     gate_kind: exit
-    evaluated_at: "n01 exit"
+    evaluated_at: "n01_call_analysis exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -330,7 +330,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_02_gate
     gate_kind: exit
-    evaluated_at: "n02 exit"
+    evaluated_at: "n02_concept_refinement exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -433,7 +433,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_03_gate
     gate_kind: exit
-    evaluated_at: "n03 exit"
+    evaluated_at: "n03_wp_design exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -551,7 +551,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_04_gate
     gate_kind: exit
-    evaluated_at: "n04 exit"
+    evaluated_at: "n04_gantt_milestones exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -667,7 +667,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_05_gate
     gate_kind: exit
-    evaluated_at: "n05 exit"
+    evaluated_at: "n05_impact_architecture exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -798,7 +798,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: phase_06_gate
     gate_kind: exit
-    evaluated_at: "n06 exit"
+    evaluated_at: "n06_implementation_architecture exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -941,7 +941,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_09_budget_consistency
     gate_kind: exit
-    evaluated_at: "n07 exit"
+    evaluated_at: "n07_budget_gate exit"
     mandatory: true
     bypass_prohibited: true
     hard_block_on_missing_received_dir: true
@@ -1077,7 +1077,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_10_part_b_completeness
     gate_kind: exit
-    evaluated_at: "n08b exit"
+    evaluated_at: "n08b_assembly exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -1156,7 +1156,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_11_review_closure
     gate_kind: exit
-    evaluated_at: "n08c exit"
+    evaluated_at: "n08c_evaluator_review exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -1234,7 +1234,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_12_constitutional_compliance
     gate_kind: exit
-    evaluated_at: "n08d exit"
+    evaluated_at: "n08d_revision exit"
     mandatory: false
     bypass_prohibited: false
     predicates:

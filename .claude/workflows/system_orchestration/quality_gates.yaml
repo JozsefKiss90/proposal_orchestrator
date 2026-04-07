@@ -1,3 +1,10 @@
+# Approach B migration: predicate_refs added to all gate conditions.
+# Each condition now carries both a prose description (for human review) and
+# a predicate_refs list (machine-readable composition source for the runner).
+# predicate_refs values are predicate_id keys defined in gate_rules_library.yaml.
+# The runner resolves each predicate_id from the library to get type/function/args.
+# See gate_rules_library_plan.md §9 for the Approach B migration specification.
+
 quality_gates:
 
   - id: gate_01_source_integrity
@@ -8,6 +15,17 @@ quality_gates:
       resolvable to a work programme area with a source document.
     evaluated_at: phase_01_call_analysis entry
     fail_action: "Halt workflow; report missing sources to human operator"
+    conditions:
+      - prose: "selected_call.json must be present and non-empty"
+        predicate_refs: [g01_p01, g01_p02]
+      - prose: "At least one work programme document must be present"
+        predicate_refs: [g01_p03]
+      - prose: "At least one call extract matching the topic code must be present"
+        predicate_refs: [g01_p04]
+      - prose: "An application form template for the resolved instrument type must be present"
+        predicate_refs: [g01_p05]
+      - prose: "An evaluation form for the resolved instrument type must be present"
+        predicate_refs: [g01_p06]
 
   - id: gate_02_call_alignment
     name: "Call Alignment"
@@ -17,6 +35,17 @@ quality_gates:
       carries source references. No unresolved scope conflict exists.
     evaluated_at: phase_02_concept_refinement exit
     fail_action: "Block Phase 3 and Phase 5; report scope conflicts"
+    conditions:
+      - prose: "Phase 1 gate must have passed"
+        predicate_refs: [g03_p01]
+      - prose: "topic_mapping.json is non-empty and all mappings carry source references"
+        predicate_refs: [g03_p02, g03_p03]
+      - prose: "compliance_profile.json is non-empty"
+        predicate_refs: [g03_p04]
+      - prose: "Phase 2 summary written to Tier 4"
+        predicate_refs: [g03_p05, g03_p07]
+      - prose: "No unresolved scope conflicts between concept and Tier 2B"
+        predicate_refs: [g03_p06]
 
   - id: gate_03_concept_coherence
     name: "Concept Coherence"
@@ -35,6 +64,21 @@ quality_gates:
       assigned partners exist in Tier 3. Dependency map is acyclic.
     evaluated_at: phase_03_wp_design_and_dependency_mapping exit
     fail_action: "Block Phase 4, Phase 5, and Phase 6; report structural non-compliances"
+    conditions:
+      - prose: "Phase 2 gate must have passed"
+        predicate_refs: [g04_p01]
+      - prose: "Full WP structure written to Tier 4"
+        predicate_refs: [g04_p02, g04_p02b]
+      - prose: "Dependency map written to Tier 4"
+        predicate_refs: [g04_p03]
+      - prose: "All WPs have at least one deliverable and a responsible lead"
+        predicate_refs: [g04_p04]
+      - prose: "WP count compliant with Tier 2A instrument constraints"
+        predicate_refs: [g04_p05]
+      - prose: "No dependency cycles in the dependency map"
+        predicate_refs: [g04_p06]
+      - prose: "All assigned partners present in Tier 3 consortium data"
+        predicate_refs: [g04_p07]
 
   - id: gate_05_dependency_coherence
     name: "Dependency Coherence"
@@ -53,6 +97,19 @@ quality_gates:
       dependency map. Critical path fits within project duration.
     evaluated_at: phase_04_gantt_and_milestones exit
     fail_action: "Block Phase 6; report scheduling conflicts and duration violations"
+    conditions:
+      - prose: "Phase 3 gate must have passed"
+        predicate_refs: [g05_p01]
+      - prose: "Gantt structure and milestone table written to Tier 4"
+        predicate_refs: [g05_p02, g05_p02b]
+      - prose: "All tasks assigned to months within project duration"
+        predicate_refs: [g05_p03, g05_p04]
+      - prose: "All milestones have verifiable criteria and due months"
+        predicate_refs: [g05_p05]
+      - prose: "Critical path identified and consistent with dependency map"
+        predicate_refs: [g05_p06]
+      - prose: "milestones_seed.json populated in Tier 3"
+        predicate_refs: [g05_p07]
 
   - id: gate_07_impact_specificity
     name: "Impact Specificity"
@@ -63,6 +120,21 @@ quality_gates:
       project-specific grounding.
     evaluated_at: phase_05_impact_architecture exit
     fail_action: "Block Phase 8; report unmapped expected impacts"
+    conditions:
+      - prose: "Phase 2 gate must have passed"
+        predicate_refs: [g06_p01]
+      - prose: "Phase 3 gate must have passed"
+        predicate_refs: [g06_p02]
+      - prose: "Full impact architecture written to Tier 4"
+        predicate_refs: [g06_p03, g06_p03b]
+      - prose: "All call expected impacts have at least one mapped project output"
+        predicate_refs: [g06_p04]
+      - prose: "KPI set is defined and traceable to WP deliverables"
+        predicate_refs: [g06_p05]
+      - prose: "Dissemination and exploitation logic is defined"
+        predicate_refs: [g06_p06, g06_p07]
+      - prose: "Sustainability mechanism is defined"
+        predicate_refs: [g06_p08]
 
   - id: gate_08_implementation_consistency
     name: "Implementation Consistency"
@@ -73,6 +145,25 @@ quality_gates:
       Tier 3 consortium members.
     evaluated_at: phase_06_implementation_architecture exit
     fail_action: "Block Phase 7; report omitted sections and missing assignments"
+    conditions:
+      - prose: "Phase 3 gate must have passed"
+        predicate_refs: [g07_p01]
+      - prose: "Phase 4 gate must have passed"
+        predicate_refs: [g07_p02]
+      - prose: "Phase 5 gate must have passed"
+        predicate_refs: [g07_p03]
+      - prose: "Implementation architecture written to Tier 4"
+        predicate_refs: [g07_p04, g07_p04b]
+      - prose: "Risk register is populated"
+        predicate_refs: [g07_p05]
+      - prose: "Ethics self-assessment is explicitly present (not omitted)"
+        predicate_refs: [g07_p06]
+      - prose: "Governance matrix is defined"
+        predicate_refs: [g07_p07]
+      - prose: "All management roles assigned to Tier 3 consortium members"
+        predicate_refs: [g07_p08]
+      - prose: "All instrument-mandated implementation sections addressed per Tier 2A schema"
+        predicate_refs: [g07_p09]
 
   - id: gate_09_budget_consistency
     name: "Budget Consistency"
@@ -85,6 +176,23 @@ quality_gates:
     mandatory: true
     bypass_prohibited: true
     fail_action: "Block Phase 8 finalization entirely; report blocking inconsistencies and required corrections"
+    conditions:
+      - prose: "Phase 6 gate must have passed"
+        predicate_refs: [g08_p01]
+      - prose: "Non-empty budget response artifact present in integrations/received/"
+        predicate_refs: [g08_p02]
+      - prose: "Validation artifact present in integrations/validation/"
+        predicate_refs: [g08_p03]
+      - prose: "Interface contract conformance confirmed"
+        predicate_refs: [g08_p04]
+      - prose: "All Phase 3 WPs have corresponding budget entries"
+        predicate_refs: [g08_p05]
+      - prose: "All consortium partners have corresponding budget allocations"
+        predicate_refs: [g08_p06]
+      - prose: "No blocking inconsistency logged without resolution"
+        predicate_refs: [g08_p07]
+      - prose: "Budget gate assessment written to Tier 4"
+        predicate_refs: [g08_p08, g08_p09]
 
   - id: gate_10_part_b_completeness
     name: "Part B Completeness"
@@ -94,6 +202,15 @@ quality_gates:
       missing or unvalidated data without explicit flagging.
     evaluated_at: phase_08b_assembly exit
     fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+    conditions:
+      - prose: "Budget gate must have passed"
+        predicate_refs: [g09_p01]
+      - prose: "All sections required by active application form present in proposal_sections/"
+        predicate_refs: [g09_p02]
+      - prose: "Assembled draft present in assembled_drafts/"
+        predicate_refs: [g09_p03, g09_p03b]
+      - prose: "Each section traceable to named Tier 1-4 sources"
+        predicate_refs: [g09_p04]
 
   - id: gate_11_review_closure
     name: "Review Closure"
@@ -103,6 +220,15 @@ quality_gates:
       The final export is produced.
     evaluated_at: phase_08d_revision exit
     fail_action: "Block final export; report unresolved critical findings"
+    conditions:
+      - prose: "gate_10 must have passed"
+        predicate_refs: [g10_p01]
+      - prose: "Review packet present in review_packets/"
+        predicate_refs: [g10_p02, g10_p02b]
+      - prose: "All critical findings categorised by severity"
+        predicate_refs: [g10_p03]
+      - prose: "Prioritised revision action list produced"
+        predicate_refs: [g10_p04]
 
   - id: gate_12_constitutional_compliance
     name: "Constitutional Compliance"
@@ -113,3 +239,22 @@ quality_gates:
       annex schema used as proposal structure.
     evaluated_at: phase_08d_revision exit
     fail_action: "Block final export; log constitutional violation; surface to human operator"
+    conditions:
+      - prose: "gate_11 must have passed"
+        predicate_refs: [g11_p01]
+      - prose: "All sections required by active application form present"
+        predicate_refs: [g11_p02]
+      - prose: "Review packet present"
+        predicate_refs: [g11_p03]
+      - prose: "All critical revision actions resolved or logged as unresolvable with reason"
+        predicate_refs: [g11_p04]
+      - prose: "Final export present in final_exports/"
+        predicate_refs: [g11_p05, g11_p05b]
+      - prose: "Phase 8 checkpoint published"
+        predicate_refs: [g11_p06]
+      - prose: "Budget gate confirmation present and no section contradicts the validated budget"
+        predicate_refs: [g11_p07, g11_p10]
+      - prose: "No section contains content contradicted by a higher tier"
+        predicate_refs: [g11_p08]
+      - prose: "No constitutional prohibitions from CLAUDE.md Section 13 are violated"
+        predicate_refs: [g11_p09, g11_p11, g11_p12, g11_p13]

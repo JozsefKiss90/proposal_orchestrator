@@ -188,7 +188,14 @@ class TestRunContextHardBlock:
         assert manifest["hard_block_reason"] == "HARD_BLOCK_UPSTREAM"
 
     def test_phase8_node_ids_are_expected_set(self) -> None:
-        assert PHASE_8_NODE_IDS == frozenset({"n08a", "n08b", "n08c", "n08d"})
+        assert PHASE_8_NODE_IDS == frozenset(
+            {
+                "n08a_section_drafting",
+                "n08b_assembly",
+                "n08c_evaluator_review",
+                "n08d_revision",
+            }
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -237,7 +244,7 @@ class TestRunContextSave:
         ctx.save()
 
         reloaded = RunContext.load(tmp_path, "run-save2")
-        assert reloaded.get_node_state("n08a") == "hard_block_upstream"
+        assert reloaded.get_node_state("n08a_section_drafting") == "hard_block_upstream"
 
     def test_to_dict_returns_copy(self, tmp_path: Path) -> None:
         ctx = RunContext.initialize(tmp_path, run_id="run-dict")

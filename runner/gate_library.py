@@ -77,6 +77,15 @@ class GateLibrary:
         self._index: dict[str, dict] = {
             gate["gate_id"]: gate for gate in data.get("gate_rules", [])
         }
+        # Build an O(1) lookup index keyed by predicate_id across all gates.
+        # Used by Approach B: the runner resolves predicate_id → full predicate
+        # entry after reading predicate_refs from the manifest.
+        self._predicate_index: dict[str, dict] = {}
+        for gate in data.get("gate_rules", []):
+            for pred in gate.get("predicates") or []:
+                pid = pred.get("predicate_id")
+                if pid:
+                    self._predicate_index[pid] = pred
 
     # ------------------------------------------------------------------
     # Factory
@@ -206,6 +215,27 @@ class GateLibrary:
                 f"Available gates: {sorted(self._index)}"
             )
         return self._index[gate_id]
+
+    def get_predicate(self, predicate_id: str) -> dict:
+        """
+        Return the predicate entry dict for *predicate_id*.
+
+        Used by Approach B gate evaluation: the runner reads ``predicate_refs``
+        from the manifest, then resolves each ID here to obtain the full
+        predicate definition (type, function, args, fail_message,
+        prose_condition).
+
+        Raises
+        ------
+        GateLibraryError
+            If *predicate_id* is not found in any gate in the library.
+        """
+        if predicate_id not in self._predicate_index:
+            raise GateLibraryError(
+                f"predicate_id {predicate_id!r} not found in any gate in the "
+                f"gate rules library."
+            )
+        return self._predicate_index[predicate_id]
 
     # ------------------------------------------------------------------
     # Version properties

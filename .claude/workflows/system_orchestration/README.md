@@ -34,7 +34,8 @@ system_orchestration/
 ├── manifest.compile.yaml             # Compiled DAG manifest (DAG-runner entry point)
 ├── artifact_schema_specification.yaml  # Field-level schemas for all 13 canonical artifact types
 ├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
-└── gate_rules_library_plan.md        # Implementation plan (reference only)
+├── gate_rules_library_plan.md        # Implementation plan (reference only — complete)
+└── dag_scheduler_plan.md             # Next planning item: DAG scheduler and node execution loop
 ```
 
 The runner implementation lives at the repository root (not inside this package directory):
@@ -46,9 +47,10 @@ runner/                               # DAG-runner implementation package
 ├── versions.py                       # Manifest/library/constitution version constants
 ├── gate_result_registry.py           # §6.3 gate result path table (gate_id → tier4-relative path)
 ├── upstream_inputs.py                # Gate freshness: gate_id → upstream required input paths
-├── gate_library.py                   # Step 10: GateLibrary loader/validator
+├── gate_library.py                   # Step 10 + Approach B: GateLibrary loader/validator + predicate registry
+├── manifest_reader.py                # Approach B: ManifestReader — loads manifest.compile.yaml, exposes predicate_refs
 ├── run_context.py                    # Step 10: RunContext (run manifest + reuse policy)
-├── gate_evaluator.py                 # Step 10+11: evaluate_gate() main entry point (deterministic + semantic dispatch)
+├── gate_evaluator.py                 # Step 10+11 + Approach B: evaluate_gate() — manifest-driven or library-driven predicate resolution
 ├── semantic_dispatch.py              # Step 11: Semantic predicate dispatch layer
 └── predicates/
     ├── __init__.py                   # Predicate API exports
@@ -63,7 +65,8 @@ runner/                               # DAG-runner implementation package
 tests/
 ├── conftest.py                       # repo_root fixture
 └── runner/
-    ├── test_gate_library.py          # Step 10 unit tests: GateLibrary (23 tests)
+    ├── test_gate_library.py          # Step 10 + Approach B unit tests: GateLibrary (28 tests)
+    ├── test_manifest_reader.py       # Approach B unit tests: ManifestReader + integration (19 tests)
     ├── test_run_context.py           # Step 10 unit tests: RunContext (26 tests)
     ├── test_gate_evaluator.py        # Step 10+11 unit tests: evaluate_gate + semantic integration (50 tests)
     ├── test_semantic_dispatch.py     # Step 11 unit tests: dispatch + agent invocation + validation (61 tests)
@@ -146,6 +149,12 @@ The workflow package is now partially executable.
 - **Step 11 — Semantic predicate dispatch layer** completed (agent-invocation corrective pass applied):
   - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, calls Claude API, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
   - `runner/gate_evaluator.py` extended — semantic dispatch loop integrated; malformed/fail/pass routing; node state `released`/`blocked_at_exit` set after semantic evaluation; `skipped_semantic` flag when deterministic predicates fail
+- **Approach B migration — Manifest-driven predicate composition** completed (see migration note below):
+  - `quality_gates.yaml` — all 11 gates augmented with `conditions:` blocks carrying `{prose:, predicate_refs:}` entries
+  - `manifest.compile.yaml` — all 11 gates in `gate_registry` converted from plain-string conditions to structured `{prose:, predicate_refs:}` conditions; upstream gate_pass conditions added where previously implicit
+  - `runner/gate_library.py` — extended with `_predicate_index` and `get_predicate(predicate_id)` method; library becomes implementation registry for Approach B
+  - `runner/manifest_reader.py` (new) — `ManifestReader` class: loads `manifest.compile.yaml`, indexes `gate_registry` by `gate_id`, provides `get_predicate_refs(gate_id) → Optional[list[str]]`
+  - `runner/gate_evaluator.py` — step 4 updated: tries `ManifestReader.get_predicate_refs()` first (Approach B); falls back silently to library gate entry predicates when manifest is absent or raises `ManifestReaderError` (Approach A fallback)
 
 **Current executable predicate layer**
 The following predicates are implemented and tested:
@@ -212,9 +221,16 @@ Ownership predicate — §7 (Step 10):
 
 Runner integration — (Step 10):
 - `runner.gate_library.GateLibrary.load(library_path, *, repo_root, expected_manifest_version)` — loads and validates `gate_rules_library.yaml`; raises `ManifestVersionMismatchError` on version conflict
+- `runner.gate_library.GateLibrary.get_predicate(predicate_id)` — (Approach B) looks up a predicate by ID across all gates; raises `GateLibraryError` if not found
 - `runner.run_context.RunContext.initialize(repo_root, run_id)` — creates `.claude/runs/<run_id>/run_manifest.json` and `reuse_policy.json`
 - `runner.run_context.RunContext.load(repo_root, run_id)` — loads existing run state
-- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path)` — evaluates all deterministic predicates, dispatches semantic predicates, writes GateResult to Tier 4, updates node state
+- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path, manifest_path)` — evaluates all deterministic predicates (Approach B manifest-driven or Approach A library-driven), dispatches semantic predicates, writes GateResult to Tier 4, updates node state
+
+Manifest-driven predicate composition — (Approach B):
+- `runner.manifest_reader.ManifestReader.load(manifest_path, *, repo_root)` — loads `manifest.compile.yaml`; raises `ManifestReaderError` on missing file, invalid YAML, or missing `gate_registry`
+- `runner.manifest_reader.ManifestReader.get_predicate_refs(gate_id)` — returns ordered flat list of predicate IDs from all `predicate_refs` conditions; returns `None` when gate absent or no predicate_refs found (caller interprets as Approach A fallback)
+- `runner.manifest_reader.ManifestReader.has_predicate_refs(gate_id)` — convenience bool wrapper
+- `runner.manifest_reader.ManifestReader.gate_ids()` — returns all gate IDs in insertion order
 
 Semantic dispatch — (Step 11):
 - `runner.semantic_dispatch.validate_semantic_result(result)` — validates a semantic predicate result dict against the §4.9 contract; returns `(True,"")` or `(False, reason)`
@@ -249,12 +265,47 @@ The repository does **not** yet implement:
 - Step 7 coverage predicates: 71 tests in `tests/runner/predicates/test_coverage_predicates.py`
 - Step 8 cycle predicate: 30 tests in `tests/runner/predicates/test_cycle_predicates.py`
 - Step 9 timeline predicates: 52 tests in `tests/runner/predicates/test_timeline_predicates.py`
-- Step 10 GateLibrary: 23 tests in `tests/runner/test_gate_library.py`
+- Step 10 GateLibrary + Approach B predicate registry: 28 tests in `tests/runner/test_gate_library.py`
 - Step 10 RunContext: 26 tests in `tests/runner/test_run_context.py`
 - Step 10+11 evaluate_gate + semantic integration: 50 tests in `tests/runner/test_gate_evaluator.py`
 - Step 11 semantic dispatch + agent invocation + validation: 61 tests in `tests/runner/test_semantic_dispatch.py`
 - Step 12 gate fixture scenarios: 27 tests in `tests/runner/test_gate_scenarios.py`
-- **Total: 503 tests, all passing**
+- Approach B ManifestReader + integration: 19 tests in `tests/runner/test_manifest_reader.py`
+- **Total: 527 tests, all passing**
+
+---
+
+## Approach B Migration — Manifest-Driven Predicate Composition
+
+### What changed
+
+**Before (Approach A):** `evaluate_gate()` loaded the gate rules library, looked up the gate by `gate_id`, and used the gate entry's own `predicates` list as the predicates to run. The manifest (`manifest.compile.yaml`) carried conditions as plain prose strings; it was a documentation layer, not an execution input.
+
+**After (Approach B):** `evaluate_gate()` first loads the manifest and calls `ManifestReader.get_predicate_refs(gate_id)`. If the manifest returns a list of predicate IDs, those IDs are resolved one-by-one via `GateLibrary.get_predicate(predicate_id)` to obtain full predicate definitions. The manifest is now the **composition source** (what predicates run and in what order per condition); the library is the **implementation registry** (the full definition of each predicate).
+
+When the manifest is absent or raises `ManifestReaderError`, `evaluate_gate()` silently falls back to Approach A (library gate entry predicates). This fallback preserves backward compatibility for all synthetic test environments that do not carry a manifest.
+
+### Files modified
+
+| File | Change |
+|------|--------|
+| `quality_gates.yaml` | All 11 gates: added `conditions:` blocks with `{prose:, predicate_refs:}` entries |
+| `manifest.compile.yaml` | All 11 gates in `gate_registry`: conditions converted from plain strings to structured `{prose:, predicate_refs:}` objects |
+| `runner/gate_library.py` | Added `_predicate_index` (cross-gate predicate lookup) and `get_predicate(predicate_id)` method |
+| `runner/manifest_reader.py` | New file: `ManifestReader` class — loads manifest, indexes gates, provides `get_predicate_refs()` |
+| `runner/gate_evaluator.py` | Step 4 rewritten: tries manifest-driven path first; falls back to library path on `ManifestReaderError` or `None` return |
+
+### Predicate ID namespace
+
+All 97 predicates across 11 gates follow the `g<gate_number>_p<sequence>` scheme (e.g., `g01_p01` through `g11_p13`). Predicate IDs in `predicate_refs` must match the `predicate_id` fields in `gate_rules_library.yaml` exactly.
+
+### Evaluation order
+
+Predicate evaluation order is governed by `PREDICATE_TYPE_ORDER` in `gate_evaluator.py` (file → gate_pass → schema → source_ref → coverage → cycle → timeline → semantic). Predicates are sorted by type after the predicate list is resolved, so `predicate_refs` ordering within conditions affects grouping semantics in the manifest but not execution order.
+
+### Fallback behaviour
+
+Existing tests (503) that create synthetic repos without a manifest file continue to pass via the Approach A fallback. No existing test was modified. The 24 new tests (`TestGetPredicate` + `TestApproachBIntegration` + `TestManifestReaderLoad` + `TestGetPredicateRefs` + `TestIntrospection`) verify the Approach B path directly.
 
 ---
 

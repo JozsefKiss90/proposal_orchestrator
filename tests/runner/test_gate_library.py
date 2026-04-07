@@ -234,3 +234,89 @@ class TestGateLibraryGetGate:
         lib_path = _write_library_yaml(tmp_path, data)
         lib = GateLibrary.load(lib_path)
         assert lib.gate_ids() == []
+
+
+# ---------------------------------------------------------------------------
+# get_predicate — Approach B predicate registry
+# ---------------------------------------------------------------------------
+
+
+class TestGetPredicate:
+    """Tests for GateLibrary.get_predicate() (Approach B implementation registry)."""
+
+    def _library_with_predicates(self, tmp_path: Path) -> GateLibrary:
+        data = _minimal_library()
+        data["gate_rules"] = [
+            {
+                "gate_id": "gate_alpha",
+                "gate_kind": "exit",
+                "evaluated_at": "n01 exit",
+                "predicates": [
+                    {
+                        "predicate_id": "g01_p01",
+                        "type": "file",
+                        "function": "non_empty_json",
+                        "args": {"path": "docs/some/file.json"},
+                        "fail_message": "file missing",
+                        "prose_condition": "file must be present",
+                    },
+                    {
+                        "predicate_id": "g01_p02",
+                        "type": "schema",
+                        "function": "json_fields_present",
+                        "args": {"path": "docs/some/file.json", "fields": ["id"]},
+                        "fail_message": "field missing",
+                        "prose_condition": "id field required",
+                    },
+                ],
+            },
+            {
+                "gate_id": "gate_beta",
+                "gate_kind": "exit",
+                "evaluated_at": "n02 exit",
+                "predicates": [
+                    {
+                        "predicate_id": "g02_p01",
+                        "type": "gate_pass",
+                        "function": "gate_pass_recorded",
+                        "args": {"gate_id": "gate_alpha"},
+                        "fail_message": "upstream gate not passed",
+                        "prose_condition": "gate_alpha must have passed",
+                    },
+                ],
+            },
+        ]
+        lib_path = _write_library_yaml(tmp_path, data)
+        return GateLibrary.load(lib_path)
+
+    def test_get_predicate_returns_correct_entry(self, tmp_path: Path) -> None:
+        lib = self._library_with_predicates(tmp_path)
+        pred = lib.get_predicate("g01_p01")
+        assert pred["predicate_id"] == "g01_p01"
+        assert pred["function"] == "non_empty_json"
+        assert pred["type"] == "file"
+
+    def test_get_predicate_crosses_gate_boundary(self, tmp_path: Path) -> None:
+        lib = self._library_with_predicates(tmp_path)
+        pred = lib.get_predicate("g02_p01")
+        assert pred["predicate_id"] == "g02_p01"
+        assert pred["function"] == "gate_pass_recorded"
+
+    def test_get_predicate_unknown_id_raises(self, tmp_path: Path) -> None:
+        lib = self._library_with_predicates(tmp_path)
+        with pytest.raises(GateLibraryError, match="g99_p99"):
+            lib.get_predicate("g99_p99")
+
+    def test_predicate_index_covers_all_predicates(self, tmp_path: Path) -> None:
+        lib = self._library_with_predicates(tmp_path)
+        for pid in ("g01_p01", "g01_p02", "g02_p01"):
+            pred = lib.get_predicate(pid)
+            assert pred["predicate_id"] == pid
+
+    def test_get_predicate_on_empty_library_raises(self, tmp_path: Path) -> None:
+        data = _minimal_library()
+        data["gate_rules"] = []
+        lib_path = _write_library_yaml(tmp_path, data)
+        lib = GateLibrary.load(lib_path)
+        with pytest.raises(GateLibraryError):
+            lib.get_predicate("g01_p01")
