@@ -76,7 +76,7 @@ Inputs are determined at invocation time by the calling agent or operator. The c
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -90,3 +90,94 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Note on `reads_from`
 
 The catalog entry for `state_recorder` reads: `reads_from: "Any phase context requiring durable recording"`. This is intentional; the agent's read scope is not a fixed path list but is determined at invocation time by the calling agent or operator. The writing paths are fixed.
+
+---
+
+## Output Schema Contracts
+
+### Decision Log Entries — Content Contract (no schema_id in spec)
+
+**Canonical path:** `docs/tier4_orchestration_state/decision_log/<entry_id>.json` (or appended to an existing log file)
+**Provenance:** run_produced
+**Schema ID:** None defined in `artifact_schema_specification.yaml`
+
+Required fields per entry (from `node_body_contract.md` §3.10):
+
+| Field | Required | Content |
+|-------|----------|---------|
+| `agent_id` | **yes** | ID of the agent recording the decision (the calling agent, not `state_recorder` itself) |
+| `phase_id` | **yes** | Phase during which the decision was made |
+| `run_id` | **yes** | From invoking run context |
+| `timestamp` | **yes** | ISO 8601 |
+| `decision_type` | **yes** | One of: `material_decision`, `assumption`, `scope_conflict`, `gate_pass`, `gate_failure`, `constitutional_halt` |
+| `rationale` | **yes** | Human-readable explanation; must reference source artifacts |
+| Source references | **yes** | File paths or artifact IDs that ground the decision |
+
+### `phase8_checkpoint.json` — Checkpoint Artifact (invocation context 2)
+
+**Canonical path:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`
+**Schema ID:** `orch.checkpoints.phase8_checkpoint.v1`
+**Provenance:** run_produced
+
+This agent writes this artifact only when invoked by `revision_integrator` after `gate_12_constitutional_compliance` passes.
+
+| Field | Type | Required | Derivation |
+|-------|------|----------|-----------|
+| `schema_id` | string | **yes** | Stamped exactly as `"orch.checkpoints.phase8_checkpoint.v1"` |
+| `run_id` | string | **yes** | From invoking run context |
+| `status` | string | **yes** | Must equal `"published"`; only written after all Phase 8 gates confirmed |
+| `published_at` | string | **yes** | ISO 8601 timestamp |
+| `gate_results_confirmed` | array | **yes** | Must include: `gate_09_budget_consistency`, `gate_10_part_b_completeness`, `gate_11_review_closure`, `gate_12_constitutional_compliance` |
+
+`artifact_status` must be absent at write time (runner-stamped). This checkpoint must not be overwritten once published with `status: published`.
+
+### Validation Report Summaries — Content Contract (invocation context 3)
+
+**Canonical path:** `docs/tier4_orchestration_state/validation_reports/<invocation_id>_summary.json`
+**Schema ID:** None defined in spec.
+
+Written after `compliance_validator` or `traceability_auditor` invocations to persist findings as a summary record.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Invocation Preconditions (Cross-Phase Agent)
+
+This agent has no own predecessor gates. It is always available for invocation by any agent at any phase.
+
+**Checkpoint-publish context exception:** `phase8_checkpoint.json` must not be written until `gate_12_constitutional_compliance` has passed. The invoking agent (`revision_integrator`) is responsible for gate verification before triggering this invocation context.
+
+### No Own Exit Gate
+
+This agent carries `exit_gate: null`. It does not satisfy any gate condition by itself.
+
+### Failure Protocol
+
+#### Case 1: Checkpoint publish requested but gate_12 not passed
+- **Halt:** Do not write `phase8_checkpoint.json`.
+- **Write:** Decision log entry `decision_type: constitutional_halt`; cite CLAUDE.md §9.4 and checkpoint-publish constitutional constraint.
+- **Must not:** Publish a checkpoint with `status: published` before all Phase 8 gates have passed.
+
+#### Case 2: Checkpoint already exists with `status: published`
+- **Halt:** Do not overwrite.
+- **Write:** Decision log entry `decision_type: constitutional_halt`; the prior checkpoint is immutable.
+- **Must not:** Overwrite a validated checkpoint (CLAUDE.md §9.4).
+
+#### Case 3: Required fields missing in the decision context passed by the caller
+- **Halt:** If the calling agent does not provide `agent_id`, `phase_id`, `run_id`, or `rationale`, do not write an incomplete entry.
+- **Write:** Decision log entry noting the incomplete invocation context.
+- **Must not:** Write a decision log entry with empty or null required fields.
+
+#### Case 4: Constitutional prohibition triggered by this agent's own action
+- **Halt:** Halt and surface to the calling agent.
+
+### Decision-Log Write Obligations
+
+`state_recorder` is the mechanism for writing decision log entries on behalf of other agents. Its own decisions are minimal. When it does act as a decision-maker:
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Checkpoint published | `gate_pass` | `agent_id: state_recorder`; gate IDs confirmed; run_id; published_at |
+| Checkpoint publish blocked (overwrite attempt) | `constitutional_halt` | Reason; existing checkpoint reference; CLAUDE.md §9.4 |
+| Checkpoint publish blocked (gate not passed) | `constitutional_halt` | Gate ID not yet passed; invoking agent; CLAUDE.md §9.4 |

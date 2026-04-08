@@ -58,7 +58,7 @@ Contributes to `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -73,3 +73,74 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Note on Exit Gate
 
 This sub-agent carries `exit_gate: null` because it does not independently satisfy a gate; the gate that evaluates its output (`phase_03_gate`) is the exit gate of the parent node `n03_wp_design`, evaluated after both `wp_designer` and `dependency_mapper` have completed.
+
+---
+
+## Output Schema Contracts
+
+### `wp_structure.json` — Shared Canonical Output (sub-agent contribution)
+
+**Canonical path:** `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
+**Schema ID:** `orch.phase3.wp_structure.v1`
+**Provenance:** run_produced (jointly with `wp_designer`)
+
+This sub-agent does not write a separate canonical artifact. It contributes the `dependency_map` field to `wp_structure.json` produced by `wp_designer`. The field is required by the schema; its absence constitutes an incomplete artifact that will fail `phase_03_gate` condition `g04_p03`.
+
+**`dependency_map` field contract** (from `artifact_schema_specification.yaml` schema `orch.phase3.wp_structure.v1`):
+
+| Sub-field | Type | Required | Derivation |
+|-----------|------|----------|-----------|
+| `dependency_map.nodes` | array of strings | **yes** | All `wp_id` and `task_id` values present in `work_packages`; must be complete |
+| `dependency_map.edges` | array | **yes** | Directed edges (from → to); `from` and `to` must be node identifiers from `nodes`; `edge_type` must be one of: `finish_to_start`, `start_to_start`, `data_input`, `partial_output` |
+| `dependency_map.edges[].from` | string | **yes** | Source node identifier (wp_id or task_id) |
+| `dependency_map.edges[].to` | string | **yes** | Target node identifier (wp_id or task_id) |
+| `dependency_map.edges[].edge_type` | string | **yes** | Enum as above |
+
+The `dependency_map` must represent an acyclic directed graph (DAG). If a cycle is detected, it must be flagged — not silently removed.
+
+`schema_id` and `run_id` are written by `wp_designer` as primary artifact owner. This agent must not overwrite those fields. `artifact_status` must remain absent at write time.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Predecessor Gate Requirements (Sub-Agent Invocation Preconditions)
+
+This agent is a sub-agent; it has no independent entry gate. Invocation preconditions:
+1. `wp_designer` must have written the initial WP structure (work_packages, tasks, deliverables) to `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` before this agent reads it.
+2. `phase_02_gate` must have passed (inherited from the parent node `n03_wp_design`).
+
+If `wp_structure.json` does not exist or has an empty `work_packages` array, halt and report to `wp_designer`.
+
+### Exit Gate
+
+No own exit gate. Contributes to `phase_03_gate` via condition `g04_p03` (dependency map written to Tier 4) and `g04_p06` (no dependency cycles). Gate authority belongs to `wp_designer`.
+
+### Failure Protocol
+
+#### Case 1: Dependency cycle detected
+- **Flag — do not silently remove:** Write the cycle as an unresolved entry in the dependency map with an annotation; do not remove nodes or edges to hide the cycle.
+- **Write:** Decision log entry via `wp_designer`'s decision log path with `decision_type: scope_conflict`; list the cycle nodes.
+- **Must not:** Resolve the cycle by deleting an edge without flagging it.
+
+#### Case 2: WP structure input absent or incomplete
+- **Halt:** If `wp_structure.json` does not have a non-empty `work_packages` array, halt and report.
+- **Must not:** Construct a dependency map for WPs not defined by `wp_designer`.
+
+#### Case 3: Undeclared cross-WP dependency suspected but not documented in Tier 3
+- **Flag as assumption:** Write the assumed dependency as an `assumed` entry; document why it was inferred.
+- **Decision log:** `decision_type: assumption`; identify the basis for the inferred dependency.
+
+#### Case 4: Constitutional prohibition triggered
+- **Halt** if required to invent task relationships not derivable from the WP structure. Write `decision_type: constitutional_halt` via the parent node's decision log.
+
+### Decision-Log Write Obligations
+
+Written via `wp_designer`'s decision log flow (same path). Entry fields: `agent_id: dependency_mapper`, `phase_id: phase_03_wp_design_and_dependency_mapping`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Cross-WP dependency identified from WP task structure | `material_decision` | Source WP, target WP, edge_type, derivation basis |
+| Dependency inferred (not explicit in Tier 3) | `assumption` | Inferred edge; basis; Tier 3 evidence |
+| Dependency cycle detected | `scope_conflict` | Cycle node list; resolution or unresolved |
+| Undeclared dependency suspected but cannot be confirmed | `assumption` | Suspicion basis; why not included |

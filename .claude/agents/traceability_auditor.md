@@ -85,7 +85,7 @@ Inputs are determined at invocation time by the calling agent or operator. The f
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -99,3 +99,78 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Note on Node Binding
 
 No `node_ids` binding. Not assigned to any specific manifest node. Carries no own entry or exit gate. Invoked by other agents or the operator.
+
+---
+
+## Output Schema Contracts
+
+### Traceability Audit Reports — Content Contract (no schema_id in spec)
+
+**Canonical path:** `docs/tier4_orchestration_state/validation_reports/<invocation_id>_traceability_report.json`
+**Provenance:** run_produced
+**Schema ID:** None defined in `artifact_schema_specification.yaml` for validation reports
+
+One report per invocation. Required content:
+
+| Required element | Description |
+|-----------------|-------------|
+| `agent_id` | `"traceability_auditor"` |
+| `run_id` | Propagated from invoking run context |
+| `invocation_id` | Unique identifier for this invocation |
+| `target_artifact` | Path(s) of the artifact(s) audited |
+| `audit_scope` | Gate context or `"on_demand"` |
+| `claim_audit` | Array; each entry: `claim_id`, `claim_summary`, `status` (confirmed/inferred/assumed/unresolved), `source_ref` (required for confirmed/inferred), `assumption_declared` (for assumed), `resolution_required` (boolean — true for unresolved) |
+| `overall_traceability` | `traceable` or `gaps_present` |
+| `timestamp` | ISO 8601 |
+
+Status categories applied per CLAUDE.md §12.2:
+- **Confirmed** — directly evidenced by a named source in Tier 1–3
+- **Inferred** — derived by logical reasoning; inference chain stated
+- **Assumed** — adopted in absence of direct evidence; assumption explicitly declared
+- **Unresolved** — conflicting evidence or missing information; resolution required
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Invocation Preconditions (Cross-Phase Agent)
+
+This agent has no own predecessor gates. Invocation is context-dependent:
+- When invoked at gates 10, 11, or 12: the assembled draft or final export is the primary target.
+- When invoked on demand at any phase: the calling agent provides the target artifact path(s).
+
+The agent does not declare any phase gate passed or failed. Its outputs are consumed by gate semantic predicates (`all_sections_have_traceability_footer`, `no_gap_masked_as_confirmed`, `no_unsupported_tier5_claims`) or by calling agents.
+
+### No Own Exit Gate
+
+This agent carries `exit_gate: null`. It does not satisfy any gate condition independently.
+
+### Failure Protocol
+
+#### Case 1: Unresolved claim found (no traceable source)
+- **Flag as Unresolved** in `claim_audit`; set `resolution_required: true`.
+- **Decision log:** Entry with `decision_type: scope_conflict`; identify the claim, section, and what source evidence is needed.
+- **Must not:** Accept an unattributed claim as Confirmed (CLAUDE.md §12.2, §10.5).
+
+#### Case 2: Claim marked Confirmed without a named source artifact
+- **Downgrade to Assumed or Unresolved** in the report.
+- **Write:** `decision_type: assumption` or `scope_conflict`; document the downgrade reason.
+- **Must not:** Validate a Confirmed status without a specific source path.
+
+#### Case 3: Target artifact absent
+- **Write:** Audit report with `overall_traceability: gaps_present`; note the absent artifact as a blocking gap.
+
+#### Case 4: Tier 1–3 source files needed but absent
+- **Flag:** Cannot issue Confirmed status without access to source files; flag affected claims as Unresolved.
+- **Write:** `decision_type: scope_conflict`; note which source files are needed.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: traceability_auditor`, `phase_id` (target or `cross-phase`), `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Unresolved claim found (no traceable source) | `scope_conflict` | Claim ID; section; what source is needed |
+| Claim downgraded from Confirmed to Assumed/Unresolved | `material_decision` | Claim ID; original status; new status; reason |
+| Full traceability confirmed | `gate_pass` | Invocation ID; target artifact; audit summary |
+| Gaps identified that block downstream use | `gate_failure` | Invocation ID; unresolved claim IDs |

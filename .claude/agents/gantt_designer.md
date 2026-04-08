@@ -85,7 +85,7 @@ Schema: `orch.phase4.gantt.v1`
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -102,3 +102,91 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Predecessor Gate
 
 `phase_03_gate` must have passed. Verify before any action is taken.
+
+---
+
+## Output Schema Contracts
+
+### 1. `gantt.json` — Primary Canonical Output
+
+**Canonical path:** `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json`
+**Schema ID:** `orch.phase4.gantt.v1`
+**Provenance:** run_produced
+
+| Field | Type | Required | Source / Derivation |
+|-------|------|----------|---------------------|
+| `schema_id` | string | **yes** | Stamped exactly as `"orch.phase4.gantt.v1"` |
+| `run_id` | string | **yes** | Propagated from invoking run context |
+| `artifact_status` | string | **NO — absent at write time** | Runner stamps after `phase_04_gate` evaluation |
+| `tasks` | array | **yes** | Every `task_id` from `wp_structure.json` `work_packages[].tasks[]` must appear; each entry: `task_id` (join key — must match wp_structure), `wp_id` (parent WP), `start_month` (1-based integer ≥ 1), `end_month` (1-based integer ≤ `start_month`), `responsible_partner` (from Tier 3 `partners.json`) |
+| `tasks[].end_month` | integer | **yes** | Must be ≤ project_duration_months from `selected_call.json`; `timeline_within_duration` predicate verifies this |
+| `milestones` | array | **yes** | Every milestone must have: `milestone_id` (unique, e.g., "MS1"), `title`, `due_month` (non-null 1-based integer), `verifiable_criterion` (non-empty, concrete, externally verifiable string — not a placeholder), `responsible_wp` (wp_id from wp_structure) |
+| `critical_path` | array | **yes** | Non-empty ordered list of `task_id` and `milestone_id` strings forming the critical path; `critical_path_present` verifies non-empty |
+
+### 2. `milestones_seed.json` — Tier 3 Updated Output (no schema_id in spec)
+
+**Canonical path:** `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json`
+**Provenance:** tier3_updated (no schema_id_value defined in spec)
+
+Required content: Updated from the Gantt `milestones` array. Each milestone from `gantt.json` must have a corresponding entry with at least: `milestone_id`, `title`, `due_month`, `verifiable_criterion`. Gate condition `g05_p07` verifies this file is populated.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Predecessor Gate Requirements
+
+**Predecessor:** `phase_03_gate` — must have passed. Source: edge `e03_to_04`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json`.
+
+If `phase_03_gate` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
+
+**Entry gate:** none.
+
+### Exit Gate
+
+**Exit gate:** `phase_04_gate` — evaluated after this agent writes all canonical outputs.
+
+Gate conditions (source: `manifest.compile.yaml`, `quality_gates.yaml`):
+1. `phase_03_gate` predecessor passed (`g05_p01`)
+2. Gantt structure written to Tier 4 (`g05_p02`, `g05_p02b`)
+3. All tasks assigned to months within project duration (`g05_p03`, `g05_p04`)
+4. All milestones have verifiable criteria and due months (`g05_p05`)
+5. Critical path identified and consistent with dependency map (`g05_p06`)
+6. `milestones_seed.json` populated in Tier 3 (`g05_p07`)
+
+Gate result: `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json`. Blocking edge on pass: `e04_to_06` (`n06_implementation_architecture`).
+
+### Failure Protocol
+
+#### Case 1: Gate condition not met (`phase_04_gate` fails)
+- **Halt:** Do not proceed.
+- **Write:** `gantt.json` with the schedule as produced; document which conditions failed (e.g., tasks beyond project duration, milestones without verifiable criteria).
+- **Decision log:** `decision_type: gate_failure`; list failed conditions.
+- **Must not:** Silently adjust project duration to make tasks fit (CLAUDE.md §13 — Tier 3 call binding governs duration). Must not write placeholder milestone criteria.
+
+#### Case 2: Required input absent
+- **Halt:** If `wp_structure.json` is absent or `selected_call.json` project duration is absent, halt.
+- **Write:** Decision log `decision_type: gate_failure`.
+
+#### Case 3: Mandatory predecessor gate not passed
+- **Halt immediately** if `phase_03_gate` is not passed.
+- **Write:** `decision_type: constitutional_halt`.
+
+#### Case 4: WP structure has dependency cycle (inherited from Phase 3)
+- **Halt:** Do not schedule tasks on a cyclic dependency graph.
+- **Write:** `decision_type: gate_failure` — note the Phase 3 artifact has an unresolved cycle that blocks scheduling.
+- **Must not:** Proceed with scheduling by ignoring declared dependency cycles.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: gantt_designer`, `phase_id: phase_04_gantt_and_milestones`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Task scheduling decision (start/end month assignment) | `material_decision` | Task ID; month assignment; dependency basis |
+| Schedule conflict resolved by prioritizing one dependency | `assumption` | Conflict; resolution; alternative considered |
+| Critical path identified | `material_decision` | Path node list; derivation from dependency map |
+| Scheduling conflict that cannot be resolved within project duration | `scope_conflict` | Conflicting tasks; why unresolvable; what is needed |
+| `phase_04_gate` passes | `gate_pass` | Gate ID; all conditions confirmed; run_id |
+| `phase_04_gate` fails | `gate_failure` | Gate ID; failed conditions |
+| `phase_03_gate` predecessor not passed | `constitutional_halt` | Edge `e03_to_04`; status |

@@ -77,7 +77,7 @@ Inputs are determined at invocation time by the calling agent or operator. The f
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -91,3 +91,76 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Note on Node Binding
 
 This agent has no `node_ids` binding because it is not assigned to any specific node in `manifest.compile.yaml`. It is invoked by other agents or by the operator at gate evaluation time. It carries no own entry or exit gate.
+
+---
+
+## Output Schema Contracts
+
+### Validation Reports — Content Contract (no schema_id in spec)
+
+**Canonical path:** `docs/tier4_orchestration_state/validation_reports/<invocation_id>_compliance_report.json`
+**Provenance:** run_produced
+**Schema ID:** None defined in `artifact_schema_specification.yaml` for validation reports
+
+This agent writes one compliance report per invocation. No schema_id_value is defined in the spec for validation report artifacts. Required content per report:
+
+| Required element | Description |
+|-----------------|-------------|
+| `agent_id` | `"compliance_validator"` |
+| `run_id` | Propagated from invoking run context |
+| `invocation_id` | Unique identifier for this invocation (used in file naming) |
+| `target_artifact` | Path(s) of the artifact(s) checked |
+| `gate_context` | The gate ID being evaluated (if invoked at a gate), or `"on_demand"` |
+| `findings` | Array of findings; each: `finding_id`, `prohibition_ref` (CLAUDE.md §13.x), `description`, `severity` (critical/major/minor), `resolution_required` (boolean) |
+| `overall_compliance` | `compliant` or `non_compliant` |
+| `timestamp` | ISO 8601 |
+
+### Decision Log Entries
+
+One entry per finding that would affect downstream use. Written to `docs/tier4_orchestration_state/decision_log/`.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Invocation Preconditions (Cross-Phase Agent)
+
+This agent has no own predecessor gates. Invocation preconditions are context-dependent:
+- When invoked at a specific gate (e.g., `gate_10`, `gate_11`, `gate_12`): the invoking agent or operator must have identified a need for compliance checking at that gate.
+- When invoked on demand: no preconditions; the operator or calling agent provides the target artifact path(s).
+
+The agent does not declare any phase gate passed or failed directly. It produces a compliance report that gate predicates or calling agents may consume.
+
+### No Own Exit Gate
+
+This agent carries `exit_gate: null`. It does not satisfy any gate condition by itself. Its outputs (validation reports) are consumed by gate predicates and by the calling agent's gate-enforcement logic.
+
+### Failure Protocol
+
+#### Case 1: Constitutional violation found in target artifact
+- **Write:** Compliance report with `overall_compliance: non_compliant`; populate `findings` with the specific prohibition(s) triggered.
+- **Decision log:** One entry per finding with `decision_type: constitutional_halt` (for critical violations) or `material_decision` (for non-critical findings).
+- **Must not:** Approve content that violates constitutional prohibitions even if the invoking agent requests approval (CLAUDE.md §10.5).
+
+#### Case 2: Target artifact absent
+- **Write:** Compliance report with `findings` noting the absent artifact; `overall_compliance: non_compliant`.
+- **Must not:** Issue a compliant determination for an artifact that cannot be read.
+
+#### Case 3: Tier 1 source documents present but not read
+- **Must read the Tier 1 extracted files** — must not substitute agent knowledge of Horizon Europe compliance requirements (CLAUDE.md §13.9).
+- **Halt and flag** if Tier 1 extracted files are referenced but absent.
+
+#### Case 4: Constitutional prohibition triggered by this agent's own action
+- **Halt:** If the compliance check itself would require fabricating data, halt.
+- **Write:** `decision_type: constitutional_halt`.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: compliance_validator`, `phase_id` (of the target or `cross-phase`), `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Constitutional violation found | `constitutional_halt` | Finding ID; CLAUDE.md §13.x; target artifact; description |
+| Non-critical finding requiring operator awareness | `material_decision` | Finding ID; prohibition reference; description; severity |
+| Compliant determination issued | `gate_pass` | Invocation ID; target artifact(s); gate context; all checks confirmed |
+| Target artifact absent | `gate_failure` | Invocation ID; missing path |

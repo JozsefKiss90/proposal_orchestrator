@@ -118,7 +118,7 @@ Failure of `gate_09_budget_consistency` triggers HARD_BLOCK propagation in the D
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -136,3 +136,111 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Predecessor Gate
 
 `phase_06_gate` must have passed (edge registry: `e06_to_07`). Verify before any action is taken.
+
+---
+
+## Output Schema Contracts
+
+### 1. `budget_gate_assessment.json` — Primary Canonical Output
+
+**Canonical path:** `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json`
+**Schema ID:** `orch.phase7.budget_gate_assessment.v1`
+**Provenance:** run_produced
+
+| Field | Type | Required | Source / Derivation |
+|-------|------|----------|---------------------|
+| `schema_id` | string | **yes** | Stamped exactly as `"orch.phase7.budget_gate_assessment.v1"` |
+| `run_id` | string | **yes** | Propagated from invoking run context |
+| `artifact_status` | string | **NO — absent at write time** | Runner stamps after `gate_09_budget_consistency` evaluation |
+| `gate_pass_declaration` | string | **yes** | Enum: `pass` or `fail`; must reflect actual validation state — `budget_gate_confirmation_present` predicate verifies this equals `"pass"` for gate satisfaction; **absent budget artifacts always produce `"fail"`** |
+| `budget_response_reference` | string | **yes** | File name or path of the budget response file(s) in `docs/integrations/lump_sum_budget_planner/received/` that was validated; if absent = `"ABSENT — gate failure"` |
+| `validation_artifact_reference` | string | **yes** | File name or path of the validation artifact in `docs/integrations/lump_sum_budget_planner/validation/`; if absent = `"ABSENT — gate failure"` |
+| `wp_coverage_results` | array | **yes** | Coverage check: every `wp_id` from `wp_structure.json` must appear; each entry: `wp_id`, `present_in_budget` (boolean), `budget_line_reference` (optional), `inconsistencies` (array of strings, empty when consistent) |
+| `partner_coverage_results` | array | **yes** | Coverage check: every partner in Tier 3 must appear; each entry: `partner_id`, `present_in_budget` (boolean), `budget_line_reference` (optional), `inconsistencies` (array of strings) |
+| `blocking_inconsistencies` | array | **yes** | All structural inconsistencies found; must be empty array when `gate_pass_declaration: pass`; each entry: `inconsistency_id`, `description`, `severity` (blocking/non_blocking), `resolution` (resolved/unresolved); `no_blocking_inconsistencies` predicate fails if any entry has `resolution: unresolved` |
+
+### 2. `budget_response.json` — Tier 3 Integration Output (no schema_id in spec)
+
+**Canonical path:** `docs/tier3_project_instantiation/integration/budget_response.json`
+**Provenance:** tier3_integration (no schema_id_value defined in spec)
+
+This is a copy/reference of the validated external budget response for downstream traceability. Its content is governed by the interface contract, not by `artifact_schema_specification.yaml`. Written only when a budget response is present and validates. If budget response is absent, this file must not be written with fabricated content.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Predecessor Gate Requirements
+
+**Predecessor:** `phase_06_gate` — must have passed. Source: edge `e06_to_07`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json`.
+
+If `phase_06_gate` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
+
+**Entry gate:** none (node `n07_budget_gate` has no `entry_gate` in manifest).
+
+### Exit Gate
+
+**Exit gate:** `gate_09_budget_consistency` — mandatory, bypass-prohibited (`mandatory: true`, `bypass_prohibited: true` in manifest).
+
+Gate conditions (source: `manifest.compile.yaml` gate_09_budget_consistency, `quality_gates.yaml`):
+1. `phase_06_gate` passed (`g08_p01`)
+2. Non-empty budget response present in `integrations/received/` (`g08_p02`)
+3. Validation artifact present in `integrations/validation/` (`g08_p03`)
+4. Interface contract conformance confirmed (`g08_p04`)
+5. All Phase 3 WPs have corresponding budget entries (`g08_p05`)
+6. All consortium partners have corresponding budget allocations (`g08_p06`)
+7. No blocking inconsistency unresolved (`g08_p07`)
+8. Budget gate assessment written to Tier 4 (`g08_p08`, `g08_p09`)
+
+Gate result: `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json`. Blocking edge on pass: `e07_to_08a` (`n08a_section_drafting`).
+
+### Budget Gate Special Handling — Absent-Artifacts Rule (Unconditional)
+
+**If `docs/integrations/lump_sum_budget_planner/received/` is empty or absent:**
+- `gate_pass_declaration` in `budget_gate_assessment.json` **must be `"fail"`** — no other value is valid.
+- This is not a hold state. This is not a partial pass. This is not a deferral.
+- Write the gate failure to `budget_gate_assessment.json` and to the decision log immediately.
+- Surface to the human operator via the fail_action.
+- Do not proceed to Phase 8 — `n08a`, `n08b`, `n08c`, `n08d` are all blocked.
+
+Source: CLAUDE.md §8.4, §13.4; `manifest.compile.yaml` `absent_artifacts_behavior: blocking_gate_failure`.
+
+This agent does **not** compute budget figures. This agent does **not** generate, estimate, or approximate any budget number. These are constitutional prohibitions (CLAUDE.md §8.1–8.3). Violations must be halted with `decision_type: constitutional_halt`.
+
+### Failure Protocol
+
+#### Case 1: Gate condition not met — budget artifacts present but inconsistent
+- **Halt Phase 8:** Set `gate_pass_declaration: fail`.
+- **Write:** `budget_gate_assessment.json` with all `blocking_inconsistencies` populated; `resolution: unresolved` for each unresolved blocking inconsistency.
+- **Decision log:** `decision_type: gate_failure`; list each blocking inconsistency with `inconsistency_id`.
+- **Must not:** Reclassify a blocking inconsistency as non_blocking to pass the gate.
+
+#### Case 2: Budget response absent (absent-artifacts rule)
+- **Unconditional gate failure** — see special handling above.
+- **Write:** `budget_gate_assessment.json` with `gate_pass_declaration: fail`; `budget_response_reference: "ABSENT"`.
+- **Decision log:** `decision_type: gate_failure`; `absent_artifacts_behavior: blocking_gate_failure`.
+- **Must not:** Create a placeholder or estimated budget response.
+
+#### Case 3: Mandatory predecessor gate not passed
+- **Halt immediately** if `phase_06_gate` is unmet.
+- **Write:** `decision_type: constitutional_halt`.
+
+#### Case 4: Constitutional prohibition triggered
+- **Halt** if required to compute, estimate, or generate any budget figure, or to bypass the mandatory gate.
+- **Write:** `decision_type: constitutional_halt`; cite CLAUDE.md §8.1, §8.4, or §13.4.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: budget_gate_validator`, `phase_id: phase_07_budget_gate`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Budget response found and validated | `material_decision` | Response file reference; interface contract conformance result |
+| WP coverage check finding (any WP absent from budget) | `material_decision` | WP ID; budget response reference; inconsistency description |
+| Partner coverage check finding | `material_decision` | Partner ID; budget response reference; inconsistency |
+| Blocking inconsistency identified | `scope_conflict` | Inconsistency ID; description; severity; resolution status |
+| Budget response absent | `gate_failure` | `absent_artifacts_behavior: blocking_gate_failure`; CLAUDE.md §8.4 |
+| `gate_09_budget_consistency` passes | `gate_pass` | Gate ID; all conditions; budget_response_reference; run_id |
+| `gate_09_budget_consistency` fails | `gate_failure` | Gate ID; conditions failed; what is required |
+| Budget computation attempted | `constitutional_halt` | CLAUDE.md §8.1; halted action |
+| `phase_06_gate` predecessor not passed | `constitutional_halt` | Edge `e06_to_07`; status |

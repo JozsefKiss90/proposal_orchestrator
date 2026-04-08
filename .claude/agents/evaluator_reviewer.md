@@ -82,7 +82,7 @@ Schema: `orch.tier5.review_packet.v1`
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -97,3 +97,82 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Predecessor Gate
 
 `gate_10_part_b_completeness` must have passed (edge registry: `e08b_to_08c`). Verify before any action is taken.
+
+---
+
+## Output Schema Contracts
+
+### `review_packet.json` — Primary Canonical Output
+
+**Canonical path:** `docs/tier5_deliverables/review_packets/review_packet.json`
+**Schema ID:** `orch.tier5.review_packet.v1`
+**Provenance:** run_produced
+
+| Field | Type | Required | Source / Derivation |
+|-------|------|----------|---------------------|
+| `schema_id` | string | **yes** | Stamped exactly as `"orch.tier5.review_packet.v1"` |
+| `run_id` | string | **yes** | Propagated from invoking run context |
+| `artifact_status` | string | **NO — absent at write time** | Runner stamps after `gate_11_review_closure` evaluation |
+| `findings` | array | **yes** | All findings from evaluator-style review; every entry must have non-null `severity` for `findings_categorised_by_severity` to pass; each entry: `finding_id`, `section_id`, `criterion` (from active evaluation form — Tier 2A), `description`, `severity` (enum: critical/major/minor — non-null) |
+| `revision_actions` | array | **yes** | Non-empty (`revision_action_list_present` predicate verifies); each entry: `action_id`, `finding_id` (reference), `priority` (1-based integer), `action_description`, `target_section`, `severity` (enum: critical/major/minor) |
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Budget Gate Prerequisite (Phase 8 Agent)
+
+`gate_09_budget_consistency` must have passed. This is verified transitively: `gate_10_part_b_completeness` condition `g09_p01` requires the budget gate to have passed before sections were assembled. If the assembled draft reaching this agent contains budget-dependent content that was approved without a passed budget gate, this agent must flag it as a constitutional violation in the review packet.
+
+### Predecessor Gate Requirements
+
+**Predecessor:** `gate_10_part_b_completeness` — must have passed. Source: edge `e08b_to_08c`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10_result.json`.
+
+If `gate_10_part_b_completeness` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
+
+**Entry gate:** none.
+
+### Exit Gate
+
+**Exit gate:** `gate_11_review_closure` — evaluated after this agent writes all canonical outputs.
+
+Gate conditions (source: `manifest.compile.yaml`, `quality_gates.yaml`):
+1. `gate_10` must have passed (`g10_p01`)
+2. Review packet present in `review_packets/` (`g10_p02`, `g10_p02b`)
+3. All critical findings categorised by severity (`g10_p03`)
+4. Prioritised revision action list produced (`g10_p04`)
+
+Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. Blocking edge on pass: `e08c_to_08d` (`n08d_revision`).
+
+### Failure Protocol
+
+#### Case 1: Gate condition not met (`gate_11_review_closure` fails)
+- **Halt:** Do not proceed.
+- **Write:** `review_packet.json` with findings produced; document which gate conditions are unmet (e.g., revision_actions empty).
+- **Decision log:** `decision_type: gate_failure`.
+- **Must not:** Produce an empty `revision_actions` array and declare gate passed.
+
+#### Case 2: Assembled draft absent
+- **Halt:** If `assembled_draft.json` is absent or empty, halt.
+- **Write:** Decision log `decision_type: gate_failure`.
+
+#### Case 3: Predecessor gate not passed
+- **Halt immediately** if `gate_10_part_b_completeness` is unmet.
+- **Write:** `decision_type: constitutional_halt`; edge `e08b_to_08c`.
+
+#### Case 4: Budget gate violation found in assembled draft
+- **Flag as critical finding:** Include as a `finding` with `severity: critical`; `criterion` set to "CLAUDE.md §13.4 — budget gate".
+- **Must not:** Pass the review without flagging budget-dependent content produced before the budget gate passed.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validation_reports and findings). Every entry: `agent_id: evaluator_reviewer`, `phase_id: phase_08c_evaluator_review`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Critical weakness identified against evaluation criterion | `material_decision` | Finding ID; criterion; section ID; evidence |
+| Constitutional violation found in assembled draft | `constitutional_halt` | Finding ID; CLAUDE.md section; description |
+| Traceability gap found (claim not attributed) | `assumption` | Claim; section; what attribution is missing |
+| `gate_11_review_closure` passes | `gate_pass` | Gate ID; all conditions; run_id |
+| `gate_11_review_closure` fails | `gate_failure` | Gate ID; conditions failed |
+| `gate_10` predecessor not passed | `constitutional_halt` | Edge `e08b_to_08c`; status |

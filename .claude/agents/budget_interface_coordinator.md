@@ -83,7 +83,7 @@ This agent carries `exit_gate: null` because it is a pre-gate action, not a prim
 
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Steps 6–7 implemented below. Steps 8–9 (constitutional review notes; prompt specification) remain.
 
 ## Must-Not Constraints
 
@@ -99,3 +99,80 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 ## Budget Constitution
 
 CLAUDE.md §8.1–8.5 governs budget handling. This agent is an execution mechanism for §8.2 (prepare structured budget requests). It has no authority to execute any other budget activity.
+
+---
+
+## Output Schema Contracts
+
+### `budget_request.json` — Pre-Gate Output (no schema_id in spec)
+
+**Canonical path:** `docs/tier3_project_instantiation/integration/budget_request.json`
+**Provenance:** tier3_integration (listed as `manually_placed` in artifact registry — note: `a_t3_budget_request` in manifest; "not a gate condition")
+**Schema ID:** None defined in `artifact_schema_specification.yaml`
+
+This artifact is not schema-bound in the spec. It is structured per the interface contract at `docs/integrations/lump_sum_budget_planner/interface_contract.json`, which is the governing schema. All payload construction must conform to that contract. The `budget-interface-validation` skill verifies conformance before this artifact is written.
+
+Required content (from interface contract; agent must read the contract, not assume):
+- WP-level effort data derived from `wp_structure.json` work_packages
+- Period-level timeline data derived from `gantt.json` tasks
+- Partner-level cost attribution derived from Tier 3 consortium data
+- No budget figures computed or estimated by this agent — all numeric effort/cost fields must be flagged as "requires_external_computation"
+
+`run_id` propagation: Include `run_id` in the request payload for traceability. This is not a schema-enforced field but is required by the constitutional obligation (CLAUDE.md §9.4) that outputs be traceable to a run.
+
+**This artifact is not a gate condition** (manifest artifact registry note for `a_t3_budget_request`). Its absence does not cause a gate failure, but its presence and conformance are required before `budget_gate_validator` can validate a response.
+
+---
+
+## Gate Awareness and Failure Behaviour
+
+### Predecessor Gate Requirements
+
+**Predecessor:** `phase_06_gate` must have passed before `n07_budget_gate` is entered. This agent is the pre-gate action for `n07_budget_gate`; it runs within Phase 7 after `phase_06_gate` passes (edge `e06_to_07`).
+
+Precondition check: `wp_structure.json` (schema `orch.phase3.wp_structure.v1`) and `gantt.json` (schema `orch.phase4.gantt.v1`) must be present and valid — verified by the Phase 3 and Phase 4 gate results having passed.
+
+**Entry gate:** none (pre-gate agent).
+**Exit gate:** none — this agent does not declare or evaluate any gate.
+
+### Exit Gate
+
+This agent has no exit gate. Gate authority for `n07_budget_gate` belongs to `budget_gate_validator`. This agent's sole responsibility is to produce a conforming budget request payload for human handoff.
+
+### Failure Protocol
+
+#### Case 1: Interface contract not found or unreadable
+- **Halt:** If `docs/integrations/lump_sum_budget_planner/interface_contract.json` is absent, halt.
+- **Write:** Decision log entry `decision_type: gate_failure`; the budget request cannot be constructed without the contract.
+- **Must not:** Construct a request payload by guessing the schema from memory.
+
+#### Case 2: Required upstream input absent
+- **Halt:** If `wp_structure.json` or `gantt.json` are absent, halt.
+- **Write:** Decision log `decision_type: gate_failure`; identify missing input.
+- **Must not:** Populate WP or timeline fields by inference from other sources.
+
+#### Case 3: Interface contract validation fails on the produced request
+- **Halt:** Do not write a non-conforming request to `budget_request.json`.
+- **Write:** Decision log `decision_type: scope_conflict` (contract vs. produced payload); identify the non-conforming field(s).
+- **Must not:** Write a request that does not conform to the interface contract.
+
+#### Case 4: Budget figure computation attempted
+- **Halt immediately** — constitutional prohibition (CLAUDE.md §8.1, §8.3, §5.3 of agent-generation-plan.md).
+- **Write:** `decision_type: constitutional_halt`; name the prohibited computation.
+- **Must not:** Generate, estimate, or approximate any budget figure.
+
+### Budget Gate Special Handling
+
+This agent is a pre-gate action. It does **not** declare `gate_09_budget_consistency` passed or failed. It does **not** evaluate whether the budget is consistent. It does **not** substitute for an external budget response. Absent budget artifacts in `docs/integrations/lump_sum_budget_planner/received/` are not this agent's concern — that is `budget_gate_validator`'s unconditional blocking failure.
+
+### Decision-Log Write Obligations
+
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: budget_interface_coordinator`, `phase_id: phase_07_budget_gate`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+
+| Trigger | `decision_type` | Minimum entry content |
+|---------|-----------------|-----------------------|
+| Interface contract field interpretation decision | `material_decision` | Field name; contract section; interpretation adopted |
+| WP-to-request mapping decision (how WP data maps to request schema) | `material_decision` | WP IDs; contract fields; mapping basis |
+| Contract field left empty because data not available | `assumption` | Field name; reason; what is needed |
+| Interface contract validation failure | `scope_conflict` | Non-conforming field; contract requirement; what was produced |
+| Budget computation attempted and halted | `constitutional_halt` | CLAUDE.md §8.1; the halted action |
