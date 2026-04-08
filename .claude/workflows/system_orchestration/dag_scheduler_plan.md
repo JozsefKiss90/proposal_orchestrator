@@ -1,9 +1,9 @@
 # DAG Scheduler — Implementation Plan
 
-**Status:** Plan only. No implementation has been performed.
+**Status:** Fully implemented — Steps 1–6 complete. 762 tests pass.
 **Applies to:** `system_orchestration` package v1.1
-**Prerequisite:** Gate rules library (Approach A) and manifest-driven predicate composition (Approach B) are complete. `evaluate_gate()` is fully implemented. 527 tests pass.
-**Scope:** DAG scheduler, node execution loop, HARD_BLOCK propagation, run summary artifact, and CLI entry point.
+**Prerequisite:** Gate rules library (Approach A) and manifest-driven predicate composition (Approach B) are complete. `evaluate_gate()` is fully implemented.
+**Scope:** DAG scheduler, HARD_BLOCK propagation, run summary artifact, and CLI entry point.
 
 ---
 
@@ -59,7 +59,7 @@ When a node's exit gate fails (state → `blocked_at_exit`), all downstream node
 
 ### 2.5 HARD_BLOCK (gate_09)
 
-When `gate_09_budget_consistency` fails and `RunContext.propagate_hard_block()` has been called, the four Phase 8 node IDs (`n08a`, `n08b`, `n08c`, `n08d`) are set to `hard_block_upstream`. The scheduler must call `propagate_hard_block()` immediately after `evaluate_gate()` returns a failing result for `gate_09_budget_consistency`. These nodes must never be dispatched regardless of edge conditions.
+When `gate_09_budget_consistency` fails and `RunContext.mark_hard_block_downstream()` has been called, the four Phase 8 node IDs (`n08a_section_drafting`, `n08b_assembly`, `n08c_evaluator_review`, `n08d_revision`) are set to `hard_block_upstream`. The scheduler calls `mark_hard_block_downstream()` immediately after `evaluate_gate()` returns a failing result for `gate_09_budget_consistency`. These nodes are never dispatched regardless of edge conditions.
 
 ### 2.6 Entry gates
 
@@ -117,7 +117,9 @@ while True:
         _dispatch_node(node_id)
 
 _settle_stalled_nodes()
-return RunSummary.build(ctx, graph)
+summary = RunSummary.build(ctx=ctx, graph=graph, ...)
+summary.write(ctx.run_dir)
+return summary  # raises RunAbortedError instead when pending nodes remain
 ```
 
 This is a synchronous, single-threaded loop. Parallelism is deferred (see §7).
@@ -129,7 +131,7 @@ This is a synchronous, single-threaded loop. Parallelism is deferred (see §7).
 3. Call `evaluate_gate(exit_gate, ...)`.
 4. If result status is `pass`: set state → `released`.
 5. If result status is not `pass`:
-   - If gate_id is `gate_09_budget_consistency`: call `ctx.propagate_hard_block(reason)`; set state → `blocked_at_exit`.
+   - If gate_id is `gate_09_budget_consistency`: call `ctx.mark_hard_block_downstream()`; set state → `blocked_at_exit`.
    - Otherwise: set state → `blocked_at_exit`.
 
 The scheduler does not call the agent or run the node body. At this stage, node body execution is out of scope (see §7). The scheduler drives the gate evaluation loop against already-produced artifacts, consistent with the existing `evaluate_gate()` contract.
@@ -149,7 +151,7 @@ class RunAbortedError(DAGSchedulerError):
     at least one non-terminal node is unsettled."""
 ```
 
-`RunAbortedError` is raised at the end of `run()` only when the run did not reach all terminal nodes. The `RunSummary` is still built and written before raising — the caller receives both the exception and the written summary artifact.
+`RunAbortedError` is raised at the end of `run()` when any node remains `pending` after the dispatch loop exits. `RunSummary` is built and written to disk before raising. The exception carries `.summary` (the authoritative `RunSummary` object) and `.result` (`summary.to_dict()` — stable compatibility surface for callers that previously indexed a plain dict).
 
 ---
 
@@ -243,7 +245,7 @@ With `--json`, each line is a JSON object with `event`, `node_id` or `gate_id`, 
 
 ## 6. Implementation Sequence
 
-### Step 1 — ManifestGraph
+### Step 1 — ManifestGraph ✓ Implemented
 
 Implement `ManifestGraph.load()` and all read methods. No RunContext dependency. Cover:
 - Loading the node registry and edge registry from `manifest.compile.yaml`.
@@ -253,7 +255,7 @@ Implement `ManifestGraph.load()` and all read methods. No RunContext dependency.
 
 **Tests:** Unit tests using synthetic manifest dicts (no file I/O required). Cover: single-node graph, linear chain, fork-join (n03→n04 and n03→n05→n06), additional_condition (e02_to_05), no-incoming-edge node is immediately ready.
 
-### Step 2 — DAGScheduler core loop
+### Step 2 — DAGScheduler core loop ✓ Implemented
 
 Implement `DAGScheduler.__init__()`, `run()`, and `_dispatch_node()`. At this stage, `_dispatch_node()` calls `evaluate_gate()` for real.
 
@@ -264,25 +266,25 @@ Implement `DAGScheduler.__init__()`, `run()`, and `_dispatch_node()`. At this st
 - Two-node linear: first node gate fails → second never dispatched; `_settle_stalled_nodes()` logs stall.
 - `gate_09` failure → `propagate_hard_block()` called → Phase 8 nodes `hard_block_upstream`.
 
-### Step 3 — HARD_BLOCK and stall detection
+### Step 3 — HARD_BLOCK and stall detection ✓ Implemented
 
 Implement `_settle_stalled_nodes()` and `RunAbortedError` raising logic. Ensure `RunSummary` is written before the exception propagates.
 
 **Tests:** Cover: stalled subgraph after upstream failure; mixed settled/stalled; HARD_BLOCK with Phase 8 nodes present.
 
-### Step 4 — RunSummary
+### Step 4 — RunSummary ✓ Implemented
 
 Implement `RunSummary.build()` and disk write. Cover all four `overall_status` values.
 
 **Tests:** Unit tests constructing RunSummary from mock RunContext state. Verify correct JSON schema, correct `overall_status`, correct `gate_results_index` paths.
 
-### Step 5 — CLI entry point
+### Step 5 — CLI entry point ✓ Implemented
 
 Implement `runner/__main__.py`. Include `--dry-run` and `--json` modes.
 
 **Tests:** Subprocess tests invoking `python -m runner` with a synthetic repo. Verify exit codes, stdout format, and that `run_summary.json` is written to `.claude/runs/<run_id>/`.
 
-### Step 6 — Full DAG integration scenarios
+### Step 6 — Full DAG integration scenarios ✓ Implemented
 
 End-to-end tests against a fully populated synthetic repo covering:
 - Linear pass through all 11 gates (n01 → n08d).
@@ -322,18 +324,67 @@ The following are not part of this plan and must not be implemented speculativel
 
 ---
 
-## 9. Test Count Projection
+## 9. Test Count (Actual)
 
-Based on the scope above:
-
-| Test file | Estimated tests |
-|-----------|----------------|
-| `test_manifest_graph.py` | ~20 |
-| `test_dag_scheduler.py` | ~35 |
-| `test_dag_full_run.py` | ~10 |
-| **New total** | **~65 new tests** |
-| **Cumulative total** | **~592 tests** |
+| Test file | Actual tests |
+|-----------|-------------|
+| `test_manifest_graph.py` | 21 |
+| `test_dag_scheduler.py` | 122 |
+| `test_dag_full_run.py` | 55 |
+| **DAG scheduler total** | **198** |
+| **Cumulative total** | **762** |
 
 ---
 
-*Plan authored 2026-04-07. Implementation has not begun. Amendments require explicit human instruction.*
+## 10. Implemented Contract (Finalization Reference)
+
+### Entry points
+
+```python
+graph   = ManifestGraph.load(manifest_path)               # or repo_root=
+ctx     = RunContext.initialize(repo_root, run_id)
+sched   = DAGScheduler(graph, ctx, repo_root,
+                        library_path=..., manifest_path=...)
+summary = sched.run()                                      # may raise RunAbortedError
+```
+
+### Return / exception behavior
+
+| Outcome | Return | Side effect |
+|---------|--------|-------------|
+| All terminal nodes reached | `RunSummary` (overall_status=`pass`) | `run_summary.json` written |
+| Some terminal nodes reached | `RunSummary` (overall_status=`partial_pass`) | `run_summary.json` written |
+| No terminal node reached, no pending | `RunSummary` (overall_status=`fail`) | `run_summary.json` written |
+| Pending nodes remain (stall) | raises `RunAbortedError` | `run_summary.json` written first |
+
+### Summary artifact
+
+Written to: `.claude/runs/<run_id>/run_summary.json`
+
+Key fields: `run_id`, `overall_status`, `terminal_nodes_reached`, `stalled_nodes`,
+`hard_blocked_nodes`, `node_states`, `gate_results_index`, `dispatched_nodes`,
+`started_at`, `completed_at`.
+
+### CLI invocation
+
+```
+python -m runner --run-id <uuid> [--repo-root <path>] [--library-path <path>]
+                  [--manifest-path <path>] [--dry-run] [--json]
+```
+
+Exit codes: `0` = pass, `1` = fail/partial_pass, `2` = aborted, `3` = config error.
+
+Dry-run semantics: initializes RunContext, prints initially-ready nodes, exits 0.
+Does NOT evaluate gates or write `run_summary.json`.
+
+### Stable compatibility surface
+
+`RunSummary` supports `summary["key"]` and `"key" in summary` (delegates to `to_dict()`).
+`to_dict()` includes the plan-schema fields plus the following stable aliases:
+`released_nodes`, `blocked_nodes`, `pending_nodes`, `stall_report`, `stalled`, `aborted`.
+
+`RunAbortedError.result` is always exactly `exc.summary.to_dict()`.
+
+---
+
+*Plan authored 2026-04-07. Implementation complete 2026-04-08. Amendments require explicit human instruction.*

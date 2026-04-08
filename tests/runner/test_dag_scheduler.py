@@ -2126,3 +2126,151 @@ class TestCLISummaryOutput:
         out = capsys.readouterr().out
         assert "overall_status=aborted" in out
 
+
+# ===========================================================================
+# Finalization tests — compat surface, dry-run RunContext creation
+# ===========================================================================
+
+
+class TestRunAbortedErrorResultAlias:
+    """
+    exc.result is a stable compat alias that must equal exc.summary.to_dict()
+    exactly (same object contents) for every aborted run.
+    """
+
+    def test_result_equals_summary_to_dict(self, tmp_path: Path) -> None:
+        """exc.result must be exactly exc.summary.to_dict() — same keys and values."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="abort-eq")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        exc = exc_info.value
+        assert exc.result == exc.summary.to_dict()
+
+    def test_result_contains_overall_status_aborted(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="abort-st")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        assert exc_info.value.result["overall_status"] == "aborted"
+
+    def test_result_and_summary_share_no_mutable_state(self, tmp_path: Path) -> None:
+        """Mutating result dict must not affect summary (they are separate dicts)."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="abort-mut")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        exc = exc_info.value
+        # Mutate the result dict
+        exc.result["injected_key"] = "injected_value"
+        # summary.to_dict() must not contain the injected key
+        assert "injected_key" not in exc.summary.to_dict()
+
+
+class TestCompatAliasesInToDict:
+    """
+    RunSummary.to_dict() must include all six stable compat aliases for both
+    pass and aborted runs.
+    """
+
+    _ALIAS_KEYS = frozenset(
+        {"released_nodes", "blocked_nodes", "pending_nodes", "stall_report", "stalled", "aborted"}
+    )
+
+    def test_all_compat_aliases_present_on_pass(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="compat-pass")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        d = result.to_dict()
+        missing = self._ALIAS_KEYS - d.keys()
+        assert not missing, f"Missing compat aliases in to_dict(): {missing!r}"
+
+    def test_all_compat_aliases_present_on_aborted(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="compat-abort")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        d = exc_info.value.summary.to_dict()
+        missing = self._ALIAS_KEYS - d.keys()
+        assert not missing, f"Missing compat aliases in aborted to_dict(): {missing!r}"
+
+    def test_stalled_true_when_aborted(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="compat-stalled")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        d = exc_info.value.summary.to_dict()
+        assert d["stalled"] is True
+        assert d["aborted"] is True
+
+    def test_stalled_false_when_pass(self, tmp_path: Path) -> None:
+        sched = _make_scheduler(tmp_path, _single_node_manifest(), run_id="compat-not-stalled")
+        with patch(_EG_TARGET, return_value=_GATE_PASS):
+            result = sched.run()
+
+        d = result.to_dict()
+        assert d["stalled"] is False
+        assert d["aborted"] is False
+
+    def test_stall_report_alias_equals_stalled_nodes(self, tmp_path: Path) -> None:
+        """stall_report must be identical to stalled_nodes in the dict."""
+        sched = _make_scheduler(tmp_path, _two_node_linear_manifest(), run_id="compat-sr")
+        with patch(_EG_TARGET, return_value=_GATE_FAIL):
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
+
+        d = exc_info.value.summary.to_dict()
+        assert d["stall_report"] == d["stalled_nodes"]
+
+
+class TestDryRunRunContextCreation:
+    """
+    dry-run is side-effect-minimizing: RunContext.initialize() runs and creates
+    run_manifest.json / reuse_policy.json.  run_summary.json must NOT be written.
+    """
+
+    def _write_minimal_manifest(self, tmp_path: Path) -> Path:
+        data = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [
+                {"node_id": "n01_call_analysis", "exit_gate": "phase_01_gate", "terminal": True}
+            ],
+            "edge_registry": [],
+        }
+        path = tmp_path / "manifest.compile.yaml"
+        path.write_text(yaml.dump(data, default_flow_style=False), encoding="utf-8")
+        return path
+
+    def test_dry_run_creates_run_manifest_json(self, tmp_path: Path) -> None:
+        """run_manifest.json must exist after --dry-run (RunContext was initialized)."""
+        manifest = self._write_minimal_manifest(tmp_path)
+        run_id = "dry-ctx-test"
+
+        with patch(_FR, return_value=tmp_path):
+            cli_main(["--run-id", run_id, "--manifest-path", str(manifest), "--dry-run"])
+
+        run_manifest = tmp_path / ".claude" / "runs" / run_id / "run_manifest.json"
+        assert run_manifest.exists(), (
+            f"run_manifest.json not created by dry-run at {run_manifest}"
+        )
+
+    def test_dry_run_does_not_create_run_summary_json(self, tmp_path: Path) -> None:
+        """run_summary.json must NOT exist after --dry-run (gates were not evaluated)."""
+        manifest = self._write_minimal_manifest(tmp_path)
+        run_id = "dry-no-summary"
+
+        with patch(_FR, return_value=tmp_path):
+            cli_main(["--run-id", run_id, "--manifest-path", str(manifest), "--dry-run"])
+
+        run_summary = tmp_path / ".claude" / "runs" / run_id / "run_summary.json"
+        assert not run_summary.exists(), (
+            f"run_summary.json must not be written by dry-run, but found at {run_summary}"
+        )
+

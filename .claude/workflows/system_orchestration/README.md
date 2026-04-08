@@ -35,7 +35,8 @@ system_orchestration/
 ├── artifact_schema_specification.yaml  # Field-level schemas for all 13 canonical artifact types
 ├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
 ├── gate_rules_library_plan.md        # Implementation plan (reference only — complete)
-└── dag_scheduler_plan.md             # Next planning item: DAG scheduler and node execution loop
+├── dag_scheduler_plan.md             # DAG scheduler implementation plan (Steps 1–6 complete)
+└── dag_scheduler_guide.md            # Operator/developer guide: CLI invocation, artifacts, exit codes
 ```
 
 The runner implementation lives at the repository root (not inside this package directory):
@@ -52,6 +53,8 @@ runner/                               # DAG-runner implementation package
 ├── run_context.py                    # Step 10: RunContext (run manifest + reuse policy)
 ├── gate_evaluator.py                 # Step 10+11 + Approach B: evaluate_gate() — manifest-driven or library-driven predicate resolution
 ├── semantic_dispatch.py              # Step 11: Semantic predicate dispatch layer
+├── dag_scheduler.py                  # DAG scheduler: ManifestGraph, DAGScheduler, RunSummary, RunAbortedError
+├── __main__.py                       # CLI entry point (python -m runner)
 └── predicates/
     ├── __init__.py                   # Predicate API exports
     ├── types.py                      # PredicateResult + failure-category constants
@@ -71,6 +74,9 @@ tests/
     ├── test_gate_evaluator.py        # Step 10+11 unit tests: evaluate_gate + semantic integration (50 tests)
     ├── test_semantic_dispatch.py     # Step 11 unit tests: dispatch + agent invocation + validation (61 tests)
     ├── test_gate_scenarios.py        # Step 12 integration tests: per-gate fixture scenarios (27 tests)
+    ├── test_manifest_graph.py        # DAG Steps 1: ManifestGraph unit tests (21 tests)
+    ├── test_dag_scheduler.py         # DAG Steps 2–5: DAGScheduler + CLI tests (122 tests)
+    ├── test_dag_full_run.py          # DAG Step 6: full-DAG end-to-end scenarios (55 tests)
     ├── fixtures/
     │   ├── __init__.py
     │   ├── repo_builders.py          # Step 12: synthetic repo root, RunContext, gate library builders
@@ -141,6 +147,12 @@ The workflow package is now partially executable.
   - `runner/run_context.py` — RunContext (run manifest, reuse policy, node state, HARD_BLOCK propagation)
   - `runner/gate_evaluator.py` — evaluate_gate() entry point (predicate dispatch, fingerprinting, GateResult writing, node-state updates)
   - `runner/predicates/file_predicates.py` extended with `artifact_owned_by_run`
+- **DAG Steps 1–6 — DAG Scheduler** completed:
+  - `runner/dag_scheduler.py` — `ManifestGraph` (read-only DAG from manifest), `DAGScheduler` (synchronous gate-evaluation loop), `RunSummary` (typed run outcome artifact), `RunAbortedError` (stall / abort exception), `DAGSchedulerError` (configuration errors)
+  - `runner/__main__.py` — CLI entry point (`python -m runner`) with `--dry-run`, `--json`, `--repo-root`, `--library-path`, `--manifest-path`; exit codes 0/1/2/3
+  - `tests/runner/test_manifest_graph.py` — 21 unit tests for `ManifestGraph`
+  - `tests/runner/test_dag_scheduler.py` — 122 tests covering dispatch loop, stall detection, HARD_BLOCK, RunSummary schema, CLI behavior
+  - `tests/runner/test_dag_full_run.py` — 55 end-to-end integration tests covering linear pass, parallel-path fork-join, early failure stall, HARD_BLOCK, partial-pass scenarios
 - **Step 12 — Test fixtures** completed:
   - `tests/runner/fixtures/repo_builders.py` — synthetic repo root builder, RunContext helpers, gate library and predicate dict builders
   - `tests/runner/fixtures/artifact_writers.py` — canonical Tier 3/4/5 artifact writers (all phase outputs, integration artifacts)
@@ -254,8 +266,12 @@ All five failure categories are in use across the implemented predicates:
 - `CROSS_ARTIFACT_INCONSISTENCY` — cross-file join failures (missing WP/partner/task/impact/section coverage), internal WP structure violations
 
 **Current non-goals**
-The repository does **not** yet implement:
-- DAG scheduler / node execution loop
+The DAG scheduler drives gate evaluation over pre-produced artifacts.
+The following behaviors are **intentionally out of scope** and not implemented:
+- Node body execution (invoking agents or skills to produce phase outputs)
+- Parallel / concurrent node dispatch
+- Rerun / resume logic (incremental re-entry into a prior run)
+- Semantic agent orchestration beyond calling ``evaluate_gate()``
 
 **Test status**
 - Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
@@ -271,7 +287,52 @@ The repository does **not** yet implement:
 - Step 11 semantic dispatch + agent invocation + validation: 61 tests in `tests/runner/test_semantic_dispatch.py`
 - Step 12 gate fixture scenarios: 27 tests in `tests/runner/test_gate_scenarios.py`
 - Approach B ManifestReader + integration: 19 tests in `tests/runner/test_manifest_reader.py`
-- **Total: 527 tests, all passing**
+- DAG Step 1 ManifestGraph: 21 tests in `tests/runner/test_manifest_graph.py`
+- DAG Steps 2–5 DAGScheduler + CLI: 122 tests in `tests/runner/test_dag_scheduler.py`
+- DAG Step 6 full-DAG scenarios: 55 tests in `tests/runner/test_dag_full_run.py`
+- **Total: 762 tests, all passing**
+
+---
+
+## DAG Scheduler — Execution Layer (Implemented)
+
+The DAG scheduler evaluates all gate rules in the manifest DAG in dependency order against pre-produced artifacts. It does **not** invoke agents or produce phase outputs.
+
+### Key components
+
+**`ManifestGraph`** — read-only in-memory graph built from `manifest.compile.yaml`. Provides `node_ids()` (registry order), `entry_gate()`, `exit_gate()`, `is_terminal()`, `incoming_conditions()`, and `is_ready(node_id, ctx)`.
+
+**`DAGScheduler`** — synchronous single-threaded dispatch loop. Each iteration computes all ready nodes (pending + all incoming conditions satisfied) and dispatches them in manifest registry order. After the loop, stalled pending nodes are identified and `run_summary.json` is written.
+
+**Node state machine** — states are defined in `runner.run_context.NODE_STATES`:
+- `pending` → `running` → `released` (exit gate pass) or `blocked_at_exit` (exit gate fail)
+- `pending` → `running` → `blocked_at_entry` (entry gate fail, no exit gate evaluated)
+- `hard_block_upstream` — set on all Phase 8 nodes when `gate_09_budget_consistency` fails
+
+**HARD_BLOCK behavior** — when `gate_09_budget_consistency` fails, `RunContext.mark_hard_block_downstream()` is called immediately. All four Phase 8 nodes (`n08a_section_drafting`, `n08b_assembly`, `n08c_evaluator_review`, `n08d_revision`) are set to `hard_block_upstream` and are never dispatched.
+
+**`RunSummary`** — typed dataclass written to `.claude/runs/<run_id>/run_summary.json`. Contains `overall_status` (`pass` / `partial_pass` / `fail` / `aborted`), `terminal_nodes_reached`, `stalled_nodes`, `hard_blocked_nodes`, `node_states`, `gate_results_index`, and `dispatched_nodes`. Always written before `run()` returns or raises.
+
+**CLI entry point** — invoked as `python -m runner --run-id <uuid> [options]`.
+
+| Exit code | Meaning |
+|-----------|---------|
+| 0 | `overall_status == "pass"` |
+| 1 | `overall_status == "fail"` or `"partial_pass"` |
+| 2 | `RunAbortedError` (pending nodes remain) |
+| 3 | Configuration error or unhandled exception |
+
+Dry-run (`--dry-run`): initializes `RunContext`, prints initially-ready nodes, exits 0. Does **not** evaluate gates or write `run_summary.json`. JSON output mode (`--json`): emits progress as one JSON object per line with `event`, `timestamp`, and relevant fields.
+
+See `dag_scheduler_guide.md` for a concise operator reference.
+
+### Scope boundaries
+
+The scheduler is intentionally out of scope for:
+- **Node body execution** — the scheduler drives gate evaluation over already-produced artifacts; it does not invoke agents or skills
+- **Parallel dispatch** — dispatch is single-threaded; Phase 4/5 parallel paths are processed sequentially within the same ready-node batch
+- **Rerun / resume logic** — each `run()` call starts from current `RunContext` state; no prior summary is consulted
+- **Semantic agent orchestration beyond `evaluate_gate()`** — `evaluate_gate()` handles semantic dispatch internally
 
 ---
 

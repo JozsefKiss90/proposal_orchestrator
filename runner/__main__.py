@@ -144,6 +144,11 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     # ------------------------------------------------------------------
     # Dry run: enumerate ready nodes from initial state, then exit 0
+    #
+    # Semantics: dry-run is side-effect-MINIMIZING, not side-effect-free.
+    # RunContext.initialize() has already run above, creating
+    # .claude/runs/<run_id>/run_manifest.json and reuse_policy.json.
+    # Dry-run does NOT evaluate any gates and does NOT write run_summary.json.
     # ------------------------------------------------------------------
 
     if args.dry_run:

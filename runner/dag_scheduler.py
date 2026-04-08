@@ -1,66 +1,63 @@
 """
-DAG Scheduler — Steps 1–4: ManifestGraph, DAGScheduler core loop,
-stall detection / abort, and RunSummary persistence.
+DAG Scheduler — stable runtime contract for the Horizon Europe Proposal
+Orchestration System.
+
+Public API
+----------
+ManifestGraph       Read-only in-memory graph built from manifest.compile.yaml.
+DAGScheduler        Synchronous gate-evaluation loop over the manifest DAG.
+RunSummary          Typed dataclass capturing the full run outcome.
+RunAbortedError     Raised when a run cannot complete; carries ``.summary``.
+RUN_SUMMARY_FILENAME  Filename of the per-run summary artifact (``run_summary.json``).
 
 Node ID convention
 ------------------
-All node IDs in this module are **canonical manifest node IDs** as defined
-in ``manifest.compile.yaml`` ``node_registry`` (e.g. ``n01_call_analysis``,
+All node IDs are **canonical manifest node IDs** as defined in
+``manifest.compile.yaml`` ``node_registry`` (e.g. ``n01_call_analysis``,
 ``n08a_section_drafting``).  Short-form IDs (e.g. ``n01``, ``n08a``) are
-never used.  The same canonical IDs are used by:
+never used.
 
-* ``RunContext.set_node_state`` / ``get_node_state``
-* ``PHASE_8_NODE_IDS`` in ``runner.run_context``
-* Gate-to-node extraction in ``runner.gate_evaluator._extract_node_id``
-  (which reads ``evaluated_at`` from the gate library; the library entries
-  now use canonical IDs in ``evaluated_at`` after the Step 1 reconciliation)
+Node state machine
+------------------
+States are defined in ``runner.run_context``.  Valid terminal states:
 
-See dag_scheduler_plan.md §2 for the full node-state and readiness invariants.
+``released``
+    Exit gate passed; downstream edges unblocked.
+``blocked_at_entry``
+    Entry gate failed; node body not executed.
+``blocked_at_exit``
+    Exit gate failed; node body ran but gate did not pass.
+``hard_block_upstream``
+    Frozen by HARD_BLOCK propagation when ``gate_09_budget_consistency`` fails.
 
-Step 1 scope (ManifestGraph)
-----------------------------
-``ManifestGraph``, ``IncomingCondition``, and ``DAGSchedulerError``.
+Non-terminal states (scheduler-internal):
 
-Step 2 scope (DAGScheduler core loop)
---------------------------------------
-``DAGScheduler.__init__``, ``run()``, and ``_dispatch_node()``.
+``pending``
+    Not yet dispatched.
+``running``
+    Gate evaluation in progress.
+``deterministic_pass_semantic_pending``
+    Deterministic predicates passed; semantic evaluation outstanding.
 
-``_dispatch_node()`` drives gate evaluation via ``evaluate_gate()``.
-``evaluate_gate()`` loads a fresh ``RunContext`` from disk, updates node
-state, and saves.  After each ``evaluate_gate()`` call ``_dispatch_node``
-reloads ``self.ctx`` from disk so that subsequent readiness checks see the
-updated state.  Where ``evaluate_gate()`` is mocked in tests, the scheduler
-explicitly enforces the intended terminal state so that the two code-paths
-produce identical observable behaviour.
+See ``dag_scheduler_plan.md`` §2 for readiness invariants.
 
-Step 3 scope (stall detection and run-abort)
---------------------------------------------
-``_settle_stalled_nodes()`` and ``RunAbortedError``.
+Run outcome contract
+--------------------
+``DAGScheduler.run()`` returns a :class:`RunSummary` when the run completes
+(``overall_status`` is ``"pass"``, ``"partial_pass"``, or ``"fail"``).
+It raises :class:`RunAbortedError` (carrying ``.summary``) when pending nodes
+remain after the dispatch loop exits.  ``run_summary.json`` is written to
+``.claude/runs/<run_id>/`` **before** the method returns or raises.
 
-After the dispatch loop exits, any node still ``pending`` is permanently
-stalled.  ``run()`` raises ``RunAbortedError`` when any pending nodes remain.
+Scope boundaries
+----------------
+This module implements gate-evaluation dispatch over pre-produced artifacts.
+The following are intentionally out of scope:
 
-Step 4 scope (RunSummary persistence)
---------------------------------------
-``RunSummary`` — a typed dataclass that captures the full run outcome.
-
-``RunSummary.build()`` derives the summary from ``RunContext``,
-``ManifestGraph``, scheduler bookkeeping (dispatched nodes, evaluated gates,
-timestamps), and the stall report from ``_settle_stalled_nodes()``.
-
-``RunSummary.write()`` persists ``run_summary.json`` to
-``.claude/runs/<run_id>/`` **before** ``run()`` returns or raises.  This
-replaces the Step 3 "exception carries result dict" pattern:
-``RunAbortedError`` now carries the ``RunSummary`` object on ``.summary``
-and exposes a backward-compatible ``.result`` dict via ``summary.to_dict()``.
-
-``run()`` returns ``RunSummary`` (not a plain dict).  ``RunSummary`` supports
-dict-style ``[key]`` and ``in`` access via ``__getitem__`` / ``__contains__``
-so that existing Step 2/3 tests that index the return value continue to work
-unchanged.
-
-Deferred to Step 5:
-``runner/__main__.py``, node body execution, parallelism.
+- Node body execution (invoking agents or skills)
+- Parallel dispatch
+- Rerun / resume logic
+- Semantic agent orchestration beyond calling ``evaluate_gate()``
 """
 
 from __future__ import annotations
@@ -170,13 +167,28 @@ class RunSummary:
     dispatched_nodes:
         Ordered list of node IDs dispatched during the run.
 
-    Backward-compatible access
-    --------------------------
-    ``summary["key"]`` and ``"key" in summary`` are supported via
-    ``__getitem__`` / ``__contains__`` (both delegate to ``to_dict()``).
-    ``to_dict()`` also includes derived compat fields: ``released_nodes``,
-    ``blocked_nodes``, ``pending_nodes``, ``stalled``, ``aborted``,
-    ``stall_report``.
+    Stable compatibility surface
+    ----------------------------
+    ``summary["key"]`` and ``"key" in summary`` are **stable public API**
+    via ``__getitem__`` / ``__contains__`` (both delegate to ``to_dict()``).
+
+    ``to_dict()`` includes the plan-schema fields (written to
+    ``run_summary.json``) **plus** the following named aliases that are
+    **stable public contract** and will not be removed:
+
+    =====================  ================================================
+    Alias                  Derived from
+    =====================  ================================================
+    ``released_nodes``     nodes in ``"released"`` state
+    ``blocked_nodes``      nodes in ``"blocked_at_entry"`` or ``"blocked_at_exit"``
+    ``pending_nodes``      nodes in ``"pending"`` state
+    ``stall_report``       alias for ``stalled_nodes`` (stall-detail dicts)
+    ``stalled``            ``True`` when ``overall_status == "aborted"``
+    ``aborted``            same as ``stalled``
+    =====================  ================================================
+
+    These aliases are **not** written to ``run_summary.json``; they exist
+    only for in-process consumers.
     """
 
     # Plan schema fields
@@ -429,11 +441,12 @@ class RunAbortedError(DAGSchedulerError):
     ----------
     summary:
         The :class:`RunSummary` built at the end of the aborted run.
-        This is the authoritative payload for Step 4 onwards.
+        This is the authoritative source for all run outcome data.
     result:
-        ``summary.to_dict()`` — retained for backward compatibility with
-        callers and tests that previously accessed ``exc.result["key"]``.
-        Both attributes are always consistent.
+        ``summary.to_dict()`` — **stable compatibility surface** retained
+        for callers that previously indexed the plain result dict via
+        ``exc.result["key"]``.  Always exactly equal to
+        ``exc.summary.to_dict()``.
     """
 
     def __init__(self, message: str, summary: RunSummary) -> None:
@@ -831,21 +844,13 @@ class DAGScheduler:
         sched = DAGScheduler(graph, ctx, repo_root)
         result = sched.run()
 
-    Step 2 scope
-    ------------
-    Implements ``__init__``, ``run()``, and ``_dispatch_node()``.
-
-    Step 3 scope
-    ------------
-    Implements ``_settle_stalled_nodes()`` and ``RunAbortedError`` raising
-    in ``run()``.
-
-    Step 4 scope
-    ------------
+    Run outcome
+    -----------
     ``run()`` builds and writes a :class:`RunSummary` before returning or
-    raising.  Returns a ``RunSummary`` (not a plain dict).  ``RunAbortedError``
-    now carries ``.summary`` (the authoritative payload) and a backward-
-    compatible ``.result`` dict.
+    raising.  Returns ``RunSummary`` when the run completes.  Raises
+    :class:`RunAbortedError` (carrying ``.summary``) when pending nodes
+    remain after the dispatch loop exits.  ``run_summary.json`` is always
+    written, including on abort.
     """
 
     def __init__(
@@ -1041,8 +1046,9 @@ class DAGScheduler:
         ``evaluate_gate()`` internally loads a fresh ``RunContext``, writes
         node state, and saves.  After each call this method reloads
         ``self.ctx`` from disk so the in-memory state stays authoritative.
-        When ``evaluate_gate()`` is mocked (tests), the explicit state
-        enforcement in steps 4–5 guarantees identical observable behaviour.
+        The explicit state enforcement in steps 4–5 above guarantees that
+        node state in ``RunContext`` is always consistent with the gate result,
+        regardless of how ``evaluate_gate()`` is implemented.
 
         Parameters
         ----------

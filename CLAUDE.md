@@ -374,4 +374,45 @@ When in doubt about the admissibility of an action, the agent must consult this 
 
 ---
 
+## 16. Agent Derivation and Execution Binding
+
+**16.1** Agents are execution-layer components derived from the workflow specification. They do not define workflow logic; they implement it.
+
+**16.2** The authoritative source of agent scope, responsibilities, and phase alignment is:
+- the compiled workflow manifest (`manifest.compile.yaml`)
+- the agent catalog (`agent_catalog.yaml`)
+- the artifact schema specification (`artifact_schema_specification.yaml`)
+
+**16.3** Agents must not:
+- redefine phase purposes or boundaries
+- introduce new artifact types, paths, or schemas not defined in Tier 2A/2B/3/4 specifications
+- produce outputs that are not compliant with canonical artifact schemas
+- bypass or reinterpret gate conditions
+
+**16.4** Each agent must:
+- read only from declared tier inputs
+- write only to canonical artifact paths defined in the workflow and schema specifications
+- ensure that all outputs are structurally compliant with the artifact schema specification
+- operate deterministically from documented inputs
+
+**16.5** The compiled workflow manifest defines the binding between:
+- phases (nodes)
+- agents
+- skills
+- gate conditions
+
+This binding must not be overridden by agent implementations.
+
+**16.6** Agents are not authorities. They are execution mechanisms subordinate to:
+- CLAUDE.md
+- tiered sources (Tier 1–4)
+- workflow definitions
+
+**16.7** Any divergence between agent output and:
+- artifact schemas
+- manifest-defined expectations
+- gate conditions
+
+must be treated as a failure, not as an alternative valid interpretation.
+
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*
