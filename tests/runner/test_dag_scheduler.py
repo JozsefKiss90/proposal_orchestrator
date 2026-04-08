@@ -39,6 +39,7 @@ instances backed by tmp_path.  No live repository artifacts are read.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, call, patch
@@ -1774,4 +1775,354 @@ class TestTimestamps:
             result = sched.run()
 
         assert result.started_at <= result.completed_at
+
+
+# ===========================================================================
+# Step 5 — CLI entry point (runner/__main__.py)
+# ===========================================================================
+#
+# Tests use patched external dependencies so no live repository artifacts
+# are required.  All patches target names as imported in runner.__main__:
+#
+#   runner.__main__.find_repo_root
+#   runner.__main__.ManifestGraph.load  (via runner.__main__.ManifestGraph)
+#   runner.__main__.RunContext.initialize
+#   runner.__main__.DAGScheduler
+#
+# The DAGScheduler constructor is patched as a class so that
+# ``mock_cls.return_value`` is the scheduler instance and
+# ``mock_cls.return_value.run`` is the method under test.
+# ---------------------------------------------------------------------------
+
+
+from runner.__main__ import main as cli_main  # noqa: E402
+from runner.dag_scheduler import RunSummary  # noqa: E402  (already imported above, harmless re-import)
+
+
+# Patch target constants for Step 5
+_FR = "runner.__main__.find_repo_root"
+_ML = "runner.__main__.ManifestGraph.load"
+_RI = "runner.__main__.RunContext.initialize"
+_DS = "runner.__main__.DAGScheduler"
+
+
+def _make_mock_summary(overall_status: str = "pass") -> MagicMock:
+    """Return a MagicMock that quacks like a RunSummary."""
+    s = MagicMock()
+    s.overall_status = overall_status
+    s.terminal_nodes_reached = []
+    s.stalled_nodes = []
+    s.hard_blocked_nodes = []
+    s.node_states = {}
+    return s
+
+
+def _make_mock_graph(
+    node_ids: list | None = None, ready: bool = False
+) -> MagicMock:
+    g = MagicMock()
+    g.node_ids.return_value = node_ids or []
+    g.is_ready.return_value = ready
+    return g
+
+
+def _base_argv(tmp_path: Path, extra: list | None = None) -> list:
+    """Minimal argv that supplies --run-id and --repo-root."""
+    argv = ["--run-id", "cli-test", "--repo-root", str(tmp_path)]
+    if extra:
+        argv += extra
+    return argv
+
+
+# ---------------------------------------------------------------------------
+# Exit codes
+# ---------------------------------------------------------------------------
+
+
+class TestCLIExitCodes:
+    def test_exit_0_on_pass(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    code = cli_main(_base_argv(tmp_path))
+        assert code == 0
+
+    def test_exit_1_on_fail(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("fail")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    code = cli_main(_base_argv(tmp_path))
+        assert code == 1
+
+    def test_exit_1_on_partial_pass(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("partial_pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    code = cli_main(_base_argv(tmp_path))
+        assert code == 1
+
+    def test_exit_2_on_run_aborted(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("aborted")
+        exc = RunAbortedError("stalled", summary)
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.side_effect = exc
+                    code = cli_main(_base_argv(tmp_path))
+        assert code == 2
+
+    def test_exit_3_on_dag_scheduler_error(self, tmp_path: Path) -> None:
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.side_effect = DAGSchedulerError("bad cfg")
+                    code = cli_main(_base_argv(tmp_path))
+        assert code == 3
+
+    def test_exit_3_on_find_repo_root_failure(self) -> None:
+        """RuntimeError from find_repo_root (no --repo-root given) → exit 3."""
+        with patch(_FR, side_effect=RuntimeError("no root")):
+            code = cli_main(["--run-id", "no-root"])
+        assert code == 3
+
+    def test_exit_3_on_manifest_load_error(self, tmp_path: Path) -> None:
+        with patch(_ML, side_effect=FileNotFoundError("missing manifest")):
+            with patch(_RI):
+                code = cli_main(_base_argv(tmp_path))
+        assert code == 3
+
+    def test_run_id_required_raises_system_exit(self) -> None:
+        with pytest.raises(SystemExit):
+            cli_main([])
+
+
+# ---------------------------------------------------------------------------
+# Dry-run mode
+# ---------------------------------------------------------------------------
+
+
+class TestCLIDryRun:
+    def test_dry_run_prints_ready_nodes(self, tmp_path: Path, capsys) -> None:
+        graph = _make_mock_graph(
+            node_ids=["n01_call_analysis", "n02_concept_refinement"],
+            ready=True,
+        )
+        with patch(_ML, return_value=graph):
+            with patch(_RI):
+                with patch(_DS):
+                    code = cli_main(_base_argv(tmp_path, ["--dry-run"]))
+
+        out = capsys.readouterr().out
+        assert "n01_call_analysis" in out
+        assert "n02_concept_refinement" in out
+        assert code == 0
+
+    def test_dry_run_does_not_call_scheduler_run(self, tmp_path: Path) -> None:
+        graph = _make_mock_graph(node_ids=["n01_call_analysis"], ready=True)
+        with patch(_ML, return_value=graph):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    cli_main(_base_argv(tmp_path, ["--dry-run"]))
+                    mock_cls.return_value.run.assert_not_called()
+
+    def test_dry_run_exits_0_with_no_ready_nodes(self, tmp_path: Path) -> None:
+        graph = _make_mock_graph(node_ids=[], ready=False)
+        with patch(_ML, return_value=graph):
+            with patch(_RI):
+                with patch(_DS):
+                    code = cli_main(_base_argv(tmp_path, ["--dry-run"]))
+        assert code == 0
+
+    def test_dry_run_skips_non_ready_nodes(self, tmp_path: Path, capsys) -> None:
+        """Only nodes where graph.is_ready() returns True are printed."""
+        graph = MagicMock()
+        graph.node_ids.return_value = ["n01_call_analysis", "n02_concept_refinement"]
+        graph.is_ready.side_effect = lambda nid, ctx: nid == "n01_call_analysis"
+        with patch(_ML, return_value=graph):
+            with patch(_RI):
+                with patch(_DS):
+                    cli_main(_base_argv(tmp_path, ["--dry-run"]))
+
+        out = capsys.readouterr().out
+        assert "n01_call_analysis" in out
+        assert "n02_concept_refinement" not in out
+
+
+# ---------------------------------------------------------------------------
+# JSON output mode
+# ---------------------------------------------------------------------------
+
+
+class TestCLIJsonMode:
+    def test_all_lines_valid_json(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path, ["--json"]))
+
+        lines = [ln for ln in capsys.readouterr().out.splitlines() if ln.strip()]
+        assert lines, "Expected at least one JSON line"
+        for ln in lines:
+            obj = json.loads(ln)
+            assert "event" in obj
+            assert "timestamp" in obj
+
+    def test_summary_event_present_on_pass(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path, ["--json"]))
+
+        lines = capsys.readouterr().out.splitlines()
+        events = [json.loads(ln)["event"] for ln in lines if ln.strip()]
+        assert "summary" in events
+
+    def test_summary_event_present_on_abort(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("aborted")
+        exc = RunAbortedError("stalled", summary)
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.side_effect = exc
+                    cli_main(_base_argv(tmp_path, ["--json"]))
+
+        lines = capsys.readouterr().out.splitlines()
+        events = [json.loads(ln)["event"] for ln in lines if ln.strip()]
+        assert "summary" in events
+
+    def test_error_event_on_config_failure(self, tmp_path: Path, capsys) -> None:
+        with patch(_ML, side_effect=FileNotFoundError("missing")):
+            with patch(_RI):
+                cli_main(_base_argv(tmp_path, ["--json"]))
+
+        out = capsys.readouterr().out.strip()
+        obj = json.loads(out)
+        assert obj["event"] == "error"
+
+    def test_dry_run_ready_events_in_json(self, tmp_path: Path, capsys) -> None:
+        graph = _make_mock_graph(node_ids=["n01_call_analysis"], ready=True)
+        with patch(_ML, return_value=graph):
+            with patch(_RI):
+                with patch(_DS):
+                    cli_main(_base_argv(tmp_path, ["--dry-run", "--json"]))
+
+        lines = [ln for ln in capsys.readouterr().out.splitlines() if ln.strip()]
+        events = [json.loads(ln)["event"] for ln in lines]
+        assert "ready" in events
+        ready_objs = [json.loads(ln) for ln in lines if json.loads(ln)["event"] == "ready"]
+        assert ready_objs[0]["node_id"] == "n01_call_analysis"
+
+
+# ---------------------------------------------------------------------------
+# Path wiring
+# ---------------------------------------------------------------------------
+
+
+class TestCLIPathWiring:
+    def test_repo_root_arg_forwarded_to_run_context(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI) as mock_init:
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(["--run-id", "path-test", "--repo-root", str(tmp_path)])
+
+        call_args = mock_init.call_args
+        assert call_args[0][0] == Path(str(tmp_path)).resolve()
+
+    def test_custom_manifest_path_passed_to_graph_load(self, tmp_path: Path) -> None:
+        custom = str(tmp_path / "custom_manifest.yaml")
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()) as mock_load:
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path, ["--manifest-path", custom]))
+
+        mock_load.assert_called_once_with(Path(custom))
+
+    def test_custom_library_path_forwarded_to_dag_scheduler(self, tmp_path: Path) -> None:
+        custom_lib = str(tmp_path / "custom_library.yaml")
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path, ["--library-path", custom_lib]))
+
+        _, kwargs = mock_cls.call_args
+        assert kwargs.get("library_path") == Path(custom_lib)
+
+    def test_find_repo_root_called_without_repo_root_arg(self) -> None:
+        summary = _make_mock_summary("pass")
+        fake_root = Path("/fake/repo")
+        with patch(_FR, return_value=fake_root) as mock_fr:
+            with patch(_ML, return_value=_make_mock_graph()):
+                with patch(_RI):
+                    with patch(_DS) as mock_cls:
+                        mock_cls.return_value.run.return_value = summary
+                        cli_main(["--run-id", "auto-root"])
+        mock_fr.assert_called_once()
+
+    def test_run_id_forwarded_to_run_context_initialize(self, tmp_path: Path) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI) as mock_init:
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(["--run-id", "my-run-id", "--repo-root", str(tmp_path)])
+
+        call_args = mock_init.call_args
+        assert call_args[0][1] == "my-run-id"
+
+
+# ---------------------------------------------------------------------------
+# Summary output content
+# ---------------------------------------------------------------------------
+
+
+class TestCLISummaryOutput:
+    def test_summary_line_contains_overall_status(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path))
+
+        out = capsys.readouterr().out
+        assert "overall_status=pass" in out
+
+    def test_run_start_line_contains_run_id(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("pass")
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.return_value = summary
+                    cli_main(_base_argv(tmp_path))
+
+        out = capsys.readouterr().out
+        assert "cli-test" in out  # run_id from _base_argv
+
+    def test_summary_line_emitted_after_abort(self, tmp_path: Path, capsys) -> None:
+        summary = _make_mock_summary("aborted")
+        exc = RunAbortedError("stalled", summary)
+        with patch(_ML, return_value=_make_mock_graph()):
+            with patch(_RI):
+                with patch(_DS) as mock_cls:
+                    mock_cls.return_value.run.side_effect = exc
+                    cli_main(_base_argv(tmp_path))
+
+        out = capsys.readouterr().out
+        assert "overall_status=aborted" in out
 
