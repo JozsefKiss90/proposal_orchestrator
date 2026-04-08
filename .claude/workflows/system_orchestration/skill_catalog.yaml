@@ -302,7 +302,7 @@ skill_catalog:
       gate status to Tier 4. Block downstream phases if gate has not passed.
     used_by_agents:
       - call_analyzer
-      - concept_refiner
+      # concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)
       - wp_designer
       - gantt_designer
       - impact_architect

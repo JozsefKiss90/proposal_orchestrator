@@ -34,9 +34,43 @@ Because this agent has no direct node binding, it carries no own `entry_gate` or
 - `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json`
 - `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json`
 
+## Skill Bindings
+
+### `evaluation-matrix-builder`
+**Purpose:** Build a structured evaluation matrix from the applicable evaluation form and call priority weights.
+**Trigger:** When evaluation form template for the active instrument has been located; produces the evaluator expectation registry.
+**Output / side-effect:** Populates `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json`.
+**Constitutional constraints:**
+- Evaluation criteria must reflect the active evaluation form, not a generic template.
+- Sub-criterion weights must be traceable to Tier 2B extracted files.
+
+### `instrument-schema-normalization`
+**Purpose:** Resolve the active instrument type to its application form section schema.
+**Trigger:** When `selected_call.json` has been read and the instrument type identified.
+**Output / side-effect:** Populates `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` with section identifiers, field requirements, page limits, mandatory elements, and structural constraints.
+**Constitutional constraints:**
+- Must resolve from the actual Tier 2A application form, not from generic memory.
+- Must never substitute a Grant Agreement Annex as a section schema source.
+- Page limits and section constraints must be read from the template, not assumed.
+
+## Canonical Inputs
+
+| Path | Tier | Provenance | Schema ID | Role |
+|------|------|------------|-----------|------|
+| `docs/tier2a_instrument_schemas/application_forms/` | tier2a_source | manually_placed | — | Application form template for the active instrument |
+| `docs/tier2a_instrument_schemas/evaluation_forms/` | tier2a_source | manually_placed | — | Evaluation form template for the active instrument |
+| `docs/tier3_project_instantiation/call_binding/selected_call.json` | tier3 | manually_placed | — | Identifies the active instrument type for schema resolution |
+
+## Canonical Outputs
+
+| Path | Tier | Provenance | Schema ID | Role |
+|------|------|------------|-----------|------|
+| `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` | tier2a_extracted | manually_placed | — | Section schema for the active instrument; consumed by n03, n06, n08a |
+| `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` | tier2a_extracted | manually_placed | — | Evaluator expectation patterns; consumed by n08a, n08c |
+
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 5–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
 
 ## Must-Not Constraints
 

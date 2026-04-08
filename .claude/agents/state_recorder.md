@@ -39,9 +39,44 @@ Three invocation contexts:
 - `docs/tier4_orchestration_state/checkpoints/` — checkpoint artifact (when checkpoint-publish is invoked)
 - `docs/tier4_orchestration_state/validation_reports/` — validation summary (when invoked after a validator)
 
+## Skill Bindings
+
+### `decision-log-update`
+**Purpose:** Write a durable decision record to the Tier 4 decision log whenever a material interpretation is made or a conflict is resolved.
+**Trigger:** Invocation context 1 (decision logging): any agent invokes `state_recorder` to write a decision log entry at any phase.
+**Output / side-effect:** Decision log entry written to `docs/tier4_orchestration_state/decision_log/`.
+**Constitutional constraints:**
+- Decisions held only in agent memory do not constitute durable decisions.
+- Every resolved tier conflict must produce a decision log entry.
+- Decision log entries must identify the tier authority applied.
+
+### `checkpoint-publish`
+**Purpose:** Write a formal checkpoint artifact to Tier 4 confirming that a phase or phase group has completed with a known validated state.
+**Trigger:** Invocation context 2 (checkpoint publishing): `revision_integrator` invokes `state_recorder` to publish the Phase 8 checkpoint after gate_12 passes.
+**Output / side-effect:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` written.
+**Constitutional constraints:**
+- Validated checkpoints must not be overwritten by subsequent reruns.
+- A checkpoint must not be published before all gate conditions for the phase are met.
+
+## Canonical Inputs
+
+Inputs are determined at invocation time by the calling agent or operator. The calling agent passes the context (artifact, decision, or validation summary) to be recorded.
+
+| Path | Tier | Provenance | Schema ID | Role |
+|------|------|------------|-----------|------|
+| _(invocation-determined)_ | _(any)_ | — | — | Source context for the artifact being recorded; specified by caller |
+
+## Canonical Outputs
+
+| Path | Tier | Provenance | Schema ID | Role |
+|------|------|------------|-----------|------|
+| `docs/tier4_orchestration_state/decision_log/` | tier4_decision_log | run_produced | — | Decision log entry (invocation context 1) |
+| `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` | tier4_checkpoint | run_produced | `orch.checkpoints.phase8_checkpoint.v1` | Checkpoint artifact (invocation context 2; revision_integrator caller only) |
+| `docs/tier4_orchestration_state/validation_reports/` | tier4_validation | run_produced | — | Validation summary (invocation context 3; after compliance_validator or traceability_auditor) |
+
 ## Contract
 
-This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 5–9 of `agent-generation-plan.md`.
+This agent is bound by `node_body_contract.md`. Full body implementation is deferred to Steps 6–9 of `agent-generation-plan.md`.
 
 ## Must-Not Constraints
 
