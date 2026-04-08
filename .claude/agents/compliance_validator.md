@@ -164,3 +164,36 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Non-critical finding requiring operator awareness | `material_decision` | Finding ID; prohibition reference; description; severity |
 | Compliant determination issued | `gate_pass` | Invocation ID; target artifact(s); gate context; all checks confirmed |
 | Target artifact absent | `gate_failure` | Invocation ID; missing path |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The write targets are `docs/tier4_orchestration_state/validation_reports/` and `docs/tier4_orchestration_state/decision_log/`. This agent does not write to any tier source, Tier 5 deliverable, or phase output directory beyond validation reports and decision log. The read scope is broad (Tier 1 extracted, Tier 2A extracted, Tier 4 phase outputs, Tier 5 deliverables, and CLAUDE.md) but all paths are within the declared `reads_from` catalog entries. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+This agent has no node binding (`node_ids: []`). It is a cross-phase auxiliary with `entry_gate: null` and `exit_gate: null`. The body text explicitly states: "The agent does not declare any phase gate passed or failed directly. It produces a compliance report that gate predicates or calling agents may consume." No manifest authority conflict exists. No language implies this agent can redefine phase purposes or gate logic.
+
+**Implied right to amend constitutional hierarchy:** No such language exists. The `constitutional-compliance-check` skill constraint explicitly states: "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md." The agent body repeats this. Risk: none.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **Approving violations (§13.1–§13.12):** Must_not includes "approve content that violates constitutional prohibitions." Failure Protocol Case 1 requires producing a non-compliant determination even if the invoking agent requests approval. Risk: low.
+- **§13.9 — Generic knowledge substitution for Tier 1:** Must_not explicitly prohibits "substitute Tier 1 document knowledge for reading Tier 1 extracted files when present." Failure Protocol Case 3 halts and flags if Tier 1 extracted files are referenced but absent. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write path is declared; one entry per finding that affects downstream use is required. Risk: low.
+- **§13.6 — Skill becoming de facto constitutional authority:** The skill constraint and body text both make clear that CLAUDE.md governs this skill, not the reverse. Risk: none.
+- **No Tier 5 content production:** This agent does not produce Tier 5 content. Not applicable for §13.10.
+- **No gate-passing authority:** Cannot declare any gate passed independently. Risk: none.
+
+### 4. Must-not integrity
+
+Both must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The Note on Node Binding section clarifies the auxiliary nature without creating authority claims.
+
+**Cross-phase scope constraint:** This agent's scope is limited to reading and reporting, not to modifying workflow logic, phase outputs, or gate conditions. The body text is consistent with this constraint.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

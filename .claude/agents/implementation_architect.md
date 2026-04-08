@@ -208,3 +208,36 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `phase_06_gate` passes | `gate_pass` | Gate ID; all conditions confirmed; run_id |
 | `phase_06_gate` fails | `gate_failure` | Gate ID; failed conditions |
 | Predecessor gate(s) not passed | `constitutional_halt` | Edge IDs; predecessor gate statuses |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The concrete canonical write is `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. The `docs/tier4_orchestration_state/decision_log/` write path is also declared. No undeclared path access is implied. This agent does not write to Tier 3 or Tier 5.
+
+### 2. Manifest authority compliance
+
+Node binding is `n06_implementation_architecture`. Exit gate is `phase_06_gate` — matches manifest. The `gate-enforcement` skill is in the manifest skill list for `n06_implementation_architecture` and is legitimately used. All three predecessor gates (`phase_03_gate` via `e03_to_06`, `phase_04_gate` via `e04_to_06`, `phase_05_gate` via `e05_to_06`) are correctly identified and enforced before action. Runner stamps `gate_result.json` and `artifact_status`.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.3 — Fabricated project facts (partners, risks, governance):** Must_not prohibits "redesign the consortium" and "assign management roles to partners not present in Tier 3." The output schema requires `management_roles[].assigned_to` to match a `partner_id` from Tier 3 `partners.json` (via `all_management_roles_in_tier3` predicate). The risk-register-builder skill requires flagging risks not in Tier 3 seeds rather than silently adding them. Risk: low.
+- **§13.1 — Grant Agreement Annex as schema source:** Must_not includes "omit instrument-mandated implementation sections identified in Tier 2A." Sections are sourced from `section_schema_registry.json`, not from a Grant Agreement Annex. Failure Protocol explicitly cites indirect CLAUDE.md §13.1 risk. Risk: low.
+- **Ethics omission (§13 general / §7 Phase 6 gate condition):** Must_not explicitly prohibits "omit the ethics self-assessment." The output schema requires `ethics_assessment` to not be null, empty, or the sentinel `"N/A"`. Gate condition `g07_p06` enforces this. Risk: low.
+- **§13.2 — Fabricated call constraints:** This agent does not produce call-side data. Risk: not applicable as a producer.
+- **§13.9 — Generic knowledge substitution:** Failure protocol Case 2 prohibits inventing risk entries or governance roles from generic programme knowledge. Risk: low.
+- **§13.5 — Durable decisions in memory:** `writes_to` includes the decision log; decision-log write obligations table covers all material events. Risk: low.
+- **§13.7 — Silent gate bypass:** All three predecessor gates are checked with halt+constitutional_halt on failure. Risk: low.
+- **Budget-dependent content / Phase 8:** Phase 6 does not produce Tier 5 content. Not applicable.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The output schema contracts strengthen the ethics constraint (explicit sentinel prohibition), the governance constraint (predicate join), and the instrument-sections-addressed constraint.
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field table.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

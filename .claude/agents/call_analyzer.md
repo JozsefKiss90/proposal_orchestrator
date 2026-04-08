@@ -227,3 +227,36 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry must includ
 | `phase_01_gate` passes | `gate_pass` | Gate ID `phase_01_gate`; all six Tier 2B files confirmed non-empty; run_id |
 | `phase_01_gate` fails | `gate_failure` | Gate ID; which conditions failed; what is required to resolve before re-run |
 | Constitutional halt triggered | `constitutional_halt` | CLAUDE.md section triggered; action halted; what would have been required |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. No body text implies access to any path outside those declarations. The Tier 2A extracted files (`section_schema_registry.json`, `evaluator_expectation_registry.json`) are explicitly noted as produced by `instrument_schema_resolver` within this phase — this agent does not claim write authority over them. The canonical writes within `docs/tier2b_topic_and_call_sources/extracted/` are bounded to the six named files produced by this phase. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+Node binding is `n01_call_analysis`. Entry gate (`gate_01_source_integrity`) and exit gate (`phase_01_gate`) match `manifest.compile.yaml` exactly. The `gate-enforcement` skill is listed in the manifest under `n01_call_analysis` — it is legitimately used by this agent. Gate result artifacts (`gate_result.json`) are described as written by the runner after evaluation — not self-declared by this agent. The agent body correctly states the runner stamps `artifact_status`; the agent must not write that field. Invocation of `instrument_schema_resolver` as an auxiliary agent within Phase 1 is consistent with the manifest `skills` list and the catalog scope.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.2 — Fabricated call constraints:** The must_not list explicitly prohibits inventing call constraints not present in source work programme or call extract documents. The extraction section reinforces this: every extracted element must carry `source_section` and `source_document`. Risk: low.
+- **§13.3 — Fabricated project facts:** This agent does not write project facts; it extracts call-side data. The only project-side artifact it reads is `selected_call.json` to identify the topic and instrument type — it does not invent content in that file. Risk: low.
+- **§13.9 — Generic programme knowledge substitution:** The must_not list explicitly prohibits substituting generic programme knowledge for source document content. Failure protocol Case 4 explicitly halts if this would be required. Risk: low.
+- **§13.1 — Grant Agreement Annex as schema source:** The `instrument-schema-normalization` skill constraint and the `instrument_schema_resolver` auxiliary agent both include explicit prohibitions against using Grant Agreement Annex templates. Risk: low.
+- **Budget-dependent content before Phase 7:** This agent does not produce Tier 5 content. No budget-related content is produced. Not applicable.
+- **§13.5 — Durable decisions in memory only:** Decision-log write obligations table covers all material decision events. Risk: low.
+- **§13.7 — Silent gate bypass:** The gate-enforcement skill and failure protocols prohibit fabricated completion. The gate condition checklist is fully enumerated. Risk: low.
+- **§13.10 — Tier 5 outputs not traceable:** This agent does not produce Tier 5 outputs. Not applicable.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim in the Must-Not Constraints section. The Step 6–7 additions (output schema contracts, gate awareness, failure behaviour) do not weaken any must_not. The gate awareness section's "Fabricated Completion" language is additive. The universal node_body_contract §3 reference preserves any universal constraints. No weakening detected.
+
+**Universal node_body_contract constraint:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field table (marked "NO — absent at write time").
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

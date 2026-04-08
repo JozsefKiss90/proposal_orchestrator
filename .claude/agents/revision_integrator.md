@@ -262,3 +262,39 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Checkpoint published | `gate_pass` | Gate ID `gate_12_constitutional_compliance`; all conditions; run_id |
 | `gate_12_constitutional_compliance` fails | `gate_failure` | Gate ID; failed conditions; what blocks export |
 | `gate_11` predecessor not passed | `constitutional_halt` | Edge `e08c_to_08d`; status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` (revised version), `docs/tier5_deliverables/final_exports/final_export.json`, `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json`, `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`, and `docs/tier4_orchestration_state/decision_log/`. All are declared in the catalog. This agent does not write to `docs/tier5_deliverables/review_packets/` (read-only input) or `docs/tier5_deliverables/proposal_sections/` (input, not modified by revision). No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+Node binding is `n08d_revision` (`terminal: true`). Exit gate is `gate_12_constitutional_compliance` — matches manifest. This is the only agent with authority to write `final_exports/` and `checkpoints/`. The Terminal Node section correctly notes that `overall_status: pass` in `run_summary.json` is set by the scheduler (not by this agent). No confusion about runner-owned artifacts (`run_summary.json`, `gate_result.json`, `artifact_status`) exists.
+
+**Checkpoint authority:** The `checkpoint-publish` skill is listed in both the manifest skill list for `n08d_revision` and in this agent's `invoked_skills`. This agent is the only Phase 8 agent with write authority to `checkpoints/`. The must_not constraint "Must not overwrite a validated checkpoint" is in place. The Output Schema Contracts section states the checkpoint is immutable once published.
+
+**Budget gate prerequisite:** The Budget Gate Prerequisite section describes transitive verification (via gate_11 → gate_10 → g09_p01) and also the direct check via `gate_12` conditions `g11_p07` and `g11_p10`. Any revision action that would introduce budget-dependent content not confirmed by the budget gate must be flagged as unresolvable. No softening of the budget gate exists.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §8
+
+- **§13.4/§8.4 — Phase 8 before budget gate:** Budget Gate Prerequisite section is explicit. Failure Protocol Case 4 halts revision actions that would introduce budget-dependent content without gate passage. The `gate_12` conditions `g11_p07` and `g11_p10` verify budget gate confirmation and no section contradicts the validated budget. Risk: low.
+- **§13.3 — Fabricated project facts in revisions:** Must_not includes "fill revision gaps with fabricated content." Failure Protocol Case 2 requires setting `status: unresolved` with a non-empty `reason` rather than fabricating content to resolve a critical action. Risk: low.
+- **§13.10/§11.4 — Unsupported Tier 5 claims introduced by revision:** The `proposal-section-traceability-check` skill is invoked after applying revision actions to verify the revised draft maintains source traceability. `gate_12` condition `g11_p08` checks "No section contains content contradicted by a higher tier." Risk: low.
+- **§13.8 — Finalizing text with incomplete state:** Must_not includes "declare Phase 8 complete if critical revision actions are unresolved." Failure Protocol Case 1 blocks final export and checkpoint if `gate_12` fails. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write path is declared; decision-log write obligations table covers all material events. Risk: low.
+- **Checkpoint-before-gate (§9.4):** Must_not includes "overwrite a validated checkpoint." Output schema for `phase8_checkpoint.json` states "immutable once published." Failure Protocol Case 1 explicitly: "Do not write `phase8_checkpoint.json`" if gate_12 fails. Risk: low.
+- **§13.1 — Grant Agreement Annex schema:** `evaluator-criteria-review` skill constraint prohibits evaluating against grant agreement annex requirements. Risk: low.
+
+### 4. Must-not integrity
+
+All four must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The addition of `gate_12_constitutional_compliance` conditions `g11_p09`, `g11_p11`, `g11_p12`, `g11_p13` (CLAUDE.md §13 prohibitions) as explicit gate conditions creates a stronger enforcement mechanism than the catalog constraint alone.
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field tables for all three produced artifacts.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

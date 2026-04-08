@@ -144,3 +144,36 @@ Written via `wp_designer`'s decision log flow (same path). Entry fields: `agent_
 | Dependency inferred (not explicit in Tier 3) | `assumption` | Inferred edge; basis; Tier 3 evidence |
 | Dependency cycle detected | `scope_conflict` | Cycle node list; resolution or unresolved |
 | Undeclared dependency suspected but cannot be confirmed | `assumption` | Suspicion basis; why not included |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The only write target is `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` — specifically contributing the `dependency_map` field to `wp_structure.json`. This agent does not write a separate canonical artifact; it modifies a field within the primary artifact jointly owned with `wp_designer`. No undeclared path access is implied. Decision log entries are written via `wp_designer`'s decision log flow — this is consistent with the agent not having `docs/tier4_orchestration_state/decision_log/` in its own `writes_to` list.
+
+### 2. Manifest authority compliance
+
+This sub-agent is listed as `sub_agent: dependency_mapper` under `n03_wp_design` in the manifest. It has `node_ids: [n03_wp_design]` in the front matter (same node as `wp_designer`). It carries `entry_gate: null` and `exit_gate: null`. The body text correctly states gate authority belongs to `wp_designer`. No language implies this agent can independently pass or fail `phase_03_gate`. The sub-agent contributes to `g04_p03` (dependency map written) and `g04_p06` (no cycles), but gate evaluation is performed by the runner over the completed artifact.
+
+**Auxiliary/sub-agent constraint:** The body text explicitly requires invocation only after `wp_designer` has written the initial WP structure. The invocation precondition section states: "Must not operate on WP structure that has not been produced by `wp_designer`." No implicit claim to independent gate authority exists.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.3 — Fabricated project facts (task relationships):** Must_not includes "Must not declare a dependency map complete if any WP has undeclared dependencies" and "Must not operate on WP structure that has not been produced by `wp_designer`." Failure Protocol Case 4 prohibits inventing task relationships not derivable from the WP structure. Risk: low.
+- **§13.7 — Silent cycle removal:** Must_not explicitly states "Must not silently resolve dependency cycles; must flag them." Failure Protocol Case 1 reinforces: cycles must be written as unresolved entries, not removed. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision log entries are written via parent agent's flow, but all trigger events are enumerated. Risk: low.
+- **§13.2/§13.9 — Generic knowledge or invented relationships:** Failure Protocol Case 4 halts if required to invent task relationships. Case 3 requires flagging inferred dependencies as assumptions. Risk: low.
+- **Budget-dependent content / Phase 8:** Not applicable; this agent operates in Phase 3 only.
+- **No Tier 5 outputs:** Not applicable.
+
+### 4. Must-not integrity
+
+All three must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The cycle-flagging requirement is explicitly stronger than the catalog constraint (the catalog says "must flag them"; the body specifies that cycles must be written as unresolved entries with annotations, not silently removed).
+
+**Universal constraint note:** `schema_id` and `run_id` are written by `wp_designer` as primary artifact owner; this agent must not overwrite those fields — stated explicitly in the Output Schema Contracts section. `artifact_status` must remain absent at write time — also stated.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

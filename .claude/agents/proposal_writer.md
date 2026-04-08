@@ -219,3 +219,41 @@ Write to `docs/tier4_orchestration_state/decision_log/` (via `decision-log-updat
 | `gate_10_part_b_completeness` passes | `gate_pass` | Gate ID; all sections confirmed; run_id |
 | `gate_10_part_b_completeness` fails | `gate_failure` | Gate ID; missing sections |
 | Budget gate (`gate_09`) not passed at invocation | `constitutional_halt` | CLAUDE.md §8.4, §13.4 |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier5_deliverables/proposal_sections/` (per-section artifacts), `docs/tier5_deliverables/assembled_drafts/assembled_draft.json`, and `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/`. The agent does not write to `docs/tier5_deliverables/final_exports/` or `docs/tier4_orchestration_state/checkpoints/` — those belong to `revision_integrator`. No undeclared path access is implied.
+
+The agent reads from `docs/tier4_orchestration_state/phase_outputs/` broadly (all phase 1–7 outputs) — this is declared in both `agent_catalog.yaml` and the front matter as `docs/tier4_orchestration_state/phase_outputs/`. The canonically required `budget_gate_assessment.json` is explicitly listed as a canonical input with schema check.
+
+### 2. Manifest authority compliance
+
+Node bindings are `n08a_section_drafting` and `n08b_assembly`. Exit gate for both is `gate_10_part_b_completeness` — matches manifest. This agent does not have authority over `gate_11_review_closure`, `gate_12_constitutional_compliance`, the checkpoint, or the final export — those belong to `evaluator_reviewer` and `revision_integrator` respectively. The gate awareness section makes no claim to those downstream gates.
+
+**Budget gate prerequisite:** The body text states the prerequisite is "unconditional" and "constitutional requirement (CLAUDE.md §8.4, §13.4), not a workflow preference." Failure Protocol Case 3 halts with `constitutional_halt` if budget gate is not passed. No implicit budget gate softening exists.
+
+**No final-export or checkpoint claim:** This agent produces `proposal_sections/` and `assembled_drafts/` only. Final export and checkpoint are not mentioned as outputs. Correct.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §8
+
+- **§13.4/§8.4 — Phase 8 before budget gate:** The Budget Gate Prerequisite section is marked "Absolute" and appears twice (once in the Purpose section and once in Gate Awareness). Must_not includes "finalize budget-dependent sections before Phase 7 gate has passed." Failure Protocol Case 3 explicitly cites CLAUDE.md §8.4. Risk: low.
+- **§13.3 — Fabricated project facts:** Must_not includes "fill data gaps with fabricated content." Failure Protocol Case 2 requires flagging data gaps as `unresolved` in `claim_statuses` and setting `no_unsupported_claims_declaration: false`, not filling with invented content. Risk: low.
+- **§13.10/§11.4 — Unsupported Tier 5 claims:** The output schema requires `traceability_footer.primary_sources` (non-empty) and `validation_status` with per-claim status for every section artifact. Must_not includes "introduce claims not grounded in Tier 1-4 state." Risk: low.
+- **§13.1 — Grant Agreement Annex as schema:** Must_not includes "write to satisfy grant agreement annex formatting requirements." Risk: low.
+- **§13.8 — Finalizing text with incomplete source state:** Failure Protocol Case 2 flags gaps rather than filling them; `overall_status: unresolved` blocks implicit passage. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers material events. Risk: low.
+- **Budget figures from non-validated source (§8.3):** Must_not includes "reference budget figures not validated through Phase 7 gate." Risk: low.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The output schema contracts strengthen the traceability constraint (mandatory `traceability_footer` and `validation_status` fields) and the budget gate constraint (explicit check of `gate_pass_declaration` field before any action).
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in both Output Schema Contracts field tables (proposal_section and assembled_draft).
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

@@ -190,3 +190,34 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `phase_04_gate` passes | `gate_pass` | Gate ID; all conditions confirmed; run_id |
 | `phase_04_gate` fails | `gate_failure` | Gate ID; failed conditions |
 | `phase_03_gate` predecessor not passed | `constitutional_halt` | Edge `e03_to_04`; status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Within the `writes_to` targets, the concrete canonical artifacts are: `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json` (Tier 3 update) and `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` (primary canonical output). No undeclared path access is implied. This agent does not write to any Tier 5 deliverable path.
+
+### 2. Manifest authority compliance
+
+Node binding is `n04_gantt_milestones`. Exit gate is `phase_04_gate` — matches manifest. The `gate-enforcement` skill is in the manifest skill list for `n04_gantt_milestones` and is legitimately used. Runner stamps `gate_result.json` and `artifact_status`. Agent does not self-declare gate pass.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.3 — Fabricated project facts (duration, partner roles):** Must_not list prohibits assigning tasks to months beyond project duration and scheduling tasks before prerequisite completion. The output schema field `end_month` must be ≤ `project_duration_months` from `selected_call.json`. Partner data for task assignments must come from Tier 3 `roles.json`. Risk: low.
+- **§13.7 — Silent duration manipulation:** Must_not explicitly prohibits "silently adjust project duration to accommodate an oversized WP structure." Failure Protocol Case 1 reinforces: if tasks cannot fit, declare gate failure, do not silently adjust. This directly addresses CLAUDE.md §13.7 for this agent's domain. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers all material scheduling events. Risk: low.
+- **§13.2/§13.9 — Generic knowledge:** Must_not "Operate before `phase_03_gate` has passed" prevents acting without source WP structure. Risk: low.
+- **Milestone fabrication (§13.3):** Must_not prohibits "produce milestones without verifiable achievement criteria." The output schema field `verifiable_criterion` is required, non-empty, and explicitly not a placeholder. Risk: low.
+- **Budget-dependent content / Phase 8:** Phase 4 does not produce Tier 5 content. Not applicable.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The output schema contracts strengthen the "no milestones without verifiable criteria" constraint by requiring the `verifiable_criterion` field to be "non-empty, concrete, externally verifiable string — not a placeholder."
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in the Output Schema Contracts field table.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

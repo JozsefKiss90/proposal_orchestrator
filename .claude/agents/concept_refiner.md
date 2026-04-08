@@ -218,3 +218,38 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `phase_02_gate` passes | `gate_pass` | Gate ID; all conditions confirmed; run_id |
 | `phase_02_gate` fails | `gate_failure` | Gate ID; which conditions failed |
 | `phase_01_gate` predecessor not passed | `constitutional_halt` | Edge `e01_to_02`; predecessor gate status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The three concrete write targets within `writes_to` are: `topic_mapping.json`, `compliance_profile.json` (both within `docs/tier3_project_instantiation/call_binding/`), `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/` (one canonical artifact: `concept_refinement_summary.json`), and `docs/tier4_orchestration_state/decision_log/`. No body text implies access to paths outside those declarations. The agent does not write to Tier 2A or Tier 2B extracted files (those are read-only inputs here).
+
+### 2. Manifest authority compliance
+
+Node binding is `n02_concept_refinement`. The exit gate is `phase_02_gate`. The manifest lists `n02_concept_refinement` with no `entry_gate` field — this file correctly reflects `entry_gate: null`. The manifest skill list for `n02_concept_refinement` does **not** include `gate-enforcement` (this was a reconciliation fix noted in `skill_catalog.yaml` comments). This agent does not list `gate-enforcement` in its `invoked_skills` — consistent with the manifest. The gate is evaluated by the runner; the agent declares the pass state by producing complete outputs, not by invoking a gate-enforcement skill directly. This is the correct pattern for `n02`.
+
+**Previously reported mismatch re-check:** The prior pass flagged a potential gate-enforcement mismatch for `concept_refiner`. Examining the current file: `invoked_skills` does NOT include `gate-enforcement`. This is consistent with `manifest.compile.yaml` node `n02_concept_refinement` (which lists `concept-alignment-check`, `topic-scope-check`, `proposal-section-traceability-check`, `decision-log-update` — no `gate-enforcement`). The `skill_catalog.yaml` comment on `gate-enforcement` explicitly notes: "concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)". The mismatch is **resolved in the current file**. No residual conflict.
+
+The Predecessor Gate section states: "If `phase_01_gate` has not passed, halt immediately". This is enforcement of a gate condition, not declaration of one — constitutionally correct.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.2 — Fabricated call constraints:** This agent refines concept vocabulary against Tier 2B extracted files. The must_not list prohibits inventing a new project concept not grounded in Tier 3 and fabricating coverage of an expected outcome. The `topic_mapping.json` output requires Tier 2B source references on all mappings — uncovered outcomes must be flagged, not silently filled. Risk: the primary risk here is claiming a Tier 2B expected outcome is addressed when it is not. The must_not list and failure protocol Case 4 address this directly.
+- **§13.3 — Fabricated project facts:** The must_not list explicitly prohibits inventing a project concept not grounded in Tier 3. The refinement is vocabulary alignment only; scientific substance must not be altered. Risk: low, but agent body must not be interpreted to permit adding project capabilities not in Tier 3 as "refinement".
+- **§13.9 — Generic knowledge substitution:** Must_not includes "Operate before `phase_01_gate` has passed" and failure protocol Case 2 prohibits reconstructing call constraints from memory. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers all material decision events. Risk: low.
+- **§13.7 — Silent gate bypass:** Failure protocol Case 3 explicitly halts if `phase_01_gate` is unmet. Risk: low.
+- **Budget-dependent content / Phase 8:** Phase 2 does not produce Tier 5 content. Not applicable.
+
+### 4. Must-not integrity
+
+All four must_not items from `agent_catalog.yaml` are present verbatim in the Must-Not Constraints section. Step 6–7 additions do not weaken them. The Predecessor Gate section adds enforcement of the "Operate before `phase_01_gate` has passed" constraint — this is additive, not weakening.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified
+
+**Note on previously reported mismatch:** The gate-enforcement mismatch for `concept_refiner` is fully resolved in the current file. `gate-enforcement` is correctly absent from `invoked_skills`. No residual conflict remains.

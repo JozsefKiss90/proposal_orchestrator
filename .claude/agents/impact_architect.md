@@ -198,3 +198,35 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `phase_05_gate` passes | `gate_pass` | Gate ID; all impacts mapped; run_id |
 | `phase_05_gate` fails | `gate_failure` | Gate ID; unmapped expected impact IDs |
 | Predecessor gate(s) not passed | `constitutional_halt` | Edge ID; predecessor status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The single write target is `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/` — one canonical artifact: `impact_architecture.json`. No undeclared path access is implied. This agent does not write to Tier 3 or Tier 5. All Tier 2B extracted files read are within the declared `reads_from` scope.
+
+### 2. Manifest authority compliance
+
+Node binding is `n05_impact_architecture`. Exit gate is `phase_05_gate` — matches manifest. The `gate-enforcement` skill is in the manifest skill list for `n05_impact_architecture` and is legitimately used. Both predecessor gates (`phase_02_gate` via `e02_to_05`, `phase_03_gate` via `e03_to_05`) are correctly identified and enforced before action. Runner stamps `gate_result.json` and `artifact_status`.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.2 — Fabricated call expected impacts/outcomes:** Must_not explicitly prohibits "fabricate coverage of a call expected impact not addressed by a project output." The output schema requires `expected_impact_id` join keys from Tier 2B `expected_impacts.json`. Unmapped expected impacts must trigger gate failure, not fabrication. Failure Protocol Case 1 explicitly cites CLAUDE.md §13.3 for this risk. Risk: low.
+- **§13.3 — Fabricated project facts (impact mechanisms):** Must_not prohibits "assert impact claims without a traceable project mechanism." The output schema requires `project_outputs` as a non-empty array of `deliverable_id` from `wp_structure.json`. Any impact claim without a traceable WP deliverable mechanism must be flagged as Unresolved. Risk: low.
+- **§13.9 — Generic programme-level impact language:** Must_not explicitly prohibits using generic programme-level impact language without project-specific grounding. Risk: low.
+- **KPI fabrication (§13.3):** Must_not prohibits "produce KPIs not traceable to named WP deliverables." Output schema requires `traceable_to_deliverable` join key. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers all material events. Risk: low.
+- **§13.7 — Silent gate bypass:** Failure protocol explicitly halts if either predecessor gate is unmet. Risk: low.
+- **Budget-dependent content / Phase 8:** Phase 5 does not produce Tier 5 content. Not applicable.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The output schema contracts strengthen the constraint that every call expected impact must be mapped (via the `all_impacts_mapped` predicate binding).
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field table.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

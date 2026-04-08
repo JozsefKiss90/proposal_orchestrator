@@ -225,3 +225,36 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `phase_03_gate` passes | `gate_pass` | Gate ID; all conditions confirmed; run_id |
 | `phase_03_gate` fails | `gate_failure` | Gate ID; which conditions failed |
 | Predecessor `phase_02_gate` not passed | `constitutional_halt` | Edge `e02_to_03`; predecessor gate status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Within the `writes_to` targets, the concrete canonical artifacts are: `docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json` (Tier 3 update) and `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` (primary canonical output). The `dependency_map` field within `wp_structure.json` is contributed by `dependency_mapper` sub-agent, but the file path itself is within this agent's declared write scope. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+Node binding is `n03_wp_design`. Exit gate is `phase_03_gate` — matches manifest. `dependency_mapper` is declared as `sub_agent` in the manifest for `n03_wp_design`. This file correctly describes the sub-agent relationship and states that gate authority belongs to `wp_designer` as primary node agent. The `gate-enforcement` skill is in the manifest skill list for `n03_wp_design` and is used by this agent. Runner stamps `gate_result.json` and `artifact_status`; agent does not self-declare gate pass.
+
+The must_not constraint "Must not declare `phase_03_gate` passed without a completed dependency map in Tier 4" is correctly treated as an output completeness requirement, not as a gate-passing authority claim. Gate result is produced by the runner.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.3 — Fabricated project facts (partner assignments):** The must_not list explicitly prohibits assigning WP leads or task leads to partners not in Tier 3 consortium data. The output schema requires `responsible_partner` values that match Tier 3 `partners.json`. Failure protocol Case 4 cites CLAUDE.md §13.3 for this violation. Risk: low.
+- **§13.1 — Grant Agreement Annex as schema source:** The `instrument-schema-normalization` skill constrains WP structural checks to derive from the actual Tier 2A application form, not an annex template. Risk: low.
+- **§13.2 — Fabricated call constraints:** This agent does not extract or create call constraints. It reads them as consumed inputs. Risk: not applicable as a producer.
+- **§13.3 risk for WP design fabrication:** Failure protocol Case 2 prohibits designing WPs from generic programme knowledge without a populated Tier 3 seed. Risk: low.
+- **§13.9 — Generic knowledge substitution:** Must_not includes "Operate before `phase_02_gate` has passed". Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers material events. Risk: low.
+- **§13.7 — Silent dependency cycle removal:** Must_not does not include an explicit prohibition on silently resolving cycles, but the body text (Failure Protocol Case 1 and the sub-agent coordination section) states that cycles must be flagged, not removed. This is stronger than the must_not list alone. Risk: low.
+- **Budget-dependent content / Phase 8:** Phase 3 does not produce Tier 5 content. Not applicable.
+
+### 4. Must-not integrity
+
+All five must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken any of them. The output schema contracts strengthen the partner-assignment constraint by making it mechanically verifiable (the `all_partners_in_tier3` predicate joins the WP structure against Tier 3 `partners.json`).
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

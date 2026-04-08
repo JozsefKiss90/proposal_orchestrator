@@ -176,3 +176,39 @@ Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validati
 | `gate_11_review_closure` passes | `gate_pass` | Gate ID; all conditions; run_id |
 | `gate_11_review_closure` fails | `gate_failure` | Gate ID; conditions failed |
 | `gate_10` predecessor not passed | `constitutional_halt` | Edge `e08b_to_08c`; status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier5_deliverables/review_packets/review_packet.json` and `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/`. This agent does not write to `docs/tier5_deliverables/proposal_sections/`, `docs/tier5_deliverables/assembled_drafts/`, `docs/tier5_deliverables/final_exports/`, or `docs/tier4_orchestration_state/checkpoints/`. It reads but does not modify the assembled draft — consistent with the "review only, no revision" constraint. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+Node binding is `n08c_evaluator_review`. Exit gate is `gate_11_review_closure` — matches manifest. This agent does not claim authority over `gate_12_constitutional_compliance` (that belongs to `revision_integrator`). The agent also does not produce a final export or checkpoint. No confusion between reviewing authority and revision authority exists in the body text.
+
+**Drafting/review/revision authority boundary:** The body text explicitly states "This agent reviews only. It does not revise the draft. Revision is the responsibility of `revision_integrator`." Must_not includes "Revise the draft; review only." The `writes_to` does not include the assembled drafts directory for writing. Correct.
+
+**Budget gate transitivity:** The Budget Gate Prerequisite section explains that `gate_09_budget_consistency` is verified transitively (via `gate_10_part_b_completeness` condition `g09_p01`). If budget-dependent content was produced before the gate passed, this agent must flag it as a critical finding — not silently accept it. This is constitutionally stronger than a passive check.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §8
+
+- **§13.4/§8.4 — Phase 8 before budget gate:** Failure Protocol Case 4 requires flagging budget-dependent content in the assembled draft as a critical finding with `criterion: "CLAUDE.md §13.4 — budget gate"`. This agent cannot bypass this — it must detect and report violations. Risk: low.
+- **§13.1 — Grant Agreement Annex as evaluation schema:** Must_not includes "evaluate against grant agreement annex requirements" and "apply review criteria from a different instrument than the active instrument." Risk: low.
+- **§13.10/§11.4 — Unsupported Tier 5 claims:** The `proposal-section-traceability-check` skill is used during review to flag unattributed claims. These appear in the review packet as findings. Risk: low.
+- **§13.3 — Fabricated project facts:** This agent reads and reviews; it does not introduce new content into the proposal. Risk: not applicable as a content producer.
+- **§13.8 — Finalizing text with incomplete state:** This agent does not finalize text; it produces a review packet that blocks finalization through `gate_11_review_closure`. Risk: not applicable.
+- **§13.5 — Durable decisions in memory:** Decision-log write obligations table covers material events. Risk: low.
+- **Implicit draft modification:** No body text suggests the agent modifies the assembled draft. The `writes_to` catalog entry does not include the assembled drafts directory. Risk: none.
+
+### 4. Must-not integrity
+
+All three must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The constitutional violation detection capability (Failure Protocol Case 4) is an additive constraint beyond the catalog.
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field table for `review_packet.json`.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

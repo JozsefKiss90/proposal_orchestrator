@@ -174,3 +174,36 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Claim downgraded from Confirmed to Assumed/Unresolved | `material_decision` | Claim ID; original status; new status; reason |
 | Full traceability confirmed | `gate_pass` | Invocation ID; target artifact; audit summary |
 | Gaps identified that block downstream use | `gate_failure` | Invocation ID; unresolved claim IDs |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Write targets are `docs/tier4_orchestration_state/validation_reports/` and `docs/tier4_orchestration_state/decision_log/`. The read scope covers all four tiers (Tier 1–4 extracted, Tier 3 instantiation, Tier 4 phase outputs, Tier 5 deliverables) — all declared in the catalog. This agent does not write to any tier source, Tier 5 deliverable, or phase output directory. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+This agent has no node binding (`node_ids: []`). It is a cross-phase auxiliary with `entry_gate: null` and `exit_gate: null`. The body text states: "The agent does not declare any phase gate passed or failed." Its outputs are consumed by semantic gate predicates (`all_sections_have_traceability_footer`, `no_gap_masked_as_confirmed`, `no_unsupported_tier5_claims`) — but the gate pass/fail decision is made by the runner applying those predicates, not by this agent.
+
+**Implied right to amend workflow logic:** No such language exists. This agent reads artifacts and writes audit reports. Risk: none.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §12
+
+- **§12.2 — Confirmed status without named source:** Must_not includes "mark a claim Confirmed without identifying the specific source artifact." Failure Protocol Case 2 requires downgrading Confirmed status to Assumed or Unresolved when no specific source path can be identified. Risk: low.
+- **§13.9 — Generic knowledge for Confirmed status:** The audit can only issue Confirmed status for claims with a named, readable source artifact. If Tier 1–3 source files are absent, affected claims must be flagged as Unresolved (Failure Protocol Case 4). Risk: low.
+- **§13.5 — Durable decisions in memory:** One decision log entry per Unresolved finding is required. Risk: low.
+- **§13.6 — Skill/agent as de facto authority:** This agent reads and reports. It has no authority to modify source documents, phase outputs, or gate conditions. Risk: none.
+- **No Tier 5 content production:** This agent does not produce Tier 5 content. Not applicable for §13.10.
+- **No gate-passing authority:** Cannot declare any gate passed independently. Risk: none.
+
+### 4. Must-not integrity
+
+Both must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. Failure Protocol Case 2 strengthens the Confirmed-without-source-artifact constraint by specifying the downgrade mechanism.
+
+**Cross-phase scope constraint:** This agent reads broadly but writes only to validation reports and decision log. No write path approaches a source document or phase output. Scope boundary is respected.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

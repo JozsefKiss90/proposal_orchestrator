@@ -181,3 +181,39 @@ This agent carries `exit_gate: null`. It does not satisfy any gate condition by 
 | Checkpoint published | `gate_pass` | `agent_id: state_recorder`; gate IDs confirmed; run_id; published_at |
 | Checkpoint publish blocked (overwrite attempt) | `constitutional_halt` | Reason; existing checkpoint reference; CLAUDE.md §9.4 |
 | Checkpoint publish blocked (gate not passed) | `constitutional_halt` | Gate ID not yet passed; invoking agent; CLAUDE.md §9.4 |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier4_orchestration_state/decision_log/`, `docs/tier4_orchestration_state/checkpoints/`, and `docs/tier4_orchestration_state/validation_reports/`. The read scope is declared as "Any phase context requiring durable recording" — acknowledged as intentional and invocation-determined. No body text implies write access to any path beyond the three declared write targets. This agent does not write to Tier 5 deliverables, Tier 3, or any Tier 2 directory.
+
+**Checkpoint write constraint:** Within `docs/tier4_orchestration_state/checkpoints/`, the only artifact this agent is permitted to write is `phase8_checkpoint.json`, and only when invoked by `revision_integrator` after `gate_12_constitutional_compliance` passes. This is the sole canonically permitted checkpoint artifact for this agent.
+
+### 2. Manifest authority compliance
+
+This agent has no node binding (`node_ids: []`). It is a cross-phase auxiliary with `entry_gate: null` and `exit_gate: null`. The body text correctly states that `overall_status: pass` in `run_summary.json` is set by the runner (scheduler), not by this agent. The checkpoint artifact is the only gate-adjacent output, and the body text correctly conditions it on `gate_12_constitutional_compliance` passing, with gate verification responsibility placed on the invoking agent (`revision_integrator`).
+
+**No authority to redefine workflow logic:** This agent's function is purely to persist state. No language implies authority over phase definitions, gate conditions, or the authority hierarchy. Risk: none.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §9
+
+- **§9.4 — Decisions held only in memory:** This agent is the implementation mechanism for §9.4. Its purpose is to convert in-memory decisions into durable Tier 4 records. Must_not includes "substitute in-memory notes for written Tier 4 artifacts." Risk: low.
+- **§9.4 / checkpoint immutability:** Must_not includes "overwrite a checkpoint that has been formally validated." Failure Protocol Case 2 halts and writes a constitutional_halt entry on any overwrite attempt. Risk: low.
+- **Checkpoint before gate (§9.4 / §6.4):** Failure Protocol Case 1 prohibits publishing the checkpoint before all Phase 8 gates are passed. The checkpoint-publish skill constraint states "A checkpoint must not be published before all gate conditions for the phase are met." Risk: low.
+- **§13.5 — Durable decisions in memory:** This agent is the anti-§13.5 mechanism. Its function is the solution, not a risk. Risk: none.
+- **§13.6 — Agent as de facto authority:** This agent writes but does not decide. It is a recording mechanism, not an authority. Risk: none.
+- **No Tier 5 content production:** Not applicable.
+- **No gate-passing authority:** Cannot declare any gate passed (the `gate_pass` decision log type records that a gate passed, as reported by the invoking agent — it does not constitute a gate pass declaration by this agent).
+
+### 4. Must-not integrity
+
+Both must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The Checkpoint-publish context exception in the invocation preconditions section adds a specific gate-enforcement requirement for the checkpoint write path.
+
+**Runner-owned artifact boundary:** `run_summary.json` and `artifact_status` are runner-owned artifacts and must not be written by this agent. No body text claims write authority over these. `artifact_status` is absent from the checkpoint schema field table (marked "absent at write time"). Correct.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

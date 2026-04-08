@@ -160,3 +160,35 @@ This agent writes to the decision log via `call_analyzer` (since it has no own d
 | Instrument type resolved to specific template file | `material_decision` | Template file name; instrument_type value; source field in `selected_call.json` |
 | Section constraint interpreted where template is ambiguous | `assumption` | The interpretation; the template text; reason |
 | Grant Annex detected as source instead of application form | `constitutional_halt` | CLAUDE.md §13.1; the detected file; halt action |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The only write target is `docs/tier2a_instrument_schemas/extracted/`, and the two concrete artifacts produced within that directory — `section_schema_registry.json` and `evaluator_expectation_registry.json` — are the only files this agent is constitutionally permitted to write. No body text implies access to any other path. Decision log entries are channelled through `call_analyzer` (as stated in the Decision-Log Write Obligations section), which holds the write path to `docs/tier4_orchestration_state/decision_log/`; this agent does not write there directly, consistent with not having that path in its `writes_to` list.
+
+### 2. Manifest authority compliance
+
+This agent has no `agent:` field in any manifest node (`node_ids: []`). It is explicitly an auxiliary invoked by `call_analyzer`. It carries `entry_gate: null` and `exit_gate: null`. It does not claim any gate authority — its outputs are consumed by `phase_01_gate` conditions `g02_p14` and `g02_p15`, but gate authority belongs to `call_analyzer`. The body text states this clearly: "Gate authority belongs to `call_analyzer` as the primary node agent." No manifest authority conflict exists.
+
+### 3. Forbidden-action review against CLAUDE.md §13
+
+- **§13.1 — Grant Agreement Annex as schema source:** The must_not list and Failure Protocol Case 3 explicitly prohibit extracting from a Grant Agreement Annex. The skill constraint for `instrument-schema-normalization` reinforces this. Risk: low.
+- **§13.2 — Fabricated call constraints / §13.9 — Generic knowledge substitution:** Must_not prohibits inventing section constraints not present in the actual application form, and prohibits resolving by assumption. Failure Protocol Case 1 requires halting and reporting rather than constructing from memory. Risk: low.
+- **§13.3 — Fabricated project facts:** This agent does not produce project facts. Not applicable.
+- **Budget-dependent content / Phase 8 gate:** This agent operates in Phase 1 and produces Tier 2A structural artifacts only. Not applicable.
+- **§13.5 — Durable decisions in memory:** Decision log entries are written via `call_analyzer`. All material decisions have documented triggers. Risk: low.
+- **§13.7 — Silent gate bypass:** This agent has no gate to bypass; it cannot declare any gate passed. Risk: none.
+- **Implicit node authority claim:** The body text is clear that gate authority belongs to `call_analyzer`. No language implies independent gate-passing authority.
+
+### 4. Must-not integrity
+
+All three must_not items from `agent_catalog.yaml` are present verbatim in the Must-Not Constraints section. Step 6–7 additions do not weaken them. The Note on Node Binding section does not soften scope constraints.
+
+**Auxiliary sub-agent constraint:** No language in this file implies the agent can proceed without being invoked within `n01_call_analysis`'s Phase 1 execution context. The invocation precondition section explicitly states this requirement.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

@@ -176,3 +176,39 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Contract field left empty because data not available | `assumption` | Field name; reason; what is needed |
 | Interface contract validation failure | `scope_conflict` | Non-conforming field; contract requirement; what was produced |
 | Budget computation attempted and halted | `constitutional_halt` | CLAUDE.md §8.1; the halted action |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. The concrete write targets are `docs/tier3_project_instantiation/integration/budget_request.json` and `docs/tier4_orchestration_state/decision_log/`. The `budget-interface-validation` skill also writes to `docs/integrations/lump_sum_budget_planner/validation/`, but this is declared under the skill's `writes_to` in `skill_catalog.yaml` — not in this agent's own `writes_to`. No undeclared path is implied.
+
+The agent explicitly does not write to `docs/integrations/lump_sum_budget_planner/received/` (that is the external system's write target). The body text confirms this agent is purely a request preparer and does not touch the received/ directory.
+
+### 2. Manifest authority compliance
+
+This agent is declared as `pre_gate_agent: budget_interface_coordinator` under `n07_budget_gate` in the manifest. It carries `exit_gate: null`. The body text explicitly states: "This agent **does not declare the budget gate passed**." Gate authority for `gate_09_budget_consistency` belongs exclusively to `budget_gate_validator`. The artifact registry note for `a_t3_budget_request` confirms: "not a gate condition." No manifest authority conflict exists.
+
+**Pre-gate agent constraint:** The body text, must_not list, and Budget Gate Special Handling section all consistently prohibit this agent from declaring or passing `gate_09_budget_consistency`. Risk of accidental gate-passing authority claim: none detected.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §8
+
+- **§8.1/§8.3 — Budget computation:** Must_not explicitly prohibits "compute, estimate, or invent budget figures." The output schema requires all numeric effort/cost fields to be flagged as "requires_external_computation." Failure Protocol Case 4 triggers a constitutional halt if computation is attempted. Risk: low.
+- **§8.5 — Interface contract conformance:** Must_not prohibits deviating from the interface contract schema. The `budget-interface-validation` skill verifies conformance before writing. Failure Protocol Case 3 halts and writes a non-conforming payload rather than silently accepting it. Risk: low.
+- **§13.4 — Phase 8 before budget gate:** This agent is a pre-gate action; it cannot enable Phase 8. Its output (`budget_request.json`) is not a gate condition. Risk: none.
+- **§13.3 — Fabricated project facts:** This agent reads WP structure and Gantt from Phase 3/4 outputs and maps them to the request schema. It does not invent project facts. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write path is declared and decision-log write obligations table covers material events. Risk: low.
+- **§13.7 — Silent gate bypass:** This agent cannot bypass any gate; it has no exit gate. Risk: none.
+- **Budget figure substitution (§8.3):** Must_not prohibits "fabricate a budget response in the absence of an external response." This is explicitly the `budget_gate_validator`'s domain, but this prohibition also appears in this agent's must_not list as a defence-in-depth. Risk: low.
+
+### 4. Must-not integrity
+
+All four must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them. The Budget Constitution section adds explicit reference to CLAUDE.md §8.1–8.5 as the governing authority. The Budget Gate Special Handling section reinforces that absent budget artifacts are not this agent's concern — they are unconditionally a gate failure for `budget_gate_validator`.
+
+**Universal constraint note:** `budget_request.json` has no `schema_id` requirement; it is governed by the interface contract, not the artifact schema specification. This is correctly stated in the Output Schema Contracts section.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified

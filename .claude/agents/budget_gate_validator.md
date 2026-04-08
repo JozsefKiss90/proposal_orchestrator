@@ -244,3 +244,38 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | `gate_09_budget_consistency` fails | `gate_failure` | Gate ID; conditions failed; what is required |
 | Budget computation attempted | `constitutional_halt` | CLAUDE.md §8.1; halted action |
 | `phase_06_gate` predecessor not passed | `constitutional_halt` | Edge `e06_to_07`; status |
+
+---
+
+## Constitutional Review
+
+### 1. Scope compliance
+
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` (primary canonical output), `docs/tier3_project_instantiation/integration/budget_response.json` (copy of validated external response), and `docs/tier4_orchestration_state/decision_log/`. The `budget-interface-validation` skill writes to `docs/integrations/lump_sum_budget_planner/validation/` — declared under that skill's `writes_to` in `skill_catalog.yaml`. No undeclared path access is implied.
+
+### 2. Manifest authority compliance
+
+Node binding is `n07_budget_gate`. Exit gate is `gate_09_budget_consistency` — mandatory, bypass-prohibited (`mandatory: true`, `bypass_prohibited: true`) — matches manifest exactly. This is the primary gate authority agent for Phase 7; only this agent declares `gate_09_budget_consistency` pass or fail. The manifest `absent_artifacts_behavior: blocking_gate_failure` is reproduced in the Absent-Artifacts Rule section. The HARD_BLOCK consequence section correctly attributes the downstream HARD_BLOCK propagation to the DAG runner (`RunContext.mark_hard_block_downstream()`), not to this agent.
+
+**No hold state wording:** The body text uses "not a hold state, not a deferral, not a partial-pass" three times, directly addressing the v1.0 semantic correction documented in the workflow README. No hold-state language appears anywhere in the file.
+
+### 3. Forbidden-action review against CLAUDE.md §13 and §8
+
+- **§8.1/§8.3 — Budget computation:** Must_not explicitly prohibits "substitute an internally generated budget estimate for an absent external response." The body text twice states "This agent does not compute budget figures." Failure Protocol Case 4 triggers a constitutional halt. Risk: low.
+- **§8.4/§13.4 — Absent budget = gate failure, not hold:** The Absent-Artifacts Rule section is unambiguous: absent artifacts always produce `gate_pass_declaration: fail`. Must_not includes "Treat absence of a response as a non-failing hold state." Risk: none.
+- **§8.5 — Interface contract rejection:** Must_not prohibits "silently accept a budget response that does not conform to the interface contract." The `budget-interface-validation` skill is used to validate conformance; non-conforming responses must be rejected and flagged. Risk: low.
+- **§13.7 — Silent bypass of blocking inconsistencies:** Must_not prohibits "bypass blocking inconsistencies." The output schema requires `blocking_inconsistencies[].resolution: unresolved` to cause `no_blocking_inconsistencies` predicate to fail. Failure Protocol Case 1 prohibits reclassifying blocking inconsistencies as non-blocking. Risk: low.
+- **§13.3 — Fabricated budget response:** Must_not prohibits "substitute an internally generated budget estimate." Failure Protocol Case 2 (absent artifacts) prohibits creating a placeholder or estimated budget response. Risk: low.
+- **§13.5 — Durable decisions in memory:** Decision-log write path declared; decision-log table covers all material events. Risk: low.
+
+### 4. Must-not integrity
+
+All six must_not items from `agent_catalog.yaml` are present verbatim. Step 6–7 additions do not weaken them; they add the Absent-Artifacts Rule section and HARD_BLOCK consequence as explicit enforcement mechanisms.
+
+**Stronger-than-catalog constraint:** The catalog states "Treat absence of a response as a non-failing hold state" in the must_not list. The body text goes further: "not a hold state, not a deferral, not a partial-pass" and "ABSENT — gate failure" sentinel value in the output schema. This exceeds the catalog constraint — constitutionally correct.
+
+**Universal constraint note:** `artifact_status` must not be written by the agent — confirmed in Output Schema Contracts field table.
+
+### 5. Conflict status
+
+Constitutional review result: no conflict identified
