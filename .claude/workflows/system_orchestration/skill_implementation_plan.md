@@ -20,6 +20,7 @@ No skill implementation may be generated, modified, or reviewed without first re
 | 5 | `.claude/workflows/system_orchestration/artifact_schema_specification.yaml` | Field-level schemas for every canonical artifact. Required before implementing any skill that writes a canonical artifact. |
 | 6 | `.claude/workflows/system_orchestration/state_rules.yaml` | State durability, checkpoint preservation, decision logging, and rerun behavior rules. Applies to all skills that write to Tier 4 or Tier 5 paths. |
 | 7 | `.claude/workflows/system_orchestration/design_notes.yaml` | Design rationale, especially `workflow_as_authoritative_specification`, `constitutional_subordination`, and `tier3_as_project_container`. Governs implementation intent. |
+| 8 | `.claude/workflows/system_orchestration/README.md` | Contextual execution reference. Defines current package structure and execution boundaries. Must be read to prevent architectural misinterpretation (e.g. scheduler–agent–skill separation). |
 
 **Enforcement rule:** An implementer that skips any of these sources and proceeds from memory violates CLAUDE.md §10.6 and §13.9. The resulting skill is constitutionally invalid and must not be used.
 
@@ -47,6 +48,16 @@ Requirements:
   - state rules → MUST re-check `state_rules.yaml`
 
 - If a step proceeds without re-validating these sources, the result is invalid.
+
+## 1.2 Contextual Execution Sources
+
+The following sources are not part of the constitutional authority hierarchy but MUST be read to correctly interpret the current implementation state and execution boundaries.
+
+| File | Purpose |
+|------|--------|
+| `.claude/workflows/system_orchestration/README.md` | Defines current package structure, execution boundaries, and scheduler–agent–skill separation. Prevents architectural misinterpretation during implementation. |
+
+These sources do not override §1 Mandatory Sources but must be consulted before making implementation decisions.
 
 ---
 
