@@ -437,7 +437,7 @@ For each scaffolded file, populate all front matter fields from §3.2A using `sk
 - `writes_to` matches `writes_to` in `skill_catalog.yaml` exactly
 - `constitutional_constraints` is copied verbatim from `skill_catalog.yaml` — no paraphrase, no omission
 
-### Step 4 — Bind canonical inputs and outputs
+### Step 4 — Bind canonical inputs and outputs **Status: COMPLETE**
 
 For each skill:
 - Expand each path in `reads_from` to identify:
@@ -446,7 +446,7 @@ For each skill:
   - The schema ID expected (from `artifact_schema_specification.yaml`) for canonical artifacts
 - Expand each path in `writes_to` to identify:
   - The specific artifact(s) the skill will write at that path
-  - The schema ID the artifact must carry (if applicable)
+  - The schema ID the artifact must carry (if applicable) 
   - All required fields, with their derivation sources
 
 For each declared output:
