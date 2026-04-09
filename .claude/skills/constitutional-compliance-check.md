@@ -49,5 +49,96 @@ constitutional_constraints:
 | `docs/tier4_orchestration_state/validation_reports/` | Not registered as a discrete artifact_id in the artifact_registry | Multiple nodes (context-dependent per invoking agent) |
 | `docs/tier4_orchestration_state/decision_log/` | Not registered as a discrete artifact_id in the artifact_registry | Multiple nodes (context-dependent per invoking agent) |
 
-<!-- BODY: Execution specification — to be completed in Step 5 (execution logic) -->
+## Execution Specification
+
+### 1. Input Validation Sequence
+
+- Step 1.1: Confirm the invoking agent provides the path of the artifact to be audited as context parameter `artifact_path`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="artifact_path required; invoking agent must specify which artifact to audit") and halt.
+- Step 1.2: Presence check — confirm the artifact at `artifact_path` exists and is readable. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Artifact at <artifact_path> not found") and halt.
+- Step 1.3: Confirm `CLAUDE.md` is accessible at the repository root. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="CLAUDE.md not found; cannot perform constitutional compliance check") and halt.
+- Step 1.4: Read CLAUDE.md §13 (prohibitions 13.1–13.12). These 12 prohibitions define the exact checks to apply. If the §13 content cannot be read: halt.
+
+### 2. Core Processing Logic
+
+Apply each of the 12 checks below to the artifact at `artifact_path`. For each check: assign `check_status` as "pass" or "violation". If a violation is found: record `violation_evidence` (quoted text from the artifact that evidences the violation) and `severity` (critical or major).
+
+**Check 13.1 — Grant Agreement Annex as schema source:**
+- Read the artifact's content. If the artifact is a proposal section (schema_id = "orch.tier5.proposal_section.v1") or a phase output: check whether any structural reference in the content or traceability_footer identifies a Grant Agreement Annex, Model Grant Agreement Annex, or "AGA" template as a schema source.
+- Specific detection: look for strings matching "Annex [0-9]", "Grant Agreement Annex", "AGA Template", "Model Grant Agreement template" used as a structural authority (not as a citation). If found: violation. Severity: critical.
+
+**Check 13.2 — Invented call constraints:**
+- Applicable to: any artifact that makes claims about what the call requires, excludes, or mandates.
+- For each claim in the artifact that asserts a call requirement, scope boundary, or eligibility condition: check whether a corresponding entry exists in `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` or `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` or `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json`. If a claim asserts a call requirement that has no matching entry in any Tier 2B extracted file: violation. Severity: critical.
+
+**Check 13.3 — Invented project facts:**
+- Applicable to: all artifacts containing project-specific content.
+- For each claim naming a specific partner (by name or identifier), capability, objective, prior experience, budget figure, team size, or equipment item: check whether that specific fact appears in `docs/tier3_project_instantiation/`. Check specifically: `consortium/partners.json` for partner names and identifiers, `architecture_inputs/` for objectives and outcomes, `project_brief/` for general project facts.
+- If a named partner, capability, or project fact cannot be found in any Tier 3 file: violation. Severity: critical.
+
+**Check 13.4 — Phase 8 activity before budget gate:**
+- Applicable to: all Phase 8 artifacts (schema_id begins with "orch.tier5." or "orch.phase8.").
+- Check whether `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` exists with `gate_pass_declaration: "pass"`. If the artifact is a Phase 8 artifact AND this budget_gate_assessment either does not exist or has `gate_pass_declaration: "fail"`: violation. Severity: critical.
+- For proposal sections: scan content for any budget figure references (patterns like "€[0-9]+", "[0-9]+ EUR", "[0-9]+ person-months" used as confirmed values). If any budget-dependent claims are present without a passing budget gate: violation.
+
+**Check 13.5 — Durable decisions held only in agent memory:**
+- Not directly checkable by reading an artifact. Skip for artifact-level check. Record check_status: "pass" (cannot verify from artifact content alone; this is enforced by decision-log-update skill).
+
+**Check 13.6 — Skill becoming a de facto constitutional authority:**
+- Not directly checkable from an artifact. Skip. Record check_status: "pass".
+
+**Check 13.7 — Silent phase reordering:**
+- Check whether the artifact references activities from a phase higher than the current phase in its `run_id` or phase context. If a Phase 3 artifact (wp_structure.json) references Phase 5 outputs as inputs: violation. Severity: critical.
+
+**Check 13.8 — Finalised text with incomplete source state:**
+- Applicable to: Tier 5 deliverable artifacts.
+- For each proposal section: check `validation_status.overall_status`. If `overall_status: "unresolved"`: the section contains unresolved content. Check whether this is flagged in the section's content with explicit language (e.g., "[DATA REQUIRED: ...]", "INCOMPLETE:", "FLAGGED AS INCOMPLETE"). If unresolved status is present but NOT explicitly flagged in the section content: violation (the section appears complete but has unresolved claims). Severity: critical.
+
+**Check 13.9 — Generic programme knowledge as substitute for Tier 1 documents:**
+- Applicable when Tier 1 documents are present.
+- Check whether any claim in the artifact that references Horizon Europe rules (participation conditions, grant agreement terms, financial regulation) has a `source_ref` in `traceability_footer.primary_sources[]` pointing to a Tier 1 extracted artifact. If a regulatory claim has no Tier 1 source but Tier 1 extracted files exist: violation. Severity: major.
+
+**Check 13.10 — Tier 5 outputs not traceable to Tier 1–4:**
+- Applicable to: all Tier 5 artifacts.
+- Check `traceability_footer.no_unsupported_claims_declaration`. If false: examine `validation_status.claim_statuses[]` for any entries with status "unresolved" that lack a source_ref. For each unresolved claim with no source_ref in traceability_footer: violation. Severity: critical.
+
+**Check 13.11 — Tier 1 or Tier 2 source documents modified to reflect project assumptions:**
+- Not checkable from a phase output or deliverable artifact. Skip. Record check_status: "pass".
+
+**Check 13.12 — CLAUDE.md treated as advisory:**
+- Not directly checkable from an artifact. Skip. Record check_status: "pass".
+
+- Step 2.2: For each violation found: determine whether a resolution decision is needed (i.e., whether the violation must be logged to the decision log because it may affect future interpretation). A violation requires a decision log entry if: it is severity critical, OR if the invoking agent has flagged it as requiring durable recording.
+
+### 3. Output Construction
+
+**Compliance report file (e.g., `compliance_check_<artifact_slug>_<timestamp>.json`):**
+- `report_id`: `"compliance_check_<artifact_slug>_<agent_id>_<ISO8601_timestamp>"`
+- `skill_id`: `"constitutional-compliance-check"`
+- `invoking_agent`: from agent context
+- `run_id_reference`: from agent context
+- `artifact_audited`: the `artifact_path` provided by the invoking agent
+- `section13_checks`: array — one entry per prohibition 13.1–13.12: `{prohibition_id (e.g., "13.1"), prohibition_description (short description), check_status ("pass"/"violation"), violation_evidence (quoted text or null), severity ("critical"/"major" or null)}`
+- `summary`: `{total_prohibitions_checked: 12, violations_found: <count of violation entries>}`
+- `timestamp`: ISO 8601
+
+**Decision log entry (written ONLY when a violation is found and requires durable recording):**
+- `decision_id`: `"constitutional_violation_<agent_id>_<ISO8601_timestamp>"`
+- `decision_type`: `"constitutional_violation"`
+- `violation_id`: `"<prohibition_id>_<artifact_slug>_<timestamp>"`
+- `constitutional_rule_ref`: e.g., `"CLAUDE.md §13.3"`
+- `artifact_affected`: the `artifact_path`
+- `resolution_status`: `"unresolved"` (violations are flagged; they are not resolved by this skill)
+- `resolution_note`: `"Constitutional violation detected; requires human operator resolution"`
+- `tier_authority_applied`: `"CLAUDE.md §13"`
+- `timestamp`: ISO 8601
+
+### 4. Conformance Stamping
+
+Validation reports and decision log entries are not phase output canonical artifacts. No `schema_id` or `artifact_status` applies.
+
+### 5. Write Sequence
+
+- Step 5.1: Write the compliance report to `docs/tier4_orchestration_state/validation_reports/<report_id>.json`
+- Step 5.2: For each violation requiring a decision log entry: write to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`
+
 <!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
