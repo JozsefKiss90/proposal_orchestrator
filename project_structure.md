@@ -4,15 +4,15 @@
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 d-----     2026. 04. 02.     22:13                .claude
-d--h--     2026. 04. 08.     10:11                .git
+d--h--     2026. 04. 09.     13:08                .git
 d-----     2026. 04. 01.     15:16                .pytest_cache
 d-----     2026. 03. 31.     15:06                docs
 d-----     2026. 04. 08.     10:37                runner
 d-----     2026. 04. 01.     15:16                tests
 -a----     2026. 04. 01.     13:10              0 .gitignore
--a----     2026. 04. 01.     12:48          31987 CLAUDE.md
+-a----     2026. 04. 08.     11:15          33551 CLAUDE.md
 -a----     2026. 04. 02.     18:53              0 progress.md
--a----     2026. 04. 07.     15:41          34865 project_structure.md
+-a----     2026. 04. 08.     11:07          35742 project_structure.md
 -a----     2026. 04. 01.     15:06             82 pyproject.toml
 
 
@@ -22,13 +22,62 @@ d-----     2026. 04. 01.     15:16                tests
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 d-----     2026. 03. 31.     15:10                agent-memory
-d-----     2026. 03. 31.     15:10                agents
+d-----     2026. 04. 09.      3:15                agents
 d-----     2026. 03. 31.     15:10                cache
 d-----     2026. 03. 31.     15:10                logs
 d-----     2026. 03. 31.     15:10                runs
 d-----     2026. 03. 31.     15:10                skills
-d-----     2026. 03. 31.     19:58                workflows
+d-----     2026. 04. 08.     11:59                workflows
 -a----     2026. 04. 02.     22:13           1364 settings.local.json
+
+
+    Directory: C:\Code\proposal_orchestator\.claude\agents
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----     2026. 04. 08.     23:06                prompts
+-a----     2026. 04. 08.     22:14          20080 budget_gate_validator.md
+-a----     2026. 04. 08.     22:14          14894 budget_interface_coordinator.md
+-a----     2026. 04. 08.     22:11          20715 call_analyzer.md
+-a----     2026. 04. 08.     22:16          12200 compliance_validator.md
+-a----     2026. 04. 08.     22:12          18554 concept_refiner.md
+-a----     2026. 04. 08.     22:12          12016 dependency_mapper.md
+-a----     2026. 04. 08.     22:15          13835 evaluator_reviewer.md
+-a----     2026. 04. 08.     22:13          13691 gantt_designer.md
+-a----     2026. 04. 08.     22:13          15825 impact_architect.md
+-a----     2026. 04. 08.     22:13          17167 implementation_architect.md
+-a----     2026. 04. 08.     22:11          13014 instrument_schema_resolver.md
+-a----     2026. 04. 08.     12:30           8031 node_body_contract.md
+-a----     2026. 04. 08.     22:15          18725 proposal_writer.md
+-a----     2026. 04. 08.     22:16          21200 revision_integrator.md
+-a----     2026. 04. 08.     22:17          13634 state_recorder.md
+-a----     2026. 04. 08.     22:16          12091 traceability_auditor.md
+-a----     2026. 04. 09.      3:15          35707 validation_checklist.md
+-a----     2026. 04. 08.     22:12          18192 wp_designer.md
+
+
+    Directory: C:\Code\proposal_orchestator\.claude\agents\prompts
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----     2026. 04. 08.     22:59          16486 budget_gate_validator_prompt_spec.md
+-a----     2026. 04. 08.     22:58          12883 budget_interface_coordinator_prompt_spec.md
+-a----     2026. 04. 08.     22:47          20240 call_analyzer_prompt_spec.md
+-a----     2026. 04. 08.     23:04          12085 compliance_validator_prompt_spec.md
+-a----     2026. 04. 08.     22:51          16754 concept_refiner_prompt_spec.md
+-a----     2026. 04. 08.     22:53          12577 dependency_mapper_prompt_spec.md
+-a----     2026. 04. 08.     23:01          13954 evaluator_reviewer_prompt_spec.md
+-a----     2026. 04. 08.     22:55          13630 gantt_designer_prompt_spec.md
+-a----     2026. 04. 08.     22:56          15421 impact_architect_prompt_spec.md
+-a----     2026. 04. 08.     22:57          15432 implementation_architect_prompt_spec.md
+-a----     2026. 04. 08.     22:50          15631 instrument_schema_resolver_prompt_spec.md
+-a----     2026. 04. 08.     23:00          16680 proposal_writer_prompt_spec.md
+-a----     2026. 04. 08.     23:03          18345 revision_integrator_prompt_spec.md
+-a----     2026. 04. 08.     23:06          13920 state_recorder_prompt_spec.md
+-a----     2026. 04. 08.     23:05          11983 traceability_auditor_prompt_spec.md
+-a----     2026. 04. 08.     22:52          15830 wp_designer_prompt_spec.md
 
 
     Directory: C:\Code\proposal_orchestator\.claude\workflows
@@ -36,7 +85,8 @@ d-----     2026. 03. 31.     19:58                workflows
 
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
-d-----     2026. 04. 08.     10:48                system_orchestration
+d-----     2026. 04. 09.     13:53                system_orchestration
+-a----     2026. 04. 08.     12:23          27066 agent-generation-plan.md
 -a----     2026. 03. 31.     19:36         111086 system_orchestration.yaml
 
 
@@ -46,7 +96,7 @@ d-----     2026. 04. 08.     10:48                system_orchestration
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 d-----     2026. 03. 31.     20:21                workflow_phases
--a----     2026. 03. 31.     20:23          18194 agent_catalog.yaml
+-a----     2026. 04. 08.     17:20          18183 agent_catalog.yaml
 -a----     2026. 04. 01.     14:54          88009 artifact_schema_specification.yaml
 -a----     2026. 04. 08.     10:48           5209 dag_scheduler_guide.md
 -a----     2026. 04. 08.     10:40          17861 dag_scheduler_plan.md
@@ -59,7 +109,8 @@ d-----     2026. 03. 31.     20:21                workflow_phases
 -a----     2026. 03. 31.     19:58           3948 meta.yaml
 -a----     2026. 04. 07.     13:41          12691 quality_gates.yaml
 -a----     2026. 04. 08.     10:41          30584 README.md
--a----     2026. 03. 31.     20:24          16561 skill_catalog.yaml
+-a----     2026. 04. 08.     17:20          16659 skill_catalog.yaml
+-a----     2026. 04. 09.     13:53          47057 skill_implementation_plan.md
 -a----     2026. 03. 31.     20:25           3339 state_rules.yaml
 -a----     2026. 03. 31.     20:02           6631 tier_bindings.yaml
 
