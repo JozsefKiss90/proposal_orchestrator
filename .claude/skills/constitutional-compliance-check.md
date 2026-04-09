@@ -68,12 +68,11 @@ Apply each of the 12 checks below to the artifact at `artifact_path`. For each c
 
 **Check 13.2 — Invented call constraints:**
 - Applicable to: any artifact that makes claims about what the call requires, excludes, or mandates.
-- For each claim in the artifact that asserts a call requirement, scope boundary, or eligibility condition: check whether a corresponding entry exists in `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` or `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` or `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json`. If a claim asserts a call requirement that has no matching entry in any Tier 2B extracted file: violation. Severity: critical.
+- For each claim in the artifact that asserts a call requirement, scope boundary, or eligibility condition: check whether the claim's `traceability_footer.primary_sources[]` contains a reference pointing to a path within `docs/tier2b_topic_and_call_sources/extracted/`. If a call requirement claim carries no Tier 2B source reference in the artifact's traceability footer: violation. Severity: critical. Note: this skill does not read `docs/tier2b_topic_and_call_sources/extracted/` directly (not in reads_from); it checks only whether the artifact provides a Tier 2B source reference, not whether the referenced entry is present in the Tier 2B files.
 
 **Check 13.3 — Invented project facts:**
 - Applicable to: all artifacts containing project-specific content.
-- For each claim naming a specific partner (by name or identifier), capability, objective, prior experience, budget figure, team size, or equipment item: check whether that specific fact appears in `docs/tier3_project_instantiation/`. Check specifically: `consortium/partners.json` for partner names and identifiers, `architecture_inputs/` for objectives and outcomes, `project_brief/` for general project facts.
-- If a named partner, capability, or project fact cannot be found in any Tier 3 file: violation. Severity: critical.
+- For each claim naming a specific partner (by name or identifier), capability, objective, prior experience, budget figure, team size, or equipment item: check whether the claim's `traceability_footer.primary_sources[]` contains a reference pointing to a path within `docs/tier3_project_instantiation/`. If a project-fact claim carries no Tier 3 source reference in the artifact's traceability footer: violation. Severity: critical. Note: this skill does not read `docs/tier3_project_instantiation/` directly (not in reads_from); it checks only whether the artifact provides a Tier 3 source reference, not whether the referenced fact is present in the Tier 3 files.
 
 **Check 13.4 — Phase 8 activity before budget gate:**
 - Applicable to: all Phase 8 artifacts (schema_id begins with "orch.tier5." or "orch.phase8.").
@@ -94,8 +93,7 @@ Apply each of the 12 checks below to the artifact at `artifact_path`. For each c
 - For each proposal section: check `validation_status.overall_status`. If `overall_status: "unresolved"`: the section contains unresolved content. Check whether this is flagged in the section's content with explicit language (e.g., "[DATA REQUIRED: ...]", "INCOMPLETE:", "FLAGGED AS INCOMPLETE"). If unresolved status is present but NOT explicitly flagged in the section content: violation (the section appears complete but has unresolved claims). Severity: critical.
 
 **Check 13.9 — Generic programme knowledge as substitute for Tier 1 documents:**
-- Applicable when Tier 1 documents are present.
-- Check whether any claim in the artifact that references Horizon Europe rules (participation conditions, grant agreement terms, financial regulation) has a `source_ref` in `traceability_footer.primary_sources[]` pointing to a Tier 1 extracted artifact. If a regulatory claim has no Tier 1 source but Tier 1 extracted files exist: violation. Severity: major.
+- Check whether any claim in the artifact that references Horizon Europe rules (participation conditions, grant agreement terms, financial regulation) has a `source_ref` in `traceability_footer.primary_sources[]` pointing to a path within `docs/tier1_normative_framework/extracted/`. If a regulatory claim carries no Tier 1 source reference in the artifact's traceability footer: violation. Severity: major. Note: this skill does not read `docs/tier1_normative_framework/extracted/` directly (not in reads_from); it checks only whether the artifact's traceability footer contains a Tier 1 path reference, not whether the referenced file exists.
 
 **Check 13.10 — Tier 5 outputs not traceable to Tier 1–4:**
 - Applicable to: all Tier 5 artifacts.

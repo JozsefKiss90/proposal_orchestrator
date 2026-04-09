@@ -32,7 +32,7 @@ constitutional_constraints:
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
 | `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` | phase8_checkpoint.json | `orch.checkpoints.phase8_checkpoint.v1` | schema_id, run_id, status[published], published_at (ISO 8601), gate_results_confirmed (array of gate_ids: must include gate_09_budget_consistency, gate_10_part_b_completeness, gate_11_review_closure, gate_12_constitutional_compliance) | Yes | status: set to "published" only when all required gate results carry status: "pass"; published_at: ISO 8601 timestamp at time of checkpoint publication; gate_results_confirmed: list of gate_ids confirmed at checkpoint time, derived from reading gate result files in phase_outputs/ |
 
-**Critical constraint:** A validated checkpoint must not be overwritten by subsequent reruns (CLAUDE.md §5 Tier 4 constraints). If `phase8_checkpoint.json` already exists with status: "published", this skill must refuse to overwrite it and must write a gate failure to the decision log instead.
+**Critical constraint:** A validated checkpoint must not be overwritten by subsequent reruns (CLAUDE.md §5 Tier 4 constraints). If `phase8_checkpoint.json` already exists with status: "published", this skill must refuse to overwrite it and return a CONSTRAINT_VIOLATION failure. This skill does not write to the decision log; the invoking agent must call decision-log-update if durable logging of the overwrite refusal is required.
 
 ### Artifact Registry Cross-Reference
 

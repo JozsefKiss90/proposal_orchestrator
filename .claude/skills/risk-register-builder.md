@@ -33,7 +33,7 @@ constitutional_constraints:
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
 | `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` | implementation_architecture.json (risk_register field) | `orch.phase6.implementation_architecture.v1` | schema_id, run_id (already set by governance-model-builder); risk_register (array: risk_id, description, category[technical/financial/organisational/ethical/external/other], likelihood[low/medium/high], impact[low/medium/high], mitigation[non-empty string], responsible_partner per entry) | Yes — same run_id as the full implementation_architecture.json | risk_register entries: risk_id, description, category from risks.json seeds; likelihood and impact refined from initial values; mitigation derived from mitigation_seed with specific reference to WP activities from wp_structure.json; monitoring_triggers derived from gantt.json milestone due months |
 
-**Note:** `artifact_status` must be ABSENT at write time. This skill populates the risk_register field within the implementation_architecture.json file. If material risks are identified during analysis of wp_structure or gantt that are NOT in risks.json, they must be documented in a flag record (not added to the register) and surfaced to the operator via the decision log.
+**Note:** `artifact_status` must be ABSENT at write time. This skill populates the risk_register field within the implementation_architecture.json file. If material risks are identified during analysis of wp_structure or gantt that are NOT in risks.json, they must be documented as flag records (not added to the register) and returned in the SkillResult payload's `flagged_gap_risks` array so the invoking agent can invoke decision-log-update. This skill does not write to the decision log directly.
 
 ### Artifact Registry Cross-Reference
 
@@ -56,7 +56,7 @@ constitutional_constraints:
 - Step 2.1: Extract **risk seeds** from `risks.json`: each seed entry with `risk_id`, `description`, `category`, `initial_likelihood`, `initial_impact`, `mitigation_seed`, `responsible_partner`.
 - Step 2.2: Build a **WP activity catalogue** from `wp_structure.json`: for each WP, collect all task titles and deliverable titles. For each task: record `{ task_id, title, wp_id, responsible_partner }`. For each deliverable: record `{ deliverable_id, title, type, wp_id, responsible_partner }`. This catalogue is used to anchor mitigation measures to specific project activities.
 - Step 2.3: Extract **milestone monitoring points** from `gantt.json`: for each milestone, record `{ milestone_id, due_month, responsible_wp }`. These become candidate monitoring trigger points for risk monitoring.
-- Step 2.4: Build the **valid_partner_ids** set from `docs/tier3_project_instantiation/consortium/partners.json` (read from context or directly).
+- Step 2.4: Build the **valid_partner_ids** set from the consortium partner list provided by the invoking agent as context. This skill does not read `docs/tier3_project_instantiation/consortium/partners.json` directly (not in reads_from); the invoking agent must supply the partner_id list as a context parameter before invoking this skill.
 - Step 2.5: For each risk seed entry, build a full risk register entry:
   - `risk_id`: from seed `risk_id` — preserve exactly.
   - `description`: from seed `description` — preserve exactly; do not paraphrase or elaborate.
