@@ -71,7 +71,7 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 - Step A.2.1: Read `interface_contract.json`. Extract the request schema: required fields list, field types, protocol version.
 - Step A.2.2: For each file in `request_templates/`: parse the file as JSON. For each required field in the contract request schema: check whether the field is present and of the correct type. Record non-conformances.
 - Step A.2.3: Build the conformance result: `conformance_status` = "conforms" if all required fields are present and correctly typed; "non_conforming" if any required field is missing or incorrectly typed.
-- Step A.2.4: MUST NOT read any budget figures from any source, compute any budget values, or write any budget figure to any output. Any budget numeric data that appears in the template is pass-through only; this skill validates structure, not values.
+- Step A.2.4: Numeric fields may be parsed for structural validation (presence/type check) only. MUST NOT compute, estimate, copy, materialize, store, quote, or write any numeric budget value to any output artifact. Structural validation of numeric fields is allowed (e.g., "field present and is a number"); materialization of the value itself is forbidden.
 
 #### 3. Output Construction (Mode A)
 
@@ -109,7 +109,7 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 - Step B.2.6: Build the **partner coverage check**: extract all `partner_id` values from `wp_structure.json partner_role_matrix[]`. For each partner_id: check whether a corresponding budget allocation entry exists in the budget response. Build `partner_coverage_results`: for each partner_id: `{ partner_id, present_in_budget: boolean, budget_line_reference: string or null, inconsistencies: [] }`. If `present_in_budget` is false: add `"Partner not found in budget response"` to inconsistencies.
 - Step B.2.7: Build `blocking_inconsistencies` array: collect all unresolved issues where `severity: "blocking"`. These include: contract non-conformance, any WP not found in budget, any partner not found in budget. Non-blocking findings (format issues, optional field absence) are recorded with `severity: "non_blocking"`.
 - Step B.2.8: Determine `gate_pass_declaration`: "pass" if AND ONLY IF all of the following hold: (1) received/ is non-empty, (2) response conforms to interface contract, (3) no blocking_inconsistencies with resolution: "unresolved" exist. Otherwise: "fail".
-- Step B.2.9: MUST NOT read, record, compute, estimate, or write any numeric budget value. The skill checks structural coverage only. Any budget figures in the response are pass-through; they are not read or recorded in any output field.
+- Step B.2.9: Numeric fields in the budget response may be parsed for structural validation (presence/type check) only. MUST NOT compute, estimate, copy, materialize, store, quote, or write any numeric budget value (cost, person-month count, currency amount) to any output artifact field or text. The skill checks structural coverage only — wp_id and partner_id presence/absence — not numeric values.
 
 #### 3. Output Construction (Mode B)
 
@@ -160,25 +160,28 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 **Enforcement mechanism — explicit allowed/forbidden boundary:**
 
 ALLOWED:
-- Reading structural keys from the budget response: wp_id, partner_id, field names, presence/absence of entries
-- Checking whether a WP or partner identifier is present or absent in the response
-- Passing through non-numeric identifier strings (e.g., wp_id values, partner_id values)
+- Parsing structure (field presence, field names, identifiers)
+- Reading wp_id, partner_id, or non-numeric identifiers
+- Checking presence/absence of keys
+- Checking structural conformance (field names match interface contract)
 
 FORBIDDEN (triggers CONSTITUTIONAL_HALT):
 - Computing any numeric value (sum, average, ratio, allocation, person-month count, cost)
-- Estimating a missing numeric value
-- Copying any numeric amount from the budget response into any output artifact field
-- Writing any currency amount, numeric budget figure, person-month count, or cost figure to any output
-- Referencing a numeric amount in a validation finding or assessment field
+- Estimating any numeric value
+- Copying numeric values into any output artifact
+- Materializing numeric budget amounts in any output artifact field
+- Referencing or quoting specific numeric amounts in output text
+
+KEY RULE: Numeric fields may be parsed for structural validation (presence/type check) but must not be materialized, stored, quoted, or written to outputs.
 
 DETERMINISTIC RULE:
-IF any numeric value (integer or float representing a cost, amount, or effort) is present in any output artifact written by this skill:
+IF any numeric value (integer or float representing a cost, amount, or effort) is materialized, stored, quoted, or written to any output artifact by this skill:
 → CONSTITUTIONAL_HALT immediately
-→ Reason: numeric budget values must not be materialized, stored, or written to any output artifact
-→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Numeric budget value <value> was generated/estimated internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3")
+→ Reason: numeric budget values must not be materialized, stored, quoted, or written to any output artifact
+→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Numeric budget value <value> was generated/estimated/materialized internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3")
 → No output written
 
-The check applies at write time: before writing any output field, verify no numeric budget value has been included. This applies to both Mode A and Mode B outputs.
+The check applies at write time: before writing any output field, verify no numeric budget value has been materialized, stored, quoted, or written. This applies to both Mode A and Mode B outputs.
 
 **Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No validation artifact or budget_gate_assessment.json written.
 
@@ -290,7 +293,7 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at write se
 ### CONSTITUTIONAL_HALT
 
 **Trigger conditions in this skill:**
-- Constraint 1 (must not generate or estimate budget figures): Any numeric budget value (cost, person-months, currency amount) that does not originate verbatim from the `received/` budget response file is written to any output artifact → `failure_reason="Numeric budget value <value> was generated/estimated internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3"`
+- Constraint 1 (must not generate or estimate budget figures): Any numeric budget value (cost, person-months, currency amount) is materialized, stored, quoted, or written to any output artifact — regardless of origin. Numeric fields may be parsed for structural validation (presence/type check) but must not be materialized, stored, quoted, or written to outputs → `failure_reason="Numeric budget value <value> was generated/estimated/materialized internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3"`
 - Constraint 2 (must not accept non-conforming response as conforming): The skill writes `conformance_status: "conforms"` when a required field is missing or of wrong type in the budget response → `failure_reason="Non-conforming budget response accepted as conforming; this violates the interface contract and CLAUDE.md §8.5"`
 - Constraint 3 (must not declare gate passed with blocking inconsistencies): `gate_pass_declaration` is set to "pass" when any entry in `blocking_inconsistencies` has `resolution: "unresolved"` → `failure_reason="gate_pass_declaration set to pass despite unresolved blocking inconsistencies; CLAUDE.md §7 Phase 7 gate and §13.4 prohibit declaring the budget gate passed when blocking inconsistencies exist"`
 - Constraint 4 (absent response treated as non-failing): Any attempt to treat absent `received/` directory as a state other than blocking gate failure → `failure_reason="Attempted to treat absent budget response as a non-failing state; CLAUDE.md §8.4 defines absent budget artifacts as a blocking gate failure, not a hold state"`
