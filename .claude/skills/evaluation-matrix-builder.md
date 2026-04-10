@@ -218,3 +218,7 @@ No INCOMPLETE_OUTPUT conditions are defined explicitly in the execution logic. O
 **Corrections applied:** None. Output Construction and Outputs table already list every required schema field with correct schema_id and enum-compliant status values.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

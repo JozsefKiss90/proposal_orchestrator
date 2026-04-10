@@ -350,3 +350,7 @@ When `overall_status = "fail"`, this skill writes a decision log entry to `docs/
 **Corrections applied:** None. The output contract is correctly partitioned: SkillResult payload (in-memory, runner-owned GateResult write) and decision_log/ entry (skill-written on failure).
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

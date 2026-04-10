@@ -228,3 +228,7 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional con
 **Corrections applied:** None to Output Construction. The placeholder strategy is documented in Step 5.2 and is consistent with the merge-on-write contract; the artifact is not gate-evaluable until all co-producer skills have completed.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

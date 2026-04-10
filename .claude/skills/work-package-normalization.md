@@ -239,3 +239,7 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional fai
 **Corrections applied:** None. Output Construction already lists every required schema field with correct schema_id, enum-compliant deliverable types, dependency_types, and edge_types.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

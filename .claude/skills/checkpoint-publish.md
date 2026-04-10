@@ -247,3 +247,7 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at Step 5.2
 **Corrections applied:** None — Output Construction is already fully conformant with `orch.checkpoints.phase8_checkpoint.v1`.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

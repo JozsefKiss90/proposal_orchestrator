@@ -250,3 +250,7 @@ constitutional_constraints:
 **Corrections applied:** None. Output Construction preserves schema_id and run_id, leaves artifact_status absent, and extends only dependency_map fields per spec.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

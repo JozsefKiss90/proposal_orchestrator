@@ -259,3 +259,7 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 *Validation status vocabulary check:* Confirmed/Inferred/Assumed/Unresolved vocabulary per CLAUDE.md §12.2 is used in Step 2.4 for outcome alignment status assignment, and propagated into the decision log entry's `alignment_findings` summary. The decision log entry includes `decision_id`, `decision_type`, `tier_authority_applied`, `resolution_status`, and ISO 8601 `timestamp`, conforming to decision-log-update structure.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

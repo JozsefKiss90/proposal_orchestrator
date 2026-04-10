@@ -324,3 +324,7 @@ This skill reads from source document directories (not structured schema-validat
 **Overall corrections applied:** 6 root-field renames, 2 required enum fields added (constraint_type, impact_type), 1 id field rename (scope_element_id→requirement_id), 1 field replacement (boundary_type→mandatory), 1 enum restated (condition_type), 1 field rename (priority_note→priority_notes), 1 required field added (criterion_name).
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

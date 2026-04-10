@@ -268,3 +268,7 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. If a write error occurs 
 **Conformance note (`section_type` enforcement):** When parsing the application form, each section must be classified into one of the four enum values. This is a new enforcement obligation created by the spec; the skill's Step 2.2 must assign `section_type` per section from form evidence (proposal body sections → `proposal_section`; management/implementation annex sections → `implementation_section`; title/cover page → `cover_page`; annexes → `annexe`). If classification is not derivable from the form, the section entry must flag the classification as Assumed with an `assumption_note`, consistent with the skill's Constraint 3 pattern for `mandatory` without form evidence.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.

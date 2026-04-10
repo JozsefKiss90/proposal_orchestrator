@@ -228,3 +228,7 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional con
 **Corrections applied:** None. Output Construction enforces enum-compliant category, likelihood, and impact values, and preserves all non-risk_register fields by merge.
 
 <!-- Step 8 complete: schema validation performed -->
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.
