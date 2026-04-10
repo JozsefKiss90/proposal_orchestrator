@@ -174,4 +174,139 @@ The decision log entry written by this skill (when overall_status is "fail") doe
 - Step 5.2: If overall_status is "fail": write the decision log entry to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`.
 - Step 5.3: Do NOT write gate_result.json or any named gate result variant (gate_01_result.json, gate_10_result.json, gate_11_result.json, gate_12_result.json). These are runner-owned artifacts written by the DAG scheduler after receiving the SkillResult payload via the invoking agent.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Gate conditions are defined in this workflow and in CLAUDE.md; they must not be weakened"
+
+**Decision point in execution logic:** Step 2.1 and Step 2.2 — at the point each deterministic and semantic predicate is applied; and Step 2.4 — at the point `overall_status` is determined.
+
+**Exact failure condition:** (a) Any deterministic predicate listed in the gate-to-predicate mapping for the current gate_id is omitted from the evaluation; OR (b) a semantic predicate defined in the gate-to-predicate mapping is not applied (e.g., skipped because the artifact "seems fine"); OR (c) a predicate's pass/fail determination is softened — e.g., a predicate that requires `non-empty` is re-interpreted as "has at least one character" rather than "has at least one meaningful entry".
+
+**Enforcement mechanism:** In Steps 2.1 and 2.2, the predicate lists are fixed and exhaustive as defined in the gate-to-artifact mapping. The skill has no authority to add, remove, or reinterpret predicates. For each predicate: the check must be applied exactly as specified — no agent judgment override of the predicate's definition is permitted. If applying a predicate requires a value that is unavailable (e.g., `project_duration_months` is null), the predicate must be recorded as a special case and `fail_message` must state the reason — the predicate is not silently passed. Weakening a predicate in any way triggers: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Gate predicate <predicate_id> was weakened or omitted; gate conditions defined in CLAUDE.md §7 and the manifest must not be weakened per CLAUDE.md §13.7 and §6.2"). No SkillResult payload returned; no decision log entry written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No SkillResult predicate evaluation payload returned.
+
+**Hard failure confirmation:** Yes — predicate weakening or omission is a categorical constitutional violation.
+
+**CLAUDE.md §13 cross-reference:** §13.7 — "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete." §6.2 — "Gates are mandatory. Each phase has a gate condition. A phase is not complete until its gate condition is satisfied."
+
+---
+
+### Constraint 2: "Gate failure must be declared explicitly; fabricated completion is a constitutional violation"
+
+**Decision point in execution logic:** Step 2.4 — at the point `overall_status` is set; and Step 5.2 — at the point the decision log entry is written for failures.
+
+**Exact failure condition:** `overall_status` is set to "pass" when ANY predicate (deterministic or semantic) has failed. Equivalently: the SkillResult payload returns `overall_status: "pass"` to mask a gate failure, preventing downstream gate blocking.
+
+**Enforcement mechanism:** Step 2.4 is a deterministic check: `overall_status = "pass"` if and only if ALL predicates pass. If any predicate fails: `overall_status = "fail"`. The conjunction is non-negotiable. If `overall_status = "fail"`: Step 5.2 must write a decision log entry to `docs/tier4_orchestration_state/decision_log/`. If the decision log write fails: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Decision log write failed for gate failure; gate failures must be durably recorded per CLAUDE.md §9.4"). Under no circumstances may the SkillResult payload carry `overall_status: "pass"` when any predicate has failed — doing so is a constitutional violation that would allow a downstream phase to begin on an unpassed gate.
+
+**Failure output:** For gate failure (correct outcome): SkillResult(status="success") with payload containing `overall_status: "fail"` + decision log entry written. For fabricated pass (constitutional violation): SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Attempted to declare gate passed when predicates have failed; this is a constitutional violation per CLAUDE.md §15 and §13.7").
+
+**Hard failure confirmation:** Yes — fabricating a pass when predicates fail is an unconditional constitutional violation.
+
+**CLAUDE.md §13 cross-reference:** §15 — "The system must prefer explicit gate failure over fabricated completion. A declared failure is an honest and correct output. A fabricated completion is a constitutional violation." §13.7 — "Silently reordering phases or weakening gate conditions."
+
+---
+
+### Constraint 3: "A gate cannot be declared passed without confirming all gate conditions"
+
+**Decision point in execution logic:** Step 2.3 — at the point the predicate evaluation summary is compiled; and Step 2.4 — at the point `overall_status` is set.
+
+**Exact failure condition:** (a) `overall_status` is set to "pass" without having evaluated all deterministic predicates for the current gate_id; OR (b) `overall_status` is set to "pass" without having evaluated all semantic predicates for the current gate_id; OR (c) `deterministic_predicates.passed` + `deterministic_predicates.failed` does not account for all predicates defined for the gate_id in Step 2.1.
+
+**Enforcement mechanism:** In Step 2.3, the predicate evaluation summary must account for every predicate defined in Step 2.1 and Step 2.2 for the current gate_id. If the count of evaluated predicates (passed + failed) is less than the count of defined predicates for the gate: `overall_status` must not be set — return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Gate <gate_id> evaluation is incomplete: <n> predicates defined but <m> evaluated; all gate conditions must be confirmed before a gate result can be declared per CLAUDE.md §6.2"). The special case for `gate_09_budget_consistency` (absent received/ → immediate fail, hard_block: true) is a complete resolution — it does not require evaluating further predicates, and the incomplete evaluation in this case is constitutionally correct because the hard_block failure is the gate determination.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT") when predicate count mismatch is detected. For gate_09 hard_block: predicate evaluation is constitutionally complete at the presence check — no further predicates required.
+
+**Hard failure confirmation:** Yes — declaring a gate passed with an incomplete evaluation is a constitutional violation of CLAUDE.md §6.2.
+
+**CLAUDE.md §13 cross-reference:** §6.2 — "Gates are mandatory. Each phase has a gate condition. A phase is not complete until its gate condition is satisfied." §6.5 — "If a phase cannot complete because required inputs are absent, the system must declare a gate failure and halt."
+
+**Bidirectional guarantee (IF pass THEN provable):**
+A gate_pass_declaration of "pass" (or overall_status: "pass" in the SkillResult payload) is valid if and only if ALL of the following are provable from the evaluation record:
+- `deterministic_predicates.failed` is an empty array
+- `semantic_predicates.failed` is an empty array
+- The count of (`deterministic_predicates.passed` + `deterministic_predicates.failed`) equals the count of defined predicates for this gate_id
+
+IF pass is set but any of these conditions cannot be verified from the written predicate arrays:
+→ CONSTITUTIONAL_HALT
+→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="overall_status: pass set but predicate arrays do not satisfy the bidirectional guarantee; an unverifiable pass claim is equivalent to fabricated completion per CLAUDE.md §15")
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: Invoking agent does not provide `gate_id` as a context parameter → `failure_reason="gate_id required; invoking agent must specify which gate to evaluate"`
+- Step 1.2: The `gate_id` is not in the gate-to-artifact mapping → `failure_reason="gate_id '<gate_id>' not recognised"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path (note: this skill's primary output is a SkillResult payload, not a written artifact). Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.4: The canonical artifact exists but its `schema_id` does not match the expected value from the gate-to-artifact mapping → A predicate failure for `schema_id_match` is recorded; gate evaluation continues (overall_status = "fail"); no MALFORMED_ARTIFACT halt.
+
+Note: schema mismatch in the canonical artifact is handled as a predicate failure (resulting in a gate failure declaration) rather than a MALFORMED_ARTIFACT SkillResult halt. The skill continues evaluating to produce a complete predicate summary.
+
+**Artifact write behavior:** Not applicable (schema mismatch produces a gate failure SkillResult with `overall_status: "fail"`, not a MALFORMED_ARTIFACT halt).
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT or INCOMPLETE_OUTPUT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 3 (gate cannot be declared passed without confirming all gate conditions): The count of evaluated predicates (passed + failed) is less than the count of defined predicates for the gate_id → `failure_reason="Gate <gate_id> evaluation is incomplete: <n> predicates defined but <m> evaluated; all gate conditions must be confirmed before a gate result can be declared per CLAUDE.md §6.2"`
+- Constraint 2 (gate failure must be declared explicitly): Decision log write fails when `overall_status = "fail"` → `failure_reason="Decision log write failed for gate failure; gate failures must be durably recorded per CLAUDE.md §9.4"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No SkillResult predicate payload returned. No decision log entry written.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (gate conditions must not be weakened): Any deterministic or semantic predicate is omitted or softened; the gate predicate definition is reinterpreted by agent judgment → `failure_reason="Gate predicate <predicate_id> was weakened or omitted; gate conditions defined in CLAUDE.md §7 and the manifest must not be weakened per CLAUDE.md §13.7 and §6.2"`
+- Constraint 2 (gate failure declared explicitly): `overall_status` is set to "pass" when any predicate has failed → `failure_reason="Attempted to declare gate passed when predicates have failed; this is a constitutional violation per CLAUDE.md §15 and §13.7"`
+- Constraint 3 bidirectional guarantee: `overall_status: "pass"` is set but predicate arrays do not satisfy the bidirectional guarantee → `failure_reason="overall_status: pass set but predicate arrays do not satisfy the bidirectional guarantee; an unverifiable pass claim is equivalent to fabricated completion per CLAUDE.md §15"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No SkillResult predicate evaluation payload returned. A decision log entry MAY be written to `docs/tier4_orchestration_state/decision_log/` documenting the constitutional halt, as `decision_log/` is in this skill's declared `writes_to` scope.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires. Note: this skill's primary output is an in-memory SkillResult payload forwarded to the runner; the decision log entry is a secondary durable output written when `overall_status = "fail"`.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/decision_log/`; a failure record MAY be written there even when the primary payload cannot be returned.
+4. The invoking agent receives the `SkillResult` and is responsible for forwarding the predicate evaluation payload to the runner and for halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

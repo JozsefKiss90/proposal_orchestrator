@@ -139,4 +139,128 @@ Validation reports and decision log entries are not phase output canonical artif
 - Step 5.1: Write the compliance report to `docs/tier4_orchestration_state/validation_reports/<report_id>.json`
 - Step 5.2: For each violation requiring a decision log entry: write to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Must check against CLAUDE.md Section 13 prohibitions as a minimum"
+
+**Decision point in execution logic:** Step 1.4 and Step 2 — at the point CLAUDE.md §13 is read and all 12 checks (13.1–13.12) are applied.
+
+**Exact failure condition:** (a) The skill does not apply all 12 §13 checks to the artifact (i.e., any check is skipped without a recorded justification that it is not applicable); OR (b) CLAUDE.md is not read before the checks are applied (i.e., checks are applied from agent memory of §13 rather than from reading the current CLAUDE.md); OR (c) fewer than 12 `section13_checks` entries appear in the compliance report.
+
+**Enforcement mechanism:** In Step 1.4, reading CLAUDE.md §13 is mandatory and must occur before Step 2. In Step 2, all 12 checks must appear in the `section13_checks` output array — including those that are skipped for the specific artifact (13.5, 13.6, 13.11, 13.12), which must be recorded with `check_status: "pass"` and an explicit reason for not being applicable to artifact-level checks. If the compliance report would have fewer than 12 entries: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="compliance report has <n> section13_checks entries; all 12 CLAUDE.md §13 prohibitions must be checked as a minimum"). No compliance report written.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No report written.
+
+**Hard failure confirmation:** Yes — all 12 §13 checks are mandatory; any omission makes the report constitutionally incomplete.
+
+**CLAUDE.md §13 cross-reference:** This constraint is self-referential: the skill's own constitutionality depends on checking all 12 §13 prohibitions. §10.1 — "Every agent operating in this repository must consult this constitution before taking action."
+
+---
+
+### Constraint 2: "Constitutional violations must be flagged; they must not be silently resolved"
+
+**Decision point in execution logic:** Step 2 — at the point each violation is found and classified; and Step 3 — at the point the compliance report and decision log entry are written.
+
+**Exact failure condition:** (a) A violation is detected during execution but assigned `check_status: "pass"` in the output; OR (b) a critical violation is found but no decision log entry is written when a decision log write is required (when the violation requires durable recording per Step 2.2); OR (c) a violation is "resolved" by the skill itself (e.g., the skill modifies the artifact it is checking, or records the violation as resolved in the decision log rather than as unresolved requiring human operator action).
+
+**Enforcement mechanism:** In Step 2, if any check identifies a violation: `check_status` must be set to "violation" — it must not be downgraded to "pass" by agent judgment. In Step 3, the decision log entry (when required) must have `resolution_status: "unresolved"` — this skill does not resolve constitutional violations, it flags them. Setting `resolution_status: "resolved"` in a decision log entry written by this skill is a constitutional violation. If a violation is found but the compliance report write fails: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Compliance report write failed; constitutional violations must be flagged in the durable report per CLAUDE.md §12.3"). If a decision log write fails for a critical violation: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). Silently absorbing a violation (recording it internally but not writing it to the compliance report) is prohibited.
+
+**Failure output:** Report write failure → SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). Violation silencing → SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT").
+
+**Hard failure confirmation:** Yes — violation silencing is a constitutional violation; accurate flagging is the only permitted response.
+
+**CLAUDE.md §13 cross-reference:** §12.3 — "Contradictions between tiers must be resolved explicitly … A contradiction must not be silently resolved by selecting the more convenient source." §15 — "A declared failure is an honest and correct output. A fabricated completion is a constitutional violation."
+
+---
+
+### Constraint 3: "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md"
+
+**Decision point in execution logic:** This constraint applies to the skill's scope definition — it is enforced by what the skill does NOT do, verified at the scope boundary.
+
+**Exact failure condition:** (a) The skill modifies, amends, or overwrites CLAUDE.md at any point during its execution; OR (b) the skill interprets a §13 check in a way that narrows or expands CLAUDE.md's prohibitions (e.g., deciding a check "doesn't apply" to certain artifacts without CLAUDE.md stating that exception); OR (c) the skill makes a "policy decision" about whether a §13 prohibition is valid or appropriate — i.e., it treats CLAUDE.md as advisory.
+
+**Enforcement mechanism:** CLAUDE.md is declared in `reads_from` — the skill reads it as a source of checks to apply. It is not declared in `writes_to` — the skill must never write to CLAUDE.md. If any output construction step would produce a write to CLAUDE.md: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="This skill attempted to write to CLAUDE.md; CLAUDE.md is the governing constitution and may not be modified by any skill per CLAUDE.md §14.5 and §10.2"). The checks in Step 2 are applied as stated in CLAUDE.md §13 — the skill has no authority to add, remove, or reinterpret checks. If a check's applicability to a specific artifact type is uncertain: the check must be applied conservatively (assume it applies) and the result documented — not silently skipped.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT") for any attempt to modify CLAUDE.md.
+
+**Hard failure confirmation:** Yes — any attempt to modify or override CLAUDE.md by this skill is an unconditional constitutional violation.
+
+**CLAUDE.md §13 cross-reference:** §14.5 — "Amendments may not be made by agents, skills, or workflows operating autonomously." §10.2 — "Skills defined in .claude/skills/ are execution aids … A skill may not redefine phase meanings, tier meanings, gate logic, or the authority hierarchy."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: Invoking agent does not provide the `artifact_path` context parameter → `failure_reason="artifact_path required; invoking agent must specify which artifact to audit"`
+- Step 1.2: Artifact at `artifact_path` does not exist or is not readable → `failure_reason="Artifact at <artifact_path> not found"`
+- Step 1.3: `CLAUDE.md` is not accessible at the repository root → `failure_reason="CLAUDE.md not found; cannot perform constitutional compliance check"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads artifacts for auditing rather than for structured field extraction; schema mismatches in audited artifacts are findings recorded in the compliance report, not MALFORMED_ARTIFACT failures of the skill itself. No MALFORMED_ARTIFACT conditions are defined for this skill's own inputs.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT or INCOMPLETE_OUTPUT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (all 12 §13 checks applied): Compliance report would have fewer than 12 `section13_checks` entries → `failure_reason="compliance report has <n> section13_checks entries; all 12 CLAUDE.md §13 prohibitions must be checked as a minimum"`
+- Constraint 2 (violations flagged, not silently resolved): Compliance report write fails after a violation is detected → `failure_reason="Compliance report write failed; constitutional violations must be flagged in the durable report per CLAUDE.md §12.3"`
+- Constraint 2 (decision log write failure for critical violation): Decision log write fails for a critical violation requiring durable recording → `failure_reason="Decision log write failed for critical violation <violation_id>"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 2 (violations not silently resolved): A violation is detected but the skill attempts to assign `check_status: "pass"` to suppress it → `failure_reason="Attempted to silence a constitutional violation by assigning pass status; accurate flagging is the only permitted response per CLAUDE.md §12.3 and §15"`
+- Constraint 3 (CLAUDE.md governs this skill): Any output construction step would produce a write to `CLAUDE.md` → `failure_reason="This skill attempted to write to CLAUDE.md; CLAUDE.md is the governing constitution and may not be modified by any skill per CLAUDE.md §14.5 and §10.2"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No canonical artifact written. A decision log entry MAY be written to `docs/tier4_orchestration_state/decision_log/` documenting the constitutional halt, as `decision_log/` is in this skill's declared `writes_to` scope.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes both `docs/tier4_orchestration_state/validation_reports/` and `docs/tier4_orchestration_state/decision_log/`; failure records MAY be written to those paths even when the primary output fails.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

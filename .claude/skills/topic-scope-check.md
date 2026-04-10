@@ -85,4 +85,109 @@ Decision log entries are not phase output canonical artifacts. No `schema_id`, `
 - Step 5.1: Write the decision log entry file to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`
 - The filename must match the `decision_id` value exactly.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Scope boundary is defined by Tier 2B only; must not infer scope from generic programme knowledge"
+
+**Decision point in execution logic:** Steps 2.1–2.5 — at the point scope boundary entries are built and used to evaluate each claim. The boundary set must be constructed exclusively from `scope_requirements.json` and `call_constraints.json`.
+
+**Exact failure condition:** (a) The scope boundary set used for evaluation contains entries not sourced from `scope_requirements.json` or `call_constraints.json` — i.e., entries constructed from agent prior knowledge of what the call "typically" requires; OR (b) any claim is marked `in_scope` based on a generic programme-level judgment (e.g., "this topic is generally within Horizon Europe scope") rather than a match against a specific Tier 2B `scope_element_id`.
+
+**Enforcement mechanism:** Every `scope_element_ref` in the `scope_findings` array must reference a `scope_element_id` from `scope_requirements.json` or a `constraint_id` from `call_constraints.json`. Any claim evaluated as `in_scope` without a matching `scope_element_ref` from the loaded Tier 2B data must instead be assigned `status: "flagged"` with `flag_reason: "No Tier 2B scope element found to confirm this claim is in-scope; scope boundary is defined by Tier 2B only"`. If the skill cannot evaluate any claim without relying on prior programme knowledge: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Scope evaluation requires Tier 2B source data; inferring scope from generic programme knowledge is prohibited by CLAUDE.md §13.2 and §13.9") and halt.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No decision log entry written.
+
+**Hard failure confirmation:** Yes — scope boundary is exclusively Tier 2B; prior knowledge cannot expand or substitute for it.
+
+**CLAUDE.md §13 cross-reference:** §13.2 — "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents." §13.9 — "Using agent-local knowledge … as a substitute for reading Tier 1 source documents."
+
+---
+
+### Constraint 2: "Out-of-scope flags must be written to decision log"
+
+**Decision point in execution logic:** Step 5.1 — at the point the decision log entry is written. The decision log entry must be written for every invocation where `resolution_status = "unresolved"` (i.e., at least one out-of-scope or flagged finding exists).
+
+**Exact failure condition:** The skill invocation identifies one or more out-of-scope or flagged claims (resolution_status = "unresolved") but does NOT write a decision log entry to `docs/tier4_orchestration_state/decision_log/`.
+
+**Enforcement mechanism:** In Step 5.1, if `resolution_status = "unresolved"`, the decision log entry write is not optional — it is mandatory. If the write fails for any reason (e.g., directory not accessible): return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Decision log entry could not be written; out-of-scope flags must be persisted to the decision log per skill constitutional constraints and CLAUDE.md §9.4") and halt. An invocation that returns `status="success"` without having written the decision log entry when unresolved flags exist is a constitutional violation.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT") if decision log write fails.
+
+**Hard failure confirmation:** Yes — the decision log write for unresolved scope flags is not advisory; it is mandatory per CLAUDE.md §9.4.
+
+**CLAUDE.md §13 cross-reference:** §13.5 (analogous) — "Storing durable decisions only in agent memory without writing them to Tier 4." §9.4 — "Every decision that affects future interpretation, traceability, or reproducibility must be written to the decision log."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` is absent → `failure_reason="scope_requirements.json not found; call-requirements-extraction must run before topic-scope-check"`
+- Step 1.2: `scope_requirements.json` contains zero entries → `failure_reason="scope_requirements.json is empty; cannot evaluate scope without scope boundary definitions"`
+- Step 1.4: Invoking agent has not provided concept or section text as context → `failure_reason="No content provided for scope checking; invoking agent must supply concept or section text as context"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads from Tier 2B extracted artifact files (not structured canonical artifacts with schema_id). No MALFORMED_ARTIFACT conditions are defined; input absence is handled by MISSING_INPUT.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT or INCOMPLETE_OUTPUT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 2 (out-of-scope flags written to decision log): The skill identifies out-of-scope or flagged claims (`resolution_status = "unresolved"`) but the decision log write at Step 5.1 fails → `failure_reason="Decision log entry could not be written; out-of-scope flags must be persisted to the decision log per skill constitutional constraints and CLAUDE.md §9.4"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (scope boundary defined by Tier 2B only): The skill cannot evaluate any claim without relying on prior programme knowledge as the scope boundary; scope boundary set cannot be constructed from Tier 2B sources → `failure_reason="Scope evaluation requires Tier 2B source data; inferring scope from generic programme knowledge is prohibited by CLAUDE.md §13.2 and §13.9"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No decision log entry written. A decision log entry MAY be written to `docs/tier4_orchestration_state/decision_log/` documenting the constraint violation, as `decision_log/` is in this skill's declared `writes_to` scope.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/decision_log/`; a failure record MAY be written there even when the primary output fails.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

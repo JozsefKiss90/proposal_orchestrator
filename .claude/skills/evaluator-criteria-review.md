@@ -95,4 +95,138 @@ constitutional_constraints:
 - Step 5.1: Create directory `docs/tier5_deliverables/review_packets/` if not present.
 - Step 5.2: Write `review_packet.json` to `docs/tier5_deliverables/review_packets/review_packet.json`.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Evaluation must apply the active instrument evaluation criteria only"
+
+**Decision point in execution logic:** Step 2.2 — at the point the `criteria set` is built from `call_analysis_summary.json evaluation_matrix` and Step 2.4 — at the point findings are generated for each criterion.
+
+**Exact failure condition:** (a) The criteria set used for evaluation contains criterion_ids that do not exist in `call_analysis_summary.json evaluation_matrix` (i.e., criteria invented from prior knowledge); OR (b) findings are generated for evaluation criteria not present in the active instrument's evaluation form (i.e., generic evaluation dimensions not specific to the active instrument).
+
+**Enforcement mechanism:** In Step 2.2, the criteria set must be built exclusively from the `evaluation_matrix` in `call_analysis_summary.json`. No criterion may be added from agent prior knowledge of "typical" Horizon Europe evaluation criteria. In Step 2.4.1, if a section is being evaluated against a criterion_id that is not in the `evaluation_matrix`: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Evaluation criterion <criterion_id> not found in call_analysis_summary.json evaluation_matrix; evaluation must apply active instrument criteria only per CLAUDE.md §11.2 and §10.6"). No `review_packet.json` written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No output written.
+
+**Hard failure confirmation:** Yes — evaluating against criteria not in the active instrument evaluation form is a categorical prohibition.
+
+**CLAUDE.md §13 cross-reference:** §10.6 — "Agents must not substitute their prior knowledge of Horizon Europe requirements for the contents of Tier 1 and Tier 2 source documents." §11.2 — "Deliverables must be compliant with the active instrument's application form structure and constraints."
+
+---
+
+### Constraint 2: "Must not evaluate against grant agreement annex requirements"
+
+**Decision point in execution logic:** Step 1.2 — the Grant Agreement Annex guard is applied at input validation before any processing begins.
+
+**Exact failure condition:** The evaluation form file identified in `evaluation_forms/` has a title, header, or filename containing "Annex", "Grant Agreement", "Model Grant Agreement", or "AGA" — AND the skill continues to use it as the evaluation authority without halting.
+
+**Enforcement mechanism:** Step 1.2 is an unconditional guard that fires before Step 2 begins. If the guard condition triggers: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Document '<filename>' appears to be a Grant Agreement Annex. CLAUDE.md §13.1 prohibits evaluating against Grant Agreement Annex requirements; evaluation must apply the active instrument evaluation form criteria only") and halt. This guard cannot be bypassed, disabled, or deferred. Its enforcement is identical in structure to the guard in `instrument-schema-normalization` — both implement the same categorical prohibition from CLAUDE.md §13.1 in their respective domains.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). Immediate halt before any evaluation. No `review_packet.json` written.
+
+**Hard failure confirmation:** Yes — unconditional halt; this is a categorical prohibition with no exceptions.
+
+**CLAUDE.md §13 cross-reference:** §13.1 — "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing." The same prohibition applies to evaluation: Grant Agreement Annexes may not serve as evaluation criteria.
+
+---
+
+### Constraint 3: "Weakness severity (critical/major/minor) must be assigned to each finding"
+
+**Decision point in execution logic:** Step 2.4.3 — at the point severity is determined for each weakness, and Step 3 — at the point `findings` array entries are constructed.
+
+**Exact failure condition:** Any finding entry in the `findings` array has a `severity` field that is absent, null, or contains a value other than exactly "critical", "major", or "minor".
+
+**Enforcement mechanism:**
+
+DETERMINISTIC BRANCHING RULE:
+IF mandatory sub-criterion has zero coverage: severity = "critical"
+IF evidence required but only general assertion present: severity = "major"
+IF specificity weak but criterion substantially addressed: severity = "minor"
+IF severity field is absent or not in {critical, major, minor} at write time:
+→ INCOMPLETE_OUTPUT (halt before writing)
+→ return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Finding <finding_id> is missing a valid severity assignment (critical/major/minor); severity must be assigned to each finding per skill constitutional constraints and CLAUDE.md §12.2")
+→ No `review_packet.json` written
+
+Every finding record produced in Step 2.4.4 MUST carry a severity value from the enumeration {critical, major, minor}. No other values are valid.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No output written.
+
+**Hard failure confirmation:** Yes — findings without severity assignments are non-conformant outputs that may not be written to canonical paths.
+
+**CLAUDE.md §13 cross-reference:** §12.2 — validation status vocabulary applies to validation outputs. §12.1 — "Every phase output must be reviewable." A finding without severity is not reviewable in a structured way.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier2a_instrument_schemas/evaluation_forms/` directory is empty → `failure_reason="evaluation_forms/ directory is empty; cannot evaluate without the active instrument's evaluation form"`
+- Step 1.3: `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` is absent or schema mismatch → `failure_reason="call_analysis_summary.json not found or schema mismatch"`
+- Step 1.4: `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` is absent or schema mismatch → `failure_reason="assembled_draft.json not found or schema mismatch"`
+- Step 1.5: No section files referenced in `assembled_draft.json` are accessible → `failure_reason="No section files found in assembled draft"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads from source document directories and canonical phase artifacts. Schema mismatch conditions for `call_analysis_summary.json` and `assembled_draft.json` are captured in Steps 1.3 and 1.4 as MISSING_INPUT (per the existing Input Validation Sequence). No additional MALFORMED_ARTIFACT conditions are defined.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT or INCOMPLETE_OUTPUT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 3 (weakness severity must be assigned to each finding): Any finding entry in the `findings` array has a `severity` field that is absent, null, or not in {critical, major, minor} at write time → `failure_reason="Finding <finding_id> is missing a valid severity assignment (critical/major/minor); severity must be assigned to each finding per skill constitutional constraints and CLAUDE.md §12.2"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Step 1.2 (Grant Agreement Annex guard): The evaluation form file contains "Annex", "Grant Agreement", "Model Grant Agreement", or "AGA" in its title or header → `failure_reason="Document '<filename>' appears to be a Grant Agreement Annex. CLAUDE.md §13.1 prohibits evaluating against Grant Agreement Annex requirements"`
+- Constraint 1 (active instrument evaluation criteria only): Evaluation is attempted against a criterion_id not present in `call_analysis_summary.json evaluation_matrix` → `failure_reason="Evaluation criterion <criterion_id> not found in call_analysis_summary.json evaluation_matrix; evaluation must apply active instrument criteria only per CLAUDE.md §11.2 and §10.6"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No `review_packet.json` written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier5_deliverables/review_packets/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

@@ -145,4 +145,168 @@ The invoking agent must provide `invocation_mode` as a context parameter. If abs
 - Step B.5.2: Create directory `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/` if not present.
 - Step B.5.3: Write `budget_gate_assessment.json` to `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json`
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Must not generate or estimate budget figures"
+
+**Decision point in execution logic:** Steps A.2.4 (Mode A) and B.2.9 (Mode B) — the active prohibition on reading, recording, computing, estimating, or writing any numeric budget value.
+
+**Exact failure condition:** Any numeric budget value (cost, person-months, amount in any currency, estimated budget allocation) that does NOT originate verbatim from the `received/` budget response file is written to any skill output artifact. This includes: computing a budget figure by arithmetic from other figures, estimating a missing value, defaulting to a prior budget figure from agent memory, or filling in a missing budget line with an assumed value.
+
+**Enforcement mechanism — explicit allowed/forbidden boundary:**
+
+ALLOWED:
+- Reading structural keys from the budget response: wp_id, partner_id, field names, presence/absence of entries
+- Checking whether a WP or partner identifier is present or absent in the response
+- Passing through non-numeric identifier strings (e.g., wp_id values, partner_id values)
+
+FORBIDDEN (triggers CONSTITUTIONAL_HALT):
+- Computing any numeric value (sum, average, ratio, allocation, person-month count, cost)
+- Estimating a missing numeric value
+- Copying any numeric amount from the budget response into any output artifact field
+- Writing any currency amount, numeric budget figure, person-month count, or cost figure to any output
+- Referencing a numeric amount in a validation finding or assessment field
+
+DETERMINISTIC RULE:
+IF any numeric value (integer or float representing a cost, amount, or effort) is present in any output artifact written by this skill:
+→ CONSTITUTIONAL_HALT immediately
+→ Reason: numeric budget values must not be materialized, stored, or written to any output artifact
+→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Numeric budget value <value> was generated/estimated internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3")
+→ No output written
+
+The check applies at write time: before writing any output field, verify no numeric budget value has been included. This applies to both Mode A and Mode B outputs.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No validation artifact or budget_gate_assessment.json written.
+
+**Hard failure confirmation:** Yes — unconditional halt; budget figure generation is a categorical prohibition with no exceptions.
+
+**CLAUDE.md §13 cross-reference:** §8.1 — "This repository does not compute, estimate, or generate lump-sum budgets." §8.3 — "No agent may invent, substitute, approximate, or silently generate budget figures." §13.3 (analogous) — budget figures not received from the external system are fabricated project facts.
+
+---
+
+### Constraint 2: "Must not accept a response that does not conform to the interface contract"
+
+**Decision point in execution logic:** Steps B.2.3 and B.2.4 (Mode B) — at the point the budget response is parsed for schema conformance against `interface_contract.json`.
+
+**Exact failure condition:** The budget response file in `received/` does not conform to the interface contract (any required field missing or of wrong type per the contract schema), AND the skill writes `conformance_status: "conforms"` to the validation artifact; OR the skill does not write a blocking inconsistency entry for the non-conformance; OR the skill proceeds to build a passing budget_gate_assessment despite non-conformance.
+
+**Enforcement mechanism:** In Step B.2.4: if `conformance_status: "non_conforming"`, this MUST be added to `blocking_inconsistencies` with `severity: "blocking"`. The non-conformance check is a necessary condition for gate_pass_declaration: "pass" — a non-conforming response means `gate_pass_declaration` MUST be "fail". The skill must not write `conformance_status: "conforms"` unless every required field is present and of the correct type as specified in the interface contract. Any logic that skips or downgrades a non-conformance finding to non-blocking is a constitutional violation: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Non-conforming budget response accepted as conforming; this violates the interface contract and CLAUDE.md §8.5"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT") for false-conformance case. For correctly detected non-conformance: blocking_inconsistency recorded, gate_pass_declaration: "fail" — this is the correct and constitutional outcome (not a SkillResult failure).
+
+**Hard failure confirmation:** Yes — falsely accepting a non-conforming response is a constitutional violation; correctly identifying non-conformance and declaring gate failure is the required behavior.
+
+**CLAUDE.md §13 cross-reference:** §8.5 — "The interface contract at docs/integrations/lump_sum_budget_planner/interface_contract.json defines the schema and exchange protocol for budget requests and responses. Responses that do not conform to the interface contract must be rejected and flagged, not silently accepted."
+
+---
+
+### Constraint 3: "Must not declare the budget gate passed if blocking inconsistencies exist"
+
+**Decision point in execution logic:** Step B.2.8 — at the point `gate_pass_declaration` is set.
+
+**Exact failure condition:** `gate_pass_declaration` is set to "pass" when any entry in `blocking_inconsistencies` has `resolution: "unresolved"`.
+
+**Enforcement mechanism:** Step B.2.8 is a deterministic check: `gate_pass_declaration` = "pass" if and only if ALL of the following hold simultaneously: (1) received/ is non-empty, (2) response conforms to interface contract, (3) no blocking_inconsistency with resolution: "unresolved" exists. The conjunction is unconditional — any single failing condition forces `gate_pass_declaration` = "fail". The skill must evaluate `blocking_inconsistencies` exhaustively before setting `gate_pass_declaration`. If the skill sets "pass" when any blocking inconsistency is unresolved: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="gate_pass_declaration set to pass despite unresolved blocking inconsistencies; CLAUDE.md §7 Phase 7 gate and §13.4 prohibit declaring the budget gate passed when blocking inconsistencies exist"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No budget_gate_assessment.json written.
+
+**Hard failure confirmation:** Yes — setting gate_pass_declaration: "pass" with unresolved blocking inconsistencies is an unconditional constitutional violation.
+
+**CLAUDE.md §13 cross-reference:** §13.4 — "Commencing any Phase 8 activity … before the budget gate (Phase 7) has passed." §7 Phase 7 gate — "No blocking inconsistencies are unresolved."
+
+---
+
+### Constraint 4: "Must not treat absent response as a non-failing state"
+
+**Decision point in execution logic:** Step B.1.1 (Mode B) — the very first step in Mode B, before any other processing.
+
+**Exact failure condition:** `docs/integrations/lump_sum_budget_planner/received/` is empty or absent, AND the skill does not immediately return a blocking gate failure.
+
+**Enforcement mechanism:** Step B.1.1 is an unconditional BLOCKING GATE FAILURE trigger. If received/ is empty or absent: `gate_pass_declaration` must be set to "fail"; `budget_gate_assessment.json` must be written immediately with this declaration (no other processing proceeds); SkillResult must be returned with status="failure", failure_category="MISSING_INPUT". No further steps in Mode B execute. There is no conditional branch, no wait state, no "soft failure" — absent budget artifacts are a hard block. Setting any other state (e.g., "pending", "not_yet_received", "hold") is a constitutional violation: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Attempted to treat absent budget response as a non-failing state; CLAUDE.md §8.4 defines absent budget artifacts as a blocking gate failure, not a hold state").
+
+**Failure output:** SkillResult(status="failure", failure_category="MISSING_INPUT") when received/ is absent/empty — plus writing budget_gate_assessment.json with gate_pass_declaration: "fail" as a durable record of the blocking failure.
+
+**Hard failure confirmation:** Yes — absent response is unconditionally a blocking gate failure; no other state is constitutionally permissible.
+
+**CLAUDE.md §13 cross-reference:** §8.4 — "Absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ constitute a blocking gate failure, not a hold state." §13.4 — no Phase 8 activity may begin until the budget gate passes.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Pre-step: Invoking agent does not provide `invocation_mode` context parameter → `failure_reason="invocation_mode required; must be 'request_validation' or 'response_validation'"`
+- Step A.1.1 (Mode A): `docs/integrations/lump_sum_budget_planner/interface_contract.json` does not exist → `failure_reason="interface_contract.json not found"`
+- Step A.1.2 (Mode A): `request_templates/` directory is empty → `failure_reason="request_templates/ directory is empty"`
+- Step B.1.1 (Mode B): `docs/integrations/lump_sum_budget_planner/received/` directory is empty or absent — BLOCKING GATE FAILURE → `failure_reason="No budget response in received/; this is a blocking gate failure"` (additionally writes `budget_gate_assessment.json` with `gate_pass_declaration: "fail"`)
+- Step B.1.2 (Mode B): `interface_contract.json` does not exist → `failure_reason="interface_contract.json not found"`
+- Step B.1.3 (Mode B): `wp_structure.json` is absent → `failure_reason="wp_structure.json not found"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. For the Mode B absent-response case: `budget_gate_assessment.json` is written immediately with `gate_pass_declaration: "fail"` as required by the constitutional blocking-gate-failure rule; this is the one exception to the no-write rule and is constitutionally required.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill validates structure of external artifacts (budget response, interface contract). Schema violations in the budget response are findings recorded in the validation artifact (with `conformance_status: "non_conforming"` and `gate_pass_declaration: "fail"`) — not MALFORMED_ARTIFACT failures of the skill itself. No MALFORMED_ARTIFACT conditions are defined for this skill's own inputs.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at write sequence steps should return `failure_reason="<artifact name> could not be written"`.
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (must not generate or estimate budget figures): Any numeric budget value (cost, person-months, currency amount) that does not originate verbatim from the `received/` budget response file is written to any output artifact → `failure_reason="Numeric budget value <value> was generated/estimated internally; this skill must not compute, estimate, or invent budget figures per CLAUDE.md §8.1, §8.3, and §13.3"`
+- Constraint 2 (must not accept non-conforming response as conforming): The skill writes `conformance_status: "conforms"` when a required field is missing or of wrong type in the budget response → `failure_reason="Non-conforming budget response accepted as conforming; this violates the interface contract and CLAUDE.md §8.5"`
+- Constraint 3 (must not declare gate passed with blocking inconsistencies): `gate_pass_declaration` is set to "pass" when any entry in `blocking_inconsistencies` has `resolution: "unresolved"` → `failure_reason="gate_pass_declaration set to pass despite unresolved blocking inconsistencies; CLAUDE.md §7 Phase 7 gate and §13.4 prohibit declaring the budget gate passed when blocking inconsistencies exist"`
+- Constraint 4 (absent response treated as non-failing): Any attempt to treat absent `received/` directory as a state other than blocking gate failure → `failure_reason="Attempted to treat absent budget response as a non-failing state; CLAUDE.md §8.4 defines absent budget artifacts as a blocking gate failure, not a hold state"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires, with one constitutionally-required exception: Mode B absent-response (Step B.1.1) MUST write `budget_gate_assessment.json` with `gate_pass_declaration: "fail"` as a durable record of the blocking gate failure.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` includes `docs/integrations/lump_sum_budget_planner/validation/` and `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/`; no decision log exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

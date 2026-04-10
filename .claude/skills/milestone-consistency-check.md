@@ -82,4 +82,123 @@ Validation reports are not phase output canonical artifacts. No `schema_id`, `ar
 
 - Step 5.1: Write the validation report to `docs/tier4_orchestration_state/validation_reports/<report_id>.json`
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Milestones with non-verifiable criteria must be flagged"
+
+**Decision point in execution logic:** Step 2.4.3 — at the point each milestone's `verifiable_criterion` field is evaluated for adequacy.
+
+**Exact failure condition:** Any milestone has a `verifiable_criterion` that is empty, null, or a placeholder string (TBD, "to be defined", "to be determined", "N/A", "placeholder"), AND the corresponding finding is NOT written to the validation report with `verifiable_criterion_present: false` and an appropriate `flag_reason`.
+
+**Enforcement mechanism:**
+
+DETERMINISTIC WRITE RULE:
+IF `verifiable_criterion` is empty OR is one of {TBD, "to be defined", "to be determined", N/A, placeholder} (case-insensitive):
+→ `verifiable_criterion_present` MUST be set to false
+→ `flag_reason` MUST be non-empty
+→ THEN write to validation report
+
+IF validation report write fails after the above:
+→ return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Validation report write failed; milestones with non-verifiable criteria must be flagged in the durable validation report per skill constitutional constraints and CLAUDE.md §12.2")
+
+Omitting this flag or recording `verifiable_criterion_present: true` for a placeholder is a constitutional violation. There is no threshold below which a non-verifiable criterion can be silently accepted.
+
+**Failure output:** Individual milestone failures → recorded as findings with `verifiable_criterion_present: false` in the report (not a SkillResult failure); report write failure → SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT").
+
+**Hard failure confirmation:** Yes — every non-verifiable criterion must produce a flagged finding in the report; silently passing it is prohibited.
+
+**CLAUDE.md §13 cross-reference:** §12.2 — validation status vocabulary requires accurate flagging; accepting a non-verifiable criterion as "consistent" is equivalent to assigning "Confirmed" status without evidence. §7 Phase 4 gate — "All milestones have a defined verifiable criterion."
+
+---
+
+### Constraint 2: "Milestone due months must be consistent with task completion months"
+
+**Decision point in execution logic:** Step 2.4.2 — at the point each milestone's `due_month` is compared against `max_task_end_month[responsible_wp]`.
+
+**Exact failure condition:** A milestone's `due_month` is earlier than the latest task `end_month` for its `responsible_wp`, AND the finding is NOT written with `consistency_status: "flagged"` in the validation report. OR: the comparison is performed but the flag is suppressed or overridden to "consistent" by agent judgment.
+
+**Enforcement mechanism:** In Step 2.4.2, the timing comparison is deterministic: if `milestone.due_month < max_task_end_month[responsible_wp]`, `consistency_status` must be set to "flagged" — no agent override is permitted. The `flag_reason` must state the specific due_month and max task end_month values so the issue is human-reviewable. Setting `consistency_status: "consistent"` when this condition holds is a constitutional violation. The check must fire for every milestone; there is no skip condition.
+
+**Failure output:** Individual inconsistency → recorded as `consistency_status: "flagged"` in findings (not a SkillResult failure; the gate will fail on this). Report write failure → SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT").
+
+**Hard failure confirmation:** Yes — timing inconsistency must be flagged in the report; suppressing the flag is prohibited.
+
+**CLAUDE.md §13 cross-reference:** §7 Phase 4 gate condition — "All tasks are assigned to months … No critical path dependency is unresolved." Milestone-task timing inconsistencies are gate-relevant and must be surfaced. §15 — explicit gate failure (via flagged findings) is preferred over fabricated completion.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` does not exist → `failure_reason="wp_structure.json not found"`
+- Step 1.3: `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` does not exist → `failure_reason="gantt.json not found; gantt_designer must produce gantt.json before milestone-consistency-check"`
+- Step 1.5: `gantt.json` has an empty `milestones` array or empty `tasks` array → `failure_reason="gantt.json milestones or tasks array is empty"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.2: `wp_structure.json` has `schema_id` ≠ "orch.phase3.wp_structure.v1" → `failure_reason="wp_structure.json schema_id mismatch"`
+- Step 1.4: `gantt.json` has `schema_id` ≠ "orch.phase4.gantt.v1" → `failure_reason="gantt.json schema_id mismatch"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use INCOMPLETE_OUTPUT (validation report write failure) as appropriate. Individual milestone findings are written to the validation report as `consistency_status: "flagged"` entries — not as SkillResult failures.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (milestones with non-verifiable criteria must be flagged): Validation report write fails after a non-verifiable criterion is identified → `failure_reason="Validation report write failed; milestones with non-verifiable criteria must be flagged in the durable validation report per skill constitutional constraints and CLAUDE.md §12.2"`
+- Constraint 2 (milestone due months consistent with task completion months): Validation report write fails after a timing inconsistency is identified → `failure_reason="<write error>"`
+- Step 5.1: Validation report write fails for any reason → `failure_reason="Validation report could not be written to validation_reports/"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+No CONSTITUTIONAL_HALT conditions are defined for this skill. Individual milestone failures (non-verifiable criterion, timing inconsistency) are recorded as flagged findings in the validation report, not as CONSTITUTIONAL_HALT. The skill's constitutional constraints are enforced through the completeness of reporting, not through halting on individual milestone failures.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/validation_reports/`; a failure record MAY be written there even when the primary output fails — but only if the directory is accessible.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

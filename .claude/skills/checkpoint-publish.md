@@ -87,4 +87,123 @@ constitutional_constraints:
 - Step 5.2: Write `phase8_checkpoint.json` to `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`.
 - Note: once written with `status: "published"`, this file must never be overwritten by any subsequent invocation of this skill (enforced by Step 1.1 on future invocations).
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Validated checkpoints must not be overwritten by subsequent reruns"
+
+**Decision point in execution logic:** Step 1.1 — the existing checkpoint guard is applied as the very first step, before any other processing.
+
+**Exact failure condition:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` already exists with `status: "published"` — AND the skill continues past Step 1.1 to overwrite it.
+
+**Enforcement mechanism:** Step 1.1 is an unconditional pre-check. If the checkpoint file exists with `status: "published"`: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="Validated checkpoint already exists at docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json with status: published; overwrite is constitutionally prohibited per CLAUDE.md §5 Tier 4 constraints and state_rules.yaml checkpoint_preservation rule") and halt immediately. No further steps in this invocation execute. The invoking agent must invoke `decision-log-update` to durably record the overwrite refusal — this skill does not write to the decision log. There is no override mechanism, no force-flag, no conditional path that permits overwriting a validated checkpoint. The gate status of the new run being higher or different from the original does not justify overwrite — a new checkpoint file with a different name must be produced instead if the system requires a different checkpoint record.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION"). Immediate halt. No file written.
+
+**Hard failure confirmation:** Yes — unconditional halt; this is a categorical prohibition with no exceptions and no override path.
+
+**CLAUDE.md §13 cross-reference:** §5 Tier 4 — "Tier 4 may be updated by reruns, but prior checkpoint states must be preserved when a checkpoint has been formally validated." §9.4 — "Agent working memory may assist execution. It must not override documented state in docs/." A published checkpoint is formally validated state; overwriting it destroys the reproducibility record.
+
+---
+
+### Constraint 2: "A checkpoint must not be published before all gate conditions for the phase are met"
+
+**Decision point in execution logic:** Step 1.2 and Step 1.3 — at the point gate result files are read and their `status` fields are evaluated.
+
+**Exact failure condition:** (a) Any of the four required gate result files (gate_09, gate_10, gate_11, gate_12) is absent; OR (b) any gate result has `status ≠ "pass"`; OR (c) the skill writes `phase8_checkpoint.json` with `status: "published"` when any gate result condition in Steps 1.2–1.3 was not satisfied.
+
+**Enforcement mechanism:** Steps 1.2 and 1.3 are mandatory sequential checks. If any gate result file is absent (Step 1.2): return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Gate result file <path> not found; all four gate results required before checkpoint can be published"). If any gate result has `status ≠ "pass"` (Step 1.3): return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Gate <gate_id> has status '<status>'; all required gates must have status 'pass' before checkpoint can be published per CLAUDE.md §6.2 and §7"). Both checks must complete and pass before Step 2 begins. If the gate check results in a failure: no `phase8_checkpoint.json` is written. A checkpoint published before all gates pass would enable Phase 8 content to be declared complete when it is not — constitutionally equivalent to fabricated completion.
+
+**Failure output:** SkillResult(status="failure", failure_category="MISSING_INPUT") for absent gate files or non-passing gates. No `phase8_checkpoint.json` written.
+
+**Hard failure confirmation:** Yes — publishing a checkpoint with unpassed gates is a categorical constitutional violation per CLAUDE.md §6.2.
+
+**CLAUDE.md §13 cross-reference:** §6.2 — "Gates are mandatory. Each phase has a gate condition. A phase is not complete until its gate condition is satisfied. A downstream phase must not begin if the gate condition of any upstream phase has not been met." §15 — "A declared failure is an honest and correct output."
+
+**Bidirectional guarantee (IF published THEN all gates provably passed):**
+A checkpoint with `status: "published"` is constitutionally valid if and only if:
+- `gate_results_confirmed[]` contains exactly the four required gate_ids
+- Each of those gate_ids has a gate result file at its canonical path with `status: "pass"`
+- All four gate result `run_id`s match the current run_id
+
+IF `phase8_checkpoint.json` is written with `status: "published"` but any of these conditions was not verified in Steps 1.2–1.4:
+→ CONSTITUTIONAL_HALT
+→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Checkpoint published without verifiable gate passage; publishing a checkpoint without verifiable gate passage is fabricated completion per CLAUDE.md §15")
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.2: Any of the four required gate result files is absent → `failure_reason="Gate result file <path> not found; all four gate results required for checkpoint"`
+- Step 1.3: Any gate result file has `status ≠ "pass"` → `failure_reason="Gate <gate_id> has status '<status>'; all required gates must have status 'pass' before checkpoint can be published"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.2: Any gate result file's `schema_id` does not match "orch.gate_result.v1" → `failure_reason="Gate result at <path> has unexpected schema_id"`
+- Step 1.4: Any gate result's `run_id` does not match the current run_id → `failure_reason="Gate result at <path> has run_id '<gate_run_id>' which does not match current run_id '<current_run_id>'"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 1 (validated checkpoints must not be overwritten): `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` already exists with `status: "published"` → `failure_reason="Validated checkpoint already exists at docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json with status: published; overwrite is constitutionally prohibited per CLAUDE.md §5 Tier 4 constraints and state_rules.yaml checkpoint_preservation rule"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No file written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent must invoke decision-log-update to durably record the overwrite refusal.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at Step 5.2 should return `failure_reason="phase8_checkpoint.json could not be written"`.
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 2 bidirectional guarantee: `phase8_checkpoint.json` is written with `status: "published"` but the gate verification conditions in Steps 1.2–1.4 were not fully satisfied → `failure_reason="Checkpoint published without verifiable gate passage; publishing a checkpoint without verifiable gate passage is fabricated completion per CLAUDE.md §15"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/checkpoints/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

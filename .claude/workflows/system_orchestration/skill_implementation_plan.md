@@ -476,7 +476,7 @@ The specification must not delegate core logic back to an LLM as "reason about t
 - what constitutes a gap or mismatch
 - how the output represents the judgment result
 
-### Step 6 — Enforce constitutional constraints
+### Step 6 — Enforce constitutional constraints **Status: COMPLETE**
 
 For each skill, revisit every constraint in its `constitutional_constraints` and implement explicit enforcement logic:
 

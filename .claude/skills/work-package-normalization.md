@@ -87,4 +87,128 @@ constitutional_constraints:
 - Step 5.1: Create target directory `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` if it does not exist.
 - Step 5.2: Write `wp_structure.json` to `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "WP leads must be drawn from Tier 3 consortium data only"
+
+**Decision point in execution logic:** Step 2.4 (lead_partner validation) and Step 2.5 (partner_role_matrix construction) — at the point each WP's `lead_partner` field is validated against the `valid_partner_ids` set.
+
+**Exact failure condition:** Any WP entry in `wp_structure.json` has a `lead_partner` value that is not present in the `valid_partner_ids` set derived from `docs/tier3_project_instantiation/consortium/partners.json`. Equivalently: a WP lead is invented, guessed, or assigned from prior knowledge rather than from the Tier 3 consortium data.
+
+**Enforcement mechanism:** In Step 2.4, `lead_partner` validation is mandatory for every WP entry. If `lead_partner` is absent or not in `valid_partner_ids`: this must be recorded as a normalization_issue (not silently corrected or substituted). A normalization_issue for lead_partner causes the Phase 3 gate to fail on the partner_role_matrix check; this is the correct and constitutional outcome — the skill must not paper over the gap by inventing a valid partner_id. If the `valid_partner_ids` set was not provided by the invoking agent (Step 1.5): the skill must halt before any WP processing begins. Any output written with a fabricated `lead_partner` value is a constitutional violation per CLAUDE.md §13.3.
+
+**Failure output:** If valid_partner_ids is absent: SkillResult(status="failure", failure_category="MISSING_INPUT"). If lead_partner is not in valid_partner_ids: recorded as normalization_issue (gate will fail); skill does not halt unless no valid WPs remain (INCOMPLETE_OUTPUT).
+
+**Hard failure confirmation:** Yes for missing valid_partner_ids (halt). For individual invalid lead_partner values: hard normalization_issue recorded that blocks gate passage; not silently corrected.
+
+**CLAUDE.md §13 cross-reference:** §13.3 — "Inventing project facts — partner names, capabilities, roles … not present in Tier 3." Partners not in Tier 3 consortium data may not be assigned as WP leads.
+
+---
+
+### Constraint 2: "WP count must not exceed instrument limits from Tier 2A"
+
+**Decision point in execution logic:** Step 2.3 — immediately after counting all WP entries from `workpackage_seed.json` and before any per-WP processing begins.
+
+**Exact failure condition:** The total number of WP entries exceeds the `max_wp_count` value from `section_schema_registry.json` for the resolved_instrument_type, AND `max_wp_count` is not null.
+
+**Enforcement mechanism:** Step 2.3 is an unconditional hard check. If the WP count exceeds the instrument limit: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="WP count <n> exceeds instrument limit <max_wp_count> from section_schema_registry.json; WP structure must comply with Tier 2A instrument constraints") and halt. No partial output is written. The invoking agent or human operator must reduce the WP count before re-invoking this skill. The constraint cannot be waived by agent judgment.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION"). No `wp_structure.json` written.
+
+**Hard failure confirmation:** Yes — instrument WP count limits are Tier 2A structural constraints; exceeding them is a constitutional violation per CLAUDE.md §11.2.
+
+**CLAUDE.md §13 cross-reference:** §11.2 — "Deliverables must be compliant with the active instrument's application form structure and constraints. Section length, content requirements, and mandatory inclusions are governed by Tier 2A."
+
+---
+
+### Constraint 3: "Deliverables must have due months within project duration"
+
+**Decision point in execution logic:** Step 2.4 (deliverables validation) — at the point each deliverable's `due_month` is validated against `project_duration_months` from `section_schema_registry.json`.
+
+**Exact failure condition:** Any deliverable entry has a `due_month` value that exceeds `project_duration_months`, AND `project_duration_months` is not null.
+
+**Enforcement mechanism:** In Step 2.4, for each deliverable: if `due_month > project_duration_months` (and project_duration_months is non-null): this is recorded as a normalization_issue for that deliverable. The normalization_issue must state: "deliverable_id <id> has due_month <m> which exceeds project_duration_months <d>; this violates instrument constraints". The skill does not silently adjust due_month values — it records the violation and writes it to `normalization_issues[]` in the output. The Phase 3 gate will fail on the duration check. If so many deliverables have out-of-range due months that no valid output structure can be produced: SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT") and halt.
+
+**Failure output:** For individual violations: normalization_issue recorded in output (gate will fail). For systemic failure: SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT").
+
+**Hard failure confirmation:** Hard normalization_issue for each violation (gate-blocking); systemic failure triggers halt.
+
+**CLAUDE.md §13 cross-reference:** §11.2 — instrument constraints (project duration) govern deliverable due months. §7 Phase 3 gate condition — "The structure is consistent with the instrument's maximum WP count and deliverable constraints from Tier 2A."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json` does not exist → `failure_reason="workpackage_seed.json not found; WP normalization requires a seed WP structure in Tier 3"`
+- Step 1.2: `workpackage_seed.json` is empty or unparseable JSON → `failure_reason="workpackage_seed.json is empty or invalid JSON"`
+- Step 1.3: `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` does not exist → `failure_reason="section_schema_registry.json not found; instrument-schema-normalization must run before work-package-normalization"`
+- Step 1.4: `section_schema_registry.json` has no entry for the `resolved_instrument_type` → `failure_reason="section_schema_registry.json has no entry for instrument type <resolved_instrument_type>"`
+- Step 1.5: Invoking agent has not provided the `valid_partner_ids` set as context → `failure_reason="valid_partner_ids not provided in context; the invoking agent must read partners.json and pass the partner_id set as context before invoking this skill"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads from Tier 3 source artifacts and Tier 2A extracted artifacts (not canonical phase outputs with schema_id guards at this level). No MALFORMED_ARTIFACT conditions are defined; input absence and parseability are handled by MISSING_INPUT.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 2 (WP count must not exceed instrument limits): WP count exceeds `max_wp_count` from `section_schema_registry.json` → `failure_reason="WP count <n> exceeds instrument limit <max_wp_count> from section_schema_registry.json; WP structure must comply with Tier 2A instrument constraints"`
+- Constraint 1 (governance roles/systemic failure): If no valid partner_ids are available to produce any governance body (systemic failure) → `failure_reason="No valid partner_ids available from Tier 3 consortium data to assign WP leads; WP leads must be drawn from Tier 3 consortium members only per CLAUDE.md §13.3"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the failure.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Step 2.7: Normalization issues make it impossible to produce a structurally complete artifact (e.g., zero valid WPs remain) → `failure_reason="normalization issues prevent producing a conformant wp_structure.json"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional failures related to partner fabrication are handled via CONSTRAINT_VIOLATION (hard constraint on WP count) or normalization_issues (which cause gate failure without a SkillResult halt, per the skill's constitutional design). The CLAUDE.md §13.3 prohibition on fabricating partner facts is enforced through the `valid_partner_ids` check at Step 1.5 (MISSING_INPUT if absent) and normalization_issue recording (not CONSTITUTIONAL_HALT).
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

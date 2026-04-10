@@ -94,4 +94,130 @@ constitutional_constraints:
 - Step 5.2: Apply extensions to `dependency_map`, add `cycle_detected`, `cycle_flags`, and `critical_path_nodes` fields.
 - Step 5.3: Write the updated object back to `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`, preserving all other fields exactly.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Must flag dependency cycles; must not silently remove them"
+
+**Decision point in execution logic:** Step 2.3 — at the completion of Kahn's topological sort algorithm when cycles are detected.
+
+**Exact failure condition:** (a) The topological sort identifies one or more cycle members (nodes remaining with in-degree > 0 after processing), AND the skill silently removes the cycle edges from `dependency_map.edges` instead of flagging them; OR (b) `cycle_detected` is set to false when cycles are actually present; OR (c) `cycle_flags` array is empty when cycles exist.
+
+**Enforcement mechanism:** When Kahn's algorithm identifies cycle members (Step 2.3): the cycle edges MUST be retained in `dependency_map.edges`; they must NOT be removed. `cycle_detected` must be set to true. `cycle_flags` must contain at least one entry per detected cycle. If the cycle detection result conflicts with a desire to produce a "clean" dependency map: the constitutional constraint governs — cycles are flagged, not removed. Silently removing cycle edges to produce a valid-looking DAG is equivalent to fabricated completion per CLAUDE.md §15 and is a constitutional violation. If the skill detects a cycle and cannot write the correct output (e.g., a write error): return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). But cycles themselves do not cause a SkillResult failure — they are correctly represented in the output.
+
+**Failure output:** If cycle removal is attempted instead of flagging: SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Dependency cycle detected but cycle edges were scheduled for removal; cycles must be flagged, not silently removed per skill constitutional constraints and CLAUDE.md §15").
+
+**Hard failure confirmation:** Yes — cycle removal is a categorical prohibition; flagging is the only permitted response.
+
+**CLAUDE.md §13 cross-reference:** §15 — "The system must prefer explicit gate failure over fabricated completion." Silently removing cycles produces a fabricated valid DAG. §12.4 — "Missing mandatory inputs must trigger a gate failure; they must not be papered over."
+
+---
+
+### Constraint 2: "Critical path must be traceable to the dependency map"
+
+**Decision point in execution logic:** Step 2.4 — at the point `critical_path_nodes` is computed.
+
+**Exact failure condition:** `critical_path_nodes` contains node identifiers that are not present in `dependency_map.nodes`; OR the critical path was computed from a different edge/node set than the one stored in `dependency_map`; OR `critical_path_nodes` contains nodes derived from agent prior knowledge rather than the actual dependency graph.
+
+**Enforcement mechanism:** In Step 2.4, the critical path algorithm must operate exclusively on the node set and edge set constructed in Steps 2.1–2.5. After computing the critical path: the skill must verify that every node identifier in `critical_path_nodes` exists in `dependency_map.nodes`. If any node in `critical_path_nodes` is not in `dependency_map.nodes`: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="Critical path contains node <node_id> not present in dependency_map.nodes; critical path must be traceable to the dependency map") and halt without writing output. If cycles prevent critical path computation: `critical_path_nodes` must be an empty array (not a guessed path).
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION"). Updated `wp_structure.json` not written.
+
+**Hard failure confirmation:** Yes — untraceable critical path is a hard failure; guessing the path is not permitted.
+
+**CLAUDE.md §13 cross-reference:** §10.5 — every material claim (including structural analysis results) must be traceable to its Tier 4 source. §9.5 — orchestration outputs must be reproducible from documented inputs.
+
+---
+
+### Constraint 3: "Must not declare the map complete with undeclared dependencies"
+
+**Decision point in execution logic:** Step 5.3 — at the point the updated `wp_structure.json` is written.
+
+**Exact failure condition:** The skill returns SkillResult(status="success") and writes the updated `wp_structure.json` with `dependency_map` when the invoking agent's context identifies specific cross-WP task dependencies that have NOT been included in `dependency_map.edges`.
+
+**Enforcement mechanism:** Before writing the output, the skill must verify that all cross-WP dependencies provided by the invoking agent context (Step 2.2 Source B) have been added to `dependency_map.edges`. If the invoking agent's context contains a dependency that is not in the edges array: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Cross-WP dependency <from> → <to> provided by invoking agent context was not added to dependency_map.edges; the map must not be declared complete with undeclared dependencies") and halt. Additionally: if at any point the skill is aware of a structural dependency between WP activities (e.g., WP2 inputs are produced by WP1) but that dependency is not represented in the edges array, this must be logged as an Unresolved finding — not silently ignored.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No output written.
+
+**Hard failure confirmation:** Yes — declaring the map complete with known undeclared dependencies is equivalent to fabricated completion.
+
+**CLAUDE.md §13 cross-reference:** §15 — "A declared failure is an honest and correct output. A fabricated completion is a constitutional violation." §12.5 — "Review … must check … internal consistency."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` does not exist → `failure_reason="wp_structure.json not found; work-package-normalization must run before wp-dependency-analysis"`
+- Step 1.3: `work_packages` array in `wp_structure.json` is empty → `failure_reason="wp_structure.json work_packages array is empty"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.2: `wp_structure.json` `schema_id` field does not equal "orch.phase3.wp_structure.v1" → `failure_reason="wp_structure.json schema_id does not match expected 'orch.phase3.wp_structure.v1'"`
+- Step 1.4: `dependency_map` object is absent in `wp_structure.json` → `failure_reason="wp_structure.json missing dependency_map field"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 2 (critical path traceable to dependency map): Any node identifier in `critical_path_nodes` is not present in `dependency_map.nodes` → `failure_reason="Critical path contains node <node_id> not present in dependency_map.nodes; critical path must be traceable to the dependency map"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Updated `wp_structure.json` not written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the failure.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 3 (map not declared complete with undeclared dependencies): Any cross-WP dependency provided by the invoking agent context has not been added to `dependency_map.edges` before write → `failure_reason="Cross-WP dependency <from> → <to> provided by invoking agent context was not added to dependency_map.edges; the map must not be declared complete with undeclared dependencies"`
+- Write error at Step 5.3: If the write of the updated `wp_structure.json` fails after detecting a cycle (cycle must be flagged, not removed) → `failure_reason="<write error>"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (cycles flagged, not silently removed): Cycle detection identifies cycle members and the skill schedules removal of cycle edges from `dependency_map.edges` rather than flagging them → `failure_reason="Dependency cycle detected but cycle edges were scheduled for removal; cycles must be flagged, not silently removed per skill constitutional constraints and CLAUDE.md §15"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

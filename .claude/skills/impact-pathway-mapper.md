@@ -110,4 +110,131 @@ constitutional_constraints:
 - Step 5.2: Write `impact_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json`.
 - Step 5.3: Return the SkillResult payload to the invoking agent. If any uncovered impacts were identified in Step 2.11, they must be included in the SkillResult payload's `uncovered_impacts` array so the invoking agent can invoke decision-log-update. This skill does not write to `docs/tier4_orchestration_state/decision_log/`.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Every call expected impact must be explicitly mapped or flagged as uncovered"
+
+**Decision point in execution logic:** Step 2.6 — at the point each expected_impact entry from `expected_impacts.json` is processed; and Step 2.11 — at the point the uncovered_impacts list is compiled.
+
+**Exact failure condition:** Any `impact_id` from `expected_impacts.json` has no corresponding entry in the `impact_pathways` array of `impact_architecture.json`. OR: an uncovered impact exists but is not recorded in the SkillResult payload's `uncovered_impacts` array, preventing the invoking agent from writing a durable decision log entry for it.
+
+**Enforcement mechanism:** In Step 2.6.1, the required coverage set (all impact_ids from expected_impacts.json, extracted in Step 2.1) must be checked exhaustively. For every impact_id that could not be matched: a pathway entry must be created with an explicit `impact_narrative: "UNCOVERED — no project mechanism identified for this expected impact"` AND the impact_id must be added to the `uncovered_impacts` array in the SkillResult payload (Step 2.11). At output construction time (Step 5.2), the skill must verify that every impact_id from the required coverage set appears in `impact_pathways` — either as a matched pathway or as an uncovered entry. If any impact_id is absent: return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Expected impact <impact_id> from expected_impacts.json is absent from impact_pathways; every call expected impact must be explicitly mapped or flagged as uncovered per skill constitutional constraints and CLAUDE.md §12.4"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No `impact_architecture.json` written.
+
+**Hard failure confirmation:** Yes — omitting an expected impact from the mapping is a constitutional violation equivalent to fabricated completion.
+
+**CLAUDE.md §13 cross-reference:** §12.4 — "Missing mandatory inputs must trigger a gate failure; they must not be papered over." §7 Phase 5 gate — "Every expected_impact_id from expected_impacts.json appears in at least one pathway."
+
+---
+
+### Constraint 2: "Impact claims must trace to a named WP deliverable or activity"
+
+**Decision point in execution logic:** Step 2.6.2 and Step 2.7 — at the point `project_outputs` deliverable_ids are assigned to pathways, and at the point `traceable_to_deliverable` is set for KPIs.
+
+**Exact failure condition:** (a) A pathway entry has a non-empty `project_outputs` array containing a `deliverable_id` that does not exist in the valid deliverable reference set from `wp_structure.json` (Step 2.3); OR (b) a KPI entry has a `traceable_to_deliverable` value that is not in the valid deliverable reference set; OR (c) a KPI or pathway asserts an impact without naming any deliverable or activity from wp_structure.json.
+
+**Enforcement mechanism:** In Step 2.6.2: every `deliverable_id` written to `project_outputs` must be verified against the valid deliverable reference set before being written. If a deliverable_id does not exist in wp_structure.json: it must NOT be written to `project_outputs` — it must be flagged as Unresolved in the pathway entry. In Step 2.7: before setting `traceable_to_deliverable`, verify the deliverable_id exists in the valid reference set. If it does not exist: set `traceable_to_deliverable` to null with a flag: "No deliverable found to trace this KPI; operator review required". Writing any deliverable_id not in the valid reference set triggers: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="deliverable_id <id> in pathway/KPI does not exist in wp_structure.json; impact claims must trace to a named WP deliverable per skill constitutional constraints and CLAUDE.md §13.3"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No `impact_architecture.json` written.
+
+**Hard failure confirmation:** Yes — fabricated deliverable_ids are a constitutional violation per CLAUDE.md §13.3 (inventing project facts not present in Tier 3/4).
+
+**CLAUDE.md §13 cross-reference:** §13.3 — inventing project facts (including deliverable_ids not present in Tier 3/4). §11.4 — "Tier 5 deliverables are the output layer; they must be derived from Tier 1–4 state."
+
+---
+
+### Constraint 3: "Generic impact language must not substitute for project-specific pathways"
+
+**Decision point in execution logic:** Step 2.6.4 — at the point `impact_narrative` is set for each pathway entry.
+
+**Exact failure condition:** Any pathway's `impact_narrative` contains boilerplate or generic language such as: "the project will have a positive impact on society", "results will benefit stakeholders", "broad societal impact is expected", "the project will contribute to European competitiveness", or any equivalent phrase that does not name the specific project mechanism, target group, or outcome chain for this pathway.
+
+**Enforcement mechanism:** In Step 2.6.4, after constructing each `impact_narrative` string, the skill must apply the following check: the narrative must include at least one of: (a) a reference to a specific project activity, task_id, or deliverable_id from wp_structure.json; OR (b) a named specific target group (not "stakeholders" or "society"); OR (c) a specific metric or quantifiable outcome from impacts.json. If the constructed narrative fails all three criteria: it must not be written as-is. The narrative must be revised to include project-specific content, OR the pathway entry must be flagged as Unresolved with `impact_narrative: "INCOMPLETE — generic narrative replaced; project-specific pathway mechanism required"`. Writing a generic narrative as if it were a project-specific pathway is a constitutional violation. If this condition is detected at write time: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="Pathway <pathway_id> has a generic impact_narrative that does not trace to project-specific mechanisms; CLAUDE.md §11.1 requires evaluator-oriented, project-specific impact content"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION"). No `impact_architecture.json` written.
+
+**Hard failure confirmation:** Yes — generic impact language as a substitute for project-specific pathways is a constitutional violation per CLAUDE.md §11.1.
+
+**CLAUDE.md §13 cross-reference:** §11.1 — "All deliverables in Tier 5 must be evaluator-oriented. They must address evaluation criteria directly, in the language and frame of reference established by the applicable evaluation form and call-specific expected impacts." §13.3 — generic statements not grounded in Tier 3 data constitute fabricated project-specific claims.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` is absent or empty → `failure_reason="expected_impacts.json not found or empty; call-requirements-extraction must run before impact-pathway-mapper"`
+- Step 1.2: `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` is absent or empty → `failure_reason="expected_outcomes.json not found or empty"`
+- Step 1.3: `docs/tier3_project_instantiation/architecture_inputs/outcomes.json` is absent → `failure_reason="outcomes.json not found in Tier 3; project outcomes must be provided"`
+- Step 1.4: `docs/tier3_project_instantiation/architecture_inputs/impacts.json` is absent → `failure_reason="impacts.json not found in Tier 3; project impacts must be provided"`
+- Step 1.5: `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` is absent or schema mismatch → `failure_reason="wp_structure.json not found or schema mismatch"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.6: `wp_structure.json` has `artifact_status: "invalid"` → `failure_reason="wp_structure.json has artifact_status: invalid; the artifact was invalidated by a prior gate failure and cannot be used as input until Phase 3 gate passes"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 3 (no generic impact language): Any pathway's `impact_narrative` contains boilerplate language that does not reference a specific project mechanism, named target group, or specific metric from `impacts.json` → `failure_reason="Pathway <pathway_id> has a generic impact_narrative that does not trace to project-specific mechanisms; CLAUDE.md §11.1 requires evaluator-oriented, project-specific impact content"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the failure.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (every call expected impact explicitly mapped or flagged): At output construction time (Step 5.2), any `impact_id` from `expected_impacts.json` is absent from `impact_pathways` — neither as a matched pathway nor as an uncovered entry → `failure_reason="Expected impact <impact_id> from expected_impacts.json is absent from impact_pathways; every call expected impact must be explicitly mapped or flagged as uncovered per skill constitutional constraints and CLAUDE.md §12.4"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 2 (impact claims trace to named WP deliverable): Any `deliverable_id` written to `project_outputs` or `traceable_to_deliverable` does not exist in the valid deliverable reference set from `wp_structure.json` → `failure_reason="deliverable_id <id> in pathway/KPI does not exist in wp_structure.json; impact claims must trace to a named WP deliverable per skill constitutional constraints and CLAUDE.md §13.3"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No `impact_architecture.json` written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

@@ -100,4 +100,141 @@ Decision log entries are not phase output canonical artifacts. No `schema_id`, `
 - The target directory must exist; create it if absent.
 - The filename must exactly match `<decision_id>.json`.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Decisions held only in agent memory do not constitute durable decisions"
+
+**Decision point in execution logic:** Step 5.1 — at the point the decision log entry is written. The constraint enforces that writing actually occurs, not that a decision was made.
+
+**Exact failure condition:** The skill is invoked with valid parameters (all input validation passes) but the decision log file write at Step 5.1 fails or is not attempted — meaning the decision exists in agent context but has not been persisted to `docs/tier4_orchestration_state/decision_log/`.
+
+**Enforcement mechanism:** In Step 5.1, the file write is the constitutionally required action. If the write fails for any reason (directory inaccessible, file system error, permission denied): return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Decision log entry <decision_id> could not be written to docs/tier4_orchestration_state/decision_log/; decisions held only in agent memory do not constitute durable decisions per CLAUDE.md §9.4. Write must be retried or the operator must be notified of the write failure.") and halt. A SkillResult(status="success") may only be returned AFTER confirming the file has been written and is readable at the target path. Returning success without a confirmed write is a constitutional violation — the decision would remain only in agent memory.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No success returned until file write is confirmed.
+
+**Hard failure confirmation:** Yes — an unwritten decision log entry is a constitutional violation regardless of how well-formed the decision content is.
+
+**CLAUDE.md §13 cross-reference:** §13.5 — "Storing durable decisions only in agent memory without writing them to Tier 4." §9.4 — "Every decision that affects future interpretation, traceability, or reproducibility must be written to docs/tier4_orchestration_state/decision_log/ … Decisions held only in agent memory do not constitute durable decisions."
+
+---
+
+### Constraint 2: "Every resolved tier conflict must produce a decision log entry"
+
+**Decision point in execution logic:** Step 1.1 — the decision_type validation; specifically when `decision_type = "tier_conflict_resolution"` is provided by the invoking agent.
+
+**Exact failure condition:** The invoking agent calls this skill with `decision_type: "tier_conflict_resolution"` but: (a) `decision_description` does not describe which tiers were in conflict and which prevailed; OR (b) `tier_authority_applied` does not identify the tier that governed the resolution (e.g., "CLAUDE.md §3 — Tier 2B governs over Tier 3 in this conflict").
+
+**Enforcement mechanism:** In Step 1.3, the `tier_authority_applied` validation is especially strict for `decision_type: "tier_conflict_resolution"`. For this decision type: `tier_authority_applied` must reference both the conflicting tiers and the governing authority (either "CLAUDE.md §3" or a specific tier document). A generic string like "programme knowledge" or "best practice" is always rejected. Additionally, in Step 1.2, for `decision_type: "tier_conflict_resolution"`: `decision_description` must contain at minimum: the name of the two tiers in conflict AND the specific issue. If either validation fails: return SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason="Tier conflict resolution entry missing tier identification or authority reference; every resolved tier conflict must produce a complete decision log entry per CLAUDE.md §12.3"). No entry written.
+
+**Failure output:** SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT"). No entry written.
+
+**Hard failure confirmation:** Yes — a tier conflict resolution without naming the tiers and authority is an incomplete record that does not constitute a durable decision.
+
+**CLAUDE.md §13 cross-reference:** §12.3 — "Contradictions between tiers must be resolved explicitly. The resolution method, the tier that prevailed, and the reasoning must be recorded in the decision log. A contradiction must not be silently resolved by selecting the more convenient source."
+
+---
+
+### Constraint 3: "Decision log entries must identify the tier authority applied"
+
+**Decision point in execution logic:** Step 1.3 — the `tier_authority_applied` validation before entry construction begins.
+
+**Exact failure condition:** `tier_authority_applied` is empty, null, or contains only a generic string that does not reference: (a) a named CLAUDE.md section (e.g., "CLAUDE.md §9.4"), (b) a named tier document (e.g., "Tier 2B scope_requirements.json"), or (c) a named gate or phase reference (e.g., "phase_03_gate condition from CLAUDE.md §7"). Strings like "standard practice", "programme knowledge", "general requirement", or "common sense" are explicitly rejected.
+
+**Enforcement mechanism:**
+
+DETERMINISTIC VALIDATION RULE:
+Acceptable `tier_authority_applied` values MUST match at least one of:
+- Pattern A: starts with "CLAUDE.md §" followed by a section number
+- Pattern B: starts with "Tier " followed by a tier number or name and a specific document reference
+- Pattern C: starts with "phase_" or "gate_" followed by a phase/gate identifier
+
+IF `tier_authority_applied` does not match any pattern: MALFORMED_ARTIFACT immediately
+→ return SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason="tier_authority_applied '<value>' does not reference a specific named authority; decision log entries must identify the tier authority applied per CLAUDE.md §9.4 and §12.2. Must reference a CLAUDE.md section, tier document, or gate condition.")
+→ No entry is constructed
+
+IF `tier_authority_applied` matches a pattern but contains only "programme knowledge", "standard practice", "common sense", or "general requirement" as the sole justification: MALFORMED_ARTIFACT
+
+This validation fires before any other processing and cannot be bypassed.
+
+**Failure output:** SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT"). No entry written. No further steps executed.
+
+**Hard failure confirmation:** Yes — an entry without a named tier authority does not fulfil the constitutional requirement of CLAUDE.md §9.4 and may not be written.
+
+**CLAUDE.md §13 cross-reference:** §9.4 — "Every decision that affects future interpretation, traceability, or reproducibility must be written to the decision log." Traceability requires naming the authority. §12.2 — "Confirmed — directly evidenced by a named source in Tier 1–3; the source artifact must be named." The same naming principle applies to decision records.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.2: `decision_description` context parameter is empty or null → `failure_reason="decision_description must be non-empty"`
+- Step 1.4: `rationale` context parameter is empty or null → `failure_reason="rationale must be non-empty"`
+- Step 1.1: Any other required context parameter (`invoking_agent`, `phase_context`) is absent → `failure_reason="<parameter_name> must be non-empty"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.3: `tier_authority_applied` does not match any of the acceptable patterns (does not start with "CLAUDE.md §", "Tier ", "phase_", or "gate_"); OR contains only generic strings ("standard practice", "programme knowledge", "general requirement", "common sense") → `failure_reason="tier_authority_applied '<value>' does not reference a specific named authority; decision log entries must identify the tier authority applied per CLAUDE.md §9.4 and §12.2"`
+- Step 1.1: `decision_type` is not one of the enumerated valid types → `failure_reason="decision_type '<value>' is not a valid decision type"`
+- Constraint 2 (tier conflict resolution): For `decision_type: "tier_conflict_resolution"`, `decision_description` does not name both conflicting tiers and the specific issue; or `tier_authority_applied` does not reference both conflicting tiers and the governing authority → `failure_reason="Tier conflict resolution entry missing tier identification or authority reference; every resolved tier conflict must produce a complete decision log entry per CLAUDE.md §12.3"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use INCOMPLETE_OUTPUT or MALFORMED_ARTIFACT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (decisions written to decision log, not held in agent memory): The decision log file write at Step 5.1 fails for any reason — the decision is not persisted → `failure_reason="Decision log entry <decision_id> could not be written to docs/tier4_orchestration_state/decision_log/; decisions held only in agent memory do not constitute durable decisions per CLAUDE.md §9.4. Write must be retried or the operator must be notified of the write failure."`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before returning success.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+No CONSTITUTIONAL_HALT conditions are defined for this skill. The skill's constitutional constraint failures are handled via MALFORMED_ARTIFACT (malformed tier_authority reference) and INCOMPLETE_OUTPUT (write failure). This skill does not perform any operations that could trigger a §13 categorical prohibition halt.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/decision_log/` — this IS the canonical output of this skill. When INCOMPLETE_OUTPUT fires because the write itself fails, no decision log entry is produced by definition.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

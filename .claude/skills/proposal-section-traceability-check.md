@@ -103,4 +103,123 @@ Validation reports are not phase output canonical artifacts. No `schema_id` or `
 
 - Step 5.1: Write the traceability report to `docs/tier4_orchestration_state/validation_reports/<report_id>.json`
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Unattributed claims must be flagged, not silently accepted as Confirmed"
+
+**Decision point in execution logic:** Step 2.3.3 — at the point each material claim's status is assigned based on traceability_footer examination.
+
+**Exact failure condition:** A material claim has no matching source reference in `traceability_footer.primary_sources[]` AND the claim is about a project fact (partner capability, specific objective, specific outcome, specific metric) — AND the claim is assigned status "Confirmed" or "Inferred" rather than "Unresolved".
+
+**Enforcement mechanism:** In Step 2.3.3, the status assignment rules are deterministic:
+- **Unresolved** is mandatory when: no source reference is provided AND the claim is about a project fact. There is no judgment threshold — absence of source reference for a project-fact claim always yields Unresolved, not Confirmed.
+- **Assumed** is the weakest permissible non-flagged status, applicable only to generic structural statements that no source needs to validate. Project-fact claims cannot be Assumed — they must be Unresolved.
+
+If any material claim about a project fact is assigned status "Confirmed" or "Inferred" without a verifiable source reference in `primary_sources[]`: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Material claim about project fact <claim_id> was assigned Confirmed/Inferred status without a Tier 1–4 source reference; unattributed project-fact claims must be flagged as Unresolved per CLAUDE.md §10.5 and §12.2"). No validation report written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No report written.
+
+**Hard failure confirmation:** Yes — silently accepting unattributed project-fact claims as Confirmed is a categorical prohibition.
+
+**CLAUDE.md §13 cross-reference:** §10.5 — "Unattributed claims must be flagged, not asserted." §12.2 — "Confirmed — directly evidenced by a named source in Tier 1–3; the source artifact must be named." §13.10 — "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4."
+
+---
+
+### Constraint 2: "Confirmed status requires naming the specific source artifact"
+
+**Decision point in execution logic:** Step 2.3.3 — at the point a claim is assigned status "Confirmed", and Step 3 — at the point the `claim_audit_results` array is constructed.
+
+**Exact failure condition:** Any claim_audit_result entry has `status: "confirmed"` AND the `source_ref` field is empty, null, or contains only a directory path without a specific filename and relevant field identification. Equivalently: Confirmed status is assigned without naming the exact file in the Tier 1–4 hierarchy that supports the claim.
+
+**Enforcement mechanism:** In Step 2.3.3, condition for Confirmed status requires both: (a) a `primary_sources[]` entry with a `source_path` referencing a specific Tier 1–4 file (not just a directory), AND (b) the content of that file being directly consistent with the claim.
+
+DETERMINISTIC CHECK AT WRITE TIME:
+IF `status == "confirmed"` AND `source_ref` is null, empty, OR is only a directory path (does not end in a filename with extension):
+→ CONSTITUTIONAL_HALT immediately before writing the report
+→ return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Claim <claim_id> assigned Confirmed status but source_ref does not name a specific artifact; CLAUDE.md §12.2 requires naming the specific source artifact for Confirmed status")
+→ No report written
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No validation report written.
+
+**Hard failure confirmation:** Yes — Confirmed status without a specific named source artifact is a constitutional violation per CLAUDE.md §12.2.
+
+**CLAUDE.md §13 cross-reference:** §12.2 — "Confirmed — directly evidenced by a named source in Tier 1–3; the source artifact must be named." §10.5 — "Unattributed claims must be flagged, not asserted."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: Invoking agent provides neither a `section_id` nor an assembled-draft audit mode instruction → `failure_reason="section_id or assembled_draft audit mode required"`
+- Step 1.2 (per-section mode): Section file `<section_id>.json` does not exist at `docs/tier5_deliverables/proposal_sections/` → `failure_reason="Proposal section file <section_id>.json not found"`
+- Step 1.3 (assembled draft mode): `assembled_draft.json` is absent or schema mismatch → `failure_reason="assembled_draft.json not found or schema mismatch"`
+- Step 1.5: No Tier 1–4 reference directory is accessible → `failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.4: A section file to be audited has `schema_id` ≠ "orch.tier5.proposal_section.v1" → recorded as a traceability failure for that section; evaluation continues. This does not produce a MALFORMED_ARTIFACT SkillResult halt — the schema mismatch is treated as a finding.
+
+Note: schema mismatch in section files is surfaced as a traceability finding in the report, not as a MALFORMED_ARTIFACT halt.
+
+**Artifact write behavior:** Not applicable (schema mismatch produces a finding in the report, not a halt).
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+No INCOMPLETE_OUTPUT conditions are explicitly defined in the execution logic. Write errors at Step 5.1 should return `failure_reason="Traceability report could not be written to validation_reports/"`.
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (unattributed claims flagged, not silently accepted as Confirmed): Any material claim about a project fact is assigned status "Confirmed" or "Inferred" without a verifiable source reference in `traceability_footer.primary_sources[]` → `failure_reason="Material claim about project fact <claim_id> was assigned Confirmed/Inferred status without a Tier 1–4 source reference; unattributed project-fact claims must be flagged as Unresolved per CLAUDE.md §10.5 and §12.2"`
+- Constraint 2 (Confirmed status requires naming the specific source artifact): Any claim_audit_result entry has `status: "confirmed"` AND `source_ref` is null, empty, or is only a directory path → `failure_reason="Claim <claim_id> assigned Confirmed status but source_ref does not name a specific artifact; CLAUDE.md §12.2 requires naming the specific source artifact for Confirmed status"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No validation report written. A validation report entry MAY be written to `docs/tier4_orchestration_state/validation_reports/` documenting the halt if the directory is accessible, as `validation_reports/` is in this skill's declared `writes_to` scope.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/validation_reports/`; a failure record MAY be written there even when the primary output fails.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

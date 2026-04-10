@@ -109,4 +109,120 @@ constitutional_constraints:
 - Step 5.1: Write `concept_refinement_summary.json` to `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json`
 - Step 5.2: Write decision log entry to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Alignment must be tested against Tier 2B extracted files, not assumed from concept vocabulary"
+
+**Decision point in execution logic:** Step 2.4 — at the point each expected outcome entry from `expected_outcomes.json` is matched against the concept corpus.
+
+**Exact failure condition:** Any expected outcome entry is assigned `status: "Confirmed"` or `status: "Inferred"` in `topic_mapping_rationale` without: (a) a `tier2b_source_ref` that identifies the specific `source_section` and `source_document` from `expected_outcomes.json`; AND (b) a `tier3_evidence_ref` that identifies a specific file and location in `docs/tier3_project_instantiation/project_brief/` where the matching concept evidence was found. Equivalently: any alignment judgment is made from the skill's prior knowledge of what "aligned concepts" look like rather than from comparing the actual concept corpus against the actual Tier 2B file entries.
+
+**Enforcement mechanism:** In Step 2.5, for every entry in `topic_mapping_rationale`: before setting `status: "Confirmed"` or `status: "Inferred"`, the skill must verify that `tier2b_source_ref` is non-empty (populated from `expected_outcomes.json` entry data) AND `tier3_evidence_ref` is non-empty (populated from actual file evidence in project_brief/). If either is absent: the status must be downgraded to "Assumed" or "Unresolved" as appropriate. It is never acceptable to mark an outcome "Confirmed" without both references. If the skill cannot perform any Tier 2B-grounded alignment evaluation: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Alignment evaluation cannot be performed without Tier 2B extracted files; assuming alignment from concept vocabulary alone is prohibited by CLAUDE.md §10.6") and halt.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No `concept_refinement_summary.json` written.
+
+**Hard failure confirmation:** Yes — alignment judgments must be grounded in Tier 2B source files; prior knowledge cannot substitute.
+
+**CLAUDE.md §13 cross-reference:** §13.9 — generic programme knowledge may not substitute for Tier 2B source documents. §10.5 — every material claim must identify its Tier 1–4 source.
+
+---
+
+### Constraint 2: "Uncovered expected outcomes must be flagged, not silently assumed covered"
+
+**Decision point in execution logic:** Step 2.5 and Step 2.10 — at the point `topic_mapping_rationale` is built and the decision log entry's `uncovered_outcomes` list is compiled.
+
+**Exact failure condition:** Any expected outcome entry from `expected_outcomes.json` is absent from the `topic_mapping_rationale` output (i.e., no entry exists for its `outcome_id`). OR: an expected outcome entry is present but has `status: "Assumed"` or `status: "Unresolved"` without being listed in the decision log entry's `uncovered_outcomes` array.
+
+**Enforcement mechanism:** In Step 2.5, every `outcome_id` from `expected_outcomes.json` must have a corresponding entry in `topic_mapping_rationale` — no omissions permitted. The `uncovered_outcomes` list in the decision log entry (Step 2.10) must include every outcome_id with status Assumed or Unresolved.
+
+DETERMINISTIC COMPLETENESS CHECK:
+AT output construction time, before writing `concept_refinement_summary.json`:
+- Build set A = {outcome_id for all entries in expected_outcomes.json}
+- Build set B = {topic_element_id for all entries in topic_mapping_rationale}
+- IF A ≠ B (any element in A missing from B): INCOMPLETE_OUTPUT — halt immediately
+→ return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="Expected outcome <outcome_id> from expected_outcomes.json has no entry in topic_mapping_rationale; uncovered outcomes must be explicitly flagged per CLAUDE.md §12.4 and §13.7")
+→ No output written
+
+Silently omitting an uncovered outcome is a constitutional violation equivalent to fabricated completion.
+
+**Failure output:** SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT"). No output written.
+
+**Hard failure confirmation:** Yes — every expected outcome must appear in the mapping rationale; omission is a constitutional violation.
+
+**CLAUDE.md §13 cross-reference:** §12.4 — "Missing mandatory inputs must trigger a gate failure; they must not be papered over by hallucinated completion, generic programme knowledge, or optimistic inference." §15 — "The system must prefer explicit gate failure over fabricated completion."
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier3_project_instantiation/project_brief/` directory is empty → `failure_reason="project_brief/ directory is empty; concept alignment cannot proceed without project concept text"`
+- Step 1.2: `expected_outcomes.json` does not exist → `failure_reason="expected_outcomes.json not found; call-requirements-extraction must run before concept-alignment-check"`
+- Step 1.3: `expected_outcomes.json` contains zero entries → `failure_reason="expected_outcomes.json is empty; cannot check alignment without expected outcome definitions"`
+- Step 1.5: No readable files found in `project_brief/` → `failure_reason="project_brief/ contains no readable concept documents"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads from Tier 3 source directories and Tier 2B extracted artifact files (not structured canonical artifacts with schema_id). No MALFORMED_ARTIFACT conditions are defined; input absence is handled by MISSING_INPUT.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutional constraint failures use CONSTITUTIONAL_HALT or INCOMPLETE_OUTPUT as appropriate.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+- Constraint 2 (uncovered expected outcomes explicitly flagged): At output construction time, any `outcome_id` from `expected_outcomes.json` is absent from `topic_mapping_rationale` (set A ≠ set B in the deterministic completeness check) → `failure_reason="Expected outcome <outcome_id> from expected_outcomes.json has no entry in topic_mapping_rationale; uncovered outcomes must be explicitly flagged per CLAUDE.md §12.4 and §13.7"`
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (alignment tested against Tier 2B extracted files): The skill cannot perform any Tier 2B-grounded alignment evaluation; any expected outcome entry is assigned `status: "Confirmed"` or `"Inferred"` without both `tier2b_source_ref` and `tier3_evidence_ref` populated from actual source data → `failure_reason="Alignment evaluation cannot be performed without Tier 2B extracted files; assuming alignment from concept vocabulary alone is prohibited by CLAUDE.md §10.6"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No `concept_refinement_summary.json` written. A decision log entry MAY be written to `docs/tier4_orchestration_state/decision_log/` documenting the constitutional halt, as `decision_log/` is in this skill's declared `writes_to` scope.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: this skill's `writes_to` includes `docs/tier4_orchestration_state/decision_log/`; a failure record MAY be written there even when the primary output fails.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

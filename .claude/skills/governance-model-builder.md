@@ -89,4 +89,111 @@ constitutional_constraints:
 - Step 5.1: Create directory `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/` if not present.
 - Step 5.2: Write `implementation_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. If the file already exists (because another skill will update it), read the existing content first and merge: update only the `governance_matrix` and `management_roles` fields; preserve all other fields.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Governance roles must be assigned to Tier 3 consortium members only"
+
+**Decision point in execution logic:** Steps 2.4 and 2.5 — at the point governance body composition arrays and management_roles `assigned_to` fields are populated.
+
+**Exact failure condition:** Any `composition` array in `governance_matrix` contains a partner_id that is NOT in `valid_partner_ids`; OR any `assigned_to` field in `management_roles` contains a partner_id that is NOT in `valid_partner_ids`. Equivalently: a governance role or body member is invented or sourced from prior knowledge rather than from `docs/tier3_project_instantiation/consortium/partners.json`.
+
+**Enforcement mechanism:** In Step 2.4, every partner_id added to a governance body's `composition` array must be verified against `valid_partner_ids` before being added. If a partner_id is not in `valid_partner_ids`: it must NOT be added to the composition array. Its absence must be recorded as a validation issue. In Step 2.5, every `assigned_to` value must be verified against `valid_partner_ids`. An `assigned_to` value not in `valid_partner_ids` is a validation issue that causes Phase 6 gate failure — it is not silently corrected by substituting a valid partner_id. If the validation issues make it impossible to produce any governance body with a valid composition (e.g., no valid partner_ids exist in Tier 3): return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="No valid partner_ids available from Tier 3 consortium data to assign governance roles; governance roles must be assigned to Tier 3 consortium members only per CLAUDE.md §13.3"). No output written.
+
+**Failure output:** Individual invalid partner → validation_issue recorded (gate-blocking). Systemic failure → SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION").
+
+**Hard failure confirmation:** Yes — assigning governance roles to non-Tier-3 partners is a constitutional violation per CLAUDE.md §13.3; silent correction by substitution is also prohibited.
+
+**CLAUDE.md §13 cross-reference:** §13.3 — "Inventing project facts — partner names, capabilities, roles … not present in Tier 3." Governance role assignments are project facts; they must be traceable to Tier 3.
+
+---
+
+### Constraint 2: "Management structure must be consistent with WP lead assignments"
+
+**Decision point in execution logic:** Step 2.5 — at the point WP lead management roles are created from `work_packages[].lead_partner` in wp_structure.json.
+
+**Exact failure condition:** Any WP lead role entry in `management_roles` has an `assigned_to` value that differs from the `lead_partner` field for the corresponding WP in `wp_structure.json`. Equivalently: the management structure diverges from the WP lead assignments without a recorded explanation.
+
+**Enforcement mechanism:** In Step 2.5, the WP lead role entries are derived directly from `work_packages[].lead_partner` in wp_structure.json. The `assigned_to` value for each "WPL-<wp_id>" role must equal the `lead_partner` value from the corresponding WP entry — no substitution, adjustment, or agent judgment override is permitted. If the lead_partner from wp_structure.json is not in valid_partner_ids (a pre-existing normalization issue): the inconsistency must be carried forward as a validation_issue in the output — it must not be silently resolved by assigning a different partner. At output construction time, the skill must verify consistency between every `management_roles[].assigned_to` value and the corresponding `wp_structure.work_packages[].lead_partner`. Any mismatch detected at write time triggers: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="management_roles assigned_to for WP <wp_id> does not match lead_partner in wp_structure.json; management structure must be consistent with WP lead assignments"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION"). No `implementation_architecture.json` written.
+
+**Hard failure confirmation:** Yes — management-WP lead inconsistency is not correctable by agent judgment; the source data must be corrected at Phase 3 level.
+
+**CLAUDE.md §13 cross-reference:** §7 Phase 6 gate — "Consortium management roles are assigned and non-overlapping." §12.5 — review must check internal consistency.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier3_project_instantiation/consortium/partners.json` does not exist → `failure_reason="partners.json not found; governance roles cannot be assigned without consortium partner data"`
+- Step 1.4: `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` is absent or schema mismatch → `failure_reason="wp_structure.json not found or schema mismatch"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+- Step 1.5: `wp_structure.json` has `artifact_status: "invalid"` → `failure_reason="wp_structure.json has artifact_status: invalid; the artifact was invalidated by a prior gate failure and cannot be used as input until Phase 3 gate passes"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Skill halts immediately.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 1 (governance roles assigned to Tier 3 consortium members only — systemic failure): No valid partner_ids are available from Tier 3 consortium data to assign governance roles → `failure_reason="No valid partner_ids available from Tier 3 consortium data to assign governance roles; governance roles must be assigned to Tier 3 consortium members only per CLAUDE.md §13.3"`
+- Constraint 2 (management structure consistent with WP lead assignments): At output construction time, any `management_roles[].assigned_to` value for a WP lead role does not match `lead_partner` for the corresponding WP in `wp_structure.json` → `failure_reason="management_roles assigned_to for WP <wp_id> does not match lead_partner in wp_structure.json; management structure must be consistent with WP lead assignments"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the failure.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at Step 5.2 should return `failure_reason="implementation_architecture.json could not be written"`.
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional constraint failures (invalid partner assignments, management-WP lead inconsistency) are handled as CONSTRAINT_VIOLATION. Individual invalid partner entries in governance body composition are recorded as validation_issues — not as CONSTITUTIONAL_HALT.
+
+**Artifact write behavior:** Not applicable.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->

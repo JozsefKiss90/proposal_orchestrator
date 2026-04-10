@@ -81,4 +81,112 @@ constitutional_constraints:
 - Step 5.1: Write `call_analysis_summary.json` to `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json`
 - If the target directory does not exist, create it before writing.
 
-<!-- Step 3 complete: front matter populated from skill_catalog.yaml -->
+## Constitutional Constraint Enforcement
+
+*Step 6 implementation — skill plan §4.6 and §7 Step 6. Each constraint from `skill_catalog.yaml` is mapped to a specific decision point in the execution logic and enforced as a hard failure. Cross-checked against CLAUDE.md §13.*
+
+---
+
+### Constraint 1: "Evaluation criteria must reflect the active evaluation form, not a generic template"
+
+**Decision point in execution logic:** Step 1.5 and Step 2.2 — at the point the evaluation form file is identified and parsed. The form file must be the actual Tier 2A evaluation form for the resolved_instrument_type, not a generic criteria list or prior-knowledge template.
+
+**Exact failure condition:** (a) No evaluation form file in `evaluation_forms/` matches the `resolved_instrument_type` (caught at Step 1.5); OR (b) the evaluation form identified in Step 2.1 does not correspond to the active instrument type — e.g., the form is for a different instrument type or is a generic criteria document (caught at Step 2.2 when parsing fails to find instrument-specific section identifiers); OR (c) the evaluation_matrix is constructed from agent prior knowledge of evaluation criteria rather than from the parsed form content.
+
+**Enforcement mechanism:** Step 2.2 must parse criteria exclusively from the file identified in Step 2.1. If the skill cannot parse at least one evaluation criterion with `source_section` and `source_document` populated from the file: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Evaluation criteria cannot be sourced from the provided form file for instrument type <resolved_instrument_type>; constructing criteria from generic knowledge is prohibited by CLAUDE.md §13.9 and §10.6"). No output written.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT"). No `call_analysis_summary.json` written.
+
+**Hard failure confirmation:** Yes — immediate halt; generic criteria may not substitute for source-read criteria.
+
+**CLAUDE.md §13 cross-reference:** §13.9 — "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible." Also §10.6 — agents must not substitute prior knowledge for source documents.
+
+---
+
+### Constraint 2: "Sub-criterion weights must be traceable to Tier 2B extracted files"
+
+**Decision point in execution logic:** Step 2.3 and Step 2.4 — at the point weights are assigned to each criterion entry in the evaluation_matrix.
+
+**Exact failure condition:** Any criterion entry in the `evaluation_matrix` has a non-null `weight` value that was NOT sourced from `evaluation_priority_weights.json` and has no `weight_source` field referencing that file. Equivalently: a weight is invented by the skill from prior knowledge rather than read from the Tier 2B extracted file.
+
+**Enforcement mechanism:** In Step 2.3, every weight value applied to an entry must be traced to a specific entry in `evaluation_priority_weights.json`. The `weight_source` field must be set to "tier2b_evaluation_priority_weights.json" for any weight that was overlaid from Tier 2B. If no Tier 2B weight exists for a criterion, the criterion's `weight` must be set to null (not assigned a value from prior knowledge) and `weight_source` must be absent or null. Assigning a non-null weight without a Tier 2B source reference is a constitutional violation.
+
+**Failure output:** SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="Criterion <criterion_id> has weight <value> with no traceable Tier 2B source; weights must originate from evaluation_priority_weights.json per skill constitutional constraints"). No `call_analysis_summary.json` written.
+
+**Hard failure confirmation:** Yes — no output produced when this violation is detected.
+
+**CLAUDE.md §13 cross-reference:** §10.5 — "Agents must be able to identify, for each material claim in its output, the Tier 1–4 source from which the claim derives." Weight values are material claims about call evaluation structure; they must be sourced from Tier 2B.
+
+<!-- Step 6 complete: constitutional constraint enforcement implemented -->
+
+## Failure Protocol
+
+*Step 7 implementation — skill plan §4.8 and §7 Step 7. All five failure categories are handled. For every failure: SkillResult(status="failure", failure_category=<category>, failure_reason=<non-null string>). No artifact is written to a canonical output path when a failure is declared.*
+
+---
+
+### MISSING_INPUT
+
+**Trigger conditions in this skill:**
+- Step 1.1: `docs/tier2a_instrument_schemas/evaluation_forms/` directory is empty → `failure_reason="evaluation_forms/ directory is empty; cannot build evaluation matrix without an evaluation form template"`
+- Step 1.2: `evaluation_priority_weights.json` does not exist → `failure_reason="evaluation_priority_weights.json not found; call-requirements-extraction must run before evaluation-matrix-builder"`
+- Step 1.4: Invoking agent context does not provide `resolved_instrument_type` → `failure_reason="resolved_instrument_type required from selected_call.json"`
+- Step 1.5: No evaluation form file in `evaluation_forms/` matches the `resolved_instrument_type` → `failure_reason="No evaluation form found for instrument type <resolved_instrument_type>"`
+
+**Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No artifact written to any canonical output path. Skill halts immediately.
+
+---
+
+### MALFORMED_ARTIFACT
+
+**Trigger conditions in this skill:**
+This skill reads from source document directories and a Tier 2B extracted artifact (not a structured canonical artifact with schema_id). No MALFORMED_ARTIFACT conditions are defined; input absence is handled by MISSING_INPUT.
+
+**Artifact write behavior:** Not applicable for this skill.
+
+---
+
+### CONSTRAINT_VIOLATION
+
+**Trigger conditions in this skill:**
+- Constraint 2 (sub-criterion weights traceable to Tier 2B): Any criterion entry in `evaluation_matrix` has a non-null `weight` value not sourced from `evaluation_priority_weights.json` and lacking a `weight_source` field referencing that file → `failure_reason="Criterion <criterion_id> has weight <value> with no traceable Tier 2B source; weights must originate from evaluation_priority_weights.json per skill constitutional constraints"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No canonical artifact written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the failure.
+
+---
+
+### INCOMPLETE_OUTPUT
+
+**Trigger conditions in this skill:**
+No INCOMPLETE_OUTPUT conditions are defined explicitly in the execution logic. Output construction failures would surface as CONSTRAINT_VIOLATION or CONSTITUTIONAL_HALT. If a write error occurs at Step 5.1, return `failure_reason="call_analysis_summary.json could not be written"`.
+
+**Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** No partial write to any canonical output path. Skill halts before writing.
+
+---
+
+### CONSTITUTIONAL_HALT
+
+**Trigger conditions in this skill:**
+- Constraint 1 (evaluation criteria from active evaluation form only): The skill cannot parse at least one evaluation criterion with `source_section` and `source_document` from the identified form file; OR criteria are constructed from prior knowledge rather than from the parsed form → `failure_reason="Evaluation criteria cannot be sourced from the provided form file for instrument type <resolved_instrument_type>; constructing criteria from generic knowledge is prohibited by CLAUDE.md §13.9 and §10.6"`
+
+**Required response:** `SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason=<specific reason>)`
+
+**Artifact write behavior:** Immediate halt. No `call_analysis_summary.json` written. Decision log write is not in this skill's declared `writes_to` scope; the invoking agent is responsible for logging the constitutional halt.
+
+---
+
+### Universal Failure Rules
+
+1. Every failure returns `SkillResult(status="failure")` with a non-null `failure_reason` string.
+2. No canonical output artifact is written (partially or fully) when any failure category fires.
+3. Exceptions: skills whose `writes_to` includes `decision_log/` or `validation_reports/` MAY write failure records to those paths even when the primary output fails. This skill's `writes_to` is `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/` only; no exception applies.
+4. The invoking agent receives the `SkillResult` and is responsible for logging the failure and halting phase execution per its own failure protocol.
+5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
+
+<!-- Step 7 complete: failure protocol implemented -->
