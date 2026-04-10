@@ -36,7 +36,77 @@ system_orchestration/
 ├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
 ├── gate_rules_library_plan.md        # Implementation plan (reference only — complete)
 ├── dag_scheduler_plan.md             # DAG scheduler implementation plan (Steps 1–6 complete)
-└── dag_scheduler_guide.md            # Operator/developer guide: CLI invocation, artifacts, exit codes
+├── dag_scheduler_guide.md            # Operator/developer guide: CLI invocation, artifacts, exit codes
+├── agent-generation-plan.md          # Agent generation plan (Steps 1–10 complete)
+└── skill_implementation_plan.md      # Skill implementation plan (Steps 1–10 complete)
+```
+
+The agent layer lives at `.claude/agents/` (not inside this package directory):
+
+```
+.claude/agents/                       # Agent execution layer (16 agents + contract + prompts + checklist)
+├── node_body_contract.md             # Shared contract: all agents must conform
+├── validation_checklist.md           # Step 10 checklist: 16 agents × 9 columns + cross-agent handoffs
+├── call_analyzer.md                  # Phase 1 — call analysis
+├── instrument_schema_resolver.md     # Phase 1 — instrument schema resolution
+├── concept_refiner.md                # Phase 2 — concept refinement
+├── wp_designer.md                    # Phase 3 — work package design
+├── dependency_mapper.md              # Phase 3 — WP dependency analysis (sub-agent)
+├── gantt_designer.md                 # Phase 4 — Gantt & milestones
+├── impact_architect.md               # Phase 5 — impact architecture
+├── implementation_architect.md       # Phase 6 — implementation architecture
+├── budget_interface_coordinator.md   # Phase 7 — budget request preparation
+├── budget_gate_validator.md          # Phase 7 — budget gate validation
+├── proposal_writer.md               # Phase 8a/8b — section drafting & assembly
+├── evaluator_reviewer.md            # Phase 8c — evaluator review
+├── revision_integrator.md           # Phase 8d — revision & checkpoint
+├── compliance_validator.md          # Cross-phase — constitutional compliance
+├── traceability_auditor.md          # Cross-phase — traceability audit
+├── state_recorder.md                # Cross-phase — decision logging & checkpoints
+└── prompts/                         # 16 prompt specification files (Step 9)
+    ├── call_analyzer_prompt_spec.md
+    ├── instrument_schema_resolver_prompt_spec.md
+    ├── concept_refiner_prompt_spec.md
+    ├── wp_designer_prompt_spec.md
+    ├── dependency_mapper_prompt_spec.md
+    ├── gantt_designer_prompt_spec.md
+    ├── impact_architect_prompt_spec.md
+    ├── implementation_architect_prompt_spec.md
+    ├── budget_interface_coordinator_prompt_spec.md
+    ├── budget_gate_validator_prompt_spec.md
+    ├── proposal_writer_prompt_spec.md
+    ├── evaluator_reviewer_prompt_spec.md
+    ├── revision_integrator_prompt_spec.md
+    ├── compliance_validator_prompt_spec.md
+    ├── traceability_auditor_prompt_spec.md
+    └── state_recorder_prompt_spec.md
+```
+
+The skill layer lives at `.claude/skills/` (not inside this package directory):
+
+```
+.claude/skills/                       # Skill execution layer (19 skills + contract + checklist)
+├── skill_runtime_contract.md         # Shared contract: all skills must conform
+├── validation_checklist.md           # Step 10 checklist: 19 skills × 10 columns, all pass
+├── call-requirements-extraction.md   # Phase 1 — extract call requirements from Tier 2B
+├── evaluation-matrix-builder.md      # Phase 1 — build evaluation matrix
+├── instrument-schema-normalization.md # Phase 1 — resolve instrument schema
+├── topic-scope-check.md             # Phase 1/2 — verify scope against Tier 2B
+├── concept-alignment-check.md       # Phase 2 — check concept/call alignment
+├── work-package-normalization.md    # Phase 3 — normalize WP structure
+├── wp-dependency-analysis.md        # Phase 3 — dependency DAG + cycle detection
+├── milestone-consistency-check.md   # Phase 3/4/6 — milestone validation
+├── impact-pathway-mapper.md         # Phase 5 — map outputs to impacts
+├── dissemination-exploitation-communication-check.md  # Phase 5 — DEC plan validation
+├── governance-model-builder.md      # Phase 6 — governance model
+├── risk-register-builder.md         # Phase 6 — risk register
+├── budget-interface-validation.md   # Phase 7 — budget request/response validation
+├── proposal-section-traceability-check.md  # Phase 8 — claim traceability audit
+├── evaluator-criteria-review.md     # Phase 8 — evaluator criteria assessment
+├── constitutional-compliance-check.md # Cross-phase — CLAUDE.md §13 audit
+├── gate-enforcement.md              # Cross-phase — gate predicate evaluation
+├── decision-log-update.md           # Cross-phase — durable decision recording
+└── checkpoint-publish.md            # Cross-phase — checkpoint publication
 ```
 
 The runner implementation lives at the repository root (not inside this package directory):
@@ -130,7 +200,7 @@ The workflow executes as a DAG. All gates are blocking. Gate failure is a valid 
 
 ## Runner Implementation Status
 
-The workflow package is now fully implemented.
+The runner (gate evaluation + DAG scheduler) is fully implemented.
 
 **Completed implementation steps**
 - **Step 1 — Artifact schema specification** completed in `artifact_schema_specification.yaml`
@@ -268,7 +338,7 @@ All five failure categories are in use across the implemented predicates:
 **Current non-goals**
 The DAG scheduler drives gate evaluation over pre-produced artifacts.
 The following behaviors are **intentionally out of scope** and not implemented:
-- Node body execution (invoking agents or skills to produce phase outputs)
+- Node body execution (invoking agents or skills to produce phase outputs) — this is the subject of the Skill Runtime + Agent Runtime Integration Plan
 - Parallel / concurrent node dispatch
 - Rerun / resume logic (incremental re-entry into a prior run)
 - Semantic agent orchestration beyond calling ``evaluate_gate()``
@@ -291,6 +361,64 @@ The following behaviors are **intentionally out of scope** and not implemented:
 - DAG Steps 2–5 DAGScheduler + CLI: 122 tests in `tests/runner/test_dag_scheduler.py`
 - DAG Step 6 full-DAG scenarios: 55 tests in `tests/runner/test_dag_full_run.py`
 - **Total: 762 tests, all passing**
+
+---
+
+## Agent Layer — Implementation Status
+
+The agent execution layer is fully implemented. 16 agent definition files, `node_body_contract.md`, 16 prompt specification files, and `validation_checklist.md` have been produced at `.claude/agents/`.
+
+**Completed steps (agent-generation-plan.md)**
+- **Step 1 — Initialize generation context** — all mandatory sources read
+- **Step 2 — Scaffold all agent files** — 16 `.md` files + `node_body_contract.md` created
+- **Step 3 — Fill in standard front matter** — all front matter fields populated from `agent_catalog.yaml` and `manifest.compile.yaml`; 2 catalog corrections applied (concept_refiner gate-enforcement removal, budget_interface_coordinator writes_to alignment)
+- **Step 4 — Bind skills** — `invoked_skills` populated from manifest `skills` fields; trigger conditions and expected outputs documented
+- **Step 5 — Bind canonical inputs and outputs** — `canonical_inputs` and `canonical_outputs` tables populated with paths, schema IDs, and extraction specs
+- **Step 6 — Align with artifact schemas** — field-level output specs added for all `required: true` fields from `artifact_schema_specification.yaml`; `run_id` inheritance and `schema_id` stamping confirmed; `artifact_status` left absent
+- **Step 7 — Implement gate awareness and failure behaviour** — predecessor gate verification, failure protocol (4 categories), and decision-log write obligations added to all 16 agents
+- **Step 8 — Review for constitutional conflicts** — CLAUDE.md §13 review conducted; all 16 agents pass `constitutional_review_passed` column
+- **Step 9 — Write prompt specification files** — 16 `prompts/<agent_id>_prompt_spec.md` files produced with mandatory reading order, reasoning sequence, output construction rules, traceability obligations, and failure protocol
+- **Step 10 — Add a validation checklist** — `.claude/agents/validation_checklist.md` produced; 16/16 agents complete across all 9 columns; 13 cross-agent handoffs validated (11 pass, 2 minor caveats flagged for operator review)
+
+---
+
+## Skill Layer — Implementation Status
+
+The skill execution layer is fully implemented. 19 skill definition files, `skill_runtime_contract.md`, and `validation_checklist.md` have been produced at `.claude/skills/`.
+
+**Completed steps (skill_implementation_plan.md)**
+- **Step 1 — Initialize implementation context** — all mandatory sources read
+- **Step 2 — Scaffold all skill files** — 19 `.md` files + `skill_runtime_contract.md` created
+- **Step 3 — Fill in standard front matter** — all front matter fields populated verbatim from `skill_catalog.yaml`
+- **Step 4 — Bind canonical inputs and outputs** — all `reads_from`/`writes_to` paths expanded to specific artifacts with extraction/field specs
+- **Step 5 — Implement execution logic** — deterministic execution specifications with input validation, core processing, output construction, conformance stamping, and write sequences
+- **Step 6 — Enforce constitutional constraints** — every catalog constraint mapped to a hard failure condition with explicit decision points and CLAUDE.md §13 cross-references
+- **Step 7 — Implement failure protocol** — all five failure categories (MISSING_INPUT, MALFORMED_ARTIFACT, CONSTRAINT_VIOLATION, INCOMPLETE_OUTPUT, CONSTITUTIONAL_HALT) handled in all 19 skills
+- **Step 8 — Validate outputs against artifact schemas** — all canonical outputs verified against `artifact_schema_specification.yaml`; corrections applied where needed
+- **Step 9 — Review against CLAUDE.md** — all 19 skills reviewed against §13 prohibitions; 1 finding corrected (`impact-pathway-mapper` Step 2.6.2 heuristic matching replaced with explicit Tier 3 linkage requirement)
+- **Step 10 — Produce validation checklist** — `.claude/skills/validation_checklist.md` produced; all 19 skills pass all 10 columns; 1 systematic gap (missing `skill_runtime_contract.md` reference) remediated
+
+**Skill file structure per skill:**
+Each skill `.md` file contains: YAML front matter, Canonical Inputs table, Execution Specification (deterministic steps), Output Construction, Constitutional Constraint Enforcement (per constraint: decision point, failure condition, enforcement mechanism, hard failure confirmation, CLAUDE.md cross-reference), Failure Protocol (all 5 categories), Schema Validation, and Runtime Contract reference.
+
+---
+
+## Integration Status — Next Step
+
+Three layers are now independently specified:
+
+| Layer | Status | Artifacts |
+|-------|--------|-----------|
+| DAG scheduler (runner) | Fully implemented + tested (762 tests) | `runner/` package, CLI entry point |
+| Agent layer | Fully implemented (Steps 1–10) | 16 agents + contract + 16 prompt specs + checklist at `.claude/agents/` |
+| Skill layer | Fully implemented (Steps 1–10) | 19 skills + contract + checklist at `.claude/skills/` |
+
+**The next integration target is the Skill Runtime + Agent Runtime Integration Plan**, which will bridge:
+- The DAG scheduler's `_dispatch_node()` call (currently evaluates gates only; does not invoke agents)
+- The agent layer's execution specifications (currently define what agents do; no runtime invocation mechanism)
+- The skill layer's `run_skill()` interface (currently specified in `skill_runtime_contract.md`; no runtime implementation)
+
+This plan will define how `_dispatch_node()` invokes an agent, how an agent invokes skills via `run_skill()`, how `SkillResult` flows back to the agent, and how the agent's completion triggers gate evaluation.
 
 ---
 

@@ -2,7 +2,7 @@
 ## Horizon Europe Proposal Orchestration System — Agent Execution Layer
 
 **Package:** `system_orchestration` v1.1
-**Plan status:** Authoritative specification. No agent file may be generated without reading all mandatory sources listed in §1.
+**Plan status:** Fully implemented — Steps 1–10 complete. 16 agent files + `node_body_contract.md` + 16 prompt specs + `validation_checklist.md` produced.
 **Constitutional authority:** Subordinate to `CLAUDE.md`. This plan operationalizes; it does not override.
 
 ---
@@ -243,11 +243,11 @@ Phase 8 agents (`proposal_writer` for n08a/n08b, `evaluator_reviewer` for n08c, 
 
 Execute the steps in order. Do not begin a step before all prior steps are complete. No step may be skipped.
 
-### Step 1 — Initialize generation context
+### Step 1 — Initialize generation context ✓ Implemented
 Confirm all mandatory sources (§1) are available and readable.
 Do not assume prior reading persists across steps.
 
-### Step 2 — Scaffold all agent files
+### Step 2 — Scaffold all agent files ✓ Implemented
 Create an empty (front-matter-only) `.claude/agents/<agent_id>.md` for each agent in the mapping table (§4), including cross-phase agents. Use the front matter schema from §2.2A. At this stage, the body may be a placeholder. Target: 14 agent files + the `node_body_contract.md`.
 
 **Agent file list:**
@@ -271,40 +271,40 @@ Create an empty (front-matter-only) `.claude/agents/<agent_id>.md` for each agen
 .claude/agents/node_body_contract.md
 ```
 
-### Step 3 — Fill in standard front matter for each agent
+### Step 3 — Fill in standard front matter for each agent ✓ Implemented
 For each scaffolded file, populate all front matter fields from §2.2A using `manifest.compile.yaml` and `agent_catalog.yaml` as the exclusive sources. Verify:
 - `agent_id` matches `agent_catalog.yaml` exactly
 - `node_ids` matches the manifest `agent` field for each node
 - `reads_from` and `writes_to` match `agent_catalog.yaml` exactly
 - `exit_gate` matches the manifest `exit_gate` for the node(s) served
 
-### Step 4 — Bind skills
+### Step 4 — Bind skills ✓ Implemented
 For each agent, add the `invoked_skills` list populated from `manifest.compile.yaml` `skills` field for the corresponding node(s). For each skill:
 - Read its entry in `skill_catalog.yaml`
 - Add a one-line description of trigger condition and expected output
 - Confirm the skill's `constitutional_constraints` are reflected in the agent's `must_not` section
 
-### Step 5 — Bind canonical inputs and outputs
+### Step 5 — Bind canonical inputs and outputs ✓ Implemented
 For each agent:
 - Populate `canonical_inputs` from `agent_catalog.yaml` `reads_from`, cross-referenced against the `artifact_registry` in `manifest.compile.yaml`
 - Populate `canonical_outputs` from `agent_catalog.yaml` `writes_to`, cross-referenced against the `artifact_registry`
 - For each canonical output, record its `schema_id_value` from `artifact_schema_specification.yaml`
 
-### Step 6 — Align with artifact schemas
+### Step 6 — Align with artifact schemas ✓ Implemented
 For each canonical output:
 - Read the full field specification in `artifact_schema_specification.yaml` for the relevant schema
 - Add a field-level output spec to the agent body covering all `required: true` fields
 - Confirm `run_id` inheritance and `schema_id` stamping are implemented
 - Confirm `artifact_status` is left absent at write time (runner-stamped post-gate)
 
-### Step 7 — Implement gate awareness and failure behaviour
+### Step 7 — Implement gate awareness and failure behaviour ✓ Implemented
 For each agent:
 - Add explicit predecessor gate verification logic (§3.8)
 - Add the failure protocol from §3.9 as named handling cases
 - Add the decision-log obligations from §3.10 as explicit write steps
 - For `budget_gate_validator`: add the absent-artifacts-always-fail rule as an unconditional branch
 
-### Step 8 — Review for constitutional conflicts
+### Step 8 — Review for constitutional conflicts ✓ Implemented
 For each completed agent file:
 - Re-read CLAUDE.md §13 (Forbidden Actions and Anti-Patterns)
 - Confirm no generated agent violates any prohibition
@@ -312,7 +312,7 @@ For each completed agent file:
 - Confirm no `must_not` from the catalog has been softened or omitted
 - Flag any conflict for human review; do not silently resolve
 
-### Step 9 — Write prompt specification files
+### Step 9 — Write prompt specification files ✓ Implemented
 For each agent, produce the corresponding `prompts/<agent_id>_prompt_spec.md`:
 - Reading instructions (which files to read, in what order)
 - Reasoning steps (how to derive outputs from inputs)
@@ -320,7 +320,7 @@ For each agent, produce the corresponding `prompts/<agent_id>_prompt_spec.md`:
 - Traceability footer requirements (Confirmed/Inferred/Assumed/Unresolved)
 - Failure declaration protocol (verbatim steps from §3.9)
 
-### Step 10 — Add a validation checklist
+### Step 10 — Add a validation checklist ✓ Implemented
 After all agent files and prompt specs are complete, create `.claude/agents/validation_checklist.md` containing:
 - A row per agent confirming: front matter complete, skills bound, canonical I/O specified, schemas aligned, gate awareness implemented, failure protocol implemented, constitutional review passed, prompt spec written
 - For each agent marked incomplete, a specific gap description
@@ -361,4 +361,4 @@ Agents are invoked as node body executors by the DAG scheduler. The following ru
 - **Gate failure is a correct output.** An agent that declares a gate condition unmet and writes a failure report has done its job correctly. It must not attempt to satisfy the gate through fabrication.
 - **The DAG scheduler reads `run_summary.json` for orchestration state.** Agents must not write to this file. Its path and schema are owned by `runner/dag_scheduler.py`.
 
-*Agent generation plan. Effective from creation. Amendments require explicit human instruction. No amendment may widen agent scope, weaken gate conditions, or relax any constitutional prohibition.*
+*Agent generation plan. Effective from creation. Implementation complete 2026-04-09. Amendments require explicit human instruction. No amendment may widen agent scope, weaken gate conditions, or relax any constitutional prohibition.*

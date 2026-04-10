@@ -299,7 +299,7 @@ End-to-end tests against a fully populated synthetic repo covering:
 
 The following are not part of this plan and must not be implemented speculatively:
 
-**Node body execution.** The scheduler drives gate evaluation against already-produced artifacts. It does not invoke agents, call skills, or produce phase outputs. Node body execution (calling `call_analyzer`, `concept_refiner`, etc.) is a separate concern that requires agent orchestration design.
+**Node body execution.** The scheduler drives gate evaluation against already-produced artifacts. It does not invoke agents, call skills, or produce phase outputs. Node body execution (calling `call_analyzer`, `concept_refiner`, etc.) is the subject of the Skill Runtime + Agent Runtime Integration Plan, which bridges the agent layer (16 agents, Steps 1–7 complete) and the skill layer (19 skills, Steps 1–10 complete) with the DAG scheduler's dispatch loop.
 
 **Parallel dispatch.** The run loop is single-threaded. Phase 4 and Phase 5 are identified as a parallel path in the manifest but the scheduler evaluates them sequentially within a single iteration of the ready-node loop. True concurrent dispatch is deferred pending a concurrency model decision.
 

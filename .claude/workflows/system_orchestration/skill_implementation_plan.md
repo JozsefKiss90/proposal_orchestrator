@@ -2,7 +2,7 @@
 ## Horizon Europe Proposal Orchestration System — Skill Runtime Layer
 
 **Package:** `system_orchestration` v1.1
-**Plan status:** Authoritative specification. No skill file may be generated without reading all mandatory sources listed in §1.
+**Plan status:** Fully implemented — Steps 1–10 complete. All 19 skill files + `skill_runtime_contract.md` + `validation_checklist.md` produced.
 **Constitutional authority:** Subordinate to `CLAUDE.md`. This plan operationalizes; it does not override.
 
 ---
@@ -437,7 +437,7 @@ For each scaffolded file, populate all front matter fields from §3.2A using `sk
 - `writes_to` matches `writes_to` in `skill_catalog.yaml` exactly
 - `constitutional_constraints` is copied verbatim from `skill_catalog.yaml` — no paraphrase, no omission
 
-### Step 4 — Bind canonical inputs and outputs **Status: COMPLETE**
+### Step 4 — Bind canonical inputs and outputs ✓ Implemented
 
 For each skill:
 - Expand each path in `reads_from` to identify:
@@ -454,7 +454,7 @@ For each declared output:
 - Confirm the producing phase/node is consistent with the agent invoking this skill
 - Confirm `run_id` is required in the output (applies to all canonical Tier 4 and Tier 5 artifacts)
 
-### Step 5 — Implement execution logic **Status: COMPLETE**
+### Step 5 — Implement execution logic ✓ Implemented
 
 For each skill, write the execution specification body. This is the step that defines *what the skill does*, expressed as a precise, ordered sequence of operations:
 
@@ -476,7 +476,7 @@ The specification must not delegate core logic back to an LLM as "reason about t
 - what constitutes a gap or mismatch
 - how the output represents the judgment result
 
-### Step 6 — Enforce constitutional constraints **Status: COMPLETE**
+### Step 6 — Enforce constitutional constraints ✓ Implemented
 
 For each skill, revisit every constraint in its `constitutional_constraints` and implement explicit enforcement logic:
 
@@ -489,7 +489,7 @@ For constraints that are categorical prohibitions (e.g., "must not invent", "mus
 
 Cross-check all constraints against CLAUDE.md §13 (Forbidden Actions and Anti-Patterns) to confirm that no constraint is weaker than the constitutional prohibition it operationalizes.
 
-### Step 7 — Implement failure protocol
+### Step 7 — Implement failure protocol ✓ Implemented
 
 For each skill, add explicit failure handling for all failure categories defined in §4.8:
 
@@ -506,7 +506,7 @@ For every failure category:
 - No artifact must be written to a canonical output path when a failure is declared (unless the canonical path is itself a failure report path such as `validation_reports/` or `decision_log/`)
 - The invoking agent receives the failure result and is responsible for logging and halting per its own failure protocol
 
-### Step 8 — Validate outputs against artifact schemas
+### Step 8 — Validate outputs against artifact schemas ✓ Implemented
 
 For each skill that writes a canonical Tier 4 or Tier 5 artifact:
 - Re-read `artifact_schema_specification.yaml` for the relevant schema
@@ -518,7 +518,7 @@ For each skill that writes a canonical Tier 4 or Tier 5 artifact:
 
 For skills that write to `validation_reports/` or `decision_log/`: confirm the output structure conforms to the validation status vocabulary (§4.7).
 
-### Step 9 — Review against CLAUDE.md
+### Step 9 — Review against CLAUDE.md ✓ Implemented
 
 For each completed skill file:
 - Re-read CLAUDE.md §13 (Forbidden Actions and Anti-Patterns)
@@ -530,7 +530,7 @@ For each completed skill file:
 - Confirm no Phase 8 skill touches budget-dependent content without confirming Phase 7 gate passage (CLAUDE.md §13.4)
 - Flag any conflict for human review; do not silently resolve
 
-### Step 10 — Produce validation checklist
+### Step 10 — Produce validation checklist ✓ Implemented
 
 After all skill files are complete, produce a validation checklist at `.claude/skills/validation_checklist.md` containing a row per skill confirming:
 
@@ -734,4 +734,4 @@ The following runtime facts govern every skill implementation:
 
 ---
 
-*Skill implementation plan. Effective from creation. Amendments require explicit human instruction. No amendment may expand skill scope, weaken constitutional constraints, introduce scheduler coupling, or relax any constitutional prohibition from CLAUDE.md.*
+*Skill implementation plan. Effective from creation. Implementation complete 2026-04-10. Amendments require explicit human instruction. No amendment may expand skill scope, weaken constitutional constraints, introduce scheduler coupling, or relax any constitutional prohibition from CLAUDE.md.*
