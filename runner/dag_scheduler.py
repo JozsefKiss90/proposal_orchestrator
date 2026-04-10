@@ -51,10 +51,10 @@ remain after the dispatch loop exits.  ``run_summary.json`` is written to
 
 Scope boundaries
 ----------------
-This module implements gate-evaluation dispatch over pre-produced artifacts.
-The following are intentionally out of scope:
+This module implements gate-evaluation dispatch with integrated node body
+execution via the agent runtime.  The following are intentionally out of scope:
 
-- Node body execution (invoking agents or skills)
+- Direct skill invocation (the scheduler calls ``run_agent()``, never ``run_skill()``)
 - Parallel dispatch
 - Rerun / resume logic
 - Semantic agent orchestration beyond calling ``evaluate_gate()``
@@ -71,11 +71,14 @@ from typing import Any, Optional, Union
 
 import yaml
 
+from runner.agent_runtime import run_agent
 from runner.gate_evaluator import evaluate_gate
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
+from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
 from runner.run_context import RunContext
+from runner.runtime_models import AgentResult, NodeExecutionResult
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
 
 # ---------------------------------------------------------------------------
@@ -161,6 +164,10 @@ class RunSummary:
     gate_results_index:
         ``{gate_id: repo_relative_path}`` for every gate evaluated during
         the run.
+    node_failure_details:
+        ``{node_id: {failure_origin, exit_gate_evaluated, ...}}`` for nodes
+        not in ``released`` or ``pending`` state.  See §9.3 of
+        ``runtime_integration_plan.md``.
 
     Extra implementation fields (not in plan schema)
     -------------------------------------------------
@@ -204,6 +211,7 @@ class RunSummary:
     hard_blocked_nodes: list[str]
     node_states: dict[str, str]
     gate_results_index: dict[str, str]
+    node_failure_details: dict[str, dict]
     # Extra implementation field
     dispatched_nodes: list[str]
 
@@ -296,6 +304,56 @@ class RunSummary:
                 gate_results_index[gid] = _gate_result_repo_path(gid)
                 seen.add(gid)
 
+        # ------------------------------------------------------------------
+        # node_failure_details (§9.3 of runtime_integration_plan.md)
+        # ------------------------------------------------------------------
+        # Populated only for nodes not in "released" or "pending" state.
+        # Manifest registry order is preserved via all_node_ids iteration.
+        node_failure_details: dict[str, dict] = {}
+        for nid in all_node_ids:
+            st = node_states[nid]
+            if st in ("released", "pending"):
+                continue
+            if st == "hard_block_upstream":
+                # Frozen by propagation — not a local failure.
+                node_failure_details[nid] = {
+                    "failure_origin": None,
+                    "exit_gate_evaluated": False,
+                    "failure_reason": None,
+                    "failure_category": None,
+                }
+            elif st in ("blocked_at_entry", "blocked_at_exit"):
+                stored = ctx.get_node_failure_details(nid)
+                if stored is not None:
+                    node_failure_details[nid] = dict(stored)
+                else:
+                    # Conservative fallback when metadata was not persisted
+                    # (e.g. gate evaluator set state before Step 6 extension).
+                    if st == "blocked_at_entry":
+                        node_failure_details[nid] = {
+                            "failure_origin": "entry_gate",
+                            "exit_gate_evaluated": False,
+                            "failure_reason": None,
+                            "failure_category": None,
+                        }
+                    else:
+                        node_failure_details[nid] = {
+                            "failure_origin": None,
+                            "exit_gate_evaluated": False,
+                            "failure_reason": None,
+                            "failure_category": None,
+                        }
+            elif st == "deterministic_pass_semantic_pending":
+                # Runner-internal transitional state — not a failure.
+                # Include with null origin for completeness (node is neither
+                # released nor truly failed; semantic evaluation is pending).
+                node_failure_details[nid] = {
+                    "failure_origin": None,
+                    "exit_gate_evaluated": False,
+                    "failure_reason": None,
+                    "failure_category": None,
+                }
+
         return cls(
             run_id=ctx.run_id,
             manifest_version=MANIFEST_VERSION,
@@ -309,6 +367,7 @@ class RunSummary:
             hard_blocked_nodes=hard_blocked,
             node_states=node_states,
             gate_results_index=gate_results_index,
+            node_failure_details=node_failure_details,
             dispatched_nodes=list(dispatched_nodes),
         )
 
@@ -352,6 +411,7 @@ class RunSummary:
             "hard_blocked_nodes": list(self.hard_blocked_nodes),
             "node_states": dict(self.node_states),
             "gate_results_index": dict(self.gate_results_index),
+            "node_failure_details": dict(self.node_failure_details),
             # --- Extra implementation field ---
             "dispatched_nodes": list(self.dispatched_nodes),
             # --- Backward-compat derived fields ---
@@ -394,6 +454,7 @@ class RunSummary:
             "hard_blocked_nodes": self.hard_blocked_nodes,
             "node_states": self.node_states,
             "gate_results_index": self.gate_results_index,
+            "node_failure_details": self.node_failure_details,
             "dispatched_nodes": self.dispatched_nodes,
         }
         path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
@@ -870,6 +931,22 @@ class DAGScheduler:
         #: Populated by _dispatch_node() and consumed by RunSummary.build().
         self._evaluated_gates: list[str] = []
 
+        #: Node resolver for agent_id / skill_ids / phase_id lookups.
+        #: Constructed once on first access via :attr:`_node_resolver`
+        #: (lazy to avoid requiring the manifest file at construction
+        #: time in test harnesses that don't provide it).
+        self.__node_resolver: Optional[NodeResolver] = None
+
+    @property
+    def _node_resolver(self) -> NodeResolver:
+        """Return the cached ``NodeResolver``, constructing it on first access."""
+        if self.__node_resolver is None:
+            self.__node_resolver = NodeResolver(
+                manifest_path=self.manifest_path,
+                repo_root=self.repo_root,
+            )
+        return self.__node_resolver
+
     # ------------------------------------------------------------------
     # Public entry point
     # ------------------------------------------------------------------
@@ -1025,29 +1102,28 @@ class DAGScheduler:
     # Node dispatch
     # ------------------------------------------------------------------
 
-    def _dispatch_node(self, node_id: str) -> dict:
+    def _dispatch_node(self, node_id: str) -> NodeExecutionResult:
         """
-        Evaluate the entry and exit gates for *node_id*.
+        Execute node body and evaluate gates for *node_id*.
 
-        Execution contract
-        ------------------
-        1. Transition node state to ``"running"`` and persist.
-        2. If the node has an entry gate, evaluate it.  On failure,
-           ensure state is ``"blocked_at_entry"`` and return.
-        3. Evaluate the exit gate.
-        4. On exit-gate pass, ensure state is ``"released"``.
-        5. On exit-gate failure:
-           - If the gate is ``gate_09_budget_consistency``, call
-             ``ctx.mark_hard_block_downstream()`` and persist so that Phase 8
-             nodes are frozen even when ``evaluate_gate()`` is mocked.
-           - Ensure state is ``"blocked_at_exit"``.
-        6. Return the last gate result dict.
+        Execution contract (runtime_integration_plan.md §9.2)
+        -----------------------------------------------------
+        1. Set state → ``"running"``.  Persist.
+        2. Evaluate entry gate (if present).  On failure →
+           ``"blocked_at_entry"``; return immediately.
+        3. Execute node body via ``run_agent()``.  On failure or
+           ``can_evaluate_exit_gate == False`` → ``"blocked_at_exit"``
+           with ``failure_origin="agent_body"``; skip exit gate; return.
+        4. Evaluate exit gate.  On pass → ``"released"``.
+           On failure → ``"blocked_at_exit"`` with
+           ``failure_origin="exit_gate"``.
+        5. Return :class:`NodeExecutionResult`.
 
         ``evaluate_gate()`` internally loads a fresh ``RunContext``, writes
         node state, and saves.  After each call this method reloads
         ``self.ctx`` from disk so the in-memory state stays authoritative.
-        The explicit state enforcement in steps 4–5 above guarantees that
-        node state in ``RunContext`` is always consistent with the gate result,
+        The explicit state enforcement guarantees that node state in
+        ``RunContext`` is always consistent with the gate/agent result,
         regardless of how ``evaluate_gate()`` is implemented.
 
         Parameters
@@ -1057,19 +1133,19 @@ class DAGScheduler:
 
         Returns
         -------
-        dict
-            The gate result dict from the last ``evaluate_gate()`` call.
+        NodeExecutionResult
+            Full composite result of the dispatch.
 
         Raises
         ------
         DAGSchedulerError
             If *node_id* has no exit gate (all production nodes must have one).
         """
-        # 1. Mark running
+        # ── Step 1: Mark running ──────────────────────────────────────
         self.ctx.set_node_state(node_id, "running")
         self.ctx.save()
 
-        # 2. Entry gate (optional — only n01_call_analysis has one currently)
+        # ── Step 2: Entry gate (optional) ─────────────────────────────
         entry_gate_id = self.graph.entry_gate(node_id)
         if entry_gate_id is not None:
             entry_result = evaluate_gate(
@@ -1083,13 +1159,25 @@ class DAGScheduler:
             self._reload_ctx()
 
             if entry_result.get("status") != "pass":
-                # Enforce blocked_at_entry in case evaluate_gate() was mocked.
-                if self.ctx.get_node_state(node_id) != "blocked_at_entry":
-                    self.ctx.set_node_state(node_id, "blocked_at_entry")
-                    self.ctx.save()
-                return entry_result
+                # Enforce blocked_at_entry and persist failure metadata
+                # (idempotent if evaluate_gate() already set the state).
+                self.ctx.set_node_state(
+                    node_id,
+                    "blocked_at_entry",
+                    failure_origin="entry_gate",
+                    exit_gate_evaluated=False,
+                )
+                self.ctx.save()
+                return NodeExecutionResult(
+                    node_id=node_id,
+                    final_state="blocked_at_entry",
+                    exit_gate_evaluated=False,
+                    failure_origin="entry_gate",
+                    gate_result=entry_result,
+                    agent_result=None,
+                )
 
-        # 3. Exit gate (mandatory for all production nodes)
+        # ── Validate exit gate exists (before agent invocation) ───────
         exit_gate_id = self.graph.exit_gate(node_id)
         if exit_gate_id is None:
             raise DAGSchedulerError(
@@ -1097,6 +1185,59 @@ class DAGScheduler:
                 "All production nodes must have an exit gate."
             )
 
+        # ── Step 3: Node body execution via agent runtime ─────────────
+        resolver = self._node_resolver
+        agent_id = resolver.resolve_agent_id(node_id)
+        sub_agent_id = resolver.resolve_sub_agent_id(node_id)
+        pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
+        skill_ids = resolver.resolve_skill_ids(node_id)
+        phase_id = resolver.resolve_phase_id(node_id)
+
+        agent_result: AgentResult = run_agent(
+            agent_id,
+            node_id,
+            self.ctx.run_id,
+            self.repo_root,
+            manifest_path=self.manifest_path,
+            skill_ids=skill_ids,
+            phase_id=phase_id,
+            sub_agent_id=sub_agent_id,
+            pre_gate_agent_id=pre_gate_agent_id,
+        )
+
+        # Agent-body failure OR can_evaluate_exit_gate == False:
+        # skip exit gate unconditionally (§9.2 step 3, §10.4).
+        if (
+            agent_result.status == "failure"
+            or not agent_result.can_evaluate_exit_gate
+        ):
+            self.ctx.set_node_state(
+                node_id,
+                "blocked_at_exit",
+                failure_origin="agent_body",
+                exit_gate_evaluated=False,
+                failure_reason=agent_result.failure_reason,
+                failure_category=agent_result.failure_category,
+            )
+
+            # HARD_BLOCK: if this is the budget gate node, freeze Phase 8.
+            if exit_gate_id == _HARD_BLOCK_GATE:
+                self.ctx.mark_hard_block_downstream()
+
+            self.ctx.save()
+
+            return NodeExecutionResult(
+                node_id=node_id,
+                final_state="blocked_at_exit",
+                exit_gate_evaluated=False,
+                failure_origin="agent_body",
+                gate_result=None,
+                agent_result=agent_result,
+                failure_reason=agent_result.failure_reason,
+                failure_category=agent_result.failure_category,
+            )
+
+        # ── Step 4: Exit gate evaluation ──────────────────────────────
         exit_result = evaluate_gate(
             exit_gate_id,
             self.ctx.run_id,
@@ -1108,24 +1249,51 @@ class DAGScheduler:
         self._reload_ctx()
 
         if exit_result.get("status") == "pass":
-            # 4. Enforce released.
-            if self.ctx.get_node_state(node_id) != "released":
-                self.ctx.set_node_state(node_id, "released")
-                self.ctx.save()
+            # Enforce released and persist metadata (idempotent if
+            # evaluate_gate() already set the state).
+            self.ctx.set_node_state(
+                node_id,
+                "released",
+                failure_origin=None,
+                exit_gate_evaluated=True,
+            )
+            self.ctx.save()
+
+            return NodeExecutionResult(
+                node_id=node_id,
+                final_state="released",
+                exit_gate_evaluated=True,
+                failure_origin=None,
+                gate_result=exit_result,
+                agent_result=agent_result,
+            )
         else:
-            # 5. Exit gate failed.
+            # Exit gate failed.
             if exit_gate_id == _HARD_BLOCK_GATE:
-                # Freeze Phase 8 nodes.  This is idempotent if evaluate_gate()
-                # already called it; it is essential when evaluate_gate() is mocked.
+                # Freeze Phase 8 nodes.
                 self.ctx.mark_hard_block_downstream()
-                self.ctx.save()
 
             # Enforce blocked_at_exit.
-            if self.ctx.get_node_state(node_id) != "blocked_at_exit":
-                self.ctx.set_node_state(node_id, "blocked_at_exit")
-                self.ctx.save()
+            self.ctx.set_node_state(
+                node_id,
+                "blocked_at_exit",
+                failure_origin="exit_gate",
+                exit_gate_evaluated=True,
+                failure_reason=exit_result.get("reason"),
+                failure_category=exit_result.get("failure_category"),
+            )
+            self.ctx.save()
 
-        return exit_result
+            return NodeExecutionResult(
+                node_id=node_id,
+                final_state="blocked_at_exit",
+                exit_gate_evaluated=True,
+                failure_origin="exit_gate",
+                gate_result=exit_result,
+                agent_result=agent_result,
+                failure_reason=exit_result.get("reason"),
+                failure_category=exit_result.get("failure_category"),
+            )
 
     # ------------------------------------------------------------------
     # Internal helpers

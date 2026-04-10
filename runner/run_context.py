@@ -226,13 +226,56 @@ class RunContext:
         """Return the current state of *node_id* (default: ``"pending"``)."""
         return self._manifest["node_states"].get(node_id, "pending")
 
-    def set_node_state(self, node_id: str, state: str) -> None:
+    def set_node_state(
+        self,
+        node_id: str,
+        state: str,
+        *,
+        failure_origin: str | None = None,
+        exit_gate_evaluated: bool | None = None,
+        failure_reason: str | None = None,
+        failure_category: str | None = None,
+    ) -> None:
         """
         Update the state of *node_id* in the in-memory manifest.
+
+        Optional keyword arguments persist failure metadata alongside
+        the node state (§9.4 of runtime_integration_plan.md).  Existing
+        2-argument calls continue to work unchanged — all kwargs default
+        to ``None`` and are only stored when at least one is provided.
 
         Call :meth:`save` to persist.
         """
         self._manifest["node_states"][node_id] = state
+
+        # Persist failure metadata when any kwarg is explicitly provided.
+        has_metadata = (
+            failure_origin is not None
+            or exit_gate_evaluated is not None
+            or failure_reason is not None
+            or failure_category is not None
+        )
+        if has_metadata:
+            if "node_failure_details" not in self._manifest:
+                self._manifest["node_failure_details"] = {}
+            self._manifest["node_failure_details"][node_id] = {
+                "failure_origin": failure_origin,
+                "exit_gate_evaluated": exit_gate_evaluated,
+                "failure_reason": failure_reason,
+                "failure_category": failure_category,
+            }
+
+    def get_node_failure_details(self, node_id: str) -> dict | None:
+        """Return the failure details dict for *node_id*, or ``None``.
+
+        Returns the dict persisted by :meth:`set_node_state` when called
+        with failure metadata keyword arguments.  Returns ``None`` if no
+        failure metadata has been recorded for *node_id*.
+        """
+        details = self._manifest.get("node_failure_details")
+        if details is None:
+            return None
+        return details.get(node_id)
 
     # ------------------------------------------------------------------
     # Reuse policy
