@@ -197,3 +197,34 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional con
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `implementation_architecture.json` (partial population — merge model)
+
+**Schema ID verified:** `orch.phase6.implementation_architecture.v1` ✓
+
+**Partial-population rationale:** The Phase 6 canonical artifact is co-produced by three skills (governance-model-builder, risk-register-builder, implementation_architect agent populating ethics and instrument sections). Step 5.2 specifies merge-on-write: this skill writes only governance_matrix and management_roles; placeholder values for risk_register, ethics_assessment, and instrument_sections_addressed are written only on first invocation and overwritten by the subsequent skills before the Phase 6 gate evaluates the artifact.
+
+**Required fields checked (this skill's scope):**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase6.implementation_architecture.v1" in Step 3 and Step 4 |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| governance_matrix | true | ✓ Implemented | Built in Step 2.4 with body_name, composition[], decision_scope per body |
+| management_roles | true | ✓ Implemented | Built in Step 2.5 with role_id, role_name, assigned_to (partner_id), responsibilities[] |
+| risk_register | true | ✓ Placeholder ([]) — populated by risk-register-builder | Final population required before Phase 6 gate |
+| ethics_assessment | true | ⚠ Placeholder (null) — populated by implementation_architect agent | Final population required before Phase 6 gate; schema requires non-null with ethics_issues_identified, issues[], self_assessment_statement |
+| instrument_sections_addressed | true | ✓ Placeholder ([]) — populated by implementation_architect agent | Final population required before Phase 6 gate |
+
+**Reads_from compliance:** governance_matrix and management_roles fields are derived exclusively from declared reads_from sources (consortium/partners.json, consortium/roles.json, wp_structure.json). No external fields introduced.
+
+**Corrections applied:** None to Output Construction. The placeholder strategy is documented in Step 5.2 and is consistent with the merge-on-write contract; the artifact is not gate-evaluable until all co-producer skills have completed.
+
+<!-- Step 8 complete: schema validation performed -->

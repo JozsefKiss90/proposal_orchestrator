@@ -76,27 +76,27 @@ For each of the six output JSON files, the structure is an array of entries as d
 
 **`call_constraints.json`:**
 - Root field: `constraints` — array of entries produced in Step 2.3
-- Each entry: `constraint_id` (string, unique), `description` (string), `source_section` (string, non-empty), `source_document` (string, filename from work_programmes/ or call_extracts/), `status` (one of: "Confirmed", "Inferred", "Assumed", "Unresolved"), and conditionally: `inference_note` (if Inferred), `assumption_note` (if Assumed), `conflict_note` (if Unresolved)
+- Each entry: `constraint_id` (string, unique), `description` (string), `constraint_type` (string, one of: eligibility/scope/methodological/partnership/reporting/other — required per tier2b_extracted_schemas.call_constraints spec), `source_section` (string, non-empty), `source_document` (string, filename from work_programmes/ or call_extracts/), `status` (one of: "Confirmed", "Inferred", "Assumed", "Unresolved"), and conditionally: `inference_note` (if Inferred), `assumption_note` (if Assumed), `conflict_note` (if Unresolved)
 
 **`expected_outcomes.json`:**
-- Root field: `expected_outcomes` — array of entries produced in Step 2.4
+- Root field: `outcomes` — array of entries produced in Step 2.4 (matches tier2b_extracted_schemas.expected_outcomes spec)
 - Each entry: `outcome_id` (string, unique), `description` (string), `source_section` (string), `source_document` (string), `status` (Confirmed/Inferred/Assumed/Unresolved), and conditional note fields
 
 **`expected_impacts.json`:**
-- Root field: `expected_impacts` — array of entries produced in Step 2.5
-- Each entry: `impact_id` (string, unique — preserved as join key for Phase 5), `description` (string), `source_section` (string), `source_document` (string), `status`, and conditional note fields
+- Root field: `impacts` — array of entries produced in Step 2.5 (matches tier2b_extracted_schemas.expected_impacts spec)
+- Each entry: `impact_id` (string, unique — preserved as join key for Phase 5), `description` (string), `impact_type` (string, one of: scientific/societal/economic/policy/technological/environmental — required per spec), `source_section` (string), `source_document` (string), `status`, and conditional note fields
 
 **`scope_requirements.json`:**
-- Root field: `scope_requirements` — array of entries produced in Step 2.6
-- Each entry: `scope_element_id` (string, unique), `description` (string), `boundary_type` (string, one of required_focus/excluded_topic/conditional_requirement), `source_section` (string), `source_document` (string), `status`, and conditional note fields
+- Root field: `requirements` — array of entries produced in Step 2.6 (matches tier2b_extracted_schemas.scope_requirements spec)
+- Each entry: `requirement_id` (string, unique), `description` (string), `mandatory` (boolean — required per spec; true if the source marks the scope element as required/must-do, false if it is a conditional or optional scope element), `source_section` (string), `source_document` (string), `status`, and conditional note fields
 
 **`eligibility_conditions.json`:**
-- Root field: `eligibility_conditions` — array of entries produced in Step 2.7
-- Each entry: `condition_id` (string, unique), `description` (string), `condition_type` (string), `source_section` (string), `source_document` (string), `status`, and conditional note fields
+- Root field: `conditions` — array of entries produced in Step 2.7 (matches tier2b_extracted_schemas.eligibility_conditions spec)
+- Each entry: `condition_id` (string, unique), `description` (string), `condition_type` (string, one of: consortium_composition/trl_level/budget_limit/geographic/open_access/other — enum per spec), `source_section` (string), `source_document` (string), `status`, and conditional note fields
 
 **`evaluation_priority_weights.json`:**
-- Root field: `evaluation_priority_weights` — array of entries produced in Step 2.8
-- Each entry: `criterion_id` (string — must match the evaluation form criterion label for the active instrument), `weight` (number or null), `priority_note` (string), `source_section` (string), `source_document` (string), `status`, and conditional note fields
+- Root field: `criteria` — array of entries produced in Step 2.8 (matches tier2b_extracted_schemas.evaluation_priority_weights spec)
+- Each entry: `criterion_id` (string — must match the evaluation form criterion label for the active instrument), `criterion_name` (string — required per spec), `weight` (number or null), `priority_notes` (string, optional — spec field name), `source_section` (string), `source_document` (string), `status`, and conditional note fields
 
 ### 4. Conformance Stamping
 
@@ -258,3 +258,69 @@ This skill reads from source document directories (not structured schema-validat
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validation of Output Construction against `artifact_schema_specification.yaml` §7 (tier2b_extracted_schemas). Group C note: these Tier 2B extracted artifacts are `provenance_class: manually_placed`; they do not carry `schema_id`, `run_id`, or `artifact_status`. The skill additionally applies the CLAUDE.md §12.2 Confirmed/Inferred/Assumed/Unresolved vocabulary as an augmentation enabling gate status tracking.*
+
+---
+
+### Artifact 1: `call_constraints.json`
+
+**Spec:** `tier2b_extracted_schemas.call_constraints` — root field `constraints`; item_schema requires `constraint_id`, `description`, `constraint_type` (enum: eligibility/scope/methodological/partnership/reporting/other), `source_section`, `source_document`.
+
+**Gap identified:** Original Output Construction omitted the required `constraint_type` enum field.
+
+**Correction applied:** Added `constraint_type` (enum per spec) to each entry in `constraints[]`.
+
+### Artifact 2: `expected_outcomes.json`
+
+**Spec:** `tier2b_extracted_schemas.expected_outcomes` — root field `outcomes`; item_schema requires `outcome_id`, `description`, `source_section`, `source_document`.
+
+**Gap identified:** Original Output Construction used root field name `expected_outcomes` instead of spec's `outcomes`.
+
+**Correction applied:** Root field renamed to `outcomes`.
+
+### Artifact 3: `expected_impacts.json`
+
+**Spec:** `tier2b_extracted_schemas.expected_impacts` — root field `impacts`; item_schema requires `impact_id`, `description`, `impact_type` (enum: scientific/societal/economic/policy/technological/environmental), `source_section`, `source_document`.
+
+**Gaps identified:** (a) Root field name mismatch (`expected_impacts` vs `impacts`); (b) missing required `impact_type` enum field.
+
+**Corrections applied:** Root field renamed to `impacts`; `impact_type` added per entry.
+
+### Artifact 4: `scope_requirements.json`
+
+**Spec:** `tier2b_extracted_schemas.scope_requirements` — root field `requirements`; item_schema requires `requirement_id`, `description`, `mandatory` (boolean), `source_section`, `source_document`.
+
+**Gaps identified:** (a) Root field name mismatch (`scope_requirements` vs `requirements`); (b) id field mismatch (`scope_element_id` vs `requirement_id`); (c) skill used freeform `boundary_type` instead of required boolean `mandatory`.
+
+**Corrections applied:** Root renamed to `requirements`; id renamed to `requirement_id`; `boundary_type` removed and replaced with required boolean `mandatory`.
+
+### Artifact 5: `eligibility_conditions.json`
+
+**Spec:** `tier2b_extracted_schemas.eligibility_conditions` — root field `conditions`; item_schema requires `condition_id`, `description`, `condition_type` (enum: consortium_composition/trl_level/budget_limit/geographic/open_access/other), `source_section`, `source_document`.
+
+**Gaps identified:** (a) Root field name mismatch (`eligibility_conditions` vs `conditions`); (b) `condition_type` enum mismatch — skill originally listed `[consortium_composition, partner_type, country_restriction, ethics, other]` which is not the spec enum.
+
+**Corrections applied:** Root renamed to `conditions`; `condition_type` enum restated to match spec `[consortium_composition, trl_level, budget_limit, geographic, open_access, other]`.
+
+### Artifact 6: `evaluation_priority_weights.json`
+
+**Spec:** `tier2b_extracted_schemas.evaluation_priority_weights` — root field `criteria`; item_schema requires `criterion_id`, `criterion_name`, `source_section`, `source_document`; optional `weight` (number), `priority_notes` (string).
+
+**Gaps identified:** (a) Root field name mismatch (`evaluation_priority_weights` vs `criteria`); (b) missing required `criterion_name`; (c) field name `priority_note` (singular) vs spec's `priority_notes`.
+
+**Corrections applied:** Root renamed to `criteria`; `criterion_name` added as required; `priority_note` renamed to `priority_notes`.
+
+### Conformance summary
+
+- **reads_from compliance:** Reads only from `docs/tier2b_topic_and_call_sources/work_programmes/` and `docs/tier2b_topic_and_call_sources/call_extracts/` — both declared in frontmatter. Compliant.
+- **writes_to compliance:** Writes only to `docs/tier2b_topic_and_call_sources/extracted/` — declared in frontmatter. Compliant.
+- **`schema_id` / `run_id` / `artifact_status`:** Spec treats these artifacts as `manually_placed` (no schema_id_value). Step 4 correctly states these fields do not apply and must not be added. Compliant.
+- **Validation status vocabulary:** Skill correctly enforces Confirmed/Inferred/Assumed/Unresolved per CLAUDE.md §12.2 across all six files, via Constraint 3 (INCOMPLETE_OUTPUT). This augments the base spec (which is silent on status fields for Tier 2B) without conflicting with it.
+- **`source_section` / `source_document` required on every item:** Spec marks both fields as required across all six common_item_fields. Skill enforces presence via Constraint 2 (CONSTITUTIONAL_HALT for Confirmed/Inferred without source refs). For Assumed/Unresolved entries, source fields may be absent provided an explanatory note is present — this is a declared gap pattern consistent with CLAUDE.md §12.2.
+
+**Overall corrections applied:** 6 root-field renames, 2 required enum fields added (constraint_type, impact_type), 1 id field rename (scope_element_id→requirement_id), 1 field replacement (boundary_type→mandatory), 1 enum restated (condition_type), 1 field rename (priority_note→priority_notes), 1 required field added (criterion_name).
+
+<!-- Step 8 complete: schema validation performed -->

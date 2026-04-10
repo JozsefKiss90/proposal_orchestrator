@@ -207,3 +207,43 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at Step 5.2
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validation of Output Construction against `artifact_schema_specification.yaml` for the canonical checkpoint artifact.*
+
+---
+
+### Artifact: `phase8_checkpoint.json`
+
+**Schema ID:** `orch.checkpoints.phase8_checkpoint.v1`
+
+**Spec location:** `artifact_schema_specification.yaml` — checkpoints section, `phase8_checkpoint` entry.
+
+**Required fields per spec:**
+- `schema_id` (string, const "orch.checkpoints.phase8_checkpoint.v1")
+- `run_id` (string)
+- `status` (enum: ["published"])
+- `published_at` (string, ISO 8601)
+- `gate_results_confirmed` (array of strings — gate_ids)
+
+**Output Construction (Step 3) verification:**
+| Field | Set by skill? | Value source | Conformant? |
+|-------|---------------|--------------|-------------|
+| `schema_id` | Yes (Step 3, Step 4) | const "orch.checkpoints.phase8_checkpoint.v1" | Yes — exact match |
+| `run_id` | Yes (Step 2.5, Step 3, Step 4) | invoking agent's run_id context parameter | Yes |
+| `status` | Yes (Step 2.3, Step 3) | literal "published" (enum sole value) | Yes |
+| `published_at` | Yes (Step 2.4, Step 3) | ISO 8601 timestamp at write time | Yes |
+| `gate_results_confirmed` | Yes (Step 2.1, Step 3) | ["gate_09_budget_consistency", "gate_10_part_b_completeness", "gate_11_review_closure", "gate_12_constitutional_compliance"] — derived from reading the four gate result files and extracting their gate_id fields | Yes — contains all four required gate_ids as strings |
+
+**`artifact_status` handling:** The `phase8_checkpoint.v1` schema does NOT include an `artifact_status` field. Step 4 explicitly states `artifact_status` does NOT apply to checkpoint artifacts. This is correct per the spec — checkpoints are published artifacts whose publication is the terminal state; no draft/candidate/published progression applies. No change needed.
+
+**reads_from compliance:** Skill reads from `docs/tier4_orchestration_state/phase_outputs/` (gate result files) and `docs/tier3_project_instantiation/` (snapshot data). Both paths are declared in frontmatter `reads_from`. Compliant.
+
+**writes_to compliance:** Skill writes only to `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`. Declared in frontmatter `writes_to`. Compliant.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None — Output Construction is already fully conformant with `orch.checkpoints.phase8_checkpoint.v1`.
+
+<!-- Step 8 complete: schema validation performed -->

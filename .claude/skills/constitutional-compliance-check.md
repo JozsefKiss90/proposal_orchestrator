@@ -264,3 +264,56 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Group C skill with dual output: a validation report and, conditionally, a decision log entry. Neither has a canonical `schema_id` in `artifact_schema_specification.yaml`; conformance is governed by CLAUDE.md §9.4, §12.1, §12.2, §12.3.*
+
+---
+
+### Artifact 1: `compliance_check_<artifact_slug>_<timestamp>.json` (validation report)
+
+**Canonical schema:** None — operational validation report, not registered.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `report_id` | Yes (Step 3) | skill-defined | Yes |
+| `skill_id` | Yes | matches frontmatter | Yes |
+| `invoking_agent` | Yes | agent context | Yes |
+| `run_id_reference` | Yes | agent context | Yes |
+| `artifact_audited` | Yes | `artifact_path` input | Yes |
+| `section13_checks[]` | Yes (Step 2, Step 3) | 12 entries, one per §13.1–§13.12 prohibition; each entry has prohibition_id, prohibition_description, check_status (enum: pass/violation), violation_evidence, severity (enum: critical/major or null) | Yes — 12-entry coverage is enforced by Constraint 1 (INCOMPLETE_OUTPUT) |
+| `summary` | Yes | total_prohibitions_checked (=12), violations_found | Yes |
+| `timestamp` | Yes | ISO 8601 | Yes |
+
+### Artifact 2: `constitutional_violation_<agent_id>_<timestamp>.json` (decision log entry, conditional)
+
+**Canonical schema:** None — operational decision log entry, not registered.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `decision_id` | Yes (Step 3) | skill-defined | Yes |
+| `decision_type` | Yes — "constitutional_violation" | skill-defined | Yes |
+| `violation_id` | Yes | skill-defined | Yes |
+| `constitutional_rule_ref` | Yes | e.g., "CLAUDE.md §13.3" | Yes — references a named CLAUDE.md section as required by §14.2 |
+| `artifact_affected` | Yes | `artifact_path` | Yes |
+| `resolution_status` | Yes — "unresolved" | skill-defined; Constraint 2 prohibits "resolved" | Yes — matches §12.2 Unresolved semantics |
+| `resolution_note` | Yes | explicit human-action requirement | Yes |
+| `tier_authority_applied` | Yes — "CLAUDE.md §13" | required per CLAUDE.md §9.4 | Yes |
+| `timestamp` | Yes | ISO 8601 | Yes |
+
+**CLAUDE.md §12.2 vocabulary compliance:** The decision log entry uses `resolution_status: "unresolved"` — directly matches the §12.2 Unresolved category (conflicting evidence or missing information; resolution required before downstream use). The compliance report's per-check `check_status` uses (pass/violation) — a domain-specific operational enum for this skill's audit function. A "violation" finding semantically corresponds to Unresolved per §12.2 (the constitutional issue must be resolved before the audited artifact may advance). `violation_evidence` satisfies the §12.2 requirement to state the basis for the finding. No correction required.
+
+**`schema_id` / `artifact_status`:** Step 4 correctly states these do not apply to either artifact.
+
+**reads_from compliance:** Reads `CLAUDE.md`, `docs/tier4_orchestration_state/phase_outputs/`, and `docs/tier5_deliverables/`. All three declared in frontmatter. Compliant.
+
+**writes_to compliance:** Writes to both `docs/tier4_orchestration_state/validation_reports/` and `docs/tier4_orchestration_state/decision_log/`. Both declared in frontmatter. Compliant.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None.
+
+<!-- Step 8 complete: schema validation performed -->

@@ -310,3 +310,43 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Gate Result Artifacts: NOT written by this skill
+
+GateResult artifacts (schema_id `orch.gate_result.v1`, canonical paths defined in artifact_schema_specification.yaml §gate_result_schema.canonical_paths) are runner-owned artifacts. This skill returns a predicate evaluation summary as an in-memory SkillResult payload; the DAG scheduler runner constructs the GateResult artifact (computing input_fingerprint, input_artifact_fingerprints, manifest_version, library_version, constitution_version, evaluated_at, repo_root, gate_kind, status, deterministic_predicates, semantic_predicates, skipped_semantic, report_written_to) and writes it to disk. Schema conformance of the GateResult artifact is the runner's responsibility.
+
+### SkillResult payload contract (in-memory return value)
+
+The payload supplied to the invoking agent (and forwarded to the runner) must contain the fields needed by the runner to construct a schema-conformant GateResult:
+
+| Payload field | Required for runner | Status | Notes |
+|---------------|---------------------|--------|-------|
+| gate_id | true | ✓ Implemented | From context parameter |
+| run_id | true | ✓ Implemented | Propagated from invoking agent |
+| overall_status | true | ✓ Implemented | Set in Step 2.4; bidirectional guarantee enforced |
+| evaluated_at | true | ✓ Implemented | ISO 8601 timestamp |
+| deterministic_predicates.passed[] | true | ✓ Implemented | Predicate IDs from Step 2.1 |
+| deterministic_predicates.failed[] | true | ✓ Implemented | Each entry has predicate_id, type, function, args, failure_category (enum), fail_message, prose_condition |
+| semantic_predicates.passed[] | true | ✓ Implemented | Predicate IDs from Step 2.2 |
+| semantic_predicates.failed[] | true | ✓ Implemented | Each entry has predicate_id, function, agent, constitutional_rule, findings[claim, violated_rule, evidence_path, severity (enum: critical/major)] |
+| hard_block | conditional | ✓ Implemented | Set true only for gate_09 absent-received case |
+
+**Note:** `artifact_status` is not relevant for the SkillResult payload; the runner stamps `artifact_status` on the GateResult file post-gate.
+
+### Decision log entry (written by this skill on failure only)
+
+When `overall_status = "fail"`, this skill writes a decision log entry to `docs/tier4_orchestration_state/decision_log/<decision_id>.json` containing: decision_id, decision_type ("gate_failure"), gate_id, failure_reason, predicates_failed[], tier_authority_applied, resolution_required, timestamp. This is not a canonical phase output artifact and carries no schema_id.
+
+**Validation status vocabulary check:** Decision log entries from this skill use the gate failure vocabulary (predicates_failed, failure_reason) rather than the Confirmed/Inferred/Assumed/Unresolved vocabulary, since gate evaluation results are deterministic pass/fail rather than evidence-status categorisations. This matches the runner-side gate failure semantics.
+
+**Reads_from compliance:** All payload fields derived from declared reads_from sources (phase_outputs/ canonical artifacts and tier3_project_instantiation/ for cross-artifact predicates). No external fields introduced.
+
+**Corrections applied:** None. The output contract is correctly partitioned: SkillResult payload (in-memory, runner-owned GateResult write) and decision_log/ entry (skill-written on failure).
+
+<!-- Step 8 complete: schema validation performed -->

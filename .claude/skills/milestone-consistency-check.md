@@ -202,3 +202,43 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Individual milesto
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. This is a Group C skill whose sole output is a validation report file in `docs/tier4_orchestration_state/validation_reports/`. There is no canonical `schema_id` in `artifact_schema_specification.yaml` for individual validation reports; conformance is governed by CLAUDE.md §12.1 (reviewability) and §12.2 (validation status vocabulary).*
+
+---
+
+### Upstream input schema verification
+
+- **`wp_structure.json`** (`orch.phase3.wp_structure.v1`) — skill reads `work_packages[].deliverables[].due_month` and `work_packages[].tasks[].task_id`. Field path matches spec §1.3. Compliant.
+- **`gantt.json`** (`orch.phase4.gantt.v1`) — skill reads `milestones[].milestone_id, due_month, verifiable_criterion, responsible_wp` and `tasks[].task_id, wp_id, start_month, end_month`. All field names match spec §1.4 exactly. Compliant.
+
+### Artifact: `milestone_consistency_<agent_id>_<timestamp>.json` (validation report)
+
+**Canonical schema:** None — validation reports are operational artifacts not defined in the schema registry.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `report_id` | Yes (Step 3) | skill-defined | Yes |
+| `skill_id` | Yes — "milestone-consistency-check" | matches frontmatter | Yes |
+| `invoking_agent` | Yes | agent context | Yes |
+| `run_id_reference` | Yes | current run_id from agent context | Yes |
+| `findings[]` | Yes (Step 2.4, Step 3) | each finding: milestone_id, due_month, task_completion_month, verifiable_criterion_present (bool), consistency_status (enum: consistent/flagged), flag_reason | Yes |
+| `summary` | Yes (Step 2.5, Step 3) | total_milestones_checked/passed/flagged | Yes |
+| `timestamp` | Yes | ISO 8601 | Yes |
+
+**CLAUDE.md §12.2 vocabulary note:** The skill's finding-level `consistency_status` (consistent/flagged) is domain-specific scheduling vocabulary. This is an operational classification distinct from the §12.2 Confirmed/Inferred/Assumed/Unresolved enum, which applies to evaluated-element statuses in validation reports. Where a flagged finding could be mapped to §12.2: a timing inconsistency corresponds to "Unresolved" (requires human resolution before downstream use); a non-verifiable criterion corresponds to "Unresolved". The skill's `flag_reason` field satisfies the §12.2 requirement to declare the basis for the non-Confirmed status. No correction required — the operational vocabulary is consistent with §12.2 semantics.
+
+**`schema_id` / `run_id` / `artifact_status`:** Step 4 correctly states these fields do not apply to validation report files. `run_id_reference` is an informational back-pointer, not the same as the canonical `run_id` that would require stamping.
+
+**reads_from compliance:** Declared paths in frontmatter match the paths read in Steps 1.1–1.4. Compliant.
+
+**writes_to compliance:** Writes only to `docs/tier4_orchestration_state/validation_reports/`. Declared in frontmatter. Compliant.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None.
+
+<!-- Step 8 complete: schema validation performed -->

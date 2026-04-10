@@ -202,3 +202,29 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional con
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `implementation_architecture.json` (risk_register field, merge update)
+
+**Schema ID verified:** `orch.phase6.implementation_architecture.v1` ✓ (preserved from existing file at Step 2.7)
+
+**Required fields checked (this skill's scope — risk_register subschema):**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Preserved | Skill does not change schema_id |
+| run_id | true | ✓ Preserved | Skill does not change run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| risk_register | true | ✓ Implemented | Built in Step 2.5; each entry has risk_id, description, category (enum: technical/financial/organisational/ethical/external/other), likelihood (enum: low/medium/high), impact (enum: low/medium/high), mitigation (non-empty), responsible_partner |
+| governance_matrix, management_roles, ethics_assessment, instrument_sections_addressed | true | ✓ Preserved unchanged | Read at Step 2.7 and re-written; this skill does not modify these fields |
+
+**Reads_from compliance:** risk_register entries derived exclusively from declared reads_from (risks.json seeds + WP activity catalogue from wp_structure.json + milestone monitoring points from gantt.json). valid_partner_ids is supplied by the invoking agent as context (partners.json explicitly excluded from reads_from per Step 2.4). No external fields introduced.
+
+**Corrections applied:** None. Output Construction enforces enum-compliant category, likelihood, and impact values, and preserves all non-risk_register fields by merge.
+
+<!-- Step 8 complete: schema validation performed -->

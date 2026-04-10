@@ -223,3 +223,46 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined in the execution logic. W
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Group C skill whose sole output is a validation report file; no canonical `schema_id` applies. Conformance is governed by CLAUDE.md §10.5, §12.1, §12.2, §13.10.*
+
+---
+
+### Upstream input schema verification
+
+- **Proposal section files** (`orch.tier5.proposal_section.v1`): skill reads `content`, `validation_status.claim_statuses[]`, `traceability_footer.primary_sources[]`. All three field paths match spec §3 (`tier5_proposal_section_schema`) exactly. The spec defines `validation_status.claim_statuses[].status` enum as lowercase `[confirmed, inferred, assumed, unresolved]` — the skill uses the same lowercase vocabulary. Compliant.
+- **`assembled_draft.json`** (`orch.tier5.assembled_draft.v1`): skill reads `sections[].section_id, artifact_path`. Field paths match spec §2.1. Compliant.
+- **Tier 1–4 reference directories**: skill declares all four `extracted/` and Tier 3 directories in `reads_from`; checks only path existence and content consistency for traceability verification. No schema_id binding required for reference reads.
+
+### Artifact: `traceability_<section_id>_<timestamp>.json` (validation report)
+
+**Canonical schema:** None — operational validation report, not registered.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `report_id` | Yes (Step 3) | skill-defined | Yes |
+| `skill_id` | Yes | matches frontmatter | Yes |
+| `invoking_agent` | Yes | agent context | Yes |
+| `run_id_reference` | Yes | agent context | Yes |
+| `section_id_audited` | Yes | `section_id` or "all_sections" | Yes |
+| `claim_audit_results[]` | Yes (Step 2.5, Step 3) | per entry: claim_id, claim_summary, status (enum: confirmed/inferred/assumed/unresolved), source_ref, flag_reason | Yes — status enum matches §12.2 vocabulary exactly |
+| `summary` | Yes (Step 2.6, Step 3) | total_claims, confirmed, inferred, assumed, unresolved | Yes |
+| `no_unsupported_claims_declaration` | Yes (Step 2.4) | boolean — matches spec's `traceability_footer.no_unsupported_claims_declaration` semantics | Yes |
+| `timestamp` | Yes | ISO 8601 | Yes |
+
+**CLAUDE.md §12.2 vocabulary compliance:** This skill's `claim_audit_results[].status` field uses lowercase `{confirmed, inferred, assumed, unresolved}` — directly aligned with the CLAUDE.md §12.2 validation status vocabulary and consistent with the upstream `proposal_section.v1` schema's `validation_status.claim_statuses[].status` enum. Constraint 1 and Constraint 2 enforce the §12.2 semantics: Confirmed requires named source; Unresolved is mandatory for unattributed project-fact claims; Assumed is restricted to generic structural statements. Full vocabulary conformance.
+
+**`schema_id` / `artifact_status`:** Step 4 correctly states these do not apply to validation reports.
+
+**reads_from compliance:** All six declared reference directories are used in the execution logic (Step 1.5, Step 2.3). Compliant.
+
+**writes_to compliance:** Writes only to `docs/tier4_orchestration_state/validation_reports/`. Compliant.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None.
+
+<!-- Step 8 complete: schema validation performed -->

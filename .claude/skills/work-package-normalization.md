@@ -212,3 +212,30 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional fai
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `wp_structure.json`
+
+**Schema ID verified:** `orch.phase3.wp_structure.v1` ✓
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase3.wp_structure.v1" in Step 3 and Step 4 |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| work_packages | true | ✓ Implemented | Built in Steps 2.2–2.4; each entry has wp_id, title, objectives[], lead_partner, tasks[task_id, title, responsible_partner], deliverables[deliverable_id, title, type (enum), due_month, responsible_partner], dependencies[depends_on_wp_id, dependency_type (enum)] |
+| dependency_map | true | ✓ Implemented | Built in Step 2.5 with nodes[] and edges[from, to, edge_type (enum)] |
+| partner_role_matrix | true | ✓ Implemented | Built in Step 2.6 with partner_id, wps_as_lead[], wps_as_contributor[] |
+
+**Reads_from compliance:** All output fields derived from declared reads_from sources (workpackage_seed.json, section_schema_registry.json) plus invoking-agent-supplied valid_partner_ids context (partners.json read by the agent, not directly by this skill — explicitly documented in Output Note).
+
+**Corrections applied:** None. Output Construction already lists every required schema field with correct schema_id, enum-compliant deliverable types, dependency_types, and edge_types.
+
+<!-- Step 8 complete: schema validation performed -->

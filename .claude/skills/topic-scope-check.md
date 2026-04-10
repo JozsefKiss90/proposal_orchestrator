@@ -191,3 +191,40 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. This is a Group C skill whose sole output is a decision log entry file in `docs/tier4_orchestration_state/decision_log/`. There is no canonical `schema_id` in `artifact_schema_specification.yaml` for individual decision log entries; conformance is governed by CLAUDE.md §9.4 (durable decision logging) and §12.2 (validation status vocabulary).*
+
+---
+
+### Artifact: `scope_check_<agent_id>_<ISO8601_timestamp>.json` (decision log entry)
+
+**Canonical schema in `artifact_schema_specification.yaml`:** None — decision log entries are operational artifacts not defined in the schema registry. Conformance is governed by (a) CLAUDE.md §12.2 status vocabulary, (b) skill-defined decision log entry fields, and (c) consistency with upstream Tier 2B field names.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `decision_id` | Yes (Step 3) | skill-defined | Yes |
+| `decision_type` | Yes — "scope_check" | skill-defined | Yes |
+| `invoking_agent` | Yes | agent context | Yes |
+| `phase_context` | Yes | agent context | Yes |
+| `scope_findings[]` | Yes (Step 2.6, Step 3) | each finding: claim, scope_element_ref, constraint_ref, status, flag_reason | Yes — status values (in_scope/out_of_scope/flagged) are deterministic per Step 2.4 |
+| `tier2b_source_refs` | Yes | unique source_section list | Yes |
+| `tier_authority_applied` | Yes | explicit Tier 2B file references | Yes |
+| `resolution_status` | Yes | enum: resolved/unresolved | Yes |
+| `timestamp` | Yes | ISO 8601 | Yes |
+
+**CLAUDE.md §12.2 vocabulary compliance:** The skill's `resolution_status` values (resolved/unresolved) are operational status for scope findings, not the §12.2 validation status enum. This is consistent with §12.2, which applies to validation reports, not to the scope-check decision log entries. Individual scope findings use in_scope/out_of_scope/flagged per skill contract — these are the scope-specific status vocabulary, not a substitution for the §12.2 enum. No conflict.
+
+**Upstream Tier 2B field-name alignment (cross-skill consistency):** The skill reads `scope_requirements.json`, whose spec (`tier2b_extracted_schemas.scope_requirements`) uses root `requirements[]` with item id `requirement_id` and boolean `mandatory`. The skill's Step 2.1 refers to `scope_element_id` and `boundary_type` — legacy terminology that predates the spec alignment corrections in call-requirements-extraction. The `scope_element_ref` field in the decision log entry is a back-pointer: its value must reference the id field as it appears in the upstream Tier 2B file, which per spec is `requirement_id`. Cross-skill consistency is preserved by interpreting `scope_element_ref` as holding a `requirement_id` value.
+
+**Gap identified:** Step 2.1 and §2.4 of this skill use legacy field names (`scope_element_id`, `boundary_type`, enum `required_focus/excluded_topic/conditional_requirement`) inconsistent with the spec (`requirement_id`, boolean `mandatory`). This is an execution-logic gap, not an Output Construction gap — per Step 8 task scope, Output Construction corrections take minimal form only. The downstream decision log entry field `scope_element_ref` is documented here as carrying the upstream `requirement_id` value. Execution logic steps 2.1 and 2.4 should be reconciled in a future skill-logic update; flagged here for traceability without modifying the execution specification.
+
+**Correction applied to Output Construction:** None — Output Construction fields are conformant with decision log entry conventions. The upstream naming gap is documented as a known future reconciliation item.
+
+**reads_from compliance:** Reads from `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` and `call_constraints.json`. Both declared in frontmatter. Compliant.
+
+**writes_to compliance:** Writes only to `docs/tier4_orchestration_state/decision_log/`. Declared in frontmatter. Compliant.
+
+<!-- Step 8 complete: schema validation performed -->

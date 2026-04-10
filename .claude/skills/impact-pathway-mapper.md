@@ -238,3 +238,32 @@ constitutional_constraints:
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `impact_architecture.json`
+
+**Schema ID verified:** `orch.phase5.impact_architecture.v1` ✓
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase5.impact_architecture.v1" in Step 3 and Step 4 |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| impact_pathways | true | ✓ Implemented | Built in Step 2.6 with pathway_id, expected_impact_id, project_outputs[], outcomes[outcome_id, description, timeframe], impact_narrative, tier2b_source_ref |
+| kpis | true | ✓ Implemented | Built in Step 2.7 with kpi_id, description, target, measurement_method, traceable_to_deliverable per entry |
+| dissemination_plan | true | ✓ Implemented | Built in Step 2.8 with activities[activity_type, target_audience, responsible_partner] and open_access_policy |
+| exploitation_plan | true | ✓ Implemented | Built in Step 2.9 with activities[activity_type, expected_result, responsible_partner] |
+| sustainability_mechanism | true | ✓ Implemented | Built in Step 2.10 with description and responsible_partners[] |
+
+**Reads_from compliance:** All output fields derived from declared reads_from sources (outcomes.json, impacts.json, expected_outcomes.json, expected_impacts.json, wp_structure.json). Where dissemination/sustainability data is not present in impacts.json, the skill explicitly requires the invoking agent to provide it as context — partner_brief and partners.json are not in reads_from and are explicitly excluded.
+
+**Corrections applied:** None. Output Construction lists every required schema field with correct schema_id.
+
+<!-- Step 8 complete: schema validation performed -->

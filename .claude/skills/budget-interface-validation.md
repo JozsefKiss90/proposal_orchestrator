@@ -313,3 +313,37 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. Write errors at write se
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `budget_gate_assessment.json` (Mode B)
+
+**Schema ID verified:** `orch.phase7.budget_gate_assessment.v1` ✓
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase7.budget_gate_assessment.v1" in Mode B Output Construction and Conformance Stamping |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| gate_pass_declaration | true | ✓ Implemented | Set in Step B.2.8 — enum [pass/fail] |
+| budget_response_reference | true | ✓ Implemented | Set in Step B.2.2 — filename in received/ |
+| validation_artifact_reference | true | ✓ Implemented | Filename of validation artifact written to validation/ |
+| wp_coverage_results | true | ✓ Implemented | Built in Step B.2.5 with wp_id, present_in_budget (boolean), inconsistencies[] per WP |
+| partner_coverage_results | true | ✓ Implemented | Built in Step B.2.6 with partner_id, present_in_budget (boolean), inconsistencies[] per partner |
+| blocking_inconsistencies | true | ✓ Implemented | Built in Step B.2.7 with inconsistency_id, description, severity (enum: blocking/non_blocking), resolution (enum: resolved/unresolved) |
+
+**Reads_from compliance:** All output fields derived from declared reads_from sources (interface_contract.json, received/, request_templates/, wp_structure.json). Numeric budget values are explicitly forbidden from being materialized into any output (Constraint 1).
+
+### Auxiliary Artifact: `budget_validation_<...>.json` in validation/
+
+This is an integration validation artifact, not a canonical Tier 4 phase output. It carries no schema_id requirement. Required structural fields (validation_id, validation_type, contract_version, validated_file_reference, conformance_status, non_conformance_findings[], structural_consistency_findings[], timestamp) are documented and consistent for both Mode A and Mode B.
+
+**Corrections applied:** None. Output Construction lists every required schema field with correct schema_id and enum-compliant values.
+
+<!-- Step 8 complete: schema validation performed -->

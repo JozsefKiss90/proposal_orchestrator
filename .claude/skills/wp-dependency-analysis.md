@@ -221,3 +221,32 @@ constitutional_constraints:
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `wp_structure.json` (updated in place)
+
+**Schema ID verified:** `orch.phase3.wp_structure.v1` ✓ (preserved from input; never altered by this skill)
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Preserved | Skill does not change schema_id; verified equals "orch.phase3.wp_structure.v1" at Step 1.2 |
+| run_id | true | ✓ Preserved | Skill does not change run_id; preserved from input file |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate; existing values from prior runs respected per Step 1.5 |
+| work_packages | true | ✓ Preserved unchanged | Each WP's dependencies[] (depends_on_wp_id, dependency_type) remain conformant |
+| dependency_map | true | ✓ Extended | nodes[] expanded to include all task_ids; edges[] expanded with cross-WP task edges; every edge has from, to, edge_type (enum: finish_to_start/start_to_start/data_input/partial_output) |
+| partner_role_matrix | true | ✓ Preserved unchanged | |
+
+**Auxiliary (non-schema) fields written by this skill:** `cycle_detected`, `cycle_flags`, `critical_path_nodes`. These supplement the artifact for downstream gate predicates and are not part of the canonical schema; they do not displace any required field.
+
+**Reads_from compliance:** All output fields derived from declared reads_from source (wp_structure.json itself) plus invoking-agent context for cross-WP task edges. No external fields introduced.
+
+**Corrections applied:** None. Output Construction preserves schema_id and run_id, leaves artifact_status absent, and extends only dependency_map fields per spec.
+
+<!-- Step 8 complete: schema validation performed -->

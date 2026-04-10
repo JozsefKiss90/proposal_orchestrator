@@ -238,3 +238,46 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. The skill's consti
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Group C skill whose sole output is a decision log entry file in `docs/tier4_orchestration_state/decision_log/`. Decision log entries are not registered in the schema_id registry of `artifact_schema_specification.yaml`; conformance is governed by CLAUDE.md §9.4 (durable decision recording), §12.2 (validation status vocabulary), §12.3 (explicit conflict resolution), and §13.5 (no decisions held only in agent memory).*
+
+---
+
+### Artifact: `<decision_type>_<agent_id>_<timestamp>.json` (decision log entry)
+
+**Canonical schema:** None — decision log entries are durable operational artifacts required by CLAUDE.md §9.4 but not included in the schema registry.
+
+**Output Construction fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `decision_id` | Yes (Step 2.1, Step 3) | skill-defined unique id | Yes |
+| `decision_type` | Yes | enum validated in Step 1.1: scope_check, concept_alignment, wp_design_choice, gate_failure, tier_conflict_resolution, constitutional_violation, gap_risk_flagged, uncovered_expected_impact, traceability_gap, budget_gate_failure | Yes — enforced via MALFORMED_ARTIFACT |
+| `invoking_agent` | Yes | agent context, required | Yes |
+| `phase_context` | Yes | agent context, required | Yes |
+| `run_id_reference` | Yes (Step 2.4, Step 3) | optional agent context or null | Yes |
+| `decision_description` | Yes | agent context, non-empty, enforced in Step 1.2 (MISSING_INPUT) | Yes |
+| `alternatives_considered` | Yes (Step 2.3, Step 3) | agent context or [] | Yes |
+| `tier_authority_applied` | Yes | agent context; must match Pattern A/B/C in Step 1.3 (MALFORMED_ARTIFACT enforced) | Yes — named-authority requirement satisfies §9.4 and §12.2 |
+| `rationale` | Yes | agent context, non-empty, enforced in Step 1.4 (MISSING_INPUT) | Yes |
+| `resolution_status` | Yes (Step 2.2, Step 3) | enum: resolved/unresolved; defaults by decision_type for gap/failure types | Yes — matches §12.2 Unresolved semantics |
+| `timestamp` | Yes | ISO 8601 at write time | Yes |
+
+**CLAUDE.md §9.4 compliance:** The skill's INCOMPLETE_OUTPUT protocol (Constraint 1) enforces that success is only returned after the file write is confirmed. This directly implements §13.5's prohibition on decisions held only in agent memory. Compliant.
+
+**CLAUDE.md §12.2 vocabulary compliance:** `resolution_status` uses `{resolved, unresolved}` — a domain-specific binary that subsumes the §12.2 Unresolved state (mandatory for gate_failure, constitutional_violation, uncovered_expected_impact, traceability_gap). The per-decision `tier_authority_applied` field satisfies the §12.2 requirement that Confirmed evidence must name its source; here, every decision record names the authority under which the decision was taken. Compliant.
+
+**CLAUDE.md §12.3 compliance:** For `decision_type: "tier_conflict_resolution"`, Constraint 2 enforces that `decision_description` must name both conflicting tiers and the issue, and `tier_authority_applied` must name the governing authority — implementing §12.3 ("The resolution method, the tier that prevailed, and the reasoning must be recorded in the decision log"). Compliant.
+
+**`schema_id` / `artifact_status`:** Step 4 correctly states these do not apply to decision log entries. `run_id_reference` is an informational field, not the canonical `run_id` required by phase output schemas. Compliant.
+
+**reads_from compliance:** The frontmatter declares `reads_from: "Any phase context requiring durable recording"` — reflecting that this skill takes no structured artifact input, only in-context decision state from the invoking agent. Consistent with the skill's purpose as a decision-recording mechanism. Compliant.
+
+**writes_to compliance:** Writes only to `docs/tier4_orchestration_state/decision_log/`. Declared in frontmatter. Compliant.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None.
+
+<!-- Step 8 complete: schema validation performed -->

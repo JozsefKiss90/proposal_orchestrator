@@ -63,10 +63,12 @@ constitutional_constraints:
 ### 3. Output Construction
 
 **`section_schema_registry.json`** (updated in place):
-- Top-level structure: object where keys are instrument_type values
-- Key `<resolved_instrument_type>`: derived from Step 2.5 — `{instrument_type, source_document, extracted_at, sections[], max_wp_count, project_duration_months, max_deliverable_count}`
-- Each section entry: `{section_id, section_name, mandatory (boolean), page_limit (integer or null), field_requirements (array of strings), source_document (string — filename of the application form file from Step 2.1)}`
+- Top-level structure: object with required `instruments` array (matches `tier2a_extracted_schemas.section_schema_registry` spec)
+- Each item in `instruments[]`: `{instrument_type (string, required), sections (array, required), max_work_packages (integer, optional — spec field name), evaluation_form_ref (string, required — filename of the evaluation form template in tier2a_instrument_schemas/evaluation_forms/ for this instrument)}`
+- Each section entry in `sections[]`: `{section_id (string, required), section_name (string, required), mandatory (boolean, required), section_type (string, required, enum: [proposal_section, implementation_section, cover_page, annexe]), page_limit (integer, optional — omit or null when absent from form), word_limit (integer, optional)}`
+- Auxiliary (non-spec) fields retained for traceability only, and only when traceable to the form: `source_document` (filename of application form), `field_requirements` (array of strings), `extracted_at` (ISO 8601), `project_duration_months`, `max_deliverable_count`. These auxiliary fields must not conflict with the spec's required fields and must not be substituted for them.
 - All values derived from the application form template file identified in Step 2.1; no values assumed from generic memory
+- Upsert semantics (Step 2.6): when updating the registry, locate the existing `instruments[]` entry by `instrument_type` and replace it; if none exists, append the new entry; entries for other instrument types remain unchanged
 
 ### 4. Conformance Stamping
 
@@ -228,3 +230,41 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined. If a write error occurs 
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validation of Output Construction against `artifact_schema_specification.yaml` §8 (tier2a_extracted_schemas). This is a Tier 2A extracted artifact (`provenance_class: manually_placed`); no `schema_id`, `run_id`, or `artifact_status` applies.*
+
+---
+
+### Artifact: `section_schema_registry.json`
+
+**Spec location:** `tier2a_extracted_schemas.section_schema_registry`
+
+**Required top-level field:** `instruments` (array)
+
+**Required per-instrument item fields:** `instrument_type` (string), `sections` (array), `evaluation_form_ref` (string — filename of evaluation form template)
+
+**Optional per-instrument fields:** `max_work_packages` (integer)
+
+**Required per-section item_schema fields:** `section_id` (string), `section_name` (string), `mandatory` (boolean), `section_type` (string, enum: [proposal_section, implementation_section, cover_page, annexe])
+
+**Optional per-section fields:** `page_limit` (integer), `word_limit` (integer)
+
+**Gaps identified in original Output Construction:**
+1. Top-level structure was described as "object where keys are instrument_type values" — spec requires root `instruments` array.
+2. Field name `max_wp_count` does not match spec's `max_work_packages`.
+3. Missing required `evaluation_form_ref` per instrument entry.
+4. Missing required `section_type` enum field per section entry.
+
+**Corrections applied:** Root structure restated as `instruments[]` array; `max_wp_count` renamed to `max_work_packages`; `evaluation_form_ref` added as required; `section_type` enum field added as required per section; upsert semantics clarified to operate over the `instruments[]` array by `instrument_type` join key.
+
+**Auxiliary fields (non-spec, retained):** `source_document`, `field_requirements`, `extracted_at`, `project_duration_months`, `max_deliverable_count` are not defined in the spec but are preserved at the instrument/section level as traceability metadata, consistent with the skill's constitutional enforcement that every section must be sourced to the application form file. These fields do not override or conflict with spec-required fields.
+
+**reads_from compliance:** Reads from `docs/tier2a_instrument_schemas/application_forms/` and `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json`. Both declared in frontmatter. Compliant.
+
+**writes_to compliance:** Writes only to `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json`. Declared in frontmatter. Compliant.
+
+**Conformance note (`section_type` enforcement):** When parsing the application form, each section must be classified into one of the four enum values. This is a new enforcement obligation created by the spec; the skill's Step 2.2 must assign `section_type` per section from form evidence (proposal body sections → `proposal_section`; management/implementation annex sections → `implementation_section`; title/cover page → `cover_page`; annexes → `annexe`). If classification is not derivable from the form, the section entry must flag the classification as Assumed with an `assumption_note`, consistent with the skill's Constraint 3 pattern for `mandatory` without form evidence.
+
+<!-- Step 8 complete: schema validation performed -->

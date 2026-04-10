@@ -230,3 +230,43 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validation of Output Construction against `artifact_schema_specification.yaml` for `review_packet.json`.*
+
+---
+
+### Artifact: `review_packet.json`
+
+**Schema ID:** `orch.tier5.review_packet.v1`
+
+**Spec location:** `artifact_schema_specification.yaml` §2.2 (Tier 5 deliverables) — `review_packet` entry.
+
+**Required fields per spec:**
+- `schema_id` (string, const "orch.tier5.review_packet.v1")
+- `run_id` (string)
+- `findings` (array) — each entry has required `finding_id`, `section_id`, `criterion`, `description`, `severity` (enum: critical/major/minor); optional `evidence`, `recommendation`
+- `revision_actions` (array) — each entry has required `action_id`, `finding_id`, `priority` (integer, 1-based), `action_description`, `target_section`, `severity` (enum: critical/major/minor)
+- `artifact_status` (optional, enum [valid, invalid]) — runner-stamped; must be ABSENT at write time
+
+**Output Construction (Step 3) verification:**
+| Field | Set by skill? | Value source | Conformant? |
+|-------|---------------|--------------|-------------|
+| `schema_id` | Yes (Step 3, Step 4) | const "orch.tier5.review_packet.v1" | Yes — exact match |
+| `run_id` | Yes (Step 3, Step 4) | invoking agent's run_id context parameter | Yes |
+| `findings[]` | Yes (Step 2.4.4, Step 3) | each finding built with finding_id, section_id, criterion (from evaluation_matrix), description, severity (enum-validated in Step 2.4.3 and Constraint 3), evidence (quoted text), recommendation | Yes — all required item_schema fields present; severity restricted to enum |
+| `revision_actions[]` | Yes (Step 2.5, Step 3) | each action built with action_id, finding_id, priority (integer, 1-based), action_description, target_section, severity | Yes — all required item_schema fields present; priority correctly 1-based integer; severity enum-compliant |
+| `artifact_status` | ABSENT at write time (Step 4 explicit) | runner stamps post-gate | Yes — correctly absent |
+
+**reads_from compliance:** Skill reads from `docs/tier2a_instrument_schemas/evaluation_forms/`, `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/`, and `docs/tier5_deliverables/assembled_drafts/`. All three declared in frontmatter `reads_from`. Compliant.
+
+**writes_to compliance:** Skill writes only to `docs/tier5_deliverables/review_packets/review_packet.json`. Declared in frontmatter `writes_to`. Compliant.
+
+**Severity enum alignment:** The spec restricts `findings[].severity` and `revision_actions[].severity` to `[critical, major, minor]`. The skill enforces this via Constraint 3 (INCOMPLETE_OUTPUT) and the deterministic branching rule in Step 2.4.3. Enforcement matches the schema enum exactly.
+
+**Gaps identified:** None.
+
+**Corrections applied:** None — Output Construction is already fully conformant with `orch.tier5.review_packet.v1`.
+
+<!-- Step 8 complete: schema validation performed -->

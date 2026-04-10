@@ -226,3 +226,36 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `concept_refinement_summary.json`
+
+**Schema ID verified:** `orch.phase2.concept_refinement_summary.v1` ✓
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase2.concept_refinement_summary.v1" in Step 3 and Step 4 |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| topic_mapping_rationale | true | ✓ Implemented | Built in Step 2.5 with topic_element_id, mapping_to_concept, tier2b_source_ref, tier3_evidence_ref per entry |
+| scope_conflict_log | true | ✓ Implemented | Built in Step 2.8 with conflict_id, description, resolution_status (enum), resolution_note (when resolved), tier2b_source_ref |
+| strategic_differentiation | true | ✓ Implemented | Built in Step 2.9 — non-empty string |
+
+**Reads_from compliance:** All output fields derived from declared reads_from sources (project_brief/, expected_outcomes.json, scope_requirements.json). No external fields introduced.
+
+**Corrections applied:** None. Output Construction already lists every required schema field with correct schema_id and enum-compliant resolution_status values.
+
+---
+
+### Secondary Output: decision_log/ entry
+
+*Validation status vocabulary check:* Confirmed/Inferred/Assumed/Unresolved vocabulary per CLAUDE.md §12.2 is used in Step 2.4 for outcome alignment status assignment, and propagated into the decision log entry's `alignment_findings` summary. The decision log entry includes `decision_id`, `decision_type`, `tier_authority_applied`, `resolution_status`, and ISO 8601 `timestamp`, conforming to decision-log-update structure.
+
+<!-- Step 8 complete: schema validation performed -->

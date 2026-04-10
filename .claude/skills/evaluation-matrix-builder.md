@@ -190,3 +190,31 @@ No INCOMPLETE_OUTPUT conditions are defined explicitly in the execution logic. O
 5. Failure is a correct and valid output. Fabricated completion is a constitutional violation per CLAUDE.md §15.
 
 <!-- Step 7 complete: failure protocol implemented -->
+
+## Schema Validation
+
+*Step 8 implementation — skill plan §7 Step 8. Validates output construction against artifact_schema_specification.yaml.*
+
+---
+
+### Canonical Artifact: `call_analysis_summary.json`
+
+**Schema ID verified:** `orch.phase1.call_analysis_summary.v1` ✓
+
+**Required fields checked:**
+
+| Field | Required | Status | Notes |
+|-------|----------|--------|-------|
+| schema_id | true | ✓ Implemented | Set to "orch.phase1.call_analysis_summary.v1" in Step 3 and Step 4 |
+| run_id | true | ✓ Implemented | Propagated from invoking agent run_id |
+| artifact_status | false | ✓ Absent at write time | Runner-stamped post-gate |
+| resolved_instrument_type | true | ✓ Implemented | Derived from selected_call.json via agent context |
+| evaluation_matrix | true | ✓ Implemented | Built in Step 2.4 with criterion_id, criterion_name, weight, source_section, source_document per entry |
+| compliance_checklist | true | ✓ Implemented | Built in Step 2.5 with requirement_id, description, status (enum), source_section, source_document |
+| call_analysis_notes | false | ✓ Implemented | Optional summary string |
+
+**Reads_from compliance:** All output fields derived from declared reads_from sources (evaluation_forms/ and evaluation_priority_weights.json) plus invoking-agent context for resolved_instrument_type. No external fields introduced.
+
+**Corrections applied:** None. Output Construction and Outputs table already list every required schema field with correct schema_id and enum-compliant status values.
+
+<!-- Step 8 complete: schema validation performed -->
