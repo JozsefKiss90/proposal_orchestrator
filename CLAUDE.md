@@ -415,4 +415,126 @@ This binding must not be overridden by agent implementations.
 
 must be treated as a failure, not as an alternative valid interpretation.
 
+---
+
+## 17. Runtime Execution Architecture
+
+This section defines the runtime execution stack that implements the workflow execution model (Section 6) and the agent derivation rules (Section 16). The runtime architecture is constitutionally binding. Implementations that violate the layering, contracts, or prohibitions defined here are constitutional violations, regardless of whether they produce correct outputs.
+
+### 17.1 Execution Stack
+
+The system executes through a three-layer runtime stack. Each layer has a single, defined caller:
+
+| Layer | Module | Called by | Calls |
+|-------|--------|-----------|-------|
+| Scheduler | `DAGScheduler` | CLI entry point (`runner/__main__.py`) | Agent runtime, gate evaluator |
+| Agent runtime | `run_agent()` | Scheduler (`_dispatch_node()`) | Skill runtime |
+| Skill runtime | `run_skill()` | Agent runtime (`run_agent()`) | Claude API |
+
+The following call-graph constraints are unconditional:
+
+**17.1.1** The scheduler calls the agent runtime. The scheduler never calls the skill runtime directly. All skill invocations flow through the agent runtime.
+
+**17.1.2** The agent runtime calls the skill runtime. The agent runtime never calls the gate evaluator, the scheduler, or other agents (except: the n03 sub-agent and n07 pre-gate agent are coordinated within the same node body execution, per the manifest's `sub_agent` and `pre_gate_agent` bindings).
+
+**17.1.3** The skill runtime calls the Claude API. The skill runtime never calls the agent runtime, the scheduler, or the gate evaluator.
+
+**17.1.4** The gate evaluator is called by the scheduler. It is never called by agents or skills.
+
+### 17.2 Node Execution Model
+
+Each node dispatch follows a five-step contract. This contract is the sole implementation of Section 6's phase execution rules within the scheduler:
+
+1. **Set state to `running`.** Persist to `RunContext`.
+2. **Evaluate entry gate** (if defined). On failure: set state to `blocked_at_entry`; return immediately. Agent body is never invoked.
+3. **Execute node body** via `run_agent()`. The agent runtime loads the agent and prompt specifications, sequences skill invocations through `run_skill()`, and returns an `AgentResult`. On failure or when `can_evaluate_exit_gate` is `False`: set state to `blocked_at_exit` with `failure_origin="agent_body"`; skip exit gate; return immediately.
+4. **Evaluate exit gate.** On pass: set state to `released`. On failure: set state to `blocked_at_exit` with `failure_origin="exit_gate"`.
+5. **Return `NodeExecutionResult`** capturing the full composite outcome.
+
+This contract is the sole modification point in the scheduler for node body execution. The `run()` dispatch loop, stall detection, `RunSummary` construction, and `ManifestGraph` are not modified by agent or skill integration.
+
+### 17.3 Failure Semantics
+
+All node-level failures are classified by exactly one `failure_origin` value. No new node states are introduced. The existing state machine (`pending`, `running`, `released`, `blocked_at_entry`, `blocked_at_exit`, `deterministic_pass_semantic_pending`, `hard_block_upstream`) is unchanged.
+
+**17.3.1 Failure origins.** The closed set of failure origins is:
+
+| Origin | When | Node state | Exit gate evaluated |
+|--------|------|------------|-------------------|
+| `entry_gate` | Entry gate returns status != "pass" | `blocked_at_entry` | No |
+| `agent_body` | Agent runtime returns failure or `can_evaluate_exit_gate == False` | `blocked_at_exit` | No |
+| `exit_gate` | Exit gate returns status != "pass" after successful agent body | `blocked_at_exit` | Yes |
+
+**17.3.2 Exit gate skip rule.** Exit gate evaluation is skipped if and only if: (a) entry gate failed, (b) agent body failed, or (c) `AgentResult.can_evaluate_exit_gate` is `False`. In all other cases — specifically when `AgentResult.status == "success"` and `can_evaluate_exit_gate == True` — exit gate evaluation proceeds unconditionally. The `can_evaluate_exit_gate` flag is determined by inspecting actual artifacts on disk, not by optimistic assumption.
+
+**17.3.3 CONSTITUTIONAL_HALT propagation.** A `CONSTITUTIONAL_HALT` from any skill causes the agent to halt immediately and return `AgentResult(status="failure", failure_category="CONSTITUTIONAL_HALT", can_evaluate_exit_gate=False)`. The scheduler treats this identically to any other agent-body failure.
+
+**17.3.4 HARD_BLOCK from agent-body failure.** When `gate_09_budget_consistency` is the exit gate of a node whose agent body fails, HARD_BLOCK propagation to Phase 8 nodes is triggered, identically to how it is triggered by exit-gate failure. Agent-body failure at the budget gate node is not a lesser failure — it produces the same downstream freeze.
+
+**17.3.5 Failure metadata persistence.** `failure_origin`, `exit_gate_evaluated`, `failure_reason`, and `failure_category` are persisted to `RunContext` alongside node state and are included in `RunSummary.node_failure_details` and `run_summary.json`.
+
+### 17.4 Runtime Contracts
+
+The runtime stack communicates through three structured result types. These are data contracts, not implementation details. Any runtime layer that produces results inconsistent with these contracts is in violation.
+
+**17.4.1 `SkillResult`** — returned by `run_skill()` to the agent runtime:
+- `status`: `"success"` or `"failure"`
+- `outputs_written`: paths of artifacts written (relative to repo root)
+- `failure_reason`: human-readable description (required on failure)
+- `failure_category`: one of `MISSING_INPUT`, `MALFORMED_ARTIFACT`, `CONSTRAINT_VIOLATION`, `INCOMPLETE_OUTPUT`, `CONSTITUTIONAL_HALT` (required on failure)
+
+**17.4.2 `AgentResult`** — returned by `run_agent()` to the scheduler:
+- `status`: `"success"` or `"failure"`
+- `can_evaluate_exit_gate`: `True` only when all gate-relevant artifacts exist on disk
+- `failure_origin`: always `"agent_body"` (this type is only constructed by the agent runtime)
+- `failure_category`: one of the skill categories plus `SKILL_FAILURE`, `AGENT_EXECUTION_ERROR`
+- `invoked_skills`: ordered record of all skill invocations and their results
+
+**17.4.3 `NodeExecutionResult`** — returned by `_dispatch_node()` to the scheduler's `run()` loop:
+- `node_id`: canonical manifest node ID
+- `final_state`: terminal state after dispatch
+- `failure_origin`: `"entry_gate"`, `"agent_body"`, `"exit_gate"`, or `None`
+- `exit_gate_evaluated`: `True` only when `evaluate_gate()` was actually called on the exit gate
+- `agent_result`: the `AgentResult` (or `None` when entry gate failed before agent execution)
+
+### 17.5 Claude API Execution Principle
+
+**17.5.1** Skill `.md` files and agent `.md` files are **specifications, not executable code**. There is no interpreter that reads a Markdown execution specification and deterministically executes its steps. The entity that performs domain reasoning is Claude, invoked via the Claude API.
+
+**17.5.2** The skill runtime (`run_skill()`) is a **Claude API adapter** that: loads the skill specification, resolves canonical inputs from disk, assembles a structured prompt, invokes the Claude API, parses the structured JSON response, validates it against the expected schema, writes the validated output atomically to the canonical path, and returns a `SkillResult`. It contains prompt assembly, API invocation, response parsing, validation, and I/O logic — not domain knowledge.
+
+**17.5.3** The agent runtime (`run_agent()`) is an **orchestration adapter** that: loads agent and prompt specifications, resolves canonical inputs, sequences skill invocations through `run_skill()`, manages context passing between invocations, handles failure propagation, and determines `can_evaluate_exit_gate` from disk state. It does not perform domain reasoning itself.
+
+**17.5.4** If Claude's response is malformed, incomplete, or violates a constitutional constraint, the runtime returns a failure result. It does not retry, improvise, or silently repair the response.
+
+### 17.6 Runtime Prohibitions
+
+The following runtime-layer constraints supplement the general prohibitions in Section 13:
+
+**17.6.1** The scheduler must not invoke skills directly. All skill invocations must flow through the agent runtime.
+
+**17.6.2** Agents must not evaluate gates. Gate evaluation is exclusively a scheduler responsibility.
+
+**17.6.3** Skills must not write gate results. Gate result artifacts are written exclusively by the gate evaluator.
+
+**17.6.4** Skills must not invoke other skills. Each skill is an atomic, single-invocation unit. Skill composition is managed by the agent runtime.
+
+**17.6.5** The runtime must not silently repair Claude API responses. Missing `run_id`, incorrect `schema_id`, or presence of `artifact_status` in a skill response are validation failures, not auto-correctable conditions.
+
+**17.6.6** `can_evaluate_exit_gate` must be determined by inspecting actual file-system state (artifacts present on disk), not by assuming that successful skill invocations imply artifact presence.
+
+**17.6.7** No runtime layer may fabricate, estimate, or substitute budget figures. Budget computation remains exclusively the responsibility of the external Lump Sum Budget Planner system per Section 8.
+
+---
+
+### Constitutional Amendment Record — Section 17
+
+| Field | Value |
+|-------|-------|
+| Section amended | New section added (Section 17) |
+| Prior rule | No prior Section 17 existed. Runtime execution was implicit in Sections 6, 10, and 16 but not formally defined. |
+| New rule | Section 17 formalizes the three-layer execution stack (scheduler → agent runtime → skill runtime → Claude API), the five-step node dispatch contract, failure origin classification, runtime result contracts, the Claude API adapter principle, and runtime-layer prohibitions. |
+| Reason for change | The runtime integration layer has been fully implemented and tested (988 tests, Steps 1–9 of `runtime_integration_execution_plan.md`). The system is now an executable orchestration engine, not only a workflow specification repository. The constitution must reflect the implemented runtime architecture to prevent future modifications from violating the established layering, call-graph constraints, and failure semantics. |
+| Impacted components | `runner/dag_scheduler.py` (`_dispatch_node()`), `runner/agent_runtime.py` (`run_agent()`), `runner/skill_runtime.py` (`run_skill()`), `runner/runtime_models.py` (result contracts), `runner/run_context.py` (failure metadata persistence), all agent and skill `.md` specifications (clarified as Claude API prompt sources, not executable code). |
+
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*
