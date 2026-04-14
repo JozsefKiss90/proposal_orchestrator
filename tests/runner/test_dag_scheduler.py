@@ -54,6 +54,7 @@ from runner.dag_scheduler import (
     RunAbortedError,
 )
 from runner.run_context import PHASE_8_NODE_IDS, RunContext
+from runner.runtime_models import AgentResult
 
 
 # ---------------------------------------------------------------------------
@@ -62,6 +63,20 @@ from runner.run_context import PHASE_8_NODE_IDS, RunContext
 
 _GATE_PASS = {"status": "pass"}
 _GATE_FAIL = {"status": "fail"}
+_RA_TARGET = "runner.dag_scheduler.run_agent"
+_SUCCESS_AGENT = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+
+@pytest.fixture(autouse=True)
+def _mock_run_agent():
+    """Patch ``run_agent`` for all tests in this module.
+
+    These tests exercise gate evaluation behaviour; the agent runtime is
+    irrelevant and is mocked to return a successful ``AgentResult`` so that
+    ``_dispatch_node()`` reaches the exit-gate code path.
+    """
+    with patch(_RA_TARGET, return_value=_SUCCESS_AGENT):
+        yield
 
 
 def _write_manifest(tmp_path: Path, data: dict, name: str = "manifest.yaml") -> Path:
@@ -173,13 +188,24 @@ def _make_scheduler(
     mp = _write_manifest(tmp_path, manifest_data)
     graph = ManifestGraph.load(mp)
     ctx = RunContext.initialize(tmp_path, run_id)
-    return DAGScheduler(
+    sched = DAGScheduler(
         graph,
         ctx,
         tmp_path,
         library_path=library_path,
         manifest_path=manifest_path,
     )
+    # Inject a mock NodeResolver so that synthetic manifests (which lack
+    # agent/skills/phase_id fields) do not cause NodeResolverError when
+    # _dispatch_node() accesses self._node_resolver.
+    mock_resolver = MagicMock()
+    mock_resolver.resolve_agent_id.return_value = "test_agent"
+    mock_resolver.resolve_sub_agent_id.return_value = None
+    mock_resolver.resolve_pre_gate_agent_id.return_value = None
+    mock_resolver.resolve_skill_ids.return_value = []
+    mock_resolver.resolve_phase_id.return_value = "phase1"
+    sched._DAGScheduler__node_resolver = mock_resolver
+    return sched
 
 
 # ---------------------------------------------------------------------------

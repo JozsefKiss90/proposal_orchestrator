@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Callable
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -42,6 +42,7 @@ from runner.dag_scheduler import (
     RunSummary,
 )
 from runner.run_context import PHASE_8_NODE_IDS, RunContext
+from runner.runtime_models import AgentResult
 
 
 # ---------------------------------------------------------------------------
@@ -49,8 +50,21 @@ from runner.run_context import PHASE_8_NODE_IDS, RunContext
 # ---------------------------------------------------------------------------
 
 _EG_TARGET = "runner.dag_scheduler.evaluate_gate"
+_RA_TARGET = "runner.dag_scheduler.run_agent"
 _PASS = {"status": "pass"}
 _FAIL = {"status": "fail"}
+_SUCCESS_AGENT = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+
+@pytest.fixture(autouse=True)
+def _mock_run_agent():
+    """Patch ``run_agent`` for all tests in this module.
+
+    These tests exercise gate evaluation and DAG scheduling; the agent
+    runtime is mocked to return a successful ``AgentResult``.
+    """
+    with patch(_RA_TARGET, return_value=_SUCCESS_AGENT):
+        yield
 
 
 # ---------------------------------------------------------------------------
@@ -118,7 +132,16 @@ def _make_scheduler(
     mp = _write_manifest(tmp_path, manifest_data)
     graph = ManifestGraph.load(mp)
     ctx = RunContext.initialize(tmp_path, run_id)
-    return DAGScheduler(graph, ctx, tmp_path, library_path=None, manifest_path=mp)
+    sched = DAGScheduler(graph, ctx, tmp_path, library_path=None, manifest_path=mp)
+    # Inject mock NodeResolver — synthetic manifests lack agent fields.
+    mock_resolver = MagicMock()
+    mock_resolver.resolve_agent_id.return_value = "test_agent"
+    mock_resolver.resolve_sub_agent_id.return_value = None
+    mock_resolver.resolve_pre_gate_agent_id.return_value = None
+    mock_resolver.resolve_skill_ids.return_value = []
+    mock_resolver.resolve_phase_id.return_value = "phase1"
+    sched._DAGScheduler__node_resolver = mock_resolver
+    return sched
 
 
 # ---------------------------------------------------------------------------
