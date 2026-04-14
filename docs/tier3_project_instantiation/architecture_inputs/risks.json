@@ -1,1 +1,134 @@
-{}
+{
+  "risks": [
+    {
+      "id": "RISK-01",
+      "title": "Neuro-symbolic integration complexity exceeds projections",
+      "description": "Integrating symbolic planning formalisms with LLM-based reasoning may prove more difficult than anticipated, particularly in achieving real-time performance for the planning engine.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "high",
+      "affected_objectives": ["OBJ-1"],
+      "affected_work_packages": ["WP2"],
+      "mitigation": "Adopt a modular architecture with well-defined interfaces between symbolic and neural components. Implement fallback modes where the LLM-only planner operates when symbolic integration introduces unacceptable latency. Begin integration testing from M6, not M18.",
+      "contingency": "If full neuro-symbolic integration is not achievable at TRL 5, deliver the symbolic planning module as a verification layer that validates LLM-generated plans post-hoc rather than co-generating them.",
+      "risk_owner": "ATU"
+    },
+    {
+      "id": "RISK-02",
+      "title": "Memory architecture scalability limitations",
+      "description": "The tri-store memory architecture may not scale to the interaction lengths required by demonstrators (hundreds of steps) without unacceptable latency or storage costs.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-2"],
+      "affected_work_packages": ["WP3"],
+      "mitigation": "Design the memory controller with configurable retention policies from the start. Conduct scalability stress-testing on synthetic long-horizon tasks from M9. Implement tiered storage with fast/approximate retrieval for working memory and precise/slower retrieval for episodic memory.",
+      "contingency": "If full tri-store unification is not performant, deploy a simplified two-store architecture (working + episodic) for demonstrators, with semantic memory as an offline enrichment service.",
+      "risk_owner": "BIIS"
+    },
+    {
+      "id": "RISK-03",
+      "title": "Multi-agent convergence guarantees not achievable for all task classes",
+      "description": "Formal convergence proofs may be achievable only for restricted task classes, not for the full generality of real-world multi-agent scenarios encountered in demonstrators.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-3"],
+      "affected_work_packages": ["WP4"],
+      "mitigation": "Classify task types early (M3–M6) by coordination complexity. Prioritise convergence proofs for the most common demonstrator task patterns. Use probabilistic convergence bounds for task classes where deterministic proofs are infeasible.",
+      "contingency": "Deliver formally verified protocols for the core task classes with empirical convergence evidence (simulation-based) for edge cases. Clearly delineate the boundary of formal guarantees.",
+      "risk_owner": "CERIA"
+    },
+    {
+      "id": "RISK-04",
+      "title": "Clinical data access delays or restrictions",
+      "description": "Access to de-identified clinical datasets may be delayed by ethics review processes or restricted in scope, reducing the clinical validation power of the healthcare demonstrator.",
+      "category": "regulatory",
+      "probability": "medium",
+      "impact": "high",
+      "affected_objectives": ["OBJ-4"],
+      "affected_work_packages": ["WP5"],
+      "mitigation": "Submit ethics applications in M1 (pre-project preparation already initiated). Use publicly available clinical datasets (MIMIC-IV, eICU) for initial development and intermediate evaluation. Design the demonstrator with a data abstraction layer that can switch between data sources.",
+      "contingency": "If proprietary clinical data access is blocked, validate the demonstrator using exclusively public clinical benchmarks and synthetic patient data, with a clinical expert review panel assessing realism.",
+      "risk_owner": "NIHS"
+    },
+    {
+      "id": "RISK-05",
+      "title": "Manufacturing pilot factory availability disruption",
+      "description": "Operational factory access for the manufacturing demonstrator may be interrupted by production schedules, equipment maintenance, or external disruptions.",
+      "category": "operational",
+      "probability": "low",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-5"],
+      "affected_work_packages": ["WP6"],
+      "mitigation": "Secure a formal access agreement with factory partners before project start. Schedule the 3-month validation period with buffer windows. Develop a high-fidelity digital twin of the pilot factory that can substitute for physical access during development phases.",
+      "contingency": "Conduct final validation in the digital twin environment if physical factory access is not available for the full validation period. Supplement with shorter physical validation runs.",
+      "risk_owner": "ISIA"
+    },
+    {
+      "id": "RISK-06",
+      "title": "Logistics data confidentiality constraints limit demonstrator scope",
+      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of demonstrator results.",
+      "category": "operational",
+      "probability": "medium",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-6"],
+      "affected_work_packages": ["WP7"],
+      "mitigation": "Negotiate data access and publication terms in the consortium agreement. Design the demonstrator with an anonymisation layer that enables publication of performance metrics without exposing proprietary data. Supplement with public logistics benchmarks.",
+      "contingency": "If operational data cannot be used for publication, validate using synthesised scenarios calibrated against operational statistics, with ELI confirming the realism of the synthetic scenarios.",
+      "risk_owner": "ELI"
+    },
+    {
+      "id": "RISK-07",
+      "title": "Rapid LLM landscape evolution renders baseline assumptions obsolete",
+      "description": "The fast pace of LLM development may produce new foundation models during the project that significantly change the baseline capabilities, requiring re-evaluation of MAESTRO's value proposition.",
+      "category": "technical",
+      "probability": "high",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3"],
+      "affected_work_packages": ["WP2", "WP3", "WP4", "WP8"],
+      "mitigation": "Design all MAESTRO components with model-agnostic interfaces that can integrate new LLMs without architectural changes. Conduct annual baseline re-evaluation (M12, M24, M36) against latest models. MAESTRO's value lies in the architecture (planning, memory, coordination) not in any specific LLM.",
+      "contingency": "If new LLMs achieve MAESTRO's planning/memory targets natively, pivot research focus to multi-agent coordination (where formal guarantees remain differentiated) and to demonstrator-specific adaptation.",
+      "risk_owner": "BAL"
+    },
+    {
+      "id": "RISK-08",
+      "title": "EU AI Act compliance requirements exceed initial assessment",
+      "description": "Regulatory requirements under the EU AI Act for high-risk AI systems (particularly the healthcare demonstrator) may impose compliance obligations that require additional development effort.",
+      "category": "regulatory",
+      "probability": "medium",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-4", "OBJ-5"],
+      "affected_work_packages": ["WP5", "WP6", "WP8"],
+      "mitigation": "Monitor EU AI Act implementing regulations throughout the project. Design auditability and transparency mechanisms from the start (audit trails, decision explanations). Engage with AI regulatory sandboxes where available.",
+      "contingency": "Reduce demonstrator scope to lower-risk use cases (e.g., clinical support for non-critical decisions) if compliance burden for high-risk classification exceeds available resources.",
+      "risk_owner": "FIIT"
+    },
+    {
+      "id": "RISK-09",
+      "title": "Partner withdrawal or key personnel departure",
+      "description": "A key partner may reduce commitment or a principal investigator may depart during the project, creating capability gaps.",
+      "category": "management",
+      "probability": "low",
+      "impact": "high",
+      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-4", "OBJ-5", "OBJ-6"],
+      "affected_work_packages": ["WP1"],
+      "mitigation": "Ensure each pillar has at least 2 partners with relevant expertise. Include deputy PI appointments for each WP lead. Consortium agreement includes commitment clauses and transition procedures.",
+      "contingency": "Activate the knowledge transfer protocol defined in WP1. Redistribute tasks to remaining partners with overlapping capabilities. Engage the ADRA network for replacement expertise if needed.",
+      "risk_owner": "ATU"
+    },
+    {
+      "id": "RISK-10",
+      "title": "Integration of three pillars proves architecturally incompatible",
+      "description": "The independently developed planning, memory, and coordination modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "high",
+      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-7"],
+      "affected_work_packages": ["WP2", "WP3", "WP4", "WP8"],
+      "mitigation": "Define shared data representations, API contracts, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars.",
+      "contingency": "If full integration is not achievable, deliver pillar-specific modules that can be composed via a lightweight orchestration layer rather than deeply integrated. Demonstrators use the composition approach.",
+      "risk_owner": "FIIT"
+    }
+  ]
+}

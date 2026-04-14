@@ -1,1 +1,103 @@
-{}
+{
+  "milestones": [
+    {
+      "id": "MS1",
+      "title": "Architecture specification and integration contracts finalised",
+      "month": 3,
+      "responsible_partner": "ATU",
+      "linked_work_packages": ["WP1", "WP2", "WP3", "WP4", "WP8"],
+      "verification_criterion": "Shared data representations, API contracts, and integration interfaces for all three pillars are documented, reviewed, and accepted by all pillar leads. Integration test harness is operational.",
+      "type": "management"
+    },
+    {
+      "id": "MS2",
+      "title": "Planning engine v1.0 — baseline neuro-symbolic integration",
+      "month": 12,
+      "responsible_partner": "ATU",
+      "linked_work_packages": ["WP2"],
+      "verification_criterion": "Planning engine decomposes ≥5 benchmark task types into sub-task graphs with verifiable pre/post-conditions. End-to-end evaluation on ≥1 standardised agent benchmark showing measurable improvement over LLM-only baseline.",
+      "type": "technical"
+    },
+    {
+      "id": "MS3",
+      "title": "Memory architecture v1.0 — tri-store prototype operational",
+      "month": 12,
+      "responsible_partner": "BIIS",
+      "linked_work_packages": ["WP3"],
+      "verification_criterion": "Working, episodic, and semantic memory stores are individually operational with basic memory controller. Evaluation on synthetic long-horizon tasks (>20 steps) shows coherence improvement over context-window-only baseline.",
+      "type": "technical"
+    },
+    {
+      "id": "MS4",
+      "title": "Multi-agent protocol specification with convergence proofs",
+      "month": 15,
+      "responsible_partner": "CERIA",
+      "linked_work_packages": ["WP4"],
+      "verification_criterion": "Formal specification of task-delegation and negotiation protocols complete. Convergence proofs delivered for ≥3 core task classes. Simulation validation with ≥5 heterogeneous agents on synthetic coordination tasks.",
+      "type": "technical"
+    },
+    {
+      "id": "MS5",
+      "title": "Demonstrator use cases defined and domain data secured",
+      "month": 12,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": ["WP5", "WP6", "WP7"],
+      "verification_criterion": "Clinical use cases, manufacturing scenarios, and logistics corridors are fully specified with acceptance criteria. Ethics approvals for clinical data access granted. Factory access agreement signed. Logistics data access terms agreed.",
+      "type": "management"
+    },
+    {
+      "id": "MS6",
+      "title": "Integrated MAESTRO framework v1.0",
+      "month": 24,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": ["WP2", "WP3", "WP4", "WP8"],
+      "verification_criterion": "All three pillars integrated into a single framework. End-to-end evaluation on cross-cutting benchmarks demonstrates all three capabilities operating together. Framework deployable in demonstrator environments.",
+      "type": "technical"
+    },
+    {
+      "id": "MS7",
+      "title": "Demonstrator v1.0 — initial deployment in all three sectors",
+      "month": 30,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": ["WP5", "WP6", "WP7"],
+      "verification_criterion": "MAESTRO framework deployed in healthcare, manufacturing, and logistics demonstrator environments. Initial functional evaluation completed in each sector. Identified gaps documented for framework refinement.",
+      "type": "technical"
+    },
+    {
+      "id": "MS8",
+      "title": "Research pillar targets achieved",
+      "month": 36,
+      "responsible_partner": "ATU",
+      "linked_work_packages": ["WP2", "WP3", "WP4"],
+      "verification_criterion": "OBJ-1 target met (≥40% plan success improvement). OBJ-2 target met (≥30% coherence improvement). OBJ-3 target met (≥25% joint task completion improvement). All results reproducible and documented.",
+      "type": "technical"
+    },
+    {
+      "id": "MS9",
+      "title": "Demonstrator validation complete — all sectors",
+      "month": 42,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": ["WP5", "WP6", "WP7", "WP8"],
+      "verification_criterion": "Healthcare demonstrator validated on 500 clinical cases (OBJ-4). Manufacturing demonstrator validated over 3-month operational period (OBJ-5). Logistics demonstrator validated across 3 corridors (OBJ-6). Cross-demonstrator evaluation report completed.",
+      "type": "technical"
+    },
+    {
+      "id": "MS10",
+      "title": "Open-source release and platform contributions delivered",
+      "month": 45,
+      "responsible_partner": "BAL",
+      "linked_work_packages": ["WP8", "WP9"],
+      "verification_criterion": "MAESTRO framework released as open-source on GitHub. Benchmark suite published on AI-on-demand platform. Documentation and tutorials available. EDIH dissemination initiated in ≥3 hubs.",
+      "type": "dissemination"
+    },
+    {
+      "id": "MS11",
+      "title": "Project completion and final review",
+      "month": 48,
+      "responsible_partner": "ATU",
+      "linked_work_packages": ["WP1", "WP9"],
+      "verification_criterion": "All deliverables submitted. Final exploitation plans per partner delivered. TEF validation reports completed. Final review documentation compiled.",
+      "type": "management"
+    }
+  ]
+}

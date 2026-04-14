@@ -1,1 +1,74 @@
-{}
+{
+  "objectives": [
+    {
+      "id": "OBJ-1",
+      "title": "Neuro-symbolic planning engine for autonomous task decomposition",
+      "description": "Develop a hybrid neuro-symbolic planning engine that decomposes high-level natural language goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints.",
+      "measurable_target": "Achieve ≥40% improvement in plan success rate over pure LLM-based agent baselines (ReAct, Reflexion) on standardised agent benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring >10 sequential steps.",
+      "target_month": 36,
+      "pillar": "Pillar 1 — Neuro-Symbolic Planning and Reasoning",
+      "responsible_partner": "ATU",
+      "contributing_partners": ["CERIA", "BIIS", "BAL"]
+    },
+    {
+      "id": "OBJ-2",
+      "title": "Unified adaptive memory architecture",
+      "description": "Design and implement a unified memory architecture integrating working memory, episodic memory, and semantic memory stores with a learned memory controller that manages information flow between stores.",
+      "measurable_target": "Demonstrate ≥30% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps, measured on MAESTRO's long-horizon evaluation suite.",
+      "target_month": 30,
+      "pillar": "Pillar 2 — Adaptive Memory Architecture",
+      "responsible_partner": "BIIS",
+      "contributing_partners": ["ATU", "BAL"]
+    },
+    {
+      "id": "OBJ-3",
+      "title": "Decentralised multi-agent coordination protocols",
+      "description": "Develop formally specified task-delegation and negotiation protocols that enable heterogeneous AI agents to coordinate on shared objectives with provable convergence guarantees and auditable interaction traces.",
+      "measurable_target": "Demonstrate effective coordination of ≥5 heterogeneous agents on shared tasks, with ≥25% improvement in joint task completion over independent agent baselines, and formal proof of protocol convergence.",
+      "target_month": 36,
+      "pillar": "Pillar 3 — Decentralised Multi-Agent Coordination",
+      "responsible_partner": "CERIA",
+      "contributing_partners": ["ATU", "BIIS"]
+    },
+    {
+      "id": "OBJ-4",
+      "title": "Healthcare demonstrator — clinical decision support",
+      "description": "Validate the integrated MAESTRO agent framework in a clinical decision support system that assists clinicians in diagnostic reasoning by autonomously gathering patient data, planning differential diagnoses, and coordinating specialist sub-agents.",
+      "measurable_target": "Achieve diagnostic reasoning accuracy within 10% of specialist clinician performance on a benchmark of 500 de-identified clinical cases spanning 5 diagnostic domains, validated by clinical experts at NIHS.",
+      "target_month": 42,
+      "pillar": "Demonstrator — Healthcare",
+      "responsible_partner": "NIHS",
+      "contributing_partners": ["ATU", "BIIS", "BAL"]
+    },
+    {
+      "id": "OBJ-5",
+      "title": "Manufacturing demonstrator — process optimisation",
+      "description": "Validate the integrated MAESTRO agent framework in a multi-agent system that monitors, diagnoses, and optimises manufacturing processes in real time across production line segments.",
+      "measurable_target": "Demonstrate ≥15% reduction in defect rates and ≥10% reduction in energy consumption compared to baseline operations in a pilot factory environment at ISIA, validated over a 3-month operational period.",
+      "target_month": 42,
+      "pillar": "Demonstrator — Manufacturing",
+      "responsible_partner": "ISIA",
+      "contributing_partners": ["ATU", "CERIA", "BAL"]
+    },
+    {
+      "id": "OBJ-6",
+      "title": "Logistics demonstrator — supply chain planning",
+      "description": "Validate the integrated MAESTRO agent framework in an agent-based supply chain planning system that coordinates logistics operations across multiple actors, re-plans in response to disruptions, and maintains consistent state.",
+      "measurable_target": "Demonstrate ≥20% improvement in disruption recovery time and ≥15% improvement in delivery schedule adherence compared to current planning systems, validated on ELI operational scenarios across 3 supply chain corridors.",
+      "target_month": 42,
+      "pillar": "Demonstrator — Logistics",
+      "responsible_partner": "ELI",
+      "contributing_partners": ["CERIA", "BAL"]
+    },
+    {
+      "id": "OBJ-7",
+      "title": "Open framework release and ecosystem contribution",
+      "description": "Release the MAESTRO agent framework as open-source software, contribute all models, benchmarks, and evaluation results to the AI-on-demand platform, and validate demonstrator results through Testing and Experiment Facilities.",
+      "measurable_target": "Open-source release with ≥500 GitHub stars within 6 months of release; contributions accepted to AI-on-demand platform; results validated through ≥2 TEFs; technology transfer initiated through ≥3 EDIHs.",
+      "target_month": 48,
+      "pillar": "Cross-cutting — Dissemination and Exploitation",
+      "responsible_partner": "BAL",
+      "contributing_partners": ["FIIT", "ATU"]
+    }
+  ]
+}

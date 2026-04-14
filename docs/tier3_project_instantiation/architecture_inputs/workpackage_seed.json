@@ -1,1 +1,112 @@
-{}
+{
+  "work_packages": [
+    {
+      "id": "WP1",
+      "title": "Project Management and Coordination",
+      "lead": "ATU",
+      "participants": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
+      "start_month": 1,
+      "end_month": 48,
+      "person_months": 36,
+      "type": "management",
+      "description": "Overall project coordination, administrative and financial management, quality assurance, risk management, and coordination with ADRA and GenAI4EU central Hub. Includes consortium governance, reporting, and ethics compliance oversight.",
+      "objectives_addressed": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-4", "OBJ-5", "OBJ-6", "OBJ-7"]
+    },
+    {
+      "id": "WP2",
+      "title": "Neuro-Symbolic Planning and Reasoning Engine",
+      "lead": "ATU",
+      "participants": ["ATU", "CERIA", "BIIS", "BAL"],
+      "start_month": 1,
+      "end_month": 36,
+      "person_months": 120,
+      "type": "research",
+      "description": "Design and implement the hybrid neuro-symbolic planning engine. Research on sub-task graph decomposition with formal pre/post-conditions, integration of MCTS and HTN planning with LLM-based heuristics, plan monitoring and self-correction from verified intermediate states.",
+      "objectives_addressed": ["OBJ-1"]
+    },
+    {
+      "id": "WP3",
+      "title": "Adaptive Memory Architecture",
+      "lead": "BIIS",
+      "participants": ["BIIS", "ATU", "CERIA", "BAL"],
+      "start_month": 1,
+      "end_month": 30,
+      "person_months": 96,
+      "type": "research",
+      "description": "Design and implement the unified tri-store memory architecture (working, episodic, semantic memory) with a learned memory controller. Research on memory indexing, retrieval strategies, forgetting mechanisms, and coherence maintenance over long interaction horizons.",
+      "objectives_addressed": ["OBJ-2"]
+    },
+    {
+      "id": "WP4",
+      "title": "Decentralised Multi-Agent Coordination",
+      "lead": "CERIA",
+      "participants": ["CERIA", "ATU", "BIIS"],
+      "start_month": 3,
+      "end_month": 36,
+      "person_months": 96,
+      "type": "research",
+      "description": "Develop formally specified task-delegation and negotiation protocols for heterogeneous AI agents. Research on convergence guarantees, conflict resolution under partial observability, auditable multi-agent interaction traces, and scalable decentralised coordination.",
+      "objectives_addressed": ["OBJ-3"]
+    },
+    {
+      "id": "WP5",
+      "title": "Healthcare Demonstrator — Clinical Decision Support",
+      "lead": "NIHS",
+      "participants": ["NIHS", "ATU", "BIIS", "BAL", "FIIT"],
+      "start_month": 12,
+      "end_month": 42,
+      "person_months": 84,
+      "type": "demonstration",
+      "description": "Co-design and validate the MAESTRO agent framework in a clinical decision support system. Define clinical use cases and diagnostic benchmarks, integrate with clinical data sources (HL7 FHIR), deploy specialist sub-agents for imaging/lab/guideline reasoning, and conduct clinical expert validation.",
+      "objectives_addressed": ["OBJ-4"]
+    },
+    {
+      "id": "WP6",
+      "title": "Manufacturing Demonstrator — Process Optimisation",
+      "lead": "ISIA",
+      "participants": ["ISIA", "ATU", "CERIA", "BAL", "FIIT"],
+      "start_month": 12,
+      "end_month": 42,
+      "person_months": 84,
+      "type": "demonstration",
+      "description": "Co-design and validate the MAESTRO agent framework for manufacturing process optimisation. Define production line scenarios and KPIs, integrate with digital twin environments, deploy multi-agent real-time coordination across production segments, and validate in pilot factory over 3-month operational period.",
+      "objectives_addressed": ["OBJ-5"]
+    },
+    {
+      "id": "WP7",
+      "title": "Logistics Demonstrator — Supply Chain Planning",
+      "lead": "ELI",
+      "participants": ["ELI", "CERIA", "BAL", "FIIT"],
+      "start_month": 12,
+      "end_month": 42,
+      "person_months": 72,
+      "type": "demonstration",
+      "description": "Co-design and validate the MAESTRO agent framework for supply chain planning. Define multi-actor logistics scenarios and disruption recovery benchmarks, deploy agent-based planning with negotiation across supply chain actors, and validate on real operational data across 3 international corridors.",
+      "objectives_addressed": ["OBJ-6"]
+    },
+    {
+      "id": "WP8",
+      "title": "Integration, Evaluation and Benchmarking",
+      "lead": "FIIT",
+      "participants": ["FIIT", "ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL"],
+      "start_month": 6,
+      "end_month": 48,
+      "person_months": 72,
+      "type": "research",
+      "description": "Define the cross-cutting evaluation framework and benchmark suite. Integrate the three research pillars into a unified MAESTRO framework. Conduct cross-demonstrator evaluation with standardised KPIs. Coordinate validation through Testing and Experiment Facilities. Produce the MAESTRO benchmark suite for community adoption.",
+      "objectives_addressed": ["OBJ-7"]
+    },
+    {
+      "id": "WP9",
+      "title": "Dissemination, Exploitation and Communication",
+      "lead": "BAL",
+      "participants": ["BAL", "ATU", "ISIA", "ELI", "FIIT"],
+      "start_month": 1,
+      "end_month": 48,
+      "person_months": 48,
+      "type": "dissemination",
+      "description": "Manage open-source framework release and community building. Coordinate AI-on-demand platform contributions. Lead EDIH network dissemination and technology transfer. Develop and execute exploitation strategy per partner. Manage project communication, website, and public engagement.",
+      "objectives_addressed": ["OBJ-7"]
+    }
+  ]
+}
