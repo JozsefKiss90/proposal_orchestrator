@@ -318,16 +318,15 @@ def dir_non_empty(
     Pass condition:
         * path exists
         * path is a directory
-        * directory contains at least one direct-child file with byte
-          size > 0
+        * directory (or any subdirectory) contains at least one file with
+          byte size > 0
 
     Scan depth
     ----------
-    This predicate scans **direct children only** (non-recursive).
-    There is no existing runner convention for recursive scanning in this
-    repository.  Subdirectories within *path* are not descended into and
-    do not contribute to the "non-empty" determination.  If the directory
-    contains only subdirectories and no files, the predicate fails.
+    This predicate scans **recursively** into subdirectories.  Source
+    directories in this repository use subdirectory organisation (e.g.
+    ``work_programmes/cluster_digital/``, ``application_forms/ria_ia/``).
+    A file at any depth satisfies the non-empty condition.
 
     Policy note
     -----------
@@ -375,11 +374,12 @@ def dir_non_empty(
             details={"path": str(resolved), "is_file": True},
         )
 
-    # Scan direct children only (non-recursive by design — see docstring)
+    # Scan recursively — source directories use subdirectory organisation
+    # (e.g. work_programmes/cluster_digital/, application_forms/ria_ia/)
     children = list(resolved.iterdir())
     non_empty_files = [
         child
-        for child in children
+        for child in resolved.rglob("*")
         if child.is_file() and child.stat().st_size > 0
     ]
 
