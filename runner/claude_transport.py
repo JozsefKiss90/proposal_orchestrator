@@ -106,8 +106,7 @@ def invoke_claude_text(
     cmd: list[str] = [
         "claude",
         "-p",
-        "--model", model,
-        "--max-tokens", str(max_tokens),
+        "--model", model
     ]
 
     # Determine how to pass the system prompt.

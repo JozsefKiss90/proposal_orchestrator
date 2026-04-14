@@ -1,0 +1,160 @@
+{
+  "run_id": "ff339385-3189-436e-8580-278a839a0840",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "started_at": "2026-04-14T16:28:05.792584+00:00",
+  "completed_at": "2026-04-14T16:36:19.723396+00:00",
+  "overall_status": "aborted",
+  "terminal_nodes_reached": [],
+  "stalled_nodes": [
+    {
+      "node_id": "n02_concept_refinement",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_01_gate",
+          "source_node_id": "n01_call_analysis",
+          "source_node_state": "blocked_at_exit"
+        }
+      ]
+    },
+    {
+      "node_id": "n03_wp_design",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_02_gate",
+          "source_node_id": "n02_concept_refinement",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n04_gantt_milestones",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_03_gate",
+          "source_node_id": "n03_wp_design",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n05_impact_architecture",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_02_gate",
+          "source_node_id": "n02_concept_refinement",
+          "source_node_state": "pending"
+        },
+        {
+          "gate_id": "phase_03_gate",
+          "source_node_id": "n03_wp_design",
+          "source_node_state": "pending"
+        },
+        {
+          "gate_id": "phase_03_gate",
+          "source_node_id": "n03_wp_design",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n06_implementation_architecture",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_03_gate",
+          "source_node_id": "n03_wp_design",
+          "source_node_state": "pending"
+        },
+        {
+          "gate_id": "phase_04_gate",
+          "source_node_id": "n04_gantt_milestones",
+          "source_node_state": "pending"
+        },
+        {
+          "gate_id": "phase_05_gate",
+          "source_node_id": "n05_impact_architecture",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n07_budget_gate",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "phase_06_gate",
+          "source_node_id": "n06_implementation_architecture",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n08a_section_drafting",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_09_budget_consistency",
+          "source_node_id": "n07_budget_gate",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n08b_assembly",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_10_part_b_completeness",
+          "source_node_id": "n08a_section_drafting",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n08c_evaluator_review",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_10_part_b_completeness",
+          "source_node_id": "n08b_assembly",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n08d_revision",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_11_review_closure",
+          "source_node_id": "n08c_evaluator_review",
+          "source_node_state": "pending"
+        }
+      ]
+    }
+  ],
+  "hard_blocked_nodes": [],
+  "node_states": {
+    "n01_call_analysis": "blocked_at_exit",
+    "n02_concept_refinement": "pending",
+    "n03_wp_design": "pending",
+    "n04_gantt_milestones": "pending",
+    "n05_impact_architecture": "pending",
+    "n06_implementation_architecture": "pending",
+    "n07_budget_gate": "pending",
+    "n08a_section_drafting": "pending",
+    "n08b_assembly": "pending",
+    "n08c_evaluator_review": "pending",
+    "n08d_revision": "pending"
+  },
+  "gate_results_index": {
+    "gate_01_source_integrity": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_01_result.json"
+  },
+  "node_failure_details": {
+    "n01_call_analysis": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'gate-enforcement' failed: Skill 'gate-enforcement' output validation failed: schema_id mismatch: expected 'orch.phase1.call_analysis_summary.v1', got 'orch.gate_enforcement.skill_result.v1'; Required field missing: 'resolved_instrument_type' (required by artifact_schema_specification.yaml); Required field missing: 'evaluation_matrix' (required by artifact_schema_specification.yaml); Required field missing: 'compliance_checklist' (required by artifact_schema_specification.yaml)",
+      "failure_category": "SKILL_FAILURE"
+    }
+  },
+  "dispatched_nodes": [
+    "n01_call_analysis"
+  ]
+}

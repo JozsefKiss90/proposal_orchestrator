@@ -1,0 +1,19 @@
+{
+  "run_id": "ff339385-3189-436e-8580-278a839a0840",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "created_at": "2026-04-14T16:28:05.790583+00:00",
+  "node_states": {
+    "n01_call_analysis": "blocked_at_exit"
+  },
+  "node_failure_details": {
+    "n01_call_analysis": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'gate-enforcement' failed: Skill 'gate-enforcement' output validation failed: schema_id mismatch: expected 'orch.phase1.call_analysis_summary.v1', got 'orch.gate_enforcement.skill_result.v1'; Required field missing: 'resolved_instrument_type' (required by artifact_schema_specification.yaml); Required field missing: 'evaluation_matrix' (required by artifact_schema_specification.yaml); Required field missing: 'compliance_checklist' (required by artifact_schema_specification.yaml)",
+      "failure_category": "SKILL_FAILURE"
+    }
+  }
+}

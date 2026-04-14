@@ -386,12 +386,58 @@ The scheduler will:
 3. Dispatch nodes in topological order, evaluating gates between phases
 4. Write a run summary to `.claude/runs/<run-id>/run_summary.json`
 
+### Single-Phase Execution
+
+Execute exactly one phase per invocation using `--phase`:
+
+```bash
+# Run only Phase 1 (Call Analysis)
+python -m runner --run-id <uuid> --phase 1
+
+# Equivalent forms
+python -m runner --run-id <uuid> --phase phase1
+python -m runner --run-id <uuid> --phase phase_01
+python -m runner --run-id <uuid> --phase phase_01_call_analysis
+```
+
+**Semantics — strictly gate-locked and artifact-locked:**
+
+- Only nodes belonging to the requested phase are eligible for dispatch.
+- All prerequisite checks use the **full DAG**: dependency states, incoming conditions, entry gates, and required upstream artifacts are all evaluated against real upstream state. No shortcut or bypass is applied.
+- If the requested phase's prerequisites are not satisfied (i.e. required upstream phases have not been run and released), the run aborts with `overall_status=aborted` and the stall report explains which upstream conditions are unmet.
+- Downstream phases are **never** dispatched, even if the requested phase passes all gates.
+- The run summary (`run_summary.json`) records `phase_scope` (the requested phase number) and `phase_scope_nodes` (the node IDs in that phase).
+
+**Typical workflow — running phases one at a time:**
+
+```bash
+# Phase 1: no prerequisites, runs immediately
+python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())") --phase 1
+
+# Phase 2: requires Phase 1 released
+python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())") --phase 2
+
+# Phase 3: requires Phase 2 released
+python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())") --phase 3
+```
+
+Each invocation uses a new `--run-id`. The scheduler reads the durable node states from prior runs (via gate result artifacts in Tier 4) to determine whether prerequisites are satisfied.
+
+Add `--verbose` for detailed scheduler logging to stderr showing readiness decisions, gate evaluations, and state transitions for each node:
+
+```bash
+python -m runner --run-id <uuid> --phase 1 --verbose
+```
+
 ### Dry-Run Mode
 
 Preview which nodes are ready to execute without actually running them:
 
 ```bash
 python -m runner --run-id <uuid> --dry-run
+
+# Dry-run respects --phase: only shows ready nodes in the requested phase
+python -m runner --run-id <uuid> --dry-run --phase 1
 ```
 
 Output (text mode):
@@ -442,11 +488,13 @@ Required:
   --run-id UUID         Unique identifier for this run
 
 Optional:
+  --phase PHASE         Execute only the specified phase (e.g. 1, phase1, phase_01)
   --repo-root PATH      Repository root (default: auto-discovered from working directory)
   --manifest-path PATH  Path to manifest.compile.yaml
   --library-path PATH   Path to gate_rules_library.yaml
   --dry-run             List ready nodes and exit; do not execute
   --json                Emit progress as JSON lines to stdout
+  --verbose, -v         Enable detailed scheduler logging to stderr
 ```
 
 ---

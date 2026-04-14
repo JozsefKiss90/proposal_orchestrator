@@ -16,14 +16,18 @@ Arguments
 --repo-root     Repository root path (default: auto-discovered via find_repo_root).
 --library-path  Path to gate_rules_library.yaml (default: repo_root / LIBRARY_REL_PATH).
 --manifest-path Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).
+--phase         Execute only the specified phase (e.g. 1, phase1, phase_01).
 --dry-run       Print ready nodes and exit without evaluating gates.
 --json          Emit progress as JSON lines to stdout.
+--verbose       Enable detailed scheduler logging to stderr.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import logging
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -44,6 +48,17 @@ from runner.run_context import RunContext
 def _ts() -> str:
     """Return a UTC ISO-8601 timestamp string."""
     return datetime.now(timezone.utc).isoformat()
+
+
+def _parse_phase(raw: str) -> int:
+    """Parse a phase argument like ``1``, ``phase1``, ``phase_01``, ``phase_01_call_analysis``."""
+    m = re.match(r"^(?:phase[_-]?)?0*(\d+)", raw.lower())
+    if not m:
+        raise argparse.ArgumentTypeError(
+            f"Invalid phase identifier: {raw!r}.  "
+            "Expected a phase number (e.g. 1, phase1, phase_01)."
+        )
+    return int(m.group(1))
 
 
 # ---------------------------------------------------------------------------
@@ -79,6 +94,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).",
     )
     parser.add_argument(
+        "--phase",
+        type=_parse_phase,
+        default=None,
+        help=(
+            "Execute only the specified phase (e.g. 1, phase1, phase_01).  "
+            "All prerequisite gates and artifacts must already be satisfied.  "
+            "No downstream phases are dispatched."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print ready nodes from the initial graph state and exit without evaluating gates.",
@@ -89,8 +114,27 @@ def main(argv: Optional[list[str]] = None) -> int:
         action="store_true",
         help="Emit progress as JSON lines to stdout.",
     )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Enable detailed scheduler logging to stderr.",
+    )
     args = parser.parse_args(argv)
     use_json: bool = args.use_json
+
+    # ------------------------------------------------------------------
+    # Configure logging
+    # ------------------------------------------------------------------
+    sched_logger = logging.getLogger("runner.scheduler")
+    if args.verbose:
+        sched_logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+        sched_logger.addHandler(handler)
+    else:
+        # INFO level so phase-scoped messages appear, but only with a handler
+        # when --verbose is set; without a handler, messages are silently dropped.
+        sched_logger.setLevel(logging.WARNING)
 
     # ------------------------------------------------------------------
     # Output helpers (text vs JSON-lines)
@@ -140,7 +184,15 @@ def main(argv: Optional[list[str]] = None) -> int:
         _err(str(exc))
         return 3
 
-    _out(f"[RUN]   run_id={args.run_id}", "run_start", run_id=args.run_id)
+    phase_label = f"  phase={args.phase}" if args.phase else ""
+    run_start_fields: dict[str, object] = {"run_id": args.run_id}
+    if args.phase is not None:
+        run_start_fields["phase"] = args.phase
+    _out(
+        f"[RUN]   run_id={args.run_id}{phase_label}",
+        "run_start",
+        **run_start_fields,
+    )
 
     # ------------------------------------------------------------------
     # Dry run: enumerate ready nodes from initial state, then exit 0
@@ -152,13 +204,18 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
 
     if args.dry_run:
-        ready = [nid for nid in graph.node_ids() if graph.is_ready(nid, ctx)]
+        scope = set(graph.nodes_for_phase(args.phase)) if args.phase else None
+        ready = [
+            nid for nid in graph.node_ids()
+            if graph.is_ready(nid, ctx)
+            and (scope is None or nid in scope)
+        ]
         for nid in ready:
             _out(f"[READY] {nid}", "ready", node_id=nid)
         return 0
 
     # ------------------------------------------------------------------
-    # Normal run
+    # Normal run (full DAG or phase-scoped)
     # ------------------------------------------------------------------
 
     sched = DAGScheduler(
@@ -167,6 +224,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         repo_root,
         library_path=library_path,
         manifest_path=manifest_path,
+        phase=args.phase,
     )
 
     try:
@@ -180,16 +238,27 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 3
 
     released_count = sum(1 for s in summary.node_states.values() if s == "released")
+    ps = getattr(summary, "phase_scope", None)
+    has_phase = isinstance(ps, int)
+    phase_info = f"  phase={ps}" if has_phase else ""
+    summary_fields: dict[str, object] = {
+        "overall_status": summary.overall_status,
+        "nodes_released": released_count,
+        "stalled": len(summary.stalled_nodes),
+        "hard_blocked": len(summary.hard_blocked_nodes),
+    }
+    if has_phase:
+        summary_fields["phase_scope"] = ps
+        psn = getattr(summary, "phase_scope_nodes", None)
+        summary_fields["phase_scope_nodes"] = list(psn) if isinstance(psn, list) else []
     _out(
         f"[SUMMARY] overall_status={summary.overall_status}"
         f"  nodes_released={released_count}"
         f"  stalled={len(summary.stalled_nodes)}"
-        f"  hard_blocked={len(summary.hard_blocked_nodes)}",
+        f"  hard_blocked={len(summary.hard_blocked_nodes)}"
+        f"{phase_info}",
         "summary",
-        overall_status=summary.overall_status,
-        nodes_released=released_count,
-        stalled=len(summary.stalled_nodes),
-        hard_blocked=len(summary.hard_blocked_nodes),
+        **summary_fields,
     )
     return exit_code
 

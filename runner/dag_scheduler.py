@@ -63,6 +63,7 @@ execution via the agent runtime.  The following are intentionally out of scope:
 from __future__ import annotations
 
 import json
+import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -70,6 +71,8 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 import yaml
+
+log = logging.getLogger("runner.scheduler")
 
 from runner.agent_runtime import run_agent
 from runner.gate_evaluator import evaluate_gate
@@ -212,8 +215,10 @@ class RunSummary:
     node_states: dict[str, str]
     gate_results_index: dict[str, str]
     node_failure_details: dict[str, dict]
-    # Extra implementation field
+    # Extra implementation fields
     dispatched_nodes: list[str]
+    phase_scope: int | None = None
+    phase_scope_nodes: list[str] = field(default_factory=list)
 
     # ------------------------------------------------------------------
     # Factory
@@ -230,6 +235,8 @@ class RunSummary:
         stalled_nodes: list[dict],
         started_at: str,
         completed_at: str,
+        phase_scope: int | None = None,
+        phase_scope_nodes: list[str] | None = None,
     ) -> RunSummary:
         """
         Derive a ``RunSummary`` from scheduler state after ``run()`` exits.
@@ -277,9 +284,24 @@ class RunSummary:
         ]
 
         # ------------------------------------------------------------------
-        # overall_status (dag_scheduler_plan.md §4, RunSummary schema)
+        # overall_status
         # ------------------------------------------------------------------
-        if pending:
+        _phase_nodes = phase_scope_nodes or []
+
+        if phase_scope is not None and _phase_nodes:
+            # Phase-scoped: status is based on the phase's own nodes only.
+            phase_st = {n: node_states.get(n, "pending") for n in _phase_nodes}
+            p_pending = [n for n, s in phase_st.items() if s == "pending"]
+            p_released = [n for n, s in phase_st.items() if s == "released"]
+            if p_pending:
+                overall_status = "aborted"
+            elif len(p_released) == len(_phase_nodes):
+                overall_status = "pass"
+            elif p_released:
+                overall_status = "partial_pass"
+            else:
+                overall_status = "fail"
+        elif pending:
             overall_status = "aborted"
         elif not terminal_nodes:
             # No terminal nodes defined — check for any blocking failures.
@@ -369,6 +391,8 @@ class RunSummary:
             gate_results_index=gate_results_index,
             node_failure_details=node_failure_details,
             dispatched_nodes=list(dispatched_nodes),
+            phase_scope=phase_scope,
+            phase_scope_nodes=list(_phase_nodes),
         )
 
     # ------------------------------------------------------------------
@@ -412,8 +436,10 @@ class RunSummary:
             "node_states": dict(self.node_states),
             "gate_results_index": dict(self.gate_results_index),
             "node_failure_details": dict(self.node_failure_details),
-            # --- Extra implementation field ---
+            # --- Extra implementation fields ---
             "dispatched_nodes": list(self.dispatched_nodes),
+            "phase_scope": self.phase_scope,
+            "phase_scope_nodes": list(self.phase_scope_nodes),
             # --- Backward-compat derived fields ---
             "released_nodes": [
                 n for n, s in self.node_states.items() if s == "released"
@@ -456,6 +482,8 @@ class RunSummary:
             "gate_results_index": self.gate_results_index,
             "node_failure_details": self.node_failure_details,
             "dispatched_nodes": self.dispatched_nodes,
+            "phase_scope": self.phase_scope,
+            "phase_scope_nodes": self.phase_scope_nodes,
         }
         path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
         return path
@@ -591,6 +619,7 @@ class ManifestGraph:
         self._nodes: dict[str, dict] = {}
         self._node_order: list[str] = []
         self._incoming: dict[str, list[IncomingCondition]] = defaultdict(list)
+        self._phase_map: dict[int, list[str]] = defaultdict(list)
 
         # ------------------------------------------------------------------
         # 1. Index nodes (validates duplicates)
@@ -613,7 +642,15 @@ class ManifestGraph:
             self._node_order.append(nid)
 
         # ------------------------------------------------------------------
-        # 2. Build exit-gate → node reverse lookup
+        # 2. Index phase_number → node_ids
+        # ------------------------------------------------------------------
+        for nid, node in self._nodes.items():
+            pn = node.get("phase_number")
+            if pn is not None:
+                self._phase_map[int(pn)].append(nid)
+
+        # ------------------------------------------------------------------
+        # 3. Build exit-gate → node reverse lookup
         #    Used to resolve additional_condition sources correctly.
         # ------------------------------------------------------------------
         exit_gate_to_node: dict[str, str] = {}
@@ -623,7 +660,7 @@ class ManifestGraph:
                 exit_gate_to_node[eg] = nid
 
         # ------------------------------------------------------------------
-        # 3. Process edges, build incoming-conditions index
+        # 4. Process edges, build incoming-conditions index
         # ------------------------------------------------------------------
         for edge in edge_registry:
             if not isinstance(edge, dict):
@@ -854,6 +891,21 @@ class ManifestGraph:
         return True
 
     # ------------------------------------------------------------------
+    # Phase queries
+    # ------------------------------------------------------------------
+
+    def nodes_for_phase(self, phase_number: int) -> list[str]:
+        """Return node IDs belonging to *phase_number*, in manifest order.
+
+        Returns an empty list when no nodes carry that ``phase_number``.
+        """
+        return list(self._phase_map.get(phase_number, []))
+
+    def phase_numbers(self) -> list[int]:
+        """Return sorted list of all distinct ``phase_number`` values."""
+        return sorted(self._phase_map.keys())
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
@@ -921,12 +973,15 @@ class DAGScheduler:
         repo_root: Union[str, Path],
         library_path: Optional[Path] = None,
         manifest_path: Optional[Path] = None,
+        phase: Optional[int] = None,
     ) -> None:
         self.graph: ManifestGraph = graph
         self.ctx: RunContext = ctx
         self.repo_root: Path = Path(repo_root)
         self.library_path: Optional[Path] = library_path
         self.manifest_path: Optional[Path] = manifest_path
+        #: Phase scope: when set, only nodes with this phase_number are dispatched.
+        self._phase_scope: Optional[int] = phase
         #: Accumulates every gate ID passed to evaluate_gate() during run().
         #: Populated by _dispatch_node() and consumed by RunSummary.build().
         self._evaluated_gates: list[str] = []
@@ -953,14 +1008,20 @@ class DAGScheduler:
 
     def run(self) -> RunSummary:
         """
-        Execute all nodes in dependency order until no node is ready.
+        Execute nodes in dependency order until no node is ready.
+
+        When ``phase`` was passed to the constructor, only nodes belonging
+        to that phase are eligible for dispatch.  All prerequisite checks
+        (dependency state, incoming conditions, entry gates, artifacts)
+        still use the full DAG — the phase filter restricts *which* nodes
+        may be dispatched, not *which rules apply*.
 
         Each iteration recomputes the ready set from the current
         ``RunContext`` state.  Nodes are dispatched in manifest registry
         order within each iteration.  The loop stops when:
 
-        * all nodes are settled (released / blocked / hard_blocked), or
-        * no further node becomes ready (upstream failure stall).
+        * all in-scope nodes are settled (released / blocked / hard_blocked), or
+        * no further in-scope node becomes ready (upstream failure stall).
 
         After the loop, :meth:`_settle_stalled_nodes` is called, a
         :class:`RunSummary` is built, and ``run_summary.json`` is written
@@ -969,48 +1030,96 @@ class DAGScheduler:
         Returns
         -------
         RunSummary
-            Summary of the completed run.  Supports ``summary["key"]`` and
-            ``"key" in summary`` for backward compatibility with tests that
-            previously indexed the plain result dict.
+            Summary of the completed run.
 
         Raises
         ------
         RunAbortedError
-            When any nodes remain ``pending`` after the loop exits.
-            ``run_summary.json`` is written **before** raising.  The
-            exception carries ``.summary`` (the :class:`RunSummary`) and a
-            backward-compatible ``.result`` dict (``summary.to_dict()``).
+            When in-scope nodes remain ``pending`` after the loop exits.
         DAGSchedulerError
-            If a dispatched node has no exit gate defined.
+            If the requested phase has no nodes, or a dispatched node has
+            no exit gate defined.
         """
         started_at: str = datetime.now(timezone.utc).isoformat()
         dispatched: list[str] = []
 
+        # ------------------------------------------------------------------
+        # Phase scope resolution
+        # ------------------------------------------------------------------
+        scope_node_ids: set[str] | None = None
+        if self._phase_scope is not None:
+            phase_nodes = self.graph.nodes_for_phase(self._phase_scope)
+            if not phase_nodes:
+                raise DAGSchedulerError(
+                    f"No nodes found for phase {self._phase_scope}.  "
+                    f"Known phases: {self.graph.phase_numbers()!r}"
+                )
+            scope_node_ids = set(phase_nodes)
+            log.info(
+                "Phase-scoped execution: phase=%d  nodes=%s",
+                self._phase_scope,
+                phase_nodes,
+            )
+        else:
+            log.info("Full DAG execution mode")
+
+        # ------------------------------------------------------------------
+        # Dispatch loop
+        # ------------------------------------------------------------------
         while True:
             ready = [
                 nid
                 for nid in self.graph.node_ids()
                 if self.graph.is_ready(nid, self.ctx)
+                and (scope_node_ids is None or nid in scope_node_ids)
             ]
             if not ready:
+                # Log why no nodes are ready when in phase-scoped mode.
+                if scope_node_ids is not None:
+                    for nid in scope_node_ids:
+                        state = self.ctx.get_node_state(nid)
+                        if state == "pending":
+                            unmet = []
+                            for cond in self.graph.incoming_conditions(nid):
+                                src_st = self.ctx.get_node_state(
+                                    cond.source_node_id
+                                )
+                                if src_st != "released":
+                                    unmet.append(
+                                        f"{cond.source_node_id}={src_st}"
+                                        f" (requires {cond.gate_id})"
+                                    )
+                            if unmet:
+                                log.info(
+                                    "  [%s] blocked by unmet upstream: %s",
+                                    nid,
+                                    "; ".join(unmet),
+                                )
                 break
+
             for nid in ready:
                 # Re-check: an earlier dispatch in this batch may have
                 # frozen this node (e.g. gate_09 HARD_BLOCK).
                 if not self.graph.is_ready(nid, self.ctx):
+                    log.info("  [%s] skipped (no longer ready)", nid)
                     continue
+                if scope_node_ids is not None and nid not in scope_node_ids:
+                    continue
+                log.info("  Dispatching: %s", nid)
                 self._dispatch_node(nid)
                 dispatched.append(nid)
                 # _dispatch_node reloads self.ctx; subsequent is_ready()
                 # calls use the updated state directly.
 
         # ------------------------------------------------------------------
-        # Step 3: stall detection
+        # Stall detection (scoped when phase filter is active)
         # ------------------------------------------------------------------
-        stall_report = self._settle_stalled_nodes()
+        stall_report = self._settle_stalled_nodes(
+            scope_node_ids=scope_node_ids
+        )
 
         # ------------------------------------------------------------------
-        # Step 4: build RunSummary and write to disk
+        # Build RunSummary and write to disk
         # ------------------------------------------------------------------
         completed_at: str = datetime.now(timezone.utc).isoformat()
 
@@ -1022,8 +1131,17 @@ class DAGScheduler:
             stalled_nodes=stall_report,
             started_at=started_at,
             completed_at=completed_at,
+            phase_scope=self._phase_scope,
+            phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
         )
         summary.write(self.ctx.run_dir)
+
+        log.info(
+            "Run complete: overall_status=%s  dispatched=%d  stalled=%d",
+            summary.overall_status,
+            len(dispatched),
+            len(stall_report),
+        )
 
         if summary.overall_status == "aborted":
             stalled_ids = [e["node_id"] for e in stall_report]
@@ -1041,7 +1159,11 @@ class DAGScheduler:
     # Stall detection
     # ------------------------------------------------------------------
 
-    def _settle_stalled_nodes(self) -> list[dict]:
+    def _settle_stalled_nodes(
+        self,
+        *,
+        scope_node_ids: set[str] | None = None,
+    ) -> list[dict]:
         """
         Identify nodes that are permanently stalled after the dispatch loop.
 
@@ -1050,33 +1172,23 @@ class DAGScheduler:
         never reached ``"released"`` state, so the ready condition (§2.2 of
         the plan) can never be satisfied.
 
-        This method is **read-only**: it does not mutate any node state and
-        does not introduce new state strings.  Hard-blocked nodes
-        (``"hard_block_upstream"``) are already settled and are excluded.
+        Parameters
+        ----------
+        scope_node_ids:
+            When provided, only nodes in this set are checked.  Nodes
+            outside the set are ignored even if they are ``"pending"``.
+            Used by phase-scoped execution to restrict stall detection to
+            the requested phase.
 
         Returns
         -------
         list[dict]
-            One dict per stalled node (in manifest registry order), each with:
-
-            ``node_id``
-                Canonical manifest node ID of the stalled node.
-            ``unsatisfied_conditions``
-                List of dicts — one per :class:`IncomingCondition` whose
-                source is not ``"released"`` — each containing:
-
-                * ``gate_id`` — the gate that was never satisfied
-                * ``source_node_id`` — the upstream node that should have
-                  been released
-                * ``source_node_state`` — its actual current state
-
-            An entry node (no incoming edges) that somehow remains pending
-            will appear with an empty ``unsatisfied_conditions`` list; this
-            indicates a scheduler invariant violation and must not occur in
-            normal operation.
+            One dict per stalled node (in manifest registry order).
         """
         report: list[dict] = []
         for node_id in self.graph.node_ids():
+            if scope_node_ids is not None and node_id not in scope_node_ids:
+                continue
             if self.ctx.get_node_state(node_id) != "pending":
                 continue
             unsatisfied: list[dict] = []
@@ -1142,6 +1254,7 @@ class DAGScheduler:
             If *node_id* has no exit gate (all production nodes must have one).
         """
         # ── Step 1: Mark running ──────────────────────────────────────
+        log.info("  [%s] state -> running", node_id)
         self.ctx.set_node_state(node_id, "running")
         self.ctx.save()
 
@@ -1158,7 +1271,12 @@ class DAGScheduler:
             self._evaluated_gates.append(entry_gate_id)
             self._reload_ctx()
 
-            if entry_result.get("status") != "pass":
+            entry_status = entry_result.get("status", "unknown")
+            log.info(
+                "  [%s] entry gate %s -> %s", node_id, entry_gate_id, entry_status
+            )
+
+            if entry_status != "pass":
                 # Enforce blocked_at_entry and persist failure metadata
                 # (idempotent if evaluate_gate() already set the state).
                 self.ctx.set_node_state(
@@ -1193,6 +1311,7 @@ class DAGScheduler:
         skill_ids = resolver.resolve_skill_ids(node_id)
         phase_id = resolver.resolve_phase_id(node_id)
 
+        log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
         agent_result: AgentResult = run_agent(
             agent_id,
             node_id,
@@ -1203,6 +1322,12 @@ class DAGScheduler:
             phase_id=phase_id,
             sub_agent_id=sub_agent_id,
             pre_gate_agent_id=pre_gate_agent_id,
+        )
+        log.info(
+            "  [%s] agent result: status=%s  can_evaluate_exit=%s",
+            node_id,
+            agent_result.status,
+            agent_result.can_evaluate_exit_gate,
         )
 
         # Agent-body failure OR can_evaluate_exit_gate == False:
@@ -1225,6 +1350,9 @@ class DAGScheduler:
                 self.ctx.mark_hard_block_downstream()
 
             self.ctx.save()
+            log.info(
+                "  [%s] state -> blocked_at_exit (agent_body failure)", node_id
+            )
 
             return NodeExecutionResult(
                 node_id=node_id,
@@ -1248,7 +1376,12 @@ class DAGScheduler:
         self._evaluated_gates.append(exit_gate_id)
         self._reload_ctx()
 
-        if exit_result.get("status") == "pass":
+        exit_status = exit_result.get("status", "unknown")
+        log.info(
+            "  [%s] exit gate %s -> %s", node_id, exit_gate_id, exit_status
+        )
+
+        if exit_status == "pass":
             # Enforce released and persist metadata (idempotent if
             # evaluate_gate() already set the state).
             self.ctx.set_node_state(
@@ -1258,6 +1391,7 @@ class DAGScheduler:
                 exit_gate_evaluated=True,
             )
             self.ctx.save()
+            log.info("  [%s] state -> released", node_id)
 
             return NodeExecutionResult(
                 node_id=node_id,
@@ -1283,6 +1417,9 @@ class DAGScheduler:
                 failure_category=exit_result.get("failure_category"),
             )
             self.ctx.save()
+            log.info(
+                "  [%s] state -> blocked_at_exit (exit_gate failure)", node_id
+            )
 
             return NodeExecutionResult(
                 node_id=node_id,
