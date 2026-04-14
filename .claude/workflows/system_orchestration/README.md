@@ -229,7 +229,7 @@ The runner (gate evaluation + DAG scheduler) is fully implemented.
   - `tests/runner/fixtures/gate_result_writers.py` — pre-fabricated gate result writers (pass/fail, version-controllable)
   - `tests/runner/test_gate_scenarios.py` — 27 integration scenario tests covering all 11 gates and all 10 failure dimensions from the plan
 - **Step 11 — Semantic predicate dispatch layer** completed (agent-invocation corrective pass applied):
-  - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, calls Claude API, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
+  - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, invokes Claude via runtime transport, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
   - `runner/gate_evaluator.py` extended — semantic dispatch loop integrated; malformed/fail/pass routing; node state `released`/`blocked_at_exit` set after semantic evaluation; `skipped_semantic` flag when deterministic predicates fail
 - **Approach B migration — Manifest-driven predicate composition** completed (see migration note below):
   - `quality_gates.yaml` — all 11 gates augmented with `conditions:` blocks carrying `{prose:, predicate_refs:}` entries
@@ -317,7 +317,7 @@ Manifest-driven predicate composition — (Approach B):
 Semantic dispatch — (Step 11):
 - `runner.semantic_dispatch.validate_semantic_result(result)` — validates a semantic predicate result dict against the §4.9 contract; returns `(True,"")` or `(False, reason)`
 - `runner.semantic_dispatch.dispatch_semantic_predicate(pred_entry, run_id, repo_root)` — delegates to `invoke_agent()`; unknown functions return a sentinel dispatch-error result that intentionally fails validation
-- `runner.semantic_dispatch.invoke_agent(pred_entry, run_id, repo_root)` — reads artifact files from disk, constructs system/user prompts embedding artifact content and the constitutional rule, calls the Claude API (`claude-sonnet-4-6`), parses the JSON response, and overrides `predicate_id` and `artifacts_inspected` from ground truth; unknown functions and non-dict/non-parseable responses produce a `_dispatch_error` sentinel
+- `runner.semantic_dispatch.invoke_agent(pred_entry, run_id, repo_root)` — reads artifact files from disk, constructs system/user prompts embedding artifact content and the constitutional rule, invokes `claude-sonnet-4-6` via the runtime transport (`runner/claude_transport.py`), parses the JSON response, and overrides `predicate_id` and `artifacts_inspected` from ground truth; unknown functions and non-dict/non-parseable responses produce a `_dispatch_error` sentinel
 - `SemanticPredicateConfig` — frozen dataclass: `function`, `agent`, `constitutional_rule`, `description`; replaces the old callable-registry pattern
 - `SEMANTIC_REGISTRY` — 7 registered entries (configuration only; no local handler callables):
   - `no_unresolved_scope_conflicts` — agent: `concept_refiner`; rule: CLAUDE.md §7 Phase 2 gate

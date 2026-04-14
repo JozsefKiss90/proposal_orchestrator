@@ -2,8 +2,8 @@
 Unit tests for Step 11 (corrected) — runner/semantic_dispatch.py.
 
 The corrected implementation replaces local violation-marker handlers
-with open-ended agent invocation via the Claude API.  These tests mock
-the ``anthropic`` module so no real API calls are made.
+with open-ended agent invocation via the Claude runtime transport.
+These tests mock ``invoke_claude_text`` so no real CLI calls are made.
 
 Test groups:
   - validate_semantic_result       — §4.9 schema validation (unchanged)
@@ -11,7 +11,7 @@ Test groups:
   - InvokeAgentSuccessPath         — pass/fail results correctly integrated
   - InvokeAgentArtifactReading     — disk reads, dir enumeration, run_id sub
   - InvokeAgentResponseParsing     — JSON extraction from various response forms
-  - InvokeAgentErrorHandling       — API errors, malformed responses, unknown fn
+  - InvokeAgentErrorHandling       — transport errors, malformed responses, unknown fn
   - AgentPromptConstruction        — system/user prompt content verified
   - DispatchSemanticPredicateRouting — public entry point delegates to invoke_agent
 """
@@ -25,6 +25,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from runner.claude_transport import ClaudeTransportError
 from runner.semantic_dispatch import (
     AGENT_MODEL,
     REQUIRED_RESULT_FIELDS,
@@ -99,31 +100,27 @@ def _pred_entry(
     }
 
 
-def _mock_claude_response(client_mock: MagicMock, payload: dict) -> None:
-    """Configure *client_mock* (from mock_claude fixture) to return *payload*."""
-    msg = MagicMock()
-    msg.content[0].text = json.dumps(payload)
-    client_mock.messages.create.return_value = msg
+def _mock_transport_response(mock_transport: MagicMock, payload: dict) -> None:
+    """Configure *mock_transport* to return *payload* as JSON text."""
+    mock_transport.return_value = json.dumps(payload)
 
 
 # ---------------------------------------------------------------------------
-# Fixture: mock the anthropic module
+# Fixture: mock the Claude runtime transport
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture
-def mock_claude():
+def mock_transport():
     """
-    Patch ``runner.semantic_dispatch.anthropic`` so no real API calls happen.
+    Patch ``runner.semantic_dispatch.invoke_claude_text`` so no real
+    CLI calls happen.
 
-    Yields the mock Anthropic *client* (the return value of
-    ``anthropic.Anthropic()``).  Tests set
-    ``mock_claude.messages.create.return_value`` to control responses.
+    Yields the mock function.  Tests set ``mock_transport.return_value``
+    to control responses.
     """
-    with patch("runner.semantic_dispatch.anthropic") as mock_mod:
-        client = MagicMock()
-        mock_mod.Anthropic.return_value = client
-        yield client
+    with patch("runner.semantic_dispatch.invoke_claude_text") as mock_fn:
+        yield mock_fn
 
 
 # ---------------------------------------------------------------------------
@@ -309,10 +306,10 @@ class TestSemanticRegistry:
 
 class TestInvokeAgentSuccessPath:
     def test_pass_result_returned_and_passes_validation(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         payload = _valid_pass_result("p_test")
-        _mock_claude_response(mock_claude, payload)
+        _mock_transport_response(mock_transport, payload)
 
         entry = _pred_entry("no_unsupported_tier5_claims", pred_id="p_test")
         result = invoke_agent(entry, "run-1", tmp_path)
@@ -321,10 +318,10 @@ class TestInvokeAgentSuccessPath:
         assert result["status"] == "pass"
 
     def test_fail_result_returned_and_passes_validation(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         payload = _valid_fail_result("p_test")
-        _mock_claude_response(mock_claude, payload)
+        _mock_transport_response(mock_transport, payload)
 
         entry = _pred_entry("no_unsupported_tier5_claims", pred_id="p_test")
         result = invoke_agent(entry, "run-1", tmp_path)
@@ -334,18 +331,18 @@ class TestInvokeAgentSuccessPath:
         assert len(result["findings"]) == 1
 
     def test_predicate_id_always_injected_from_entry(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """Runner injects its own pred_id even if agent sets a different value."""
         payload = _valid_pass_result("wrong_id_from_agent")
-        _mock_claude_response(mock_claude, payload)
+        _mock_transport_response(mock_transport, payload)
 
         entry = _pred_entry("no_forbidden_schema_authority", pred_id="authoritative_id")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["predicate_id"] == "authoritative_id"
 
     def test_artifacts_inspected_set_from_disk_not_agent(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """artifacts_inspected reflects what was actually read, overriding agent."""
         art = tmp_path / "section.json"
@@ -353,7 +350,7 @@ class TestInvokeAgentSuccessPath:
 
         payload = _valid_pass_result()
         payload["artifacts_inspected"] = ["/agent/self/report"]  # agent's value
-        _mock_claude_response(mock_claude, payload)
+        _mock_transport_response(mock_transport, payload)
 
         entry = _pred_entry(
             "no_gap_masked_as_confirmed",
@@ -365,25 +362,25 @@ class TestInvokeAgentSuccessPath:
         assert "/agent/self/report" not in result["artifacts_inspected"]
 
     def test_findings_from_agent_preserved_in_result(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         payload = _valid_fail_result()
         payload["findings"][0]["claim"] = "Specific violation text"
-        _mock_claude_response(mock_claude, payload)
+        _mock_transport_response(mock_transport, payload)
 
         entry = _pred_entry("no_cross_tier_contradictions")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["findings"][0]["claim"] == "Specific violation text"
 
-    def test_claude_api_called_with_correct_model(
-        self, mock_claude: MagicMock, tmp_path: Path
+    def test_transport_called_with_correct_model(
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         invoke_agent(entry, "run-1", tmp_path)
 
-        call_kwargs = mock_claude.messages.create.call_args.kwargs
+        call_kwargs = mock_transport.call_args.kwargs
         assert call_kwargs["model"] == AGENT_MODEL
 
 
@@ -394,7 +391,7 @@ class TestInvokeAgentSuccessPath:
 
 class TestInvokeAgentArtifactReading:
     def test_file_artifact_content_sent_to_agent(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """The content of the artifact file appears in the user prompt."""
         art = tmp_path / "concept.json"
@@ -402,18 +399,18 @@ class TestInvokeAgentArtifactReading:
         scope = tmp_path / "scope.json"
         scope.write_text('{}', encoding="utf-8")
 
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
         entry = _pred_entry(
             "no_unresolved_scope_conflicts",
             args={"phase2_path": str(art), "scope_path": str(scope)},
         )
         invoke_agent(entry, "run-1", tmp_path)
 
-        user_msg = mock_claude.messages.create.call_args.kwargs["messages"][0]["content"]
-        assert "scope_conflicts" in user_msg
+        user_prompt = mock_transport.call_args.kwargs["user_prompt"]
+        assert "scope_conflicts" in user_prompt
 
     def test_directory_artifacts_enumerate_json_files(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """All .json files in a directory arg are read and sent to the agent."""
         sections = tmp_path / "sections"
@@ -422,7 +419,7 @@ class TestInvokeAgentArtifactReading:
         (sections / "part_c.json").write_text('{"title": "C"}', encoding="utf-8")
         (sections / "notes.txt").write_text("ignore me", encoding="utf-8")
 
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
         entry = _pred_entry(
             "no_forbidden_schema_authority",
             args={"sections_path": str(sections)},
@@ -436,10 +433,10 @@ class TestInvokeAgentArtifactReading:
         assert not any("notes.txt" in p for p in result["artifacts_inspected"])
 
     def test_nonexistent_path_skipped_gracefully(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """A missing artifact path is silently skipped; no exception raised."""
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
         entry = _pred_entry(
             "no_gap_masked_as_confirmed",
             args={"sections_path": "nonexistent/dir"},
@@ -449,7 +446,7 @@ class TestInvokeAgentArtifactReading:
         assert "status" in result
 
     def test_run_id_substituted_before_path_resolution(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """${run_id} in an arg is replaced with the actual run_id."""
         run_id = "abc-123"
@@ -457,7 +454,7 @@ class TestInvokeAgentArtifactReading:
         run_dir.mkdir(parents=True)
         (run_dir / "section.json").write_text('{}', encoding="utf-8")
 
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
         entry = _pred_entry(
             "no_forbidden_schema_authority",
             args={"sections_path": "runs/${run_id}"},
@@ -466,21 +463,21 @@ class TestInvokeAgentArtifactReading:
         assert any(run_id in p for p in result["artifacts_inspected"])
 
     def test_artifact_content_appears_in_user_prompt(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        """The user message passed to the API contains the artifact file content."""
+        """The user message passed to the transport contains the artifact file content."""
         art = tmp_path / "s.json"
         art.write_text('{"unique_token": "XYZZY42"}', encoding="utf-8")
 
-        _mock_claude_response(mock_claude, _valid_pass_result())
+        _mock_transport_response(mock_transport, _valid_pass_result())
         entry = _pred_entry(
             "no_gap_masked_as_confirmed",
             args={"sections_path": str(art)},
         )
         invoke_agent(entry, "run-1", tmp_path)
 
-        user_msg = mock_claude.messages.create.call_args.kwargs["messages"][0]["content"]
-        assert "XYZZY42" in user_msg
+        user_prompt = mock_transport.call_args.kwargs["user_prompt"]
+        assert "XYZZY42" in user_prompt
 
 
 # ---------------------------------------------------------------------------
@@ -490,48 +487,40 @@ class TestInvokeAgentArtifactReading:
 
 class TestInvokeAgentResponseParsing:
     def test_bare_json_response_parsed(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        msg = MagicMock()
-        msg.content[0].text = json.dumps(_valid_pass_result())
-        mock_claude.messages.create.return_value = msg
+        mock_transport.return_value = json.dumps(_valid_pass_result())
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["status"] == "pass"
 
     def test_json_embedded_in_prose_extracted(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         payload = _valid_pass_result()
-        response_text = "Here is my evaluation:\n" + json.dumps(payload) + "\nEnd."
-        msg = MagicMock()
-        msg.content[0].text = response_text
-        mock_claude.messages.create.return_value = msg
+        mock_transport.return_value = (
+            "Here is my evaluation:\n" + json.dumps(payload) + "\nEnd."
+        )
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["status"] == "pass"
 
     def test_json_in_markdown_code_block_extracted(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         payload = _valid_pass_result()
-        response_text = "```json\n" + json.dumps(payload) + "\n```"
-        msg = MagicMock()
-        msg.content[0].text = response_text
-        mock_claude.messages.create.return_value = msg
+        mock_transport.return_value = "```json\n" + json.dumps(payload) + "\n```"
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["status"] == "pass"
 
     def test_non_json_response_produces_dispatch_error(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        msg = MagicMock()
-        msg.content[0].text = "I cannot evaluate this predicate."
-        mock_claude.messages.create.return_value = msg
+        mock_transport.return_value = "I cannot evaluate this predicate."
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
@@ -540,12 +529,10 @@ class TestInvokeAgentResponseParsing:
         assert not ok
 
     def test_json_list_response_produces_dispatch_error(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """A JSON array (not object) cannot satisfy the §4.9 schema."""
-        msg = MagicMock()
-        msg.content[0].text = json.dumps([{"status": "pass"}])
-        mock_claude.messages.create.return_value = msg
+        mock_transport.return_value = json.dumps([{"status": "pass"}])
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
@@ -553,15 +540,15 @@ class TestInvokeAgentResponseParsing:
 
 
 # ---------------------------------------------------------------------------
-# InvokeAgentErrorHandling — API failures and unknown functions
+# InvokeAgentErrorHandling — transport failures and unknown functions
 # ---------------------------------------------------------------------------
 
 
 class TestInvokeAgentErrorHandling:
-    def test_api_exception_produces_dispatch_error(
-        self, mock_claude: MagicMock, tmp_path: Path
+    def test_transport_error_produces_dispatch_error(
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        mock_claude.messages.create.side_effect = RuntimeError("network error")
+        mock_transport.side_effect = ClaudeTransportError("network error")
 
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
@@ -569,30 +556,30 @@ class TestInvokeAgentErrorHandling:
         assert "network error" in result.get("_dispatch_error_reason", "")
 
     def test_dispatch_error_has_dispatch_error_flag(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        mock_claude.messages.create.side_effect = ConnectionError("timeout")
+        mock_transport.side_effect = ClaudeTransportError("timeout")
         entry = _pred_entry("no_forbidden_schema_authority")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["_dispatch_error"] is True
 
     def test_dispatch_error_fails_validation(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        mock_claude.messages.create.side_effect = ValueError("bad")
+        mock_transport.side_effect = ClaudeTransportError("bad")
         entry = _pred_entry("no_forbidden_schema_authority")
         result = invoke_agent(entry, "run-1", tmp_path)
         ok, _ = validate_semantic_result(result)
         assert not ok
 
-    def test_unknown_function_returns_dispatch_error_without_api_call(
-        self, mock_claude: MagicMock, tmp_path: Path
+    def test_unknown_function_returns_dispatch_error_without_transport_call(
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        """Unknown function → error before API is even called."""
+        """Unknown function → error before transport is even called."""
         entry = _pred_entry("nonexistent_agent_check")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result.get("_dispatch_error") is True
-        mock_claude.messages.create.assert_not_called()
+        mock_transport.assert_not_called()
 
     def test_unknown_function_reason_names_available_functions(
         self, tmp_path: Path
@@ -699,14 +686,14 @@ class TestExtractJson:
 
 class TestDispatchSemanticPredicateRouting:
     def test_delegates_to_invoke_agent(
-        self, mock_claude: MagicMock, tmp_path: Path
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         """dispatch_semantic_predicate is a thin wrapper around invoke_agent."""
-        _mock_claude_response(mock_claude, _valid_pass_result("p_x"))
+        _mock_transport_response(mock_transport, _valid_pass_result("p_x"))
         entry = _pred_entry("no_unsupported_tier5_claims", pred_id="p_x")
         result = dispatch_semantic_predicate(entry, "run-abc", tmp_path)
         assert result["predicate_id"] == "p_x"
-        mock_claude.messages.create.assert_called_once()
+        mock_transport.assert_called_once()
 
     def test_unknown_function_dispatch_error_propagated(
         self, tmp_path: Path
@@ -715,10 +702,23 @@ class TestDispatchSemanticPredicateRouting:
         result = dispatch_semantic_predicate(entry, "run-1", tmp_path)
         assert result.get("_dispatch_error") is True
 
-    def test_api_error_dispatch_error_propagated(
-        self, mock_claude: MagicMock, tmp_path: Path
+    def test_transport_error_dispatch_error_propagated(
+        self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
-        mock_claude.messages.create.side_effect = OSError("disk full")
+        mock_transport.side_effect = ClaudeTransportError("disk full")
         entry = _pred_entry("no_forbidden_schema_authority")
         result = dispatch_semantic_predicate(entry, "run-1", tmp_path)
         assert result.get("_dispatch_error") is True
+
+
+# ---------------------------------------------------------------------------
+# Module isolation
+# ---------------------------------------------------------------------------
+
+
+class TestModuleIsolation:
+    def test_no_anthropic_import(self) -> None:
+        """After transport migration, semantic_dispatch must not import anthropic."""
+        import runner.semantic_dispatch as mod
+        source = Path(mod.__file__).read_text(encoding="utf-8")
+        assert "import anthropic" not in source

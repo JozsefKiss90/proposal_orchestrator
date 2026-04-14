@@ -486,9 +486,10 @@ def run_agent(
 
     This is an **orchestration adapter**, not a domain reasoner.  It loads
     agent and prompt specifications, sequences skill invocations through
-    :func:`runner.skill_runtime.run_skill` (a Claude API adapter), manages
-    context passing between invocations, handles failure propagation, and
-    determines ``can_evaluate_exit_gate`` from actual disk state.
+    :func:`runner.skill_runtime.run_skill` (a Claude runtime transport
+    adapter), manages context passing between invocations, handles failure
+    propagation, and determines ``can_evaluate_exit_gate`` from actual disk
+    state.
 
     Parameters
     ----------

@@ -429,7 +429,7 @@ The system executes through a three-layer runtime stack. Each layer has a single
 |-------|--------|-----------|-------|
 | Scheduler | `DAGScheduler` | CLI entry point (`runner/__main__.py`) | Agent runtime, gate evaluator |
 | Agent runtime | `run_agent()` | Scheduler (`_dispatch_node()`) | Skill runtime |
-| Skill runtime | `run_skill()` | Agent runtime (`run_agent()`) | Claude API |
+| Skill runtime | `run_skill()` | Agent runtime (`run_agent()`) | Claude runtime transport |
 
 The following call-graph constraints are unconditional:
 
@@ -437,7 +437,7 @@ The following call-graph constraints are unconditional:
 
 **17.1.2** The agent runtime calls the skill runtime. The agent runtime never calls the gate evaluator, the scheduler, or other agents (except: the n03 sub-agent and n07 pre-gate agent are coordinated within the same node body execution, per the manifest's `sub_agent` and `pre_gate_agent` bindings).
 
-**17.1.3** The skill runtime calls the Claude API. The skill runtime never calls the agent runtime, the scheduler, or the gate evaluator.
+**17.1.3** The skill runtime invokes Claude through the configured runtime transport (`runner/claude_transport.py`). The skill runtime never calls the agent runtime, the scheduler, or the gate evaluator.
 
 **17.1.4** The gate evaluator is called by the scheduler. It is never called by agents or skills.
 
@@ -497,11 +497,11 @@ The runtime stack communicates through three structured result types. These are 
 - `exit_gate_evaluated`: `True` only when `evaluate_gate()` was actually called on the exit gate
 - `agent_result`: the `AgentResult` (or `None` when entry gate failed before agent execution)
 
-### 17.5 Claude API Execution Principle
+### 17.5 Claude Runtime Transport Principle
 
-**17.5.1** Skill `.md` files and agent `.md` files are **specifications, not executable code**. There is no interpreter that reads a Markdown execution specification and deterministically executes its steps. The entity that performs domain reasoning is Claude, invoked via the Claude API.
+**17.5.1** Skill `.md` files and agent `.md` files are **specifications, not executable code**. There is no interpreter that reads a Markdown execution specification and deterministically executes its steps. The entity that performs domain reasoning is Claude, invoked through the configured runtime transport.
 
-**17.5.2** The skill runtime (`run_skill()`) is a **Claude API adapter** that: loads the skill specification, resolves canonical inputs from disk, assembles a structured prompt, invokes the Claude API, parses the structured JSON response, validates it against the expected schema, writes the validated output atomically to the canonical path, and returns a `SkillResult`. It contains prompt assembly, API invocation, response parsing, validation, and I/O logic — not domain knowledge.
+**17.5.2** The skill runtime (`run_skill()`) is a **Claude runtime transport adapter** that: loads the skill specification, resolves canonical inputs from disk, assembles a structured prompt, invokes Claude through the runtime transport (`runner/claude_transport.py`), parses the structured JSON response, validates it against the expected schema, writes the validated output atomically to the canonical path, and returns a `SkillResult`. It contains prompt assembly, transport invocation, response parsing, validation, and I/O logic — not domain knowledge. The runtime transport routes invocations through the local `claude` CLI, authenticated via the user's Claude Code Max subscription. No Anthropic API key is required for runtime execution.
 
 **17.5.3** The agent runtime (`run_agent()`) is an **orchestration adapter** that: loads agent and prompt specifications, resolves canonical inputs, sequences skill invocations through `run_skill()`, manages context passing between invocations, handles failure propagation, and determines `can_evaluate_exit_gate` from disk state. It does not perform domain reasoning itself.
 
@@ -519,7 +519,7 @@ The following runtime-layer constraints supplement the general prohibitions in S
 
 **17.6.4** Skills must not invoke other skills. Each skill is an atomic, single-invocation unit. Skill composition is managed by the agent runtime.
 
-**17.6.5** The runtime must not silently repair Claude API responses. Missing `run_id`, incorrect `schema_id`, or presence of `artifact_status` in a skill response are validation failures, not auto-correctable conditions.
+**17.6.5** The runtime must not silently repair Claude responses. Missing `run_id`, incorrect `schema_id`, or presence of `artifact_status` in a skill response are validation failures, not auto-correctable conditions.
 
 **17.6.6** `can_evaluate_exit_gate` must be determined by inspecting actual file-system state (artifacts present on disk), not by assuming that successful skill invocations imply artifact presence.
 
@@ -533,8 +533,18 @@ The following runtime-layer constraints supplement the general prohibitions in S
 |-------|-------|
 | Section amended | New section added (Section 17) |
 | Prior rule | No prior Section 17 existed. Runtime execution was implicit in Sections 6, 10, and 16 but not formally defined. |
-| New rule | Section 17 formalizes the three-layer execution stack (scheduler → agent runtime → skill runtime → Claude API), the five-step node dispatch contract, failure origin classification, runtime result contracts, the Claude API adapter principle, and runtime-layer prohibitions. |
+| New rule | Section 17 formalizes the three-layer execution stack (scheduler → agent runtime → skill runtime → Claude runtime transport), the five-step node dispatch contract, failure origin classification, runtime result contracts, the Claude runtime transport adapter principle, and runtime-layer prohibitions. |
 | Reason for change | The runtime integration layer has been fully implemented and tested (988 tests, Steps 1–9 of `runtime_integration_execution_plan.md`). The system is now an executable orchestration engine, not only a workflow specification repository. The constitution must reflect the implemented runtime architecture to prevent future modifications from violating the established layering, call-graph constraints, and failure semantics. |
-| Impacted components | `runner/dag_scheduler.py` (`_dispatch_node()`), `runner/agent_runtime.py` (`run_agent()`), `runner/skill_runtime.py` (`run_skill()`), `runner/runtime_models.py` (result contracts), `runner/run_context.py` (failure metadata persistence), all agent and skill `.md` specifications (clarified as Claude API prompt sources, not executable code). |
+| Impacted components | `runner/dag_scheduler.py` (`_dispatch_node()`), `runner/agent_runtime.py` (`run_agent()`), `runner/skill_runtime.py` (`run_skill()`), `runner/runtime_models.py` (result contracts), `runner/run_context.py` (failure metadata persistence), all agent and skill `.md` specifications (clarified as Claude runtime transport prompt sources, not executable code). |
+
+### Constitutional Amendment Record — Section 17 Transport Migration
+
+| Field | Value |
+|-------|-------|
+| Section amended | Section 17.1 (Execution Stack table, §17.1.3), Section 17.5 (renamed from "Claude API Execution Principle" to "Claude Runtime Transport Principle"; §17.5.1, §17.5.2 updated), Section 17.6.5 (wording) |
+| Prior rule | Section 17 described the skill runtime as a "Claude API adapter" and stated that the skill runtime "calls the Claude API" via `anthropic.Anthropic().messages.create()`. Runtime execution required an Anthropic API key. |
+| New rule | Section 17 now describes the skill runtime as a "Claude runtime transport adapter" that invokes Claude through the configured runtime transport (`runner/claude_transport.py`). The transport routes invocations through the local `claude` CLI, authenticated via the user's Claude Code Max subscription. No Anthropic API key is required for runtime execution. The three-layer execution architecture, call-graph constraints, failure semantics, runtime contracts, and all prohibitions are unchanged. |
+| Reason for change | Transport migration from per-token Anthropic API-key billing to the subscription-based Claude Code Max path. The migration is transport-layer only: no workflow logic, gate logic, DAG structure, node state semantics, artifact schemas, or failure category meanings were changed. |
+| Impacted components | `runner/claude_transport.py` (new shared transport adapter), `runner/skill_runtime.py` (`_invoke_claude()` rewired to use transport), `runner/semantic_dispatch.py` (`invoke_agent()` rewired to use transport; `import anthropic` removed), `runner/gate_evaluator.py` (docstring updated), `runner/agent_runtime.py` (docstring updated), test suite (mock targets updated from `anthropic` module to `invoke_claude_text`). |
 
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*

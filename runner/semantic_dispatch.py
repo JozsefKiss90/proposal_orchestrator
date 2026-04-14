@@ -2,12 +2,13 @@
 Semantic predicate dispatch layer (Step 11 — corrected).
 
 Invokes the designated agent for each semantic predicate via the Claude
-API.  The agent reads the supplied artifact content and applies
-open-ended constitutional judgment, returning a structured result
-conforming to the §4.9 result schema.  No local rule about what
-constitutes a violation is encoded here: the agent reasons from the
-actual artifact content and the constitutional rule stated in its
-system prompt.
+runtime transport (local ``claude`` CLI through
+:func:`runner.claude_transport.invoke_claude_text`).  The agent reads the
+supplied artifact content and applies open-ended constitutional judgment,
+returning a structured result conforming to the §4.9 result schema.  No
+local rule about what constitutes a violation is encoded here: the agent
+reasons from the actual artifact content and the constitutional rule
+stated in its system prompt.
 
 See gate_rules_library_plan.md §4.9 for the result schema and
 §6.1 step 8 for the runner integration contract.
@@ -23,8 +24,8 @@ For each semantic predicate the dispatcher:
 3. Builds a system prompt that states the agent's role, the predicate
    description, the constitutional rule, and the mandatory JSON response
    schema (§4.9).
-4. Calls ``claude-sonnet-4-6`` with the system prompt and a user message
-   containing the artifact content.
+4. Invokes ``claude-sonnet-4-6`` via the runtime transport with the
+   system prompt and a user message containing the artifact content.
 5. Parses the agent's JSON response and validates it with
    :func:`validate_semantic_result`.
 
@@ -37,9 +38,9 @@ Every finding in a ``status: fail`` result MUST include:
   violation.
 
 The runner rejects findings that omit either field.  Dispatch errors
-(unknown function, API failure, malformed response) produce a sentinel
-dict with ``_dispatch_error: True`` and ``status: "error"``; this
-intentionally fails :func:`validate_semantic_result` so the caller
+(unknown function, transport failure, malformed response) produce a
+sentinel dict with ``_dispatch_error: True`` and ``status: "error"``;
+this intentionally fails :func:`validate_semantic_result` so the caller
 treats it as a gate failure.
 """
 
@@ -51,8 +52,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-import anthropic
-
+from runner.claude_transport import ClaudeTransportError, invoke_claude_text
 from runner.paths import resolve_repo_path
 
 # ---------------------------------------------------------------------------
@@ -112,7 +112,7 @@ class SemanticPredicateConfig:
 
 
 #: Maps semantic predicate function names to their invocation configurations.
-#: Semantic predicates are evaluated by the Claude API, not by local functions.
+#: Semantic predicates are evaluated by Claude (via the runtime transport), not by local functions.
 SEMANTIC_REGISTRY: dict[str, SemanticPredicateConfig] = {
     "no_unresolved_scope_conflicts": SemanticPredicateConfig(
         function="no_unresolved_scope_conflicts",
@@ -481,11 +481,11 @@ def invoke_agent(
     repo_root: Path,
 ) -> dict:
     """
-    Invoke the designated agent via the Claude API.
+    Invoke the designated agent via the Claude runtime transport.
 
-    Reads artifact content, builds prompts, calls ``claude-sonnet-4-6``,
-    and returns the raw result dict for validation by
-    :func:`validate_semantic_result`.
+    Reads artifact content, builds prompts, invokes ``claude-sonnet-4-6``
+    through the local ``claude`` CLI, and returns the raw result dict for
+    validation by :func:`validate_semantic_result`.
 
     Parameters
     ----------
@@ -532,22 +532,19 @@ def invoke_agent(
     system_prompt = _build_system_prompt(config)
     user_prompt = _build_user_prompt(config, artifact_contents, resolved_args)
 
-    # Invoke the agent via the Claude API
+    # Invoke the agent via the Claude runtime transport
     try:
-        client = anthropic.Anthropic()
-        message = client.messages.create(
+        response_text: str = invoke_claude_text(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
             model=AGENT_MODEL,
             max_tokens=AGENT_MAX_TOKENS,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
         )
-        response_text: str = message.content[0].text
-    except Exception as exc:  # noqa: BLE001
+    except ClaudeTransportError as exc:
         return _dispatch_error_result(
             pred_id,
             func_name,
-            f"Claude API call failed for {func_name!r}: "
-            f"{type(exc).__name__}: {exc}",
+            f"Claude transport failed for {func_name!r}: {exc}",
         )
 
     # Parse the agent's JSON response
@@ -585,7 +582,7 @@ def dispatch_semantic_predicate(
 
     Called by ``evaluate_gate()`` after all deterministic predicates have
     passed.  Delegates to :func:`invoke_agent`, which reads artifact
-    content and calls the Claude API.
+    content and invokes Claude through the runtime transport.
 
     The caller is responsible for validating the returned dict with
     :func:`validate_semantic_result` before treating it as authoritative.

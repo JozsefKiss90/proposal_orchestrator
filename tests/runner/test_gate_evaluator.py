@@ -965,19 +965,19 @@ class TestSemanticDispatchIntegration:
         assert result["status"] == "pass"
 
     # ------------------------------------------------------------------
-    # End-to-end executor chain: evaluate_gate → dispatch → invoke_agent → API
-    # Patches anthropic at the semantic_dispatch module level, NOT at
+    # End-to-end executor chain: evaluate_gate → dispatch → invoke_agent → transport
+    # Patches invoke_claude_text at the semantic_dispatch module level, NOT at
     # dispatch_semantic_predicate, proving the full call chain is wired.
     # ------------------------------------------------------------------
 
-    def test_full_executor_chain_reaches_claude_api(
+    def test_full_executor_chain_reaches_claude_transport(
         self, tmp_path: Path, run_id: str
     ) -> None:
-        """evaluate_gate delegates through dispatch_semantic_predicate → invoke_agent → API.
+        """evaluate_gate delegates through dispatch_semantic_predicate → invoke_agent → transport.
 
-        Mocking anthropic (not dispatch_semantic_predicate) verifies that the
-        executor boundary is real: evaluate_gate cannot pass without the Claude
-        API mock returning a valid §4.9 result.
+        Mocking invoke_claude_text (not dispatch_semantic_predicate) verifies
+        that the executor boundary is real: evaluate_gate cannot pass without
+        the transport mock returning a valid §4.9 result.
         """
         target = tmp_path / "f.json"
         _write_json(target, {"content": "clean section"})
@@ -1012,19 +1012,15 @@ class TestSemanticDispatchIntegration:
             "fail_message": "",
         }
 
-        with patch("runner.semantic_dispatch.anthropic") as mock_mod:
-            client = MagicMock()
-            mock_mod.Anthropic.return_value = client
-            msg = MagicMock()
-            msg.content[0].text = json.dumps(api_payload)
-            client.messages.create.return_value = msg
+        with patch("runner.semantic_dispatch.invoke_claude_text") as mock_transport:
+            mock_transport.return_value = json.dumps(api_payload)
 
             result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
 
         assert result["status"] == "pass"
         assert "p_chain_test" in result["semantic_predicates"]["passed"]
-        # Confirm the API was invoked (not short-circuited at a higher level)
-        assert client.messages.create.called
+        # Confirm the transport was invoked (not short-circuited at a higher level)
+        assert mock_transport.called
 
 
 # ---------------------------------------------------------------------------

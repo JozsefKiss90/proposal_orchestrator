@@ -1,5 +1,5 @@
 """
-Tests for runner.skill_runtime — skill execution via Claude API adapter.
+Tests for runner.skill_runtime — skill execution via Claude runtime transport adapter.
 
 Covers §14 test cases 4–6:
   4. run_id propagation into written artifacts
@@ -16,7 +16,7 @@ Additional tests:
   - atomic write: failure leaves no partial artifact at canonical path
   - No imports from runner.dag_scheduler or runner.gate_evaluator
 
-All tests use synthetic skill catalogs and mock the Claude API.
+All tests use synthetic skill catalogs and mock the Claude runtime transport.
 """
 
 from __future__ import annotations
@@ -29,6 +29,7 @@ from unittest.mock import patch
 import pytest
 import yaml
 
+from runner.claude_transport import ClaudeTransportError
 from runner.runtime_models import SkillResult
 from runner.skill_runtime import (
     _assemble_skill_prompt,
@@ -150,28 +151,28 @@ def skill_env(tmp_path: Path) -> Path:
 
 
 # ---------------------------------------------------------------------------
-# Claude API mock helper
+# Claude transport mock helpers
 # ---------------------------------------------------------------------------
 
-_INVOKE_TARGET = "runner.skill_runtime._invoke_claude"
+_TRANSPORT_TARGET = "runner.skill_runtime.invoke_claude_text"
 
 
 def _claude_returns(response_dict: dict):
-    """Patch ``_invoke_claude`` to return a JSON-serialised dict."""
-    return patch(
-        _INVOKE_TARGET,
-        return_value=(json.dumps(response_dict), None),
-    )
+    """Patch ``invoke_claude_text`` to return a JSON-serialised dict."""
+    return patch(_TRANSPORT_TARGET, return_value=json.dumps(response_dict))
 
 
 def _claude_returns_text(text: str):
-    """Patch ``_invoke_claude`` to return raw text."""
-    return patch(_INVOKE_TARGET, return_value=(text, None))
+    """Patch ``invoke_claude_text`` to return raw text."""
+    return patch(_TRANSPORT_TARGET, return_value=text)
 
 
 def _claude_fails(error_msg: str):
-    """Patch ``_invoke_claude`` to return an API error."""
-    return patch(_INVOKE_TARGET, return_value=(None, error_msg))
+    """Patch ``invoke_claude_text`` to raise a transport error."""
+    return patch(
+        _TRANSPORT_TARGET,
+        side_effect=ClaudeTransportError(error_msg),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -250,12 +251,12 @@ class TestRunSkillMissingInput:
         # Remove the input file
         (skill_env / "docs" / "tier3" / "input.json").unlink()
 
-        with patch(_INVOKE_TARGET) as mock_claude:
+        with patch(_TRANSPORT_TARGET) as mock_transport:
             result = run_skill("test-skill", "run-001", skill_env)
 
         assert result.status == "failure"
         assert result.failure_category == "MISSING_INPUT"
-        mock_claude.assert_not_called()  # Claude API not invoked
+        mock_transport.assert_not_called()  # Claude not invoked
 
     def test_unknown_skill_id(self, skill_env: Path) -> None:
         result = run_skill("nonexistent-skill", "run-001", skill_env)
@@ -281,8 +282,8 @@ class TestRunSkillMalformedResponse:
         assert result.failure_category == "INCOMPLETE_OUTPUT"
         assert not canonical.exists(), "No partial artifact at canonical path"
 
-    def test_api_failure(self, skill_env: Path) -> None:
-        """Claude API failure → INCOMPLETE_OUTPUT."""
+    def test_transport_failure(self, skill_env: Path) -> None:
+        """Claude transport failure → INCOMPLETE_OUTPUT."""
         with _claude_fails("Connection timeout"):
             result = run_skill("test-skill", "run-001", skill_env)
 
@@ -353,12 +354,12 @@ class TestCanonicalInputBinding:
             "run_id": "run-001",
             "result": "processed",
         }
-        with _claude_returns(response) as mock_claude:
+        with _claude_returns(response) as mock_transport:
             result = run_skill("test-skill", "run-001", skill_env)
 
         assert result.status == "success"
         # Verify Claude was called (inputs were resolved and passed)
-        mock_claude.assert_called_once()
+        mock_transport.assert_called_once()
 
     def test_caller_provided_inputs_override_disk(self, skill_env: Path) -> None:
         """Pre-resolved inputs dict overrides reading from disk."""
@@ -486,3 +487,9 @@ class TestModuleIsolation:
         source = Path(mod.__file__).read_text(encoding="utf-8")
         assert "runner.dag_scheduler" not in source
         assert "runner.gate_evaluator" not in source
+
+    def test_no_anthropic_import(self) -> None:
+        """After transport migration, skill_runtime must not import anthropic."""
+        import runner.skill_runtime as mod
+        source = Path(mod.__file__).read_text(encoding="utf-8")
+        assert "import anthropic" not in source

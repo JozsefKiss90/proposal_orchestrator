@@ -1,14 +1,16 @@
 """
-Skill runtime — Claude API adapter layer.
+Skill runtime — Claude runtime transport adapter layer.
 
 Loads a skill execution specification (``.claude/skills/<skill_id>.md``),
-assembles prompt context from canonical inputs, invokes Claude, parses the
-structured JSON response, validates outputs against the expected schema,
-writes canonical artifacts atomically, and returns a :class:`SkillResult`.
+assembles prompt context from canonical inputs, invokes Claude through the
+configured runtime transport (local ``claude`` CLI via
+:func:`runner.claude_transport.invoke_claude_text`), parses the structured
+JSON response, validates outputs against the expected schema, writes
+canonical artifacts atomically, and returns a :class:`SkillResult`.
 
 Skill ``.md`` files are **specifications, not executable code**.  Domain
 reasoning is performed by Claude; this module handles prompt assembly,
-API invocation, response parsing, validation, and atomic I/O.
+transport invocation, response parsing, validation, and atomic I/O.
 
 Follows the same architectural pattern as ``runner/semantic_dispatch.py``
 ``invoke_agent()`` but at runtime-integration scope — producing canonical
@@ -37,6 +39,7 @@ from typing import Any, Optional
 
 import yaml
 
+from runner.claude_transport import ClaudeTransportError, invoke_claude_text
 from runner.runtime_models import SkillResult
 
 # ---------------------------------------------------------------------------
@@ -75,7 +78,7 @@ class SkillRuntimeError(Exception):
     artifacts, constraint violations, etc.) are returned as ``SkillResult``
     with the appropriate ``failure_category``.  ``SkillRuntimeError`` is
     reserved for truly unexpected errors such as the skill catalog being
-    unreadable or the Claude library not being installed.
+    unreadable or the Claude CLI being unavailable.
     """
 
 
@@ -319,7 +322,7 @@ def _assemble_skill_prompt(
     writes_to: list[str],
     constraints: list[str],
 ) -> tuple[str, str]:
-    """Assemble the system and user prompts for Claude API invocation.
+    """Assemble the system and user prompts for Claude invocation.
 
     Returns ``(system_prompt, user_prompt)``.
     """
@@ -366,7 +369,7 @@ def _assemble_skill_prompt(
 
 
 # ---------------------------------------------------------------------------
-# Phase C — Claude API invocation
+# Phase C — Claude invocation via runtime transport
 # ---------------------------------------------------------------------------
 
 
@@ -374,26 +377,22 @@ def _invoke_claude(
     system_prompt: str,
     user_prompt: str,
 ) -> tuple[str | None, str | None]:
-    """Call the Claude API and return ``(response_text, error_message)``.
+    """Invoke Claude via the runtime transport and return ``(response_text, error_message)``.
 
     Returns ``(text, None)`` on success, ``(None, error_msg)`` on failure.
+    Uses the shared :func:`runner.claude_transport.invoke_claude_text`
+    adapter, which routes through the local ``claude`` CLI.
     """
     try:
-        import anthropic
-    except ImportError as exc:
-        return None, f"anthropic library not installed: {exc}"
-
-    try:
-        client = anthropic.Anthropic()
-        message = client.messages.create(
+        text = invoke_claude_text(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
             model=SKILL_MODEL,
             max_tokens=SKILL_MAX_TOKENS,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
         )
-        return message.content[0].text, None
-    except Exception as exc:  # noqa: BLE001
-        return None, f"Claude API call failed: {type(exc).__name__}: {exc}"
+        return text, None
+    except ClaudeTransportError as exc:
+        return None, f"Claude transport failed: {exc}"
 
 
 # ---------------------------------------------------------------------------
@@ -582,10 +581,10 @@ def run_skill(
 ) -> SkillResult:
     """Execute a skill specification via Claude and return a SkillResult.
 
-    This is a **Claude API adapter**, not a Markdown interpreter.  The
-    skill ``.md`` file is loaded as prompt context; Claude performs the
-    domain reasoning; this function handles I/O, validation, and atomic
-    writes.
+    This is a **Claude runtime transport adapter**, not a Markdown
+    interpreter.  The skill ``.md`` file is loaded as prompt context;
+    Claude performs the domain reasoning; this function handles I/O,
+    validation, and atomic writes.
 
     Parameters
     ----------
@@ -662,7 +661,7 @@ def run_skill(
         constraints=constraints,
     )
 
-    # ── Phase C: Claude API invocation ─────────────────────────────────
+    # ── Phase C: Claude invocation via runtime transport ────────────────
 
     response_text, api_error = _invoke_claude(system_prompt, user_prompt)
     if api_error is not None:
