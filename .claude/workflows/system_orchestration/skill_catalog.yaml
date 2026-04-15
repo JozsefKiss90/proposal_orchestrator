@@ -7,6 +7,7 @@ skill_catalog:
 #             receiving them serialized in the prompt.
 
   - id: call-requirements-extraction
+    execution_mode: "tapm"
     purpose: >
       Extract binding topic-specific requirements from work programme and call
       extract documents. Produces structured output with source section references
@@ -14,8 +15,8 @@ skill_catalog:
     used_by_agents:
       - call_analyzer
     reads_from:
-      - docs/tier2b_topic_and_call_sources/work_programmes/
       - docs/tier2b_topic_and_call_sources/call_extracts/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
     writes_to:
       - docs/tier2b_topic_and_call_sources/extracted/
     constitutional_constraints:

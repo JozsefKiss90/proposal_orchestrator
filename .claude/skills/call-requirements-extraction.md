@@ -7,8 +7,8 @@ purpose_summary: >
 used_by_agents:
   - call_analyzer
 reads_from:
-  - docs/tier2b_topic_and_call_sources/work_programmes/
   - docs/tier2b_topic_and_call_sources/call_extracts/
+  - docs/tier3_project_instantiation/call_binding/selected_call.json
 writes_to:
   - docs/tier2b_topic_and_call_sources/extracted/
 constitutional_constraints:
@@ -17,14 +17,23 @@ constitutional_constraints:
   - "Must apply Confirmed/Inferred/Assumed/Unresolved status"
 ---
 
+## Input Access (TAPM Mode)
+
+Read the files listed in the Declared Inputs section from disk using the Read tool.
+For call data, read the Step 0 call slice (*.slice.json) and the curated call extract file.
+Do not read grouped JSON files (cluster_CL*.grouped.json) or work programme directories.
+Do not read files outside the declared input set.
+Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
 
 | Path | Artifact / Content | Fields Extracted | Schema ID | Purpose |
 |------|--------------------|-----------------|-----------|---------|
-| `docs/tier2b_topic_and_call_sources/work_programmes/` | Work programme source documents (PDF/DOCX) for the relevant Horizon Europe cluster | Full document text; section identifiers; topic descriptions; expected outcomes; expected impacts; scope requirements; eligibility conditions; evaluation criteria | N/A — source document directory (dir_non_empty check only) | Primary authoritative source from which all Tier 2B extracted fields are read; every extracted element must carry a section reference back to this directory |
-| `docs/tier2b_topic_and_call_sources/call_extracts/` | Call extract documents (PDF/DOCX) for the specific topic | Topic identifier; call deadline; scope narrative; specific conditions; evaluation priority weightings | N/A — source document directory (dir_non_empty check only) | Supplements the work programme with call-specific constraints and priority weighting; used when topic-level detail not fully present in the work programme |
+| `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.slice.json` | Step 0 call slice — single call entry extracted from grouped work-programme JSON by `runner/call_slicer.py` | Full scope text; expected outcomes; expected impacts; eligibility conditions; TRL; budget figures; deadlines | N/A — Step 0 deterministic output | Primary call data source: complete, unedited call entry bounded to the target topic only (~5-8KB) |
+| `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.json` | Curated call extract with structured interpretation | Structured outcomes array; scope summary; research areas; FSTP details; platform requirements | N/A — manually curated | Supplementary structured interpretation of the call; complements the raw slice with curated fields |
+| `docs/tier3_project_instantiation/call_binding/selected_call.json` | Call binding metadata | topic_code; work_programme; instrument_type; max_project_duration_months; max_eu_contribution | N/A — project instantiation | Identifies the target call and provides context for scoping extraction |
 
 ### Outputs
 
