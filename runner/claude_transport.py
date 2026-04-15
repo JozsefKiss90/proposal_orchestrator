@@ -70,6 +70,7 @@ def invoke_claude_text(
     model: str,
     max_tokens: int,
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
+    tools: list[str] | None = None,
 ) -> str:
     """Invoke the local ``claude`` CLI in print mode and return response text.
 
@@ -87,6 +88,12 @@ def invoke_claude_text(
         Maximum tokens for the response.
     timeout_seconds:
         Maximum wall-clock seconds to wait for the CLI to complete.
+    tools:
+        Optional list of tool names to make available to Claude during
+        execution (e.g. ``["Read", "Glob"]``).  When provided with a
+        non-empty list, appends ``--tools <comma-joined>`` to the CLI
+        command.  When ``None`` (default) or empty, no ``--tools`` flag
+        is added and Claude operates in pure print mode.
 
     Returns
     -------
@@ -108,6 +115,10 @@ def invoke_claude_text(
         "-p",
         "--model", model
     ]
+
+    # Append --tools flag when tools are specified.
+    if tools:
+        cmd.extend(["--tools", ",".join(tools)])
 
     # Determine how to pass the system prompt.
     # When the system prompt fits within safe OS command-line limits, pass

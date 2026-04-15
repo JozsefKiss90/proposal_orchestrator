@@ -138,6 +138,47 @@ class TestCommandConstruction:
 
 
 # ---------------------------------------------------------------------------
+# Tools parameter
+# ---------------------------------------------------------------------------
+
+
+class TestToolsParameter:
+    def test_no_tools_flag_when_tools_is_none(self) -> None:
+        with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
+            invoke_claude_text(**_call_kwargs())
+        cmd = mock_run.call_args.args[0]
+        assert "--tools" not in cmd
+
+    def test_no_tools_flag_when_tools_is_empty_list(self) -> None:
+        with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
+            invoke_claude_text(**_call_kwargs(), tools=[])
+        cmd = mock_run.call_args.args[0]
+        assert "--tools" not in cmd
+
+    def test_single_tool_produces_tools_flag(self) -> None:
+        with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
+            invoke_claude_text(**_call_kwargs(), tools=["Read"])
+        cmd = mock_run.call_args.args[0]
+        idx = cmd.index("--tools")
+        assert cmd[idx + 1] == "Read"
+
+    def test_multiple_tools_comma_separated(self) -> None:
+        with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
+            invoke_claude_text(**_call_kwargs(), tools=["Read", "Glob"])
+        cmd = mock_run.call_args.args[0]
+        idx = cmd.index("--tools")
+        assert cmd[idx + 1] == "Read,Glob"
+
+    def test_tools_flag_before_system_prompt(self) -> None:
+        with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
+            invoke_claude_text(**_call_kwargs(), tools=["Read"])
+        cmd = mock_run.call_args.args[0]
+        tools_idx = cmd.index("--tools")
+        system_idx = cmd.index("--system-prompt")
+        assert tools_idx < system_idx
+
+
+# ---------------------------------------------------------------------------
 # System prompt length fallback
 # ---------------------------------------------------------------------------
 
