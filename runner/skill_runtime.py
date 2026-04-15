@@ -68,6 +68,12 @@ SKILL_MODEL: str = "claude-sonnet-4-6"
 #: Maximum tokens for skill execution responses.
 SKILL_MAX_TOKENS: int = 8192
 
+#: Timeout for TAPM invocations (tool-augmented mode).
+#: TAPM invocations involve multiple Read/Glob tool round-trips,
+#: each adding latency.  The default 300s is insufficient for
+#: skills that read multiple files and produce complex output.
+TAPM_TIMEOUT_SECONDS: int = 600
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -897,8 +903,26 @@ def run_skill(
                 model=SKILL_MODEL,
                 max_tokens=SKILL_MAX_TOKENS,
                 tools=["Read", "Glob"],
+                timeout_seconds=TAPM_TIMEOUT_SECONDS,
             )
         except ClaudeTransportError as exc:
+            # Diagnostic: capture transport failure for debugging
+            _diag_dir = repo_root / ".claude" / "skill_diag"
+            _diag_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                (
+                    _diag_dir / f"{skill_id}_{run_id[:8]}_transport_fail.txt"
+                ).write_text(
+                    f"=== Transport failure ===\n"
+                    f"skill_id: {skill_id}\n"
+                    f"mode: tapm\n"
+                    f"error: {exc}\n"
+                    f"timeout_seconds: {TAPM_TIMEOUT_SECONDS}\n"
+                    f"=== END ===\n",
+                    encoding="utf-8",
+                )
+            except OSError:
+                pass
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1098,15 +1122,36 @@ def run_skill(
             # The primary required field is the root array/object key
             # (e.g. "constraints", "outcomes", "impacts").
             root_field = req_fields[0]
-            if root_field not in parsed:
+
+            # Claude may return one of two response shapes:
+            #   Flat:       { "constraints": [...], "outcomes": [...] }
+            #   File-keyed: { "call_constraints.json": {"constraints": [...]}, ... }
+            # Accept both by trying flat lookup first, then file-keyed.
+            sub_artifact: dict | None = None
+
+            if root_field in parsed:
+                # Flat shape — root field at top level
+                sub_artifact = {root_field: parsed[root_field]}
+            else:
+                # File-keyed shape — look up by filename derived from
+                # the canonical path (e.g. "call_constraints.json").
+                file_key = canonical_rel.rsplit("/", 1)[-1]
+                nested = parsed.get(file_key)
+                if isinstance(nested, dict) and root_field in nested:
+                    sub_artifact = {root_field: nested[root_field]}
+                else:
+                    # Also try without .json extension
+                    file_key_stem = file_key.rsplit(".", 1)[0]
+                    nested = parsed.get(file_key_stem)
+                    if isinstance(nested, dict) and root_field in nested:
+                        sub_artifact = {root_field: nested[root_field]}
+
+            if sub_artifact is None:
                 all_errors.append(
                     f"Multi-artifact response missing root field "
                     f"{root_field!r} for {canonical_rel!r}"
                 )
                 continue
-
-            # Extract the sub-object for this artifact
-            sub_artifact: dict = {root_field: parsed[root_field]}
             if need_run_id and "run_id" in parsed:
                 sub_artifact["run_id"] = parsed["run_id"]
             if exp_sid is not None and "schema_id" in parsed:
