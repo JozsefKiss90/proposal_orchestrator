@@ -357,3 +357,232 @@ class TestAssembleTapmPromptAbsolutePaths:
         )
         expected_abs = str(tapm_env / "docs/tier3/data/input.json")
         assert expected_abs in usr_p
+
+
+# ---------------------------------------------------------------------------
+# TestRunSkillTapmMode — run_skill() TAPM mode integration tests (Step 3)
+# ---------------------------------------------------------------------------
+
+from unittest.mock import patch
+
+from runner.claude_transport import ClaudeTransportError
+from runner.runtime_models import SkillResult
+from runner.skill_runtime import run_skill
+
+
+def _write_skill_spec(repo_root: Path, skill_id: str, content: str = "") -> None:
+    """Write a synthetic skill .md file."""
+    spec_path = repo_root / ".claude" / "skills" / f"{skill_id}.md"
+    spec_path.parent.mkdir(parents=True, exist_ok=True)
+    spec_path.write_text(
+        content or f"# {skill_id}\nTest skill specification.",
+        encoding="utf-8",
+    )
+
+
+def _make_tapm_skill_env(tmp_path: Path) -> Path:
+    """Create an environment for run_skill() TAPM mode tests.
+
+    Returns repo_root with:
+      - skill catalog containing a TAPM skill and a cli-prompt skill
+      - artifact schema specification
+      - skill spec .md files
+      - output directories
+      - input files on disk (TAPM mode should NOT pre-read these)
+    """
+    repo_root = tmp_path
+
+    # Skill catalog with execution_mode field
+    _write_skill_catalog(repo_root, [
+        {
+            "id": "tapm-skill",
+            "execution_mode": "tapm",
+            "reads_from": ["docs/tier3/data/input.json"],
+            "writes_to": ["docs/tier4/phase1/test_output.json"],
+            "constitutional_constraints": ["Must not fabricate data"],
+        },
+        {
+            "id": "cli-skill",
+            # No execution_mode — defaults to "cli-prompt"
+            "reads_from": ["docs/tier3/data/input.json"],
+            "writes_to": ["docs/tier4/phase1/test_output.json"],
+            "constitutional_constraints": ["Must not fabricate data"],
+        },
+        {
+            "id": "bad-mode-skill",
+            "execution_mode": "unknown-mode",
+            "reads_from": [],
+            "writes_to": ["docs/tier4/phase1/test_output.json"],
+            "constitutional_constraints": [],
+        },
+    ])
+
+    # Artifact schema
+    _write_artifact_schema(repo_root)
+
+    # Skill specs
+    _write_skill_spec(repo_root, "tapm-skill")
+    _write_skill_spec(repo_root, "cli-skill")
+    _write_skill_spec(repo_root, "bad-mode-skill")
+
+    # Input file on disk
+    input_dir = repo_root / "docs" / "tier3" / "data"
+    input_dir.mkdir(parents=True, exist_ok=True)
+    (input_dir / "input.json").write_text(
+        json.dumps({"topic": "AI in healthcare"}), encoding="utf-8",
+    )
+
+    # Output directory
+    (repo_root / "docs" / "tier4" / "phase1").mkdir(parents=True, exist_ok=True)
+
+    return repo_root
+
+
+@pytest.fixture()
+def tapm_skill_env(tmp_path: Path) -> Path:
+    """Return a fresh environment for run_skill() TAPM mode tests."""
+    import runner.skill_runtime as _sr
+    _sr._catalog_cache.clear()
+    _sr._schema_spec_cache.clear()
+    return _make_tapm_skill_env(tmp_path)
+
+
+_TRANSPORT_TARGET = "runner.skill_runtime.invoke_claude_text"
+
+_VALID_RESPONSE = json.dumps({
+    "schema_id": "test_output_v1",
+    "run_id": "run-001",
+    "result": "extracted data",
+})
+
+
+class TestRunSkillTapmMode:
+    """Integration tests for run_skill() TAPM mode selection (Step 3)."""
+
+    def test_default_mode_is_cli_prompt(self, tapm_skill_env: Path) -> None:
+        """Skill without execution_mode uses cli-prompt path."""
+        response = {
+            "schema_id": "test_output_v1",
+            "run_id": "run-001",
+            "result": "data",
+        }
+        with patch(_TRANSPORT_TARGET, return_value=json.dumps(response)) as mock:
+            result = run_skill("cli-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "success"
+        # cli-prompt path: transport called WITHOUT tools
+        call_kwargs = mock.call_args
+        assert call_kwargs.kwargs.get("tools") is None
+
+    def test_tapm_mode_passes_tools(self, tapm_skill_env: Path) -> None:
+        """TAPM skill passes tools=["Read", "Glob"] to transport."""
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE) as mock:
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "success"
+        call_kwargs = mock.call_args
+        assert call_kwargs.kwargs.get("tools") == ["Read", "Glob"]
+
+    def test_tapm_mode_skips_resolve_inputs(self, tapm_skill_env: Path) -> None:
+        """TAPM mode succeeds even when input files are missing from disk."""
+        # Remove the input file — would cause MISSING_INPUT in cli-prompt
+        (tapm_skill_env / "docs" / "tier3" / "data" / "input.json").unlink()
+
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        # TAPM doesn't validate inputs in Python — should succeed
+        assert result.status == "success"
+
+    def test_tapm_mode_skips_skill_prompt_assembly(
+        self, tapm_skill_env: Path
+    ) -> None:
+        """TAPM mode does not call _assemble_skill_prompt."""
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE), \
+             patch(
+                 "runner.skill_runtime._assemble_skill_prompt",
+                 side_effect=AssertionError("should not be called"),
+             ):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "success"
+
+    def test_tapm_mode_writes_artifact(self, tapm_skill_env: Path) -> None:
+        """TAPM mode writes artifact to canonical path via shared Phases D-F."""
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 1
+        written_path = tapm_skill_env / result.outputs_written[0]
+        assert written_path.exists()
+        content = json.loads(written_path.read_text(encoding="utf-8"))
+        assert content["run_id"] == "run-001"
+        assert content["schema_id"] == "test_output_v1"
+        assert "artifact_status" not in content
+
+    def test_tapm_mode_transport_failure(self, tapm_skill_env: Path) -> None:
+        """Claude transport failure in TAPM mode returns INCOMPLETE_OUTPUT."""
+        with patch(
+            _TRANSPORT_TARGET,
+            side_effect=ClaudeTransportError("timeout"),
+        ):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+
+    def test_tapm_mode_malformed_response(self, tapm_skill_env: Path) -> None:
+        """Non-JSON response in TAPM mode returns INCOMPLETE_OUTPUT."""
+        with patch(_TRANSPORT_TARGET, return_value="This is not JSON"):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+
+    def test_tapm_mode_schema_validation_failure(
+        self, tapm_skill_env: Path
+    ) -> None:
+        """TAPM response without run_id returns MALFORMED_ARTIFACT."""
+        bad_response = json.dumps({
+            "schema_id": "test_output_v1",
+            # run_id intentionally missing
+            "result": "data",
+        })
+        with patch(_TRANSPORT_TARGET, return_value=bad_response):
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "MALFORMED_ARTIFACT"
+
+    def test_node_id_forwarded_to_tapm_prompt(
+        self, tapm_skill_env: Path
+    ) -> None:
+        """node_id parameter appears in TAPM prompt."""
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE) as mock:
+            run_skill(
+                "tapm-skill", "run-001", tapm_skill_env,
+                node_id="n01_call_analysis",
+            )
+
+        call_kwargs = mock.call_args
+        user_prompt = call_kwargs.kwargs.get("user_prompt", "")
+        assert "n01_call_analysis" in user_prompt
+
+    def test_node_id_none_works_for_tapm(self, tapm_skill_env: Path) -> None:
+        """TAPM mode works when node_id is None (default)."""
+        with patch(_TRANSPORT_TARGET, return_value=_VALID_RESPONSE) as mock:
+            result = run_skill("tapm-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "success"
+        call_kwargs = mock.call_args
+        user_prompt = call_kwargs.kwargs.get("user_prompt", "")
+        assert "node_id:" not in user_prompt
+
+    def test_unknown_execution_mode(self, tapm_skill_env: Path) -> None:
+        """Unrecognized execution_mode returns CONSTRAINT_VIOLATION."""
+        result = run_skill("bad-mode-skill", "run-001", tapm_skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "CONSTRAINT_VIOLATION"
+        assert "unknown-mode" in result.failure_reason

@@ -1,4 +1,10 @@
 skill_catalog:
+# Optional field per entry:
+#   execution_mode: "cli-prompt" | "tapm"
+#     Default: "cli-prompt" (when absent)
+#     "tapm": Tool-Augmented Prompt Mode — Claude reads declared
+#             inputs from disk via Read/Glob tools instead of
+#             receiving them serialized in the prompt.
 
   - id: call-requirements-extraction
     purpose: >

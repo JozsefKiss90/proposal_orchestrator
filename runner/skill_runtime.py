@@ -725,6 +725,8 @@ def run_skill(
     run_id: str,
     repo_root: Path,
     inputs: dict[str, Any] | None = None,
+    *,
+    node_id: str | None = None,
 ) -> SkillResult:
     """Execute a skill specification via Claude and return a SkillResult.
 
@@ -732,6 +734,15 @@ def run_skill(
     interpreter.  The skill ``.md`` file is loaded as prompt context;
     Claude performs the domain reasoning; this function handles I/O,
     validation, and atomic writes.
+
+    Supports two execution modes controlled by the ``execution_mode``
+    field in the skill catalog entry:
+
+    - ``"cli-prompt"`` (default): All inputs are resolved from disk,
+      serialized into the prompt, and piped to ``claude -p``.
+    - ``"tapm"``: Tool-Augmented Prompt Mode.  Only task metadata and
+      the skill spec are included in the prompt.  Claude reads declared
+      inputs from disk via Read/Glob tools during execution.
 
     Parameters
     ----------
@@ -744,7 +755,12 @@ def run_skill(
     inputs:
         Optional pre-resolved inputs dict.  Keys are repo-relative paths;
         values are parsed artifact content.  Missing inputs are resolved
-        from disk using the skill's ``reads_from`` paths.
+        from disk using the skill's ``reads_from`` paths.  Ignored in
+        TAPM mode (Claude reads inputs from disk directly).
+    node_id:
+        Optional workflow node identifier (e.g. ``"n01_call_analysis"``).
+        Included as task metadata in TAPM prompts for traceability.
+        Ignored in cli-prompt mode.
 
     Returns
     -------
@@ -781,41 +797,90 @@ def run_skill(
             failure_category="MISSING_INPUT",
         )
 
-    # Resolve inputs from disk
-    resolved_inputs = _resolve_inputs(reads_from, repo_root, inputs)
+    # ── Mode selection ────────────────────────────────────────────────
+    mode = entry.get("execution_mode", "cli-prompt")
 
-    # Validate inputs
-    validation_errors = _validate_skill_inputs(
-        skill_id, reads_from, repo_root, resolved_inputs
-    )
-    if validation_errors:
+    if mode == "tapm":
+        # ── TAPM Path: Phases A'-C' ──────────────────────────────────
+        #
+        # Skip _resolve_inputs() and _validate_skill_inputs(): Claude
+        # reads declared inputs from disk via the Read tool.
+        # Skip _assemble_skill_prompt(): use _assemble_tapm_prompt().
+
+        system_prompt, user_prompt = _assemble_tapm_prompt(
+            skill_spec=skill_spec,
+            skill_id=skill_id,
+            run_id=run_id,
+            reads_from=reads_from,
+            writes_to=writes_to,
+            constraints=constraints,
+            repo_root=repo_root,
+            node_id=node_id,
+        )
+
+        try:
+            response_text = invoke_claude_text(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model=SKILL_MODEL,
+                max_tokens=SKILL_MAX_TOKENS,
+                tools=["Read", "Glob"],
+            )
+        except ClaudeTransportError as exc:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: Claude transport failed: {exc}"
+                ),
+                failure_category="INCOMPLETE_OUTPUT",
+            )
+
+    elif mode == "cli-prompt":
+        # ── CLI-Prompt Path: Phases A-C (unchanged) ──────────────────
+
+        # Resolve inputs from disk
+        resolved_inputs = _resolve_inputs(reads_from, repo_root, inputs)
+
+        # Validate inputs
+        validation_errors = _validate_skill_inputs(
+            skill_id, reads_from, repo_root, resolved_inputs
+        )
+        if validation_errors:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Input validation failed for skill {skill_id!r}: "
+                    + "; ".join(validation_errors)
+                ),
+                failure_category="MISSING_INPUT",
+            )
+
+        # Phase B: Prompt assembly
+        system_prompt, user_prompt = _assemble_skill_prompt(
+            skill_spec=skill_spec,
+            inputs=resolved_inputs,
+            run_id=run_id,
+            writes_to=writes_to,
+            constraints=constraints,
+        )
+
+        # Phase C: Claude invocation via runtime transport
+        response_text, api_error = _invoke_claude(system_prompt, user_prompt)
+        if api_error is not None:
+            return SkillResult(
+                status="failure",
+                failure_reason=f"Skill {skill_id!r}: {api_error}",
+                failure_category="INCOMPLETE_OUTPUT",
+            )
+
+    else:
         return SkillResult(
             status="failure",
             failure_reason=(
-                f"Input validation failed for skill {skill_id!r}: "
-                + "; ".join(validation_errors)
+                f"Skill {skill_id!r}: unrecognized execution_mode "
+                f"{mode!r}; must be 'cli-prompt' or 'tapm'"
             ),
-            failure_category="MISSING_INPUT",
-        )
-
-    # ── Phase B: Prompt assembly ───────────────────────────────────────
-
-    system_prompt, user_prompt = _assemble_skill_prompt(
-        skill_spec=skill_spec,
-        inputs=resolved_inputs,
-        run_id=run_id,
-        writes_to=writes_to,
-        constraints=constraints,
-    )
-
-    # ── Phase C: Claude invocation via runtime transport ────────────────
-
-    response_text, api_error = _invoke_claude(system_prompt, user_prompt)
-    if api_error is not None:
-        return SkillResult(
-            status="failure",
-            failure_reason=f"Skill {skill_id!r}: {api_error}",
-            failure_category="INCOMPLETE_OUTPUT",
+            failure_category="CONSTRAINT_VIOLATION",
         )
 
     # ── Phase D: Response parsing and validation ───────────────────────
