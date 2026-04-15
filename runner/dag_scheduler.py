@@ -75,6 +75,7 @@ import yaml
 log = logging.getLogger("runner.scheduler")
 
 from runner.agent_runtime import run_agent
+from runner.call_slicer import CallSlicerError, generate_call_slice
 from runner.gate_evaluator import evaluate_gate
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
@@ -1042,6 +1043,15 @@ class DAGScheduler:
         """
         started_at: str = datetime.now(timezone.utc).isoformat()
         dispatched: list[str] = []
+
+        # ------------------------------------------------------------------
+        # Step 0: Call slicing (deterministic input bounding)
+        # ------------------------------------------------------------------
+        try:
+            call_slice_path = generate_call_slice(self.repo_root)
+            log.info("Call slice generated: %s", call_slice_path)
+        except CallSlicerError as exc:
+            log.warning("Call slicer skipped (non-blocking): %s", exc)
 
         # ------------------------------------------------------------------
         # Phase scope resolution

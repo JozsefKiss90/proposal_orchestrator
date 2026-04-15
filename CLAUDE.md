@@ -419,6 +419,8 @@ must be treated as a failure, not as an alternative valid interpretation.
 
 ## 17. Runtime Execution Architecture
 
+> **MIGRATION IN PROGRESS (2026-04-15).** The Hybrid Architecture Migration (`backend_migration_plan.md`) is currently being implemented. This migration transitions input-heavy skill invocations from full-prompt serialization to Tool-Augmented Prompt Mode (TAPM), where Claude reads declared inputs from disk via `--tools "Read,Glob"` instead of receiving them serialized in the prompt. It also introduces a deterministic Call Slicer (Step 0) that bounds downstream inputs before any Claude invocation. The migration preserves the DAG scheduler, external gates, external artifact validation, and fail-closed semantics. Section 17 will be amended to reflect the final implemented runtime architecture when the migration is complete. Until that amendment, the rules in this section remain in force as written.
+
 This section defines the runtime execution stack that implements the workflow execution model (Section 6) and the agent derivation rules (Section 16). The runtime architecture is constitutionally binding. Implementations that violate the layering, contracts, or prohibitions defined here are constitutional violations, regardless of whether they produce correct outputs.
 
 ### 17.1 Execution Stack
@@ -546,5 +548,16 @@ The following runtime-layer constraints supplement the general prohibitions in S
 | New rule | Section 17 now describes the skill runtime as a "Claude runtime transport adapter" that invokes Claude through the configured runtime transport (`runner/claude_transport.py`). The transport routes invocations through the local `claude` CLI, authenticated via the user's Claude Code Max subscription. No Anthropic API key is required for runtime execution. The three-layer execution architecture, call-graph constraints, failure semantics, runtime contracts, and all prohibitions are unchanged. |
 | Reason for change | Transport migration from per-token Anthropic API-key billing to the subscription-based Claude Code Max path. The migration is transport-layer only: no workflow logic, gate logic, DAG structure, node state semantics, artifact schemas, or failure category meanings were changed. |
 | Impacted components | `runner/claude_transport.py` (new shared transport adapter), `runner/skill_runtime.py` (`_invoke_claude()` rewired to use transport), `runner/semantic_dispatch.py` (`invoke_agent()` rewired to use transport; `import anthropic` removed), `runner/gate_evaluator.py` (docstring updated), `runner/agent_runtime.py` (docstring updated), test suite (mock targets updated from `anthropic` module to `invoke_claude_text`). |
+
+### Constitutional Amendment Record — Section 17 Backend Migration (Pending)
+
+| Field | Value |
+|-------|-------|
+| Section to be amended | Section 17 (Runtime Execution Architecture) — §17.1, §17.5, and related subsections |
+| Current rule | Section 17 describes the skill runtime as assembling a full prompt with all resolved inputs serialized into stdin, piped to `claude -p` via `runner/claude_transport.py`. |
+| Planned rule | Section 17 will describe a dual-mode skill runtime: (1) existing cli-prompt mode for lightweight skills, and (2) Tool-Augmented Prompt Mode (TAPM) for input-heavy skills, where `claude -p --tools "Read,Glob"` is invoked with a bounded prompt (~5-30KB of task metadata and skill spec) and Claude reads declared inputs from disk on demand. A deterministic Call Slicer (Step 0) preprocessing layer will be formalized as a pre-Claude input bounding stage. All external governance (scheduler, gates, artifact validation, fail-closed semantics) remains unchanged. |
+| Status | **IN PROGRESS.** Implementation follows `backend_migration_plan.md`. Section 17 amendment will be applied when the migration is complete and validated. Until then, Section 17 as written remains in force. |
+| Reason for change | Prompt-size bottleneck: current transport serializes 150-800KB per skill invocation (98.5% irrelevant for Phase 1). TAPM reduces this to ~5-30KB while preserving all runtime contracts and constitutional guarantees. |
+| Impacted components | `runner/skill_runtime.py` (dual-mode execution, TAPM prompt assembly), `runner/claude_transport.py` (tool-enabled invocation), `runner/call_slicer.py` (new Step 0 deterministic preprocessing), skill `.md` specifications (input-boundary instructions for TAPM mode). Scheduler, gate evaluator, agent runtime, runtime contracts, and failure semantics are unchanged. |
 
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*
