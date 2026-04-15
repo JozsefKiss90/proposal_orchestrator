@@ -6,6 +6,7 @@
 |-----|------|--------|
 | 1.0 | 2025-04-15 | Original plan: native Claude Code backend as primary migration target |
 | 2.0 | 2025-04-15 | Revised after operational validation. TAPM is now the immediate implementation path. True native Claude Code backend deferred to conditional future path pending operational proof. See `native_backend_validation_report.md` for full evidence. |
+| 3.0 | 2026-04-15 | Revised Step 0 from brief placeholder into fully defined **Call Slicer (Deterministic Input Bounding Layer)**. Step 0 is now a pure Python preprocessing layer that runs before all Claude invocations, deterministically extracts the target call from grouped JSONs, and bounds downstream inputs to ~10-15KB. Updated `call-requirements-extraction` `reads_from` to reference Step 0 output instead of full grouped JSONs. Updated TAPM interaction, test plan, and rollout order to reflect Step 0's elevated role. All governance semantics unchanged. |
 
 ---
 
@@ -112,7 +113,7 @@ run_skill(skill_id, ...)
 
 **What this achieves**:
 - Prompt reduction from 150-800KB to ~5-30KB for input-heavy skills
-- Call slicing further reduces relevant input to ~10KB
+- Step 0 call slicing deterministically bounds input to ~10-15KB before any Claude invocation
 - No dependency on Claude Code's skill/agent discovery
 - No format conversion of `.claude/skills/` or `.claude/agents/` files
 - All existing contracts, validation, and fail-closed behavior preserved
@@ -186,7 +187,7 @@ WITHIN run_skill() — TWO MODES:
 | Mode selection per skill | `skill_runtime.py` | **Yes** — new branching |
 | TAPM prompt assembly | `skill_runtime.py` | **Yes** — new `_assemble_tapm_prompt()` |
 | Transport with tools flag | `claude_transport.py` | **Yes** — optional `tools` parameter |
-| Call slicing (pre-execution) | New `runner/call_slicer.py` | **Yes** — new module |
+| Call slicing (Step 0, deterministic pre-execution) | New `runner/call_slicer.py` | **Yes** — new module, pure Python, no Claude |
 | Response parsing, schema validation, atomic write | `skill_runtime.py` | No |
 | Runtime contracts (SkillResult, AgentResult, etc.) | `runtime_models.py` | No |
 
@@ -333,68 +334,341 @@ The first skill to migrate to TAPM is **`call-requirements-extraction`** (node n
 
 `selected_call.json` identifies `topic_code: "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02"`. The `call_analyzer` agent's `reads_from` includes `docs/tier2b_topic_and_call_sources/work_programmes/`. The `_resolve_directory_recursive()` function reads **every file** under that directory tree, including `cluster_CL4.grouped.json` (338KB, 64 topics). Only 5,181 bytes (1.5%) is the target call.
 
-### 5.2 Call Slice Strategy
+### 5.2 Call Slice Strategy (Implemented by Step 0)
+
+The call slice strategy is fully defined in **Step 0 — Call Slicer (Deterministic Input Bounding Layer)** in Section 6. Step 0 is the authoritative specification for input bounding. This section summarizes the strategy for context.
 
 **Pre-execution step** (new `runner/call_slicer.py`, invoked by scheduler before first dispatch):
 
 1. Read `docs/tier3_project_instantiation/call_binding/selected_call.json` to get `topic_code` and `work_programme`
-2. Map `work_programme` to the grouped JSON directory
-3. Parse and extract the matching call entry
-4. Write focused slice to `docs/tier2b_topic_and_call_sources/extracted/call_slice.json`
+2. Map `work_programme` to the grouped JSON via deterministic lookup table
+3. Linear scan: extract the single matching call entry by `call_id` / `original_call_id`
+4. Write focused slice to `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.slice.json`
+5. Fail-closed on missing inputs, missing match, or output > 20KB
 
-**Slice content** (~5-6KB): Single call entry with full expected_outcome, scope, deadlines, and indicative_budget.
+**Slice content** (~4-10KB): Single call entry with full scope, expected_outcome, eligibility_conditions, deadlines, budget figures, and all other fields from the grouped JSON call entry. Wrapped with source references and provenance metadata.
 
-**Complement**: The call extract at `docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json` (~4KB) already exists. Together these two files (~10KB) contain everything the `call-requirements-extraction` skill needs.
+**Complement**: The existing curated call extract at `docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json` (~4KB) provides structured interpretation (outcomes array, research areas, FSTP details). Together the slice (~5-8KB) and extract (~4KB) provide ~10-15KB of bounded, call-specific input.
 
 ### 5.3 What Remains for Traceability vs. Runtime
 
 | Artifact | Purpose | Used at runtime? |
 |---|---|---|
-| `cluster_CL4.grouped.json` (338KB) | Traceability — full work programme source | **No** — not read by TAPM skills |
-| `call_slice.json` (5KB) | Runtime — focused call data | **Yes** — read by Claude via Read tool |
-| `HORIZON-CL4-...json` call extract (4KB) | Runtime — supplementary call detail | **Yes** — read by Claude via Read tool |
+| `cluster_CL4.grouped.json` (338KB) | Traceability — full work programme source | **No** — not read by skills (source for Step 0 slicer only) |
+| `<topic_code>.slice.json` (5-8KB) | Runtime — bounded call data (Step 0 output) | **Yes** — read by Claude via Read tool |
+| `<topic_code>.json` call extract (4KB) | Runtime — structured call interpretation | **Yes** — read by Claude via Read tool |
+| `selected_call.json` (1KB) | Runtime — call binding metadata | **Yes** — read by Claude via Read tool |
 
-### 5.4 How TAPM Skills Use Call Data
+### 5.4 How TAPM Skills Use Call Data (After Step 0)
 
-The TAPM prompt for a skill declares `reads_from` paths:
+With Step 0 in place, TAPM skills operate over **pre-sliced, bounded inputs only**. The TAPM prompt declares:
 ```
 ## Declared Inputs (read these from disk using the Read tool)
-  docs/tier2b_topic_and_call_sources/extracted/call_slice.json
-  docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-...json
+  docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json
+  docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json
   docs/tier3_project_instantiation/call_binding/selected_call.json
 ```
 
-Claude reads these files on demand (~10KB total) vs. 338-794KB externally serialized in a cli-prompt.
+Claude reads these 3 files on demand (~10-15KB total) vs. 338-794KB previously. Claude does NOT read grouped JSON files — Step 0 has already extracted the relevant entry. TAPM's `Read` tool calls are bounded to small, pre-sliced files.
 
 ---
 
 ## 6. Step-by-Step Migration Plan (TAPM)
 
-### Step 0: Call Slice Generator
+### Step 0 — Call Slicer (Deterministic Input Bounding Layer)
 
-**Goal**: Eliminate the grouped JSON bottleneck by producing a focused call slice before any node executes.
+**Goal**: Eliminate input breadth at the source — before any Claude invocation, before TAPM prompt assembly, and before any skill or agent executes. Step 0 deterministically pre-selects the exact call-specific input slice so that all downstream steps operate over bounded, call-specific data only.
 
-**What changes**:
-- New: `runner/call_slicer.py` (~100 lines)
-- Modified: `runner/dag_scheduler.py` — add `generate_call_slice()` call before dispatch loop (~5 lines)
+**Classification**: Pure Python runtime preprocessing. Step 0 is NOT a skill, NOT an agent, NOT a TAPM operation. It does not invoke Claude. It does not depend on TAPM infrastructure. It runs entirely in Python as a deterministic function.
 
-**What remains unchanged**: All existing skill_runtime, agent_runtime, gate_evaluator, transport code.
+#### 0.1 Why Step 0 Exists
 
-**How to test immediately**:
+The current plan reduces prompt size via TAPM (Claude reads files from disk instead of receiving them serialized). But TAPM alone still leaves Claude to discover and navigate large input corpora via `Read` — e.g., `cluster_CL4.grouped.json` (338KB, 64 topics) when only 1 topic (~5KB) matters. Even with TAPM, Claude would read 338KB through the Read tool, parse it, and find the 5KB entry. This is unnecessary work, unnecessary token consumption, and a source of non-determinism (Claude's file-reading strategy is not guaranteed).
+
+Step 0 eliminates this by performing the lookup in Python before any Claude invocation. The downstream skill receives a single, bounded, call-specific JSON object — not a grouped corpus to search through.
+
+**Input breadth reduction chain**:
+```
+Without Step 0 + Without TAPM:  338-794KB serialized in prompt (current state)
+Without Step 0 + With TAPM:     338-794KB read via Read tool (Claude navigates)
+With Step 0    + With TAPM:     5-8KB read via Read tool (pre-sliced, bounded)
+With Step 0    + Without TAPM:  5-8KB serialized in prompt (also works)
+```
+
+Step 0 is orthogonal to TAPM. It reduces input breadth; TAPM reduces prompt serialization. Both are needed. Either works independently.
+
+#### 0.2 Inputs
+
+Step 0 reads exactly two categories of file:
+
+1. **`docs/tier3_project_instantiation/call_binding/selected_call.json`** — contains `topic_code` (e.g., `"HORIZON-CL4-2026-05-DIGITAL-EMERGING-02"`) and `work_programme` (e.g., `"cluster_digital"`), which together identify the target call and the grouped JSON that contains it.
+
+2. **The grouped JSON file** determined by `work_programme` — e.g., `docs/tier2b_topic_and_call_sources/work_programmes/cluster_digital/cluster_CL4.grouped.json`. The mapping from `work_programme` value to grouped JSON path is a deterministic lookup table in `call_slicer.py`:
+   ```
+   cluster_digital  → work_programmes/cluster_digital/cluster_CL4.grouped.json
+   cluster_health   → work_programmes/cluster_health/cluster_CL1.grouped.json
+   cluster_culture  → work_programmes/cluster_culture/cluster_CL2.grouped.json
+   cluster_security → work_programmes/cluster_security/cluster_CL3.grouped.json
+   cluster_food     → work_programmes/cluster_food/cluster_CL5.grouped.json
+   cluster_climate  → work_programmes/cluster_climate/cluster_CL6.grouped.json
+   ```
+
+#### 0.3 Algorithm
+
+The slicer is a pure function with no branching ambiguity:
+
+```python
+def generate_call_slice(repo_root: Path) -> Path:
+    # 1. Read selected_call.json
+    selected = json.loads((repo_root / SELECTED_CALL_PATH).read_text())
+    topic_code = selected["topic_code"]
+    work_programme = selected["work_programme"]
+
+    # 2. Resolve grouped JSON path from lookup table
+    grouped_path = repo_root / GROUPED_JSON_MAP[work_programme]
+
+    # 3. Parse grouped JSON
+    grouped = json.loads(grouped_path.read_text())
+
+    # 4. Linear scan: find the single matching call entry
+    match = None
+    for destination in grouped["destinations"]:
+        for call in destination["calls"]:
+            if call["call_id"] == topic_code or call.get("original_call_id") == topic_code:
+                match = call
+                break
+        if match:
+            break
+
+    # 5. Fail-closed if no match
+    if match is None:
+        raise CallSlicerError(
+            f"topic_code '{topic_code}' not found in {grouped_path}"
+        )
+
+    # 6. Assemble the bounded call slice object
+    call_slice = {
+        "topic_code": topic_code,
+        "source_grouped_json": str(grouped_path.relative_to(repo_root)),
+        "source_destination": destination["destination_title"],
+        "call_entry": match,
+        "sliced_by": "runner/call_slicer.py",
+        "slice_timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+
+    # 7. Write to canonical output path
+    output_path = repo_root / CALL_SLICE_OUTPUT_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(call_slice, indent=2, ensure_ascii=False))
+
+    return output_path
+```
+
+**Key properties**:
+- Deterministic: same inputs → same output (modulo timestamp)
+- Fail-closed: missing `selected_call.json`, missing grouped JSON, or no matching `topic_code` raises an exception — never produces a partial or empty slice
+- Single-match: extracts exactly one call entry. If multiple matches exist, takes the first (grouped JSONs have unique `call_id` values by construction)
+
+#### 0.4 Output
+
+**Canonical output path**: `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.slice.json`
+
+Example: `docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json`
+
+**Output structure**:
+```json
+{
+  "topic_code": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02",
+  "source_grouped_json": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_digital/cluster_CL4.grouped.json",
+  "source_destination": "Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)",
+  "call_entry": {
+    "call_id": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02",
+    "call_title": "...",
+    "scope": "...",
+    "expected_outcome": "...",
+    "eligibility_conditions": "...",
+    "technology_readiness_level": "...",
+    "indicative_budget": 38000000,
+    "max_contribution": 19000000,
+    "deadline": "2026-04-15",
+    "...": "all fields from the grouped JSON call entry"
+  },
+  "sliced_by": "runner/call_slicer.py",
+  "slice_timestamp": "2026-04-15T10:30:00Z"
+}
+```
+
+**Output contains**:
+- Full scope text from the grouped JSON call entry
+- Expected outcomes (from `expected_outcome` field)
+- Eligibility conditions, technology readiness level, procedure text
+- Budget figures (indicative budget, max contribution)
+- Deadlines, opening dates, funding links
+- Source references (grouped JSON path, destination title)
+
+**Output does NOT contain**:
+- Any other call entries from the grouped JSON
+- Destination-level metadata for other destinations
+- Data from other cluster grouped JSONs
+
+**Size bound**: The output must be < 20KB. A single call entry from the grouped JSON is typically 3-8KB. With the wrapper metadata, the slice is 4-10KB. If the output exceeds 20KB, this indicates a data anomaly and the slicer must raise an error.
+
+#### 0.5 Relationship to Existing Call Extract
+
+The repository already contains a manually curated call extract at:
+`docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json`
+
+This file (~4KB) contains curated fields: structured `expected_outcomes` (array), `scope_summary`, `scope_research_areas`, structured `eligibility_restrictions`, `fstp_provisions`, `mandatory_cohesion_activities`, and `platform_requirements`.
+
+The Step 0 slice and the existing call extract are **complementary, not redundant**:
+
+| Artifact | Source | Content | Role |
+|---|---|---|---|
+| `*.slice.json` (Step 0 output) | Grouped JSON (machine-extracted) | Raw call entry with full scope text, expected_outcome string, all fields | Primary call data — complete, unedited |
+| `*.json` (existing call extract) | Manual curation from PDF | Structured outcomes array, research areas, FSTP details, platform requirements | Supplementary — structured interpretation |
+
+Both files are small (< 10KB each). Together they provide ~10-15KB of bounded, call-specific input. The `call-requirements-extraction` skill reads both.
+
+#### 0.6 Execution Position
+
+Step 0 runs **before all other steps** in the migration plan. It is also **before all DAG node dispatches** at runtime:
+
+```
+Runtime execution order:
+  1. generate_call_slice()          ← Step 0 (Python, no Claude)
+  2. DAGScheduler.run()             ← existing dispatch loop
+     2a. _dispatch_node(n01)        ← entry gate → agent body → exit gate
+         → run_agent() → run_skill("call-requirements-extraction")
+           → TAPM prompt references *.slice.json + *.json (Step 0 output)
+     2b. _dispatch_node(n02) ...
+```
+
+**Integration point**: `runner/dag_scheduler.py` — add `generate_call_slice()` call before the dispatch loop (~5 lines). The slicer is invoked once per run, not per node.
+
+#### 0.7 What Changes Downstream
+
+**`call-requirements-extraction` no longer reads**:
+- `docs/tier2b_topic_and_call_sources/work_programmes/` (entire directory tree)
+- Full grouped JSON files (`cluster_CL4.grouped.json`, etc.)
+
+**`call-requirements-extraction` now reads ONLY**:
+- `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.slice.json` (Step 0 output, 4-10KB)
+- `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.json` (existing call extract, ~4KB)
+- `docs/tier3_project_instantiation/call_binding/selected_call.json` (call binding metadata, ~1KB)
+
+**Total input to `call-requirements-extraction`**: ~10-15KB (vs. 338-794KB previously).
+
+This means that when TAPM is applied in Step 4, Claude's `Read` tool calls access only these small, pre-sliced files. There is no large corpus to navigate. The combination of Step 0 (input bounding) + TAPM (read delegation) reduces the effective input from 338-794KB serialized to 10-15KB read on demand.
+
+#### 0.8 TAPM Interaction After Step 0
+
+With Step 0 in place, TAPM operates over **bounded inputs only**. The TAPM prompt for `call-requirements-extraction` becomes:
+
+```
+## Declared Inputs (read these from disk using the Read tool)
+  docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json
+  docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json
+  docs/tier3_project_instantiation/call_binding/selected_call.json
+```
+
+Claude uses `Read` only for:
+- The sliced call JSON (Step 0 output) — bounded, single-call
+- The curated call extract — bounded, single-call
+- Small auxiliary files (`selected_call.json`) — ~1KB
+
+Claude does NOT use `Read` for:
+- Grouped JSON files (eliminated by Step 0)
+- Work programme directories (eliminated by Step 0)
+- Any file > 20KB (no such file exists in the declared input set)
+
+#### 0.9 Implementation
+
+**New file**: `runner/call_slicer.py` (~100-120 lines)
+
+Contents:
+- `SELECTED_CALL_PATH` constant
+- `GROUPED_JSON_MAP` lookup table (6 entries)
+- `CALL_SLICE_OUTPUT_PATH` template
+- `CallSlicerError` exception class
+- `generate_call_slice(repo_root: Path) -> Path` function
+- Size validation (output < 20KB)
+- Logging of slice size and source
+
+**Modified file**: `runner/dag_scheduler.py` — add ~5 lines before dispatch loop:
+```python
+from runner.call_slicer import generate_call_slice
+
+# In run() method, before dispatch loop:
+call_slice_path = generate_call_slice(self.repo_root)
+logger.info(f"Call slice generated: {call_slice_path}")
+```
+
+**What remains unchanged**: All existing skill_runtime, agent_runtime, gate_evaluator, transport, runtime_models, manifest_reader, node_resolver code. Step 0 touches only `call_slicer.py` (new) and `dag_scheduler.py` (5-line addition).
+
+#### 0.10 Testability
+
+**Unit test**: `tests/runner/test_call_slicer.py`
+
+Required test cases:
+
+| # | Test | Assertion |
+|---|---|---|
+| 1 | Happy path: valid `selected_call.json` + matching grouped JSON | Exactly one call extracted; output valid JSON; `topic_code` matches |
+| 2 | Output size bound | Output file size < 20KB |
+| 3 | No other calls included | `call_entry.call_id` == target `topic_code`; no other `call_id` values in output |
+| 4 | Missing `selected_call.json` | Raises `CallSlicerError` |
+| 5 | Missing grouped JSON | Raises `CallSlicerError` |
+| 6 | `topic_code` not found in grouped JSON | Raises `CallSlicerError` |
+| 7 | Unknown `work_programme` value | Raises `CallSlicerError` (not in lookup table) |
+| 8 | Idempotency | Running twice with same inputs produces identical output (modulo timestamp) |
+| 9 | Grouped JSON unmodified | Grouped JSON file is byte-identical before and after slicing |
+| 10 | Output path correctness | Output written to `call_extracts/<topic_code>.slice.json` |
+
+**Verification command**:
 ```bash
-# Unit test
+# Unit tests
 python -m pytest tests/runner/test_call_slicer.py -v
 
 # Manual verification
-python -c "from pathlib import Path; from runner.call_slicer import generate_call_slice; print(generate_call_slice(Path('.')))"
-cat docs/tier2b_topic_and_call_sources/extracted/call_slice.json | python -m json.tool | head -20
+python -c "
+from pathlib import Path
+from runner.call_slicer import generate_call_slice
+path = generate_call_slice(Path('.'))
+import json, os
+data = json.loads(path.read_text())
+size = os.path.getsize(path)
+print(f'Output: {path}')
+print(f'Size: {size} bytes')
+print(f'Topic: {data[\"topic_code\"]}')
+print(f'Call ID in entry: {data[\"call_entry\"][\"call_id\"]}')
+assert size < 20480, f'Output too large: {size} bytes'
+assert data['topic_code'] == data['call_entry']['call_id'] or data['topic_code'] == data['call_entry'].get('original_call_id')
+print('PASS')
+"
 ```
 
-**Success signals**: `call_slice.json` exists, is <10KB, contains only target topic, valid JSON. Grouped JSON files are unmodified.
+**Success signals**: `*.slice.json` exists, is < 20KB, contains exactly one call entry matching `topic_code`, valid JSON. Grouped JSON files are unmodified.
 
-**Failure signals**: Missing `selected_call.json`, no matching call_id in grouped JSON, output >50KB (slicing failed).
+**Failure signals**: Missing `selected_call.json`, no matching `topic_code` in grouped JSON, output > 20KB (slicing failed or wrong entry extracted), multiple call entries in output.
 
-**Rollback**: Delete `call_slicer.py`, remove the 5-line scheduler call. No downstream dependencies.
+#### 0.11 Governance Preservation
+
+Step 0 does NOT:
+- Modify the DAG scheduler's dispatch logic, gate evaluation, or state management
+- Modify gate conditions or gate predicates
+- Modify artifact schemas or introduce new artifact types consumed by gates
+- Modify the agent runtime or skill runtime
+- Invoke Claude or any LLM
+- Move any reasoning logic into Python (the slicer is a lookup + extract, not interpretation)
+- Alter the constitutional authority hierarchy or tier semantics
+
+Step 0 IS:
+- A deterministic preprocessing optimization that narrows input breadth
+- Aligned with the existing call-extract pattern (writes to `call_extracts/`)
+- A runtime-layer enhancement consistent with CLAUDE.md Section 17 (runtime execution architecture)
+- Independently testable and independently rollbackable
+
+**Rollback**: Delete `call_slicer.py`, remove the 5-line scheduler call, revert `reads_from` in skill catalog. No downstream dependencies break — skills fall back to reading grouped JSONs (larger but functionally equivalent).
 
 ---
 
@@ -523,11 +797,17 @@ python -m pytest tests/runner/test_skill_runtime_tapm.py -v  # new TAPM mode tes
   ```
   ## Input Access (TAPM Mode)
   Read the files listed in the Declared Inputs section from disk using the Read tool.
-  For call data, read call_slice.json and the call extract file.
-  Do not read grouped JSON files (cluster_CL*.grouped.json) or files outside the declared input set.
+  For call data, read the Step 0 call slice (*.slice.json) and the curated call extract file.
+  Do not read grouped JSON files (cluster_CL*.grouped.json) or work programme directories.
+  Do not read files outside the declared input set.
   Return your output as a single JSON object in your response.
   ```
-- Execution flow: `run_skill()` selects TAPM mode → `_assemble_tapm_prompt()` builds ~10KB prompt → `invoke_claude_text(tools=["Read", "Glob"])` → Claude reads ~10KB of call data from disk → returns 6 extracted JSON files as candidate artifact → external validation and atomic write
+- Modified: `reads_from` for `call-requirements-extraction` updated to reference Step 0 output:
+  - **Removed**: `docs/tier2b_topic_and_call_sources/work_programmes/` (entire directory tree)
+  - **Added**: `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.slice.json` (Step 0 output)
+  - **Retained**: `docs/tier2b_topic_and_call_sources/call_extracts/<topic_code>.json` (existing call extract)
+  - **Retained**: `docs/tier3_project_instantiation/call_binding/selected_call.json`
+- Execution flow: Step 0 generates `*.slice.json` → `run_skill()` selects TAPM mode → `_assemble_tapm_prompt()` builds ~10KB prompt referencing Step 0 output → `invoke_claude_text(tools=["Read", "Glob"])` → Claude reads ~10-15KB of pre-sliced call data from disk → returns 6 extracted JSON files as candidate artifact → external validation and atomic write
 
 **What remains unchanged**: `reads_from`, `writes_to`, constraints, output schema, agent runtime, scheduler, gates. The skill spec body (domain reasoning instructions) is unchanged.
 
@@ -644,8 +924,8 @@ ls docs/tier5_deliverables/review_packets/
 
 | Step | Test Type | Command | Success Signal |
 |---|---|---|---|
-| 0 | Unit | `pytest tests/runner/test_call_slicer.py` | All tests pass; `call_slice.json` exists and is <10KB |
-| 0 | Manual | Read `call_slice.json` | Contains only target topic, valid JSON |
+| 0 | Unit | `pytest tests/runner/test_call_slicer.py` | All 10 test cases pass (happy path, size bound, no leakage, fail-closed errors, idempotency, path correctness) |
+| 0 | Manual | Read `<topic_code>.slice.json` | Contains exactly one call entry matching `topic_code`; output < 20KB; valid JSON; grouped JSON unmodified |
 | 1 | Unit | `pytest tests/runner/test_claude_transport.py` | All existing tests pass; new tools-parameter tests pass |
 | 1 | Smoke | Real `invoke_claude_text(tools=["Read"])` call | Claude reads a file and returns content |
 | 2 | Unit | `pytest tests/runner/test_skill_runtime_tapm.py` | TAPM prompt is <30KB; no file contents in prompt |
@@ -702,7 +982,7 @@ ls docs/tier5_deliverables/review_packets/
 ## 9. Recommended Rollout Order
 
 ### Phase A: Foundation (Steps 0-1) — Zero-Risk, Additive
-Call slicer and transport enhancement are independent additive changes. No existing behavior changes. Can be implemented in parallel.
+Step 0 (call slicer) and Step 1 (transport enhancement) are independent additive changes with no existing behavior changes. Step 0 is a pure Python preprocessing layer that deterministically bounds input breadth before any Claude invocation. Step 1 enables tool-augmented transport. Both can be implemented in parallel. Step 0 must complete before Step 4 (pilot migration), since Step 4's `reads_from` references Step 0's output.
 
 ### Phase B: TAPM Integration (Steps 2-3) — Low Risk
 TAPM prompt assembly and mode selection added to `run_skill()`. All skills default to cli-prompt. No behavioral change.
@@ -733,7 +1013,7 @@ Constitutional amendment to reflect the validated architecture.
 | Manifest reader | `runner/manifest_reader.py` | YAML loading |
 | Node resolver | `runner/node_resolver.py` | Manifest lookup |
 
-Note: `dag_scheduler.py` gains a call to `generate_call_slice()` before the dispatch loop (Step 0). This is an additive pre-execution step that does not modify dispatch logic, gate evaluation, or state management. The dispatch loop itself (`run()`, `_dispatch_node()`) is unchanged.
+Note: `dag_scheduler.py` gains a call to `generate_call_slice()` before the dispatch loop (Step 0). This is a deterministic, pure-Python pre-execution step that runs before any Claude invocation. It does not modify dispatch logic, gate evaluation, state management, or the DAG structure. The dispatch loop itself (`run()`, `_dispatch_node()`) is unchanged. Step 0 is not a skill, not an agent, and not TAPM-dependent.
 
 ### Contracts — Unchanged
 
@@ -799,7 +1079,7 @@ Gate-enforcement is a compliance-checking step, not a reasoning step. Its prompt
 ### 12.2 Specific Constraints
 
 1. **Bounded input selection remains mandatory.** Every skill invocation must operate on a declared, bounded set of inputs.
-2. **Grouped JSON call slicing remains the preferred runtime strategy.** Even when Claude can read files from disk, serializing 338KB of irrelevant topic data through Read tool calls is wasteful.
+2. **Step 0 call slicing is the mandatory input bounding strategy.** Step 0 deterministically extracts the target call before any Claude invocation. Even when Claude can read files from disk via TAPM, navigating 338KB of irrelevant topic data through Read tool calls is wasteful and non-deterministic. Step 0 eliminates this at the source.
 3. **TAPM access does not justify broad corpus ingestion.** Skills must read only what is necessary. The `reads_from` set constrains what is declared available.
 4. **Input budgets apply to both modes.** CLI-prompt skills: total prompt <50KB. TAPM skills: TAPM prompt <30KB; declared `reads_from` sets must remain bounded.
 
