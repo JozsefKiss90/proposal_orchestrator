@@ -368,6 +368,153 @@ def _assemble_skill_prompt(
     return system_prompt, user_prompt
 
 
+def _assemble_tapm_prompt(
+    skill_spec: str,
+    skill_id: str,
+    run_id: str,
+    reads_from: list[str],
+    writes_to: list[str],
+    constraints: list[str],
+    repo_root: Path,
+    node_id: str | None = None,
+) -> tuple[str, str]:
+    """Assemble TAPM (Tool-Augmented Prompt Mode) prompts for Claude.
+
+    Unlike :func:`_assemble_skill_prompt`, this function does **not**
+    serialize input file contents into the prompt.  Instead it provides
+    declared input *paths* so Claude can read them from disk via the
+    Read tool during execution.
+
+    Returns ``(system_prompt, user_prompt)`` with a combined size of
+    ~5-30KB (vs. 150-800KB in cli-prompt mode).
+    """
+    # ── System prompt ─────────────────────────────────────────────────
+    system_prompt = (
+        "You are a skill execution engine for the Horizon Europe Proposal "
+        "Orchestration System. You execute skill specifications precisely. "
+        "You MUST return a single JSON object as your response — no prose, "
+        "no markdown wrapping, no explanation. The JSON must conform to the "
+        "output schema described in the skill specification.\n\n"
+    )
+
+    # TAPM input-boundary instructions
+    system_prompt += (
+        "## Tool Access and Input Boundary\n\n"
+        "You have access to the Read and Glob tools to read files from disk.\n"
+        "Read ONLY the files listed in the Declared Inputs section of the "
+        "task prompt. Do not read files outside the declared set.\n"
+        "Do not use the Glob tool to discover files beyond the declared "
+        "input paths. If a declared input is a directory, you may use Glob "
+        "to list its contents, but do not navigate outside declared "
+        "directories.\n"
+        "Do not use any tools other than Read and Glob.\n\n"
+    )
+
+    # Constitutional constraints
+    if constraints:
+        system_prompt += "Constitutional constraints (hard failures if violated):\n"
+        for c in constraints:
+            system_prompt += f"- {c}\n"
+        system_prompt += "\n"
+
+    # Output field requirements
+    system_prompt += (
+        "You MUST include these fields in every output artifact:\n"
+        f'- "run_id": "{run_id}"\n'
+        "- The appropriate schema_id as defined in the skill specification\n"
+        "- Do NOT include an artifact_status field\n"
+    )
+
+    # ── User prompt ───────────────────────────────────────────────────
+    user_prompt = "# Skill Execution Specification\n\n"
+    user_prompt += skill_spec
+
+    # Task metadata
+    user_prompt += "\n\n# Task Metadata\n\n"
+    user_prompt += f"skill_id: {skill_id}\n"
+    user_prompt += f"run_id: {run_id}\n"
+    if node_id is not None:
+        user_prompt += f"node_id: {node_id}\n"
+
+    # Declared inputs — paths only, NO contents
+    user_prompt += "\n# Declared Inputs\n\n"
+    user_prompt += (
+        "Read these files from disk using the Read tool. "
+        "Do not read files outside this set.\n\n"
+    )
+    if reads_from:
+        for rel_path in reads_from:
+            abs_path = str(repo_root / rel_path)
+            user_prompt += f"- {abs_path}\n"
+    else:
+        user_prompt += "(no declared inputs)\n"
+
+    # Output requirements with schema hints
+    user_prompt += "\n# Output Requirements\n\n"
+    user_prompt += f"run_id: {run_id}\n"
+    if writes_to:
+        user_prompt += f"writes_to: {', '.join(writes_to)}\n"
+
+    # Look up schema hints for writes_to paths
+    schema_hints: list[str] = []
+    for rel_path in writes_to:
+        abs_path = repo_root / rel_path
+        if rel_path.endswith("/") or abs_path.is_dir():
+            # Directory — find all schemas under this prefix
+            try:
+                spec_data = _load_artifact_schemas(repo_root)
+            except SkillRuntimeError:
+                continue
+            dir_norm = rel_path.rstrip("/")
+            for section_key in (
+                "tier4_phase_output_schemas",
+                "tier5_deliverable_schemas",
+                "tier3_source_schemas",
+                "tier2b_extracted_schemas",
+                "tier2a_extracted_schemas",
+                "checkpoint_schemas",
+            ):
+                section = spec_data.get(section_key)
+                if not isinstance(section, dict):
+                    continue
+                for _name, entry in section.items():
+                    if not isinstance(entry, dict):
+                        continue
+                    cp = entry.get("canonical_path", "")
+                    if cp.startswith(dir_norm + "/"):
+                        sid, req = _extract_schema_requirements(entry)
+                        hint = f"  - {cp}"
+                        if sid:
+                            hint += f" (schema_id: {sid!r})"
+                        if req:
+                            hint += f" required fields: {', '.join(req)}"
+                        schema_hints.append(hint)
+        else:
+            # File — exact match
+            schema_entry = _find_schema_for_path(rel_path, repo_root)
+            if schema_entry is not None:
+                sid, req = _extract_schema_requirements(schema_entry)
+                hint = f"  - {rel_path}"
+                if sid:
+                    hint += f" (schema_id: {sid!r})"
+                if req:
+                    hint += f" required fields: {', '.join(req)}"
+                schema_hints.append(hint)
+
+    if schema_hints:
+        user_prompt += "\nExpected output schemas:\n"
+        for h in schema_hints:
+            user_prompt += h + "\n"
+
+    user_prompt += (
+        "\nReturn a single JSON object conforming to the output schema "
+        "defined in the skill specification above. Do not wrap in markdown. "
+        "Do not include explanatory text."
+    )
+
+    return system_prompt, user_prompt
+
+
 # ---------------------------------------------------------------------------
 # Phase C — Claude invocation via runtime transport
 # ---------------------------------------------------------------------------
