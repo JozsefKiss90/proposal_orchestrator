@@ -41,7 +41,16 @@
       "Bash(cat:*)",
       "Bash(__NEW_LINE_91210b1ca3399ac1__ echo:*)",
       "Bash(find /c/Code/proposal_orchestator -type f \\\\\\(-name *.env* -o -name *config* -o -name *.ini \\\\\\))",
-      "Bash(pip list:*)"
+      "Bash(pip list:*)",
+      "WebSearch",
+      "Bash(ls -la /c/Code/proposal_demo/proposal_orchestrator/runner/*.py)",
+      "Bash(claude --version)",
+      "Bash(claude agents:*)",
+      "Bash(claude -p \"List all available slash commands and skills you can see\" --model haiku --max-turns 1)",
+      "Bash(claude -p \"What custom agents from .claude/agents/ can you see? List them by name.\" --model haiku --max-turns 1)",
+      "Bash(claude -p --help)",
+      "Bash(claude -p --agent call_analyzer \"test\")",
+      "Bash(claude --agent nonexistent_agent_xyz -p \"test\")"
     ]
   }
 }
