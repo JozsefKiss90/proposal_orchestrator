@@ -31,6 +31,7 @@ Constitutional authority:
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import tempfile
@@ -41,6 +42,8 @@ import yaml
 
 from runner.claude_transport import ClaudeTransportError, invoke_claude_text
 from runner.runtime_models import SkillResult
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -956,7 +959,48 @@ def run_skill(
     # ── Phase D: Response parsing and validation ───────────────────────
 
     assert response_text is not None  # guaranteed by api_error check
+
+    # ── Diagnostic capture (temporary) ──────────────────────────────
+    _diag_dir = repo_root / ".claude" / "skill_diag"
+    _diag_dir.mkdir(parents=True, exist_ok=True)
+    _diag_path = _diag_dir / f"{skill_id}_{run_id[:8]}_response.txt"
+    try:
+        _diag_path.write_text(
+            f"=== skill_id: {skill_id} ===\n"
+            f"=== mode: {mode} ===\n"
+            f"=== response_text length: {len(response_text)} ===\n"
+            f"=== response_text (full) ===\n{response_text}\n"
+            f"=== END ===\n",
+            encoding="utf-8",
+        )
+    except OSError:
+        pass  # Best-effort diagnostic
+
     parsed = _extract_json_response(response_text)
+
+    # Diagnostic: log parse result
+    try:
+        _diag_parse_path = _diag_dir / f"{skill_id}_{run_id[:8]}_parsed.txt"
+        if parsed is not None:
+            _diag_parse_path.write_text(
+                f"=== parsed OK ===\n"
+                f"=== top-level keys: {list(parsed.keys())} ===\n"
+                f"=== parsed content ===\n"
+                f"{json.dumps(parsed, indent=2)[:5000]}\n"
+                f"=== END ===\n",
+                encoding="utf-8",
+            )
+        else:
+            _diag_parse_path.write_text(
+                f"=== parsed FAILED (None) ===\n"
+                f"=== response_text first 1000 chars ===\n"
+                f"{response_text[:1000]}\n"
+                f"=== END ===\n",
+                encoding="utf-8",
+            )
+    except OSError:
+        pass
+
     if parsed is None:
         return SkillResult(
             status="failure",
@@ -1027,6 +1071,19 @@ def run_skill(
             break  # Process first writes_to that resolves
 
     # ── Multi-artifact write path ────────────────────────────────────
+    # Diagnostic: Phase E state
+    try:
+        _diag_phase_e = _diag_dir / f"{skill_id}_{run_id[:8]}_phase_e.txt"
+        _diag_phase_e.write_text(
+            f"=== Phase E ===\n"
+            f"dir_artifacts count: {len(dir_artifacts)}\n"
+            f"dir_artifacts paths: {[cp for cp, _ in dir_artifacts]}\n"
+            f"parsed keys (if parsed): {list(parsed.keys()) if parsed else 'N/A'}\n"
+            f"=== END ===\n",
+            encoding="utf-8",
+        )
+    except (OSError, NameError):
+        pass
     if len(dir_artifacts) > 1:
         all_errors: list[str] = []
         pending_writes: list[tuple[str, dict]] = []
