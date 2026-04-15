@@ -321,6 +321,7 @@ def _assemble_skill_prompt(
     run_id: str,
     writes_to: list[str],
     constraints: list[str],
+    repo_root: Path,
 ) -> tuple[str, str]:
     """Assemble the system and user prompts for Claude invocation.
 
@@ -336,12 +337,58 @@ def _assemble_skill_prompt(
     )
     for c in constraints:
         system_prompt += f"- {c}\n"
-    system_prompt += (
-        "\nYou MUST include these fields in every output artifact:\n"
-        f'- "run_id": "{run_id}"\n'
-        "- The appropriate schema_id as defined in the skill specification\n"
-        "- Do NOT include an artifact_status field\n"
-    )
+
+    # Determine if the output schema requires run_id/schema_id
+    any_schema_requires_run_id = False
+    for rel_path in writes_to:
+        abs_wpath = repo_root / rel_path
+        if rel_path.endswith("/") or abs_wpath.is_dir():
+            try:
+                spec_data = _load_artifact_schemas(repo_root)
+            except SkillRuntimeError:
+                continue
+            dir_norm = rel_path.rstrip("/")
+            for section_key in (
+                "tier4_phase_output_schemas",
+                "tier5_deliverable_schemas",
+                "tier3_source_schemas",
+                "tier2b_extracted_schemas",
+                "tier2a_extracted_schemas",
+                "checkpoint_schemas",
+            ):
+                section = spec_data.get(section_key)
+                if not isinstance(section, dict):
+                    continue
+                for _name, entry in section.items():
+                    if not isinstance(entry, dict):
+                        continue
+                    cp = entry.get("canonical_path", "")
+                    if cp.startswith(dir_norm + "/"):
+                        if entry.get("schema_id_value"):
+                            any_schema_requires_run_id = True
+                            break
+                if any_schema_requires_run_id:
+                    break
+        else:
+            w_entry = _find_schema_for_path(rel_path, repo_root)
+            if w_entry is not None and w_entry.get("schema_id_value"):
+                any_schema_requires_run_id = True
+        if any_schema_requires_run_id:
+            break
+
+    if any_schema_requires_run_id:
+        system_prompt += (
+            "\nYou MUST include these fields in every output artifact:\n"
+            f'- "run_id": "{run_id}"\n'
+            "- The appropriate schema_id as defined in the skill "
+            "specification\n"
+            "- Do NOT include an artifact_status field\n"
+        )
+    else:
+        system_prompt += (
+            "\nDo NOT include run_id, schema_id, or artifact_status fields "
+            "in the output — this artifact type does not use them.\n"
+        )
 
     # User prompt: skill spec + inputs
     user_prompt = "# Skill Execution Specification\n\n"
@@ -357,7 +404,8 @@ def _assemble_skill_prompt(
             user_prompt += "(not available)\n\n"
 
     user_prompt += "# Output Requirements\n\n"
-    user_prompt += f"run_id: {run_id}\n"
+    if any_schema_requires_run_id:
+        user_prompt += f"run_id: {run_id}\n"
     user_prompt += f"writes_to: {', '.join(writes_to)}\n"
     user_prompt += (
         "\nReturn a single JSON object conforming to the output schema "
@@ -417,13 +465,70 @@ def _assemble_tapm_prompt(
             system_prompt += f"- {c}\n"
         system_prompt += "\n"
 
-    # Output field requirements
-    system_prompt += (
-        "You MUST include these fields in every output artifact:\n"
-        f'- "run_id": "{run_id}"\n'
-        "- The appropriate schema_id as defined in the skill specification\n"
-        "- Do NOT include an artifact_status field\n"
-    )
+    # Look up schemas for writes_to paths to determine metadata
+    # requirements and build schema hints for the user prompt.
+    schema_hints: list[str] = []
+    any_schema_requires_run_id = False
+    for rel_path in writes_to:
+        abs_wpath = repo_root / rel_path
+        if rel_path.endswith("/") or abs_wpath.is_dir():
+            try:
+                spec_data = _load_artifact_schemas(repo_root)
+            except SkillRuntimeError:
+                continue
+            dir_norm = rel_path.rstrip("/")
+            for section_key in (
+                "tier4_phase_output_schemas",
+                "tier5_deliverable_schemas",
+                "tier3_source_schemas",
+                "tier2b_extracted_schemas",
+                "tier2a_extracted_schemas",
+                "checkpoint_schemas",
+            ):
+                section = spec_data.get(section_key)
+                if not isinstance(section, dict):
+                    continue
+                for _name, entry in section.items():
+                    if not isinstance(entry, dict):
+                        continue
+                    cp = entry.get("canonical_path", "")
+                    if cp.startswith(dir_norm + "/"):
+                        sid, req = _extract_schema_requirements(entry)
+                        if sid:
+                            any_schema_requires_run_id = True
+                        hint = f"  - {cp}"
+                        if sid:
+                            hint += f" (schema_id: {sid!r})"
+                        if req:
+                            hint += f" required fields: {', '.join(req)}"
+                        schema_hints.append(hint)
+        else:
+            w_entry = _find_schema_for_path(rel_path, repo_root)
+            if w_entry is not None:
+                sid, req = _extract_schema_requirements(w_entry)
+                if sid:
+                    any_schema_requires_run_id = True
+                hint = f"  - {rel_path}"
+                if sid:
+                    hint += f" (schema_id: {sid!r})"
+                if req:
+                    hint += f" required fields: {', '.join(req)}"
+                schema_hints.append(hint)
+
+    # Output field requirements — conditional on artifact type
+    if any_schema_requires_run_id:
+        system_prompt += (
+            "You MUST include these fields in every output artifact:\n"
+            f'- "run_id": "{run_id}"\n'
+            "- The appropriate schema_id as defined in the skill "
+            "specification\n"
+            "- Do NOT include an artifact_status field\n"
+        )
+    else:
+        system_prompt += (
+            "Do NOT include run_id, schema_id, or artifact_status fields "
+            "in the output — this artifact type does not use them.\n"
+        )
 
     # ── User prompt ───────────────────────────────────────────────────
     user_prompt = "# Skill Execution Specification\n\n"
@@ -451,55 +556,10 @@ def _assemble_tapm_prompt(
 
     # Output requirements with schema hints
     user_prompt += "\n# Output Requirements\n\n"
-    user_prompt += f"run_id: {run_id}\n"
+    if any_schema_requires_run_id:
+        user_prompt += f"run_id: {run_id}\n"
     if writes_to:
         user_prompt += f"writes_to: {', '.join(writes_to)}\n"
-
-    # Look up schema hints for writes_to paths
-    schema_hints: list[str] = []
-    for rel_path in writes_to:
-        abs_path = repo_root / rel_path
-        if rel_path.endswith("/") or abs_path.is_dir():
-            # Directory — find all schemas under this prefix
-            try:
-                spec_data = _load_artifact_schemas(repo_root)
-            except SkillRuntimeError:
-                continue
-            dir_norm = rel_path.rstrip("/")
-            for section_key in (
-                "tier4_phase_output_schemas",
-                "tier5_deliverable_schemas",
-                "tier3_source_schemas",
-                "tier2b_extracted_schemas",
-                "tier2a_extracted_schemas",
-                "checkpoint_schemas",
-            ):
-                section = spec_data.get(section_key)
-                if not isinstance(section, dict):
-                    continue
-                for _name, entry in section.items():
-                    if not isinstance(entry, dict):
-                        continue
-                    cp = entry.get("canonical_path", "")
-                    if cp.startswith(dir_norm + "/"):
-                        sid, req = _extract_schema_requirements(entry)
-                        hint = f"  - {cp}"
-                        if sid:
-                            hint += f" (schema_id: {sid!r})"
-                        if req:
-                            hint += f" required fields: {', '.join(req)}"
-                        schema_hints.append(hint)
-        else:
-            # File — exact match
-            schema_entry = _find_schema_for_path(rel_path, repo_root)
-            if schema_entry is not None:
-                sid, req = _extract_schema_requirements(schema_entry)
-                hint = f"  - {rel_path}"
-                if sid:
-                    hint += f" (schema_id: {sid!r})"
-                if req:
-                    hint += f" required fields: {', '.join(req)}"
-                schema_hints.append(hint)
 
     if schema_hints:
         user_prompt += "\nExpected output schemas:\n"
@@ -593,6 +653,8 @@ def _validate_skill_output(
     run_id: str,
     expected_schema_id: str | None,
     required_fields: list[str] | None,
+    *,
+    require_run_id: bool = True,
 ) -> list[str]:
     """Validate a parsed skill output against schema expectations.
 
@@ -616,17 +678,24 @@ def _validate_skill_output(
     required_fields:
         List of field names that must be present (from the schema's
         ``required: true`` fields), or ``None`` to skip field checks.
+    require_run_id:
+        Whether to enforce ``run_id`` presence and correctness.  Phase-output
+        canonical artifacts (which carry a ``schema_id_value``) require
+        ``run_id``; Tier 2B/2A extracted artifacts (``provenance_class:
+        manually_placed``, no ``schema_id_value``) do not.  Callers set
+        this explicitly based on the artifact type.
     """
     errors: list[str] = []
 
-    # run_id must be present and correct — not silently added
-    if "run_id" not in response:
-        errors.append("run_id is missing from response")
-    elif response["run_id"] != run_id:
-        errors.append(
-            f"run_id mismatch: expected {run_id!r}, "
-            f"got {response['run_id']!r}"
-        )
+    # run_id check — only for artifact types that carry it
+    if require_run_id:
+        if "run_id" not in response:
+            errors.append("run_id is missing from response")
+        elif response["run_id"] != run_id:
+            errors.append(
+                f"run_id mismatch: expected {run_id!r}, "
+                f"got {response['run_id']!r}"
+            )
 
     # schema_id check (only when expected from artifact_schema_specification)
     if expected_schema_id is not None:
@@ -862,6 +931,7 @@ def run_skill(
             run_id=run_id,
             writes_to=writes_to,
             constraints=constraints,
+            repo_root=repo_root,
         )
 
         # Phase C: Claude invocation via runtime transport
@@ -903,34 +973,34 @@ def run_skill(
 
     # ── Phase E: Path-aware canonical write ────────────────────────────
     #
-    # Limitation (documented honestly):
-    #   This implementation supports writing Claude's single JSON response
-    #   to exactly ONE canonical artifact path per invocation.  Skills
-    #   whose writes_to declares multiple paths (e.g. a phase output
-    #   directory AND a decision_log directory) will write the response
-    #   to the first path that resolves to a canonical artifact with a
-    #   known schema.  If no canonical schema is found for any writes_to
-    #   path, the response is written to the first concrete file path.
+    # Supports two write modes:
     #
-    #   Multi-artifact skill output (where Claude returns multiple
-    #   distinct artifacts in one response) is not yet supported and
-    #   will require a structured multi-artifact response protocol in
-    #   a future step.
+    # 1. Single-artifact mode (default): writes_to resolves to exactly
+    #    one canonical artifact path.  Claude's full response is written
+    #    to that path after validation.
+    #
+    # 2. Multi-artifact mode: writes_to is a directory containing
+    #    multiple canonical schemas, and Claude's response contains
+    #    root fields matching each schema's required fields.  Each
+    #    matching sub-object is extracted, validated independently,
+    #    and written to its own canonical path.
+    #
+    # Multi-artifact mode activates when a directory writes_to resolves
+    # to more than one canonical schema AND the response contains the
+    # required root field for at least one of those schemas.
 
     outputs_written: list[str] = []
 
-    # Resolve the single canonical output path and its schema.
-    canonical_rel: str | None = None
-    schema_entry: dict | None = None
-    expected_schema_id: str | None = None
-    required_fields: list[str] | None = None
+    # Collect ALL matching canonical artifacts for each writes_to path.
+    dir_artifacts: list[tuple[str, dict]] = []  # (canonical_rel, schema_entry)
 
     for rel_path in writes_to:
         abs_path = repo_root / rel_path
         if rel_path.endswith("/") or abs_path.is_dir():
-            # Directory write path — look for a canonical artifact
+            # Directory write path — collect all canonical artifacts
             # whose canonical_path lives inside this directory.
             spec = _load_artifact_schemas(repo_root)
+            dir_norm = rel_path.rstrip("/")
             for section_key in (
                 "tier4_phase_output_schemas",
                 "tier5_deliverable_schemas",
@@ -946,29 +1016,115 @@ def run_skill(
                     if not isinstance(entry, dict):
                         continue
                     cp = entry.get("canonical_path", "")
-                    dir_norm = rel_path.rstrip("/")
                     if cp.startswith(dir_norm + "/"):
-                        schema_entry = entry
-                        canonical_rel = cp
-                        break
-                if schema_entry is not None:
-                    break
+                        dir_artifacts.append((cp, entry))
         else:
             # File write path — look for an exact canonical_path match.
-            schema_entry = _find_schema_for_path(rel_path, repo_root)
-            canonical_rel = rel_path
+            file_entry = _find_schema_for_path(rel_path, repo_root)
+            dir_artifacts.append((rel_path, file_entry or {}))
 
-        if canonical_rel is not None:
-            break
+        if dir_artifacts:
+            break  # Process first writes_to that resolves
 
-    # Fallback: if no canonical schema found, use first writes_to as-is
-    if canonical_rel is None and writes_to:
-        first = writes_to[0]
-        if first.endswith("/"):
-            # Directory with no known schema — write a named file
-            canonical_rel = first + f"{skill_id}_{run_id[:8]}.json"
-        else:
-            canonical_rel = first
+    # ── Multi-artifact write path ────────────────────────────────────
+    if len(dir_artifacts) > 1:
+        all_errors: list[str] = []
+        pending_writes: list[tuple[str, dict]] = []
+
+        for canonical_rel, s_entry in dir_artifacts:
+            exp_sid, req_fields = _extract_schema_requirements(s_entry)
+            need_run_id = exp_sid is not None
+
+            if not req_fields:
+                continue  # Skip schemas with no required fields
+
+            # The primary required field is the root array/object key
+            # (e.g. "constraints", "outcomes", "impacts").
+            root_field = req_fields[0]
+            if root_field not in parsed:
+                all_errors.append(
+                    f"Multi-artifact response missing root field "
+                    f"{root_field!r} for {canonical_rel!r}"
+                )
+                continue
+
+            # Extract the sub-object for this artifact
+            sub_artifact: dict = {root_field: parsed[root_field]}
+            if need_run_id and "run_id" in parsed:
+                sub_artifact["run_id"] = parsed["run_id"]
+            if exp_sid is not None and "schema_id" in parsed:
+                sub_artifact["schema_id"] = parsed["schema_id"]
+
+            # Validate the sub-artifact independently
+            sub_errors = _validate_skill_output(
+                response=sub_artifact,
+                run_id=run_id,
+                expected_schema_id=exp_sid,
+                required_fields=req_fields,
+                require_run_id=need_run_id,
+            )
+            if sub_errors:
+                all_errors.append(
+                    f"Validation failed for {canonical_rel!r}: "
+                    + "; ".join(sub_errors)
+                )
+            else:
+                pending_writes.append((canonical_rel, sub_artifact))
+
+        if all_errors:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r} multi-artifact validation failed: "
+                    + "; ".join(all_errors)
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        if not pending_writes:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: no sub-artifacts matched in response"
+                ),
+                failure_category="INCOMPLETE_OUTPUT",
+            )
+
+        # Write all validated sub-artifacts
+        for canonical_rel, content in pending_writes:
+            write_error = _atomic_write(content, repo_root / canonical_rel)
+            if write_error is not None:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: atomic write to "
+                        f"{canonical_rel!r} failed: {write_error}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+            outputs_written.append(canonical_rel)
+
+        return SkillResult(
+            status="success",
+            outputs_written=outputs_written,
+        )
+
+    # ── Single-artifact write path (existing behavior) ───────────────
+    canonical_rel: str | None = None
+    schema_entry: dict | None = None
+    expected_schema_id: str | None = None
+    required_fields: list[str] | None = None
+
+    if dir_artifacts:
+        canonical_rel, schema_entry = dir_artifacts[0]
+    else:
+        # Fallback: if no canonical schema found, use first writes_to as-is
+        if writes_to:
+            first = writes_to[0]
+            if first.endswith("/"):
+                canonical_rel = first + f"{skill_id}_{run_id[:8]}.json"
+            else:
+                canonical_rel = first
 
     if canonical_rel is None:
         return SkillResult(
@@ -985,12 +1141,15 @@ def run_skill(
             schema_entry
         )
 
+    require_run_id = expected_schema_id is not None
+
     # Validate response against the real schema (no silent repair)
     output_errors = _validate_skill_output(
         response=parsed,
         run_id=run_id,
         expected_schema_id=expected_schema_id,
         required_fields=required_fields,
+        require_run_id=require_run_id,
     )
     if output_errors:
         return SkillResult(

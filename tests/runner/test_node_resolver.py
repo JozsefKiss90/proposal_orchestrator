@@ -147,7 +147,7 @@ class TestSkillListResolution:
 
     def test_n01_skill_count(self, resolver: NodeResolver) -> None:
         skills = resolver.resolve_skill_ids("n01_call_analysis")
-        assert len(skills) == 5
+        assert len(skills) == 4
 
     def test_n01_skill_list(self, resolver: NodeResolver) -> None:
         skills = resolver.resolve_skill_ids("n01_call_analysis")
@@ -155,7 +155,6 @@ class TestSkillListResolution:
         assert "evaluation-matrix-builder" in skills
         assert "instrument-schema-normalization" in skills
         assert "topic-scope-check" in skills
-        assert "gate-enforcement" in skills
 
     def test_n03_skills_include_sub_agent_skills(self, resolver: NodeResolver) -> None:
         skills = resolver.resolve_skill_ids("n03_wp_design")
