@@ -412,7 +412,7 @@ python -m runner --run-id <uuid> --phase phase_01_call_analysis
 
 ```bash
 # Phase 1: no prerequisites, runs immediately
-python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())") --phase 1
+
 
 # Phase 2: requires Phase 1 released
 python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())") --phase 2

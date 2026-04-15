@@ -1,10 +1,10 @@
 {
-  "run_id": "37f754dc-321d-4555-9c3d-afac7030ef6f",
+  "run_id": "bde90ced-1835-4622-8a59-95accacaf4c3",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "started_at": "2026-04-14T17:40:30.166915+00:00",
-  "completed_at": "2026-04-14T17:47:47.163082+00:00",
+  "started_at": "2026-04-15T19:24:55.749496+00:00",
+  "completed_at": "2026-04-15T19:29:56.268582+00:00",
   "overall_status": "fail",
   "terminal_nodes_reached": [],
   "stalled_nodes": [],
@@ -29,7 +29,7 @@
     "n01_call_analysis": {
       "failure_origin": "agent_body",
       "exit_gate_evaluated": false,
-      "failure_reason": "Skill 'gate-enforcement' failed: Skill 'gate-enforcement' output validation failed: schema_id is missing; expected 'orch.phase1.call_analysis_summary.v1'; Required field missing: 'schema_id' (required by artifact_schema_specification.yaml); Required field missing: 'resolved_instrument_type' (required by artifact_schema_specification.yaml); Required field missing: 'evaluation_matrix' (required by artifact_schema_specification.yaml); Required field missing: 'compliance_checklist' (required by artifact_schema_specification.yaml)",
+      "failure_reason": "Skill 'topic-scope-check' failed: Input validation failed for skill 'topic-scope-check': Required input is an empty object: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json; Required input is an empty object: docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
       "failure_category": "SKILL_FAILURE"
     }
   },

@@ -55,7 +55,20 @@
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f -name *call_slicer* -o -name *slicer* -o -name *bound*)",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator/runner -type f -name *.py)",
       "Bash(head -c 2000 /c/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/work_programmes/cluster_digital/cluster_CL4.grouped.json)",
-      "Bash(grep -E \"\\\\.\\(py\\)$\")"
+      "Bash(grep -E \"\\\\.\\(py\\)$\")",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/agents -type f -name *.md)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/runner -name *.py -type f)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/workflows -type f -name *.yaml)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs/tier3_project_instantiation -type f -name *.json)",
+      "Bash(xargs -I {} ls -lh {})",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs -type f -name *.json)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/extracted -type f -name *.json)",
+      "Bash(du -sh /c/Code/proposal_demo/proposal_orchestrator/.claude/skills/*.md)",
+      "Bash(du -sh /c/Code/proposal_demo/proposal_orchestrator/.claude/agents/*.md)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/call_extracts -type f \\\\\\(-name *.slice.json -o -name *.json \\\\\\))",
+      "Bash(find \"C:/Code/proposal_demo/proposal_orchestrator/docs/tier2a_instrument_schemas\" -name \"*.json\" -type f -exec wc -c {} +)",
+      "Bash(find \"C:/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/extracted\" -name \"*.json\" -type f -exec wc -c {} +)",
+      "Bash(find \"C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis\" -type f -exec wc -c {} +)"
     ]
   }
 }
