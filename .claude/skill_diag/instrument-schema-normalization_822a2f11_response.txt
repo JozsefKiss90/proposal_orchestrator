@@ -1,3 +1,22 @@
+=== skill_id: instrument-schema-normalization ===
+=== mode: tapm ===
+=== response_text length: 38341 ===
+=== response_text (full) ===
+I have now read all 54 pages of `af_he-ria-ia_en.pdf` in three batches. I have confirmed:
+
+- **Title/header**: "Horizon Europe Programme — Standard Application Form (HE RIA, IA)" — passes Step 1.4 Grant Agreement Annex guard (no prohibited markers)
+- **Instrument type**: RIA (and IA) — matches existing registry `instrument_type: "RIA"`
+- **Page limit (hard)**: Sections 1+2+3 + title/participants combined ≤ 40 pages (45 for lump sum) — stated explicitly in Part B instruction page
+- **Individual section page counts**: All labeled "[e.g. N pages]" and explicitly stated as "only indicative" → all `page_limit: null`
+- **max_work_packages**: Form states "the number of work packages should be proportionate to the scale and complexity of the project" — no maximum stated → null
+- **max_deliverable_count**: "Only include deliverables that you consider essential" — no maximum stated → null
+- **project_duration_months**: Not specified in form → null
+- **Section 2.3 Summary**: Explicitly marked "OPTIONAL – Please remove this section if not used" → `mandatory: false`
+- **Annexes**: "Some calls may ask to upload annexes" → `mandatory: false`
+
+All existing section entries in the registry are confirmed accurate against the form. Upserting with fresh `extracted_at` timestamp.
+
+```json
 {
   "instruments": [
     {
@@ -346,3 +365,6 @@
     }
   ]
 }
+```
+
+=== END ===

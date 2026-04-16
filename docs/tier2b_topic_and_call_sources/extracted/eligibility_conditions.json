@@ -2,7 +2,7 @@
   "conditions": [
     {
       "condition_id": "EC-01",
-      "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "description": "Participation is restricted to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
       "condition_type": "geographic",
       "source_section": "eligibility_restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
@@ -11,14 +11,14 @@
     {
       "condition_id": "EC-02",
       "description": "Entities controlled by non-eligible countries may be excluded unless appropriate guarantees are provided.",
-      "condition_type": "geographic",
+      "condition_type": "other",
       "source_section": "eligibility_restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-03",
-      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project; proposals falling outside this TRL range are out of scope.",
       "condition_type": "trl_level",
       "source_section": "technology_readiness_level",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
@@ -26,46 +26,37 @@
     },
     {
       "condition_id": "EC-04",
-      "description": "Maximum EU contribution per project is €19,000,000; minimum contribution is also set at €19,000,000, making this a fixed-amount funding topic.",
+      "description": "Maximum EU contribution per project is EUR 19,000,000 (minimum contribution also set at EUR 19,000,000).",
       "condition_type": "budget_limit",
-      "source_section": "call_entry > max_contribution",
+      "source_section": "call_entry.max_contribution",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-05",
-      "description": "Financial support to third parties (FSTP) is permitted with the following limits: maximum €300,000 per grant at stage 2; maximum €2,250,000 per grant at stage 3; maximum €2,550,000 per individual third party.",
-      "condition_type": "budget_limit",
-      "source_section": "fstp_provisions",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "description": "All proposals must implement the co-programmed European Partnership on AI, Data and Robotics (ADRA) by allocating tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "condition_type": "consortium_composition",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-06",
-      "description": "Standard minimum consortium composition requirements for RIA actions apply: at least 3 independent legal entities from at least 3 different EU Member States or associated countries.",
+      "description": "Standard Horizon Europe RIA minimum consortium size and composition requirements are presumed to apply (minimum three independent legal entities from three different Member States or associated countries).",
       "condition_type": "consortium_composition",
-      "source_section": "call_entry > call_type",
+      "source_section": "call_entry.eligibility_conditions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Inferred",
-      "inference_note": "The call identifies this as a 'Research and Innovation Actions' (RIA) type action. Standard Horizon Europe RIA minimum consortium composition requirements (at least 3 independent legal entities from at least 3 different Member States or associated countries) are not explicitly stated in the source extract documents but are inferred as applicable from the RIA instrument type designation. Verification against Tier 1 normative sources (General Annexes) is required."
+      "status": "Assumed",
+      "assumption_note": "The eligibility_conditions field in the slice source is empty. The curated extract's eligibility_restrictions address only geographic participation restrictions. Standard Horizon Europe RIA minimum consortium requirements are assumed to apply per the General Annex B framework but are not explicitly stated in these topic-level source documents. Verify against Tier 1 General Annexes before use in downstream proposal content."
     },
     {
       "condition_id": "EC-07",
-      "description": "Maximum project duration is 48 months.",
-      "condition_type": "other",
-      "source_section": "max_project_duration_months",
-      "source_document": "selected_call.json",
-      "status": "Assumed",
-      "assumption_note": "The 48-month maximum project duration is not explicitly stated in the call topic text. The value is drawn from the selected_call.json binding metadata field max_project_duration_months, which itself carries a note that 48 months is the standard maximum for large RIA actions and requires verification against General Annex B. This assumption must be confirmed against Tier 1 normative sources before finalising the project duration in the proposal."
-    },
-    {
-      "condition_id": "EC-08",
-      "description": "Open access to research outputs is required as a standard Horizon Europe programme condition applicable to all funded RIA actions; no derogation is indicated in the call extract.",
+      "description": "Open access obligations for scientific publications and research data apply under standard Horizon Europe RIA grant conditions.",
       "condition_type": "open_access",
-      "source_section": "call_entry > call_type",
+      "source_section": "call_entry.eligibility_conditions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "Open access requirements are not explicitly stated in the call extract source documents. They are a standard Horizon Europe programme condition applicable to all RIA-type funded actions. The call extract does not indicate any derogation from standard open access requirements. This assumption requires verification against Tier 1 normative sources (General Annexes and Annotated Grant Agreement)."
+      "assumption_note": "Open access requirements are not explicitly stated in the topic-level source documents (eligibility_conditions field is empty in the slice). This condition is assumed to apply as a standard Horizon Europe RIA grant requirement per the Model Grant Agreement and General Annexes. Verify against Tier 1 normative sources before applying to proposal content."
     }
   ]
 }
