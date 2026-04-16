@@ -285,11 +285,23 @@ def _validate_skill_inputs(
     reads_from: list[str],
     repo_root: Path,
     resolved_inputs: dict[str, Any],
+    writes_to: list[str] | None = None,
 ) -> list[str]:
     """Validate that all declared inputs are present and non-empty.
 
+    When *writes_to* is provided, files that appear in both *reads_from*
+    and *writes_to* are treated as upsert targets: an empty object ``{}``
+    is accepted as a valid initial state because the skill is about to
+    populate it.
+
     Returns a list of validation errors.  Empty list means all inputs valid.
     """
+    # Normalize writes_to paths for reliable overlap detection
+    norm_writes = {
+        p.replace("\\", "/").rstrip("/")
+        for p in (writes_to or [])
+    }
+
     errors: list[str] = []
     for rel_path in reads_from:
         abs_path = repo_root / rel_path
@@ -309,9 +321,13 @@ def _validate_skill_inputs(
                     f"Required input is null/unreadable: {rel_path}"
                 )
             elif isinstance(content, dict) and not content:
-                errors.append(
-                    f"Required input is an empty object: {rel_path}"
-                )
+                norm_rel = rel_path.replace("\\", "/").rstrip("/")
+                if writes_to is not None and norm_rel in norm_writes:
+                    pass  # valid upsert seed — skill will populate
+                else:
+                    errors.append(
+                        f"Required input is an empty object: {rel_path}"
+                    )
         else:
             errors.append(
                 f"Required input does not exist: {rel_path}"
@@ -939,7 +955,7 @@ def run_skill(
 
         # Validate inputs
         validation_errors = _validate_skill_inputs(
-            skill_id, reads_from, repo_root, resolved_inputs
+            skill_id, reads_from, repo_root, resolved_inputs, writes_to
         )
         if validation_errors:
             return SkillResult(

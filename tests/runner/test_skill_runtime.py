@@ -406,6 +406,55 @@ class TestValidateSkillInputs:
         )
         assert len(errors) > 0
 
+    def test_empty_object_allowed_for_upsert_target(self, skill_env: Path) -> None:
+        """Empty {} is valid when the file is also in writes_to (upsert pattern)."""
+        upsert_path = "docs/tier2a/extracted/registry.json"
+        abs_path = skill_env / upsert_path
+        abs_path.parent.mkdir(parents=True, exist_ok=True)
+        abs_path.write_text("{}", encoding="utf-8")
+        resolved = {upsert_path: {}}
+        errors = _validate_skill_inputs(
+            "test-skill",
+            [upsert_path],
+            skill_env,
+            resolved,
+            writes_to=[upsert_path],
+        )
+        assert errors == []
+
+    def test_empty_object_rejected_when_not_upsert_target(self, skill_env: Path) -> None:
+        """Empty {} is still an error when the file is NOT in writes_to."""
+        readonly_path = "docs/tier2a/extracted/registry.json"
+        abs_path = skill_env / readonly_path
+        abs_path.parent.mkdir(parents=True, exist_ok=True)
+        abs_path.write_text("{}", encoding="utf-8")
+        resolved = {readonly_path: {}}
+        errors = _validate_skill_inputs(
+            "test-skill",
+            [readonly_path],
+            skill_env,
+            resolved,
+            writes_to=["docs/some/other/output.json"],
+        )
+        assert len(errors) == 1
+        assert "empty object" in errors[0]
+
+    def test_empty_object_rejected_when_writes_to_not_provided(self, skill_env: Path) -> None:
+        """Backward compatibility: no writes_to arg means strict validation."""
+        readonly_path = "docs/tier2a/extracted/registry.json"
+        abs_path = skill_env / readonly_path
+        abs_path.parent.mkdir(parents=True, exist_ok=True)
+        abs_path.write_text("{}", encoding="utf-8")
+        resolved = {readonly_path: {}}
+        errors = _validate_skill_inputs(
+            "test-skill",
+            [readonly_path],
+            skill_env,
+            resolved,
+        )
+        assert len(errors) == 1
+        assert "empty object" in errors[0]
+
 
 class TestValidateSkillOutput:
     def test_valid_output(self) -> None:

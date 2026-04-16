@@ -71,7 +71,10 @@
       "Bash(find \"C:/Code/proposal_demo/proposal_orchestrator/docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis\" -type f -exec wc -c {} +)",
       "Bash(claude -p --model claude-sonnet-4-6)",
       "Bash(claude -p --model claude-sonnet-4-6 --tools \"Read,Glob\")",
-      "Bash(find C:/Code/proposal_demo/proposal_orchestrator/.claude -name *diag* -o -name *response* -o -name *parsed* -o -name *phase_e*)"
+      "Bash(find C:/Code/proposal_demo/proposal_orchestrator/.claude -name *diag* -o -name *response* -o -name *parsed* -o -name *phase_e*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *extraction* -o -name *init*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs -name *.md -o -name *.json)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *migration* -o -name *backend*)"
     ]
   }
 }
