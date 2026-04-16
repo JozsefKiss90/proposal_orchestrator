@@ -1,40 +1,40 @@
 {
   "criteria": [
     {
-      "criterion_id": "EXC",
+      "criterion_id": "Excellence",
       "criterion_name": "Excellence",
       "weight": null,
-      "priority_notes": "Standard RIA evaluation criterion. The topic scope emphasises novelty in AI agent architecture including autonomous planning and reasoning, advanced memory management, multi-agent frameworks, and multimodal capabilities as key technical differentiators. No topic-specific weight is stated in the source documents; standard Horizon Europe RIA weighting must be verified against Tier 2A evaluation form templates and Tier 1 General Annexes.",
-      "source_section": null,
-      "source_document": null,
+      "priority_notes": "Standard Horizon Europe RIA evaluation criterion. No topic-specific weight adjustment or priority note is stated in the available call extract sources. Weighting must be verified against the Tier 2A evaluation form schema for the RIA instrument.",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "The Excellence criterion and its standard weight (typically 50% for RIA per Horizon Europe General Annexes) are not stated in the topic source documents (slice.json or curated extract). This entry is derived from the general Horizon Europe RIA evaluation framework applicable to the instrument type recorded in selected_call.json. Weight and criterion definition must be verified against Tier 1 General Annexes and Tier 2A RIA evaluation form templates."
+      "assumption_note": "Excellence is a standard evaluation criterion for all Horizon Europe RIA actions. It is not explicitly named with a weighting in the topic text or call extract. The source_section reference points to the scope field, which implies technical and scientific excellence requirements but does not specify evaluation weighting. Criterion label, weight, and thresholds must be confirmed against Tier 2A RIA evaluation form schemas."
     },
     {
-      "criterion_id": "IMP",
+      "criterion_id": "Impact",
       "criterion_name": "Impact",
       "weight": null,
-      "priority_notes": "Topic source documents signal the following impact-relevant priorities for evaluators: (1) contribution to the Apply AI Strategy; (2) alignment with and cohesion activities for the ADRA Partnership; (3) sector coverage positioning across healthcare, advanced manufacturing, and in-vehicle autonomous driving (portfolio selection procedure); (4) sharing of communicable results via the AI-on-demand platform; (5) linkage to AI Factories, TEFs, and EDIHs for validation and deployment.",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Inferred",
-      "inference_note": "The Impact criterion name is assumed from the standard Horizon Europe RIA evaluation framework and is not stated in the topic source documents. The topic-specific impact priorities listed in priority_notes are derived from explicit scope, partnership, and reporting requirements in the source documents and are expected to be evaluated under the Impact criterion. Weight (typically 30% for RIA) must be verified against Tier 1 General Annexes and Tier 2A evaluation form templates."
+      "priority_notes": "Standard Horizon Europe RIA evaluation criterion. The topic explicitly requires contribution to the Apply AI Strategy and ADRA European Partnership, which may constitute call-specific impact evaluation priorities. No explicit numeric weight stated in source documents.",
+      "source_section": "apply_ai_strategy_contribution",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Assumed",
+      "assumption_note": "Impact is a standard evaluation criterion for Horizon Europe RIA actions. Weighting is not explicitly stated in the topic text. The topic's mandatory alignment with the Apply AI Strategy and ADRA partnership (confirmed in sources) is likely to constitute a call-specific impact priority, but no numeric weight or threshold is stated. Confirm criterion weight and thresholds against Tier 2A RIA evaluation form schemas."
     },
     {
-      "criterion_id": "QE",
+      "criterion_id": "Quality and Efficiency of Implementation",
       "criterion_name": "Quality and Efficiency of Implementation",
       "weight": null,
-      "priority_notes": "Topic source documents signal the following implementation-quality priorities for evaluators: (1) mandatory qualitative and quantitative KPIs, benchmarking, and progress monitoring mechanisms; (2) mandatory cohesion activities with ADRA and the GenAI4EU central Hub; (3) collaboration with relevant international, European, national, and regional initiatives; (4) reuse of public results from previously funded actions where possible.",
+      "priority_notes": "Standard Horizon Europe RIA evaluation criterion. No topic-specific weight adjustment is stated in the available sources. Weighting must be verified against Tier 2A evaluation form schema for the RIA instrument.",
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Inferred",
-      "inference_note": "The Quality and Efficiency of Implementation criterion name is assumed from the standard Horizon Europe RIA evaluation framework and is not stated in the topic source documents. The topic-specific implementation requirements listed in priority_notes are explicitly stated in the source documents and are expected to be evaluated under this criterion. Weight (typically 20% for RIA) must be verified against Tier 1 General Annexes and Tier 2A evaluation form templates."
+      "status": "Assumed",
+      "assumption_note": "Quality and Efficiency of Implementation is a standard evaluation criterion for Horizon Europe RIA actions. It is not explicitly named or weighted in the topic text or call extract. The scope section references KPIs, benchmarking, and progress monitoring requirements which are relevant to this criterion but do not constitute an evaluation weighting statement. Confirm against Tier 2A RIA evaluation form schemas."
     },
     {
-      "criterion_id": "SECTOR-PORTFOLIO",
-      "criterion_name": "Sector Portfolio Balance",
+      "criterion_id": "Portfolio-Coverage-Priority",
+      "criterion_name": "Portfolio Coverage Priority (Sector Balance)",
       "weight": null,
-      "priority_notes": "Grants will be awarded not only in order of ranking score but also to ensure at least one funded project in each of three sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving. This is a post-threshold award selection criterion applied after individual evaluation scores are determined; it is not a standard evaluation sub-criterion with a numeric weight and does not replace the standard Excellence, Impact, and Quality and Efficiency of Implementation criteria.",
+      "priority_notes": "Grants will be awarded to applications not only in order of ranking, but also to at least one proposal focusing on each of three sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving. This applies subject to proposals passing all evaluation thresholds. This is a special selection procedure provision, not a separate scored criterion.",
       "source_section": "procedure_exceptions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"

@@ -2,6 +2,14 @@
   "conditions": [
     {
       "condition_id": "EC-01",
+      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "condition_type": "trl_level",
+      "source_section": "technology_readiness_level",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-02",
       "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
       "condition_type": "geographic",
       "source_section": "eligibility_restrictions.eligible_entities",
@@ -9,45 +17,70 @@
       "status": "Confirmed"
     },
     {
-      "condition_id": "EC-02",
-      "description": "Entities controlled by non-eligible countries may be excluded from participation unless sufficient guarantees are provided.",
+      "condition_id": "EC-03",
+      "description": "Entities controlled by non-eligible countries may be excluded unless guarantees are provided.",
       "condition_type": "geographic",
       "source_section": "eligibility_restrictions.control_restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
-      "condition_id": "EC-03",
-      "description": "Activities are expected to start at Technology Readiness Level (TRL) 2 and achieve TRL 5 by the end of the project.",
-      "condition_type": "trl_level",
-      "source_section": "technology_readiness_level",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
-      "status": "Confirmed"
-    },
-    {
       "condition_id": "EC-04",
-      "description": "The maximum EU contribution per project is EUR 19,000,000. The indicative total topic budget is EUR 38,000,000 for up to 2 projects.",
+      "description": "Maximum EU contribution per project is €19,000,000 (both minimum and maximum contribution are set at €19,000,000).",
       "condition_type": "budget_limit",
-      "source_section": "call_entry.max_contribution",
+      "source_section": "call_entry.min__contribution / call_entry.max_contribution",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-05",
-      "description": "Submission follows a single-stage procedure with a deadline of 15 April 2026.",
-      "condition_type": "other",
-      "source_section": "call_entry.deadline_model",
+      "description": "Indicative total topic budget is €38,000,000, with an indicative number of 2 funded projects.",
+      "condition_type": "budget_limit",
+      "source_section": "call_entry.indicative_budget / call_entry.max_funded_projects",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-06",
-      "description": "The standard minimum consortium composition requirement for Horizon Europe RIA actions applies: at least 3 independent legal entities from at least 3 different eligible countries. This condition is not explicitly stated in the topic source documents.",
-      "condition_type": "consortium_composition",
-      "source_section": null,
-      "source_document": null,
+      "description": "Financial support to third parties (FSTP) is permitted with the following limits: maximum €300,000 per grant (stage 2), maximum €2,250,000 per grant (stage 3), and maximum €2,550,000 per third party.",
+      "condition_type": "budget_limit",
+      "source_section": "fstp_provisions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-07",
+      "description": "This topic implements the co-programmed European Partnership on AI, Data and Robotics (ADRA); proposals must participate in the ADRA co-programme.",
+      "condition_type": "other",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-08",
+      "description": "Communicable results must be made available via the AI-on-demand platform, constituting an open access dissemination obligation.",
+      "condition_type": "open_access",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-09",
+      "description": "Maximum project duration is 48 months (standard maximum for large RIA actions under Horizon Europe; not explicitly stated in the topic text).",
+      "condition_type": "other",
+      "source_section": "max_project_duration_months",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Assumed",
-      "assumption_note": "Standard Horizon Europe RIA eligibility requires at least 3 independent legal entities from at least 3 different eligible countries, per the General Annexes. The topic source documents (slice.json and curated extract) contain empty eligibility_conditions fields and do not explicitly state consortium size requirements. This condition is assumed from the RIA instrument type as recorded in selected_call.json. Verification required against Tier 1 General Annexes."
+      "assumption_note": "The 48-month maximum duration is not explicitly stated in the topic text of either source file. The value is carried from selected_call.json which includes an explicit note: 'Max project duration not explicitly stated in the topic text; 48 months is the standard maximum for large RIA actions under Horizon Europe. Verify against General Annex B for the applicable instrument constraints.' This condition should be verified against Tier 1 normative framework before finalisation."
+    },
+    {
+      "condition_id": "EC-10",
+      "description": "Minimum consortium composition: the topic text does not explicitly state minimum partner count or entity type requirements beyond geographic eligibility. Standard Horizon Europe RIA minimum consortium rules (typically 3 independent legal entities from 3 different eligible countries) are expected to apply.",
+      "condition_type": "consortium_composition",
+      "source_section": "call_entry.eligibility_conditions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Assumed",
+      "assumption_note": "The call_entry.eligibility_conditions field in the slice is empty. The curated call extract does not specify minimum consortium size. The standard Horizon Europe RIA minimum consortium requirement (3 independent legal entities from 3 different Member States or associated countries) is a General Annex condition not reproduced in these topic-specific source files. This condition must be verified against Tier 1 normative framework documents (General Annexes) before downstream use."
     }
   ]
 }

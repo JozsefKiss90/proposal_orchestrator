@@ -1,3 +1,19 @@
+=== skill_id: instrument-schema-normalization ===
+=== mode: tapm ===
+=== response_text length: 38031 ===
+=== response_text (full) ===
+I have now read the complete application form (Part A: 24 pages, Part B: 23 pages). I have confirmed:
+
+1. **Grant Agreement Annex guard**: Document title is "Standard Application Form (HE RIA, IA)" — NOT a Grant Agreement Annex. Guard passes.
+2. **Instrument type resolved**: HE-RIA-IA from the document title and filename.
+3. **Hard page limit** directly stated in form (Part B p.3 of 23): "sections 1, 2 and 3, together, should not be longer than 40 pages." Individual section page counts are all "[e.g. X pages]" — explicitly labeled **indicative only** — so `page_limit` = null for all sections.
+4. **max_work_packages**: No maximum stated; form says "proportionate to scale and complexity."
+5. **max_deliverable_count**: No maximum stated.
+6. **evaluation_form_ref**: ef_he-ria-ia_en.pdf — assumed via naming convention (evaluation_forms/ not in declared inputs).
+
+All section entries carry `source_document: "af_he-ria-ia_en.pdf"` traceable to direct PDF reading.
+
+```json
 {
   "instruments": [
     {
@@ -346,3 +362,6 @@
     }
   ]
 }
+```
+
+=== END ===
