@@ -1296,18 +1296,25 @@ def run_skill(
                 # Flat shape — root field at top level
                 sub_artifact = {root_field: parsed[root_field]}
             else:
-                # File-keyed shape — look up by filename derived from
-                # the canonical path (e.g. "call_constraints.json").
-                file_key = canonical_rel.rsplit("/", 1)[-1]
-                nested = parsed.get(file_key)
+                # Full canonical-path-keyed shape — Claude returned the
+                # full repo-relative path as key (e.g.
+                # "docs/tier2b_.../extracted/call_constraints.json").
+                nested = parsed.get(canonical_rel)
                 if isinstance(nested, dict) and root_field in nested:
                     sub_artifact = {root_field: nested[root_field]}
                 else:
-                    # Also try without .json extension
-                    file_key_stem = file_key.rsplit(".", 1)[0]
-                    nested = parsed.get(file_key_stem)
+                    # File-keyed shape — look up by filename derived from
+                    # the canonical path (e.g. "call_constraints.json").
+                    file_key = canonical_rel.rsplit("/", 1)[-1]
+                    nested = parsed.get(file_key)
                     if isinstance(nested, dict) and root_field in nested:
                         sub_artifact = {root_field: nested[root_field]}
+                    else:
+                        # Also try without .json extension
+                        file_key_stem = file_key.rsplit(".", 1)[0]
+                        nested = parsed.get(file_key_stem)
+                        if isinstance(nested, dict) and root_field in nested:
+                            sub_artifact = {root_field: nested[root_field]}
 
             if sub_artifact is None:
                 all_errors.append(

@@ -17,6 +17,15 @@ constitutional_constraints:
   - "Sub-criterion weights must be traceable to Tier 2B extracted files"
 ---
 
+## Input Access (TAPM Mode)
+
+Read the files listed in the Declared Inputs section from disk using the Read tool.
+The declared input `docs/tier2a_instrument_schemas/evaluation_forms/` is a directory — use Glob to list its contents, then Read the evaluation form file matching the resolved instrument type.
+Read `evaluation_priority_weights.json` for call-specific weight overlays.
+Do not read files outside the declared input set.
+Do not read application form templates, work programme documents, or other Tier 2A/Tier 2B files.
+Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

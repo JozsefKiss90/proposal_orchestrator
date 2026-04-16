@@ -650,6 +650,133 @@ class TestAtomicWrite:
 
 
 # ---------------------------------------------------------------------------
+# Multi-artifact response shape: canonical-path-keyed
+# ---------------------------------------------------------------------------
+
+
+def _make_multi_artifact_env(tmp_path: Path) -> Path:
+    """Create a synthetic environment for multi-artifact skill tests."""
+    repo_root = tmp_path
+
+    _write_skill_catalog(repo_root, [
+        {
+            "id": "multi-skill",
+            "reads_from": ["docs/tier3/input.json"],
+            "writes_to": ["docs/tier2b/extracted/"],
+            "constitutional_constraints": [],
+        },
+    ])
+
+    # Two artifacts in the same directory
+    _write_artifact_schema(repo_root, {
+        "tier2b_extracted_schemas": {
+            "call_constraints": {
+                "canonical_path": "docs/tier2b/extracted/call_constraints.json",
+                "fields": {
+                    "constraints": {"required": True},
+                },
+            },
+            "expected_outcomes": {
+                "canonical_path": "docs/tier2b/extracted/expected_outcomes.json",
+                "fields": {
+                    "outcomes": {"required": True},
+                },
+            },
+        }
+    })
+
+    _write_skill_spec(repo_root, "multi-skill")
+
+    input_path = repo_root / "docs" / "tier3" / "input.json"
+    input_path.parent.mkdir(parents=True, exist_ok=True)
+    input_path.write_text(json.dumps({"topic": "test"}), encoding="utf-8")
+
+    (repo_root / "docs" / "tier2b" / "extracted").mkdir(parents=True, exist_ok=True)
+    return repo_root
+
+
+@pytest.fixture()
+def multi_env(tmp_path: Path) -> Path:
+    import runner.skill_runtime as _sr
+    _sr._catalog_cache.clear()
+    _sr._schema_spec_cache.clear()
+    return _make_multi_artifact_env(tmp_path)
+
+
+class TestMultiArtifactCanonicalPathKeys:
+    """Multi-artifact writer accepts full canonical-path-keyed responses."""
+
+    def test_canonical_path_keyed_response(self, multi_env: Path) -> None:
+        """Claude returns full repo-relative paths as top-level keys."""
+        response = {
+            "docs/tier2b/extracted/call_constraints.json": {
+                "constraints": [{"id": "c1", "text": "constraint"}]
+            },
+            "docs/tier2b/extracted/expected_outcomes.json": {
+                "outcomes": [{"id": "o1", "text": "outcome"}]
+            },
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+        c_path = multi_env / "docs/tier2b/extracted/call_constraints.json"
+        o_path = multi_env / "docs/tier2b/extracted/expected_outcomes.json"
+        assert c_path.exists()
+        assert o_path.exists()
+        c_data = json.loads(c_path.read_text(encoding="utf-8"))
+        assert "constraints" in c_data
+        o_data = json.loads(o_path.read_text(encoding="utf-8"))
+        assert "outcomes" in o_data
+
+    def test_flat_shape_still_works(self, multi_env: Path) -> None:
+        """Flat root-field shape is still accepted (regression guard)."""
+        response = {
+            "constraints": [{"id": "c1", "text": "constraint"}],
+            "outcomes": [{"id": "o1", "text": "outcome"}],
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+    def test_basename_keyed_still_works(self, multi_env: Path) -> None:
+        """Basename-keyed shape is still accepted (regression guard)."""
+        response = {
+            "call_constraints.json": {
+                "constraints": [{"id": "c1"}]
+            },
+            "expected_outcomes.json": {
+                "outcomes": [{"id": "o1"}]
+            },
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+    def test_stem_keyed_still_works(self, multi_env: Path) -> None:
+        """Stem-keyed shape (no .json) is still accepted (regression guard)."""
+        response = {
+            "call_constraints": {
+                "constraints": [{"id": "c1"}]
+            },
+            "expected_outcomes": {
+                "outcomes": [{"id": "o1"}]
+            },
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+
+# ---------------------------------------------------------------------------
 # Module isolation
 # ---------------------------------------------------------------------------
 
