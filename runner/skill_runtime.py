@@ -35,12 +35,14 @@ import logging
 import os
 import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Any, Optional
 
 import yaml
 
 from runner.claude_transport import (
+    DEFAULT_TIMEOUT_SECONDS,
     ClaudeCLITimeoutError,
     ClaudeTransportError,
     invoke_claude_text,
@@ -978,6 +980,11 @@ def run_skill(
 
     # ── Mode selection ────────────────────────────────────────────────
     mode = entry.get("execution_mode", "cli-prompt")
+    _skill_t0 = time.monotonic()
+    logger.info(
+        "  skill START  id=%s  mode=%s  node=%s  run=%s",
+        skill_id, mode, node_id or "-", run_id[:8],
+    )
 
     if mode == "tapm":
         # ── TAPM Path: Phases A'-C' ──────────────────────────────────
@@ -995,6 +1002,11 @@ def run_skill(
             constraints=constraints,
             repo_root=repo_root,
             node_id=node_id,
+        )
+        logger.info(
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            skill_id, len(system_prompt), len(user_prompt),
+            TAPM_TIMEOUT_SECONDS,
         )
 
         try:
@@ -1024,6 +1036,11 @@ def run_skill(
                 )
             except OSError:
                 pass
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs",
+                skill_id, _elapsed,
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1061,6 +1078,11 @@ def run_skill(
             constraints=constraints,
             repo_root=repo_root,
         )
+        logger.info(
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            skill_id, len(system_prompt), len(user_prompt),
+            DEFAULT_TIMEOUT_SECONDS,
+        )
 
         # Phase C: Claude invocation via runtime transport
         try:
@@ -1084,6 +1106,11 @@ def run_skill(
                 repo_root=repo_root,
             )
             meta_rel = diag_paths.get("meta", "")
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill TIMEOUT id=%s  elapsed=%.1fs  diag=%s",
+                skill_id, _elapsed, meta_rel,
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1093,6 +1120,11 @@ def run_skill(
                 failure_category="INCOMPLETE_OUTPUT",
             )
         except ClaudeTransportError as exc:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs",
+                skill_id, _elapsed,
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1410,6 +1442,11 @@ def run_skill(
 
     # ── Phase F: Return ────────────────────────────────────────────────
 
+    _elapsed = time.monotonic() - _skill_t0
+    logger.info(
+        "  skill OK     id=%s  outputs=%d  elapsed=%.1fs",
+        skill_id, len(outputs_written), _elapsed,
+    )
     return SkillResult(
         status="success",
         outputs_written=outputs_written,

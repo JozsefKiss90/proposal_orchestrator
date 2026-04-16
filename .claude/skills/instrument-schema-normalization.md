@@ -18,6 +18,15 @@ constitutional_constraints:
   - "Page limits and section constraints must be read from the template, not assumed"
 ---
 
+## Input Access (TAPM Mode)
+
+Read the files listed in the Declared Inputs section from disk using the Read tool.
+The declared input `docs/tier2a_instrument_schemas/application_forms/` is a directory — use Glob to list its contents, then Read the application form file matching the resolved instrument type.
+Read the existing `section_schema_registry.json` to check for prior entries (it may be an empty `{}` on first run — this is valid).
+Do not read files outside the declared input set.
+Do not read files from other tier directories (Tier 1, Tier 2B, Tier 3).
+Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

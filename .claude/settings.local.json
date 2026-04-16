@@ -74,7 +74,13 @@
       "Bash(find C:/Code/proposal_demo/proposal_orchestrator/.claude -name *diag* -o -name *response* -o -name *parsed* -o -name *phase_e*)",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *extraction* -o -name *init*)",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator/docs -name *.md -o -name *.json)",
-      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *migration* -o -name *backend*)"
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *migration* -o -name *backend*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/skill_diag -type f -name instrument-schema-normalization_*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/skill_diag -type f -name topic-scope-check_*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/skill_diag -type f -name evaluation-matrix-builder_*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/.claude/runs -name run_summary.json -type f -exec ls -lh {})",
+      "Bash(2)",
+      "Bash(ls -lh /c/Code/proposal_demo/proposal_orchestrator/.claude/skill_diag/instrument-schema-normalization_0ace9e49* /c/Code/proposal_demo/proposal_orchestrator/.claude/skill_diag/topic-scope-check_0ace9e49*)"
     ]
   }
 }

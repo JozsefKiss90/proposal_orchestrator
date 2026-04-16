@@ -284,8 +284,8 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 |---|---|---|---|
 | **n01** `call-requirements-extraction` | tapm | **First** | Highest waste: 338-794KB prompt, 5KB relevant. Call slicing + TAPM Read eliminates 98% |
 | **n01** `evaluation-matrix-builder` | tapm | Later | Reads evaluation forms (~50KB), benefits from selective reading |
-| **n01** `instrument-schema-normalization` | cli-prompt | Never | Small inputs (~15KB), well-bounded |
-| **n01** `topic-scope-check` | cli-prompt | Never | Small inputs (~10KB), 2 extracted JSONs |
+| **n01** `instrument-schema-normalization` | ~~cli-prompt~~ **tapm** | ~~Never~~ **First** | ~~Small inputs (~15KB), well-bounded~~ **Reclassified 2026-04-16: actual user_prompt 78KB (run 0ace9e49), 300s timeout with zero output. Same prompt-bottleneck pattern as call-requirements-extraction.** |
+| **n01** `topic-scope-check` | ~~cli-prompt~~ **tapm** | ~~Never~~ **First** | ~~Small inputs (~10KB), 2 extracted JSONs~~ **Reclassified 2026-04-16: actual user_prompt 74KB (run 0ace9e49), 300s timeout with zero output. Prompt includes full skill spec + serialized extracted JSONs.** |
 | **n02** `concept-alignment-check` | tapm | Later | Reads project_brief/ + extracted (~80KB) |
 | **n03** `work-package-normalization` | tapm | Later | Reads WP seed + consortium + schema (~30KB) |
 | **n03** `wp-dependency-analysis` | cli-prompt | Never | Reads only Phase 3 outputs (~20KB) |
@@ -309,10 +309,12 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 
 ### 4.2 Summary Counts
 
-- **Migrate first (TAPM)**: 4 skills (`call-requirements-extraction`, `proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
+- **Migrate first (TAPM)**: 6 skills (`call-requirements-extraction`, `instrument-schema-normalization`, `topic-scope-check`, `proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
 - **Migrate later (TAPM)**: 5 skills (`evaluation-matrix-builder`, `concept-alignment-check`, `work-package-normalization`, `impact-pathway-mapper`, `governance-model-builder`)
-- **Never migrate**: 9 skills (small/bounded inputs, deterministic checks)
+- **Never migrate**: 7 skills (small/bounded inputs, deterministic checks)
 - **Permanently external**: 6 functions (gates, validation, writes, state, HARD_BLOCK)
+
+> **Reclassification note (2026-04-16):** `instrument-schema-normalization` and `topic-scope-check` moved from "Never migrate" to "Migrate first" based on runtime telemetry from run `0ace9e49`. Original estimates (~15KB, ~10KB) were based on declared `reads_from` sizes; actual cli-prompt user prompts measured at 78KB and 74KB respectively, causing 300s timeouts with zero partial output. Classification decisions must be validated against runtime prompt-size telemetry, not static input estimates.
 
 ### 4.3 First Migration Target: `call-requirements-extraction`
 

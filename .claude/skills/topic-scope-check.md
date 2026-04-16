@@ -17,6 +17,14 @@ constitutional_constraints:
   - "Out-of-scope flags must be written to decision log"
 ---
 
+## Input Access (TAPM Mode)
+
+Read the files listed in the Declared Inputs section from disk using the Read tool.
+Read `scope_requirements.json` and `call_constraints.json` — these are the only two authoritative scope sources.
+Do not read files outside the declared input set.
+Do not read work programme source documents or other Tier 2B extracted files.
+Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

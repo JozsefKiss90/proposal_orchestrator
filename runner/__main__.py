@@ -126,15 +126,19 @@ def main(argv: Optional[list[str]] = None) -> int:
     # Configure logging
     # ------------------------------------------------------------------
     sched_logger = logging.getLogger("runner.scheduler")
+    skill_logger = logging.getLogger("runner.skill_runtime")
     if args.verbose:
-        sched_logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler(sys.stderr)
         handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+        sched_logger.setLevel(logging.DEBUG)
         sched_logger.addHandler(handler)
+        skill_logger.setLevel(logging.INFO)
+        skill_logger.addHandler(handler)
     else:
         # INFO level so phase-scoped messages appear, but only with a handler
         # when --verbose is set; without a handler, messages are silently dropped.
         sched_logger.setLevel(logging.WARNING)
+        skill_logger.setLevel(logging.WARNING)
 
     # ------------------------------------------------------------------
     # Output helpers (text vs JSON-lines)

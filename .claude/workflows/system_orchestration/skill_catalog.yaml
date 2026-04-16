@@ -42,6 +42,7 @@ skill_catalog:
       - "Sub-criterion weights must be traceable to Tier 2B extracted files"
 
   - id: instrument-schema-normalization
+    execution_mode: "tapm"
     purpose: >
       Resolve the active instrument type to its application form section schema.
       Extract section identifiers, field requirements, page limits, mandatory
@@ -60,6 +61,7 @@ skill_catalog:
       - "Page limits and section constraints must be read from the template, not assumed"
 
   - id: topic-scope-check
+    execution_mode: "tapm"
     purpose: >
       Verify that a project concept or proposal section is within the thematic
       scope defined by Tier 2B scope requirements. Flag any out-of-scope claims.
