@@ -192,6 +192,47 @@ class TestInstrumentTypeMatchesSchema:
         assert not result.passed
         assert result.failure_category == MISSING_MANDATORY_INPUT
 
+    # --- Form B (canonical per artifact_schema_specification.yaml §8) ---
+
+    def test_pass_form_b_instrument_found(self, tmp_path):
+        call = _write(tmp_path, "call.json", {"instrument_type": "RIA"})
+        registry = _write(tmp_path, "registry.json", {
+            "instruments": [{"instrument_type": "RIA", "sections": []}]
+        })
+        result = instrument_type_matches_schema(call, registry)
+        assert result.passed
+        assert result.details["instrument_type"] == "RIA"
+
+    def test_pass_form_b_multiple_instruments(self, tmp_path):
+        call = _write(tmp_path, "call.json", {"instrument_type": "RIA"})
+        registry = _write(tmp_path, "registry.json", {
+            "instruments": [
+                {"instrument_type": "CSA", "sections": []},
+                {"instrument_type": "RIA", "sections": []},
+                {"instrument_type": "IA", "sections": []},
+            ]
+        })
+        result = instrument_type_matches_schema(call, registry)
+        assert result.passed
+
+    def test_fail_form_b_instrument_not_found(self, tmp_path):
+        call = _write(tmp_path, "call.json", {"instrument_type": "RIA"})
+        registry = _write(tmp_path, "registry.json", {
+            "instruments": [{"instrument_type": "CSA", "sections": []}]
+        })
+        result = instrument_type_matches_schema(call, registry)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+        assert "RIA" in result.reason
+        assert result.details["registry_instrument_types"] == ["CSA"]
+
+    def test_fail_form_b_empty_instruments_array(self, tmp_path):
+        call = _write(tmp_path, "call.json", {"instrument_type": "RIA"})
+        registry = _write(tmp_path, "registry.json", {"instruments": []})
+        result = instrument_type_matches_schema(call, registry)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
 
 # ---------------------------------------------------------------------------
 # §interface_contract_conforms

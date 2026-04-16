@@ -177,26 +177,22 @@ def write_section_schema_registry(
     # Used by all_sections_drafted (keys/ids = section IDs)
     section_ids: list[str] | None = None,
     include_impl_sections: list[str] | None = None,
+    form_b: bool = False,
 ) -> Path:
     """
     Write ``section_schema_registry.json``.
 
-    This function reconciles the two different interpretations of the file:
+    Three output shapes:
 
-    * ``instrument_type_matches_schema`` expects top-level keys to be
-      instrument type identifiers (e.g. ``"RIA"``).
-    * ``all_sections_drafted`` and ``instrument_sections_addressed`` treat
-      top-level keys as section IDs.
-
-    Since these two predicates never appear in the same gate, the caller
-    selects the appropriate form via the keyword arguments:
-
-    * ``instrument_types`` (default ``["RIA"]``) — object keys are instrument
-      types; used for ``phase_01_gate`` tests.
-    * ``section_ids`` (default ``["excellence", "impact", "implementation"]``)
-      with optional ``include_impl_sections`` — list format where each item
-      carries ``section_id``, ``mandatory``, and optionally ``section_type``;
-      used for ``gate_10`` / ``gate_12`` tests.
+    * ``form_b=True`` with ``instrument_types`` — canonical Form B per
+      artifact_schema_specification.yaml §8:
+      ``{"instruments": [{"instrument_type": t, "sections": []} for t]}``.
+      Used for ``phase_01_gate`` tests that exercise Form B matching.
+    * ``instrument_types`` without ``form_b`` — legacy Form A (top-level
+      keys are instrument types):  ``{"RIA": {}, "IA": {}}``.
+      Used for Form A backward-compatibility tests.
+    * ``section_ids`` — list form for ``all_sections_drafted`` /
+      ``instrument_sections_addressed`` gate tests.
     """
     path = repo_root / _T2A_EXTRACTED / "section_schema_registry.json"
 
@@ -210,8 +206,17 @@ def write_section_schema_registry(
                 entry["section_type"] = "implementation"
             entries.append(entry)
         write_json(path, entries)
+    elif form_b:
+        # Form B: canonical per artifact_schema_specification.yaml §8
+        types = instrument_types if instrument_types is not None else ["RIA"]
+        write_json(path, {
+            "instruments": [
+                {"instrument_type": t, "sections": []}
+                for t in types
+            ]
+        })
     else:
-        # Dict form keyed by instrument type for instrument_type_matches_schema
+        # Form A: legacy dict keyed by instrument type
         types = instrument_types if instrument_types is not None else ["RIA"]
         write_json(path, {t: {} for t in types})
 
@@ -219,8 +224,19 @@ def write_section_schema_registry(
 
 
 def write_evaluator_expectation_registry(repo_root: Path) -> Path:
+    """Write ``evaluator_expectation_registry.json`` in canonical Form B shape."""
     path = repo_root / _T2A_EXTRACTED / "evaluator_expectation_registry.json"
-    write_json(path, {"expectations": [{"criterion": "Excellence", "weight": 0.33}]})
+    write_json(path, {
+        "instruments": [{
+            "instrument_type": "RIA",
+            "criteria": [{
+                "criterion_id": "EXC",
+                "criterion_name": "Excellence",
+                "threshold_score": 3,
+                "evaluator_expectations": ["clarity of objectives"],
+            }],
+        }],
+    })
     return path
 
 

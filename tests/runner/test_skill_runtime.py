@@ -777,6 +777,129 @@ class TestMultiArtifactCanonicalPathKeys:
 
 
 # ---------------------------------------------------------------------------
+# Multi-target writes_to — independent output directories/files
+# ---------------------------------------------------------------------------
+
+
+def _make_multi_target_env(tmp_path: Path) -> Path:
+    """Create an environment where one skill writes to two independent targets.
+
+    Target A: docs/tier4/phase1/ (directory) → call_analysis_summary.json
+    Target B: docs/tier2a/extracted/evaluator_expectation_registry.json (file)
+    """
+    repo_root = tmp_path
+
+    _write_skill_catalog(repo_root, [
+        {
+            "id": "multi-target-skill",
+            "reads_from": ["docs/tier3/input.json"],
+            "writes_to": [
+                "docs/tier4/phase1/",
+                "docs/tier2a/extracted/evaluator_expectation_registry.json",
+            ],
+            "constitutional_constraints": [],
+        },
+    ])
+
+    _write_artifact_schema(repo_root, {
+        "tier4_phase_output_schemas": {
+            "call_analysis_summary": {
+                "canonical_path": "docs/tier4/phase1/call_analysis_summary.json",
+                "schema_id_value": "orch.phase1.call_analysis_summary.v1",
+                "fields": {
+                    "schema_id": {"required": True},
+                    "run_id": {"required": True},
+                    "evaluation_matrix": {"required": True},
+                },
+            },
+        },
+        "tier2a_extracted_schemas": {
+            "evaluator_expectation_registry": {
+                "canonical_path": "docs/tier2a/extracted/evaluator_expectation_registry.json",
+                "fields": {
+                    "instruments": {"required": True},
+                },
+            },
+        },
+    })
+
+    _write_skill_spec(repo_root, "multi-target-skill")
+
+    input_path = repo_root / "docs" / "tier3" / "input.json"
+    input_path.parent.mkdir(parents=True, exist_ok=True)
+    input_path.write_text(json.dumps({"topic": "test"}), encoding="utf-8")
+
+    (repo_root / "docs" / "tier4" / "phase1").mkdir(parents=True, exist_ok=True)
+    (repo_root / "docs" / "tier2a" / "extracted").mkdir(parents=True, exist_ok=True)
+    return repo_root
+
+
+@pytest.fixture()
+def multi_target_env(tmp_path: Path) -> Path:
+    import runner.skill_runtime as _sr
+    _sr._catalog_cache.clear()
+    _sr._schema_spec_cache.clear()
+    return _make_multi_target_env(tmp_path)
+
+
+class TestMultiTargetWritesTo:
+    """Tests for skills that write to multiple independent writes_to targets."""
+
+    def test_both_targets_written(self, multi_target_env: Path) -> None:
+        """Claude returns sub-artifacts for both targets; both files written."""
+        response = {
+            "schema_id": "orch.phase1.call_analysis_summary.v1",
+            "run_id": "run-001",
+            "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+            "instruments": [{"instrument_type": "RIA", "criteria": []}],
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-target-skill", "run-001", multi_target_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+        # Verify both files exist on disk
+        t4_path = multi_target_env / "docs/tier4/phase1/call_analysis_summary.json"
+        t2a_path = multi_target_env / "docs/tier2a/extracted/evaluator_expectation_registry.json"
+        assert t4_path.exists()
+        assert t2a_path.exists()
+
+        # Verify content
+        t4_data = json.loads(t4_path.read_text(encoding="utf-8"))
+        assert "evaluation_matrix" in t4_data
+
+        t2a_data = json.loads(t2a_path.read_text(encoding="utf-8"))
+        assert "instruments" in t2a_data
+
+    def test_missing_second_target_fails(self, multi_target_env: Path) -> None:
+        """Claude returns only first target's artifact; fails MALFORMED_ARTIFACT."""
+        response = {
+            "schema_id": "orch.phase1.call_analysis_summary.v1",
+            "run_id": "run-001",
+            "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+            # Missing: "instruments" key for the second target
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-target-skill", "run-001", multi_target_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "MALFORMED_ARTIFACT"
+
+    def test_missing_first_target_fails(self, multi_target_env: Path) -> None:
+        """Claude returns only second target's artifact; fails MALFORMED_ARTIFACT."""
+        response = {
+            "instruments": [{"instrument_type": "RIA", "criteria": []}],
+            # Missing: "evaluation_matrix" for first target
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-target-skill", "run-001", multi_target_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "MALFORMED_ARTIFACT"
+
+
+# ---------------------------------------------------------------------------
 # Module isolation
 # ---------------------------------------------------------------------------
 

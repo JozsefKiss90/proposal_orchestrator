@@ -1210,15 +1210,17 @@ def run_skill(
     #    one canonical artifact path.  Claude's full response is written
     #    to that path after validation.
     #
-    # 2. Multi-artifact mode: writes_to is a directory containing
-    #    multiple canonical schemas, and Claude's response contains
-    #    root fields matching each schema's required fields.  Each
-    #    matching sub-object is extracted, validated independently,
-    #    and written to its own canonical path.
+    # 2. Multi-artifact mode: the combined writes_to entries resolve to
+    #    more than one canonical artifact path.  This may occur when a
+    #    single directory contains multiple canonical schemas, OR when
+    #    multiple independent writes_to entries (directories and/or
+    #    files) each resolve to one or more canonical schemas.  Claude's
+    #    response contains root fields matching each schema's required
+    #    fields.  Each matching sub-object is extracted, validated
+    #    independently, and written to its own canonical path.
     #
-    # Multi-artifact mode activates when a directory writes_to resolves
-    # to more than one canonical schema AND the response contains the
-    # required root field for at least one of those schemas.
+    # Multi-artifact mode activates when the total number of resolved
+    # canonical artifacts across ALL writes_to entries exceeds one.
 
     outputs_written: list[str] = []
 
@@ -1254,8 +1256,9 @@ def run_skill(
             file_entry = _find_schema_for_path(rel_path, repo_root)
             dir_artifacts.append((rel_path, file_entry or {}))
 
-        if dir_artifacts:
-            break  # Process first writes_to that resolves
+        # All writes_to entries are iterated — no early break.
+        # Artifacts from independent directories/files accumulate in
+        # dir_artifacts and are handled by multi-artifact mode below.
 
     # ── Multi-artifact write path ────────────────────────────────────
     # Diagnostic: Phase E state

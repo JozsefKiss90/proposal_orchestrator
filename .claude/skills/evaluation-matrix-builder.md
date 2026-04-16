@@ -12,6 +12,7 @@ reads_from:
   - docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+  - docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
 constitutional_constraints:
   - "Evaluation criteria must reflect the active evaluation form, not a generic template"
   - "Sub-criterion weights must be traceable to Tier 2B extracted files"
@@ -40,14 +41,16 @@ Return your output as a single JSON object in your response.
 | Path | Artifact | Schema ID | Required Fields (from artifact_schema_specification.yaml) | run_id Required | Derivation Source |
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
 | `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` | call_analysis_summary.json | `orch.phase1.call_analysis_summary.v1` | schema_id, run_id, resolved_instrument_type, evaluation_matrix (object: structured mapping of criteria; each entry contains criterion_id, criterion_name, weight, source_section, source_document), compliance_checklist (array: requirement_id, description, status, source_section, source_document per entry) | Yes | evaluation_matrix entries derived from evaluation form templates; weights overlaid from evaluation_priority_weights.json; resolved_instrument_type from selected_call.json via call_analyzer context |
+| `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` | evaluator_expectation_registry.json | N/A — Tier 2A extracted artifact | instruments (array: each entry contains instrument_type, criteria array with criterion_id, criterion_name, threshold_score, evaluator_expectations array of strings) | No | criteria and evaluator expectations derived from evaluation form templates parsed in Steps 2.1-2.2; instrument_type from resolved_instrument_type |
 
-**Note:** `artifact_status` must be ABSENT at write time; the runner stamps it post-gate.
+**Note:** `artifact_status` must be ABSENT at write time for `call_analysis_summary.json`; the runner stamps it post-gate. `evaluator_expectation_registry.json` is a Tier 2A extracted artifact — no `schema_id`, `run_id`, or `artifact_status` fields.
 
 ### Artifact Registry Cross-Reference
 
 | Output Path | Registered in manifest.compile.yaml artifact_registry? | Producing Node |
 |-------------|--------------------------------------------------------|----------------|
 | `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` | Yes — artifact_id: a_t4_phase1 (directory); canonical file within that directory | n01_call_analysis |
+| `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` | Yes — artifact_id: a_t2a_evaluator_expectation_registry | n01_call_analysis |
 
 ## Execution Specification
 
@@ -68,6 +71,7 @@ Return your output as a single JSON object in your response.
 - Step 2.5: Build the `compliance_checklist` array. Source: the eligibility and compliance section of the evaluation form (if present). For each compliance requirement found in the evaluation form: assign `requirement_id` (unique, e.g., "CR-01"), `description`, `status` (one of: confirmed, requires_review, not_applicable), `source_section`, `source_document` (evaluation form filename). The compliance_checklist must not be empty; if no compliance requirements are found in the evaluation form, generate at least one entry from the instrument's known minimum consortium requirements with status: requires_review. Note: `eligibility_conditions.json` is not in this skill's `reads_from` and must not be read directly; if the invoking agent wishes to supplement the checklist with Tier 2B eligibility data, it must pass that data as context.
 - Step 2.6: Set `resolved_instrument_type` from the invoking agent's context (the value read from selected_call.json). Do not infer it.
 - Step 2.7: Set `call_analysis_notes` to a string summarising: (a) the evaluation form file used, (b) any weights overlay applied, (c) any unmatched weight entries, (d) any assumptions or inferences made during matrix construction.
+- Step 2.8: Build the `evaluator_expectation_registry` data. For each criterion extracted in Step 2.2, construct an entry containing: `criterion_id`, `criterion_name`, `threshold_score` (the minimum passing score from the evaluation form's scoring thresholds, or null if not stated), and `evaluator_expectations` (an array of strings — the sub-criteria or aspects the evaluator is instructed to assess under this criterion, as extracted from the evaluation form). Wrap the criteria array in an instrument entry: `{"instrument_type": <resolved_instrument_type>, "criteria": [<array>]}`. Wrap in top-level `{"instruments": [<instrument_entry>]}`.
 
 ### 3. Output Construction
 
@@ -79,6 +83,12 @@ Return your output as a single JSON object in your response.
 - `compliance_checklist`: derived from Step 2.5 — array of `{requirement_id, description, status, source_section, source_document}`
 - `call_analysis_notes`: derived from Step 2.7 — string summarising extraction decisions
 
+**`evaluator_expectation_registry.json`:**
+- `instruments`: array containing one entry for the resolved instrument type
+- Each instrument entry: `{instrument_type (string — from resolved_instrument_type), criteria (array)}`
+- Each criterion entry: `{criterion_id (string), criterion_name (string), threshold_score (number or null), evaluator_expectations (array of strings — sub-criteria from evaluation form)}`
+- No `schema_id`, `run_id`, or `artifact_status` — this is a Tier 2A extracted artifact
+
 ### 4. Conformance Stamping
 
 - `schema_id`: set to "orch.phase1.call_analysis_summary.v1" at write time
@@ -88,7 +98,10 @@ Return your output as a single JSON object in your response.
 ### 5. Write Sequence
 
 - Step 5.1: Write `call_analysis_summary.json` to `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json`
-- If the target directory does not exist, create it before writing.
+- Step 5.2: Write `evaluator_expectation_registry.json` to `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json`
+- If either target directory does not exist, create it before writing.
+
+**Important — multi-target response format:** The runtime processes both `writes_to` targets in a single invocation. Your JSON response must contain root fields for BOTH artifacts at the top level. Specifically, the response must include `evaluation_matrix`, `compliance_checklist`, `schema_id`, `run_id` (for `call_analysis_summary.json`) AND `instruments` (for `evaluator_expectation_registry.json`) at the top level. The runtime extracts each sub-artifact by its root field name.
 
 ## Constitutional Constraint Enforcement
 

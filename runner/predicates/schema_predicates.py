@@ -40,16 +40,22 @@ Step 5 implementation brief):
     invalid JSON / missing field     → MALFORMED_ARTIFACT
     structurally-valid rule violation → POLICY_VIOLATION
 
-Registry format assumption (instrument_type_matches_schema)
------------------------------------------------------------
-``section_schema_registry.json`` (the schema_path argument) is expected
-to be a JSON object whose top-level keys are instrument type identifiers
-(e.g., "RIA", "IA", "CSA", "MSCA-PF").  An instrument_type matches when
-it appears as a key in this object.  This is the narrowest correct
-interpretation supported by the current (empty ``{}``) registry file; no
-other structural signal exists to distinguish field semantics.  When the
-registry is populated this interpretation must be validated against the
-actual format.
+Registry format (instrument_type_matches_schema)
+-------------------------------------------------
+``section_schema_registry.json`` supports two structural forms:
+
+Form B (canonical, per artifact_schema_specification.yaml §8):
+    ``{"instruments": [{"instrument_type": "RIA", ...}, ...]}``
+    An instrument_type matches when any element in the ``instruments``
+    array has a matching ``instrument_type`` field.
+
+Form A (legacy/test):
+    ``{"RIA": {...}, "IA": {...}, ...}``
+    Top-level keys are instrument type identifiers.  An instrument_type
+    matches when it appears as a key.
+
+Form B is checked first.  Form A is a fallback for backward
+compatibility with tests and pre-population states.
 
 Sentinel set (ethics_assessment_explicit)
 -----------------------------------------
@@ -361,12 +367,15 @@ def instrument_type_matches_schema(
         * schema_path is a valid JSON object (the section schema registry)
         * the ``instrument_type`` value is a key in the registry object
 
-    Registry format assumption
-    --------------------------
-    The section_schema_registry.json is expected to be a JSON object whose
-    top-level keys are instrument type identifiers (e.g., "RIA", "IA",
-    "CSA", "MSCA-PF").  A match is confirmed when ``instrument_type``
-    appears as a key.  See module docstring for the full rationale.
+    Registry format
+    ---------------
+    Two structural forms are supported (see module docstring):
+
+    Form B (canonical): ``{"instruments": [{"instrument_type": "RIA", ...}]}``
+    Form A (legacy):    ``{"RIA": {...}, "IA": {...}, ...}``
+
+    Form B is checked first.  A match is confirmed when any entry in the
+    ``instruments`` array has ``instrument_type`` equal to the call value.
 
     Failure categories
     ------------------
@@ -427,7 +436,47 @@ def instrument_type_matches_schema(
             details={**err.details, "schema_path": str(resolved_schema)},
         )
 
-    # Lookup: instrument_type must be a top-level key in the registry
+    # Lookup: Form B first (canonical), then Form A (legacy fallback).
+    instruments_raw = registry.get("instruments")
+    if isinstance(instruments_raw, list):
+        # Form B: {"instruments": [{"instrument_type": "RIA", ...}, ...]}
+        matched = any(
+            isinstance(entry, dict)
+            and entry.get("instrument_type") == instrument_type
+            for entry in instruments_raw
+        )
+        known_types = sorted(
+            entry.get("instrument_type", "<missing>")
+            for entry in instruments_raw
+            if isinstance(entry, dict)
+        )
+        if not matched:
+            return PredicateResult(
+                passed=False,
+                failure_category=POLICY_VIOLATION,
+                reason=(
+                    f"instrument_type {instrument_type!r} from {resolved_call} "
+                    f"is not registered in the schema registry at "
+                    f"{resolved_schema}.  "
+                    f"Known instrument types: {known_types}"
+                ),
+                details={
+                    "path": str(resolved_call),
+                    "schema_path": str(resolved_schema),
+                    "instrument_type": instrument_type,
+                    "registry_instrument_types": known_types,
+                },
+            )
+        return PredicateResult(
+            passed=True,
+            details={
+                "path": str(resolved_call),
+                "schema_path": str(resolved_schema),
+                "instrument_type": instrument_type,
+            },
+        )
+
+    # Form A fallback: top-level keys are instrument type identifiers
     if instrument_type not in registry:
         return PredicateResult(
             passed=False,
