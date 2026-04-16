@@ -1260,6 +1260,19 @@ def run_skill(
         # Artifacts from independent directories/files accumulate in
         # dir_artifacts and are handled by multi-artifact mode below.
 
+    # ── Deduplicate dir_artifacts by canonical_rel ──────────────────
+    # Multiple writes_to entries could theoretically resolve to the same
+    # canonical path (config mistake).  Deduplicate to avoid double
+    # validation/write.
+    if dir_artifacts:
+        _seen: set[str] = set()
+        _unique: list[tuple[str, dict]] = []
+        for _cp, _se in dir_artifacts:
+            if _cp not in _seen:
+                _seen.add(_cp)
+                _unique.append((_cp, _se))
+        dir_artifacts = _unique
+
     # ── Multi-artifact write path ────────────────────────────────────
     # Diagnostic: Phase E state
     try:
@@ -1278,6 +1291,9 @@ def run_skill(
         all_errors: list[str] = []
         pending_writes: list[tuple[str, dict]] = []
 
+        # Metadata fields are stamped separately from domain fields.
+        _META_FIELDS = {"schema_id", "run_id"}
+
         for canonical_rel, s_entry in dir_artifacts:
             exp_sid, req_fields = _extract_schema_requirements(s_entry)
             need_run_id = exp_sid is not None
@@ -1285,49 +1301,63 @@ def run_skill(
             if not req_fields:
                 continue  # Skip schemas with no required fields
 
-            # The primary required field is the root array/object key
-            # (e.g. "constraints", "outcomes", "impacts").
-            root_field = req_fields[0]
+            # Domain fields = required fields minus metadata.
+            # The first domain field is used as the anchor to detect
+            # whether Claude returned a flat or nested response shape.
+            domain_fields = [f for f in req_fields if f not in _META_FIELDS]
+            if not domain_fields:
+                continue  # No domain fields to anchor extraction
 
-            # Claude may return one of two response shapes:
-            #   Flat:       { "constraints": [...], "outcomes": [...] }
-            #   File-keyed: { "call_constraints.json": {"constraints": [...]}, ... }
-            # Accept both by trying flat lookup first, then file-keyed.
+            anchor_field = domain_fields[0]
+
+            # Claude may return one of several response shapes:
+            #   Flat:           { "evaluation_matrix": {...}, "instruments": [...] }
+            #   Canonical-keyed: { "docs/.../call_analysis_summary.json": {...} }
+            #   Basename-keyed:  { "call_analysis_summary.json": {...} }
+            #   Stem-keyed:      { "call_analysis_summary": {...} }
+            # Detect shape using the anchor field, then collect ALL
+            # required fields from the identified source dict.
             sub_artifact: dict | None = None
 
-            if root_field in parsed:
-                # Flat shape — root field at top level
-                sub_artifact = {root_field: parsed[root_field]}
+            if anchor_field in parsed:
+                # Flat shape — domain fields at top level of parsed.
+                # Collect all required fields present at top level.
+                sub_artifact = {}
+                for f in req_fields:
+                    if f in parsed:
+                        sub_artifact[f] = parsed[f]
             else:
-                # Full canonical-path-keyed shape — Claude returned the
-                # full repo-relative path as key (e.g.
-                # "docs/tier2b_.../extracted/call_constraints.json").
-                nested = parsed.get(canonical_rel)
-                if isinstance(nested, dict) and root_field in nested:
-                    sub_artifact = {root_field: nested[root_field]}
-                else:
-                    # File-keyed shape — look up by filename derived from
-                    # the canonical path (e.g. "call_constraints.json").
-                    file_key = canonical_rel.rsplit("/", 1)[-1]
-                    nested = parsed.get(file_key)
-                    if isinstance(nested, dict) and root_field in nested:
-                        sub_artifact = {root_field: nested[root_field]}
-                    else:
-                        # Also try without .json extension
-                        file_key_stem = file_key.rsplit(".", 1)[0]
-                        nested = parsed.get(file_key_stem)
-                        if isinstance(nested, dict) and root_field in nested:
-                            sub_artifact = {root_field: nested[root_field]}
+                # Try nested shapes: canonical path, basename, stem.
+                file_key = canonical_rel.rsplit("/", 1)[-1]
+                file_key_stem = file_key.rsplit(".", 1)[0]
+                source: dict | None = None
+                for key in (canonical_rel, file_key, file_key_stem):
+                    nested = parsed.get(key)
+                    if isinstance(nested, dict) and anchor_field in nested:
+                        source = nested
+                        break
+
+                if source is not None:
+                    sub_artifact = {}
+                    for f in req_fields:
+                        if f in source:
+                            sub_artifact[f] = source[f]
 
             if sub_artifact is None:
                 all_errors.append(
-                    f"Multi-artifact response missing root field "
-                    f"{root_field!r} for {canonical_rel!r}"
+                    f"Multi-artifact response missing field "
+                    f"{anchor_field!r} for {canonical_rel!r}"
                 )
                 continue
-            if need_run_id and "run_id" in parsed:
+
+            # Stamp metadata from top-level parsed as fallback
+            if need_run_id and "run_id" not in sub_artifact and "run_id" in parsed:
                 sub_artifact["run_id"] = parsed["run_id"]
-            if exp_sid is not None and "schema_id" in parsed:
+            if (
+                exp_sid is not None
+                and "schema_id" not in sub_artifact
+                and "schema_id" in parsed
+            ):
                 sub_artifact["schema_id"] = parsed["schema_id"]
 
             # Validate the sub-artifact independently

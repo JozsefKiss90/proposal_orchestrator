@@ -809,7 +809,9 @@ def _make_multi_target_env(tmp_path: Path) -> Path:
                 "fields": {
                     "schema_id": {"required": True},
                     "run_id": {"required": True},
+                    "resolved_instrument_type": {"required": True},
                     "evaluation_matrix": {"required": True},
+                    "compliance_checklist": {"required": True},
                 },
             },
         },
@@ -843,16 +845,30 @@ def multi_target_env(tmp_path: Path) -> Path:
 
 
 class TestMultiTargetWritesTo:
-    """Tests for skills that write to multiple independent writes_to targets."""
+    """Tests for skills that write to multiple independent writes_to targets.
 
-    def test_both_targets_written(self, multi_target_env: Path) -> None:
-        """Claude returns sub-artifacts for both targets; both files written."""
-        response = {
+    Target A is a multi-field artifact (call_analysis_summary.json) with
+    schema_id, run_id, resolved_instrument_type, evaluation_matrix,
+    compliance_checklist.
+
+    Target B is a single-root-field artifact (evaluator_expectation_registry.json)
+    with only instruments.
+    """
+
+    def _full_response(self) -> dict:
+        """Complete flat response with all required fields for both targets."""
+        return {
             "schema_id": "orch.phase1.call_analysis_summary.v1",
             "run_id": "run-001",
+            "resolved_instrument_type": "RIA",
             "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+            "compliance_checklist": [{"requirement_id": "CR-01"}],
             "instruments": [{"instrument_type": "RIA", "criteria": []}],
         }
+
+    def test_flat_mixed_response_both_written(self, multi_target_env: Path) -> None:
+        """Flat response with top-level metadata + domain fields + instruments."""
+        response = self._full_response()
         with _claude_returns(response):
             result = run_skill("multi-target-skill", "run-001", multi_target_env)
 
@@ -865,19 +881,68 @@ class TestMultiTargetWritesTo:
         assert t4_path.exists()
         assert t2a_path.exists()
 
-        # Verify content
+        # Verify multi-field artifact has ALL domain fields
         t4_data = json.loads(t4_path.read_text(encoding="utf-8"))
-        assert "evaluation_matrix" in t4_data
+        assert t4_data["evaluation_matrix"] == {"EXC": {"criterion_id": "EXC"}}
+        assert t4_data["compliance_checklist"] == [{"requirement_id": "CR-01"}]
+        assert t4_data["resolved_instrument_type"] == "RIA"
+        assert t4_data["schema_id"] == "orch.phase1.call_analysis_summary.v1"
+        assert t4_data["run_id"] == "run-001"
 
+        # Verify single-root-field artifact
         t2a_data = json.loads(t2a_path.read_text(encoding="utf-8"))
         assert "instruments" in t2a_data
+
+    def test_nested_keyed_multi_field_target(self, multi_target_env: Path) -> None:
+        """Canonical-path-keyed shape for the multi-field target."""
+        response = {
+            "docs/tier4/phase1/call_analysis_summary.json": {
+                "schema_id": "orch.phase1.call_analysis_summary.v1",
+                "run_id": "run-001",
+                "resolved_instrument_type": "RIA",
+                "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+                "compliance_checklist": [{"requirement_id": "CR-01"}],
+            },
+            "instruments": [{"instrument_type": "RIA", "criteria": []}],
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-target-skill", "run-001", multi_target_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 2
+
+        t4_data = json.loads(
+            (multi_target_env / "docs/tier4/phase1/call_analysis_summary.json")
+            .read_text(encoding="utf-8")
+        )
+        assert t4_data["evaluation_matrix"] == {"EXC": {"criterion_id": "EXC"}}
+        assert t4_data["compliance_checklist"] == [{"requirement_id": "CR-01"}]
+
+    def test_missing_field_in_multi_field_target(self, multi_target_env: Path) -> None:
+        """Omit compliance_checklist from multi-field target; fails validation."""
+        response = {
+            "schema_id": "orch.phase1.call_analysis_summary.v1",
+            "run_id": "run-001",
+            "resolved_instrument_type": "RIA",
+            "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+            # Missing: "compliance_checklist"
+            "instruments": [{"instrument_type": "RIA", "criteria": []}],
+        }
+        with _claude_returns(response):
+            result = run_skill("multi-target-skill", "run-001", multi_target_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "MALFORMED_ARTIFACT"
+        assert "compliance_checklist" in result.failure_reason
 
     def test_missing_second_target_fails(self, multi_target_env: Path) -> None:
         """Claude returns only first target's artifact; fails MALFORMED_ARTIFACT."""
         response = {
             "schema_id": "orch.phase1.call_analysis_summary.v1",
             "run_id": "run-001",
+            "resolved_instrument_type": "RIA",
             "evaluation_matrix": {"EXC": {"criterion_id": "EXC"}},
+            "compliance_checklist": [{"requirement_id": "CR-01"}],
             # Missing: "instruments" key for the second target
         }
         with _claude_returns(response):
@@ -890,7 +955,7 @@ class TestMultiTargetWritesTo:
         """Claude returns only second target's artifact; fails MALFORMED_ARTIFACT."""
         response = {
             "instruments": [{"instrument_type": "RIA", "criteria": []}],
-            # Missing: "evaluation_matrix" for first target
+            # Missing: all domain fields for the multi-field target
         }
         with _claude_returns(response):
             result = run_skill("multi-target-skill", "run-001", multi_target_env)
