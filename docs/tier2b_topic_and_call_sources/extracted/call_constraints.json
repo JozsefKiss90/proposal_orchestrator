@@ -2,15 +2,15 @@
   "constraints": [
     {
       "constraint_id": "CC-01",
-      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
-      "constraint_type": "scope",
-      "source_section": "technology_readiness_level",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
+      "constraint_type": "reporting",
+      "source_section": "call_entry.expected_outcome",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-02",
-      "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
+      "description": "When possible, proposals should build on and reuse public results from relevant previously funded actions.",
       "constraint_type": "methodological",
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -18,14 +18,6 @@
     },
     {
       "constraint_id": "CC-03",
-      "description": "When possible, proposals should build on and reuse public results from relevant previous funded actions.",
-      "constraint_type": "methodological",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-04",
       "description": "Communicable results should be shared with the European R&D community through the AI-on-demand platform.",
       "constraint_type": "reporting",
       "source_section": "call_entry.scope",
@@ -33,39 +25,23 @@
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-05",
+      "constraint_id": "CC-04",
       "description": "Projects selected in this topic should link to the resources offered by the AI Factories, including the Data Labs.",
-      "constraint_type": "methodological",
+      "constraint_type": "scope",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-05",
+      "description": "This topic implements the co-programmed European Partnership on AI, data, and robotics (ADRA), and all proposals are expected to allocate tasks for cohesion activities with ADRA and the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+      "constraint_type": "partnership",
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-06",
-      "description": "All proposals are expected to allocate tasks for cohesion activities with the co-programmed European Partnership on AI, data, and robotics (ADRA).",
-      "constraint_type": "partnership",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-07",
-      "description": "All proposals are expected to allocate tasks for cohesion activities with CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
-      "constraint_type": "partnership",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-08",
-      "description": "Maximum EU contribution per project is 19,000,000 EUR. The indicative total topic budget is 38,000,000 EUR for an indicative 2 projects.",
-      "constraint_type": "eligibility",
-      "source_section": "call_entry.max_contribution / call_entry.indicative_budget",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-09",
       "description": "Proposals should build on or seek collaboration with relevant projects and develop synergies with other relevant International, European, national, or regional initiatives.",
       "constraint_type": "partnership",
       "source_section": "call_entry.scope",
@@ -73,35 +49,43 @@
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-10",
-      "description": "To ensure portfolio coverage, grants will be awarded to applications not only in order of ranking, but also to at least one proposal focusing on each of three sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving, subject to proposals passing all evaluation thresholds.",
+      "constraint_id": "CC-07",
+      "description": "Participation is restricted to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom. Entities controlled by non-eligible countries may be excluded unless guarantees are provided.",
+      "constraint_type": "eligibility",
+      "source_section": "eligibility_restrictions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-08",
+      "description": "To ensure portfolio coverage, grants will be awarded to applications not only in order of ranking, but also to at least one proposal focusing on each of the three sectors (healthcare, advanced manufacturing, in-vehicle autonomous driving), subject to proposals passing all evaluation thresholds.",
       "constraint_type": "scope",
       "source_section": "procedure_exceptions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-11",
-      "description": "Financial Support to Third Parties (FSTP) provisions apply: maximum 300,000 EUR per third party at grant stage 2; maximum 2,250,000 EUR per third party at grant stage 3; maximum 2,550,000 EUR per third party total.",
+      "constraint_id": "CC-09",
+      "description": "Financial support to third parties (FSTP) is permitted. Maximum FSTP per grant at stage 2: €300,000; at stage 3: €2,250,000; maximum per third party: €2,550,000.",
       "constraint_type": "other",
       "source_section": "fstp_provisions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-12",
-      "description": "Submission follows a single-stage deadline model with a submission deadline of 2026-04-15.",
-      "constraint_type": "other",
-      "source_section": "call_entry.deadline_model",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "constraint_id": "CC-10",
+      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "constraint_type": "scope",
+      "source_section": "technology_readiness_level",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-13",
-      "description": "This topic implements the co-programmed European Partnership on AI, data, and robotics (ADRA); proposals must align with and contribute to the ADRA co-programming framework.",
-      "constraint_type": "partnership",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "constraint_id": "CC-11",
+      "description": "The results may be validated in the Testing and Experiment Facilities and further deployed via the European Digital Innovation Hubs (EDIHs), and must contribute to the Apply AI strategy.",
+      "constraint_type": "scope",
+      "source_section": "platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     }
   ]

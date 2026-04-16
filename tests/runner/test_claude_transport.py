@@ -270,6 +270,47 @@ class TestTimeout:
     def test_is_subclass_of_transport_error(self) -> None:
         assert issubclass(ClaudeCLITimeoutError, ClaudeTransportError)
 
+    def test_timeout_preserves_stdout_stderr(self) -> None:
+        te = subprocess.TimeoutExpired(cmd=["claude", "-p"], timeout=120)
+        te.stdout = "partial output"
+        te.stderr = "some warning"
+        with patch(_SUBPROCESS_TARGET, side_effect=te):
+            with pytest.raises(ClaudeCLITimeoutError) as exc_info:
+                invoke_claude_text(**_call_kwargs(), timeout_seconds=120)
+        err = exc_info.value
+        assert err.stdout == "partial output"
+        assert err.stderr == "some warning"
+
+    def test_timeout_preserves_command(self) -> None:
+        te = subprocess.TimeoutExpired(cmd=["claude", "-p"], timeout=60)
+        with patch(_SUBPROCESS_TARGET, side_effect=te):
+            with pytest.raises(ClaudeCLITimeoutError) as exc_info:
+                invoke_claude_text(**_call_kwargs(), timeout_seconds=60)
+        err = exc_info.value
+        assert isinstance(err.command, list)
+        assert err.command[0] == "claude"
+
+    def test_timeout_has_elapsed_seconds(self) -> None:
+        te = subprocess.TimeoutExpired(cmd="claude", timeout=30)
+        with patch(_SUBPROCESS_TARGET, side_effect=te):
+            with pytest.raises(ClaudeCLITimeoutError) as exc_info:
+                invoke_claude_text(**_call_kwargs(), timeout_seconds=30)
+        err = exc_info.value
+        assert err.timeout_seconds == 30
+        assert isinstance(err.elapsed_seconds, float)
+        assert err.elapsed_seconds >= 0
+
+    def test_timeout_none_stdout_stays_none(self) -> None:
+        """When subprocess captures nothing, stdout/stderr are None, not ''."""
+        te = subprocess.TimeoutExpired(cmd="claude", timeout=60)
+        # TimeoutExpired defaults: stdout=None, stderr=None
+        with patch(_SUBPROCESS_TARGET, side_effect=te):
+            with pytest.raises(ClaudeCLITimeoutError) as exc_info:
+                invoke_claude_text(**_call_kwargs(), timeout_seconds=60)
+        err = exc_info.value
+        assert err.stdout is None
+        assert err.stderr is None
+
 
 # ---------------------------------------------------------------------------
 # Empty / whitespace stdout

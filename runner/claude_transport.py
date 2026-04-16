@@ -21,6 +21,7 @@ Authoritative source:
 from __future__ import annotations
 
 import subprocess
+import time
 
 
 # ---------------------------------------------------------------------------
@@ -41,7 +42,28 @@ class ClaudeCLIUnavailableError(ClaudeTransportError):
 
 
 class ClaudeCLITimeoutError(ClaudeTransportError):
-    """Raised when a ``claude`` CLI invocation exceeds the timeout."""
+    """Raised when a ``claude`` CLI invocation exceeds the timeout.
+
+    Carries structured diagnostic fields so that callers can write rich
+    timeout diagnostic bundles without re-parsing exception messages.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        stdout: str | None = None,
+        stderr: str | None = None,
+        command: list[str] | None = None,
+        timeout_seconds: int | None = None,
+        elapsed_seconds: float | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.stdout = stdout
+        self.stderr = stderr
+        self.command = command
+        self.timeout_seconds = timeout_seconds
+        self.elapsed_seconds = elapsed_seconds
 
 
 # ---------------------------------------------------------------------------
@@ -135,6 +157,7 @@ def invoke_claude_text(
             + user_prompt
         )
 
+    _t0 = time.monotonic()
     try:
         completed = subprocess.run(
             cmd,
@@ -150,9 +173,15 @@ def invoke_claude_text(
             "The 'claude' CLI executable was not found on PATH. "
             "Ensure Claude Code is installed and available."
         )
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
+        _elapsed = time.monotonic() - _t0
         raise ClaudeCLITimeoutError(
-            f"Claude CLI invocation timed out after {timeout_seconds}s"
+            f"Claude CLI invocation timed out after {timeout_seconds}s",
+            stdout=exc.stdout if isinstance(exc.stdout, str) else None,
+            stderr=exc.stderr if isinstance(exc.stderr, str) else None,
+            command=cmd,
+            timeout_seconds=timeout_seconds,
+            elapsed_seconds=round(_elapsed, 3),
         )
     except Exception as exc:
         raise ClaudeTransportError(

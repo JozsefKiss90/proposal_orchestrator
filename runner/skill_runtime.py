@@ -40,7 +40,11 @@ from typing import Any, Optional
 
 import yaml
 
-from runner.claude_transport import ClaudeTransportError, invoke_claude_text
+from runner.claude_transport import (
+    ClaudeCLITimeoutError,
+    ClaudeTransportError,
+    invoke_claude_text,
+)
 from runner.runtime_models import SkillResult
 
 logger = logging.getLogger(__name__)
@@ -628,6 +632,87 @@ def _invoke_claude(
 
 
 # ---------------------------------------------------------------------------
+# Timeout diagnostic bundle
+# ---------------------------------------------------------------------------
+
+
+def _write_timeout_diagnostics(
+    *,
+    skill_id: str,
+    run_id: str,
+    node_id: str | None,
+    mode: str,
+    reads_from: list[str],
+    writes_to: list[str],
+    system_prompt: str,
+    user_prompt: str,
+    exc: ClaudeCLITimeoutError,
+    repo_root: Path,
+) -> dict[str, str]:
+    """Write a diagnostic bundle for a cli-prompt timeout failure.
+
+    Returns a dict mapping logical names to repo-relative paths of
+    the written diagnostic files.
+    """
+    diag_dir = repo_root / ".claude" / "skill_diag"
+    diag_dir.mkdir(parents=True, exist_ok=True)
+    prefix = f"{skill_id}_{run_id[:8]}"
+    written: dict[str, str] = {}
+
+    partial_stdout = exc.stdout or ""
+    partial_stderr = exc.stderr or ""
+
+    # -- timeout_meta.json --
+    meta = {
+        "skill_id": skill_id,
+        "execution_mode": mode,
+        "run_id": run_id,
+        "node_id": node_id,
+        "reads_from": reads_from,
+        "writes_to": writes_to,
+        "model": SKILL_MODEL,
+        "max_tokens": SKILL_MAX_TOKENS,
+        "timeout_seconds": exc.timeout_seconds,
+        "elapsed_seconds": exc.elapsed_seconds,
+        "system_prompt_size": len(system_prompt),
+        "user_prompt_size": len(user_prompt),
+        "command": exc.command,
+        "had_partial_stdout": bool(partial_stdout.strip()),
+        "had_stderr": bool(partial_stderr.strip()),
+    }
+
+    file_map = {
+        "meta": (f"{prefix}_timeout_meta.json", None),
+        "system_prompt": (f"{prefix}_system_prompt.txt", system_prompt),
+        "user_prompt": (f"{prefix}_user_prompt.txt", user_prompt),
+        "stdout": (f"{prefix}_stdout.txt", partial_stdout),
+        "stderr": (f"{prefix}_stderr.txt", partial_stderr),
+    }
+
+    # Populate diagnostic_files in meta before writing
+    meta["diagnostic_files"] = {
+        k: f".claude/skill_diag/{fname}" for k, (fname, _) in file_map.items()
+    }
+
+    try:
+        meta_path = diag_dir / file_map["meta"][0]
+        meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+        written["meta"] = f".claude/skill_diag/{file_map['meta'][0]}"
+    except OSError:
+        pass
+
+    for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
+        fname, content = file_map[key]
+        try:
+            (diag_dir / fname).write_text(content or "", encoding="utf-8")
+            written[key] = f".claude/skill_diag/{fname}"
+        except OSError:
+            pass
+
+    return written
+
+
+# ---------------------------------------------------------------------------
 # Phase D — Response parsing and validation
 # ---------------------------------------------------------------------------
 
@@ -978,11 +1063,41 @@ def run_skill(
         )
 
         # Phase C: Claude invocation via runtime transport
-        response_text, api_error = _invoke_claude(system_prompt, user_prompt)
-        if api_error is not None:
+        try:
+            response_text = invoke_claude_text(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model=SKILL_MODEL,
+                max_tokens=SKILL_MAX_TOKENS,
+            )
+        except ClaudeCLITimeoutError as exc:
+            diag_paths = _write_timeout_diagnostics(
+                skill_id=skill_id,
+                run_id=run_id,
+                node_id=node_id,
+                mode=mode,
+                reads_from=reads_from,
+                writes_to=writes_to,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                exc=exc,
+                repo_root=repo_root,
+            )
+            meta_rel = diag_paths.get("meta", "")
             return SkillResult(
                 status="failure",
-                failure_reason=f"Skill {skill_id!r}: {api_error}",
+                failure_reason=(
+                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
+                    f"Diagnostics written to {meta_rel}"
+                ),
+                failure_category="INCOMPLETE_OUTPUT",
+            )
+        except ClaudeTransportError as exc:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: Claude transport failed: {exc}"
+                ),
                 failure_category="INCOMPLETE_OUTPUT",
             )
 

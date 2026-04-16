@@ -2,17 +2,17 @@
   "conditions": [
     {
       "condition_id": "EC-01",
-      "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "description": "Participation is restricted to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
       "condition_type": "geographic",
-      "source_section": "eligibility_restrictions.eligible_entities",
+      "source_section": "eligibility_restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-02",
-      "description": "Entities controlled by non-eligible countries may be excluded from participation unless appropriate guarantees are provided.",
-      "condition_type": "other",
-      "source_section": "eligibility_restrictions.control_restrictions",
+      "description": "Legal entities controlled by non-eligible countries may be excluded from participation unless guarantees are provided.",
+      "condition_type": "geographic",
+      "source_section": "eligibility_restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
@@ -26,7 +26,7 @@
     },
     {
       "condition_id": "EC-04",
-      "description": "The maximum EU contribution per project is 19,000,000 EUR.",
+      "description": "Maximum EU contribution per project is €19,000,000. The indicative total call budget is €38,000,000 for an indicative 2 projects.",
       "condition_type": "budget_limit",
       "source_section": "call_entry.max_contribution",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -34,21 +34,20 @@
     },
     {
       "condition_id": "EC-05",
-      "description": "Standard Horizon Europe minimum consortium composition requirements for RIA apply (typically minimum 3 independent legal entities from 3 different eligible countries). Not explicitly restated in the topic-specific text.",
-      "condition_type": "consortium_composition",
-      "source_section": "call_entry.eligibility_conditions",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Assumed",
-      "assumption_note": "The call_entry.eligibility_conditions field is empty in the source slice document. Standard Horizon Europe RIA consortium composition rules (minimum 3 independent legal entities established in 3 different EU Member States or associated countries) apply per the General Annexes and are not topic-specific derogations. This assumption must be verified against the applicable Tier 1 normative framework documents (General Annexes) before use in compliance checking."
+      "description": "Communicable results must be shared with the European R&D community through the AI-on-demand platform as an open access dissemination requirement.",
+      "condition_type": "open_access",
+      "source_section": "platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
     },
     {
       "condition_id": "EC-06",
-      "description": "Open access obligations for research outputs and publications apply under the standard Horizon Europe open access policy.",
-      "condition_type": "open_access",
-      "source_section": "call_entry.eligibility_conditions",
+      "description": "Standard Research and Innovation Action (RIA) consortium composition requirements apply. The topic call extract identifies this as an RIA but does not explicitly state minimum consortium size or country diversity rules; these must be verified against the Horizon Europe General Annexes.",
+      "condition_type": "consortium_composition",
+      "source_section": "call_entry.call_type",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "The call_entry.eligibility_conditions field is empty in the source slice. Open access conditions for RIA are standard Horizon Europe requirements per the Grant Agreement and General Annexes and are not topic-specific. This assumption must be verified against Tier 1 normative framework documents. The additional requirement to share results via the AI-on-demand platform (SR-06, CC-04) supplements but does not substitute for the general open access obligation."
+      "assumption_note": "The call extract identifies this as a Research and Innovation Action (RIA) but does not state specific minimum consortium composition rules (e.g., minimum 3 legal entities from 3 different eligible countries). Standard Horizon Europe RIA consortium rules are assumed based on the declared instrument type. Verification against General Annex B is required before submission."
     }
   ]
 }

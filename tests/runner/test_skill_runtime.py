@@ -29,7 +29,7 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from runner.claude_transport import ClaudeTransportError
+from runner.claude_transport import ClaudeCLITimeoutError, ClaudeTransportError
 from runner.runtime_models import SkillResult
 from runner.skill_runtime import (
     _assemble_skill_prompt,
@@ -175,6 +175,25 @@ def _claude_fails(error_msg: str):
     )
 
 
+def _claude_times_out(
+    timeout_seconds: int = 300,
+    stdout: str | None = None,
+    stderr: str | None = None,
+):
+    """Patch ``invoke_claude_text`` to raise a timeout error with diagnostics."""
+    return patch(
+        _TRANSPORT_TARGET,
+        side_effect=ClaudeCLITimeoutError(
+            f"Claude CLI invocation timed out after {timeout_seconds}s",
+            stdout=stdout,
+            stderr=stderr,
+            command=["claude", "-p", "--model", "claude-sonnet-4-6"],
+            timeout_seconds=timeout_seconds,
+            elapsed_seconds=float(timeout_seconds) + 0.123,
+        ),
+    )
+
+
 # ---------------------------------------------------------------------------
 # run_skill — success path
 # ---------------------------------------------------------------------------
@@ -289,6 +308,111 @@ class TestRunSkillMalformedResponse:
 
         assert result.status == "failure"
         assert result.failure_category == "INCOMPLETE_OUTPUT"
+
+
+# ---------------------------------------------------------------------------
+# run_skill — cli-prompt timeout diagnostics
+# ---------------------------------------------------------------------------
+
+
+class TestCliPromptTimeoutDiagnostics:
+    """Verify that cli-prompt timeout failures write a rich diagnostic bundle."""
+
+    def test_timeout_returns_failure_result(self, skill_env: Path) -> None:
+        """Timeout still produces a failure SkillResult (contract preserved)."""
+        with _claude_times_out():
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+        assert "timed out" in result.failure_reason
+
+    def test_timeout_failure_reason_includes_diag_path(self, skill_env: Path) -> None:
+        """Failure reason must include a pointer to the diagnostic file."""
+        with _claude_times_out():
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert ".claude/skill_diag/" in result.failure_reason
+        assert "timeout_meta.json" in result.failure_reason
+
+    def test_timeout_writes_meta_json(self, skill_env: Path) -> None:
+        """Timeout must write a timeout_meta.json with all required fields."""
+        with _claude_times_out(timeout_seconds=300, stderr="some warning"):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_timeout_meta.json"
+        )
+        assert meta_path.exists()
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+
+        assert meta["skill_id"] == "test-skill"
+        assert meta["execution_mode"] == "cli-prompt"
+        assert meta["run_id"] == "run-001"
+        assert meta["timeout_seconds"] == 300
+        assert isinstance(meta["elapsed_seconds"], float)
+        assert isinstance(meta["system_prompt_size"], int)
+        assert meta["system_prompt_size"] > 0
+        assert isinstance(meta["user_prompt_size"], int)
+        assert meta["user_prompt_size"] > 0
+        assert meta["model"] is not None
+        assert meta["max_tokens"] is not None
+        assert isinstance(meta["command"], list)
+        assert isinstance(meta["reads_from"], list)
+        assert isinstance(meta["writes_to"], list)
+        assert isinstance(meta["had_partial_stdout"], bool)
+        assert meta["had_stderr"] is True
+        assert isinstance(meta["diagnostic_files"], dict)
+
+    def test_timeout_writes_prompt_files(self, skill_env: Path) -> None:
+        """Timeout must write system_prompt.txt and user_prompt.txt."""
+        with _claude_times_out():
+            run_skill("test-skill", "run-001", skill_env)
+
+        diag_dir = skill_env / ".claude" / "skill_diag"
+        sys_path = diag_dir / "test-skill_run-001_system_prompt.txt"
+        usr_path = diag_dir / "test-skill_run-001_user_prompt.txt"
+        assert sys_path.exists()
+        assert usr_path.exists()
+        assert len(sys_path.read_text(encoding="utf-8")) > 0
+        assert len(usr_path.read_text(encoding="utf-8")) > 0
+
+    def test_timeout_writes_stdout_stderr_files(self, skill_env: Path) -> None:
+        """stdout and stderr files are always written (even if empty)."""
+        with _claude_times_out(stdout="partial data", stderr="warn"):
+            run_skill("test-skill", "run-001", skill_env)
+
+        diag_dir = skill_env / ".claude" / "skill_diag"
+        stdout_path = diag_dir / "test-skill_run-001_stdout.txt"
+        stderr_path = diag_dir / "test-skill_run-001_stderr.txt"
+        assert stdout_path.exists()
+        assert stdout_path.read_text(encoding="utf-8") == "partial data"
+        assert stderr_path.exists()
+        assert stderr_path.read_text(encoding="utf-8") == "warn"
+
+    def test_timeout_with_node_id(self, skill_env: Path) -> None:
+        """node_id is recorded in meta when provided."""
+        with _claude_times_out():
+            run_skill("test-skill", "run-001", skill_env, node_id="n01_call_analysis")
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_timeout_meta.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["node_id"] == "n01_call_analysis"
+
+    def test_non_timeout_transport_error_no_diagnostic_bundle(self, skill_env: Path) -> None:
+        """Generic transport errors should NOT write timeout diagnostic files."""
+        with _claude_fails("Connection reset"):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_timeout_meta.json"
+        )
+        assert not meta_path.exists()
 
 
 # ---------------------------------------------------------------------------
