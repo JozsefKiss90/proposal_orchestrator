@@ -84,8 +84,8 @@ skill_catalog:
     purpose: >
       Check the alignment between the project concept and the call expected
       outcomes and scope requirements. Identify vocabulary gaps, framing mismatches,
-      and uncovered expected outcomes. Produce topic mapping and compliance profile
-      for Tier 3 call binding.
+      and uncovered expected outcomes. Produce concept refinement summary with
+      topic mapping rationale for downstream derivation.
     used_by_agents:
       - concept_refiner
     reads_from:
@@ -97,11 +97,34 @@ skill_catalog:
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
       - docs/tier4_orchestration_state/decision_log/
-      - docs/tier3_project_instantiation/call_binding/topic_mapping.json
-      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
     constitutional_constraints:
       - "Alignment must be tested against Tier 2B extracted files, not assumed from concept vocabulary"
       - "Uncovered expected outcomes must be flagged, not silently assumed covered"
+
+  - id: concept-call-binding-derivation
+    execution_mode: "tapm"
+    purpose: >
+      Derive Tier 3 call binding artifacts (topic_mapping.json and
+      compliance_profile.json) from the concept refinement summary and
+      Tier 2B extracted files. Lightweight deterministic transformation
+      of topic_mapping_rationale entries into structured mappings and
+      derivation of compliance flags from call constraints and eligibility
+      conditions.
+    used_by_agents:
+      - concept_refiner
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+      - docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+    writes_to:
+      - docs/tier3_project_instantiation/call_binding/topic_mapping.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+    constitutional_constraints:
+      - "topic_mapping entries must be derived from topic_mapping_rationale in concept_refinement_summary.json, not invented"
+      - "compliance_profile flags must be derived from Tier 2B call_constraints and eligibility_conditions, not assumed from generic programme knowledge"
+      - "Must fail closed if concept_refinement_summary.json is absent or empty"
 
   - id: work-package-normalization
     purpose: >

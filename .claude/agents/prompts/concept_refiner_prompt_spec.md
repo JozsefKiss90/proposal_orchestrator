@@ -65,16 +65,19 @@ Apply the `concept-alignment-check` skill: systematically compare the project br
 - Determine whether the project concept addresses it
 - If yes: identify the Tier 3 evidence and the alignment mapping
 - If no: flag it as an uncovered outcome — do not assert coverage that does not exist
-Record vocabulary gaps (terms used in call documents that are absent from the project brief) for refinement.
+Record vocabulary gaps (terms used in call documents that are absent from the project brief) for refinement. This skill produces `concept_refinement_summary.json` with `topic_mapping_rationale` but does NOT produce `topic_mapping.json` or `compliance_profile.json`.
+
+**Step 3.5 — Invoke concept-call-binding-derivation skill.**
+Apply the `concept-call-binding-derivation` skill: derive `topic_mapping.json` and `compliance_profile.json` from the `concept_refinement_summary.json` produced by concept-alignment-check. This skill reads the `topic_mapping_rationale` field from the summary and mechanically transforms each entry into a structured mapping entry. It also derives compliance flags from `call_constraints.json` and `eligibility_conditions.json`. Both outputs are written to `docs/tier3_project_instantiation/call_binding/`.
 
 **Step 4 — Invoke topic-scope-check skill.**
 Apply the `topic-scope-check` skill: verify that the refined concept stays within the topic scope boundary defined by `scope_requirements.json`. Flag any elements of the concept that fall outside the scope boundary. For each scope conflict: record both source references, propose a resolution if available, or mark as unresolved. Any unresolved scope conflict will block `phase_02_gate`.
 
-**Step 5 — Construct topic_mapping.json.**
-Produce `topic_mapping.json` entries: for each call topic element (expected outcome or scope requirement identifier), create a mapping entry with `topic_element_id` (from Tier 2B), `mapping_to_concept` (how the project addresses it), `tier2b_source_ref` (Tier 2B section/file), and `tier3_evidence_ref` (Tier 3 path/field). Every entry must carry both source references. Uncovered outcomes must be flagged — not omitted or silently assumed covered.
+**Step 5 — Verify topic_mapping.json on disk.**
+Confirm that `concept-call-binding-derivation` (Step 3.5) has produced `docs/tier3_project_instantiation/call_binding/topic_mapping.json` with non-empty entries carrying both `tier2b_source_ref` and `tier3_evidence_ref`. If absent or empty, the Phase 2 gate will fail on predicates `g03_p02` and `g03_p03`.
 
-**Step 6 — Construct compliance_profile.json.**
-Produce `compliance_profile.json` entries: for each eligibility condition and call constraint from Tier 2B, create a compliance entry with `condition_id`, `compliance_status` (compliant / requires_action / not_applicable), `evidence_ref` (Tier 3 source), and `tier2b_source_ref`. Do not fabricate compliance — if evidence is absent in Tier 3, set `compliance_status: requires_action`.
+**Step 6 — Verify compliance_profile.json on disk.**
+Confirm that `concept-call-binding-derivation` (Step 3.5) has produced `docs/tier3_project_instantiation/call_binding/compliance_profile.json` with all required fields populated. If absent or empty, the Phase 2 gate will fail on predicate `g03_p04`.
 
 **Step 7 — Invoke proposal-section-traceability-check skill.**
 Before finalizing `concept_refinement_summary.json`, apply the `proposal-section-traceability-check` skill to all material claims. Assign Confirmed/Inferred/Assumed/Unresolved status to each claim. Confirmed status requires naming the specific source artifact. Write any unattributed assertions to `docs/tier4_orchestration_state/validation_reports/`.
