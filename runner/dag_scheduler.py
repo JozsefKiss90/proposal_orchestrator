@@ -231,10 +231,21 @@ def bootstrap_phase_prerequisites(
             if result_data.get("status") == "pass":
                 ctx.set_node_state(node_id, "released")
                 bootstrapped.append(node_id)
+                # Record accepted upstream gate evidence so that
+                # downstream gate_pass_recorded predicates can verify
+                # the run_id mismatch was explicitly accepted by this
+                # run's continuation bootstrap.
+                ctx.record_accepted_upstream_gate(
+                    gate_id=exit_gate_id,
+                    original_run_id=result_data.get("run_id", "unknown"),
+                    evidence_path=gate_result_rel,
+                )
                 log.info(
-                    "  Bootstrap: %s -> released (evidence: %s)",
+                    "  Bootstrap: %s -> released (evidence: %s, "
+                    "original_run_id: %s)",
                     node_id,
                     gate_result_rel,
+                    result_data.get("run_id", "unknown"),
                 )
         except (json.JSONDecodeError, OSError, TypeError):
             continue  # corrupt or unreadable evidence — remain pending

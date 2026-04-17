@@ -88,6 +88,47 @@ def _max_upstream_mtime(
     return max_ts
 
 
+def _check_continuation_acceptance(
+    gate_id: str,
+    current_run_id: str,
+    recorded_run_id: str,
+    repo_root: Optional[Path],
+) -> bool:
+    """Check whether *gate_id*'s run_id mismatch was explicitly accepted.
+
+    Returns ``True`` when the current run's continuation bootstrap recorded
+    an acceptance of *gate_id* with *recorded_run_id* as the original run.
+    Returns ``False`` in all other cases (no RunContext, no acceptance record,
+    original_run_id mismatch, status != pass, or any error).
+
+    This is a **narrow** continuation-contract check — it does not globally
+    relax run_id enforcement.  It only accepts mismatches that were
+    explicitly recorded by :func:`bootstrap_phase_prerequisites`.
+    """
+    if repo_root is None:
+        return False
+    try:
+        from runner.run_context import RunContext, RUNS_DIR_REL
+
+        manifest_path = (
+            repo_root / RUNS_DIR_REL / current_run_id / "run_manifest.json"
+        )
+        if not manifest_path.exists():
+            return False
+        ctx = RunContext.load(repo_root, current_run_id)
+        accepted = ctx.get_accepted_upstream_gate(gate_id)
+        if accepted is None:
+            return False
+        if accepted.get("original_run_id") != recorded_run_id:
+            return False
+        if accepted.get("status") != "pass":
+            return False
+        return True
+    except Exception:  # noqa: BLE001
+        # Any infrastructure failure — fail closed
+        return False
+
+
 def gate_pass_recorded(
     gate_id: str,
     run_id: str,
@@ -235,23 +276,29 @@ def gate_pass_recorded(
             },
         )
 
-    # 5 — run_id must match
+    # 5 — run_id must match (or be accepted via continuation bootstrap)
     recorded_run_id: str = data["run_id"]
     if recorded_run_id != run_id:
-        return PredicateResult(
-            passed=False,
-            failure_category=STALE_UPSTREAM_MISMATCH,
-            reason=(
-                f"Gate result for '{gate_id}' was produced by a different run. "
-                f"Expected run_id='{run_id}', found '{recorded_run_id}'."
-            ),
-            details={
-                "gate_id": gate_id,
-                "path": str(result_path),
-                "expected_run_id": run_id,
-                "recorded_run_id": recorded_run_id,
-            },
+        # Check if this gate was explicitly accepted as upstream evidence
+        # during the current run's phase-scoped continuation bootstrap.
+        accepted = _check_continuation_acceptance(
+            gate_id, run_id, recorded_run_id, repo_root
         )
+        if not accepted:
+            return PredicateResult(
+                passed=False,
+                failure_category=STALE_UPSTREAM_MISMATCH,
+                reason=(
+                    f"Gate result for '{gate_id}' was produced by a different run. "
+                    f"Expected run_id='{run_id}', found '{recorded_run_id}'."
+                ),
+                details={
+                    "gate_id": gate_id,
+                    "path": str(result_path),
+                    "expected_run_id": run_id,
+                    "recorded_run_id": recorded_run_id,
+                },
+            )
 
     # 6 — manifest_version must match current library's MANIFEST_VERSION
     recorded_manifest: str = data["manifest_version"]

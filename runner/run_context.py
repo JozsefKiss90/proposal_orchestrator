@@ -306,6 +306,51 @@ class RunContext:
         return details.get(node_id)
 
     # ------------------------------------------------------------------
+    # Continuation acceptance (phase-scoped bootstrap)
+    # ------------------------------------------------------------------
+
+    def record_accepted_upstream_gate(
+        self,
+        gate_id: str,
+        original_run_id: str,
+        evidence_path: str,
+    ) -> None:
+        """Record that upstream gate evidence from a prior run was accepted.
+
+        Called by :func:`bootstrap_phase_prerequisites` when prior-run gate
+        evidence is accepted to seed an upstream node as ``released``.  The
+        record is persisted in the run manifest so that downstream predicates
+        (specifically ``gate_pass_recorded``) can verify that the run_id
+        mismatch was explicitly accepted by the current run's continuation
+        bootstrap — not a stale artifact from an unrelated run.
+
+        The acceptance record preserves provenance: the original artifact's
+        ``run_id`` is stored separately from the current run's ``run_id``.
+
+        Does **not** call :meth:`save`; the caller is responsible for
+        persisting.
+        """
+        if "accepted_upstream_gates" not in self._manifest:
+            self._manifest["accepted_upstream_gates"] = {}
+        self._manifest["accepted_upstream_gates"][gate_id] = {
+            "original_run_id": original_run_id,
+            "evidence_path": evidence_path,
+            "accepted_at": datetime.now(timezone.utc).isoformat(),
+            "status": "pass",
+        }
+
+    def get_accepted_upstream_gate(self, gate_id: str) -> dict | None:
+        """Return the continuation acceptance record for *gate_id*, or None.
+
+        Returns the dict written by :meth:`record_accepted_upstream_gate`
+        if the gate was accepted during bootstrap; ``None`` otherwise.
+        """
+        gates = self._manifest.get("accepted_upstream_gates")
+        if gates is None:
+            return None
+        return gates.get(gate_id)
+
+    # ------------------------------------------------------------------
     # Reuse policy
     # ------------------------------------------------------------------
 
