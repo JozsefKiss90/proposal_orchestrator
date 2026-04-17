@@ -594,8 +594,35 @@ def evaluate_gate(
                 )
             elif raw["status"] == "pass":
                 passed_sem_ids.append(raw["predicate_id"])
+            elif raw.get("_dispatch_error"):
+                # Dispatch-level failure (transport error, unknown function,
+                # malformed response) — surface the real cause distinctly.
+                failed_sem_entries.append(
+                    {
+                        "predicate_id": raw["predicate_id"],
+                        "function": raw["function"],
+                        "failure_reason": "semantic_dispatch_error",
+                        "constitutional_rule": raw.get(
+                            "constitutional_rule", ""
+                        ),
+                        "fail_message": raw.get("fail_message", ""),
+                        "artifacts_inspected": raw.get(
+                            "artifacts_inspected", []
+                        ),
+                        "_dispatch_error": True,
+                        "_dispatch_error_reason": raw.get(
+                            "_dispatch_error_reason", ""
+                        ),
+                        "_dispatch_error_category": raw.get(
+                            "_dispatch_error_category", ""
+                        ),
+                        "_diagnostic_bundle_path": raw.get(
+                            "_diagnostic_bundle_path"
+                        ),
+                    }
+                )
             else:
-                # status == "fail": record with full finding detail
+                # Genuine semantic failure from agent evaluation
                 failed_sem_entries.append(
                     {
                         "predicate_id": raw["predicate_id"],

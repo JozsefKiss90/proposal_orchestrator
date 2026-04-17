@@ -39,9 +39,10 @@ Every finding in a ``status: fail`` result MUST include:
 
 The runner rejects findings that omit either field.  Dispatch errors
 (unknown function, transport failure, malformed response) produce a
-sentinel dict with ``_dispatch_error: True`` and ``status: "error"``;
-this intentionally fails :func:`validate_semantic_result` so the caller
-treats it as a gate failure.
+schema-valid result with ``_dispatch_error: True`` and ``status: "fail"``
+with an empty ``findings`` list.  The gate evaluator detects the
+``_dispatch_error`` flag and records the failure with
+``failure_reason: "semantic_dispatch_error"`` to surface the real cause.
 """
 
 from __future__ import annotations
@@ -52,7 +53,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-from runner.claude_transport import ClaudeTransportError, invoke_claude_text
+from runner.claude_transport import (
+    ClaudeCLITimeoutError,
+    ClaudeTransportError,
+    invoke_claude_text,
+)
 from runner.paths import resolve_repo_path
 
 # ---------------------------------------------------------------------------
@@ -269,23 +274,126 @@ def validate_semantic_result(result: Any) -> tuple[bool, str]:
 # ---------------------------------------------------------------------------
 
 
-def _dispatch_error_result(pred_id: str, func_name: str, reason: str) -> dict:
+def _dispatch_error_result(
+    pred_id: str,
+    func_name: str,
+    reason: str,
+    *,
+    agent: str = "<unknown>",
+    constitutional_rule: str = "<unknown>",
+    artifacts_inspected: list[str] | None = None,
+    failure_category: str = "DISPATCH_ERROR",
+    diagnostic_bundle_path: str | None = None,
+) -> dict:
     """
-    Return a sentinel dict that signals a dispatch-level failure.
+    Return a schema-valid fail result for a dispatch-level failure.
 
-    The result intentionally uses ``status: "error"`` (not in
-    :data:`VALID_STATUSES`) and omits required fields so that
-    :func:`validate_semantic_result` returns ``(False, …)``.  Callers
-    identify dispatch errors via the ``_dispatch_error`` boolean key.
+    The result passes :func:`validate_semantic_result` with
+    ``status: "fail"`` and an empty ``findings`` list.  The
+    ``_dispatch_error: True`` flag distinguishes dispatch failures from
+    genuine semantic evaluation failures.  The gate evaluator uses this
+    flag to set ``failure_reason`` to ``"semantic_dispatch_error"``
+    instead of ``"semantic_fail"``.
     """
-    return {
+    result: dict = {
         "predicate_id": pred_id,
         "function": func_name,
-        "status": "error",          # invalid → validation rejects this
+        "status": "fail",
+        "agent": agent,
+        "constitutional_rule": constitutional_rule,
+        "artifacts_inspected": artifacts_inspected or [],
         "findings": [],
+        "fail_message": f"Dispatch error: {reason}",
         "_dispatch_error": True,
         "_dispatch_error_reason": reason,
+        "_dispatch_error_category": failure_category,
     }
+    if diagnostic_bundle_path is not None:
+        result["_diagnostic_bundle_path"] = diagnostic_bundle_path
+    return result
+
+
+def _write_semantic_diagnostics(
+    *,
+    func_name: str,
+    run_id: str,
+    repo_root: Path,
+    reason: str,
+    category: str,
+    system_prompt: str | None = None,
+    user_prompt: str | None = None,
+    response_text: str | None = None,
+    exc: Exception | None = None,
+) -> str | None:
+    """
+    Write a diagnostic bundle for a semantic dispatch failure.
+
+    Writes to ``.claude/semantic_diag/`` following the same pattern as
+    ``skill_runtime._write_timeout_diagnostics()`` writes to
+    ``.claude/skill_diag/``.
+
+    Returns the repo-relative path to the meta JSON file, or ``None``
+    if writing fails.  Failures to write diagnostics are silently
+    swallowed — they must not propagate and obscure the original error.
+    """
+    diag_dir = repo_root / ".claude" / "semantic_diag"
+    try:
+        diag_dir.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return None
+
+    prefix = f"{func_name}_{run_id[:8]}"
+    meta: dict[str, Any] = {
+        "function": func_name,
+        "run_id": run_id,
+        "category": category,
+        "reason": reason,
+        "system_prompt_size": len(system_prompt) if system_prompt else 0,
+        "user_prompt_size": len(user_prompt) if user_prompt else 0,
+    }
+
+    if isinstance(exc, ClaudeCLITimeoutError):
+        meta["timeout_seconds"] = exc.timeout_seconds
+        meta["elapsed_seconds"] = exc.elapsed_seconds
+        meta["command"] = exc.command
+    if exc is not None and hasattr(exc, "stderr"):
+        meta["had_stderr"] = bool((getattr(exc, "stderr", None) or "").strip())
+    if exc is not None and hasattr(exc, "stdout"):
+        meta["had_stdout"] = bool((getattr(exc, "stdout", None) or "").strip())
+
+    file_map: dict[str, tuple[str, str | None]] = {
+        "meta": (f"{prefix}_dispatch_meta.json", None),
+    }
+    if system_prompt is not None:
+        file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
+    if user_prompt is not None:
+        file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
+    if response_text is not None:
+        file_map["response"] = (f"{prefix}_response.txt", response_text)
+    if exc is not None and hasattr(exc, "stderr") and exc.stderr:
+        file_map["stderr"] = (f"{prefix}_stderr.txt", exc.stderr)
+    if exc is not None and hasattr(exc, "stdout") and exc.stdout:
+        file_map["stdout"] = (f"{prefix}_stdout.txt", exc.stdout)
+
+    meta["diagnostic_files"] = {
+        k: f".claude/semantic_diag/{fname}" for k, (fname, _) in file_map.items()
+    }
+
+    try:
+        meta_path = diag_dir / file_map["meta"][0]
+        meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    except OSError:
+        return None
+
+    for key, (fname, content) in file_map.items():
+        if key == "meta" or content is None:
+            continue
+        try:
+            (diag_dir / fname).write_text(content, encoding="utf-8")
+        except OSError:
+            pass
+
+    return f".claude/semantic_diag/{file_map['meta'][0]}"
 
 
 def _read_artifacts(
@@ -515,6 +623,7 @@ def invoke_agent(
             func_name,
             f"Unknown semantic predicate function {func_name!r}; "
             f"available: {sorted(SEMANTIC_REGISTRY)}",
+            failure_category="UNKNOWN_FUNCTION",
         )
 
     config = SEMANTIC_REGISTRY[func_name]
@@ -541,20 +650,50 @@ def invoke_agent(
             max_tokens=AGENT_MAX_TOKENS,
         )
     except ClaudeTransportError as exc:
+        diag_path = _write_semantic_diagnostics(
+            func_name=func_name,
+            run_id=run_id,
+            repo_root=repo_root,
+            reason=str(exc),
+            category="TRANSPORT_FAILURE",
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            exc=exc,
+        )
         return _dispatch_error_result(
             pred_id,
             func_name,
             f"Claude transport failed for {func_name!r}: {exc}",
+            agent=config.agent,
+            constitutional_rule=config.constitutional_rule,
+            artifacts_inspected=inspected_paths,
+            failure_category="TRANSPORT_FAILURE",
+            diagnostic_bundle_path=diag_path,
         )
 
     # Parse the agent's JSON response
     result = _extract_json(response_text)
     if result is None:
+        diag_path = _write_semantic_diagnostics(
+            func_name=func_name,
+            run_id=run_id,
+            repo_root=repo_root,
+            reason=f"Non-JSON response: {response_text[:300]!r}",
+            category="MALFORMED_RESPONSE",
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            response_text=response_text,
+        )
         return _dispatch_error_result(
             pred_id,
             func_name,
             f"Agent returned a non-JSON response for {func_name!r}: "
             f"{response_text[:300]!r}",
+            agent=config.agent,
+            constitutional_rule=config.constitutional_rule,
+            artifacts_inspected=inspected_paths,
+            failure_category="MALFORMED_RESPONSE",
+            diagnostic_bundle_path=diag_path,
         )
 
     # Inject authoritative predicate_id (always override agent's value)

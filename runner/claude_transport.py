@@ -34,7 +34,22 @@ class ClaudeTransportError(Exception):
 
     Raised when the ``claude`` CLI returns a non-zero exit code,
     produces unusable output, or encounters an unexpected runtime error.
+
+    Carries optional structured ``stderr`` and ``stdout`` fields so that
+    callers can write rich diagnostic bundles without re-parsing exception
+    messages.
     """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        stderr: str | None = None,
+        stdout: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.stderr = stderr
+        self.stdout = stdout
 
 
 class ClaudeCLIUnavailableError(ClaudeTransportError):
@@ -58,9 +73,7 @@ class ClaudeCLITimeoutError(ClaudeTransportError):
         timeout_seconds: int | None = None,
         elapsed_seconds: float | None = None,
     ) -> None:
-        super().__init__(message)
-        self.stdout = stdout
-        self.stderr = stderr
+        super().__init__(message, stderr=stderr, stdout=stdout)
         self.command = command
         self.timeout_seconds = timeout_seconds
         self.elapsed_seconds = elapsed_seconds
@@ -192,7 +205,9 @@ def invoke_claude_text(
         stderr_snippet = (completed.stderr or "").strip()[:500]
         raise ClaudeTransportError(
             f"Claude CLI exited with code {completed.returncode}"
-            + (f": {stderr_snippet}" if stderr_snippet else "")
+            + (f": {stderr_snippet}" if stderr_snippet else ""),
+            stderr=completed.stderr,
+            stdout=completed.stdout,
         )
 
     stdout = completed.stdout
@@ -203,7 +218,9 @@ def invoke_claude_text(
                 f" (stderr: {(completed.stderr or '').strip()[:300]})"
                 if completed.stderr
                 else ""
-            )
+            ),
+            stderr=completed.stderr,
+            stdout=completed.stdout,
         )
 
     return stdout

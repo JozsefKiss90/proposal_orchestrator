@@ -525,8 +525,10 @@ class TestInvokeAgentResponseParsing:
         entry = _pred_entry("no_unsupported_tier5_claims")
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result.get("_dispatch_error") is True
-        ok, _ = validate_semantic_result(result)
-        assert not ok
+        ok, err = validate_semantic_result(result)
+        assert ok, f"Dispatch error should now pass validation: {err}"
+        assert result["status"] == "fail"
+        assert result["agent"] == "constitutional_compliance_check"
 
     def test_json_list_response_produces_dispatch_error(
         self, mock_transport: MagicMock, tmp_path: Path
@@ -563,14 +565,18 @@ class TestInvokeAgentErrorHandling:
         result = invoke_agent(entry, "run-1", tmp_path)
         assert result["_dispatch_error"] is True
 
-    def test_dispatch_error_fails_validation(
+    def test_dispatch_error_passes_validation_with_fail_status(
         self, mock_transport: MagicMock, tmp_path: Path
     ) -> None:
         mock_transport.side_effect = ClaudeTransportError("bad")
         entry = _pred_entry("no_forbidden_schema_authority")
         result = invoke_agent(entry, "run-1", tmp_path)
-        ok, _ = validate_semantic_result(result)
-        assert not ok
+        ok, err = validate_semantic_result(result)
+        assert ok, f"Dispatch error should now pass validation: {err}"
+        assert result["status"] == "fail"
+        assert result["_dispatch_error"] is True
+        assert result["agent"] == "constitutional_compliance_check"
+        assert result["constitutional_rule"] == "CLAUDE.md §13.1"
 
     def test_unknown_function_returns_dispatch_error_without_transport_call(
         self, mock_transport: MagicMock, tmp_path: Path
@@ -589,6 +595,75 @@ class TestInvokeAgentErrorHandling:
         reason = result.get("_dispatch_error_reason", "")
         # Should mention at least one known function name
         assert "no_forbidden_schema_authority" in reason
+
+    def test_transport_error_includes_agent_and_constitutional_rule(
+        self, mock_transport: MagicMock, tmp_path: Path
+    ) -> None:
+        """Transport error result includes config fields from SEMANTIC_REGISTRY."""
+        mock_transport.side_effect = ClaudeTransportError("network error")
+        entry = _pred_entry("no_unresolved_scope_conflicts")
+        result = invoke_agent(entry, "run-1", tmp_path)
+        assert result["agent"] == "concept_refiner"
+        assert result["constitutional_rule"] == "CLAUDE.md §7 Phase 2 gate"
+        assert result["_dispatch_error_category"] == "TRANSPORT_FAILURE"
+
+    def test_unknown_function_uses_fallback_agent_and_rule(
+        self, tmp_path: Path
+    ) -> None:
+        """Unknown function → fallback agent/rule defaults, still schema-valid."""
+        entry = _pred_entry("nonexistent_agent_check")
+        result = invoke_agent(entry, "run-1", tmp_path)
+        assert result["agent"] == "<unknown>"
+        assert result["constitutional_rule"] == "<unknown>"
+        assert result["_dispatch_error_category"] == "UNKNOWN_FUNCTION"
+        ok, err = validate_semantic_result(result)
+        assert ok, f"Unknown function dispatch error should pass validation: {err}"
+
+    def test_transport_error_writes_diagnostic_bundle(
+        self, mock_transport: MagicMock, tmp_path: Path
+    ) -> None:
+        """Transport failure writes diagnostic meta to .claude/semantic_diag/."""
+        mock_transport.side_effect = ClaudeTransportError("connection reset")
+        entry = _pred_entry(
+            "no_forbidden_schema_authority",
+            args={"sections_path": "missing/dir"},
+        )
+        result = invoke_agent(entry, "run-abcd1234", tmp_path)
+        diag_path = result.get("_diagnostic_bundle_path")
+        assert diag_path is not None
+        full_path = tmp_path / diag_path
+        assert full_path.exists(), f"Diagnostic meta not found at {full_path}"
+        meta = json.loads(full_path.read_text(encoding="utf-8"))
+        assert meta["category"] == "TRANSPORT_FAILURE"
+        assert meta["function"] == "no_forbidden_schema_authority"
+
+    def test_non_json_response_writes_diagnostic_bundle(
+        self, mock_transport: MagicMock, tmp_path: Path
+    ) -> None:
+        """Non-JSON response writes diagnostic bundle with response text."""
+        mock_transport.return_value = "Not JSON at all"
+        entry = _pred_entry("no_gap_masked_as_confirmed")
+        result = invoke_agent(entry, "run-abcd1234", tmp_path)
+        diag_path = result.get("_diagnostic_bundle_path")
+        assert diag_path is not None
+        meta = json.loads((tmp_path / diag_path).read_text(encoding="utf-8"))
+        assert meta["category"] == "MALFORMED_RESPONSE"
+        # Response text should also be written
+        response_files = list(
+            (tmp_path / ".claude" / "semantic_diag").glob("*_response.txt")
+        )
+        assert len(response_files) >= 1
+
+    def test_dispatch_error_has_descriptive_fail_message(
+        self, mock_transport: MagicMock, tmp_path: Path
+    ) -> None:
+        mock_transport.side_effect = ClaudeTransportError(
+            "CLI exited with code 1"
+        )
+        entry = _pred_entry("no_forbidden_schema_authority")
+        result = invoke_agent(entry, "run-1", tmp_path)
+        assert result["fail_message"].startswith("Dispatch error:")
+        assert "CLI exited with code 1" in result["fail_message"]
 
 
 # ---------------------------------------------------------------------------

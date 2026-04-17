@@ -100,7 +100,7 @@ def _semantic_pred() -> dict:
     """Return a synthetic semantic predicate with an UNKNOWN function name.
 
     After Step 11 this will produce a dispatch error → gate fails with
-    failure_reason='semantic_result_malformed'.
+    failure_reason='semantic_dispatch_error'.
     """
     return {
         "predicate_id": "p_sem_quality",
@@ -588,7 +588,7 @@ class TestSemanticDispatchIntegration:
     """Step 11: semantic predicates are dispatched and results integrated."""
 
     # ------------------------------------------------------------------
-    # Unknown function → dispatch error → gate fail (malformed)
+    # Unknown function → dispatch error → gate fail (semantic_dispatch_error)
     # No patch needed: unknown function is rejected before API call.
     # ------------------------------------------------------------------
 
@@ -612,7 +612,7 @@ class TestSemanticDispatchIntegration:
         result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
         assert result["status"] == "fail"
 
-    def test_unknown_semantic_function_records_malformed_reason(
+    def test_unknown_semantic_function_records_dispatch_error_reason(
         self, tmp_path: Path, run_id: str
     ) -> None:
         target = tmp_path / "f.json"
@@ -629,8 +629,56 @@ class TestSemanticDispatchIntegration:
         result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
         failed = result["semantic_predicates"]["failed"]
         assert len(failed) == 1
-        assert failed[0]["failure_reason"] == "semantic_result_malformed"
+        assert failed[0]["failure_reason"] == "semantic_dispatch_error"
         assert failed[0].get("_dispatch_error") is True
+        assert failed[0].get("_dispatch_error_category") == "UNKNOWN_FUNCTION"
+
+    # ------------------------------------------------------------------
+    # Transport failure → dispatch error → gate fail (semantic_dispatch_error)
+    # ------------------------------------------------------------------
+
+    def test_transport_failure_records_semantic_dispatch_error(
+        self, tmp_path: Path, run_id: str
+    ) -> None:
+        """Transport failure surfaces as semantic_dispatch_error, not malformed."""
+        target = tmp_path / "f.json"
+        _write_json(target, {})
+        lib_path = _write_library(
+            tmp_path,
+            [
+                _gate_entry(
+                    _GATE_SEM,
+                    gate_kind="exit",
+                    evaluated_at="n02_concept_refinement exit",
+                    predicates=[
+                        _exists_pred("f.json"),
+                        _sem_pred("no_forbidden_schema_authority", "p_no_ga"),
+                    ],
+                )
+            ],
+        )
+        dispatch_error_result = {
+            "predicate_id": "p_no_ga",
+            "function": "no_forbidden_schema_authority",
+            "status": "fail",
+            "agent": "constitutional_compliance_check",
+            "constitutional_rule": "CLAUDE.md §13.1",
+            "artifacts_inspected": [],
+            "findings": [],
+            "fail_message": "Dispatch error: Claude CLI exited with code 1",
+            "_dispatch_error": True,
+            "_dispatch_error_reason": "Claude transport failed: CLI exited with code 1",
+            "_dispatch_error_category": "TRANSPORT_FAILURE",
+        }
+        with patch("runner.gate_evaluator.dispatch_semantic_predicate") as mock_d:
+            mock_d.return_value = dispatch_error_result
+            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        assert result["status"] == "fail"
+        failed = result["semantic_predicates"]["failed"]
+        assert len(failed) == 1
+        assert failed[0]["failure_reason"] == "semantic_dispatch_error"
+        assert failed[0].get("_dispatch_error") is True
+        assert "transport" in failed[0]["_dispatch_error_reason"].lower()
 
     # ------------------------------------------------------------------
     # Known semantic predicate → mocked dispatch → gate pass
