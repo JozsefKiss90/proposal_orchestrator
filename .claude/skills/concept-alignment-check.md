@@ -10,9 +10,13 @@ reads_from:
   - docs/tier3_project_instantiation/project_brief/
   - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
   - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+  - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+  - docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
   - docs/tier4_orchestration_state/decision_log/
+  - docs/tier3_project_instantiation/call_binding/topic_mapping.json
+  - docs/tier3_project_instantiation/call_binding/compliance_profile.json
 constitutional_constraints:
   - "Alignment must be tested against Tier 2B extracted files, not assumed from concept vocabulary"
   - "Uncovered expected outcomes must be flagged, not silently assumed covered"
@@ -23,9 +27,11 @@ constitutional_constraints:
 Read the files listed in the Declared Inputs section from disk using the Read tool.
 For the project brief, read `docs/tier3_project_instantiation/project_brief/` as a directory: use Glob to list its contents, then Read each file — including `.md` and `.json` files (concept_note.md, strategic_positioning.md, project_summary.json).
 Read `expected_outcomes.json` and `scope_requirements.json` — these are the Tier 2B extracted files that define alignment targets.
+Read `call_constraints.json` if present — provides call-specific constraints for compliance profile derivation.
+Read `eligibility_conditions.json` if present — provides eligibility conditions for compliance profile derivation.
 Do not read files outside the declared input set.
 Do not read work programme source documents, grouped JSON files, or other Tier 2B extracted files not listed in the declared inputs.
-Return your output as a single JSON object in your response.
+Return your output as a single JSON object in your response. The response must include fields for all three output artifacts: concept_refinement_summary (flat at top level), topic_mapping (nested under key `topic_mapping`), and compliance_profile (nested under key `compliance_profile`). Returning an empty object `{}` for any artifact is invalid and will be treated as a failure.
 
 ## Canonical Inputs and Outputs
 
@@ -36,6 +42,8 @@ Return your output as a single JSON object in your response.
 | `docs/tier3_project_instantiation/project_brief/` | Project brief directory: concept_note (PDF/DOCX/MD), project_summary (PDF/DOCX/MD), strategic_positioning (PDF/DOCX/MD) | Concept description; stated objectives; target outcomes; approach narrative; differentiation claims; vocabulary used | N/A — Tier 3 source directory | Source of the project concept being evaluated; the text is compared term-by-term and claim-by-claim against Tier 2B expected outcomes and scope requirements |
 | `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` | expected_outcomes.json — Tier 2B extracted | Expected outcome entries: outcome_id, description, source_section, source_document, status | N/A — Tier 2B extracted artifact | The authoritative list of call-required expected outcomes that the concept must address; uncovered outcomes must be flagged |
 | `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` | scope_requirements.json — Tier 2B extracted | Scope boundary entries: scope element descriptions, source_section, source_document, status | N/A — Tier 2B extracted artifact | Defines the thematic scope boundary; concept claims outside this boundary are flagged as scope mismatches |
+| `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` | call_constraints.json — Tier 2B extracted (optional) | Constraint entries: constraint_id, description, constraint_type, source_section, source_document | N/A — Tier 2B extracted artifact | Provides call-specific constraints (eligibility, scope, methodological) used to derive compliance profile flags; optional — continue with conservative defaults if absent |
+| `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json` | eligibility_conditions.json — Tier 2B extracted (optional) | Condition entries: condition_id, description, condition_type, source_section, source_document | N/A — Tier 2B extracted artifact | Provides eligibility conditions for compliance profile derivation; optional — set eligibility_confirmed to false if absent |
 
 ### Outputs
 
@@ -43,8 +51,10 @@ Return your output as a single JSON object in your response.
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
 | `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json` | concept_refinement_summary.json | `orch.phase2.concept_refinement_summary.v1` | schema_id, run_id, topic_mapping_rationale (object: topic_element_id, mapping_to_concept, tier2b_source_ref, tier3_evidence_ref per entry), scope_conflict_log (array: conflict_id, description, resolution_status, resolution_note, tier2b_source_ref per entry), strategic_differentiation (string, non-empty) | Yes | topic_mapping_rationale entries derived from expected_outcomes.json entries matched against project_brief content; scope_conflict_log derived from scope mismatches found; strategic_differentiation derived from strategic_positioning document in project_brief |
 | `docs/tier4_orchestration_state/decision_log/` | Per-invocation decision log entry file | N/A — decision log entry | decision_id; decision_type: "concept_alignment"; invoking_agent; phase_context; alignment_findings; uncovered_outcomes list; vocabulary_gaps list; tier2b_source_refs; resolution_status; timestamp | No | Vocabulary gaps and uncovered outcomes derived from comparing concept vocabulary against expected_outcomes.json and scope_requirements.json entries |
+| `docs/tier3_project_instantiation/call_binding/topic_mapping.json` | topic_mapping.json — Tier 3 call binding | mappings (array: topic_element_id, tier2b_source_ref, tier3_evidence_ref, mapping_description per entry) | N/A — Tier 3 source artifact (no schema_id, no run_id) | Derived from topic_mapping_rationale in Step 2.11; maps each call topic element to the project concept with bidirectional source references |
+| `docs/tier3_project_instantiation/call_binding/compliance_profile.json` | compliance_profile.json — Tier 3 call binding | eligibility_confirmed (boolean), ethics_review_required (boolean), gender_plan_required (boolean), open_science_requirements (array of strings) | N/A — Tier 3 source artifact (no schema_id, no run_id) | Derived from call constraints and eligibility conditions analysis in Step 2.12; records compliance flags for downstream phases |
 
-**Note:** `artifact_status` must be ABSENT at write time for concept_refinement_summary.json; the runner stamps it post-gate.
+**Note:** `artifact_status` must be ABSENT at write time for concept_refinement_summary.json; the runner stamps it post-gate. `topic_mapping.json` and `compliance_profile.json` are Tier 3 artifacts — they do NOT carry `schema_id`, `run_id`, or `artifact_status`.
 
 ### Artifact Registry Cross-Reference
 
@@ -62,6 +72,8 @@ Return your output as a single JSON object in your response.
 - Step 1.3: Non-empty check — confirm `expected_outcomes.json` contains at least one entry. If empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="expected_outcomes.json is empty; cannot check alignment without expected outcome definitions") and halt.
 - Step 1.4: Presence check — confirm `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` exists and is non-empty. If absent or empty: log as Unresolved; continue without scope constraint checking, but flag this gap in scope_conflict_log.
 - Step 1.5: Read all files in `project_brief/` (concept_note, project_summary, strategic_positioning). Concatenate their text content into a single **concept corpus** for analysis. If no readable files are found: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="project_brief/ contains no readable concept documents") and halt.
+- Step 1.6: Presence check — attempt to read `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json`. If absent: log as Assumed; continue without call constraint data. Compliance profile derivation (Step 2.12) will use conservative defaults.
+- Step 1.7: Presence check — attempt to read `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json`. If absent: log as Assumed; set `eligibility_confirmed` to `false` in the compliance profile (conservative default). Continue.
 
 ### 2. Core Processing Logic
 
@@ -84,6 +96,13 @@ Return your output as a single JSON object in your response.
 - Step 2.8: Build the `scope_conflict_log` array: all framing mismatches (from Step 2.6) and scope conflicts (from Step 2.7). If none found, the array is empty. Each entry must have: `conflict_id`, `description`, `resolution_status` (resolved / unresolved), `resolution_note` (required when resolved), `tier2b_source_ref`, `conflict_type` (framing_mismatch / scope_violation / conditional_unmet).
 - Step 2.9: Build `strategic_differentiation` from the `strategic_positioning` file in project_brief/ (if present). Extract the core differentiation statement (what distinguishes this project from others in the call scope). If no strategic positioning file is present: set strategic_differentiation to "No strategic positioning document provided — differentiation statement required." (This will cause the Phase 2 gate semantic predicate to flag the gap.)
 - Step 2.10: Build the decision log entry: compile `alignment_findings` (summary of Confirmed/Inferred/Assumed/Unresolved counts), `uncovered_outcomes` (list of outcome_ids with status Assumed or Unresolved), `vocabulary_gaps` (aggregate list of terms from all outcomes), `tier2b_source_refs` (list of source_section + source_document pairs consulted).
+- Step 2.11: **Derive `topic_mapping`** from `topic_mapping_rationale` (Step 2.5). For each entry in `topic_mapping_rationale`, create a corresponding entry in the `mappings` array with: `topic_element_id` (same as `topic_element_id`), `tier2b_source_ref` (same as `tier2b_source_ref`), `tier3_evidence_ref` (same as `tier3_evidence_ref`), `mapping_description` (same as `mapping_to_concept`). The `mappings` array must be non-empty — it must contain one entry per expected outcome from `expected_outcomes.json`. If `topic_mapping_rationale` is empty (which should not happen given Constraint 2), this constitutes an INCOMPLETE_OUTPUT failure.
+- Step 2.12: **Derive `compliance_profile`** from call constraints (Step 1.6), eligibility conditions (Step 1.7), and scope requirements (Step 2.2):
+  - `eligibility_confirmed`: Set to `true` if `eligibility_conditions.json` is present and all conditions with `condition_type: "consortium_composition"` are satisfiable based on the concept (i.e., the concept does not explicitly contradict them). Set to `false` if eligibility_conditions.json is absent or any condition is contradicted. When uncertain, set to `false` (conservative).
+  - `ethics_review_required`: Set to `true` if any constraint in `call_constraints.json` has `constraint_type: "scope"` or description mentioning ethics review, OR if the concept corpus mentions human subjects, personal data, animal experimentation, dual use, or other ethics-triggering activities. Set to `false` only when no ethics triggers are found. When uncertain, set to `true` (conservative).
+  - `gender_plan_required`: Set to `true` if any scope requirement or call constraint mentions gender equality plan, gender dimension, or gender-related requirements. Default to `true` for RIA and IA instrument types (conservative).
+  - `open_science_requirements`: Extract from call constraints and scope requirements any requirements related to open access, open data, FAIR principles, or open science mandates. Return as an array of requirement description strings. If none found, return an empty array `[]`.
+  - `notes`: Optional string with any additional compliance observations.
 
 ### 3. Output Construction
 
@@ -107,16 +126,31 @@ Return your output as a single JSON object in your response.
 - `resolution_status`: "unresolved" if any Unresolved scope conflicts or Unresolved outcome statuses; otherwise "resolved"
 - `timestamp`: ISO 8601
 
+**`topic_mapping` (nested under key `topic_mapping` in the response):**
+- `mappings`: derived from Step 2.11 — array of `{topic_element_id, tier2b_source_ref, tier3_evidence_ref, mapping_description}` — must be non-empty
+- Do NOT include `schema_id`, `run_id`, or `artifact_status` — this is a Tier 3 source artifact
+
+**`compliance_profile` (nested under key `compliance_profile` in the response):**
+- `eligibility_confirmed`: derived from Step 2.12 — boolean
+- `ethics_review_required`: derived from Step 2.12 — boolean
+- `gender_plan_required`: derived from Step 2.12 — boolean
+- `open_science_requirements`: derived from Step 2.12 — array of strings (may be empty `[]`)
+- `notes`: optional string — any additional compliance observations
+- Do NOT include `schema_id`, `run_id`, or `artifact_status` — this is a Tier 3 source artifact
+
 ### 4. Conformance Stamping
 
-- `schema_id`: set to "orch.phase2.concept_refinement_summary.v1" at write time
-- `run_id`: copied from invoking agent's run_id parameter
+- `schema_id`: set to "orch.phase2.concept_refinement_summary.v1" at write time (concept_refinement_summary only)
+- `run_id`: copied from invoking agent's run_id parameter (concept_refinement_summary only)
 - `artifact_status`: MUST be absent at write time (runner stamps post-gate)
+- `topic_mapping.json` and `compliance_profile.json` do NOT carry `schema_id`, `run_id`, or `artifact_status` — they are Tier 3 source artifacts
 
 ### 5. Write Sequence
 
 - Step 5.1: Write `concept_refinement_summary.json` to `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json`
 - Step 5.2: Write decision log entry to `docs/tier4_orchestration_state/decision_log/<decision_id>.json`
+- Step 5.3: Write `topic_mapping.json` to `docs/tier3_project_instantiation/call_binding/topic_mapping.json` — derived from Step 2.11. Must contain a non-empty `mappings` array.
+- Step 5.4: Write `compliance_profile.json` to `docs/tier3_project_instantiation/call_binding/compliance_profile.json` — derived from Step 2.12. Must contain all four required fields.
 
 ## Constitutional Constraint Enforcement
 
@@ -266,6 +300,37 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 ### Secondary Output: decision_log/ entry
 
 *Validation status vocabulary check:* Confirmed/Inferred/Assumed/Unresolved vocabulary per CLAUDE.md §12.2 is used in Step 2.4 for outcome alignment status assignment, and propagated into the decision log entry's `alignment_findings` summary. The decision log entry includes `decision_id`, `decision_type`, `tier_authority_applied`, `resolution_status`, and ISO 8601 `timestamp`, conforming to decision-log-update structure.
+
+### Tier 3 Artifact: `topic_mapping.json`
+
+**Canonical schema in `artifact_schema_specification.yaml`:** Section 6.2 — `tier3_source_schemas.topic_mapping`.
+
+**Schema governance:** Tier 3 source artifact (`provenance_class: manually_placed`). No `schema_id`, `run_id`, or `artifact_status` fields.
+
+**Required fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `mappings` | Yes (Step 2.11) | array, required: true; each item: topic_element_id, tier2b_source_ref, tier3_evidence_ref, mapping_description | Yes — derived 1:1 from topic_mapping_rationale entries |
+
+**Validation rule:** `mappings` array must be non-empty. An empty array or missing field constitutes INCOMPLETE_OUTPUT.
+
+---
+
+### Tier 3 Artifact: `compliance_profile.json`
+
+**Canonical schema in `artifact_schema_specification.yaml`:** Section 6.3 — `tier3_source_schemas.compliance_profile`.
+
+**Schema governance:** Tier 3 source artifact (`provenance_class: manually_placed`). No `schema_id`, `run_id`, or `artifact_status` fields.
+
+**Required fields verification:**
+| Field | Set by skill? | Governance | Conformant? |
+|-------|---------------|------------|-------------|
+| `eligibility_confirmed` | Yes (Step 2.12) | boolean, required: true | Yes |
+| `ethics_review_required` | Yes (Step 2.12) | boolean, required: true | Yes |
+| `gender_plan_required` | Yes (Step 2.12) | boolean, required: true | Yes |
+| `open_science_requirements` | Yes (Step 2.12) | array of strings, required: true | Yes — may be empty `[]` |
+
+**Validation rule:** All four required fields must be present. Missing any field constitutes INCOMPLETE_OUTPUT.
 
 <!-- Step 8 complete: schema validation performed -->
 
