@@ -18,6 +18,15 @@ constitutional_constraints:
   - "Uncovered expected outcomes must be flagged, not silently assumed covered"
 ---
 
+## Input Access (TAPM Mode)
+
+Read the files listed in the Declared Inputs section from disk using the Read tool.
+For the project brief, read `docs/tier3_project_instantiation/project_brief/` as a directory: use Glob to list its contents, then Read each file — including `.md` and `.json` files (concept_note.md, strategic_positioning.md, project_summary.json).
+Read `expected_outcomes.json` and `scope_requirements.json` — these are the Tier 2B extracted files that define alignment targets.
+Do not read files outside the declared input set.
+Do not read work programme source documents, grouped JSON files, or other Tier 2B extracted files not listed in the declared inputs.
+Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
