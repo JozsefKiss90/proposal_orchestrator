@@ -10,15 +10,15 @@
     },
     {
       "constraint_id": "CC-02",
-      "description": "This topic implements the co-programmed European Partnership on AI, Data and Robotics (ADRA). All proposals are expected to allocate tasks for cohesion activities with ADRA.",
-      "constraint_type": "partnership",
-      "source_section": "call_entry.scope",
+      "description": "Maximum EU contribution per project is €19,000,000. Indicative total topic budget is €38,000,000 for an indicative 2 funded projects.",
+      "constraint_type": "other",
+      "source_section": "call_entry.max_contribution",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-03",
-      "description": "All proposals are expected to allocate tasks for cohesion activities with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+      "description": "This topic implements the co-programmed European Partnership on AI, Data and Robotics (ADRA), and all proposals are expected to allocate tasks for cohesion activities with ADRA.",
       "constraint_type": "partnership",
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -26,6 +26,14 @@
     },
     {
       "constraint_id": "CC-04",
+      "description": "All proposals are expected to allocate tasks for cohesion activities with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+      "constraint_type": "partnership",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-05",
       "description": "Communicable results must be shared with the European R&D community through the AI-on-demand platform.",
       "constraint_type": "reporting",
       "source_section": "call_entry.scope",
@@ -33,7 +41,7 @@
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-05",
+      "constraint_id": "CC-06",
       "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
       "constraint_type": "methodological",
       "source_section": "call_entry.scope",
@@ -41,16 +49,8 @@
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-06",
-      "description": "When possible, proposals should build on and reuse public results from relevant previous funded actions.",
-      "constraint_type": "methodological",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
       "constraint_id": "CC-07",
-      "description": "Projects selected in this topic must link to the resources offered by the AI Factories, including the Data Labs.",
+      "description": "Projects selected in this topic should link to the resources offered by the AI Factories, including the Data Labs. Results may be validated in the Testing and Experiment Facilities.",
       "constraint_type": "methodological",
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -58,68 +58,51 @@
     },
     {
       "constraint_id": "CC-08",
-      "description": "Project results may be validated in the Testing and Experiment Facilities and further deployed via the European Digital Innovation Hubs (EDIHs).",
-      "constraint_type": "methodological",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "constraint_type": "eligibility",
+      "source_section": "eligibility_restrictions.eligible_entities",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-09",
-      "description": "Projects must contribute to the Apply AI Strategy (COM xxxx(2025)) as an explicit implementation objective of this topic.",
-      "constraint_type": "scope",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "description": "Entities controlled by non-eligible countries may be excluded from participation unless appropriate guarantees are provided.",
+      "constraint_type": "eligibility",
+      "source_section": "eligibility_restrictions.control_restrictions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-10",
-      "description": "Proposals should build on or seek collaboration with relevant projects and develop synergies with other relevant international, European, national, or regional initiatives.",
-      "constraint_type": "methodological",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-11",
-      "description": "Maximum EU contribution per project is EUR 19,000,000 (minimum and maximum both set at EUR 19,000,000).",
-      "constraint_type": "eligibility",
-      "source_section": "call_entry.max_contribution",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-12",
-      "description": "Submission procedure is single-stage (single deadline model); no two-stage evaluation process applies.",
-      "constraint_type": "other",
-      "source_section": "call_entry.deadline_model",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-13",
-      "description": "To ensure portfolio coverage, grants will be awarded not only in order of ranking but also to at least one proposal focusing on each of the three sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving, subject to passing all evaluation thresholds.",
+      "description": "To ensure portfolio coverage, grants will be awarded not only in order of ranking but also to ensure at least one proposal focuses on each of three Apply AI sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving — subject to proposals passing all evaluation thresholds.",
       "constraint_type": "other",
       "source_section": "procedure_exceptions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
-      "constraint_id": "CC-14",
-      "description": "Financial support to third parties (FSTP) is provided under this topic: maximum EUR 300,000 per grant at stage 2, EUR 2,250,000 per grant at stage 3, and EUR 2,550,000 per third party.",
+      "constraint_id": "CC-11",
+      "description": "When possible, proposals should build on and reuse public results from relevant previously funded actions.",
+      "constraint_type": "methodological",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-12",
+      "description": "Proposals should build on or seek collaboration with relevant projects and develop synergies with other relevant international, European, national, or regional initiatives.",
+      "constraint_type": "partnership",
+      "source_section": "call_entry.scope",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-13",
+      "description": "Financial support to third parties (FSTP) applies under the following limits: maximum €300,000 per third party at grant stage 2; maximum €2,250,000 per grant at stage 3; maximum €2,550,000 per third party in total.",
       "constraint_type": "other",
       "source_section": "fstp_provisions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-15",
-      "description": "Maximum project duration is 48 months.",
-      "constraint_type": "scope",
-      "source_section": "max_project_duration_months",
-      "source_document": "selected_call.json",
-      "status": "Assumed",
-      "assumption_note": "Maximum project duration of 48 months is not explicitly stated in the topic text of the call extract or slice. This value is drawn from selected_call.json, which itself carries a note that this is the standard maximum for large RIA actions under Horizon Europe and that it should be verified against General Annex B. Verification against Tier 1 General Annexes is required before using this figure in downstream proposal content."
     }
   ]
 }

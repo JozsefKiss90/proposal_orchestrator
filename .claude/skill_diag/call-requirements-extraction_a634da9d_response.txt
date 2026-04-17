@@ -1,0 +1,366 @@
+=== skill_id: call-requirements-extraction ===
+=== mode: tapm ===
+=== response_text length: 22293 ===
+=== response_text (full) ===
+{
+  "call_constraints": {
+    "constraints": [
+      {
+        "constraint_id": "CC-01",
+        "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+        "constraint_type": "scope",
+        "source_section": "technology_readiness_level",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-02",
+        "description": "Maximum EU contribution per project is €19,000,000. Indicative total topic budget is €38,000,000 for an indicative 2 funded projects.",
+        "constraint_type": "other",
+        "source_section": "call_entry.max_contribution",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-03",
+        "description": "This topic implements the co-programmed European Partnership on AI, Data and Robotics (ADRA), and all proposals are expected to allocate tasks for cohesion activities with ADRA.",
+        "constraint_type": "partnership",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-04",
+        "description": "All proposals are expected to allocate tasks for cohesion activities with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+        "constraint_type": "partnership",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-05",
+        "description": "Communicable results must be shared with the European R&D community through the AI-on-demand platform.",
+        "constraint_type": "reporting",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-06",
+        "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
+        "constraint_type": "methodological",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-07",
+        "description": "Projects selected in this topic should link to the resources offered by the AI Factories, including the Data Labs. Results may be validated in the Testing and Experiment Facilities.",
+        "constraint_type": "methodological",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-08",
+        "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+        "constraint_type": "eligibility",
+        "source_section": "eligibility_restrictions.eligible_entities",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-09",
+        "description": "Entities controlled by non-eligible countries may be excluded from participation unless appropriate guarantees are provided.",
+        "constraint_type": "eligibility",
+        "source_section": "eligibility_restrictions.control_restrictions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-10",
+        "description": "To ensure portfolio coverage, grants will be awarded not only in order of ranking but also to ensure at least one proposal focuses on each of three Apply AI sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving — subject to proposals passing all evaluation thresholds.",
+        "constraint_type": "other",
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-11",
+        "description": "When possible, proposals should build on and reuse public results from relevant previously funded actions.",
+        "constraint_type": "methodological",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-12",
+        "description": "Proposals should build on or seek collaboration with relevant projects and develop synergies with other relevant international, European, national, or regional initiatives.",
+        "constraint_type": "partnership",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "constraint_id": "CC-13",
+        "description": "Financial support to third parties (FSTP) applies under the following limits: maximum €300,000 per third party at grant stage 2; maximum €2,250,000 per grant at stage 3; maximum €2,550,000 per third party in total.",
+        "constraint_type": "other",
+        "source_section": "fstp_provisions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      }
+    ]
+  },
+  "expected_outcomes": {
+    "outcomes": [
+      {
+        "outcome_id": "EO-01",
+        "description": "Significant improvements in the autonomy, robustness and reliability of AI agents through advanced planning mechanisms, memory management, and reasoning capabilities.",
+        "source_section": "call_entry.expected_outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "outcome_id": "EO-02",
+        "description": "Innovative multi-agent frameworks and protocols demonstrating effective decentralized coordination and collaboration among multiple AI agents beyond the capabilities of individual agents.",
+        "source_section": "call_entry.expected_outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      }
+    ]
+  },
+  "expected_impacts": {
+    "impacts": [
+      {
+        "impact_id": "EI-01",
+        "description": "Contribution to and implementation of the European Apply AI Strategy, advancing the adoption of next-generation AI agent capabilities in key economic sectors including healthcare, advanced manufacturing, and in-vehicle autonomous driving.",
+        "impact_type": "policy",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "impact_id": "EI-02",
+        "description": "Wider deployment and industrial uptake of next-generation AI agent solutions across economic sectors via European Digital Innovation Hubs (EDIHs), enabling broader societal and economic benefit.",
+        "impact_type": "economic",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "impact_id": "EI-03",
+        "description": "Open scientific advancement: dissemination and sharing of AI agent R&D results with the European research community through the AI-on-demand platform, strengthening European AI research infrastructure.",
+        "impact_type": "scientific",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "impact_id": "EI-04",
+        "description": "Strengthening European open strategic autonomy in digital and emerging enabling technologies through advances in next-generation AI agent capabilities.",
+        "impact_type": "policy",
+        "source_section": "call_entry.destination",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Inferred",
+        "inference_note": "The topic is placed within the destination 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)'. Advances in next-generation AI agents directly serve EU strategic autonomy objectives in the digital domain. This impact is inferred from topic destination placement and not from an explicit impact statement within the topic scope or expected_outcome section."
+      },
+      {
+        "impact_id": "EI-05",
+        "description": "Unlocking the economic potential of AI agents across diverse economic sectors, including data analytics and coding, by advancing agent architecture, memory, reasoning, and autonomous behaviour.",
+        "impact_type": "economic",
+        "source_section": "call_entry.expected_outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      }
+    ]
+  },
+  "scope_requirements": {
+    "requirements": [
+      {
+        "requirement_id": "SR-01",
+        "description": "Research must focus on next-generation AI agents defined as autonomous systems powered by large AI language models (LLMs) or large multimodal models, capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve specified goals based on high-level instructions.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-02",
+        "description": "Proposals must address robust planning, reasoning, and search mechanisms that allow agents to approach complex tasks by breaking them down into structured subgoals.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-03",
+        "description": "Proposals must address effective memory and state management, including balanced integration of short-term and external long-term memory solutions to maintain coherent long-term agent interactions.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-04",
+        "description": "Integration of external tools and APIs is an essential required element to overcome limitations of large AI models and enhance agent performance in tasks requiring accuracy and reliability.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-05",
+        "description": "Proposals must focus on at least one of the following research areas: (a) enhancing AI agent autonomy through advanced self-planning and self-optimization; (b) innovation in memory-augmented AI agents for robust long-term reasoning and lifelong learning; (c) developing advanced multi-agent frameworks tailored for collaborative agents, including mixed AI architectures; (d) advancing multimodal reasoning capabilities for real-world applications.",
+        "mandatory": true,
+        "source_section": "scope_research_areas",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-06",
+        "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-07",
+        "description": "Proposals must demonstrate application in at least one Apply AI sector. The three specifically identified sectors are: healthcare, advanced manufacturing, and in-vehicle autonomous driving.",
+        "mandatory": true,
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-08",
+        "description": "Effective AI agents must incorporate appropriate validation and monitoring techniques for agent behaviour as a required design element.",
+        "mandatory": true,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-09",
+        "description": "All proposals must allocate tasks for cohesion activities with the European Partnership on AI, Data and Robotics (ADRA) and with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+        "mandatory": true,
+        "source_section": "mandatory_cohesion_activities",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-10",
+        "description": "Communicable results must be shared with the European R&D community through the AI-on-demand platform.",
+        "mandatory": true,
+        "source_section": "platform_requirements",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-11",
+        "description": "Projects must link to the resources offered by the AI Factories, including the Data Labs.",
+        "mandatory": true,
+        "source_section": "platform_requirements",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "requirement_id": "SR-12",
+        "description": "When possible, proposals should build on and reuse public results from relevant previously funded actions.",
+        "mandatory": false,
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      }
+    ]
+  },
+  "eligibility_conditions": {
+    "conditions": [
+      {
+        "condition_id": "EC-01",
+        "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+        "condition_type": "geographic",
+        "source_section": "eligibility_restrictions.eligible_entities",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "condition_id": "EC-02",
+        "description": "Entities controlled by non-eligible countries may be excluded from participation unless appropriate guarantees are provided.",
+        "condition_type": "geographic",
+        "source_section": "eligibility_restrictions.control_restrictions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "condition_id": "EC-03",
+        "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+        "condition_type": "trl_level",
+        "source_section": "technology_readiness_level",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      },
+      {
+        "condition_id": "EC-04",
+        "description": "Maximum EU contribution per project is €19,000,000.",
+        "condition_type": "budget_limit",
+        "source_section": "call_entry.max_contribution",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      },
+      {
+        "condition_id": "EC-05",
+        "description": "Standard Horizon Europe RIA minimum consortium composition: at least 3 independent legal entities established in at least 3 different EU Member States or associated countries.",
+        "condition_type": "consortium_composition",
+        "source_section": null,
+        "source_document": null,
+        "status": "Assumed",
+        "assumption_note": "Standard minimum consortium composition requirement for Horizon Europe RIA actions. Not explicitly stated in the topic text, curated call extract, or call slice for this topic. Adopted from standard Horizon Europe RIA instrument practice. Must be verified against Tier 1 normative framework (General Annexes) and Tier 2A RIA instrument schema before use in compliance determination."
+      },
+      {
+        "condition_id": "EC-06",
+        "description": "Financial support to third parties (FSTP) is permitted under the following cumulative limits: maximum €300,000 per third party at grant stage 2; maximum €2,250,000 per grant at stage 3; maximum €2,550,000 per third party in total across stages.",
+        "condition_type": "other",
+        "source_section": "fstp_provisions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+        "status": "Confirmed"
+      }
+    ]
+  },
+  "evaluation_priority_weights": {
+    "criteria": [
+      {
+        "criterion_id": "Excellence",
+        "criterion_name": "Excellence",
+        "weight": null,
+        "priority_notes": "No explicit weight stated in topic source documents. Call-specific technical priorities for Excellence assessment derived from scope text include: advances in AI agent autonomy and self-planning/self-optimization; innovation in memory-augmented agents for long-term reasoning and lifelong learning; development of advanced multi-agent frameworks including mixed AI architectures; multimodal reasoning for real-world applications; robust planning and search mechanisms for complex task decomposition; and integration of external tools and APIs. Proposals must also incorporate structured validation and monitoring techniques.",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Assumed",
+        "assumption_note": "Standard Horizon Europe RIA evaluation criterion. The criterion name and its role in evaluation are not stated in the topic text or call extract; they are adopted from standard RIA instrument practice. The criterion weight is not stated in any source document for this topic. Priority notes are derived from explicit scope text describing required and encouraged technical focus areas. Must be verified against Tier 2A evaluation form templates for the RIA instrument."
+      },
+      {
+        "criterion_id": "Impact",
+        "criterion_name": "Impact",
+        "weight": null,
+        "priority_notes": "No explicit weight stated in topic source documents. Call-specific impact priorities derived from scope text include: contribution to the European Apply AI Strategy; mandatory cohesion activities with ADRA and GenAI4EU central Hub (HORIZON-CL4-2025-03-HUMAN-18); deployment via European Digital Innovation Hubs (EDIHs); sharing of results via the AI-on-demand platform; linkage to AI Factories and Data Labs resources; and development of synergies with international, European, national, or regional initiatives. Portfolio selection procedure gives priority to proposals targeting healthcare, advanced manufacturing, or in-vehicle autonomous driving sectors.",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Assumed",
+        "assumption_note": "Standard Horizon Europe RIA evaluation criterion. The criterion name and its role in evaluation are not stated in the topic text or call extract; they are adopted from standard RIA instrument practice. The criterion weight is not stated in any source document for this topic. Priority notes are derived from explicit scope text requirements on cohesion activities, platform linkage, and Apply AI Strategy contribution. Must be verified against Tier 2A evaluation form templates for the RIA instrument."
+      },
+      {
+        "criterion_id": "Quality and Efficiency of the Implementation",
+        "criterion_name": "Quality and Efficiency of the Implementation",
+        "weight": null,
+        "priority_notes": "No explicit weight stated in topic source documents. Call-specific implementation priorities derived from scope text include: mandatory incorporation of qualitative and quantitative KPIs, benchmarking mechanisms, and progress monitoring; building on and reusing public results from previously funded relevant actions where possible; collaboration with relevant prior projects; and single-stage submission procedure (deadline-model: single-stage).",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Assumed",
+        "assumption_note": "Standard Horizon Europe RIA evaluation criterion. The criterion name and its role in evaluation are not stated in the topic text or call extract; they are adopted from standard RIA instrument practice. The criterion weight is not stated in any source document for this topic. Priority notes on KPI and benchmarking requirements are derived from explicit scope text. Must be verified against Tier 2A evaluation form templates for the RIA instrument."
+      }
+    ]
+  }
+}
+
+=== END ===

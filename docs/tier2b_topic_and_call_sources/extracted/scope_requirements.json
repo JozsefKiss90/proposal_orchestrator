@@ -2,7 +2,7 @@
   "requirements": [
     {
       "requirement_id": "SR-01",
-      "description": "Proposals must target next-generation AI agents: autonomous systems powered by large AI language models (e.g., large language models or large multimodal models) that can plan, utilise tools, and perform actions autonomously to achieve specified goals based on high-level instructions.",
+      "description": "Research must focus on next-generation AI agents defined as autonomous systems powered by large AI language models (LLMs) or large multimodal models, capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve specified goals based on high-level instructions.",
       "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -10,7 +10,7 @@
     },
     {
       "requirement_id": "SR-02",
-      "description": "AI agent design must incorporate structured planning and reasoning methods to manage complex tasks, and agents must be equipped with appropriate validation and monitoring techniques.",
+      "description": "Proposals must address robust planning, reasoning, and search mechanisms that allow agents to approach complex tasks by breaking them down into structured subgoals.",
       "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -18,7 +18,7 @@
     },
     {
       "requirement_id": "SR-03",
-      "description": "Proposals must address real-world applications in Apply AI sectors; the call explicitly references data analytics, coding, healthcare, advanced manufacturing, and autonomous driving as application areas.",
+      "description": "Proposals must address effective memory and state management, including balanced integration of short-term and external long-term memory solutions to maintain coherent long-term agent interactions.",
       "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -26,7 +26,7 @@
     },
     {
       "requirement_id": "SR-04",
-      "description": "Proposals must allocate tasks for cohesion activities with the European Partnership on AI, Data and Robotics (ADRA) and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "description": "Integration of external tools and APIs is an essential required element to overcome limitations of large AI models and enhance agent performance in tasks requiring accuracy and reliability.",
       "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -34,15 +34,15 @@
     },
     {
       "requirement_id": "SR-05",
-      "description": "Proposals must incorporate qualitative and quantitative KPIs, benchmarking, and progress monitoring mechanisms to demonstrate progress.",
+      "description": "Proposals must focus on at least one of the following research areas: (a) enhancing AI agent autonomy through advanced self-planning and self-optimization; (b) innovation in memory-augmented AI agents for robust long-term reasoning and lifelong learning; (c) developing advanced multi-agent frameworks tailored for collaborative agents, including mixed AI architectures; (d) advancing multimodal reasoning capabilities for real-world applications.",
       "mandatory": true,
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "source_section": "scope_research_areas",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "requirement_id": "SR-06",
-      "description": "Communicable results must be shared via the AI-on-demand platform; projects must link to AI Factories and Data Labs resources; results may be validated in Testing and Experiment Facilities and deployed via EDIHs.",
+      "description": "All proposals are expected to incorporate mechanisms for assessing and demonstrating progress, including qualitative and quantitative KPIs, benchmarking, and progress monitoring.",
       "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -50,31 +50,47 @@
     },
     {
       "requirement_id": "SR-07",
-      "description": "Activities must start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "description": "Proposals must demonstrate application in at least one Apply AI sector. The three specifically identified sectors are: healthcare, advanced manufacturing, and in-vehicle autonomous driving.",
       "mandatory": true,
-      "source_section": "technology_readiness_level",
+      "source_section": "procedure_exceptions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "requirement_id": "SR-08",
-      "description": "Potential (non-exhaustive) research areas include: (a) enhancing AI agent autonomy through advanced self-planning and self-optimisation; (b) innovation in memory-augmented AI agents for long-term reasoning and lifelong learning; (c) advanced multi-agent frameworks for collaborative agents including mixed AI architectures; (d) advancing multimodal reasoning for real-world applications.",
-      "mandatory": false,
+      "description": "Effective AI agents must incorporate appropriate validation and monitoring techniques for agent behaviour as a required design element.",
+      "mandatory": true,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "requirement_id": "SR-09",
-      "description": "To qualify for sector-portfolio-based grant award, proposals should address at least one of the three priority application sectors: healthcare, advanced manufacturing, or in-vehicle autonomous driving.",
-      "mandatory": false,
-      "source_section": "procedure_exceptions",
+      "description": "All proposals must allocate tasks for cohesion activities with the European Partnership on AI, Data and Robotics (ADRA) and with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub.",
+      "mandatory": true,
+      "source_section": "mandatory_cohesion_activities",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "requirement_id": "SR-10",
-      "description": "Proposals should build on or seek collaboration with relevant projects and develop synergies with other relevant international, European, national, or regional initiatives.",
+      "description": "Communicable results must be shared with the European R&D community through the AI-on-demand platform.",
+      "mandatory": true,
+      "source_section": "platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "requirement_id": "SR-11",
+      "description": "Projects must link to the resources offered by the AI Factories, including the Data Labs.",
+      "mandatory": true,
+      "source_section": "platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "requirement_id": "SR-12",
+      "description": "When possible, proposals should build on and reuse public results from relevant previously funded actions.",
       "mandatory": false,
       "source_section": "call_entry.scope",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
