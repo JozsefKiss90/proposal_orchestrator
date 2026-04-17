@@ -484,6 +484,7 @@ def _assemble_tapm_prompt(
     constraints: list[str],
     repo_root: Path,
     node_id: str | None = None,
+    caller_context: dict[str, Any] | None = None,
 ) -> tuple[str, str]:
     """Assemble TAPM (Tool-Augmented Prompt Mode) prompts for Claude.
 
@@ -612,6 +613,30 @@ def _assemble_tapm_prompt(
             user_prompt += f"- {abs_path}\n"
     else:
         user_prompt += "(no declared inputs)\n"
+
+    # Caller-supplied context — content provided by the invoking agent
+    # that is NOT part of the skill's declared disk inputs.  Context-
+    # sensitive skills (e.g. topic-scope-check) require the invoking
+    # agent to supply the text being evaluated.
+    if caller_context:
+        user_prompt += "\n# Caller-Supplied Context\n\n"
+        user_prompt += (
+            "The invoking agent has provided the following content as "
+            "context for this skill invocation. This content is the "
+            "text to evaluate — use it as the primary input for the "
+            "skill's content analysis steps (e.g. Step 1.4 and Step 2.3 "
+            "of the skill specification).\n\n"
+        )
+        for ctx_path, ctx_content in caller_context.items():
+            user_prompt += f"## {ctx_path}\n\n"
+            if isinstance(ctx_content, (dict, list)):
+                user_prompt += (
+                    f"```json\n{json.dumps(ctx_content, indent=2)}\n```\n\n"
+                )
+            elif ctx_content is not None:
+                user_prompt += f"```\n{ctx_content}\n```\n\n"
+            else:
+                user_prompt += "(not available)\n\n"
 
     # Output requirements with schema hints
     user_prompt += "\n# Output Requirements\n\n"
@@ -936,6 +961,7 @@ def run_skill(
     inputs: dict[str, Any] | None = None,
     *,
     node_id: str | None = None,
+    caller_context: dict[str, Any] | None = None,
 ) -> SkillResult:
     """Execute a skill specification via Claude and return a SkillResult.
 
@@ -970,6 +996,13 @@ def run_skill(
         Optional workflow node identifier (e.g. ``"n01_call_analysis"``).
         Included as task metadata in TAPM prompts for traceability.
         Ignored in cli-prompt mode.
+    caller_context:
+        Optional dict of content supplied by the invoking agent for
+        context-sensitive skills.  Keys are source paths (for
+        traceability); values are the content (str or parsed JSON).
+        In TAPM mode, this content is rendered directly into the prompt
+        so the skill can access it without additional disk reads.
+        In cli-prompt mode, merged into the resolved inputs dict.
 
     Returns
     -------
@@ -1030,6 +1063,7 @@ def run_skill(
             constraints=constraints,
             repo_root=repo_root,
             node_id=node_id,
+            caller_context=caller_context,
         )
         logger.info(
             "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
@@ -1080,8 +1114,13 @@ def run_skill(
     elif mode == "cli-prompt":
         # ── CLI-Prompt Path: Phases A-C (unchanged) ──────────────────
 
+        # Merge caller context into inputs for cli-prompt serialization
+        effective_inputs = dict(inputs) if inputs else {}
+        if caller_context:
+            effective_inputs.update(caller_context)
+
         # Resolve inputs from disk
-        resolved_inputs = _resolve_inputs(reads_from, repo_root, inputs)
+        resolved_inputs = _resolve_inputs(reads_from, repo_root, effective_inputs)
 
         # Validate inputs
         validation_errors = _validate_skill_inputs(

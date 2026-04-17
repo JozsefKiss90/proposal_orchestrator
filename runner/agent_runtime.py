@@ -482,6 +482,74 @@ def _determine_can_evaluate_exit_gate(
 
 
 # ---------------------------------------------------------------------------
+# Caller context for context-sensitive skills
+# ---------------------------------------------------------------------------
+
+#: Skills that require the invoking agent to supply content context, mapped
+#: to the Tier 3 source paths that provide that context.  When these skills
+#: are invoked, the agent runtime reads the listed paths and passes them as
+#: ``caller_context`` to ``run_skill()``.
+#:
+#: This is the authoritative registry of skill→context-source bindings.
+#: Each entry's source paths must fall within the invoking agent's
+#: ``reads_from`` scope (agent_catalog.yaml).
+_SKILL_CONTEXT_SOURCES: dict[str, tuple[str, ...]] = {
+    "topic-scope-check": (
+        "docs/tier3_project_instantiation/project_brief/concept_note.md",
+        "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
+        "docs/tier3_project_instantiation/project_brief/project_summary.json",
+    ),
+}
+
+
+def _build_caller_context(
+    skill_id: str,
+    resolved_inputs: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any]:
+    """Build caller-supplied content context for context-sensitive skills.
+
+    Returns a dict mapping source paths to their content.  Empty dict when
+    no context sources are configured or no sources are available for
+    *skill_id*.
+
+    Content is taken from *resolved_inputs* first (for JSON files already
+    loaded by ``_resolve_agent_inputs``), then read from disk (for non-JSON
+    files such as ``.md`` that ``_resolve_agent_inputs`` does not collect).
+
+    **Fail-closed:** returns empty dict when sources are absent.  The
+    skill's own input validation (e.g. Step 1.4 of ``topic-scope-check``)
+    will produce the appropriate ``MISSING_INPUT`` failure.
+    """
+    source_paths = _SKILL_CONTEXT_SOURCES.get(skill_id)
+    if source_paths is None:
+        return {}
+
+    context: dict[str, Any] = {}
+    for rel_path in source_paths:
+        # Check resolved_inputs first (JSON files already loaded by agent)
+        if rel_path in resolved_inputs and resolved_inputs[rel_path] is not None:
+            context[rel_path] = resolved_inputs[rel_path]
+            continue
+        # Read from disk for files not in resolved_inputs (.md files)
+        abs_path = repo_root / rel_path
+        if abs_path.is_file():
+            try:
+                raw = abs_path.read_text(encoding="utf-8-sig")
+                if rel_path.endswith(".json"):
+                    try:
+                        context[rel_path] = json.loads(raw)
+                    except json.JSONDecodeError:
+                        context[rel_path] = raw
+                else:
+                    context[rel_path] = raw
+            except OSError:
+                pass  # absent/unreadable — skip; fail-closed downstream
+
+    return context
+
+
+# ---------------------------------------------------------------------------
 # Skill applicability guard
 # ---------------------------------------------------------------------------
 
@@ -737,7 +805,16 @@ def run_agent(
             )
             continue
 
-        result = run_skill(sid, run_id, repo_root, resolved_inputs)
+        # Build caller context for context-sensitive skills (e.g.
+        # topic-scope-check needs concept text from the invoking agent).
+        caller_context = _build_caller_context(
+            sid, resolved_inputs, repo_root
+        )
+
+        result = run_skill(
+            sid, run_id, repo_root, resolved_inputs,
+            caller_context=caller_context or None,
+        )
         record = SkillInvocationRecord(
             skill_id=sid,
             status=result.status,
