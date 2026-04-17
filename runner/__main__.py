@@ -33,7 +33,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from runner.dag_scheduler import DAGScheduler, DAGSchedulerError, ManifestGraph, RunAbortedError
+from runner.dag_scheduler import (
+    DAGScheduler,
+    DAGSchedulerError,
+    ManifestGraph,
+    RunAbortedError,
+    bootstrap_phase_prerequisites,
+)
 from runner.gate_library import LIBRARY_REL_PATH
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.paths import find_repo_root
@@ -183,10 +189,36 @@ def main(argv: Optional[list[str]] = None) -> int:
             else repo_root / MANIFEST_REL_PATH
         )
         graph = ManifestGraph.load(manifest_path)
-        ctx = RunContext.initialize(repo_root, args.run_id)
+        ctx = RunContext.load_or_initialize(repo_root, args.run_id)
     except Exception as exc:
         _err(str(exc))
         return 3
+
+    # ------------------------------------------------------------------
+    # Phase-scoped continuation bootstrap
+    # ------------------------------------------------------------------
+    # When --phase is specified, seed upstream prerequisite nodes as
+    # "released" from durable Tier 4 gate result evidence.  This enables
+    # phase-by-phase execution with new run-ids (each invocation reads
+    # prior-run evidence) and also works with existing run-ids (already-
+    # loaded states are preserved; only "pending" nodes are candidates).
+    if args.phase is not None:
+        try:
+            bootstrapped = bootstrap_phase_prerequisites(
+                ctx, graph, repo_root, args.phase
+            )
+            if bootstrapped:
+                _out(
+                    f"[BOOTSTRAP] Seeded {len(bootstrapped)} upstream node(s) "
+                    f"from prior evidence: {bootstrapped}",
+                    "bootstrap",
+                    bootstrapped_nodes=bootstrapped,
+                    count=len(bootstrapped),
+                )
+        except Exception as exc:
+            # Bootstrap failure is non-blocking: the scheduler will detect
+            # unmet prerequisites via its normal readiness checks and abort.
+            sched_logger.warning("Bootstrap failed (non-blocking): %s", exc)
 
     phase_label = f"  phase={args.phase}" if args.phase else ""
     run_start_fields: dict[str, object] = {"run_id": args.run_id}

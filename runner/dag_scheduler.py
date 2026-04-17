@@ -49,6 +49,16 @@ It raises :class:`RunAbortedError` (carrying ``.summary``) when pending nodes
 remain after the dispatch loop exits.  ``run_summary.json`` is written to
 ``.claude/runs/<run_id>/`` **before** the method returns or raises.
 
+Phase-scoped continuation
+-------------------------
+:func:`bootstrap_phase_prerequisites` seeds upstream prerequisite nodes as
+``released`` from durable Tier 4 gate result artifacts, enabling
+phase-by-phase execution with new ``--run-id`` values per invocation.
+This is a **bootstrap/seed step** invoked before dispatch, not rerun or
+resume logic.  ``ManifestGraph.is_ready()`` continues to rely on current
+``RunContext`` node states; the bootstrap ensures those states are correctly
+initialized from prior evidence.
+
 Scope boundaries
 ----------------
 This module implements gate-evaluation dispatch with integrated node body
@@ -56,7 +66,7 @@ execution via the agent runtime.  The following are intentionally out of scope:
 
 - Direct skill invocation (the scheduler calls ``run_agent()``, never ``run_skill()``)
 - Parallel dispatch
-- Rerun / resume logic
+- Full rerun / resume logic (phase-scoped continuation bootstrap is in scope)
 - Semantic agent orchestration beyond calling ``evaluate_gate()``
 """
 
@@ -118,6 +128,121 @@ def _gate_result_repo_path(gate_id: str) -> str:
     if gate_id in GATE_RESULT_PATHS:
         return f"{_TIER4_ROOT_REL}/{GATE_RESULT_PATHS[gate_id]}"
     return f"{_TIER4_ROOT_REL}/{_FALLBACK_GATE_RESULT_SUB}/{gate_id}.json"
+
+
+# ---------------------------------------------------------------------------
+# Phase-scoped continuation bootstrap
+# ---------------------------------------------------------------------------
+
+
+def _collect_upstream_nodes(
+    graph: "ManifestGraph",
+    target_nodes: set[str],
+    upstream: set[str],
+) -> None:
+    """Recursively collect all transitive upstream node IDs for *target_nodes*.
+
+    Traces incoming conditions in the ``ManifestGraph`` and accumulates
+    every source node that must be ``released`` before *target_nodes* can
+    become ready.  Already-visited nodes (present in *upstream*) are not
+    re-traversed, so the function terminates on acyclic graphs.
+    """
+    for node_id in target_nodes:
+        for cond in graph.incoming_conditions(node_id):
+            src = cond.source_node_id
+            if src not in upstream:
+                upstream.add(src)
+                _collect_upstream_nodes(graph, {src}, upstream)
+
+
+def bootstrap_phase_prerequisites(
+    ctx: RunContext,
+    graph: "ManifestGraph",
+    repo_root: Path,
+    phase: int,
+) -> list[str]:
+    """Seed upstream prerequisite nodes as ``released`` from durable evidence.
+
+    For phase-scoped execution (``--phase N``), upstream nodes outside the
+    requested phase start as ``pending`` in a fresh ``RunContext``.  This
+    function inspects canonical Tier 4 gate result artifacts to determine
+    which upstream nodes have previously passed their exit gates, and seeds
+    them as ``released`` in the current ``RunContext``.
+
+    Evidence requirement
+    --------------------
+    A node is bootstrapped to ``released`` only when its canonical exit-gate
+    result artifact exists in Tier 4 **and** contains ``"status": "pass"``.
+    No completion is inferred from the mere existence of phase output files
+    or any other heuristic.
+
+    Fail-closed
+    -----------
+    If evidence is absent, ambiguous, corrupt, or shows a non-pass status,
+    the node remains ``pending``.
+
+    Parameters
+    ----------
+    ctx:
+        ``RunContext`` for the current run.  Modified in-place and saved
+        when at least one node is bootstrapped.
+    graph:
+        ``ManifestGraph`` for the DAG.
+    repo_root:
+        Absolute path to the repository root.
+    phase:
+        Phase number being executed.
+
+    Returns
+    -------
+    list[str]
+        Node IDs bootstrapped to ``released``, in manifest registry order.
+    """
+    phase_nodes = set(graph.nodes_for_phase(phase))
+    if not phase_nodes:
+        return []
+
+    # Collect all transitive upstream nodes required by the target phase.
+    upstream_needed: set[str] = set()
+    _collect_upstream_nodes(graph, phase_nodes, upstream_needed)
+    upstream_needed -= phase_nodes  # Don't bootstrap the target phase itself.
+
+    bootstrapped: list[str] = []
+    for node_id in graph.node_ids():  # preserve manifest registry order
+        if node_id not in upstream_needed:
+            continue
+        if ctx.get_node_state(node_id) != "pending":
+            continue  # already has a state (loaded from existing run)
+
+        exit_gate_id = graph.exit_gate(node_id)
+        if exit_gate_id is None:
+            continue  # no exit gate — cannot verify completion
+
+        # Check canonical gate result artifact in Tier 4.
+        gate_result_rel = _gate_result_repo_path(exit_gate_id)
+        gate_result_abs = repo_root / gate_result_rel
+        if not gate_result_abs.exists():
+            continue  # no evidence — remain pending
+
+        try:
+            result_data = json.loads(
+                gate_result_abs.read_text(encoding="utf-8")
+            )
+            if result_data.get("status") == "pass":
+                ctx.set_node_state(node_id, "released")
+                bootstrapped.append(node_id)
+                log.info(
+                    "  Bootstrap: %s -> released (evidence: %s)",
+                    node_id,
+                    gate_result_rel,
+                )
+        except (json.JSONDecodeError, OSError, TypeError):
+            continue  # corrupt or unreadable evidence — remain pending
+
+    if bootstrapped:
+        ctx.save()
+
+    return bootstrapped
 
 
 # ---------------------------------------------------------------------------

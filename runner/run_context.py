@@ -161,6 +161,34 @@ class RunContext:
         return ctx
 
     @classmethod
+    def load_or_initialize(
+        cls,
+        repo_root: Path,
+        run_id: Optional[str] = None,
+    ) -> "RunContext":
+        """
+        Load an existing run context if it exists, otherwise create a new one.
+
+        This preserves node states from prior invocations when re-using a
+        ``run_id``.  When the run directory does not yet exist, a fresh
+        context is created via :meth:`initialize`.
+
+        Parameters
+        ----------
+        repo_root:
+            Repository root directory.
+        run_id:
+            Run UUID.  When ``None``, a fresh UUID v4 is generated (and
+            ``initialize`` is always called since no prior run can exist).
+        """
+        if run_id is None:
+            return cls.initialize(repo_root)
+        try:
+            return cls.load(repo_root, run_id)
+        except FileNotFoundError:
+            return cls.initialize(repo_root, run_id)
+
+    @classmethod
     def load(cls, repo_root: Path, run_id: str) -> "RunContext":
         """
         Load an existing run context from disk.
