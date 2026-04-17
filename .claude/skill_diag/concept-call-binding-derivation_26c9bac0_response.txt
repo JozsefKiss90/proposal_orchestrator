@@ -1,0 +1,32 @@
+=== skill_id: concept-call-binding-derivation ===
+=== mode: tapm ===
+=== response_text length: 4560 ===
+=== response_text (full) ===
+{
+  "topic_mapping": {
+    "mappings": [
+      {
+        "topic_element_id": "EO-01",
+        "tier2b_source_ref": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json § call_entry.expected_outcome",
+        "tier3_evidence_ref": "concept_note.md (Pillar 1 — Neuro-Symbolic Planning and Reasoning section, lines 13–19; Pillar 2 — Adaptive Memory Architecture section, lines 21–29); strategic_positioning.md (Positioning Against the Expected Outcomes, outcome 1 paragraph, lines 13–14); project_summary.json (abstract: 'neuro-symbolic planning and reasoning engines that decompose high-level goals into executable sub-task graphs with verifiable intermediate states; adaptive memory architectures that unify short-term working memory with external long-term knowledge stores to sustain coherent, context-aware agent behaviour over extended interactions')",
+        "mapping_description": "MAESTRO directly addresses EO-01 through Pillar 1 (Neuro-Symbolic Planning and Reasoning) and Pillar 2 (Adaptive Memory Architecture). Pillar 1 develops a hybrid neuro-symbolic planning engine combining LLM-based reasoning with formal symbolic planning methods — integrating Monte Carlo Tree Search and hierarchical task networks with LLM-driven heuristic evaluation — plus self-correction through plan monitoring that detects execution failures and replans from verified intermediate states. This produces significant improvements in agent autonomy and robustness through advanced planning mechanisms. Pillar 2 designs a unified memory architecture integrating working memory (short-term, attention-managed), episodic memory (retrieval-augmented, context-indexed), and semantic memory (persistent knowledge graph of domain concepts and tool capabilities), managed by a memory controller. This produces improvements in agent coherence and long-horizon performance through advanced memory management. The strategic_positioning.md explicitly maps Pillars 1 and 2 to EO-01 and identifies the formal guarantees (verifiable sub-task decomposition, plan monitoring with provable recovery) as the distinctive mechanism differentiating MAESTRO from pure LLM-based approaches."
+      },
+      {
+        "topic_element_id": "EO-02",
+        "tier2b_source_ref": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json § call_entry.expected_outcome",
+        "tier3_evidence_ref": "concept_note.md (Pillar 3 — Decentralised Multi-Agent Coordination section, lines 31–37; opening vision paragraph: 'Many real-world tasks exceed the scope of any single agent'); strategic_positioning.md (Positioning Against the Expected Outcomes, outcome 2 paragraph, lines 15–16; Positioning Against the State of the Art — multi-agent systems paragraph); project_summary.json (abstract: 'decentralised multi-agent coordination protocols that enable heterogeneous AI agents to negotiate, delegate, and jointly execute tasks with provable convergence guarantees'; keyword entry 'multi-agent systems')",
+        "mapping_description": "MAESTRO directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination). The concept defines: (1) a formal task-delegation protocol enabling agents to decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence; (2) conflict resolution mechanisms for contested resources, interfering plans, and inconsistent world models from partial observations; and (3) fully auditable multi-agent interactions producing structured traces of every delegation, negotiation step, and joint decision. The strategic_positioning.md explicitly positions Pillar 3 against EO-02, distinguishing MAESTRO's formally specified delegation and negotiation protocols with convergence guarantees from ad-hoc LLM-based agent communication patterns. All three demonstrators exercise multi-agent coordination, and the concept explicitly states that 'many real-world tasks exceed the scope of any single agent' as the motivating premise for the multi-agent coordination pillar — directly mapping to the outcome's framing of 'beyond the capabilities of individual agents'."
+      }
+    ]
+  },
+  "compliance_profile": {
+    "eligibility_confirmed": true,
+    "ethics_review_required": true,
+    "gender_plan_required": true,
+    "open_science_requirements": [
+      "Communicable results must be shared with the European R&D community through the AI-on-demand platform (derived from CC-05 / SR-10: call_constraints.json and scope_requirements.json, source_document HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json)."
+    ]
+  }
+}
+
+=== END ===

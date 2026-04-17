@@ -1,3 +1,7 @@
+=== skill_id: concept-alignment-check ===
+=== mode: tapm ===
+=== response_text length: 9275 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase2.concept_refinement_summary.v1",
   "run_id": "26c9bac0-fb8a-4ef2-8a3d-9547aa391acb",
@@ -11,9 +15,7 @@
       },
       "tier3_evidence_ref": "concept_note.md (Pillar 1 — Neuro-Symbolic Planning and Reasoning section, lines 13–19; Pillar 2 — Adaptive Memory Architecture section, lines 21–29); strategic_positioning.md (Positioning Against the Expected Outcomes, outcome 1 paragraph, lines 13–14); project_summary.json (abstract: 'neuro-symbolic planning and reasoning engines that decompose high-level goals into executable sub-task graphs with verifiable intermediate states; adaptive memory architectures that unify short-term working memory with external long-term knowledge stores to sustain coherent, context-aware agent behaviour over extended interactions')",
       "status": "Confirmed",
-      "vocabulary_gaps": [
-        "reliability"
-      ]
+      "vocabulary_gaps": ["reliability"]
     },
     "EO-02": {
       "topic_element_id": "EO-02",
@@ -53,3 +55,5 @@
   ],
   "strategic_differentiation": "MAESTRO's primary differentiator is the integrated co-design of three mutually reinforcing AI agent capabilities — neuro-symbolic planning and reasoning (Pillar 1), adaptive memory architecture (Pillar 2), and decentralised multi-agent coordination (Pillar 3) — as a single unified architecture, rather than treating them as independent research streams. This integration is not achievable by combining off-the-shelf components from the three currently disconnected research communities: LLM-based agents (strong on natural language task understanding, weak on long-horizon planning robustness and memory management), classical planning and multi-agent systems (strong on formal guarantees, weak on handling real-world ambiguity), and memory-augmented neural systems (focused on retrieval augmentation for single-turn accuracy but lacking planning and coordination integration). The neuro-symbolic planning approach delivers formal guarantees — verifiable sub-task decomposition and plan monitoring with provable recovery from failure states — that pure LLM-based approaches cannot offer, while retaining neural flexibility. The multi-agent protocol delivers formally specified delegation and negotiation with provable convergence guarantees, rather than ad-hoc LLM-based communication patterns. All three pillars share common data representations, evaluation benchmarks, and integration interfaces from the project's start. Validation is conducted across three Apply AI sectors (healthcare clinical decision support, advanced manufacturing process optimisation, autonomous logistics supply chain planning) co-designed with sector-leading industry partners in operational environments, targeting TRL 5 by project end — ensuring research advances are generalisable and not domain-specific artifacts. (Derived from strategic_positioning.md: sections Differentiation within the Call Scope, Positioning Against the Expected Outcomes, Positioning Against the State of the Art, Positioning Within the Apply AI Sectors, Risks Addressed by the Positioning.)"
 }
+
+=== END ===

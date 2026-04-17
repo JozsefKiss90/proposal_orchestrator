@@ -1,7 +1,7 @@
 {
   "gate_id": "phase_02_gate",
   "gate_kind": "exit",
-  "run_id": "c6c6ab63-5e69-47c5-842c-9f565643a42c",
+  "run_id": "26c9bac0-fb8a-4ef2-8a3d-9547aa391acb",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
@@ -10,7 +10,7 @@
     "docs/tier3_project_instantiation/project_brief": "sha256:cf910ac86f465bce8e2f2d1d99e9141bdd8c193c74d2e22fea4d03dd47257d9f",
     "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json": "sha256:602cccade449ca9626e3cd72ec077389b4170a618c75927e984b2d9284c83718"
   },
-  "evaluated_at": "2026-04-17T19:54:48.914550+00:00",
+  "evaluated_at": "2026-04-17T21:14:21.819559+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -30,10 +30,27 @@
       {
         "predicate_id": "g03_p06",
         "function": "no_unresolved_scope_conflicts",
-        "failure_reason": "semantic_result_malformed",
-        "validation_error": "semantic result missing required fields: ['agent', 'artifacts_inspected', 'constitutional_rule']",
-        "_dispatch_error": true,
-        "_dispatch_error_reason": "Claude transport failed for 'no_unresolved_scope_conflicts': Claude CLI exited with code 1"
+        "failure_reason": "semantic_fail",
+        "constitutional_rule": "CLAUDE.md \u00a77 Phase 2 gate",
+        "findings": [
+          {
+            "claim": "SC-01 resolution_status: 'unresolved' \u2014 MAESTRO's third demonstrator targets logistics and supply chain planning rather than in-vehicle autonomous driving, leaving the portfolio coverage conflict with CC-10/SR-07 explicitly unresolved in the concept refinement summary.",
+            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
+            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
+            "severity": "critical"
+          },
+          {
+            "claim": "SC-02 resolution_status: 'unresolved' \u2014 The mandatory Tier 2B scope requirement SR-04 ('Integration of external tools and APIs is an essential required element') is not explicitly addressed as a named architecture component or research pillar in the MAESTRO concept, and this conflict is logged as unresolved in the concept refinement summary.",
+            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
+            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
+            "severity": "critical"
+          }
+        ],
+        "fail_message": "Phase 2 gate condition is not satisfied: the concept refinement summary records two explicitly unresolved scope conflicts (SC-01: logistics sector vs. in-vehicle autonomous driving portfolio coverage; SC-02: missing explicit SR-04 tool and API integration mechanism), both of which must be resolved before the Phase 2 gate can pass per CLAUDE.md \u00a77.",
+        "artifacts_inspected": [
+          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
+          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\scope_requirements.json"
+        ]
       }
     ]
   },

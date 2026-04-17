@@ -1,0 +1,68 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-04-17T12:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agents powered by LLMs capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve specified goals based on high-level instructions.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops a hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints; integrates MCTS and hierarchical task networks with LLM-driven heuristic evaluation; and supports self-correction through plan monitoring with replanning from verified intermediate states.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO designs a unified memory architecture integrating working memory (structured short-term store for current goals and plan state), episodic memory (retrieval-augmented store of past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph connecting domain concepts, tool capabilities, and task patterns), with a memory controller managing information flow between stores.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Tool capabilities are referenced within the semantic memory knowledge graph and agents are described as specialised in different tools, but the concept note includes no dedicated research task, protocol, or mechanism for external tool and API integration as a distinct project contribution or explicit design element.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "SR-04 designates integration of external tools and APIs as an essential required element to overcome limitations of large AI models and enhance agent performance. The concept note addresses this only implicitly \u2014 through storage of tool capabilities in semantic memory and characterisation of agents as tool-specialised \u2014 without a dedicated research activity explicitly addressing tool/API integration mechanisms. Given SR-04 is a mandatory scope element, this implicit treatment is a potential compliance gap that must be made explicit in the concept before Phase 2 completes."
+    },
+    {
+      "claim": "MAESTRO addresses self-planning and self-optimisation (Pillar 1 \u2014 neuro-symbolic planning), memory-augmented AI for robust long-term reasoning (Pillar 2 \u2014 adaptive memory architecture), and advanced multi-agent frameworks for collaborative agents (Pillar 3 \u2014 decentralised coordination), satisfying the SR-05 'at least one' requirement across three of its four identified research areas.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops decentralised multi-agent coordination protocols with formal task-delegation, negotiation, and provable convergence guarantees; conflict resolution mechanisms for contested resources and inconsistent world models; and auditable structured interaction traces that humans can inspect.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates validation through three sector-specific demonstrators co-designed with industry partners, with validation against real diagnostic pathways, operational factory environments, and logistics partner environments; progress monitoring is implied through the co-design structure though an explicit KPI and benchmarking framework is not detailed in the concept note.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates agent behaviour monitoring through plan monitoring that detects execution failures, verifiable intermediate states in the sub-task graph, and auditable structured traces of all multi-agent delegation, negotiation, and joint decision steps.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO includes a Healthcare Clinical Decision Support demonstrator where AI agents assist clinicians in diagnostic reasoning by autonomously gathering patient data from multiple sources, planning differential diagnoses, and coordinating specialist sub-agents fo
+=== END ===

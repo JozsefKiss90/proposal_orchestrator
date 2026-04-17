@@ -1,0 +1,159 @@
+=== skill_id: topic-scope-check ===
+=== mode: tapm ===
+=== response_text length: 11323 ===
+=== response_text (full) ===
+```json
+{
+  "decision_id": "scope_check_concept_refiner_2026-04-17T12:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agents powered by LLMs capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve specified goals based on high-level instructions.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops a hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints; integrates MCTS and hierarchical task networks with LLM-driven heuristic evaluation; and supports self-correction through plan monitoring with replanning from verified intermediate states.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO designs a unified memory architecture integrating working memory (structured short-term store for current goals and plan state), episodic memory (retrieval-augmented store of past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph connecting domain concepts, tool capabilities, and task patterns), with a memory controller managing information flow between stores.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Tool capabilities are referenced within the semantic memory knowledge graph and agents are described as specialised in different tools, but the concept note includes no dedicated research task, protocol, or mechanism for external tool and API integration as a distinct project contribution or explicit design element.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "SR-04 designates integration of external tools and APIs as an essential required element to overcome limitations of large AI models and enhance agent performance. The concept note addresses this only implicitly — through storage of tool capabilities in semantic memory and characterisation of agents as tool-specialised — without a dedicated research activity explicitly addressing tool/API integration mechanisms. Given SR-04 is a mandatory scope element, this implicit treatment is a potential compliance gap that must be made explicit in the concept before Phase 2 completes."
+    },
+    {
+      "claim": "MAESTRO addresses self-planning and self-optimisation (Pillar 1 — neuro-symbolic planning), memory-augmented AI for robust long-term reasoning (Pillar 2 — adaptive memory architecture), and advanced multi-agent frameworks for collaborative agents (Pillar 3 — decentralised coordination), satisfying the SR-05 'at least one' requirement across three of its four identified research areas.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops decentralised multi-agent coordination protocols with formal task-delegation, negotiation, and provable convergence guarantees; conflict resolution mechanisms for contested resources and inconsistent world models; and auditable structured interaction traces that humans can inspect.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates validation through three sector-specific demonstrators co-designed with industry partners, with validation against real diagnostic pathways, operational factory environments, and logistics partner environments; progress monitoring is implied through the co-design structure though an explicit KPI and benchmarking framework is not detailed in the concept note.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates agent behaviour monitoring through plan monitoring that detects execution failures, verifiable intermediate states in the sub-task graph, and auditable structured traces of all multi-agent delegation, negotiation, and joint decision steps.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO includes a Healthcare Clinical Decision Support demonstrator where AI agents assist clinicians in diagnostic reasoning by autonomously gathering patient data from multiple sources, planning differential diagnoses, and coordinating specialist sub-agents for imaging analysis, lab result interpretation, and treatment guideline retrieval.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO includes an Advanced Manufacturing Process Optimisation demonstrator where a multi-agent system autonomously monitors, diagnoses, and optimises manufacturing processes in real time, with agents coordinating across production line segments to minimise defects and energy consumption.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO includes an Autonomous Logistics Supply Chain Planning demonstrator where agents coordinate logistics operations across warehouses, carriers, and customs; negotiate delivery schedules; replan in response to disruptions; and maintain consistent state across a distributed supply chain.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "flagged",
+      "flag_reason": "SR-07 and CC-10 specifically identify three Apply AI sectors for this topic: healthcare, advanced manufacturing, and in-vehicle autonomous driving. Logistics and supply chain is not among the three specifically identified sectors. MAESTRO satisfies the SR-07 'at least one' requirement through its healthcare and advanced manufacturing demonstrators. However, the logistics demonstrator does not contribute to coverage of the three call-specified sectors, and the project includes no in-vehicle autonomous driving demonstrator. CC-10 constrains grant awards to ensure portfolio coverage including in-vehicle autonomous driving; evaluators applying CC-10 portfolio logic may note the absence of an autonomous driving demonstrator as a strategic gap. The logistics demonstrator choice should be justified in the concept text or replaced/supplemented with an in-vehicle autonomous driving demonstrator."
+    },
+    {
+      "claim": "MAESTRO will allocate dedicated tasks for cohesion activities with the European Partnership on AI, Data and Robotics (ADRA) and with the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "scope_element_ref": "SR-09",
+      "constraint_ref": "CC-03",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All research outputs — frameworks, models, benchmarks, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "scope_element_ref": "SR-10",
+      "constraint_ref": "CC-05",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation, and demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO's open-source framework and standardised agent interaction protocols aim to lower barriers for European SMEs and startups to build on next-generation AI agent technology, reducing strategic dependency on non-European AI platforms.",
+      "scope_element_ref": "SR-10",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The requested EU contribution of €18,500,000 is within the per-project maximum of €19,000,000.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project targets TRL 5 validation in operational environments by the end of the project, consistent with the CC-01 TRL trajectory requirement.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The concept note does not explicitly describe any activity to build on or reuse public results from relevant previously funded EU actions; positioning against the state of the art references publicly known systems (ReAct, AutoGPT-style) but does not commit to prior EU-funded project reuse.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "SR-12 (mandatory: false) and CC-11 recommend that proposals build on and reuse public results from relevant previously funded actions when possible. The concept note positions MAESTRO against current non-EU research streams but does not explicitly address prior EU-funded results. This is not a blocking scope violation given SR-12's non-mandatory status, but the absence of this element from the concept text is a gap relative to call scope expectations and should be addressed before Phase 2 finalisation."
+    },
+    {
+      "claim": "The concept note mentions only ADRA and the GenAI4EU central Hub as collaborative partnerships; no synergies with other relevant international, European, national, or regional initiatives are described.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-12",
+      "status": "flagged",
+      "flag_reason": "CC-12 expects proposals to build on or seek collaboration with relevant projects and develop synergies with other relevant international, European, national, or regional initiatives. The concept note addresses only the mandatory ADRA and GenAI4EU cohesion requirements. No broader synergies with other initiatives are identified. CC-12 is a non-mandatory 'should' constraint, but its absence from the concept text is a gap relative to call expectations and should be addressed in the concept note to strengthen positioning."
+    }
+  ],
+  "tier2b_source_refs": [
+    "call_entry.scope",
+    "scope_research_areas",
+    "procedure_exceptions",
+    "mandatory_cohesion_activities",
+    "platform_requirements"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-04-17T12:00:00Z"
+}
+```
+
+=== END ===
