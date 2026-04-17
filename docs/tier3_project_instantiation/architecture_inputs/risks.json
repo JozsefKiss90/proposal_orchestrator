@@ -67,8 +67,8 @@
     },
     {
       "id": "RISK-06",
-      "title": "Logistics data confidentiality constraints limit demonstrator scope",
-      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of demonstrator results.",
+      "title": "Logistics data confidentiality constraints limit transfer demonstrator scope",
+      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of transfer demonstrator results.",
       "category": "operational",
       "probability": "medium",
       "impact": "medium",
@@ -119,16 +119,29 @@
     },
     {
       "id": "RISK-10",
-      "title": "Integration of three pillars proves architecturally incompatible",
-      "description": "The independently developed planning, memory, and coordination modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
+      "title": "Integration of three pillars and tool orchestration layer proves architecturally incompatible",
+      "description": "The independently developed planning, memory, coordination, and tool orchestration modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
       "category": "technical",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-7"],
+      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-7", "OBJ-8"],
       "affected_work_packages": ["WP2", "WP3", "WP4", "WP8"],
-      "mitigation": "Define shared data representations, API contracts, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars.",
-      "contingency": "If full integration is not achievable, deliver pillar-specific modules that can be composed via a lightweight orchestration layer rather than deeply integrated. Demonstrators use the composition approach.",
+      "mitigation": "Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars and the tool orchestration layer.",
+      "contingency": "If full integration is not achievable, deliver pillar-specific modules and a standalone tool orchestration library that can be composed via a lightweight orchestration layer rather than deeply integrated. Demonstrators use the composition approach.",
       "risk_owner": "FIIT"
+    },
+    {
+      "id": "RISK-11",
+      "title": "External tool and API heterogeneity exceeds adapter framework capacity",
+      "description": "The diversity of external APIs across three demonstrator domains (HL7 FHIR in healthcare, OPC-UA in manufacturing, logistics tracking/customs APIs) may require more adapter development effort than planned, delaying tool orchestration layer readiness.",
+      "category": "technical",
+      "probability": "medium",
+      "impact": "medium",
+      "affected_objectives": ["OBJ-8", "OBJ-4", "OBJ-5", "OBJ-6"],
+      "affected_work_packages": ["WP2", "WP3", "WP5", "WP6", "WP7", "WP8"],
+      "mitigation": "Define a minimal common adapter interface in M1–M3. Prioritise adapters for the most critical APIs per demonstrator. Use existing open-source connector libraries where available rather than building from scratch.",
+      "contingency": "If adapter development exceeds capacity, reduce the number of integrated external tools per demonstrator to the most critical subset and document the remaining tools as extension points in the open-source framework.",
+      "risk_owner": "ATU"
     }
   ]
 }

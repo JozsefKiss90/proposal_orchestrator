@@ -10,7 +10,7 @@
       "person_months": 36,
       "type": "management",
       "description": "Overall project coordination, administrative and financial management, quality assurance, risk management, and coordination with ADRA and GenAI4EU central Hub. Includes consortium governance, reporting, and ethics compliance oversight.",
-      "objectives_addressed": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-4", "OBJ-5", "OBJ-6", "OBJ-7"]
+      "objectives_addressed": ["OBJ-1", "OBJ-2", "OBJ-3", "OBJ-4", "OBJ-5", "OBJ-6", "OBJ-7", "OBJ-8"]
     },
     {
       "id": "WP2",
@@ -21,8 +21,8 @@
       "end_month": 36,
       "person_months": 120,
       "type": "research",
-      "description": "Design and implement the hybrid neuro-symbolic planning engine. Research on sub-task graph decomposition with formal pre/post-conditions, integration of MCTS and HTN planning with LLM-based heuristics, plan monitoring and self-correction from verified intermediate states.",
-      "objectives_addressed": ["OBJ-1"]
+      "description": "Design and implement the hybrid neuro-symbolic planning engine. Research on sub-task graph decomposition with formal pre/post-conditions, integration of MCTS and HTN planning with LLM-based heuristics, plan monitoring and self-correction from verified intermediate states. Integrates formal tool selection and invocation policies from the External Tool and API Orchestration Layer, enabling the planning engine to reason about when and why to invoke external tools versus relying on agent-internal capabilities.",
+      "objectives_addressed": ["OBJ-1", "OBJ-8"]
     },
     {
       "id": "WP3",
@@ -33,8 +33,8 @@
       "end_month": 30,
       "person_months": 96,
       "type": "research",
-      "description": "Design and implement the unified tri-store memory architecture (working, episodic, semantic memory) with a learned memory controller. Research on memory indexing, retrieval strategies, forgetting mechanisms, and coherence maintenance over long interaction horizons.",
-      "objectives_addressed": ["OBJ-2"]
+      "description": "Design and implement the unified tri-store memory architecture (working, episodic, semantic memory) with a learned memory controller. Research on memory indexing, retrieval strategies, forgetting mechanisms, and coherence maintenance over long interaction horizons. The semantic memory store hosts the typed tool registry and tool capability models; episodic memory stores tool execution traces and learned tool-selection heuristics for experience-based tool orchestration.",
+      "objectives_addressed": ["OBJ-2", "OBJ-8"]
     },
     {
       "id": "WP4",
@@ -45,8 +45,8 @@
       "end_month": 36,
       "person_months": 96,
       "type": "research",
-      "description": "Develop formally specified task-delegation and negotiation protocols for heterogeneous AI agents. Research on convergence guarantees, conflict resolution under partial observability, auditable multi-agent interaction traces, and scalable decentralised coordination.",
-      "objectives_addressed": ["OBJ-3"]
+      "description": "Develop formally specified task-delegation and negotiation protocols for heterogeneous AI agents. Research on convergence guarantees, conflict resolution under partial observability, auditable multi-agent interaction traces, and scalable decentralised coordination. Includes protocols for shared tool access governance, delegated tool invocation across agents, and conflict resolution when multiple agents require the same external resource.",
+      "objectives_addressed": ["OBJ-3", "OBJ-8"]
     },
     {
       "id": "WP5",
@@ -74,14 +74,14 @@
     },
     {
       "id": "WP7",
-      "title": "Logistics Demonstrator — Supply Chain Planning",
+      "title": "Logistics Transfer Demonstrator — Cross-Sector Generalisation",
       "lead": "ELI",
       "participants": ["ELI", "CERIA", "BAL", "FIIT"],
       "start_month": 12,
       "end_month": 42,
       "person_months": 72,
       "type": "demonstration",
-      "description": "Co-design and validate the MAESTRO agent framework for supply chain planning. Define multi-actor logistics scenarios and disruption recovery benchmarks, deploy agent-based planning with negotiation across supply chain actors, and validate on real operational data across 3 international corridors.",
+      "description": "Co-design and validate the MAESTRO agent framework for logistics and supply chain operations as a cross-sector transfer demonstrator. Define multi-actor logistics scenarios and disruption recovery benchmarks, deploy agent-based planning with negotiation across supply chain actors, and validate on real operational data across 3 international corridors. Confirms that the integrated planning–memory–coordination–tool-orchestration architecture generalises beyond the call's specifically identified Apply AI sectors.",
       "objectives_addressed": ["OBJ-6"]
     },
     {
@@ -93,8 +93,8 @@
       "end_month": 48,
       "person_months": 72,
       "type": "research",
-      "description": "Define the cross-cutting evaluation framework and benchmark suite. Integrate the three research pillars into a unified MAESTRO framework. Conduct cross-demonstrator evaluation with standardised KPIs. Coordinate validation through Testing and Experiment Facilities. Produce the MAESTRO benchmark suite for community adoption.",
-      "objectives_addressed": ["OBJ-7"]
+      "description": "Define the cross-cutting evaluation framework and benchmark suite. Integrate the three research pillars and the External Tool and API Orchestration Layer into a unified MAESTRO framework. Conduct cross-demonstrator evaluation with standardised KPIs and benchmarking. Coordinate validation through Testing and Experiment Facilities. Produce the MAESTRO benchmark suite for community adoption. Includes a targeted architectural mapping analysis assessing the MAESTRO architecture's transferability to in-vehicle autonomous driving settings.",
+      "objectives_addressed": ["OBJ-7", "OBJ-8"]
     },
     {
       "id": "WP9",
