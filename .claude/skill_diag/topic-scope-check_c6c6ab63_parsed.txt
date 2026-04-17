@@ -1,0 +1,65 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-04-17T12:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops a new generation of AI agent architectures for autonomous real-world task execution, grounded in structured planning with verifiable reasoning, persistent and adaptive memory, and decentralised multi-agent coordination, powered by large language models.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Hybrid neuro-symbolic planning engine combining LLM-based reasoning flexibility with formal guarantees of symbolic planning methods; decomposes high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints; integrates search-based planning algorithms (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Self-correction through plan monitoring \u2014 detecting execution failures and replanning from verified intermediate states rather than restarting from scratch.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Unified memory architecture integrating working memory (structured, attention-managed short-term store), episodic memory (retrieval-augmented store of past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph connecting domain concepts, tool capabilities, and learned task patterns); memory controller manages information flow between stores, deciding what to commit to long-term memory, what to retrieve, and when to forget.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Formal task-delegation protocol enabling agents to decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence; conflict resolution mechanisms for interfering plans and contested resources; auditable multi-agent interactions producing structured traces for human inspection.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare demonstrator \u2014 Clinical Decision Support: AI agent system assisting clinicians in diagnostic reasoning by autonomously gathering patient data from multiple sources, planning differential diagnoses, and coordinating specialist sub-agents for imaging analysis, lab result interpretation, and treatment guideline retrieval; validated with clinical partners against real diagnostic pathways.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced Manufacturing demonstrator \u2014 Process Optimisation: multi-agent system autonomously monitoring, diagnosing, and optimising manufacturing processes in real time across production line segments, sharing process state and collaboratively planning adjustments to minimise defects and energy consumption; validated in operational factory environments.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Autonomous Logistics \u2014 Supply Chain Planning as the third primary demonstrator sector: agent-based planning system coordinating logistics operations across warehouses, carriers, and customs actors; agents negotiate delivery schedules and re-plan in response to disruptions; validated with logistics industry partners.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "flagged",
+      "flag_reason": "SR-07 identifies the three specifically named Apply AI sectors as healthcare, advanced manufacturing, and in-vehicle autonomous driving. CC-10 confirms these same three sectors for portfolio coverage purposes. Logistics/supply chain is not listed as one of the three specifically identified Apply AI sectors in any Tier 2B source. The project satisfies the SR-07 minimum ('at least one Apply AI sector') through its healthcare and advanced manufacturing demonstrators, but the logistics sector claim is unconfirmed by Tier 2B as an Apply AI Strategy sector. The project does not include a demonstrator for in-vehicle autonomous driving, which is explicitly identified in SR-07 and CC-10. Resolution required: the concept must clarify that healthcare and advanced manufacturing are the primary Apply AI sector validations satisfying SR-07, and m
+=== END ===

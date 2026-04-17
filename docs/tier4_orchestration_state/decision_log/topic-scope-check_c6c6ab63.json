@@ -1,0 +1,132 @@
+{
+  "decision_id": "scope_check_concept_refiner_2026-04-17T12:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops a new generation of AI agent architectures for autonomous real-world task execution, grounded in structured planning with verifiable reasoning, persistent and adaptive memory, and decentralised multi-agent coordination, powered by large language models.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Hybrid neuro-symbolic planning engine combining LLM-based reasoning flexibility with formal guarantees of symbolic planning methods; decomposes high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints; integrates search-based planning algorithms (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Self-correction through plan monitoring — detecting execution failures and replanning from verified intermediate states rather than restarting from scratch.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Unified memory architecture integrating working memory (structured, attention-managed short-term store), episodic memory (retrieval-augmented store of past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph connecting domain concepts, tool capabilities, and learned task patterns); memory controller manages information flow between stores, deciding what to commit to long-term memory, what to retrieve, and when to forget.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Formal task-delegation protocol enabling agents to decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence; conflict resolution mechanisms for interfering plans and contested resources; auditable multi-agent interactions producing structured traces for human inspection.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare demonstrator — Clinical Decision Support: AI agent system assisting clinicians in diagnostic reasoning by autonomously gathering patient data from multiple sources, planning differential diagnoses, and coordinating specialist sub-agents for imaging analysis, lab result interpretation, and treatment guideline retrieval; validated with clinical partners against real diagnostic pathways.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced Manufacturing demonstrator — Process Optimisation: multi-agent system autonomously monitoring, diagnosing, and optimising manufacturing processes in real time across production line segments, sharing process state and collaboratively planning adjustments to minimise defects and energy consumption; validated in operational factory environments.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Autonomous Logistics — Supply Chain Planning as the third primary demonstrator sector: agent-based planning system coordinating logistics operations across warehouses, carriers, and customs actors; agents negotiate delivery schedules and re-plan in response to disruptions; validated with logistics industry partners.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "flagged",
+      "flag_reason": "SR-07 identifies the three specifically named Apply AI sectors as healthcare, advanced manufacturing, and in-vehicle autonomous driving. CC-10 confirms these same three sectors for portfolio coverage purposes. Logistics/supply chain is not listed as one of the three specifically identified Apply AI sectors in any Tier 2B source. The project satisfies the SR-07 minimum ('at least one Apply AI sector') through its healthcare and advanced manufacturing demonstrators, but the logistics sector claim is unconfirmed by Tier 2B as an Apply AI Strategy sector. The project does not include a demonstrator for in-vehicle autonomous driving, which is explicitly identified in SR-07 and CC-10. Resolution required: the concept must clarify that healthcare and advanced manufacturing are the primary Apply AI sector validations satisfying SR-07, and must re-evaluate whether the logistics demonstrator replaces or supplements the in-vehicle autonomous driving sector targeted by the CC-10 portfolio logic."
+    },
+    {
+      "claim": "Strategic positioning (strategic_positioning.md) asserts that 'MAESTRO validates across three of the Apply AI Strategy's priority sectors: Healthcare, Advanced manufacturing, Logistics.'",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "out_of_scope",
+      "flag_reason": "SR-07 explicitly identifies the three Apply AI sectors as healthcare, advanced manufacturing, and in-vehicle autonomous driving. CC-10 confirms these same three sectors for portfolio coverage logic. Logistics is not identified as an Apply AI Strategy priority sector in any Tier 2B source document. The strategic positioning claim that logistics is one of the Apply AI Strategy's priority sectors is factually inconsistent with SR-07 and CC-10 — logistics is substituted for in-vehicle autonomous driving, which is a Tier 2B-confirmed Apply AI sector. This framing must be corrected: either the strategic positioning must accurately name the three Tier 2B-confirmed sectors (replacing logistics with in-vehicle autonomous driving), or it must explicitly acknowledge that MAESTRO covers two of the three Tier 2B-defined Apply AI sectors (healthcare and advanced manufacturing) plus an additional logistics sector that is not among the three specifically identified Apply AI sectors in Tier 2B."
+    },
+    {
+      "claim": "MAESTRO will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "scope_element_ref": "SR-09",
+      "constraint_ref": "CC-03",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All research outputs — frameworks, models, benchmarks, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "scope_element_ref": "SR-10",
+      "constraint_ref": "CC-05",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation; demonstrator results validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Validation in operational environments targeting TRL 5; co-design with industry partners to ensure research progresses from foundational TRL to deployment-ready TRL 5 by project end.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Requested EU contribution of €18,500,000.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Open-source framework and standardised agent interaction protocols to lower barriers for European SMEs and startups, strengthening the European AI ecosystem's competitiveness and reducing strategic dependency on non-European AI platforms.",
+      "scope_element_ref": "SR-10",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Tool capabilities are referenced within the semantic memory knowledge graph ('connecting domain concepts, tool capabilities, and learned task patterns'); demonstrator activities imply external tool and data-source integration (autonomously gathering patient data from multiple sources; monitoring manufacturing processes in real time via agent coordination across production line segments).",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "SR-04 designates integration of external tools and APIs as an 'essential required element to overcome limitations of large AI models and enhance agent performance in tasks requiring accuracy and reliability.' The concept note references tool capabilities only within the semantic memory architecture description and implicitly through demonstrator activities. No dedicated research pillar or explicit design commitment to external tool and API integration is described as a distinct research contribution within the three pillars (neuro-symbolic planning, adaptive memory, multi-agent coordination). The SR-04 mandatory element is thus covered only implicitly in the current concept. Resolution required: confirm whether external tool and API integration is addressed as an explicit capability within one of the three research pillars or as a cross-cutting architectural element, and revise the concept text to make this explicit."
+    }
+  ],
+  "tier2b_source_refs": [
+    "call_entry.scope",
+    "scope_research_areas",
+    "procedure_exceptions",
+    "mandatory_cohesion_activities",
+    "platform_requirements",
+    "technology_readiness_level",
+    "call_entry.max_contribution"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-04-17T12:00:00Z"
+}
