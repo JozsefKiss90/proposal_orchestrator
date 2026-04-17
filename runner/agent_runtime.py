@@ -53,6 +53,22 @@ MANIFEST_REL_PATH: str = (
     ".claude/workflows/system_orchestration/manifest.compile.yaml"
 )
 
+#: Skills whose primary audit target is Tier 5 deliverable artifacts.
+#: When invoked in a phase where Tier 5 does not yet exist (e.g. Phase 2),
+#: these skills are skipped as "not_applicable" rather than failed with
+#: MISSING_INPUT.  In phases where Tier 5 is expected (Phase 8), they
+#: execute normally and fail-closed on missing inputs.
+_TIER5_AUDIT_SKILLS: frozenset[str] = frozenset({
+    "proposal-section-traceability-check",
+})
+
+#: Tier 5 deliverable directories that must contain at least one JSON
+#: file for a Tier 5 audit skill to be considered applicable.
+_TIER5_DELIVERABLE_DIRS: tuple[str, ...] = (
+    "docs/tier5_deliverables/proposal_sections",
+    "docs/tier5_deliverables/assembled_drafts",
+)
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -466,6 +482,53 @@ def _determine_can_evaluate_exit_gate(
 
 
 # ---------------------------------------------------------------------------
+# Skill applicability guard
+# ---------------------------------------------------------------------------
+
+
+def _check_skill_applicability(
+    skill_id: str,
+    repo_root: Path,
+) -> tuple[bool, str | None]:
+    """Check whether *skill_id* is applicable in the current repo state.
+
+    Returns ``(is_applicable, skip_reason)``.  When ``is_applicable`` is
+    ``False``, *skip_reason* explains why the skill should be skipped.
+
+    This is a **narrow** applicability guard for skills that audit Tier 5
+    deliverable artifacts (e.g. ``proposal-section-traceability-check``).
+    In phases before Tier 5 is populated (Phase 2), these skills are not
+    applicable and must be skipped rather than failed with MISSING_INPUT.
+    In phases where Tier 5 is expected (Phase 8), the guard passes and
+    the skill runs normally — preserving fail-closed behavior.
+
+    The check is based on actual disk state (whether Tier 5 directories
+    contain any JSON files), not on phase number.  This ensures the guard
+    is phase-sensitive without coupling to manifest constants.
+    """
+    if skill_id not in _TIER5_AUDIT_SKILLS:
+        return True, None
+
+    # Check if any Tier 5 deliverable directory has content
+    for dir_path in _TIER5_DELIVERABLE_DIRS:
+        abs_dir = repo_root / dir_path
+        if abs_dir.is_dir():
+            json_files = [
+                f for f in abs_dir.iterdir()
+                if f.suffix == ".json" and f.is_file()
+            ]
+            if json_files:
+                return True, None  # Tier 5 has content — skill is applicable
+
+    # No Tier 5 content exists — skill is not applicable yet
+    return False, (
+        f"Skill {skill_id!r} requires Tier 5 deliverable artifacts "
+        f"(proposal_sections/ or assembled_drafts/) which do not yet exist; "
+        f"skipping as not applicable in current phase"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -660,6 +723,20 @@ def run_agent(
     failure_category_accumulator: str | None = None
 
     for sid in ordered_skills:
+        # ── Applicability guard: skip Tier-5 audit skills pre-Tier-5 ──
+        applicable, skip_reason = _check_skill_applicability(sid, repo_root)
+        if not applicable:
+            record = SkillInvocationRecord(
+                skill_id=sid,
+                status="not_applicable",
+                failure_reason=skip_reason,
+            )
+            all_invocations.append(record)
+            logger.info(
+                "Skill %s skipped (not applicable): %s", sid, skip_reason
+            )
+            continue
+
         result = run_skill(sid, run_id, repo_root, resolved_inputs)
         record = SkillInvocationRecord(
             skill_id=sid,
