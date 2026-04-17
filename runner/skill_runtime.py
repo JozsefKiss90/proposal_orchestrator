@@ -230,6 +230,30 @@ def _extract_schema_requirements(
 
 
 # ---------------------------------------------------------------------------
+# Contextual descriptor detection
+# ---------------------------------------------------------------------------
+
+
+def _is_contextual_descriptor(reads_from_entry: str) -> bool:
+    """Return ``True`` when *reads_from_entry* is a contextual input descriptor
+    rather than a real filesystem path.
+
+    Some skills (e.g. ``decision-log-update``) declare ``reads_from`` entries
+    that are prose descriptions of their input context rather than repository
+    paths.  These must be skipped by path resolution and filesystem validation
+    so they don't trigger spurious "Required input does not exist" failures.
+
+    Recognition heuristic: all real repository paths in the skill catalog are
+    repo-relative paths without embedded whitespace (e.g.
+    ``docs/tier3_project_instantiation/project_brief/``, ``CLAUDE.md``).
+    Contextual descriptors are natural-language prose that always contain
+    at least one space character (e.g.
+    ``"Any phase context requiring durable recording"``).
+    """
+    return " " in reads_from_entry
+
+
+# ---------------------------------------------------------------------------
 # Phase A — Load and resolve
 # ---------------------------------------------------------------------------
 
@@ -257,6 +281,8 @@ def _resolve_inputs(
     """
     resolved: dict[str, Any] = dict(caller_inputs)
     for rel_path in reads_from:
+        if _is_contextual_descriptor(rel_path):
+            continue  # prose descriptor, not a filesystem path
         abs_path = repo_root / rel_path
         if str(rel_path) in resolved:
             continue  # caller already provided this input
@@ -310,6 +336,8 @@ def _validate_skill_inputs(
 
     errors: list[str] = []
     for rel_path in reads_from:
+        if _is_contextual_descriptor(rel_path):
+            continue  # prose descriptor, not a filesystem path
         abs_path = repo_root / rel_path
         if abs_path.is_dir():
             if not abs_path.exists():
