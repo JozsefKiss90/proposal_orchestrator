@@ -1,0 +1,43 @@
+{
+  "schema_id": "orch.phase2.concept_refinement_summary.v1",
+  "run_id": "360d3e43-e665-4c76-b277-57a8dcd4016c",
+  "topic_mapping_rationale": {
+    "EO-01": {
+      "topic_element_id": "EO-01",
+      "mapping_to_concept": "The concept corpus explicitly and directly addresses EO-01 through Pillar 1 (Neuro-Symbolic Planning and Reasoning) and Pillar 2 (Adaptive Memory Architecture) in concept_note.md. Pillar 1 develops a hybrid neuro-symbolic planning engine with formal guarantees: sub-task graph decomposition with pre-conditions, post-conditions, and verification checkpoints; integrated search-based planning (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation; and plan monitoring enabling self-correction from verified intermediate states — directly addressing 'advanced planning mechanisms' and 'reasoning capabilities'. Pillar 2 develops a three-tier memory architecture (working memory for active plan state and goals, episodic memory as retrieval-augmented experience store, semantic memory as persistent knowledge graph) with a memory controller managing inter-store flow — directly addressing 'memory management'. Autonomy and robustness are addressed explicitly: concept_note.md states the goal is to produce agents that are 'robust, trustworthy, and deployable' with 'verifiable reasoning', and project_summary.json confirms 'next-generation AI agent architectures that combine structured planning, persistent memory management, and robust multi-step reasoning to autonomously accomplish complex real-world tasks'. The term 'reliability' does not appear in the concept corpus; the concept uses 'robustness' and 'trustworthy' and addresses the underlying concept through formal guarantees and provable recovery, but 'reliability' itself is recorded as a vocabulary gap requiring attention before drafting.",
+      "tier2b_source_ref": "call_entry.expected_outcome / HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md (Pillar 1 — Neuro-Symbolic Planning and Reasoning section; Pillar 2 — Adaptive Memory Architecture section; Vision paragraph); project_summary.json (abstract field)",
+      "status": "Confirmed",
+      "vocabulary_gaps": [
+        "reliability"
+      ]
+    },
+    "EO-02": {
+      "topic_element_id": "EO-02",
+      "mapping_to_concept": "The concept corpus explicitly and directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination) in concept_note.md. The research develops: (a) a formal task-delegation protocol enabling agents to decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence — directly addressing 'innovative multi-agent frameworks and protocols'; (b) conflict resolution mechanisms for situations where agent plans interfere, resources are contested, or partial observations produce inconsistent world models — directly addressing 'effective decentralised coordination'; (c) auditable multi-agent interactions producing structured delegation and negotiation traces — supporting transparency of collaborative behaviour. The concept explicitly frames the motivation as: 'many real-world tasks exceed the scope of any single agent', confirming the 'beyond the capabilities of individual agents' framing. project_summary.json confirms: 'decentralised multi-agent coordination protocols that enable heterogeneous AI agents to negotiate, delegate, and jointly execute tasks with provable convergence guarantees'. strategic_positioning.md confirms differentiation: 'formally specified delegation and negotiation protocols with convergence guarantees, rather than relying on ad-hoc LLM-based agent communication patterns'. All key terms from EO-02 — 'multi-agent frameworks', 'protocols', 'decentralised coordination', 'collaboration', and 'beyond capabilities of individual agents' — are matched by exact or definitionally equivalent terms in the concept corpus.",
+      "tier2b_source_ref": "call_entry.expected_outcome / HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md (Pillar 3 — Decentralised Multi-Agent Coordination section); project_summary.json (abstract field); strategic_positioning.md (Positioning Against the Expected Outcomes section)",
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    }
+  },
+  "scope_conflict_log": [
+    {
+      "conflict_id": "SC-001",
+      "description": "SR-05 (mandatory) requires proposals to incorporate qualitative and quantitative KPIs, benchmarking, and progress monitoring mechanisms to demonstrate progress. The concept corpus does not explicitly describe a KPI framework or progress monitoring system. 'Evaluation benchmarks' appears once in strategic_positioning.md in the context of shared cross-pillar infrastructure ('all three pillars share common data representations, evaluation benchmarks, and integration interfaces'), but this is not framed as qualitative/quantitative KPIs or as a progress monitoring mechanism addressing the SR-05 requirement. The terms 'KPI', 'qualitative KPIs', 'quantitative KPIs', and 'progress monitoring' are absent from concept_note.md and project_summary.json. This mandatory requirement is incompletely addressed at the concept level and must be remedied in concept refinement.",
+      "resolution_status": "unresolved",
+      "resolution_note": "",
+      "tier2b_source_ref": "call_entry.scope / HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "conflict_type": "scope_violation"
+    },
+    {
+      "conflict_id": "SC-002",
+      "description": "SR-07 (mandatory) requires activities to start at TRL 2 and achieve TRL 5 by project end. strategic_positioning.md confirms TRL 5 as the endpoint ('validated in operational environments at TRL 5'). However, TRL 2 as the explicit starting TRL is not stated anywhere in the concept corpus. The foundational research framing is consistent with a TRL 2 starting point, but the mandatory scope requirement explicitly stipulates 'Activities must start at TRL 2', which is not confirmed by any statement in concept_note.md, strategic_positioning.md, or project_summary.json. The TRL start-level commitment must be made explicit in concept refinement.",
+      "resolution_status": "unresolved",
+      "resolution_note": "",
+      "tier2b_source_ref": "technology_readiness_level / HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "conflict_type": "conditional_unmet"
+    }
+  ],
+  "strategic_differentiation": "MAESTRO's primary differentiator is the co-design of three AI agent capabilities — neuro-symbolic planning and reasoning (Pillar 1), adaptive memory architecture (Pillar 2), and decentralised multi-agent coordination (Pillar 3) — into a single unified architecture where all three pillars share common data representations, evaluation benchmarks, and integration interfaces from project inception. This is distinguished from the three currently disconnected research communities (LLM-based agents, classical planning and multi-agent systems, and memory-augmented neural systems): no existing approach achieves the combination, and the combination is not achievable by assembling off-the-shelf components from these communities. The neuro-symbolic planning engine provides formal guarantees — verifiable sub-task decomposition, plan monitoring with provable recovery — that are absent from pure LLM-based frameworks such as ReAct or AutoGPT-style systems. The coordination protocols provide formally specified delegation and negotiation guarantees with provable convergence, as opposed to ad-hoc LLM-based agent communication. Validation is conducted across three Apply AI priority sectors (healthcare clinical decision support, advanced manufacturing process optimisation, autonomous logistics planning) through industry co-design in operational environments, confirming generalisability of research advances and guarding against domain-specific artefacts. Post-project exploitation is planned through open-source framework release, AI-on-demand platform dissemination, Testing and Experiment Facility validation, and EDIH-mediated adoption, lowering barriers for European SMEs and startups and reducing strategic dependency on non-European AI platforms."
+}
