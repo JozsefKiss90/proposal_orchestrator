@@ -1,0 +1,68 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-04-18T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agent architectures based on large AI language models (LLMs) that are capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve complex real-world goals.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with pre-conditions, post-conditions, and verification checkpoints; integrates Monte Carlo Tree Search and hierarchical task networks with LLM-driven heuristic evaluation; supports self-correction through plan monitoring and replanning from verified intermediate states.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Unified adaptive memory architecture integrating working memory (short-term structured store), episodic memory (retrieval-augmented past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph connecting domain concepts, tool capabilities, and learned task patterns), with a memory controller managing long-term retention, retrieval, and forgetting to sustain coherent long-horizon agent behaviour.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "External Tool and API Orchestration Layer providing a typed tool registry with capability models (input/output schemas, preconditions, postconditions, cost profiles, reliability metadata), formal tool selection and invocation policies integrated with the neuro-symbolic planning engine, standardised API adapters abstracting heterogeneous protocols (REST, GraphQL, HL7 FHIR, OPC-UA), post-invocation verification and result grounding, execution monitoring with fallback/recovery strategies, and auditable tool execution traces stored in the adaptive memory architecture.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Research explicitly addresses (a) enhancing AI agent autonomy through advanced self-planning and self-optimisation (Pillar 1 \u2014 neuro-symbolic planning and reasoning engine), (b) innovation in memory-augmented AI agents for robust long-term reasoning and lifelong learning (Pillar 2 \u2014 adaptive memory architecture), and (c) developing advanced multi-agent frameworks for collaborative heterogeneous agents with formal task-delegation protocols and convergence guarantees (Pillar 3 \u2014 decentralised multi-agent coordination).",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Effective AI agent behaviour validated through appropriate agent behaviour monitoring, plan monitoring with self-correction on execution failures, conflict resolution mechanisms in multi-agent settings, and post-invocation tool output validation.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints with measurable performance targets benchmarked against operational baselines and current state-of-the-art agent systems.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare clinical decision support sector demonstrator (Apply AI sector: healthcare): AI agent system assisting clinicians in diagnostic reasoning with HL7 FHIR API integration, specialist sub-agent coordination for imaging analysis, lab result interpretation, and treatment guideline retrieval; full provenance tracking for regulatory auditability; validated with clinical partners against real diagnostic pathways with quantitative KPIs including diagnostic accuracy, reasoning trace completeness, and tool invocation success rate benchmarked against clinician baselines.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced manufacturing process optimisation sector demonstrator (Apply AI sector: advanced manufacturing): multi-agent system autonomously monitoring, diagnosing, and optimising manufacturing processes in real time with OPC-UA industrial connectors, digital twin
+=== END ===
