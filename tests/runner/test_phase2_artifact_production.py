@@ -78,6 +78,9 @@ _ARTIFACT_SCHEMAS = {
                 "topic_mapping_rationale": {
                     "type": "object", "required": True,
                 },
+                "scope_coverage": {
+                    "type": "object", "required": True,
+                },
                 "scope_conflict_log": {
                     "type": "array", "required": True,
                 },
@@ -136,6 +139,16 @@ def _valid_summary_response(run_id: str = "run-test-001") -> dict:
                 "tier3_evidence_ref": "project_brief/concept_note.md line 5",
                 "status": "Confirmed",
                 "vocabulary_gaps": [],
+            }
+        },
+        "scope_coverage": {
+            "SR-01": {
+                "scope_element_id": "SR-01",
+                "constraint_ref": None,
+                "coverage_status": "covered",
+                "coverage_description": "Concept addresses SR-01 through Pillar 1.",
+                "tier2b_source_ref": "call_entry.scope from source.json",
+                "tier3_evidence_ref": "project_brief/concept_note.md line 5",
             }
         },
         "scope_conflict_log": [],
@@ -663,6 +676,7 @@ class TestPhase2AgentProducesArtifacts:
                         "schema_id": "orch.phase2.concept_refinement_summary.v1",
                         "run_id": run_id,
                         "topic_mapping_rationale": {"EO-01": {}},
+                        "scope_coverage": {"SR-01": {"coverage_status": "covered"}},
                         "scope_conflict_log": [],
                         "strategic_differentiation": "Test diff",
                     },

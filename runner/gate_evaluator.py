@@ -57,6 +57,7 @@ from runner.gate_library import (
 from runner.manifest_reader import ManifestReader, ManifestReaderError
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.paths import find_repo_root, resolve_repo_path
+from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.coverage_predicates import (
     all_impacts_mapped,
     all_management_roles_in_tier3,
@@ -186,6 +187,8 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "instrument_sections_addressed": instrument_sections_addressed,
     "all_sections_have_traceability_footer": all_sections_have_traceability_footer,
     "all_wps_have_deliverable_and_lead": all_wps_have_deliverable_and_lead,
+    # --- scope coverage predicate (Phase 2 gate) ---
+    "all_mandatory_scope_covered": all_mandatory_scope_covered,
     # --- cycle predicate (Step 8) ---
     "no_dependency_cycles": no_dependency_cycles,
     # --- timeline predicates (Step 9) ---

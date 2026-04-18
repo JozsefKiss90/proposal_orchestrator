@@ -408,6 +408,21 @@ gate_rules:
           evidence reference.
         prose_condition: "All mappings carry source references"
 
+      # --- scope coverage predicate (deterministic) ---
+      - predicate_id: g03_p08
+        type: coverage
+        function: all_mandatory_scope_covered
+        args:
+          summary_path: "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+          scope_path: "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+          constraints_path: "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"
+        fail_message: >
+          One or more mandatory Tier 2B scope requirements or call constraints
+          are missing from scope_coverage in concept_refinement_summary.json,
+          or have unresolved coverage_status. All mandatory scope elements must
+          be explicitly covered before Phase 3 can proceed.
+        prose_condition: "All mandatory scope requirements have documented coverage"
+
       # --- semantic predicates ---
       - predicate_id: g03_p06
         type: semantic

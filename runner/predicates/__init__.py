@@ -82,6 +82,7 @@ from runner.predicates.coverage_predicates import (
     partner_budget_coverage_match,
     wp_budget_coverage_match,
 )
+from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.cycle_predicates import no_dependency_cycles
 from runner.predicates.timeline_predicates import (
     all_milestones_have_criteria,
@@ -146,6 +147,8 @@ __all__ = [
     "instrument_sections_addressed",
     "all_sections_have_traceability_footer",
     "all_wps_have_deliverable_and_lead",
+    # scope coverage predicate (Phase 2 gate)
+    "all_mandatory_scope_covered",
     # cycle predicate (Step 8 — §4.5)
     "no_dependency_cycles",
     # timeline predicates (Step 9 — §4.6)
