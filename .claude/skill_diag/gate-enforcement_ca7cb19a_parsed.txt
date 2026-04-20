@@ -1,0 +1,88 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'predicate_evaluation_detail', 'bidirectional_guarantee_check'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.gate_result.v1",
+  "run_id": "ca7cb19a-accb-4e30-9430-9f1a9d3c3f71",
+  "gate_id": "phase_03_gate",
+  "overall_status": "pass",
+  "hard_block": false,
+  "evaluated_at": "2026-04-20T00:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "work_packages_non_empty",
+      "every_wp_has_deliverables_non_empty",
+      "every_wp_has_lead_partner_non_null",
+      "dependency_map_non_null_with_nodes_and_edges",
+      "cycle_detected_false",
+      "partner_role_matrix_non_empty"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [
+      "all_partners_in_tier3"
+    ],
+    "failed": []
+  },
+  "predicate_evaluation_detail": {
+    "artifact_present": {
+      "result": "pass",
+      "evidence": "File exists at docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    "schema_id_match": {
+      "result": "pass",
+      "evidence": "artifact.schema_id = 'orch.phase3.wp_structure.v1'; expected 'orch.phase3.wp_structure.v1'"
+    },
+    "run_id_match": {
+      "result": "pass",
+      "evidence": "artifact.run_id = 'ca7cb19a-accb-4e30-9430-9f1a9d3c3f71'; matches invoking run_id"
+    },
+    "artifact_not_invalid": {
+      "result": "pass",
+      "evidence": "artifact_status field is absent from the artifact; no 'invalid' status present"
+    },
+    "work_packages_non_empty": {
+      "result": "pass",
+      "evidence": "work_packages array contains 9 entries: WP1 through WP9"
+    },
+    "every_wp_has_deliverables_non_empty": {
+      "result": "pass",
+      "evidence": "WP1: 3 deliverables (D1-01, D1-02, D1-03); WP2: 2 (D2-01, D2-02); WP3: 2 (D3-01, D3-02); WP4: 2 (D4-01, D4-02); WP5: 2 (D5-01, D5-02); WP6: 2 (D6-01, D6-02); WP7: 2 (D7-01, D7-02); WP8: 2 (D8-01, D8-02); WP9: 3 (D9-01, D9-02, D9-03). All 9 WPs have at least one deliverable."
+    },
+    "every_wp_has_lead_partner_non_null": {
+      "result": "pass",
+      "evidence": "WP1=ATU; WP2=ATU; WP3=BIIS; WP4=CERIA; WP5=NIHS; WP6=ISIA; WP7=ELI; WP8=FIIT; WP9=BAL. All non-null."
+    },
+    "dependency_map_non_null_with_nodes_and_edges": {
+      "result": "pass",
+      "evidence": "dependency_map is non-null; nodes array has 36 entries (9 WP nodes + 27 task nodes); edges array has 44 directed dependency edges with typed edge_type values (finish_to_start, data_input)"
+    },
+    "cycle_detected_false": {
+      "result": "pass",
+      "evidence": "cycle_detected = false; cycle_flags = [] (empty)"
+    },
+    "partner_role_matrix_non_empty": {
+      "result": "pass",
+      "evidence": "partner_role_matrix array has 8 entries: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT \u2014 each with wps_as_lead and wps_as_contributor arrays"
+    },
+    "all_partners_in_tier3": {
+      "result": "pass",
+      "evidence": "Tier 3 partners.json defines 8 partner_ids: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT. All lead_partner and contributing_partners references across all 9 WPs and 27 tasks were checked against this set. No unrecognised partner ID found in any WP or task assignment."
+    }
+  },
+  "bidirectional_guarantee_check": {
+    "deterministic_failed_is_empty": true,
+    "semantic_failed_is_empty": true,
+    "predicate_count_deterministic_defined": 10,
+    "predicate_count_deterministic_evaluated": 10,
+    "predicate_count_semantic_defined": 1,
+    "predicate_count_semantic_evaluated": 1,
+    "guarantee_satisfied": true
+  }
+}
+=== END ===
