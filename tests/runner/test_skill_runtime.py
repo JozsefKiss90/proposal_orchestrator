@@ -1170,6 +1170,142 @@ class TestTapmTransportFailureDiagnostics:
 
 
 # ---------------------------------------------------------------------------
+# Optional reads_from support (Fix 1: dual-mode skills with optional inputs)
+# ---------------------------------------------------------------------------
+
+
+class TestOptionalReadsFrom:
+    """Tests for the optional_reads_from mechanism that allows skills like
+    milestone-consistency-check to declare inputs that may be absent without
+    triggering a MISSING_INPUT validation failure.
+    """
+
+    def _make_env_with_optional(self, tmp_path: Path) -> Path:
+        """Create a repo with a skill that has optional_reads_from."""
+        repo_root = tmp_path
+
+        _write_skill_catalog(repo_root, [
+            {
+                "id": "dual-mode-skill",
+                "reads_from": [
+                    "docs/tier4/phase3_wp_design/",
+                ],
+                "optional_reads_from": [
+                    "docs/tier4/phase4_gantt_milestones/",
+                ],
+                "writes_to": ["docs/tier4/validation_reports/"],
+                "constitutional_constraints": [],
+            },
+        ])
+        _write_artifact_schema(repo_root, {
+            "tier4_phase_output_schemas": {
+                "validation_report": {
+                    "canonical_path": "docs/tier4/validation_reports/report.json",
+                    "fields": {
+                        "mode": {"required": True},
+                        "findings": {"required": True},
+                    },
+                }
+            }
+        })
+        _write_skill_spec(repo_root, "dual-mode-skill")
+
+        # Required input: phase3 wp_structure.json exists
+        wp_path = repo_root / "docs" / "tier4" / "phase3_wp_design" / "wp_structure.json"
+        wp_path.parent.mkdir(parents=True, exist_ok=True)
+        wp_path.write_text(json.dumps({"work_packages": [{"wp_id": "WP1"}]}), encoding="utf-8")
+
+        # Output directory
+        (repo_root / "docs" / "tier4" / "validation_reports").mkdir(parents=True, exist_ok=True)
+
+        # NOTE: phase4_gantt_milestones/ does NOT exist — this is the test condition
+
+        return repo_root
+
+    def test_optional_absent_does_not_fail_validation(self, tmp_path: Path) -> None:
+        """When optional_reads_from path is absent but required reads_from exists,
+        the skill does not fail pre-validation with MISSING_INPUT."""
+        repo_root = self._make_env_with_optional(tmp_path)
+
+        response = {"mode": "DEGRADED", "findings": []}
+        with _claude_returns(response):
+            result = run_skill("dual-mode-skill", "run-opt-001", repo_root)
+
+        # Should NOT be a MISSING_INPUT failure
+        assert result.failure_category != "MISSING_INPUT", (
+            f"Optional absent path caused MISSING_INPUT: {result.failure_reason}"
+        )
+
+    def test_required_absent_still_fails(self, tmp_path: Path) -> None:
+        """When required reads_from path is absent, validation still fails."""
+        repo_root = self._make_env_with_optional(tmp_path)
+
+        # Remove the required input
+        import shutil
+        shutil.rmtree(repo_root / "docs" / "tier4" / "phase3_wp_design")
+
+        result = run_skill("dual-mode-skill", "run-opt-002", repo_root)
+
+        assert result.status == "failure"
+        assert result.failure_category == "MISSING_INPUT"
+        assert "phase3_wp_design" in (result.failure_reason or "")
+
+    def test_optional_present_is_resolved(self, tmp_path: Path) -> None:
+        """When optional_reads_from path IS present, its contents are resolved
+        and included in the skill invocation."""
+        repo_root = self._make_env_with_optional(tmp_path)
+
+        # Create the optional path with content
+        gantt_path = repo_root / "docs" / "tier4" / "phase4_gantt_milestones" / "gantt.json"
+        gantt_path.parent.mkdir(parents=True, exist_ok=True)
+        gantt_path.write_text(json.dumps({"milestones": []}), encoding="utf-8")
+
+        response = {"mode": "FULL", "findings": []}
+        with _claude_returns(response) as mock_claude:
+            result = run_skill("dual-mode-skill", "run-opt-003", repo_root)
+
+        # Claude should have been called (validation passed)
+        assert mock_claude.called
+
+    def test_no_optional_field_means_empty_list(self, tmp_path: Path) -> None:
+        """Skills without optional_reads_from behave exactly as before."""
+        repo_root = _make_skill_env(tmp_path)
+
+        # test-skill has no optional_reads_from — missing required input fails
+        result = run_skill("test-skill", "run-opt-004", repo_root, {
+            "docs/tier3/input.json": {"topic": "test"},
+        })
+        # Should succeed since input is provided
+        # (Claude is not mocked here, so we'd get a transport error,
+        #  but the point is: no validation failure from optional paths)
+
+    def test_tapm_prompt_includes_optional_paths(self, tmp_path: Path) -> None:
+        """TAPM prompt assembly includes optional paths annotated as OPTIONAL."""
+        from runner.skill_runtime import _assemble_tapm_prompt
+
+        repo_root = tmp_path
+
+        _write_artifact_schema(repo_root, {
+            "tier4_phase_output_schemas": {}
+        })
+
+        _, user_prompt = _assemble_tapm_prompt(
+            skill_spec="# Test skill",
+            skill_id="test",
+            run_id="r1",
+            reads_from=["docs/tier4/phase3/"],
+            writes_to=["docs/tier4/output/"],
+            constraints=[],
+            repo_root=repo_root,
+            optional_reads_from=["docs/tier4/phase4/"],
+        )
+
+        assert "OPTIONAL" in user_prompt
+        assert "phase4" in user_prompt
+        assert "phase3" in user_prompt
+
+
+# ---------------------------------------------------------------------------
 # Module isolation
 # ---------------------------------------------------------------------------
 

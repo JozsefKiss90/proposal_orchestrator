@@ -482,6 +482,40 @@ def _determine_can_evaluate_exit_gate(
 
 
 # ---------------------------------------------------------------------------
+# Exit gate lookup for gate-enforcement context
+# ---------------------------------------------------------------------------
+
+_node_exit_gate_cache: dict[str, dict[str, str]] = {}
+
+
+def _get_exit_gate_for_node(
+    node_id: str,
+    manifest_path: Path,
+) -> str | None:
+    """Look up the ``exit_gate`` for *node_id* from the manifest node_registry.
+
+    Returns the gate identifier (e.g. ``"phase_03_gate"``), or ``None`` if
+    the node has no exit gate or cannot be found.  Results are cached per
+    manifest path.
+    """
+    key = str(manifest_path)
+    if key not in _node_exit_gate_cache:
+        try:
+            raw = manifest_path.read_text(encoding="utf-8-sig")
+            data = yaml.safe_load(raw)
+            mapping: dict[str, str] = {}
+            for node in data.get("node_registry", []):
+                nid = node.get("node_id")
+                gate = node.get("exit_gate")
+                if nid and gate:
+                    mapping[nid] = gate
+            _node_exit_gate_cache[key] = mapping
+        except (OSError, yaml.YAMLError):
+            _node_exit_gate_cache[key] = {}
+    return _node_exit_gate_cache.get(key, {}).get(node_id)
+
+
+# ---------------------------------------------------------------------------
 # Caller context for context-sensitive skills
 # ---------------------------------------------------------------------------
 
@@ -810,6 +844,16 @@ def run_agent(
         caller_context = _build_caller_context(
             sid, resolved_inputs, repo_root
         )
+
+        # Inject gate_id context for gate-enforcement invocations.
+        # The gate_id is resolved from the manifest's exit_gate binding
+        # for the current node — not hardcoded per phase.
+        if sid == "gate-enforcement":
+            exit_gate = _get_exit_gate_for_node(node_id, manifest_path)
+            if exit_gate:
+                if not caller_context:
+                    caller_context = {}
+                caller_context["gate_id"] = exit_gate
 
         result = run_skill(
             sid, run_id, repo_root, resolved_inputs,

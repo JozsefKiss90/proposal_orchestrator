@@ -44,14 +44,37 @@ This skill executes in TAPM mode. Claude reads declared inputs from disk via the
 
 ---
 
+## Phase 3 Synthesis Responsibility
+
+Phase 3 is responsible for **producing** the WP structure, not merely echoing the seed verbatim. The seed provides initial direction; this skill must ensure every WP has a **gate-sufficient** structure.
+
+**If the seed lacks tasks for a WP:**
+- Synthesize 1–3 compact task entries per WP, derived from the WP objectives and title.
+- Use functional-label titles (e.g., "Design data integration pipeline", "Validate pilot deployment").
+- Assign `responsible_partner` from `valid_partner_ids` (prefer `lead_partner` when uncertain).
+- Assign sequential `task_id` values (e.g., "T1-01", "T1-02").
+
+**If the seed lacks deliverables for a WP:**
+- Synthesize at least one deliverable per WP, derived from WP objectives.
+- Use compact titles (e.g., "Integration framework report", "Pilot evaluation dataset").
+- Assign appropriate `type` (report, dataset, software, other).
+- Set `due_month` to the WP's end_month or a reasonable value within project duration.
+- Assign `responsible_partner` from `valid_partner_ids`.
+
+**Empty `tasks` or `deliverables` arrays are NOT acceptable Phase 3 output.** The gate requires non-empty tasks, non-empty deliverables, and a responsible lead for every WP. Producing empty arrays when the seed lacks detail is a gate-failure-by-omission — the skill must synthesize the minimum viable structure.
+
+Record any synthesized elements in `normalization_issues` with advisory severity so the synthesis is auditable.
+
+---
+
 ## Output Minimization Rules
 
-These rules are operational constraints, not style suggestions:
+These rules are operational constraints, not style suggestions. They apply **after** gate-sufficiency is ensured — minimization must not produce a gate-insufficient artifact.
 
 1. Return only one JSON object. No markdown wrapping, no commentary, no explanatory prose.
 2. Do not include duplicate semantic content across fields. If a value appears in `work_packages`, do not mirror it elsewhere.
 3. Use concise task and deliverable titles — functional labels, not narrative descriptions.
-4. Populate only schema-required and gate-relevant fields. Do not synthesize optional descriptive substructures unless explicitly required by the schema.
+4. Populate only schema-required and gate-relevant fields. Do not synthesize optional descriptive substructures beyond what gate-sufficiency requires.
 5. Do not add rationale, justification, or explanatory text inside JSON field values.
 6. `objectives` arrays: use short, measurable objective statements. One sentence maximum per objective.
 7. `tasks` entries: `title` is a functional label (e.g., "Design knowledge graph ontology"), not a paragraph.
@@ -99,10 +122,10 @@ These rules are operational constraints, not style suggestions:
 - Step 2.1: Extract structural constraints from `section_schema_registry.json` for the active instrument: `max_wp_count` (integer or null), `max_deliverable_count` (integer or null), `project_duration_months` (integer or null).
 - Step 2.2: Read all WP seed entries from `workpackage_seed.json`. Assign a canonical `wp_id` to each WP: if the seed entry already has a `wp_id` field that is a unique string, keep it. If missing or duplicate, assign a sequential identifier: "WP1", "WP2", ..., "WPn". Record any reassignments.
 - Step 2.3: Validate WP count: count the total number of WP entries. If `max_wp_count` is not null and the count exceeds `max_wp_count`: return SkillResult(status="failure", failure_category="CONSTRAINT_VIOLATION", failure_reason="WP count <n> exceeds instrument limit <max_wp_count> from section_schema_registry.json") and halt. This is a hard constraint from Tier 2A.
-- Step 2.4: For each WP entry, validate and normalise:
-  - `objectives`: must be a non-empty array of strings. If missing or empty: this is a validation failure — record in a `normalization_issues` list but do not halt; the gate will fail on this WP.
-  - `tasks`: must be a non-empty array. For each task: `task_id` must be present and unique across the whole WP structure. If `task_id` is missing, assign "T<wp_number>-<task_number>" (e.g., "T1-01"). `title` must be non-empty. `responsible_partner` must be a value in the valid_partner_ids set; if not: record a normalization_issue.
-  - `deliverables`: must be a non-empty array. For each deliverable: `deliverable_id` must be present and unique. If missing, assign "D<wp_number>-<deliverable_number>". `type` must be one of [report, dataset, software, other]. `due_month` must be an integer ≥ 1; if `project_duration_months` is not null, `due_month` must be ≤ `project_duration_months`. If `due_month` exceeds `project_duration_months`: record a normalization_issue. `responsible_partner` must be in valid_partner_ids.
+- Step 2.4: For each WP entry, validate, normalise, and **synthesize missing structure**:
+  - `objectives`: must be a non-empty array of strings. If missing or empty: derive 1–2 short objective statements from the WP title and description. Record a normalization_issue with advisory severity noting synthesis.
+  - `tasks`: must be a non-empty array. **If the seed WP has no tasks or an empty tasks array: synthesize 1–3 compact task entries** derived from the WP objectives and title. Use functional-label titles. Assign `task_id` as "T<wp_number>-<task_number>" (e.g., "T1-01"). Assign `responsible_partner` as the WP's `lead_partner`. Record a normalization_issue noting synthesis. For each task (seed or synthesized): `task_id` must be present and unique across the whole WP structure. `title` must be non-empty. `responsible_partner` must be a value in the valid_partner_ids set; if not: record a normalization_issue.
+  - `deliverables`: must be a non-empty array. **If the seed WP has no deliverables or an empty deliverables array: synthesize at least one deliverable** derived from WP objectives. Use a compact title. Assign `deliverable_id` as "D<wp_number>-<deliverable_number>". Set `type` to "report" (default for synthesized deliverables). Set `due_month` to the WP's `end_month` or a reasonable value within project duration. Assign `responsible_partner` as the WP's `lead_partner`. Record a normalization_issue noting synthesis. For each deliverable (seed or synthesized): `deliverable_id` must be present and unique. `type` must be one of [report, dataset, software, other]. `due_month` must be an integer ≥ 1; if `project_duration_months` is not null, `due_month` must be ≤ `project_duration_months`. If `due_month` exceeds `project_duration_months`: record a normalization_issue. `responsible_partner` must be in valid_partner_ids.
   - `lead_partner`: must be a value in the valid_partner_ids set. If not present or not a valid partner_id: record a normalization_issue (this will cause the Phase 3 gate to fail).
   - `dependencies`: must be an array (empty array is valid). For each entry: `depends_on_wp_id` must reference a wp_id that exists in the WP set. `dependency_type` must be one of [finish_to_start, start_to_start, data_input, partial_output].
 - Step 2.5: Build the `dependency_map` object:

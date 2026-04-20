@@ -491,6 +491,7 @@ def _assemble_tapm_prompt(
     repo_root: Path,
     node_id: str | None = None,
     caller_context: dict[str, Any] | None = None,
+    optional_reads_from: list[str] | None = None,
 ) -> tuple[str, str]:
     """Assemble TAPM (Tool-Augmented Prompt Mode) prompts for Claude.
 
@@ -619,6 +620,16 @@ def _assemble_tapm_prompt(
             user_prompt += f"- {abs_path}\n"
     else:
         user_prompt += "(no declared inputs)\n"
+
+    # Optional declared inputs — may not exist on disk; absence is not an error
+    if optional_reads_from:
+        user_prompt += (
+            "\nOptional inputs (may not exist — absence triggers "
+            "degraded/fallback mode, not failure):\n"
+        )
+        for rel_path in optional_reads_from:
+            abs_path = str(repo_root / rel_path)
+            user_prompt += f"- {abs_path} (OPTIONAL)\n"
 
     # Caller-supplied context — content provided by the invoking agent
     # that is NOT part of the skill's declared disk inputs.  Context-
@@ -1090,6 +1101,7 @@ def run_skill(
         )
 
     reads_from: list[str] = entry.get("reads_from", [])
+    optional_reads_from: list[str] = entry.get("optional_reads_from", [])
     writes_to: list[str] = entry.get("writes_to", [])
     constraints: list[str] = entry.get("constitutional_constraints", [])
 
@@ -1128,6 +1140,7 @@ def run_skill(
             repo_root=repo_root,
             node_id=node_id,
             caller_context=caller_context,
+            optional_reads_from=optional_reads_from or None,
         )
         logger.info(
             "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
@@ -1184,10 +1197,11 @@ def run_skill(
         if caller_context:
             effective_inputs.update(caller_context)
 
-        # Resolve inputs from disk
-        resolved_inputs = _resolve_inputs(reads_from, repo_root, effective_inputs)
+        # Resolve inputs from disk (both required and optional)
+        all_reads_from = reads_from + optional_reads_from
+        resolved_inputs = _resolve_inputs(all_reads_from, repo_root, effective_inputs)
 
-        # Validate inputs
+        # Validate only required inputs (optional paths may be absent)
         validation_errors = _validate_skill_inputs(
             skill_id, reads_from, repo_root, resolved_inputs, writes_to
         )

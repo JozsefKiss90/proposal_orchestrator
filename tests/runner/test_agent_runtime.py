@@ -759,6 +759,135 @@ class TestMissingSpecs:
 
 
 # ---------------------------------------------------------------------------
+# Gate-enforcement context injection (Fix 2)
+# ---------------------------------------------------------------------------
+
+
+class TestGateEnforcementContext:
+    """Tests that gate-enforcement receives gate_id via caller_context."""
+
+    def test_gate_enforcement_receives_gate_id(self, tmp_path: Path) -> None:
+        """When gate-enforcement is in the skill list, the agent runtime
+        passes the node's exit gate as gate_id in caller_context."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["skill-a", "gate-enforcement"],
+            node_id="n03_wp_design",
+        )
+        # Update manifest so n03 has exit_gate
+        manifest_path = kwargs["repo_root"] / "manifest_test.yaml"
+        manifest_data = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        manifest_data["node_registry"][0]["exit_gate"] = "phase_03_gate"
+        _write_yaml(manifest_path, manifest_data)
+        kwargs["manifest_path"] = manifest_path
+
+        # Write gate-relevant artifact so can_evaluate_exit_gate can be True
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        captured_calls: list[dict] = []
+
+        def _capture_run_skill(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture_run_skill):
+            result = run_agent(**kwargs)
+
+        # Find the gate-enforcement call
+        gate_calls = [c for c in captured_calls if c["skill_id"] == "gate-enforcement"]
+        assert len(gate_calls) == 1, (
+            f"Expected 1 gate-enforcement call, got {len(gate_calls)}"
+        )
+        ctx = gate_calls[0]["caller_context"]
+        assert ctx is not None, "gate-enforcement should receive caller_context"
+        assert ctx.get("gate_id") == "phase_03_gate", (
+            f"Expected gate_id='phase_03_gate', got {ctx.get('gate_id')!r}"
+        )
+
+    def test_non_gate_enforcement_skills_unaffected(self, tmp_path: Path) -> None:
+        """Skills other than gate-enforcement do not get gate_id injected."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["skill-a", "skill-b"],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        captured_calls: list[dict] = []
+
+        def _capture_run_skill(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture_run_skill):
+            result = run_agent(**kwargs)
+
+        for call in captured_calls:
+            ctx = call["caller_context"]
+            # Non-gate-enforcement skills: caller_context should be None or
+            # not contain gate_id
+            if ctx is not None:
+                assert "gate_id" not in ctx, (
+                    f"Skill {call['skill_id']!r} should not receive gate_id"
+                )
+
+
+# ---------------------------------------------------------------------------
+# Exit gate lookup helper
+# ---------------------------------------------------------------------------
+
+
+class TestGetExitGateForNode:
+    """Tests for _get_exit_gate_for_node manifest lookup."""
+
+    def test_returns_exit_gate(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _get_exit_gate_for_node, _node_exit_gate_cache
+        _node_exit_gate_cache.clear()
+
+        manifest_path = tmp_path / "manifest.yaml"
+        _write_yaml(manifest_path, {
+            "node_registry": [
+                {"node_id": "n03_wp_design", "exit_gate": "phase_03_gate"},
+                {"node_id": "n04_gantt", "exit_gate": "phase_04_gate"},
+            ],
+        })
+
+        assert _get_exit_gate_for_node("n03_wp_design", manifest_path) == "phase_03_gate"
+        assert _get_exit_gate_for_node("n04_gantt", manifest_path) == "phase_04_gate"
+
+    def test_returns_none_for_unknown_node(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _get_exit_gate_for_node, _node_exit_gate_cache
+        _node_exit_gate_cache.clear()
+
+        manifest_path = tmp_path / "manifest.yaml"
+        _write_yaml(manifest_path, {
+            "node_registry": [
+                {"node_id": "n01", "exit_gate": "gate_01"},
+            ],
+        })
+
+        assert _get_exit_gate_for_node("n99_unknown", manifest_path) is None
+
+    def test_returns_none_for_missing_manifest(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _get_exit_gate_for_node, _node_exit_gate_cache
+        _node_exit_gate_cache.clear()
+
+        manifest_path = tmp_path / "nonexistent.yaml"
+        assert _get_exit_gate_for_node("n01", manifest_path) is None
+
+
+# ---------------------------------------------------------------------------
 # Module isolation
 # ---------------------------------------------------------------------------
 
