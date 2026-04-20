@@ -693,11 +693,34 @@ def _invoke_claude(
 
 
 # ---------------------------------------------------------------------------
-# Timeout diagnostic bundle
+# Transport failure diagnostic bundle
 # ---------------------------------------------------------------------------
 
+#: Closed set of transport failure classes for diagnostic classification.
+_FAILURE_CLASS_TIMEOUT = "TIMEOUT"
+_FAILURE_CLASS_NONZERO_EXIT = "NONZERO_EXIT"
+_FAILURE_CLASS_EMPTY_OUTPUT = "EMPTY_OUTPUT"
+_FAILURE_CLASS_CLI_UNAVAILABLE = "CLI_UNAVAILABLE"
+_FAILURE_CLASS_OTHER = "OTHER"
 
-def _write_timeout_diagnostics(
+
+def _classify_transport_failure(exc: ClaudeTransportError) -> str:
+    """Classify a transport exception into a diagnostic failure class."""
+    from runner.claude_transport import ClaudeCLIUnavailableError
+
+    if isinstance(exc, ClaudeCLITimeoutError):
+        return _FAILURE_CLASS_TIMEOUT
+    if isinstance(exc, ClaudeCLIUnavailableError):
+        return _FAILURE_CLASS_CLI_UNAVAILABLE
+    msg = str(exc).lower()
+    if "exited with code" in msg:
+        return _FAILURE_CLASS_NONZERO_EXIT
+    if "empty output" in msg:
+        return _FAILURE_CLASS_EMPTY_OUTPUT
+    return _FAILURE_CLASS_OTHER
+
+
+def _write_transport_failure_diagnostics(
     *,
     skill_id: str,
     run_id: str,
@@ -707,54 +730,82 @@ def _write_timeout_diagnostics(
     writes_to: list[str],
     system_prompt: str,
     user_prompt: str,
-    exc: ClaudeCLITimeoutError,
+    exc: ClaudeTransportError,
     repo_root: Path,
+    elapsed_seconds: float | None = None,
+    timeout_seconds: int | None = None,
+    tools: list[str] | None = None,
 ) -> dict[str, str]:
-    """Write a diagnostic bundle for a cli-prompt timeout failure.
+    """Write a consistent diagnostic bundle for any transport failure.
+
+    Covers all transport failure classes (timeout, non-zero exit, empty
+    output, CLI unavailable, other) in both execution modes (cli-prompt,
+    tapm).  Produces a structured JSON meta file plus prompt and
+    stdout/stderr companion files.
 
     Returns a dict mapping logical names to repo-relative paths of
     the written diagnostic files.
+
+    This is an **observability-only** function.  It does not affect
+    skill success/failure classification or canonical artifact writes.
     """
     diag_dir = repo_root / ".claude" / "skill_diag"
     diag_dir.mkdir(parents=True, exist_ok=True)
     prefix = f"{skill_id}_{run_id[:8]}"
     written: dict[str, str] = {}
 
-    partial_stdout = exc.stdout or ""
-    partial_stderr = exc.stderr or ""
+    failure_class = _classify_transport_failure(exc)
 
-    # -- timeout_meta.json --
-    meta = {
+    # Extract structured fields from typed exceptions when available.
+    partial_stdout = getattr(exc, "stdout", None) or ""
+    partial_stderr = getattr(exc, "stderr", None) or ""
+    command = getattr(exc, "command", None)
+
+    # For ClaudeCLITimeoutError, prefer its own timing fields.
+    if isinstance(exc, ClaudeCLITimeoutError):
+        if timeout_seconds is None:
+            timeout_seconds = exc.timeout_seconds
+        if elapsed_seconds is None:
+            elapsed_seconds = exc.elapsed_seconds
+
+    # -- transport_diag.json --
+    meta: dict[str, Any] = {
         "skill_id": skill_id,
         "execution_mode": mode,
+        "failure_class": failure_class,
         "run_id": run_id,
         "node_id": node_id,
         "reads_from": reads_from,
         "writes_to": writes_to,
         "model": SKILL_MODEL,
-        "max_tokens": SKILL_MAX_TOKENS,
-        "timeout_seconds": exc.timeout_seconds,
-        "elapsed_seconds": exc.elapsed_seconds,
-        "system_prompt_size": len(system_prompt),
-        "user_prompt_size": len(user_prompt),
-        "command": exc.command,
+        "max_tokens_requested": SKILL_MAX_TOKENS,
+        "timeout_seconds": timeout_seconds,
+        "elapsed_seconds": elapsed_seconds,
+        "system_prompt_chars": len(system_prompt),
+        "user_prompt_chars": len(user_prompt),
+        "exception_class": type(exc).__name__,
+        "exception_message": str(exc),
+        "command": command,
         "had_partial_stdout": bool(partial_stdout.strip()),
         "had_stderr": bool(partial_stderr.strip()),
+        "tapm_tools_requested": tools,
+        "tapm_tools_enabled": tools is not None and len(tools) > 0,
     }
 
-    file_map = {
-        "meta": (f"{prefix}_timeout_meta.json", None),
+    file_map: dict[str, tuple[str, str | None]] = {
+        "meta": (f"{prefix}_transport_diag.json", None),
         "system_prompt": (f"{prefix}_system_prompt.txt", system_prompt),
         "user_prompt": (f"{prefix}_user_prompt.txt", user_prompt),
         "stdout": (f"{prefix}_stdout.txt", partial_stdout),
         "stderr": (f"{prefix}_stderr.txt", partial_stderr),
     }
 
-    # Populate diagnostic_files in meta before writing
+    # Populate diagnostic_files in meta before writing.
     meta["diagnostic_files"] = {
         k: f".claude/skill_diag/{fname}" for k, (fname, _) in file_map.items()
     }
 
+    # Write meta JSON.
     try:
         meta_path = diag_dir / file_map["meta"][0]
         meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
@@ -762,6 +813,7 @@ def _write_timeout_diagnostics(
     except OSError:
         pass
 
+    # Write companion files (prompts, stdout, stderr).
     for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
         fname, content = file_map[key]
         try:
@@ -771,6 +823,12 @@ def _write_timeout_diagnostics(
             pass
 
     return written
+
+
+# Backward-compatible alias used by existing test expectations that
+# reference the _timeout_meta.json filename.  The new unified function
+# writes _transport_diag.json instead.
+_write_timeout_diagnostics = _write_transport_failure_diagnostics
 
 
 # ---------------------------------------------------------------------------
@@ -1087,32 +1145,33 @@ def run_skill(
                 timeout_seconds=TAPM_TIMEOUT_SECONDS,
             )
         except ClaudeTransportError as exc:
-            # Diagnostic: capture transport failure for debugging
-            _diag_dir = repo_root / ".claude" / "skill_diag"
-            _diag_dir.mkdir(parents=True, exist_ok=True)
-            try:
-                (
-                    _diag_dir / f"{skill_id}_{run_id[:8]}_transport_fail.txt"
-                ).write_text(
-                    f"=== Transport failure ===\n"
-                    f"skill_id: {skill_id}\n"
-                    f"mode: tapm\n"
-                    f"error: {exc}\n"
-                    f"timeout_seconds: {TAPM_TIMEOUT_SECONDS}\n"
-                    f"=== END ===\n",
-                    encoding="utf-8",
-                )
-            except OSError:
-                pass
             _elapsed = time.monotonic() - _skill_t0
+            diag_paths = _write_transport_failure_diagnostics(
+                skill_id=skill_id,
+                run_id=run_id,
+                node_id=node_id,
+                mode=mode,
+                reads_from=reads_from,
+                writes_to=writes_to,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                exc=exc,
+                repo_root=repo_root,
+                elapsed_seconds=_elapsed,
+                timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                tools=["Read", "Glob"],
+            )
+            meta_rel = diag_paths.get("meta", "")
             logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs",
-                skill_id, _elapsed,
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                "elapsed=%.1fs  diag=%s",
+                skill_id, _elapsed, meta_rel,
             )
             return SkillResult(
                 status="failure",
                 failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}"
+                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
+                    f"Diagnostics written to {meta_rel}"
                 ),
                 failure_category="INCOMPLETE_OUTPUT",
             )
@@ -1165,8 +1224,9 @@ def run_skill(
                 model=SKILL_MODEL,
                 max_tokens=SKILL_MAX_TOKENS,
             )
-        except ClaudeCLITimeoutError as exc:
-            diag_paths = _write_timeout_diagnostics(
+        except ClaudeTransportError as exc:
+            _elapsed = time.monotonic() - _skill_t0
+            diag_paths = _write_transport_failure_diagnostics(
                 skill_id=skill_id,
                 run_id=run_id,
                 node_id=node_id,
@@ -1177,11 +1237,13 @@ def run_skill(
                 user_prompt=user_prompt,
                 exc=exc,
                 repo_root=repo_root,
+                elapsed_seconds=_elapsed,
+                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
             )
             meta_rel = diag_paths.get("meta", "")
-            _elapsed = time.monotonic() - _skill_t0
             logger.info(
-                "  skill TIMEOUT id=%s  elapsed=%.1fs  diag=%s",
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                "elapsed=%.1fs  diag=%s",
                 skill_id, _elapsed, meta_rel,
             )
             return SkillResult(
@@ -1189,19 +1251,6 @@ def run_skill(
                 failure_reason=(
                     f"Skill {skill_id!r}: Claude transport failed: {exc}. "
                     f"Diagnostics written to {meta_rel}"
-                ),
-                failure_category="INCOMPLETE_OUTPUT",
-            )
-        except ClaudeTransportError as exc:
-            _elapsed = time.monotonic() - _skill_t0
-            logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs",
-                skill_id, _elapsed,
-            )
-            return SkillResult(
-                status="failure",
-                failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}"
                 ),
                 failure_category="INCOMPLETE_OUTPUT",
             )

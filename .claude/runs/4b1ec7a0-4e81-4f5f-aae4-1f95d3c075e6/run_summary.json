@@ -1,0 +1,41 @@
+{
+  "run_id": "4b1ec7a0-4e81-4f5f-aae4-1f95d3c075e6",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "started_at": "2026-04-20T12:01:07.936322+00:00",
+  "completed_at": "2026-04-20T12:25:19.302427+00:00",
+  "overall_status": "fail",
+  "terminal_nodes_reached": [],
+  "stalled_nodes": [],
+  "hard_blocked_nodes": [],
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "blocked_at_exit",
+    "n04_gantt_milestones": "pending",
+    "n05_impact_architecture": "pending",
+    "n06_implementation_architecture": "pending",
+    "n07_budget_gate": "pending",
+    "n08a_section_drafting": "pending",
+    "n08b_assembly": "pending",
+    "n08c_evaluator_review": "pending",
+    "n08d_revision": "pending"
+  },
+  "gate_results_index": {},
+  "node_failure_details": {
+    "n03_wp_design": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'instrument-schema-normalization' failed: Skill 'instrument-schema-normalization': Claude transport failed: Claude CLI invocation timed out after 600s",
+      "failure_category": "SKILL_FAILURE"
+    }
+  },
+  "dispatched_nodes": [
+    "n03_wp_design"
+  ],
+  "phase_scope": 3,
+  "phase_scope_nodes": [
+    "n03_wp_design"
+  ]
+}

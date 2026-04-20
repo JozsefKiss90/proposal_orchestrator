@@ -1,0 +1,225 @@
+=== skill_id: wp-dependency-analysis ===
+=== mode: tapm ===
+=== response_text length: 9671 ===
+=== response_text (full) ===
+{
+  "schema_id": "orch.phase3.wp_structure.v1",
+  "run_id": "da98ba01-037d-4836-82cc-547296497706",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "title": "Project Management and Coordination",
+      "objectives": [
+        "Coordinate all consortium administrative, financial, and governance processes and ensure quality assurance, risk management, and ethics compliance throughout the project duration."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": ["CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Neuro-Symbolic Planning and Reasoning Engine",
+      "objectives": [
+        "Design and implement a hybrid neuro-symbolic planning engine integrating sub-task graph decomposition, MCTS/HTN planning with LLM-based heuristics, self-correcting plan monitoring, and formal tool-invocation policies."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": ["CERIA", "BIIS", "BAL"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Adaptive Memory Architecture",
+      "objectives": [
+        "Design and implement a unified tri-store memory architecture (working, episodic, semantic) with a learned memory controller supporting long-horizon coherence, tool registry hosting, and experience-based tool-selection heuristics."
+      ],
+      "lead_partner": "BIIS",
+      "contributing_partners": ["ATU", "CERIA", "BAL"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Decentralised Multi-Agent Coordination",
+      "objectives": [
+        "Develop formally specified task-delegation and negotiation protocols for heterogeneous AI agents with convergence guarantees, conflict resolution under partial observability, auditable interaction traces, and shared tool-access governance."
+      ],
+      "lead_partner": "CERIA",
+      "contributing_partners": ["ATU", "BIIS"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Healthcare Demonstrator — Clinical Decision Support",
+      "objectives": [
+        "Co-design and validate MAESTRO in a clinical decision support system integrating HL7 FHIR data sources with specialist sub-agents for imaging, lab, and guideline reasoning, confirmed through clinical expert validation."
+      ],
+      "lead_partner": "NIHS",
+      "contributing_partners": ["ATU", "BIIS", "BAL", "FIIT"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP6",
+      "title": "Manufacturing Demonstrator — Process Optimisation",
+      "objectives": [
+        "Co-design and validate MAESTRO for manufacturing process optimisation using multi-agent real-time coordination across digital twin environments, validated over a 3-month pilot factory operational period."
+      ],
+      "lead_partner": "ISIA",
+      "contributing_partners": ["ATU", "CERIA", "BAL", "FIIT"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP7",
+      "title": "Logistics Transfer Demonstrator — Cross-Sector Generalisation",
+      "objectives": [
+        "Co-design and validate MAESTRO for logistics and supply chain operations across three international corridors, confirming cross-sector generalisation of the integrated planning–memory–coordination–tool-orchestration architecture."
+      ],
+      "lead_partner": "ELI",
+      "contributing_partners": ["CERIA", "BAL", "FIIT"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP8",
+      "title": "Integration, Evaluation and Benchmarking",
+      "objectives": [
+        "Define the cross-cutting evaluation framework, integrate all MAESTRO research pillars into a unified system, conduct cross-demonstrator benchmarking with standardised KPIs, and produce a community-adoptable MAESTRO benchmark suite."
+      ],
+      "lead_partner": "FIIT",
+      "contributing_partners": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP9",
+      "title": "Dissemination, Exploitation and Communication",
+      "objectives": [
+        "Manage open-source framework release, EDIH-network dissemination, AI-on-demand platform contributions, and per-partner exploitation strategy execution to maximise community adoption and societal impact."
+      ],
+      "lead_partner": "BAL",
+      "contributing_partners": ["ATU", "ISIA", "ELI", "FIIT"],
+      "tasks": [],
+      "deliverables": [],
+      "dependencies": []
+    }
+  ],
+  "dependency_map": {
+    "nodes": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5",
+      "WP6",
+      "WP7",
+      "WP8",
+      "WP9"
+    ],
+    "edges": []
+  },
+  "cycle_detected": false,
+  "cycle_flags": [],
+  "critical_path_nodes": [
+    "WP1",
+    "WP2",
+    "WP3",
+    "WP4",
+    "WP5",
+    "WP6",
+    "WP7",
+    "WP8",
+    "WP9"
+  ],
+  "partner_role_matrix": [
+    {
+      "partner_id": "ATU",
+      "wps_as_lead": ["WP1", "WP2"],
+      "wps_as_contributor": ["WP3", "WP4", "WP5", "WP6", "WP8", "WP9"]
+    },
+    {
+      "partner_id": "CERIA",
+      "wps_as_lead": ["WP4"],
+      "wps_as_contributor": ["WP1", "WP2", "WP3", "WP6", "WP7", "WP8"]
+    },
+    {
+      "partner_id": "BIIS",
+      "wps_as_lead": ["WP3"],
+      "wps_as_contributor": ["WP1", "WP2", "WP4", "WP5", "WP8"]
+    },
+    {
+      "partner_id": "ISIA",
+      "wps_as_lead": ["WP6"],
+      "wps_as_contributor": ["WP1", "WP8", "WP9"]
+    },
+    {
+      "partner_id": "NIHS",
+      "wps_as_lead": ["WP5"],
+      "wps_as_contributor": ["WP1", "WP8"]
+    },
+    {
+      "partner_id": "ELI",
+      "wps_as_lead": ["WP7"],
+      "wps_as_contributor": ["WP1", "WP8", "WP9"]
+    },
+    {
+      "partner_id": "BAL",
+      "wps_as_lead": ["WP9"],
+      "wps_as_contributor": ["WP1", "WP2", "WP3", "WP5", "WP6", "WP7", "WP8"]
+    },
+    {
+      "partner_id": "FIIT",
+      "wps_as_lead": ["WP8"],
+      "wps_as_contributor": ["WP1", "WP5", "WP6", "WP7", "WP9"]
+    }
+  ],
+  "normalization_issues": [
+    {
+      "issue_type": "MISSING_CONTEXT",
+      "field": "valid_partner_ids",
+      "detail": "valid_partner_ids were not provided as explicit context by the invoking agent per Step 1.5; partner IDs were derived from participants arrays in workpackage_seed.json (declared Tier 3 input). Derived set: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}. All lead_partner and contributing_partners values validated against this set. Gate confirmation against partners.json is required."
+    },
+    {
+      "issue_type": "MISSING_FIELD",
+      "field": "tasks",
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
+      "detail": "workpackage_seed.json defines no tasks arrays for any WP. Empty arrays written. Tasks are required for Phase 3 gate passage; seed must be enriched with task definitions before gate can pass."
+    },
+    {
+      "issue_type": "MISSING_FIELD",
+      "field": "deliverables",
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
+      "detail": "workpackage_seed.json defines no deliverables arrays for any WP. Empty arrays written. Deliverables with due_month and type are required for Phase 3 gate passage; seed must be enriched with deliverable definitions before gate can pass."
+    },
+    {
+      "issue_type": "MISSING_FIELD",
+      "field": "dependencies",
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
+      "detail": "workpackage_seed.json defines no dependencies arrays for any WP. Empty arrays written; dependency_map contains no edges. Inter-WP dependencies should be specified in the seed before Phase 4 inputs are finalised."
+    },
+    {
+      "issue_type": "DERIVED_FIELD",
+      "field": "objectives",
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
+      "detail": "workpackage_seed.json provides no explicit objectives text fields; objectives were derived from the description field of each WP seed entry. objectives_addressed references (OBJ-1 through OBJ-8) were noted but not expanded. Formal objectives text should be confirmed in seed before Phase 3 gate."
+    },
+    {
+      "issue_type": "DEPENDENCY_ANALYSIS_NOTE",
+      "field": "dependency_map",
+      "detail": "wp-dependency-analysis executed against wp_structure.json. All nine work_packages[].tasks[] arrays are empty and all work_packages[].dependencies[] arrays are empty. Consequently: (1) no task_ids could be added to dependency_map.nodes; (2) no WP-level or cross-WP task-level edges could be derived; (3) the dependency graph is fully disconnected with 9 isolated nodes and 0 edges. Kahn topological sort confirms no cycles (cycle_detected=false). Critical path computation is degenerate: all WPs have in-degree 0 and out-degree 0; each is simultaneously a source and sink with longest-path length 0. All 9 WP IDs are recorded in critical_path_nodes to reflect that every WP is an independent parallel track with no sequential dependency structure — this does NOT imply a sequential chain. Structural dependency information (inter-WP relationships implied by the project design) cannot be derived from the current seed state. Dependency edges must be explicitly declared in workpackage_seed.json before a meaningful critical path analysis can be produced. This is an Unresolved finding per CLAUDE.md §12.2."
+    }
+  ]
+}
+
+=== END ===

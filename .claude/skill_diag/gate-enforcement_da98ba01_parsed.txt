@@ -1,0 +1,72 @@
+=== parsed OK ===
+=== top-level keys: ['run_id', 'schema_id', 'status', 'outputs_written', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'canonical_artifact_read', 'deterministic_predicates', 'deterministic_evaluation_notes', 'semantic_predicates', 'semantic_evaluation_notes', 'normalization_issues_review', 'gate_failure_summary', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "run_id": "da98ba01-037d-4836-82cc-547296497706",
+  "schema_id": "orch.gate_enforcement.predicate_evaluation.v1",
+  "status": "success",
+  "outputs_written": [
+    "docs/tier4_orchestration_state/decision_log/gate_failure_phase_03_gate_wp_designer_2026-04-20T000000Z.json"
+  ],
+  "gate_id": "phase_03_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-20T00:00:00Z",
+  "canonical_artifact_read": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "artifact_not_invalid",
+      "work_packages_non_empty",
+      "all_wps_have_deliverables",
+      "all_wps_have_lead_partner",
+      "dependency_map_non_null_with_nodes_and_edges",
+      "cycle_not_detected",
+      "partner_role_matrix_non_empty"
+    ],
+    "failed": [
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "equals",
+        "args": {
+          "field": "artifact.run_id",
+          "artifact_value": "4b1ec7a0-4e81-4f5f-aae4-1f95d3c075e6",
+          "expected_value": "da98ba01-037d-4836-82cc-547296497706"
+        },
+        "failure_category": "MALFORMED_ARTIFACT",
+        "fail_message": "artifact.run_id '4b1ec7a0-4e81-4f5f-aae4-1f95d3c075e6' does not match current run_id 'da98ba01-037d-4836-82cc-547296497706'. The canonical artifact docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json was produced in a prior execution run and has not been regenerated under the current orchestration run context. The Phase 3 WP design skill (wp_structure_builder) must be re-executed under run_id 'da98ba01-037d-4836-82cc-547296497706' before this gate can pass.",
+        "prose_condition": "artifact.run_id must equal the current run_id provided by the invoking agent"
+      }
+    ]
+  },
+  "deterministic_evaluation_notes": {
+    "artifact_present": "wp_structure.json confirmed present at canonical path",
+    "schema_id_match": "schema_id 'orch.phase3.wp_structure.v1' matches expected value",
+    "artifact_not_invalid": "artifact_status field absent from artifact \u2014 not stamped invalid",
+    "work_packages_non_empty": "9 work packages present: WP1\u2013WP9",
+    "all_wps_have_deliverables": "All 9 WPs have non-empty deliverables arrays: WP1(3), WP2(2), WP3(2), WP4(2), WP5(2), WP6(2), WP7(2), WP8(2), WP9(3)",
+    "all_wps_have_lead_partner": "All 9 WPs have non-null lead_partner: WP1=ATU, WP2=ATU, WP3=BIIS, WP4=CERIA, WP5=NIHS, WP6=ISIA, WP7=ELI, WP8=FIIT, WP9=BAL",
+    "dependency_map_non_null_with_nodes_and_edges": "dependency_map present with nodes array (36 entries: 9 WP nodes + 27 task nodes) and edges array (34 directed data_input edges)",
+    "cycle_not_detected": "cycle_detected=false; cycle_flags=[]",
+    "partner_role_matrix_non_empty": "partner_role_matrix contains 8 entries covering all consortium partners"
+  },
+  "semantic_predicates": {
+    "passed": [
+      "all_partners_in_tier3"
+    ],
+    "failed": []
+  },
+  "semantic_evaluation_notes": {
+    "all_partners_in_tier3": "Cross-reference of all lead_partner and contributing_partners values across WP1\u2013WP9 against docs/tier3_project_instantiation/consortium/partners.json completed. Partners used in wp_structure.json: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}. Partners declared in Tier 3 partners.json: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}. All 8 partner IDs confirmed present. Normalization issue NI-004 (partners inferred at WP design time, verification against partners.json required) is resolved by this gate evaluation. Predicate: PASS.",
+    "partner_role_matrix_cross_check": "partner_role_matrix partner_ids {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT} also confirmed present in Tier 3 partners.json"
+  },
+  "normalization_issues_review": {
+    "NI-001": "Tasks synthesized from WP descriptions \u2014 deterministic gate predicates do not include a task data-origin check; tasks arrays are non-empty and structurally valid; predicate evaluation proceeds on structural presence. Advisory: human review recommended before Phase 4 Gantt assignment.",
+    "NI-002": "Deliverables synthesized from WP type and description fields \u2014 deliverables arrays are non-empty across all WPs satisfying the all_wps_have_deliverables predicate. Advisory: human review recommended before Phase 5 KPI traceability evaluation.",
+    "NI-003": "WP dependency arrays in individual WP objects are empty ([]) but dependency_map.edges is non-empty (34 edges); dependency analysis has been performed at the dependency_map level, satisfying dependency_map_non_null_with_nodes_and_edges predicate.",
+    "NI-004": "RESOLVED by semantic predicate all_partners_in_tier3 \u2014 all 8 partner IDs confirmed in docs/tier3_project_instantiation/consortium/partners.json."
+  },
+  "gate_failure_summary": "phase_03_gate fails on 1 of 10 deterministic predicates (run_id_match). The wp_structure.json a
+=== END ===

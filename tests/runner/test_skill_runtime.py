@@ -117,6 +117,13 @@ def _make_skill_env(tmp_path: Path) -> Path:
             "writes_to": ["docs/tier4/phase1/test_output.json"],
             "constitutional_constraints": [],
         },
+        {
+            "id": "test-skill-tapm",
+            "execution_mode": "tapm",
+            "reads_from": ["docs/tier3/input.json"],
+            "writes_to": ["docs/tier4/phase1/"],
+            "constitutional_constraints": ["Must not fabricate data"],
+        },
     ])
 
     # Artifact schema
@@ -125,6 +132,7 @@ def _make_skill_env(tmp_path: Path) -> Path:
     # Skill spec
     _write_skill_spec(repo_root, "test-skill")
     _write_skill_spec(repo_root, "test-skill-dir-input")
+    _write_skill_spec(repo_root, "test-skill-tapm")
 
     # Input artifact
     input_path = repo_root / "docs" / "tier3" / "input.json"
@@ -315,8 +323,14 @@ class TestRunSkillMalformedResponse:
 # ---------------------------------------------------------------------------
 
 
-class TestCliPromptTimeoutDiagnostics:
-    """Verify that cli-prompt timeout failures write a rich diagnostic bundle."""
+class TestTransportFailureDiagnostics:
+    """Verify that ALL transport failures write a consistent diagnostic bundle.
+
+    Covers timeout, non-zero exit, empty output, and generic transport
+    errors in both cli-prompt and tapm modes.
+    """
+
+    # -- A. Timeout failure writes diagnostic bundle --
 
     def test_timeout_returns_failure_result(self, skill_env: Path) -> None:
         """Timeout still produces a failure SkillResult (contract preserved)."""
@@ -333,31 +347,34 @@ class TestCliPromptTimeoutDiagnostics:
             result = run_skill("test-skill", "run-001", skill_env)
 
         assert ".claude/skill_diag/" in result.failure_reason
-        assert "timeout_meta.json" in result.failure_reason
+        assert "transport_diag.json" in result.failure_reason
 
-    def test_timeout_writes_meta_json(self, skill_env: Path) -> None:
-        """Timeout must write a timeout_meta.json with all required fields."""
+    def test_timeout_writes_transport_diag_json(self, skill_env: Path) -> None:
+        """Timeout writes a transport_diag.json with all required fields."""
         with _claude_times_out(timeout_seconds=300, stderr="some warning"):
             run_skill("test-skill", "run-001", skill_env)
 
         meta_path = (
             skill_env / ".claude" / "skill_diag"
-            / "test-skill_run-001_timeout_meta.json"
+            / "test-skill_run-001_transport_diag.json"
         )
         assert meta_path.exists()
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
 
         assert meta["skill_id"] == "test-skill"
         assert meta["execution_mode"] == "cli-prompt"
+        assert meta["failure_class"] == "TIMEOUT"
         assert meta["run_id"] == "run-001"
         assert meta["timeout_seconds"] == 300
         assert isinstance(meta["elapsed_seconds"], float)
-        assert isinstance(meta["system_prompt_size"], int)
-        assert meta["system_prompt_size"] > 0
-        assert isinstance(meta["user_prompt_size"], int)
-        assert meta["user_prompt_size"] > 0
+        assert isinstance(meta["system_prompt_chars"], int)
+        assert meta["system_prompt_chars"] > 0
+        assert isinstance(meta["user_prompt_chars"], int)
+        assert meta["user_prompt_chars"] > 0
+        assert meta["exception_class"] == "ClaudeCLITimeoutError"
+        assert isinstance(meta["exception_message"], str)
         assert meta["model"] is not None
-        assert meta["max_tokens"] is not None
+        assert meta["max_tokens_requested"] is not None
         assert isinstance(meta["command"], list)
         assert isinstance(meta["reads_from"], list)
         assert isinstance(meta["writes_to"], list)
@@ -398,21 +415,109 @@ class TestCliPromptTimeoutDiagnostics:
 
         meta_path = (
             skill_env / ".claude" / "skill_diag"
-            / "test-skill_run-001_timeout_meta.json"
+            / "test-skill_run-001_transport_diag.json"
         )
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         assert meta["node_id"] == "n01_call_analysis"
 
-    def test_non_timeout_transport_error_no_diagnostic_bundle(self, skill_env: Path) -> None:
-        """Generic transport errors should NOT write timeout diagnostic files."""
+    # -- B. Non-timeout transport failure writes diagnostic bundle --
+
+    def test_generic_transport_error_writes_diagnostic(self, skill_env: Path) -> None:
+        """Generic ClaudeTransportError also writes a diagnostic bundle."""
         with _claude_fails("Connection reset"):
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        assert meta_path.exists()
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["failure_class"] == "OTHER"
+        assert meta["exception_class"] == "ClaudeTransportError"
+        assert "Connection reset" in meta["exception_message"]
+
+    def test_nonzero_exit_classified_correctly(self, skill_env: Path) -> None:
+        """Transport error with 'exited with code' is classified as NONZERO_EXIT."""
+        with patch(
+            _TRANSPORT_TARGET,
+            side_effect=ClaudeTransportError(
+                "Claude CLI exited with code 1: some error",
+                stderr="fatal error details",
+            ),
+        ):
             run_skill("test-skill", "run-001", skill_env)
 
         meta_path = (
             skill_env / ".claude" / "skill_diag"
-            / "test-skill_run-001_timeout_meta.json"
+            / "test-skill_run-001_transport_diag.json"
         )
-        assert not meta_path.exists()
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["failure_class"] == "NONZERO_EXIT"
+        assert meta["had_stderr"] is True
+
+    def test_empty_output_classified_correctly(self, skill_env: Path) -> None:
+        """Transport error with 'empty output' is classified as EMPTY_OUTPUT."""
+        with patch(
+            _TRANSPORT_TARGET,
+            side_effect=ClaudeTransportError("Claude CLI returned empty output"),
+        ):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["failure_class"] == "EMPTY_OUTPUT"
+
+    # -- C. Skill failure semantics unchanged --
+
+    def test_failure_semantics_preserved(self, skill_env: Path) -> None:
+        """SkillResult is still failure with correct category on transport error."""
+        with _claude_fails("any transport error"):
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+        assert result.failure_reason is not None
+        assert len(result.outputs_written) == 0
+
+    # -- D. No canonical artifact written on transport failure --
+
+    def test_no_canonical_artifact_on_transport_failure(self, skill_env: Path) -> None:
+        """Transport failure must not write to any canonical output path."""
+        canonical = skill_env / "docs" / "tier4" / "phase1" / "test_output.json"
+        assert not canonical.exists()
+
+        with _claude_times_out():
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert result.status == "failure"
+        assert not canonical.exists(), "No canonical artifact on transport failure"
+        assert len(result.outputs_written) == 0
+
+    # -- E. Prompt-size metadata included --
+
+    def test_prompt_size_metadata_in_diagnostic(self, skill_env: Path) -> None:
+        """Diagnostic bundle must include system/user prompt char counts."""
+        with _claude_fails("transport error"):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert "system_prompt_chars" in meta
+        assert "user_prompt_chars" in meta
+        assert isinstance(meta["system_prompt_chars"], int)
+        assert meta["system_prompt_chars"] > 0
+        assert isinstance(meta["user_prompt_chars"], int)
+        assert meta["user_prompt_chars"] > 0
 
 
 # ---------------------------------------------------------------------------
@@ -962,6 +1067,106 @@ class TestMultiTargetWritesTo:
 
         assert result.status == "failure"
         assert result.failure_category == "MALFORMED_ARTIFACT"
+
+
+# ---------------------------------------------------------------------------
+# Module isolation
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# TAPM transport failure diagnostics
+# ---------------------------------------------------------------------------
+
+
+class TestTapmTransportFailureDiagnostics:
+    """Verify TAPM-mode transport failures write consistent diagnostic bundles
+    with TAPM-specific execution context (tools, input paths)."""
+
+    def test_tapm_timeout_writes_diagnostic(self, skill_env: Path) -> None:
+        """TAPM timeout writes full diagnostic bundle, not a thin txt file."""
+        with _claude_times_out(timeout_seconds=600):
+            result = run_skill("test-skill-tapm", "run-002", skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+        assert "transport_diag.json" in result.failure_reason
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill-tapm_run-002_transport_diag.json"
+        )
+        assert meta_path.exists()
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["execution_mode"] == "tapm"
+        assert meta["failure_class"] == "TIMEOUT"
+        assert meta["skill_id"] == "test-skill-tapm"
+
+    def test_tapm_diagnostic_includes_tools_metadata(self, skill_env: Path) -> None:
+        """TAPM diagnostic must include tools_requested and tools_enabled."""
+        with _claude_times_out(timeout_seconds=600):
+            run_skill("test-skill-tapm", "run-002", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill-tapm_run-002_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["tapm_tools_requested"] == ["Read", "Glob"]
+        assert meta["tapm_tools_enabled"] is True
+
+    def test_tapm_diagnostic_includes_prompt_sizes(self, skill_env: Path) -> None:
+        """TAPM diagnostic bundle includes prompt character counts."""
+        with _claude_fails("transport error"):
+            run_skill("test-skill-tapm", "run-002", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill-tapm_run-002_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert isinstance(meta["system_prompt_chars"], int)
+        assert meta["system_prompt_chars"] > 0
+        assert isinstance(meta["user_prompt_chars"], int)
+        assert meta["user_prompt_chars"] > 0
+
+    def test_tapm_diagnostic_includes_declared_inputs(self, skill_env: Path) -> None:
+        """TAPM diagnostic records the declared reads_from paths."""
+        with _claude_fails("transport error"):
+            run_skill("test-skill-tapm", "run-002", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill-tapm_run-002_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert isinstance(meta["reads_from"], list)
+        assert "docs/tier3/input.json" in meta["reads_from"]
+
+    def test_tapm_no_canonical_artifact_on_failure(self, skill_env: Path) -> None:
+        """TAPM transport failure must not write any canonical artifact."""
+        with _claude_times_out(timeout_seconds=600):
+            result = run_skill("test-skill-tapm", "run-002", skill_env)
+
+        assert result.status == "failure"
+        assert len(result.outputs_written) == 0
+        # Check no JSON was written to the output directory
+        output_dir = skill_env / "docs" / "tier4" / "phase1"
+        json_files = list(output_dir.glob("*.json"))
+        assert len(json_files) == 0
+
+    def test_cliprompt_diagnostic_has_no_tapm_tools(self, skill_env: Path) -> None:
+        """cli-prompt diagnostics should show tools as None."""
+        with _claude_fails("transport error"):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["tapm_tools_requested"] is None
+        assert meta["tapm_tools_enabled"] is False
 
 
 # ---------------------------------------------------------------------------
