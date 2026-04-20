@@ -1,0 +1,90 @@
+{
+  "gate_id": "phase_03_gate",
+  "gate_kind": "exit",
+  "run_id": "764ce089-ccbc-4312-bf31-578eb9adab01",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:1b2c64ffdd75fc64a827e0f13a0f65f97163b8ca51ed8e169ffb26264bf1741e",
+  "input_artifact_fingerprints": {
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "sha256:0c848d478707442bab2bcbc4330a07ce44cf3fde48eece9fecdb34f502980a72",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "sha256:51fe5409a984faa4dd6e93f10b8084378d341d9f438b6423e90d48a944662c35",
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json": "sha256:8b14ac1654bc86eaf6c0ecd423e331a3cd16d1194274f077490e96f2b335c5a5"
+  },
+  "evaluated_at": "2026-04-20T20:30:52.073630+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g04_p02",
+      "g04_p02b",
+      "g04_p01",
+      "g04_p03",
+      "g04_p04",
+      "g04_p06"
+    ],
+    "failed": [
+      {
+        "predicate_id": "g04_p07",
+        "type": "coverage",
+        "function": "all_partners_in_tier3",
+        "args": {
+          "wp_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+          "partners_path": "docs/tier3_project_instantiation/consortium/partners.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "8 partner(s) referenced in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase3_wp_design\\wp_structure.json are not present in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier3_project_instantiation\\consortium\\partners.json: ['ATU', 'BAL', 'BIIS', 'CERIA', 'ELI', 'FIIT', 'ISIA', 'NIHS'].  All WP lead and contributing partners must exist in Tier 3 consortium data (gate_rules_library_plan.md \u00a74.4).",
+        "details": {
+          "wp_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase3_wp_design\\wp_structure.json",
+          "partners_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier3_project_instantiation\\consortium\\partners.json",
+          "partners_in_wps": [
+            "ATU",
+            "BAL",
+            "BIIS",
+            "CERIA",
+            "ELI",
+            "FIIT",
+            "ISIA",
+            "NIHS"
+          ],
+          "partners_in_tier3": [],
+          "missing_from_tier3": [
+            "ATU",
+            "BAL",
+            "BIIS",
+            "CERIA",
+            "ELI",
+            "FIIT",
+            "ISIA",
+            "NIHS"
+          ]
+        },
+        "fail_message": "One or more partners assigned as lead or contributor in wp_structure.json do not exist in docs/tier3_project_instantiation/consortium/partners.json. All WP-assigned partners must be present in Tier 3 consortium data.\n",
+        "prose_condition": "All assigned partners present in Tier 3 consortium data"
+      },
+      {
+        "predicate_id": "g04_p05",
+        "type": "timeline",
+        "function": "wp_count_within_limit",
+        "args": {
+          "wp_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+          "schema_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+        },
+        "failure_category": "MALFORMED_ARTIFACT",
+        "reason": "section_schema_registry.json contains no 'max_work_packages' constraint in any instrument entry.  The registry must define this limit for wp_count_within_limit to evaluate.",
+        "details": {
+          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2a_instrument_schemas\\extracted\\section_schema_registry.json"
+        },
+        "fail_message": "The number of work packages in wp_structure.json exceeds the maximum WP count specified in section_schema_registry.json for the active instrument type. Reduce the WP count to comply with Tier 2A instrument constraints.\n",
+        "prose_condition": "WP count compliant with Tier 2A instrument constraints"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase3_wp_design\\gate_result.json"
+}

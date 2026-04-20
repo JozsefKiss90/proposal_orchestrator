@@ -1,3 +1,8 @@
+=== skill_id: wp-dependency-analysis ===
+=== mode: tapm ===
+=== response_text length: 26646 ===
+=== response_text (full) ===
+```json
 {
   "schema_id": "orch.phase3.wp_structure.v1",
   "run_id": "764ce089-ccbc-4312-bf31-578eb9adab01",
@@ -10,15 +15,7 @@
         "Monitor progress, quality assurance, and ethics compliance across all work packages."
       ],
       "lead_partner": "ATU",
-      "contributing_partners": [
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "contributing_partners": ["CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "tasks": [
         {
           "task_id": "T1-01",
@@ -65,11 +62,7 @@
         "Integrate MCTS, HTN planning, and LLM-based heuristics with plan monitoring and self-correction mechanisms."
       ],
       "lead_partner": "ATU",
-      "contributing_partners": [
-        "CERIA",
-        "BIIS",
-        "BAL"
-      ],
+      "contributing_partners": ["CERIA", "BIIS", "BAL"],
       "tasks": [
         {
           "task_id": "T2-01",
@@ -116,11 +109,7 @@
         "Develop a learned memory controller with indexing, retrieval, and coherence maintenance over long interaction horizons."
       ],
       "lead_partner": "BIIS",
-      "contributing_partners": [
-        "ATU",
-        "CERIA",
-        "BAL"
-      ],
+      "contributing_partners": ["ATU", "CERIA", "BAL"],
       "tasks": [
         {
           "task_id": "T3-01",
@@ -167,10 +156,7 @@
         "Produce auditable multi-agent interaction traces and scalable decentralised coordination including shared tool access governance."
       ],
       "lead_partner": "CERIA",
-      "contributing_partners": [
-        "ATU",
-        "BIIS"
-      ],
+      "contributing_partners": ["ATU", "BIIS"],
       "tasks": [
         {
           "task_id": "T4-01",
@@ -217,12 +203,7 @@
         "Conduct clinical expert validation with specialist sub-agents for imaging, lab, and guideline reasoning."
       ],
       "lead_partner": "NIHS",
-      "contributing_partners": [
-        "ATU",
-        "BIIS",
-        "BAL",
-        "FIIT"
-      ],
+      "contributing_partners": ["ATU", "BIIS", "BAL", "FIIT"],
       "tasks": [
         {
           "task_id": "T5-01",
@@ -276,12 +257,7 @@
         "Validate multi-agent real-time coordination across production segments in a pilot factory over a 3-month operational period."
       ],
       "lead_partner": "ISIA",
-      "contributing_partners": [
-        "ATU",
-        "CERIA",
-        "BAL",
-        "FIIT"
-      ],
+      "contributing_partners": ["ATU", "CERIA", "BAL", "FIIT"],
       "tasks": [
         {
           "task_id": "T6-01",
@@ -328,11 +304,7 @@
         "Confirm generalisability of the integrated MAESTRO architecture beyond specifically identified Apply AI sectors."
       ],
       "lead_partner": "ELI",
-      "contributing_partners": [
-        "CERIA",
-        "BAL",
-        "FIIT"
-      ],
+      "contributing_partners": ["CERIA", "BAL", "FIIT"],
       "tasks": [
         {
           "task_id": "T7-01",
@@ -379,15 +351,7 @@
         "Produce the MAESTRO benchmark suite for community adoption and coordinate validation through Testing and Experiment Facilities."
       ],
       "lead_partner": "FIIT",
-      "contributing_partners": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL"
-      ],
+      "contributing_partners": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL"],
       "tasks": [
         {
           "task_id": "T8-01",
@@ -434,12 +398,7 @@
         "Execute consortium exploitation strategy and maintain project communication, website, and public engagement."
       ],
       "lead_partner": "BAL",
-      "contributing_partners": [
-        "ATU",
-        "ISIA",
-        "ELI",
-        "FIIT"
-      ],
+      "contributing_partners": ["ATU", "ISIA", "ELI", "FIIT"],
       "tasks": [
         {
           "task_id": "T9-01",
@@ -481,42 +440,16 @@
   ],
   "dependency_map": {
     "nodes": [
-      "WP1",
-      "WP2",
-      "WP3",
-      "WP4",
-      "WP5",
-      "WP6",
-      "WP7",
-      "WP8",
-      "WP9",
-      "T1-01",
-      "T1-02",
-      "T1-03",
-      "T2-01",
-      "T2-02",
-      "T2-03",
-      "T3-01",
-      "T3-02",
-      "T3-03",
-      "T4-01",
-      "T4-02",
-      "T4-03",
-      "T5-01",
-      "T5-02",
-      "T5-03",
-      "T6-01",
-      "T6-02",
-      "T6-03",
-      "T7-01",
-      "T7-02",
-      "T7-03",
-      "T8-01",
-      "T8-02",
-      "T8-03",
-      "T9-01",
-      "T9-02",
-      "T9-03"
+      "WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9",
+      "T1-01", "T1-02", "T1-03",
+      "T2-01", "T2-02", "T2-03",
+      "T3-01", "T3-02", "T3-03",
+      "T4-01", "T4-02", "T4-03",
+      "T5-01", "T5-02", "T5-03",
+      "T6-01", "T6-02", "T6-03",
+      "T7-01", "T7-02", "T7-03",
+      "T8-01", "T8-02", "T8-03",
+      "T9-01", "T9-02", "T9-03"
     ],
     "edges": [
       {
@@ -612,115 +545,49 @@
     ],
     "cycle_detected": false,
     "cycle_flags": [],
-    "critical_path_nodes": [
-      "T2-03",
-      "T8-02",
-      "T9-01"
-    ],
+    "critical_path_nodes": ["T2-03", "T8-02", "T9-01"],
     "critical_path_derivation_note": "Kahn's topological sort confirmed no cycles across all 36 nodes and 15 edges. Longest-path DP applied over the DAG: maximum path length is 2 edges (3 nodes). Multiple tied critical paths of equal length exist (e.g. T3-03→T8-02→T9-01; T4-03→T8-02→T9-01; T5-03→T8-03→T9-02; T6-03→T8-03→T9-02; T7-03→T8-03→T9-02). Representative path T2-03→T8-02→T9-01 selected as the primary research-to-integration-to-dissemination chain. Note: intra-WP task sequencing is not represented in dependency_map edges (tasks lack explicit depends_on fields in wp_structure.json); the full project critical path would be longer if intra-WP edges were added by a subsequent enrichment pass."
   },
   "partner_role_matrix": [
     {
       "partner_id": "ATU",
-      "wps_as_lead": [
-        "WP1",
-        "WP2"
-      ],
-      "wps_as_contributor": [
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP8",
-        "WP9"
-      ]
+      "wps_as_lead": ["WP1", "WP2"],
+      "wps_as_contributor": ["WP3", "WP4", "WP5", "WP6", "WP8", "WP9"]
     },
     {
       "partner_id": "CERIA",
-      "wps_as_lead": [
-        "WP4"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP6",
-        "WP7",
-        "WP8"
-      ]
+      "wps_as_lead": ["WP4"],
+      "wps_as_contributor": ["WP1", "WP2", "WP3", "WP6", "WP7", "WP8"]
     },
     {
       "partner_id": "BIIS",
-      "wps_as_lead": [
-        "WP3"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP2",
-        "WP4",
-        "WP5",
-        "WP8"
-      ]
+      "wps_as_lead": ["WP3"],
+      "wps_as_contributor": ["WP1", "WP2", "WP4", "WP5", "WP8"]
     },
     {
       "partner_id": "ISIA",
-      "wps_as_lead": [
-        "WP6"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP8",
-        "WP9"
-      ]
+      "wps_as_lead": ["WP6"],
+      "wps_as_contributor": ["WP1", "WP8", "WP9"]
     },
     {
       "partner_id": "NIHS",
-      "wps_as_lead": [
-        "WP5"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP8"
-      ]
+      "wps_as_lead": ["WP5"],
+      "wps_as_contributor": ["WP1", "WP8"]
     },
     {
       "partner_id": "ELI",
-      "wps_as_lead": [
-        "WP7"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP8",
-        "WP9"
-      ]
+      "wps_as_lead": ["WP7"],
+      "wps_as_contributor": ["WP1", "WP8", "WP9"]
     },
     {
       "partner_id": "BAL",
-      "wps_as_lead": [
-        "WP9"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8"
-      ]
+      "wps_as_lead": ["WP9"],
+      "wps_as_contributor": ["WP1", "WP2", "WP3", "WP5", "WP6", "WP7", "WP8"]
     },
     {
       "partner_id": "FIIT",
-      "wps_as_lead": [
-        "WP8"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP9"
-      ]
+      "wps_as_lead": ["WP8"],
+      "wps_as_contributor": ["WP1", "WP5", "WP6", "WP7", "WP9"]
     }
   ],
   "normalization_issues": [
@@ -729,85 +596,35 @@
       "severity": "advisory",
       "category": "field_normalization",
       "description": "Seed field 'id' mapped to canonical 'wp_id'; seed field 'lead' mapped to canonical 'lead_partner'; seed field 'participants' expanded to 'contributing_partners' excluding the lead_partner.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     },
     {
       "issue_id": "NI-02",
       "severity": "advisory",
       "category": "objectives_synthesized",
       "description": "Seed contains 'objectives_addressed' with OBJ reference IDs only; no objectives text present. Objective statements synthesized from WP title and description for all 9 WPs.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     },
     {
       "issue_id": "NI-03",
       "severity": "advisory",
       "category": "tasks_synthesized",
       "description": "Seed contains no tasks for any WP. Three compact tasks per WP synthesized from WP title and objectives. Responsible partner set to WP lead_partner in all cases.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     },
     {
       "issue_id": "NI-04",
       "severity": "advisory",
       "category": "deliverables_synthesized",
       "description": "Seed contains no deliverables for any WP. Deliverables synthesized from WP objectives; due_months set at or before WP end_month; types assigned as report/software/dataset/other as appropriate; responsible partner set to WP lead_partner.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     },
     {
       "issue_id": "NI-05",
       "severity": "advisory",
       "category": "dependencies_absent",
       "description": "Seed contains no 'dependencies' arrays for any WP. All WP dependencies set to empty arrays; dependency_map edges are empty. WP-level dependency resolution delegated to wp-dependency-analysis.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     },
     {
       "issue_id": "NI-06",
@@ -828,17 +645,10 @@
       "severity": "advisory",
       "category": "intra_wp_edges_absent",
       "description": "Task data in wp_structure.json contains no explicit depends_on fields for intra-WP task sequencing. wp-dependency-analysis populated only cross-WP task edges (Source B). Intra-WP sequential edges (e.g. T2-01→T2-02→T2-03) are not represented in dependency_map.edges. Critical path computation reflects cross-WP topology only; the effective project critical path is longer when intra-WP sequencing is included. A subsequent enrichment pass with explicit task dependency data is recommended before Phase 4 Gantt construction.",
-      "affected_wps": [
-        "WP1",
-        "WP2",
-        "WP3",
-        "WP4",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP8",
-        "WP9"
-      ]
+      "affected_wps": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"]
     }
   ]
 }
+```
+
+=== END ===
