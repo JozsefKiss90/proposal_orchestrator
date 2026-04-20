@@ -351,6 +351,102 @@ class TestAllPartnersInTier3:
         assert not result.passed
         assert result.failure_category == MALFORMED_ARTIFACT
 
+    def test_pass_wrapped_array_with_short_name(self, tmp_path):
+        """partners.json in {"partners": [...]} form using short_name field."""
+        wp_data = {
+            "schema_id": "orch.phase3.wp_structure.v1",
+            "run_id": "run-001",
+            "work_packages": [
+                {
+                    "wp_id": "WP1",
+                    "title": "WP 1",
+                    "lead_partner": "ATU",
+                    "contributing_partners": ["CERIA", "BIIS"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D1.1"}],
+                },
+            ],
+        }
+        wp_p = _write(tmp_path, "wp_structure.json", wp_data)
+        par_p = _write(tmp_path, "partners.json", {
+            "partners": [
+                {"partner_number": 1, "short_name": "ATU", "legal_name": "Alpenstadt TU",
+                 "country": "DE", "coordinator": True},
+                {"partner_number": 2, "short_name": "CERIA", "legal_name": "CERIA",
+                 "country": "FR", "coordinator": False},
+                {"partner_number": 3, "short_name": "BIIS", "legal_name": "BIIS",
+                 "country": "NL", "coordinator": False},
+            ]
+        })
+        result = all_partners_in_tier3(wp_p, par_p)
+        assert result.passed
+
+    def test_fail_wrapped_array_missing_partner(self, tmp_path):
+        """Wrapped array partners.json with one partner missing → fail."""
+        wp_data = {
+            "schema_id": "orch.phase3.wp_structure.v1",
+            "run_id": "run-001",
+            "work_packages": [
+                {
+                    "wp_id": "WP1",
+                    "lead_partner": "ATU",
+                    "contributing_partners": ["UNKNOWN_PARTNER"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D1.1"}],
+                },
+            ],
+        }
+        wp_p = _write(tmp_path, "wp_structure.json", wp_data)
+        par_p = _write(tmp_path, "partners.json", {
+            "partners": [
+                {"short_name": "ATU", "legal_name": "Alpenstadt TU"},
+            ]
+        })
+        result = all_partners_in_tier3(wp_p, par_p)
+        assert not result.passed
+        assert result.failure_category == CROSS_ARTIFACT_INCONSISTENCY
+        assert "UNKNOWN_PARTNER" in result.details["missing_from_tier3"]
+
+    def test_pass_short_name_in_flat_array(self, tmp_path):
+        """Flat array partners.json with short_name field (no partner_id/id)."""
+        wp_p = _write(tmp_path, "wp_structure.json", _WP_STRUCTURE)
+        par_p = _write(tmp_path, "partners.json", [
+            {"short_name": "UNIV_A", "legal_name": "University A"},
+            {"short_name": "INST_B", "legal_name": "Institute B"},
+        ])
+        result = all_partners_in_tier3(wp_p, par_p)
+        assert result.passed
+
+    def test_pass_real_consortium_structure(self, tmp_path):
+        """Full real-like consortium structure with 8 partners in wrapped array form."""
+        partners = [
+            "ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"
+        ]
+        wp_data = {
+            "schema_id": "orch.phase3.wp_structure.v1",
+            "run_id": "run-001",
+            "work_packages": [
+                {
+                    "wp_id": "WP1",
+                    "lead_partner": "ATU",
+                    "contributing_partners": ["CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D1.1"}],
+                },
+            ],
+        }
+        wp_p = _write(tmp_path, "wp_structure.json", wp_data)
+        par_p = _write(tmp_path, "partners.json", {
+            "partners": [
+                {"partner_number": i + 1, "short_name": sn, "legal_name": f"Org {sn}",
+                 "country": "XX", "coordinator": i == 0}
+                for i, sn in enumerate(partners)
+            ]
+        })
+        result = all_partners_in_tier3(wp_p, par_p)
+        assert result.passed
+        assert result.details["partners_checked"] == 8
+
 
 # ===========================================================================
 # §all_management_roles_in_tier3
@@ -928,3 +1024,109 @@ class TestPartnerBudgetCoverageMatch:
         result = partner_budget_coverage_match(par_p, budget_dir)
         assert not result.passed
         assert result.failure_category == MALFORMED_ARTIFACT
+
+
+# ===========================================================================
+# §gate_and_gate_enforcement_alignment — integration-style sanity checks
+# ===========================================================================
+
+
+class TestGateAndGateEnforcementAlignment:
+    """
+    Focused integration-style tests ensuring the real gate predicate
+    (all_partners_in_tier3) produces results consistent with the actual
+    Tier 3 consortium structure used by the project.
+
+    These tests verify that the predicate correctly resolves partner
+    identifiers from the same ``partners.json`` format that the
+    gate-enforcement skill reads.  If these tests pass, there is no
+    semantic drift between the real gate evaluator and the gate-enforcement
+    evidence on partner coverage.
+    """
+
+    def test_alignment_wrapped_array_short_name_matches_wp_partners(self, tmp_path):
+        """
+        Given a wrapped-array partners.json using short_name and a
+        wp_structure.json referencing the same short names:
+        - all_partners_in_tier3 must pass
+        - the partner set resolved from partners.json matches the WP references
+
+        This is the exact scenario where the real gate evaluator and
+        gate-enforcement evidence previously disagreed.
+        """
+        partner_names = ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"]
+        partners_data = {
+            "partners": [
+                {
+                    "partner_number": i + 1,
+                    "short_name": sn,
+                    "legal_name": f"Organisation {sn}",
+                    "country": "XX",
+                    "organisation_type": "HES",
+                    "coordinator": i == 0,
+                }
+                for i, sn in enumerate(partner_names)
+            ]
+        }
+        wp_data = {
+            "schema_id": "orch.phase3.wp_structure.v1",
+            "run_id": "test-alignment",
+            "work_packages": [
+                {
+                    "wp_id": "WP1",
+                    "lead_partner": "ATU",
+                    "contributing_partners": ["CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D1.1"}],
+                },
+                {
+                    "wp_id": "WP2",
+                    "lead_partner": "CERIA",
+                    "contributing_partners": ["ATU", "BIIS"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D2.1"}],
+                },
+            ],
+        }
+
+        wp_p = _write(tmp_path, "wp_structure.json", wp_data)
+        par_p = _write(tmp_path, "partners.json", partners_data)
+        result = all_partners_in_tier3(wp_p, par_p)
+
+        assert result.passed, (
+            f"all_partners_in_tier3 failed but should pass: {result.reason}"
+        )
+        assert result.details["partners_checked"] == 8
+        assert result.details["all_found_in_tier3"] is True
+
+    def test_alignment_unknown_partner_still_fails(self, tmp_path):
+        """
+        Even with the wrapped-array format fix, referencing a truly
+        unknown partner must still fail.
+        """
+        partners_data = {
+            "partners": [
+                {"short_name": "ATU", "legal_name": "Alpenstadt TU"},
+            ]
+        }
+        wp_data = {
+            "schema_id": "orch.phase3.wp_structure.v1",
+            "run_id": "test-alignment",
+            "work_packages": [
+                {
+                    "wp_id": "WP1",
+                    "lead_partner": "ATU",
+                    "contributing_partners": ["NONEXISTENT_ORG"],
+                    "tasks": [],
+                    "deliverables": [{"deliverable_id": "D1.1"}],
+                },
+            ],
+        }
+
+        wp_p = _write(tmp_path, "wp_structure.json", wp_data)
+        par_p = _write(tmp_path, "partners.json", partners_data)
+        result = all_partners_in_tier3(wp_p, par_p)
+
+        assert not result.passed
+        assert result.failure_category == CROSS_ARTIFACT_INCONSISTENCY
+        assert "NONEXISTENT_ORG" in result.details["missing_from_tier3"]

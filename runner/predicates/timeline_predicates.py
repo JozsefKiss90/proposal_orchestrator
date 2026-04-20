@@ -108,13 +108,17 @@ form is present.  Since the predicate signature ``wp_count_within_limit(wp_path,
 schema_path)`` does not receive an instrument_type argument, the following
 resolution rule is applied:
 
-1.  Collect all ``max_work_packages`` integer values found across all
-    instrument entries in the registry.
-2.  If no values are found → fail with MALFORMED_ARTIFACT (missing constraint).
-3.  If one or more values are found → use the **minimum** (most conservative /
-    strictest constraint).  This is the narrowest correct interpretation: if the
-    active instrument cannot be determined from the predicate's inputs alone, the
-    strictest available constraint is applied to avoid false passes.
+1.  Collect all ``max_work_packages`` values across all instrument entries,
+    distinguishing integer values from explicit ``null``.
+2.  If no instrument entries exist → fail with MALFORMED_ARTIFACT.
+3.  If instrument entries exist but none define ``max_work_packages`` at all
+    → fail with MALFORMED_ARTIFACT (field required but absent).
+4.  If all ``max_work_packages`` values are ``null`` → **pass**.  A null
+    value means the source document defines no explicit hard numeric upper
+    bound; only proportionality guidance exists.  The predicate has no
+    numeric constraint to enforce.
+5.  If one or more integer values are found → use the **minimum** (most
+    conservative / strictest constraint).
 
 This interpretation is documented here and encoded in the tests.  When the
 full runner (Step 10) resolves instrument_type from the gate context and passes
@@ -228,34 +232,55 @@ def _read_json_object(
     return parsed, None
 
 
-def _extract_max_wp_values(registry: dict) -> List[int]:
+def _extract_max_wp_values(
+    registry: dict,
+) -> tuple[List[int], bool, bool]:
     """
-    Extract all ``max_work_packages`` integer values from the section schema
+    Extract all ``max_work_packages`` values from the section schema
     registry, supporting both known formats (see module docstring).
 
-    Returns a list of non-negative integers found.  Empty list means no
-    ``max_work_packages`` constraint is present anywhere in the registry.
+    Returns a 3-tuple:
+        ``(integer_limits, null_found, has_instrument_entries)``
+
+    - ``integer_limits``: list of non-negative integer values found across
+      all instrument entries.
+    - ``null_found``: ``True`` if at least one instrument entry has
+      ``max_work_packages`` explicitly set to ``null``, meaning no hard
+      numeric upper bound is defined by the source document.
+    - ``has_instrument_entries``: ``True`` if the registry contains at
+      least one instrument entry (dict) regardless of whether it has a
+      ``max_work_packages`` field.
     """
     found: List[int] = []
+    null_found: bool = False
+    has_instrument_entries: bool = False
 
     # Form B: top-level ``instruments`` array
     instruments_raw = registry.get("instruments")
     if isinstance(instruments_raw, list):
         for entry in instruments_raw:
             if isinstance(entry, dict):
-                mwp = entry.get("max_work_packages")
-                if isinstance(mwp, int) and not isinstance(mwp, bool):
-                    found.append(mwp)
-        return found
+                has_instrument_entries = True
+                if "max_work_packages" in entry:
+                    mwp = entry["max_work_packages"]
+                    if mwp is None:
+                        null_found = True
+                    elif isinstance(mwp, int) and not isinstance(mwp, bool):
+                        found.append(mwp)
+        return found, null_found, has_instrument_entries
 
     # Form A: top-level keys are instrument-type strings, values are dicts
     for value in registry.values():
         if isinstance(value, dict):
-            mwp = value.get("max_work_packages")
-            if isinstance(mwp, int) and not isinstance(mwp, bool):
-                found.append(mwp)
+            has_instrument_entries = True
+            if "max_work_packages" in value:
+                mwp = value["max_work_packages"]
+                if mwp is None:
+                    null_found = True
+                elif isinstance(mwp, int) and not isinstance(mwp, bool):
+                    found.append(mwp)
 
-    return found
+    return found, null_found, has_instrument_entries
 
 
 # ---------------------------------------------------------------------------
@@ -592,11 +617,17 @@ def wp_count_within_limit(
     Registry format and instrument selection
     -----------------------------------------
     See module docstring.  Both Form A (object with instrument-type keys) and
-    Form B (object with ``instruments`` array) are supported.  When the registry
-    contains multiple instrument entries, the **minimum** max_work_packages
-    found is used as the binding constraint (most conservative interpretation).
-    This ensures the predicate never produces a false pass when the active
-    instrument cannot be determined from the available inputs alone.
+    Form B (object with ``instruments`` array) are supported.
+
+    When ``max_work_packages`` is ``null`` for all instrument entries, the
+    predicate passes because no hard numeric constraint is defined in the
+    source document.
+
+    When the registry contains multiple instrument entries with integer
+    limits, the **minimum** max_work_packages found is used as the binding
+    constraint (most conservative interpretation).  This ensures the
+    predicate never produces a false pass when the active instrument cannot
+    be determined from the available inputs alone.
     """
     wp_resolved = resolve_repo_path(wp_path, repo_root)
     schema_resolved = resolve_repo_path(schema_path, repo_root)
@@ -624,15 +655,50 @@ def wp_count_within_limit(
     wp_count = len(wps_raw)
 
     # --- Extract max_work_packages from registry ---
-    max_values = _extract_max_wp_values(schema_data)
-    if not max_values:
+    max_values, null_found, has_entries = _extract_max_wp_values(schema_data)
+
+    if not has_entries:
         return PredicateResult(
             passed=False,
             failure_category=MALFORMED_ARTIFACT,
             reason=(
-                "section_schema_registry.json contains no 'max_work_packages' "
-                "constraint in any instrument entry.  The registry must define "
-                "this limit for wp_count_within_limit to evaluate."
+                "section_schema_registry.json contains no instrument entries.  "
+                "The registry must contain at least one instrument definition "
+                "for wp_count_within_limit to evaluate."
+            ),
+            details={"path": str(schema_resolved)},
+        )
+
+    if not max_values:
+        if null_found:
+            # All instrument entries define max_work_packages as null,
+            # meaning no explicit hard numeric upper bound is specified in
+            # the source document.  The predicate passes because there is
+            # no constraint to violate.
+            return PredicateResult(
+                passed=True,
+                details={
+                    "wp_path": str(wp_resolved),
+                    "schema_path": str(schema_resolved),
+                    "wp_count": wp_count,
+                    "max_work_packages": None,
+                    "note": (
+                        "No hard numeric WP limit defined in the instrument "
+                        "schema (max_work_packages is null).  "
+                        "Proportionality guidance applies but no numeric "
+                        "constraint to enforce."
+                    ),
+                },
+            )
+        # No integer values AND no nulls found → field truly absent
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                "section_schema_registry.json contains instrument entries but "
+                "none define a 'max_work_packages' field.  The registry must "
+                "define this field (as an integer limit or null for no hard "
+                "constraint) for wp_count_within_limit to evaluate."
             ),
             details={"path": str(schema_resolved)},
         )

@@ -623,6 +623,130 @@ class TestWpCountWithinLimit:
         assert result.passed is True
         assert result.details["max_work_packages"] == 6
 
+    # -----------------------------------------------------------------------
+    # null max_work_packages — "no hard upper bound defined"
+    # -----------------------------------------------------------------------
+
+    def test_pass_null_max_wp_form_b(self, tmp_path):
+        """Form B registry with max_work_packages: null → pass (no hard constraint)."""
+        wp = _write(
+            tmp_path,
+            "wp_structure.json",
+            _wp_structure([f"WP{i}" for i in range(1, 9)]),  # 8 WPs
+        )
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {
+                "instruments": [
+                    {
+                        "instrument_type": "RIA",
+                        "max_work_packages": None,
+                        "max_work_packages_note": "No maximum stated in form.",
+                    }
+                ]
+            },
+        )
+        result = wp_count_within_limit(wp, schema)
+        assert result.passed is True
+        assert result.details["max_work_packages"] is None
+        assert "no hard numeric wp limit" in result.details.get("note", "").lower()
+
+    def test_pass_null_max_wp_form_a(self, tmp_path):
+        """Form A registry with max_work_packages: null → pass (no hard constraint)."""
+        wp = _write(
+            tmp_path,
+            "wp_structure.json",
+            _wp_structure([f"WP{i}" for i in range(1, 11)]),  # 10 WPs
+        )
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {"RIA": {"max_work_packages": None, "sections": []}},
+        )
+        result = wp_count_within_limit(wp, schema)
+        assert result.passed is True
+        assert result.details["max_work_packages"] is None
+
+    def test_mixed_null_and_integer_uses_integer(self, tmp_path):
+        """Registry with one null and one integer limit → uses the integer."""
+        wp = _write(
+            tmp_path,
+            "wp_structure.json",
+            _wp_structure([f"WP{i}" for i in range(1, 8)]),  # 7 WPs
+        )
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {
+                "RIA": {"max_work_packages": None},  # null
+                "IA": {"max_work_packages": 6},  # integer
+            },
+        )
+        result = wp_count_within_limit(wp, schema)
+        # 7 > 6 → should fail using the integer limit
+        assert result.passed is False
+        assert result.failure_category == POLICY_VIOLATION
+        assert result.details["max_work_packages"] == 6
+
+    def test_fail_no_instrument_entries_at_all(self, tmp_path):
+        """Empty registry with no instrument entries → MALFORMED_ARTIFACT."""
+        wp = _write(tmp_path, "wp_structure.json", _wp_structure(["WP1"]))
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {"instruments": []},  # no entries
+        )
+        result = wp_count_within_limit(wp, schema)
+        assert result.passed is False
+        assert result.failure_category == MALFORMED_ARTIFACT
+        assert "no instrument entries" in result.reason.lower()
+
+    def test_fail_field_absent_not_null(self, tmp_path):
+        """Instrument entry exists but max_work_packages field absent → MALFORMED_ARTIFACT."""
+        wp = _write(tmp_path, "wp_structure.json", _wp_structure(["WP1"]))
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {"RIA": {"sections": []}},  # no max_work_packages key at all
+        )
+        result = wp_count_within_limit(wp, schema)
+        assert result.passed is False
+        assert result.failure_category == MALFORMED_ARTIFACT
+
+    def test_pass_real_registry_shape(self, tmp_path):
+        """Registry matching the real section_schema_registry.json shape with null max → pass."""
+        wp = _write(
+            tmp_path,
+            "wp_structure.json",
+            _wp_structure([f"WP{i}" for i in range(1, 9)]),  # 8 WPs
+        )
+        # Mimics the actual repo structure
+        schema = _write(
+            tmp_path,
+            "section_schema_registry.json",
+            {
+                "instruments": [
+                    {
+                        "instrument_type": "RIA",
+                        "evaluation_form_ref": "ef_he-ria-ia_en.pdf",
+                        "max_work_packages": None,
+                        "max_work_packages_note": (
+                            "No maximum work package count stated in form. "
+                            "Form states: 'the number of work packages should be "
+                            "proportionate to the scale and complexity of the project.'"
+                        ),
+                        "source_document": "af_he-ria-ia_en.pdf",
+                        "sections": [],
+                    }
+                ]
+            },
+        )
+        result = wp_count_within_limit(wp, schema)
+        assert result.passed is True
+        assert result.details["wp_count"] == 8
+        assert result.details["max_work_packages"] is None
+
 
 # ===========================================================================
 # critical_path_present

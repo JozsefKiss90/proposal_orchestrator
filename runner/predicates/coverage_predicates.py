@@ -30,18 +30,21 @@ missing required structural fields.
 Bounded extraction strategies
 ---------------------------------------------------------------------------
 
-partners.json (Tier 3 consortium/partners.json) — unknown format
-----------------------------------------------------------------
+partners.json (Tier 3 consortium/partners.json)
+-------------------------------------------------
 partners.json is a manually-placed Tier 3 artifact with no mandated
-schema_id or run_id.  Its format is not yet defined (empty {} placeholder).
-Two sub-cases are supported:
+schema_id or run_id.  Four structural forms are supported:
 
-* **Array form**: each element is a dict; partner_id extracted from the
-  ``partner_id`` field if present, else the ``id`` field.
+* **Array form**: top-level list of partner dicts.
+* **Wrapped array form**: ``{"partners": [...]}`` — a dict with a
+  ``partners`` key whose value is a list of partner dicts.
 * **Object — dict-of-entries**: keys are partner identifiers (top-level
   dict values that are dicts); the key is the partner_id.
-* **Object — single entry**: dict has a top-level ``partner_id`` or ``id``
-  field; treated as a single partner entry.
+* **Object — single entry**: dict has a top-level ``partner_id``, ``id``,
+  or ``short_name`` field; treated as a single partner entry.
+
+Within each partner dict, the identifier is resolved by field priority:
+``partner_id`` → ``id`` → ``short_name``.
 
 expected_impacts.json (Tier 2B extracted) — unknown format
 ----------------------------------------------------------
@@ -210,6 +213,38 @@ def _read_json_any(
 # ---------------------------------------------------------------------------
 
 
+def _extract_partner_ids_from_array(
+    items: list,
+    resolved: Path,
+) -> tuple[Optional[Set[str]], Optional[PredicateResult]]:
+    """
+    Extract partner identifier strings from a list of partner entry dicts.
+
+    Field resolution priority: ``partner_id`` → ``id`` → ``short_name``.
+    Returns (set[str], None) or (None, error PredicateResult).
+    """
+    ids: Set[str] = set()
+    for idx, item in enumerate(items):
+        if not isinstance(item, dict):
+            return None, PredicateResult(
+                passed=False,
+                failure_category=MALFORMED_ARTIFACT,
+                reason=(
+                    f"partners.json array element at index {idx} is not an object "
+                    f"(got {type(item).__name__}) in {resolved}."
+                ),
+                details={"path": str(resolved), "entry_index": idx},
+            )
+        pid = (
+            item.get("partner_id")
+            or item.get("id")
+            or item.get("short_name")
+        )
+        if isinstance(pid, str) and pid.strip():
+            ids.add(pid)
+    return ids, None
+
+
 def _extract_partner_ids(
     parsed: object,
     resolved: Path,
@@ -218,37 +253,38 @@ def _extract_partner_ids(
     Extract partner identifier strings from parsed partners.json.
 
     See module docstring for the full bounded traversal rules.
+
+    Supported formats:
+    * **Array form**: top-level list of partner dicts.
+    * **Wrapped array form**: ``{"partners": [...]}`` — dict with a
+      ``partners`` key whose value is a list of partner dicts.
+    * **Dict-of-entries**: top-level keys are partner identifiers (values
+      are dicts).
+    * **Single-entry form**: dict with a top-level ``partner_id``, ``id``,
+      or ``short_name`` field.
+
+    Within each partner dict, the identifier is resolved by priority:
+    ``partner_id`` → ``id`` → ``short_name``.
+
     Returns (set[str], None) or (None, error PredicateResult).
     """
     if isinstance(parsed, list):
-        ids: Set[str] = set()
-        for idx, item in enumerate(parsed):
-            if not isinstance(item, dict):
-                return None, PredicateResult(
-                    passed=False,
-                    failure_category=MALFORMED_ARTIFACT,
-                    reason=(
-                        f"partners.json array element at index {idx} is not an object "
-                        f"(got {type(item).__name__}) in {resolved}."
-                    ),
-                    details={"path": str(resolved), "entry_index": idx},
-                )
-            pid = item.get("partner_id") or item.get("id")
-            if isinstance(pid, str) and pid.strip():
-                ids.add(pid)
-        return ids, None
+        return _extract_partner_ids_from_array(parsed, resolved)
 
     if isinstance(parsed, dict):
-        # Single-entry form: dict has partner_id at top level
-        if "partner_id" in parsed:
-            pid = parsed["partner_id"]
-            if isinstance(pid, str) and pid.strip():
-                return {pid}, None
-            return set(), None
-        if "id" in parsed:
-            pid = parsed["id"]
-            if isinstance(pid, str) and pid.strip():
-                return {pid}, None
+        # Wrapped array form: {"partners": [...]}
+        partners_list = parsed.get("partners")
+        if isinstance(partners_list, list):
+            return _extract_partner_ids_from_array(partners_list, resolved)
+
+        # Single-entry form: dict has partner_id / id / short_name at top level
+        for field in ("partner_id", "id", "short_name"):
+            if field in parsed:
+                pid = parsed[field]
+                if isinstance(pid, str) and pid.strip():
+                    return {pid}, None
+                return set(), None
+
         # Dict-of-entries: keys are partner identifiers
         return {k for k, v in parsed.items() if isinstance(v, dict)}, None
 
