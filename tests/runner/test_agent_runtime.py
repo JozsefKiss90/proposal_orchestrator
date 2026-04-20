@@ -382,6 +382,260 @@ class TestSubAgentCoordination:
 
 
 # ---------------------------------------------------------------------------
+# Declarative sub-agent injection (manifest-driven, not skill-name coupled)
+# ---------------------------------------------------------------------------
+
+
+class TestDeclarativeSubAgentInjection:
+    """Verify sub-agent invocation is manifest-driven via artifact readiness,
+    not coupled to any hardcoded skill name."""
+
+    def test_sub_agent_invoked_by_artifact_readiness_not_skill_name(
+        self, tmp_path: Path,
+    ) -> None:
+        """Sub-agent triggers when its reads_from inputs appear on disk,
+        regardless of which skill produced them.  Uses non-standard skill
+        names to prove no coupling to 'work-package-normalization'."""
+        # Use completely different skill names — no reference to
+        # "work-package-normalization" anywhere in this test.
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="my_agent",
+            node_id="n03_wp_design",
+            skill_ids=["primary-alpha", "sub-beta", "primary-gamma"],
+            sub_agent_id="my_sub_agent",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier4/phase1/"],
+            extra_catalog_entries=[
+                {
+                    "id": "my_sub_agent",
+                    # Sub-agent reads from a directory that the primary
+                    # agent writes to — the key readiness trigger.
+                    "reads_from": ["docs/output_dir/"],
+                    "writes_to": ["docs/output_dir/"],
+                },
+            ],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        invoked: list[str] = []
+
+        def _track(skill_id, *args, **kw):
+            invoked.append(skill_id)
+            if skill_id == "primary-alpha":
+                # Simulate the primary skill writing the artifact that
+                # makes the sub-agent's inputs ready.
+                out_dir = tmp_path / "docs" / "output_dir"
+                out_dir.mkdir(parents=True, exist_ok=True)
+                _write_json(out_dir / "structure.json", {"wp": "data"})
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        # Sub-agent skill was invoked — triggered by artifact readiness,
+        # not by any skill name matching.
+        assert "sub-beta" in invoked
+        # Sub-agent was invoked AFTER primary-alpha (which created the artifact)
+        assert invoked.index("sub-beta") > invoked.index("primary-alpha")
+
+    def test_sub_agent_not_invoked_when_inputs_not_ready(
+        self, tmp_path: Path,
+    ) -> None:
+        """When the sub-agent's reads_from inputs are never produced,
+        the sub-agent is not invoked during the primary loop, and the
+        fallback fails closed."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="my_agent",
+            node_id="n03_wp_design",
+            skill_ids=["primary-alpha", "sub-beta"],
+            sub_agent_id="my_sub_agent",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier4/phase1/"],
+            extra_catalog_entries=[
+                {
+                    "id": "my_sub_agent",
+                    # Points to a directory that will NOT be created.
+                    "reads_from": ["docs/nonexistent_dir/"],
+                    "writes_to": [],
+                },
+            ],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        invoked: list[str] = []
+
+        def _track(skill_id, *args, **kw):
+            invoked.append(skill_id)
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        # Sub-agent skill was NOT invoked — inputs never became ready.
+        assert "sub-beta" not in invoked
+        # Fail closed: agent reports failure because sub-agent couldn't run.
+        assert result.status == "failure"
+        assert result.failure_category == "INCOMPLETE_OUTPUT"
+        assert "sub-agent" in (result.failure_reason or "").lower()
+
+    def test_sub_agent_invoked_at_correct_point_in_sequence(
+        self, tmp_path: Path,
+    ) -> None:
+        """Sub-agent skills are injected after the skill that makes
+        their inputs ready, not at the end of the sequence."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="my_agent",
+            node_id="n03_wp_design",
+            skill_ids=["step-one", "sub-work", "step-two"],
+            sub_agent_id="my_sub_agent",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier4/phase1/"],
+            extra_catalog_entries=[
+                {
+                    "id": "my_sub_agent",
+                    "reads_from": ["docs/sub_input/"],
+                    "writes_to": [],
+                },
+            ],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        invoked: list[str] = []
+
+        def _track(skill_id, *args, **kw):
+            invoked.append(skill_id)
+            if skill_id == "step-one":
+                # Create the sub-agent's required input directory.
+                d = tmp_path / "docs" / "sub_input"
+                d.mkdir(parents=True, exist_ok=True)
+                _write_json(d / "data.json", {"ready": True})
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        # Execution order: step-one → sub-work → step-two
+        assert invoked.index("step-one") < invoked.index("sub-work")
+        assert invoked.index("sub-work") < invoked.index("step-two")
+
+    def test_no_sub_agent_unchanged_behavior(self, tmp_path: Path) -> None:
+        """Nodes without a declared sub_agent execute normally."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["alpha", "beta"],
+            sub_agent_id=None,
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        invoked: list[str] = []
+
+        def _track(skill_id, *args, **kw):
+            invoked.append(skill_id)
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        assert invoked == ["alpha", "beta"]
+
+    def test_no_hardcoded_skill_name_trigger_in_source(self) -> None:
+        """Confirm agent_runtime.py no longer contains the hardcoded
+        'work-package-normalization' trigger string as a controlling
+        mechanism for sub-agent invocation."""
+        import runner.agent_runtime as mod
+
+        source = Path(mod.__file__).read_text(encoding="utf-8")
+        # The old _should_invoke_sub_agent function must be gone.
+        assert "_should_invoke_sub_agent" not in source
+        # No runtime decision based on the literal skill name.
+        # (The string may appear in comments explaining history,
+        # but not in executable if/elif branches.)
+        lines = source.splitlines()
+        for line in lines:
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                continue  # skip comments
+            assert (
+                '"work-package-normalization"' not in stripped
+                and "'work-package-normalization'" not in stripped
+            ), (
+                f"Hardcoded skill-name trigger found in executable code: "
+                f"{line!r}"
+            )
+
+    def test_manifest_declared_sub_agent_is_controlling_factor(
+        self, tmp_path: Path,
+    ) -> None:
+        """When the manifest declares a sub_agent, its invocation is
+        driven by agent_catalog reads_from readiness — not by any
+        heuristic or prompt parsing."""
+        # Use a totally novel agent/sub-agent pair with no resemblance
+        # to Phase 3 names.  If this works, the mechanism is generic.
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="novel_agent",
+            node_id="n99_novel",
+            skill_ids=["novel-build", "sub-novel-enrich", "novel-check"],
+            sub_agent_id="novel_sub",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier4/phase1/"],
+            extra_catalog_entries=[
+                {
+                    "id": "novel_sub",
+                    "reads_from": ["docs/novel_ready/"],
+                    "writes_to": ["docs/novel_ready/"],
+                },
+            ],
+            artifact_registry=[
+                {
+                    "path": "docs/tier4/phase1/output.json",
+                    "produced_by": "n99_novel",
+                    "tier": "tier4_phase_output",
+                },
+            ],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        invoked: list[str] = []
+
+        def _track(skill_id, *args, **kw):
+            invoked.append(skill_id)
+            if skill_id == "novel-build":
+                d = tmp_path / "docs" / "novel_ready"
+                d.mkdir(parents=True, exist_ok=True)
+                _write_json(d / "artifact.json", {"built": True})
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        assert "sub-novel-enrich" in invoked
+        assert invoked.index("novel-build") < invoked.index("sub-novel-enrich")
+
+
+# ---------------------------------------------------------------------------
 # §14 test 10 — n07 pre_gate_agent coordination
 # ---------------------------------------------------------------------------
 

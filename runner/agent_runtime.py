@@ -833,18 +833,15 @@ def run_agent(
                 resolved_inputs, result.outputs_written, repo_root
             )
 
-            # n03 sub-agent injection point: after the primary agent's
-            # structure-producing skills have run, invoke the sub-agent's
-            # skills (e.g. wp-dependency-analysis after work-package-
-            # normalization produces wp_structure.json).
+            # Manifest-driven sub-agent injection: after each
+            # successful primary skill, check whether the declared
+            # sub-agent's required inputs are now present on disk.
+            # The readiness check uses the sub-agent's reads_from
+            # paths from agent_catalog.yaml — no coupling to any
+            # specific skill name.
             if sub_agent_id is not None and sub_agent_skills:
-                # Check if we should inject sub-agent skills now.
-                # Heuristic: invoke after the first skill that writes to
-                # the same output directory as the sub-agent reads from.
-                # For n03, this means after work-package-normalization
-                # writes wp_structure.json.
-                if _should_invoke_sub_agent(
-                    sid, sub_agent_skills, repo_root
+                if _sub_agent_inputs_ready(
+                    sub_agent_id, repo_root
                 ):
                     for sub_sid in sub_agent_skills:
                         sub_result = run_skill(
@@ -926,50 +923,72 @@ def run_agent(
             )
             failure_category_accumulator = "SKILL_FAILURE"
 
-    # Invoke any remaining sub-agent skills that weren't triggered by
-    # the injection heuristic (defensive: ensures they always run).
+    # Invoke any remaining sub-agent skills that weren't triggered
+    # during the primary skill loop.  Check artifact readiness first:
+    # if the sub-agent's declared inputs are not on disk, the parent
+    # agent failed to produce the required artifacts — fail closed.
     if sub_agent_id is not None and sub_agent_skills:
-        for sub_sid in sub_agent_skills:
-            sub_result = run_skill(
-                sub_sid, run_id, repo_root, resolved_inputs
-            )
-            sub_record = SkillInvocationRecord(
-                skill_id=sub_sid,
-                status=sub_result.status,
-                failure_reason=sub_result.failure_reason,
-                failure_category=sub_result.failure_category,
-                outputs_written=list(sub_result.outputs_written),
-            )
-            all_invocations.append(sub_record)
+        if _sub_agent_inputs_ready(sub_agent_id, repo_root):
+            for sub_sid in sub_agent_skills:
+                sub_result = run_skill(
+                    sub_sid, run_id, repo_root, resolved_inputs
+                )
+                sub_record = SkillInvocationRecord(
+                    skill_id=sub_sid,
+                    status=sub_result.status,
+                    failure_reason=sub_result.failure_reason,
+                    failure_category=sub_result.failure_category,
+                    outputs_written=list(sub_result.outputs_written),
+                )
+                all_invocations.append(sub_record)
 
-            if sub_result.status == "success":
-                all_outputs.extend(sub_result.outputs_written)
-                if sub_result.validation_report:
-                    all_validation_reports.append(sub_result.validation_report)
-                _refresh_inputs_from_outputs(
-                    resolved_inputs, sub_result.outputs_written, repo_root
-                )
-            else:
-                if sub_result.failure_category == "CONSTITUTIONAL_HALT":
-                    return AgentResult(
-                        status="failure",
-                        can_evaluate_exit_gate=False,
-                        failure_reason=(
-                            f"CONSTITUTIONAL_HALT from sub-agent skill "
-                            f"{sub_sid!r}: {sub_result.failure_reason}"
-                        ),
-                        failure_category="CONSTITUTIONAL_HALT",
-                        outputs_written=all_outputs,
-                        validation_reports=all_validation_reports,
-                        decision_log_writes=all_decision_log_writes,
-                        invoked_skills=all_invocations,
+                if sub_result.status == "success":
+                    all_outputs.extend(sub_result.outputs_written)
+                    if sub_result.validation_report:
+                        all_validation_reports.append(
+                            sub_result.validation_report
+                        )
+                    _refresh_inputs_from_outputs(
+                        resolved_inputs, sub_result.outputs_written, repo_root
                     )
-                had_failure = True
-                failure_reason_accumulator = (
-                    f"Sub-agent skill {sub_sid!r} failed: "
-                    f"{sub_result.failure_reason}"
-                )
-                failure_category_accumulator = "SKILL_FAILURE"
+                else:
+                    if sub_result.failure_category == "CONSTITUTIONAL_HALT":
+                        return AgentResult(
+                            status="failure",
+                            can_evaluate_exit_gate=False,
+                            failure_reason=(
+                                f"CONSTITUTIONAL_HALT from sub-agent skill "
+                                f"{sub_sid!r}: {sub_result.failure_reason}"
+                            ),
+                            failure_category="CONSTITUTIONAL_HALT",
+                            outputs_written=all_outputs,
+                            validation_reports=all_validation_reports,
+                            decision_log_writes=all_decision_log_writes,
+                            invoked_skills=all_invocations,
+                        )
+                    had_failure = True
+                    failure_reason_accumulator = (
+                        f"Sub-agent skill {sub_sid!r} failed: "
+                        f"{sub_result.failure_reason}"
+                    )
+                    failure_category_accumulator = "SKILL_FAILURE"
+        else:
+            # Sub-agent's declared inputs are not on disk — the
+            # parent agent did not produce the required artifacts.
+            # Fail closed per CLAUDE.md §6.5.
+            had_failure = True
+            failure_reason_accumulator = (
+                f"Declared sub-agent {sub_agent_id!r} cannot run: "
+                f"its required inputs (from agent_catalog.yaml "
+                f"reads_from) are not present on disk; the parent "
+                f"agent did not produce the required artifacts"
+            )
+            failure_category_accumulator = "INCOMPLETE_OUTPUT"
+            logger.warning(
+                "Sub-agent %s inputs not ready at fallback; "
+                "failing closed",
+                sub_agent_id,
+            )
 
     # ── Phase E: Gate-readiness determination ──────────────────────────
 
@@ -1081,21 +1100,46 @@ def _refresh_inputs_from_outputs(
                 pass  # Skill already validated; skip on re-read error
 
 
-def _should_invoke_sub_agent(
-    just_completed_skill_id: str,
-    sub_agent_skills: list[str],
+def _sub_agent_inputs_ready(
+    sub_agent_id: str,
     repo_root: Path,
 ) -> bool:
-    """Determine whether sub-agent skills should be invoked now.
+    """Check whether a declared sub-agent's required inputs exist on disk.
 
-    For n03: the sub-agent (dependency_mapper) should run after
-    work-package-normalization has produced wp_structure.json.
+    Resolves the sub-agent's ``reads_from`` paths from
+    ``agent_catalog.yaml`` and verifies each path exists and is
+    non-empty.  This is a **manifest-driven artifact-readiness check**:
+    sub-agent invocation timing is determined by the readiness of
+    declared inputs, not by the name of the skill that produced them.
 
-    This is a simple heuristic that checks if the just-completed skill
-    is ``work-package-normalization`` (the primary structure-producing
-    skill for n03).  For other nodes with sub-agents (if any arise in
-    the future), this can be extended.
+    Returns ``True`` when all declared inputs are ready for the
+    sub-agent to begin execution.
     """
-    if just_completed_skill_id == "work-package-normalization":
+    try:
+        sub_entry = _get_agent_entry(sub_agent_id, repo_root)
+    except AgentRuntimeError:
+        logger.warning(
+            "Sub-agent %s not found in agent catalog; inputs not ready",
+            sub_agent_id,
+        )
+        return False
+
+    reads_from = sub_entry.get("reads_from", [])
+    if not reads_from:
+        # No declared inputs — sub-agent is trivially ready.
         return True
-    return False
+
+    for rel_path in reads_from:
+        abs_path = repo_root / rel_path
+        if rel_path.endswith("/") or abs_path.is_dir():
+            # Directory input: must exist with at least one child.
+            if not abs_path.is_dir():
+                return False
+            if not any(abs_path.iterdir()):
+                return False
+        else:
+            # File input: must exist.
+            if not abs_path.is_file():
+                return False
+
+    return True
