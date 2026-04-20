@@ -53,6 +53,13 @@ MANIFEST_REL_PATH: str = (
     ".claude/workflows/system_orchestration/manifest.compile.yaml"
 )
 
+#: Repo-relative path to the authoritative Tier 3 call binding source.
+#: Used by ``_resolve_instrument_type()`` to extract the instrument type
+#: for skills that need it (e.g. ``instrument-schema-normalization``).
+_SELECTED_CALL_REL_PATH: str = (
+    "docs/tier3_project_instantiation/call_binding/selected_call.json"
+)
+
 #: Skills whose primary audit target is Tier 5 deliverable artifacts.
 #: When invoked in a phase where Tier 5 does not yet exist (e.g. Phase 2),
 #: these skills are skipped as "not_applicable" rather than failed with
@@ -516,6 +523,60 @@ def _get_exit_gate_for_node(
 
 
 # ---------------------------------------------------------------------------
+# Instrument type resolution from Tier 3 call binding
+# ---------------------------------------------------------------------------
+
+
+def _resolve_instrument_type(repo_root: Path) -> str | None:
+    """Resolve the instrument type from the authoritative Tier 3 call binding.
+
+    Reads ``selected_call.json`` and extracts the ``instrument_type`` field.
+    Returns the instrument type string (e.g. ``"RIA"``), or ``None`` if the
+    source file is missing, malformed, or lacks the field.
+
+    This is a **runtime-level** resolution: the agent runtime reads from an
+    authoritative Tier 3 source to inject structured context into skills
+    that need it, without broadening the skill's TAPM file access.
+    Analogous to ``_get_exit_gate_for_node()`` reading the manifest to
+    provide ``gate_id`` context.
+
+    **Fail-closed:** returns ``None`` when the source is absent or invalid.
+    The caller must treat ``None`` as a blocking failure — not default to
+    any instrument type.
+    """
+    call_path = repo_root / _SELECTED_CALL_REL_PATH
+    if not call_path.is_file():
+        logger.warning(
+            "Cannot resolve instrument type: %s not found",
+            _SELECTED_CALL_REL_PATH,
+        )
+        return None
+    try:
+        data = json.loads(call_path.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning(
+            "Cannot resolve instrument type: %s is unreadable/malformed: %s",
+            _SELECTED_CALL_REL_PATH, exc,
+        )
+        return None
+    if not isinstance(data, dict):
+        logger.warning(
+            "Cannot resolve instrument type: %s root is not a dict",
+            _SELECTED_CALL_REL_PATH,
+        )
+        return None
+    instrument_type = data.get("instrument_type")
+    if not isinstance(instrument_type, str) or not instrument_type.strip():
+        logger.warning(
+            "Cannot resolve instrument type: %s has no valid "
+            "instrument_type field",
+            _SELECTED_CALL_REL_PATH,
+        )
+        return None
+    return instrument_type.strip()
+
+
+# ---------------------------------------------------------------------------
 # Caller context for context-sensitive skills
 # ---------------------------------------------------------------------------
 
@@ -865,6 +926,44 @@ def run_agent(
                 if not caller_context:
                     caller_context = {}
                 caller_context["gate_id"] = exit_gate
+
+        # Inject resolved_instrument_type for instrument-schema-normalization.
+        # Source: selected_call.json (Tier 3 call binding) — the authoritative
+        # upstream source that already determines instrument type.
+        # This preserves bounded execution: the skill does not get TAPM file
+        # access to selected_call.json; it receives a structured value.
+        if sid == "instrument-schema-normalization":
+            instrument_type = _resolve_instrument_type(repo_root)
+            if instrument_type is not None:
+                if not caller_context:
+                    caller_context = {}
+                caller_context["resolved_instrument_type"] = instrument_type
+            else:
+                # Fail closed: cannot resolve instrument type from the
+                # authoritative Tier 3 source.  Do not fabricate or default.
+                _fail_reason = (
+                    f"Cannot resolve instrument type from "
+                    f"{_SELECTED_CALL_REL_PATH}: file is missing, "
+                    f"malformed, or does not contain a valid "
+                    f"instrument_type field"
+                )
+                record = SkillInvocationRecord(
+                    skill_id=sid,
+                    status="failure",
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+                all_invocations.append(record)
+                had_failure = True
+                failure_reason_accumulator = (
+                    f"Skill {sid!r} failed: {_fail_reason}"
+                )
+                failure_category_accumulator = "SKILL_FAILURE"
+                logger.warning(
+                    "Skill %s skipped (instrument type unresolvable): %s",
+                    sid, _fail_reason,
+                )
+                continue
 
         result = run_skill(
             sid, run_id, repo_root, resolved_inputs,

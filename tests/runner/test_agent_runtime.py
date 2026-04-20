@@ -888,6 +888,332 @@ class TestGetExitGateForNode:
 
 
 # ---------------------------------------------------------------------------
+# Instrument type context injection (resolved_instrument_type fix)
+# ---------------------------------------------------------------------------
+
+
+class TestResolveInstrumentType:
+    """Tests for _resolve_instrument_type() helper."""
+
+    def test_returns_instrument_type_from_selected_call(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json",
+            {"instrument_type": "RIA", "topic_code": "HORIZON-CL4-2026"},
+        )
+        assert _resolve_instrument_type(tmp_path) == "RIA"
+
+    def test_returns_none_when_file_missing(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        assert _resolve_instrument_type(tmp_path) is None
+
+    def test_returns_none_when_field_missing(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json",
+            {"topic_code": "HORIZON-CL4-2026"},
+        )
+        assert _resolve_instrument_type(tmp_path) is None
+
+    def test_returns_none_when_field_empty(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json",
+            {"instrument_type": "  "},
+        )
+        assert _resolve_instrument_type(tmp_path) is None
+
+    def test_returns_none_when_malformed_json(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        path = (
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json"
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("not valid json {{{", encoding="utf-8")
+        assert _resolve_instrument_type(tmp_path) is None
+
+    def test_strips_whitespace(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_instrument_type
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json",
+            {"instrument_type": "  CSA  "},
+        )
+        assert _resolve_instrument_type(tmp_path) == "CSA"
+
+
+class TestInstrumentTypeContextInjection:
+    """Tests that instrument-schema-normalization receives resolved_instrument_type
+    via caller_context, sourced from selected_call.json."""
+
+    def _make_env_with_selected_call(
+        self,
+        tmp_path: Path,
+        *,
+        instrument_type: str = "RIA",
+        include_selected_call: bool = True,
+        skill_ids: list[str] | None = None,
+    ) -> dict:
+        """Create a test environment with instrument-schema-normalization."""
+        if skill_ids is None:
+            skill_ids = [
+                "work-package-normalization",
+                "instrument-schema-normalization",
+                "gate-enforcement",
+            ]
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="wp_designer",
+            node_id="n03_wp_design",
+            skill_ids=skill_ids,
+            phase_id="phase_03_wp_design_and_dependency_mapping",
+        )
+        # Update manifest exit_gate
+        manifest_path = kwargs["repo_root"] / "manifest_test.yaml"
+        manifest_data = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        manifest_data["node_registry"][0]["exit_gate"] = "phase_03_gate"
+        _write_yaml(manifest_path, manifest_data)
+
+        # Write gate-relevant artifact
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+
+        # Write selected_call.json (authoritative source)
+        if include_selected_call:
+            _write_json(
+                tmp_path / "docs" / "tier3_project_instantiation"
+                / "call_binding" / "selected_call.json",
+                {"instrument_type": instrument_type, "topic_code": "HORIZON-TEST"},
+            )
+        return kwargs
+
+    def test_receives_resolved_instrument_type(self, tmp_path: Path) -> None:
+        """Positive case: instrument-schema-normalization receives the
+        resolved_instrument_type from selected_call.json via caller_context."""
+        kwargs = self._make_env_with_selected_call(tmp_path, instrument_type="RIA")
+
+        captured_calls: list[dict] = []
+
+        def _capture(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture):
+            result = run_agent(**kwargs)
+
+        # Find the instrument-schema-normalization call
+        isn_calls = [
+            c for c in captured_calls
+            if c["skill_id"] == "instrument-schema-normalization"
+        ]
+        assert len(isn_calls) == 1, (
+            f"Expected 1 instrument-schema-normalization call, got {len(isn_calls)}"
+        )
+        ctx = isn_calls[0]["caller_context"]
+        assert ctx is not None, (
+            "instrument-schema-normalization should receive caller_context"
+        )
+        assert ctx.get("resolved_instrument_type") == "RIA", (
+            f"Expected resolved_instrument_type='RIA', "
+            f"got {ctx.get('resolved_instrument_type')!r}"
+        )
+
+    def test_fails_closed_when_selected_call_missing(self, tmp_path: Path) -> None:
+        """Missing-source case: runtime fails closed with clear reason."""
+        kwargs = self._make_env_with_selected_call(
+            tmp_path, include_selected_call=False,
+        )
+
+        invoked_skill_ids: list[str] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            invoked_skill_ids.append(skill_id)
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        # instrument-schema-normalization was NOT invoked via run_skill
+        assert "instrument-schema-normalization" not in invoked_skill_ids
+        # Agent reports failure
+        assert result.status == "failure"
+        assert "instrument type" in (result.failure_reason or "").lower()
+        # The failure is recorded in invoked_skills
+        isn_records = [
+            r for r in result.invoked_skills
+            if r.skill_id == "instrument-schema-normalization"
+        ]
+        assert len(isn_records) == 1
+        assert isn_records[0].status == "failure"
+        assert isn_records[0].failure_category == "MISSING_INPUT"
+
+    def test_fails_closed_when_instrument_type_field_missing(
+        self, tmp_path: Path,
+    ) -> None:
+        """Malformed source: selected_call.json exists but has no instrument_type."""
+        kwargs = self._make_env_with_selected_call(tmp_path)
+        # Overwrite selected_call.json without instrument_type
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "call_binding" / "selected_call.json",
+            {"topic_code": "HORIZON-TEST"},
+        )
+
+        invoked_skill_ids: list[str] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            invoked_skill_ids.append(skill_id)
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert "instrument-schema-normalization" not in invoked_skill_ids
+        assert result.status == "failure"
+        isn_records = [
+            r for r in result.invoked_skills
+            if r.skill_id == "instrument-schema-normalization"
+        ]
+        assert len(isn_records) == 1
+        assert isn_records[0].failure_category == "MISSING_INPUT"
+
+    def test_no_fabricated_default_instrument_type(self, tmp_path: Path) -> None:
+        """No default value is used when the source is missing."""
+        kwargs = self._make_env_with_selected_call(
+            tmp_path, include_selected_call=False,
+        )
+
+        captured_contexts: list[dict | None] = []
+
+        def _capture(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_contexts.append(kw.get("caller_context"))
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture):
+            run_agent(**kwargs)
+
+        # No call should have received a fabricated resolved_instrument_type
+        for ctx in captured_contexts:
+            if ctx is not None:
+                assert "resolved_instrument_type" not in ctx, (
+                    "No skill should receive a fabricated resolved_instrument_type"
+                )
+
+    def test_other_skills_unaffected(self, tmp_path: Path) -> None:
+        """Non-instrument-schema-normalization skills do not get
+        resolved_instrument_type injected."""
+        kwargs = self._make_env_with_selected_call(
+            tmp_path,
+            skill_ids=["skill-a", "skill-b"],
+        )
+
+        captured_calls: list[dict] = []
+
+        def _capture(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_capture):
+            run_agent(**kwargs)
+
+        for call in captured_calls:
+            ctx = call["caller_context"]
+            if ctx is not None:
+                assert "resolved_instrument_type" not in ctx, (
+                    f"Skill {call['skill_id']!r} should not receive "
+                    f"resolved_instrument_type"
+                )
+
+    def test_gate_enforcement_ordering_preserved(self, tmp_path: Path) -> None:
+        """gate-enforcement still executes LAST after instrument-schema-normalization."""
+        kwargs = self._make_env_with_selected_call(
+            tmp_path,
+            skill_ids=[
+                "work-package-normalization",
+                "instrument-schema-normalization",
+                "gate-enforcement",
+            ],
+        )
+
+        invoked_order: list[str] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            invoked_order.append(skill_id)
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            run_agent(**kwargs)
+
+        # gate-enforcement must be last
+        assert invoked_order[-1] == "gate-enforcement"
+        # instrument-schema-normalization must come before gate-enforcement
+        isn_idx = invoked_order.index("instrument-schema-normalization")
+        ge_idx = invoked_order.index("gate-enforcement")
+        assert isn_idx < ge_idx
+
+    def test_phase3_full_skill_sequence(self, tmp_path: Path) -> None:
+        """Integration-style: Phase 3 agent passes instrument type and
+        maintains correct skill ordering."""
+        kwargs = self._make_env_with_selected_call(
+            tmp_path,
+            instrument_type="IA",
+            skill_ids=[
+                "work-package-normalization",
+                "wp-dependency-analysis",
+                "milestone-consistency-check",
+                "instrument-schema-normalization",
+                "gate-enforcement",
+            ],
+        )
+        # Update skill catalog for all skills
+        catalog_path = (
+            tmp_path / ".claude" / "workflows"
+            / "system_orchestration" / "skill_catalog.yaml"
+        )
+        catalog = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        for entry in catalog["skill_catalog"]:
+            entry["used_by_agents"] = ["wp_designer"]
+        _write_yaml(catalog_path, catalog)
+
+        invoked_order: list[str] = []
+        isn_context: dict | None = None
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            nonlocal isn_context
+            invoked_order.append(skill_id)
+            if skill_id == "instrument-schema-normalization":
+                isn_context = kw.get("caller_context")
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        # instrument-schema-normalization received IA
+        assert isn_context is not None
+        assert isn_context.get("resolved_instrument_type") == "IA"
+
+        # gate-enforcement is last
+        assert invoked_order[-1] == "gate-enforcement"
+
+        # instrument-schema-normalization is before gate-enforcement
+        assert invoked_order.index("instrument-schema-normalization") < (
+            invoked_order.index("gate-enforcement")
+        )
+
+
+# ---------------------------------------------------------------------------
 # Module isolation
 # ---------------------------------------------------------------------------
 
