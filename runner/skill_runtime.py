@@ -72,6 +72,12 @@ SKILL_SPECS_REL_DIR: str = ".claude/skills"
 SKILL_MODEL: str = "claude-sonnet-4-6"
 
 #: Maximum tokens for skill execution responses.
+#: NOTE: This value is passed to invoke_claude_text() for interface
+#: compatibility, but the claude -p CLI transport does NOT enforce a
+#: --max-tokens flag.  Response length is bounded by prompt design
+#: (output minimization rules in skill specs), not by this constant.
+#: Retained for forward compatibility if the transport gains token
+#: control in a future backend migration.
 SKILL_MAX_TOKENS: int = 8192
 
 #: Timeout for TAPM invocations (tool-augmented mode).

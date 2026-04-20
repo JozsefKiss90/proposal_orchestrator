@@ -127,10 +127,12 @@ skill_catalog:
       - "Must fail closed if concept_refinement_summary.json is absent or empty"
 
   - id: work-package-normalization
+    execution_mode: "tapm"
     purpose: >
       Normalize a work package structure to ensure each WP has all required elements:
       unique identifier, title, objective, tasks with identifiers, deliverables with
       due months and types, milestones with verifiable criteria, and a responsible lead.
+      Produces the minimal schema-complete Phase 3 gate artifact (wp_structure.json).
     used_by_agents:
       - wp_designer
     reads_from:
@@ -138,12 +140,18 @@ skill_catalog:
       - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    notes: >
+      Phase 3 bounded-execution: TAPM mode reads declared inputs from disk
+      via Read tool. Output must be a minimal canonical artifact — schema-
+      complete and gate-sufficient, not a rich planning dossier. Dependency
+      enrichment is delegated to dependency_mapper; schedule richness to Phase 4.
     constitutional_constraints:
       - "WP leads must be drawn from Tier 3 consortium data only"
       - "WP count must not exceed instrument limits from Tier 2A"
       - "Deliverables must have due months within project duration"
 
   - id: wp-dependency-analysis
+    execution_mode: "tapm"
     purpose: >
       Analyse inter-WP and inter-task dependencies. Produce a directed acyclic graph
       representation. Identify critical path, dependency cycles, and dependencies
@@ -155,6 +163,10 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    notes: >
+      Phase 3 bounded-execution: TAPM mode reads wp_structure.json from disk
+      via Read tool. Extends dependency_map in place; does not rewrite the
+      full WP structure. Only reads from the declared phase3_wp_design directory.
     constitutional_constraints:
       - "Must flag dependency cycles; must not silently remove them"
       - "Critical path must be traceable to the dependency map"
@@ -350,9 +362,13 @@ skill_catalog:
       - "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md"
 
   - id: gate-enforcement
+    execution_mode: "tapm"
     purpose: >
-      Evaluate whether a phase gate condition is met. Declare pass or failure. Write
-      gate status to Tier 4. Block downstream phases if gate has not passed.
+      Evaluate all deterministic and semantic predicates for a named phase gate
+      against the canonical phase artifact, and return a structured predicate
+      evaluation summary as a SkillResult payload to the invoking agent. The
+      runner — not this skill — writes the GateResult artifact and declares
+      gate pass or fail.
     used_by_agents:
       - call_analyzer
       # concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)
@@ -369,6 +385,12 @@ skill_catalog:
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/
       - docs/tier4_orchestration_state/decision_log/
+    notes: >
+      TAPM mode: reads the phase-specific canonical artifact and Tier 3
+      reference data from disk via Read tool. The invoking agent supplies
+      gate_id as context; the skill reads only the artifact mapped to that
+      gate. Must not broaden reads beyond the declared phase output directory
+      and Tier 3 project instantiation directory.
     constitutional_constraints:
       - "Gate conditions are defined in this workflow and in CLAUDE.md; they must not be weakened"
       - "Gate failure must be declared explicitly; fabricated completion is a constitutional violation"

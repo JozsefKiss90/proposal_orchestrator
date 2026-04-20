@@ -17,6 +17,50 @@ constitutional_constraints:
   - "Deliverables must have due months within project duration"
 ---
 
+## Output Nature
+
+The output of this skill is a **minimal canonical Phase 3 gate artifact**, not a rich planning dossier. The artifact must be schema-complete and gate-sufficient, but intentionally compact. Dependency enrichment is delegated to `wp-dependency-analysis` (via `dependency_mapper`). Schedule richness is delegated to Phase 4. This skill produces the narrowest correct `wp_structure.json` that satisfies the `orch.phase3.wp_structure.v1` schema, downstream `dependency_mapper` expectations, and `phase_03_gate` deterministic predicates.
+
+---
+
+## TAPM File-Boundary Instructions
+
+This skill executes in TAPM mode. Claude reads declared inputs from disk via the Read tool.
+
+**Authoritative input files (read these and only these):**
+- `docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json` — WP seed structure
+- `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` — instrument constraints
+
+**Context supplied by invoking agent (not read from disk by this skill):**
+- `valid_partner_ids` — set of partner IDs from `partners.json`, provided in caller context
+
+**Do not read:**
+- Files outside the two declared input paths
+- Other Tier 3 directories (consortium/, project_brief/, etc.) — the invoking agent provides partner context
+- Other Tier 4 phase output directories
+- Tier 2B extracted files (not inputs to this skill)
+
+**Do not infer from undeclared files.** All structural decisions must derive from the declared inputs and caller-supplied context only.
+
+---
+
+## Output Minimization Rules
+
+These rules are operational constraints, not style suggestions:
+
+1. Return only one JSON object. No markdown wrapping, no commentary, no explanatory prose.
+2. Do not include duplicate semantic content across fields. If a value appears in `work_packages`, do not mirror it elsewhere.
+3. Use concise task and deliverable titles — functional labels, not narrative descriptions.
+4. Populate only schema-required and gate-relevant fields. Do not synthesize optional descriptive substructures unless explicitly required by the schema.
+5. Do not add rationale, justification, or explanatory text inside JSON field values.
+6. `objectives` arrays: use short, measurable objective statements. One sentence maximum per objective.
+7. `tasks` entries: `title` is a functional label (e.g., "Design knowledge graph ontology"), not a paragraph.
+8. `deliverables` entries: `title` is a compact label (e.g., "Ontology specification report"), not a description.
+9. `dependency_map` seed: include only WP-level nodes and edges derived from the seed `dependencies` arrays. Do not pre-populate task-level edges — `dependency_mapper` handles this.
+10. Prefer compact values over verbose phrasing throughout.
+
+---
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

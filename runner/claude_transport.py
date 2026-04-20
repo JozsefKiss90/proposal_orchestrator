@@ -120,7 +120,13 @@ def invoke_claude_text(
     model:
         Model identifier (e.g. ``"claude-sonnet-4-6"`` or ``"sonnet"``).
     max_tokens:
-        Maximum tokens for the response.
+        Accepted for interface compatibility but **not currently enforced**
+        by the ``claude -p`` CLI transport.  The ``claude`` CLI does not
+        expose a ``--max-tokens`` flag; response length is determined by
+        the model's own completion behavior.  Callers should not rely on
+        this parameter to bound output size.  Output bounding is achieved
+        through prompt design (output minimization rules in skill specs),
+        not through transport-level token caps.
     timeout_seconds:
         Maximum wall-clock seconds to wait for the CLI to complete.
     tools:

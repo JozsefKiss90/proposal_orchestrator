@@ -56,13 +56,21 @@ Read `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gat
 **Step 2 — Read all inputs.**
 Read all inputs listed in the Inputs to Inspect table. Extract the instrument WP count limit and deliverable constraints from `section_schema_registry.json`. Extract all partner IDs from the Tier 3 consortium directory. If any required input is absent or empty, execute Failure Case 2.
 
-**Step 3 — Design WP structure (work-package-normalization skill).**
-Invoke the `work-package-normalization` skill. Elaborate the `workpackage_seed.json` entries against `objectives.json` and the concept vocabulary from `concept_refinement_summary.json`. For each WP:
-- Assign a unique `wp_id`
-- Define objectives, tasks, and at least one deliverable
-- Assign a `lead_partner` from the Tier 3 consortium data — must match a `partner_id` in `partners.json`; must not assign a partner not present in Tier 3
+**Step 3 — Design WP structure (work-package-normalization skill) — MINIMAL STRUCTURE GENERATION.**
+Invoke the `work-package-normalization` skill. The goal of this step is to produce a **valid, compact, schema-compliant `wp_structure.json`** that satisfies Phase 3 gate prerequisites. This is not a broad planning elaboration step. Do not overbuild the output.
+
+The skill produces the narrowest correct artifact. Specifically:
+- Assign a unique `wp_id` per WP
+- Define concise objectives (short, measurable statements — not paragraphs)
+- Define tasks with functional-label titles (not narrative descriptions)
+- Define at least one deliverable per WP with compact title, type, and due_month
+- Assign `lead_partner` from Tier 3 consortium data — must match a `partner_id` in `partners.json`
 - Assign `responsible_partner` for each task and deliverable from Tier 3 consortium data
 - Set `deliverable.due_month` within project duration from `selected_call.json`
+- Build only a WP-level `dependency_map` seed — leave task-level dependency enrichment to `dependency_mapper`
+
+Do not add explanatory prose, rationale blobs, or speculative metadata to the artifact. The output is a structural skeleton for gate evaluation and downstream extension, not a rich planning dossier.
+
 Verify WP count does not exceed the instrument limit from `section_schema_registry.json`. If it does, document the conflict and resolve it — do not silently trim WPs without a decision log entry.
 
 **Step 4 — Check milestone consistency (milestone-consistency-check skill).**

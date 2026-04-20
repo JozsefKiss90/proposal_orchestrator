@@ -26,6 +26,24 @@ constitutional_constraints:
   - "A gate cannot be declared passed without confirming all gate conditions"
 ---
 
+## TAPM File-Boundary Instructions
+
+This skill executes in TAPM mode. Claude reads declared inputs from disk via the Read tool.
+
+**Authoritative input directories (read only within these boundaries):**
+- `docs/tier4_orchestration_state/phase_outputs/` — read only the canonical artifact for the gate being evaluated (see gate-to-artifact mapping below)
+- `docs/tier3_project_instantiation/` — read only the specific files needed for cross-artifact consistency predicates (e.g., `partners.json` for partner validation, `call_binding/selected_call.json` for duration checks)
+
+**Do not read:**
+- Tier 1 or Tier 2 source documents (normative rules are encoded in the gate predicates, not re-read at gate time)
+- Tier 5 deliverables (unless evaluating gate_10, gate_11, or gate_12 which explicitly reference Tier 5)
+- Phase output directories other than the one mapped to the current gate_id
+- `.claude/` runtime state, agent memory, or cache files
+
+**Scoping rule:** The invoking agent provides `gate_id` as context. Use the gate-to-artifact mapping to identify the single canonical artifact to evaluate. Read only that artifact and the minimal Tier 3 reference data required by the gate's predicates.
+
+---
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

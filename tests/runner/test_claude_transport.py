@@ -112,12 +112,15 @@ class TestCommandConstruction:
         idx = cmd.index("--model")
         assert cmd[idx + 1] == "claude-sonnet-4-6"
 
-    def test_command_includes_max_tokens(self) -> None:
+    def test_max_tokens_not_passed_to_cli(self) -> None:
+        """max_tokens is accepted for interface compatibility but the claude -p
+        CLI does not support a --max-tokens flag.  Output bounding is achieved
+        through prompt design (output minimization rules), not transport-level
+        token caps.  Verify the flag is NOT added to the command."""
         with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:
             invoke_claude_text(**_call_kwargs())
         cmd = mock_run.call_args.args[0]
-        idx = cmd.index("--max-tokens")
-        assert cmd[idx + 1] == "4096"
+        assert "--max-tokens" not in cmd
 
     def test_short_system_prompt_passed_via_flag(self) -> None:
         with patch(_SUBPROCESS_TARGET, return_value=_mock_completed("ok")) as mock_run:

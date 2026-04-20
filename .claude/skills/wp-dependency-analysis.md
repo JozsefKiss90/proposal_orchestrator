@@ -17,6 +17,23 @@ constitutional_constraints:
   - "Must not declare the map complete with undeclared dependencies"
 ---
 
+## TAPM File-Boundary Instructions
+
+This skill executes in TAPM mode. Claude reads declared inputs from disk via the Read tool.
+
+**Authoritative input file (read this and only this):**
+- `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` — the canonical Phase 3 artifact produced by `work-package-normalization`
+
+**Do not read:**
+- Files outside the `phase3_wp_design/` directory
+- Tier 3 source files (consortium/, architecture_inputs/) — this skill operates on the already-normalized WP structure, not on raw seeds
+- Other Tier 4 phase output directories (phase1, phase2, phase4, etc.)
+- Tier 2A or Tier 2B extracted files
+
+**Do not infer dependencies from undeclared files.** All dependency edges must derive from the `work_packages[].dependencies[]` arrays in `wp_structure.json` and from cross-WP task relationships identifiable within that artifact. The invoking agent may supply additional cross-WP task dependency context — use that context, but do not broaden file reads beyond the declared input.
+
+---
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
