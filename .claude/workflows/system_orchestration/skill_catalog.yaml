@@ -5,9 +5,25 @@ skill_catalog:
 #     "tapm": Tool-Augmented Prompt Mode — Claude reads declared
 #             inputs from disk via Read/Glob tools instead of
 #             receiving them serialized in the prompt.
+#
+#   output_contract: "single_artifact" | "multi_artifact" | "payload"
+#     Default: "single_artifact" (when absent)
+#     "single_artifact": Skill produces exactly one canonical artifact.
+#     "multi_artifact": Skill produces multiple canonical artifacts in
+#                       a single response. The runtime extracts and
+#                       validates each sub-artifact independently.
+#     "payload": Skill returns an in-memory payload via SkillResult.
+#                No canonical artifact is written by the skill runtime.
+#                Used for skills whose primary output is consumed by
+#                the invoking agent or runner (e.g. gate-enforcement).
+#
+#   payload_required_fields: (only for output_contract: "payload")
+#     List of field names required in the payload response.
+#     The runtime validates that all listed fields are present.
 
   - id: call-requirements-extraction
     execution_mode: "tapm"
+    output_contract: "multi_artifact"
     purpose: >
       Extract binding topic-specific requirements from work programme and call
       extract documents. Produces structured output with source section references
@@ -26,6 +42,7 @@ skill_catalog:
 
   - id: evaluation-matrix-builder
     execution_mode: "tapm"
+    output_contract: "multi_artifact"
     purpose: >
       Build a structured evaluation matrix from the applicable evaluation form and
       call priority weights. Maps evaluation criteria, sub-criteria, scoring
@@ -103,6 +120,7 @@ skill_catalog:
 
   - id: concept-call-binding-derivation
     execution_mode: "tapm"
+    output_contract: "multi_artifact"
     purpose: >
       Derive Tier 3 call binding artifacts (topic_mapping.json and
       compliance_profile.json) from the concept refinement summary and
@@ -364,6 +382,14 @@ skill_catalog:
 
   - id: gate-enforcement
     execution_mode: "tapm"
+    output_contract: "payload"
+    payload_required_fields:
+      - gate_id
+      - run_id
+      - overall_status
+      - evaluated_at
+      - deterministic_predicates
+      - semantic_predicates
     purpose: >
       Evaluate all deterministic and semantic predicates for a named phase gate
       against the canonical phase artifact, and return a structured predicate

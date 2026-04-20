@@ -1,0 +1,107 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'skill_result', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'canonical_artifact_evaluated', 'canonical_artifact_schema_id_expected', 'canonical_artifact_schema_id_actual', 'deterministic_predicates', 'semantic_predicates', 'predicate_evaluation_detail', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.gate_result.v1",
+  "run_id": "5949b883-ef93-46a9-a54e-a3bea2c4faaa",
+  "skill_result": {
+    "status": "success",
+    "outputs_written": [
+      "docs/tier4_orchestration_state/decision_log/gate_failure_phase_03_gate_wp_designer_2026-04-20T00:00:00Z.json"
+    ],
+    "failure_reason": null,
+    "failure_category": null
+  },
+  "gate_id": "phase_03_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-20T00:00:00Z",
+  "canonical_artifact_evaluated": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+  "canonical_artifact_schema_id_expected": "orch.phase3.wp_structure.v1",
+  "canonical_artifact_schema_id_actual": "orch.phase3.wp_structure.v1",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "artifact_not_invalid",
+      "work_packages_non_empty",
+      "every_wp_has_deliverables_non_empty",
+      "every_wp_has_lead_partner_non_null",
+      "dependency_map_non_null_with_nodes_and_edges",
+      "cycle_detected_false",
+      "partner_role_matrix_non_empty"
+    ],
+    "failed": [
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "field_equals",
+        "args": {
+          "field": "run_id",
+          "expected": "5949b883-ef93-46a9-a54e-a3bea2c4faaa",
+          "actual": "1af7d7ad-47e8-43c4-8f90-32479511c8a5"
+        },
+        "failure_category": "MALFORMED_ARTIFACT",
+        "fail_message": "Artifact run_id '1af7d7ad-47e8-43c4-8f90-32479511c8a5' does not match the current run_id '5949b883-ef93-46a9-a54e-a3bea2c4faaa'. The wp_structure.json artifact at docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json was produced by a different workflow run and cannot serve as the canonical output for this gate evaluation. The phase_03_gate cannot pass until this artifact is regenerated under the current run_id.",
+        "prose_condition": "artifact.run_id must equal the current run_id provided by the invoking agent"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [
+      "all_partners_in_tier3"
+    ],
+    "failed": []
+  },
+  "predicate_evaluation_detail": {
+    "artifact_present": {
+      "result": "pass",
+      "evidence": "File exists at docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    "schema_id_match": {
+      "result": "pass",
+      "evidence": "artifact.schema_id = 'orch.phase3.wp_structure.v1' matches expected value"
+    },
+    "run_id_match": {
+      "result": "fail",
+      "evidence": "artifact.run_id = '1af7d7ad-47e8-43c4-8f90-32479511c8a5'; current run_id = '5949b883-ef93-46a9-a54e-a3bea2c4faaa'"
+    },
+    "artifact_not_invalid": {
+      "result": "pass",
+      "evidence": "No 'artifact_status' field present in artifact; artifact is not marked invalid"
+    },
+    "work_packages_non_empty": {
+      "result": "pass",
+      "evidence": "work_packages array contains 9 entries: WP1, WP2, WP3, WP4, WP5, WP6, WP7, WP8, WP9"
+    },
+    "every_wp_has_deliverables_non_empty": {
+      "result": "pass",
+      "evidence": "WP1: 4 deliverables; WP2: 2; WP3: 2; WP4: 2; WP5: 2; WP6: 2; WP7: 2; WP8: 3; WP9: 3 \u2014 all non-empty"
+    },
+    "every_wp_has_lead_partner_non_null": {
+      "result": "pass",
+      "evidence": "WP1\u2192ATU, WP2\u2192ATU, WP3\u2192BIIS, WP4\u2192CERIA, WP5\u2192NIHS, WP6\u2192ISIA, WP7\u2192ELI, WP8\u2192FIIT, WP9\u2192BAL \u2014 all non-null"
+    },
+    "dependency_map_non_null_with_nodes_and_edges": {
+      "result": "pass",
+      "evidence": "dependency_map is non-null; nodes array contains 36 entries (9 WP nodes + 27 task nodes); edges array contains 43 edges (WP-level and task-level finish_to_start and data_input relationships)"
+    },
+    "cycle_detected_false": {
+      "result": "pass",
+      "evidence": "artifact.cycle_detected = false; cycle_flags = []"
+    },
+    "partner_role_matrix_non_empty": {
+      "result": "pass",
+      "evidence": "partner_role_matrix contains 8 entries: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT"
+    },
+    "all_partners_in_tier3": {
+      "result": "pass",
+      "evidence": "All lead_partner and contributing_partners values across all 9 WPs cross-validated against docs/tier3_project_instantiation/consortium/partners.json. Tier 3 partner set: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}. All partner references in wp_structure.json are members of this set. No unresolved partner reference found."
+    }
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_phase_03_gate_wp_designer_2026-04-20T00:00:00Z",
+    "decision_type": "gate_failure",
+    "gate_id": "phase_03_gate",
+    "failure_reason": "Deterministic predicate 'run_id_match' failed: artifact run_id '1af7d7ad-47e8-43c4-8f90-32479511c8a5' does not match current run_id '5949b883-ef93-46a9-a54e-a3bea2c4faaa'. The canonical artifact docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json was produced by a pr
+=== END ===

@@ -89,6 +89,14 @@ class SkillResult:
     failure_category: str | None = None
     """One of :data:`SKILL_FAILURE_CATEGORIES`, or ``None`` on success."""
 
+    payload: dict[str, Any] | None = None
+    """In-memory payload for ``output_contract: "payload"`` skills.
+
+    When a skill's output contract is ``"payload"`` (e.g. gate-enforcement),
+    the parsed response is returned here instead of being written to a
+    canonical artifact path.  The invoking agent or runner consumes the
+    payload directly.  ``None`` for artifact-producing skills."""
+
 
 # ---------------------------------------------------------------------------
 # SkillInvocationRecord

@@ -243,6 +243,7 @@ def _make_binding_skill_env(tmp_path: Path) -> Path:
         {"skill_catalog": [{
             "id": "concept-call-binding-derivation",
             "execution_mode": "tapm",
+            "output_contract": "multi_artifact",
             "reads_from": [
                 "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json",
                 "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
@@ -548,6 +549,7 @@ def _make_phase2_agent_env(tmp_path: Path) -> dict:
             {
                 "id": "concept-call-binding-derivation",
                 "execution_mode": "tapm",
+                "output_contract": "multi_artifact",
                 "reads_from": [
                     "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json",
                     "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
@@ -842,6 +844,7 @@ class TestCallBindingFailClosed:
             {"skill_catalog": [{
                 "id": "concept-call-binding-derivation",
                 "execution_mode": "cli-prompt",
+                "output_contract": "multi_artifact",
                 "reads_from": [
                     "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json",
                     "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",

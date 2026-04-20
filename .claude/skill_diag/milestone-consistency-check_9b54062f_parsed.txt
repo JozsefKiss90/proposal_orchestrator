@@ -1,0 +1,30 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'mode', 'validated_scope', 'findings', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "milestone_consistency_wp_designer_2026-04-20T00:00:00.000Z",
+  "skill_id": "milestone-consistency-check",
+  "invoking_agent": "wp_designer",
+  "run_id_reference": "9b54062f-53b7-4f75-adc1-089764159f90",
+  "mode": "DEGRADED",
+  "validated_scope": [
+    "wp_structure"
+  ],
+  "findings": [
+    {
+      "milestone_id": null,
+      "due_month": null,
+      "task_completion_month": null,
+      "verifiable_criterion_present": false,
+      "consistency_status": "flagged",
+      "flag_reason": "No milestones found in wp_structure.json or milestones_seed.json; cannot perform milestone consistency validation"
+    }
+  ],
+  "summary": {
+    "total_milestones_checked": 0,
+    "passed": 0,
+    "flagged": 1
+  },
+  "timestamp": "2026-04-20T00:00:00.000Z"
+}
+=== END ===

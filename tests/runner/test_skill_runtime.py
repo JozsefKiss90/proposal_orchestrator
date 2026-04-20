@@ -766,6 +766,7 @@ def _make_multi_artifact_env(tmp_path: Path) -> Path:
     _write_skill_catalog(repo_root, [
         {
             "id": "multi-skill",
+            "output_contract": "multi_artifact",
             "reads_from": ["docs/tier3/input.json"],
             "writes_to": ["docs/tier2b/extracted/"],
             "constitutional_constraints": [],
@@ -897,6 +898,7 @@ def _make_multi_target_env(tmp_path: Path) -> Path:
     _write_skill_catalog(repo_root, [
         {
             "id": "multi-target-skill",
+            "output_contract": "multi_artifact",
             "reads_from": ["docs/tier3/input.json"],
             "writes_to": [
                 "docs/tier4/phase1/",

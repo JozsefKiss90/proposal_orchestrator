@@ -1,0 +1,13 @@
+=== skill_id: instrument-schema-normalization ===
+=== mode: tapm ===
+=== response_text length: 660 ===
+=== response_text (full) ===
+```json
+{
+  "status": "failure",
+  "failure_category": "MISSING_INPUT",
+  "failure_reason": "resolved_instrument_type required to identify the correct application form. Step 1.2 requires the invoking agent context to supply a resolved_instrument_type value. The task metadata contains skill_id and run_id only; no resolved_instrument_type field is present. The declared inputs (application_forms/ directory and section_schema_registry.json) do not substitute for this value, and docs/tier3_project_instantiation/call_binding/selected_call.json is outside the declared input set and cannot be read. Skill halted before any extraction or registry update."
+}
+```
+
+=== END ===

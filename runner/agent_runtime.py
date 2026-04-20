@@ -809,6 +809,17 @@ def run_agent(
         agent_id, primary_skills, prompt_spec
     )
 
+    # Gate-enforcement must always execute LAST in the agent body.
+    # It evaluates canonical artifacts produced by earlier skills, so
+    # running it before those skills causes it to evaluate stale
+    # artifacts from a prior run (triggering run_id_match failures).
+    # Move it to the end regardless of prompt-spec ordering.
+    if "gate-enforcement" in ordered_skills:
+        ordered_skills = [
+            s for s in ordered_skills if s != "gate-enforcement"
+        ]
+        ordered_skills.append("gate-enforcement")
+
     # For n03: identify sub-agent skills so they can be invoked at the
     # right point in the sequence.
     sub_agent_skills: list[str] = []

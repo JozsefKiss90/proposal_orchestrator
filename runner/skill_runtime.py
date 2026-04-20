@@ -236,6 +236,27 @@ def _extract_schema_requirements(
 
 
 # ---------------------------------------------------------------------------
+# Filename sanitization
+# ---------------------------------------------------------------------------
+
+
+def _sanitize_filename(name: str) -> str:
+    """Replace characters that are invalid in Windows filenames.
+
+    Colons from ISO 8601 timestamps (``2026-04-20T00:00:00Z``) are the
+    primary offender.  Also replaces other Windows-reserved characters
+    (``<>``, ``|``, ``"``).  Preserves path separators (``/``, ``\\``)
+    so callers can pass repo-relative paths without mangling.
+    """
+    # Replace colons with underscores (ISO 8601 timestamps)
+    sanitized = name.replace(":", "_")
+    # Replace other Windows-reserved filename characters
+    for ch in '<>|"':
+        sanitized = sanitized.replace(ch, "_")
+    return sanitized
+
+
+# ---------------------------------------------------------------------------
 # Contextual descriptor detection
 # ---------------------------------------------------------------------------
 
@@ -1338,29 +1359,146 @@ def run_skill(
     # If Claude omitted run_id or included artifact_status, that is a
     # MALFORMED_ARTIFACT failure — not silently corrected.
 
+    # ── Phase D.5: Detect Claude model-level failure signaling ────────
+    #
+    # Claude sometimes returns a SkillResult-shaped failure envelope
+    # instead of a valid artifact payload:
+    #   {"status": "failure", "failure_reason": "...", "failure_category": "..."}
+    #
+    # This violates the runtime contract: Claude responses must always
+    # represent artifact payloads, never SkillResult envelopes.  Detect
+    # this pattern and convert it to a proper SkillResult failure before
+    # schema validation rejects it for missing artifact fields.
+    if (
+        parsed.get("status") == "failure"
+        and ("failure_reason" in parsed or "failure_category" in parsed)
+    ):
+        model_failure_reason = parsed.get(
+            "failure_reason", "unspecified model-signaled failure"
+        )
+        model_failure_category = parsed.get(
+            "failure_category", "INCOMPLETE_OUTPUT"
+        )
+        _known_categories = {
+            "MISSING_INPUT", "MALFORMED_ARTIFACT", "CONSTRAINT_VIOLATION",
+            "INCOMPLETE_OUTPUT", "CONSTITUTIONAL_HALT",
+        }
+        if model_failure_category not in _known_categories:
+            model_failure_category = "INCOMPLETE_OUTPUT"
+
+        _elapsed = time.monotonic() - _skill_t0
+        logger.info(
+            "  skill FAIL   id=%s  category=%s  elapsed=%.1fs  "
+            "(model-signaled failure intercepted)",
+            skill_id, model_failure_category, _elapsed,
+        )
+        return SkillResult(
+            status="failure",
+            failure_reason=(
+                f"Skill {skill_id!r}: model-signaled failure: "
+                f"{model_failure_reason}"
+            ),
+            failure_category=model_failure_category,
+        )
+
     # ── Phase E: Path-aware canonical write ────────────────────────────
     #
-    # Supports two write modes:
+    # Supports three write modes controlled by the skill catalog's
+    # ``output_contract`` field:
     #
-    # 1. Single-artifact mode (default): writes_to resolves to exactly
-    #    one canonical artifact path.  Claude's full response is written
-    #    to that path after validation.
+    # 1. "single_artifact" (default): writes_to resolves to exactly one
+    #    canonical artifact path.  Claude's full response is written to
+    #    that path after validation.
     #
-    # 2. Multi-artifact mode: the combined writes_to entries resolve to
-    #    more than one canonical artifact path.  This may occur when a
-    #    single directory contains multiple canonical schemas, OR when
-    #    multiple independent writes_to entries (directories and/or
-    #    files) each resolve to one or more canonical schemas.  Claude's
-    #    response contains root fields matching each schema's required
-    #    fields.  Each matching sub-object is extracted, validated
-    #    independently, and written to its own canonical path.
+    # 2. "multi_artifact": the skill explicitly declares that it
+    #    produces multiple canonical artifacts.  Claude's response
+    #    contains root fields matching each schema's required fields.
+    #    Each matching sub-object is extracted, validated independently,
+    #    and written to its own canonical path.
     #
-    # Multi-artifact mode activates when the total number of resolved
-    # canonical artifacts across ALL writes_to entries exceeds one.
+    # 3. "payload": the skill returns an in-memory payload (e.g.
+    #    gate-enforcement returning a predicate evaluation summary).
+    #    The response is validated against declared
+    #    ``payload_required_fields`` and returned in SkillResult.payload.
+    #    No canonical artifact is written to disk by the skill runtime.
+    #    Decision-log entries embedded in the payload are extracted and
+    #    written separately.
+    #
+    # The write mode is selected by the ``output_contract`` field in the
+    # skill catalog entry.  It is NOT inferred from the number of
+    # resolved canonical artifacts.  This prevents accidental
+    # multi-artifact validation for skills with broad writes_to
+    # directories (e.g. gate-enforcement writing to phase_outputs/).
+
+    output_contract = entry.get("output_contract", "single_artifact")
 
     outputs_written: list[str] = []
 
-    # Collect ALL matching canonical artifacts for each writes_to path.
+    # ── Payload write path ─────────────────────────────────────────
+    if output_contract == "payload":
+        # Validate the payload against declared required fields.
+        payload_required = entry.get("payload_required_fields", [])
+        payload_errors: list[str] = []
+
+        for field_name in payload_required:
+            if field_name not in parsed:
+                payload_errors.append(
+                    f"Required payload field missing: {field_name!r}"
+                )
+
+        # Validate run_id if present in required fields
+        if "run_id" in parsed and parsed["run_id"] != run_id:
+            payload_errors.append(
+                f"run_id mismatch: expected {run_id!r}, "
+                f"got {parsed['run_id']!r}"
+            )
+
+        if payload_errors:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r} payload validation failed: "
+                    + "; ".join(payload_errors)
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        # Extract and write decision_log_entry if present (gate-
+        # enforcement writes decision log entries on gate failure).
+        decision_log_entry = parsed.get("decision_log_entry")
+        if isinstance(decision_log_entry, dict):
+            decision_id = decision_log_entry.get("decision_id", "")
+            if decision_id:
+                # Sanitize: decision_id may contain ISO 8601 timestamps
+                # with colons (e.g. "gate_failure_phase_03_gate_2026-04-20T00:00:00Z")
+                # which are invalid in Windows filenames.
+                safe_decision_id = _sanitize_filename(decision_id)
+                log_rel = (
+                    f"docs/tier4_orchestration_state/decision_log/"
+                    f"{safe_decision_id}.json"
+                )
+                log_path = repo_root / log_rel
+                write_error = _atomic_write(decision_log_entry, log_path)
+                if write_error is None:
+                    outputs_written.append(log_rel)
+                else:
+                    logger.warning(
+                        "Decision log write failed for %s: %s",
+                        skill_id, write_error,
+                    )
+
+        _elapsed = time.monotonic() - _skill_t0
+        logger.info(
+            "  skill OK     id=%s  contract=payload  outputs=%d  elapsed=%.1fs",
+            skill_id, len(outputs_written), _elapsed,
+        )
+        return SkillResult(
+            status="success",
+            outputs_written=outputs_written,
+            payload=parsed,
+        )
+
+    # ── Collect canonical artifacts for artifact-producing modes ────
     dir_artifacts: list[tuple[str, dict]] = []  # (canonical_rel, schema_entry)
 
     for rel_path in writes_to:
@@ -1381,12 +1519,12 @@ def run_skill(
                 section = spec.get(section_key)
                 if not isinstance(section, dict):
                     continue
-                for _name, entry in section.items():
-                    if not isinstance(entry, dict):
+                for _name, entry_s in section.items():
+                    if not isinstance(entry_s, dict):
                         continue
-                    cp = entry.get("canonical_path", "")
+                    cp = entry_s.get("canonical_path", "")
                     if cp.startswith(dir_norm + "/"):
-                        dir_artifacts.append((cp, entry))
+                        dir_artifacts.append((cp, entry_s))
         else:
             # File write path — look for an exact canonical_path match.
             file_entry = _find_schema_for_path(rel_path, repo_root)
@@ -1409,12 +1547,12 @@ def run_skill(
                 _unique.append((_cp, _se))
         dir_artifacts = _unique
 
-    # ── Multi-artifact write path ────────────────────────────────────
-    # Diagnostic: Phase E state
+    # ── Diagnostic: Phase E state ──────────────────────────────────
     try:
         _diag_phase_e = _diag_dir / f"{skill_id}_{run_id[:8]}_phase_e.txt"
         _diag_phase_e.write_text(
             f"=== Phase E ===\n"
+            f"output_contract: {output_contract}\n"
             f"dir_artifacts count: {len(dir_artifacts)}\n"
             f"dir_artifacts paths: {[cp for cp, _ in dir_artifacts]}\n"
             f"parsed keys (if parsed): {list(parsed.keys()) if parsed else 'N/A'}\n"
@@ -1423,7 +1561,11 @@ def run_skill(
         )
     except (OSError, NameError):
         pass
-    if len(dir_artifacts) > 1:
+
+    # ── Multi-artifact write path ────────────────────────────────────
+    # Entered ONLY when the skill explicitly declares
+    # output_contract: "multi_artifact" in the skill catalog.
+    if output_contract == "multi_artifact":
         all_errors: list[str] = []
         pending_writes: list[tuple[str, dict]] = []
 

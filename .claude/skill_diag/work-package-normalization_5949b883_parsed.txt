@@ -1,0 +1,170 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'work_packages', 'dependency_map', 'partner_role_matrix', 'normalization_issues'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase3.wp_structure.v1",
+  "run_id": "5949b883-ef93-46a9-a54e-a3bea2c4faaa",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "title": "Project Management and Coordination",
+      "objectives": [
+        "Establish and maintain consortium governance, administrative, and financial management across all project phases.",
+        "Ensure quality assurance, risk monitoring, ethics compliance, and timely reporting to ADRA and GenAI4EU Hub."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": [
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T1-01",
+          "title": "Establish consortium governance structure and management processes",
+          "responsible_partner": "ATU",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1-02",
+          "title": "Conduct administrative, financial, and ethics compliance management",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA",
+            "BIIS",
+            "ISIA",
+            "NIHS",
+            "ELI",
+            "BAL",
+            "FIIT"
+          ]
+        },
+        {
+          "task_id": "T1-03",
+          "title": "Coordinate reporting, quality review, and stakeholder communication",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA",
+            "BIIS",
+            "ISIA",
+            "NIHS",
+            "ELI",
+            "BAL",
+            "FIIT"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D1-01",
+          "title": "Project management handbook",
+          "type": "report",
+          "due_month": 3,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D1-02",
+          "title": "Periodic management and progress reports",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "ATU"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Neuro-Symbolic Planning and Reasoning Engine",
+      "objectives": [
+        "Design and implement a hybrid neuro-symbolic planning engine with sub-task graph decomposition and formal pre/post-conditions.",
+        "Integrate MCTS and HTN planning with LLM-based heuristics and verified plan self-correction."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": [
+        "CERIA",
+        "BIIS",
+        "BAL"
+      ],
+      "tasks": [
+        {
+          "task_id": "T2-01",
+          "title": "Design sub-task graph decomposition with formal pre/post-conditions",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T2-02",
+          "title": "Implement MCTS/HTN planning integration with LLM heuristics",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "BIIS"
+          ]
+        },
+        {
+          "task_id": "T2-03",
+          "title": "Develop plan monitoring and self-correction module",
+          "responsible_partner": "CERIA",
+          "contributing_partners": [
+            "BAL"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D2-01",
+          "title": "Neuro-symbolic planning engine specification",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D2-02",
+          "title": "Planning engine software prototype",
+          "type": "software",
+          "due_month": 30,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D2-03",
+          "title": "Planning engine evaluation report",
+          "type": "report",
+          "due_month": 36,
+          "responsible_partner": "ATU"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Adaptive Memory Architecture",
+      "objectives": [
+        "Design and implement a unified tri-store memory architecture with a learned memory controller for long-horizon interactions.",
+        "Develop memory indexing, retrieval, forgetting, and coherence maintenance strategies including tool execution trace storage."
+      ],
+      "lead_partner": "BIIS",
+      "contributing_partners": [
+        "ATU",
+        "CERIA",
+        "BAL"
+      ],
+      "tasks": [
+        {
+          "task_id": "T3-01",
+          "title": "Design tri-store memory architecture and learned memory controller",
+          "responsible_partner": "BIIS",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T3-02",
+          "title": "Implement memory indexing and retrieval strategies",
+          "responsible_partner": "BIIS",
+          "contributing_partners": [
+=== END ===

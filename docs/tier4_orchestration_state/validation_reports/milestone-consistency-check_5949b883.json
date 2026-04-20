@@ -1,0 +1,26 @@
+{
+  "report_id": "milestone_consistency_wp_designer_2026-04-20T00:00:00Z",
+  "skill_id": "milestone-consistency-check",
+  "invoking_agent": "wp_designer",
+  "run_id_reference": "5949b883-ef93-46a9-a54e-a3bea2c4faaa",
+  "mode": "DEGRADED",
+  "validated_scope": [
+    "wp_structure"
+  ],
+  "findings": [
+    {
+      "milestone_id": null,
+      "due_month": null,
+      "task_completion_month": null,
+      "verifiable_criterion_present": false,
+      "consistency_status": "flagged",
+      "flag_reason": "No milestones found in wp_structure.json or milestones_seed.json; cannot perform milestone consistency validation. wp_structure.json (orch.phase3.wp_structure.v1, run_id 5949b883-ef93-46a9-a54e-a3bea2c4faaa) contains no top-level milestones array and no milestone entries within any of the 9 work package objects. No milestones_seed.json was present in Tier 3 architecture inputs as a fallback source. Phase 4 gantt.json is absent (DEGRADED mode). Milestone definition and verifiable criterion assignment must be completed before Phase 4 gate condition 'All milestones have a defined verifiable criterion' can be satisfied."
+    }
+  ],
+  "summary": {
+    "total_milestones_checked": 0,
+    "passed": 0,
+    "flagged": 1
+  },
+  "timestamp": "2026-04-20T00:00:00Z"
+}
