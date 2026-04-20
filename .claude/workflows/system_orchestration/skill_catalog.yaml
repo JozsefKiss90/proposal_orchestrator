@@ -162,9 +162,11 @@ skill_catalog:
 
   - id: milestone-consistency-check
     purpose: >
-      Verify milestone due months against task schedule and deliverable due months.
-      Confirm every milestone has a verifiable achievement criterion testable at
-      the stated due month.
+      Verify milestone due months against deliverable due months and (when available)
+      task schedule. Confirm every milestone has a verifiable achievement criterion
+      testable at the stated due month. Operates in dual mode: DEGRADED (WP-level
+      validation only, when gantt.json is absent) or FULL (schedule-level validation,
+      when gantt.json is present).
     used_by_agents:
       - gantt_designer
       - wp_designer
@@ -174,9 +176,20 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
+    notes: >
+      Operates in dual mode:
+        - Phase 3 (n03_wp_design): DEGRADED — WP-level validation only (no gantt.json).
+          Validates milestone IDs, WP linkage, duration bounds, deliverable alignment,
+          and verifiable criteria using wp_structure.json alone.
+        - Phase 4+ (n04_gantt_milestones, n06_implementation_architecture): FULL —
+          schedule-level validation (requires gantt.json). Validates milestone due months
+          against task completion months and dependency map timing.
+      gantt.json is an optional input. Its absence triggers DEGRADED mode, not a
+      MISSING_INPUT failure. This prevents phase-leakage failures when the skill is
+      invoked during Phase 3 before gantt.json exists.
     constitutional_constraints:
       - "Milestones with non-verifiable criteria must be flagged"
-      - "Milestone due months must be consistent with task completion months"
+      - "Milestone due months must be consistent with task completion months (FULL mode) or WP duration bounds (DEGRADED mode)"
 
   - id: impact-pathway-mapper
     purpose: >

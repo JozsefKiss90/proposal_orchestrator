@@ -66,7 +66,7 @@ Invoke the `work-package-normalization` skill. Elaborate the `workpackage_seed.j
 Verify WP count does not exceed the instrument limit from `section_schema_registry.json`. If it does, document the conflict and resolve it — do not silently trim WPs without a decision log entry.
 
 **Step 4 — Check milestone consistency (milestone-consistency-check skill).**
-Invoke the `milestone-consistency-check` skill on the preliminary WP structure. Verify that milestone due months are consistent with task completion months and that all milestones have verifiable achievement criteria. Flag any milestones with non-verifiable criteria.
+Invoke the `milestone-consistency-check` skill on the preliminary WP structure. During Phase 3, this skill operates in **DEGRADED mode** (gantt.json does not yet exist). DEGRADED mode validates WP-level consistency only: milestone due_month within WP duration bounds, unique milestone IDs, WP linkage, deliverable–milestone alignment, and verifiable achievement criteria. It does NOT validate against task schedules or dependency graph timing — those checks occur in FULL mode when the skill is re-invoked during Phase 4 with gantt.json available. Do not expect Gantt-based validation at this stage.
 
 **Step 5 — Write initial wp_structure.json (without dependency_map).**
 Write the initial `wp_structure.json` to `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` with all `work_packages`, `partner_role_matrix`, `schema_id`, and `run_id` populated. Leave `dependency_map` absent or null at this stage — `dependency_mapper` will contribute it.
