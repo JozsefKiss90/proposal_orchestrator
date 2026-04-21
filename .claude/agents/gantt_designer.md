@@ -16,6 +16,7 @@ writes_to:
   - docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
   - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
 invoked_skills:
+  - gantt-schedule-builder
   - milestone-consistency-check
   - gate-enforcement
   - decision-log-update
@@ -41,6 +42,16 @@ Schema: `orch.phase4.gantt.v1`
 `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json` — updated from the produced Gantt schedule.
 
 ## Skill Bindings
+
+### `gantt-schedule-builder`
+**Purpose:** Assign all tasks to months consistent with the normalized dependency constraints; define milestone due months and verifiable achievement criteria; identify the critical path; produce the canonical `gantt.json` artifact.
+**Trigger:** First skill invoked in Phase 4. Runs after dependency normalization (Phase B+) produces `scheduling_constraints.json`.
+**Output / side-effect:** `gantt.json` written to `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` (schema `orch.phase4.gantt.v1`).
+**Constitutional constraints:**
+- Must not assign tasks beyond project duration.
+- Must not schedule before prerequisites per strict constraints.
+- Must not produce milestones without verifiable criteria.
+- Must not silently adjust project duration.
 
 ### `milestone-consistency-check`
 **Purpose:** Verify milestone due months against task schedule and deliverable due months; confirm every milestone has a verifiable achievement criterion testable at the stated due month.

@@ -55,31 +55,16 @@ Read `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.
 **Step 2 — Read all inputs.**
 Read `wp_structure.json`, `selected_call.json` (extract project duration in months), and `consortium/roles.json`. Extract all `task_id` values from all WPs. Check for dependency cycles in `dependency_map` — if any unresolved cycles are present, execute Failure Case 4.
 
-**Step 3 — Assign tasks to months.**
-Read the normalized scheduling constraints from `scheduling_constraints.json` (produced by the dependency normalizer before this agent runs). Use `strict_constraints` to determine enforceable temporal ordering and `non_strict_constraints` as informational dependencies.
-Using the strict constraints and the `dependency_map.edges`, assign each task a `start_month` and `end_month`:
-- `start_month` must be ≥ 1
-- `end_month` must be ≤ project duration from `selected_call.json` — no exceptions
-- `start_month` must respect strict `finish_to_start` constraints: a task cannot start before all strict predecessors have completed
-- Non-strict constraints (reclassified WP-level edges, data_input edges) do NOT enforce strict temporal ordering but represent logical data flow
-- `responsible_partner` for each task must come from Tier 3 `roles.json` / consortium data
-If any task cannot be assigned to months within project duration due to strict dependency constraints, do not silently adjust project duration. Record the conflict as a scope conflict and execute Failure Case 1 for the affected conditions.
+**Steps 3–6 — Invoke `gantt-schedule-builder` skill.**
+The `gantt-schedule-builder` skill executes the following as a single Claude invocation:
+- Assign tasks to months respecting strict constraints from `scheduling_constraints.json`
+- Define milestone due months and verifiable criteria from `milestones_seed.json`
+- Identify the critical path from strict dependency chains
+- Construct and write `gantt.json` to `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json`
+This skill must complete and write `gantt.json` to disk BEFORE `milestone-consistency-check` runs, so that the validation skill can operate in FULL mode (schedule-level validation).
 
-**Step 4 — Define milestone due months and verifiable criteria.**
-For each milestone implied by the WP structure (from `milestones_seed.json` if populated, or derived from the WP deliverables and task completions):
-- Assign a `due_month` consistent with the task completion months
-- Write a `verifiable_criterion`: a concrete, externally verifiable string — not a placeholder, not generic language such as "work package completed"
-- Assign `responsible_wp` (wp_id from `wp_structure.json`)
-If any milestone cannot have a verifiable criterion derived from the WP structure and Tier 3 data, flag it as an assumption and document it.
-
-**Step 5 — Identify critical path.**
-Derive the critical path from the strict constraints in `scheduling_constraints.json` and the task month assignments. The critical path is an ordered list of `task_id` and `milestone_id` strings forming the longest dependency chain. Must be non-empty. Record the derivation basis in the decision log.
-
-**Step 6 — Construct gantt.json.**
-Write `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` with all required fields. `artifact_status` must be absent at write time. This must be written to disk BEFORE invoking milestone-consistency-check so that skill can run in FULL mode.
-
-**Step 7 — Update milestones_seed.json.**
-Overwrite `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json` with the milestone definitions from `gantt.json` (`milestone_id`, `title`, `due_month`, `verifiable_criterion` per entry). Gate condition `g05_p07` verifies this file is populated.
+**Step 7 — milestones_seed.json.**
+Gate condition `g05_p07` verifies `milestones_seed.json` is populated. This file is already pre-populated in Tier 3 and is consumed as input by `gantt-schedule-builder`. No overwrite is required unless the Phase 4 run determines that milestone definitions have materially changed.
 
 **Step 8 — Invoke milestone-consistency-check skill.**
 Invoke the `milestone-consistency-check` skill to verify:

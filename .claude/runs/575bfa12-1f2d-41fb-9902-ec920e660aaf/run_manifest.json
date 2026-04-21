@@ -1,0 +1,42 @@
+{
+  "run_id": "575bfa12-1f2d-41fb-9902-ec920e660aaf",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "created_at": "2026-04-21T12:34:37.246804+00:00",
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "blocked_at_exit"
+  },
+  "accepted_upstream_gates": {
+    "phase_01_gate": {
+      "original_run_id": "a634da9d-ef08-4aca-98e1-57e9c9f6de89",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "accepted_at": "2026-04-21T12:34:37.249810+00:00",
+      "status": "pass"
+    },
+    "phase_02_gate": {
+      "original_run_id": "3bb41e14-a388-4cbc-8c24-81e1475d1393",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "accepted_at": "2026-04-21T12:34:37.251320+00:00",
+      "status": "pass"
+    },
+    "phase_03_gate": {
+      "original_run_id": "ca7cb19a-accb-4e30-9430-9f1a9d3c3f71",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "accepted_at": "2026-04-21T12:34:37.253337+00:00",
+      "status": "pass"
+    }
+  },
+  "node_failure_details": {
+    "n04_gantt_milestones": {
+      "failure_origin": "exit_gate",
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  }
+}
