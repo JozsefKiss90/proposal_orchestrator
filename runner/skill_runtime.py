@@ -1498,6 +1498,155 @@ def run_skill(
             payload=parsed,
         )
 
+    # ── Enrich-artifact write path ─────────────────────────────────
+    # Entered when the skill declares output_contract: "enrich_artifact".
+    # Claude emits only the enrichment fields (a compact JSON patch).
+    # The runtime reads the existing base artifact from disk, merges
+    # the patch fields into it, validates the merged result against
+    # the full schema, and writes atomically.  This eliminates the
+    # need for Claude to reproduce existing content verbatim, which
+    # drastically reduces the probability of structural JSON errors
+    # in large artifacts.
+    if output_contract == "enrich_artifact":
+        base_rel = entry.get("enrichment_base_artifact")
+        if not base_rel:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: output_contract is "
+                    f"'enrich_artifact' but no enrichment_base_artifact "
+                    f"declared in skill catalog"
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        base_path = repo_root / base_rel
+        if not base_path.is_file():
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: enrichment base artifact "
+                    f"not found: {base_rel}"
+                ),
+                failure_category="MISSING_INPUT",
+            )
+
+        try:
+            base_artifact = json.loads(
+                base_path.read_text(encoding="utf-8-sig")
+            )
+        except (json.JSONDecodeError, OSError) as exc:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: cannot read enrichment base "
+                    f"artifact {base_rel}: {exc}"
+                ),
+                failure_category="MISSING_INPUT",
+            )
+
+        if not isinstance(base_artifact, dict):
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: enrichment base artifact "
+                    f"is not a JSON object"
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        # Validate enrichment patch metadata against base artifact
+        patch_errors: list[str] = []
+        if (
+            "schema_id" in parsed
+            and "schema_id" in base_artifact
+            and parsed["schema_id"] != base_artifact["schema_id"]
+        ):
+            patch_errors.append(
+                f"schema_id mismatch: patch has "
+                f"{parsed['schema_id']!r}, base has "
+                f"{base_artifact['schema_id']!r}"
+            )
+        if "run_id" in parsed and parsed["run_id"] != run_id:
+            patch_errors.append(
+                f"run_id mismatch: expected {run_id!r}, "
+                f"patch has {parsed['run_id']!r}"
+            )
+        if "artifact_status" in parsed:
+            patch_errors.append(
+                "artifact_status must be absent in enrichment patch"
+            )
+
+        if patch_errors:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r} enrichment patch validation "
+                    f"failed: " + "; ".join(patch_errors)
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        # Merge: overlay non-metadata patch fields onto base artifact.
+        # Metadata fields (schema_id, run_id) come from the base.
+        _ENRICH_META = {"schema_id", "run_id"}
+        merged = dict(base_artifact)
+        for key, value in parsed.items():
+            if key not in _ENRICH_META:
+                merged[key] = value
+
+        # Look up schema for the base artifact path
+        enrich_schema = _find_schema_for_path(base_rel, repo_root)
+        enrich_exp_sid: str | None = None
+        enrich_req_fields: list[str] | None = None
+        if enrich_schema is not None:
+            enrich_exp_sid, enrich_req_fields = (
+                _extract_schema_requirements(enrich_schema)
+            )
+
+        enrich_need_run_id = enrich_exp_sid is not None
+
+        # Validate the MERGED result against the full artifact schema
+        merge_errors = _validate_skill_output(
+            response=merged,
+            run_id=run_id,
+            expected_schema_id=enrich_exp_sid,
+            required_fields=enrich_req_fields,
+            require_run_id=enrich_need_run_id,
+        )
+        if merge_errors:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r} merged artifact validation "
+                    f"failed: " + "; ".join(merge_errors)
+                ),
+                failure_category="MALFORMED_ARTIFACT",
+            )
+
+        # Atomic write of the merged artifact
+        write_error = _atomic_write(merged, base_path)
+        if write_error is not None:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: atomic write to "
+                    f"{base_rel!r} failed: {write_error}"
+                ),
+                failure_category="INCOMPLETE_OUTPUT",
+            )
+
+        _elapsed = time.monotonic() - _skill_t0
+        logger.info(
+            "  skill OK     id=%s  contract=enrich_artifact  "
+            "outputs=1  elapsed=%.1fs",
+            skill_id, _elapsed,
+        )
+        return SkillResult(
+            status="success",
+            outputs_written=[base_rel],
+        )
+
     # ── Collect canonical artifacts for artifact-producing modes ────
     dir_artifacts: list[tuple[str, dict]] = []  # (canonical_rel, schema_entry)
 

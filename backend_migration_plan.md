@@ -10,7 +10,7 @@
 
 ---
 
-## Current Migration Status (as of 2026-04-21, post Phase 4 gate pass)
+## Current Migration Status (as of 2026-04-22, post Phase 5 enricher fix)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
@@ -18,7 +18,7 @@
 | Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
 | Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
 | Phase 4 | OPERATIONAL | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. |
-| Phase 5 | NOT YET ATTEMPTED | Requires Phase 3 gate pass (satisfied) + Phase 2 gate pass (satisfied). Readiness diagnostic not yet performed. |
+| Phase 5 | REMEDIATED | Core-builder succeeds (TAPM). Enricher converted to `enrich_artifact` output contract: emits only DEC fields (~7KB), runtime merges into base artifact. Fixes structural JSON error in 24KB full-artifact mode. Pending rerun validation. |
 
 ---
 

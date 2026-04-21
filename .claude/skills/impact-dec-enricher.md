@@ -2,9 +2,10 @@
 skill_id: impact-dec-enricher
 purpose_summary: >
   Enrich the existing impact_architecture.json by populating the dissemination_plan,
-  exploitation_plan, and sustainability_mechanism fields. Reads the partial artifact
-  produced by impact-pathway-core-builder and overwrites it with the complete version.
-  Does NOT modify impact_pathways or kpis.
+  exploitation_plan, and sustainability_mechanism fields. Emits only the three DEC
+  fields as a compact JSON patch; the runtime merges them into the existing base
+  artifact produced by impact-pathway-core-builder. Does NOT emit or modify
+  impact_pathways or kpis — those are preserved automatically by the runtime merge.
 used_by_agents:
   - impact_architect
 reads_from:
@@ -38,18 +39,18 @@ in the Declared Inputs section from disk using the Read tool.
 
 ## Scope Limitation
 
-This skill ONLY populates three fields in the existing `impact_architecture.json`:
+This skill ONLY produces three fields as a compact enrichment patch:
 - `dissemination_plan`
 - `exploitation_plan`
 - `sustainability_mechanism`
 
-It MUST preserve unchanged:
-- `schema_id`
-- `run_id`
-- `impact_pathways` (copy verbatim from existing artifact)
-- `kpis` (copy verbatim from existing artifact)
+The runtime will automatically merge these fields into the existing
+`impact_architecture.json`, preserving `schema_id`, `run_id`,
+`impact_pathways`, and `kpis` from the base artifact.
 
-Do NOT recompute pathways or KPIs. Do NOT modify their content.
+**Do NOT include `impact_pathways` or `kpis` in your output.**
+**Do NOT recompute pathways or KPIs.**
+The runtime merge handles preservation of all base artifact fields.
 
 ## Canonical Inputs and Outputs
 
@@ -57,7 +58,7 @@ Do NOT recompute pathways or KPIs. Do NOT modify their content.
 
 | Path | Artifact / Content | Purpose |
 |------|--------------------|---------|
-| `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` | Partial Phase 5 artifact with impact_pathways and kpis populated, DEC fields null | Base artifact to enrich |
+| `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` | Partial Phase 5 artifact with impact_pathways and kpis populated, DEC fields null | Context for DEC plan construction (read impact pathways for alignment) |
 | `docs/tier3_project_instantiation/architecture_inputs/impacts.json` | Project impacts with dissemination, exploitation, sustainability data | Source for DEC plan content |
 | `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` | Call expected impacts | DEC plans must address call-specific requirements |
 | `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` | Instrument DEC section requirements | Ensures DEC plans cover mandatory instrument sections |
@@ -66,7 +67,7 @@ Do NOT recompute pathways or KPIs. Do NOT modify their content.
 
 | Path | Schema ID | Notes |
 |------|-----------|-------|
-| `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` | `orch.phase5.impact_architecture.v1` | Overwrites partial artifact with complete version |
+| `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` | `orch.phase5.impact_architecture.v1` | Runtime merges enrichment patch into existing base artifact |
 
 ## Execution Specification
 
@@ -77,10 +78,11 @@ Do NOT recompute pathways or KPIs. Do NOT modify their content.
 - Step 1.3: Confirm `impacts.json` exists. If absent: MISSING_INPUT.
 - Step 1.4: Confirm `expected_impacts.json` exists. If absent: MISSING_INPUT.
 
-### 2. Core Processing — Read Existing Artifact
+### 2. Core Processing — Read Context
 
 - Step 2.1: Read the existing `impact_architecture.json` from disk.
-- Step 2.2: Extract and preserve verbatim: `schema_id`, `run_id`, `impact_pathways`, `kpis`.
+- Step 2.2: Note the `schema_id` and `run_id` values — you will include these in your output.
+- Step 2.3: Review `impact_pathways` to understand which project outputs, outcomes, and expected impacts are addressed — DEC plans should align with these pathways.
 
 ### 3. Core Processing — Dissemination Plan
 
@@ -103,22 +105,25 @@ Do NOT recompute pathways or KPIs. Do NOT modify their content.
 
 ### 6. Output Construction
 
-Produce a complete `impact_architecture.json` with ALL fields:
+Produce a compact JSON enrichment patch with ONLY these fields:
 
 ```json
 {
-  "schema_id": "<preserved from existing>",
-  "run_id": "<preserved from existing>",
-  "impact_pathways": "<preserved verbatim from existing>",
-  "kpis": "<preserved verbatim from existing>",
+  "schema_id": "<copied from existing artifact>",
+  "run_id": "<copied from existing artifact>",
   "dissemination_plan": { "activities": [...], "open_access_policy": "..." },
   "exploitation_plan": { "activities": [...], "ipr_strategy": "..." },
   "sustainability_mechanism": { "description": "...", "responsible_partners": [...] }
 }
 ```
 
-- `artifact_status` MUST be absent at write time.
-- `impact_pathways` and `kpis` MUST be identical to the existing artifact.
+**Critical output rules:**
+- `schema_id` and `run_id` MUST match the existing artifact values exactly.
+- `artifact_status` MUST be absent.
+- Do NOT include `impact_pathways` or `kpis` — the runtime preserves these from the base.
+- Do NOT wrap the JSON in markdown code fences.
+- Do NOT include any prose, explanation, or annotation outside the JSON object.
+- The output must be a single, valid, self-contained JSON object.
 
 ## Failure Protocol
 
@@ -130,4 +135,8 @@ Produce a complete `impact_architecture.json` with ALL fields:
 
 ## Runtime Contract
 
-This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`.
+This skill uses the `enrich_artifact` output contract. The runtime reads the
+existing base artifact, merges this skill's output fields into it, validates
+the merged result against the full `orch.phase5.impact_architecture.v1` schema,
+and writes atomically. This skill is governed by the skill runtime contract at
+`.claude/skills/skill_runtime_contract.md`.
