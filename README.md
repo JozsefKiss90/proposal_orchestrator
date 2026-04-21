@@ -604,8 +604,13 @@ The orchestration pipeline transitions through three structural regimes:
   - Construct dependency DAG
 
 - **Phase 4: Temporal realization**
-  - Convert DAG into executable timeline (Gantt)
-  - Introduce scheduling constraints and milestone alignment
+  - Deterministic dependency normalization (pure Python, pre-agent):
+    converts Phase 3 dependency_map into `scheduling_constraints.json`,
+    reclassifying infeasible WP-level `finish_to_start` edges as non-strict
+  - Convert normalized constraints into executable timeline (Gantt)
+  - Gate enforces dependency-to-schedule consistency via `g05_p08`
+  - Dependency cycle validation remains Phase 3's responsibility;
+    temporal consistency is Phase 4's
 
 This separation is intentional and enforced by gates.
 

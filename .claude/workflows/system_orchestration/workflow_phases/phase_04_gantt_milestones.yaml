@@ -23,6 +23,9 @@ required_inputs:
       validation: "Duration field must be present and non-null"
     - path: docs/tier3_project_instantiation/consortium/roles.json
       role: "Partner roles for milestone responsibility assignment"
+    - path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      role: "WP start/end month bounds for dependency normalization"
+      validation: "Must be present and non-empty"
 outputs:
   tier3_updated:
     - path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
@@ -34,6 +37,12 @@ outputs:
         responsible partner; milestone table with verifiable criteria; critical
         path summary; timeline compliance confirmation against call-specified
         project duration; identified scheduling conflicts or critical path risks.
+    - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+      content: >
+        Normalized scheduling constraints derived from Phase 3 dependency_map.
+        Produced by deterministic dependency_normalizer (runner/dependency_normalizer.py)
+        before agent body execution. Classifies edges as strict (temporally
+        enforceable) or non_strict (informational). Schema: orch.phase4.scheduling_constraints.v1.
 instructions:
   - "Assign start and end months to every task from Phase 3."
   - "Ensure task scheduling respects the dependency map; no task starts before prerequisites complete."
@@ -59,6 +68,8 @@ gate_condition:
     - "Critical path identified and consistent with dependency map"
     - "milestones_seed.json populated in Tier 3"
     - "Gantt structure and milestone table written to Tier 4"
+    - "Normalized scheduling constraints written to Tier 4"
+    - "Schedule respects all strict dependency constraints from normalized dependency map"
   fail_behavior: >
     Declare gate failure. Write scheduling conflicts and duration violations to
     phase4_gantt_milestones/. Phase 5 may proceed independently if it depends

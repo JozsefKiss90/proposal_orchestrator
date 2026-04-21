@@ -329,14 +329,19 @@ def timeline_within_duration(
         return err
 
     # --- Read duration ---
+    # Primary field: project_duration_months.  Fallback: max_project_duration_months
+    # (selected_call.json uses the latter in the current project data).
     duration_raw = call_data.get("project_duration_months")
+    if duration_raw is None:
+        duration_raw = call_data.get("max_project_duration_months")
     if duration_raw is None:
         return PredicateResult(
             passed=False,
             failure_category=MALFORMED_ARTIFACT,
             reason=(
                 "selected_call.json is missing required field "
-                "'project_duration_months' "
+                "'project_duration_months' (and fallback "
+                "'max_project_duration_months') "
                 "(artifact_schema_specification.yaml tier3_instantiation_schemas)"
             ),
             details={"path": str(call_resolved)},
@@ -856,3 +861,203 @@ def critical_path_present(
             **({"critical_path_length": cp_len} if cp_len is not None else {}),
         },
     )
+
+
+# ---------------------------------------------------------------------------
+# dependency_schedule_consistency — Phase 4 gate predicate (g05_p08)
+# ---------------------------------------------------------------------------
+
+
+def dependency_schedule_consistency(
+    gantt_path: PathLike,
+    wp_path: PathLike,
+    scheduling_constraints_path: PathLike,
+    *,
+    repo_root: Optional[str] = None,
+) -> PredicateResult:
+    """
+    Verify that the Gantt schedule respects all strict normalized constraints.
+
+    For each strict constraint in ``scheduling_constraints.json``, checks that
+    the source node's latest task end_month ≤ the target node's earliest task
+    start_month in ``gantt.json``.  Non-strict constraints are not enforced.
+
+    Parameters
+    ----------
+    gantt_path :
+        Path to ``gantt.json`` (Phase 4 canonical artifact).
+    wp_path :
+        Path to ``wp_structure.json`` (Phase 3 canonical artifact).
+    scheduling_constraints_path :
+        Path to ``scheduling_constraints.json`` (Phase 4 derived artifact).
+    repo_root :
+        Optional repository root for path resolution.
+
+    Returns
+    -------
+    PredicateResult
+        Passes when all strict constraints are satisfied.
+        Fails with CROSS_ARTIFACT_INCONSISTENCY when any strict constraint
+        is violated, with actionable details identifying the violated
+        constraint(s).
+    """
+    gantt_resolved = resolve_repo_path(gantt_path, repo_root)
+    wp_resolved = resolve_repo_path(wp_path, repo_root)
+    sc_resolved = resolve_repo_path(scheduling_constraints_path, repo_root)
+
+    # ── Load artifacts ───────────────────────────────────────────────
+    gantt, err = _read_json_object(gantt_resolved)
+    if err:
+        return err
+
+    wp_data, err = _read_json_object(wp_resolved)
+    if err:
+        return err
+
+    sc_data, err = _read_json_object(sc_resolved)
+    if err:
+        return err
+
+    # ── Build task schedule map from gantt.json ──────────────────────
+    tasks_raw = gantt.get("tasks")
+    if not isinstance(tasks_raw, list):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason="gantt.json missing 'tasks' array",
+            details={"path": str(gantt_resolved)},
+        )
+
+    task_schedule: dict[str, dict[str, int]] = {}
+    for t in tasks_raw:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("task_id")
+        sm = t.get("start_month")
+        em = t.get("end_month")
+        if tid and isinstance(sm, int) and isinstance(em, int):
+            task_schedule[str(tid)] = {"start_month": sm, "end_month": em}
+
+    # ── Build task→WP and WP→tasks maps ─────────────────────────────
+    task_to_wp: dict[str, str] = {}
+    wp_to_tasks: dict[str, list[str]] = {}
+    work_packages = wp_data.get("work_packages")
+    if isinstance(work_packages, list):
+        for wp in work_packages:
+            if not isinstance(wp, dict):
+                continue
+            wp_id = wp.get("wp_id")
+            if wp_id is None:
+                continue
+            wp_id = str(wp_id)
+            tasks = wp.get("tasks")
+            if isinstance(tasks, list):
+                for task in tasks:
+                    if isinstance(task, dict) and task.get("task_id"):
+                        tid = str(task["task_id"])
+                        task_to_wp[tid] = wp_id
+                        wp_to_tasks.setdefault(wp_id, []).append(tid)
+
+    # ── Read strict constraints ──────────────────────────────────────
+    strict = sc_data.get("strict_constraints")
+    if not isinstance(strict, list):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason="scheduling_constraints.json missing 'strict_constraints' array",
+            details={"path": str(sc_resolved)},
+        )
+
+    # ── Evaluate each strict constraint ──────────────────────────────
+    violations: list[dict] = []
+
+    for constraint in strict:
+        if not isinstance(constraint, dict):
+            continue
+        from_node = str(constraint.get("from", ""))
+        to_node = str(constraint.get("to", ""))
+        if not from_node or not to_node:
+            continue
+
+        # Resolve the latest end_month of the source node
+        from_end = _resolve_max_end_month(from_node, task_schedule, wp_to_tasks)
+        # Resolve the earliest start_month of the target node
+        to_start = _resolve_min_start_month(to_node, task_schedule, wp_to_tasks)
+
+        if from_end is None or to_start is None:
+            # Node not found in gantt — skip (may be a WP without tasks in gantt)
+            continue
+
+        if from_end > to_start:
+            violations.append({
+                "from": from_node,
+                "to": to_node,
+                "from_max_end_month": from_end,
+                "to_min_start_month": to_start,
+                "constraint": constraint,
+            })
+
+    if violations:
+        return PredicateResult(
+            passed=False,
+            failure_category=CROSS_ARTIFACT_INCONSISTENCY,
+            reason=(
+                f"{len(violations)} strict temporal constraint(s) violated in "
+                f"gantt.json: predecessor task(s) end after successor task(s) "
+                f"start. See details for each violation."
+            ),
+            details={
+                "violations": violations,
+                "total_strict_constraints": len(strict),
+                "gantt_path": str(gantt_resolved),
+                "scheduling_constraints_path": str(sc_resolved),
+            },
+        )
+
+    return PredicateResult(
+        passed=True,
+        details={
+            "total_strict_constraints": len(strict),
+            "all_satisfied": True,
+            "gantt_path": str(gantt_resolved),
+            "scheduling_constraints_path": str(sc_resolved),
+        },
+    )
+
+
+def _resolve_max_end_month(
+    node_id: str,
+    task_schedule: dict[str, dict[str, int]],
+    wp_to_tasks: dict[str, list[str]],
+) -> Optional[int]:
+    """Resolve the maximum end_month for a node (task or WP)."""
+    # Direct task lookup
+    if node_id in task_schedule:
+        return task_schedule[node_id]["end_month"]
+    # WP lookup: max end_month across all tasks in the WP
+    if node_id in wp_to_tasks:
+        months = [
+            task_schedule[tid]["end_month"]
+            for tid in wp_to_tasks[node_id]
+            if tid in task_schedule
+        ]
+        return max(months) if months else None
+    return None
+
+
+def _resolve_min_start_month(
+    node_id: str,
+    task_schedule: dict[str, dict[str, int]],
+    wp_to_tasks: dict[str, list[str]],
+) -> Optional[int]:
+    """Resolve the minimum start_month for a node (task or WP)."""
+    if node_id in task_schedule:
+        return task_schedule[node_id]["start_month"]
+    if node_id in wp_to_tasks:
+        months = [
+            task_schedule[tid]["start_month"]
+            for tid in wp_to_tasks[node_id]
+            if tid in task_schedule
+        ]
+        return min(months) if months else None
+    return None

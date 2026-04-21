@@ -403,6 +403,10 @@ gate_registry:
         predicate_refs: [g05_p06]
       - prose: "milestones_seed.json populated in Tier 3"
         predicate_refs: [g05_p07]
+      - prose: "Normalized scheduling constraints written to Tier 4"
+        predicate_refs: [g05_p02c, g05_p02d]
+      - prose: "Schedule respects all strict dependency constraints from normalized dependency map"
+        predicate_refs: [g05_p08]
     blocking_edges:
       - e04_to_06
     fail_action: "Declare gate failure; write scheduling conflicts to phase4_gantt_milestones/; do not proceed to Phase 6"
@@ -634,6 +638,14 @@ artifact_registry:
     produced_by: n04_gantt_milestones
     consumed_by: [n06_implementation_architecture, n07_budget_gate, n08a_section_drafting]
     gate_dependency: phase_04_gate
+
+  - artifact_id: a_t4_phase4_scheduling_constraints
+    path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+    tier: tier4_phase_output
+    produced_by: n04_gantt_milestones
+    consumed_by: []
+    gate_dependency: phase_04_gate
+    note: "Produced by deterministic dependency_normalizer before agent body execution, not by a Claude skill"
 
   - artifact_id: a_t4_phase5
     path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/

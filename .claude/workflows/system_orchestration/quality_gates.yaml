@@ -110,6 +110,10 @@ quality_gates:
         predicate_refs: [g05_p06]
       - prose: "milestones_seed.json populated in Tier 3"
         predicate_refs: [g05_p07]
+      - prose: "Normalized scheduling constraints written to Tier 4"
+        predicate_refs: [g05_p02c, g05_p02d]
+      - prose: "Schedule respects all strict dependency constraints from normalized dependency map"
+        predicate_refs: [g05_p08]
 
   - id: gate_07_impact_specificity
     name: "Impact Specificity"

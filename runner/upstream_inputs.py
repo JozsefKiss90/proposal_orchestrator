@@ -51,11 +51,13 @@ UPSTREAM_REQUIRED_INPUTS: dict[str, list[str]] = {
         "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
     ],
 
-    # exit gate for n04 — Phase 4 consumed Phase 3 output + call duration + consortium roles
+    # exit gate for n04 — Phase 4 consumed Phase 3 output + call duration + consortium roles + WP seed bounds
     "phase_04_gate": [
         "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
         "docs/tier3_project_instantiation/call_binding/selected_call.json",
         "docs/tier3_project_instantiation/consortium/roles.json",
+        "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json",
     ],
 
     # exit gate for n05 — Phase 5 consumed Phase 2 output + impact seeds + Tier 2B extracts

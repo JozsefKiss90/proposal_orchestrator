@@ -102,6 +102,7 @@ from runner.predicates.source_ref_predicates import (
 from runner.predicates.timeline_predicates import (
     all_milestones_have_criteria,
     critical_path_present,
+    dependency_schedule_consistency,
     timeline_within_duration,
     wp_count_within_limit,
 )
@@ -196,6 +197,7 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "all_milestones_have_criteria": all_milestones_have_criteria,
     "wp_count_within_limit": wp_count_within_limit,
     "critical_path_present": critical_path_present,
+    "dependency_schedule_consistency": dependency_schedule_consistency,
 }
 
 

@@ -669,6 +669,47 @@ gate_rules:
           schedule.
         prose_condition: "Critical path identified and consistent with dependency map"
 
+      # --- file predicates for scheduling_constraints.json ---
+      - predicate_id: g05_p02c
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json"
+        fail_message: >
+          scheduling_constraints.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/.
+          The dependency normalizer must produce this artifact before the
+          Phase 4 gate can pass.
+        prose_condition: "Normalized scheduling constraints written to Tier 4"
+
+      - predicate_id: g05_p02d
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json"
+          run_id: "${run_id}"
+        fail_message: >
+          scheduling_constraints.json exists but its run_id does not match
+          the current run. Re-run Phase 4 or add the artifact to the reuse
+          policy.
+        prose_condition: "Normalized scheduling constraints written to Tier 4"
+
+      # --- dependency-schedule consistency predicate ---
+      - predicate_id: g05_p08
+        type: timeline
+        function: dependency_schedule_consistency
+        args:
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          scheduling_constraints_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json"
+        fail_message: >
+          One or more strict temporal constraints from
+          scheduling_constraints.json are violated in gantt.json. A task
+          starts before its prerequisite completes according to the
+          normalized dependency map. Review scheduling_constraints.json
+          normalization_log for constraint details.
+        prose_condition: "Schedule respects all strict dependency constraints from normalized dependency map"
+
 
   # ===========================================================================
   # GATE 06 — phase_05_gate

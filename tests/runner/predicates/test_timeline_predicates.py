@@ -35,6 +35,7 @@ import pytest
 from runner.predicates.timeline_predicates import (
     all_milestones_have_criteria,
     critical_path_present,
+    dependency_schedule_consistency,
     timeline_within_duration,
     wp_count_within_limit,
 )
@@ -860,3 +861,158 @@ class TestCriticalPathPresent:
         # Fail (missing)
         r_fail = critical_path_present(str(tmp_path / "absent.json"))
         assert "path" in r_fail.details
+
+
+# ===========================================================================
+# dependency_schedule_consistency tests
+# ===========================================================================
+
+
+class TestDependencyScheduleConsistency:
+    """Tests for the Phase 4 dependency-schedule consistency predicate."""
+
+    @staticmethod
+    def _write_triple(tmp_path, gantt, wp_structure, sc):
+        """Write gantt.json, wp_structure.json, and scheduling_constraints.json."""
+        g = tmp_path / "gantt.json"
+        g.write_text(json.dumps(gantt), encoding="utf-8")
+        w = tmp_path / "wp_structure.json"
+        w.write_text(json.dumps(wp_structure), encoding="utf-8")
+        s = tmp_path / "scheduling_constraints.json"
+        s.write_text(json.dumps(sc), encoding="utf-8")
+        return str(g), str(w), str(s)
+
+    @staticmethod
+    def _base_wp_structure():
+        return {
+            "work_packages": [
+                {"wp_id": "WP1", "tasks": [{"task_id": "T1-01"}, {"task_id": "T1-02"}]},
+                {"wp_id": "WP2", "tasks": [{"task_id": "T2-01"}, {"task_id": "T2-02"}]},
+            ],
+        }
+
+    def test_pass_all_strict_satisfied(self, tmp_path):
+        """All strict constraints satisfied → PASS."""
+        gantt = {
+            "tasks": [
+                {"task_id": "T1-01", "wp_id": "WP1", "start_month": 1, "end_month": 12},
+                {"task_id": "T1-02", "wp_id": "WP1", "start_month": 6, "end_month": 18},
+                {"task_id": "T2-01", "wp_id": "WP2", "start_month": 19, "end_month": 30},
+                {"task_id": "T2-02", "wp_id": "WP2", "start_month": 24, "end_month": 36},
+            ],
+        }
+        sc = {
+            "strict_constraints": [
+                # T1-02 ends M18, T2-01 starts M19 → 18 <= 19 ✓
+                {"from": "T1-02", "to": "T2-01", "original_edge_type": "finish_to_start",
+                 "action": "preserved", "reason": "task-level"},
+            ],
+            "non_strict_constraints": [],
+        }
+        gp, wp, sp = self._write_triple(tmp_path, gantt, self._base_wp_structure(), sc)
+        result = dependency_schedule_consistency(gp, wp, sp)
+        assert result.passed is True
+
+    def test_fail_strict_violated(self, tmp_path):
+        """Strict constraint violated → FAIL with CROSS_ARTIFACT_INCONSISTENCY."""
+        gantt = {
+            "tasks": [
+                {"task_id": "T1-02", "wp_id": "WP1", "start_month": 1, "end_month": 30},
+                {"task_id": "T2-01", "wp_id": "WP2", "start_month": 25, "end_month": 36},
+            ],
+        }
+        sc = {
+            "strict_constraints": [
+                # T1-02 ends M30, T2-01 starts M25 → 30 > 25 ✗
+                {"from": "T1-02", "to": "T2-01", "original_edge_type": "finish_to_start",
+                 "action": "preserved", "reason": "task-level"},
+            ],
+            "non_strict_constraints": [],
+        }
+        gp, wp, sp = self._write_triple(tmp_path, gantt, self._base_wp_structure(), sc)
+        result = dependency_schedule_consistency(gp, wp, sp)
+        assert result.passed is False
+        assert result.failure_category == CROSS_ARTIFACT_INCONSISTENCY
+        assert len(result.details["violations"]) == 1
+        v = result.details["violations"][0]
+        assert v["from"] == "T1-02"
+        assert v["to"] == "T2-01"
+
+    def test_non_strict_ignored(self, tmp_path):
+        """Non-strict constraints don't cause failure even when violated."""
+        gantt = {
+            "tasks": [
+                {"task_id": "T1-02", "wp_id": "WP1", "start_month": 1, "end_month": 30},
+                {"task_id": "T2-01", "wp_id": "WP2", "start_month": 10, "end_month": 36},
+            ],
+        }
+        sc = {
+            # strict_constraints empty; only non-strict (would be violated)
+            "strict_constraints": [],
+            "non_strict_constraints": [
+                {"from": "T1-02", "to": "T2-01", "original_edge_type": "finish_to_start",
+                 "action": "reclassified", "reason": "WP-level infeasible"},
+            ],
+        }
+        gp, wp, sp = self._write_triple(tmp_path, gantt, self._base_wp_structure(), sc)
+        result = dependency_schedule_consistency(gp, wp, sp)
+        assert result.passed is True
+
+    def test_missing_gantt(self, tmp_path):
+        """Missing gantt.json → MISSING_MANDATORY_INPUT."""
+        wp = tmp_path / "wp.json"
+        wp.write_text(json.dumps(self._base_wp_structure()), encoding="utf-8")
+        sc = tmp_path / "sc.json"
+        sc.write_text(json.dumps({"strict_constraints": [], "non_strict_constraints": []}), encoding="utf-8")
+        result = dependency_schedule_consistency(
+            str(tmp_path / "absent_gantt.json"), str(wp), str(sc)
+        )
+        assert result.passed is False
+        assert result.failure_category == MISSING_MANDATORY_INPUT
+
+    def test_missing_scheduling_constraints(self, tmp_path):
+        """Missing scheduling_constraints.json → MISSING_MANDATORY_INPUT."""
+        gantt = tmp_path / "gantt.json"
+        gantt.write_text(json.dumps({"tasks": []}), encoding="utf-8")
+        wp = tmp_path / "wp.json"
+        wp.write_text(json.dumps(self._base_wp_structure()), encoding="utf-8")
+        result = dependency_schedule_consistency(
+            str(gantt), str(wp), str(tmp_path / "absent_sc.json")
+        )
+        assert result.passed is False
+        assert result.failure_category == MISSING_MANDATORY_INPUT
+
+    def test_empty_strict_constraints_passes(self, tmp_path):
+        """Empty strict_constraints → passes trivially."""
+        gantt = {
+            "tasks": [
+                {"task_id": "T1-01", "wp_id": "WP1", "start_month": 1, "end_month": 12},
+            ],
+        }
+        sc = {"strict_constraints": [], "non_strict_constraints": []}
+        gp, wp, sp = self._write_triple(tmp_path, gantt, self._base_wp_structure(), sc)
+        result = dependency_schedule_consistency(gp, wp, sp)
+        assert result.passed is True
+        assert result.details["total_strict_constraints"] == 0
+
+    def test_wp_level_strict_constraint(self, tmp_path):
+        """WP-level strict constraint resolves to task max/min months."""
+        gantt = {
+            "tasks": [
+                {"task_id": "T1-01", "wp_id": "WP1", "start_month": 1, "end_month": 10},
+                {"task_id": "T1-02", "wp_id": "WP1", "start_month": 5, "end_month": 18},
+                {"task_id": "T2-01", "wp_id": "WP2", "start_month": 19, "end_month": 30},
+                {"task_id": "T2-02", "wp_id": "WP2", "start_month": 24, "end_month": 36},
+            ],
+        }
+        sc = {
+            "strict_constraints": [
+                # WP1 max end = 18, WP2 min start = 19 → 18 <= 19 ✓
+                {"from": "WP1", "to": "WP2", "original_edge_type": "finish_to_start",
+                 "action": "preserved", "reason": "feasible WP-level"},
+            ],
+            "non_strict_constraints": [],
+        }
+        gp, wp, sp = self._write_triple(tmp_path, gantt, self._base_wp_structure(), sc)
+        result = dependency_schedule_consistency(gp, wp, sp)
+        assert result.passed is True

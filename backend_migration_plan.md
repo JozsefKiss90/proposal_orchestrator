@@ -17,7 +17,7 @@
 | Phase 1 | COMPLETE | Call slicer + TAPM stable |
 | Phase 2 | COMPLETE | scope_coverage fix → semantic gate stable |
 | Phase 3 | FUNCTIONAL | CLI mode; structural output stable |
-| Phase 4 | NOT READY | Blocking issues in dependency semantics and gate coverage |
+| Phase 4 | REMEDIATION IMPLEMENTED — PENDING VALIDATION | Option A implemented: normalizer + gate predicate + validation order fix |
 
 ---
 
@@ -1252,29 +1252,36 @@ Phase 3 is operationally complete but not fully optimized.
 
 ---
 
-## 19. Phase 4 — Migration Readiness (BLOCKED)
+## 19. Phase 4 — Migration Readiness (REMEDIATION IMPLEMENTED — PENDING VALIDATION)
 
-Phase 4 is NOT ready for implementation due to structural inconsistencies between Phase 3 outputs and Phase 4 requirements.
+Phase 4 blocking issues have been remediated via Option A ("Better architecture").
+Status moves to READY only after a Phase 4 rerun passes with evidence.
 
-### Blocking issues
+### Remediation applied (3 fixes)
 
-1. **Dependency semantics mismatch:**
-   - WP-level `finish_to_start` edges are temporally infeasible
-   - Must be reclassified to `data_input`
+1. **Dependency normalization layer** (`runner/dependency_normalizer.py`):
+   - Pure-Python deterministic preprocessor, no Claude invocation
+   - Reads Phase 3 `wp_structure.json` + Tier 3 `workpackage_seed.json` + `selected_call.json`
+   - Reclassifies 16 infeasible WP-level `finish_to_start` edges as `non_strict`
+   - Preserves 3 feasible task-level `finish_to_start` edges as `strict`
+   - Writes `scheduling_constraints.json` to Phase 4 output directory
+   - Integrated via `agent_runtime.py` Phase B+ (before agent body, after input resolution)
 
-2. **Gate incompleteness:**
-   - No predicate enforcing dependency → schedule consistency
+2. **Gate hardening** (`g05_p02c`, `g05_p02d`, `g05_p08`):
+   - `g05_p02c`/`g05_p02d`: file existence + run ownership for `scheduling_constraints.json`
+   - `g05_p08` (`dependency_schedule_consistency`): validates gantt.json task schedule respects all strict normalized constraints
+   - Non-strict constraints are not enforced (informational data flow only)
 
-3. **Skill sequencing error:**
-   - `milestone-consistency-check` executes before `gantt.json` exists
+3. **Validation order correction** (`gantt_designer_prompt_spec.md`):
+   - `gantt.json` is now written (Step 6) BEFORE `milestone-consistency-check` runs (Step 8)
+   - Skill detects `gantt.json` on disk → runs in FULL mode (schedule-level validation)
+   - No regression to Phase 3 DEGRADED behavior (gantt.json absence triggers DEGRADED, not failure)
 
-### Required fixes before implementation
+### Previous blocking issues (now resolved)
 
-- Reclassify WP-level dependency edges (Phase 3 artifact correction)
-- Add `dependency_schedule_consistency` predicate to Phase 4 gate
-- Reorder or dual-mode `milestone-consistency-check`
-
-**Phase 4 must NOT be implemented before these corrections.**
+1. ~~Dependency semantics mismatch~~ → Normalizer reclassifies infeasible edges
+2. ~~Gate incompleteness~~ → `g05_p08` predicate added
+3. ~~Skill sequencing error~~ → Prompt spec reordered
 
 ### Phase 4 TAPM Suitability
 

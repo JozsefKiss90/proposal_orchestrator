@@ -804,6 +804,44 @@ def run_agent(
             failure_category="MISSING_INPUT",
         )
 
+    # ── Phase B+: Deterministic dependency normalization (n04 only) ────
+    #
+    # The dependency normalizer is a pure-Python preprocessor that reads
+    # wp_structure.json + workpackage_seed.json + selected_call.json and
+    # produces scheduling_constraints.json before the gantt_designer agent
+    # body executes.  This follows the same architectural pattern as the
+    # sub-agent injection for n03 (lines 996-1048): manifest-derived,
+    # node-specific preprocessing within the agent runtime.
+
+    if node_id == "n04_gantt_milestones":
+        try:
+            from runner.dependency_normalizer import (
+                normalize_dependencies,
+                DependencyNormalizerError,
+            )
+            sc_path = normalize_dependencies(run_id, repo_root)
+            logger.info(
+                "Dependency normalization completed: %s",
+                sc_path.relative_to(repo_root),
+            )
+            _refresh_inputs_from_outputs(
+                resolved_inputs,
+                [str(sc_path.relative_to(repo_root))],
+                repo_root,
+            )
+        except Exception as exc:
+            # DependencyNormalizerError or any unexpected error → fail closed
+            return AgentResult(
+                status="failure",
+                can_evaluate_exit_gate=False,
+                failure_reason=f"Dependency normalization failed: {exc}",
+                failure_category="MISSING_INPUT",
+                outputs_written=all_outputs,
+                validation_reports=all_validation_reports,
+                decision_log_writes=all_decision_log_writes,
+                invoked_skills=all_invocations,
+            )
+
     # ── Phase C: Pre-gate agent (n07 special case) ─────────────────────
 
     if pre_gate_agent_id is not None:

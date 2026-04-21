@@ -640,6 +640,108 @@ tier4_phase_output_schemas:
         item_type: string
 
   # ---------------------------------------------------------------------------
+  # 1.4b scheduling_constraints.json
+  # Path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+  # Produced by: dependency_normalizer (deterministic Python, Phase 4 preprocessing)
+  # Consumed by: phase_04_gate predicate dependency_schedule_consistency; gantt_designer agent body
+  # ---------------------------------------------------------------------------
+  scheduling_constraints:
+    schema_id_value: "orch.phase4.scheduling_constraints.v1"
+    canonical_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.phase4.scheduling_constraints.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+        description: >
+          Runner-managed field. Set to "invalid" when the exit gate for this
+          phase fails (blocked_at_exit). Set to "valid" when the gate passes.
+          Absence means the artifact has not yet been evaluated.
+
+      source_wp_structure_run_id:
+        type: string
+        required: true
+        description: >
+          run_id from the wp_structure.json used as input. Enables traceability
+          from normalized constraints back to the Phase 3 artifact that produced them.
+
+      derived_from_artifact:
+        type: string
+        required: true
+        description: >
+          Relative path to the wp_structure.json that was normalized.
+
+      normalization_timestamp:
+        type: string
+        required: true
+        description: ISO 8601 timestamp of when normalization was performed.
+
+      project_duration_months:
+        type: integer
+        required: true
+        description: >
+          Project duration in months from selected_call.json. Used as the
+          temporal envelope for feasibility checking.
+
+      wp_bounds:
+        type: object
+        required: true
+        description: >
+          Map of wp_id to {start_month, end_month} from workpackage_seed.json.
+          Records the WP temporal bounds used for feasibility classification.
+
+      strict_constraints:
+        type: array
+        required: true
+        description: >
+          Edges classified as temporally enforceable. The Phase 4 gate predicate
+          dependency_schedule_consistency verifies gantt.json respects these.
+        item_schema:
+          from: { type: string, required: true }
+          to: { type: string, required: true }
+          original_edge_type: { type: string, required: true }
+          action: { type: string, required: true, enum: [preserved] }
+          reason: { type: string, required: true }
+
+      non_strict_constraints:
+        type: array
+        required: true
+        description: >
+          Edges classified as informational. Not enforced by gate predicates.
+          Includes reclassified WP-level finish_to_start and all data_input edges.
+        item_schema:
+          from: { type: string, required: true }
+          to: { type: string, required: true }
+          original_edge_type: { type: string, required: true }
+          action: { type: string, required: true, enum: [preserved, reclassified] }
+          reason: { type: string, required: true }
+
+      normalization_log:
+        type: array
+        required: true
+        description: >
+          Full provenance log recording every edge classification decision.
+
+      unresolved_constraints:
+        type: array
+        required: true
+        description: >
+          Edges that could not be classified. Must be empty for the normalizer
+          to succeed. A non-empty array indicates ambiguity that requires
+          human intervention.
+
+  # ---------------------------------------------------------------------------
   # 1.5 impact_architecture.json
   # Path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json
   # Produced by: impact_architect agent (Phase 5)
@@ -2525,6 +2627,9 @@ schema_id_registry:
   - schema_id: "orch.phase4.gantt.v1"
     artifact: gantt.json
     section: "1.4"
+  - schema_id: "orch.phase4.scheduling_constraints.v1"
+    artifact: scheduling_constraints.json
+    section: "1.4b"
   - schema_id: "orch.phase5.impact_architecture.v1"
     artifact: impact_architecture.json
     section: "1.5"

@@ -13,9 +13,10 @@ Before taking any action, read the following sources in this order:
 1. `CLAUDE.md` — Constitutional authority; §7 Phase 4 gate condition, §13.3 (fabricated project facts — task assignments and duration), §13.7 (silent duration manipulation prohibited), §9.4 (durable decisions)
 2. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json` — Verify `phase_03_gate` has passed before any further action
 3. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` — WP structure and dependency map; schema `orch.phase3.wp_structure.v1`
-4. `docs/tier3_project_instantiation/call_binding/selected_call.json` — Project duration constraint (authoritative source)
-5. `docs/tier3_project_instantiation/consortium/roles.json` — Partner roles for task assignment
-6. `.claude/agents/gantt_designer.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
+4. `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json` — Normalized scheduling constraints (produced by dependency_normalizer before this agent runs); classifies dependency edges as strict vs non-strict
+5. `docs/tier3_project_instantiation/call_binding/selected_call.json` — Project duration constraint (authoritative source)
+6. `docs/tier3_project_instantiation/consortium/roles.json` — Partner roles for task assignment
+7. `.claude/agents/gantt_designer.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
 
 ---
 
@@ -36,6 +37,7 @@ Before taking any action, read the following sources in this order:
 |-------|------|----------|-----------------------|
 | `phase_03_gate` gate result | Tier 4 | `phase_outputs/phase3_wp_design/gate_result.json` | Must show `pass`; halt immediately if absent or fail |
 | WP structure and dependency map | Tier 4 | `phase_outputs/phase3_wp_design/wp_structure.json` | Must be present; `work_packages` and `dependency_map` non-empty; schema `orch.phase3.wp_structure.v1` |
+| Normalized scheduling constraints | Tier 4 | `phase_outputs/phase4_gantt_milestones/scheduling_constraints.json` | Must be present (produced by dependency_normalizer before this agent runs); `strict_constraints` and `non_strict_constraints` arrays; schema `orch.phase4.scheduling_constraints.v1` |
 | Project duration | Tier 3 | `call_binding/selected_call.json` | Must contain a non-null project duration in months; this is the authoritative scheduling constraint |
 | Partner roles | Tier 3 | `consortium/roles.json` | Must be present; used for task-to-partner assignment verification |
 
@@ -54,12 +56,14 @@ Read `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.
 Read `wp_structure.json`, `selected_call.json` (extract project duration in months), and `consortium/roles.json`. Extract all `task_id` values from all WPs. Check for dependency cycles in `dependency_map` — if any unresolved cycles are present, execute Failure Case 4.
 
 **Step 3 — Assign tasks to months.**
-Using the `dependency_map.edges` to determine task ordering, assign each task a `start_month` and `end_month`:
+Read the normalized scheduling constraints from `scheduling_constraints.json` (produced by the dependency normalizer before this agent runs). Use `strict_constraints` to determine enforceable temporal ordering and `non_strict_constraints` as informational dependencies.
+Using the strict constraints and the `dependency_map.edges`, assign each task a `start_month` and `end_month`:
 - `start_month` must be ≥ 1
 - `end_month` must be ≤ project duration from `selected_call.json` — no exceptions
-- `start_month` must respect `finish_to_start` and `start_to_start` dependency constraints from the dependency map
+- `start_month` must respect strict `finish_to_start` constraints: a task cannot start before all strict predecessors have completed
+- Non-strict constraints (reclassified WP-level edges, data_input edges) do NOT enforce strict temporal ordering but represent logical data flow
 - `responsible_partner` for each task must come from Tier 3 `roles.json` / consortium data
-If any task cannot be assigned to months within project duration due to dependency constraints, do not silently adjust project duration. Record the conflict as a scope conflict and execute Failure Case 1 for the affected conditions.
+If any task cannot be assigned to months within project duration due to strict dependency constraints, do not silently adjust project duration. Record the conflict as a scope conflict and execute Failure Case 1 for the affected conditions.
 
 **Step 4 — Define milestone due months and verifiable criteria.**
 For each milestone implied by the WP structure (from `milestones_seed.json` if populated, or derived from the WP deliverables and task completions):
@@ -69,20 +73,21 @@ For each milestone implied by the WP structure (from `milestones_seed.json` if p
 If any milestone cannot have a verifiable criterion derived from the WP structure and Tier 3 data, flag it as an assumption and document it.
 
 **Step 5 — Identify critical path.**
-Derive the critical path from the `dependency_map` and the task month assignments. The critical path is an ordered list of `task_id` and `milestone_id` strings forming the longest dependency chain. Must be non-empty. Record the derivation basis in the decision log.
+Derive the critical path from the strict constraints in `scheduling_constraints.json` and the task month assignments. The critical path is an ordered list of `task_id` and `milestone_id` strings forming the longest dependency chain. Must be non-empty. Record the derivation basis in the decision log.
 
-**Step 6 — Invoke milestone-consistency-check skill.**
+**Step 6 — Construct gantt.json.**
+Write `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` with all required fields. `artifact_status` must be absent at write time. This must be written to disk BEFORE invoking milestone-consistency-check so that skill can run in FULL mode.
+
+**Step 7 — Update milestones_seed.json.**
+Overwrite `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json` with the milestone definitions from `gantt.json` (`milestone_id`, `title`, `due_month`, `verifiable_criterion` per entry). Gate condition `g05_p07` verifies this file is populated.
+
+**Step 8 — Invoke milestone-consistency-check skill.**
 Invoke the `milestone-consistency-check` skill to verify:
 - All milestone `due_month` values are consistent with task completion months
 - No milestone `due_month` exceeds project duration
 - All `verifiable_criterion` values are concrete and non-empty
 Write the check result to `docs/tier4_orchestration_state/validation_reports/`. Flag any inconsistencies.
-
-**Step 7 — Construct gantt.json.**
-Write `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` with all required fields. `artifact_status` must be absent at write time.
-
-**Step 8 — Update milestones_seed.json.**
-Overwrite `docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json` with the milestone definitions from `gantt.json` (`milestone_id`, `title`, `due_month`, `verifiable_criterion` per entry). Gate condition `g05_p07` verifies this file is populated.
+Note: `gantt.json` must already be written to disk (Step 6) so the skill runs in FULL mode with schedule-level validation. If `gantt.json` is absent, the skill falls back to DEGRADED mode (WP-level only).
 
 **Step 9 — Invoke gate-enforcement skill.**
 Invoke the `gate-enforcement` skill to evaluate `phase_04_gate`. Gate conditions:
@@ -92,6 +97,8 @@ Invoke the `gate-enforcement` skill to evaluate `phase_04_gate`. Gate conditions
 4. All milestones have verifiable criteria and due months (`g05_p05`)
 5. Critical path identified and consistent with dependency map (`g05_p06`)
 6. `milestones_seed.json` populated in Tier 3 (`g05_p07`)
+7. Normalized scheduling constraints written to Tier 4 (`g05_p02c`, `g05_p02d`)
+8. Schedule respects all strict dependency constraints (`g05_p08`)
 
 **Step 10 — Write decision log entries.**
 Invoke the `decision-log-update` skill for all material scheduling decisions, conflict resolutions, and the gate result.
@@ -147,6 +154,8 @@ Gate conditions:
 4. All milestones have verifiable criteria and due months (`g05_p05`)
 5. Critical path identified (`g05_p06`)
 6. `milestones_seed.json` populated (`g05_p07`)
+7. Normalized scheduling constraints written to Tier 4 (`g05_p02c`, `g05_p02d`)
+8. Schedule respects all strict dependency constraints (`g05_p08`)
 
 Gate result written by runner to `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json`. Blocking edge on pass: `e04_to_06` (n06).
 
