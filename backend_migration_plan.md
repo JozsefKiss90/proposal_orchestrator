@@ -10,14 +10,15 @@
 
 ---
 
-## Current Migration Status (as of Phase 4 readiness diagnostic)
+## Current Migration Status (as of 2026-04-21, post Phase 4 gate pass)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
 | Phase 1 | COMPLETE | Call slicer + TAPM stable |
-| Phase 2 | COMPLETE | scope_coverage fix → semantic gate stable |
-| Phase 3 | FUNCTIONAL | CLI mode; structural output stable |
-| Phase 4 | REMEDIATION IMPLEMENTED — PENDING VALIDATION | Option A implemented: normalizer + gate predicate + validation order fix |
+| Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
+| Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
+| Phase 4 | OPERATIONAL | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. |
+| Phase 5 | NOT YET ATTEMPTED | Requires Phase 3 gate pass (satisfied) + Phase 2 gate pass (satisfied). Readiness diagnostic not yet performed. |
 
 ---
 
@@ -300,6 +301,7 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 | **n02** `concept-alignment-check` | tapm | Later | Reads project_brief/ + extracted (~80KB) |
 | **n03** `work-package-normalization` | tapm | Later | Reads WP seed + consortium + schema (~30KB) |
 | **n03** `wp-dependency-analysis` | cli-prompt | Never | Reads only Phase 3 outputs (~20KB) |
+| **n04** `gantt-schedule-builder` | cli-prompt | Later | Moderate: Phase 3+4 outputs + Tier 3 (~40-50KB); TAPM not required for correctness |
 | **n04** `milestone-consistency-check` | cli-prompt | Never | Small: Phase 3+4 outputs (~20KB) |
 | **n05** `impact-pathway-mapper` | tapm | Later | 4 paths across tiers (~80KB) |
 | **n06** `governance-model-builder` | tapm | Later | Consortium + Phase 3 outputs (~40KB) |
@@ -321,8 +323,8 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 ### 4.2 Summary Counts
 
 - **Migrate first (TAPM)**: 7 skills (`call-requirements-extraction`, `evaluation-matrix-builder`, `instrument-schema-normalization`, `topic-scope-check`, `proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
-- **Migrate later (TAPM)**: 4 skills (`concept-alignment-check`, `work-package-normalization`, `impact-pathway-mapper`, `governance-model-builder`)
-- **Never migrate**: 7 skills (small/bounded inputs, deterministic checks)
+- **Migrate later (TAPM)**: 5 skills (`concept-alignment-check`, `work-package-normalization`, `impact-pathway-mapper`, `governance-model-builder`, `gantt-schedule-builder`)
+- **Never migrate**: 8 skills (small/bounded inputs, deterministic checks, validation-only)
 - **Permanently external**: 6 functions (gates, validation, writes, state, HARD_BLOCK)
 
 > **Reclassification note (2026-04-16):** `instrument-schema-normalization` and `topic-scope-check` moved from "Never migrate" to "Migrate first" based on runtime telemetry from run `0ace9e49`. Original estimates (~15KB, ~10KB) were based on declared `reads_from` sizes; actual cli-prompt user prompts measured at 78KB and 74KB respectively, causing 300s timeouts with zero partial output. Classification decisions must be validated against runtime prompt-size telemetry, not static input estimates.
@@ -1252,12 +1254,11 @@ Phase 3 is operationally complete but not fully optimized.
 
 ---
 
-## 19. Phase 4 — Migration Readiness (REMEDIATION IMPLEMENTED — PENDING VALIDATION)
+## 19. Phase 4 — Migration Readiness (OPERATIONAL — VALIDATED)
 
-Phase 4 blocking issues have been remediated via Option A ("Better architecture").
-Status moves to READY only after a Phase 4 rerun passes with evidence.
+Phase 4 is operationally complete. Remediation was implemented and validated by a successful Phase 4 gate pass at runtime.
 
-### Remediation applied (3 fixes)
+### Remediation applied (4 components)
 
 1. **Dependency normalization layer** (`runner/dependency_normalizer.py`):
    - Pure-Python deterministic preprocessor, no Claude invocation
@@ -1267,25 +1268,34 @@ Status moves to READY only after a Phase 4 rerun passes with evidence.
    - Writes `scheduling_constraints.json` to Phase 4 output directory
    - Integrated via `agent_runtime.py` Phase B+ (before agent body, after input resolution)
 
-2. **Gate hardening** (`g05_p02c`, `g05_p02d`, `g05_p08`):
+2. **Gantt-producing skill** (`gantt-schedule-builder`):
+   - Skill spec: `.claude/skills/gantt-schedule-builder.md`
+   - Registered in `skill_catalog.yaml`, added to n04 manifest skill list
+   - Reads: wp_structure.json, scheduling_constraints.json, selected_call.json, roles.json, milestones_seed.json
+   - Writes: `gantt.json` (schema `orch.phase4.gantt.v1`) — the canonical Phase 4 gate artifact
+   - Executes before `milestone-consistency-check` so the validation skill sees gantt.json on disk and runs in FULL mode
+   - Uses cli-prompt mode; TAPM migration deferred (moderate input size ~40-50KB, not a bottleneck)
+
+3. **Gate hardening** (`g05_p02c`, `g05_p02d`, `g05_p08`):
    - `g05_p02c`/`g05_p02d`: file existence + run ownership for `scheduling_constraints.json`
    - `g05_p08` (`dependency_schedule_consistency`): validates gantt.json task schedule respects all strict normalized constraints
    - Non-strict constraints are not enforced (informational data flow only)
 
-3. **Validation order correction** (`gantt_designer_prompt_spec.md`):
-   - `gantt.json` is now written (Step 6) BEFORE `milestone-consistency-check` runs (Step 8)
-   - Skill detects `gantt.json` on disk → runs in FULL mode (schedule-level validation)
-   - No regression to Phase 3 DEGRADED behavior (gantt.json absence triggers DEGRADED, not failure)
+4. **Skill sequencing**:
+   - n04 skill execution order: `gantt-schedule-builder` → `milestone-consistency-check` → `decision-log-update` → `gate-enforcement`
+   - `gantt.json` written to disk before milestone validation; skill detects it and runs in FULL mode
+   - `gate-enforcement` always last (enforced by agent runtime)
 
-### Previous blocking issues (now resolved)
+### Previous blocking issues (resolved)
 
 1. ~~Dependency semantics mismatch~~ → Normalizer reclassifies infeasible edges
 2. ~~Gate incompleteness~~ → `g05_p08` predicate added
-3. ~~Skill sequencing error~~ → Prompt spec reordered
+3. ~~No gantt-producing skill~~ → `gantt-schedule-builder` added to n04
+4. ~~Milestone validation in DEGRADED mode~~ → gantt.json now present before milestone-consistency-check runs
 
 ### Phase 4 TAPM Suitability
 
-Phase 4 input size (~40–50KB) is moderate.
+Phase 4 input size (~40-50KB) is moderate. `gantt-schedule-builder` uses cli-prompt mode.
 
 TAPM is:
 - Not required for correctness
@@ -1297,15 +1307,18 @@ Priority: Phase 1 >> Phase 3 > Phase 4
 
 ## 20. Predicate Layer Expansion (Phase 4)
 
-The current predicate set is insufficient for temporal correctness.
+The Phase 4 predicate set has been extended for temporal correctness.
 
-**Required additions:**
+**Implemented:**
 
-- `dependency_schedule_consistency`
-- `milestone_traceability`
-- `task_duration_positive`
+- `dependency_schedule_consistency` (`g05_p08`) — validates gantt.json task schedule respects strict normalized constraints from scheduling_constraints.json. Operational and gate-enforced.
 
-These extend gate validation from structural correctness → temporal correctness.
+**Recommended future additions (not yet implemented):**
+
+- `milestone_traceability` — verify each milestone is linked to at least one deliverable or task
+- `task_duration_positive` — verify every task has `end_month > start_month`
+
+These would further extend gate validation but are not required for current Phase 4 gate passage.
 
 ---
 

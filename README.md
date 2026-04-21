@@ -50,7 +50,7 @@ Verify your setup:
 ```bash
 python --version          # 3.10 or later
 claude --version          # Claude Code CLI installed and on PATH
-python -m pytest tests/   # 1015 tests should pass
+python -m pytest tests/   # 1371 tests should pass
 ```
 
 ---
@@ -74,6 +74,8 @@ proposal_orchestator/
 |   +-- semantic_dispatch.py          #   Semantic predicate dispatch
 |   +-- run_context.py                #   Per-run state persistence
 |   +-- runtime_models.py             #   SkillResult, AgentResult, NodeExecutionResult
+|   +-- dependency_normalizer.py      #   Phase 4 deterministic dependency normalization
+|   +-- call_slicer.py               #   Step 0 deterministic call input bounding
 |   +-- ...                           #   Predicates, helpers, path utilities
 |
 +-- docs/                              # Tiered source truth (see Section 3)
@@ -89,17 +91,17 @@ proposal_orchestator/
 +-- .claude/                           # Workflow specifications and runtime state
 |   +-- workflows/system_orchestration/
 |   |   +-- manifest.compile.yaml      #   Compiled DAG manifest (runtime entry point)
-|   |   +-- gate_rules_library.yaml    #   97 predicates across 11 gates
+|   |   +-- gate_rules_library.yaml    #   102 predicates across 11 gates
 |   |   +-- artifact_schema_specification.yaml
-|   |   +-- agent_catalog.yaml         #   16 agent definitions
-|   |   +-- skill_catalog.yaml         #   19 skill definitions
+|   |   +-- agent_catalog.yaml         #   18 agent definitions
+|   |   +-- skill_catalog.yaml         #   21 skill definitions
 |   |   +-- workflow_phases/           #   Phase YAML definitions
 |   |   +-- ...
-|   +-- agents/                        #   Agent .md specifications (16 agents)
-|   +-- skills/                        #   Skill .md specifications (19 skills)
+|   +-- agents/                        #   Agent .md specifications (18 agents)
+|   +-- skills/                        #   Skill .md specifications (21 skills)
 |   +-- runs/                          #   Per-run state (run_manifest.json, run_summary.json)
 |
-+-- tests/                             # Test suite (1015 tests)
++-- tests/                             # Test suite (1371 tests)
 ```
 
 ---
@@ -534,16 +536,20 @@ Phase 3: WP Design & Dependencies
     |                           |
 Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
   n04_gantt_milestones          n05_impact_architecture
-    - Transforms dependency DAG into temporal schedule:
+    - Deterministic dependency normalization (Phase B+, pure Python):
+        * Reads Phase 3 dependency_map + WP seed bounds
+        * Classifies edges as strict (enforceable) or non-strict (informational)
+        * Writes scheduling_constraints.json before agent body
+    - gantt-schedule-builder skill produces gantt.json:
         * Assigns start_month / end_month to all tasks
-        * Produces milestone events with verification criteria
-    - Introduces temporal constraints:
-        * Project duration bound (from selected_call.json)
-        * Task coverage (all tasks must have time assignments)
-    - IMPORTANT:
-        Current gate predicates validate timeline completeness and bounds,
-        but do NOT fully enforce dependency_map temporal consistency.
-        This is a known limitation and must be addressed in predicate layer.
+        * Defines milestones with verifiable criteria
+        * Identifies critical path
+    - milestone-consistency-check runs in FULL mode (gantt.json present)
+    - Gate enforces:
+        * Timeline completeness and bounds (g05_p03, g05_p04)
+        * Milestone criteria presence (g05_p05)
+        * Dependency-to-schedule consistency via g05_p08
+        * scheduling_constraints.json presence (g05_p02c, g05_p02d)
   Exit: phase_04_gate           Exit: phase_05_gate
     |                           |
     +---------------------------+
@@ -572,10 +578,8 @@ Each gate evaluates a set of predicates — deterministic checks first, then sem
   - JSON schema conformance
   - field presence
   - cross-artifact coverage
-  - timeline bounds (Phase 4)
+  - timeline bounds and dependency-to-schedule consistency (Phase 4)
   - dependency cycles (Phase 3)
-
-  Note: Dependency cycle validation is enforced in Phase 3. Full dependency-to-schedule consistency is not yet enforced in Phase 4.
 
 - **Semantic predicates** invoke Claude to check constitutional compliance (e.g., no fabricated project facts, no unresolved scope conflicts, no unsupported Tier 5 claims)
 
@@ -607,7 +611,11 @@ The orchestration pipeline transitions through three structural regimes:
   - Deterministic dependency normalization (pure Python, pre-agent):
     converts Phase 3 dependency_map into `scheduling_constraints.json`,
     reclassifying infeasible WP-level `finish_to_start` edges as non-strict
-  - Convert normalized constraints into executable timeline (Gantt)
+  - `gantt-schedule-builder` skill converts normalized constraints into
+    executable timeline (`gantt.json`), assigns task months, defines
+    milestones with verifiable criteria, and identifies critical path
+  - `milestone-consistency-check` runs in FULL mode (schedule-level
+    validation) because gantt.json is written before it executes
   - Gate enforces dependency-to-schedule consistency via `g05_p08`
   - Dependency cycle validation remains Phase 3's responsibility;
     temporal consistency is Phase 4's
