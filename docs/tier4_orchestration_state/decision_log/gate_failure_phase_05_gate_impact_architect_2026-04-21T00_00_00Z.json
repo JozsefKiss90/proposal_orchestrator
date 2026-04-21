@@ -1,0 +1,21 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-04-21T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "canonical_artifact_evaluated": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+  "failure_reason": "Deterministic predicate 'every_pathway_project_outputs_non_empty' failed for all 5 impact pathways. impact_architecture.json contains 5 impact pathways (PATH-EI01 through PATH-EI05) each with project_outputs set to an empty array []. All five pathways record project_outputs_linkage_status as 'Unresolved', with notes that Tier 3 architecture_inputs (impacts.json, outcomes.json) contain no explicit linked_deliverable_ids or linked_wp_ids fields, and that heuristic matching of WP deliverable IDs to project outcomes is prohibited per CLAUDE.md §13.3. The phase_05_gate condition requires every pathway's project_outputs array to be non-empty, establishing a traceable project mechanism grounding each call expected impact claim in specific Phase 3 work package deliverables. Without non-empty project_outputs, impact claims lack the required traceability to project activities, violating CLAUDE.md §7 Phase 5 gate condition: 'No impact claim is asserted without a traceable project mechanism.'",
+  "predicates_failed": [
+    "every_pathway_project_outputs_non_empty"
+  ],
+  "affected_pathways": [
+    "PATH-EI01",
+    "PATH-EI02",
+    "PATH-EI03",
+    "PATH-EI04",
+    "PATH-EI05"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 Phase 5 gate condition (all impact claims grounded in project activities from Phase 3; no impact claim asserted without a traceable project mechanism), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "resolution_guidance": "Populate project_outputs arrays in all 5 impact pathways in impact_architecture.json with explicit references to deliverable IDs or work package output IDs from wp_structure.json. This requires explicit linked_deliverable_ids or linked_wp_ids to be added to Tier 3 architecture_inputs (impacts.json and/or outcomes.json) by the project team, providing the traceability chain that the Phase 5 skill can use to populate project_outputs without heuristic matching.",
+  "timestamp": "2026-04-21T00:00:00Z"
+}

@@ -1,0 +1,27 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-04-22T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "phase_05_gate FAILED: 3 deterministic predicates failed. The impact_architecture.json artifact (schema_id: orch.phase5.impact_architecture.v1, run_id: c4d3d0a6-f07c-407c-8ef0-984905856dc2) produced by Phase 5 has null values for three mandatory gate condition fields: dissemination_plan (null, line 209), exploitation_plan (null, line 210), and sustainability_mechanism (null, line 211). All three fields are required to be non-null by the phase_05_gate conditions defined in CLAUDE.md §7 Phase 5 ('exploitation and dissemination logic; Full impact pathway with outputs, outcomes, and impacts') and by the orch.phase5.impact_architecture.v1 schema required fields. The impact_pathways, kpis, and all KPI traceable_to_deliverable references are structurally sound and pass their respective predicates. The gate failure is attributable solely to the three null mandatory fields. Phase 6 and all downstream phases must not begin until phase_05_gate passes. Phase 5 must be rerun with dissemination_plan, exploitation_plan, and sustainability_mechanism populated.",
+  "predicates_failed": [
+    "dissemination_plan_non_null",
+    "exploitation_plan_non_null",
+    "sustainability_mechanism_non_null"
+  ],
+  "predicates_passed": [
+    "artifact_present",
+    "schema_id_match",
+    "run_id_match",
+    "artifact_not_invalid",
+    "impact_pathways_non_empty",
+    "all_expected_impact_ids_covered",
+    "all_pathways_project_outputs_non_empty",
+    "kpis_non_empty",
+    "all_kpis_traceable_to_deliverable",
+    "no_generic_impact_language"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory; a phase is not complete until its gate condition is satisfied), §7 Phase 5 gate condition (Full impact pathway with outputs, outcomes, and impacts cross-referenced to call expected impacts; exploitation and dissemination logic; dissemination_plan non-null; exploitation_plan non-null; sustainability_mechanism non-null), §12.4 (missing mandatory inputs trigger a gate failure; they must not be papered over by hallucinated completion), §15 (the system must prefer explicit gate failure over fabricated completion; a declared failure is a correct output)",
+  "resolution_required": true,
+  "resolution_action": "Rerun Phase 5 (impact_architect agent) to produce a complete impact_architecture.json with dissemination_plan, exploitation_plan, and sustainability_mechanism fields fully populated (non-null). All other artifact fields (impact_pathways, kpis) are structurally complete and do not require re-derivation.",
+  "timestamp": "2026-04-22T00:00:00Z"
+}
