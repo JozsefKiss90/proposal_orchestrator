@@ -20,6 +20,26 @@ constitutional_constraints:
   - "Generic impact language must not substitute for project-specific pathways"
 ---
 
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
+in the Declared Inputs section from disk using the Read tool. For directory
+paths, use Glob to discover JSON files within the directory, then Read each
+relevant file.
+
+**Declared input files to read:**
+- `docs/tier3_project_instantiation/architecture_inputs/outcomes.json`
+- `docs/tier3_project_instantiation/architecture_inputs/impacts.json`
+- `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json`
+- `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json`
+- `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
+
+**Boundary constraints:**
+- Do not read files outside the declared input set.
+- Do not read grouped JSON files (`cluster_CL*.grouped.json`) or work programme directories.
+- Do not read Tier 5 deliverables or integration artifacts.
+- Return your output as a single JSON object in your response.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
