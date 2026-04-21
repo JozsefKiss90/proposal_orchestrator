@@ -1,0 +1,115 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.gate_enforcement.predicate_summary.v1",
+  "run_id": "6d4ba767-280b-4175-9ad4-33768965e2d1",
+  "gate_id": "phase_05_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-21T12:00:00Z",
+  "deterministic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "artifact_present",
+        "type": "deterministic",
+        "function": "file_exists",
+        "args": {
+          "path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Canonical artifact does not exist at docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json \u2014 the phase5_impact_architecture directory is absent from phase_outputs, confirming Phase 5 has not been executed.",
+        "prose_condition": "The canonical phase artifact must exist at the mapped path before gate evaluation can proceed."
+      },
+      {
+        "predicate_id": "schema_id_match",
+        "type": "deterministic",
+        "function": "field_equals",
+        "args": {
+          "field": "schema_id",
+          "expected": "orch.phase5.impact_architecture.v1"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot read or verify schema_id field; expected value 'orch.phase5.impact_architecture.v1' cannot be confirmed.",
+        "prose_condition": "artifact.schema_id must equal 'orch.phase5.impact_architecture.v1'."
+      },
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "field_equals",
+        "args": {
+          "field": "run_id",
+          "expected": "6d4ba767-280b-4175-9ad4-33768965e2d1"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot read or verify run_id field; expected '6d4ba767-280b-4175-9ad4-33768965e2d1' cannot be confirmed.",
+        "prose_condition": "artifact.run_id must equal the current run_id '6d4ba767-280b-4175-9ad4-33768965e2d1'."
+      },
+      {
+        "predicate_id": "artifact_not_invalid",
+        "type": "deterministic",
+        "function": "field_not_equals",
+        "args": {
+          "field": "artifact_status",
+          "excluded_value": "invalid"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot read or verify artifact_status field; condition cannot be confirmed.",
+        "prose_condition": "artifact.artifact_status must be absent or not equal to 'invalid'."
+      },
+      {
+        "predicate_id": "impact_pathways_non_empty",
+        "type": "deterministic",
+        "function": "array_non_empty",
+        "args": {
+          "field": "impact_pathways"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot verify that impact_pathways is a non-empty array.",
+        "prose_condition": "impact_pathways must be a non-empty array."
+      },
+      {
+        "predicate_id": "all_expected_impacts_mapped",
+        "type": "deterministic",
+        "function": "all_ids_present_in_pathways",
+        "args": {
+          "source": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+          "target_field": "expected_impact_id"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot verify that every expected_impact_id from Tier 2B expected_impacts.json appears in at least one impact pathway.",
+        "prose_condition": "Every expected_impact_id from Tier 2B expected_impacts.json must appear in at least one impact_pathway entry."
+      },
+      {
+        "predicate_id": "pathways_have_project_outputs",
+        "type": "deterministic",
+        "function": "all_pathways_have_non_empty_array",
+        "args": {
+          "field": "project_outputs"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot verify that every impact pathway contains a non-empty project_outputs array.",
+        "prose_condition": "Every impact pathway's project_outputs array must be non-empty."
+      },
+      {
+        "predicate_id": "kpis_non_empty",
+        "type": "deterministic",
+        "function": "field_non_empty",
+        "args": {
+          "field": "kpis"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Artifact absent \u2014 cannot verify that kpis is non-empty.",
+        "prose_condition": "kpis must be non-empty."
+      },
+      {
+        "predicate_id": "kpis_traceable_to_deliverables",
+        "type": "deterministic",
+        "function": "all_kpis_traceable_to_valid_deliverable",
+        "args": {
+          "field": "traceable_to_deliverable",
+          "reference_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+        },
+        "failur
+=== END ===

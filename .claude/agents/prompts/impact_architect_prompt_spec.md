@@ -63,25 +63,26 @@ Read both gate result files. If either is absent or not `pass`, halt immediately
 **Step 2 — Read all inputs.**
 Read all inputs in the Inputs to Inspect table. Extract all `expected_impact_id` values from `expected_impacts.json` — these form the mandatory mapping set. Extract all `deliverable_id` values from `wp_structure.json` — these are the traceable project mechanisms for impact claims. If `expected_impacts.json` is absent or empty, execute Failure Case 2.
 
-**Step 3 — Invoke impact-pathway-mapper skill.**
-Apply the `impact-pathway-mapper` skill: for each `expected_impact_id` from Tier 2B `expected_impacts.json`:
-- Map the call expected impact to at least one project output (identified by `deliverable_id` from `wp_structure.json`)
-- Define the outcome intermediate step (output → outcome)
-- Define the impact narrative (outcome → broader impact)
-- Record `tier2b_source_ref` for the expected impact source
-If any call expected impact cannot be mapped to a project output, flag it as an uncovered impact — do not fabricate a project output to satisfy the mapping. Record it in the decision log as `scope_conflict`. An unmapped expected impact will block `phase_05_gate` condition `g06_p04`.
+**Step 3 — Invoke impact-pathway-core-builder skill.**
+Apply the `impact-pathway-core-builder` skill to produce the structural backbone of the impact architecture:
+- For each `expected_impact_id` from Tier 2B `expected_impacts.json`:
+  - Map the call expected impact to at least one project output (identified by `deliverable_id` from `wp_structure.json`)
+  - Define the outcome intermediate step (output → outcome)
+  - Define the impact narrative (outcome → broader impact)
+  - Record `tier2b_source_ref` for the expected impact source
+- Define KPIs traceable to WP deliverables
+If any call expected impact cannot be mapped to a project output, flag it as an uncovered impact — do not fabricate a project output to satisfy the mapping. Record it in the decision log as `scope_conflict`.
+This skill writes `impact_architecture.json` with `impact_pathways` and `kpis` populated; `dissemination_plan`, `exploitation_plan`, and `sustainability_mechanism` are set to `null`.
 
-**Step 4 — Define KPIs.**
-For each impact pathway, define at least one KPI:
-- `kpi_id`: unique
-- `description`: non-empty
-- `target`: non-empty
-- `measurement_method`: non-empty
-- `traceable_to_deliverable`: must reference a `deliverable_id` from `wp_structure.json`
-KPIs not traceable to a named WP deliverable are constitutional violations (CLAUDE.md §13.3). If a KPI target is set by inference from project context, flag it as an assumption and document it.
+**Step 4 — Invoke impact-dec-enricher skill.**
+Apply the `impact-dec-enricher` skill to populate the remaining fields:
+- Dissemination plan: activities with specific target audiences and responsible partners
+- Exploitation plan: activities with expected results and responsible partners
+- Sustainability mechanism: how results persist post-project
+This skill reads the existing `impact_architecture.json`, preserves `impact_pathways` and `kpis` verbatim, and overwrites the file with the complete version.
 
 **Step 5 — Invoke dissemination-exploitation-communication-check skill.**
-Define the dissemination plan, exploitation plan, and sustainability mechanism. Apply the `dissemination-exploitation-communication-check` skill to verify:
+Apply the `dissemination-exploitation-communication-check` skill to verify:
 - Dissemination activities: non-empty, specific to the project, with defined `target_audience` and `responsible_partner` from Tier 3
 - Exploitation activities: non-empty, with `expected_result` and `responsible_partner`
 - Sustainability: non-empty `description` with `responsible_partners` array
@@ -90,8 +91,8 @@ DEC plans must not be generic templates — all elements must be grounded in pro
 **Step 6 — Invoke proposal-section-traceability-check skill.**
 Before finalizing, apply the `proposal-section-traceability-check` skill to all impact claims. Assign Confirmed/Inferred/Assumed/Unresolved status. Any impact claim without a named WP deliverable mechanism must be flagged as Unresolved, not asserted as Confirmed (CLAUDE.md §13.3). Write unattributed assertions to `docs/tier4_orchestration_state/validation_reports/`.
 
-**Step 7 — Construct impact_architecture.json.**
-Write `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` with all required fields. `artifact_status` must be absent at write time.
+**Step 7 — Verify impact_architecture.json completeness.**
+Confirm that `impact_architecture.json` has been written by the preceding skills (Steps 3-4) with all required fields: `impact_pathways` (non-empty), `kpis` (non-empty), `dissemination_plan` (non-null), `exploitation_plan` (non-null), `sustainability_mechanism` (non-null). `artifact_status` must be absent.
 
 **Step 8 — Invoke gate-enforcement skill.**
 Invoke the `gate-enforcement` skill to evaluate `phase_05_gate`. Gate conditions:

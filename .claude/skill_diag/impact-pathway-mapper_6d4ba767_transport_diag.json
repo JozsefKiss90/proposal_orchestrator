@@ -1,0 +1,49 @@
+{
+  "skill_id": "impact-pathway-mapper",
+  "execution_mode": "tapm",
+  "failure_class": "TIMEOUT",
+  "run_id": "6d4ba767-280b-4175-9ad4-33768965e2d1",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/"
+  ],
+  "writes_to": [
+    "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 8192,
+  "timeout_seconds": 600,
+  "elapsed_seconds": 600.8429999999935,
+  "system_prompt_chars": 1283,
+  "user_prompt_chars": 33979,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 600s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--tools",
+    "Read,Glob",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\n## Tool Access and Input Boundary\n\nYou have access to the Read and Glob tools to read files from disk.\nRead ONLY the files listed in the Declared Inputs section of the task prompt. Do not read files outside the declared set.\nDo not use the Glob tool to discover files beyond the declared input paths. If a declared input is a directory, you may use Glob to list its contents, but do not navigate outside declared directories.\nDo not use any tools other than Read and Glob.\n\nConstitutional constraints (hard failures if violated):\n- Every call expected impact must be explicitly mapped or flagged as uncovered\n- Impact claims must trace to a named WP deliverable or activity\n- Generic impact language must not substitute for project-specific pathways\n\nYou MUST include these fields in every output artifact:\n- \"run_id\": \"6d4ba767-280b-4175-9ad4-33768965e2d1\"\n- The appropriate schema_id as defined in the skill specification\n- Do NOT include an artifact_status field\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": [
+    "Read",
+    "Glob"
+  ],
+  "tapm_tools_enabled": true,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/impact-pathway-mapper_6d4ba767_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/impact-pathway-mapper_6d4ba767_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/impact-pathway-mapper_6d4ba767_user_prompt.txt",
+    "stdout": ".claude/skill_diag/impact-pathway-mapper_6d4ba767_stdout.txt",
+    "stderr": ".claude/skill_diag/impact-pathway-mapper_6d4ba767_stderr.txt"
+  }
+}

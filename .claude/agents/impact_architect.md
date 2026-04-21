@@ -20,7 +20,8 @@ reads_from:
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
 invoked_skills:
-  - impact-pathway-mapper
+  - impact-pathway-core-builder
+  - impact-dec-enricher
   - dissemination-exploitation-communication-check
   - proposal-section-traceability-check
   - gate-enforcement
@@ -43,14 +44,23 @@ Schema: `orch.phase5.impact_architecture.v1`
 
 ## Skill Bindings
 
-### `impact-pathway-mapper`
-**Purpose:** Map project outputs to call expected outcomes and expected impacts; produce a structured pathway showing output-to-outcome-to-impact chains with source references.
-**Trigger:** Primary invocation on n05 execution; reads Tier 3 outcomes/impacts and Tier 2B expected impacts/outcomes.
-**Output / side-effect:** Structured impact pathway with output-to-outcome-to-impact chains written to `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/`.
+### `impact-pathway-core-builder`
+**Purpose:** Produce the structural backbone of Phase 5: impact pathways mapping call expected impacts to project outputs, and KPIs traceable to WP deliverables.
+**Trigger:** First invocation on n05 execution; reads Tier 3 outcomes/impacts and Tier 2B expected impacts/outcomes.
+**Output / side-effect:** Partial `impact_architecture.json` written to `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/` with `impact_pathways` and `kpis` populated; DEC fields set to `null`.
 **Constitutional constraints:**
 - Every call expected impact must be explicitly mapped or flagged as uncovered.
 - Impact claims must trace to a named WP deliverable or activity.
 - Generic impact language must not substitute for project-specific pathways.
+
+### `impact-dec-enricher`
+**Purpose:** Enrich the existing `impact_architecture.json` by populating dissemination_plan, exploitation_plan, and sustainability_mechanism fields. Does NOT modify impact_pathways or kpis.
+**Trigger:** After `impact-pathway-core-builder` succeeds; reads the partial artifact from disk.
+**Output / side-effect:** Overwrites `impact_architecture.json` with the complete version including DEC fields.
+**Constitutional constraints:**
+- DEC plans must be specific to the project; generic templates are insufficient.
+- Target groups must be defined with specificity.
+- Must preserve existing impact_pathways and kpis fields without modification.
 
 ### `dissemination-exploitation-communication-check`
 **Purpose:** Verify that dissemination, exploitation, and communication plans address the relevant call and instrument requirements.
