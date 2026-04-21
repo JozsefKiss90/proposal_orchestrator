@@ -10,6 +10,17 @@
 
 ---
 
+## Current Migration Status (as of Phase 4 readiness diagnostic)
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 1 | COMPLETE | Call slicer + TAPM stable |
+| Phase 2 | COMPLETE | scope_coverage fix → semantic gate stable |
+| Phase 3 | FUNCTIONAL | CLI mode; structural output stable |
+| Phase 4 | NOT READY | Blocking issues in dependency semantics and gate coverage |
+
+---
+
 ## Context
 
 The proposal orchestrator currently assembles all inputs into a single text prompt piped to `claude -p` via stdin for every skill invocation. This creates a prompt-size bottleneck: for Phase 1 the prompt reaches ~400-800KB (98.5% irrelevant), and for Phase 8 it reaches 150-500KB per skill invocation with redundant re-serialization across sequential skills. The root causes are: (1) no call-level input slicing — entire grouped JSONs with 64+ topics are serialized when only 1 matters, (2) `claude -p` without `--tools` cannot read files from disk so everything must be in the prompt, (3) per-skill re-resolution of the same inputs within an agent's skill sequence.
@@ -1216,3 +1227,87 @@ The Agent SDK represents the most plausible bridge to the native backend but req
 - Runtime contracts — unchanged
 - Fail-closed behavior — unchanged
 - External scheduler/gates/validation — unchanged
+
+---
+
+## 18. Phase 3 — Migration Status
+
+Phase 3 is operationally complete but not fully optimized.
+
+**Current characteristics:**
+- Uses CLI prompt mode (not TAPM)
+- Produces `wp_structure.json` (~30KB structured artifact)
+- Includes dependency graph construction
+
+**Known limitations:**
+- No TAPM migration for core skills:
+  - `work-package-normalization`
+  - `wp-dependency-analysis`
+  - `gate-enforcement`
+- Global token limit (8192) may be insufficient for large WP structures
+
+**Migration actions:**
+- Add `execution_mode: "tapm"` to Phase 3 skills
+- Introduce per-skill `max_tokens` override (≥16384)
+
+---
+
+## 19. Phase 4 — Migration Readiness (BLOCKED)
+
+Phase 4 is NOT ready for implementation due to structural inconsistencies between Phase 3 outputs and Phase 4 requirements.
+
+### Blocking issues
+
+1. **Dependency semantics mismatch:**
+   - WP-level `finish_to_start` edges are temporally infeasible
+   - Must be reclassified to `data_input`
+
+2. **Gate incompleteness:**
+   - No predicate enforcing dependency → schedule consistency
+
+3. **Skill sequencing error:**
+   - `milestone-consistency-check` executes before `gantt.json` exists
+
+### Required fixes before implementation
+
+- Reclassify WP-level dependency edges (Phase 3 artifact correction)
+- Add `dependency_schedule_consistency` predicate to Phase 4 gate
+- Reorder or dual-mode `milestone-consistency-check`
+
+**Phase 4 must NOT be implemented before these corrections.**
+
+### Phase 4 TAPM Suitability
+
+Phase 4 input size (~40–50KB) is moderate.
+
+TAPM is:
+- Not required for correctness
+- Recommended for consistency and future scaling
+
+Priority: Phase 1 >> Phase 3 > Phase 4
+
+---
+
+## 20. Predicate Layer Expansion (Phase 4)
+
+The current predicate set is insufficient for temporal correctness.
+
+**Required additions:**
+
+- `dependency_schedule_consistency`
+- `milestone_traceability`
+- `task_duration_positive`
+
+These extend gate validation from structural correctness → temporal correctness.
+
+---
+
+## 21. Migration Guardrail
+
+No phase implementation may proceed if:
+
+- artifact schema ≠ gate expectations
+- dependency semantics are ambiguous
+- required predicates are missing
+
+This enforces fail-closed migration discipline.

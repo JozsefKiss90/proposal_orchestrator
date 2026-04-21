@@ -517,12 +517,33 @@ Phase 2: Concept Refinement
     |
 Phase 3: WP Design & Dependencies
   n03_wp_design  (wp_designer + dependency_mapper sub-agent)
+    - Produces structured multi-entity artifact:
+        * Work packages (WPs)
+        * Tasks
+        * Deliverables
+        * Dependency graph (DAG)
+    - Introduces graph-level constraints:
+        * Dependency acyclicity (validated at gate)
+        * Deliverable presence per WP
+        * Partner-role consistency (partial)
+    - Output artifact:
+        docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
   Exit: phase_03_gate
     |
     +---------------------------+
     |                           |
 Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
   n04_gantt_milestones          n05_impact_architecture
+    - Transforms dependency DAG into temporal schedule:
+        * Assigns start_month / end_month to all tasks
+        * Produces milestone events with verification criteria
+    - Introduces temporal constraints:
+        * Project duration bound (from selected_call.json)
+        * Task coverage (all tasks must have time assignments)
+    - IMPORTANT:
+        Current gate predicates validate timeline completeness and bounds,
+        but do NOT fully enforce dependency_map temporal consistency.
+        This is a known limitation and must be addressed in predicate layer.
   Exit: phase_04_gate           Exit: phase_05_gate
     |                           |
     +---------------------------+
@@ -546,7 +567,16 @@ Phase 8: Drafting & Review (4 substeps)
 
 Each gate evaluates a set of predicates — deterministic checks first, then semantic checks:
 
-- **Deterministic predicates** verify file existence, JSON schema conformance, field presence, cross-artifact coverage, timeline validity, and dependency cycles
+- **Deterministic predicates** verify:
+  - file existence
+  - JSON schema conformance
+  - field presence
+  - cross-artifact coverage
+  - timeline bounds (Phase 4)
+  - dependency cycles (Phase 3)
+
+  Note: Dependency cycle validation is enforced in Phase 3. Full dependency-to-schedule consistency is not yet enforced in Phase 4.
+
 - **Semantic predicates** invoke Claude to check constitutional compliance (e.g., no fabricated project facts, no unresolved scope conflicts, no unsupported Tier 5 claims)
 
 If any deterministic predicate fails, semantic evaluation is skipped. A gate passes only when all predicates pass.
@@ -560,6 +590,24 @@ The budget gate (`gate_09_budget_consistency`) has special constitutional status
 - Phase 8 cannot begin — including preparatory drafting — until a validated budget response is present in `docs/integrations/lump_sum_budget_planner/received/`
 
 To unblock: place a valid budget response file in the `received/` directory and re-run the scheduler.
+
+### Phase Execution Characteristics
+
+The orchestration pipeline transitions through three structural regimes:
+
+- **Phase 1–2: Semantic alignment**
+  - Extract and validate call constraints
+  - Ensure concept coverage completeness (e.g. scope_coverage)
+
+- **Phase 3: Structural graph construction**
+  - Build WP/task/deliverable hierarchy
+  - Construct dependency DAG
+
+- **Phase 4: Temporal realization**
+  - Convert DAG into executable timeline (Gantt)
+  - Introduce scheduling constraints and milestone alignment
+
+This separation is intentional and enforced by gates.
 
 ---
 
