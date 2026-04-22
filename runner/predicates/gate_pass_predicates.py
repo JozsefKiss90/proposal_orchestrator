@@ -129,6 +129,69 @@ def _check_continuation_acceptance(
         return False
 
 
+def is_gate_fresh(
+    gate_id: str,
+    gate_result_data: dict,
+    repo_root: Optional[Path] = None,
+) -> tuple[bool, Optional[str], list[str]]:
+    """Check whether a gate result is fresh relative to its upstream inputs.
+
+    Reuses the same freshness logic as step 9 of :func:`gate_pass_recorded`:
+    compares the ``evaluated_at`` timestamp from *gate_result_data* against the
+    modification timestamps of upstream required inputs declared in
+    :data:`runner.upstream_inputs.UPSTREAM_REQUIRED_INPUTS`.
+
+    Parameters
+    ----------
+    gate_id:
+        Gate identifier (must be a key in ``UPSTREAM_REQUIRED_INPUTS``).
+    gate_result_data:
+        Parsed gate result dict (must contain ``evaluated_at``).
+    repo_root:
+        Repository root for resolving upstream input paths.
+
+    Returns
+    -------
+    tuple[bool, Optional[str], list[str]]
+        ``(is_fresh, reason, stale_inputs)``
+
+        * ``is_fresh``: ``True`` when the gate result is not stale.
+        * ``reason``: Human-readable explanation when stale; ``None`` when fresh.
+        * ``stale_inputs``: List of upstream input paths whose mtime exceeds
+          ``evaluated_at``; empty when fresh.
+    """
+    evaluated_at_raw = gate_result_data.get("evaluated_at")
+    if evaluated_at_raw is None:
+        return False, f"Gate result for '{gate_id}' has no evaluated_at field", []
+
+    evaluated_at_dt = _parse_iso8601(evaluated_at_raw)
+    if evaluated_at_dt is None:
+        return (
+            False,
+            f"Gate result for '{gate_id}' has unparseable evaluated_at: "
+            f"{evaluated_at_raw!r}",
+            [],
+        )
+
+    evaluated_at_posix = evaluated_at_dt.timestamp()
+    max_mtime = _max_upstream_mtime(gate_id, repo_root)
+
+    if max_mtime is not None and evaluated_at_posix < max_mtime:
+        stale_inputs: list[str] = []
+        for raw_path in UPSTREAM_REQUIRED_INPUTS.get(gate_id, []):
+            resolved = resolve_repo_path(raw_path, repo_root)
+            if resolved.exists() and resolved.stat().st_mtime > evaluated_at_posix:
+                stale_inputs.append(raw_path)
+        return (
+            False,
+            f"Gate result for '{gate_id}' is stale: evaluated_at "
+            f"{evaluated_at_raw} predates upstream input modifications",
+            stale_inputs,
+        )
+
+    return True, None, []
+
+
 def gate_pass_recorded(
     gate_id: str,
     run_id: str,
@@ -354,42 +417,22 @@ def gate_pass_recorded(
         )
 
     # 9 — freshness: evaluated_at must not predate any upstream input's mtime
-    evaluated_at_dt = _parse_iso8601(data["evaluated_at"])
-    if evaluated_at_dt is None:
-        return PredicateResult(
-            passed=False,
-            failure_category=MALFORMED_ARTIFACT,
-            reason=(
-                f"Gate result for '{gate_id}' has an unparseable evaluated_at "
-                f"timestamp: {data['evaluated_at']!r}"
-            ),
-            details={
-                "gate_id": gate_id,
-                "path": str(result_path),
-                "evaluated_at": data["evaluated_at"],
-            },
+    fresh, fresh_reason, stale_inputs = is_gate_fresh(gate_id, data, repo_root)
+    if not fresh:
+        # Determine failure category: unparseable timestamp → MALFORMED_ARTIFACT;
+        # stale inputs → STALE_UPSTREAM_MISMATCH.
+        category = (
+            STALE_UPSTREAM_MISMATCH if stale_inputs
+            else MALFORMED_ARTIFACT
         )
-
-    evaluated_at_posix = evaluated_at_dt.timestamp()
-    max_mtime = _max_upstream_mtime(gate_id, repo_root)
-
-    if max_mtime is not None and evaluated_at_posix < max_mtime:
-        stale_inputs = []
-        for raw_path in UPSTREAM_REQUIRED_INPUTS.get(gate_id, []):
-            resolved = resolve_repo_path(raw_path, repo_root)
-            if resolved.exists() and resolved.stat().st_mtime > evaluated_at_posix:
-                stale_inputs.append(str(resolved))
         return PredicateResult(
             passed=False,
-            failure_category=STALE_UPSTREAM_MISMATCH,
-            reason=(
-                f"Gate result for '{gate_id}' is stale: one or more upstream "
-                "input artifacts were modified after the gate was evaluated."
-            ),
+            failure_category=category,
+            reason=fresh_reason or f"Gate result for '{gate_id}' freshness check failed",
             details={
                 "gate_id": gate_id,
                 "path": str(result_path),
-                "evaluated_at": data["evaluated_at"],
+                "evaluated_at": data.get("evaluated_at"),
                 "stale_inputs": stale_inputs,
             },
         )

@@ -91,6 +91,7 @@ from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
+from runner.predicates.gate_pass_predicates import is_gate_fresh
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult, NodeExecutionResult
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
@@ -228,25 +229,47 @@ def bootstrap_phase_prerequisites(
             result_data = json.loads(
                 gate_result_abs.read_text(encoding="utf-8")
             )
-            if result_data.get("status") == "pass":
-                ctx.set_node_state(node_id, "released")
-                bootstrapped.append(node_id)
-                # Record accepted upstream gate evidence so that
-                # downstream gate_pass_recorded predicates can verify
-                # the run_id mismatch was explicitly accepted by this
-                # run's continuation bootstrap.
-                ctx.record_accepted_upstream_gate(
-                    gate_id=exit_gate_id,
-                    original_run_id=result_data.get("run_id", "unknown"),
-                    evidence_path=gate_result_rel,
-                )
+            if result_data.get("status") != "pass":
+                continue  # non-pass status — remain pending
+
+            # Freshness check: reject stale upstream gates before
+            # accepting them.  This enforces the invariant that a
+            # node never executes with stale upstream gates — the
+            # same freshness check that exit-gate evaluation applies
+            # via gate_pass_recorded step 9.
+            fresh, stale_reason, stale_inputs = is_gate_fresh(
+                exit_gate_id, result_data, repo_root
+            )
+            if not fresh:
                 log.info(
-                    "  Bootstrap: %s -> released (evidence: %s, "
-                    "original_run_id: %s)",
-                    node_id,
-                    gate_result_rel,
-                    result_data.get("run_id", "unknown"),
+                    "  [BOOTSTRAP] Rejecting upstream gate %s "
+                    "(stale inputs detected): %s  "
+                    "evaluated_at=%s  stale_inputs=%s",
+                    exit_gate_id,
+                    stale_reason,
+                    result_data.get("evaluated_at", "unknown"),
+                    stale_inputs,
                 )
+                continue  # stale evidence — remain pending
+
+            ctx.set_node_state(node_id, "released")
+            bootstrapped.append(node_id)
+            # Record accepted upstream gate evidence so that
+            # downstream gate_pass_recorded predicates can verify
+            # the run_id mismatch was explicitly accepted by this
+            # run's continuation bootstrap.
+            ctx.record_accepted_upstream_gate(
+                gate_id=exit_gate_id,
+                original_run_id=result_data.get("run_id", "unknown"),
+                evidence_path=gate_result_rel,
+            )
+            log.info(
+                "  Bootstrap: %s -> released (evidence: %s, "
+                "original_run_id: %s)",
+                node_id,
+                gate_result_rel,
+                result_data.get("run_id", "unknown"),
+            )
         except (json.JSONDecodeError, OSError, TypeError):
             continue  # corrupt or unreadable evidence — remain pending
 
