@@ -18,7 +18,7 @@
 | Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
 | Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
 | Phase 4 | OPERATIONAL | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. |
-| Phase 5 | REMEDIATED | Core-builder succeeds (TAPM). Enricher converted to `enrich_artifact` output contract: emits only DEC fields (~7KB), runtime merges into base artifact. Fixes structural JSON error in 24KB full-artifact mode. Pending rerun validation. |
+| Phase 5 | REMEDIATED | Core-builder succeeds (TAPM). Enricher converted to `enrich_artifact` output contract: emits only DEC fields (~7KB), runtime merges into base artifact. DEC-check migrated to TAPM (was 234KB cli-prompt, 300s timeout). Pending rerun validation. |
 
 ---
 
@@ -313,7 +313,7 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 | `gate-enforcement` | cli-prompt | Never | Deterministic checks, small inputs |
 | `decision-log-update` | cli-prompt | Never | Writes only, minimal reads |
 | `checkpoint-publish` | cli-prompt | Never | Writes checkpoint, minimal reads |
-| `dissemination-exploitation-communication-check` | cli-prompt | Never | Phase 5 + extracted (~30KB) |
+| `dissemination-exploitation-communication-check` | ~~cli-prompt~~ **tapm** | ~~Never~~ **Migrated** | ~~Phase 5 + extracted (~30KB)~~ **Reclassified 2026-04-22: actual user_prompt 234KB (run c3066a3c), 300s timeout with zero output. Original estimate (~30KB) was based on declared reads_from sizes; actual cli-prompt serializes full impact_architecture.json (~200KB) + skill spec + Tier 2A/2B extracted files. Phase 5 operational blocker.** |
 | **Gate evaluation** | permanently external | Never | Constitutional: external, deterministic |
 | **Schema validation** | permanently external | Never | Constitutional: external, no silent repair |
 | **Atomic writes** | permanently external | Never | File I/O, no reasoning |

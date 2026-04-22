@@ -523,11 +523,11 @@ class TestSpecConsistency:
 class TestRegressionGuards:
     """Ensure other Phase 5 skills and gate predicates are unaffected."""
 
-    def test_dec_check_unchanged(self) -> None:
+    def test_dec_check_reads_from_phase5(self) -> None:
+        """DEC check reads from Phase 5 directory (unchanged by TAPM migration)."""
         entry = _get_skill_entry(
             "dissemination-exploitation-communication-check", _REPO_ROOT
         )
-        assert entry.get("execution_mode") is None or entry.get("execution_mode") == "cli-prompt"
         reads_from = entry.get("reads_from", [])
         assert any("phase5_impact_architecture" in r for r in reads_from)
 
