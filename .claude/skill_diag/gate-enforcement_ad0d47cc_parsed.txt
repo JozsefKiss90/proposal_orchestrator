@@ -1,0 +1,63 @@
+=== parsed OK ===
+=== top-level keys: ['run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "run_id": "ad0d47cc-fea7-4784-a797-79702e9d11b2",
+  "gate_id": "phase_06_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-23T00:01:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "ethics_assessment_non_null",
+      "ethics_self_assessment_statement_non_empty",
+      "governance_matrix_non_empty",
+      "every_risk_has_likelihood_impact_mitigation",
+      "management_roles_assigned_to_valid_partners",
+      "instrument_sections_addressed_non_empty"
+    ],
+    "failed": [
+      {
+        "predicate_id": "risk_register_non_empty",
+        "type": "deterministic",
+        "function": "array_non_empty",
+        "args": {
+          "field": "risk_register",
+          "observed_value": "[]",
+          "expected": "non-empty array with at least one entry having non-null likelihood, impact, mitigation"
+        },
+        "failure_category": "CONSTRAINT_VIOLATION",
+        "fail_message": "risk_register is an empty array []. The Phase 6 gate condition (CLAUDE.md \u00a77) requires the risk register to be populated. No risk entries are present; the predicate every_risk_has_likelihood_impact_mitigation passes vacuously due to the empty array but this does not satisfy the population requirement. The risk register must contain at least one entry with non-null likelihood, impact, and mitigation before this gate can pass.",
+        "prose_condition": "risk_register is non-empty array"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "instrument_sections_complete",
+        "function": "all_mandatory_sections_have_status_addressed",
+        "agent": "implementation_architect",
+        "constitutional_rule": "CLAUDE.md \u00a77 Phase 6 gate condition: All instrument-mandated implementation sections are addressed",
+        "findings": [
+          {
+            "claim": "instrument_sections_addressed contains only one entry (B.3.1: Work plan and resources, status: addressed). The compliance_profile.json confirms gender_plan_required: true and ethics_review_required: true for this RIA call (HORIZON-CL4-2026-05-DIGITAL-EMERGING-02, instrument_type: RIA). A gender equality plan section is a mandatory instrument-mandated implementation section under Horizon Europe RIA when gender_plan_required is true (per compliance_profile.json). No gender equality plan section (e.g., B.6 or equivalent) appears in instrument_sections_addressed, meaning this mandatory section is not represented and cannot be confirmed as addressed. Additionally, no dedicated implementation section tracking entry for the ethics review requirement (ethics_review_required: true) is present beyond the populated ethics_assessment field.",
+            "violated_rule": "CLAUDE.md \u00a77 Phase 6 gate condition: all instrument-mandated implementation sections are addressed; compliance_profile.json gender_plan_required: true mandates inclusion of a gender equality plan section traceable through instrument_sections_addressed",
+            "evidence_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json (gender_plan_required: true, ethics_review_required: true); docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (instrument_sections_addressed: [{section_id: B.3.1, status: addressed}] \u2014 one entry only)",
+            "severity": "critical"
+          }
+        ]
+      }
+    ]
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_phase_06_gate_implementation_architect_2026-04-23T00_01_00Z",
+    "decision_type": "gate_failure",
+    "gate_id": "phase_06_gate",
+    "failure_reason": "phase_06_gate failed on 1 deterministic predicate and 1 semantic predicate for run ad0d47cc-fea7-4784-a797-79702e9d11b2. (1) risk_register_non_empty [deterministic]: risk_register in implementation_architecture.json is an empty array []; the Phase 6 gate condition requires a populated risk register with at least one entry having non-null likelihood, impact, and mitigation values. (2) instrument_sections_complete [semantic]: instrument_sections_addressed lists only one section (B.3.1, status: addressed). The compliance_profile.json (Tier 3) confirms gender_plan_required: true for this RIA call; a gender equality plan section is a mandatory instrument-mandated implementation section but is entirely absent from instrument_sections_addressed, making it impossible to confirm this mandatory section is addressed. This is a gate failure against CLAUDE.md \u00a77 Phase 6 gate condition ('All instrument-mandated implementation sections are addressed. Risk register is populated.'). Note: this evaluation supersedes the prior gate_failure decision log entry dated 2026-04-23T000000Z, which recorded different predicate failures on an earlier artifact version. The current artifact has resolved ethics_assessm
+=== END ===

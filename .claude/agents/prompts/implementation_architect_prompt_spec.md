@@ -65,12 +65,14 @@ Read all three gate result files. If any is absent or not `pass`, halt immediate
 **Step 2 — Read all inputs.**
 Read all inputs in the Inputs to Inspect table. Extract all partner IDs from the consortium directory. Extract all `section_id` values from `section_schema_registry.json` for the active instrument — these define which implementation sections must be addressed.
 
-**Step 3 — Build governance model (governance-model-builder skill).**
+**Step 3 — Build governance model, ethics assessment, and instrument sections (governance-model-builder skill).**
 Invoke the `governance-model-builder` skill:
 - Derive management body composition from WP lead structure and Tier 3 consortium data
 - Assign governance roles only to partners present in Tier 3 `partners.json` — never invent roles or assign to non-Tier-3 partners
 - Define `decision_scope` for each governance body (non-empty string)
 - Produce `governance_matrix` and `management_roles` arrays
+- Produce `ethics_assessment` from compliance_profile.json (non-null, with self_assessment_statement)
+- Produce `instrument_sections_addressed` from section_schema_registry.json for the active instrument
 - Every `management_roles[].assigned_to` must match a `partner_id` in Tier 3 `partners.json`
 Document all governance composition decisions in the decision log.
 
@@ -82,18 +84,11 @@ Invoke the `risk-register-builder` skill:
 - Mitigation measures must be traceable to specific project activities
 Each risk entry must have: `risk_id`, `description`, `category` (enum), `likelihood` (enum), `impact` (enum), `mitigation` (non-empty string — non-null)
 
-**Step 5 — Conduct ethics self-assessment.**
-The ethics self-assessment must be explicitly present — it must not be omitted, left null, or marked as `"N/A"`. Per the output schema:
-- `ethics_issues_identified`: boolean, explicitly present
-- `issues`: non-empty array if `ethics_issues_identified: true`, may be empty otherwise
-- `self_assessment_statement`: non-empty string, explicitly present
-Document each ethics issue identified as a `material_decision` in the decision log.
+**Step 5 — Verify ethics and instrument sections (post-skill validation).**
+Verify that governance-model-builder produced non-null `ethics_assessment` with a non-empty `self_assessment_statement` and non-empty `instrument_sections_addressed`. These fields are now produced by the governance-model-builder skill (Step 3) from compliance_profile.json and section_schema_registry.json respectively. If either is missing, the gate will correctly fail on g07_p06 or g07_p09.
 
-**Step 6 — Address instrument-mandated sections.**
-For every `section_id` in `section_schema_registry.json` for the active instrument:
-- Determine whether it is addressed by Phase 6 implementation content
-- Assign `status`: `addressed`, `not_applicable`, or `deferred` — `deferred` is only permissible if Phase 6 explicitly cannot address it (requires decision log entry with reason)
-- Source any determination of `not_applicable` from the compliance profile or the section schema — document as an `assumption` if derived by inference
+**Step 6 — (Reserved — covered by Step 3.)**
+Instrument-mandated section addressing is now part of the governance-model-builder skill invocation in Step 3.
 
 **Step 7 — Invoke milestone-consistency-check skill.**
 Invoke the `milestone-consistency-check` skill to verify that Phase 4 Gantt and Phase 3 WP milestones remain consistent after Phase 6 additions. Write results to `docs/tier4_orchestration_state/validation_reports/`.

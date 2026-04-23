@@ -46,12 +46,13 @@ Schema: `orch.phase6.implementation_architecture.v1`
 ## Skill Bindings
 
 ### `governance-model-builder`
-**Purpose:** Build the project governance model: management body composition, meeting frequency and decision scope, escalation paths, and quality assurance procedures.
-**Trigger:** Primary invocation on n06 execution; reads Tier 3 consortium data and WP structure to derive governance.
-**Output / side-effect:** Governance model written to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/`.
+**Purpose:** Build the project governance model, ethics self-assessment, and instrument-mandated section coverage: management body composition, meeting frequency and decision scope, escalation paths, ethics assessment from compliance profile, and instrument section addressing from section schema registry.
+**Trigger:** Primary invocation on n06 execution; reads Tier 3 consortium data, WP structure, compliance profile, selected call, and section schema registry.
+**Output / side-effect:** Base implementation architecture written to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/` with governance_matrix, management_roles, ethics_assessment, and instrument_sections_addressed populated; risk_register set to `[]` (populated by risk-register-builder).
 **Constitutional constraints:**
 - Governance roles must be assigned to Tier 3 consortium members only.
 - Management structure must be consistent with WP lead assignments.
+- Ethics self-assessment must not be omitted, null, or 'N/A'.
 
 ### `risk-register-builder`
 **Purpose:** Populate the risk register from Tier 3 risk seeds; assign likelihood, impact, mitigation, and monitoring; identify material risks not in the seed file.

@@ -15,6 +15,7 @@ used_by_agents:
 reads_from:
   - CLAUDE.md
   - docs/tier4_orchestration_state/phase_outputs/
+optional_reads_from:
   - docs/tier5_deliverables/
 writes_to:
   - docs/tier4_orchestration_state/validation_reports/
