@@ -1,19 +1,14 @@
+=== skill_id: governance-model-builder ===
+=== mode: tapm ===
+=== response_text length: 34874 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase6.implementation_architecture.v1",
   "run_id": "5831d759-165e-4f46-ab85-09ca2e183689",
   "governance_matrix": [
     {
       "body_name": "Consortium General Assembly",
-      "composition": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "decision_scope": "Strategic project direction, consortium agreement amendments, partner admission or exit, IP strategy approval, escalated inter-partner disputes, and any matters requiring collective consent of all beneficiaries.",
       "meeting_frequency": "Biannual (twice per year) and ad hoc upon written request of the coordinator or any consortium partner",
       "escalation_path": "Disputes not resolvable within the Consortium General Assembly to be handled consistent with consortium agreement provisions, as a project governance route consistent with Tier 1 implementation provisions. Coordinator manages formal interface with the granting authority.",
@@ -27,16 +22,7 @@
     },
     {
       "body_name": "Project Management Board",
-      "composition": [
-        "ATU",
-        "BIIS",
-        "CERIA",
-        "NIHS",
-        "ISIA",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "BIIS", "CERIA", "NIHS", "ISIA", "ELI", "BAL", "FIIT"],
       "decision_scope": "Operational management, quality assurance, risk monitoring, internal reporting, deliverable review and approval, task-level coordination across work packages, and day-to-day project decision-making not requiring full consortium consent.",
       "meeting_frequency": "Quarterly (every three months) and ad hoc as required by the coordinator or any WP lead",
       "escalation_path": "Issues requiring strategic decisions, significant budget realignment, or unresolvable operational disputes escalated to the Consortium General Assembly. Escalation route framed as a project governance route consistent with coordinator's role under grant agreement implementation provisions.",
@@ -50,10 +36,7 @@
     },
     {
       "body_name": "Ethics and Compliance Panel",
-      "composition": [
-        "ATU",
-        "NIHS"
-      ],
+      "composition": ["ATU", "NIHS"],
       "decision_scope": "Ethics self-assessment monitoring, ethics compliance tracking across all work packages, coordination of ethics requirements under WP1 task T1-03, and ethics oversight for healthcare AI applications under WP5.",
       "meeting_frequency": "Quarterly and as triggered by ethics-relevant events or new data processing activities commencing under any work package",
       "escalation_path": "Ethics issues requiring consortium-wide action escalated to the Project Management Board. Ethics requirements that become contractual obligations reported to the coordinator for compliance management. Significant ethics concerns requiring partner-level decisions escalated to the Consortium General Assembly.",
@@ -213,138 +196,26 @@
       "source_basis": "wp_structure.json (WP9 lead_partner: 'BAL'); roles.json (BAL wp_lead: ['WP9'], scientific_role: 'LLM Engineering and Platform Integration Lead', key_responsibilities: 'Lead dissemination, exploitation and communication', 'AI-on-demand platform integration and open-source release management'). Assigned_to 'BAL' matches lead_partner 'BAL' in wp_structure.json WP9 — Constraint 2 satisfied."
     }
   ],
-  "risk_register": [
-    {
-      "risk_id": "RISK-01",
-      "description": "Integrating symbolic planning formalisms with LLM-based reasoning may prove more difficult than anticipated, particularly in achieving real-time performance for the planning engine.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Adopt a modular architecture with well-defined interfaces between symbolic and neural components. Implement fallback modes where the LLM-only planner operates when symbolic integration introduces unacceptable latency. Begin integration testing from M6, not M18. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-02",
-      "description": "The tri-store memory architecture may not scale to the interaction lengths required by demonstrators (hundreds of steps) without unacceptable latency or storage costs.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Design the memory controller with configurable retention policies from the start. Conduct scalability stress-testing on synthetic long-horizon tasks from M9. Implement tiered storage with fast/approximate retrieval for working memory and precise/slower retrieval for episodic memory. [Affects: WP3 (Adaptive Memory Architecture)]",
-      "responsible_partner": "BIIS"
-    },
-    {
-      "risk_id": "RISK-03",
-      "description": "Formal convergence proofs may be achievable only for restricted task classes, not for the full generality of real-world multi-agent scenarios encountered in demonstrators.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Classify task types early (M3–M6) by coordination complexity. Prioritise convergence proofs for the most common demonstrator task patterns. Use probabilistic convergence bounds for task classes where deterministic proofs are infeasible. [Affects: WP4 (Decentralised Multi-Agent Coordination)]",
-      "responsible_partner": "CERIA"
-    },
-    {
-      "risk_id": "RISK-04",
-      "description": "Access to de-identified clinical datasets may be delayed by ethics review processes or restricted in scope, reducing the clinical validation power of the healthcare demonstrator.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Submit ethics applications in M1 (pre-project preparation already initiated). Use publicly available clinical datasets (MIMIC-IV, eICU) for initial development and intermediate evaluation. Design the demonstrator with a data abstraction layer that can switch between data sources. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support)]",
-      "responsible_partner": "NIHS"
-    },
-    {
-      "risk_id": "RISK-05",
-      "description": "Operational factory access for the manufacturing demonstrator may be interrupted by production schedules, equipment maintenance, or external disruptions.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "medium",
-      "mitigation": "Secure a formal access agreement with factory partners before project start. Schedule the 3-month validation period with buffer windows. Develop a high-fidelity digital twin of the pilot factory that can substitute for physical access during development phases. [Affects: WP6 (Manufacturing Demonstrator — Process Optimisation)]",
-      "responsible_partner": "ISIA"
-    },
-    {
-      "risk_id": "RISK-06",
-      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of transfer demonstrator results.",
-      "category": "organisational",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Negotiate data access and publication terms in the consortium agreement. Design the demonstrator with an anonymisation layer that enables publication of performance metrics without exposing proprietary data. Supplement with public logistics benchmarks. [Affects: WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation)]",
-      "responsible_partner": "ELI"
-    },
-    {
-      "risk_id": "RISK-07",
-      "description": "The fast pace of LLM development may produce new foundation models during the project that significantly change the baseline capabilities, requiring re-evaluation of MAESTRO's value proposition.",
-      "category": "technical",
-      "likelihood": "high",
-      "impact": "medium",
-      "mitigation": "Design all MAESTRO components with model-agnostic interfaces that can integrate new LLMs without architectural changes. Conduct annual baseline re-evaluation (M12, M24, M36) against latest models. MAESTRO's value lies in the architecture (planning, memory, coordination) not in any specific LLM. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "BAL"
-    },
-    {
-      "risk_id": "RISK-08",
-      "description": "Regulatory requirements under the EU AI Act for high-risk AI systems (particularly the healthcare demonstrator) may impose compliance obligations that require additional development effort.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Monitor EU AI Act implementing regulations throughout the project. Design auditability and transparency mechanisms from the start (audit trails, decision explanations). Engage with AI regulatory sandboxes where available. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-09",
-      "description": "A key partner may reduce commitment or a principal investigator may depart during the project, creating capability gaps.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "high",
-      "mitigation": "Ensure each pillar has at least 2 partners with relevant expertise. Include deputy PI appointments for each WP lead. Consortium agreement includes commitment clauses and transition procedures. [Affects: WP1 (Project Management and Coordination)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-10",
-      "description": "The independently developed planning, memory, coordination, and tool orchestration modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars and the tool orchestration layer. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-11",
-      "description": "The diversity of external APIs across three demonstrator domains (HL7 FHIR in healthcare, OPC-UA in manufacturing, logistics tracking/customs APIs) may require more adapter development effort than planned, delaying tool orchestration layer readiness.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Define a minimal common adapter interface in M1–M3. Prioritise adapters for the most critical APIs per demonstrator. Use existing open-source connector libraries where available rather than building from scratch. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "ATU"
-    }
-  ],
+  "risk_register": [],
   "ethics_assessment": {
     "ethics_issues_identified": true,
     "issues": [
       {
         "category": "Category 8 — Artificial Intelligence",
         "description": "The project develops and deploys AI-based systems across all core research work packages: WP2 (neuro-symbolic planning engine), WP3 (adaptive memory architecture), WP4 (decentralised multi-agent coordination), and validates these in applied AI demonstrators in WP5 (clinical decision support), WP6 (manufacturing process optimisation), and WP7 (logistics supply chain planning). Ethical concerns related to human rights and values include: AI transparency and explainability, AI safety in the safety-critical clinical decision support domain, prevention of discriminatory outcomes in clinical and manufacturing AI applications, and maintenance of human oversight mechanisms in deployed agent systems. These concerns are addressed through architecture design choices in WP2–WP4 (formally verifiable plans, auditable multi-agent interaction traces per T4-03) and through domain-specific validation in WP5–WP7.",
-        "wps_involved": [
-          "WP2",
-          "WP3",
-          "WP4",
-          "WP5",
-          "WP6",
-          "WP7"
-        ],
+        "wps_involved": ["WP2", "WP3", "WP4", "WP5", "WP6", "WP7"],
         "source_basis": "compliance_profile.json (ethics_review_required: true); implementation_constraints.json (ethics_self_assessment_required: rule sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf p.16, programme-guide_horizon_en.pdf pp.25-28; civil_focus_constraint: sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17); wp_structure.json (WP2, WP3, WP4, WP5, WP6, WP7 objectives and tasks); section_schema_registry.json (section A.4, Category 8: 'development/deployment/use of AI-based systems; detail whether ethical concerns related to human rights and values arise and how addressed')."
       },
       {
         "category": "Category 2 — Humans",
         "description": "WP5 (Healthcare Demonstrator) involves clinical expert validation of specialist sub-agents against diagnostic benchmarks (T5-03: 'Clinical expert validation and results analysis'). Clinical experts participating in validation studies may constitute human participants. The de-identified clinical datasets used in WP5 originate from human patients (NIHS-provided). Appropriate consent, ethics committee approval, and data governance procedures for dataset use must be confirmed and documented by NIHS. NIHS carries explicit Tier 3 responsibility for 'Ethics oversight for healthcare AI application'.",
-        "wps_involved": [
-          "WP5"
-        ],
+        "wps_involved": ["WP5"],
         "source_basis": "wp_structure.json (WP5 task T5-01: 'Clinical use case definition and diagnostic benchmark design'; T5-03: 'Clinical expert validation and results analysis'; WP5 objective: 'Conduct clinical expert validation of specialist sub-agents against diagnostic benchmarks'); roles.json (NIHS key_responsibilities: 'Provide de-identified clinical datasets and validation pathways', 'Ethics oversight for healthcare AI application'); implementation_constraints.json (ethics_self_assessment_required; ethics_appraisal_summary: 'proportionality of methods, applicant awareness of ethical and social impacts'); section_schema_registry.json (section A.4, Category 2: 'patients for medical studies', 'volunteers for nonmedical studies')."
       },
       {
         "category": "Category 4 — Personal Data",
         "description": "WP5 processes de-identified clinical datasets provided by NIHS. De-identified health data may retain re-identification risk when processed by advanced AI analysis systems and may constitute special category data under GDPR Article 9 (health data). A Data Management Plan (D1-02, M6 under WP1) will establish data governance procedures compliant with applicable EU data protection law. Data processing is conducted within the EU/associated countries framework. No export of personal data outside the EU is anticipated, but must be confirmed by NIHS.",
-        "wps_involved": [
-          "WP1",
-          "WP5"
-        ],
+        "wps_involved": ["WP1", "WP5"],
         "source_basis": "wp_structure.json (WP5 objectives: reference to 'de-identified clinical datasets'; D1-02: 'Data management plan', responsible_partner: ATU, due_month: 6); roles.json (NIHS: 'Provide de-identified clinical datasets and validation pathways'); implementation_constraints.json (ethics_self_assessment_required; ethics_appraisal_summary: 'compliance with ethical principles, relevant legislation'); section_schema_registry.json (section A.4, Category 4: 'processing of personal data', 'special categories (... health data)', 'further processing of previously collected data')."
       }
     ],
@@ -507,3 +378,5 @@
     }
   ]
 }
+
+=== END ===

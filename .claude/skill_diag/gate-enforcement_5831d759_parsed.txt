@@ -1,0 +1,126 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.gate_result.v1",
+  "run_id": "5831d759-165e-4f46-ab85-09ca2e183689",
+  "gate_id": "phase_06_gate",
+  "overall_status": "pass",
+  "hard_block": false,
+  "evaluated_at": "2026-04-23T12:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      {
+        "predicate_id": "artifact_present",
+        "type": "deterministic",
+        "function": "file_exists",
+        "args": {
+          "path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        },
+        "prose_condition": "Canonical artifact exists at declared path for phase_06_gate."
+      },
+      {
+        "predicate_id": "schema_id_match",
+        "type": "deterministic",
+        "function": "field_equals",
+        "args": {
+          "field": "schema_id",
+          "expected": "orch.phase6.implementation_architecture.v1",
+          "actual": "orch.phase6.implementation_architecture.v1"
+        },
+        "prose_condition": "artifact.schema_id equals expected value orch.phase6.implementation_architecture.v1."
+      },
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "field_equals",
+        "args": {
+          "field": "run_id",
+          "expected": "5831d759-165e-4f46-ab85-09ca2e183689",
+          "actual": "5831d759-165e-4f46-ab85-09ca2e183689"
+        },
+        "prose_condition": "artifact.run_id matches current invocation run_id."
+      },
+      {
+        "predicate_id": "artifact_not_invalid",
+        "type": "deterministic",
+        "function": "field_absent_or_not_equal",
+        "args": {
+          "field": "artifact_status",
+          "disallowed_value": "invalid"
+        },
+        "prose_condition": "artifact.artifact_status is absent (field not present in artifact); artifact is not flagged invalid."
+      },
+      {
+        "predicate_id": "risk_register_non_empty",
+        "type": "deterministic",
+        "function": "array_non_empty",
+        "args": {
+          "field": "risk_register",
+          "actual_count": 11
+        },
+        "prose_condition": "risk_register is a non-empty array. Found 11 risk entries: RISK-01 through RISK-11."
+      },
+      {
+        "predicate_id": "risk_entries_complete",
+        "type": "deterministic",
+        "function": "all_entries_have_non_null_fields",
+        "args": {
+          "field": "risk_register",
+          "required_non_null_fields": [
+            "likelihood",
+            "impact",
+            "mitigation"
+          ],
+          "entries_checked": 11,
+          "entries_passing": 11
+        },
+        "prose_condition": "Every risk register entry has non-null likelihood, impact, and mitigation. RISK-01 (medium/high/mitigation present), RISK-02 (medium/medium/present), RISK-03 (medium/medium/present), RISK-04 (medium/high/present), RISK-05 (low/medium/present), RISK-06 (medium/medium/present), RISK-07 (high/medium/present), RISK-08 (medium/medium/present), RISK-09 (low/high/present), RISK-10 (medium/high/present), RISK-11 (medium/medium/present). All 11 entries pass."
+      },
+      {
+        "predicate_id": "ethics_assessment_non_null",
+        "type": "deterministic",
+        "function": "field_non_null",
+        "args": {
+          "field": "ethics_assessment"
+        },
+        "prose_condition": "ethics_assessment is a non-null object containing issues array (3 entries: Category 8 AI, Category 2 Humans, Category 4 Personal Data), self_assessment_statement, and source_basis."
+      },
+      {
+        "predicate_id": "ethics_self_assessment_statement_non_empty",
+        "type": "deterministic",
+        "function": "string_non_empty",
+        "args": {
+          "field": "ethics_assessment.self_assessment_statement"
+        },
+        "prose_condition": "ethics_assessment.self_assessment_statement is a non-empty multi-paragraph string covering Category 8 (AI), Category 2 (Humans), Category 4 (Personal Data), gender equality plan obligations, and ethics governance structure."
+      },
+      {
+        "predicate_id": "governance_matrix_non_empty",
+        "type": "deterministic",
+        "function": "array_non_empty",
+        "args": {
+          "field": "governance_matrix",
+          "actual_count": 3
+        },
+        "prose_condition": "governance_matrix is a non-empty array with 3 governance bodies: Consortium General Assembly (all 8 partners), Project Management Board (all 8 partners), Ethics and Compliance Panel (ATU, NIHS)."
+      },
+      {
+        "predicate_id": "management_roles_assigned_to_valid",
+        "type": "deterministic",
+        "function": "all_entries_assigned_to_valid_partner",
+        "args": {
+          "field": "management_roles",
+          "reference_source": "docs/tier3_project_instantiation/consortium/partners.json",
+          "valid_partner_ids": [
+            "ATU",
+            "CERIA",
+            "BIIS",
+            "ISIA",
+            "NIHS",
+            "ELI",
+            "BAL",
+            "FIIT"
+          ],
+ 
+=== END ===
