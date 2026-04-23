@@ -1,0 +1,56 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'governance_matrix', 'management_roles', 'risk_register', 'ethics_assessment', 'instrument_sections_addressed', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "2ec96048-c2f2-4f39-aaab-7470e47dc4cd",
+  "governance_matrix": [
+    {
+      "body_name": "Consortium Management Board",
+      "body_id": "CMB",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "chair": "ATU",
+      "decision_scope": "Strategic project governance including approval of major deliverables, budget oversight and allocation decisions, significant scope changes, partner dispute resolution, approval of amendments to consortium-level agreements, and overall project direction. ATU chairs in its capacity as project coordinator. All composition members verified against Tier 3 partners.json valid_partner_ids.",
+      "meeting_frequency": "Bi-monthly (every two months)",
+      "escalation_path": "Issues unresolved within the Consortium Management Board are subject to consortium-agreement dispute resolution procedures, consistent with the Tier 1 obligation that the consortium agreement must complement and not contradict grant agreement provisions (source_basis: governance_principles.json consortium_agreement_guidance, programme-guide_horizon_en.pdf p.34; governance_principles.json escalation_path_constraint, wp-15-general-annexes_horizon-2026-2027_en.pdf p.35).",
+      "source_basis": [
+        "WP1 task T1-01 (Consortium governance and financial management) in docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+        "ATU consortium_role: Coordinator and key_responsibilities in docs/tier3_project_instantiation/consortium/roles.json",
+        "docs/tier1_normative_framework/extracted/governance_principles.json \u2014 governance_constraints.consortium_agreement_guidance (programme-guide_horizon_en.pdf p.34)",
+        "docs/tier1_normative_framework/extracted/governance_principles.json \u2014 governance_constraints.escalation_path_constraint (programme-guide_horizon_en.pdf p.34; wp-15-general-annexes_horizon-2026-2027_en.pdf p.35)"
+      ],
+      "assumption_note": "Body name 'Consortium Management Board' is a project-operational design choice; Tier 1 sources confirm no prescribed governance body names are mandated (governance_principles.json no_prescribed_governance_body_names, sourced to programme-guide_horizon_en.pdf p.6 and wp-15-general-annexes_horizon-2026-2027_en.pdf pp.3-4). Meeting frequency 'bi-monthly' is not specified in Tier 3 consortium data and is not prescribed in Tier 1 extracted sources (governance_principles.json no_prescribed_meeting_frequency); bi-monthly cadence selected as a project-operational assumption appropriate to a 48-month, 9-WP, 8-partner consortium. This is not a 'standard RIA practice' claim."
+    },
+    {
+      "body_name": "Technical and Scientific Committee",
+      "body_id": "TSC",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "chair": "ATU",
+      "decision_scope": "Technical and scientific project direction including cross-WP coordination decisions, research methodology approval, integration architecture decisions, resolution of inter-WP technical conflicts, and review of technical deliverables before submission. Membership drawn from the set of all WP leads as identified in wp_structure.json; since all eight consortium partners hold at least one WP lead role, composition equals the full consortium.",
+      "meeting_frequency": "Monthly",
+      "escalation_path": "Technical disputes unresolved at the Technical and Scientific Committee level are escalated to the Consortium Management Board as a project-operational escalation route (not a normative Tier 1 programme rule; consistent with governance_principles.json escalation_path_constraint framing of internal governance routes).",
+      "source_basis": [
+        "WP lead assignments derived from work_packages[].lead_partner in docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP1\u2192ATU, WP2\u2192ATU, WP3\u2192BIIS, WP4\u2192CERIA, WP5\u2192NIHS, WP6\u2192ISIA, WP7\u2192ELI, WP8\u2192FIIT, WP9\u2192BAL",
+        "WP lead responsibilities confirmed per-partner in docs/tier3_project_instantiation/consortium/roles.json",
+        "docs/tier1_normative_framework/extracted/governance_principles.json \u2014 governance_constraints.escalation_path_constraint (programme-guide_horizon_en.pdf p.34)"
+      ],
+      "assumption_note": "Body name 'Technical and Scientific Committee' and monthly meeting frequency are project-operational design choices. Tier 1 sources confirm no prescribed body names or meeting cadences (governance_principles.json no_prescribed_governance_body_names, no_prescribed_meeting_frequency, sourced to programme-guide_horizon_en.pdf p.6 and wp-15-general-annexes_horizon-2026-2027_en.pdf pp.3-4). Chair assigned to ATU as project coordinator; this i
+=== END ===

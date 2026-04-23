@@ -1,0 +1,42 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-04-23T18:30:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "2ec96048-c2f2-4f39-aaab-7470e47dc4cd",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing. Annex templates govern post-award implementation reporting; application form templates (Tier 2A) govern proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Artifact content and traceability_footer.primary_sources were scanned for strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural schema authority. The artifact references 'wp-15-general-annexes_horizon-2026-2027_en.pdf' exclusively as a Tier 1 normative source cited via docs/tier1_normative_framework/extracted/governance_principles.json and implementation_constraints.json \u2014 not as a structural schema for proposal section design. The reference to 'AGA art 6' appears only in docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (Declaration 10 text for lump sum grants), which is the Tier 2A instrument schema source itself and is not the artifact under audit. No Grant Agreement Annex template is used as a structural authority in this artifact. Check passes."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The implementation_architecture.json is a Phase 6 management, governance, risk, and ethics artifact. It does not independently assert call-level scope boundaries, expected outcomes, or expected impacts. Call-derived constraints (open_science_requirements, ethics_review_required, gender_plan_required) flow exclusively through docs/tier3_project_instantiation/call_binding/compliance_profile.json, which is cited in traceability_footer.primary_sources. The compliance_profile.json itself carries a Tier 2B source reference (HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json) for open_science_requirements CC-05. No call constraint claim in this artifact is asserted without an intermediate Tier 3 path reference that itself chains to Tier 2B. Check passes."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All partner identifiers appearing in governance_matrix[*].composition arrays (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) and all assigned_to values in management_roles[*] are cited in source_basis arrays pointing to docs/tier3_project_instantiation/consortium/partners.json and docs/tier3_project_instantiation/consortium/roles.json. The artifact's traceability_footer.constraint_checks[0] explicitly confirms: 'All partner_id values in governance_matrix[*].composition arrays and all assigned_to values in management_roles[*] verified against valid_partner_ids set derived from docs/tier3_project_instantiation/consortium/partners.json: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}.' The risk_register entries (RISK-01 through RISK-11) match identically to the 11 risks in the canonical Tier 3 docs/tier3_project_instantiation/architecture_inputs/risks.json input provided. No budget figures are present in the artifact. No partner capability, prior experience, equipment, or team size claim is introduced without a corresponding Tier 3 source reference. Check passes."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact schema_id is 'orch.phase6.implementation_architecture.v1'. This is a Phase 6 Tier 4 artifact; it is not a Phase 8 artifact (schema_id does not begin with 'orch.tier5.' or 'orch.phase8.'). No Tier 5 or Phase 8 output is produced. The artifact explicitly acknowledges the budget gate block: instrument_sections_addressed for section A.3 has status 'blocked_pending_budget_gate' with phase6_contribution 'None \u2014 budget gate (Phase 7) must pass before budge
+=== END ===

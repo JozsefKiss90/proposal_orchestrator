@@ -1,0 +1,118 @@
+=== skill_id: constitutional-compliance-check ===
+=== mode: cli-prompt ===
+=== response_text length: 13577 ===
+=== response_text (full) ===
+```json
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-04-23T18:30:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "2ec96048-c2f2-4f39-aaab-7470e47dc4cd",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing. Annex templates govern post-award implementation reporting; application form templates (Tier 2A) govern proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Artifact content and traceability_footer.primary_sources were scanned for strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural schema authority. The artifact references 'wp-15-general-annexes_horizon-2026-2027_en.pdf' exclusively as a Tier 1 normative source cited via docs/tier1_normative_framework/extracted/governance_principles.json and implementation_constraints.json — not as a structural schema for proposal section design. The reference to 'AGA art 6' appears only in docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (Declaration 10 text for lump sum grants), which is the Tier 2A instrument schema source itself and is not the artifact under audit. No Grant Agreement Annex template is used as a structural authority in this artifact. Check passes."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The implementation_architecture.json is a Phase 6 management, governance, risk, and ethics artifact. It does not independently assert call-level scope boundaries, expected outcomes, or expected impacts. Call-derived constraints (open_science_requirements, ethics_review_required, gender_plan_required) flow exclusively through docs/tier3_project_instantiation/call_binding/compliance_profile.json, which is cited in traceability_footer.primary_sources. The compliance_profile.json itself carries a Tier 2B source reference (HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json) for open_science_requirements CC-05. No call constraint claim in this artifact is asserted without an intermediate Tier 3 path reference that itself chains to Tier 2B. Check passes."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All partner identifiers appearing in governance_matrix[*].composition arrays (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) and all assigned_to values in management_roles[*] are cited in source_basis arrays pointing to docs/tier3_project_instantiation/consortium/partners.json and docs/tier3_project_instantiation/consortium/roles.json. The artifact's traceability_footer.constraint_checks[0] explicitly confirms: 'All partner_id values in governance_matrix[*].composition arrays and all assigned_to values in management_roles[*] verified against valid_partner_ids set derived from docs/tier3_project_instantiation/consortium/partners.json: {ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT}.' The risk_register entries (RISK-01 through RISK-11) match identically to the 11 risks in the canonical Tier 3 docs/tier3_project_instantiation/architecture_inputs/risks.json input provided. No budget figures are present in the artifact. No partner capability, prior experience, equipment, or team size claim is introduced without a corresponding Tier 3 source reference. Check passes."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact schema_id is 'orch.phase6.implementation_architecture.v1'. This is a Phase 6 Tier 4 artifact; it is not a Phase 8 artifact (schema_id does not begin with 'orch.tier5.' or 'orch.phase8.'). No Tier 5 or Phase 8 output is produced. The artifact explicitly acknowledges the budget gate block: instrument_sections_addressed for section A.3 has status 'blocked_pending_budget_gate' with phase6_contribution 'None — budget gate (Phase 7) must pass before budget data can be entered; this section is fully blocked pending a validated budget response from the external Lump Sum Budget Planner per CLAUDE.md Section 8.' No budget figures of the form '€[0-9]+', '[0-9]+ EUR', or '[0-9]+ person-months' used as confirmed values appear in the artifact content. Check passes."
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not directly checkable by reading an artifact. This prohibition governs runtime agent behaviour during execution — specifically whether decisions were held in agent working memory rather than written to docs/tier4_orchestration_state/decision_log/ or a phase output. The compliance of this prohibition is enforced by the decision-log-update skill and the runtime architecture, not by inspection of a single artifact's content. Recorded as pass per skill specification Step 2 (checks 13.5, 13.6, 13.11, 13.12 must be recorded with check_status: pass and explicit non-applicability reason for artifact-level checks)."
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not directly checkable from a phase output artifact. This prohibition governs the structural scope of workflow and skill definitions as authoritative documents, not the content of individual artifacts produced by them. The implementation_architecture.json does not contain workflow or skill definitions; it is a phase output artifact. Recorded as pass per skill specification Step 2 (not applicable to artifact-level checks)."
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's traceability_footer.primary_sources references only prior or current phase outputs as inputs: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (Phase 3). No Phase 7 or Phase 8 outputs are referenced as inputs to this Phase 6 artifact. The instrument_sections_addressed field correctly identifies section A.3 as 'blocked_pending_budget_gate' — acknowledging the Phase 7 gate as a future blocking condition, not bypassing it. No Phase 8 activities are declared as commenced. The phase ordering is consistent with the constitutional sequence (Phases 1–6 complete; Phase 7 pending). Check passes."
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Check 13.8 is applicable primarily to Tier 5 deliverable artifacts with a validation_status.overall_status field. This artifact is a Tier 4 phase output (schema_id: orch.phase6.implementation_architecture.v1), not a Tier 5 deliverable. No proposal text is finalized in this artifact. An internal inconsistency is noted for traceability purposes: traceability_footer.note states 'risk_register is set to [] (placeholder); this field will be populated by the risk-register-builder skill in a subsequent invocation,' yet the risk_register field actually contains 11 populated entries (RISK-01 through RISK-11) whose content matches exactly the canonical Tier 3 docs/tier3_project_instantiation/architecture_inputs/risks.json. The note is stale but the underlying data is present and properly sourced. This inconsistency does not constitute a §13.8 violation because (a) the artifact is not a Tier 5 deliverable, (b) the risk_register data is correctly populated and traceable to Tier 3, and (c) no proposal section text is being finalized in this artifact. Check passes with advisory note regarding stale placeholder note."
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Every Horizon Europe programme rule claim in this artifact — including GEP requirements, ethics self-assessment obligation, civil-focus constraint, consortium agreement requirements, dissemination and exploitation admissibility condition, and escalation path constraints — carries a source_basis or traceability_footer entry pointing to a path within docs/tier1_normative_framework/extracted/ (specifically governance_principles.json and implementation_constraints.json), accompanied by explicit source document and page citations (programme-guide_horizon_en.pdf, wp-15-general-annexes_horizon-2026-2027_en.pdf, ef_he-ria-ia_en.pdf). The governance_matrix assumption_note fields in all three governance bodies explicitly cite governance_principles.json no_prescribed_governance_body_names and no_prescribed_meeting_frequency to confirm the absence of prescriptive Tier 1 requirements for body naming and meeting cadence, rather than asserting 'standard RIA practice.' References to EU AI Act and GDPR are external regulatory instruments, not Horizon Europe programme rules; they are derived from Tier 3 risks.json (RISK-08) and are not required to carry Tier 1 path references under check 13.9. Check passes."
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not applicable to this artifact. Check 13.10 governs Tier 5 deliverable outputs (proposal_sections, assembled_drafts, review_packets, final_exports in docs/tier5_deliverables/). This artifact is a Tier 4 phase output located at docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json. No Tier 5 content is produced by this artifact. Recorded as pass per skill specification Step 2 (not applicable to Tier 4 phase output artifacts)."
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not checkable by reading a phase output or deliverable artifact. This prohibition governs whether Tier 1 or Tier 2 source documents themselves have been altered. That check requires comparison of source document content against authoritative versions, which is outside the scope of auditing a Tier 4 phase output artifact. The artifact reads from Tier 1 and Tier 2 sources (as declared in traceability_footer.primary_sources) but does not write to them. Recorded as pass per skill specification Step 2 (not applicable to artifact-level checks)."
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not directly checkable from an artifact. This prohibition governs the operational disposition of agents, skills, and workflows toward the constitution — a runtime behavioural constraint, not an artifact content constraint. The implementation_architecture.json itself references 'CLAUDE.md Section 8' in the phase6_contribution for section A.3 ('this section is fully blocked pending a validated budget response from the external Lump Sum Budget Planner per CLAUDE.md Section 8'), demonstrating constitutional awareness rather than treatment of CLAUDE.md as advisory. Recorded as pass per skill specification Step 2 (not directly checkable from an artifact)."
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "timestamp": "2026-04-23T18:30:00Z"
+}
+```
+
+=== END ===
