@@ -287,20 +287,22 @@ class TestRiskRegisterBuilderFieldPreservation:
         }
 
     def _risk_response(self, run_id: str) -> str:
-        """Response that only updates risk_register, preserving other fields."""
-        artifact = self._pre_existing_artifact(run_id)
-        artifact["risk_register"] = [
-            {
-                "risk_id": "RISK-01",
-                "description": "Technical integration risk",
-                "category": "technical",
-                "likelihood": "medium",
-                "impact": "high",
-                "mitigation": "Addressed in T2-02 (task_id: T2-02, WP2)",
-                "responsible_partner": "P1",
-            }
-        ]
-        return json.dumps(artifact)
+        """enrich_artifact response: only risk_register plus metadata."""
+        return json.dumps({
+            "schema_id": "orch.phase6.implementation_architecture.v1",
+            "run_id": run_id,
+            "risk_register": [
+                {
+                    "risk_id": "RISK-01",
+                    "description": "Technical integration risk",
+                    "category": "technical",
+                    "likelihood": "medium",
+                    "impact": "high",
+                    "mitigation": "Addressed in T2-02 (task_id: T2-02, WP2)",
+                    "responsible_partner": "P1",
+                }
+            ],
+        })
 
     def test_ethics_assessment_preserved_after_risk_enrichment(self, tmp_path: Path) -> None:
         run_id = "test-risk-preserve-01"

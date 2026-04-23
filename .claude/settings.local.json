@@ -94,7 +94,10 @@
       "Bash(find .claude/runs -name *gate-enforcement* -type f)",
       "Bash(find C:Codeproposal_demoproposal_orchestratorrunnerpredicates -type f -name *.py)",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -path */.claude/runs/* -type f -name run_manifest.json)",
-      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -path */.claude/runs/* -type f -name run_summary.json)"
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -path */.claude/runs/* -type f -name run_summary.json)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f -name *ad0d47cc*)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f -path *phase6* -name *.json)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f \\\\\\(-name run_summary.json -o -name run_manifest.json -o -name *gate_failure*phase*06* \\\\\\))"
     ]
   }
 }

@@ -335,16 +335,18 @@ skill_catalog:
 
   - id: risk-register-builder
     execution_mode: "tapm"
+    output_contract: "enrich_artifact"
+    enrichment_base_artifact: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
     purpose: >
-      Populate the risk register from Tier 3 risk seeds. Assign likelihood, impact,
-      mitigation, and monitoring for each risk. Identify material risks not in the
-      seed file and flag for Tier 3 update.
+      Populate the risk register from Tier 3 risk seeds. Map each seed to the
+      gate-required register format with category, likelihood, impact, and
+      mitigation fields. Emits only risk_register; the runtime merges it into
+      the existing implementation_architecture.json.
     used_by_agents:
       - implementation_architect
     reads_from:
       - docs/tier3_project_instantiation/architecture_inputs/risks.json
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
-      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
     constitutional_constraints:

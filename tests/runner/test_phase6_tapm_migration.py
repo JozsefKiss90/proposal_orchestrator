@@ -42,6 +42,18 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _TRANSPORT_TARGET = "runner.skill_runtime.invoke_claude_text"
 
 
+def _fix_base_run_id(repo_root: Path, run_id: str) -> None:
+    """Patch the base artifact's run_id to match the test run_id."""
+    artifact_path = (
+        repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+        / "phase6_implementation_architecture" / "implementation_architecture.json"
+    )
+    if artifact_path.is_file():
+        data = json.loads(artifact_path.read_text(encoding="utf-8"))
+        data["run_id"] = run_id
+        artifact_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
 @pytest.fixture(autouse=True)
 def _clear_caches() -> None:
     """Clear skill_runtime caches before each test."""
@@ -134,12 +146,13 @@ class TestRiskRegisterBuilderTapmPrompt:
             node_id="n06_implementation_architecture",
         )
 
-    def test_prompt_size_under_50kb(self) -> None:
+    def test_prompt_size_under_15kb(self) -> None:
+        """After simplification, TAPM prompt should be well under 15KB."""
         sys_p, usr_p = self._assemble_prompt()
         total = len(sys_p) + len(usr_p)
-        assert total < 50_000, (
-            f"risk-register-builder TAPM prompt is {total} chars; must be under 50KB "
-            f"(was ~80KB in cli-prompt mode)"
+        assert total < 15_000, (
+            f"risk-register-builder TAPM prompt is {total} chars; "
+            f"simplified spec should be under 15KB"
         )
 
     def test_system_prompt_under_24kb(self) -> None:
@@ -209,43 +222,60 @@ class TestRiskRegisterBuilderTapmInvocation:
         dst_spec = repo_root / ".claude" / "skills" / "risk-register-builder.md"
         dst_spec.parent.mkdir(parents=True, exist_ok=True)
         dst_spec.write_text(src_spec.read_text(encoding="utf-8-sig"), encoding="utf-8")
-        (repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
-         / "phase6_implementation_architecture").mkdir(parents=True, exist_ok=True)
+        # enrich_artifact requires the base artifact on disk
+        artifact_dir = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture"
+        )
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        (artifact_dir / "implementation_architecture.json").write_text(
+            json.dumps({
+                "schema_id": "orch.phase6.implementation_architecture.v1",
+                "run_id": "__placeholder__",
+                "governance_matrix": [{"body_name": "PMB", "composition": ["P1"], "decision_scope": "Strategic", "meeting_frequency": "Quarterly"}],
+                "management_roles": [{"role_id": "COORD-01", "role_name": "Coordinator", "assigned_to": "P1", "responsibilities": ["Overall management"]}],
+                "risk_register": [],
+                "ethics_assessment": {"ethics_issues_identified": False, "issues": [], "self_assessment_statement": "No ethics issues"},
+                "instrument_sections_addressed": [{"section_id": "3.2", "section_name": "Management", "status": "addressed"}],
+            }),
+            encoding="utf-8",
+        )
         return repo_root
 
-    def _valid_response(self, run_id: str) -> str:
+    def _enrichment_response(self, run_id: str) -> str:
+        """enrich_artifact response: only the risk_register field plus metadata."""
         return json.dumps({
             "schema_id": "orch.phase6.implementation_architecture.v1",
             "run_id": run_id,
-            "governance_matrix": [{"body_name": "PMB", "composition": ["P1"], "decision_scope": "Strategic", "meeting_frequency": "Quarterly"}],
-            "management_roles": [{"role_id": "COORD-01", "role_name": "Coordinator", "assigned_to": "P1", "responsibilities": ["Overall management"]}],
-            "risk_register": [{"risk_id": "R-01", "description": "Test risk", "category": "technical", "likelihood": "medium", "impact": "high", "mitigation": "Addressed in T1.1 (task_id: T1.1, WP1)", "responsible_partner": "P1"}],
-            "ethics_assessment": {"ethics_issues_identified": False, "issues": [], "self_assessment_statement": "No ethics issues"},
-            "instrument_sections_addressed": ["3.2"],
+            "risk_register": [{"risk_id": "R-01", "description": "Test risk", "category": "technical", "likelihood": "medium", "impact": "high", "mitigation": "Addressed in WP1 activities", "responsible_partner": "P1"}],
         })
 
     def test_tapm_invocation_passes_tools(self, tmp_path: Path) -> None:
         repo_root = self._make_phase6_env(tmp_path)
-        with patch(_TRANSPORT_TARGET, return_value=self._valid_response("r1")) as mock:
+        # Fix run_id in base artifact to match
+        _fix_base_run_id(repo_root, "r1")
+        with patch(_TRANSPORT_TARGET, return_value=self._enrichment_response("r1")) as mock:
             result = run_skill("risk-register-builder", "r1", repo_root, node_id="n06_implementation_architecture")
-        assert result.status == "success"
+        assert result.status == "success", f"Expected success, got: {result.failure_reason}"
         assert mock.call_args.kwargs.get("tools") == ["Read", "Glob"]
 
     def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
         repo_root = self._make_phase6_env(tmp_path)
-        with patch(_TRANSPORT_TARGET, return_value=self._valid_response("r2")) as mock:
+        _fix_base_run_id(repo_root, "r2")
+        with patch(_TRANSPORT_TARGET, return_value=self._enrichment_response("r2")) as mock:
             run_skill("risk-register-builder", "r2", repo_root)
         assert mock.call_args.kwargs.get("timeout_seconds") == 600
 
     def test_tapm_path_invoked_not_cli_prompt(self, tmp_path: Path) -> None:
         """Verify the TAPM code path is used (prompt doesn't contain serialized inputs)."""
         repo_root = self._make_phase6_env(tmp_path)
-        with patch(_TRANSPORT_TARGET, return_value=self._valid_response("r3")) as mock:
+        _fix_base_run_id(repo_root, "r3")
+        with patch(_TRANSPORT_TARGET, return_value=self._enrichment_response("r3")) as mock:
             run_skill("risk-register-builder", "r3", repo_root)
         call_kwargs = mock.call_args.kwargs
         user_prompt = call_kwargs.get("user_prompt", "")
         assert "# Canonical Inputs\n\n## docs/" not in user_prompt
-        assert len(user_prompt) < 50_000
+        assert len(user_prompt) < 15_000
 
 
 class TestGovernanceModelBuilderTapmInvocation:
@@ -306,6 +336,9 @@ class TestRiskRegisterMergeSemantics:
         """reads_from must use specific file paths, not directories."""
         entry = _get_skill_entry("risk-register-builder", _REPO_ROOT)
         reads_from = entry.get("reads_from", [])
+        assert len(reads_from) == 2, (
+            f"risk-register-builder should read exactly 2 files, got {len(reads_from)}"
+        )
         for path in reads_from:
             assert path.endswith(".json"), (
                 f"reads_from entry '{path}' is a directory, not a file path"
@@ -389,7 +422,6 @@ class TestPhase6SkillSpecTapmInstructions:
         spec = _load_skill_spec("risk-register-builder", _REPO_ROOT)
         assert "risks.json" in spec
         assert "wp_structure.json" in spec
-        assert "gantt.json" in spec
 
     def test_risk_register_builder_spec_has_boundary_constraints(self) -> None:
         spec = _load_skill_spec("risk-register-builder", _REPO_ROOT)
