@@ -874,15 +874,37 @@ def _extract_json_response(text: str) -> dict | None:
     Handles bare JSON, JSON inside markdown code fences, and JSON
     preceded or followed by prose.  Returns ``None`` if no valid JSON
     dict can be found.
+
+    Uses ``json.JSONDecoder.raw_decode()`` as an early fallback when
+    the response starts with ``{`` but ``json.loads()`` fails.  This
+    handles the case where Claude emits a valid JSON object followed by
+    trailing characters (e.g. an extra closing brace) — ``raw_decode``
+    parses the first complete JSON value and ignores the remainder.
+    This is fail-closed: ``raw_decode`` will still reject structurally
+    malformed JSON; it only tolerates *trailing* noise after a complete
+    valid object.
     """
     stripped = text.strip()
 
-    # 1. Try whole response as JSON
+    # 1. Try whole response as JSON (strictest — entire string must be valid)
     try:
         data = json.loads(stripped)
         return data if isinstance(data, dict) else None
     except json.JSONDecodeError:
         pass
+
+    # 1b. Try raw_decode: parse the first complete JSON object from the
+    # start of the string, tolerating trailing characters (e.g. an extra
+    # closing brace emitted by Claude).  This is strictly more permissive
+    # than json.loads() but still fail-closed for structurally invalid JSON.
+    if stripped.startswith("{"):
+        try:
+            decoder = json.JSONDecoder()
+            data, _end = decoder.raw_decode(stripped)
+            if isinstance(data, dict):
+                return data
+        except (json.JSONDecodeError, ValueError):
+            pass
 
     # 2. Try markdown code fence
     code_match = re.search(

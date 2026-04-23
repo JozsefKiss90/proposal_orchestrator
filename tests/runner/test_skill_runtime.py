@@ -728,6 +728,66 @@ class TestExtractJsonResponse:
     def test_array_rejected(self) -> None:
         assert _extract_json_response("[1, 2, 3]") is None
 
+    def test_trailing_extra_brace(self) -> None:
+        """Valid JSON followed by an extra closing brace — the exact
+        failure mode observed in gate-enforcement run 2ec96048."""
+        payload = '{"schema_id":"skill_result.gate_enforcement.v1","overall_status":"pass","detail":{"a":1}}}'
+        result = _extract_json_response(payload)
+        assert result is not None
+        assert result["schema_id"] == "skill_result.gate_enforcement.v1"
+        assert result["overall_status"] == "pass"
+
+    def test_trailing_whitespace_after_extra_brace(self) -> None:
+        """Extra brace followed by whitespace/newlines."""
+        payload = '{"key":"value"}}\r\n\r\n'
+        result = _extract_json_response(payload)
+        assert result is not None
+        assert result["key"] == "value"
+
+    def test_deeply_nested_with_trailing_brace(self) -> None:
+        """Deeply nested JSON with one extra trailing brace."""
+        import json as _json
+        inner = {"predicates": {"passed": ["a", "b"], "failed": []}, "detail": {"a": {"result": "pass"}}}
+        valid_json = _json.dumps(inner)
+        payload = valid_json + "}"
+        result = _extract_json_response(payload)
+        assert result is not None
+        assert result["predicates"]["passed"] == ["a", "b"]
+
+    def test_malformed_json_still_fails(self) -> None:
+        """Structurally invalid JSON must still return None."""
+        assert _extract_json_response('{"key": value}') is None
+        assert _extract_json_response('{unterminated') is None
+        assert _extract_json_response('') is None
+
+    def test_gate_enforcement_real_payload(self) -> None:
+        """The exact gate-enforcement response shape that caused run 2ec96048 failure."""
+        import json as _json
+        payload_obj = {
+            "schema_id": "skill_result.gate_enforcement.v1",
+            "run_id": "test-run-id",
+            "gate_id": "phase_06_gate",
+            "overall_status": "pass",
+            "hard_block": False,
+            "evaluated_at": "2026-04-23T00:00:00Z",
+            "deterministic_predicates": {
+                "passed": ["artifact_present", "schema_id_match"],
+                "failed": [],
+            },
+            "semantic_predicates": {"passed": ["instrument_sections_complete"], "failed": []},
+            "bidirectional_guarantee": {"guarantee_satisfied": True},
+            "decision_log_entry_written": False,
+            "decision_log_entry_reason": "overall_status is 'pass'; no gate failure to record",
+        }
+        # Simulate the exact failure: valid JSON + one extra closing brace
+        raw_text = _json.dumps(payload_obj) + "}"
+        result = _extract_json_response(raw_text)
+        assert result is not None
+        assert result["schema_id"] == "skill_result.gate_enforcement.v1"
+        assert result["overall_status"] == "pass"
+        assert result["gate_id"] == "phase_06_gate"
+        assert result["decision_log_entry_written"] is False
+
 
 class TestAtomicWrite:
     def test_success(self, tmp_path: Path) -> None:
