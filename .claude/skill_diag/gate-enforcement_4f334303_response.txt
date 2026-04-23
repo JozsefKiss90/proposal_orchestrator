@@ -1,0 +1,37 @@
+=== skill_id: gate-enforcement ===
+=== mode: tapm ===
+=== response_text length: 820 ===
+=== response_text (full) ===
+{
+  "run_id": "4f334303-6a3f-4687-9000-fa0d7b02c9fe",
+  "gate_id": "phase_06_gate",
+  "overall_status": "pass",
+  "hard_block": false,
+  "evaluated_at": "2026-04-23T00:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "risk_register_non_empty",
+      "risk_entries_have_likelihood",
+      "risk_entries_have_impact",
+      "risk_entries_have_mitigation",
+      "ethics_assessment_non_null",
+      "ethics_self_assessment_non_empty",
+      "governance_matrix_non_empty",
+      "management_roles_assigned_to_in_tier3",
+      "instrument_sections_addressed_non_empty"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [
+      "instrument_sections_complete"
+    ],
+    "failed": []
+  }
+}
+
+=== END ===

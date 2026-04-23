@@ -1,0 +1,62 @@
+{
+  "schema_id": "tier1.governance_principles.v1",
+  "artifact_purpose": "Initial Tier 1 extracted governance principles used to ground Phase 6 governance claims and to prevent generic programme-rule assumptions.",
+  "source_documents": [
+    {
+      "document": "programme-guide_horizon_en.pdf",
+      "version": "V5.1",
+      "date": "2025-09-15",
+      "relevant_pages": [6, 25, 34],
+      "notes": "Programme Guide invitation to consult Programme Guide, General Annexes, and AGA; ethics appraisal and consortium agreement guidance."
+    },
+    {
+      "document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "decision": "C(2025) 8493",
+      "date": "2025-12-11",
+      "relevant_pages": [3, 16, 18, 35, 36],
+      "notes": "General conditions; ethics, gender equality, and grant agreement implementation provisions."
+    }
+  ],
+  "governance_constraints": {
+    "no_prescribed_governance_body_names": {
+      "value": true,
+      "meaning": "The uploaded Tier 1 sources do not prescribe mandatory body names such as 'Project Management Board' or 'Project Coordination Team' for HE RIA/IA proposals.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf p.6",
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf pp.3-4"
+      ]
+    },
+    "no_prescribed_meeting_frequency": {
+      "value": true,
+      "meaning": "The uploaded Tier 1 sources do not prescribe quarterly or monthly meeting cadences for proposal governance bodies. Such cadences must come from Tier 3 or be marked as project-operational assumptions.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf p.6",
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf pp.3-4"
+      ]
+    },
+    "consortium_agreement_guidance": {
+      "rule": "If a consortium agreement is used, it should complement the grant agreement and must not contain provisions contrary to it.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf p.34"
+      ]
+    },
+    "grant_agreement_implementation_articles": {
+      "rule": "Implementation architecture may legitimately refer to grant-agreement implementation domains only when those references are tied to explicit grant-agreement-level provisions such as proper implementation, conflict of interest, confidentiality/security, ethics and values, data protection, IPR, communication/dissemination/open science, and specific rules for carrying out the action.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36"
+      ]
+    },
+    "escalation_path_constraint": {
+      "rule": "Escalation wording may refer to coordinator/internal governance and to consortium-agreement/grant-agreement handling only if framed as a project governance route consistent with Tier 1 implementation provisions, not as unsourced generic Horizon practice.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf p.34",
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf p.35"
+      ]
+    }
+  },
+  "usage_rules_for_phase6": [
+    "Tier 1 governance rules constrain governance claims; they do not replace Tier 3 project-specific governance design.",
+    "If Tier 1 is silent on a specific design choice, the output must record an explicit assumption instead of claiming a 'standard RIA practice'.",
+    "Any mention of Grant Agreement or Consortium Agreement terms in governance text must be tied to a source_basis entry."
+  ]
+}

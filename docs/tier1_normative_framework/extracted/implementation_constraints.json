@@ -1,1 +1,82 @@
-{}
+{
+  "schema_id": "tier1.implementation_constraints.v1",
+  "artifact_purpose": "Initial Tier 1 extracted implementation constraints used to ground Phase 6 ethics, gender, and implementation-related claims.",
+  "source_documents": [
+    {
+      "document": "programme-guide_horizon_en.pdf",
+      "version": "V5.1",
+      "date": "2025-09-15",
+      "relevant_pages": [16, 17, 18, 25, 26, 27, 33, 34],
+      "notes": "Gender equality and inclusiveness; ethics and integrity; dissemination/exploitation; consortium agreement guidance."
+    },
+    {
+      "document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "decision": "C(2025) 8493",
+      "date": "2025-12-11",
+      "relevant_pages": [3, 16, 18, 24, 35, 36],
+      "notes": "Applicants are invited to read Programme Guide/General Annexes/AGA; ethics; gender equality plans; award criteria; grant agreement implementation provisions."
+    },
+    {
+      "document": "ef_he-ria-ia_en.pdf",
+      "version": "V4.0",
+      "date": "2025-11-12",
+      "relevant_pages": [4, 5, 7],
+      "notes": "Evaluation form emphasises methodology, gender dimension in R&I content, impact, implementation, civil-only focus and excluded activities."
+    }
+  ],
+  "implementation_rules": {
+    "ethics_self_assessment_required": {
+      "rule": "Applicants must complete an ethics self-assessment as part of the application; projects with ethics issues may undergo ethics review and ethics requirements may become contractual obligations.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf p.16",
+        "programme-guide_horizon_en.pdf pp.25-28"
+      ]
+    },
+    "ethics_appraisal_summary": {
+      "rule": "Ethics appraisal covers compliance with ethical principles, relevant legislation, proportionality of methods, and applicant awareness of ethical and social impacts; it may lead to ethics requirements and ethics deliverables.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf pp.25-28"
+      ]
+    },
+    "gender_equality_plan_eligibility": {
+      "rule": "Public bodies, research organisations and higher education establishments in Member States/Associated Countries must have a gender equality plan at grant signature and during the grant, with minimum process requirements.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19",
+        "programme-guide_horizon_en.pdf pp.16-17"
+      ]
+    },
+    "gender_management_balance_guidance": {
+      "rule": "Beneficiaries must promote equal opportunities between men and women and aim, to the extent possible, for gender balance at all levels of personnel assigned to the action, including supervisory and managerial level.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf p.18"
+      ]
+    },
+    "gender_dimension_in_content": {
+      "rule": "Integration of the gender dimension into research and innovation content is mandatory by default unless the topic explicitly states non-relevance; applicants who consider it irrelevant must justify that position.",
+      "source_basis": [
+        "programme-guide_horizon_en.pdf pp.17-20",
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf p.24",
+        "ef_he-ria-ia_en.pdf pp.4-5"
+      ]
+    },
+    "civil_focus_constraint": {
+      "rule": "Projects must focus exclusively on civil applications; certain human-embryo/cloning/heritable-genome-modification activities are excluded from funding.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17",
+        "ef_he-ria-ia_en.pdf p.7"
+      ]
+    },
+    "dissemination_and_exploitation_requirement": {
+      "rule": "Applications must include a plan for exploitation and dissemination of results including communication activities unless topic conditions provide otherwise; beneficiaries must later update a complete plan.",
+      "source_basis": [
+        "wp-15-general-annexes_horizon-2026-2027_en.pdf p.4",
+        "programme-guide_horizon_en.pdf pp.33-39"
+      ]
+    }
+  },
+  "usage_rules_for_phase6": [
+    "Use Tier 1 implementation rules to ground ethics and gender-related statements in implementation_architecture.json.",
+    "Do not infer additional regulatory obligations beyond what is stated in the uploaded Tier 1 sources.",
+    "Where project-specific implementation detail is needed and Tier 1 only provides a constraint, combine Tier 1 constraint with Tier 3 project data rather than replacing Tier 3 with generic programme knowledge."
+  ]
+}

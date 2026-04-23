@@ -4,11 +4,13 @@ purpose_summary: >
   Build the project governance model and populate the implementation architecture
   base artifact — management body composition, meeting frequency and decision scope,
   escalation paths, ethics self-assessment, and instrument-mandated section coverage —
-  derived from Tier 3 consortium data, WP structure, compliance profile, and the
-  Tier 2A section schema registry.
+  derived from Tier 1 extracted governance/implementation rules, Tier 3 consortium
+  data, WP structure, compliance profile, and the Tier 2A section schema registry.
 used_by_agents:
   - implementation_architect
 reads_from:
+  - docs/tier1_normative_framework/extracted/governance_principles.json
+  - docs/tier1_normative_framework/extracted/implementation_constraints.json
   - docs/tier3_project_instantiation/consortium/partners.json
   - docs/tier3_project_instantiation/consortium/roles.json
   - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
@@ -21,6 +23,7 @@ constitutional_constraints:
   - "Governance roles must be assigned to Tier 3 consortium members only"
   - "Management structure must be consistent with WP lead assignments"
   - "Ethics self-assessment must not be omitted, null, or 'N/A'"
+  - "Tier 1 programme-rule claims must be sourced to docs/tier1_normative_framework/extracted/; if no Tier 1 rule exists, the output must mark the element as an explicit assumption rather than generic 'standard RIA practice'"
 ---
 
 ## Input Access (TAPM Mode)
@@ -29,6 +32,8 @@ This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
 in the Declared Inputs section from disk using the Read tool.
 
 **Declared input files to read:**
+- `docs/tier1_normative_framework/extracted/governance_principles.json`
+- `docs/tier1_normative_framework/extracted/implementation_constraints.json`
 - `docs/tier3_project_instantiation/consortium/partners.json`
 - `docs/tier3_project_instantiation/consortium/roles.json`
 - `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
@@ -41,6 +46,8 @@ in the Declared Inputs section from disk using the Read tool.
 - Do not assume implicit context or reconstruct inputs from memory.
 - Read each required file explicitly before using it.
 - Base all reasoning ONLY on retrieved file content.
+- Do not use generic Horizon Europe / RIA governance heuristics as a substitute for Tier 1 extracted rules when Tier 1 extracted files are present.
+- If Tier 1 extracted files do not contain a rule for a governance design choice (for example meeting frequency or escalation wording), you may still make the design choice, but you MUST mark it as an explicit assumption rooted in project-operational need rather than label it as “standard RIA practice”.
 
 Return a SINGLE valid JSON object matching the schema.
 Do not include explanations outside the JSON.
@@ -51,6 +58,8 @@ Do not include explanations outside the JSON.
 
 | Path | Artifact / Content | Fields Extracted | Schema ID | Purpose |
 |------|--------------------|-----------------|-----------|---------|
+| `docs/tier1_normative_framework/extracted/governance_principles.json` | Tier 1 extracted governance and implementation-governance rules | grant_agreement_implementation_articles, consortium_agreement_guidance, no_prescribed_governance_body_names, no_prescribed_meeting_frequency, escalation_constraints, source_documents[] | `tier1.governance_principles.v1` | Provides the authoritative Tier 1 basis for governance-related claims. Prevents generic “standard RIA practice” assumptions from being used as if they were sourced programme rules. |
+| `docs/tier1_normative_framework/extracted/implementation_constraints.json` | Tier 1 extracted implementation constraints | ethics_self_assessment_required, ethics_appraisal_summary, gender_equality_requirements, management_balance_guidance, source_documents[] | `tier1.implementation_constraints.v1` | Provides the authoritative Tier 1 basis for ethics and implementation-related claims and constraints. |
 | `docs/tier3_project_instantiation/consortium/` | Consortium directory: partners.json, roles.json (and any supporting files) | partners.json: partner_id list, partner_name, partner_type, country; roles.json: role assignments per partner, management responsibilities | N/A — Tier 3 source directory | Provides the complete list of consortium partners and their roles; governance body composition must draw exclusively from partner_id values in this directory |
 | `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` | wp_structure.json — canonical Phase 3 artifact | work_packages[].wp_id; work_packages[].lead_partner (must be consistent with governance role assignments); partner_role_matrix[].partner_id, wps_as_lead | `orch.phase3.wp_structure.v1` | Provides WP lead assignments that must be reflected in governance roles; management structure must be consistent with WP leads declared here |
 | `docs/tier3_project_instantiation/call_binding/compliance_profile.json` | compliance_profile.json — Tier 3 call binding artifact | ethics_review_required, gender_plan_required, open_science_requirements[], eligibility_confirmed | N/A — Tier 3 source | Determines whether ethics issues must be identified; drives `ethics_assessment.ethics_issues_identified` and informs `self_assessment_statement` content |
@@ -61,7 +70,7 @@ Do not include explanations outside the JSON.
 
 | Path | Artifact | Schema ID | Required Fields (from artifact_schema_specification.yaml) | run_id Required | Derivation Source |
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
-| `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` | implementation_architecture.json | `orch.phase6.implementation_architecture.v1` | schema_id, run_id, governance_matrix (array), management_roles (array), risk_register (array — placeholder, populated by risk-register-builder), ethics_assessment (object — populated by this skill from compliance_profile.json), instrument_sections_addressed (array — populated by this skill from section_schema_registry.json) | Yes | governance_matrix: derived from consortium/partners.json; management_roles: derived from consortium/roles.json + wp_structure.json; ethics_assessment: derived from compliance_profile.json; instrument_sections_addressed: derived from section_schema_registry.json filtered by selected_call.json instrument_type |
+| `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` | implementation_architecture.json | `orch.phase6.implementation_architecture.v1` | schema_id, run_id, governance_matrix (array), management_roles (array), risk_register (array — placeholder, populated by risk-register-builder), ethics_assessment (object — populated by this skill from compliance_profile.json), instrument_sections_addressed (array — populated by this skill from section_schema_registry.json) | Yes | governance_matrix: Tier 1 constraints + Tier 3 consortium/roles/WP data; management_roles: Tier 3 roles + wp_structure.json; ethics_assessment: Tier 1 implementation constraints + compliance_profile.json; instrument_sections_addressed: Tier 2A section schema registry + selected_call.json|
 
 **Note:** `artifact_status` must be ABSENT at write time; the runner stamps it post-gate. This skill populates governance_matrix, management_roles, ethics_assessment, and instrument_sections_addressed. The risk_register field is set to `[]` (placeholder) and populated by the risk-register-builder skill in a subsequent invocation. The full implementation_architecture.json must be complete before the Phase 6 gate.
 
@@ -75,51 +84,30 @@ Do not include explanations outside the JSON.
 
 ### 1. Input Validation Sequence
 
-- Step 1.1: Presence check — confirm `docs/tier3_project_instantiation/consortium/partners.json` exists. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="partners.json not found; governance roles cannot be assigned without consortium partner data") and halt.
-- Step 1.2: Non-empty check — confirm `partners.json` is parseable JSON and contains at least one partner entry. Build the **valid_partner_ids** set from `partner_id` values.
-- Step 1.3: Presence check — confirm `docs/tier3_project_instantiation/consortium/roles.json` exists. If absent: log as Assumed (governance roles will be inferred from WP leads); continue — do not halt.
-- Step 1.4: Presence check and schema check — confirm `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` exists with `schema_id` = "orch.phase3.wp_structure.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="wp_structure.json not found or schema mismatch") and halt.
-- Step 1.5: Validated state check — if `wp_structure.json` has `artifact_status` = "invalid": return SkillResult(status="failure", failure_category="MALFORMED_ARTIFACT", failure_reason="wp_structure.json has artifact_status: invalid; the artifact was invalidated by a prior gate failure and cannot be used as input until Phase 3 gate passes") and halt.
-- Step 1.6: Presence check — confirm `docs/tier3_project_instantiation/call_binding/compliance_profile.json` exists. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="compliance_profile.json not found; ethics assessment requires compliance profile data") and halt.
-- Step 1.7: Presence check — confirm `docs/tier3_project_instantiation/call_binding/selected_call.json` exists. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="selected_call.json not found; instrument type resolution requires call binding data") and halt. Extract `instrument_type` from selected_call.json.
-- Step 1.8: Presence check — confirm `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` exists. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="section_schema_registry.json not found; instrument sections cannot be addressed without schema registry") and halt.
+### 1. Input Validation Sequence
+
+- Step 1.1: Confirm `docs/tier1_normative_framework/extracted/governance_principles.json` exists and is parseable JSON with `schema_id = "tier1.governance_principles.v1"`. If absent or malformed: return `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="governance_principles.json not found or malformed; Tier 1 governance grounding is required to avoid generic programme-rule assumptions")`.
+- Step 1.2: Confirm `docs/tier1_normative_framework/extracted/implementation_constraints.json` exists and is parseable JSON with `schema_id = "tier1.implementation_constraints.v1"`. If absent or malformed: return `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="implementation_constraints.json not found or malformed; Tier 1 implementation constraints are required for ethics and implementation grounding")`.
+- Step 1.3: Confirm `docs/tier3_project_instantiation/consortium/partners.json` exists and contains at least one partner entry. Build the **valid_partner_ids** set from `partner_id` values.
+- Step 1.4: Confirm `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` exists with `schema_id = "orch.phase3.wp_structure.v1"`. If absent or schema mismatch: fail with `MISSING_INPUT`.
+- Step 1.5: If `wp_structure.json` has `artifact_status = "invalid"`: fail with `MALFORMED_ARTIFACT`.
+- Step 1.6: Confirm `compliance_profile.json`, `selected_call.json`, and `section_schema_registry.json` are present and parseable. Extract `instrument_type` from selected_call.json.
 
 ### 2. Core Processing Logic
 
-- Step 2.1: Extract from `partners.json`: `partner_id`, `partner_name`, `partner_type`, `country` for each partner. These are the only permissible sources for governance role assignments.
-- Step 2.2: Extract from `roles.json` (if present): any explicit role assignments (project coordinator, WP leads, financial officer, ethics officer, etc.). For each role: record `role_name`, `assigned_to` (partner_id). For each assigned_to value: verify it is in valid_partner_ids; if not: record a validation issue.
-- Step 2.3: Extract from `wp_structure.json`: `partner_role_matrix` (partner_id → wps_as_lead list). Identify the partner with the most WPs as lead — this is the likely coordinator candidate if not specified in roles.json.
-- Step 2.4: Build the `governance_matrix` array. At minimum, construct the following governance bodies:
-  - **Project Management Board (PMB)** or equivalent: `{ body_name: "Project Management Board", composition: [<all partner_ids from valid_partner_ids>], decision_scope: "Strategic decisions, major changes, financial oversight, external communications", meeting_frequency: <from roles.json if present; otherwise "Quarterly" marked as Assumed>, escalation_path: "Escalation to project coordinator, then to funding agency if unresolved" }`.
-  - **Project Coordination Team (PCT)** or equivalent: `{ body_name: "Project Coordination Team", composition: [<partner_ids with WP lead roles>], decision_scope: "Operational decisions, task scheduling, deliverable coordination, day-to-day management", meeting_frequency: <from roles.json if present; otherwise "Monthly" marked as Assumed> }`.
-  - If `roles.json` specifies additional bodies (Technical Advisory Board, Ethics Committee, etc.): add those, with composition and decision_scope from roles.json data. All composition values must be partner_id values from valid_partner_ids.
-  - For any `meeting_frequency` value that is not explicitly stated in Tier 3: add an `assumption_note: "meeting_frequency assumed; not stated in Tier 3 consortium data"`.
-- Step 2.5: Build the `management_roles` array:
-  - **Project Coordinator**: identify from roles.json or infer as the lead partner of WP1 (management WP) from wp_structure.json. `{ role_id: "COORD-01", role_name: "Project Coordinator", assigned_to: <partner_id>, responsibilities: ["Overall project management", "Liaison with funding agency", "Financial oversight", "Report submission"] }`. If inferred (not from roles.json): record `inference_note: "Coordinator assigned as lead partner of WP1; explicit assignment not found in roles.json"`.
-  - **WP Lead roles**: for each WP in wp_structure.json, create a management role entry: `{ role_id: "WPL-<wp_id>", role_name: "WP<n> Lead", assigned_to: <lead_partner from wp_structure>, responsibilities: ["Lead WP<n> activities", "Ensure WP<n> deliverables are produced on schedule", "Report WP<n> progress to coordinator"] }`. The `assigned_to` value is taken directly from `work_packages[].lead_partner` in wp_structure.json.
-  - All `assigned_to` values MUST exist in valid_partner_ids. If any does not: record a validation issue — this will cause the Phase 6 gate to fail.
-- Step 2.6: Set `risk_register` to `[]` (empty array — populated by risk-register-builder skill in a subsequent invocation).
-- Step 2.7: Build the `ethics_assessment` object from `compliance_profile.json`:
-  - Read `compliance_profile.json`: extract `ethics_review_required`, `gender_plan_required`, `open_science_requirements`.
-  - Set `ethics_issues_identified`:
-    - If `ethics_review_required` is `true`: set `ethics_issues_identified: true`.
-    - If `ethics_review_required` is `false`: set `ethics_issues_identified: false`.
-  - Build `issues` array:
-    - If `ethics_issues_identified` is `true`: populate with ethics issues derivable from the compliance profile data and the project scope visible in wp_structure.json (e.g., human subjects data in healthcare WPs, dual-use potential, personal data processing). Each issue must have `issue_id`, `description`, and `mitigation` fields. Issues must be grounded in the compliance profile and WP structure — not invented from generic knowledge.
-    - If `ethics_issues_identified` is `false`: set `issues: []`.
-  - Build `self_assessment_statement`: a non-empty string summarising the ethics self-assessment position. Must reference the compliance profile determination and the project scope. Must NOT be `"N/A"`, empty, or a generic placeholder. Example structure: "Based on the compliance profile (ethics_review_required: true/false), the project [does/does not] involve ethics-sensitive activities. [Specific assessment based on WP content]."
-  - The resulting `ethics_assessment` object must contain all three required fields: `ethics_issues_identified` (boolean), `issues` (array), `self_assessment_statement` (non-empty string).
-- Step 2.8: Build the `instrument_sections_addressed` array from `section_schema_registry.json` and `selected_call.json`:
-  - Resolve the active instrument type from `selected_call.json` `instrument_type` field (e.g. "RIA").
-  - Find the matching instrument entry in `section_schema_registry.json` `instruments[]` where `instrument_type` matches.
-  - For each section in that instrument's `sections[]` array where `section_type` is `"implementation_section"`:
-    - Create an entry: `{ section_id: <from registry>, section_name: <from registry>, status: <determined below> }`.
-    - Determine `status`:
-      - `"addressed"` — if the section's subject matter is covered by the governance_matrix (management), risk_register (risk management), ethics_assessment (ethics), or other content produced in this artifact. For a standard RIA, management structure, risk management, ethics, and consortium description sections are addressed by Phase 6 content.
-      - `"not_applicable"` — only if the compliance profile explicitly indicates the section does not apply (e.g. gender_plan_required is false for a gender section). Must be justified by specific compliance profile data.
-    - Do not set `status: "deferred"` without recording a justification.
-  - If no matching instrument entry is found: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No instrument entry matching instrument_type '<type>' found in section_schema_registry.json") and halt.
-  - The resulting array must be non-empty for any valid instrument type.
+- Step 2.1: Build governance from **Tier 1 constraints first, Tier 3 project facts second**.
+- Step 2.2: Extract from `partners.json` and `roles.json`: partner facts, explicit role assignments, explicit governance bodies, meeting frequencies, and escalation rules.
+- Step 2.3: Extract from `wp_structure.json`: WP identifiers, lead partners, and partner_role_matrix.
+- Step 2.4: Build `governance_matrix`:
+  - Use explicit Tier 3 body names and meeting frequencies if present.
+  - If Tier 1 contains a prescribed rule, use it and cite it in `source_basis`.
+  - If Tier 1 says no prescribed frequency exists, choose a reasonable project-operational cadence but record `assumption_note: "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; selected as a project-operational assumption"`.
+  - Do **not** use phrases such as `standard RIA governance practice` or `standard operational practice`.
+  - If the output refers to Grant Agreement or Consortium Agreement obligations, the wording must be traceable to Tier 1 extracted files through `source_basis`; otherwise it must be framed as a project-operational escalation path, not as a normative programme rule.
+- Step 2.5: Build `management_roles` from explicit Tier 3 roles or, where necessary, transparent inference from WP lead assignments.
+- Step 2.6: Set `risk_register` to `[]` (placeholder for risk-register-builder).
+- Step 2.7: Build `ethics_assessment` from `implementation_constraints.json` + `compliance_profile.json` + project scope visible in `wp_structure.json`.
+- Step 2.8: Build `instrument_sections_addressed` from `section_schema_registry.json`, `selected_call.json`, and `implementation_constraints.json`.
 
 ### 3. Output Construction
 
@@ -141,7 +129,7 @@ Do not include explanations outside the JSON.
 ### 5. Write Sequence
 
 - Step 5.1: Create directory `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/` if not present.
-- Step 5.2: Write `implementation_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. If the file already exists (because another skill will update it), read the existing content first and merge: update only the `governance_matrix` and `management_roles` fields; preserve all other fields.
+- Step 5.2: Write `implementation_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. If the file already exists (because another skill will update it), read the existing content first and merge: update only the `governance_matrix`, `management_roles`, `ethics_assessment`, and `instrument_sections_addressed` fields; preserve all other fields.
 
 ## Constitutional Constraint Enforcement
 
@@ -178,6 +166,10 @@ Do not include explanations outside the JSON.
 **Hard failure confirmation:** Yes — management-WP lead inconsistency is not correctable by agent judgment; the source data must be corrected at Phase 3 level.
 
 **CLAUDE.md §13 cross-reference:** §7 Phase 6 gate — "Consortium management roles are assigned and non-overlapping." §12.5 — review must check internal consistency.
+
+- Do not present an unsourced project design choice as if it were a Tier 1 programme rule.
+- If a Tier 1 source is present and relevant, use it.
+- If a Tier 1 source is absent or explicitly non-prescriptive, the output must mark the design choice as an assumption or project-operational decision rather than a normative Horizon rule.
 
 <!-- Step 6 complete: constitutional constraint enforcement implemented -->
 

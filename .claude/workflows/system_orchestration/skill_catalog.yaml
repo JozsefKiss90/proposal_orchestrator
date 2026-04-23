@@ -320,6 +320,8 @@ skill_catalog:
     used_by_agents:
       - implementation_architect
     reads_from:
+      - docs/tier1_normative_framework/extracted/governance_principles.json
+      - docs/tier1_normative_framework/extracted/implementation_constraints.json
       - docs/tier3_project_instantiation/consortium/partners.json
       - docs/tier3_project_instantiation/consortium/roles.json
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
@@ -332,6 +334,7 @@ skill_catalog:
       - "Governance roles must be assigned to Tier 3 consortium members only"
       - "Management structure must be consistent with WP lead assignments"
       - "Ethics self-assessment must not be omitted, null, or 'N/A'"
+      - "Tier 1 programme-rule claims must be sourced to docs/tier1_normative_framework/extracted/; if no Tier 1 rule exists, the output must mark the element as an explicit assumption rather than generic 'standard RIA practice'"
 
   - id: risk-register-builder
     execution_mode: "tapm"
