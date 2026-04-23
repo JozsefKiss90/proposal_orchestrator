@@ -468,6 +468,35 @@ class TestAllMilestonesHaveCriteria:
         assert result.failure_category == CROSS_ARTIFACT_INCONSISTENCY
         assert result.details["incomplete_count"] == 2
 
+    # --- Backward-compatibility: optional depends_on_tasks / milestone_type ---
+
+    def test_pass_milestone_with_depends_on_tasks(self, tmp_path):
+        """Milestone with optional depends_on_tasks field still passes criteria check."""
+        ms = _ms("MS1", 6, "Architecture review completed")
+        ms["depends_on_tasks"] = ["T1-01"]
+        ms["milestone_type"] = "intermediate_checkpoint"
+        gantt = _write(tmp_path, "gantt.json", _gantt([], [ms], ["MS1"]))
+        result = all_milestones_have_criteria(gantt)
+        assert result.passed is True
+
+    def test_pass_milestone_without_new_fields(self, tmp_path):
+        """Legacy milestone without depends_on_tasks/milestone_type still passes."""
+        gantt = _write(
+            tmp_path, "gantt.json",
+            _gantt([], [_ms("MS1", 6, "Valid criterion")], ["MS1"]),
+        )
+        result = all_milestones_have_criteria(gantt)
+        assert result.passed is True
+
+    def test_pass_wp_completion_milestone(self, tmp_path):
+        """wp_completion milestone with all fields passes criteria check."""
+        ms = _ms("MS1", 36, "All WP outputs delivered")
+        ms["depends_on_tasks"] = ["T1-01", "T1-02"]
+        ms["milestone_type"] = "wp_completion"
+        gantt = _write(tmp_path, "gantt.json", _gantt([], [ms], ["MS1"]))
+        result = all_milestones_have_criteria(gantt)
+        assert result.passed is True
+
 
 # ===========================================================================
 # wp_count_within_limit

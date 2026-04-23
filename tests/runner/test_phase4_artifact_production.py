@@ -144,6 +144,8 @@ def _valid_gantt_response(run_id: str = "run-test-p4") -> dict:
                 "due_month": 3,
                 "verifiable_criterion": "Consortium agreement signed and first management board meeting held",
                 "responsible_wp": "WP1",
+                "depends_on_tasks": ["T1-01"],
+                "milestone_type": "intermediate_checkpoint",
             },
             {
                 "milestone_id": "MS2",
@@ -151,6 +153,8 @@ def _valid_gantt_response(run_id: str = "run-test-p4") -> dict:
                 "due_month": 24,
                 "verifiable_criterion": "Peer-reviewed publication submitted to a Q1 journal",
                 "responsible_wp": "WP2",
+                "depends_on_tasks": ["T2-01", "T2-02"],
+                "milestone_type": "wp_completion",
             },
         ],
         "critical_path": ["T2-01", "T2-02", "MS2"],
@@ -381,6 +385,41 @@ class TestGanttScheduleBuilderArtifactProduction:
 
         assert result.status == "failure"
         assert result.failure_category == "MALFORMED_ARTIFACT"
+
+    def test_valid_response_without_milestone_dependency_fields(self, tmp_path: Path) -> None:
+        """Legacy gantt response without depends_on_tasks/milestone_type still passes validation."""
+        repo = _make_gantt_skill_env(tmp_path)
+        response = _valid_gantt_response()
+        # Remove the new optional fields
+        for ms in response["milestones"]:
+            ms.pop("depends_on_tasks", None)
+            ms.pop("milestone_type", None)
+
+        with patch(_TRANSPORT_TARGET, return_value=json.dumps(response)):
+            result = run_skill("gantt-schedule-builder", "run-test-p4", repo)
+
+        assert result.status == "success"
+        assert _GANTT_CANONICAL_PATH in result.outputs_written
+
+    def test_cross_wp_depends_on_tasks_accepted_by_schema(self, tmp_path: Path) -> None:
+        """depends_on_tasks referencing a task from a different WP is accepted by schema.
+
+        Milestone in WP1 with depends_on_tasks: ["T2-01"] where T2-01 belongs to WP2
+        is a structural issue that milestone-consistency-check should flag with
+        flag_class "structural". The schema and skill runtime do not reject it —
+        structural validation is the checker's responsibility, not the builder's.
+        """
+        repo = _make_gantt_skill_env(tmp_path)
+        response = _valid_gantt_response()
+        # Set MS1 (responsible_wp=WP1) to depend on T2-01 (wp_id=WP2) — cross-WP ref
+        response["milestones"][0]["depends_on_tasks"] = ["T2-01"]
+        response["milestones"][0]["milestone_type"] = "intermediate_checkpoint"
+
+        with patch(_TRANSPORT_TARGET, return_value=json.dumps(response)):
+            result = run_skill("gantt-schedule-builder", "run-test-p4", repo)
+
+        # Schema accepts it (structural validation is the checker's job)
+        assert result.status == "success"
 
 
 # =========================================================================

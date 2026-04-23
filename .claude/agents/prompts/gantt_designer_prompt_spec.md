@@ -68,8 +68,10 @@ Gate condition `g05_p07` verifies `milestones_seed.json` is populated. This file
 
 **Step 8 — Invoke milestone-consistency-check skill.**
 Invoke the `milestone-consistency-check` skill to verify:
-- All milestone `due_month` values are consistent with task completion months
-- No milestone `due_month` exceeds project duration
+- Milestones with `depends_on_tasks` have `due_month >= max(end_month)` of their dependent tasks (Tier A — task-dependency validation)
+- Milestones marked `milestone_type: "wp_completion"` have `due_month >= max(end_month)` of all WP tasks (Tier B — WP-completion validation)
+- Milestones without explicit dependency semantics are validated against WP-level max end_month as a heuristic (Tier C — heuristic fallback)
+- All `depends_on_tasks` entries reference valid task_ids belonging to `responsible_wp` (structural check)
 - All `verifiable_criterion` values are concrete and non-empty
 Write the check result to `docs/tier4_orchestration_state/validation_reports/`. Flag any inconsistencies.
 Note: `gantt.json` must already be written to disk (Step 6) so the skill runs in FULL mode with schedule-level validation. If `gantt.json` is absent, the skill falls back to DEGRADED mode (WP-level only).
@@ -108,6 +110,8 @@ Invoke the `decision-log-update` skill for all material scheduling decisions, co
 | `tasks[].end_month` | yes, ≤ project_duration_months | Must not exceed project duration from `selected_call.json` |
 | `tasks[].responsible_partner` | yes | From Tier 3 `partners.json` |
 | `milestones` | yes, non-empty array | Each: `milestone_id`, `title`, `due_month` (1-based, non-null), `verifiable_criterion` (non-empty, concrete, not a placeholder), `responsible_wp` |
+| `milestones[].depends_on_tasks` | no (preferred) | Array of task_ids from `responsible_wp` that must complete for milestone verification. All referenced tasks must belong to `responsible_wp`. Preferred for precise downstream milestone validation. |
+| `milestones[].milestone_type` | no (preferred) | `"intermediate_checkpoint"` if depends_on_tasks is a proper subset of WP tasks; `"wp_completion"` if all WP tasks are included. Preferred but not mandatory. |
 | `critical_path` | yes, non-empty array | Ordered list of `task_id` and `milestone_id` strings |
 
 ### `milestones_seed.json` (Tier 3 update, content-contract-only)

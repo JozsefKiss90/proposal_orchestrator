@@ -104,13 +104,28 @@ Activated when `validation_mode == "FULL"`.
 Uses both `wp_structure.json` and `gantt.json`.
 
 - Step 2B.1: Build a **task schedule map** from `gantt.json`: for each task entry, record `{ task_id, wp_id, start_month, end_month }`. Key the map by `task_id`.
-- Step 2B.2: Build a **WP task completion month map**: for each `wp_id`, find all tasks in the task schedule map that have this `wp_id`. Compute `max_task_end_month[wp_id]` = the maximum `end_month` value across all tasks in that WP.
+- Step 2B.2: Build a **WP task completion month map**: for each `wp_id`, find all tasks in the task schedule map that have this `wp_id`. Compute `max_task_end_month[wp_id]` = the maximum `end_month` value across all tasks in that WP. Additionally, build a **task end month lookup**: for each `task_id`, record its `end_month` and `wp_id`. Key by `task_id`.
 - Step 2B.3: Build a **deliverable due month map** from `wp_structure.json`: for each WP, for each deliverable, record `deliverable_id`, `wp_id`, `due_month`. Key by `deliverable_id`.
 - Step 2B.4: For each milestone in `gantt.json milestones[]`:
   - Step 2B.4.1: Look up `responsible_wp` in `max_task_end_month`. If `responsible_wp` is not found in the map (i.e., the WP has no tasks in gantt.json): record a finding with `consistency_status: "flagged"`, `flag_reason: "Milestone responsible_wp '<wp_id>' has no tasks in gantt.json; cannot validate timing"`.
-  - Step 2B.4.2: If `responsible_wp` is found: compare `milestone.due_month` against `max_task_end_month[responsible_wp]`. If `milestone.due_month` < `max_task_end_month[responsible_wp]`: record a finding with `consistency_status: "flagged"`, `flag_reason: "Milestone due_month (<m>) precedes completion of all tasks in responsible WP (max task end_month: <n>); milestone may be achieved before all contributing tasks complete"`. This is flagged but not necessarily invalid — record for human review. If `milestone.due_month` >= `max_task_end_month[responsible_wp]`: record with `consistency_status: "consistent"`.
+  - Step 2B.4.2: **Three-tier milestone timing validation.** Evaluate the milestone using the first applicable tier:
+
+    **Tier A — Explicit task-dependency validation (highest priority):**
+    If the milestone has a `depends_on_tasks` field that is a non-empty array:
+    - **Structural check — cross-WP reference:** For each `task_id` in `depends_on_tasks`, look up the task in the task schedule map. If the task's `wp_id` does not match the milestone's `responsible_wp`: record with `consistency_status: "flagged"`, `flag_reason: "depends_on_tasks task '<task_id>' belongs to WP '<wp_id>', not responsible_wp '<responsible_wp>'"`, `flag_class: "structural"`. This is a structural error in the milestone's dependency declaration.
+    - If any `task_id` in `depends_on_tasks` is not found in the task schedule map at all: record with `consistency_status: "flagged"`, `flag_reason: "depends_on_tasks references unknown task_id '<id>'"`, `flag_class: "structural"`.
+    - If all structural checks pass: compute `max_dependent_end_month` = max(`end_month` for each `task_id` in `depends_on_tasks`). If `milestone.due_month` >= `max_dependent_end_month`: record with `consistency_status: "consistent"`, `flag_class: "task_dependency"`. If `milestone.due_month` < `max_dependent_end_month`: record with `consistency_status: "flagged"`, `flag_reason: "Milestone due_month (<m>) precedes completion of dependent tasks (max end_month of depends_on_tasks: <n>)"`, `flag_class: "task_dependency"`.
+    - Do NOT also check against `max_task_end_month[responsible_wp]`. Explicit task dependency supersedes the WP-level heuristic.
+
+    **Tier B — WP-completion validation:**
+    If the milestone has `milestone_type == "wp_completion"` AND `depends_on_tasks` is absent or empty:
+    - Compare `milestone.due_month` against `max_task_end_month[responsible_wp]`. If `milestone.due_month` >= `max_task_end_month[responsible_wp]`: record with `consistency_status: "consistent"`, `flag_class: "wp_completion"`. If `milestone.due_month` < `max_task_end_month[responsible_wp]`: record with `consistency_status: "flagged"`, `flag_reason: "wp_completion milestone due_month (<m>) precedes completion of all tasks in responsible WP (max task end_month: <n>)"`, `flag_class: "wp_completion"`.
+
+    **Tier C — Heuristic fallback (no explicit semantics):**
+    If neither `depends_on_tasks` (or it is empty) NOR `milestone_type` is present:
+    - Compare `milestone.due_month` against `max_task_end_month[responsible_wp]`. If `milestone.due_month` >= `max_task_end_month[responsible_wp]`: record with `consistency_status: "consistent"`, `flag_class: "heuristic"`. If `milestone.due_month` < `max_task_end_month[responsible_wp]`: record with `consistency_status: "flagged"`, `flag_reason: "Milestone due_month (<m>) precedes completion of all tasks in responsible WP (max task end_month: <n>); no depends_on_tasks or milestone_type specified — flagged as heuristic"`, `flag_class: "heuristic"`. This preserves the current behavior for milestones without explicit dependency semantics.
   - Step 2B.4.3: Check `verifiable_criterion` for the milestone: the field must be a non-empty string. Additionally, check whether the value is a placeholder — any of the following constitute a non-verifiable criterion: empty string, "TBD", "to be defined", "to be determined", "N/A", "placeholder". If the criterion is empty or a placeholder: record `verifiable_criterion_present: false` and add flag_reason: "verifiable_criterion is absent or a placeholder; must be a concrete, externally observable statement of milestone achievement". Otherwise set `verifiable_criterion_present: true`.
-  - Step 2B.4.4: Build the finding record: `{ milestone_id, due_month: milestone.due_month, task_completion_month: max_task_end_month[responsible_wp] or null, verifiable_criterion_present: boolean, consistency_status: "consistent"/"flagged", flag_reason: string or null }`.
+  - Step 2B.4.4: Build the finding record: `{ milestone_id, due_month: milestone.due_month, task_completion_month: <see below>, verifiable_criterion_present: boolean, consistency_status: "consistent"/"flagged", flag_reason: string or null, flag_class: string or null }`. The `task_completion_month` value depends on which tier was applied: Tier A sets it to `max_dependent_end_month` (the max end_month of tasks in depends_on_tasks); Tiers B and C set it to `max_task_end_month[responsible_wp]` (unchanged from prior behavior). The `flag_class` field is one of: `"task_dependency"` (Tier A), `"wp_completion"` (Tier B), `"heuristic"` (Tier C), or `"structural"` (cross-WP or unknown task_id reference). `flag_class` is present only in FULL mode findings.
 - Step 2B.5: Count results: `total_milestones_checked`, `passed` (consistency_status = "consistent" AND verifiable_criterion_present = true), `flagged` (any other combination).
 
 ### 3. Output Construction
@@ -122,7 +137,7 @@ Uses both `wp_structure.json` and `gantt.json`.
 - `run_id_reference`: string — current run_id from agent context
 - `mode`: string — `"DEGRADED"` or `"FULL"` (from Step 0)
 - `validated_scope`: array of strings — `["wp_structure"]` in DEGRADED mode; `["wp_structure", "gantt"]` in FULL mode
-- `findings`: array — derived from Step 2A.4 (DEGRADED) or Step 2B.4 (FULL) — each entry: `{milestone_id, due_month, task_completion_month, verifiable_criterion_present, consistency_status, flag_reason}`
+- `findings`: array — derived from Step 2A.4 (DEGRADED) or Step 2B.4 (FULL) — each entry: `{milestone_id, due_month, task_completion_month, verifiable_criterion_present, consistency_status, flag_reason, flag_class}`. The `flag_class` field is present only in FULL mode findings and is one of: `"task_dependency"`, `"wp_completion"`, `"heuristic"`, or `"structural"`
 - `summary`: object — derived from Step 2A.5 (DEGRADED) or Step 2B.5 (FULL) — `{total_milestones_checked, passed, flagged}`
 - `timestamp`: ISO 8601 timestamp
 
@@ -173,11 +188,11 @@ Omitting this flag or recording `verifiable_criterion_present: true` for a place
 
 **Decision point in execution logic:** Step 2B.4.2 (FULL mode) — milestone due_month vs. max_task_end_month comparison; Step 2A.4.3 (DEGRADED mode) — milestone due_month vs. WP duration bounds comparison.
 
-**Exact failure condition (FULL mode):** A milestone's `due_month` is earlier than the latest task `end_month` for its `responsible_wp`, AND the finding is NOT written with `consistency_status: "flagged"` in the validation report. OR: the comparison is performed but the flag is suppressed or overridden to "consistent" by agent judgment.
+**Exact failure condition (FULL mode):** A milestone's `due_month` is earlier than the applicable task completion reference (determined by three-tier validation: Tier A uses max end_month of `depends_on_tasks` when present; Tier B uses max end_month of all WP tasks for `wp_completion` milestones; Tier C uses max end_month of all WP tasks as heuristic fallback), AND the finding is NOT written with `consistency_status: "flagged"` in the validation report. OR: the comparison is performed but the flag is suppressed or overridden to "consistent" by agent judgment. Additionally, any `depends_on_tasks` entry referencing a task_id not found in the task schedule map, or referencing a task whose `wp_id` does not match `responsible_wp`, must be flagged with `flag_class: "structural"`.
 
 **Exact failure condition (DEGRADED mode):** A milestone's `due_month` falls outside the duration bounds of its responsible WP, or exceeds the project duration, AND the finding is NOT written with `consistency_status: "flagged"`.
 
-**Enforcement mechanism:** In both modes, the timing comparison is deterministic. When the condition holds, `consistency_status` must be set to "flagged" — no agent override is permitted. The `flag_reason` must state the specific values so the issue is human-reviewable. Setting `consistency_status: "consistent"` when the condition holds is a constitutional violation.
+**Enforcement mechanism:** In both modes, the timing comparison is deterministic. When the condition holds, `consistency_status` must be set to "flagged" — no agent override is permitted. The `flag_reason` must state the specific values so the issue is human-reviewable. The `flag_class` must accurately identify which validation tier was applied. Setting `consistency_status: "consistent"` when the condition holds is a constitutional violation.
 
 **Failure output:** Individual inconsistency → recorded as `consistency_status: "flagged"` in findings (not a SkillResult failure; the gate will fail on this). Report write failure → SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT").
 
@@ -270,7 +285,7 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Individual milesto
 ### Upstream input schema verification
 
 - **`wp_structure.json`** (`orch.phase3.wp_structure.v1`) — skill reads `work_packages[].deliverables[].due_month`, `work_packages[].tasks[].task_id`, and WP-level duration fields. Field path matches spec §1.3. Compliant.
-- **`gantt.json`** (`orch.phase4.gantt.v1`) — **FULL mode only.** Skill reads `milestones[].milestone_id, due_month, verifiable_criterion, responsible_wp` and `tasks[].task_id, wp_id, start_month, end_month`. All field names match spec §1.4 exactly. Compliant. In DEGRADED mode, this artifact is not read.
+- **`gantt.json`** (`orch.phase4.gantt.v1`) — **FULL mode only.** Skill reads `milestones[].milestone_id, due_month, verifiable_criterion, responsible_wp, depends_on_tasks (optional), milestone_type (optional)` and `tasks[].task_id, wp_id, start_month, end_month`. All field names match spec §1.4 exactly. The optional fields `depends_on_tasks` and `milestone_type` enable three-tier validation when present; their absence triggers Tier C heuristic fallback. Compliant. In DEGRADED mode, this artifact is not read.
 
 ### Artifact: `milestone_consistency_<agent_id>_<timestamp>.json` (validation report)
 
@@ -285,7 +300,7 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Individual milesto
 | `run_id_reference` | Yes | current run_id from agent context | Yes |
 | `mode` | Yes (Step 0, Step 3) | "DEGRADED" or "FULL" | Yes |
 | `validated_scope` | Yes (Step 3) | ["wp_structure"] or ["wp_structure", "gantt"] | Yes |
-| `findings[]` | Yes (Step 2A.4 or 2B.4, Step 3) | each finding: milestone_id, due_month, task_completion_month (null in DEGRADED), verifiable_criterion_present (bool), consistency_status (enum: consistent/flagged), flag_reason | Yes |
+| `findings[]` | Yes (Step 2A.4 or 2B.4, Step 3) | each finding: milestone_id, due_month, task_completion_month (null in DEGRADED), verifiable_criterion_present (bool), consistency_status (enum: consistent/flagged), flag_reason, flag_class (FULL mode only: task_dependency/wp_completion/heuristic/structural) | Yes |
 | `summary` | Yes (Step 2A.5 or 2B.5, Step 3) | total_milestones_checked/passed/flagged | Yes |
 | `timestamp` | Yes | ISO 8601 | Yes |
 

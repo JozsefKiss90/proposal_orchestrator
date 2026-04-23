@@ -85,6 +85,9 @@ For each milestone in `milestones_seed.json` (or derived from deliverable comple
 - Assign `due_month`: must be consistent with task completion months for the linked WP. Must be ≤ project_duration_months.
 - Write a `verifiable_criterion`: a concrete, externally verifiable statement. Must NOT be a placeholder like "work package completed" or "deliverables submitted". Must describe what specific evidence or result demonstrates milestone achievement.
 - Assign `responsible_wp` (wp_id from wp_structure)
+- Optionally assign `depends_on_tasks`: array of `task_id` strings from the output `tasks` array whose `wp_id` matches `responsible_wp`. Include only the tasks that must complete for the milestone's `verifiable_criterion` to be testable — identify these from the milestone's title, criterion, and the task scopes. All task_ids must exist in the output `tasks` array and must belong to the milestone's `responsible_wp`. Including this field is preferred as it enables precise downstream milestone validation, but it is not mandatory.
+- Optionally assign `milestone_type`: If `depends_on_tasks` is present and contains ALL task_ids for the `responsible_wp` in the output schedule, set to `"wp_completion"`. If `depends_on_tasks` is present but is a proper subset, set to `"intermediate_checkpoint"`. Including this field is preferred but not mandatory.
+- If `depends_on_tasks` is provided: `due_month` must be >= max(`end_month`) of tasks listed in `depends_on_tasks`.
 
 ### 4. Critical Path Identification
 
@@ -102,7 +105,17 @@ Construct `gantt.json`:
   "schema_id": "orch.phase4.gantt.v1",
   "run_id": "<propagated from invoking context>",
   "tasks": [ ... ],
-  "milestones": [ ... ],
+  "milestones": [
+    {
+      "milestone_id": "MS1",
+      "title": "Architecture specification finalised",
+      "due_month": 3,
+      "verifiable_criterion": "API contracts documented and accepted by all pillar leads",
+      "responsible_wp": "WP1",
+      "depends_on_tasks": ["T1-01"],
+      "milestone_type": "intermediate_checkpoint"
+    }
+  ],
   "critical_path": [ ... ]
 }
 ```
@@ -118,7 +131,7 @@ Return this as a single JSON object — no markdown wrapping, no explanatory pro
 1. Return only one JSON object. No markdown wrapping, no commentary.
 2. `tasks[].task_id` must exactly match `wp_structure.json` task_ids — do not rename.
 3. `milestones[].verifiable_criterion` must be concrete and specific, not generic.
-4. Do not add fields beyond those required by the schema.
+4. Do not add fields beyond those defined by the schema. The fields `depends_on_tasks` and `milestone_type` are schema-defined optional fields; including them is preferred for precise validation but not mandatory.
 5. Do not include rationale or explanatory text inside field values.
 
 ---

@@ -628,6 +628,28 @@ tier4_phase_output_schemas:
             type: string
             required: true
             description: WP identifier responsible for this milestone.
+          depends_on_tasks:
+            type: array
+            required: false
+            item_type: string
+            description: >
+              Task_id strings from the tasks array that must complete
+              before this milestone can be verified. When present and
+              non-empty, milestone-consistency-check validates due_month
+              against only these tasks, not all tasks in responsible_wp.
+              Each task_id must reference a task in the tasks array with
+              wp_id matching responsible_wp.
+          milestone_type:
+            type: string
+            required: false
+            enum: [intermediate_checkpoint, wp_completion]
+            description: >
+              "intermediate_checkpoint" indicates a mid-WP verification
+              event that does not require all WP tasks to complete.
+              "wp_completion" indicates a milestone that represents
+              completion of all tasks in the responsible WP. When absent,
+              milestone-consistency-check falls back to WP-level heuristic
+              validation and marks findings with flag_class "heuristic".
 
       critical_path:
         type: array
