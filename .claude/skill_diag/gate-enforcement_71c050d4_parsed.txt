@@ -1,0 +1,86 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.gate_result.v1",
+  "run_id": "71c050d4-dfb1-4076-8f6c-9094368bd4be",
+  "gate_id": "phase_06_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-23T00:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "risk_register_non_empty",
+      "all_risks_have_likelihood_impact_mitigation",
+      "governance_matrix_non_empty",
+      "all_management_roles_assigned_to_tier3_partners"
+    ],
+    "failed": [
+      {
+        "predicate_id": "ethics_assessment_non_null",
+        "type": "structural",
+        "function": "non_null_check",
+        "args": {
+          "field": "ethics_assessment"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "artifact.ethics_assessment is null; a non-null ethics_assessment object is required by the phase_06_gate condition. CLAUDE.md \u00a77 Phase 6 gate mandates: 'Ethics flags are explicitly stated (not omitted)'. The field is present in the artifact but set to null, which does not satisfy the gate condition.",
+        "prose_condition": "artifact.ethics_assessment must be a non-null object"
+      },
+      {
+        "predicate_id": "ethics_self_assessment_statement_non_empty",
+        "type": "structural",
+        "function": "non_empty_string_check",
+        "args": {
+          "field": "ethics_assessment.self_assessment_statement"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "artifact.ethics_assessment is null; therefore artifact.ethics_assessment.self_assessment_statement cannot be evaluated and cannot be non-empty. The self_assessment_statement is required by the phase_06_gate condition. This predicate fails as a direct consequence of ethics_assessment being null.",
+        "prose_condition": "artifact.ethics_assessment.self_assessment_statement must be a non-empty string"
+      },
+      {
+        "predicate_id": "instrument_sections_addressed_non_empty",
+        "type": "structural",
+        "function": "non_empty_array_check",
+        "args": {
+          "field": "instrument_sections_addressed"
+        },
+        "failure_category": "INCOMPLETE_OUTPUT",
+        "fail_message": "artifact.instrument_sections_addressed is an empty array []; the phase_06_gate condition requires a non-empty array confirming that instrument-mandated implementation sections have been addressed. CLAUDE.md \u00a77 Phase 6 gate mandates: 'All instrument-mandated implementation sections are addressed.' An empty array cannot satisfy this requirement.",
+        "prose_condition": "artifact.instrument_sections_addressed must be a non-empty array"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "instrument_sections_complete",
+        "function": "semantic_check_instrument_sections",
+        "agent": "implementation_architect",
+        "constitutional_rule": "CLAUDE.md \u00a77 Phase 6 gate condition: 'All instrument-mandated implementation sections are addressed.' \u00a76.2: 'A phase is not complete until its gate condition is satisfied.'",
+        "findings": [
+          {
+            "claim": "artifact.instrument_sections_addressed is an empty array; no instrument-mandated sections are recorded as addressed, deferred, or assessed in any status. There are zero entries against which the mandatory-section coverage requirement can be confirmed.",
+            "violated_rule": "phase_06_gate requires that all sections in instrument_sections_addressed corresponding to mandatory sections from section_schema_registry.json have status 'addressed' (not 'deferred' without reason). With an empty array the requirement is structurally unverifiable and cannot be declared satisfied.",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json:instrument_sections_addressed",
+            "severity": "critical"
+          },
+          {
+            "claim": "The selected instrument type is RIA (resolved from docs/tier3_project_instantiation/call_binding/selected_call.json:instrument_type). RIA applications carry mandatory implementation sections under the Horizon Europe application form (management, risk, ethics, gender). None of these sections are confirmed as addressed in instrument_sections_addressed.",
+            "violated_rule": "All instrument-mandated implementation sections must be listed in instrument_sections_addressed with status 'addressed' before the phase_06_gate can pass (CLAUDE.md \u00a77 Phase 6 gate condition).",
+            "evidence_path": "docs/tier3_project_instantiation/call_binding/selected_call.json:instrument_type",
+            "severity": "critical"
+          }
+        ]
+      }
+    ]
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_phase_06_gate_implementation_architect_2026-04-23T000000Z",
+    "decision_type": "ga
+=== END ===

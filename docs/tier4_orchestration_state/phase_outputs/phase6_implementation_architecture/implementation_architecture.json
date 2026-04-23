@@ -1,0 +1,332 @@
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "71c050d4-dfb1-4076-8f6c-9094368bd4be",
+  "governance_matrix": [
+    {
+      "body_name": "Project Management Board",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Strategic decisions, major changes, financial oversight, external communications, approval of changes to project scope or consortium structure, approval of periodic reports to the funding agency",
+      "meeting_frequency": "Quarterly",
+      "escalation_path": "Escalation to project coordinator (ATU) for initial resolution; unresolved matters escalated to the Project Management Board for majority-vote decision; matters requiring external resolution referred to the funding agency",
+      "assumption_note": "meeting_frequency assumed as Quarterly; not explicitly stated in Tier 3 consortium data (roles.json)"
+    },
+    {
+      "body_name": "Project Coordination Team",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Operational decisions, task scheduling, deliverable coordination, day-to-day management, inter-WP dependency resolution, internal risk monitoring, preparation of Project Management Board agenda items",
+      "meeting_frequency": "Monthly",
+      "escalation_path": "Unresolved operational issues escalated to the Project Management Board",
+      "assumption_note": "meeting_frequency assumed as Monthly; not explicitly stated in Tier 3 consortium data (roles.json). Composition includes all eight partners as all hold at least one WP lead role per wp_structure.json partner_role_matrix."
+    }
+  ],
+  "management_roles": [
+    {
+      "role_id": "COORD-01",
+      "role_name": "Project Coordinator",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Overall project management and consortium governance",
+        "Liaison with the funding agency and submission of periodic reports",
+        "Financial oversight and management of consortium budget flows",
+        "Report submission and compliance monitoring",
+        "Chairing the Project Management Board and Project Coordination Team",
+        "Coordination with ADRA and the GenAI4EU central Hub"
+      ],
+      "derivation_note": "ATU identified as Project Coordinator from roles.json (consortium_role: 'Coordinator') and confirmed as lead_partner of WP1 (Project Management and Coordination) in wp_structure.json."
+    },
+    {
+      "role_id": "WPL-WP1",
+      "role_name": "WP1 Lead",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Lead WP1 — Project Management and Coordination activities",
+        "Ensure WP1 deliverables (D1-01, D1-02) are produced on schedule",
+        "Report WP1 progress to coordinator",
+        "Oversee consortium governance, financial management, quality assurance, risk monitoring, and ethics compliance"
+      ]
+    },
+    {
+      "role_id": "WPL-WP2",
+      "role_name": "WP2 Lead",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Lead WP2 — Neuro-Symbolic Planning and Reasoning Engine activities",
+        "Ensure WP2 deliverables (D2-01, D2-02) are produced on schedule",
+        "Report WP2 progress to coordinator",
+        "Direct design of sub-task graph decomposition, MCTS and HTN planning integration, and plan self-correction implementation"
+      ]
+    },
+    {
+      "role_id": "WPL-WP3",
+      "role_name": "WP3 Lead",
+      "assigned_to": "BIIS",
+      "responsibilities": [
+        "Lead WP3 — Adaptive Memory Architecture activities",
+        "Ensure WP3 deliverables (D3-01, D3-02) are produced on schedule",
+        "Report WP3 progress to coordinator",
+        "Direct design of tri-store memory architecture, memory indexing and retrieval strategies, and forgetting mechanisms"
+      ]
+    },
+    {
+      "role_id": "WPL-WP4",
+      "role_name": "WP4 Lead",
+      "assigned_to": "CERIA",
+      "responsibilities": [
+        "Lead WP4 — Decentralised Multi-Agent Coordination activities",
+        "Ensure WP4 deliverables (D4-01, D4-02) are produced on schedule",
+        "Report WP4 progress to coordinator",
+        "Direct design of task-delegation and negotiation protocols, convergence and conflict resolution mechanisms, and auditable multi-agent interaction trace module"
+      ]
+    },
+    {
+      "role_id": "WPL-WP5",
+      "role_name": "WP5 Lead",
+      "assigned_to": "NIHS",
+      "responsibilities": [
+        "Lead WP5 — Healthcare Demonstrator activities",
+        "Ensure WP5 deliverables (D5-01, D5-02) are produced on schedule",
+        "Report WP5 progress to coordinator",
+        "Lead clinical use case definition, HL7 FHIR integration, specialist sub-agent deployment, and clinical expert validation"
+      ]
+    },
+    {
+      "role_id": "WPL-WP6",
+      "role_name": "WP6 Lead",
+      "assigned_to": "ISIA",
+      "responsibilities": [
+        "Lead WP6 — Manufacturing Demonstrator activities",
+        "Ensure WP6 deliverables (D6-01, D6-02) are produced on schedule",
+        "Report WP6 progress to coordinator",
+        "Lead production scenario definition, digital twin integration, multi-agent coordination deployment, and pilot factory operational validation"
+      ]
+    },
+    {
+      "role_id": "WPL-WP7",
+      "role_name": "WP7 Lead",
+      "assigned_to": "ELI",
+      "responsibilities": [
+        "Lead WP7 — Logistics Transfer Demonstrator activities",
+        "Ensure WP7 deliverables (D7-01, D7-02) are produced on schedule",
+        "Report WP7 progress to coordinator",
+        "Lead logistics scenario and disruption recovery benchmark design, agent-based planning and negotiation deployment across supply chain, and operational validation across three international corridors"
+      ]
+    },
+    {
+      "role_id": "WPL-WP8",
+      "role_name": "WP8 Lead",
+      "assigned_to": "FIIT",
+      "responsibilities": [
+        "Lead WP8 — Integration, Evaluation and Benchmarking activities",
+        "Ensure WP8 deliverables (D8-01, D8-02, D8-03) are produced on schedule",
+        "Report WP8 progress to coordinator",
+        "Lead cross-cutting evaluation framework design, MAESTRO unified framework integration, cross-demonstrator benchmarking, and community benchmark release"
+      ]
+    },
+    {
+      "role_id": "WPL-WP9",
+      "role_name": "WP9 Lead",
+      "assigned_to": "BAL",
+      "responsibilities": [
+        "Lead WP9 — Dissemination, Exploitation and Communication activities",
+        "Ensure WP9 deliverables (D9-01, D9-02, D9-03) are produced on schedule",
+        "Report WP9 progress to coordinator",
+        "Lead open-source release management, exploitation strategy development, IP management, communication, and public engagement activities"
+      ]
+    }
+  ],
+  "risk_register": [
+    {
+      "risk_id": "RISK-01",
+      "description": "Integrating symbolic planning formalisms with LLM-based reasoning may prove more difficult than anticipated, particularly in achieving real-time performance for the planning engine.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Adopt a modular architecture with well-defined interfaces between symbolic and neural components. Implement fallback modes where the LLM-only planner operates when symbolic integration introduces unacceptable latency. Begin integration testing from M6, not M18. This is addressed in MCTS and HTN planning integration with LLM heuristics (task_id: T2-02, WP2) and Neuro-symbolic planning architecture specification (deliverable_id: D2-01, WP2).",
+      "responsible_partner": "ATU"
+    },
+    {
+      "risk_id": "RISK-02",
+      "description": "The tri-store memory architecture may not scale to the interaction lengths required by demonstrators (hundreds of steps) without unacceptable latency or storage costs.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Design the memory controller with configurable retention policies from the start. Conduct scalability stress-testing on synthetic long-horizon tasks from M9. Implement tiered storage with fast/approximate retrieval for working memory and precise/slower retrieval for episodic memory. This is addressed in Tri-store memory architecture design (task_id: T3-01, WP3) and Memory indexing and retrieval strategy implementation (task_id: T3-02, WP3).",
+      "responsible_partner": "BIIS"
+    },
+    {
+      "risk_id": "RISK-03",
+      "description": "Formal convergence proofs may be achievable only for restricted task classes, not for the full generality of real-world multi-agent scenarios encountered in demonstrators.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Classify task types early (M3–M6) by coordination complexity. Prioritise convergence proofs for the most common demonstrator task patterns. Use probabilistic convergence bounds for task classes where deterministic proofs are infeasible. This is addressed in Task-delegation and negotiation protocol design (task_id: T4-01, WP4) and Convergence and conflict resolution under partial observability (task_id: T4-02, WP4).",
+      "responsible_partner": "CERIA"
+    },
+    {
+      "risk_id": "RISK-04",
+      "description": "Access to de-identified clinical datasets may be delayed by ethics review processes or restricted in scope, reducing the clinical validation power of the healthcare demonstrator.",
+      "category": "external",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Submit ethics applications in M1 (pre-project preparation already initiated). Use publicly available clinical datasets (MIMIC-IV, eICU) for initial development and intermediate evaluation. Design the demonstrator with a data abstraction layer that can switch between data sources. This is addressed in Clinical use case definition and diagnostic benchmark design (task_id: T5-01, WP5) and HL7 FHIR integration and specialist sub-agent deployment (task_id: T5-02, WP5).",
+      "responsible_partner": "NIHS"
+    },
+    {
+      "risk_id": "RISK-05",
+      "description": "Operational factory access for the manufacturing demonstrator may be interrupted by production schedules, equipment maintenance, or external disruptions.",
+      "category": "external",
+      "likelihood": "low",
+      "impact": "medium",
+      "mitigation": "Secure a formal access agreement with factory partners before project start. Schedule the 3-month validation period with buffer windows. Develop a high-fidelity digital twin of the pilot factory that can substitute for physical access during development phases. This is addressed in Digital twin integration and multi-agent coordination deployment (task_id: T6-02, WP6) and Pilot factory operational validation (task_id: T6-03, WP6).",
+      "responsible_partner": "ISIA"
+    },
+    {
+      "risk_id": "RISK-06",
+      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of transfer demonstrator results.",
+      "category": "external",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Negotiate data access and publication terms in the consortium agreement. Design the demonstrator with an anonymisation layer that enables publication of performance metrics without exposing proprietary data. Supplement with public logistics benchmarks. This is addressed in Logistics scenario and disruption recovery benchmark design (task_id: T7-01, WP7) and Agent-based planning and negotiation deployment across supply chain (task_id: T7-02, WP7).",
+      "responsible_partner": "ELI"
+    },
+    {
+      "risk_id": "RISK-07",
+      "description": "The fast pace of LLM development may produce new foundation models during the project that significantly change the baseline capabilities, requiring re-evaluation of MAESTRO's value proposition.",
+      "category": "technical",
+      "likelihood": "high",
+      "impact": "medium",
+      "mitigation": "Design all MAESTRO components with model-agnostic interfaces that can integrate new LLMs without architectural changes. Conduct annual baseline re-evaluation (M12, M24, M36) against latest models. MAESTRO's value lies in the architecture (planning, memory, coordination) not in any specific LLM. This is addressed in Sub-task graph decomposition design with formal pre/post-conditions (task_id: T2-01, WP2) and Cross-cutting evaluation framework and KPI definition (task_id: T8-01, WP8).",
+      "responsible_partner": "BAL"
+    },
+    {
+      "risk_id": "RISK-08",
+      "description": "Regulatory requirements under the EU AI Act for high-risk AI systems (particularly the healthcare demonstrator) may impose compliance obligations that require additional development effort.",
+      "category": "external",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Monitor EU AI Act implementing regulations throughout the project. Design auditability and transparency mechanisms from the start (audit trails, decision explanations). Engage with AI regulatory sandboxes where available. This is addressed in Ethics compliance oversight and coordination with GenAI4EU Hub (task_id: T1-03, WP1) and Auditable multi-agent interaction trace module (task_id: T4-03, WP4).",
+      "responsible_partner": "FIIT"
+    },
+    {
+      "risk_id": "RISK-09",
+      "description": "A key partner may reduce commitment or a principal investigator may depart during the project, creating capability gaps.",
+      "category": "organisational",
+      "likelihood": "low",
+      "impact": "high",
+      "mitigation": "Ensure each pillar has at least 2 partners with relevant expertise. Include deputy PI appointments for each WP lead. Consortium agreement includes commitment clauses and transition procedures. This is addressed in Consortium governance and financial management (task_id: T1-01, WP1) and Quality assurance and risk monitoring (task_id: T1-02, WP1).",
+      "responsible_partner": "ATU"
+    },
+    {
+      "risk_id": "RISK-10",
+      "description": "The independently developed planning, memory, coordination, and tool orchestration modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars and the tool orchestration layer. This is addressed in Cross-cutting evaluation framework and KPI definition (task_id: T8-01, WP8) and MAESTRO unified framework integration (task_id: T8-02, WP8).",
+      "responsible_partner": "FIIT"
+    },
+    {
+      "risk_id": "RISK-11",
+      "description": "The diversity of external APIs across three demonstrator domains (HL7 FHIR in healthcare, OPC-UA in manufacturing, logistics tracking/customs APIs) may require more adapter development effort than planned, delaying tool orchestration layer readiness.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Define a minimal common adapter interface in M1–M3. Prioritise adapters for the most critical APIs per demonstrator. Use existing open-source connector libraries where available rather than building from scratch. This is addressed in Sub-task graph decomposition design with formal pre/post-conditions (task_id: T2-01, WP2) and HL7 FHIR integration and specialist sub-agent deployment (task_id: T5-02, WP5).",
+      "responsible_partner": "ATU"
+    }
+  ],
+  "ethics_assessment": null,
+  "instrument_sections_addressed": [],
+  "flagged_gap_risks": [
+    {
+      "risk_indicator": "A",
+      "description": "FIIT is the sole responsible partner for three deliverables (D8-01, D8-02, D8-03) in WP8 (Integration, Evaluation and Benchmarking), which sits on the confirmed critical path (WP2→WP5→WP8→WP9). All three deliverables have empty contributing_partners at task level (T8-01, T8-02, T8-03 all have contributing_partners: []). This constitutes a single-point-of-failure risk for the integration and benchmarking pillar not covered by any Tier 3 risk seed.",
+      "affected_elements": [
+        "D8-01",
+        "D8-02",
+        "D8-03",
+        "T8-01",
+        "T8-02",
+        "T8-03"
+      ],
+      "resolution_required": true
+    },
+    {
+      "risk_indicator": "A",
+      "description": "BAL is the sole responsible partner for three deliverables (D9-01, D9-02, D9-03) in WP9 (Dissemination, Exploitation and Communication), which sits on the confirmed critical path (WP2→WP5→WP8→WP9). All three deliverables have empty contributing_partners at task level (T9-01, T9-02, T9-03 all have contributing_partners: []). This constitutes a single-point-of-failure risk for the dissemination and exploitation pillar not covered by any Tier 3 risk seed.",
+      "affected_elements": [
+        "D9-01",
+        "D9-02",
+        "D9-03",
+        "T9-01",
+        "T9-02",
+        "T9-03"
+      ],
+      "resolution_required": true
+    },
+    {
+      "risk_indicator": "B",
+      "description": "All 27 tasks across all 9 WPs have empty contributing_partners arrays, making every task a solo task with no designated fallback partner. This is a systemic structural gap confirmed by wp_structure.json normalization_issues (note: 'contributing_partners derived from seed participants array minus lead_partner for each WP' — task-level contributing_partners were not populated in the WP seeds). Critical path tasks are flagged as highest priority: T2-01, T2-02, T2-03 (ATU sole responsible, WP2), T5-02, T5-03 (NIHS sole responsible, WP5), T8-02, T8-03 (FIIT sole responsible, WP8). This systemic condition is not covered by any existing Tier 3 risk seed and requires operator review to determine whether task-level contributing_partners should be populated or whether the solo-task structure is an accepted design decision.",
+      "affected_elements": [
+        "T2-01",
+        "T2-02",
+        "T2-03",
+        "T5-02",
+        "T5-03",
+        "T8-02",
+        "T8-03"
+      ],
+      "resolution_required": true
+    }
+  ],
+  "category_conversions": [
+    {
+      "risk_id": "RISK-04",
+      "seed_category": "regulatory",
+      "mapped_category": "external",
+      "mapping_rationale": "Seed category 'regulatory' is not in the valid enum [technical, financial, organisational, ethical, external, other]. Mapped to 'external' as ethics review process delays and data access restrictions imposed by regulatory bodies are externally driven constraints beyond the project's direct control. This conversion must be recorded in the decision log by the invoking agent."
+    },
+    {
+      "risk_id": "RISK-05",
+      "seed_category": "operational",
+      "mapped_category": "external",
+      "mapping_rationale": "Seed category 'operational' is not in the valid enum. Mapped to 'external' as manufacturing pilot factory availability disruptions (production schedules, equipment maintenance, external disruptions) are externally driven operational dependencies. This conversion must be recorded in the decision log by the invoking agent."
+    },
+    {
+      "risk_id": "RISK-06",
+      "seed_category": "operational",
+      "mapped_category": "external",
+      "mapping_rationale": "Seed category 'operational' is not in the valid enum. Mapped to 'external' as commercial confidentiality constraints on ELI operational data are externally imposed contractual and commercial constraints. This conversion must be recorded in the decision log by the invoking agent."
+    },
+    {
+      "risk_id": "RISK-08",
+      "seed_category": "regulatory",
+      "mapped_category": "external",
+      "mapping_rationale": "Seed category 'regulatory' is not in the valid enum. Mapped to 'external' as EU AI Act compliance requirements constitute an externally imposed regulatory framework. This conversion must be recorded in the decision log by the invoking agent."
+    },
+    {
+      "risk_id": "RISK-09",
+      "seed_category": "management",
+      "mapped_category": "organisational",
+      "mapping_rationale": "Seed category 'management' is not in the valid enum. Mapped to 'organisational' as partner withdrawal and key personnel departure are organisational risks relating to consortium structure, governance, and personnel continuity. This conversion must be recorded in the decision log by the invoking agent."
+    }
+  ]
+}

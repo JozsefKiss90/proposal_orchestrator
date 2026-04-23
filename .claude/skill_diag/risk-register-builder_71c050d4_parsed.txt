@@ -1,0 +1,116 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'governance_matrix', 'management_roles', 'risk_register', 'ethics_assessment', 'instrument_sections_addressed', 'flagged_gap_risks', 'category_conversions'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "71c050d4-dfb1-4076-8f6c-9094368bd4be",
+  "governance_matrix": [
+    {
+      "body_name": "Project Management Board",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Strategic decisions, major changes, financial oversight, external communications, approval of changes to project scope or consortium structure, approval of periodic reports to the funding agency",
+      "meeting_frequency": "Quarterly",
+      "escalation_path": "Escalation to project coordinator (ATU) for initial resolution; unresolved matters escalated to the Project Management Board for majority-vote decision; matters requiring external resolution referred to the funding agency",
+      "assumption_note": "meeting_frequency assumed as Quarterly; not explicitly stated in Tier 3 consortium data (roles.json)"
+    },
+    {
+      "body_name": "Project Coordination Team",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Operational decisions, task scheduling, deliverable coordination, day-to-day management, inter-WP dependency resolution, internal risk monitoring, preparation of Project Management Board agenda items",
+      "meeting_frequency": "Monthly",
+      "escalation_path": "Unresolved operational issues escalated to the Project Management Board",
+      "assumption_note": "meeting_frequency assumed as Monthly; not explicitly stated in Tier 3 consortium data (roles.json). Composition includes all eight partners as all hold at least one WP lead role per wp_structure.json partner_role_matrix."
+    }
+  ],
+  "management_roles": [
+    {
+      "role_id": "COORD-01",
+      "role_name": "Project Coordinator",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Overall project management and consortium governance",
+        "Liaison with the funding agency and submission of periodic reports",
+        "Financial oversight and management of consortium budget flows",
+        "Report submission and compliance monitoring",
+        "Chairing the Project Management Board and Project Coordination Team",
+        "Coordination with ADRA and the GenAI4EU central Hub"
+      ],
+      "derivation_note": "ATU identified as Project Coordinator from roles.json (consortium_role: 'Coordinator') and confirmed as lead_partner of WP1 (Project Management and Coordination) in wp_structure.json."
+    },
+    {
+      "role_id": "WPL-WP1",
+      "role_name": "WP1 Lead",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Lead WP1 \u2014 Project Management and Coordination activities",
+        "Ensure WP1 deliverables (D1-01, D1-02) are produced on schedule",
+        "Report WP1 progress to coordinator",
+        "Oversee consortium governance, financial management, quality assurance, risk monitoring, and ethics compliance"
+      ]
+    },
+    {
+      "role_id": "WPL-WP2",
+      "role_name": "WP2 Lead",
+      "assigned_to": "ATU",
+      "responsibilities": [
+        "Lead WP2 \u2014 Neuro-Symbolic Planning and Reasoning Engine activities",
+        "Ensure WP2 deliverables (D2-01, D2-02) are produced on schedule",
+        "Report WP2 progress to coordinator",
+        "Direct design of sub-task graph decomposition, MCTS and HTN planning integration, and plan self-correction implementation"
+      ]
+    },
+    {
+      "role_id": "WPL-WP3",
+      "role_name": "WP3 Lead",
+      "assigned_to": "BIIS",
+      "responsibilities": [
+        "Lead WP3 \u2014 Adaptive Memory Architecture activities",
+        "Ensure WP3 deliverables (D3-01, D3-02) are produced on schedule",
+        "Report WP3 progress to coordinator",
+        "Direct design of tri-store memory architecture, memory indexing and retrieval strategies, and forgetting mechanisms"
+      ]
+    },
+    {
+      "role_id": "WPL-WP4",
+      "role_name": "WP4 Lead",
+      "assigned_to": "CERIA",
+      "responsibilities": [
+        "Lead WP4 \u2014 Decentralised Multi-Agent Coordination activities",
+        "Ensure WP4 deliverables (D4-01, D4-02) are produced on schedule",
+        "Report WP4 progress to coordinator",
+        "Direct design of task-delegation and negotiation protocols, convergence and conflict resolution mechanisms, and auditable multi-agent interaction trace module"
+      ]
+    },
+    {
+      "role_id": "WPL-WP5",
+      "role_name": "WP5 Lead",
+      "assigned_to": "NIHS",
+      "responsibilities": [
+        "Lead WP5 \u2014 Healthcare Demonstrator activities",
+        "Ensure WP5 deliverables (D5-01, D5-02) are produced on schedule",
+        "Report WP5 progress to coordinator",
+        "Lead clinical use case definition, HL7 FHIR integration, specialist sub-agent deployment, and clinical expert validation"
+      ]
+    },
+    {
+      "role_id": "WPL-WP6",
+      "r
+=== END ===
