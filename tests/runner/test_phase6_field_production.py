@@ -86,7 +86,7 @@ class TestGovernanceModelBuilderCatalogContract:
 
 
 class TestConstitutionalComplianceCheckCatalog:
-    """Verify Tier 5 is optional_reads_from, not reads_from."""
+    """Verify TAPM config: Tier 5 optional, broad phase_outputs/ removed."""
 
     def test_tier5_not_in_reads_from(self) -> None:
         entry = _get_skill_entry("constitutional-compliance-check", _REPO_ROOT)
@@ -98,10 +98,20 @@ class TestConstitutionalComplianceCheckCatalog:
         optional = entry.get("optional_reads_from", [])
         assert "docs/tier5_deliverables/" in optional
 
-    def test_tier4_still_required(self) -> None:
+    def test_broad_phase_outputs_not_in_reads_from(self) -> None:
+        """TAPM migration: broad directory removed from reads_from."""
         entry = _get_skill_entry("constitutional-compliance-check", _REPO_ROOT)
         reads = entry.get("reads_from", [])
-        assert "docs/tier4_orchestration_state/phase_outputs/" in reads
+        assert "docs/tier4_orchestration_state/phase_outputs/" not in reads
+
+    def test_claude_md_still_required(self) -> None:
+        entry = _get_skill_entry("constitutional-compliance-check", _REPO_ROOT)
+        reads = entry.get("reads_from", [])
+        assert "CLAUDE.md" in reads
+
+    def test_execution_mode_is_tapm(self) -> None:
+        entry = _get_skill_entry("constitutional-compliance-check", _REPO_ROOT)
+        assert entry.get("execution_mode") == "tapm"
 
 
 # ===========================================================================

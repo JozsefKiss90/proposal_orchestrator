@@ -1003,6 +1003,25 @@ def run_agent(
                 )
                 continue
 
+        # Inject artifact_path for constitutional-compliance-check.
+        # The skill audits a single targeted artifact, not the entire
+        # phase_outputs/ directory.  Resolve the primary phase output
+        # artifact from the outputs written by earlier skills in this
+        # agent body.  This bounds the TAPM prompt to ~20KB.
+        if sid == "constitutional-compliance-check":
+            phase_artifacts = [
+                p for p in all_outputs
+                if p.startswith(
+                    "docs/tier4_orchestration_state/phase_outputs/"
+                )
+                and not p.endswith("gate_result.json")
+            ]
+            if phase_artifacts:
+                if not caller_context:
+                    caller_context = {}
+                # Deduplicate: enrichment skills may write the same path
+                caller_context["artifact_path"] = phase_artifacts[0]
+
         result = run_skill(
             sid, run_id, repo_root, resolved_inputs,
             caller_context=caller_context or None,

@@ -1,0 +1,42 @@
+{
+  "skill_id": "constitutional-compliance-check",
+  "execution_mode": "cli-prompt",
+  "failure_class": "TIMEOUT",
+  "run_id": "839062b2-b776-4b78-a8f0-00095addbf49",
+  "node_id": null,
+  "reads_from": [
+    "CLAUDE.md",
+    "docs/tier4_orchestration_state/phase_outputs/"
+  ],
+  "writes_to": [
+    "docs/tier4_orchestration_state/validation_reports/",
+    "docs/tier4_orchestration_state/decision_log/"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 8192,
+  "timeout_seconds": 300,
+  "elapsed_seconds": 300.10899999993853,
+  "system_prompt_chars": 705,
+  "user_prompt_chars": 294966,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 300s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\nConstitutional constraints (hard failures if violated):\n- Must check against CLAUDE.md Section 13 prohibitions as a minimum\n- Constitutional violations must be flagged; they must not be silently resolved\n- CLAUDE.md governs this skill; this skill does not govern CLAUDE.md\n\nDo NOT include run_id, schema_id, or artifact_status fields in the output \u2014 this artifact type does not use them.\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": null,
+  "tapm_tools_enabled": false,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/constitutional-compliance-check_839062b2_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/constitutional-compliance-check_839062b2_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/constitutional-compliance-check_839062b2_user_prompt.txt",
+    "stdout": ".claude/skill_diag/constitutional-compliance-check_839062b2_stdout.txt",
+    "stderr": ".claude/skill_diag/constitutional-compliance-check_839062b2_stderr.txt"
+  }
+}

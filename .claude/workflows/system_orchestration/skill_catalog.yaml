@@ -420,6 +420,7 @@ skill_catalog:
       - "Weakness severity (critical/major/minor) must be assigned to each finding"
 
   - id: constitutional-compliance-check
+    execution_mode: "tapm"
     purpose: >
       Verify that a phase output or deliverable does not violate any prohibition in
       CLAUDE.md. Checks for fabricated project facts, fabricated call constraints,
@@ -434,12 +435,17 @@ skill_catalog:
       - budget_gate_validator
     reads_from:
       - CLAUDE.md
-      - docs/tier4_orchestration_state/phase_outputs/
     optional_reads_from:
       - docs/tier5_deliverables/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
       - docs/tier4_orchestration_state/decision_log/
+    notes: >
+      TAPM mode: reads CLAUDE.md and the specific artifact_path supplied by the
+      invoking agent via caller_context. The agent runtime resolves artifact_path
+      from the node's produced phase output artifacts. The skill does NOT
+      recursively read all phase_outputs/ — it audits only the targeted artifact.
+      This bounds the prompt to ~20KB (vs ~295KB in cli-prompt mode).
     constitutional_constraints:
       - "Must check against CLAUDE.md Section 13 prohibitions as a minimum"
       - "Constitutional violations must be flagged; they must not be silently resolved"

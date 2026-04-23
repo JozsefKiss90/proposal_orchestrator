@@ -14,7 +14,6 @@ used_by_agents:
   - budget_gate_validator
 reads_from:
   - CLAUDE.md
-  - docs/tier4_orchestration_state/phase_outputs/
 optional_reads_from:
   - docs/tier5_deliverables/
 writes_to:
@@ -26,6 +25,31 @@ constitutional_constraints:
   - "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md"
 ---
 
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Claude reads
+declared inputs from disk via the Read tool during execution.
+
+**Mandatory reads:**
+1. `CLAUDE.md` — the repository constitution; source of all §13 checks.
+2. The artifact at `artifact_path` (supplied by the invoking agent via
+   caller context) — the single artifact being audited.
+
+**Input boundary rules:**
+- Read ONLY `CLAUDE.md` and the file at `artifact_path`. Do not
+  recursively read `docs/tier4_orchestration_state/phase_outputs/` or
+  any other phase output directory.
+- For Phase 6 invocations, `artifact_path` resolves to
+  `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`.
+  Audit that artifact only.
+- `docs/tier5_deliverables/` is optional. If present and the artifact
+  being audited is a Tier 5 deliverable, read the specific artifact at
+  `artifact_path`. Do not scan the entire Tier 5 directory.
+- All 12 §13 checks (13.1–13.12) remain mandatory. Checks that are
+  structurally non-applicable to the artifact type (e.g. 13.5, 13.6,
+  13.11, 13.12) must still appear in the output with `check_status:
+  "pass"` and an explicit reason for non-applicability.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
@@ -33,7 +57,7 @@ constitutional_constraints:
 | Path | Artifact / Content | Fields Extracted | Schema ID | Purpose |
 |------|--------------------|-----------------|-----------|---------|
 | `CLAUDE.md` | Repository constitution | Section 13 prohibitions (13.1–13.12); Section 7 gate conditions; Section 8 budget integration rules; Section 11 deliverable rules | N/A — constitutional document | The binding authority that defines all prohibited actions; every violation check is mapped to a named section in this document |
-| `docs/tier4_orchestration_state/phase_outputs/` | Phase output directory — canonical artifacts from phases 1–8 | Phase-specific canonical artifact fields (varies by phase: call_analysis_summary, concept_refinement_summary, wp_structure, gantt, impact_architecture, implementation_architecture, budget_gate_assessment, drafting_review_status) | Context-dependent: the schema_id of the artifact being checked | Phase outputs being audited for constitutional violations; checked for fabricated facts, schema mismatches, gate bypasses, and other Section 13 violations |
+| `artifact_path` (caller context) | The specific phase output or deliverable artifact to audit | Phase-specific canonical artifact fields (varies by phase: call_analysis_summary, concept_refinement_summary, wp_structure, gantt, impact_architecture, implementation_architecture, budget_gate_assessment, drafting_review_status) | Context-dependent: the schema_id of the artifact being checked | The targeted artifact being audited for constitutional violations; checked for fabricated facts, schema mismatches, gate bypasses, and other Section 13 violations. In TAPM mode, read this single artifact from disk — do not scan the entire phase_outputs/ directory |
 | `docs/tier5_deliverables/` | Deliverable directory — proposal_sections/, assembled_drafts/, review_packets/, final_exports/ | content fields; traceability_footer; validation_status; section_completion_log | Context-dependent: orch.tier5.proposal_section.v1, orch.tier5.assembled_draft.v1, orch.tier5.review_packet.v1, orch.tier5.final_export.v1 | Deliverables being audited for constitutional violations; checked for budget-dependent content before gate pass, unsupported Tier 5 claims, and grant annex schema usage |
 
 ### Outputs
