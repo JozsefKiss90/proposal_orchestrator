@@ -1,0 +1,113 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'impact_pathways', 'kpis', 'dissemination_plan', 'exploitation_plan', 'sustainability_mechanism'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase5.impact_architecture.v1",
+  "run_id": "f3151039-5007-449e-a0ad-512e364e6fbd",
+  "impact_pathways": [
+    {
+      "pathway_id": "PATH-EI-01",
+      "expected_impact_id": "EI-01",
+      "coverage_status": "Covered",
+      "contributing_project_impact_ids": [
+        "IMP-2",
+        "IMP-3",
+        "IMP-4"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D5-01",
+          "wp_id": "WP5",
+          "title": "Clinical decision support use case specification",
+          "tier3_linkage_source": "outcomes.json:OUT-4.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D5-02",
+          "wp_id": "WP5",
+          "title": "Healthcare demonstrator evaluation dataset",
+          "tier3_linkage_source": "impacts.json:IMP-2.linked_deliverable_ids; outcomes.json:OUT-4.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-01",
+          "wp_id": "WP6",
+          "title": "Manufacturing use case and KPI specification",
+          "tier3_linkage_source": "outcomes.json:OUT-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "wp_id": "WP6",
+          "title": "Manufacturing process optimisation demonstrator software",
+          "tier3_linkage_source": "impacts.json:IMP-3.linked_deliverable_ids; outcomes.json:OUT-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D7-01",
+          "wp_id": "WP7",
+          "title": "Logistics demonstrator specification and benchmark report",
+          "tier3_linkage_source": "outcomes.json:OUT-6.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D7-02",
+          "wp_id": "WP7",
+          "title": "Cross-sector generalisation evaluation dataset",
+          "tier3_linkage_source": "impacts.json:IMP-4.linked_deliverable_ids; outcomes.json:OUT-6.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-4",
+          "title": "Clinical decision support agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP5"
+          ],
+          "tier3_linkage_source": "impacts.json:IMP-2.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-5",
+          "title": "Manufacturing process optimisation agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP6"
+          ],
+          "tier3_linkage_source": "impacts.json:IMP-3.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-6",
+          "title": "Logistics and supply chain transfer demonstrator (TRL 5)",
+          "linked_wp_ids": [
+            "WP7"
+          ],
+          "tier3_linkage_source": "impacts.json:IMP-4.linked_outcomes"
+        }
+      ],
+      "impact_narrative": "MAESTRO implements the European Apply AI Strategy across its three prioritised economic sectors through three sector-dedicated, TRL-5 validated demonstrators. The NIHS-led clinical decision support demonstrator (WP5) deploys multi-specialist-agent AI coordination on 500 de-identified clinical cases with HL7 FHIR integration, producing a validated system with auditable reasoning traces supporting EU AI Act high-risk system compliance requirements, and targeting engagement of \u22653 hospital networks in formal post-project adoption planning by M48 (D5-01, D5-02). The ISIA-led manufacturing demonstrator (WP6) deploys multi-agent process optimisation with digital twin integration in an operational factory environment across T6-01 through T6-03, targeting \u226515% defect reduction and \u226510% energy savings against pre-defined KPIs (D6-01, D6-02). The ELI-led logistics transfer demonstrator (WP7) validates MAESTRO architecture generalisation across three international supply chain corridors and produces a formal architectural transferability mapping to in-vehicle autonomous driving, confirming MAESTRO's demonstrated reach across all three Apply AI Strategy sectors and evidencing the portability required by EI-01 (D7-01, D7-02).",
+      "tier2b_source_ref": {
+        "source_file": "expected_impacts.json",
+        "impact_id": "EI-01",
+        "source_section": "call_entry.scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "status": "Confirmed"
+      }
+    },
+    {
+      "pathway_id": "PATH-EI-02",
+      "expected_impact_id": "EI-02",
+      "coverage_status": "Covered",
+      "contributing_project_impact_ids": [
+        "IMP-2",
+        "IMP-3",
+        "IMP-5"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D5-02",
+          "wp_id": "WP5",
+          "title": "Healthcare demonstrator evaluation dataset",
+          "tier3_linkage_source": "impacts.json:IMP-2.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "wp_id": "WP6",
+          "title": "Manufacturing process optimisation demonstrator software",
+          "tier3_linkage_source": "impacts.json:IMP-3.linked_deliverable_ids"
+        },
+        
+=== END ===

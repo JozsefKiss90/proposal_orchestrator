@@ -1,0 +1,26 @@
+=== skill_id: decision-log-update ===
+=== mode: cli-prompt ===
+=== response_text length: 4390 ===
+=== response_text (full) ===
+```json
+{
+  "decision_id": "wp_design_choice_gantt_designer_2026-04-23T17-05-00Z",
+  "decision_type": "wp_design_choice",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
+  "run_id_reference": "badb62ef-fb9c-4d14-a405-5181400524b9",
+  "decision_description": "MS1 (due month 3, responsible WP1: 'Architecture specification and integration contracts finalised') and MS5 (due month 12, responsible WP8: 'Demonstrator use cases defined and domain data secured') are intentionally placed as interim milestones within long-running WPs. WP1 spans months 1–48 and WP8 spans months 6–48; both WPs contain tasks that run well beyond their respective milestone due months. The milestone-consistency-check (report_id: milestone_consistency_gantt_designer_2026-04-23T11:00:00Z, run_id: badb62ef-fb9c-4d14-a405-5181400524b9) raised heuristic flags for MS1 and MS5 because their due_month precedes the max task end_month of the responsible WP and neither entry carries explicit depends_on_tasks or milestone_type fields. Both flags are resolved as valid design choices: MS1 captures the early architecture specification and integration contract boundary at the start of the project — a governance checkpoint within the project management WP, not a WP completion event; MS5 captures demonstrator use case definition and domain data access readiness at month 12 — a prerequisite readiness checkpoint within the integration and evaluation WP, not the conclusion of WP8 activities. Both milestones carry non-empty verifiable criteria. The flag_class for both is 'heuristic', confirming advisory rather than blocking status. No strict constraint violation is present. The absence of milestone_type and depends_on_tasks fields in MS1 and MS5 is acknowledged as an advisory enhancement opportunity for a future revision cycle.",
+  "alternatives_considered": [
+    "Add milestone_type: 'interim_checkpoint' and explicit depends_on_tasks to MS1 and MS5 to eliminate heuristic flags — deferred to next revision cycle as a non-blocking enhancement; would not change milestone semantics or verifiable criteria",
+    "Reassign MS1 to a separate early-phase milestone outside WP1 scope — rejected because the architecture specification event at month 3 is a governance output of WP1 management activities and reassignment would misrepresent WP ownership",
+    "Reassign MS5 to WP5, WP6, or WP7 — rejected because the use case definition and domain data access milestone is a cross-demonstrator readiness event owned by FIIT as WP8 lead, not by individual demonstrator WP leads",
+    "Treat heuristic flags as blocking and require gantt revision before proceeding — rejected because flag_class 'heuristic' explicitly indicates advisory status in the milestone-consistency-check schema; no Phase 4 gate condition requires heuristic-flag resolution"
+  ],
+  "tier_authority_applied": "CLAUDE.md §7 Phase 4 gate condition — all milestones must have a defined verifiable criterion; MS1 and MS5 both satisfy this requirement as confirmed by verifiable_criterion_present: true in Tier 4 docs/tier4_orchestration_state/validation_reports/milestone-consistency-check_badb62ef.json. Tier 4 docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json milestone entries for MS1 and MS5 are the authoritative source for milestone definitions evaluated in this decision.",
+  "rationale": "The milestone consistency check distinguishes heuristic flags (flag_class: 'heuristic') from task_dependency findings, signalling advisory status. The Phase 4 gate condition in CLAUDE.md §7 requires that all milestones have a defined verifiable criterion — both MS1 and MS5 satisfy this condition. Placement of interim governance and readiness milestones within long-running WPs (WP1: project management; WP8: integration and evaluation) is architecturally sound for a 48-month RIA: evaluators expect named checkpoints marking early contractual and readiness boundaries that do not coincide with WP completion. Reassigning responsible WP ownership or suppressing these milestones would reduce evaluator transparency. The decision resolves both heuristic flags as intentional design choices grounded in the WP structure and timeline, with no modification to Phase 3 or Phase 4 canonical artifacts required.",
+  "resolution_status": "resolved",
+  "timestamp": "2026-04-23T17:05:00Z"
+}
+```
+
+=== END ===

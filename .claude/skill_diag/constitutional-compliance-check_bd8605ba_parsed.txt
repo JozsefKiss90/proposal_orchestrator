@@ -1,0 +1,72 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_phase6_impl_arch_compliance_validator_2026-04-23T190000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "bd8605ba-1d6c-4825-8cd5-30ea26366b6b",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact type: the audited artifact has schema_id 'orch.phase6.implementation_architecture.v1', identifying it as a Phase 6 Tier 4 output. Check 13.4 applies to Phase 8 artifacts (schema_id beginning 'orch.tier5.' or 'orch.phase8.'). No budget figures (euro amounts, person-month values used as budget-confirmed allocations) are present in the artifact, consistent with Phase 6 preceding the budget gate. Phase 7 budget gate has not yet been evaluated; no Phase 8 activity is evidenced in or triggered by this artifact.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level check: whether durable decisions were held only in agent memory cannot be determined by reading artifact content. This prohibition is enforced by the decision-log-update skill and runtime architecture, not by inspection of the produced artifact.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level check: whether a skill or workflow has become a de facto constitutional authority cannot be determined from reading artifact content alone. This requires inspection of skill and workflow definition files, not the produced phase output.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact type: check 13.8 applies to Tier 5 deliverable artifacts. The audited artifact has schema_id 'orch.phase6.implementation_architecture.v1', identifying it as a Tier 4 phase output, not a proposal section or assembled draft. Where partial coverage is acknowledged (instrument_sections_addressed entry for B.3.1 carries status 'partially_addressed' with an explicit explanation that Tables 3.1a\u2013h are Phase 3 and Phase 4 outputs), the incompleteness is explicitly flagged and not silently omitted.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "violation",
+      "violation_evidence": "The artifact contains multiple regulatory claims referencing Horizon Europe programme rules \u2014 including GEP eligibility obligations (ethics_grounding.gender_plan_grounding), ethics self-assessment requirements (ethics_grounding.self_assessment_required_source), civil-focus constraint applicability (ETH-01.source_basis, ethics_groundi
+=== END ===

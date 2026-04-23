@@ -1,0 +1,74 @@
+=== parsed OK ===
+=== top-level keys: ['run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'semantic_predicate_findings', 'predicate_evaluation_counts', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "run_id": "f3151039-5007-449e-a0ad-512e364e6fbd",
+  "gate_id": "phase_05_gate",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-23T12:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "impact_pathways_non_empty",
+      "project_outputs_non_empty",
+      "kpis_non_empty",
+      "kpi_deliverables_valid",
+      "dissemination_plan_non_null",
+      "exploitation_plan_non_null",
+      "sustainability_mechanism_non_null"
+    ],
+    "failed": [
+      {
+        "predicate_id": "all_expected_impact_ids_covered",
+        "type": "deterministic",
+        "function": "all_items_present",
+        "args": {
+          "source_file": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+          "target_collection": "impact_pathways[*].expected_impact_id",
+          "source_field": "impact_id"
+        },
+        "failure_category": "MISSING_INPUT",
+        "fail_message": "Cannot evaluate predicate: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json is outside the declared TAPM input scope (declared inputs: docs/tier4_orchestration_state/phase_outputs/, docs/tier3_project_instantiation/). The artifact documents 5 impact_pathways covering expected_impact_ids EI-01, EI-02, EI-03, EI-04, and EI-05, each with a tier2b_source_ref tracing to expected_impacts.json in HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json. However, the complete and exhaustive set of expected_impact_ids defined in the Tier 2B expected_impacts.json cannot be independently verified from within the declared input boundary. It is therefore not confirmable that EI-01 through EI-05 represents all \u2014 and only \u2014 the expected impact IDs required by the call. Per CLAUDE.md \u00a76.2, a gate cannot be declared passed without confirming all gate conditions; this predicate cannot be confirmed as passed.",
+        "prose_condition": "Every expected_impact_id present in docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json appears in at least one entry of impact_pathways in impact_architecture.json"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [
+      "no_generic_impact_language"
+    ],
+    "failed": []
+  },
+  "semantic_predicate_findings": {
+    "no_generic_impact_language": {
+      "predicate_id": "no_generic_impact_language",
+      "function": "semantic_specificity_check",
+      "agent": "impact_architect",
+      "constitutional_rule": "CLAUDE.md \u00a711.5 \u2014 final proposal text must not be produced from content that is generic or untraceable to Tier 3 project data",
+      "evaluation": "All five impact_narrative fields were assessed. PATH-EI-01 narrative names NIHS (clinical decision support), ISIA (manufacturing), ELI (logistics), references HL7 FHIR integration, 500 de-identified clinical cases, \u22653 hospital networks by M48, \u226515% defect reduction, \u226510% energy savings, and specific deliverables D5-01, D5-02, D6-01, D6-02, D7-01, D7-02. PATH-EI-02 names BAL-led WP9 exploitation strategy, EDIH partnership agreements, \u226510 European SMEs/startups, AI-on-demand platform, specific deliverables D5-02, D6-02, D8-02, D9-02. PATH-EI-03 references specific research venues (NeurIPS, ICML, ICLR, AAMAS, AAAI), \u226520 publications, \u2265100 citations, \u22653 keynotes, AI-on-demand platform contribution, deliverables D2-02, D3-02, D4-02, D8-01, D8-02, D9-02. PATH-EI-04 references ISO/IEC JTC 1/SC 42, IEEE Standards Association, EU AI Act multi-agent transparency, CERIA's D4-01 standardisation submission, open-source release D9-02, and correctly acknowledges the Inferred status of EI-04 from topic destination placement. PATH-EI-05 names specific components (neuro-symbolic planning engine, adaptive tri-store memory, external tool orchestration layer), economic sectors (financial analysis, legal research, software development), \u2265500 GitHub stars target within 6 months of M36 release, \u226510 European SMEs/startups by M48, deliverables D2-02, D3-02, D8-01, D8-02, D9-02. No narrative contains boilerplate language such as 'the project will have a positive impact on society'. All narratives are project-specific and grounded in Tier 3 project data.",
+      "result": "passed"
+    }
+  },
+  "predicate_evaluation_counts": {
+    "deterministic_defined": 12,
+    "deterministic_evaluated": 12,
+    "deterministic_passed": 11,
+    "deterministic_failed": 1,
+    "semantic_defined": 1,
+    "semantic_evaluated": 1,
+    "semantic_passed": 1,
+    "semantic_failed": 0,
+    "total_defined": 13,
+    "total_evaluated": 13,
+    "bidirectional_guarantee_satisfied": true
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-04-23T12:00:00Z",
+    "decision_type": "gate_failure",
+    "gate_id": "phase_05_gate",
+    "failure_reason": "Predicate all_expected_impact_ids_covered failed: the Tier 2B expected_impacts.jso
+=== END ===
