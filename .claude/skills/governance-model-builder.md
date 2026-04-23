@@ -108,6 +108,7 @@ Do not include explanations outside the JSON.
 - Step 2.6: Set `risk_register` to `[]` (placeholder for risk-register-builder).
 - Step 2.7: Build `ethics_assessment` from `implementation_constraints.json` + `compliance_profile.json` + project scope visible in `wp_structure.json`.
 - Step 2.8: Build `instrument_sections_addressed` from `section_schema_registry.json`, `selected_call.json`, and `implementation_constraints.json`.
+- Step 2.9: Build `traceability_footer` — construct an artifact-level provenance record listing every declared input file actually read during this invocation, using **full repo-relative paths** (not abbreviated file names). The `traceability_footer.primary_sources[]` array must include at minimum every Tier 1 extracted file used (with tier: 1) and should include Tier 2–4 sources where their content grounds claims in the artifact. Each entry must use the full path starting with `docs/` (e.g., `docs/tier1_normative_framework/extracted/governance_principles.json`, not just `governance_principles.json`). Include `relevant_fields` where helpful for auditability.
 
 ### 3. Output Construction
 
@@ -119,6 +120,10 @@ Do not include explanations outside the JSON.
 - `risk_register`: `[]` — populated by risk-register-builder
 - `ethics_assessment`: derived from Step 2.7 — object with `{ethics_issues_identified, issues[], self_assessment_statement}`
 - `instrument_sections_addressed`: derived from Step 2.8 — array of `{section_id, section_name, status}`
+- `traceability_footer`: derived from Step 2.9 — object with `primary_sources[]` array; each entry: `{tier (integer 1–4), source_path (full repo-relative path starting with "docs/"), relevant_fields[] (optional)}`. Must include at minimum:
+  - `{tier: 1, source_path: "docs/tier1_normative_framework/extracted/governance_principles.json"}`
+  - `{tier: 1, source_path: "docs/tier1_normative_framework/extracted/implementation_constraints.json"}`
+  - Plus Tier 2A, Tier 3, and Tier 4 sources actually used
 
 ### 4. Conformance Stamping
 
@@ -129,7 +134,7 @@ Do not include explanations outside the JSON.
 ### 5. Write Sequence
 
 - Step 5.1: Create directory `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/` if not present.
-- Step 5.2: Write `implementation_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. If the file already exists (because another skill will update it), read the existing content first and merge: update only the `governance_matrix`, `management_roles`, `ethics_assessment`, and `instrument_sections_addressed` fields; preserve all other fields.
+- Step 5.2: Write `implementation_architecture.json` to `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`. If the file already exists (because another skill will update it), read the existing content first and merge: update only the `governance_matrix`, `management_roles`, `ethics_assessment`, `instrument_sections_addressed`, and `traceability_footer` fields; preserve all other fields.
 
 ## Constitutional Constraint Enforcement
 
@@ -268,8 +273,9 @@ No CONSTITUTIONAL_HALT conditions are defined for this skill. Constitutional con
 | risk_register | true | ✓ Placeholder ([]) — populated by risk-register-builder | Final population required before Phase 6 gate |
 | ethics_assessment | true | ✓ Implemented | Built in Step 2.7 from compliance_profile.json with ethics_issues_identified, issues[], self_assessment_statement |
 | instrument_sections_addressed | true | ✓ Implemented | Built in Step 2.8 from section_schema_registry.json filtered by active instrument type |
+| traceability_footer | false | ✓ Implemented | Built in Step 2.9 with primary_sources[] listing all Tier 1–4 input files using full repo-relative paths |
 
-**Reads_from compliance:** governance_matrix and management_roles derived from consortium/partners.json, consortium/roles.json, wp_structure.json. ethics_assessment derived from compliance_profile.json. instrument_sections_addressed derived from section_schema_registry.json and selected_call.json. All sources are in declared reads_from. No external fields introduced.
+**Reads_from compliance:** governance_matrix and management_roles derived from consortium/partners.json, consortium/roles.json, wp_structure.json. ethics_assessment derived from compliance_profile.json. instrument_sections_addressed derived from section_schema_registry.json and selected_call.json. traceability_footer derived from the declared reads_from set with full repo-relative paths. All sources are in declared reads_from. No external fields introduced.
 
 **Corrections applied:** Steps 2.7 and 2.8 changed from placeholder values (null / []) to substantive production from declared inputs. This eliminates the dependency on agent-body reasoning that the runtime does not execute.
 

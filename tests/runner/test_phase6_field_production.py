@@ -489,3 +489,294 @@ class TestPhase6ExitGateReachability:
             "Phase 6 artifact is present and non-empty but "
             "_determine_can_evaluate_exit_gate returned False"
         )
+
+
+# ===========================================================================
+# F. Traceability-footer production tests (§13.9 fix)
+# ===========================================================================
+
+
+def _gov_response_with_traceability_footer(run_id: str) -> str:
+    """A valid governance-model-builder response including traceability_footer."""
+    return json.dumps({
+        "schema_id": "orch.phase6.implementation_architecture.v1",
+        "run_id": run_id,
+        "governance_matrix": [
+            {
+                "body_name": "General Assembly",
+                "composition": ["P1", "P2"],
+                "decision_scope": "Strategic governance",
+                "meeting_frequency": "Annual",
+                "escalation_path": "To coordinator",
+            }
+        ],
+        "management_roles": [
+            {
+                "role_id": "COORD-01",
+                "role_name": "Coordinator",
+                "assigned_to": "P1",
+                "responsibilities": ["Overall management"],
+            }
+        ],
+        "risk_register": [],
+        "ethics_assessment": {
+            "ethics_issues_identified": True,
+            "issues": [
+                {
+                    "issue_id": "ETH-01",
+                    "description": "AI ethics in healthcare demonstrator",
+                    "mitigation": "Ethics committee oversight",
+                }
+            ],
+            "self_assessment_statement": (
+                "Based on implementation_constraints.json: ethics_self_assessment_required."
+            ),
+        },
+        "instrument_sections_addressed": [
+            {"section_id": "A.4", "section_name": "Ethics and Security", "status": "addressed"},
+            {"section_id": "B.3.1", "section_name": "Work plan and resources", "status": "addressed"},
+        ],
+        "traceability_footer": {
+            "primary_sources": [
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
+                    "relevant_fields": [
+                        "no_prescribed_governance_body_names",
+                        "consortium_agreement_guidance",
+                        "escalation_path_constraint",
+                    ],
+                },
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+                    "relevant_fields": [
+                        "ethics_self_assessment_required",
+                        "civil_focus_constraint",
+                        "gender_equality_plan_eligibility",
+                    ],
+                },
+                {
+                    "tier": 2,
+                    "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/consortium/roles.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+                },
+                {
+                    "tier": 4,
+                    "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+                },
+            ],
+        },
+    })
+
+
+class TestTraceabilityFooterProduction:
+    """Verify governance-model-builder produces traceability_footer with
+    full repo-relative Tier 1 paths, satisfying §13.9."""
+
+    def test_traceability_footer_written_to_artifact(self, tmp_path: Path) -> None:
+        """traceability_footer must be present in the written artifact."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-trace-footer-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_traceability_footer(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        assert "traceability_footer" in artifact
+        assert "primary_sources" in artifact["traceability_footer"]
+
+    def test_traceability_footer_contains_tier1_paths(self, tmp_path: Path) -> None:
+        """primary_sources must contain at least two Tier 1 entries with
+        full docs/tier1_normative_framework/extracted/ paths."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-trace-tier1-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_traceability_footer(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        sources = artifact["traceability_footer"]["primary_sources"]
+
+        tier1_sources = [s for s in sources if s.get("tier") == 1]
+        assert len(tier1_sources) >= 2, (
+            f"Expected at least 2 Tier 1 sources, found {len(tier1_sources)}"
+        )
+
+        tier1_paths = [s["source_path"] for s in tier1_sources]
+        assert any(
+            "docs/tier1_normative_framework/extracted/governance_principles.json" in p
+            for p in tier1_paths
+        ), f"governance_principles.json not found in Tier 1 paths: {tier1_paths}"
+        assert any(
+            "docs/tier1_normative_framework/extracted/implementation_constraints.json" in p
+            for p in tier1_paths
+        ), f"implementation_constraints.json not found in Tier 1 paths: {tier1_paths}"
+
+    def test_traceability_footer_uses_full_paths(self, tmp_path: Path) -> None:
+        """All source_path values must be full repo-relative paths starting
+        with 'docs/', not abbreviated file names."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-trace-fullpath-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_traceability_footer(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        sources = artifact["traceability_footer"]["primary_sources"]
+
+        for source in sources:
+            path = source["source_path"]
+            assert path.startswith("docs/"), (
+                f"source_path {path!r} does not start with 'docs/' — "
+                f"abbreviated file names do not satisfy §13.9"
+            )
+
+    def test_traceability_footer_preserved_after_risk_enrichment(self, tmp_path: Path) -> None:
+        """risk-register-builder merge must preserve traceability_footer
+        from the base artifact."""
+        run_id = "test-trace-preserve-01"
+        pre_artifact = {
+            "schema_id": "orch.phase6.implementation_architecture.v1",
+            "run_id": run_id,
+            "governance_matrix": [{"body_name": "PMB", "composition": ["P1"], "decision_scope": "Strategic"}],
+            "management_roles": [{"role_id": "COORD-01", "role_name": "Coordinator", "assigned_to": "P1", "responsibilities": ["Manage"]}],
+            "risk_register": [],
+            "ethics_assessment": {
+                "ethics_issues_identified": True,
+                "issues": [{"issue_id": "ETH-01", "description": "Test", "mitigation": "Test"}],
+                "self_assessment_statement": "Ethics self-assessment.",
+            },
+            "instrument_sections_addressed": [
+                {"section_id": "A.4", "section_name": "Ethics", "status": "addressed"},
+            ],
+            "traceability_footer": {
+                "primary_sources": [
+                    {"tier": 1, "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json"},
+                    {"tier": 1, "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json"},
+                ],
+            },
+        }
+        repo_root = _make_risk_env(tmp_path, pre_existing_artifact=pre_artifact)
+
+        risk_response = json.dumps({
+            "schema_id": "orch.phase6.implementation_architecture.v1",
+            "run_id": run_id,
+            "risk_register": [
+                {
+                    "risk_id": "RISK-01",
+                    "description": "Integration risk",
+                    "category": "technical",
+                    "likelihood": "medium",
+                    "impact": "high",
+                    "mitigation": "Modular architecture (task_id: T2-02, WP2)",
+                    "responsible_partner": "P1",
+                }
+            ],
+        })
+
+        with patch(_TRANSPORT_TARGET, return_value=risk_response):
+            result = run_skill("risk-register-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+
+        # traceability_footer must survive the merge
+        assert "traceability_footer" in artifact, (
+            "traceability_footer was lost during risk-register-builder merge"
+        )
+        tier1_paths = [
+            s["source_path"]
+            for s in artifact["traceability_footer"]["primary_sources"]
+            if s.get("tier") == 1
+        ]
+        assert len(tier1_paths) >= 2, (
+            "Tier 1 sources lost during risk-register-builder merge"
+        )
+
+    def test_existing_fields_preserved_with_traceability_footer(self, tmp_path: Path) -> None:
+        """Adding traceability_footer must not break existing required fields."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-trace-compat-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_traceability_footer(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+
+        # All existing required fields must still be present
+        assert artifact["schema_id"] == "orch.phase6.implementation_architecture.v1"
+        assert artifact["run_id"] == run_id
+        assert isinstance(artifact["governance_matrix"], list)
+        assert len(artifact["governance_matrix"]) > 0
+        assert isinstance(artifact["management_roles"], list)
+        assert isinstance(artifact["risk_register"], list)
+        assert isinstance(artifact["ethics_assessment"], dict)
+        assert isinstance(artifact["instrument_sections_addressed"], list)
+        assert "artifact_status" not in artifact
+
+
+class TestTraceabilityFooterSchemaRegistration:
+    """Verify the artifact schema accepts traceability_footer as optional."""
+
+    def test_schema_has_traceability_footer(self) -> None:
+        """artifact_schema_specification.yaml Section 1.6 must include
+        traceability_footer as an optional field."""
+        schema_path = (
+            _REPO_ROOT / ".claude" / "workflows" / "system_orchestration"
+            / "artifact_schema_specification.yaml"
+        )
+        spec = yaml.safe_load(schema_path.read_text(encoding="utf-8-sig"))
+        impl_arch = spec["tier4_phase_output_schemas"]["implementation_architecture"]
+        fields = impl_arch["fields"]
+
+        assert "traceability_footer" in fields, (
+            "traceability_footer not found in implementation_architecture schema"
+        )
+        assert fields["traceability_footer"]["required"] is False, (
+            "traceability_footer must be optional (required: false)"
+        )
+
+    def test_schema_traceability_footer_has_primary_sources(self) -> None:
+        """traceability_footer schema must define primary_sources array."""
+        schema_path = (
+            _REPO_ROOT / ".claude" / "workflows" / "system_orchestration"
+            / "artifact_schema_specification.yaml"
+        )
+        spec = yaml.safe_load(schema_path.read_text(encoding="utf-8-sig"))
+        footer = spec["tier4_phase_output_schemas"]["implementation_architecture"]["fields"]["traceability_footer"]
+        ps = footer["fields"]["primary_sources"]
+
+        assert ps["type"] == "array"
+        assert ps["required"] is True

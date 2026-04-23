@@ -1125,6 +1125,44 @@ tier4_phase_output_schemas:
             required: false
             description: Where in the proposal this section is addressed.
 
+      traceability_footer:
+        type: object
+        required: false
+        description: >
+          Traceability record linking this artifact's regulatory and
+          programme-rule claims to their Tier 1-4 source files.  When present,
+          constitutional-compliance-check §13.9 uses primary_sources[] to
+          verify that Horizon Europe rule claims are grounded in Tier 1
+          extracted files rather than generic programme knowledge.  Optional
+          for backward compatibility with existing gate predicates; no
+          Phase 6 gate predicate evaluates this field.
+        fields:
+          primary_sources:
+            type: array
+            required: true
+            description: >
+              Each entry identifies a source file used to ground claims in
+              this artifact.  source_path must be a full repo-relative path
+              (e.g., "docs/tier1_normative_framework/extracted/governance_principles.json").
+            item_schema:
+              tier:
+                type: integer
+                required: true
+                enum: [1, 2, 3, 4]
+              source_path:
+                type: string
+                required: true
+                description: >
+                  Full repo-relative path to the source file.  Must begin with
+                  "docs/" and resolve to an actual file in the repository.
+              relevant_fields:
+                type: array
+                required: false
+                item_type: string
+                description: >
+                  Key fields or rules extracted from this source that are
+                  used in the artifact.  Informational; aids auditability.
+
   # ---------------------------------------------------------------------------
   # 1.7 budget_gate_assessment.json
   # Path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json
