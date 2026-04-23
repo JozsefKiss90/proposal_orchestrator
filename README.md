@@ -50,7 +50,7 @@ Verify your setup:
 ```bash
 python --version          # 3.10 or later
 claude --version          # Claude Code CLI installed and on PATH
-python -m pytest tests/   # 1371 tests should pass
+python -m pytest tests/   # test suite should pass (1486 tests as of 2026-04-23)
 ```
 
 ---
@@ -101,7 +101,7 @@ proposal_orchestator/
 |   +-- skills/                        #   Skill .md specifications (21 skills)
 |   +-- runs/                          #   Per-run state (run_manifest.json, run_summary.json)
 |
-+-- tests/                             # Test suite (1371 tests)
++-- tests/                             # Test suite
 ```
 
 ---
@@ -536,20 +536,31 @@ Phase 3: WP Design & Dependencies
     |                           |
 Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
   n04_gantt_milestones          n05_impact_architecture
-    - Deterministic dependency normalization (Phase B+, pure Python):
-        * Reads Phase 3 dependency_map + WP seed bounds
-        * Classifies edges as strict (enforceable) or non-strict (informational)
-        * Writes scheduling_constraints.json before agent body
-    - gantt-schedule-builder skill produces gantt.json:
-        * Assigns start_month / end_month to all tasks
-        * Defines milestones with verifiable criteria
-        * Identifies critical path
-    - milestone-consistency-check runs in FULL mode (gantt.json present)
-    - Gate enforces:
-        * Timeline completeness and bounds (g05_p03, g05_p04)
-        * Milestone criteria presence (g05_p05)
-        * Dependency-to-schedule consistency via g05_p08
-        * scheduling_constraints.json presence (g05_p02c, g05_p02d)
+    - Deterministic dependency         - impact-pathway-core-builder (TAPM):
+      normalization (Phase B+,             * Maps call expected impacts to
+      pure Python):                          project outputs and WP deliverables
+        * Reads Phase 3                    * Defines KPIs traceable to WPs
+          dependency_map + WP              * Writes impact_architecture.json
+          seed bounds                        (DEC fields null)
+        * Classifies edges as            - impact-dec-enricher (TAPM,
+          strict or non-strict               enrich_artifact contract):
+        * Writes scheduling_                * Populates dissemination_plan,
+          constraints.json                     exploitation_plan,
+    - gantt-schedule-builder:                  sustainability_mechanism
+        * Assigns start_month /            * Runtime merges into base artifact
+          end_month to all tasks         - dissemination-exploitation-
+        * Defines milestones with            communication-check (TAPM):
+          verifiable criteria              * 47 DEC quality checks
+        * Identifies critical path         * Writes validation report
+    - milestone-consistency-check        - Gate enforces:
+      runs in FULL mode                    * All expected impacts mapped
+    - Gate enforces:                         (g06_p04)
+        * Timeline completeness            * KPIs traceable to WPs (g06_p05)
+          (g05_p03, g05_p04)               * DEC plans non-null (g06_p06-08)
+        * Milestone criteria               * Upstream gates fresh
+          (g05_p05)                          (g06_p01, g06_p02)
+        * Dep-to-schedule
+          consistency (g05_p08)
   Exit: phase_04_gate           Exit: phase_05_gate
     |                           |
     +---------------------------+
@@ -620,7 +631,37 @@ The orchestration pipeline transitions through three structural regimes:
   - Dependency cycle validation remains Phase 3's responsibility;
     temporal consistency is Phase 4's
 
+- **Phase 5: Impact architecture**
+  - Decomposed into two focused skills:
+    `impact-pathway-core-builder` produces impact pathways and KPIs;
+    `impact-dec-enricher` populates dissemination, exploitation, and
+    sustainability fields via the `enrich_artifact` output contract
+    (emits only DEC fields; runtime merges into base artifact)
+  - `dissemination-exploitation-communication-check` validates DEC
+    quality (target audience specificity, channel definition, generic
+    template detection, call-requirement coverage)
+  - Gate checks: all call expected impacts mapped to project outputs,
+    KPIs traceable to WP deliverables, DEC plans non-null
+
 This separation is intentional and enforced by gates.
+
+### Upstream Gate Freshness
+
+When running phases individually (`--phase N`), the scheduler bootstraps
+upstream nodes from durable Tier 4 gate result artifacts. A gate result
+is accepted only when:
+
+1. Its `status` is `"pass"`
+2. Its `evaluated_at` timestamp is not older than any substantive upstream
+   input's modification time
+
+Generated helper artifacts (e.g. call slices produced by Step 0) are
+excluded from freshness tracking to prevent false invalidation. Only
+source-of-truth inputs (Tier 3 project data, durable phase outputs,
+read-only Tier 2B source documents) trigger gate staleness.
+
+This ensures bootstrap freshness and exit-gate freshness are consistent:
+a node never executes with stale upstream gates.
 
 ---
 

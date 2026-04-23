@@ -1,84 +1,39 @@
 {
   "gate_id": "phase_05_gate",
   "gate_kind": "exit",
-  "run_id": "9e1c8361-2a25-4684-9e67-2b7dbe2a5db4",
+  "run_id": "e3caae21-094e-4537-94a6-6a26b826d8ce",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:7bbb679cb248dbb7c32f7f1f65208b6e82be4d420c8367f85ef12d992550a5dd",
+  "input_fingerprint": "sha256:304c1f2f1203dd11707748813dfaad0a595b602eef6d7d400e2927a6edf04ddc",
   "input_artifact_fingerprints": {
     "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json": "sha256:77f453c2df6d798580ace99be261d988d9500db1b6d0770f92847806281a87a0",
     "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json": "sha256:76a7147ad53a827321e630966547374a44d16d50a03a1bbb27cee4fe5eb51e5b",
     "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "sha256:6bd834fa4b391ed0debfbad3a788c72a26f333dc8786c7ad3c1824043f120ab9",
     "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "sha256:46609a3ba2ddd3eb5f7e85d8fd42c826c438c0a6a866804dd847860f9fe8ccad",
-    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json": "sha256:c40526887b36b2107b5a64b0cf95484e1fbc6b026b1415027cac1a8c8dd60484"
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json": "sha256:73f955c8538793204e10ccd6165faed97c50f509c143bf0ca90c1c90eb3443eb"
   },
-  "evaluated_at": "2026-04-22T18:17:04.621273+00:00",
+  "evaluated_at": "2026-04-22T20:56:18.066391+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g06_p03",
       "g06_p03b",
+      "g06_p01",
+      "g06_p02",
       "g06_p06",
       "g06_p07",
       "g06_p08",
       "g06_p04",
       "g06_p05"
     ],
-    "failed": [
-      {
-        "predicate_id": "g06_p01",
-        "type": "gate_pass",
-        "function": "gate_pass_recorded",
-        "args": {
-          "gate_id": "phase_02_gate",
-          "run_id": "9e1c8361-2a25-4684-9e67-2b7dbe2a5db4",
-          "tier4_root": "docs/tier4_orchestration_state"
-        },
-        "failure_category": "STALE_UPSTREAM_MISMATCH",
-        "reason": "Gate result for 'phase_02_gate' is stale: one or more upstream input artifacts were modified after the gate was evaluated.",
-        "details": {
-          "gate_id": "phase_02_gate",
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\gate_result.json",
-          "evaluated_at": "2026-04-18T00:44:06.008933+00:00",
-          "stale_inputs": [
-            "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase1_call_analysis\\call_analysis_summary.json",
-            "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier3_project_instantiation\\project_brief"
-          ]
-        },
-        "fail_message": "phase_02_gate has not passed for the current run. Phase 5 requires Phase 2 to have passed before its exit gate can be evaluated.\n",
-        "prose_condition": "Phase 2 gate must have passed"
-      },
-      {
-        "predicate_id": "g06_p02",
-        "type": "gate_pass",
-        "function": "gate_pass_recorded",
-        "args": {
-          "gate_id": "phase_03_gate",
-          "run_id": "9e1c8361-2a25-4684-9e67-2b7dbe2a5db4",
-          "tier4_root": "docs/tier4_orchestration_state"
-        },
-        "failure_category": "STALE_UPSTREAM_MISMATCH",
-        "reason": "Gate result for 'phase_03_gate' is stale: one or more upstream input artifacts were modified after the gate was evaluated.",
-        "details": {
-          "gate_id": "phase_03_gate",
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase3_wp_design\\gate_result.json",
-          "evaluated_at": "2026-04-20T21:39:17.285627+00:00",
-          "stale_inputs": [
-            "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json"
-          ]
-        },
-        "fail_message": "phase_03_gate has not passed for the current run. Phase 5 requires Phase 3 to have passed (in addition to Phase 2) before its exit gate can be evaluated. Phase 5 is not independently parallel after Phase 2 alone.\n",
-        "prose_condition": "Phase 3 gate must have passed"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase5_impact_architecture\\gate_result.json"
 }

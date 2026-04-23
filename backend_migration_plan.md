@@ -10,7 +10,7 @@
 
 ---
 
-## Current Migration Status (as of 2026-04-22, post Phase 5 enricher fix)
+## Current Migration Status (as of 2026-04-23, post Phase 5 validated pass)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
@@ -18,7 +18,8 @@
 | Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
 | Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
 | Phase 4 | OPERATIONAL | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. |
-| Phase 5 | REMEDIATED | Core-builder succeeds (TAPM). Enricher converted to `enrich_artifact` output contract: emits only DEC fields (~7KB), runtime merges into base artifact. DEC-check migrated to TAPM (was 234KB cli-prompt, 300s timeout). Pending rerun validation. |
+| Phase 5 | VALIDATED | Gate passed on runtime rerun (run `e3caae21`, 2026-04-22). All 9 deterministic predicates pass. DEC-check (47 findings, 0 flagged). See §22 for full remediation path. |
+| Phase 6 | NOT STARTED | Next phase. Requires Phases 3, 4, and 5 released. Phase 5 gate now passed; Phase 4 gate status to be confirmed before Phase 6 dispatch. |
 
 ---
 
@@ -303,7 +304,8 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 | **n03** `wp-dependency-analysis` | cli-prompt | Never | Reads only Phase 3 outputs (~20KB) |
 | **n04** `gantt-schedule-builder` | cli-prompt | Later | Moderate: Phase 3+4 outputs + Tier 3 (~40-50KB); TAPM not required for correctness |
 | **n04** `milestone-consistency-check` | cli-prompt | Never | Small: Phase 3+4 outputs (~20KB) |
-| **n05** `impact-pathway-mapper` | tapm | Later | 4 paths across tiers (~80KB) |
+| **n05** `impact-pathway-core-builder` | tapm | **Migrated** | Decomposed from `impact-pathway-mapper`. TAPM mode validated (run `e3caae21`). |
+| **n05** `impact-dec-enricher` | tapm | **Migrated** | `enrich_artifact` output contract: emits DEC fields only (~7KB), runtime merges into base artifact. TAPM mode validated. |
 | **n06** `governance-model-builder` | tapm | Later | Consortium + Phase 3 outputs (~40KB) |
 | **n06** `risk-register-builder` | cli-prompt | Never | risks.json + Phase 3-4 (~30KB) |
 | **n07** `budget-interface-validation` | cli-prompt | Never | Structured validation, bounded inputs |
@@ -322,9 +324,10 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 
 ### 4.2 Summary Counts
 
-- **Migrate first (TAPM)**: 7 skills (`call-requirements-extraction`, `evaluation-matrix-builder`, `instrument-schema-normalization`, `topic-scope-check`, `proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
-- **Migrate later (TAPM)**: 5 skills (`concept-alignment-check`, `work-package-normalization`, `impact-pathway-mapper`, `governance-model-builder`, `gantt-schedule-builder`)
-- **Never migrate**: 8 skills (small/bounded inputs, deterministic checks, validation-only)
+- **Migrated (TAPM, validated)**: 10 skills (`call-requirements-extraction`, `evaluation-matrix-builder`, `instrument-schema-normalization`, `topic-scope-check`, `impact-pathway-core-builder`, `impact-dec-enricher`, `dissemination-exploitation-communication-check`, `concept-alignment-check`, `concept-call-binding-derivation`, `gate-enforcement`)
+- **Migrate later (TAPM)**: 4 skills (`work-package-normalization`, `wp-dependency-analysis`, `governance-model-builder`, `gantt-schedule-builder`)
+- **Pending Phase 8 migration**: 3 skills (`proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
+- **Never migrate**: 3 skills (`milestone-consistency-check`, `decision-log-update`, `checkpoint-publish` — small/bounded inputs)
 - **Permanently external**: 6 functions (gates, validation, writes, state, HARD_BLOCK)
 
 > **Reclassification note (2026-04-16):** `instrument-schema-normalization` and `topic-scope-check` moved from "Never migrate" to "Migrate first" based on runtime telemetry from run `0ace9e49`. Original estimates (~15KB, ~10KB) were based on declared `reads_from` sizes; actual cli-prompt user prompts measured at 78KB and 74KB respectively, causing 300s timeouts with zero partial output. Classification decisions must be validated against runtime prompt-size telemetry, not static input estimates.
@@ -1331,3 +1334,69 @@ No phase implementation may proceed if:
 - required predicates are missing
 
 This enforces fail-closed migration discipline.
+
+---
+
+## 22. Phase 5 — Validated Remediation Path (COMPLETE)
+
+Phase 5 is operationally validated. Run `e3caae21` (2026-04-22) achieved `overall_status: "pass"` with `n05_impact_architecture` released and `phase_05_gate` passing all 9 deterministic predicates.
+
+### Original bottleneck
+
+Phase 5 was blocked by a prompt-size bottleneck: `impact-pathway-mapper` serialized ~80KB of cross-tier inputs into a single cli-prompt invocation, which intermittently timed out or produced structural JSON errors in the ~24KB response artifact.
+
+### Remediation sequence (5 components)
+
+1. **Skill decomposition** — `impact-pathway-mapper` split into two focused skills:
+   - `impact-pathway-core-builder` (TAPM): produces impact pathways and KPIs; writes `impact_architecture.json` with DEC fields set to null.
+   - `impact-dec-enricher` (TAPM, `enrich_artifact` contract): emits only `dissemination_plan`, `exploitation_plan`, `sustainability_mechanism` (~7KB); runtime merges into base artifact, preserving pathways and KPIs.
+
+2. **DEC-check TAPM migration** — `dissemination-exploitation-communication-check` migrated from cli-prompt (234KB prompt, 300s timeout) to TAPM. Prompt reduced to ~30KB. Skill validates the completed artifact and writes to `validation_reports/`.
+
+3. **Tier 3 traceability enrichment** — `impacts.json` and `outcomes.json` populated with explicit `linked_deliverable_ids` and `linked_outcomes` fields, providing the join keys required by `kpis_traceable_to_deliverables` and `all_impacts_mapped` gate predicates.
+
+4. **Freshness-scope refinement** — `UPSTREAM_REQUIRED_INPUTS` narrowed to exclude generated helper artifacts (call slices, directory-level mtime) that were causing false-positive staleness. Substantive source-of-truth freshness preserved; bootstrap and exit-gate freshness checks remain consistent.
+
+5. **Upstream gate revalidation** — Phases 2 and 3 rerun with fresh run IDs to produce gate results with current `evaluated_at` timestamps, enabling Phase 5 bootstrap acceptance.
+
+### Gate pass evidence
+
+- Run: `e3caae21-094e-4537-94a6-6a26b826d8ce`
+- Gate: `phase_05_gate` → `status: "pass"`
+- All 9 deterministic predicates passed: `g06_p01` through `g06_p08` plus `g06_p03b`
+- DEC validation report: 47 checks, 47 passed, 0 flagged
+- Input fingerprint: `sha256:304c1f2f...` covering 5 upstream artifacts
+
+### Phase 5 skill execution order (validated)
+
+1. `impact-pathway-core-builder` (TAPM) — writes partial `impact_architecture.json`
+2. `impact-dec-enricher` (TAPM, enrich_artifact) — merges DEC fields into artifact
+3. `dissemination-exploitation-communication-check` (TAPM) — validates DEC quality → writes to `validation_reports/`
+4. `proposal-section-traceability-check` — skipped (not applicable; no Tier 5 deliverables yet)
+5. `gate-enforcement` (TAPM, payload) — evaluates `phase_05_gate` → returns PASS
+
+### What remains open
+
+- Phase 6 requires Phases 3, 4, and 5 all released. Phase 5 is now released; Phase 4 gate status must be confirmed fresh before Phase 6 can dispatch.
+- Phase 5 output quality (impact narrative specificity, KPI measurability) is gate-sufficient but has not been reviewed by a human evaluator.
+- DEC-check passed with 0 flags; actual DEC plan quality for evaluator scoring is a Phase 8 concern.
+
+---
+
+## 23. Freshness-Scope Refinement (2026-04-23)
+
+Gate freshness checking (`UPSTREAM_REQUIRED_INPUTS` in `runner/upstream_inputs.py`) was refined to distinguish substantive source-of-truth inputs from generated helper artifacts.
+
+### Problem
+
+`generate_call_slice()` writes `*.slice.json` into `call_extracts/` at the start of every DAG run. The `call_extracts/` directory was listed as an upstream freshness input for `phase_01_gate`, causing its dir mtime to update on every run and unconditionally invalidating Phase 1's gate result. Similarly, `work_programmes/` dir mtime was sensitive to sibling operations. `project_brief/` (directory) conflated source files with unrelated children.
+
+### Fix
+
+- `gate_01_source_integrity` and `phase_01_gate`: removed `work_programmes` and `call_extracts` directory paths; retained `selected_call.json` (the sole substantive Tier 3 input whose change means "different call target").
+- `phase_02_gate`: replaced `project_brief` directory with specific source files (`concept_note.md`, `project_summary.json`, `strategic_positioning.md`).
+- All other gates: unchanged (already used specific file paths or directories containing only externally-placed content).
+
+### Principle
+
+`UPSTREAM_REQUIRED_INPUTS` must contain only paths whose modification represents a real change to what the gate evaluated. Generated derivatives (call slices, transport aids) and directory-level mtimes that conflate source and generated content are excluded. Externally-placed directories (e.g. `integrations/received/`) remain tracked because no runner process writes into them.

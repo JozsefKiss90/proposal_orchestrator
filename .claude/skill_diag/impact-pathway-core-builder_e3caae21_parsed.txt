@@ -1,0 +1,123 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'impact_pathways', 'kpis', 'dissemination_plan', 'exploitation_plan', 'sustainability_mechanism'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase5.impact_architecture.v1",
+  "run_id": "e3caae21-094e-4537-94a6-6a26b826d8ce",
+  "impact_pathways": [
+    {
+      "pathway_id": "PATH-01",
+      "expected_impact_id": "EI-01",
+      "expected_impact_description": "Contribution to and implementation of the European Apply AI Strategy, advancing the adoption of next-generation AI agent capabilities in key economic sectors including healthcare, advanced manufacturing, and in-vehicle autonomous driving.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.scope"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
+        "IMP-2",
+        "IMP-3"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Healthcare demonstrator evaluation dataset",
+          "wp_id": "WP5",
+          "linkage_source": "IMP-2.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "deliverable_title": "Manufacturing process optimisation demonstrator software",
+          "wp_id": "WP6",
+          "linkage_source": "IMP-3.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-4",
+          "outcome_title": "Clinical decision support agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP5"
+          ],
+          "linkage_source": "IMP-2.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-5",
+          "outcome_title": "Manufacturing process optimisation agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP6"
+          ],
+          "linkage_source": "IMP-3.linked_outcomes"
+        }
+      ],
+      "impact_narrative": "MAESTRO's clinical decision support agent system (OUT-4, D5-02, WP5) and manufacturing process optimisation agent system (OUT-5, D6-02, WP6) directly advance the European Apply AI Strategy by deploying next-generation multi-agent AI in two of the three priority sectors identified in the call. D5-02 provides validated diagnostic reasoning evidence on 500 de-identified clinical cases, with auditable reasoning traces conforming to EU AI Act high-risk system transparency requirements, establishing a validated pathway for healthcare sector adoption. D6-02 demonstrates measurable quality and efficiency improvements \u2014 \u226515% defect reduction and \u226510% energy savings \u2014 in a pilot factory environment, constituting direct evidence of AI agent readiness for advanced manufacturing deployment in line with Apply AI Strategy objectives."
+    },
+    {
+      "pathway_id": "PATH-02",
+      "expected_impact_id": "EI-02",
+      "expected_impact_description": "Wider deployment and industrial uptake of next-generation AI agent solutions across economic sectors via European Digital Innovation Hubs (EDIHs), enabling broader societal and economic benefit.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.scope"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
+        "IMP-2",
+        "IMP-3",
+        "IMP-5"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Healthcare demonstrator evaluation dataset",
+          "wp_id": "WP5",
+          "linkage_source": "IMP-2.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "deliverable_title": "Manufacturing process optimisation demonstrator software",
+          "wp_id": "WP6",
+          "linkage_source": "IMP-3.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-02",
+          "deliverable_title": "MAESTRO benchmark suite dataset",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "deliverable_title": "Open-source software release",
+          "wp_id": "WP9",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-4",
+          "outcome_title": "Clinical decision support agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP5"
+          ],
+          "linkage_source": "IMP-2.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-5",
+          "outcome_title": "Manufacturing process optimisation agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP6"
+          ],
+          "linkage_source": "IMP-3.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-7",
+          "outcome_title": "MAESTRO agent evaluation benchmark suite",
+          "linked_wp_ids": [
+            "WP8"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-8",
+          "outcome_title": "Open-source 
+=== END ===

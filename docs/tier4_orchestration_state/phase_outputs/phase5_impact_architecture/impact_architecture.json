@@ -1,334 +1,585 @@
 {
   "schema_id": "orch.phase5.impact_architecture.v1",
-  "run_id": "9e1c8361-2a25-4684-9e67-2b7dbe2a5db4",
+  "run_id": "e3caae21-094e-4537-94a6-6a26b826d8ce",
   "impact_pathways": [
     {
-      "pathway_id": "P-EI-01",
+      "pathway_id": "PATH-01",
       "expected_impact_id": "EI-01",
-      "matched_project_impact_ids": [
+      "expected_impact_description": "Contribution to and implementation of the European Apply AI Strategy, advancing the adoption of next-generation AI agent capabilities in key economic sectors including healthcare, advanced manufacturing, and in-vehicle autonomous driving.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.scope"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
         "IMP-2",
-        "IMP-3",
-        "IMP-4"
+        "IMP-3"
       ],
       "project_outputs": [
-        "D5-02",
-        "D6-02",
-        "D7-02"
+        {
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Healthcare demonstrator evaluation dataset",
+          "wp_id": "WP5",
+          "linkage_source": "IMP-2.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "deliverable_title": "Manufacturing process optimisation demonstrator software",
+          "wp_id": "WP6",
+          "linkage_source": "IMP-3.linked_deliverable_ids"
+        }
       ],
       "outcomes": [
-        "OUT-4",
-        "OUT-5",
-        "OUT-6"
+        {
+          "outcome_id": "OUT-4",
+          "outcome_title": "Clinical decision support agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP5"
+          ],
+          "linkage_source": "IMP-2.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-5",
+          "outcome_title": "Manufacturing process optimisation agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP6"
+          ],
+          "linkage_source": "IMP-3.linked_outcomes"
+        }
       ],
-      "impact_narrative": "MAESTRO advances EI-01 through three validated sector demonstrators whose outputs constitute direct evidence of Apply AI Strategy implementation. The clinical decision support agent system (OUT-4), validated on 500 de-identified clinical cases with specialist sub-agent coordination and HL7 FHIR integration and reported in D5-02 (WP5/NIHS), demonstrates trustworthy AI agent deployment in the healthcare domain prioritised by the Apply AI Strategy. The manufacturing process optimisation multi-agent system (OUT-5), validated over a three-month operational pilot with measurable defect reduction and energy savings and reported in D6-02 (WP6/ISIA), advances Apply AI Strategy implementation in advanced manufacturing. The logistics cross-sector transfer demonstrator (OUT-6), validated across three international supply chain corridors and reported in D7-02 (WP7/ELI), extends MAESTRO's architectural reach to additional high-value domains and provides a formal in-vehicle autonomous driving transferability mapping that addresses the third Apply AI Strategy sector referenced in EI-01. Together D5-02, D6-02, and D7-02 constitute the primary evidence base for EI-01 coverage.",
-      "tier2b_source_ref": {
-        "document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-        "section": "call_entry.scope"
-      },
-      "coverage_status": "Covered"
+      "impact_narrative": "MAESTRO's clinical decision support agent system (OUT-4, D5-02, WP5) and manufacturing process optimisation agent system (OUT-5, D6-02, WP6) directly advance the European Apply AI Strategy by deploying next-generation multi-agent AI in two of the three priority sectors identified in the call. D5-02 provides validated diagnostic reasoning evidence on 500 de-identified clinical cases, with auditable reasoning traces conforming to EU AI Act high-risk system transparency requirements, establishing a validated pathway for healthcare sector adoption. D6-02 demonstrates measurable quality and efficiency improvements — ≥15% defect reduction and ≥10% energy savings — in a pilot factory environment, constituting direct evidence of AI agent readiness for advanced manufacturing deployment in line with Apply AI Strategy objectives."
     },
     {
-      "pathway_id": "P-EI-02",
+      "pathway_id": "PATH-02",
       "expected_impact_id": "EI-02",
-      "matched_project_impact_ids": [
+      "expected_impact_description": "Wider deployment and industrial uptake of next-generation AI agent solutions across economic sectors via European Digital Innovation Hubs (EDIHs), enabling broader societal and economic benefit.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.scope"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
         "IMP-2",
         "IMP-3",
+        "IMP-5"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Healthcare demonstrator evaluation dataset",
+          "wp_id": "WP5",
+          "linkage_source": "IMP-2.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "deliverable_title": "Manufacturing process optimisation demonstrator software",
+          "wp_id": "WP6",
+          "linkage_source": "IMP-3.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-02",
+          "deliverable_title": "MAESTRO benchmark suite dataset",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "deliverable_title": "Open-source software release",
+          "wp_id": "WP9",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-4",
+          "outcome_title": "Clinical decision support agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP5"
+          ],
+          "linkage_source": "IMP-2.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-5",
+          "outcome_title": "Manufacturing process optimisation agent system (TRL 5)",
+          "linked_wp_ids": [
+            "WP6"
+          ],
+          "linkage_source": "IMP-3.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-7",
+          "outcome_title": "MAESTRO agent evaluation benchmark suite",
+          "linked_wp_ids": [
+            "WP8"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-8",
+          "outcome_title": "Open-source MAESTRO framework",
+          "linked_wp_ids": [
+            "WP8",
+            "WP9"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        }
+      ],
+      "impact_narrative": "EDIH-mediated wider deployment is operationalised through three channels explicitly linked to project deliverables: (1) the healthcare demonstrator evaluation dataset (D5-02, WP5) constitutes the clinical evidence base for EDIH-mediated dissemination to ≥3 hospital networks across Europe by M48, as stated in IMP-2 indicators; (2) the manufacturing process optimisation demonstrator software (D6-02, WP6) is scaled through ≥2 EDIHs and the EIT Manufacturing network, targeting ≥5 manufacturing SMEs in technology transfer by M48, as stated in IMP-3 indicators; (3) the open-source MAESTRO framework (D9-02, WP9) and benchmark suite (D8-02, WP8) are actively disseminated through ≥3 EDIHs to European AI developers and SMEs, lowering barriers to AI agent adoption across economic sectors, as stated in IMP-5 indicators. All three channels are grounded in explicit Tier 3 linkage data, not generic EDIH language."
+    },
+    {
+      "pathway_id": "PATH-03",
+      "expected_impact_id": "EI-03",
+      "expected_impact_description": "Open scientific advancement: dissemination and sharing of AI agent R&D results with the European research community through the AI-on-demand platform, strengthening European AI research infrastructure.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.scope"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
+        "IMP-1",
+        "IMP-5"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D2-02",
+          "deliverable_title": "Planning engine software prototype",
+          "wp_id": "WP2",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D3-02",
+          "deliverable_title": "Adaptive memory system software",
+          "wp_id": "WP3",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D4-02",
+          "deliverable_title": "Decentralised coordination software",
+          "wp_id": "WP4",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-01",
+          "deliverable_title": "Evaluation framework and benchmark specification",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-02",
+          "deliverable_title": "MAESTRO benchmark suite dataset",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "deliverable_title": "Open-source software release",
+          "wp_id": "WP9",
+          "linkage_source": "IMP-1.linked_deliverable_ids, IMP-5.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-1",
+          "outcome_title": "Neuro-symbolic planning framework for LLM-based agents",
+          "linked_wp_ids": [
+            "WP2"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-2",
+          "outcome_title": "Adaptive tri-store memory architecture",
+          "linked_wp_ids": [
+            "WP3"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-3",
+          "outcome_title": "Formally verified multi-agent coordination protocol suite",
+          "linked_wp_ids": [
+            "WP4"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-7",
+          "outcome_title": "MAESTRO agent evaluation benchmark suite",
+          "linked_wp_ids": [
+            "WP8"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-8",
+          "outcome_title": "Open-source MAESTRO framework",
+          "linked_wp_ids": [
+            "WP8",
+            "WP9"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes, IMP-5.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-9",
+          "outcome_title": "External Tool and API Orchestration Layer (TRL 5)",
+          "linked_wp_ids": [
+            "WP2",
+            "WP8"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        }
+      ],
+      "impact_narrative": "Open scientific advancement and AI-on-demand platform contribution operate through two explicitly linked mechanisms: (1) ≥20 peer-reviewed publications reporting results from the neuro-symbolic planning engine (OUT-1, D2-02, WP2), adaptive tri-store memory system (OUT-2, D3-02, WP3), and formally verified coordination software (OUT-3, D4-02, WP4) disseminate MAESTRO's core R&D to the European AI research community, with a target of ≥100 citations per publication within 3 years; (2) the open-source MAESTRO framework (D9-02, WP9), MAESTRO benchmark suite (D8-02, WP8), and evaluation framework specification (D8-01, WP8) are contributed to the AI-on-demand platform, directly strengthening European AI research infrastructure by providing reusable, openly accessible agent components and standardised evaluation protocols. These deliverables enable European researchers and SMEs to build on MAESTRO advances without creating dependency on proprietary non-European platforms."
+    },
+    {
+      "pathway_id": "PATH-04",
+      "expected_impact_id": "EI-04",
+      "expected_impact_description": "Strengthening European open strategic autonomy in digital and emerging enabling technologies through advances in next-generation AI agent capabilities.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.destination"
+      },
+      "coverage_status": "Covered",
+      "traceability_note": "EI-04 is classified Inferred in expected_impacts.json (inference from topic destination placement). Coverage is provided based on that documented inference; no explicit expected_impact statement exists in the call scope or expected_outcome sections for this impact.",
+      "project_impacts_aligned": [
+        "IMP-1",
+        "IMP-6"
+      ],
+      "project_outputs": [
+        {
+          "deliverable_id": "D2-02",
+          "deliverable_title": "Planning engine software prototype",
+          "wp_id": "WP2",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D3-02",
+          "deliverable_title": "Adaptive memory system software",
+          "wp_id": "WP3",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Multi-agent coordination protocol specification",
+          "wp_id": "WP4",
+          "linkage_source": "IMP-6.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D4-02",
+          "deliverable_title": "Decentralised coordination software",
+          "wp_id": "WP4",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-01",
+          "deliverable_title": "Evaluation framework and benchmark specification",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "deliverable_title": "Open-source software release",
+          "wp_id": "WP9",
+          "linkage_source": "IMP-1.linked_deliverable_ids"
+        }
+      ],
+      "outcomes": [
+        {
+          "outcome_id": "OUT-1",
+          "outcome_title": "Neuro-symbolic planning framework for LLM-based agents",
+          "linked_wp_ids": [
+            "WP2"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-2",
+          "outcome_title": "Adaptive tri-store memory architecture",
+          "linked_wp_ids": [
+            "WP3"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-3",
+          "outcome_title": "Formally verified multi-agent coordination protocol suite",
+          "linked_wp_ids": [
+            "WP4"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes, IMP-6.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-8",
+          "outcome_title": "Open-source MAESTRO framework",
+          "linked_wp_ids": [
+            "WP8",
+            "WP9"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-9",
+          "outcome_title": "External Tool and API Orchestration Layer (TRL 5)",
+          "linked_wp_ids": [
+            "WP2",
+            "WP8"
+          ],
+          "linkage_source": "IMP-1.linked_outcomes"
+        }
+      ],
+      "impact_narrative": "European open strategic autonomy in next-generation AI agents is strengthened through two project-specific mechanisms with explicit Tier 3 linkage: (1) the neuro-symbolic planning engine (OUT-1, D2-02, WP2), adaptive tri-store memory system (OUT-2, D3-02, WP3), and decentralised coordination software (OUT-3, D4-02, WP4) collectively establish a European-origin technical paradigm for trustworthy AI agents, architecturally independent of US and Chinese proprietary platforms — IMP-1 explicitly characterises this as differentiating from non-European scale-only approaches; (2) the formally verified multi-agent coordination protocol specification (D4-01, WP4) is submitted to ISO/IEC JTC 1/SC 42 or IEEE, positioning Europe at the forefront of international multi-agent AI standardisation aligned with EU AI Act transparency requirements, as stated in IMP-6 indicators. The open-source MAESTRO framework (D9-02, WP9) sustains this autonomy post-project by enabling continued European development without proprietary dependencies."
+    },
+    {
+      "pathway_id": "PATH-05",
+      "expected_impact_id": "EI-05",
+      "expected_impact_description": "Unlocking the economic potential of AI agents across diverse economic sectors, including data analytics and coding, by advancing agent architecture, memory, reasoning, and autonomous behaviour.",
+      "tier2b_source_ref": {
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+        "source_section": "call_entry.expected_outcome"
+      },
+      "coverage_status": "Covered",
+      "project_impacts_aligned": [
         "IMP-4",
         "IMP-5"
       ],
       "project_outputs": [
-        "D5-02",
-        "D6-02",
-        "D7-02",
-        "D8-02",
-        "D9-02"
+        {
+          "deliverable_id": "D7-02",
+          "deliverable_title": "Cross-sector generalisation evaluation dataset",
+          "wp_id": "WP7",
+          "linkage_source": "IMP-4.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D8-02",
+          "deliverable_title": "MAESTRO benchmark suite dataset",
+          "wp_id": "WP8",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "deliverable_title": "Open-source software release",
+          "wp_id": "WP9",
+          "linkage_source": "IMP-5.linked_deliverable_ids"
+        }
       ],
       "outcomes": [
-        "OUT-4",
-        "OUT-5",
-        "OUT-6",
-        "OUT-7",
-        "OUT-8"
+        {
+          "outcome_id": "OUT-6",
+          "outcome_title": "Logistics and supply chain transfer demonstrator (TRL 5)",
+          "linked_wp_ids": [
+            "WP7"
+          ],
+          "linkage_source": "IMP-4.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-7",
+          "outcome_title": "MAESTRO agent evaluation benchmark suite",
+          "linked_wp_ids": [
+            "WP8"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        },
+        {
+          "outcome_id": "OUT-8",
+          "outcome_title": "Open-source MAESTRO framework",
+          "linked_wp_ids": [
+            "WP8",
+            "WP9"
+          ],
+          "linkage_source": "IMP-5.linked_outcomes"
+        }
       ],
-      "impact_narrative": "MAESTRO's EI-02 pathway operates through two complementary EDIH deployment tracks. The first track delivers operationally validated AI agent systems through the three sector demonstrators: the clinical decision support system (OUT-4/D5-02) disseminated to hospital networks via EDIHs; the manufacturing multi-agent system (OUT-5/D6-02) scaled to manufacturing SMEs via EIT Manufacturing-linked EDIHs; and the logistics agent system (OUT-6/D7-02) disseminated to logistics operators across Europe. Each demonstrator report (D5-02, D6-02, D7-02) includes evidence-based guidance enabling EDIHs to support regional enterprise adoption. The second track provides shared technical infrastructure: the open-source MAESTRO framework (OUT-8/D9-02, WP9/BAL) and benchmark suite (OUT-7/D8-02, WP8/FIIT) are contributed to the AI-on-demand platform via T9-02, providing the basis for EDIH-facilitated SME AI agent development without proprietary platform dependencies. WP9 directly operationalises both tracks with a target of ≥3 EDIHs actively disseminating MAESTRO technology by M48.",
-      "tier2b_source_ref": {
-        "document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-        "section": "call_entry.scope"
-      },
-      "coverage_status": "Covered"
-    },
-    {
-      "pathway_id": "P-EI-03",
-      "expected_impact_id": "EI-03",
-      "matched_project_impact_ids": [
-        "IMP-1",
-        "IMP-5"
-      ],
-      "project_outputs": [
-        "D2-02",
-        "D3-02",
-        "D4-02",
-        "D8-01",
-        "D8-02",
-        "D9-02"
-      ],
-      "outcomes": [
-        "OUT-1",
-        "OUT-2",
-        "OUT-3",
-        "OUT-7",
-        "OUT-8",
-        "OUT-9"
-      ],
-      "impact_narrative": "MAESTRO advances EI-03 through open dissemination of research results and AI-on-demand platform contributions. The core research pillar software outputs — neuro-symbolic planning engine prototype (OUT-1/D2-02, WP2/ATU), adaptive memory system prototype (OUT-2/D3-02, WP3/BIIS), and coordination engine software release (OUT-3/D4-02, WP4/CERIA) — are released open-source under WP9 alongside ≥20 peer-reviewed publications targeted at NeurIPS, ICML, ICLR, AAMAS, and AAAI from M12 (IMP-1). The external tool and API orchestration layer (OUT-9, integrated in D2-02 and D8-01) is published as a standalone open-source library. The MAESTRO integration architecture report (D8-01, WP8/FIIT) documents the unified framework for community uptake and forms the foundation for the benchmark suite dataset (OUT-7/D8-02), which is contributed to the AI-on-demand platform via T9-02 to strengthen European AI research infrastructure. The open-source MAESTRO framework (OUT-8/D9-02, WP9/BAL) packages all research advances for community reuse. IMP-1 targets ≥100 citations within 36 months of publication; IMP-5 targets ≥5 external research groups adopting the benchmark suite.",
-      "tier2b_source_ref": {
-        "document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-        "section": "call_entry.scope"
-      },
-      "coverage_status": "Covered"
-    },
-    {
-      "pathway_id": "P-EI-04",
-      "expected_impact_id": "EI-04",
-      "matched_project_impact_ids": [
-        "IMP-1",
-        "IMP-6"
-      ],
-      "project_outputs": [
-        "D2-02",
-        "D3-02",
-        "D4-01",
-        "D4-02",
-        "D8-01",
-        "D9-02"
-      ],
-      "outcomes": [
-        "OUT-1",
-        "OUT-2",
-        "OUT-3",
-        "OUT-8",
-        "OUT-9"
-      ],
-      "impact_narrative": "MAESTRO advances EI-04 by establishing a European-origin AI agent paradigm differentiated from US/China approaches by its grounding in formal methods and verifiable behaviour rather than model scale. The neuro-symbolic planning engine (OUT-1/D2-02, WP2/ATU) and adaptive tri-store memory architecture (OUT-2/D3-02, WP3/BIIS) deliver fundamental agent architecture advances that place European researchers at the technical frontier without dependency on proprietary non-European platforms. The formally verified multi-agent coordination protocol suite (OUT-3/D4-01 specification and D4-02 software release, WP4/CERIA) provides mathematically proven convergence guarantees and full auditability that establishes European leadership in trustworthy multi-agent system design. Submission of D4-01 to ISO/IEC JTC 1/SC 42 or IEEE (IMP-6 target: ≥1 proposal by M48) extends European strategic influence to international standardisation. The external tool orchestration layer (OUT-9) and open-source MAESTRO framework (OUT-8/D9-02, WP9/BAL) package these advances for adoption by European researchers and SMEs without proprietary platform dependencies. Note: EI-04 is marked Inferred in Tier 2B (inference from topic destination placement in 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)'); MAESTRO outputs provide explicit traceable coverage through IMP-1 and IMP-6 linkages.",
-      "tier2b_source_ref": {
-        "document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-        "section": "call_entry.destination"
-      },
-      "coverage_status": "Covered",
-      "traceability_note": "EI-04 status is Inferred per expected_impacts.json. Coverage is explicit through IMP-1 (European-origin architecture independence) and IMP-6 (multi-agent standardisation). Inference chain from Tier 2B: topic placed in 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)' destination → European AI agent architecture advances and protocol standardisation directly serve digital strategic autonomy objectives."
-    },
-    {
-      "pathway_id": "P-EI-05",
-      "expected_impact_id": "EI-05",
-      "matched_project_impact_ids": [
-        "IMP-1",
-        "IMP-5",
-        "IMP-6"
-      ],
-      "project_outputs": [
-        "D2-02",
-        "D3-02",
-        "D4-01",
-        "D4-02",
-        "D8-01",
-        "D8-02",
-        "D9-02"
-      ],
-      "outcomes": [
-        "OUT-1",
-        "OUT-2",
-        "OUT-3",
-        "OUT-7",
-        "OUT-8",
-        "OUT-9"
-      ],
-      "impact_narrative": "MAESTRO advances EI-05 by delivering architectural improvements to agent planning, memory, reasoning, and tool use that directly expand the economically exploitable capability of AI agents across diverse sectors. The neuro-symbolic planning engine (OUT-1/D2-02, WP2/ATU) enables verifiable multi-step task decomposition applicable to data analytics pipelines, coding assistance, and complex process automation beyond the demonstrator sectors. The adaptive tri-store memory architecture (OUT-2/D3-02, WP3/BIIS) enables AI agents to maintain long-horizon task coherence without retraining, unlocking deployment in sustained economic workflows. The external tool and API orchestration layer (OUT-9, integrated via D2-02 and D8-01) provides production-grade connectors for real economic systems. The formally verified coordination protocol specification (OUT-3/D4-01, WP4/CERIA) enables multi-agent economic workflows with convergence guarantees applicable to finance, logistics, and supply chain automation (IMP-6). The MAESTRO benchmark suite (OUT-7/D8-02, WP8/FIIT) and open-source framework (OUT-8/D9-02, WP9/BAL) enable ≥10 European SMEs and startups to build AI agent applications in diverse economic domains by M48 (IMP-5), converting research advances into broad economic potential. The cross-demonstrator evaluation (D8-02) provides quantified evidence of performance gains across ≥3 sectors.",
-      "tier2b_source_ref": {
-        "document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-        "section": "call_entry.expected_outcome"
-      },
-      "coverage_status": "Covered"
+      "impact_narrative": "The economic potential of AI agents across diverse sectors is unlocked through two explicitly linked project mechanisms: (1) the logistics and supply chain transfer demonstrator (OUT-6, D7-02, WP7) validates MAESTRO architecture portability beyond the call's three primary sectors, demonstrating ≥20% improvement in disruption recovery time across ≥3 international supply chain corridors and producing an architectural transferability mapping to in-vehicle autonomous driving — establishing that MAESTRO's planning, memory, coordination, and tool orchestration stack generates economic value in logistics, automotive, and analogous domains not named in the call scope; (2) the open-source MAESTRO framework (D9-02, WP9) and benchmark suite (D8-02, WP8) lower entry barriers for European SMEs and startups developing AI agent applications in data analytics, coding, and further economic domains, with ≥10 SMEs/startups building on MAESTRO by M48 as stated in IMP-5 indicators. Both mechanisms are grounded in explicit Tier 3 linkage data."
     }
   ],
   "kpis": [
     {
       "kpi_id": "KPI-01",
-      "description": "Number of de-identified clinical cases on which the MAESTRO clinical decision support agent system is formally validated, as evidence of Apply AI Strategy implementation in healthcare",
-      "target": "≥500 de-identified clinical cases validated by M42, with clinical expert sign-off on diagnostic reasoning quality",
-      "measurement_method": "Case count and validation methodology documented in healthcare demonstrator evaluation report (D5-02, WP5/NIHS); clinical expert review panel sign-off protocol defined in T5-01 clinical benchmarks and executed in T5-03",
-      "traceable_to_deliverable": "D5-02",
-      "pathway_ref": "P-EI-01"
+      "pathway_id": "PATH-01",
+      "expected_impact_id": "EI-01",
+      "description": "Clinical decision support demonstrator validation: number of de-identified clinical cases processed through the MAESTRO-based diagnostic reasoning system and acceptance of clinical validation report by a national health technology assessment body",
+      "target": "500 de-identified clinical cases processed and validated; clinical validation report accepted by ≥1 national health technology assessment body by M48",
+      "measurement_method": "Clinical expert review against diagnostic benchmark designed in WP5 T5-01; health technology assessment body acceptance recorded; evidence captured in healthcare demonstrator evaluation dataset",
+      "traceable_to_deliverable": "D5-02"
     },
     {
       "kpi_id": "KPI-02",
-      "description": "Defect rate reduction and energy savings achieved in the MAESTRO manufacturing multi-agent system pilot deployment as quantified evidence of Apply AI Strategy implementation in advanced manufacturing",
-      "target": "≥15% defect reduction and ≥10% energy savings measured over the three-month operational pilot period ending by M42",
-      "measurement_method": "Before-after operational data comparison from ISIA pilot factory environment; baseline and post-deployment metrics defined in T6-01 production line KPIs; validation executed in T6-03; results reported in manufacturing pilot evaluation report (D6-02)",
-      "traceable_to_deliverable": "D6-02",
-      "pathway_ref": "P-EI-01"
+      "pathway_id": "PATH-01",
+      "expected_impact_id": "EI-01",
+      "description": "Manufacturing process optimisation demonstrator: defect rate reduction and energy savings demonstrated in pilot factory environment against pre-deployment baseline",
+      "target": "≥15% defect reduction and ≥10% energy savings versus pre-deployment baseline, demonstrated by M42",
+      "measurement_method": "Before/after operational measurement during WP6 T6-03 pilot factory validation; metrics recorded in manufacturing process optimisation demonstrator software outputs",
+      "traceable_to_deliverable": "D6-02"
     },
     {
       "kpi_id": "KPI-03",
-      "description": "Number of European Digital Innovation Hubs (EDIHs) actively disseminating MAESTRO technology to regional enterprises as evidence of wider industrial deployment",
-      "target": "≥3 EDIHs actively disseminating MAESTRO technology by M48",
-      "measurement_method": "EDIH partnership agreements, dissemination event records, and enterprise engagement logs maintained by BAL (WP9 lead) via T9-02; reported in final exploitation and communication report (D9-03); open-source framework release (D9-02) as the deployable artifact underpinning EDIH dissemination",
-      "traceable_to_deliverable": "D9-02",
-      "pathway_ref": "P-EI-02"
+      "pathway_id": "PATH-02",
+      "expected_impact_id": "EI-02",
+      "description": "Number of EDIHs actively disseminating MAESTRO technology and number of industrial adopters (hospital networks and manufacturing SMEs) engaged in adoption planning or technology transfer",
+      "target": "≥3 EDIHs actively disseminating MAESTRO technology; ≥3 hospital networks engaged in post-project adoption planning by M48; ≥5 manufacturing SMEs in technology transfer by M48",
+      "measurement_method": "EDIH engagement agreements and partner activity reports; hospital network and SME adoption plan documentation; all recorded in final dissemination and impact report",
+      "traceable_to_deliverable": "D9-03"
     },
     {
       "kpi_id": "KPI-04",
-      "description": "Number of European SMEs and startups actively building AI agent applications on the MAESTRO open-source framework and benchmark suite as evidence of industrial uptake",
-      "target": "≥10 European SMEs/startups actively building on MAESTRO framework by M48",
-      "measurement_method": "GitHub contributor and fork records for MAESTRO repository; EDIH-mediated enterprise engagement reports; community survey executed at M48 by BAL (WP9 T9-01); uptake evidenced in cross-demonstrator evaluation dataset (D8-02)",
-      "traceable_to_deliverable": "D8-02",
-      "pathway_ref": "P-EI-02"
+      "pathway_id": "PATH-02",
+      "expected_impact_id": "EI-02",
+      "description": "Adoption of MAESTRO benchmark suite by external research groups as evidence of wider AI research ecosystem industrial uptake",
+      "target": "Benchmark suite adopted by ≥5 external research groups by M48",
+      "measurement_method": "Adoption tracking via citation and reference analysis; external group adoption survey administered through WP9 community channels; uptake documented in benchmark suite dataset record",
+      "traceable_to_deliverable": "D8-02"
     },
     {
       "kpi_id": "KPI-05",
-      "description": "Number of peer-reviewed publications on MAESTRO research results in top-tier AI venues as evidence of open scientific advancement",
-      "target": "≥20 peer-reviewed publications in NeurIPS, ICML, ICLR, AAMAS, or AAAI by M60; ≥3 invited keynotes at major AI conferences; ≥100 cumulative citations within 36 months of first publication",
-      "measurement_method": "Publication list maintained in project repository and linked from MAESTRO integration architecture report (D8-01, WP8/FIIT); citation count via Google Scholar and Semantic Scholar at 36-month post-first-publication milestone; keynote invitations documented by consortium communication lead",
-      "traceable_to_deliverable": "D8-01",
-      "pathway_ref": "P-EI-03"
+      "pathway_id": "PATH-03",
+      "expected_impact_id": "EI-03",
+      "description": "Number of peer-reviewed publications in top-tier AI venues (NeurIPS, ICML, ICLR, AAMAS, AAAI) reporting MAESTRO R&D results, and aggregate citation impact",
+      "target": "≥20 peer-reviewed publications in top-tier AI venues by M60; ≥100 citations per MAESTRO publication within 3 years of publication",
+      "measurement_method": "Curated publication list maintained in final dissemination and impact report; citation counts tracked via Google Scholar and Semantic Scholar at 12, 24, and 36 months post-publication",
+      "traceable_to_deliverable": "D9-03"
     },
     {
       "kpi_id": "KPI-06",
-      "description": "Adoption of MAESTRO benchmark suite by external research groups via AI-on-demand platform as evidence of European AI research infrastructure strengthening",
-      "target": "≥5 external research groups independently using the MAESTRO benchmark suite by M54; benchmark suite live on AI-on-demand platform by M36",
-      "measurement_method": "Platform download and fork metrics from AI-on-demand platform and GitHub; evidence of external usage in publications citing MAESTRO benchmark suite dataset (D8-02); AI-on-demand platform contribution documented in WP9 dissemination reports; open-source framework release (D9-02) tracks community uptake",
-      "traceable_to_deliverable": "D9-02",
-      "pathway_ref": "P-EI-03"
+      "pathway_id": "PATH-03",
+      "expected_impact_id": "EI-03",
+      "description": "Availability of MAESTRO open-source framework on the AI-on-demand platform and uptake measured by GitHub repository activity following public release",
+      "target": "MAESTRO framework and benchmark suite contributed to AI-on-demand platform by M36; ≥500 GitHub stars within 6 months of public release",
+      "measurement_method": "AI-on-demand platform registration confirmation received; GitHub repository star, fork, and contributor metrics recorded at 3 and 6 months post-release",
+      "traceable_to_deliverable": "D9-02"
     },
     {
       "kpi_id": "KPI-07",
-      "description": "Submission of MAESTRO multi-agent coordination protocol specification to international standardisation body as evidence of European contribution to strategic autonomy in AI standards",
-      "target": "≥1 standardisation proposal submitted to ISO/IEC JTC 1/SC 42 or IEEE by M48; protocol specification adopted or cited by ≥3 external multi-agent research projects; EU AI Act multi-agent transparency alignment report published",
-      "measurement_method": "Formal submission confirmation receipt from standardisation body; evidence of external adoption in publications and project documentation; alignment report published open-access; all traceable to formally verified multi-agent coordination protocol specification (D4-01, WP4/CERIA)",
-      "traceable_to_deliverable": "D4-01",
-      "pathway_ref": "P-EI-04"
+      "pathway_id": "PATH-04",
+      "expected_impact_id": "EI-04",
+      "description": "Standardisation proposals for MAESTRO multi-agent coordination protocols submitted to ISO/IEC JTC 1/SC 42 or IEEE and external adoption of the protocol specification by research projects",
+      "target": "≥1 standardisation proposal submitted to ISO/IEC JTC 1/SC 42 or IEEE by M48; protocol specification adopted or referenced by ≥3 external multi-agent research projects",
+      "measurement_method": "Submission confirmation from the relevant standards body secretariat; adoption and citation tracking for the protocol specification document; documented in multi-agent coordination protocol specification",
+      "traceable_to_deliverable": "D4-01"
     },
     {
       "kpi_id": "KPI-08",
-      "description": "Open-source MAESTRO framework community adoption rate as indicator of European AI strategic autonomy through reduction of non-European platform dependency",
-      "target": "≥500 GitHub stars within 6 months of open-source framework release (targeting M36–M42 window); ≥50 independent forks by M48; zero mandatory dependencies on proprietary non-European AI platforms in framework core",
-      "measurement_method": "GitHub repository metrics tracked by BAL (WP9 lead, T9-01); dependency audit of MAESTRO framework (D9-02) core modules confirming absence of proprietary non-European platform dependencies; metrics reported in final exploitation and communication report (D9-03)",
-      "traceable_to_deliverable": "D9-02",
-      "pathway_ref": "P-EI-04"
+      "pathway_id": "PATH-04",
+      "expected_impact_id": "EI-04",
+      "description": "European scientific recognition of MAESTRO as a European-origin AI agent paradigm, measured by invited keynote presentations at major international AI conferences",
+      "target": "≥3 invited keynotes at major international AI conferences (NeurIPS, ICML, ICLR, AAMAS, AAAI, or equivalent) delivered by MAESTRO consortium members by M60",
+      "measurement_method": "Conference acceptance records and keynote programme confirmations; compiled and documented in final integration and evaluation report",
+      "traceable_to_deliverable": "D8-03"
     },
     {
       "kpi_id": "KPI-09",
-      "description": "Number of economic sectors demonstrating quantified AI agent performance improvement through MAESTRO architecture as evidence of economic potential unlocked",
-      "target": "≥3 sectors (healthcare, manufacturing, logistics minimum) each demonstrating ≥1 quantified performance metric improvement against pre-deployment baseline, documented in cross-demonstrator evaluation by M48",
-      "measurement_method": "Cross-demonstrator evaluation framework defined in T8-01 and executed in T8-03 (WP8/FIIT) with standardised KPIs applied across all sector demonstrators; results consolidated in MAESTRO benchmark suite dataset (D8-02); methodology and outcomes documented in MAESTRO integration architecture report (D8-01)",
-      "traceable_to_deliverable": "D8-02",
-      "pathway_ref": "P-EI-05"
+      "pathway_id": "PATH-05",
+      "expected_impact_id": "EI-05",
+      "description": "Logistics transfer demonstrator: disruption recovery time improvement versus baseline and number of international supply chain corridors operationally validated",
+      "target": "≥20% improvement in disruption recovery time versus pre-deployment baseline; operational validation completed across ≥3 international supply chain corridors; architectural transferability mapping to in-vehicle autonomous driving completed by M48",
+      "measurement_method": "Operational validation data collected during WP7 T7-03; disruption recovery baseline and post-deployment metrics recorded across corridors; transferability mapping documented in cross-sector generalisation evaluation dataset",
+      "traceable_to_deliverable": "D7-02"
     },
     {
       "kpi_id": "KPI-10",
-      "description": "TRL achieved for the neuro-symbolic planning engine prototype as evidence of architectural advancement enabling economic deployment of AI agents in complex multi-step tasks",
-      "target": "TRL 5 for neuro-symbolic planning engine prototype by M36; demonstrable improvement over LLM-only planning baseline on ≥3 MAESTRO benchmark task categories",
-      "measurement_method": "TRL self-assessment against EC TRL scale documented in neuro-symbolic planning engine prototype (D2-02, WP2/ATU); comparative evaluation against LLM-only planning baselines using MAESTRO benchmark suite tasks defined in WP8; evaluation results cross-referenced in MAESTRO integration architecture report (D8-01)",
-      "traceable_to_deliverable": "D2-02",
-      "pathway_ref": "P-EI-05"
+      "pathway_id": "PATH-05",
+      "expected_impact_id": "EI-05",
+      "description": "European SME and startup adoption of MAESTRO open-source framework for development of AI agent applications in diverse economic sectors including data analytics and coding",
+      "target": "≥10 European SMEs/startups actively building on the MAESTRO framework by M48",
+      "measurement_method": "Adoption survey administered through WP9 T9-01 community channels and EDIH partner reports; GitHub repository fork and contributor activity; tracked in open-source software release documentation",
+      "traceable_to_deliverable": "D9-02"
     }
   ],
   "dissemination_plan": {
     "activities": [
       {
-        "activity_type": "Open-access scientific publication in top-tier AI venues",
-        "target_audience": "AI researchers and reviewers at NeurIPS, ICML, ICLR, AAMAS, and AAAI evaluating advances in neuro-symbolic agent planning, adaptive memory architectures, and formally verified multi-agent coordination",
-        "responsible_partner": "ATU, BIIS, CERIA, FIIT",
-        "timing": "M12–M60"
+        "activity_type": "Peer-reviewed scientific publication in top-tier AI venues",
+        "target_audience": "Academic researchers specialising in multi-agent AI systems, neuro-symbolic planning, and LLM-based agent architectures, targeted at venues including NeurIPS, ICML, ICLR, AAMAS, and AAAI",
+        "responsible_partner": "WP2, WP3, WP4, WP8, WP9 leads",
+        "timing": "M12–M60 (first submissions from M12; target ≥20 peer-reviewed publications by M60)"
       },
       {
-        "activity_type": "Conference presentations and invited keynotes at major international AI conferences",
-        "target_audience": "AI researchers, research group leaders, and practitioners at NeurIPS, ICML, ICLR, AAMAS, and AAAI seeking frontier advances in agent autonomy and multi-agent coordination",
-        "responsible_partner": "ATU, BIIS, CERIA",
-        "timing": "M12–M60"
+        "activity_type": "Open-source MAESTRO framework release and AI-on-demand platform registration",
+        "target_audience": "European AI developers, SMEs, and startups building next-generation AI agent applications who require an open, non-proprietary agent architecture baseline",
+        "responsible_partner": "WP9 lead",
+        "timing": "M36 (public release and AI-on-demand platform registration); ongoing community updates M36–M60"
       },
       {
-        "activity_type": "Open-source MAESTRO framework and MAESTRO benchmark suite release via AI-on-demand platform and GitHub",
-        "target_audience": "European AI researchers and SMEs or startups building next-generation AI agent applications who require reusable, non-proprietary agent architecture infrastructure",
-        "responsible_partner": "BAL, FIIT",
-        "timing": "M36–M42"
+        "activity_type": "MAESTRO benchmark suite publication and adoption campaign",
+        "target_audience": "AI evaluation and benchmarking research groups assessing multi-agent system autonomy, robustness, and coordination capabilities",
+        "responsible_partner": "WP8 lead",
+        "timing": "M36 (dataset release); adoption target ≥5 external research groups by M48"
       },
       {
-        "activity_type": "EDIH-facilitated enterprise technology awareness events and knowledge transfer workshops",
-        "target_audience": "European manufacturing SMEs, logistics operators, and healthcare technology procurement decision-makers within the operational regions of ≥3 MAESTRO partner EDIHs",
-        "responsible_partner": "BAL",
-        "timing": "M36–M60"
+        "activity_type": "EDIH-mediated healthcare sector dissemination of clinical decision support demonstrator results",
+        "target_audience": "Hospital clinical informatics teams, clinical AI procurement leads, and health technology assessment body reviewers in European hospital networks",
+        "responsible_partner": "WP5 lead",
+        "timing": "M36–M48 (EDIH partnership activation from M36; ≥3 hospital networks engaged in adoption planning by M48)"
       },
       {
-        "activity_type": "Clinical validation report dissemination and hospital network technical briefings on AI-assisted diagnostics",
-        "target_audience": "Hospital network clinical informatics directors and national health technology assessment bodies in EU Member States evaluating AI agent deployment in diagnostic workflows",
-        "responsible_partner": "NIHS",
-        "timing": "M42–M54"
+        "activity_type": "EDIH-mediated manufacturing sector dissemination via EIT Manufacturing network",
+        "target_audience": "Manufacturing SME operations managers, factory automation engineers, and industrial technology transfer officers in European manufacturing clusters",
+        "responsible_partner": "WP6 lead",
+        "timing": "M36–M48 (EIT Manufacturing and EDIH channel activation from M36; ≥5 manufacturing SMEs in technology transfer by M48)"
       },
       {
-        "activity_type": "Standardisation body engagement and formally verified coordination protocol specification submission",
-        "target_audience": "ISO/IEC JTC 1/SC 42 and IEEE standards working groups developing multi-agent AI system transparency, interoperability, and auditability requirements under EU AI Act alignment",
-        "responsible_partner": "CERIA",
-        "timing": "M36–M48"
+        "activity_type": "Multi-agent coordination protocol specification submission to international standardisation bodies",
+        "target_audience": "ISO/IEC JTC 1/SC 42 and IEEE standards committee members; EU AI Act technical working group participants and multi-agent AI system transparency policy makers",
+        "responsible_partner": "WP4 lead",
+        "timing": "M36 (protocol specification published); M48 (≥1 standardisation proposal submitted to ISO/IEC JTC 1/SC 42 or IEEE)"
       },
       {
-        "activity_type": "Manufacturing sector demonstrator results dissemination through EIT Manufacturing-linked EDIHs",
-        "target_audience": "Manufacturing SME technology managers and production engineers within the EIT Manufacturing regional network seeking AI-driven quality and energy optimisation solutions",
-        "responsible_partner": "ISIA, BAL",
-        "timing": "M42–M60"
+        "activity_type": "Invited keynotes and conference presentations at major international AI events",
+        "target_audience": "International AI research community attending major venues including NeurIPS, ICML, ICLR, AAMAS, and AAAI; early adopters of the MAESTRO neuro-symbolic and coordination paradigm",
+        "responsible_partner": "WP2, WP3, WP4 leads",
+        "timing": "M24–M60 (target ≥3 invited keynotes by M60)"
+      },
+      {
+        "activity_type": "Logistics sector dissemination through ELI operational channels and supply chain practitioner networks",
+        "target_audience": "Supply chain operations leads, logistics technology practitioners, and international freight corridor operators engaged with ELI and partner supply chain ecosystems",
+        "responsible_partner": "WP7 lead",
+        "timing": "M48 (ELI integration roadmap published; architectural transferability mapping to in-vehicle autonomous driving completed)"
       }
     ],
-    "open_access_policy": "All peer-reviewed publications produced by MAESTRO will be published open access in compliance with Horizon Europe open science obligations. Manuscripts will be deposited as preprints in arXiv concurrent with or prior to journal or conference submission; accepted versions will be deposited in an open-access institutional repository within the applicable embargo period. All software outputs — including the neuro-symbolic planning engine prototype (D2-02), adaptive memory system prototype (D3-02), coordination engine software release (D4-02), external tool orchestration library, MAESTRO benchmark suite dataset (D8-02), and integrated open-source MAESTRO framework (D9-02) — will be released under the Apache 2.0 open-source licence. Research datasets will be deposited on the AI-on-demand platform and in open repositories conforming to FAIR data principles (findable, accessible, interoperable, reusable). A Data Management Plan (DMP) will be delivered as a distinct project deliverable by M6 and updated at each reporting period, in accordance with instrument requirements."
+    "open_access_policy": "All MAESTRO scientific publications are made open-access immediately upon acceptance, deposited in discipline-specific repositories (arXiv for AI and computer science preprints) and institutional open-access archives, in compliance with Horizon Europe open science requirements and the project grant agreement. The MAESTRO open-source software framework (WP9), agent evaluation benchmark suite (WP8), evaluation framework specification (WP8), and multi-agent coordination protocol specification (WP4) are released under the Apache 2.0 open-source licence, enabling unrestricted access, reuse, and derivative development by European researchers, SMEs, and startups without proprietary dependency. Research datasets generated by the project — including the healthcare demonstrator evaluation dataset (D5-02), manufacturing demonstrator operational data (D6-02), cross-sector generalisation evaluation dataset (D7-02), and MAESTRO benchmark suite (D8-02) — are made FAIR-compliant (Findable, Accessible, Interoperable, Reusable) and deposited in appropriate domain repositories with metadata records registered on the AI-on-demand platform. A Data Management Plan is delivered as a distinct project deliverable within the first 6 months of the grant signature and updated at each reporting period."
   },
   "exploitation_plan": {
     "activities": [
       {
-        "activity_type": "Open-source MAESTRO framework release targeting European SME and startup AI agent application development",
-        "expected_result": "≥10 European SMEs and startups actively building AI agent applications on the MAESTRO framework by M48; ≥500 GitHub stars on the MAESTRO repository within 6 months of framework release; zero mandatory dependencies on proprietary non-European AI platforms in framework core",
-        "responsible_partner": "BAL",
-        "timing": "M36–M48"
+        "activity_type": "Healthcare sector technology transfer via EDIH network partnerships",
+        "expected_result": "≥3 European hospital networks formally engaged in post-project adoption planning for MAESTRO clinical decision support agent system by M48; clinical validation report accepted by ≥1 national health technology assessment body; auditable EU AI Act-compliant reasoning traces establish regulatory pathway for healthcare AI agent deployment",
+        "responsible_partner": "WP5 lead",
+        "timing": "M36–M60"
       },
       {
-        "activity_type": "EDIH-mediated technology transfer of MAESTRO manufacturing multi-agent system to European manufacturing SMEs",
-        "expected_result": "≥5 manufacturing SMEs engaged in MAESTRO technology transfer by M48; technology transfer pathway operationalised through ≥2 EDIHs linked to the EIT Manufacturing network; ≥15% defect reduction and ≥10% energy savings replicated in at least one SME pilot beyond ISIA",
-        "responsible_partner": "ISIA, BAL",
-        "timing": "M42–M60"
+        "activity_type": "Manufacturing sector technology transfer via EIT Manufacturing network and EDIH partnerships",
+        "expected_result": "≥5 European manufacturing SMEs in active technology transfer for MAESTRO manufacturing process optimisation multi-agent system by M48; at least ≥2 EDIH formal partnership agreements for industrial scaling; ≥15% defect reduction and ≥10% energy savings demonstrated in pilot factory as evidence base for commercial exploitation",
+        "responsible_partner": "WP6 lead",
+        "timing": "M30–M60"
       },
       {
-        "activity_type": "Hospital network adoption planning for MAESTRO clinical decision support agent system",
-        "expected_result": "≥3 hospital networks engaged in post-project adoption planning by M48; clinical validation report accepted by ≥1 national health technology assessment body; regulatory compliance pathway with EU AI Act high-risk system requirements documented for healthcare adopters",
-        "responsible_partner": "NIHS",
-        "timing": "M42–M54"
+        "activity_type": "Open-source ecosystem commercialisation enabling SME and startup product development",
+        "expected_result": "≥10 European SMEs and startups actively building AI agent products and services on the MAESTRO open-source framework by M48; ≥500 GitHub repository stars within 6 months of public release at M36; European AI agent ecosystem reduced dependency on non-European proprietary platforms",
+        "responsible_partner": "WP9 lead",
+        "timing": "M36–M60"
       },
       {
-        "activity_type": "Logistics operational system integration roadmap for ELI post-project deployment of MAESTRO agent architecture",
-        "expected_result": "MAESTRO logistics agent system validated across ≥3 international supply chain corridors by M48; integration roadmap for full deployment in ELI operational systems completed by M48; ≥20% improvement in disruption recovery time demonstrated operationally",
-        "responsible_partner": "ELI",
-        "timing": "M36–M48"
+        "activity_type": "Multi-agent coordination protocol standardisation and external project adoption",
+        "expected_result": "≥1 standardisation proposal submitted to ISO/IEC JTC 1/SC 42 or IEEE by M48; formally verified multi-agent coordination protocol specification adopted or referenced by ≥3 external multi-agent AI research projects; EU AI Act alignment report for multi-agent transparency requirements published",
+        "responsible_partner": "WP4 lead",
+        "timing": "M36–M60"
       },
       {
-        "activity_type": "Submission of formally verified multi-agent coordination protocol specification to international standardisation bodies",
-        "expected_result": "≥1 standardisation proposal submitted to ISO/IEC JTC 1/SC 42 or IEEE by M48; protocol specification adopted or cited by ≥3 external multi-agent research projects; EU AI Act multi-agent transparency alignment report published open access",
-        "responsible_partner": "CERIA",
-        "timing": "M36–M48"
-      },
-      {
-        "activity_type": "AI-on-demand platform contribution of MAESTRO benchmark suite for European AI research infrastructure exploitation",
-        "expected_result": "MAESTRO benchmark suite live on the AI-on-demand platform by M36; ≥5 external European research groups independently using the benchmark suite by M54; benchmark suite cited in ≥5 external publications by M60",
-        "responsible_partner": "FIIT, BAL",
-        "timing": "M30–M54"
+        "activity_type": "Logistics sector operational deployment and ELI integration roadmap",
+        "expected_result": "MAESTRO multi-agent planning and coordination stack operationally validated across ≥3 international supply chain corridors demonstrating ≥20% improvement in disruption recovery time; integration roadmap for ELI operational systems finalised by M48; architectural transferability mapping to in-vehicle autonomous driving completed and disseminated",
+        "responsible_partner": "WP7 lead",
+        "timing": "M30–M60"
       }
     ],
-    "ipr_strategy": "Core MAESTRO software outputs — the neuro-symbolic planning engine prototype, adaptive memory system prototype, coordination engine, tool orchestration library, benchmark suite, and the integrated open-source MAESTRO framework — will be released under the Apache 2.0 open-source licence, maximising accessibility for European SMEs and researchers while preventing proprietary enclosure by non-European platform providers. The formally verified coordination protocol specification (D4-01) will be submitted to standardisation bodies as an open specification with no proprietary licensing restrictions. Patentable innovations identified during the project, particularly novel mechanisms arising from the neuro-symbolic planning engine (ATU/WP2) and formal coordination protocol designs (CERIA/WP4), will be assessed for IP protection under the consortium agreement; where protection is pursued, licensing terms will preserve access for European public research institutions and SMEs. IPR arrangements are aligned with EU AI Act transparency requirements for high-risk AI systems and multi-agent system auditability obligations."
+    "ipr_strategy": "MAESTRO adopts a differentiated intellectual property strategy aligned with the project's dual commitments to open science and commercial exploitation. Core platform components — the MAESTRO open-source framework, agent evaluation benchmark suite, evaluation framework specification, and multi-agent coordination protocol specification — are released under the Apache 2.0 licence to maximise European researcher and SME adoption and ensure compliance with Horizon Europe open access requirements. Sector-specific algorithmic innovations with direct commercial application potential, developed within WP5 (clinical decision support) and WP6 (manufacturing process optimisation), are assessed for patent or trade secret protection by the responsible consortium partners in accordance with the consortium agreement IP provisions prior to publication. The formally verified coordination protocols (WP4) are submitted to standardisation bodies on a royalty-free basis to ensure universal accessibility to European organisations. Background IP contributed by each consortium partner remains the exclusive property of that partner; foreground IP arising jointly from collaborative work packages is governed by joint ownership provisions in the consortium agreement, with licensing terms defined to prioritise European exploitation."
   },
   "sustainability_mechanism": {
-    "description": "MAESTRO's post-project sustainability operates through four complementary and mutually reinforcing tracks. First, the open-source MAESTRO framework and benchmark suite deposited on the AI-on-demand platform create self-sustaining community infrastructure maintained through the open-source contributor community seeded during the project; BAL commits to a minimum two-year post-project maintenance period for core framework modules, supported by the community of ≥10 SMEs and ≥5 external research groups engaged by M48. Second, operational system integrations at ELI (logistics multi-agent system) and NIHS (clinical decision support system) embed MAESTRO-derived agent capabilities in ongoing institutional operations: ELI's integration roadmap, completed by M48, provides a transition pathway to commercially sustained use within ELI's own logistics operations; NIHS's hospital network adoption planning, targeting ≥3 hospital networks by M48, generates post-project clinical rollout sustained by national health system procurement cycles rather than project funding. Third, EDIH network engagement through ≥3 partner EDIHs sustains technology dissemination to European enterprises beyond the project lifetime through the EDIHs' ongoing Horizon Europe-funded enterprise support mandates and EIT Manufacturing regional programmes, without requiring renewed project budget. Fourth, the standardisation body submission by CERIA (WP4) initiates a standards adoption lifecycle — targeting ISO/IEC JTC 1/SC 42 and IEEE — that propagates MAESTRO coordination protocol advances through international AI standards independently of project continuity, creating durable influence over multi-agent system design norms across the European AI ecosystem.",
+    "description": "MAESTRO results are sustained beyond the 60-month project duration through three reinforcing mechanisms, each grounded in explicit project impact data from impacts.json. First, the open-source MAESTRO framework (WP9, IMP-5) is maintained as a living codebase under the Apache 2.0 licence on GitHub and registered on the AI-on-demand platform, enabling continued community-driven development without dependency on project funding; the target of ≥10 European SMEs and startups actively building on the framework by M48 creates a self-sustaining developer and user ecosystem with independent motivation for continued maintenance and enhancement. Second, operational deployments in healthcare and manufacturing sectors are institutionalised through EDIH and EIT Manufacturing structural partnerships established during M36–M60: ≥3 hospital networks engaged in adoption planning for the clinical decision support agent system (IMP-2) and ≥5 manufacturing SMEs in technology transfer for the manufacturing optimisation system (IMP-3) create post-project demand-pull and sector-level maintenance obligations undertaken by the respective industrial partners. Third, the formally verified multi-agent coordination protocols (WP4, IMP-6) are embedded in international standards processes through ISO/IEC JTC 1/SC 42 or IEEE submission by M48, ensuring that MAESTRO's foundational coordination innovations persist within the regulatory and technical standards landscape independently of consortium activity. The MAESTRO benchmark suite (WP8, IMP-5), adopted by ≥5 external research groups by M48, further sustains the project's evaluation infrastructure through community curation.",
     "responsible_partners": [
-      "BAL",
-      "ELI",
-      "NIHS",
-      "ISIA",
-      "CERIA",
-      "FIIT"
+      "WP9-LEAD",
+      "WP8-LEAD",
+      "WP5-LEAD",
+      "WP6-LEAD",
+      "WP4-LEAD"
     ]
   }
 }
