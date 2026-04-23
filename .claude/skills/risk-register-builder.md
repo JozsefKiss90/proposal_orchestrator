@@ -8,14 +8,34 @@ used_by_agents:
   - implementation_architect
 reads_from:
   - docs/tier3_project_instantiation/architecture_inputs/risks.json
-  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
-  - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+  - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
 constitutional_constraints:
   - "Risks not in Tier 3 seeds must be flagged for operator review, not silently added"
   - "Mitigation measures must be traceable to project activities, not generic"
 ---
+
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
+in the Declared Inputs section from disk using the Read tool.
+
+**Declared input files to read:**
+- `docs/tier3_project_instantiation/architecture_inputs/risks.json`
+- `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
+- `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json`
+- `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` (existing artifact to merge into)
+
+**Boundary constraints:**
+- Do not read files outside the declared input set.
+- Do not assume implicit context or reconstruct inputs from memory.
+- Read each required file explicitly before using it.
+- Base all reasoning ONLY on retrieved file content.
+
+Return a SINGLE valid JSON object matching the schema.
+Do not include explanations outside the JSON.
 
 ## Canonical Inputs and Outputs
 

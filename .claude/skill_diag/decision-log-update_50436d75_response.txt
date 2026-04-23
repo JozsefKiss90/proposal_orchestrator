@@ -1,0 +1,25 @@
+=== skill_id: decision-log-update ===
+=== mode: cli-prompt ===
+=== response_text length: 4709 ===
+=== response_text (full) ===
+```json
+{
+  "decision_id": "gap_risk_flagged_gantt_designer_2026-04-23T10-52-00Z",
+  "decision_type": "gap_risk_flagged",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
+  "run_id_reference": "50436d75-d8a6-42f9-ab1f-66d709e4adae",
+  "decision_description": "The milestone consistency check (report_id: milestone_consistency_gantt_designer_2026-04-23T10:50:00+00:00) flagged 9 of 11 milestones as having due_month values that precede the maximum task end_month of their responsible WP. Specifically: MS1 (M3, WP1 max M48), MS2 (M12, WP2 max M36), MS3 (M12, WP3 max M30), MS4 (M15, WP4 max M36), MS5 (M12, WP8 max M48), MS6 (M24, WP8 max M48), MS7 (M30, WP8 max M48), MS9 (M42, WP8 max M48), MS10 (M45, WP9 max M48). The consistency check algorithm compares milestone due_month to the maximum end_month of any task within the responsible WP. For multi-phase WPs of long duration (WP1: M1–M48, WP2: M1–M36, WP3: M1–M30, WP4: M3–M36, WP8: M6–M48, WP9: M1–M48), intermediate milestones are correctly positioned as progress checkpoints within the WP scope and are not expected to align with the WP-level maximum task end_month. All 11 milestones carry non-empty verifiable criteria. The 48-month project duration is within the call-specified maximum. The flags are accepted as informational artifacts of the milestone-to-WP-max-task comparison method and do not constitute Phase 4 gate failures. No milestone redesign is required.",
+  "alternatives_considered": [
+    "Reassign each flagged milestone to the specific task or task subset whose completion it marks, eliminating comparison to WP-level max end_month; rejected because task-level milestone attribution would require restructuring the WP ontology beyond the Phase 3 wp_structure schema and is not required by the Phase 4 gate condition.",
+    "Retime flagged milestones forward to align with WP-level max task end_month; rejected because intermediate milestones such as MS2 (v1.0 planning engine baseline at M12 within WP2 running to M36) and MS6 (integrated MAESTRO v1.0 at M24 within WP8 running to M48) are scientifically and structurally correct as checkpoint events at the appropriate phase of delivery.",
+    "Declare Phase 4 gate failure on the basis of 9 flagged milestones; rejected because the CLAUDE.md §7 Phase 4 gate condition requires (a) all tasks assigned to months — satisfied for all 27 tasks, (b) all milestones with a defined verifiable criterion — satisfied for all 11 milestones, (c) timeline within call-specified duration — satisfied at 48 months, and (d) no unresolved critical path dependency — confirmed by cycle_detected: false in wp_structure.json. The gate condition does not require milestone due_month to equal WP-level max task end_month."
+  ],
+  "tier_authority_applied": "CLAUDE.md §7 — Phase 4 gate condition specifying that all milestones must have a defined verifiable criterion (confirmed: all 11 milestones have non-empty verifiable_criterion fields in gantt.json), all tasks must be assigned to months (confirmed: all 27 tasks have start_month and end_month in gantt.json), the timeline must fit within the call-specified duration (confirmed: max task end_month is M48 matching max_project_duration_months: 48 in Tier 3 selected_call.json), and no critical path dependency may be unresolved (confirmed: cycle_detected: false and all edges traceable in wp_structure.json dependency_map).",
+  "rationale": "The milestone consistency check flags arise from comparing milestone due_month to the maximum end_month of any task in the responsible WP, not to the end_month of the task subset whose completion the milestone marks. For long-duration, multi-phase WPs — particularly WP8 (Integration, Evaluation and Benchmarking, M6–M48) and WP1 (Project Management, M1–M48) — intermediate milestones positioned at M12, M24, M30, and M42 are architecturally correct as staged delivery checkpoints. The two milestones assessed as consistent (MS8 at M36 for WP2 max M36; MS11 at M48 for WP1 max M48) coincide with WP-level task completion and are correct terminal milestones. The CLAUDE.md §7 Phase 4 gate condition is satisfied in full on all four criteria. The decision to accept the 9 flagged milestones as valid intermediate checkpoints is grounded in the gate condition text as written in CLAUDE.md §7 and in the call-binding duration constraint from Tier 3 selected_call.json (max_project_duration_months: 48). The flags are recorded here as a durable interpretive decision so that downstream agents and reviewers understand the basis on which the milestone design was accepted without modification.",
+  "resolution_status": "resolved",
+  "timestamp": "2026-04-23T10:52:00Z"
+}
+```
+
+=== END ===

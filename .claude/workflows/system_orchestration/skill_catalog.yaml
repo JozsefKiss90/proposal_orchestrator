@@ -309,6 +309,7 @@ skill_catalog:
       - "Target groups must be defined with specificity"
 
   - id: governance-model-builder
+    execution_mode: "tapm"
     purpose: >
       Build the project governance model: management body composition, meeting
       frequency and decision scope, escalation paths, and quality assurance
@@ -316,8 +317,9 @@ skill_catalog:
     used_by_agents:
       - implementation_architect
     reads_from:
-      - docs/tier3_project_instantiation/consortium/
-      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier3_project_instantiation/consortium/partners.json
+      - docs/tier3_project_instantiation/consortium/roles.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
     constitutional_constraints:
@@ -325,6 +327,7 @@ skill_catalog:
       - "Management structure must be consistent with WP lead assignments"
 
   - id: risk-register-builder
+    execution_mode: "tapm"
     purpose: >
       Populate the risk register from Tier 3 risk seeds. Assign likelihood, impact,
       mitigation, and monitoring for each risk. Identify material risks not in the
@@ -333,8 +336,8 @@ skill_catalog:
       - implementation_architect
     reads_from:
       - docs/tier3_project_instantiation/architecture_inputs/risks.json
-      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
-      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
     constitutional_constraints:

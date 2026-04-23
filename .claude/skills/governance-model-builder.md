@@ -7,14 +7,34 @@ purpose_summary: >
 used_by_agents:
   - implementation_architect
 reads_from:
-  - docs/tier3_project_instantiation/consortium/
-  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+  - docs/tier3_project_instantiation/consortium/partners.json
+  - docs/tier3_project_instantiation/consortium/roles.json
+  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
 constitutional_constraints:
   - "Governance roles must be assigned to Tier 3 consortium members only"
   - "Management structure must be consistent with WP lead assignments"
 ---
+
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
+in the Declared Inputs section from disk using the Read tool.
+
+**Declared input files to read:**
+- `docs/tier3_project_instantiation/consortium/partners.json`
+- `docs/tier3_project_instantiation/consortium/roles.json`
+- `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
+
+**Boundary constraints:**
+- Do not read files outside the declared input set.
+- Do not assume implicit context or reconstruct inputs from memory.
+- Read each required file explicitly before using it.
+- Base all reasoning ONLY on retrieved file content.
+
+Return a SINGLE valid JSON object matching the schema.
+Do not include explanations outside the JSON.
 
 ## Canonical Inputs and Outputs
 
