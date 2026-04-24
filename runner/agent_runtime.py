@@ -65,8 +65,13 @@ _SELECTED_CALL_REL_PATH: str = (
 #: these skills are skipped as "not_applicable" rather than failed with
 #: MISSING_INPUT.  In phases where Tier 5 is expected (Phase 8), they
 #: execute normally and fail-closed on missing inputs.
+#:
+#: ``evaluator-criteria-review`` reads from ``assembled_drafts/`` which
+#: does not exist during ``n08a_section_drafting``.  It is applicable
+#: only once assembled drafts exist (n08c, n08d).
 _TIER5_AUDIT_SKILLS: frozenset[str] = frozenset({
     "proposal-section-traceability-check",
+    "evaluator-criteria-review",
 })
 
 #: Tier 5 deliverable directories that must contain at least one JSON
@@ -645,6 +650,77 @@ def _build_caller_context(
 
 
 # ---------------------------------------------------------------------------
+# Auditable artifact resolution for constitutional-compliance-check
+# ---------------------------------------------------------------------------
+
+#: Node-specific fallback directories for auditable artifact resolution.
+#: Used when no earlier skill in the agent body wrote an artifact to
+#: ``all_outputs``.  Maps node_id prefixes to the directories that the
+#: node is expected to populate.  Phase 8 nodes produce Tier 5 artifacts;
+#: earlier phases produce Tier 4 phase outputs.
+_NODE_AUDITABLE_FALLBACK_DIRS: dict[str, tuple[str, ...]] = {
+    "n08a_section_drafting": (
+        "docs/tier5_deliverables/proposal_sections",
+    ),
+    "n08b_assembly": (
+        "docs/tier5_deliverables/assembled_drafts",
+    ),
+    "n08c_evaluator_review": (
+        "docs/tier5_deliverables/review_packets",
+        "docs/tier5_deliverables/assembled_drafts",
+    ),
+    "n08d_revision": (
+        "docs/tier5_deliverables/assembled_drafts",
+        "docs/tier5_deliverables/proposal_sections",
+    ),
+}
+
+
+def _resolve_auditable_artifact(
+    node_id: str,
+    all_outputs: list[str],
+    repo_root: Path,
+) -> str | None:
+    """Resolve the primary auditable artifact for constitutional-compliance-check.
+
+    Searches for the first artifact path in *all_outputs* that is a Tier 4
+    phase output or a Tier 5 deliverable artifact.  Falls back to
+    node-specific directories if no matching output was written by earlier
+    skills.
+
+    Returns the repo-relative artifact path, or ``None`` if no auditable
+    artifact can be found.
+    """
+    _AUDITABLE_PREFIXES = (
+        "docs/tier4_orchestration_state/phase_outputs/",
+        "docs/tier5_deliverables/",
+    )
+
+    # Primary: search all_outputs for Tier 4 or Tier 5 artifacts
+    for p in all_outputs:
+        if any(p.startswith(pfx) for pfx in _AUDITABLE_PREFIXES):
+            if not p.endswith("gate_result.json"):
+                return p
+
+    # Fallback: check node-specific directories for existing artifacts
+    fallback_dirs = _NODE_AUDITABLE_FALLBACK_DIRS.get(node_id)
+    if fallback_dirs:
+        for dir_rel in fallback_dirs:
+            abs_dir = repo_root / dir_rel
+            if abs_dir.is_dir():
+                json_files = sorted(
+                    f for f in abs_dir.iterdir()
+                    if f.suffix == ".json" and f.is_file()
+                )
+                if json_files:
+                    return str(
+                        json_files[0].relative_to(repo_root)
+                    ).replace("\\", "/")
+
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Skill applicability guard
 # ---------------------------------------------------------------------------
 
@@ -1027,22 +1103,52 @@ def run_agent(
 
         # Inject artifact_path for constitutional-compliance-check.
         # The skill audits a single targeted artifact, not the entire
-        # phase_outputs/ directory.  Resolve the primary phase output
+        # phase_outputs/ directory.  Resolve the primary auditable
         # artifact from the outputs written by earlier skills in this
         # agent body.  This bounds the TAPM prompt to ~20KB.
+        #
+        # For Phase 8 nodes, the primary outputs are Tier 5 deliverable
+        # artifacts, not Tier 4 phase outputs.  The resolution searches
+        # both Tier 4 phase outputs and Tier 5 deliverables.  If no
+        # auditable artifact was produced, the agent returns a
+        # structured MISSING_INPUT failure before invoking the skill.
         if sid == "constitutional-compliance-check":
-            phase_artifacts = [
-                p for p in all_outputs
-                if p.startswith(
-                    "docs/tier4_orchestration_state/phase_outputs/"
-                )
-                and not p.endswith("gate_result.json")
-            ]
-            if phase_artifacts:
+            artifact_path = _resolve_auditable_artifact(
+                node_id, all_outputs, repo_root
+            )
+            if artifact_path is not None:
                 if not caller_context:
                     caller_context = {}
-                # Deduplicate: enrichment skills may write the same path
-                caller_context["artifact_path"] = phase_artifacts[0]
+                caller_context["artifact_path"] = artifact_path
+            else:
+                # No auditable artifact was produced by earlier skills.
+                # Fail closed with a clear production failure rather
+                # than letting constitutional-compliance-check crash
+                # with the generic "artifact_path required" error.
+                _fail_reason = (
+                    f"No auditable artifact was produced before "
+                    f"constitutional-compliance-check for node "
+                    f"{node_id!r}; earlier skills did not write "
+                    f"any Tier 4 phase output or Tier 5 deliverable "
+                    f"artifact to audit"
+                )
+                record = SkillInvocationRecord(
+                    skill_id=sid,
+                    status="failure",
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+                all_invocations.append(record)
+                had_failure = True
+                failure_reason_accumulator = (
+                    f"Skill {sid!r} skipped: {_fail_reason}"
+                )
+                failure_category_accumulator = "SKILL_FAILURE"
+                logger.warning(
+                    "Skill %s skipped (no auditable artifact): %s",
+                    sid, _fail_reason,
+                )
+                continue
 
         result = run_skill(
             sid, run_id, repo_root, resolved_inputs,

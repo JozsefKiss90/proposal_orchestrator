@@ -407,5 +407,6 @@ class TestAgentRuntimeArtifactPathInjection:
         """The injection logic must exclude gate_result.json from candidates."""
         import runner.agent_runtime as ar
         import inspect
-        source = inspect.getsource(ar.run_agent)
+        # The filtering is in _resolve_auditable_artifact, called by run_agent
+        source = inspect.getsource(ar._resolve_auditable_artifact)
         assert "gate_result.json" in source

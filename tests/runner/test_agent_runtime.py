@@ -1224,3 +1224,315 @@ class TestModuleIsolation:
         source = Path(mod.__file__).read_text(encoding="utf-8")
         assert "runner.dag_scheduler" not in source
         assert "runner.gate_evaluator" not in source
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 startup: artifact_path injection and skill ordering
+# ---------------------------------------------------------------------------
+
+
+class TestPhase8ArtifactPathInjection:
+    """Verify constitutional-compliance-check receives artifact_path
+    for Phase 8 nodes where outputs are Tier 5 deliverables."""
+
+    def _make_phase8_env(
+        self,
+        tmp_path: Path,
+        *,
+        node_id: str = "n08a_section_drafting",
+        skill_ids: list[str] | None = None,
+    ) -> dict:
+        if skill_ids is None:
+            skill_ids = [
+                "proposal-section-drafting",
+                "constitutional-compliance-check",
+            ]
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="proposal_writer",
+            node_id=node_id,
+            skill_ids=skill_ids,
+            phase_id="phase_08a_section_drafting",
+            reads_from=[
+                "docs/tier3/input.json",
+                "docs/tier4_orchestration_state/phase_outputs/",
+            ],
+            writes_to=[
+                "docs/tier5_deliverables/proposal_sections/",
+                "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/",
+            ],
+            artifact_registry=[
+                {
+                    "path": "docs/tier5_deliverables/proposal_sections/",
+                    "produced_by": node_id,
+                    "tier": "tier5_deliverable",
+                },
+                {
+                    "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/",
+                    "produced_by": node_id,
+                    "tier": "tier4_phase_output",
+                },
+            ],
+        )
+        # Create phase_outputs dir so input resolution doesn't fail
+        (tmp_path / "docs" / "tier4_orchestration_state" / "phase_outputs").mkdir(
+            parents=True, exist_ok=True,
+        )
+        return kwargs
+
+    def test_tier5_output_injected_as_artifact_path(
+        self, tmp_path: Path,
+    ) -> None:
+        """When proposal-section-drafting produces Tier 5 output,
+        constitutional-compliance-check receives it as artifact_path."""
+        kwargs = self._make_phase8_env(tmp_path)
+
+        captured_calls: list[dict] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            if skill_id == "proposal-section-drafting":
+                # Simulate producing a Tier 5 section artifact
+                section_path = (
+                    tmp_path / "docs" / "tier5_deliverables"
+                    / "proposal_sections" / "section_1a.json"
+                )
+                section_path.parent.mkdir(parents=True, exist_ok=True)
+                _write_json(section_path, {
+                    "schema_id": "orch.tier5.proposal_section.v1",
+                    "section_id": "section_1a",
+                    "content": "Test content",
+                })
+                return _success_skill(outputs=[
+                    "docs/tier5_deliverables/proposal_sections/section_1a.json",
+                ])
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            run_agent(**kwargs)
+
+        # Find constitutional-compliance-check call
+        ccc_calls = [
+            c for c in captured_calls
+            if c["skill_id"] == "constitutional-compliance-check"
+        ]
+        assert len(ccc_calls) == 1
+        ctx = ccc_calls[0]["caller_context"]
+        assert ctx is not None, (
+            "constitutional-compliance-check should receive caller_context"
+        )
+        assert ctx.get("artifact_path") == (
+            "docs/tier5_deliverables/proposal_sections/section_1a.json"
+        )
+
+    def test_no_artifact_produces_missing_input_failure(
+        self, tmp_path: Path,
+    ) -> None:
+        """When no earlier skill produces an auditable artifact,
+        constitutional-compliance-check is skipped with MISSING_INPUT."""
+        kwargs = self._make_phase8_env(tmp_path)
+
+        invoked_skill_ids: list[str] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            invoked_skill_ids.append(skill_id)
+            # proposal-section-drafting succeeds but writes nothing
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        # constitutional-compliance-check should NOT be invoked via run_skill
+        assert "constitutional-compliance-check" not in invoked_skill_ids
+        # But it should appear in invoked_skills with a failure record
+        ccc_records = [
+            r for r in result.invoked_skills
+            if r.skill_id == "constitutional-compliance-check"
+        ]
+        assert len(ccc_records) == 1
+        assert ccc_records[0].status == "failure"
+        assert ccc_records[0].failure_category == "MISSING_INPUT"
+        assert "auditable artifact" in (ccc_records[0].failure_reason or "").lower()
+
+    def test_tier4_phase_output_also_works_for_phase8(
+        self, tmp_path: Path,
+    ) -> None:
+        """If an earlier skill writes a Tier 4 phase output in Phase 8,
+        that path is also accepted as artifact_path."""
+        kwargs = self._make_phase8_env(tmp_path)
+
+        captured_calls: list[dict] = []
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            captured_calls.append({
+                "skill_id": skill_id,
+                "caller_context": kw.get("caller_context"),
+            })
+            if skill_id == "proposal-section-drafting":
+                # Produces a Tier 4 phase output instead of Tier 5
+                out_path = (
+                    tmp_path / "docs" / "tier4_orchestration_state"
+                    / "phase_outputs" / "phase8_drafting_review" / "status.json"
+                )
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                _write_json(out_path, {"status": "drafted"})
+                return _success_skill(outputs=[
+                    "docs/tier4_orchestration_state/phase_outputs/"
+                    "phase8_drafting_review/status.json",
+                ])
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            run_agent(**kwargs)
+
+        ccc_calls = [
+            c for c in captured_calls
+            if c["skill_id"] == "constitutional-compliance-check"
+        ]
+        assert len(ccc_calls) == 1
+        ctx = ccc_calls[0]["caller_context"]
+        assert ctx is not None
+        assert ctx["artifact_path"].startswith(
+            "docs/tier4_orchestration_state/phase_outputs/"
+        )
+
+
+class TestResolveAuditableArtifact:
+    """Unit tests for the _resolve_auditable_artifact helper."""
+
+    def test_prefers_outputs_over_fallback(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_auditable_artifact
+        outputs = [
+            "docs/tier5_deliverables/proposal_sections/section_1a.json",
+        ]
+        result = _resolve_auditable_artifact(
+            "n08a_section_drafting", outputs, tmp_path,
+        )
+        assert result == "docs/tier5_deliverables/proposal_sections/section_1a.json"
+
+    def test_filters_gate_result(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_auditable_artifact
+        outputs = [
+            "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+            "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+        ]
+        result = _resolve_auditable_artifact(
+            "n07_budget_gate", outputs, tmp_path,
+        )
+        assert result == (
+            "docs/tier4_orchestration_state/phase_outputs/"
+            "phase7_budget_gate/budget_gate_assessment.json"
+        )
+
+    def test_fallback_to_disk_for_n08a(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_auditable_artifact
+        # Create a file in the fallback directory
+        section_dir = tmp_path / "docs" / "tier5_deliverables" / "proposal_sections"
+        section_dir.mkdir(parents=True, exist_ok=True)
+        _write_json(section_dir / "section_1a.json", {"content": "test"})
+
+        result = _resolve_auditable_artifact(
+            "n08a_section_drafting", [], tmp_path,
+        )
+        assert result is not None
+        assert "proposal_sections" in result
+        assert result.endswith("section_1a.json")
+
+    def test_returns_none_when_no_artifacts(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_auditable_artifact
+        result = _resolve_auditable_artifact(
+            "n08a_section_drafting", [], tmp_path,
+        )
+        assert result is None
+
+    def test_n08b_fallback_checks_assembled_drafts(self, tmp_path: Path) -> None:
+        from runner.agent_runtime import _resolve_auditable_artifact
+        drafts_dir = tmp_path / "docs" / "tier5_deliverables" / "assembled_drafts"
+        drafts_dir.mkdir(parents=True, exist_ok=True)
+        _write_json(drafts_dir / "assembled_draft.json", {"sections": []})
+
+        result = _resolve_auditable_artifact(
+            "n08b_assembly", [], tmp_path,
+        )
+        assert result is not None
+        assert "assembled_drafts" in result
+
+
+class TestEvaluatorCriteriaReviewApplicability:
+    """Verify evaluator-criteria-review is skipped when Tier 5 is empty."""
+
+    def test_skipped_when_no_tier5_content(self, tmp_path: Path) -> None:
+        """evaluator-criteria-review should be skipped (not_applicable)
+        when no Tier 5 deliverable directories have content."""
+        from runner.agent_runtime import _check_skill_applicability
+        # Ensure Tier 5 dirs exist but are empty
+        for subdir in ("proposal_sections", "assembled_drafts"):
+            (tmp_path / "docs" / "tier5_deliverables" / subdir).mkdir(
+                parents=True, exist_ok=True,
+            )
+        applicable, reason = _check_skill_applicability(
+            "evaluator-criteria-review", tmp_path,
+        )
+        assert not applicable
+        assert reason is not None
+        assert "Tier 5" in reason
+
+    def test_applicable_when_tier5_has_content(self, tmp_path: Path) -> None:
+        """evaluator-criteria-review is applicable when Tier 5 has content."""
+        from runner.agent_runtime import _check_skill_applicability
+        section_dir = tmp_path / "docs" / "tier5_deliverables" / "proposal_sections"
+        section_dir.mkdir(parents=True, exist_ok=True)
+        _write_json(section_dir / "section_1a.json", {"content": "test"})
+        applicable, reason = _check_skill_applicability(
+            "evaluator-criteria-review", tmp_path,
+        )
+        assert applicable
+        assert reason is None
+
+    def test_regular_skills_always_applicable(self, tmp_path: Path) -> None:
+        """Skills not in _TIER5_AUDIT_SKILLS are always applicable."""
+        from runner.agent_runtime import _check_skill_applicability
+        applicable, reason = _check_skill_applicability(
+            "proposal-section-drafting", tmp_path,
+        )
+        assert applicable
+        assert reason is None
+
+
+class TestPhase8GateResultOnlyByRunner:
+    """Verify gate_result.json is never written by agent skills."""
+
+    def test_gate_result_not_in_skill_outputs(self, tmp_path: Path) -> None:
+        """No skill invocation in Phase 8 should produce gate_result.json."""
+        kwargs = _make_agent_env(
+            tmp_path,
+            agent_id="proposal_writer",
+            node_id="n08a_section_drafting",
+            skill_ids=["proposal-section-drafting"],
+            phase_id="phase_08a_section_drafting",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier5_deliverables/proposal_sections/"],
+            artifact_registry=[
+                {
+                    "path": "docs/tier5_deliverables/proposal_sections/",
+                    "produced_by": "n08a_section_drafting",
+                    "tier": "tier5_deliverable",
+                },
+            ],
+        )
+
+        def _track(skill_id, run_id, repo_root, inputs=None, **kw):
+            return _success_skill(outputs=[
+                "docs/tier5_deliverables/proposal_sections/section_1a.json",
+            ])
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        for output in result.outputs_written:
+            assert not output.endswith("gate_result.json"), (
+                f"gate_result.json must not be in skill outputs: {output}"
+            )

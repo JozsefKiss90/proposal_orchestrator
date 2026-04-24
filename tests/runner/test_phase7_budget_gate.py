@@ -707,6 +707,15 @@ class TestPhase7SkillSequence:
         primary_skills: list[str] = []
         pre_gate_done = False
 
+        # budget-interface-validation (primary call) must return the
+        # budget_gate_assessment.json path so that
+        # _resolve_auditable_artifact finds an auditable artifact for
+        # constitutional-compliance-check.
+        _BGA_PATH = (
+            "docs/tier4_orchestration_state/phase_outputs/"
+            "phase7_budget_gate/budget_gate_assessment.json"
+        )
+
         def _track(skill_id, *args, caller_context=None, **kw):
             nonlocal pre_gate_done
             # First invocation of budget-interface-validation is pre-gate
@@ -714,6 +723,8 @@ class TestPhase7SkillSequence:
                 pre_gate_done = True
                 return _success_skill()
             primary_skills.append(skill_id)
+            if skill_id == "budget-interface-validation":
+                return _success_skill(outputs=[_BGA_PATH])
             return _success_skill()
 
         with patch(_RUN_SKILL_TARGET, side_effect=_track):
@@ -736,12 +747,19 @@ class TestPhase7SkillSequence:
         primary_skills: list[str] = []
         pre_gate_done = False
 
+        _BGA_PATH = (
+            "docs/tier4_orchestration_state/phase_outputs/"
+            "phase7_budget_gate/budget_gate_assessment.json"
+        )
+
         def _track(skill_id, *args, caller_context=None, **kw):
             nonlocal pre_gate_done
             if skill_id == "budget-interface-validation" and not pre_gate_done:
                 pre_gate_done = True
                 return _success_skill()
             primary_skills.append(skill_id)
+            if skill_id == "budget-interface-validation":
+                return _success_skill(outputs=[_BGA_PATH])
             return _success_skill()
 
         with patch(_RUN_SKILL_TARGET, side_effect=_track):

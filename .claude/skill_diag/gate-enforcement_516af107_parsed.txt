@@ -1,0 +1,52 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.skill.gate_enforcement.payload.v1",
+  "run_id": "516af107-14ae-4baf-8fa5-4553cb2b7441",
+  "gate_id": "gate_09_budget_consistency",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-04-24T00:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "gate_pass_declaration_equals_pass",
+      "budget_response_reference_non_empty",
+      "validation_artifact_reference_non_empty",
+      "no_unresolved_blocking_inconsistencies"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "no_internal_budget_figures",
+        "function": "semantic_check_no_internal_budget_figures",
+        "agent": "budget_gate_validator",
+        "constitutional_rule": "CLAUDE.md \u00a78.1, \u00a78.3, \u00a78.4",
+        "findings": [
+          {
+            "claim": "The budget_response_reference field carries the value 'budget_response_placeholder.json'. The literal token 'placeholder' in the filename is semantic evidence that the budget gate assessment was conducted against a stand-in file rather than a genuine response received from the external Lump Sum Budget Planner system. As a direct consequence, the gate_pass_declaration value of 'pass' recorded in this artifact is an internally generated validation conclusion with no grounding in a real external budget response. Although the assessment artifact contains no numeric budget figures in its text body, the assessment's entire pass verdict is itself the product of an internal substitution: the budget_gate_validator agent validated against a placeholder rather than waiting for a genuine external response. This is equivalent to inventing or substituting the outcome of external budget validation, which CLAUDE.md \u00a78 prohibits absolutely. The absence of visible numeric figures does not redeem the predicate because the validation conclusion itself \u2014 gate_pass_declaration: pass \u2014 is the internally generated product, not a figure.",
+            "violated_rule": "CLAUDE.md \u00a78.1 (budget computation is exclusively the responsibility of the external Lump Sum Budget Planner system; no internal substitute of any kind is admissible); \u00a78.3 (no agent may invent, substitute, approximate, or silently generate budget figures \u2014 this prohibition extends to validation outcomes derived from placeholder rather than real external data); \u00a78.4 (absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ that represent genuine external responses constitute a blocking gate failure, not a hold state; gate_09 cannot be declared passed without a validated real external budget response present in the received/ directory)",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json \u2014 field: budget_response_reference \u2014 value: 'budget_response_placeholder.json'",
+            "severity": "critical"
+          }
+        ]
+      }
+    ]
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-04-24T00:00:00Z",
+    "decision_type": "gate_failure",
+    "gate_id": "gate_09_budget_consistency",
+    "failure_reason": "Semantic predicate no_internal_budget_figures failed. The budget_response_reference value 'budget_response_placeholder.json' contains the literal token 'placeholder', indicating the budget gate assessment was conducted and its gate_pass_declaration set to 'pass' against a placeholder file rather than a genuine response received from the external Lump Sum Budget Planner system. All deterministic structural predicates passed on their literal field-value terms (the string is non-empty; blocking_inconsistencies is empty; gate_pass_declaration field value equals 'pass'). However, semantic evaluation reveals that the pass declaration itself is an internally generated validation outcome not grounded in a real external budget response, constituting a de facto internal substitution of external budget validation in violation of CLAUDE.md \u00a78. Phase 8 must not commence until a genuine external budget response is received through docs/integrations/lump_sum_budget_planner/received/ and the budget gate assessment is re-executed against that real response.",
+    "predicates_failed": [
+      "no_internal_budget_figures"
+    ],
+    "tier_authority_applied": "CLAUDE.md \u00a76 (gates are mandatory; a phase is not complete until its gate condition is satisfied), \u00a77 (gate_09_budget_consistency phase-specific gate definitions), \u00a78.1 (budget computation exclusively the responsibility of the external Lump Sum Budget Planner system), \u00a78.3 (no agent may invent, substitute, approximate, or silently generate budget figures or validation outcomes), \u00a78.4 (absent genuine budget artifacts in received/ constitute a bl
+=== END ===

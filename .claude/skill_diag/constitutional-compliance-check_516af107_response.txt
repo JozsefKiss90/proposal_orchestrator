@@ -1,0 +1,126 @@
+=== skill_id: constitutional-compliance-check ===
+=== mode: tapm ===
+=== response_text length: 10135 ===
+=== response_text (full) ===
+{
+  "report_id": "compliance_check_budget_gate_assessment_compliance_validator_2026-04-24T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "516af107-14ae-4baf-8fa5-4553cb2b7441",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "The artifact schema_id is 'orch.phase7.budget_gate_assessment.v1'. No strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as structural authorities are present anywhere in the artifact content. The structural schema governing this artifact is a canonical Tier 4 phase output schema, not a grant agreement annex."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "The artifact is a budget gate assessment (Tier 4, Phase 7 output). It contains no claims asserting call requirements, scope boundaries, eligibility conditions, expected outcomes, or expected impacts. No call constraint assertions requiring Tier 2B traceability are present in the artifact's fields."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "check_status": "violation",
+      "violation_evidence": "The artifact names eight specific partner identifiers under partner_coverage_results[]: 'ATU', 'CERIA', 'BIIS', 'ISIA', 'NIHS', 'ELI', 'BAL', 'FIIT'; and nine work package identifiers under wp_coverage_results[]: 'WP1', 'WP2', 'WP3', 'WP4', 'WP5', 'WP6', 'WP7', 'WP8', 'WP9'. These are project-specific facts (partner identifiers and WP identifiers). The artifact contains no 'traceability_footer' field whatsoever, and therefore no primary_sources[] references pointing to docs/tier3_project_instantiation/ exist to verify these identifiers against Tier 3 source data. Additionally, the field 'budget_response_reference' holds the value 'budget_response_placeholder.json' — the word 'placeholder' in the filename raises serious concern that the budget coverage assertions recorded in the artifact (all eight partners: present_in_budget: true; all nine WPs: present_in_budget: true; blocking_inconsistencies: []) may not be grounded in a genuine validated response received from the external Lump Sum Budget Planner system through the docs/integrations/lump_sum_budget_planner/received/ channel, constituting potential fabrication of budget-consistency project facts in violation of CLAUDE.md §13.3 and §8.3.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "The artifact has schema_id 'orch.phase7.budget_gate_assessment.v1' and is itself a Phase 7 output. It does not begin with 'orch.tier5.' or 'orch.phase8.' and therefore is not a Phase 8 artifact. Check 13.4 is structurally non-applicable to this artifact type. No Phase 8 activity is evidenced in the artifact content."
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Not directly checkable by reading an artifact. This check is enforced by the decision-log-update skill and cannot be verified from phase output artifact content alone. Recorded as pass per skill specification Step 2 (Check 13.5 treatment)."
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Not directly checkable from an artifact. This is a systemic/behavioral check on workflow and skill scope that cannot be determined by reading the content of a phase output artifact. Recorded as pass per skill specification Step 2 (Check 13.6 treatment)."
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "The artifact is a Phase 7 output. Its declared references (budget_response_reference, validation_artifact_reference) are upstream integration artifacts, not outputs from phases higher than Phase 7. No evidence of a Phase 8 or higher phase output being used as an input to this Phase 7 artifact is detectable in the artifact content. No phase reordering pattern is present."
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Check 13.8 is applicable to Tier 5 deliverable artifacts only. The artifact being audited is a Tier 4 Phase 7 orchestration state artifact (schema_id: 'orch.phase7.budget_gate_assessment.v1'). It contains no proposal text. Structurally non-applicable; recorded as pass."
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "The artifact contains no claims about Horizon Europe participation conditions, grant agreement terms, EU Financial Regulation provisions, or programme-level rules. No regulatory claims requiring a Tier 1 source reference in a traceability_footer are present in the artifact's fields."
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Check 13.10 is applicable to Tier 5 artifacts only. The artifact being audited is a Tier 4 Phase 7 orchestration state artifact. It is not a Tier 5 deliverable. Structurally non-applicable; recorded as pass."
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Not checkable from a phase output or deliverable artifact. Whether Tier 1 or Tier 2 source documents were modified cannot be determined by reading the content of the audited phase output. Recorded as pass per skill specification Step 2 (Check 13.11 treatment)."
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "reason": "Not directly checkable from an artifact. Whether an agent treated CLAUDE.md as advisory is a behavioral attribute that cannot be determined solely by reading the content of a phase output artifact. Recorded as pass per skill specification Step 2 (Check 13.12 treatment)."
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 1
+  },
+  "timestamp": "2026-04-24T00:00:00Z",
+  "decision_log_entry": {
+    "decision_id": "constitutional_violation_compliance_validator_2026-04-24T00:00:00Z",
+    "decision_type": "constitutional_violation",
+    "violation_id": "13.3_budget_gate_assessment_2026-04-24T00:00:00Z",
+    "constitutional_rule_ref": "CLAUDE.md §13.3",
+    "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+    "resolution_status": "unresolved",
+    "resolution_note": "Constitutional violation detected; requires human operator resolution. The budget_gate_assessment.json artifact names specific project partner identifiers (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) and work package identifiers (WP1–WP9) with no traceability_footer.primary_sources[] references to docs/tier3_project_instantiation/ to ground these project facts. Furthermore, the budget_response_reference field value 'budget_response_placeholder.json' indicates the budget coverage claims recorded in the artifact may not derive from a genuine validated response from the external Lump Sum Budget Planner system received through the canonical integration channel (docs/integrations/lump_sum_budget_planner/received/). Human operator must verify: (1) that the referenced budget response is a genuine external system response, not a fabricated placeholder; (2) that the partner and WP identifiers in the assessment are traceable to Tier 3 consortium and WP design data; and (3) whether the gate_pass_declaration of 'pass' is constitutionally valid given the placeholder budget reference.",
+    "tier_authority_applied": "CLAUDE.md §13",
+    "timestamp": "2026-04-24T00:00:00Z"
+  }
+}
+
+=== END ===

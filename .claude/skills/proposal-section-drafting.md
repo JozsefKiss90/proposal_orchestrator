@@ -1,0 +1,138 @@
+---
+skill_id: proposal-section-drafting
+purpose_summary: >
+  Draft all mandatory proposal sections required by the active application form
+  (Tier 2A) using project data from Tier 3 and phase outputs from Tier 4. Produces
+  per-section artifacts in docs/tier5_deliverables/proposal_sections/ conforming to
+  schema orch.tier5.proposal_section.v1. Must verify budget gate has passed before
+  producing any content.
+used_by_agents:
+  - proposal_writer
+reads_from:
+  - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+  - docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
+  - docs/tier2a_instrument_schemas/application_forms/
+  - docs/tier2a_instrument_schemas/evaluation_forms/
+  - docs/tier3_project_instantiation/
+  - docs/tier4_orchestration_state/phase_outputs/
+  - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json
+writes_to:
+  - docs/tier5_deliverables/proposal_sections/
+constitutional_constraints:
+  - "Must verify budget gate passed (gate_pass_declaration: pass in budget_gate_assessment.json) before producing any content — CLAUDE.md §8.4, §13.4"
+  - "Must not introduce claims not grounded in Tier 1-4 state — CLAUDE.md §13.10, §11.4"
+  - "Must not fabricate project facts not present in Tier 3 — CLAUDE.md §13.3"
+  - "Must not use Grant Agreement Annex structure as section schema — CLAUDE.md §13.1"
+  - "Must not reference budget figures not validated through Phase 7 gate — CLAUDE.md §8.3"
+  - "Must not fill data gaps with fabricated content — CLAUDE.md §11.5, §13.8"
+---
+
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
+in the Declared Inputs section from disk using the Read tool.
+
+**Declared input files to read (in order):**
+1. `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` — MUST be read first; verify `gate_pass_declaration` equals `"pass"` before any other action
+2. `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` — section identifiers, page limits, structural constraints
+3. `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` — evaluation criteria for framing
+4. `docs/tier2a_instrument_schemas/application_forms/` — application form template (use Glob to list, then Read)
+5. `docs/tier3_project_instantiation/` — all project-specific facts (use Glob to discover, then Read relevant files)
+6. `docs/tier4_orchestration_state/phase_outputs/` — all phase 1-7 outputs (use Glob to discover, then Read relevant files)
+
+**Boundary constraints:**
+- Do not read files outside the declared input set.
+- Do not assume implicit context or reconstruct inputs from memory.
+- Read each required file explicitly before using it.
+- Base all reasoning ONLY on retrieved file content.
+- Do not use generic Horizon Europe knowledge as a substitute for reading Tier 1-4 sources.
+
+Return a SINGLE valid JSON object matching the output schema below.
+Do not include explanations outside the JSON.
+
+## Canonical Inputs and Outputs
+
+### Inputs
+
+| Path | Artifact / Content | Purpose |
+|------|--------------------|---------|
+| `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | Budget gate assessment | Verify `gate_pass_declaration: "pass"` before any drafting |
+| `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` | Section schema registry | Defines mandatory sections to draft |
+| `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` | Evaluator expectations | Criteria to address in each section |
+| `docs/tier2a_instrument_schemas/application_forms/` | Application form templates | Structural authority for sections |
+| `docs/tier3_project_instantiation/` | All project data | Sole source for project-specific claims |
+| `docs/tier4_orchestration_state/phase_outputs/` | Phase 1-7 outputs | Grounding for all proposal content |
+
+### Outputs
+
+| Path | Artifact | Schema ID | Required Fields | run_id Required |
+|------|----------|-----------|-----------------|-----------------|
+| `docs/tier5_deliverables/proposal_sections/<section_id>.json` (one per mandatory section) | Per-section draft | `orch.tier5.proposal_section.v1` | schema_id, run_id, section_id, section_name, content, word_count, validation_status, traceability_footer | Yes |
+
+## Execution Specification
+
+### 1. Input Validation Sequence
+
+- Step 1.1: Read `budget_gate_assessment.json`. Check `gate_pass_declaration` equals `"pass"`. If absent or not `"pass"`: return `{"status": "failure", "failure_reason": "Budget gate has not passed (gate_pass_declaration is not 'pass'); CLAUDE.md §8.4 prohibits any Phase 8 activity before budget gate passes", "failure_category": "CONSTITUTIONAL_HALT"}` and halt.
+- Step 1.2: Read `section_schema_registry.json`. Extract all section entries for the active instrument where `mandatory: true`. If empty or unreadable: return failure with `MISSING_INPUT`.
+- Step 1.3: Read evaluator expectation registry. If absent: continue with degraded mode (no evaluator framing).
+
+### 2. Core Processing Logic
+
+For each mandatory section identified in Step 1.2:
+
+a. **Identify applicable evaluation criteria** from the evaluator expectation registry. Frame the section content to address these criteria directly.
+
+b. **Draft section content** in evaluator-oriented language:
+   - Draw all project-specific facts from Tier 3 exclusively (CLAUDE.md §13.3)
+   - Draw call-specific framing from Tier 2B extracted files (via phase outputs)
+   - Draw structural requirements from Tier 2A
+   - Respect page limits from section_schema_registry.json
+   - Do not reference budget figures not confirmed in budget_gate_assessment.json
+   - Do not use Grant Agreement Annex structure as section schema (CLAUDE.md §13.1)
+
+c. **Apply traceability** to each material claim:
+   - Assign Confirmed/Inferred/Assumed/Unresolved status
+   - Confirmed requires naming the specific source artifact path
+   - Flag any claim not attributable to a named Tier 1-4 source
+
+d. **Handle data gaps**: If Tier 3 is incomplete for a section element, set `validation_status.overall_status: "unresolved"`, document in `claim_statuses`, set `no_unsupported_claims_declaration: false`. Do not fabricate content.
+
+### 3. Output Construction
+
+Return a single JSON object with a `sections` array. Each entry in the array is a complete proposal section artifact conforming to `orch.tier5.proposal_section.v1`:
+
+```json
+{
+  "sections": [
+    {
+      "schema_id": "orch.tier5.proposal_section.v1",
+      "run_id": "<from task metadata>",
+      "section_id": "<from section_schema_registry.json>",
+      "section_name": "<from section_schema_registry.json>",
+      "content": "<evaluator-oriented prose, grounded in Tier 1-4>",
+      "word_count": <actual word count of content>,
+      "validation_status": {
+        "overall_status": "confirmed|inferred|assumed|unresolved",
+        "claim_statuses": [
+          {
+            "claim_id": "<unique>",
+            "claim_summary": "<brief>",
+            "status": "confirmed|inferred|assumed|unresolved",
+            "source_ref": "<tier and path for confirmed/inferred>"
+          }
+        ]
+      },
+      "traceability_footer": {
+        "primary_sources": [
+          {"tier": 3, "source_path": "docs/tier3_project_instantiation/..."},
+          {"tier": 4, "source_path": "docs/tier4_orchestration_state/..."}
+        ],
+        "no_unsupported_claims_declaration": true
+      }
+    }
+  ]
+}
+```
+
+The skill runtime will extract each section from the `sections` array and write it to `docs/tier5_deliverables/proposal_sections/<section_id>.json`.

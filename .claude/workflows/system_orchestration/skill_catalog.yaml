@@ -381,6 +381,33 @@ skill_catalog:
       - "Must not declare the budget gate passed if blocking inconsistencies exist"
       - "Must not treat absent response as a non-failing state"
 
+  - id: proposal-section-drafting
+    execution_mode: "tapm"
+    output_contract: "multi_artifact"
+    purpose: >
+      Draft all mandatory proposal sections required by the active application form
+      (Tier 2A) using project data from Tier 3 and phase outputs from Tier 4.
+      Produces per-section artifacts conforming to orch.tier5.proposal_section.v1.
+      Must verify budget gate has passed before producing any content.
+    used_by_agents:
+      - proposal_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing any content — CLAUDE.md §8.4, §13.4"
+      - "Must not introduce claims not grounded in Tier 1-4 state — CLAUDE.md §13.10"
+      - "Must not fabricate project facts not present in Tier 3 — CLAUDE.md §13.3"
+      - "Must not use Grant Agreement Annex structure as section schema — CLAUDE.md §13.1"
+      - "Must not reference unvalidated budget figures — CLAUDE.md §8.3"
+
   - id: proposal-section-traceability-check
     purpose: >
       Verify that every material claim in a proposal section is traceable to a
