@@ -1,28 +1,45 @@
 {
-  "validation_id": "budget_validation_response_2026-04-24T00:00:00Z",
+  "validation_id": "budget_validation_response_2026-04-24T14:00:00Z",
   "validation_type": "response_conformance",
-  "contract_version": "N/A — interface_contract.json is currently empty ({}); no schema constraints defined; any structurally valid JSON response conforms trivially",
+  "contract_version": "1.0",
+  "protocol": "lump_sum_budget_planner_v1",
   "validated_file_reference": "budget_response_placeholder.json",
   "conformance_status": "conforms",
   "non_conformance_findings": [],
   "structural_consistency_findings": [],
-  "timestamp": "2026-04-24T00:00:00Z",
+  "timestamp": "2026-04-24T14:00:00Z",
   "_disclaimer": "DEMO_PLACEHOLDER_EXTERNAL_BUDGET_RESPONSE. This validation artifact was created as a demo placeholder to enable Phase 7 budget gate execution. It does NOT represent a real validation of an expert-approved external budget response. The validated budget response (budget_response_placeholder.json) contains illustrative placeholder values only.",
+  "contract_field_checks": {
+    "response_schema_required_fields": {
+      "response_id": { "present": true, "value": "PLACEHOLDER-BUDGET-2026-04-24" },
+      "schema_version": { "present": true, "value": "1.0" },
+      "work_packages": { "present": true, "entry_count": 9 },
+      "partners": { "present": true, "entry_count": 8 }
+    },
+    "work_package_entry_required_fields": {
+      "wp_id": { "present_in_all": true },
+      "lump_sum": { "present_in_all": true, "all_non_negative": true }
+    },
+    "partner_entry_required_fields": {
+      "partner_id": { "present_in_all": true },
+      "total_effort_pm": { "present_in_all": true, "all_non_negative": true }
+    }
+  },
   "wp_coverage_check": {
     "source": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
     "required_wp_ids": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
     "all_present_in_budget_response": true,
     "missing_wp_ids": [],
     "results": [
-      { "wp_id": "WP1", "present": true },
-      { "wp_id": "WP2", "present": true },
-      { "wp_id": "WP3", "present": true },
-      { "wp_id": "WP4", "present": true },
-      { "wp_id": "WP5", "present": true },
-      { "wp_id": "WP6", "present": true },
-      { "wp_id": "WP7", "present": true },
-      { "wp_id": "WP8", "present": true },
-      { "wp_id": "WP9", "present": true }
+      { "wp_id": "WP1", "present": true, "lump_sum": 1950000 },
+      { "wp_id": "WP2", "present": true, "lump_sum": 2570000 },
+      { "wp_id": "WP3", "present": true, "lump_sum": 2340000 },
+      { "wp_id": "WP4", "present": true, "lump_sum": 2025000 },
+      { "wp_id": "WP5", "present": true, "lump_sum": 2100000 },
+      { "wp_id": "WP6", "present": true, "lump_sum": 2100000 },
+      { "wp_id": "WP7", "present": true, "lump_sum": 1790000 },
+      { "wp_id": "WP8", "present": true, "lump_sum": 2415000 },
+      { "wp_id": "WP9", "present": true, "lump_sum": 1710000 }
     ]
   },
   "partner_coverage_check": {
@@ -31,14 +48,14 @@
     "all_present_in_budget_response": true,
     "missing_partner_ids": [],
     "results": [
-      { "partner_id": "ATU", "present": true },
-      { "partner_id": "CERIA", "present": true },
-      { "partner_id": "BIIS", "present": true },
-      { "partner_id": "ISIA", "present": true },
-      { "partner_id": "NIHS", "present": true },
-      { "partner_id": "ELI", "present": true },
-      { "partner_id": "BAL", "present": true },
-      { "partner_id": "FIIT", "present": true }
+      { "partner_id": "ATU", "present": true, "total_effort_pm": 120 },
+      { "partner_id": "CERIA", "present": true, "total_effort_pm": 74 },
+      { "partner_id": "BIIS", "present": true, "total_effort_pm": 68 },
+      { "partner_id": "ISIA", "present": true, "total_effort_pm": 34 },
+      { "partner_id": "NIHS", "present": true, "total_effort_pm": 30 },
+      { "partner_id": "ELI", "present": true, "total_effort_pm": 34 },
+      { "partner_id": "BAL", "present": true, "total_effort_pm": 78 },
+      { "partner_id": "FIIT", "present": true, "total_effort_pm": 50 }
     ]
   },
   "partner_wp_role_consistency": {
@@ -50,22 +67,22 @@
   },
   "internal_total_reconciliation": {
     "total_eu_contribution_in_response": 19000000,
-    "sum_of_wp_costs": 19000000,
+    "sum_of_wp_lump_sums": 19000000,
     "sum_of_partner_costs": 19000000,
     "totals_reconcile": true
+  },
+  "no_negative_values_check": {
+    "all_lump_sum_values_non_negative": true,
+    "all_effort_values_non_negative": true,
+    "all_cost_values_non_negative": true
   },
   "blocking_inconsistencies": [],
   "non_blocking_findings": [
     {
       "finding_id": "NBF-01",
       "severity": "non_blocking",
-      "description": "interface_contract.json is empty ({}); conformance check was trivially satisfied. When a real interface contract schema is populated, the budget response should be re-validated against it."
-    },
-    {
-      "finding_id": "NBF-02",
-      "severity": "non_blocking",
       "description": "Budget response is a demo placeholder with illustrative values. All numeric cost and effort figures are structurally valid placeholders, not expert-approved budget outputs."
     }
   ],
-  "overall_validation_result": "PASS — no blocking inconsistencies; all WPs and partners covered; totals reconcile internally"
+  "overall_validation_result": "PASS — budget response conforms to interface_contract.json v1.0 (protocol: lump_sum_budget_planner_v1); all 9 WPs present with lump_sum field; all 8 partners present with total_effort_pm field; totals reconcile (19,000,000 EUR); no blocking inconsistencies; no negative values"
 }

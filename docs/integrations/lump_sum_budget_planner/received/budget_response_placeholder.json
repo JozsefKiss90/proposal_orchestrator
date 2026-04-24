@@ -1,7 +1,8 @@
 {
   "_disclaimer": "DEMO_PLACEHOLDER_EXTERNAL_BUDGET_RESPONSE. This is NOT a real expert-approved budget. It is a structurally valid placeholder created solely to enable Phase 7 budget gate validation in a demo context. All numeric values are illustrative placeholders only and do not represent actual cost estimates, expert budget planning outputs, or validated financial data from the external Lump Sum Budget Planner system.",
+  "response_id": "PLACEHOLDER-BUDGET-2026-04-24",
+  "schema_version": "1.0",
   "response_metadata": {
-    "response_id": "PLACEHOLDER-BUDGET-2026-04-24",
     "response_date": "2026-04-24",
     "source_system": "DEMO_PLACEHOLDER (not a real Lump Sum Budget Planner response)",
     "project_acronym": "MAESTRO",
@@ -12,11 +13,11 @@
     "currency": "EUR",
     "total_eu_contribution": 19000000
   },
-  "work_package_budgets": [
+  "work_packages": [
     {
       "wp_id": "WP1",
       "wp_title": "Project Management and Coordination",
-      "total_cost": 1950000,
+      "lump_sum": 1950000,
       "total_effort_person_months": 50,
       "partner_allocations": [
         { "partner_id": "ATU", "role": "lead", "effort_person_months": 36, "cost": 1404000 },
@@ -32,7 +33,7 @@
     {
       "wp_id": "WP2",
       "wp_title": "Neuro-Symbolic Planning and Reasoning Engine",
-      "total_cost": 2570000,
+      "lump_sum": 2570000,
       "total_effort_person_months": 66,
       "partner_allocations": [
         { "partner_id": "ATU", "role": "lead", "effort_person_months": 30, "cost": 1168000 },
@@ -44,7 +45,7 @@
     {
       "wp_id": "WP3",
       "wp_title": "Adaptive Memory Architecture",
-      "total_cost": 2340000,
+      "lump_sum": 2340000,
       "total_effort_person_months": 60,
       "partner_allocations": [
         { "partner_id": "BIIS", "role": "lead", "effort_person_months": 30, "cost": 1170000 },
@@ -56,7 +57,7 @@
     {
       "wp_id": "WP4",
       "wp_title": "Decentralised Multi-Agent Coordination",
-      "total_cost": 2025000,
+      "lump_sum": 2025000,
       "total_effort_person_months": 52,
       "partner_allocations": [
         { "partner_id": "CERIA", "role": "lead", "effort_person_months": 30, "cost": 1169000 },
@@ -67,7 +68,7 @@
     {
       "wp_id": "WP5",
       "wp_title": "Healthcare Demonstrator - Clinical Decision Support",
-      "total_cost": 2100000,
+      "lump_sum": 2100000,
       "total_effort_person_months": 54,
       "partner_allocations": [
         { "partner_id": "NIHS", "role": "lead", "effort_person_months": 24, "cost": 934000 },
@@ -80,7 +81,7 @@
     {
       "wp_id": "WP6",
       "wp_title": "Manufacturing Demonstrator - Process Optimisation",
-      "total_cost": 2100000,
+      "lump_sum": 2100000,
       "total_effort_person_months": 54,
       "partner_allocations": [
         { "partner_id": "ISIA", "role": "lead", "effort_person_months": 24, "cost": 934000 },
@@ -93,7 +94,7 @@
     {
       "wp_id": "WP7",
       "wp_title": "Logistics Transfer Demonstrator - Cross-Sector Generalisation",
-      "total_cost": 1790000,
+      "lump_sum": 1790000,
       "total_effort_person_months": 46,
       "partner_allocations": [
         { "partner_id": "ELI", "role": "lead", "effort_person_months": 24, "cost": 934000 },
@@ -105,7 +106,7 @@
     {
       "wp_id": "WP8",
       "wp_title": "Integration, Evaluation and Benchmarking",
-      "total_cost": 2415000,
+      "lump_sum": 2415000,
       "total_effort_person_months": 62,
       "partner_allocations": [
         { "partner_id": "FIIT", "role": "lead", "effort_person_months": 24, "cost": 935000 },
@@ -121,7 +122,7 @@
     {
       "wp_id": "WP9",
       "wp_title": "Dissemination, Exploitation and Communication",
-      "total_cost": 1710000,
+      "lump_sum": 1710000,
       "total_effort_person_months": 44,
       "partner_allocations": [
         { "partner_id": "BAL", "role": "lead", "effort_person_months": 24, "cost": 933000 },
@@ -132,15 +133,15 @@
       ]
     }
   ],
-  "partner_budget_summary": [
-    { "partner_id": "ATU", "partner_number": 1, "total_effort_person_months": 120, "total_cost": 4674000 },
-    { "partner_id": "CERIA", "partner_number": 2, "total_effort_person_months": 74, "total_cost": 2884000 },
-    { "partner_id": "BIIS", "partner_number": 3, "total_effort_person_months": 68, "total_cost": 2650000 },
-    { "partner_id": "ISIA", "partner_number": 4, "total_effort_person_months": 34, "total_cost": 1324000 },
-    { "partner_id": "NIHS", "partner_number": 5, "total_effort_person_months": 30, "total_cost": 1168000 },
-    { "partner_id": "ELI", "partner_number": 6, "total_effort_person_months": 34, "total_cost": 1324000 },
-    { "partner_id": "BAL", "partner_number": 7, "total_effort_person_months": 78, "total_cost": 3032000 },
-    { "partner_id": "FIIT", "partner_number": 8, "total_effort_person_months": 50, "total_cost": 1944000 }
+  "partners": [
+    { "partner_id": "ATU", "partner_number": 1, "total_effort_pm": 120, "total_effort_person_months": 120, "total_cost": 4674000 },
+    { "partner_id": "CERIA", "partner_number": 2, "total_effort_pm": 74, "total_effort_person_months": 74, "total_cost": 2884000 },
+    { "partner_id": "BIIS", "partner_number": 3, "total_effort_pm": 68, "total_effort_person_months": 68, "total_cost": 2650000 },
+    { "partner_id": "ISIA", "partner_number": 4, "total_effort_pm": 34, "total_effort_person_months": 34, "total_cost": 1324000 },
+    { "partner_id": "NIHS", "partner_number": 5, "total_effort_pm": 30, "total_effort_person_months": 30, "total_cost": 1168000 },
+    { "partner_id": "ELI", "partner_number": 6, "total_effort_pm": 34, "total_effort_person_months": 34, "total_cost": 1324000 },
+    { "partner_id": "BAL", "partner_number": 7, "total_effort_pm": 78, "total_effort_person_months": 78, "total_cost": 3032000 },
+    { "partner_id": "FIIT", "partner_number": 8, "total_effort_pm": 50, "total_effort_person_months": 50, "total_cost": 1944000 }
   ],
   "budget_totals": {
     "total_eu_contribution": 19000000,

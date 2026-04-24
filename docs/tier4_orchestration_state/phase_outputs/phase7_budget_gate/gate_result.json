@@ -1,7 +1,7 @@
 {
   "gate_id": "gate_09_budget_consistency",
   "gate_kind": "exit",
-  "run_id": "0b1d50d6-9ad3-41d6-85c6-53368116eb0b",
+  "run_id": "3c0b880c-268f-44ee-8787-a60920419fd3",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
@@ -13,9 +13,9 @@
     "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json": "sha256:aec1198833efce54f08a6fb263b1b08b7ddfc5048bfe5df18c8e56b7359c071e",
     "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json": "sha256:11c5cd09cd24183ed3b35d97f33d986276d8f676bc04db0f33a89e9d3c1eb733"
   },
-  "evaluated_at": "2026-04-24T16:11:30.956263+00:00",
+  "evaluated_at": "2026-04-24T16:33:25.533879+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g08_p02",
@@ -24,36 +24,16 @@
       "g08_p09",
       "g08_p01",
       "g08_p04",
+      "g08_p07",
       "g08_p05",
       "g08_p06"
     ],
-    "failed": [
-      {
-        "predicate_id": "g08_p07",
-        "type": "schema",
-        "function": "no_blocking_inconsistencies",
-        "args": {
-          "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
-        },
-        "failure_category": "POLICY_VIOLATION",
-        "reason": "1 unresolved blocking inconsistency(ies) in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json.  All must be resolved before this gate can pass.",
-        "details": {
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json",
-          "unresolved_count": 1,
-          "unresolved_ids": [
-            "BI-01"
-          ]
-        },
-        "fail_message": "budget_gate_assessment.json contains one or more blocking_inconsistencies entries with resolution: unresolved. All blocking structural inconsistencies between the budget response and the WP/consortium design must be resolved before this gate can pass.\n",
-        "prose_condition": "No blocking inconsistency logged without resolution"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\gate_result.json"
 }

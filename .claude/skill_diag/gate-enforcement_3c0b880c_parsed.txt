@@ -1,0 +1,66 @@
+=== parsed OK ===
+=== top-level keys: ['run_id', 'schema_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "run_id": "3c0b880c-268f-44ee-8787-a60920419fd3",
+  "schema_id": "orch.gate_result.v1",
+  "gate_id": "gate_09_budget_consistency",
+  "overall_status": "fail",
+  "hard_block": true,
+  "evaluated_at": "2026-04-24T00:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      "artifact_present",
+      "schema_id_match",
+      "run_id_match",
+      "artifact_not_invalid",
+      "gate_pass_declaration_equals_pass",
+      "budget_response_reference_non_empty",
+      "validation_artifact_reference_non_empty",
+      "no_blocking_inconsistencies_unresolved"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "no_internal_budget_figures",
+        "function": "assess_budget_figure_provenance",
+        "agent": "budget_gate_validator",
+        "constitutional_rule": "CLAUDE.md \u00a78.1, \u00a78.3, \u00a78.4, \u00a715",
+        "findings": [
+          {
+            "claim": "budget_response_reference value is 'budget_response_placeholder.json' \u2014 the term 'placeholder' is self-identifying: this is not a reference to a validated budget response received from the external Lump Sum Budget Planner system, but a placeholder stand-in constructed in lieu of a real external response",
+            "violated_rule": "CLAUDE.md \u00a78.4: Absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ constitute a blocking gate failure, not a hold state; CLAUDE.md \u00a77 Phase 7 gate condition: A validated budget response is present in the integration received/ directory \u2014 this condition cannot be confirmed as met when the referenced file is self-labeled as a placeholder",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json#budget_response_reference",
+            "severity": "critical"
+          },
+          {
+            "claim": "docs/tier3_project_instantiation/integration/budget_response.json is empty ({}) \u2014 no actual budget response data is held in the project integration directory, corroborating that no real external budget response was received or recorded",
+            "violated_rule": "CLAUDE.md \u00a78.2: This repository may consume validated budget responses only from docs/integrations/lump_sum_budget_planner/received/; an empty budget_response.json confirms no external budget response exists in project state",
+            "evidence_path": "docs/tier3_project_instantiation/integration/budget_response.json",
+            "severity": "critical"
+          },
+          {
+            "claim": "docs/tier3_project_instantiation/integration/external_system_refs.json is empty ({}) \u2014 no external system exchange record exists, confirming no validated external budget response was ever received, transmitted, or registered from the Lump Sum Budget Planner",
+            "violated_rule": "CLAUDE.md \u00a78.1: Budget computation is exclusively the responsibility of the external Lump Sum Budget Planner system; absence of any external system reference confirms the budget gate assessment was produced without engagement with that system",
+            "evidence_path": "docs/tier3_project_instantiation/integration/external_system_refs.json",
+            "severity": "critical"
+          },
+          {
+            "claim": "wp_coverage_results asserts all 9 WPs as present_in_budget: true and partner_coverage_results asserts all 8 partners as present_in_budget: true \u2014 these structural budget consistency assertions were not validated against an actual external budget response; they were internally generated against a placeholder file, constituting fabricated budget gate completion",
+            "violated_rule": "CLAUDE.md \u00a78.3: No agent may invent, substitute, approximate, or silently generate budget figures; CLAUDE.md \u00a715: The system must prefer explicit gate failure over fabricated completion \u2014 a fabricated completion is a constitutional violation; CLAUDE.md \u00a713.4: No Phase 8 activity may commence before the budget gate passes on the basis of a real validated external budget response",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json#wp_coverage_results,partner_coverage_results",
+            "severity": "critical"
+          }
+        ]
+      }
+    ]
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-04-24T00:00:00Z",
+    "decision_type": "gate_failure",
+    "gate_id": "gate_09_budget_consistency",
+    "failure_reason": "Semantic predicate 'no_internal_budget_figures' failed. The budget_gate_assessment.json references 'budget_response_placeholder.json' as the budget_response_reference \u2014 a self-identified placeholder that is not a validated external budget response. This is corroborated by two additional Tier 3 integration artifacts: docs/tier3_project_instantiation/integration/budget_response.json is 
+=== END ===
