@@ -1,1 +1,39 @@
-{}
+{
+  "contract_version": "1.0",
+  "protocol": "lump_sum_budget_planner_v1",
+  "request_schema": {
+    "required_fields": [
+      "request_id",
+      "call_id",
+      "project_duration_months",
+      "work_packages",
+      "partners"
+    ],
+    "work_package_entry": {
+      "required_fields": ["wp_id", "title", "lead_partner"]
+    },
+    "partner_entry": {
+      "required_fields": ["partner_id", "name", "country", "role"]
+    }
+  },
+  "response_schema": {
+    "required_fields": [
+      "response_id",
+      "schema_version",
+      "work_packages",
+      "partners"
+    ],
+    "work_package_entry": {
+      "required_fields": ["wp_id", "lump_sum"]
+    },
+    "partner_entry": {
+      "required_fields": ["partner_id", "total_effort_pm"]
+    }
+  },
+  "validation_rules": {
+    "wp_coverage": "Every wp_id in the request must appear in the response",
+    "partner_coverage": "Every partner_id in the request must appear in the response",
+    "no_negative_values": "All numeric budget values must be non-negative"
+  },
+  "demo_mode_note": "This is a minimal interface contract for demo/placeholder mode. A production contract would include additional field-level type constraints, value ranges, and protocol versioning rules."
+}

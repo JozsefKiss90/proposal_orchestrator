@@ -853,7 +853,20 @@ def run_agent(
         pre_gate_skills = _identify_agent_skills(
             pre_gate_agent_id, skill_ids, repo_root
         )
-        primary_skills = [s for s in skill_ids if s not in pre_gate_skills]
+        # Skills used by BOTH the pre-gate and primary agents must
+        # remain in primary_skills so they run in the primary body
+        # (potentially in a different mode).  Only exclude skills
+        # that are exclusively owned by the pre-gate agent.
+        primary_agent_skills = _identify_agent_skills(
+            agent_id, skill_ids, repo_root
+        )
+        pre_gate_exclusive = [
+            s for s in pre_gate_skills
+            if s not in primary_agent_skills
+        ]
+        primary_skills = [
+            s for s in skill_ids if s not in pre_gate_exclusive
+        ]
 
         # Execute pre-gate agent's skills first
         for sid in pre_gate_skills:
@@ -954,6 +967,15 @@ def run_agent(
         caller_context = _build_caller_context(
             sid, resolved_inputs, repo_root
         )
+
+        # Inject invocation_mode for budget-interface-validation.
+        # When invoked by the primary agent body the skill operates in
+        # response_validation mode (Mode B) to produce the canonical
+        # budget_gate_assessment.json artifact.
+        if sid == "budget-interface-validation":
+            if not caller_context:
+                caller_context = {}
+            caller_context["invocation_mode"] = "response_validation"
 
         # Inject gate_id context for gate-enforcement invocations.
         # The gate_id is resolved from the manifest's exit_gate binding
