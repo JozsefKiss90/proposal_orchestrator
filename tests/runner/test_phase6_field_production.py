@@ -790,3 +790,616 @@ class TestTraceabilityFooterSchemaRegistration:
 
         assert ps["type"] == "array"
         assert ps["required"] is True
+
+
+# ===========================================================================
+# G. Gender-dimension §13.2 regression tests
+# ===========================================================================
+
+
+# Violating phrases: any call-specific assertion about the topic exemption
+# without Tier 2B traceability.
+_VIOLATING_PHRASES = [
+    "this call does not exempt the topic",
+    "this call does not exempt",
+    "the topic does not state non-relevance",
+    "the topic does not exempt",
+    "this topic does not exempt",
+    "no exemption is stated in the topic",
+]
+
+
+def _gov_response_with_gender_violation(run_id: str) -> str:
+    """governance-model-builder response containing a §13.2-violating
+    gender-dimension assertion WITHOUT a Tier 2B traceability source."""
+    return json.dumps({
+        "schema_id": "orch.phase6.implementation_architecture.v1",
+        "run_id": run_id,
+        "governance_matrix": [
+            {
+                "body_name": "General Assembly",
+                "composition": ["P1", "P2"],
+                "decision_scope": "Strategic",
+                "meeting_frequency": "Annual",
+                "escalation_path": "To coordinator",
+            }
+        ],
+        "management_roles": [
+            {
+                "role_id": "COORD-01",
+                "role_name": "Coordinator",
+                "assigned_to": "P1",
+                "responsibilities": ["Overall management"],
+            }
+        ],
+        "risk_register": [],
+        "ethics_assessment": {
+            "ethics_issues_identified": True,
+            "issues": [
+                {
+                    "issue_id": "ETH-01",
+                    "description": "AI ethics in healthcare demonstrator",
+                    "mitigation": "Ethics committee oversight",
+                }
+            ],
+            "self_assessment_statement": (
+                "Integration of the gender dimension is mandatory; "
+                "this call does not exempt the topic, so integration is required."
+            ),
+        },
+        "instrument_sections_addressed": [
+            {"section_id": "A.4", "section_name": "Ethics and Security", "status": "addressed"},
+        ],
+        "traceability_footer": {
+            "primary_sources": [
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
+                },
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+                },
+            ],
+        },
+    })
+
+
+def _gov_response_with_safe_gender_wording(run_id: str) -> str:
+    """governance-model-builder response with the correct safe wording
+    (no call-specific assertion, no Tier 2B traceability needed)."""
+    return json.dumps({
+        "schema_id": "orch.phase6.implementation_architecture.v1",
+        "run_id": run_id,
+        "governance_matrix": [
+            {
+                "body_name": "General Assembly",
+                "composition": ["P1", "P2"],
+                "decision_scope": "Strategic",
+                "meeting_frequency": "Annual",
+                "escalation_path": "To coordinator",
+            }
+        ],
+        "management_roles": [
+            {
+                "role_id": "COORD-01",
+                "role_name": "Coordinator",
+                "assigned_to": "P1",
+                "responsibilities": ["Overall management"],
+            }
+        ],
+        "risk_register": [],
+        "ethics_assessment": {
+            "ethics_issues_identified": True,
+            "issues": [
+                {
+                    "issue_id": "ETH-01",
+                    "description": "AI ethics in healthcare demonstrator",
+                    "mitigation": "Ethics committee oversight",
+                }
+            ],
+            "self_assessment_statement": (
+                "Integration of the gender dimension in research and innovation "
+                "content follows the Tier 1 default rule that it is mandatory "
+                "unless the topic explicitly states non-relevance. No Tier 2B "
+                "exemption source is currently cited in this Phase 6 artifact; "
+                "Phase 8 drafting must either add the relevant Tier 2B topic-source "
+                "reference or keep the claim framed as pending call-specific "
+                "confirmation."
+            ),
+        },
+        "instrument_sections_addressed": [
+            {"section_id": "A.4", "section_name": "Ethics and Security", "status": "addressed"},
+        ],
+        "traceability_footer": {
+            "primary_sources": [
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
+                },
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
+                },
+                {
+                    "tier": 3,
+                    "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+                },
+            ],
+        },
+    })
+
+
+def _gov_response_with_tier2b_backed_assertion(run_id: str) -> str:
+    """governance-model-builder response with a call-specific assertion
+    THAT IS backed by a Tier 2B traceability source — should be valid."""
+    return json.dumps({
+        "schema_id": "orch.phase6.implementation_architecture.v1",
+        "run_id": run_id,
+        "governance_matrix": [
+            {
+                "body_name": "General Assembly",
+                "composition": ["P1", "P2"],
+                "decision_scope": "Strategic",
+                "meeting_frequency": "Annual",
+                "escalation_path": "To coordinator",
+            }
+        ],
+        "management_roles": [
+            {
+                "role_id": "COORD-01",
+                "role_name": "Coordinator",
+                "assigned_to": "P1",
+                "responsibilities": ["Overall management"],
+            }
+        ],
+        "risk_register": [],
+        "ethics_assessment": {
+            "ethics_issues_identified": True,
+            "issues": [
+                {
+                    "issue_id": "ETH-01",
+                    "description": "AI ethics in healthcare demonstrator",
+                    "mitigation": "Ethics committee oversight",
+                }
+            ],
+            "self_assessment_statement": (
+                "Integration of the gender dimension is mandatory; "
+                "the topic text has been reviewed and does not state non-relevance "
+                "(Tier 2B: scope_requirements.json)."
+            ),
+        },
+        "instrument_sections_addressed": [
+            {"section_id": "A.4", "section_name": "Ethics and Security", "status": "addressed"},
+        ],
+        "traceability_footer": {
+            "primary_sources": [
+                {
+                    "tier": 1,
+                    "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+                },
+                {
+                    "tier": 2,
+                    "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+                    "relevant_fields": ["gender_dimension_exemption_check"],
+                },
+            ],
+        },
+    })
+
+
+class TestGenderDimensionTraceability:
+    """Regression tests for §13.2: governance-model-builder must not emit
+    unsupported call-specific gender-exemption assertions without Tier 2B
+    traceability in the traceability_footer."""
+
+    def test_skill_spec_contains_gender_wording_constraint(self) -> None:
+        """governance-model-builder.md must contain the Step 2.7.1 gender
+        dimension wording guard."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert "Step 2.7.1" in content
+        assert "Gender-dimension wording constraint" in content
+        assert "13.2" in content
+
+    def test_skill_spec_contains_constraint_3(self) -> None:
+        """governance-model-builder.md must declare Constraint 3 for
+        gender-dimension Tier 2B traceability."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert "Constraint 3" in content
+        assert "gender-dimension exemption require Tier 2B traceability" in content
+
+    def test_skill_spec_prohibits_unsupported_call_assertion(self) -> None:
+        """The spec must contain the prohibition language so Claude sees it."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert "MUST NOT assert" in content
+        assert "this call does not exempt the topic" in content
+
+    def test_skill_spec_prescribes_safe_fallback_wording(self) -> None:
+        """The spec must contain the exact safe fallback wording."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert (
+            "No Tier 2B exemption source is currently cited in this Phase 6 artifact"
+            in content
+        )
+
+    def test_violating_response_detectable_in_artifact(self, tmp_path: Path) -> None:
+        """If Claude returns a violating phrase, verify it lands in the
+        artifact so a downstream compliance-check would catch it.
+        This test proves the problem is in the production path, not the checker."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-gender-violation-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_gender_violation(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        stmt = artifact["ethics_assessment"]["self_assessment_statement"]
+
+        # The violating phrase is present in the artifact
+        assert "this call does not exempt the topic" in stmt
+
+        # AND no Tier 2B source is in the traceability_footer
+        sources = artifact.get("traceability_footer", {}).get("primary_sources", [])
+        tier2b_sources = [
+            s for s in sources
+            if s.get("source_path", "").startswith("docs/tier2b_topic_and_call_sources/extracted/")
+        ]
+        assert len(tier2b_sources) == 0, (
+            "Test fixture should have no Tier 2B source to demonstrate the violation"
+        )
+
+    def test_safe_wording_has_no_violating_phrase(self, tmp_path: Path) -> None:
+        """An artifact produced with the safe wording must not contain any
+        of the known violating phrases."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-gender-safe-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_safe_gender_wording(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        stmt = artifact["ethics_assessment"]["self_assessment_statement"].lower()
+
+        for phrase in _VIOLATING_PHRASES:
+            assert phrase not in stmt, (
+                f"Safe wording still contains violating phrase: {phrase!r}"
+            )
+
+    def test_safe_wording_contains_tier2b_deferral(self, tmp_path: Path) -> None:
+        """The safe wording must contain the Tier 2B deferral language."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-gender-deferral-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_safe_gender_wording(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        stmt = artifact["ethics_assessment"]["self_assessment_statement"]
+
+        assert "No Tier 2B exemption source" in stmt
+        assert "Phase 8 drafting" in stmt
+
+    def test_tier2b_backed_assertion_is_permitted(self, tmp_path: Path) -> None:
+        """When a Tier 2B source IS present in the traceability footer,
+        a call-specific assertion is valid (no violation)."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-gender-tier2b-backed-01"
+        with patch(_TRANSPORT_TARGET, return_value=_gov_response_with_tier2b_backed_assertion(run_id)):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+
+        # Tier 2B source is present in traceability_footer
+        sources = artifact.get("traceability_footer", {}).get("primary_sources", [])
+        tier2b_sources = [
+            s for s in sources
+            if s.get("source_path", "").startswith("docs/tier2b_topic_and_call_sources/extracted/")
+        ]
+        assert len(tier2b_sources) >= 1, (
+            "Tier 2B-backed assertion must have a Tier 2B source in traceability_footer"
+        )
+
+    def test_current_artifact_uses_safe_wording(self) -> None:
+        """The actual implementation_architecture.json in the repo must use
+        the safe wording (regression guard for the production artifact)."""
+        artifact_path = (
+            _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        stmt = artifact["ethics_assessment"]["self_assessment_statement"].lower()
+
+        for phrase in _VIOLATING_PHRASES:
+            assert phrase not in stmt, (
+                f"Production artifact still contains violating phrase: {phrase!r}"
+            )
+
+        # Must contain the safe deferral language
+        assert "no tier 2b exemption source" in stmt
+
+
+# ===========================================================================
+# H. Compliance-profile derivative labeling tests (§13.2 traceability-chain)
+# ===========================================================================
+
+
+class TestComplianceProfileDerivativeLabeling:
+    """Regression tests for §13.2: governance-model-builder must not emit
+    call-specific mandate claims sourced only to compliance_profile.json
+    without Tier 2B traceability or derivative labeling."""
+
+    def test_skill_spec_contains_constraint_4(self) -> None:
+        """governance-model-builder.md must declare Constraint 4 for
+        compliance-profile derivative labeling."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert "Constraint 4" in content
+        assert "compliance_profile.json require Tier 2B traceability or derivative labeling" in content
+
+    def test_skill_spec_contains_step_2_7_2(self) -> None:
+        """governance-model-builder.md must contain Step 2.7.2 derivative
+        labeling constraint."""
+        spec_path = _REPO_ROOT / ".claude" / "skills" / "governance-model-builder.md"
+        content = spec_path.read_text(encoding="utf-8-sig")
+        assert "Step 2.7.2" in content
+        assert "Compliance-profile derivative labeling constraint" in content
+
+    def test_skill_catalog_has_constraint_5(self) -> None:
+        """skill_catalog.yaml must declare the §13.2 constraint for
+        governance-model-builder."""
+        entry = _get_skill_entry("governance-model-builder", _REPO_ROOT)
+        constraints = entry.get("constitutional_constraints", [])
+        assert any(
+            "compliance_profile.json" in c and "13.2" in c
+            for c in constraints
+        ), f"No §13.2 compliance_profile constraint found in: {constraints}"
+
+    def test_reads_from_includes_tier2b_scope_requirements(self) -> None:
+        """governance-model-builder must declare Tier 2B scope_requirements.json
+        in reads_from."""
+        entry = _get_skill_entry("governance-model-builder", _REPO_ROOT)
+        reads = entry.get("reads_from", [])
+        assert "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json" in reads
+
+    def test_reads_from_includes_tier2b_call_constraints(self) -> None:
+        """governance-model-builder must declare Tier 2B call_constraints.json
+        in reads_from."""
+        entry = _get_skill_entry("governance-model-builder", _REPO_ROOT)
+        reads = entry.get("reads_from", [])
+        assert "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json" in reads
+
+    def test_current_artifact_has_tier2b_in_traceability_footer(self) -> None:
+        """The production artifact must have at least one Tier 2B entry in
+        traceability_footer.primary_sources[] with a path starting with
+        docs/tier2b_topic_and_call_sources/extracted/."""
+        artifact_path = (
+            _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        sources = artifact.get("traceability_footer", {}).get("primary_sources", [])
+        tier2b_sources = [
+            s for s in sources
+            if s.get("source_path", "").startswith(
+                "docs/tier2b_topic_and_call_sources/extracted/"
+            )
+        ]
+        assert len(tier2b_sources) >= 1, (
+            "Production artifact traceability_footer has no Tier 2B source; "
+            f"found sources: {[s.get('source_path') for s in sources]}"
+        )
+
+    def test_current_artifact_wp9_cites_tier2b_for_ai_on_demand(self) -> None:
+        """WPL-WP9 source_basis must cite Tier 2B extracted source for the
+        AI-on-demand platform requirement, not only compliance_profile.json."""
+        artifact_path = (
+            _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        wp9_role = next(
+            (r for r in artifact["management_roles"] if r["role_id"] == "WPL-WP9"),
+            None,
+        )
+        assert wp9_role is not None, "WPL-WP9 not found in management_roles"
+        sb = wp9_role["source_basis"]
+        assert "docs/tier2b_topic_and_call_sources/extracted/" in sb, (
+            f"WPL-WP9 source_basis does not cite Tier 2B: {sb}"
+        )
+        assert "scope_requirements.json" in sb or "call_constraints.json" in sb, (
+            f"WPL-WP9 source_basis does not cite scope_requirements or call_constraints: {sb}"
+        )
+
+    def test_current_artifact_ethics_not_asserted_as_call_mandate(self) -> None:
+        """ETH-01 through ETH-04 source_basis must NOT assert
+        compliance_profile.json ethics_review_required as a confirmed
+        call mandate without Tier 2B evidence."""
+        artifact_path = (
+            _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        issues = artifact["ethics_assessment"]["issues"]
+
+        # The violating pattern: bare "compliance_profile.json ethics_review_required: true."
+        # presented as a call condition without derivative framing
+        violating_pattern = "compliance_profile.json ethics_review_required: true."
+
+        for issue in issues:
+            sb = issue.get("source_basis", "")
+            if violating_pattern in sb:
+                # Check that it's properly framed as derivative
+                assert "Tier 3" in sb or "compliance flag" in sb or "derived during call binding" in sb, (
+                    f"{issue['issue_id']} source_basis asserts ethics_review_required "
+                    f"as a call mandate without derivative labeling: {sb}"
+                )
+
+    def test_current_artifact_self_assessment_ethics_derivative(self) -> None:
+        """self_assessment_statement must frame ethics_review_required as
+        a Tier 3 derivative, not as a Tier 2B topic-specific mandate."""
+        artifact_path = (
+            _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        stmt = artifact["ethics_assessment"]["self_assessment_statement"]
+
+        # Must NOT have the old bare assertion pattern
+        assert "compliance_profile.json ethics_review_required: true)" not in stmt, (
+            "self_assessment_statement still contains bare ethics_review_required "
+            "assertion without derivative framing"
+        )
+
+    def test_response_with_compliance_only_mandate_is_detectable(self, tmp_path: Path) -> None:
+        """If Claude returns a response asserting a call mandate sourced only
+        to compliance_profile.json, the artifact should contain the assertion
+        so downstream compliance-check can detect it."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-compliance-mandate-01"
+        # Response with ETH-01 asserting ethics as a call mandate from compliance_profile only
+        response = json.dumps({
+            "schema_id": "orch.phase6.implementation_architecture.v1",
+            "run_id": run_id,
+            "governance_matrix": [
+                {"body_name": "GA", "composition": ["P1"], "decision_scope": "All",
+                 "meeting_frequency": "Annual", "escalation_path": "To coordinator"}
+            ],
+            "management_roles": [
+                {"role_id": "COORD", "role_name": "Coordinator",
+                 "assigned_to": "P1", "responsibilities": ["Manage"]}
+            ],
+            "risk_register": [],
+            "ethics_assessment": {
+                "ethics_issues_identified": True,
+                "issues": [{
+                    "issue_id": "ETH-01",
+                    "category": "AI",
+                    "description": "AI system ethics",
+                    "relevant_wps": ["WP2"],
+                    "source_basis": (
+                        "compliance_profile.json ethics_review_required: true. "
+                        "section_schema_registry.json A.4."
+                    ),
+                }],
+                "self_assessment_statement": "Ethics required per compliance_profile.",
+            },
+            "instrument_sections_addressed": [
+                {"section_id": "A.4", "section_name": "Ethics", "status": "addressed"}
+            ],
+            "traceability_footer": {
+                "primary_sources": [
+                    {"tier": 1, "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json"},
+                    {"tier": 3, "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json"},
+                ],
+            },
+        })
+        with patch(_TRANSPORT_TARGET, return_value=response):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+
+        # Verify no Tier 2B source in footer (demonstrating the violation condition)
+        sources = artifact.get("traceability_footer", {}).get("primary_sources", [])
+        tier2b = [s for s in sources if s.get("source_path", "").startswith(
+            "docs/tier2b_topic_and_call_sources/extracted/")]
+        assert len(tier2b) == 0, "Test fixture should have no Tier 2B source"
+
+        # The bare compliance_profile assertion IS present (compliance-check would catch this)
+        eth01 = artifact["ethics_assessment"]["issues"][0]
+        assert "compliance_profile.json ethics_review_required: true" in eth01["source_basis"]
+
+    def test_response_with_tier2b_backed_open_science_is_valid(self, tmp_path: Path) -> None:
+        """When AI-on-demand platform requirement cites Tier 2B, it must
+        appear in both source_basis AND traceability_footer."""
+        repo_root = _make_gov_env(tmp_path)
+        run_id = "test-tier2b-open-science-01"
+        response = json.dumps({
+            "schema_id": "orch.phase6.implementation_architecture.v1",
+            "run_id": run_id,
+            "governance_matrix": [
+                {"body_name": "GA", "composition": ["P1"], "decision_scope": "All",
+                 "meeting_frequency": "Annual", "escalation_path": "To coordinator"}
+            ],
+            "management_roles": [
+                {"role_id": "WPL-WP9", "role_name": "WP9 Lead",
+                 "assigned_to": "P1", "responsibilities": ["Dissemination"],
+                 "source_basis": (
+                     "AI-on-demand platform requirement confirmed in "
+                     "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json "
+                     "(SR-10)."
+                 )}
+            ],
+            "risk_register": [],
+            "ethics_assessment": {
+                "ethics_issues_identified": False,
+                "issues": [],
+                "self_assessment_statement": "No issues.",
+            },
+            "instrument_sections_addressed": [
+                {"section_id": "B.2.2", "section_name": "Dissemination", "status": "addressed"}
+            ],
+            "traceability_footer": {
+                "primary_sources": [
+                    {"tier": 1, "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json"},
+                    {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+                     "relevant_fields": ["requirements[9] (SR-10)"]},
+                ],
+            },
+        })
+        with patch(_TRANSPORT_TARGET, return_value=response):
+            result = run_skill("governance-model-builder", run_id, repo_root)
+        assert result.status == "success"
+
+        artifact_path = (
+            repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+            / "phase6_implementation_architecture" / "implementation_architecture.json"
+        )
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+
+        # Tier 2B source present in footer
+        sources = artifact["traceability_footer"]["primary_sources"]
+        tier2b = [s for s in sources if s.get("source_path", "").startswith(
+            "docs/tier2b_topic_and_call_sources/extracted/")]
+        assert len(tier2b) >= 1
+
+        # WP9 source_basis cites Tier 2B
+        wp9 = artifact["management_roles"][0]
+        assert "scope_requirements.json" in wp9.get("source_basis", "")

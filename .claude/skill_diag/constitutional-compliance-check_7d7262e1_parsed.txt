@@ -1,0 +1,41 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-04-24T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "7d7262e1-7497-4edf-baee-5c6345855ce1",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's instrument_sections_addressed array references application form section IDs (A.4, B.3, B.3.1, B.3.2, B.1.2, B.2.2, A.2) derived from section_schema_registry.json (Tier 2A), which is the correct structural authority for proposal writing. Source_basis fields throughout the artifact cite section_schema_registry.json for field requirement grounding. References to 'wp-15-general-annexes_horizon-2026-2027_en.pdf' in source_basis entries are to the General Annexes of the Horizon Europe Work Programme \u2014 a Tier 1 normative document governing programme rules \u2014 not to post-award Model Grant Agreement Annex templates. No string matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' is used as a structural authority in the artifact's schema or content."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "violation",
+      "violation_evidence": "The artifact's traceability_footer.primary_sources[] array contains no reference to any path within docs/tier2b_topic_and_call_sources/extracted/. Despite this, the artifact makes call-specific mandate claims: (1) WPL-WP9 source_basis states 'AI-on-demand platform requirement sourced to docs/tier3_project_instantiation/call_binding/compliance_profile.json open_science_requirements' \u2014 asserting a call-level open science mandate with no Tier 2B path reference in the footer; (2) ETH-01 and ETH-02 source_basis fields cite 'compliance_profile.json ethics_review_required: true' as a call condition with no Tier 2B backing reference in primary_sources[]; (3) the self_assessment_statement explicitly acknowledges that 'No Tier 2B exemption source is currently cited in this Phase 6 artifact' for the gender dimension in R&I content claim. The compliance_profile.json (docs/tier3_project_instantiation/call_binding/compliance_profile.json) is a Tier 3 derivative artifact, not a Tier 2B source document. Call-specific requirement assertions sourced only to a Tier 3 derivative without a traceable Tier 2B primary_sources[] path reference cannot be confirmed as grounded in Tier 2B source documents per CLAUDE.md \u00a713.2.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All project-specific partner name claims (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) and role assignments have Tier 3 path references in the traceability_footer.primary_sources[] array: docs/tier3_project_instantiation/consortium/partners.json and docs/tier3_project_instantiation/consortium/roles.json are both listed. Individual source_basis fields throughout the governance_matrix and management_roles sections consistently cite these Tier 3 documents by field name (e.g., 'partners[*].short_name', 'roles[*].consortium_role', 'roles[*].wp_lead'). Partner capability claims (e.g., 'ELI's operational infrastructure across more than 80 countries') are explicitly sourced to 'partners.json ELI description' in the relevant source_basis. No project-specific fact is asserted without a corresponding Tier 3 path reference in the artifact-level traceability footer."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact schema_id is 'orch.phase6.implementation_architecture.v1' \u2014 a Phase 6 output, not a Phase 8 artifact (which would begin with 'orch.tier5.' or 'orch.phase8.'). Check 13.4 is structurally non-applicable to this artifact type. Additionally, no budget figures appear in the artifact as confirmed values \u2014 no patterns matching '\u20ac[0-9]+', '[0-9]+ EUR', or '[0-9]+ perso
+=== END ===

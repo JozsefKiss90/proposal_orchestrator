@@ -328,6 +328,8 @@ skill_catalog:
       - docs/tier3_project_instantiation/call_binding/compliance_profile.json
       - docs/tier3_project_instantiation/call_binding/selected_call.json
       - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
     constitutional_constraints:
@@ -335,6 +337,7 @@ skill_catalog:
       - "Management structure must be consistent with WP lead assignments"
       - "Ethics self-assessment must not be omitted, null, or 'N/A'"
       - "Tier 1 programme-rule claims must be sourced to docs/tier1_normative_framework/extracted/; if no Tier 1 rule exists, the output must mark the element as an explicit assumption rather than generic 'standard RIA practice'"
+      - "Call-specific mandate claims sourced to compliance_profile.json require Tier 2B traceability or derivative labeling per CLAUDE.md §13.2"
 
   - id: risk-register-builder
     execution_mode: "tapm"

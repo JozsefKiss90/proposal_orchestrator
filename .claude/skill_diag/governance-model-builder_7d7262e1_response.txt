@@ -1,19 +1,14 @@
+=== skill_id: governance-model-builder ===
+=== mode: tapm ===
+=== response_text length: 33943 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase6.implementation_architecture.v1",
   "run_id": "7d7262e1-7497-4edf-baee-5c6345855ce1",
   "governance_matrix": [
     {
       "body_name": "General Assembly (GA)",
-      "composition": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "decision_scope": "Strategic direction and major scope changes; approval of material amendments to the consortium agreement; admission or withdrawal of partners; resolution of escalated disputes unresolvable at Project Management Board level; final decisions on project-wide exploitation and dissemination policy; approval of annual progress and financial reports for submission to the Commission",
       "meeting_frequency": "Once per project year (approximately every 12 months) plus extraordinary sessions convened by the coordinator upon written request of any partner",
       "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; annual cadence selected as a project-operational assumption reflecting the 48-month project scope and the distinction between strategic (GA) and operational (PMB) decision cycles",
@@ -22,16 +17,7 @@
     },
     {
       "body_name": "Project Management Board (PMB)",
-      "composition": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "decision_scope": "Operational management and WP progress monitoring; deliverable review and approval; risk register review and updates; resource allocation adjustments within approved budget envelopes; ethics and compliance monitoring decisions; preparation of General Assembly agenda and decision papers; approval of project management deliverables (D1-01, D1-02)",
       "meeting_frequency": "Quarterly (approximately every three months), or as called by the coordinator",
       "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted; quarterly cadence selected as a project-operational assumption reflecting a nine-WP, 48-month project with active cross-WP dependencies and three concurrent demonstrator streams",
@@ -40,10 +26,7 @@
     },
     {
       "body_name": "Ethics and Compliance Oversight Group (ECOG)",
-      "composition": [
-        "ATU",
-        "NIHS"
-      ],
+      "composition": ["ATU", "NIHS"],
       "decision_scope": "Ethics self-assessment maintenance and periodic update; oversight of data protection and personal data processing for clinical datasets in WP5; monitoring of civil-focus compliance across all WPs; AI ethics considerations for WP2-WP4 systems including transparency and human oversight; healthcare AI ethics oversight for WP5 demonstrator; review of ethics-relevant deliverables",
       "meeting_frequency": "Bi-annually (every six months) and as required upon identification of an ethics trigger event",
       "assumption_note": "Body composition and meeting frequency inferred from Tier 3 role data: ATU leads WP1 task T1-03 'Ethics compliance oversight and coordination with GenAI4EU Hub' (wp_structure.json) and NIHS carries 'Ethics oversight for healthcare AI application' in key_responsibilities (roles.json). Meeting frequency is a project-operational assumption; Tier 1 does not prescribe a separate ethics oversight body or its meeting cadence.",
@@ -178,110 +161,10 @@
         "Produce D9-01 (Dissemination and exploitation plan, month 6 — mandatory admissibility deliverable)",
         "Produce D9-02 (Open-source software release, month 36) and D9-03 (Final dissemination and impact report, month 48)"
       ],
-      "source_basis": "assigned_to derived directly from docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json work_packages[8].lead_partner = 'BAL'. Cross-referenced with docs/tier3_project_instantiation/consortium/roles.json (BAL scientific_role: 'LLM Engineering and Platform Integration Lead', wp_lead: ['WP9'], key_responsibilities include 'Lead dissemination, exploitation and communication' and 'AI-on-demand platform integration and open-source release management'). BAL confirmed valid_partner_id. AI-on-demand platform requirement confirmed in docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-10: 'Communicable results must be shared with the European R&D community through the AI-on-demand platform', source_section: platform_requirements) and docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-05, source_section: call_entry.scope); also recorded in Tier 3 compliance_profile.json open_science_requirements."
+      "source_basis": "assigned_to derived directly from docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json work_packages[8].lead_partner = 'BAL'. Cross-referenced with docs/tier3_project_instantiation/consortium/roles.json (BAL scientific_role: 'LLM Engineering and Platform Integration Lead', wp_lead: ['WP9'], key_responsibilities include 'Lead dissemination, exploitation and communication' and 'AI-on-demand platform integration and open-source release management'). BAL confirmed valid_partner_id. AI-on-demand platform requirement sourced to docs/tier3_project_instantiation/call_binding/compliance_profile.json open_science_requirements."
     }
   ],
-  "risk_register": [
-    {
-      "risk_id": "RISK-01",
-      "description": "Integrating symbolic planning formalisms with LLM-based reasoning may prove more difficult than anticipated, particularly in achieving real-time performance for the planning engine.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Adopt a modular architecture with well-defined interfaces between symbolic and neural components. Implement fallback modes where the LLM-only planner operates when symbolic integration introduces unacceptable latency. Begin integration testing from M6, not M18. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-02",
-      "description": "The tri-store memory architecture may not scale to the interaction lengths required by demonstrators (hundreds of steps) without unacceptable latency or storage costs.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Design the memory controller with configurable retention policies from the start. Conduct scalability stress-testing on synthetic long-horizon tasks from M9. Implement tiered storage with fast/approximate retrieval for working memory and precise/slower retrieval for episodic memory. [Affects: WP3 (Adaptive Memory Architecture)]",
-      "responsible_partner": "BIIS"
-    },
-    {
-      "risk_id": "RISK-03",
-      "description": "Formal convergence proofs may be achievable only for restricted task classes, not for the full generality of real-world multi-agent scenarios encountered in demonstrators.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Classify task types early (M3–M6) by coordination complexity. Prioritise convergence proofs for the most common demonstrator task patterns. Use probabilistic convergence bounds for task classes where deterministic proofs are infeasible. [Affects: WP4 (Decentralised Multi-Agent Coordination)]",
-      "responsible_partner": "CERIA"
-    },
-    {
-      "risk_id": "RISK-04",
-      "description": "Access to de-identified clinical datasets may be delayed by ethics review processes or restricted in scope, reducing the clinical validation power of the healthcare demonstrator.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Submit ethics applications in M1 (pre-project preparation already initiated). Use publicly available clinical datasets (MIMIC-IV, eICU) for initial development and intermediate evaluation. Design the demonstrator with a data abstraction layer that can switch between data sources. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support)]",
-      "responsible_partner": "NIHS"
-    },
-    {
-      "risk_id": "RISK-05",
-      "description": "Operational factory access for the manufacturing demonstrator may be interrupted by production schedules, equipment maintenance, or external disruptions.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "medium",
-      "mitigation": "Secure a formal access agreement with factory partners before project start. Schedule the 3-month validation period with buffer windows. Develop a high-fidelity digital twin of the pilot factory that can substitute for physical access during development phases. [Affects: WP6 (Manufacturing Demonstrator — Process Optimisation)]",
-      "responsible_partner": "ISIA"
-    },
-    {
-      "risk_id": "RISK-06",
-      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of transfer demonstrator results.",
-      "category": "organisational",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Negotiate data access and publication terms in the consortium agreement. Design the demonstrator with an anonymisation layer that enables publication of performance metrics without exposing proprietary data. Supplement with public logistics benchmarks. [Affects: WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation)]",
-      "responsible_partner": "ELI"
-    },
-    {
-      "risk_id": "RISK-07",
-      "description": "The fast pace of LLM development may produce new foundation models during the project that significantly change the baseline capabilities, requiring re-evaluation of MAESTRO's value proposition.",
-      "category": "technical",
-      "likelihood": "high",
-      "impact": "medium",
-      "mitigation": "Design all MAESTRO components with model-agnostic interfaces that can integrate new LLMs without architectural changes. Conduct annual baseline re-evaluation (M12, M24, M36) against latest models. MAESTRO's value lies in the architecture (planning, memory, coordination) not in any specific LLM. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "BAL"
-    },
-    {
-      "risk_id": "RISK-08",
-      "description": "Regulatory requirements under the EU AI Act for high-risk AI systems (particularly the healthcare demonstrator) may impose compliance obligations that require additional development effort.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Monitor EU AI Act implementing regulations throughout the project. Design auditability and transparency mechanisms from the start (audit trails, decision explanations). Engage with AI regulatory sandboxes where available. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-09",
-      "description": "A key partner may reduce commitment or a principal investigator may depart during the project, creating capability gaps.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "high",
-      "mitigation": "Ensure each pillar has at least 2 partners with relevant expertise. Include deputy PI appointments for each WP lead. Consortium agreement includes commitment clauses and transition procedures. [Affects: WP1 (Project Management and Coordination)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-10",
-      "description": "The independently developed planning, memory, coordination, and tool orchestration modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars and the tool orchestration layer. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-11",
-      "description": "The diversity of external APIs across three demonstrator domains (HL7 FHIR in healthcare, OPC-UA in manufacturing, logistics tracking/customs APIs) may require more adapter development effort than planned, delaying tool orchestration layer readiness.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Define a minimal common adapter interface in M1–M3. Prioritise adapters for the most critical APIs per demonstrator. Use existing open-source connector libraries where available rather than building from scratch. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "ATU"
-    }
-  ],
+  "risk_register": [],
   "ethics_assessment": {
     "ethics_issues_identified": true,
     "issues": [
@@ -289,54 +172,39 @@
         "issue_id": "ETH-01",
         "category": "Category 8 — Artificial Intelligence",
         "description": "The project develops and deploys AI-based systems (MAESTRO neuro-symbolic planning engine in WP2, adaptive memory architecture in WP3, decentralised multi-agent coordination protocols in WP4) and integrates these into demonstrator applications in WP5, WP6, and WP7. Ethical concerns related to human rights and values — including transparency of AI decision-making, accountability of autonomous agent actions, fairness and non-discrimination in AI outputs, and human oversight of multi-agent systems operating in high-stakes domains (healthcare, manufacturing, logistics) — must be identified and addressed.",
-        "relevant_wps": [
-          "WP2",
-          "WP3",
-          "WP4",
-          "WP5",
-          "WP6",
-          "WP7",
-          "WP8"
-        ],
-        "source_basis": "section_schema_registry.json A.4 Category 8 field requirements ('development/deployment/use of AI-based systems; detail whether ethical concerns related to human rights and values arise and how addressed'). implementation_constraints.json civil_focus_constraint (sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17). The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites ethics review as a topic-specific mandate for this call. wp_structure.json WP2-WP4 titles and objectives."
+        "relevant_wps": ["WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8"],
+        "source_basis": "section_schema_registry.json A.4 Category 8 field requirements ('development/deployment/use of AI-based systems; detail whether ethical concerns related to human rights and values arise and how addressed'). implementation_constraints.json civil_focus_constraint (sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17). compliance_profile.json ethics_review_required: true. wp_structure.json WP2-WP4 titles and objectives."
       },
       {
         "issue_id": "ETH-02",
         "category": "Category 2 — Humans",
         "description": "WP5 (Healthcare Demonstrator — Clinical Decision Support) involves clinical expert validation of specialist sub-agents against diagnostic benchmarks (T5-03: 'Clinical expert validation and results analysis') and deployment of MAESTRO agents in a clinical decision support setting with HL7 FHIR integration (T5-02). This constitutes involvement of health professionals or patients as study participants and may meet the definition of a low-intervention clinical study or clinical investigation under EU Regulation 536/2014, requiring appropriate consent, protocol registration, and ethics committee review.",
-        "relevant_wps": [
-          "WP5"
-        ],
-        "source_basis": "wp_structure.json WP5 tasks T5-01, T5-02, T5-03 and deliverables D5-01, D5-02. roles.json NIHS key_responsibilities ('Provide de-identified clinical datasets and validation pathways', 'Clinical domain modelling and diagnostic reasoning benchmarks'). The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites ethics review as a topic-specific mandate for this call. section_schema_registry.json A.4 Category 2 field requirements (patients for medical studies, interventions on study participants, clinical study per EU 536/2014)."
+        "relevant_wps": ["WP5"],
+        "source_basis": "wp_structure.json WP5 tasks T5-01, T5-02, T5-03 and deliverables D5-01, D5-02. roles.json NIHS key_responsibilities ('Provide de-identified clinical datasets and validation pathways', 'Clinical domain modelling and diagnostic reasoning benchmarks'). compliance_profile.json ethics_review_required: true. section_schema_registry.json A.4 Category 2 field requirements (patients for medical studies, interventions on study participants, clinical study per EU 536/2014)."
       },
       {
         "issue_id": "ETH-03",
         "category": "Category 4 — Personal data",
         "description": "WP5 involves the use of de-identified clinical datasets provided by NIHS (roles.json: 'Provide de-identified clinical datasets and validation pathways'). Although de-identified, health data constitutes a special category of personal data under GDPR Article 9. Data protection compliance is required: legal basis for processing, pseudonymisation and security measures, data management planning (D1-02, month 6), and assessment of any planned import or export from/to non-EU countries in relation to NIHS data flows.",
-        "relevant_wps": [
-          "WP5",
-          "WP1"
-        ],
-        "source_basis": "roles.json NIHS key_responsibilities. wp_structure.json WP5 tasks and WP1 deliverable D1-02 (Data management plan, month 6). The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites ethics review as a topic-specific mandate for this call. section_schema_registry.json A.4 Category 4 field requirements (special categories including health data; further processing of previously collected data)."
+        "relevant_wps": ["WP5", "WP1"],
+        "source_basis": "roles.json NIHS key_responsibilities. wp_structure.json WP5 tasks and WP1 deliverable D1-02 (Data management plan, month 6). compliance_profile.json ethics_review_required: true. section_schema_registry.json A.4 Category 4 field requirements (special categories including health data; further processing of previously collected data)."
       },
       {
         "issue_id": "ETH-04",
         "category": "Category 6 — Non-EU countries",
         "description": "WP7 (Logistics Transfer Demonstrator) involves operational validation across three international logistics corridors using ELI's operational infrastructure across more than 80 countries (partners.json ELI description). This may involve activities, data collection, or use of local resources in non-EU, non-associated countries. Potential ethics implications of non-EU country activities — including risk to individuals in those countries, import/export of material, and local regulatory frameworks — must be assessed.",
-        "relevant_wps": [
-          "WP7"
-        ],
-        "source_basis": "partners.json ELI description ('A major European logistics company operating in over 80 countries'). wp_structure.json WP7 T7-03 ('Operational validation across three international corridors'). The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites ethics review as a topic-specific mandate for this call. section_schema_registry.json A.4 Category 6 field requirements (activities in non-EU countries; use of local resources; risk to individuals in country)."
+        "relevant_wps": ["WP7"],
+        "source_basis": "partners.json ELI description ('A major European logistics company operating in over 80 countries'). wp_structure.json WP7 T7-03 ('Operational validation across three international corridors'). compliance_profile.json ethics_review_required: true. section_schema_registry.json A.4 Category 6 field requirements (activities in non-EU countries; use of local resources; risk to individuals in country)."
       }
     ],
-    "self_assessment_statement": "An ethics self-assessment is required for this project under the mandatory obligation established in the Tier 1 normative framework: applicants must complete an ethics self-assessment as part of the application, and projects with ethics issues may undergo ethics review with ethics requirements becoming contractual obligations (implementation_constraints.json ethics_self_assessment_required, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf p.16 and programme-guide_horizon_en.pdf pp.25-28; the Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding, not as a Tier 2B topic-specific mandate). Four ethics issue categories have been identified and recorded above: ETH-01 (AI-based system development across WP2–WP4 and demonstrator WPs5–7 and WP8, raising transparency, accountability, fairness, and human oversight concerns); ETH-02 (clinical expert validation in WP5 involving human participants in a medical/diagnostic context); ETH-03 (de-identified health data from NIHS in WP5 constituting GDPR special-category data requiring a data management plan and appropriate processing safeguards, with D1-02 due at month 6 per wp_structure.json); ETH-04 (international logistics corridor validation in WP7 involving activities in non-EU countries). The project is committed to exclusive focus on civil applications in compliance with the Tier 1 civil_focus_constraint (implementation_constraints.json, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17), and no activities directed at human reproductive cloning, heritable genome modification, or destruction of human embryos are included. Ethics compliance oversight is assigned to the Ethics and Compliance Oversight Group (ECOG), co-chaired by ATU (WP1 task T1-03: 'Ethics compliance oversight and coordination with GenAI4EU Hub', wp_structure.json) and NIHS (key_responsibilities: 'Ethics oversight for healthcare AI application', roles.json). Gender equality plans: the Tier 1 rule gender_equality_plan_eligibility requires public bodies, research organisations, and higher education establishments from Member States and Associated Countries to have a gender equality plan (GEP) at grant signature and during the grant period (implementation_constraints.json, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19 and programme-guide_horizon_en.pdf pp.16-17). In this consortium, ATU (HES, DE), BIIS (HES, NL), ISIA (HES, IT), NIHS (HES, SE), and FIIT (REC, ES) are organisations of the required type; each must confirm GEP status in Part A Section 2 at submission (compliance_profile.json gender_plan_required: true). Gender balance in project personnel: beneficiaries must promote equal opportunities and aim, to the extent possible, for gender balance at all levels of personnel assigned to the action, including supervisory and managerial levels (implementation_constraints.json gender_management_balance_guidance, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf p.18). Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation."
+    "self_assessment_statement": "An ethics self-assessment is required for this project under the mandatory obligation established in the Tier 1 normative framework: applicants must complete an ethics self-assessment as part of the application, and projects with ethics issues may undergo ethics review with ethics requirements becoming contractual obligations (implementation_constraints.json ethics_self_assessment_required, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf p.16 and programme-guide_horizon_en.pdf pp.25-28; compliance_profile.json ethics_review_required: true). Four ethics issue categories have been identified and recorded above: ETH-01 (AI-based system development across WP2–WP4 and demonstrator WPs5–7 and WP8, raising transparency, accountability, fairness, and human oversight concerns); ETH-02 (clinical expert validation in WP5 involving human participants in a medical/diagnostic context); ETH-03 (de-identified health data from NIHS in WP5 constituting GDPR special-category data requiring a data management plan and appropriate processing safeguards, with D1-02 due at month 6 per wp_structure.json); ETH-04 (international logistics corridor validation in WP7 involving activities in non-EU countries). The project is committed to exclusive focus on civil applications in compliance with the Tier 1 civil_focus_constraint (implementation_constraints.json, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17), and no activities directed at human reproductive cloning, heritable genome modification, or destruction of human embryos are included. Ethics compliance oversight is assigned to the Ethics and Compliance Oversight Group (ECOG), co-chaired by ATU (WP1 task T1-03: 'Ethics compliance oversight and coordination with GenAI4EU Hub', wp_structure.json) and NIHS (key_responsibilities: 'Ethics oversight for healthcare AI application', roles.json). Gender equality plans: the Tier 1 rule gender_equality_plan_eligibility requires public bodies, research organisations, and higher education establishments from Member States and Associated Countries to have a gender equality plan (GEP) at grant signature and during the grant period (implementation_constraints.json, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19 and programme-guide_horizon_en.pdf pp.16-17). In this consortium, ATU (HES, DE), BIIS (HES, NL), ISIA (HES, IT), NIHS (HES, SE), and FIIT (REC, ES) are organisations of the required type; each must confirm GEP status in Part A Section 2 at submission (compliance_profile.json gender_plan_required: true). Gender balance in project personnel: beneficiaries must promote equal opportunities and aim, to the extent possible, for gender balance at all levels of personnel assigned to the action, including supervisory and managerial levels (implementation_constraints.json gender_management_balance_guidance, sourced to wp-15-general-annexes_horizon-2026-2027_en.pdf p.18). Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation."
   },
   "instrument_sections_addressed": [
     {
       "section_id": "A.4",
       "section_name": "Ethics and Security",
       "status": "addressed_in_phase6",
-      "notes": "Ethics self-assessment and four ethics issue categories addressed through ethics_assessment object in this artifact. Section A.4 is mandatory for the RIA instrument (section_schema_registry.json, mandatory: true). Grounds include implementation_constraints.json ethics_self_assessment_required ; the Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding, not as a Tier 2B topic-specific mandate. Security issues table (A.4 Categories 1–3) must be completed at Phase 8 drafting; no security issues are positively identified in available Tier 3 data."
+      "notes": "Ethics self-assessment and four ethics issue categories addressed through ethics_assessment object in this artifact. Section A.4 is mandatory for the RIA instrument (section_schema_registry.json, mandatory: true). Grounds include implementation_constraints.json ethics_self_assessment_required and compliance_profile.json ethics_review_required: true. Security issues table (A.4 Categories 1–3) must be completed at Phase 8 drafting; no security issues are positively identified in available Tier 3 data."
     },
     {
       "section_id": "B.3",
@@ -360,13 +228,13 @@
       "section_id": "B.1.2",
       "section_name": "Methodology",
       "status": "partially_addressed_in_phase6",
-      "notes": "Gender dimension in R&I content (mandatory aspect of B.1.2 methodology per section_schema_registry.json) is flagged in ethics_assessment.self_assessment_statement with the Tier 1 default rule applied and safe-fallback wording pending Tier 2B topic-source confirmation at Phase 8. Data management plan (D1-02, month 6) is noted and assigned to ATU via WPL-WP1. Open science practices including AI-on-demand platform contribution are confirmed in Tier 2B extracted scope_requirements.json (SR-10) and call_constraints.json (CC-05), and assigned to BAL (WPL-WP9). Full methodology narrative is a Phase 8 drafting activity."
+      "notes": "Gender dimension in R&I content (mandatory aspect of B.1.2 methodology per section_schema_registry.json) is flagged in ethics_assessment.self_assessment_statement with the Tier 1 default rule applied and safe-fallback wording pending Tier 2B topic-source confirmation at Phase 8. Data management plan (D1-02, month 6) is noted and assigned to ATU via WPL-WP1. Open science practices including AI-on-demand platform contribution are noted via compliance_profile.json and assigned to BAL (WPL-WP9). Full methodology narrative is a Phase 8 drafting activity."
     },
     {
       "section_id": "B.2.2",
       "section_name": "Measures to maximise impact - Dissemination, exploitation and communication",
       "status": "assigned_in_phase6",
-      "notes": "WP9 (Dissemination, Exploitation and Communication) assigned to BAL as lead (WPL-WP9) from wp_structure.json and roles.json. D9-01 (Dissemination and exploitation plan, month 6) is a mandatory admissibility deliverable per section_schema_registry.json B.2.2 ('plan is an admissibility condition'). Open science requirement (AI-on-demand platform sharing) confirmed in Tier 2B extracted scope_requirements.json (SR-10) and call_constraints.json (CC-05); assigned to BAL. Full dissemination and exploitation narrative is a Phase 8 drafting activity."
+      "notes": "WP9 (Dissemination, Exploitation and Communication) assigned to BAL as lead (WPL-WP9) from wp_structure.json and roles.json. D9-01 (Dissemination and exploitation plan, month 6) is a mandatory admissibility deliverable per section_schema_registry.json B.2.2 ('plan is an admissibility condition'). Open science requirement (AI-on-demand platform sharing) assigned to BAL per compliance_profile.json open_science_requirements. Full dissemination and exploitation narrative is a Phase 8 drafting activity."
     },
     {
       "section_id": "A.2",
@@ -412,20 +280,6 @@
           "instruments[0].sections[*].mandatory",
           "instruments[0].sections[*].section_type",
           "instruments[0].sections[*].field_requirements"
-        ]
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
-        "relevant_fields": [
-          "requirements[9] (SR-10: AI-on-demand platform sharing requirement)"
-        ]
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
-        "relevant_fields": [
-          "constraints[4] (CC-05: AI-on-demand platform result sharing)"
         ]
       },
       {
@@ -489,3 +343,5 @@
     ]
   }
 }
+
+=== END ===

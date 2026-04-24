@@ -17,6 +17,8 @@ reads_from:
   - docs/tier3_project_instantiation/call_binding/compliance_profile.json
   - docs/tier3_project_instantiation/call_binding/selected_call.json
   - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+  - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+  - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
 writes_to:
   - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
 constitutional_constraints:
@@ -40,6 +42,8 @@ in the Declared Inputs section from disk using the Read tool.
 - `docs/tier3_project_instantiation/call_binding/compliance_profile.json`
 - `docs/tier3_project_instantiation/call_binding/selected_call.json`
 - `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json`
+- `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json`
+- `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json`
 
 **Boundary constraints:**
 - Do not read files outside the declared input set.
@@ -65,6 +69,8 @@ Do not include explanations outside the JSON.
 | `docs/tier3_project_instantiation/call_binding/compliance_profile.json` | compliance_profile.json — Tier 3 call binding artifact | ethics_review_required, gender_plan_required, open_science_requirements[], eligibility_confirmed | N/A — Tier 3 source | Determines whether ethics issues must be identified; drives `ethics_assessment.ethics_issues_identified` and informs `self_assessment_statement` content |
 | `docs/tier3_project_instantiation/call_binding/selected_call.json` | selected_call.json — Tier 3 call binding artifact | instrument_type | N/A — Tier 3 source | Resolves the active instrument type (e.g. "RIA") to look up mandatory implementation sections in section_schema_registry.json |
 | `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` | section_schema_registry.json — Tier 2A extracted registry | instruments[].instrument_type, instruments[].sections[].section_id, section_name, section_type, mandatory | N/A — Tier 2A extracted | Provides the list of instrument-mandated sections; each mandatory implementation_section must appear in `instrument_sections_addressed` |
+| `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` | Tier 2B extracted scope requirements for the active call | requirements[].requirement_id, description, mandatory, source_section | N/A — Tier 2B extracted | Provides Tier 2B primary evidence for call-specific scope requirements (e.g. AI-on-demand platform sharing). Used to ground call-mandate claims that would otherwise rely only on the Tier 3 compliance_profile.json derivative. |
+| `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` | Tier 2B extracted call constraints for the active call | constraints[].constraint_id, description, constraint_type, source_section | N/A — Tier 2B extracted | Provides Tier 2B primary evidence for call-level constraints. Used alongside scope_requirements.json to ground call-mandate claims in Tier 2B traceability per CLAUDE.md §13.2. |
 
 ### Outputs
 
@@ -107,8 +113,13 @@ Do not include explanations outside the JSON.
 - Step 2.5: Build `management_roles` from explicit Tier 3 roles or, where necessary, transparent inference from WP lead assignments.
 - Step 2.6: Set `risk_register` to `[]` (placeholder for risk-register-builder).
 - Step 2.7: Build `ethics_assessment` from `implementation_constraints.json` + `compliance_profile.json` + project scope visible in `wp_structure.json`.
+  - Step 2.7.1 — **Gender-dimension wording constraint (§13.2 guard):** The Tier 1 rule `gender_dimension_in_content` states that integration of the gender dimension is mandatory unless the topic explicitly states non-relevance. When including this rule in the `self_assessment_statement`, you MUST NOT assert that the specific call or topic does or does not exempt the topic (e.g., "this call does not exempt the topic") UNLESS `traceability_footer.primary_sources[]` contains a Tier 2B source path within `docs/tier2b_topic_and_call_sources/extracted/` that explicitly evidences whether the topic text states non-relevance. If no Tier 2B source is cited in the traceability footer for this claim, use the following safe wording instead: "Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation." This constraint prevents §13.2 violations by ensuring no call-specific factual assertion is emitted without Tier 2B traceability.
+  - Step 2.7.2 — **Compliance-profile derivative labeling constraint (§13.2 guard):** When citing `compliance_profile.json` fields (e.g., `ethics_review_required`, `open_science_requirements`) in `source_basis` fields of ethics_assessment issues, management_roles, or instrument_sections_addressed notes, you MUST distinguish between:
+    - **(a) Claims backed by Tier 2B evidence:** If a matching requirement exists in `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` or `call_constraints.json`, cite the Tier 2B source directly (requirement_id and source_section) and add it to `traceability_footer.primary_sources[]`. The compliance_profile.json may be cited as a secondary/confirming reference.
+    - **(b) Claims NOT backed by Tier 2B evidence:** If no matching Tier 2B extracted entry exists, the `source_basis` MUST frame the compliance_profile.json field as a Tier 3 derivative compliance flag, NOT as a confirmed call-specific mandate. Use wording such as: "The Tier 3 compliance_profile.json records [field]: [value] as a compliance flag derived during call binding; no Tier 2B extracted source path cites [requirement] as a topic-specific mandate for this call."
+    - Emitting a call-specific mandate claim sourced only to compliance_profile.json without Tier 2B traceability is a §13.2 violation.
 - Step 2.8: Build `instrument_sections_addressed` from `section_schema_registry.json`, `selected_call.json`, and `implementation_constraints.json`.
-- Step 2.9: Build `traceability_footer` — construct an artifact-level provenance record listing every declared input file actually read during this invocation, using **full repo-relative paths** (not abbreviated file names). The `traceability_footer.primary_sources[]` array must include at minimum every Tier 1 extracted file used (with tier: 1) and should include Tier 2–4 sources where their content grounds claims in the artifact. Each entry must use the full path starting with `docs/` (e.g., `docs/tier1_normative_framework/extracted/governance_principles.json`, not just `governance_principles.json`). Include `relevant_fields` where helpful for auditability.
+- Step 2.9: Build `traceability_footer` — construct an artifact-level provenance record listing every declared input file actually read during this invocation, using **full repo-relative paths** (not abbreviated file names). The `traceability_footer.primary_sources[]` array must include at minimum every Tier 1 extracted file used (with tier: 1) and should include Tier 2–4 sources where their content grounds claims in the artifact. **Tier 2B inclusion rule:** If any claim in the artifact cites a call-specific requirement that is confirmed in `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` or `call_constraints.json`, the corresponding Tier 2B file MUST appear in `primary_sources[]` with `tier: 2` and `source_path` starting with `docs/tier2b_topic_and_call_sources/extracted/`. This is necessary to satisfy the §13.2 traceability check performed by constitutional-compliance-check. Each entry must use the full path starting with `docs/` (e.g., `docs/tier1_normative_framework/extracted/governance_principles.json`, not just `governance_principles.json`). Include `relevant_fields` where helpful for auditability.
 
 ### 3. Output Construction
 
@@ -124,6 +135,7 @@ Do not include explanations outside the JSON.
   - `{tier: 1, source_path: "docs/tier1_normative_framework/extracted/governance_principles.json"}`
   - `{tier: 1, source_path: "docs/tier1_normative_framework/extracted/implementation_constraints.json"}`
   - Plus Tier 2A, Tier 3, and Tier 4 sources actually used
+  - **Tier 2B entries are required** when the artifact cites call-specific requirements confirmed in Tier 2B extracted files (e.g., AI-on-demand platform sharing from scope_requirements.json SR-10 / call_constraints.json CC-05). Include `{tier: 2, source_path: "docs/tier2b_topic_and_call_sources/extracted/<file>.json"}` for each Tier 2B file used.
 
 ### 4. Conformance Stamping
 
@@ -171,6 +183,40 @@ Do not include explanations outside the JSON.
 **Hard failure confirmation:** Yes — management-WP lead inconsistency is not correctable by agent judgment; the source data must be corrected at Phase 3 level.
 
 **CLAUDE.md §13 cross-reference:** §7 Phase 6 gate — "Consortium management roles are assigned and non-overlapping." §12.5 — review must check internal consistency.
+
+---
+
+### Constraint 3: "Call-specific assertions about gender-dimension exemption require Tier 2B traceability"
+
+**Decision point in execution logic:** Step 2.7.1 — at the point the `self_assessment_statement` includes wording about the gender dimension in research and innovation content.
+
+**Exact failure condition:** The `self_assessment_statement` asserts a call-specific fact about whether the topic does or does not exempt the gender dimension (e.g., "this call does not exempt the topic", "the topic does not state non-relevance"), AND `traceability_footer.primary_sources[]` contains no entry with a `source_path` within `docs/tier2b_topic_and_call_sources/extracted/` that could evidence review of the specific topic text for a gender-dimension exemption statement.
+
+**Enforcement mechanism:** In Step 2.7.1, before writing any call-specific gender-dimension assertion, check whether the `traceability_footer.primary_sources[]` includes at least one entry with `tier: 2` and `source_path` starting with `docs/tier2b_topic_and_call_sources/extracted/`. If no such entry exists: the `self_assessment_statement` must use the safe fallback wording specified in Step 2.7.1. If such an entry exists AND its content explicitly confirms that the topic text was reviewed and contains no gender-dimension exemption statement: the call-specific assertion is permitted, and the Tier 2B source entry must remain in the traceability footer. Emitting a call-specific assertion without a Tier 2B traceability source is a validation issue that will cause a §13.2 violation at constitutional-compliance-check.
+
+**Failure output:** Not a hard skill failure — the skill produces valid output using the safe fallback wording. The constraint prevents the violation from being emitted rather than halting the skill.
+
+**Hard failure confirmation:** No — this is a wording guard, not a halt condition. The skill succeeds with safe wording when Tier 2B evidence is absent.
+
+**CLAUDE.md §13 cross-reference:** §13.2 — "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents." A negative assertion about the topic text ("this call does not exempt") is a call-specific factual claim requiring Tier 2B evidence.
+
+---
+
+### Constraint 4: "Call-specific mandate claims sourced to compliance_profile.json require Tier 2B traceability or derivative labeling"
+
+**Decision point in execution logic:** Steps 2.5 (management_roles source_basis), 2.7 (ethics_assessment source_basis), 2.7.2 (compliance-profile derivative labeling), and 2.8 (instrument_sections_addressed notes) — at every point where `compliance_profile.json` fields are cited as the basis for a call-specific requirement.
+
+**Exact failure condition:** Any `source_basis` field, `self_assessment_statement` text, or `instrument_sections_addressed` note asserts a call-specific mandate (e.g., "open science requirement", "ethics review required as a call condition") sourced to `compliance_profile.json` without EITHER: (a) a corresponding Tier 2B extracted source path in `traceability_footer.primary_sources[]`, OR (b) explicit derivative labeling framing the claim as a Tier 3 compliance flag pending Tier 2B confirmation.
+
+**Enforcement mechanism:** In Steps 2.5, 2.7, 2.7.2, and 2.8, before writing any call-specific requirement claim sourced to compliance_profile.json: check whether the requirement is also confirmed in `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` or `call_constraints.json`. If yes: cite the Tier 2B source directly in `source_basis` and add it to `traceability_footer.primary_sources[]`. If no: frame the compliance_profile.json field as a Tier 3 derivative compliance flag using the wording pattern: "The Tier 3 compliance_profile.json records [field]: [value] as a compliance flag derived during call binding; no Tier 2B extracted source path cites [requirement] as a topic-specific mandate for this call." Emitting a call-specific mandate claim sourced only to compliance_profile.json without Tier 2B traceability or derivative labeling will cause a §13.2 violation at constitutional-compliance-check.
+
+**Failure output:** Not a hard skill failure — the skill produces valid output using either Tier 2B citation or derivative labeling. The constraint prevents the violation from being emitted rather than halting the skill.
+
+**Hard failure confirmation:** No — this is a wording guard, not a halt condition. The skill succeeds with proper sourcing or derivative framing when the constraint is applied.
+
+**CLAUDE.md §13 cross-reference:** §13.2 — "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents." Asserting a compliance_profile.json derivative as a confirmed call mandate without Tier 2B traceability constitutes an invented call constraint.
+
+---
 
 - Do not present an unsourced project design choice as if it were a Tier 1 programme rule.
 - If a Tier 1 source is present and relevant, use it.
