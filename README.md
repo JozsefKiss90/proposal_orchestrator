@@ -75,7 +75,7 @@ proposal_orchestator/
 |   +-- run_context.py                #   Per-run state persistence
 |   +-- runtime_models.py             #   SkillResult, AgentResult, NodeExecutionResult
 |   +-- dependency_normalizer.py      #   Phase 4 deterministic dependency normalization
-|   +-- call_slicer.py               #   Step 0 deterministic call input bounding
+|   +-- call_slicer.py               #   Step 0: mandatory deterministic call input bounding
 |   +-- ...                           #   Predicates, helpers, path utilities
 |
 +-- docs/                              # Tiered source truth (see Section 3)
@@ -385,8 +385,9 @@ python -m runner --run-id $(python -c "import uuid; print(uuid.uuid4())")
 The scheduler will:
 1. Load the compiled manifest from `.claude/workflows/system_orchestration/manifest.compile.yaml`
 2. Initialise a run context in `.claude/runs/<run-id>/`
-3. Dispatch nodes in topological order, evaluating gates between phases
-4. Write a run summary to `.claude/runs/<run-id>/run_summary.json`
+3. Run the **call slicer** (Step 0) — a deterministic Python preprocessor that extracts the target call entry from grouped work programme JSONs into a bounded slice file (`*.slice.json`, ~5-8KB). This runs once per DAG run, before any node dispatch. After Step 0, no skill reads grouped JSONs directly.
+4. Dispatch nodes in topological order, evaluating entry and exit gates for each node
+5. Write a run summary to `.claude/runs/<run-id>/run_summary.json`
 
 ### Single-Phase Execution
 
@@ -538,27 +539,32 @@ Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
   n04_gantt_milestones          n05_impact_architecture
     - Deterministic dependency         - impact-pathway-core-builder (TAPM):
       normalization (Phase B+,             * Maps call expected impacts to
-      pure Python):                          project outputs and WP deliverables
+      pure Python, pre-agent):               project outputs and WP deliverables
         * Reads Phase 3                    * Defines KPIs traceable to WPs
-          dependency_map + WP              * Writes impact_architecture.json
-          seed bounds                        (DEC fields null)
-        * Classifies edges as            - impact-dec-enricher (TAPM,
-          strict or non-strict               enrich_artifact contract):
-        * Writes scheduling_                * Populates dissemination_plan,
-          constraints.json                     exploitation_plan,
-    - gantt-schedule-builder:                  sustainability_mechanism
-        * Assigns start_month /            * Runtime merges into base artifact
-          end_month to all tasks         - dissemination-exploitation-
-        * Defines milestones with            communication-check (TAPM):
-          verifiable criteria              * 47 DEC quality checks
-        * Identifies critical path         * Writes validation report
-    - milestone-consistency-check        - Gate enforces:
-      runs in FULL mode                    * All expected impacts mapped
-    - Gate enforces:                         (g06_p04)
-        * Timeline completeness            * KPIs traceable to WPs (g06_p05)
-          (g05_p03, g05_p04)               * DEC plans non-null (g06_p06-08)
-        * Milestone criteria               * Upstream gates fresh
-          (g05_p05)                          (g06_p01, g06_p02)
+          dependency_map (immutable)       * Writes impact_architecture.json
+        * Classifies edges as                (DEC fields null)
+          strict or non-strict           - impact-dec-enricher (TAPM,
+        * Writes scheduling_                enrich_artifact contract):
+          constraints.json                 * Emits DEC fields only (~7KB)
+          (canonical normalization         * Runtime merges (not overwrites)
+          artifact)                          into base artifact
+    - gantt-schedule-builder:            - dissemination-exploitation-
+        * Reads scheduling_                  communication-check (TAPM):
+          constraints.json                 * 47 DEC quality checks
+        * Assigns start_month /            * Writes validation report
+          end_month to all tasks         - Gate enforces:
+        * Defines milestones with            * All expected impacts mapped
+          verifiable criteria                  (g06_p04)
+        * Writes gantt.json                  * KPIs traceable to WPs (g06_p05)
+          (canonical gate artifact)          * DEC plans non-null (g06_p06-08)
+    - milestone-consistency-check            * Upstream gates fresh
+      runs AFTER gantt.json exists             (g06_p01, g06_p02)
+      (FULL mode, not degraded)
+    - Gate enforces:
+        * Timeline completeness
+          (g05_p03, g05_p04)
+        * Milestone criteria
+          (g05_p05)
         * Dep-to-schedule
           consistency (g05_p08)
   Exit: phase_04_gate           Exit: phase_05_gate
@@ -567,9 +573,37 @@ Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
     |
 Phase 6: Implementation Architecture
   n06_implementation_architecture
+    - governance-model-builder (TAPM):
+        * Builds governance matrix from
+          Tier 3 consortium data + WP structure
+        * Management structure, decision-making,
+          escalation paths
+        * Ethics self-assessment from
+          compliance_profile.json
+        * Instrument-mandated section coverage
+        * Writes implementation_architecture.json
+          (risk_register null)
+    - risk-register-builder (TAPM,
+        enrich_artifact contract):
+        * Populates risk_register from
+          Tier 3 risks.json seeds
+        * Runtime merges into base artifact
+    - milestone-consistency-check
+      (FULL mode, cli-prompt)
+    - Gate enforces:
+        * Upstream gates passed
+          (g07_p01-03)
+        * Artifact exists and run-owned
+          (g07_p04, g07_p04b)
+        * Risk register populated (g07_p05)
+        * Ethics assessment explicit (g07_p06)
+        * Governance matrix defined (g07_p07)
+        * Management roles in Tier 3 (g07_p08)
+        * Instrument sections addressed (g07_p09)
+    - **Status:** COMPLETE — VALIDATED (production-ready)
   Exit: phase_06_gate
     |
-Phase 7: Budget Gate
+Phase 7: Budget Gate (NEXT ACTIVE PHASE)
   n07_budget_gate  (budget_gate_validator + budget_interface_coordinator)
   Exit: gate_09_budget_consistency  [MANDATORY — BYPASS PROHIBITED]
     |
@@ -620,31 +654,86 @@ The orchestration pipeline transitions through three structural regimes:
 
 - **Phase 4: Temporal realization**
   - Deterministic dependency normalization (pure Python, pre-agent):
-    converts Phase 3 dependency_map into `scheduling_constraints.json`,
-    reclassifying infeasible WP-level `finish_to_start` edges as non-strict
-  - `gantt-schedule-builder` skill converts normalized constraints into
-    executable timeline (`gantt.json`), assigns task months, defines
-    milestones with verifiable criteria, and identifies critical path
+    reads Phase 3 `wp_structure.json` immutably (does not modify Phase 3 output),
+    converts dependency_map into `scheduling_constraints.json` (canonical
+    normalization artifact), reclassifying infeasible WP-level
+    `finish_to_start` edges as non-strict while preserving feasible
+    task-level edges as strict
+  - `gantt-schedule-builder` reads `scheduling_constraints.json` and produces
+    `gantt.json` (the canonical Phase 4 gate artifact): assigns task months,
+    defines milestones with verifiable criteria, identifies critical path
   - `milestone-consistency-check` runs in FULL mode (schedule-level
-    validation) because gantt.json is written before it executes
-  - Gate enforces dependency-to-schedule consistency via `g05_p08`
+    validation) because `gantt.json` is written to disk before it executes
+  - Gate enforces `dependency_schedule_consistency` (`g05_p08`):
+    validates that `gantt.json` task schedule respects all strict
+    normalized constraints from `scheduling_constraints.json`
   - Dependency cycle validation remains Phase 3's responsibility;
     temporal consistency is Phase 4's
 
 - **Phase 5: Impact architecture**
-  - Decomposed into two focused skills:
-    `impact-pathway-core-builder` produces impact pathways and KPIs;
-    `impact-dec-enricher` populates dissemination, exploitation, and
-    sustainability fields via the `enrich_artifact` output contract
-    (emits only DEC fields; runtime merges into base artifact)
-  - `dissemination-exploitation-communication-check` validates DEC
-    quality (target audience specificity, channel definition, generic
-    template detection, call-requirement coverage)
-  - Gate checks: all call expected impacts mapped to project outputs,
-    KPIs traceable to WP deliverables, DEC plans non-null
+  - Split architecture (not monolithic):
+    `impact-pathway-core-builder` (TAPM) produces impact pathways and
+    KPIs with `linked_deliverable_ids` for traceability;
+    `impact-dec-enricher` (TAPM, `enrich_artifact` contract) emits only
+    DEC fields (~7KB) — runtime merges (not overwrites) into base
+    artifact, preserving all existing pathways, KPIs, and metadata
+  - `dissemination-exploitation-communication-check` (TAPM) validates
+    DEC quality (target audience specificity, channel definition,
+    generic template detection, call-requirement coverage)
+  - Gate predicates:
+    `all_impacts_mapped` (g06_p04) — each call expected impact mapped,
+    `kpis_traceable_to_deliverables` (g06_p05) — KPIs reference WP deliverables,
+    DEC non-null checks (g06_p06-08) — all three DEC plans populated
 
 This separation is intentional and enforced by gates.
 
+- **Phase 6: Implementation architecture (validated structural synthesis layer, run `b2d4f829`)
+  - Consumes Phase 3 (WP structure), Phase 4 (gantt.json), Phase 5
+    (impact architecture), plus Tier 3 consortium and risk data
+  - Split architecture: `governance-model-builder` (TAPM) produces base
+    artifact with governance matrix, management structure, ethics
+    assessment, and instrument section coverage;
+    `risk-register-builder` (TAPM, `enrich_artifact` contract) emits
+    risk register only — runtime merges into base artifact
+  - Gate predicates: risk register populated, ethics assessment explicit
+    (not omitted/null), governance matrix defined, all management roles
+    assigned to Tier 3 partners, all instrument-mandated sections addressed
+    - Phase 6 is the first phase that enforces cross-domain coherence:
+    - structural (Phase 3)
+    - temporal (Phase 4)
+    - impact (Phase 5)
+    - organisational (Tier 3 consortium)
+  - It represents the transition from design validation to execution readiness.
+  - Phase 7 (Budget Gate) is the next active and blocking phase in the pipeline.
+
+- **Phase 7: Budget gate** (NEXT ACTIVE PHASE — BLOCKING PHASE)
+  - Requires Phase 6 released (now satisfied)
+  - Blocked until validated budget response present in
+    `docs/integrations/lump_sum_budget_planner/received/`
+  - Budget planner integration becomes active here
+  - Requires:
+    * Phase 6 released (implementation architecture must be validated before budgeting)
+  
+- **System maturity status (as of current version):**
+- Phases 1–6: implemented and validated
+- Phase 7: pending external budget integration
+- Phase 8: blocked until budget gate passes
+### Skill Execution Model
+
+Skills execute in one of two modes, selected per-skill via `skill_catalog.yaml`:
+
+- **TAPM (Tool-Augmented Prompt Mode)** — for reasoning-heavy skills with large input sets. The Python runtime assembles a bounded prompt (~5-30KB) containing the skill spec and declared input paths (not contents). Claude is invoked with `--tools "Read,Glob"` and reads declared inputs from disk on demand. Used by: `call-requirements-extraction`, `impact-pathway-core-builder`, `impact-dec-enricher`, `dissemination-exploitation-communication-check`, `governance-model-builder`, `risk-register-builder`, and other input-heavy skills.
+
+- **cli-prompt** — for deterministic, small-input, and validation tasks. The Python runtime resolves all inputs and serializes them into the prompt. Used by: `milestone-consistency-check`, `gantt-schedule-builder`, `decision-log-update`, and other bounded skills.
+
+In both modes, the Python runtime retains exclusive authority:
+- **Artifact writes**: Claude has no Write tool; all writes go through `_atomic_write()` in Python
+- **Validation**: `_validate_skill_output()` checks schema conformance before any write
+- **Gate evaluation**: only the scheduler calls `evaluate_gate()` — skills never evaluate gates or write `gate_result.json`
+- **State transitions**: node states are managed by the scheduler, not by skills or agents
+  TAPM is the production-standard execution model for input-heavy reasoning tasks.
+  It is not a transitional workaround but a deliberate architectural decision
+  to enforce deterministic input bounding and eliminate prompt-size bottlenecks.
 ### Upstream Gate Freshness
 
 When running phases individually (`--phase N`), the scheduler bootstraps

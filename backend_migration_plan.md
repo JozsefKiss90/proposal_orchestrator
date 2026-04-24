@@ -10,16 +10,18 @@
 
 ---
 
-## Current Migration Status (as of 2026-04-23, post Phase 5 validated pass)
+## Current Migration Status (as of 2026-04-24, post Phase 6 validated pass)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
 | Phase 1 | COMPLETE | Call slicer + TAPM stable |
 | Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
 | Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
-| Phase 4 | OPERATIONAL | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. |
-| Phase 5 | VALIDATED | Gate passed on runtime rerun (run `e3caae21`, 2026-04-22). All 9 deterministic predicates pass. DEC-check (47 findings, 0 flagged). See §22 for full remediation path. |
-| Phase 6 | NOT STARTED | Next phase. Requires Phases 3, 4, and 5 released. Phase 5 gate now passed; Phase 4 gate status to be confirmed before Phase 6 dispatch. |
+| Phase 4 | OPERATIONAL — VALIDATED | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. All deterministic predicates passing. |
+| Phase 5 | COMPLETE — VALIDATED | Gate passed (run `e3caae21`, 2026-04-22). All 9 deterministic predicates pass. DEC-check (47 findings, 0 flagged). See §22 for full remediation path. |
+| Phase 6 | COMPLETE — VALIDATED | Gate passed (run `b2d4f829`, 2026-04-24). All 10 deterministic predicates pass (`g07_p01`–`g07_p09` + `g07_p04b`). Governance model, risk register, ethics assessment, instrument sections all validated. See §24 for full implementation details. |
+| Phase 7 | NEXT PHASE | Budget Gate. Requires Phase 6 released (now satisfied). Blocked until validated budget response present in `docs/integrations/lump_sum_budget_planner/received/`. |
+| Phase 8 | PENDING | Drafting & Review. Blocked by mandatory budget gate (Phase 7). No Phase 8 substep may commence until `gate_09_budget_consistency` passes. |
 
 ---
 
@@ -95,11 +97,11 @@ The bottleneck is in `runner/skill_runtime.py` lines 563-664 (`_assemble_skill_p
 
 This section replaces the original Section 2 ("Target Hybrid Architecture"). The migration now has two distinct paths with different readiness levels.
 
-### 2.0 Immediate Path: Tool-Augmented Prompt Mode (TAPM)
+### 2.0 Active Production Architecture: Tool-Augmented Prompt Mode (TAPM)
 
-**What it is**: The existing `claude -p` transport with two additions: (1) `--tools "Read,Glob"` enabled for selected skills, and (2) prompt restructured to provide task metadata and the skill spec without serializing input file contents. Claude reads declared inputs from disk on demand via the Read tool.
+**What it is**: The current production execution model. The existing `claude -p` transport with two additions: (1) `--tools "Read,Glob"` enabled for reasoning-heavy skills, and (2) prompt restructured to provide task metadata and the skill spec without serializing input file contents. Claude reads declared inputs from disk on demand via the Read tool. TAPM is not transitional — it is the stable production architecture for all phases currently validated (Phases 1–6). It is not a stepping stone to a native Claude backend; it is the architecture.
 
-**What it is not**: This is not a "native Claude Code backend." It does not depend on Claude Code discovering or loading skill definitions from `.claude/skills/`. It does not use slash commands, the Skill tool, or the Agent tool. It is an enhancement to the existing CLI prompt transport that eliminates the need to serialize large input corpora into the prompt.
+**What it is not**: This is not a "native Claude Code backend." It does not depend on Claude Code discovering or loading skill definitions from `.claude/skills/`. It does not use slash commands, the Skill tool, or the Agent tool. Skills and agents defined in `.claude/skills/` and `.claude/agents/` are not discoverable by Claude Code — they are specification files read by the Python runtime. TAPM is an enhancement to the existing CLI prompt transport that eliminates the need to serialize large input corpora into the prompt.
 
 **Execution model**:
 ```
@@ -122,7 +124,12 @@ run_skill(skill_id, ...)
     Phase A-F: [UNCHANGED — existing cli-prompt backend]
 ```
 
-**Key property**: Python still reads the skill spec file and assembles the prompt. Python still receives Claude's response as text, validates it, and writes artifacts. The only change is that input file contents are NOT serialized into the prompt — Claude reads them on demand via the Read tool.
+**Key property**: The Python runtime retains exclusive authority over three concerns:
+1. **Artifact write authority** — Claude has no Write tool; all artifact writes are performed by Python after validation
+2. **Validation authority** — schema validation, field-presence checks, and structural conformance are enforced by `_validate_skill_output()` in Python
+3. **Scheduling authority** — DAG dispatch, gate evaluation, state transitions, and HARD_BLOCK propagation remain exclusively in the Python scheduler
+
+The only change from cli-prompt mode is that input file contents are NOT serialized into the prompt — Claude reads them on demand via the Read tool.
 
 **What this achieves**:
 - Prompt reduction from 150-800KB to ~5-30KB for input-heavy skills
@@ -130,11 +137,11 @@ run_skill(skill_id, ...)
 - No dependency on Claude Code's skill/agent discovery
 - No format conversion of `.claude/skills/` or `.claude/agents/` files
 - All existing contracts, validation, and fail-closed behavior preserved
-- Python runtime retains full control of artifact writes
+- Python runtime retains exclusive control of artifact writes, validation, and scheduling
 
-### 2.1 Future Path: True Native Claude Code Backend (DEFERRED)
+### 2.1 Future Path: True Native Claude Code Backend (DEFERRED — NOT PLANNED)
 
-**Status: BLOCKED.** This path is not part of the immediate implementation sequence. It is deferred pending operational proof of the assumptions listed in Section 3.
+**Status: BLOCKED.** This path is explicitly deferred. It is not part of the current or planned implementation sequence. Five operationally unproven assumptions (Section 3) remain unresolved, with no active work to resolve them. TAPM is the production architecture; the native backend is a conditional future possibility, not a planned migration target.
 
 **What it would be**: Claude Code loads skill definitions from `.claude/skills/` via native discovery, reads declared inputs from disk, and produces candidate artifacts — all without Python assembling a prompt. The external runtime would hand off ~1-5KB of task metadata, not a prompt.
 
@@ -306,8 +313,8 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 | **n04** `milestone-consistency-check` | cli-prompt | Never | Small: Phase 3+4 outputs (~20KB) |
 | **n05** `impact-pathway-core-builder` | tapm | **Migrated** | Decomposed from `impact-pathway-mapper`. TAPM mode validated (run `e3caae21`). |
 | **n05** `impact-dec-enricher` | tapm | **Migrated** | `enrich_artifact` output contract: emits DEC fields only (~7KB), runtime merges into base artifact. TAPM mode validated. |
-| **n06** `governance-model-builder` | tapm | Later | Consortium + Phase 3 outputs (~40KB) |
-| **n06** `risk-register-builder` | cli-prompt | Never | risks.json + Phase 3-4 (~30KB) |
+| **n06** `governance-model-builder` | tapm | **Migrated** | TAPM mode validated (run `b2d4f829`). Reads consortium + WP structure + Tier 1/2 extracted (~40KB). |
+| **n06** `risk-register-builder` | tapm | **Migrated** | `enrich_artifact` output contract: emits `risk_register` only, runtime merges into base artifact. TAPM mode validated (run `b2d4f829`). |
 | **n07** `budget-interface-validation` | cli-prompt | Never | Structured validation, bounded inputs |
 | **n08** `proposal-section-traceability-check` | tapm | **First** (with Phase 8) | 200KB+, reads all tiers |
 | **n08** `evaluator-criteria-review` | tapm | **First** (with Phase 8) | 100KB+, reads draft + forms |
@@ -324,8 +331,8 @@ These assumptions underlie the deferred "true native Claude Code backend" (Secti
 
 ### 4.2 Summary Counts
 
-- **Migrated (TAPM, validated)**: 10 skills (`call-requirements-extraction`, `evaluation-matrix-builder`, `instrument-schema-normalization`, `topic-scope-check`, `impact-pathway-core-builder`, `impact-dec-enricher`, `dissemination-exploitation-communication-check`, `concept-alignment-check`, `concept-call-binding-derivation`, `gate-enforcement`)
-- **Migrate later (TAPM)**: 4 skills (`work-package-normalization`, `wp-dependency-analysis`, `governance-model-builder`, `gantt-schedule-builder`)
+- **Migrated (TAPM, validated)**: 12 skills (`call-requirements-extraction`, `evaluation-matrix-builder`, `instrument-schema-normalization`, `topic-scope-check`, `impact-pathway-core-builder`, `impact-dec-enricher`, `dissemination-exploitation-communication-check`, `concept-alignment-check`, `concept-call-binding-derivation`, `gate-enforcement`, `governance-model-builder`, `risk-register-builder`)
+- **Migrate later (TAPM)**: 2 skills (`work-package-normalization`, `gantt-schedule-builder`)
 - **Pending Phase 8 migration**: 3 skills (`proposal-section-traceability-check`, `evaluator-criteria-review`, `constitutional-compliance-check`)
 - **Never migrate**: 3 skills (`milestone-consistency-check`, `decision-log-update`, `checkpoint-publish` — small/bounded inputs)
 - **Permanently external**: 6 functions (gates, validation, writes, state, HARD_BLOCK)
@@ -395,9 +402,9 @@ Claude reads these 3 files on demand (~10-15KB total) vs. 338-794KB previously. 
 
 ### Step 0 — Call Slicer (Deterministic Input Bounding Layer)
 
-**Goal**: Eliminate input breadth at the source — before any Claude invocation, before TAPM prompt assembly, and before any skill or agent executes. Step 0 deterministically pre-selects the exact call-specific input slice so that all downstream steps operate over bounded, call-specific data only.
+**Goal**: Eliminate input breadth at the source — before any Claude invocation, before TAPM prompt assembly, and before any skill or agent executes. Step 0 deterministically pre-selects the exact call-specific input slice so that all downstream steps operate over bounded, call-specific data only. Step 0 is mandatory: it is a required pre-execution layer for the prompt-budget enforcement invariant (Section 12), not an optional optimization.
 
-**Classification**: Pure Python runtime preprocessing. Step 0 is NOT a skill, NOT an agent, NOT a TAPM operation. It does not invoke Claude. It does not depend on TAPM infrastructure. It runs entirely in Python as a deterministic function.
+**Classification**: Pure Python runtime preprocessing. Step 0 is NOT a skill, NOT an agent, NOT a TAPM operation. It does not invoke Claude. It does not depend on TAPM infrastructure. It runs entirely in Python as a deterministic function. After Step 0 executes, grouped JSONs are never read by any skill — only the slice and extract files are used at runtime.
 
 #### 0.1 Why Step 0 Exists
 
@@ -681,10 +688,11 @@ Step 0 does NOT:
 - Alter the constitutional authority hierarchy or tier semantics
 
 Step 0 IS:
-- A deterministic preprocessing optimization that narrows input breadth
+- A mandatory deterministic input bounding mechanism (not an optimization — a required preprocessing layer for prompt-budget enforcement)
 - Aligned with the existing call-extract pattern (writes to `call_extracts/`)
-- A runtime-layer enhancement consistent with CLAUDE.md Section 17 (runtime execution architecture)
+- A runtime-layer mechanism consistent with CLAUDE.md Section 17 (runtime execution architecture)
 - Independently testable and independently rollbackable
+- The reason grouped JSONs are NEVER read by skills at runtime — only slice + extract files are used
 
 **Rollback**: Delete `call_slicer.py`, remove the 5-line scheduler call, revert `reads_from` in skill catalog. No downstream dependencies break — skills fall back to reading grouped JSONs (larger but functionally equivalent).
 
@@ -1107,9 +1115,9 @@ The prompt-budget bottleneck was caused by unbounded input serialization. TAPM s
 
 ---
 
-## 13. TAPM Advantages Over the Deferred Native Backend
+## 13. TAPM as Production Architecture
 
-This section explains why TAPM is architecturally preferable as the immediate path, not merely a compromise.
+TAPM is the current production execution model. This section explains why TAPM is architecturally preferable, not merely a compromise or transitional step. The native Claude Code backend remains blocked by 5 unresolved assumptions (Section 3) with no active work to resolve them.
 
 | Property | TAPM | Native Backend (Deferred) |
 |---|---|---|
@@ -1160,11 +1168,11 @@ When `proposal-section-traceability-check` is invoked 3 times during Phase 8, th
 
 ---
 
-## 16. Future Path: True Native Claude Code Backend
+## 16. Future Path: True Native Claude Code Backend (DEFERRED)
 
 ### 16.1 Status
 
-**BLOCKED.** Not part of the immediate implementation sequence.
+**BLOCKED — NOT PLANNED.** Not part of the current or planned implementation sequence. All five blocking assumptions (Section 3) remain unresolved. TAPM is the production architecture.
 
 ### 16.2 Conditions for Unblocking
 
@@ -1265,11 +1273,14 @@ Phase 4 is operationally complete. Remediation was implemented and validated by 
 
 1. **Dependency normalization layer** (`runner/dependency_normalizer.py`):
    - Pure-Python deterministic preprocessor, no Claude invocation
+   - Runs pre-agent (Phase B+, before agent body, after input resolution)
    - Reads Phase 3 `wp_structure.json` + Tier 3 `workpackage_seed.json` + `selected_call.json`
+   - Does NOT modify Phase 3 output — reads `wp_structure.json` immutably
    - Reclassifies 16 infeasible WP-level `finish_to_start` edges as `non_strict`
    - Preserves 3 feasible task-level `finish_to_start` edges as `strict`
-   - Writes `scheduling_constraints.json` to Phase 4 output directory
-   - Integrated via `agent_runtime.py` Phase B+ (before agent body, after input resolution)
+   - Writes `scheduling_constraints.json` (the canonical normalization artifact) to Phase 4 output directory
+   - Strict constraints: hard temporal dependencies that must be respected in scheduling
+   - Non-strict constraints: informational data-flow relationships, not gate-enforced
 
 2. **Gantt-producing skill** (`gantt-schedule-builder`):
    - Skill spec: `.claude/skills/gantt-schedule-builder.md`
@@ -1281,13 +1292,15 @@ Phase 4 is operationally complete. Remediation was implemented and validated by 
 
 3. **Gate hardening** (`g05_p02c`, `g05_p02d`, `g05_p08`):
    - `g05_p02c`/`g05_p02d`: file existence + run ownership for `scheduling_constraints.json`
-   - `g05_p08` (`dependency_schedule_consistency`): validates gantt.json task schedule respects all strict normalized constraints
-   - Non-strict constraints are not enforced (informational data flow only)
+   - `g05_p08` (`dependency_schedule_consistency`): validates `gantt.json` task schedule respects all strict normalized constraints from `scheduling_constraints.json`
+   - Non-strict constraints are not gate-enforced (informational data flow only)
+   - `gantt.json` is the canonical Phase 4 gate artifact (not `wp_structure.json`, which is Phase 3's artifact)
 
 4. **Skill sequencing**:
    - n04 skill execution order: `gantt-schedule-builder` → `milestone-consistency-check` → `decision-log-update` → `gate-enforcement`
-   - `gantt.json` written to disk before milestone validation; skill detects it and runs in FULL mode
+   - `gantt.json` written to disk before `milestone-consistency-check` executes; skill detects it and runs in FULL mode (schedule-level validation, not degraded)
    - `gate-enforcement` always last (enforced by agent runtime)
+   - `milestone-consistency-check` runs AFTER `gantt.json` exists — this sequencing is mandatory for FULL mode operation
 
 ### Previous blocking issues (resolved)
 
@@ -1348,8 +1361,8 @@ Phase 5 was blocked by a prompt-size bottleneck: `impact-pathway-mapper` seriali
 ### Remediation sequence (5 components)
 
 1. **Skill decomposition** — `impact-pathway-mapper` split into two focused skills:
-   - `impact-pathway-core-builder` (TAPM): produces impact pathways and KPIs; writes `impact_architecture.json` with DEC fields set to null.
-   - `impact-dec-enricher` (TAPM, `enrich_artifact` contract): emits only `dissemination_plan`, `exploitation_plan`, `sustainability_mechanism` (~7KB); runtime merges into base artifact, preserving pathways and KPIs.
+   - `impact-pathway-core-builder` (TAPM): produces impact pathways and KPIs; writes `impact_architecture.json` with DEC fields set to null. KPIs must include `linked_deliverable_ids` for traceability.
+   - `impact-dec-enricher` (TAPM, `enrich_artifact` contract): emits only `dissemination_plan`, `exploitation_plan`, `sustainability_mechanism` (~7KB). The runtime performs a merge (not overwrite) into the base artifact: DEC fields are inserted while all existing pathways, KPIs, and metadata are preserved. The enricher never sees or produces the full artifact.
 
 2. **DEC-check TAPM migration** — `dissemination-exploitation-communication-check` migrated from cli-prompt (234KB prompt, 300s timeout) to TAPM. Prompt reduced to ~30KB. Skill validates the completed artifact and writes to `validation_reports/`.
 
@@ -1363,7 +1376,12 @@ Phase 5 was blocked by a prompt-size bottleneck: `impact-pathway-mapper` seriali
 
 - Run: `e3caae21-094e-4537-94a6-6a26b826d8ce`
 - Gate: `phase_05_gate` → `status: "pass"`
-- All 9 deterministic predicates passed: `g06_p01` through `g06_p08` plus `g06_p03b`
+- All 9 deterministic predicates passed:
+  - `g06_p01`, `g06_p02`: upstream gate freshness
+  - `g06_p03`, `g06_p03b`: file existence and run ownership
+  - `g06_p04` (`all_impacts_mapped`): each Tier 2B expected impact has at least one mapped project output
+  - `g06_p05` (`kpis_traceable_to_deliverables`): all KPIs reference deliverable IDs present in Phase 3 `wp_structure.json`
+  - `g06_p06`, `g06_p07`, `g06_p08`: DEC non-null checks — `dissemination_plan`, `exploitation_plan`, `sustainability_mechanism` must all be non-null in the final artifact
 - DEC validation report: 47 checks, 47 passed, 0 flagged
 - Input fingerprint: `sha256:304c1f2f...` covering 5 upstream artifacts
 
@@ -1377,7 +1395,7 @@ Phase 5 was blocked by a prompt-size bottleneck: `impact-pathway-mapper` seriali
 
 ### What remains open
 
-- Phase 6 requires Phases 3, 4, and 5 all released. Phase 5 is now released; Phase 4 gate status must be confirmed fresh before Phase 6 can dispatch.
+- ~~Phase 6 requires Phases 3, 4, and 5 all released.~~ → Resolved: Phase 6 dispatched and gate passed (run `b2d4f829`, 2026-04-24). See §24.
 - Phase 5 output quality (impact narrative specificity, KPI measurability) is gate-sufficient but has not been reviewed by a human evaluator.
 - DEC-check passed with 0 flags; actual DEC plan quality for evaluator scoring is a Phase 8 concern.
 
@@ -1400,3 +1418,77 @@ Gate freshness checking (`UPSTREAM_REQUIRED_INPUTS` in `runner/upstream_inputs.p
 ### Principle
 
 `UPSTREAM_REQUIRED_INPUTS` must contain only paths whose modification represents a real change to what the gate evaluated. Generated derivatives (call slices, transport aids) and directory-level mtimes that conflate source and generated content are excluded. Externally-placed directories (e.g. `integrations/received/`) remain tracked because no runner process writes into them.
+
+---
+
+## 24. Phase 6 — Implementation Architecture (COMPLETE — VALIDATED)
+
+Phase 6 is operationally validated. Run `b2d4f829` (2026-04-24) achieved `overall_status: "pass"` with `n06_implementation_architecture` released and `phase_06_gate` passing all 10 deterministic predicates.
+
+### Core outputs
+
+Phase 6 produces `implementation_architecture.json` (schema `orch.phase6.implementation_architecture.v1`) containing:
+
+- **Governance model** — governance matrix with body composition, decision scope, meeting frequency, escalation paths, and source basis traced to Tier 3 consortium data
+- **Management structure** — coordinator role, WP lead assignments, decision-making processes consistent with Phase 3 `wp_structure.json` partner_role_matrix
+- **Risk register** — populated from Tier 3 `risks.json` seeds with category, likelihood, impact, and mitigation measures traceable to project activities
+- **Ethics self-assessment** — explicit flags derived from `compliance_profile.json` (not omitted, not null, not "N/A" without explanation)
+- **Instrument-mandated sections** — all sections required by the active instrument's application form (from Tier 2A `section_schema_registry.json`) are addressed
+
+### Relationship to previous phases
+
+Phase 6 consumes outputs from three upstream phases:
+
+| Input | Source Phase | Artifact |
+|-------|-------------|----------|
+| WP structure (WPs, tasks, deliverables, dependency map, partner roles) | Phase 3 | `phase3_wp_design/wp_structure.json` |
+| Gantt timeline (task schedule, milestones, critical path) | Phase 4 | `phase4_gantt_milestones/gantt.json` |
+| Impact architecture (pathways, KPIs, DEC plans) | Phase 5 | `phase5_impact_architecture/impact_architecture.json` |
+| Risk seeds | Tier 3 | `architecture_inputs/risks.json` |
+| Consortium data (partners, roles, capabilities) | Tier 3 | `consortium/partners.json`, `consortium/roles.json` |
+| Compliance profile (ethics, security, open access flags) | Tier 3 | `call_binding/compliance_profile.json` |
+
+### Skill architecture
+
+Phase 6 uses a split architecture similar to Phase 5:
+
+1. **`governance-model-builder`** (TAPM) — produces the base `implementation_architecture.json` containing governance matrix, management structure, ethics assessment, and instrument section coverage. DEC-like fields (risk register) set to null.
+2. **`risk-register-builder`** (TAPM, `enrich_artifact` contract) — emits only `risk_register`; runtime merges into base artifact, preserving all existing governance and management fields. Same merge pattern as Phase 5's `impact-dec-enricher`.
+3. **`milestone-consistency-check`** (cli-prompt) — runs in FULL mode (gantt.json present); validates milestone-to-schedule consistency.
+4. **`constitutional-compliance-check`** (TAPM) — validates constitutional compliance of implementation architecture.
+5. **`gate-enforcement`** (TAPM) — evaluates `phase_06_gate` → returns PASS.
+
+No skill evaluates gates or writes `gate_result.json`. Gate evaluation is performed exclusively by the scheduler after the agent body completes.
+
+### Gate predicates (phase_06_gate)
+
+All 10 deterministic predicates passed:
+
+| Predicate | Type | What it checks |
+|-----------|------|---------------|
+| `g07_p01` | gate_pass | Phase 3 gate must have passed |
+| `g07_p02` | gate_pass | Phase 4 gate must have passed |
+| `g07_p03` | gate_pass | Phase 5 gate must have passed |
+| `g07_p04` | file | `implementation_architecture.json` is non-empty valid JSON |
+| `g07_p04b` | file | `implementation_architecture.json` owned by current run |
+| `g07_p05` | schema | Risk register is populated (non-empty array with required fields) |
+| `g07_p06` | schema | Ethics self-assessment is explicitly present (not omitted/null) |
+| `g07_p07` | schema | Governance matrix is defined (non-empty with required structure) |
+| `g07_p08` | coverage | All management roles assigned to Tier 3 consortium members |
+| `g07_p09` | coverage | All instrument-mandated implementation sections addressed |
+
+### Gate pass evidence
+
+- Run: `b2d4f829-9349-424a-9fdb-25c16fc42ba5`
+- Gate: `phase_06_gate` → `status: "pass"`
+- All 10 deterministic predicates passed; 0 failed
+- Input fingerprint: `sha256:bec55773...` covering 6 upstream artifacts (risks.json, compliance_profile.json, partners.json, wp_structure.json, gantt.json, impact_architecture.json)
+- Evaluated at: `2026-04-24T01:04:43.596571+00:00`
+
+### Phase dependencies now satisfied
+
+With Phase 6 released, the dependency chain for Phase 7 is complete:
+
+- Phase 7 (`n07_budget_gate`) requires: Phase 6 gate passed (`phase_06_gate`) → **satisfied**
+- Phase 7 is now the active phase, blocked only by the external budget planner response in `docs/integrations/lump_sum_budget_planner/received/`
+- Phase 8 remains blocked by the mandatory budget gate (`gate_09_budget_consistency`)
