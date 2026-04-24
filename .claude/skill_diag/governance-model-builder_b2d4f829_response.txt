@@ -1,19 +1,14 @@
+=== skill_id: governance-model-builder ===
+=== mode: tapm ===
+=== response_text length: 49436 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase6.implementation_architecture.v1",
   "run_id": "b2d4f829-9349-424a-9fdb-25c16fc42ba5",
   "governance_matrix": [
     {
       "body_name": "General Assembly",
-      "composition": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "decision_scope": "Highest-authority strategic decisions for the consortium: approval of major changes to project scope or objectives, changes to consortium composition, approval of periodic progress reports submitted to the European Commission, resolution of escalated disputes that cannot be resolved at the Project Management Committee level, oversight of overall project direction and risk posture.",
       "meeting_frequency": "Biannual (twice per year, at approximately month 12 intervals)",
       "escalation_path": "The General Assembly is the final internal escalation authority. Matters unresolvable within the General Assembly are subject to the consortium agreement dispute resolution provisions; per Tier 1 governance_principles.json (consortium_agreement_guidance), the consortium agreement must complement the grant agreement and must not contain provisions contrary to it (programme-guide_horizon_en.pdf p.34). Decisions affecting grant agreement obligations are managed consistent with grant_agreement_implementation_articles (wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36).",
@@ -22,16 +17,7 @@
     },
     {
       "body_name": "Project Management Committee",
-      "composition": [
-        "ATU",
-        "CERIA",
-        "BIIS",
-        "ISIA",
-        "NIHS",
-        "ELI",
-        "BAL",
-        "FIIT"
-      ],
+      "composition": ["ATU", "CERIA", "BIIS", "ISIA", "NIHS", "ELI", "BAL", "FIIT"],
       "decision_scope": "Operational execution management: task and milestone progress monitoring, risk mitigation activation within approved parameters, technical issue resolution below the threshold of scope change, coordination of inter-WP dependencies, preparation of materials for General Assembly review, and authorisation of operational-level resource adjustments.",
       "meeting_frequency": "Quarterly (every 3 months throughout the 48-month project lifetime)",
       "escalation_path": "Issues exceeding operational scope — including major budget reallocations, scope changes, or unresolved inter-partner disputes — are escalated to the General Assembly. The coordinator (ATU) manages escalation as part of project management responsibilities under WP1 (T1-01: Consortium governance and financial management), consistent with grant agreement implementation domains identified in Tier 1 governance_principles.json (grant_agreement_implementation_articles; source: wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36).",
@@ -40,10 +26,7 @@
     },
     {
       "body_name": "Ethics and Quality Oversight Committee",
-      "composition": [
-        "ATU",
-        "NIHS"
-      ],
+      "composition": ["ATU", "NIHS"],
       "decision_scope": "Ethics compliance monitoring across all project activities, quality assurance oversight, governance of healthcare-domain data handling in WP5, AI ethics issue identification and reporting (including Category 8 AI ethics and Category 4 health data concerns), and escalation of identified ethics issues to the Project Management Committee or General Assembly as appropriate.",
       "meeting_frequency": "As needed, with a minimum of biannual convening; immediate convening upon identification of a material ethics issue",
       "escalation_path": "Identified ethics issues with operational implications are escalated to the Project Management Committee. Issues requiring consortium-level action or with contractual implications are escalated to the General Assembly. Ethics issues with potential to become contractual obligations are handled consistent with Tier 1 implementation_constraints.json (ethics_self_assessment_required: 'projects with ethics issues may undergo ethics review and ethics requirements may become contractual obligations'; source: wp-15-general-annexes_horizon-2026-2027_en.pdf p.16; programme-guide_horizon_en.pdf pp.25-28). Escalation route is a project governance path, not a claim of a prescribed Tier 1 escalation procedure.",
@@ -224,107 +207,7 @@
       "source_basis": "docs/tier3_project_instantiation/consortium/roles.json (NIHS key_responsibilities: 'Ethics oversight for healthcare AI application'). docs/tier3_project_instantiation/consortium/partners.json (NIHS description: 'de-identified clinical datasets and established clinical validation pathways'). docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP5 T5-03: 'Clinical expert validation and results analysis'; lead NIHS). Tier 1 implementation_constraints.json (ethics_self_assessment_required; ethics_appraisal_summary). assigned_to 'NIHS' confirmed in valid_partner_ids."
     }
   ],
-  "risk_register": [
-    {
-      "risk_id": "RISK-01",
-      "description": "Integrating symbolic planning formalisms with LLM-based reasoning may prove more difficult than anticipated, particularly in achieving real-time performance for the planning engine.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Adopt a modular architecture with well-defined interfaces between symbolic and neural components. Implement fallback modes where the LLM-only planner operates when symbolic integration introduces unacceptable latency. Begin integration testing from M6, not M18. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-02",
-      "description": "The tri-store memory architecture may not scale to the interaction lengths required by demonstrators (hundreds of steps) without unacceptable latency or storage costs.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Design the memory controller with configurable retention policies from the start. Conduct scalability stress-testing on synthetic long-horizon tasks from M9. Implement tiered storage with fast/approximate retrieval for working memory and precise/slower retrieval for episodic memory. [Affects: WP3 (Adaptive Memory Architecture)]",
-      "responsible_partner": "BIIS"
-    },
-    {
-      "risk_id": "RISK-03",
-      "description": "Formal convergence proofs may be achievable only for restricted task classes, not for the full generality of real-world multi-agent scenarios encountered in demonstrators.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Classify task types early (M3–M6) by coordination complexity. Prioritise convergence proofs for the most common demonstrator task patterns. Use probabilistic convergence bounds for task classes where deterministic proofs are infeasible. [Affects: WP4 (Decentralised Multi-Agent Coordination)]",
-      "responsible_partner": "CERIA"
-    },
-    {
-      "risk_id": "RISK-04",
-      "description": "Access to de-identified clinical datasets may be delayed by ethics review processes or restricted in scope, reducing the clinical validation power of the healthcare demonstrator.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Submit ethics applications in M1 (pre-project preparation already initiated). Use publicly available clinical datasets (MIMIC-IV, eICU) for initial development and intermediate evaluation. Design the demonstrator with a data abstraction layer that can switch between data sources. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support)]",
-      "responsible_partner": "NIHS"
-    },
-    {
-      "risk_id": "RISK-05",
-      "description": "Operational factory access for the manufacturing demonstrator may be interrupted by production schedules, equipment maintenance, or external disruptions.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "medium",
-      "mitigation": "Secure a formal access agreement with factory partners before project start. Schedule the 3-month validation period with buffer windows. Develop a high-fidelity digital twin of the pilot factory that can substitute for physical access during development phases. [Affects: WP6 (Manufacturing Demonstrator — Process Optimisation)]",
-      "responsible_partner": "ISIA"
-    },
-    {
-      "risk_id": "RISK-06",
-      "description": "ELI operational data may be subject to commercial confidentiality constraints that restrict the scope or publishability of transfer demonstrator results.",
-      "category": "organisational",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Negotiate data access and publication terms in the consortium agreement. Design the demonstrator with an anonymisation layer that enables publication of performance metrics without exposing proprietary data. Supplement with public logistics benchmarks. [Affects: WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation)]",
-      "responsible_partner": "ELI"
-    },
-    {
-      "risk_id": "RISK-07",
-      "description": "The fast pace of LLM development may produce new foundation models during the project that significantly change the baseline capabilities, requiring re-evaluation of MAESTRO's value proposition.",
-      "category": "technical",
-      "likelihood": "high",
-      "impact": "medium",
-      "mitigation": "Design all MAESTRO components with model-agnostic interfaces that can integrate new LLMs without architectural changes. Conduct annual baseline re-evaluation (M12, M24, M36) against latest models. MAESTRO's value lies in the architecture (planning, memory, coordination) not in any specific LLM. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "BAL"
-    },
-    {
-      "risk_id": "RISK-08",
-      "description": "Regulatory requirements under the EU AI Act for high-risk AI systems (particularly the healthcare demonstrator) may impose compliance obligations that require additional development effort.",
-      "category": "external",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Monitor EU AI Act implementing regulations throughout the project. Design auditability and transparency mechanisms from the start (audit trails, decision explanations). Engage with AI regulatory sandboxes where available. [Affects: WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-09",
-      "description": "A key partner may reduce commitment or a principal investigator may depart during the project, creating capability gaps.",
-      "category": "organisational",
-      "likelihood": "low",
-      "impact": "high",
-      "mitigation": "Ensure each pillar has at least 2 partners with relevant expertise. Include deputy PI appointments for each WP lead. Consortium agreement includes commitment clauses and transition procedures. [Affects: WP1 (Project Management and Coordination)]",
-      "responsible_partner": "ATU"
-    },
-    {
-      "risk_id": "RISK-10",
-      "description": "The independently developed planning, memory, coordination, and tool orchestration modules may not integrate cleanly into a unified framework, requiring significant re-engineering.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "high",
-      "mitigation": "Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3 (WP8 early deliverable). Conduct integration checkpoints every 6 months. Assign BAL as integration engineer across all three pillars and the tool orchestration layer. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP4 (Decentralised Multi-Agent Coordination), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "FIIT"
-    },
-    {
-      "risk_id": "RISK-11",
-      "description": "The diversity of external APIs across three demonstrator domains (HL7 FHIR in healthcare, OPC-UA in manufacturing, logistics tracking/customs APIs) may require more adapter development effort than planned, delaying tool orchestration layer readiness.",
-      "category": "technical",
-      "likelihood": "medium",
-      "impact": "medium",
-      "mitigation": "Define a minimal common adapter interface in M1–M3. Prioritise adapters for the most critical APIs per demonstrator. Use existing open-source connector libraries where available rather than building from scratch. [Affects: WP2 (Neuro-Symbolic Planning and Reasoning Engine), WP3 (Adaptive Memory Architecture), WP5 (Healthcare Demonstrator — Clinical Decision Support), WP6 (Manufacturing Demonstrator — Process Optimisation), WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation), WP8 (Integration, Evaluation and Benchmarking)]",
-      "responsible_partner": "ATU"
-    }
-  ],
+  "risk_register": [],
   "ethics_assessment": {
     "ethics_issues_identified": true,
     "issues": [
@@ -481,111 +364,55 @@
       {
         "tier": 1,
         "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
-        "relevant_fields": [
-          "governance_constraints.no_prescribed_governance_body_names",
-          "governance_constraints.no_prescribed_meeting_frequency",
-          "governance_constraints.consortium_agreement_guidance",
-          "governance_constraints.grant_agreement_implementation_articles",
-          "governance_constraints.escalation_path_constraint",
-          "usage_rules_for_phase6"
-        ]
+        "relevant_fields": ["governance_constraints.no_prescribed_governance_body_names", "governance_constraints.no_prescribed_meeting_frequency", "governance_constraints.consortium_agreement_guidance", "governance_constraints.grant_agreement_implementation_articles", "governance_constraints.escalation_path_constraint", "usage_rules_for_phase6"]
       },
       {
         "tier": 1,
         "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
-        "relevant_fields": [
-          "implementation_rules.ethics_self_assessment_required",
-          "implementation_rules.ethics_appraisal_summary",
-          "implementation_rules.gender_equality_plan_eligibility",
-          "implementation_rules.gender_management_balance_guidance",
-          "implementation_rules.gender_dimension_in_content",
-          "implementation_rules.civil_focus_constraint",
-          "implementation_rules.dissemination_and_exploitation_requirement"
-        ]
+        "relevant_fields": ["implementation_rules.ethics_self_assessment_required", "implementation_rules.ethics_appraisal_summary", "implementation_rules.gender_equality_plan_eligibility", "implementation_rules.gender_management_balance_guidance", "implementation_rules.gender_dimension_in_content", "implementation_rules.civil_focus_constraint", "implementation_rules.dissemination_and_exploitation_requirement"]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
-        "relevant_fields": [
-          "instruments[instrument_type=RIA].sections",
-          "instruments[instrument_type=RIA].sections[section_id=A.4].field_requirements",
-          "instruments[instrument_type=RIA].sections[section_id=B.3.1].section_type",
-          "instruments[instrument_type=RIA].sections[section_id=B.2.2].field_requirements"
-        ]
+        "relevant_fields": ["instruments[instrument_type=RIA].sections", "instruments[instrument_type=RIA].sections[section_id=A.4].field_requirements", "instruments[instrument_type=RIA].sections[section_id=B.3.1].section_type", "instruments[instrument_type=RIA].sections[section_id=B.2.2].field_requirements"]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
-        "relevant_fields": [
-          "requirements[requirement_id=SR-10].description",
-          "requirements[requirement_id=SR-10].source_section",
-          "requirements[requirement_id=SR-09].description",
-          "requirements[requirement_id=SR-11].description",
-          "requirements[requirement_id=SR-06].description"
-        ]
+        "relevant_fields": ["requirements[requirement_id=SR-10].description", "requirements[requirement_id=SR-10].source_section", "requirements[requirement_id=SR-09].description", "requirements[requirement_id=SR-11].description", "requirements[requirement_id=SR-06].description"]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
-        "relevant_fields": [
-          "constraints[constraint_id=CC-05].description",
-          "constraints[constraint_id=CC-05].source_section",
-          "constraints[constraint_id=CC-03].description",
-          "constraints[constraint_id=CC-04].description",
-          "constraints[constraint_id=CC-07].description"
-        ]
+        "relevant_fields": ["constraints[constraint_id=CC-05].description", "constraints[constraint_id=CC-05].source_section", "constraints[constraint_id=CC-03].description", "constraints[constraint_id=CC-04].description", "constraints[constraint_id=CC-07].description"]
       },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
-        "relevant_fields": [
-          "partners[].partner_id (all 8: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT)",
-          "partners[short_name=NIHS].description (de-identified clinical datasets)",
-          "partners[].organisation_type (for GEP eligibility determination)",
-          "partners[].country"
-        ]
+        "relevant_fields": ["partners[].partner_id (all 8: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT)", "partners[short_name=NIHS].description (de-identified clinical datasets)", "partners[].organisation_type (for GEP eligibility determination)", "partners[].country"]
       },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/consortium/roles.json",
-        "relevant_fields": [
-          "roles[].partner",
-          "roles[].consortium_role",
-          "roles[].wp_lead",
-          "roles[].key_responsibilities",
-          "roles[partner=ATU].key_responsibilities (ethics compliance)",
-          "roles[partner=NIHS].key_responsibilities (ethics oversight for healthcare AI)"
-        ]
+        "relevant_fields": ["roles[].partner", "roles[].consortium_role", "roles[].wp_lead", "roles[].key_responsibilities", "roles[partner=ATU].key_responsibilities (ethics compliance)", "roles[partner=NIHS].key_responsibilities (ethics oversight for healthcare AI)"]
       },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
-        "relevant_fields": [
-          "ethics_review_required (Tier 3 derivative compliance flag)",
-          "gender_plan_required (Tier 3 derivative compliance flag)",
-          "open_science_requirements (references CC-05 and SR-10 — confirmed by Tier 2B)"
-        ]
+        "relevant_fields": ["ethics_review_required (Tier 3 derivative compliance flag)", "gender_plan_required (Tier 3 derivative compliance flag)", "open_science_requirements (references CC-05 and SR-10 — confirmed by Tier 2B)"]
       },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json",
-        "relevant_fields": [
-          "instrument_type (RIA — used to filter section_schema_registry)",
-          "topic_code",
-          "max_project_duration_months"
-        ]
+        "relevant_fields": ["instrument_type (RIA — used to filter section_schema_registry)", "topic_code", "max_project_duration_months"]
       },
       {
         "tier": 4,
         "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-        "relevant_fields": [
-          "work_packages[].wp_id",
-          "work_packages[].lead_partner (all 9 WPs — used for management_roles Constraint 2 verification)",
-          "work_packages[].tasks (T1-03 ethics oversight, WP5 tasks for ethics issues)",
-          "partner_role_matrix[].wps_as_lead",
-          "work_packages[WP5].objectives (healthcare demonstrator ethics relevance)"
-        ]
+        "relevant_fields": ["work_packages[].wp_id", "work_packages[].lead_partner (all 9 WPs — used for management_roles Constraint 2 verification)", "work_packages[].tasks (T1-03 ethics oversight, WP5 tasks for ethics issues)", "partner_role_matrix[].wps_as_lead", "work_packages[WP5].objectives (healthcare demonstrator ethics relevance)"]
       }
     ]
   }
 }
+
+=== END ===

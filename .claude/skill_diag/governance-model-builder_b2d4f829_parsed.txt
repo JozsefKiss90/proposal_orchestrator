@@ -1,0 +1,51 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'governance_matrix', 'management_roles', 'risk_register', 'ethics_assessment', 'instrument_sections_addressed', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "b2d4f829-9349-424a-9fdb-25c16fc42ba5",
+  "governance_matrix": [
+    {
+      "body_name": "General Assembly",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Highest-authority strategic decisions for the consortium: approval of major changes to project scope or objectives, changes to consortium composition, approval of periodic progress reports submitted to the European Commission, resolution of escalated disputes that cannot be resolved at the Project Management Committee level, oversight of overall project direction and risk posture.",
+      "meeting_frequency": "Biannual (twice per year, at approximately month 12 intervals)",
+      "escalation_path": "The General Assembly is the final internal escalation authority. Matters unresolvable within the General Assembly are subject to the consortium agreement dispute resolution provisions; per Tier 1 governance_principles.json (consortium_agreement_guidance), the consortium agreement must complement the grant agreement and must not contain provisions contrary to it (programme-guide_horizon_en.pdf p.34). Decisions affecting grant agreement obligations are managed consistent with grant_agreement_implementation_articles (wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36).",
+      "source_basis": "Composition drawn exclusively from valid_partner_ids in docs/tier3_project_instantiation/consortium/partners.json (all 8 consortium partners). Coordinator role of ATU derived from docs/tier3_project_instantiation/consortium/roles.json (consortium_role: 'Coordinator'). Body naming is a project-operational decision; Tier 1 governance_principles.json (no_prescribed_governance_body_names: true) confirms no body names are prescribed by Tier 1 programme rules.",
+      "assumption_note": "Body name 'General Assembly' and meeting frequency (biannual) are project-operational assumptions. Tier 1 governance_principles.json (no_prescribed_governance_body_names: true; no_prescribed_meeting_frequency: true; source: programme-guide_horizon_en.pdf p.6 and wp-15-general-annexes_horizon-2026-2027_en.pdf pp.3-4) confirms neither the name nor the frequency is prescribed by programme rules. Selected as project-operational design appropriate for an 8-partner 48-month RIA."
+    },
+    {
+      "body_name": "Project Management Committee",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Operational execution management: task and milestone progress monitoring, risk mitigation activation within approved parameters, technical issue resolution below the threshold of scope change, coordination of inter-WP dependencies, preparation of materials for General Assembly review, and authorisation of operational-level resource adjustments.",
+      "meeting_frequency": "Quarterly (every 3 months throughout the 48-month project lifetime)",
+      "escalation_path": "Issues exceeding operational scope \u2014 including major budget reallocations, scope changes, or unresolved inter-partner disputes \u2014 are escalated to the General Assembly. The coordinator (ATU) manages escalation as part of project management responsibilities under WP1 (T1-01: Consortium governance and financial management), consistent with grant agreement implementation domains identified in Tier 1 governance_principles.json (grant_agreement_implementation_articles; source: wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36).",
+      "source_basis": "Composition drawn exclusively from valid_partner_ids in docs/tier3_project_instantiation/consortium/partners.json. All 8 partners are WP leads per docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (partner_role_matrix). Each partner participates in the PMC in their WP lead capacity. ATU chairs as coordinator per docs/tier3_project_instantiation/consortium/roles.json.",
+      "assumption_note": "Body name 'Project Management Committee' and meeting frequency (quarterly) are project-operational assumptions. Tier 1 governance_principles.json (no_prescribed_governance_body_names: true; no_prescribed_meeting_frequency: true) confirms these choices are not mandated by programme rules. Quarterly cadence selected as project-operational assumption appropriate for monitoring a 9-WP project with complex inter-WP dependencies (per dependency_map in wp_structure.json)."
+    },
+    {
+      "body_name": "Ethics and Quality Oversight Committee",
+      "composition": [
+        "ATU",
+        "NIHS"
+      ],
+      "decision_scope": "Ethics compliance monitoring across all project activities, quality assurance oversight, governance of healthcare-domain data handling in WP5, AI ethics issue identification and reporting (including Category 8 A
+=== END ===
