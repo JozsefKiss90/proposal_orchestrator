@@ -1,0 +1,70 @@
+{
+  "run_id": "d4472303-b975-47c3-99b7-8350834e8039",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "started_at": "2026-04-24T12:15:40.752829+00:00",
+  "completed_at": "2026-04-24T12:21:21.743459+00:00",
+  "overall_status": "fail",
+  "terminal_nodes_reached": [],
+  "stalled_nodes": [],
+  "hard_blocked_nodes": [
+    "n08a_section_drafting",
+    "n08b_assembly",
+    "n08c_evaluator_review",
+    "n08d_revision"
+  ],
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "blocked_at_exit",
+    "n08a_section_drafting": "hard_block_upstream",
+    "n08b_assembly": "hard_block_upstream",
+    "n08c_evaluator_review": "hard_block_upstream",
+    "n08d_revision": "hard_block_upstream"
+  },
+  "gate_results_index": {},
+  "node_failure_details": {
+    "n07_budget_gate": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'constitutional-compliance-check' failed: Skill 'constitutional-compliance-check': model-signaled failure: artifact_path required; invoking agent must specify which artifact to audit",
+      "failure_category": "SKILL_FAILURE"
+    },
+    "n08a_section_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08b_assembly": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08c_evaluator_review": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08d_revision": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  },
+  "dispatched_nodes": [
+    "n07_budget_gate"
+  ],
+  "phase_scope": 7,
+  "phase_scope_nodes": [
+    "n07_budget_gate"
+  ]
+}
