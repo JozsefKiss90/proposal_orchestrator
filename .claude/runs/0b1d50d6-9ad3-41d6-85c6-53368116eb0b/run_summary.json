@@ -1,0 +1,72 @@
+{
+  "run_id": "0b1d50d6-9ad3-41d6-85c6-53368116eb0b",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "started_at": "2026-04-24T16:01:12.014857+00:00",
+  "completed_at": "2026-04-24T16:11:31.108315+00:00",
+  "overall_status": "fail",
+  "terminal_nodes_reached": [],
+  "stalled_nodes": [],
+  "hard_blocked_nodes": [
+    "n08a_section_drafting",
+    "n08b_assembly",
+    "n08c_evaluator_review",
+    "n08d_revision"
+  ],
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "blocked_at_exit",
+    "n08a_section_drafting": "hard_block_upstream",
+    "n08b_assembly": "hard_block_upstream",
+    "n08c_evaluator_review": "hard_block_upstream",
+    "n08d_revision": "hard_block_upstream"
+  },
+  "gate_results_index": {
+    "gate_09_budget_consistency": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json"
+  },
+  "node_failure_details": {
+    "n07_budget_gate": {
+      "failure_origin": "exit_gate",
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08a_section_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08b_assembly": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08c_evaluator_review": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08d_revision": {
+      "failure_origin": null,
+      "exit_gate_evaluated": false,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  },
+  "dispatched_nodes": [
+    "n07_budget_gate"
+  ],
+  "phase_scope": 7,
+  "phase_scope_nodes": [
+    "n07_budget_gate"
+  ]
+}
