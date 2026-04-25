@@ -121,22 +121,42 @@ UPSTREAM_REQUIRED_INPUTS: dict[str, list[str]] = {
         "docs/integrations/lump_sum_budget_planner/validation",
     ],
 
-    # exit gate for n08b — Phase 8b consumed Phase 7 output + drafted sections dir
-    "gate_10_part_b_completeness": [
+    # exit gate for n08a — Excellence section consumed budget gate + Tier 3/4 inputs
+    "gate_10a_excellence_completeness": [
         "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
-        "docs/tier5_deliverables/proposal_sections",
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
     ],
 
-    # exit gate for n08c — Phase 8c consumed assembled draft + proposal sections dir
+    # exit gate for n08b — Impact section consumed budget gate + impact architecture
+    "gate_10b_impact_completeness": [
+        "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+    ],
+
+    # exit gate for n08c — Implementation section consumed budget gate + WP/Gantt/impl
+    "gate_10c_implementation_completeness": [
+        "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+    ],
+
+    # exit gate for n08d — Assembly consumed all three section artifacts
+    "gate_10d_cross_section_consistency": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+    ],
+
+    # exit gate for n08e — Review consumed assembled Part B draft
     "gate_11_review_closure": [
-        "docs/tier5_deliverables/assembled_drafts/assembled_draft.json",
-        "docs/tier5_deliverables/proposal_sections",
+        "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+        "docs/tier5_deliverables/review_packets/review_packet.json",
     ],
 
-    # exit gate for n08d — Phase 8d consumed review packet + assembled draft + status
+    # exit gate for n08f — Revision consumed review packet + assembled draft + status
     "gate_12_constitutional_compliance": [
         "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json",
-        "docs/tier5_deliverables/assembled_drafts/assembled_draft.json",
-        "docs/tier5_deliverables/review_packets/review_packet.json",
+        "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+        "docs/tier5_deliverables/final_exports/final_export.json",
     ],
 }

@@ -8,13 +8,13 @@ construct a synthetic repository in a temporary directory.
 
 Coverage matrix (failure dimensions × gates):
     pass                          gate_01, phase_02, phase_03, gate_09 (partial)
-    missing mandatory input       gate_01, phase_01, gate_10
+    missing mandatory input       gate_01, phase_01, gate_10d
     malformed artifact            phase_01, phase_05 (json_field_present →
                                   MALFORMED_ARTIFACT)
     stale artifact                phase_03
     inherited artifact            phase_02
     cross-artifact inconsistency  phase_04 (timeline), phase_06 (management roles),
-                                  gate_10 (missing section)
+                                  gate_10d (missing section)
     policy violation              phase_01 (source refs), gate_11 (revision actions)
     version mismatch              cross-gate (manifest_version)
     entry vs exit gate            gate_01 (entry), phase_03 (exit)
@@ -29,7 +29,10 @@ Gates represented in scenario tests:
     phase_05_gate ✓
     phase_06_gate ✓
     gate_09_budget_consistency ✓
-    gate_10_part_b_completeness ✓
+    gate_10a_excellence_completeness ✓
+    gate_10b_impact_completeness ✓
+    gate_10c_implementation_completeness ✓
+    gate_10d_cross_section_consistency ✓
     gate_11_review_closure ✓
     gate_12_constitutional_compliance ✓
     version mismatch (cross-gate) ✓
@@ -757,7 +760,7 @@ class TestGate09BudgetConsistency:
     def test_hard_block_freezes_phase8_nodes(self, tmp_path: Path) -> None:
         """
         HARD_BLOCK propagation: after gate_09 fails with hard_block, all
-        Phase 8 node IDs (n08a, n08b, n08c, n08d) are set to
+        Phase 8 node IDs (n08a-n08f) are set to
         ``hard_block_upstream`` in the run manifest.
 
         Exercises failure dimension 10 (HARD_BLOCK propagation) fully.
@@ -793,14 +796,14 @@ class TestGate09BudgetConsistency:
 
 
 # ===========================================================================
-# GATE 09 — gate_10_part_b_completeness (exit gate, Phase 8b)
+# GATE 09 — gate_10d_cross_section_consistency (exit gate, Phase 8d)
 # ===========================================================================
 
 
-class TestGate10PartBCompleteness:
+class TestGate10dCrossSectionConsistency:
     """
-    Exit gate for Phase 8b (Assembly).
-    Confirms all required sections are drafted.
+    Exit gate for Phase 8d (Assembly).
+    Confirms all required sections are drafted and cross-section consistency.
     """
 
     _SECTIONS_PATH = "docs/tier5_deliverables/proposal_sections/"
@@ -815,7 +818,7 @@ class TestGate10PartBCompleteness:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_10_part_b_completeness", "exit", "n08b_assembly", preds)],
+            [gate_entry("gate_10d_cross_section_consistency", "exit", "n08d_assembly", preds)],
         )
 
     def test_missing_required_section_is_cross_artifact_inconsistency(
@@ -826,7 +829,7 @@ class TestGate10PartBCompleteness:
         Only ``excellence`` and ``impact`` are drafted; ``implementation``
         is absent → CROSS_ARTIFACT_INCONSISTENCY.
 
-        Exercises failure dimension 6 (cross-artifact) for Phase 8b.
+        Exercises failure dimension 6 (cross-artifact) for Phase 8d.
         """
         repo_root = make_repo_root(tmp_path)
         _, run_id = init_run(repo_root)
@@ -843,7 +846,7 @@ class TestGate10PartBCompleteness:
         # "implementation" is intentionally absent
 
         lib = self._make_library(repo_root)
-        result = evaluate_gate("gate_10_part_b_completeness", run_id, repo_root, library_path=lib)
+        result = evaluate_gate("gate_10d_cross_section_consistency", run_id, repo_root, library_path=lib)
 
         assert result["status"] == "fail"
         failed = result["deterministic_predicates"]["failed"]
@@ -855,13 +858,13 @@ class TestGate10PartBCompleteness:
 
 
 # ===========================================================================
-# GATE 10 — gate_11_review_closure (exit gate, Phase 8c)
+# GATE 10 — gate_11_review_closure (exit gate, Phase 8e)
 # ===========================================================================
 
 
 class TestGate11ReviewClosure:
     """
-    Exit gate for Phase 8c (Evaluator Review).
+    Exit gate for Phase 8e (Evaluator Review).
     Tests a policy violation: review packet has missing revision actions.
     """
 
@@ -876,7 +879,7 @@ class TestGate11ReviewClosure:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_11_review_closure", "exit", "n08c_evaluator_review", preds)],
+            [gate_entry("gate_11_review_closure", "exit", "n08e_evaluator_review", preds)],
         )
 
     def test_empty_revision_actions_is_malformed_artifact(self, tmp_path: Path) -> None:
@@ -936,13 +939,13 @@ class TestGate11ReviewClosure:
 
 
 # ===========================================================================
-# GATE 11 — gate_12_constitutional_compliance (exit gate, Phase 8d, final)
+# GATE 11 — gate_12_constitutional_compliance (exit gate, Phase 8f, final)
 # ===========================================================================
 
 
 class TestGate12ConstitutionalCompliance:
     """
-    Final exit gate for Phase 8d (Revision).  Contains multiple semantic
+    Final exit gate for Phase 8f (Revision).  Contains multiple semantic
     predicates for constitutional compliance.
     """
 
@@ -963,7 +966,7 @@ class TestGate12ConstitutionalCompliance:
         ]
         return write_library(
             repo_root,
-            [gate_entry("gate_12_constitutional_compliance", "exit", "n08d_revision", preds)],
+            [gate_entry("gate_12_constitutional_compliance", "exit", "n08f_revision", preds)],
         )
 
     def _setup_passing_deterministic_state(self, repo_root: Path, run_id: str) -> None:
@@ -1060,7 +1063,7 @@ class TestGate12ConstitutionalCompliance:
             )
 
         assert result["status"] == "pass"
-        assert _get_node_state(repo_root, run_id, "n08d_revision") == "released"
+        assert _get_node_state(repo_root, run_id, "n08f_revision") == "released"
 
 
 # ===========================================================================
@@ -1280,7 +1283,7 @@ class TestGate11Pass:
         ]
         lib = write_library(
             repo_root,
-            [gate_entry("gate_11_review_closure", "exit", "n08c_evaluator_review", preds)],
+            [gate_entry("gate_11_review_closure", "exit", "n08e_evaluator_review", preds)],
         )
 
         result = evaluate_gate("gate_11_review_closure", run_id, repo_root, library_path=lib)

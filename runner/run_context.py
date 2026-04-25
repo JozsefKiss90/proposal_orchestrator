@@ -78,10 +78,12 @@ NODE_STATES: frozenset[str] = frozenset(
 #: These must match the canonical node_id values in manifest.compile.yaml exactly.
 PHASE_8_NODE_IDS: frozenset[str] = frozenset(
     {
-        "n08a_section_drafting",
-        "n08b_assembly",
-        "n08c_evaluator_review",
-        "n08d_revision",
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+        "n08d_assembly",
+        "n08e_evaluator_review",
+        "n08f_revision",
     }
 )
 

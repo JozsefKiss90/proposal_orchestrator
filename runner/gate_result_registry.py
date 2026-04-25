@@ -49,15 +49,27 @@ GATE_RESULT_PATHS: dict[str, str] = {
     "gate_09_budget_consistency": (
         "phase_outputs/phase7_budget_gate/gate_result.json"
     ),
-    # exit gate for n08b
-    "gate_10_part_b_completeness": (
-        "phase_outputs/phase8_drafting_review/gate_10_result.json"
+    # exit gate for n08a (Excellence section completeness)
+    "gate_10a_excellence_completeness": (
+        "phase_outputs/phase8_drafting_review/gate_10a_result.json"
     ),
-    # exit gate for n08c
+    # exit gate for n08b (Impact section completeness)
+    "gate_10b_impact_completeness": (
+        "phase_outputs/phase8_drafting_review/gate_10b_result.json"
+    ),
+    # exit gate for n08c (Implementation section completeness)
+    "gate_10c_implementation_completeness": (
+        "phase_outputs/phase8_drafting_review/gate_10c_result.json"
+    ),
+    # exit gate for n08d (Cross-section consistency)
+    "gate_10d_cross_section_consistency": (
+        "phase_outputs/phase8_drafting_review/gate_10d_result.json"
+    ),
+    # exit gate for n08e
     "gate_11_review_closure": (
         "phase_outputs/phase8_drafting_review/gate_11_result.json"
     ),
-    # exit gate for n08d
+    # exit gate for n08f
     "gate_12_constitutional_compliance": (
         "phase_outputs/phase8_drafting_review/gate_12_result.json"
     ),

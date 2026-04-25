@@ -1,13 +1,13 @@
 ---
 agent_id: revision_integrator
-phase_id: phase_08d_revision
+phase_id: phase_08f_revision
 node_ids:
-  - n08d_revision
+  - n08f_revision
 role_summary: >
   Applies revision actions from the evaluator review to the assembled draft;
   resolves critical and major weaknesses; publishes the Phase 8 checkpoint
   and produces the final export.
-constitutional_scope: "Phase 8d"
+constitutional_scope: "Phase 8f"
 reads_from:
   - docs/tier5_deliverables/assembled_drafts/
   - docs/tier5_deliverables/review_packets/
@@ -32,9 +32,9 @@ exit_gate: gate_12_constitutional_compliance
 
 ## Purpose
 
-Phase 8d node body executor for `n08d_revision`. The terminal node (`terminal: true` in `manifest.compile.yaml`). Reads the assembled draft and review packet to apply revision actions. Produces the final export, publishes the Phase 8 checkpoint, and writes the `drafting_review_status.json` Tier 4 artifact.
+Phase 8f node body executor for `n08f_revision`. The terminal node (`terminal: true` in `manifest.compile.yaml`). Reads the assembled draft and review packet to apply revision actions. Produces the final export, publishes the Phase 8 checkpoint, and writes the `drafting_review_status.json` Tier 4 artifact.
 
-Requires `gate_11_review_closure` to have passed before execution begins (edge registry: `e08c_to_08d`).
+Requires `gate_11_review_closure` to have passed before execution begins (edge registry: `e08e_to_08f`).
 
 ## Canonical Outputs
 
@@ -44,11 +44,11 @@ Requires `gate_11_review_closure` to have passed before execution begins (edge r
 
 ## Additional Output
 
-- `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` — updated revised version.
+- `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` — Updated revised version (schema: `orch.tier5.part_b_assembled_draft.v1`).
 
 ## Note on Prior Catalog Reconciliation
 
-In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for `proposal_writer` was corrected to `"Phase 8a and Phase 8b"`. This agent (`revision_integrator`) is the sole authoritative executor for Phase 8d as bound by `manifest.compile.yaml`. No further action required.
+In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for `proposal_writer` was corrected to `"Phase 8a and Phase 8b"`. This agent (`revision_integrator`) is the sole authoritative executor for Phase 8f as bound by `manifest.compile.yaml`. No further action required.
 
 ## Skill Bindings
 
@@ -99,7 +99,7 @@ In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for 
 
 | Path | Tier | Provenance | Schema ID | Role |
 |------|------|------------|-----------|------|
-| `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.assembled_draft.v1` | Draft to be revised |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.part_b_assembled_draft.v1` | Draft to be revised |
 | `docs/tier5_deliverables/review_packets/review_packet.json` | tier5_deliverable | run_produced | `orch.tier5.review_packet.v1` | Review packet with revision actions |
 | `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | tier4_phase_output | run_produced | `orch.phase7.budget_gate_assessment.v1` | Budget gate confirmation for budget-dependent sections |
 
@@ -110,7 +110,7 @@ In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for 
 | `docs/tier5_deliverables/final_exports/final_export.json` | tier5_deliverable | run_produced | `orch.tier5.final_export.v1` | Final proposal export; run_id required |
 | `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` | tier4_checkpoint | run_produced | `orch.checkpoints.phase8_checkpoint.v1` | Terminal checkpoint; must not be overwritten once validated |
 | `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json` | tier4_phase_output | run_produced | `orch.phase8.drafting_review_status.v1` | Phase 8 status artifact; run_id required |
-| `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.assembled_draft.v1` | Updated revised draft (overwrites assembly version) |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.part_b_assembled_draft.v1` | Updated revised draft (overwrites assembly version) |
 
 ## Contract
 
@@ -129,7 +129,7 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 
 ## Predecessor Gate
 
-`gate_11_review_closure` must have passed (edge registry: `e08c_to_08d`). Verify before any action is taken.
+`gate_11_review_closure` must have passed (edge registry: `e08e_to_08f`). Verify before any action is taken.
 
 ## Terminal Node
 
@@ -168,7 +168,7 @@ This is the terminal node of the DAG (`terminal: true`). A `pass` result for `ga
 | `artifact_status` | string | **NO — absent at write time** | Runner stamps after gate evaluation |
 | `section_completion_log` | array | **yes** | One entry per section in the active instrument schema; each: `section_id`, `section_name`, `status` (enum: drafted/assembled/reviewed/revised/final), `artifact_path`, `data_gaps_flagged` (boolean) |
 | `revision_actions` | array | **yes** | From `review_packet.json` `revision_actions`; updated with resolution status; each: `action_id`, `section_id`, `severity`, `description`, `status` (resolved/unresolved), `reason` (required when severity: critical and status: unresolved); `all_critical_revisions_resolved` predicate fails if any critical action has `status: unresolved` without a non-empty `reason` |
-| `revision_log` | array | **yes** | Non-empty after Phase 8d; each entry: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` (ISO 8601) |
+| `revision_log` | array | **yes** | Non-empty after Phase 8f; each entry: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` (ISO 8601) |
 
 ### 3. `phase8_checkpoint.json` — Terminal Checkpoint
 
@@ -182,14 +182,14 @@ This is the terminal node of the DAG (`terminal: true`). A `pass` result for `ga
 | `run_id` | string | **yes** | Propagated from invoking run context |
 | `status` | string | **yes** | Must equal `"published"` for `checkpoint_published` predicate to pass; written only after all Phase 8 gates have passed |
 | `published_at` | string | **yes** | ISO 8601 timestamp |
-| `gate_results_confirmed` | array | **yes** | Must include (at minimum): `gate_09_budget_consistency`, `gate_10_part_b_completeness`, `gate_11_review_closure`, `gate_12_constitutional_compliance` |
+| `gate_results_confirmed` | array | **yes** | Must include (at minimum): `gate_09_budget_consistency`, `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency`, `gate_11_review_closure`, `gate_12_constitutional_compliance` |
 
 Note: This checkpoint is immutable once published. Must not be overwritten by subsequent reruns.
 
-### 4. Updated `assembled_draft.json` — Revised Draft
+### 4. Updated `part_b_assembled_draft.json` — Revised Draft
 
-**Canonical path:** `docs/tier5_deliverables/assembled_drafts/assembled_draft.json`
-**Schema ID:** `orch.tier5.assembled_draft.v1`
+**Canonical path:** `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json`
+**Schema ID:** `orch.tier5.part_b_assembled_draft.v1`
 
 This is an overwrite of the assembly-phase artifact with the revised version. All schema fields apply as defined for `proposal_writer`'s output. The `consistency_log` must reflect revision-phase consistency checks.
 
@@ -199,13 +199,13 @@ This is an overwrite of the assembly-phase artifact with the revised version. Al
 
 ### Budget Gate Prerequisite (Phase 8 Agent)
 
-`gate_09_budget_consistency` must have passed (verified transitively via `gate_11_review_closure` → `gate_10_part_b_completeness` → `g09_p01`). Additionally, `gate_12_constitutional_compliance` condition `g11_p07` and `g11_p10` verify budget gate confirmation is present and no section contradicts the validated budget.
+`gate_09_budget_consistency` must have passed (verified transitively via `gate_11_review_closure` → `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency` → `g09_p01`). Additionally, `gate_12_constitutional_compliance` condition `g11_p07` and `g11_p10` verify budget gate confirmation is present and no section contradicts the validated budget.
 
 If any revision action would require introducing budget-dependent content not confirmed by the budget gate, this agent must flag the action as unresolvable with reason citing CLAUDE.md §13.4.
 
 ### Predecessor Gate Requirements
 
-**Predecessor:** `gate_11_review_closure` — must have passed. Source: edge `e08c_to_08d`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`.
+**Predecessor:** `gate_11_review_closure` — must have passed. Source: edge `e08e_to_08f`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`.
 
 If `gate_11_review_closure` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
 
@@ -251,7 +251,7 @@ Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_revie
 
 ### Decision-Log Write Obligations
 
-Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: revision_integrator`, `phase_id: phase_08d_revision`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: revision_integrator`, `phase_id: phase_08f_revision`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
 
 | Trigger | `decision_type` | Minimum entry content |
 |---------|-----------------|-----------------------|
@@ -261,7 +261,7 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Constitutional violation found during revision | `constitutional_halt` | CLAUDE.md section; halted action |
 | Checkpoint published | `gate_pass` | Gate ID `gate_12_constitutional_compliance`; all conditions; run_id |
 | `gate_12_constitutional_compliance` fails | `gate_failure` | Gate ID; failed conditions; what blocks export |
-| `gate_11` predecessor not passed | `constitutional_halt` | Edge `e08c_to_08d`; status |
+| `gate_11` predecessor not passed | `constitutional_halt` | Edge `e08e_to_08f`; status |
 
 ---
 
@@ -269,15 +269,15 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 
 ### 1. Scope compliance
 
-`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` (revised version), `docs/tier5_deliverables/final_exports/final_export.json`, `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json`, `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`, and `docs/tier4_orchestration_state/decision_log/`. All are declared in the catalog. This agent does not write to `docs/tier5_deliverables/review_packets/` (read-only input) or `docs/tier5_deliverables/proposal_sections/` (input, not modified by revision). No undeclared path access is implied.
+`reads_from` and `writes_to` in the front matter exactly match `agent_catalog.yaml`. Concrete write targets: `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` (revised version), `docs/tier5_deliverables/final_exports/final_export.json`, `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json`, `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`, and `docs/tier4_orchestration_state/decision_log/`. All are declared in the catalog. This agent does not write to `docs/tier5_deliverables/review_packets/` (read-only input) or `docs/tier5_deliverables/proposal_sections/` (input, not modified by revision). No undeclared path access is implied.
 
 ### 2. Manifest authority compliance
 
-Node binding is `n08d_revision` (`terminal: true`). Exit gate is `gate_12_constitutional_compliance` — matches manifest. This is the only agent with authority to write `final_exports/` and `checkpoints/`. The Terminal Node section correctly notes that `overall_status: pass` in `run_summary.json` is set by the scheduler (not by this agent). No confusion about runner-owned artifacts (`run_summary.json`, `gate_result.json`, `artifact_status`) exists.
+Node binding is `n08f_revision` (`terminal: true`). Exit gate is `gate_12_constitutional_compliance` — matches manifest. This is the only agent with authority to write `final_exports/` and `checkpoints/`. The Terminal Node section correctly notes that `overall_status: pass` in `run_summary.json` is set by the scheduler (not by this agent). No confusion about runner-owned artifacts (`run_summary.json`, `gate_result.json`, `artifact_status`) exists.
 
-**Checkpoint authority:** The `checkpoint-publish` skill is listed in both the manifest skill list for `n08d_revision` and in this agent's `invoked_skills`. This agent is the only Phase 8 agent with write authority to `checkpoints/`. The must_not constraint "Must not overwrite a validated checkpoint" is in place. The Output Schema Contracts section states the checkpoint is immutable once published.
+**Checkpoint authority:** The `checkpoint-publish` skill is listed in both the manifest skill list for `n08f_revision` and in this agent's `invoked_skills`. This agent is the only Phase 8 agent with write authority to `checkpoints/`. The must_not constraint "Must not overwrite a validated checkpoint" is in place. The Output Schema Contracts section states the checkpoint is immutable once published.
 
-**Budget gate prerequisite:** The Budget Gate Prerequisite section describes transitive verification (via gate_11 → gate_10 → g09_p01) and also the direct check via `gate_12` conditions `g11_p07` and `g11_p10`. Any revision action that would introduce budget-dependent content not confirmed by the budget gate must be flagged as unresolvable. No softening of the budget gate exists.
+**Budget gate prerequisite:** The Budget Gate Prerequisite section describes transitive verification (via gate_11 → gate_10d → gates 10a/10b/10c → gate_09) and also the direct check via `gate_12` conditions `g11_p07` and `g11_p10`. Any revision action that would introduce budget-dependent content not confirmed by the budget gate must be flagged as unresolvable. No softening of the budget gate exists.
 
 ### 3. Forbidden-action review against CLAUDE.md §13 and §8
 

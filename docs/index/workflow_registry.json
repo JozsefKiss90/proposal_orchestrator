@@ -1,1 +1,63 @@
-{}
+{
+  "workflow_registry": {
+    "workflow_id": "horizon_europe_proposal_orchestration",
+    "version": "2.0",
+    "phases": [
+      {
+        "phase_number": 1,
+        "name": "Call Analysis",
+        "nodes": ["n01_call_analysis"],
+        "description": "Parse work programme and call topic to extract evaluation criteria, expected outcomes/impacts, scope requirements, eligibility conditions, and evaluation priority weights."
+      },
+      {
+        "phase_number": 2,
+        "name": "Concept Refinement",
+        "nodes": ["n02_concept_refinement"],
+        "description": "Align the project concept with confirmed call scope, expected outcomes, and expected impacts. Refine concept note and strategic positioning."
+      },
+      {
+        "phase_number": 3,
+        "name": "WP Design & Dependencies",
+        "nodes": ["n03_wp_design"],
+        "description": "Design work package structure: define WPs, tasks, deliverables, inter-WP dependencies, and responsible partners."
+      },
+      {
+        "phase_number": 4,
+        "name": "Gantt & Milestones",
+        "nodes": ["n04_gantt_milestones"],
+        "description": "Produce project timeline: assign tasks to months, define milestones with verifiable criteria, validate timeline fits within duration constraint."
+      },
+      {
+        "phase_number": 5,
+        "name": "Impact Architecture",
+        "nodes": ["n05_impact_architecture"],
+        "description": "Construct impact narrative: define pathway from project outputs to outcomes to broader impacts, mapped against call expected impact criteria."
+      },
+      {
+        "phase_number": 6,
+        "name": "Implementation Architecture",
+        "nodes": ["n06_implementation_architecture"],
+        "description": "Define implementation approach: management structure, risk management, ethical considerations, consortium governance."
+      },
+      {
+        "phase_number": 7,
+        "name": "Budget Gate",
+        "nodes": ["n07_budget_gate"],
+        "description": "Validate external budget response is present, structurally consistent with WP design and consortium. Mandatory gate — bypass prohibited."
+      },
+      {
+        "phase_number": 8,
+        "name": "Drafting & Review",
+        "nodes": [
+          "n08a_excellence_drafting",
+          "n08b_impact_drafting",
+          "n08c_implementation_drafting",
+          "n08d_assembly",
+          "n08e_evaluator_review",
+          "n08f_revision"
+        ],
+        "description": "Criterion-aligned drafting pipeline: three parallel section drafting nodes (Excellence, Impact, Implementation) converge on cross-section assembly, followed by evaluator-style review and revision cycle. Each section is independently gated with per-criterion completeness checks."
+      }
+    ]
+  }
+}

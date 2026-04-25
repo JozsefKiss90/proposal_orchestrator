@@ -13,13 +13,13 @@ mocked to control outcomes; the scheduler, ``RunContext``, ``ManifestGraph``,
 
 Scenarios
 ---------
-1. LinearAllPass       — 11 nodes (n01→…→n08d), all pass.
+1. LinearAllPass       — 13 nodes (n01→…→n08f), all pass.
 2. AgentBodyFailN02    — n01 passes; n02 agent body fails; downstream stalls.
 3. ExitGateFailN03     — n01, n02 pass; n03 exit gate fails; downstream stalls.
 4. BudgetAgentFail     — n01–n06 pass; n07 agent body fails; Phase 8 HARD_BLOCK.
 5. BudgetExitGateFail  — n01–n06 pass; n07 exit gate fails; Phase 8 HARD_BLOCK.
 6. ConstitutionalHalt  — n01 passes; n02 CONSTITUTIONAL_HALT; downstream stalls.
-7. Phase8MultiNode     — n08a + n08b dispatched as separate agent invocations.
+7. Phase8MultiNode     — n08a + n08b + n08c dispatched as separate agent invocations.
 
 Test philosophy
 ---------------
@@ -221,17 +221,22 @@ def _run_summary_exists(tmp_path: Path, run_id: str) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def _full_linear_manifest() -> dict:
+def _full_manifest() -> dict:
     """
-    Full 11-node linear chain matching the production DAG:
-        n01 → n02 → n03 → n04 → n05 → n06 → n07 → n08a → n08b → n08c → n08d
+    Full 13-node DAG matching the production topology:
+        n01 → n02 → n03 → n04 → n05 → n06 → n07 ──┬──→ n08a ──┐
+                                                     ├──→ n08b ──┼──→ n08d → n08e → n08f
+                                                     └──→ n08c ──┘
 
     n01 has entry gate gate_01_source_integrity.
     n07 exit gate is gate_09_budget_consistency (HARD_BLOCK trigger).
-    n08d is the sole terminal node.
+    n07 fans out to n08a, n08b, n08c (parallel drafting).
+    n08a, n08b, n08c converge on n08d (assembly).
+    n08d → n08e → n08f (sequential).
+    n08f is the sole terminal node.
     """
     return _manifest(
-        "test_full_linear",
+        "test_full",
         nodes=[
             _node("n01_call_analysis", "phase_01_gate",
                   entry_gate="gate_01_source_integrity"),
@@ -241,10 +246,12 @@ def _full_linear_manifest() -> dict:
             _node("n05_impact_architecture", "phase_05_gate"),
             _node("n06_implementation_architecture", "phase_06_gate"),
             _node("n07_budget_gate", "gate_09_budget_consistency"),
-            _node("n08a_section_drafting", "gate_10_part_b_completeness"),
-            _node("n08b_assembly", "gate_10_part_b_completeness"),
-            _node("n08c_evaluator_review", "gate_11_review_closure"),
-            _node("n08d_revision", "gate_12_constitutional_compliance", terminal=True),
+            _node("n08a_excellence_drafting", "gate_10a_excellence_completeness"),
+            _node("n08b_impact_drafting", "gate_10b_impact_completeness"),
+            _node("n08c_implementation_drafting", "gate_10c_implementation_completeness"),
+            _node("n08d_assembly", "gate_10d_cross_section_consistency"),
+            _node("n08e_evaluator_review", "gate_11_review_closure"),
+            _node("n08f_revision", "gate_12_constitutional_compliance", terminal=True),
         ],
         edges=[
             _edge("e01", "n01_call_analysis", "n02_concept_refinement", "phase_01_gate"),
@@ -253,15 +260,22 @@ def _full_linear_manifest() -> dict:
             _edge("e04", "n04_gantt_milestones", "n05_impact_architecture", "phase_04_gate"),
             _edge("e05", "n05_impact_architecture", "n06_implementation_architecture", "phase_05_gate"),
             _edge("e06", "n06_implementation_architecture", "n07_budget_gate", "phase_06_gate"),
-            _edge("e07", "n07_budget_gate", "n08a_section_drafting", "gate_09_budget_consistency"),
-            _edge("e08", "n08a_section_drafting", "n08b_assembly", "gate_10_part_b_completeness"),
-            _edge("e09", "n08b_assembly", "n08c_evaluator_review", "gate_10_part_b_completeness"),
-            _edge("e10", "n08c_evaluator_review", "n08d_revision", "gate_11_review_closure"),
+            # Fan-out from n07 to three parallel drafting nodes
+            _edge("e07a", "n07_budget_gate", "n08a_excellence_drafting", "gate_09_budget_consistency"),
+            _edge("e07b", "n07_budget_gate", "n08b_impact_drafting", "gate_09_budget_consistency"),
+            _edge("e07c", "n07_budget_gate", "n08c_implementation_drafting", "gate_09_budget_consistency"),
+            # Three drafting nodes converge on assembly
+            _edge("e08a", "n08a_excellence_drafting", "n08d_assembly", "gate_10a_excellence_completeness"),
+            _edge("e08b", "n08b_impact_drafting", "n08d_assembly", "gate_10b_impact_completeness"),
+            _edge("e08c", "n08c_implementation_drafting", "n08d_assembly", "gate_10c_implementation_completeness"),
+            # Sequential: assembly → review → revision
+            _edge("e09", "n08d_assembly", "n08e_evaluator_review", "gate_10d_cross_section_consistency"),
+            _edge("e10", "n08e_evaluator_review", "n08f_revision", "gate_11_review_closure"),
         ],
     )
 
 
-_ALL_11_NODES = [
+_ALL_13_NODES = [
     "n01_call_analysis",
     "n02_concept_refinement",
     "n03_wp_design",
@@ -269,39 +283,55 @@ _ALL_11_NODES = [
     "n05_impact_architecture",
     "n06_implementation_architecture",
     "n07_budget_gate",
-    "n08a_section_drafting",
-    "n08b_assembly",
-    "n08c_evaluator_review",
-    "n08d_revision",
+    "n08a_excellence_drafting",
+    "n08b_impact_drafting",
+    "n08c_implementation_drafting",
+    "n08d_assembly",
+    "n08e_evaluator_review",
+    "n08f_revision",
 ]
 
 
 def _phase8_multi_node_manifest() -> dict:
     """
     Minimal manifest for Phase 8 multi-node scenario:
-        n07 → n08a (proposal_writer) → n08b (proposal_writer) → n08d (terminal)
+        n07 ──┬──→ n08a (excellence_writer) ──┐
+              ├──→ n08b (impact_writer)       ├──→ n08d (assembly) → n08f (terminal)
+              └──→ n08c (implementation_writer)┘
 
-    n08a and n08b share agent_id ``proposal_writer`` but are separate nodes
-    with separate dispatch / separate agent invocations.
+    n08a, n08b, n08c are separate parallel nodes fanning out from n07,
+    converging on n08d.  Each has a separate agent invocation.
     """
     return _manifest(
         "test_phase8_multi",
         nodes=[
             _node("n07_budget_gate", "gate_09_budget_consistency"),
-            _node("n08a_section_drafting", "gate_10_part_b_completeness",
-                  agent="proposal_writer"),
-            _node("n08b_assembly", "gate_10_part_b_completeness",
-                  agent="proposal_writer"),
-            _node("n08d_revision", "gate_12_constitutional_compliance",
+            _node("n08a_excellence_drafting", "gate_10a_excellence_completeness",
+                  agent="excellence_writer"),
+            _node("n08b_impact_drafting", "gate_10b_impact_completeness",
+                  agent="impact_writer"),
+            _node("n08c_implementation_drafting", "gate_10c_implementation_completeness",
+                  agent="implementation_writer"),
+            _node("n08d_assembly", "gate_10d_cross_section_consistency",
+                  agent="proposal_integrator"),
+            _node("n08f_revision", "gate_12_constitutional_compliance",
                   terminal=True),
         ],
         edges=[
-            _edge("e07", "n07_budget_gate", "n08a_section_drafting",
+            _edge("e07a", "n07_budget_gate", "n08a_excellence_drafting",
                   "gate_09_budget_consistency"),
-            _edge("e08", "n08a_section_drafting", "n08b_assembly",
-                  "gate_10_part_b_completeness"),
-            _edge("e10", "n08b_assembly", "n08d_revision",
-                  "gate_10_part_b_completeness"),
+            _edge("e07b", "n07_budget_gate", "n08b_impact_drafting",
+                  "gate_09_budget_consistency"),
+            _edge("e07c", "n07_budget_gate", "n08c_implementation_drafting",
+                  "gate_09_budget_consistency"),
+            _edge("e08a", "n08a_excellence_drafting", "n08d_assembly",
+                  "gate_10a_excellence_completeness"),
+            _edge("e08b", "n08b_impact_drafting", "n08d_assembly",
+                  "gate_10b_impact_completeness"),
+            _edge("e08c", "n08c_implementation_drafting", "n08d_assembly",
+                  "gate_10c_implementation_completeness"),
+            _edge("e09", "n08d_assembly", "n08f_revision",
+                  "gate_10d_cross_section_consistency"),
         ],
     )
 
@@ -313,7 +343,7 @@ def _phase8_multi_node_manifest() -> dict:
 
 class TestLinearAllPass:
     """
-    All 11 nodes from n01 through n08d succeed.
+    All 13 nodes from n01 through n08f succeed.
     overall_status == "pass".  node_failure_details is empty.
     run_summary.json reflects the passing run.
     """
@@ -321,7 +351,7 @@ class TestLinearAllPass:
     RUN_ID = "linear-all-pass"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_overall_status_is_pass(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -332,14 +362,14 @@ class TestLinearAllPass:
             summary = sched.run()
         assert summary.overall_status == "pass"
 
-    def test_all_11_nodes_dispatched(self, tmp_path: Path) -> None:
+    def test_all_13_nodes_dispatched(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
         with (
             patch(_RA_TARGET, return_value=_agent_success()),
             patch(_EG_TARGET, return_value=_PASS),
         ):
             summary = sched.run()
-        assert summary.dispatched_nodes == _ALL_11_NODES
+        assert set(summary.dispatched_nodes) == set(_ALL_13_NODES)
 
     def test_all_nodes_released(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -367,7 +397,7 @@ class TestLinearAllPass:
             patch(_EG_TARGET, return_value=_PASS),
         ):
             summary = sched.run()
-        assert summary.terminal_nodes_reached == ["n08d_revision"]
+        assert summary.terminal_nodes_reached == ["n08f_revision"]
 
     def test_run_summary_json_written(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -414,7 +444,7 @@ class TestAgentBodyFailN02:
     RUN_ID = "agent-fail-n02"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_raises_run_aborted(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -479,8 +509,9 @@ class TestAgentBodyFailN02:
         summary = exc_info.value.summary
         for nid in ["n03_wp_design", "n04_gantt_milestones",
                      "n05_impact_architecture", "n06_implementation_architecture",
-                     "n07_budget_gate", "n08a_section_drafting", "n08b_assembly",
-                     "n08c_evaluator_review", "n08d_revision"]:
+                     "n07_budget_gate", "n08a_excellence_drafting",
+                     "n08b_impact_drafting", "n08c_implementation_drafting",
+                     "n08d_assembly", "n08e_evaluator_review", "n08f_revision"]:
             assert summary["node_states"][nid] == "pending", (
                 f"Expected {nid} pending, got {summary['node_states'][nid]}"
             )
@@ -541,7 +572,7 @@ class TestExitGateFailN03:
     RUN_ID = "exit-gate-fail-n03"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_n03_blocked_at_exit(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -598,8 +629,9 @@ class TestExitGateFailN03:
         states = exc_info.value.summary["node_states"]
         for nid in ["n04_gantt_milestones", "n05_impact_architecture",
                      "n06_implementation_architecture", "n07_budget_gate",
-                     "n08a_section_drafting", "n08b_assembly",
-                     "n08c_evaluator_review", "n08d_revision"]:
+                     "n08a_excellence_drafting", "n08b_impact_drafting",
+                     "n08c_implementation_drafting", "n08d_assembly",
+                     "n08e_evaluator_review", "n08f_revision"]:
             assert states[nid] == "pending"
 
     def test_run_summary_json_has_node_failure_details(self, tmp_path: Path) -> None:
@@ -632,7 +664,7 @@ class TestBudgetAgentBodyFail:
     RUN_ID = "budget-agent-fail"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_n07_blocked_at_exit(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -684,7 +716,7 @@ class TestBudgetAgentBodyFail:
             patch(_EG_TARGET, return_value=_PASS),
         ):
             summary = sched.run()
-        for nid in _ALL_11_NODES[:6]:  # n01–n06
+        for nid in _ALL_13_NODES[:6]:  # n01–n06
             assert summary["node_states"][nid] == "released"
 
     def test_hard_blocked_nodes_in_summary(self, tmp_path: Path) -> None:
@@ -732,7 +764,7 @@ class TestBudgetExitGateFail:
     RUN_ID = "budget-exit-gate-fail"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_n07_blocked_at_exit(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -802,7 +834,7 @@ class TestConstitutionalHaltPropagation:
     RUN_ID = "constitutional-halt"
 
     def _sched(self, tmp_path: Path) -> DAGScheduler:
-        return _make_scheduler(tmp_path, _full_linear_manifest(), self.RUN_ID)
+        return _make_scheduler(tmp_path, _full_manifest(), self.RUN_ID)
 
     def test_n02_blocked_at_exit(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -855,7 +887,7 @@ class TestConstitutionalHaltPropagation:
                 sched.run()
         states = exc_info.value.summary["node_states"]
         assert states["n01_call_analysis"] == "released"
-        for nid in _ALL_11_NODES[2:]:  # n03 onwards
+        for nid in _ALL_13_NODES[2:]:  # n03 onwards
             assert states[nid] == "pending"
 
     def test_run_summary_json_has_constitutional_halt(self, tmp_path: Path) -> None:
@@ -881,8 +913,8 @@ class TestConstitutionalHaltPropagation:
 
 class TestPhase8MultiNode:
     """
-    Verify that n08a and n08b are dispatched as separate nodes with separate
-    agent invocations despite sharing the same agent_id (proposal_writer).
+    Verify that n08a, n08b, n08c are dispatched as separate nodes with separate
+    agent invocations (parallel fan-out from n07), converging on n08d.
     """
 
     RUN_ID = "phase8-multi-node"
@@ -890,18 +922,20 @@ class TestPhase8MultiNode:
     def _sched(self, tmp_path: Path) -> DAGScheduler:
         return _make_scheduler(tmp_path, _phase8_multi_node_manifest(), self.RUN_ID)
 
-    def test_both_nodes_dispatched(self, tmp_path: Path) -> None:
+    def test_all_drafting_nodes_dispatched(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
         with (
             patch(_RA_TARGET, return_value=_agent_success()),
             patch(_EG_TARGET, return_value=_PASS),
         ):
             summary = sched.run()
-        assert "n08a_section_drafting" in summary.dispatched_nodes
-        assert "n08b_assembly" in summary.dispatched_nodes
+        assert "n08a_excellence_drafting" in summary.dispatched_nodes
+        assert "n08b_impact_drafting" in summary.dispatched_nodes
+        assert "n08c_implementation_drafting" in summary.dispatched_nodes
+        assert "n08d_assembly" in summary.dispatched_nodes
 
     def test_separate_agent_invocations(self, tmp_path: Path) -> None:
-        """run_agent is called once per node, even with the same agent_id."""
+        """run_agent is called once per node — each drafting node is separate."""
         sched = self._sched(tmp_path)
         invoked_nodes: list[str] = []
 
@@ -915,22 +949,30 @@ class TestPhase8MultiNode:
         ):
             sched.run()
 
-        assert "n08a_section_drafting" in invoked_nodes
-        assert "n08b_assembly" in invoked_nodes
-        # n08a invoked before n08b (linear dependency)
-        n08a_idx = invoked_nodes.index("n08a_section_drafting")
-        n08b_idx = invoked_nodes.index("n08b_assembly")
-        assert n08a_idx < n08b_idx
+        assert "n08a_excellence_drafting" in invoked_nodes
+        assert "n08b_impact_drafting" in invoked_nodes
+        assert "n08c_implementation_drafting" in invoked_nodes
+        assert "n08d_assembly" in invoked_nodes
+        # All three drafting nodes must be invoked before assembly
+        n08a_idx = invoked_nodes.index("n08a_excellence_drafting")
+        n08b_idx = invoked_nodes.index("n08b_impact_drafting")
+        n08c_idx = invoked_nodes.index("n08c_implementation_drafting")
+        n08d_idx = invoked_nodes.index("n08d_assembly")
+        assert n08a_idx < n08d_idx
+        assert n08b_idx < n08d_idx
+        assert n08c_idx < n08d_idx
 
-    def test_both_released(self, tmp_path: Path) -> None:
+    def test_all_released(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
         with (
             patch(_RA_TARGET, return_value=_agent_success()),
             patch(_EG_TARGET, return_value=_PASS),
         ):
             summary = sched.run()
-        assert summary.node_states["n08a_section_drafting"] == "released"
-        assert summary.node_states["n08b_assembly"] == "released"
+        assert summary.node_states["n08a_excellence_drafting"] == "released"
+        assert summary.node_states["n08b_impact_drafting"] == "released"
+        assert summary.node_states["n08c_implementation_drafting"] == "released"
+        assert summary.node_states["n08d_assembly"] == "released"
 
     def test_overall_status_pass(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)
@@ -950,22 +992,26 @@ class TestPhase8MultiNode:
             summary = sched.run()
         assert summary.node_failure_details == {}
 
-    def test_n08a_failure_does_not_affect_n08b_identity(
+    def test_n08a_failure_blocks_assembly_not_siblings(
         self, tmp_path: Path
     ) -> None:
-        """When n08a fails, n08b is stalled as a separate node (not collapsed)."""
+        """When n08a fails, n08d (assembly) is blocked but n08b/n08c proceed independently."""
         sched = self._sched(tmp_path)
         with (
             patch(_RA_TARGET, side_effect=_agent_success_except(
-                {"n08a_section_drafting": _agent_failure()}
+                {"n08a_excellence_drafting": _agent_failure()}
             )),
             patch(_EG_TARGET, return_value=_PASS),
         ):
             with pytest.raises(RunAbortedError) as exc_info:
                 sched.run()
         states = exc_info.value.summary["node_states"]
-        assert states["n08a_section_drafting"] == "blocked_at_exit"
-        assert states["n08b_assembly"] == "pending"
+        assert states["n08a_excellence_drafting"] == "blocked_at_exit"
+        # Siblings can still run (they don't depend on n08a)
+        assert states["n08b_impact_drafting"] == "released"
+        assert states["n08c_implementation_drafting"] == "released"
+        # Assembly is blocked because it needs all three drafting nodes
+        assert states["n08d_assembly"] == "pending"
 
     def test_run_summary_json_written(self, tmp_path: Path) -> None:
         sched = self._sched(tmp_path)

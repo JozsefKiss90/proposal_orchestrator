@@ -190,10 +190,12 @@ class TestRunContextHardBlock:
     def test_phase8_node_ids_are_expected_set(self) -> None:
         assert PHASE_8_NODE_IDS == frozenset(
             {
-                "n08a_section_drafting",
-                "n08b_assembly",
-                "n08c_evaluator_review",
-                "n08d_revision",
+                "n08a_excellence_drafting",
+                "n08b_impact_drafting",
+                "n08c_implementation_drafting",
+                "n08d_assembly",
+                "n08e_evaluator_review",
+                "n08f_revision",
             }
         )
 
@@ -244,7 +246,7 @@ class TestRunContextSave:
         ctx.save()
 
         reloaded = RunContext.load(tmp_path, "run-save2")
-        assert reloaded.get_node_state("n08a_section_drafting") == "hard_block_upstream"
+        assert reloaded.get_node_state("n08a_excellence_drafting") == "hard_block_upstream"
 
     def test_to_dict_returns_copy(self, tmp_path: Path) -> None:
         ctx = RunContext.initialize(tmp_path, run_id="run-dict")

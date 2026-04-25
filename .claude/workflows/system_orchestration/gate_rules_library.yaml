@@ -1124,22 +1124,18 @@ gate_rules:
 
 
   # ===========================================================================
-  # GATE 09 — gate_10_part_b_completeness
-  # Kind: exit  |  Node: n08b  |  Phase: 8b — Assembly
-  # Evaluated after Phase 8b (assembly) completes.
-  # Requires budget gate (gate_09) to have passed. Confirms all instrument-
-  # required sections are drafted, assembled draft is written and owned,
-  # and every section has a traceability footer.
+  # GATE 09a — gate_10a_excellence_completeness
+  # Kind: exit  |  Node: n08a  |  Phase: 8a — Excellence Section Drafting
+  # Evaluated after Phase 8a (excellence drafting) completes.
   # ===========================================================================
-  - gate_id: gate_10_part_b_completeness
+  - gate_id: gate_10a_excellence_completeness
     gate_kind: exit
-    evaluated_at: "n08b_assembly exit"
+    evaluated_at: "n08a_excellence_drafting exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
 
-      # --- gate_pass predicates ---
-      - predicate_id: g09_p01
+      - predicate_id: g09a_p01
         type: gate_pass
         function: gate_pass_recorded
         args:
@@ -1148,71 +1144,370 @@ gate_rules:
           tier4_root: "docs/tier4_orchestration_state"
         fail_message: >
           gate_09_budget_consistency has not passed for the current run.
-          No Phase 8 activity — including assembly — may proceed until the
-          budget gate passes. This is a constitutional requirement per
-          CLAUDE.md §8.4 and §13.4.
+          No Phase 8 activity may proceed until the budget gate passes.
+          Constitutional requirement per CLAUDE.md §8.4 and §13.4.
         prose_condition: "Budget gate must have passed"
 
-      # --- file predicates ---
-      - predicate_id: g09_p03
+      - predicate_id: g09a_p02
         type: file
         function: non_empty_json
         args:
-          path: "docs/tier5_deliverables/assembled_drafts/assembled_draft.json"
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
         fail_message: >
-          assembled_draft.json is absent or empty in
-          docs/tier5_deliverables/assembled_drafts/. Phase 8b must write
-          the assembled draft artifact before this gate can pass.
-        prose_condition: "Assembled draft present in assembled_drafts/"
+          excellence_section.json is absent or empty in
+          docs/tier5_deliverables/proposal_sections/.
+        prose_condition: "Excellence section artifact exists and is non-empty"
 
-      - predicate_id: g09_p03b
+      - predicate_id: g09a_p03
         type: file
         function: artifact_owned_by_run
         args:
-          path: "docs/tier5_deliverables/assembled_drafts/assembled_draft.json"
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
           run_id: "${run_id}"
         fail_message: >
-          assembled_draft.json exists but its run_id does not match the
-          current run. Re-run Phase 8b or add this artifact to the reuse policy.
-        prose_condition: "Assembled draft present in assembled_drafts/"
+          excellence_section.json exists but its run_id does not match the
+          current run.
+        prose_condition: "Excellence section owned by current run"
 
-      # --- coverage predicates ---
-      - predicate_id: g09_p02
-        type: coverage
-        function: all_sections_drafted
+      - predicate_id: g09a_p04
+        type: schema
+        function: schema_id_matches
         args:
-          sections_path: "docs/tier5_deliverables/proposal_sections/"
-          schema_path: "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          expected: "orch.tier5.excellence_section.v1"
         fail_message: >
-          One or more sections required by the active instrument schema
-          (section_schema_registry.json) do not have a corresponding artifact
-          in docs/tier5_deliverables/proposal_sections/. Every mandatory
-          section must be drafted before assembly can be gated.
-        prose_condition: "All sections required by active application form present in proposal_sections/"
+          schema_id in excellence_section.json does not match
+          orch.tier5.excellence_section.v1.
+        prose_condition: "Schema ID matches orch.tier5.excellence_section.v1"
 
-      - predicate_id: g09_p04
-        type: coverage
-        function: all_sections_have_traceability_footer
+      - predicate_id: g09a_p05
+        type: schema
+        function: json_field_present
         args:
-          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          field: "traceability_footer"
         fail_message: >
-          One or more section artifacts in docs/tier5_deliverables/proposal_sections/
-          are missing a traceability_footer field or the field is empty. Every
-          section must declare its Tier 1-4 sources in a non-empty
-          traceability_footer.
-        prose_condition: "Each section traceable to named Tier 1-4 sources"
+          traceability_footer is absent or null in excellence_section.json.
+        prose_condition: "Traceability footer exists"
+
+      - predicate_id: g09a_p05b
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          field: "validation_status"
+        fail_message: >
+          validation_status is absent or null in excellence_section.json.
+          Required for no_unresolved_material_claims evaluation.
+        prose_condition: "Validation status field exists"
+
+      - predicate_id: g09a_p06
+        type: semantic
+        function: no_unresolved_material_claims
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+        fail_message: >
+          Excellence section contains unresolved material claims
+          (validation_status.overall_status is "unresolved").
+        prose_condition: "No unresolved material claims in Excellence section"
+
+
+  # ===========================================================================
+  # GATE 09b — gate_10b_impact_completeness
+  # Kind: exit  |  Node: n08b  |  Phase: 8b — Impact Section Drafting
+  # Evaluated after Phase 8b (impact drafting) completes.
+  # ===========================================================================
+  - gate_id: gate_10b_impact_completeness
+    gate_kind: exit
+    evaluated_at: "n08b_impact_drafting exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      - predicate_id: g09b_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_09_budget_consistency"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_09_budget_consistency has not passed for the current run.
+        prose_condition: "Budget gate must have passed"
+
+      - predicate_id: g09b_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          impact_section.json is absent or empty in
+          docs/tier5_deliverables/proposal_sections/.
+        prose_condition: "Impact section artifact exists and is non-empty"
+
+      - predicate_id: g09b_p03
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          run_id: "${run_id}"
+        fail_message: >
+          impact_section.json exists but its run_id does not match the
+          current run.
+        prose_condition: "Impact section owned by current run"
+
+      - predicate_id: g09b_p04
+        type: schema
+        function: schema_id_matches
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          expected: "orch.tier5.impact_section.v1"
+        fail_message: >
+          schema_id in impact_section.json does not match
+          orch.tier5.impact_section.v1.
+        prose_condition: "Schema ID matches orch.tier5.impact_section.v1"
+
+      - predicate_id: g09b_p05
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          field: "traceability_footer"
+        fail_message: >
+          traceability_footer is absent or null in impact_section.json.
+        prose_condition: "Traceability footer exists"
+
+      - predicate_id: g09b_p05b
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          field: "validation_status"
+        fail_message: >
+          validation_status is absent or null in impact_section.json.
+          Required for no_unresolved_material_claims evaluation.
+        prose_condition: "Validation status field exists"
+
+      - predicate_id: g09b_p06
+        type: coverage
+        function: impact_pathways_covered
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          impact_arch_path: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+        fail_message: >
+          Impact section does not cover all pathways from the impact
+          architecture or DEC coverage is incomplete.
+        prose_condition: "Impact pathways and DEC measures are covered"
+
+      - predicate_id: g09b_p07
+        type: semantic
+        function: no_unresolved_material_claims
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          Impact section contains unresolved material claims.
+        prose_condition: "No unresolved material claims in Impact section"
+
+
+  # ===========================================================================
+  # GATE 09c — gate_10c_implementation_completeness
+  # Kind: exit  |  Node: n08c  |  Phase: 8c — Implementation Section Drafting
+  # Evaluated after Phase 8c (implementation drafting) completes.
+  # ===========================================================================
+  - gate_id: gate_10c_implementation_completeness
+    gate_kind: exit
+    evaluated_at: "n08c_implementation_drafting exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      - predicate_id: g09c_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_09_budget_consistency"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_09_budget_consistency has not passed for the current run.
+        prose_condition: "Budget gate must have passed"
+
+      - predicate_id: g09c_p02
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          implementation_section.json is absent or empty in
+          docs/tier5_deliverables/proposal_sections/.
+        prose_condition: "Implementation section artifact exists and is non-empty"
+
+      - predicate_id: g09c_p03
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          run_id: "${run_id}"
+        fail_message: >
+          implementation_section.json exists but its run_id does not match
+          the current run.
+        prose_condition: "Implementation section owned by current run"
+
+      - predicate_id: g09c_p04
+        type: schema
+        function: schema_id_matches
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          expected: "orch.tier5.implementation_section.v1"
+        fail_message: >
+          schema_id in implementation_section.json does not match
+          orch.tier5.implementation_section.v1.
+        prose_condition: "Schema ID matches orch.tier5.implementation_section.v1"
+
+      - predicate_id: g09c_p05
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          field: "traceability_footer"
+        fail_message: >
+          traceability_footer is absent or null in implementation_section.json.
+        prose_condition: "Traceability footer exists"
+
+      - predicate_id: g09c_p05b
+        type: schema
+        function: json_field_present
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          field: "validation_status"
+        fail_message: >
+          validation_status is absent or null in implementation_section.json.
+          Required for no_unresolved_material_claims evaluation.
+        prose_condition: "Validation status field exists"
+
+      - predicate_id: g09c_p06
+        type: coverage
+        function: implementation_coverage_complete
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          wp_path: "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+          gantt_path: "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+        fail_message: >
+          Implementation section has incomplete coverage of WPs, Gantt,
+          milestones, or risk register references.
+        prose_condition: "WP, task, deliverable, milestone, governance, risk, partner-role, and resource-effort coverage"
+
+      - predicate_id: g09c_p07
+        type: semantic
+        function: no_unresolved_material_claims
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          Implementation section contains unresolved material claims.
+        prose_condition: "No unresolved material claims in Implementation section"
+
+
+  # ===========================================================================
+  # GATE 09d — gate_10d_cross_section_consistency
+  # Kind: exit  |  Node: n08d  |  Phase: 8d — Cross-Section Assembly
+  # Evaluated after Phase 8d (assembly) completes.
+  # ===========================================================================
+  - gate_id: gate_10d_cross_section_consistency
+    gate_kind: exit
+    evaluated_at: "n08d_assembly exit"
+    mandatory: false
+    bypass_prohibited: false
+    predicates:
+
+      - predicate_id: g09d_p01
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_10a_excellence_completeness"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_10a_excellence_completeness has not passed for the current run.
+        prose_condition: "Excellence gate must have passed"
+
+      - predicate_id: g09d_p02
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_10b_impact_completeness"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_10b_impact_completeness has not passed for the current run.
+        prose_condition: "Impact gate must have passed"
+
+      - predicate_id: g09d_p03
+        type: gate_pass
+        function: gate_pass_recorded
+        args:
+          gate_id: "gate_10c_implementation_completeness"
+          run_id: "${run_id}"
+          tier4_root: "docs/tier4_orchestration_state"
+        fail_message: >
+          gate_10c_implementation_completeness has not passed for the current run.
+        prose_condition: "Implementation gate must have passed"
+
+      - predicate_id: g09d_p04
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+        fail_message: >
+          part_b_assembled_draft.json is absent or empty in
+          docs/tier5_deliverables/assembled_drafts/.
+        prose_condition: "Assembled Part B draft exists"
+
+      - predicate_id: g09d_p05
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+          run_id: "${run_id}"
+        fail_message: >
+          part_b_assembled_draft.json exists but its run_id does not match
+          the current run.
+        prose_condition: "Assembled draft owned by current run"
+
+      - predicate_id: g09d_p06
+        type: schema
+        function: schema_id_matches
+        args:
+          path: "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+          expected: "orch.tier5.part_b_assembled_draft.v1"
+        fail_message: >
+          schema_id in part_b_assembled_draft.json does not match
+          orch.tier5.part_b_assembled_draft.v1.
+        prose_condition: "Schema ID matches"
+
+      - predicate_id: g09d_p07
+        type: semantic
+        function: cross_section_consistency
+        args:
+          assembled_path: "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+          sections_dir: "docs/tier5_deliverables/proposal_sections/"
+          tier3_path: "docs/tier3_project_instantiation/"
+        fail_message: >
+          Cross-section consistency check found inconsistencies in objectives,
+          WPs, partner names, deliverables, milestones, KPIs, impact claims,
+          budget/resource claims, or terminology.
+        prose_condition: "Objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, and terminology are cross-consistent"
 
 
   # ===========================================================================
   # GATE 10 — gate_11_review_closure
-  # Kind: exit  |  Node: n08c  |  Phase: 8c — Evaluator Review
-  # Evaluated after Phase 8c (evaluator review) completes.
-  # Confirms gate_10 passed, review packet is written and owned, all findings
+  # Kind: exit  |  Node: n08e  |  Phase: 8e — Evaluator Review
+  # Evaluated after Phase 8e (evaluator review) completes.
+  # Confirms gate_10d passed, review packet is written and owned, all findings
   # are categorised by severity, and a revision action list is present.
   # ===========================================================================
   - gate_id: gate_11_review_closure
     gate_kind: exit
-    evaluated_at: "n08c_evaluator_review exit"
+    evaluated_at: "n08e_evaluator_review exit"
     mandatory: false
     bypass_prohibited: false
     predicates:
@@ -1222,14 +1517,14 @@ gate_rules:
         type: gate_pass
         function: gate_pass_recorded
         args:
-          gate_id: "gate_10_part_b_completeness"
+          gate_id: "gate_10d_cross_section_consistency"
           run_id: "${run_id}"
           tier4_root: "docs/tier4_orchestration_state"
         fail_message: >
-          gate_10_part_b_completeness has not passed for the current run.
-          Phase 8c (evaluator review) cannot complete until Phase 8b
+          gate_10d_cross_section_consistency has not passed for the current run.
+          Phase 8e (evaluator review) cannot complete until Phase 8d
           (assembly) has passed its exit gate.
-        prose_condition: "gate_10 must have passed"
+        prose_condition: "gate_10d must have passed"
 
       # --- file predicates ---
       - predicate_id: g10_p02
@@ -1281,8 +1576,8 @@ gate_rules:
 
   # ===========================================================================
   # GATE 11 — gate_12_constitutional_compliance
-  # Kind: exit  |  Node: n08d  |  Phase: 8d — Revision
-  # Evaluated after Phase 8d (revision) completes.
+  # Kind: exit  |  Node: n08f  |  Phase: 8f — Revision
+  # Evaluated after Phase 8f (revision) completes.
   # This is the final gate. Confirms gate_11 passed, all sections are present,
   # all critical revisions are resolved, final export and checkpoint are written,
   # budget gate confirmation is present in the assessment, and the full set of
@@ -1290,7 +1585,7 @@ gate_rules:
   # ===========================================================================
   - gate_id: gate_12_constitutional_compliance
     gate_kind: exit
-    evaluated_at: "n08d_revision exit"
+    evaluated_at: "n08f_revision exit"
     mandatory: false
     bypass_prohibited: false
     predicates:

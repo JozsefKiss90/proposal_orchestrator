@@ -3,14 +3,17 @@ skill_id: evaluator-criteria-review
 purpose_summary: >
   Assess proposal content against the scoring logic of the applicable evaluation
   criterion, identifying weaknesses by severity and producing structured feedback
-  aligned to evaluator sub-criteria.
+  aligned to evaluator sub-criteria. Supports two modes: assembled-draft review
+  (reads part_b_assembled_draft.json) and criterion-scoped review (reads a single
+  criterion section artifact).
 used_by_agents:
   - evaluator_reviewer
   - revision_integrator
 reads_from:
   - docs/tier2a_instrument_schemas/evaluation_forms/
   - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
-  - docs/tier5_deliverables/assembled_drafts/
+  - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+  - docs/tier5_deliverables/proposal_sections/
 writes_to:
   - docs/tier5_deliverables/review_packets/
 constitutional_constraints:
@@ -27,7 +30,8 @@ constitutional_constraints:
 |------|--------------------|-----------------|-----------|---------|
 | `docs/tier2a_instrument_schemas/evaluation_forms/` | Evaluation form templates for the active instrument (PDF/DOCX) | Criterion identifiers; criterion names; sub-criteria descriptions; scoring thresholds; scoring logic; grade descriptors | N/A — source document directory (dir_non_empty check only) | The binding structural authority for evaluation; assessment must apply the active instrument evaluation form criteria, not generic criteria or grant agreement annex requirements |
 | `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` | call_analysis_summary.json — canonical Phase 1 artifact | evaluation_matrix (object: structured mapping of evaluation criteria; each entry contains criterion_id, criterion_name, weight, source_section, source_document) | `orch.phase1.call_analysis_summary.v1` | Provides the extracted evaluation matrix with source references; evaluation findings are mapped to criterion_id values from this matrix to ensure the review covers all active criteria |
-| `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` | assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.assembled_draft.v1` | The assembled draft being reviewed; sections referenced in this artifact are evaluated against each evaluation criterion |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | part_b_assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.part_b_assembled_draft.v1` | The assembled draft being reviewed (assembled-draft mode); sections referenced in this artifact are evaluated against each evaluation criterion |
+| `docs/tier5_deliverables/proposal_sections/<section>.json` (criterion-scoped mode) | Single criterion section artifact (excellence_section.json, impact_section.json, or implementation_section.json) | criterion, sub_sections[].content, validation_status, traceability_footer | `orch.tier5.excellence_section.v1` / `orch.tier5.impact_section.v1` / `orch.tier5.implementation_section.v1` | The single section being reviewed in criterion-scoped mode; only the criterion-specific evaluation sub-criteria are applied |
 
 ### Outputs
 
@@ -41,7 +45,7 @@ constitutional_constraints:
 
 | Output Path | Registered in manifest.compile.yaml artifact_registry? | Producing Node |
 |-------------|--------------------------------------------------------|----------------|
-| `docs/tier5_deliverables/review_packets/review_packet.json` | Yes — artifact_id: a_t5_review_packets (directory); canonical file within that directory | n08c_evaluator_review |
+| `docs/tier5_deliverables/review_packets/review_packet.json` | Yes — artifact_id: a_t5_review_packets (directory); canonical file within that directory | n08e_evaluator_review |
 
 ## Execution Specification
 
@@ -50,8 +54,12 @@ constitutional_constraints:
 - Step 1.1: Presence check — confirm `docs/tier2a_instrument_schemas/evaluation_forms/` exists and is non-empty. If empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="evaluation_forms/ directory is empty; cannot evaluate without the active instrument's evaluation form") and halt.
 - Step 1.2: **Grant Agreement Annex guard** — inspect the identified evaluation form file. If the document's title or header contains "Annex", "Grant Agreement", "Model Grant Agreement", or "AGA": return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Document appears to be a Grant Agreement Annex. CLAUDE.md §13.1 prohibits evaluating against Grant Agreement Annex requirements") and halt.
 - Step 1.3: Presence check and schema check — confirm `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` exists with `schema_id` = "orch.phase1.call_analysis_summary.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="call_analysis_summary.json not found or schema mismatch") and halt.
-- Step 1.4: Presence check and schema check — confirm `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` exists with `schema_id` = "orch.tier5.assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="assembled_draft.json not found or schema mismatch") and halt.
-- Step 1.5: Confirm at least one section file referenced in `assembled_draft.json sections[].artifact_path` exists and is readable. If no section files are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No section files found in assembled draft") and halt.
+- Step 1.4: **Mode determination.** The invoking agent specifies the review mode via context:
+  - **Assembled-draft mode** (default): review the complete assembled Part B draft. Proceed to Step 1.4a.
+  - **Criterion-scoped mode**: review a single criterion-aligned section artifact. Proceed to Step 1.4b.
+- Step 1.4a (assembled-draft mode): Presence check and schema check — confirm `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt.
+- Step 1.4b (criterion-scoped mode): Presence check and schema check — confirm the section artifact at the path specified by the invoking agent exists and its `schema_id` matches one of: "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", or "orch.tier5.implementation_section.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Criterion section artifact not found or schema mismatch") and halt.
+- Step 1.5 (assembled-draft mode only): Confirm at least one section file referenced in `part_b_assembled_draft.json sections[].artifact_path` exists and is readable. If no section files are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No section files found in assembled draft") and halt.
 
 ### 2. Core Processing Logic
 
@@ -59,7 +67,9 @@ constitutional_constraints:
   - All evaluation criteria (criterion_id, criterion_name, sub-criteria descriptions, scoring thresholds, grade descriptors for each score value on the 0–5 scale).
   - The scoring logic for each criterion (what constitutes a score of 0, 1, 2, 3, 4, 5 for each criterion).
 - Step 2.2: Read `call_analysis_summary.json evaluation_matrix`. This provides the weighted criterion list. Build a **criteria set**: ordered list of `{criterion_id, criterion_name, weight}` from the evaluation_matrix. For each criterion_id in the evaluation_matrix: look up the corresponding sub-criteria and scoring descriptors from Step 2.1. If a criterion_id in the evaluation_matrix has no match in the evaluation form: log as Unresolved and continue.
-- Step 2.3: Read each section file referenced in `assembled_draft.json`. Build a **section content map**: keyed by `section_id`, value is the `content` string. Also record `word_count` for each section.
+- Step 2.3: Build the **section content map**:
+  - *Assembled-draft mode*: Read each section file referenced in `part_b_assembled_draft.json sections[].artifact_path`. Build a map keyed by `section_id`, value is the `content` string. Also record `word_count` for each section.
+  - *Criterion-scoped mode*: Read the single criterion section artifact. Build a map with one entry: the section's `criterion` as key, the concatenation of all `sub_sections[].content` as value. Record the aggregate `word_count`.
 - Step 2.4: For each evaluation criterion in the criteria set (from Step 2.2):
   - Step 2.4.1: Identify which proposal section(s) from the section content map are relevant to this criterion. Relevance is determined by: matching the criterion's sub-criteria keywords against section names and content. Each criterion should map to at least one section; if no section addresses a criterion: this is a critical finding.
   - Step 2.4.2: For each relevant section, apply the scoring logic for this criterion:
@@ -171,8 +181,9 @@ Every finding record produced in Step 2.4.4 MUST carry a severity value from the
 **Trigger conditions in this skill:**
 - Step 1.1: `docs/tier2a_instrument_schemas/evaluation_forms/` directory is empty → `failure_reason="evaluation_forms/ directory is empty; cannot evaluate without the active instrument's evaluation form"`
 - Step 1.3: `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` is absent or schema mismatch → `failure_reason="call_analysis_summary.json not found or schema mismatch"`
-- Step 1.4: `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` is absent or schema mismatch → `failure_reason="assembled_draft.json not found or schema mismatch"`
-- Step 1.5: No section files referenced in `assembled_draft.json` are accessible → `failure_reason="No section files found in assembled draft"`
+- Step 1.4a (assembled-draft mode): `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` is absent or schema mismatch → `failure_reason="part_b_assembled_draft.json not found or schema mismatch"`
+- Step 1.4b (criterion-scoped mode): Criterion section artifact at specified path is absent or schema mismatch → `failure_reason="Criterion section artifact not found or schema mismatch"`
+- Step 1.5 (assembled-draft mode): No section files referenced in `part_b_assembled_draft.json` are accessible → `failure_reason="No section files found in assembled draft"`
 
 **Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
 
@@ -183,7 +194,7 @@ Every finding record produced in Step 2.4.4 MUST carry a severity value from the
 ### MALFORMED_ARTIFACT
 
 **Trigger conditions in this skill:**
-This skill reads from source document directories and canonical phase artifacts. Schema mismatch conditions for `call_analysis_summary.json` and `assembled_draft.json` are captured in Steps 1.3 and 1.4 as MISSING_INPUT (per the existing Input Validation Sequence). No additional MALFORMED_ARTIFACT conditions are defined.
+This skill reads from source document directories and canonical phase artifacts. Schema mismatch conditions for `call_analysis_summary.json` and `part_b_assembled_draft.json` (or criterion section artifact in criterion-scoped mode) are captured in Steps 1.3 and 1.4 as MISSING_INPUT (per the existing Input Validation Sequence). No additional MALFORMED_ARTIFACT conditions are defined.
 
 **Artifact write behavior:** Not applicable for this skill.
 
@@ -259,7 +270,7 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 | `revision_actions[]` | Yes (Step 2.5, Step 3) | each action built with action_id, finding_id, priority (integer, 1-based), action_description, target_section, severity | Yes — all required item_schema fields present; priority correctly 1-based integer; severity enum-compliant |
 | `artifact_status` | ABSENT at write time (Step 4 explicit) | runner stamps post-gate | Yes — correctly absent |
 
-**reads_from compliance:** Skill reads from `docs/tier2a_instrument_schemas/evaluation_forms/`, `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/`, and `docs/tier5_deliverables/assembled_drafts/`. All three declared in frontmatter `reads_from`. Compliant.
+**reads_from compliance:** Skill reads from `docs/tier2a_instrument_schemas/evaluation_forms/`, `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/`, and `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` (assembled-draft mode) or criterion section artifacts in `docs/tier5_deliverables/proposal_sections/` (criterion-scoped mode). All declared in frontmatter `reads_from`. Compliant.
 
 **writes_to compliance:** Skill writes only to `docs/tier5_deliverables/review_packets/review_packet.json`. Declared in frontmatter `writes_to`. Compliant.
 

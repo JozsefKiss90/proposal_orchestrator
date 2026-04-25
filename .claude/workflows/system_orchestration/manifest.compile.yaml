@@ -152,38 +152,66 @@ node_registry:
     absent_artifacts_behavior: blocking_gate_failure
     terminal: false
 
-  - node_id: n08a_section_drafting
-    phase_id: phase_08a_section_drafting
+  - node_id: n08a_excellence_drafting
+    phase_id: phase_08a_excellence_drafting
     phase_number: 8
     substep: a
-    name: "Section Drafting"
+    name: "Excellence Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
-    agent: proposal_writer
+    agent: excellence_writer
     skills:
-      - proposal-section-drafting
+      - excellence-section-drafting
       - proposal-section-traceability-check
-      - evaluator-criteria-review
       - constitutional-compliance-check
-    exit_gate: gate_10_part_b_completeness
+    exit_gate: gate_10a_excellence_completeness
     terminal: false
 
-  - node_id: n08b_assembly
-    phase_id: phase_08b_assembly
+  - node_id: n08b_impact_drafting
+    phase_id: phase_08b_impact_drafting
     phase_number: 8
     substep: b
-    name: "Assembly"
+    name: "Impact Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
-    agent: proposal_writer
+    agent: impact_writer
     skills:
+      - impact-section-drafting
       - proposal-section-traceability-check
       - constitutional-compliance-check
-    exit_gate: gate_10_part_b_completeness
+    exit_gate: gate_10b_impact_completeness
     terminal: false
 
-  - node_id: n08c_evaluator_review
-    phase_id: phase_08c_evaluator_review
+  - node_id: n08c_implementation_drafting
+    phase_id: phase_08c_implementation_drafting
     phase_number: 8
     substep: c
+    name: "Implementation Section Drafting"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: implementation_writer
+    skills:
+      - implementation-section-drafting
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    exit_gate: gate_10c_implementation_completeness
+    terminal: false
+
+  - node_id: n08d_assembly
+    phase_id: phase_08d_assembly
+    phase_number: 8
+    substep: d
+    name: "Cross-Section Assembly"
+    source_file: workflow_phases/phase_08_drafting_review.yaml
+    agent: proposal_integrator
+    skills:
+      - cross-section-consistency-check
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    exit_gate: gate_10d_cross_section_consistency
+    terminal: false
+
+  - node_id: n08e_evaluator_review
+    phase_id: phase_08e_evaluator_review
+    phase_number: 8
+    substep: e
     name: "Evaluator-Style Review"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: evaluator_reviewer
@@ -194,10 +222,10 @@ node_registry:
     exit_gate: gate_11_review_closure
     terminal: false
 
-  - node_id: n08d_revision
-    phase_id: phase_08d_revision
+  - node_id: n08f_revision
+    phase_id: phase_08f_revision
     phase_number: 8
-    substep: d
+    substep: f
     name: "Revision Cycle"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: revision_integrator
@@ -274,29 +302,60 @@ edge_registry:
     gate_condition: phase_06_gate
     description: "Phase 6 gate must pass before budget gate evaluation"
 
+  # Budget gate fans out to three parallel drafting nodes
   - edge_id: e07_to_08a
     from_node: n07_budget_gate
-    to_node: n08a_section_drafting
+    to_node: n08a_excellence_drafting
     gate_condition: gate_09_budget_consistency
     mandatory_gate: true
     bypass_prohibited: true
-    description: "Budget gate must pass (not hold, not partial) before any Phase 8 activity begins"
+    description: "Budget gate must pass before Excellence drafting"
 
-  - edge_id: e08a_to_08b
-    from_node: n08a_section_drafting
-    to_node: n08b_assembly
-    gate_condition: gate_10_part_b_completeness
-    description: "All sections must be drafted before assembly"
+  - edge_id: e07_to_08b
+    from_node: n07_budget_gate
+    to_node: n08b_impact_drafting
+    gate_condition: gate_09_budget_consistency
+    mandatory_gate: true
+    bypass_prohibited: true
+    description: "Budget gate must pass before Impact drafting"
 
-  - edge_id: e08b_to_08c
-    from_node: n08b_assembly
-    to_node: n08c_evaluator_review
-    gate_condition: gate_10_part_b_completeness
-    description: "Assembly must complete before evaluator review"
+  - edge_id: e07_to_08c
+    from_node: n07_budget_gate
+    to_node: n08c_implementation_drafting
+    gate_condition: gate_09_budget_consistency
+    mandatory_gate: true
+    bypass_prohibited: true
+    description: "Budget gate must pass before Implementation drafting"
+
+  # Three section gates converge on assembly
+  - edge_id: e08a_to_08d
+    from_node: n08a_excellence_drafting
+    to_node: n08d_assembly
+    gate_condition: gate_10a_excellence_completeness
+    description: "Excellence section must be complete before assembly"
+
+  - edge_id: e08b_to_08d
+    from_node: n08b_impact_drafting
+    to_node: n08d_assembly
+    gate_condition: gate_10b_impact_completeness
+    description: "Impact section must be complete before assembly"
 
   - edge_id: e08c_to_08d
-    from_node: n08c_evaluator_review
-    to_node: n08d_revision
+    from_node: n08c_implementation_drafting
+    to_node: n08d_assembly
+    gate_condition: gate_10c_implementation_completeness
+    description: "Implementation section must be complete before assembly"
+
+  # Assembly -> Review -> Revision (sequential)
+  - edge_id: e08d_to_08e
+    from_node: n08d_assembly
+    to_node: n08e_evaluator_review
+    gate_condition: gate_10d_cross_section_consistency
+    description: "Assembly must pass consistency check before review"
+
+  - edge_id: e08e_to_08f
+    from_node: n08e_evaluator_review
+    to_node: n08f_revision
     gate_condition: gate_11_review_closure
     description: "Review must complete before revision cycle"
 
@@ -495,28 +554,83 @@ gate_registry:
       phase7_budget_gate/. Block Phase 8 entirely. Surface to human operator.
       Absent budget artifacts are not a hold state; they are a gate failure.
 
-  - gate_id: gate_10_part_b_completeness
-    name: "Part B Completeness"
-    evaluated_at: n08b_assembly exit
+  - gate_id: gate_10a_excellence_completeness
+    name: "Excellence Section Completeness"
+    evaluated_at: n08a_excellence_drafting exit
     conditions:
       - prose: "Budget gate must have passed"
-        predicate_refs: [g09_p01]
-      - prose: "All sections required by active application form present in proposal_sections/"
-        predicate_refs: [g09_p02]
-      - prose: "Assembled draft present in assembled_drafts/"
-        predicate_refs: [g09_p03, g09_p03b]
-      - prose: "Each section traceable to named Tier 1-4 sources"
-        predicate_refs: [g09_p04]
+        predicate_refs: [g09a_p01]
+      - prose: "Excellence section artifact exists, owned, schema-valid"
+        predicate_refs: [g09a_p02, g09a_p03, g09a_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09a_p05, g09a_p05b]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09a_p06]
     blocking_edges:
-      - e08b_to_08c
-    fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+      - e08a_to_08d
+    fail_action: "Block assembly; report Excellence section gaps"
+    bypass_prohibited: false
+
+  - gate_id: gate_10b_impact_completeness
+    name: "Impact Section Completeness"
+    evaluated_at: n08b_impact_drafting exit
+    conditions:
+      - prose: "Budget gate must have passed"
+        predicate_refs: [g09b_p01]
+      - prose: "Impact section artifact exists, owned, schema-valid"
+        predicate_refs: [g09b_p02, g09b_p03, g09b_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09b_p05, g09b_p05b]
+      - prose: "Impact pathways and DEC measures covered"
+        predicate_refs: [g09b_p06]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09b_p07]
+    blocking_edges:
+      - e08b_to_08d
+    fail_action: "Block assembly; report Impact section gaps"
+    bypass_prohibited: false
+
+  - gate_id: gate_10c_implementation_completeness
+    name: "Implementation Section Completeness"
+    evaluated_at: n08c_implementation_drafting exit
+    conditions:
+      - prose: "Budget gate must have passed"
+        predicate_refs: [g09c_p01]
+      - prose: "Implementation section artifact exists, owned, schema-valid"
+        predicate_refs: [g09c_p02, g09c_p03, g09c_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09c_p05, g09c_p05b]
+      - prose: "WP, Gantt, milestone, risk register coverage complete"
+        predicate_refs: [g09c_p06]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09c_p07]
+    blocking_edges:
+      - e08c_to_08d
+    fail_action: "Block assembly; report Implementation section gaps"
+    bypass_prohibited: false
+
+  - gate_id: gate_10d_cross_section_consistency
+    name: "Cross-Section Consistency"
+    evaluated_at: n08d_assembly exit
+    conditions:
+      - prose: "All three criterion gates must have passed"
+        predicate_refs: [g09d_p01, g09d_p02, g09d_p03]
+      - prose: "Assembled Part B draft exists and is owned"
+        predicate_refs: [g09d_p04, g09d_p05]
+      - prose: "Schema ID matches"
+        predicate_refs: [g09d_p06]
+      - prose: "Cross-section consistency verified"
+        predicate_refs: [g09d_p07]
+    blocking_edges:
+      - e08d_to_08e
+    fail_action: "Block evaluator review; report cross-section inconsistencies"
     bypass_prohibited: false
 
   - gate_id: gate_11_review_closure
     name: "Review Closure"
-    evaluated_at: n08c_evaluator_review exit
+    evaluated_at: n08e_evaluator_review exit
     conditions:
-      - prose: "gate_10 must have passed"
+      - prose: "gate_10d must have passed"
         predicate_refs: [g10_p01]
       - prose: "Review packet present in review_packets/"
         predicate_refs: [g10_p02, g10_p02b]
@@ -525,13 +639,13 @@ gate_registry:
       - prose: "Prioritised revision action list produced"
         predicate_refs: [g10_p04]
     blocking_edges:
-      - e08c_to_08d
+      - e08e_to_08f
     fail_action: "Block revision cycle; report incomplete review"
     bypass_prohibited: false
 
   - gate_id: gate_12_constitutional_compliance
     name: "Constitutional Compliance"
-    evaluated_at: n08d_revision exit
+    evaluated_at: n08f_revision exit
     conditions:
       - prose: "gate_11 must have passed"
         predicate_refs: [g11_p01]
@@ -668,7 +782,7 @@ artifact_registry:
     path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
     tier: tier4_phase_output
     produced_by: n07_budget_gate
-    consumed_by: [n08a_section_drafting, n08d_revision]
+    consumed_by: [n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting, n08f_revision]
     gate_dependency: gate_09_budget_consistency
     mandatory: true
     bypass_prohibited: true
@@ -676,7 +790,7 @@ artifact_registry:
   - artifact_id: a_t4_phase8
     path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
     tier: tier4_phase_output
-    produced_by: [n08a_section_drafting, n08b_assembly, n08c_evaluator_review, n08d_revision]
+    produced_by: [n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting, n08d_assembly, n08e_evaluator_review, n08f_revision]
     consumed_by: []
 
   # Tier 3 artifacts updated during workflow
@@ -725,25 +839,25 @@ artifact_registry:
   - artifact_id: a_t5_proposal_sections
     path: docs/tier5_deliverables/proposal_sections/
     tier: tier5_deliverable
-    produced_by: n08a_section_drafting
-    consumed_by: [n08b_assembly]
+    produced_by: [n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting]
+    consumed_by: [n08d_assembly]
 
   - artifact_id: a_t5_assembled_drafts
     path: docs/tier5_deliverables/assembled_drafts/
     tier: tier5_deliverable
-    produced_by: [n08b_assembly, n08d_revision]
-    consumed_by: [n08c_evaluator_review, n08d_revision]
+    produced_by: [n08d_assembly, n08f_revision]
+    consumed_by: [n08e_evaluator_review, n08f_revision]
 
   - artifact_id: a_t5_review_packets
     path: docs/tier5_deliverables/review_packets/
     tier: tier5_deliverable
-    produced_by: n08c_evaluator_review
-    consumed_by: [n08d_revision]
+    produced_by: n08e_evaluator_review
+    consumed_by: [n08f_revision]
 
   - artifact_id: a_t5_final_exports
     path: docs/tier5_deliverables/final_exports/
     tier: tier5_deliverable
-    produced_by: n08d_revision
+    produced_by: n08f_revision
     consumed_by: []
     terminal: true
 
@@ -751,6 +865,6 @@ artifact_registry:
   - artifact_id: a_t4_checkpoint_phase8
     path: docs/tier4_orchestration_state/checkpoints/
     tier: tier4_checkpoint
-    produced_by: n08d_revision
+    produced_by: n08f_revision
     consumed_by: []
     immutable_after_creation: true

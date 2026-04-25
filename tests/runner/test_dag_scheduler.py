@@ -132,9 +132,20 @@ def _two_node_linear_manifest(
 
 def _gate09_node_manifest() -> dict:
     """
-    Minimal two-node manifest where n07 holds gate_09_budget_consistency and
-    Phase 8 nodes are n08a_section_drafting / n08b_assembly.
+    Manifest where n07 holds gate_09_budget_consistency and all six
+    canonical Phase 8 nodes fan out / fan in.
     Used to test HARD_BLOCK propagation.
+
+    Topology:
+      n07 → n08a_excellence_drafting   (gate_09, mandatory)
+      n07 → n08b_impact_drafting       (gate_09, mandatory)
+      n07 → n08c_implementation_drafting (gate_09, mandatory)
+      n08a → n08d_assembly             (gate_10a_excellence_completeness)
+      n08b → n08d_assembly             (gate_10b_impact_completeness)
+      n08c → n08d_assembly             (gate_10c_implementation_completeness)
+      n08d → n08e_evaluator_review     (gate_10d_cross_section_consistency)
+      n08e → n08f_revision             (gate_11_review_closure)
+      n08f terminal=true
     """
     return {
         "name": "test",
@@ -146,22 +157,32 @@ def _gate09_node_manifest() -> dict:
                 "terminal": False,
             },
             {
-                "node_id": "n08a_section_drafting",
-                "exit_gate": "gate_10_part_b_completeness",
+                "node_id": "n08a_excellence_drafting",
+                "exit_gate": "gate_10a_excellence_completeness",
                 "terminal": False,
             },
             {
-                "node_id": "n08b_assembly",
-                "exit_gate": "gate_10_part_b_completeness",
+                "node_id": "n08b_impact_drafting",
+                "exit_gate": "gate_10b_impact_completeness",
                 "terminal": False,
             },
             {
-                "node_id": "n08c_evaluator_review",
+                "node_id": "n08c_implementation_drafting",
+                "exit_gate": "gate_10c_implementation_completeness",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08d_assembly",
+                "exit_gate": "gate_10d_cross_section_consistency",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08e_evaluator_review",
                 "exit_gate": "gate_11_review_closure",
                 "terminal": False,
             },
             {
-                "node_id": "n08d_revision",
+                "node_id": "n08f_revision",
                 "exit_gate": "gate_12_constitutional_compliance",
                 "terminal": True,
             },
@@ -170,8 +191,50 @@ def _gate09_node_manifest() -> dict:
             {
                 "edge_id": "e07_to_08a",
                 "from_node": "n07_budget_gate",
-                "to_node": "n08a_section_drafting",
+                "to_node": "n08a_excellence_drafting",
                 "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e07_to_08b",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08b_impact_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e07_to_08c",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08c_implementation_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e08a_to_08d",
+                "from_node": "n08a_excellence_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10a_excellence_completeness",
+            },
+            {
+                "edge_id": "e08b_to_08d",
+                "from_node": "n08b_impact_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10b_impact_completeness",
+            },
+            {
+                "edge_id": "e08c_to_08d",
+                "from_node": "n08c_implementation_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10c_implementation_completeness",
+            },
+            {
+                "edge_id": "e08d_to_08e",
+                "from_node": "n08d_assembly",
+                "to_node": "n08e_evaluator_review",
+                "gate_condition": "gate_10d_cross_section_consistency",
+            },
+            {
+                "edge_id": "e08e_to_08f",
+                "from_node": "n08e_evaluator_review",
+                "to_node": "n08f_revision",
+                "gate_condition": "gate_11_review_closure",
             },
         ],
     }
@@ -517,10 +580,10 @@ class TestGate09HardBlock:
 class TestGate09HardBlockPhase8Nodes:
     def test_all_phase8_node_ids_frozen(self, tmp_path: Path) -> None:
         """
-        Build a manifest containing all four canonical Phase 8 nodes.
+        Build a manifest containing all six canonical Phase 8 nodes.
         When gate_09 fails, all of them must transition to hard_block_upstream.
         """
-        # Full Phase 8 subgraph manifest (no edges from n07 to n08a yet
+        # Full Phase 8 subgraph manifest (no edges from n07 to n08a/b/c yet
         # since we only need the HARD_BLOCK to apply to those nodes directly
         # via mark_hard_block_downstream)
         data = {
@@ -533,22 +596,32 @@ class TestGate09HardBlockPhase8Nodes:
                     "terminal": False,
                 },
                 {
-                    "node_id": "n08a_section_drafting",
-                    "exit_gate": "gate_10_part_b_completeness",
+                    "node_id": "n08a_excellence_drafting",
+                    "exit_gate": "gate_10a_excellence_completeness",
                     "terminal": False,
                 },
                 {
-                    "node_id": "n08b_assembly",
-                    "exit_gate": "gate_10_part_b_completeness",
+                    "node_id": "n08b_impact_drafting",
+                    "exit_gate": "gate_10b_impact_completeness",
                     "terminal": False,
                 },
                 {
-                    "node_id": "n08c_evaluator_review",
+                    "node_id": "n08c_implementation_drafting",
+                    "exit_gate": "gate_10c_implementation_completeness",
+                    "terminal": False,
+                },
+                {
+                    "node_id": "n08d_assembly",
+                    "exit_gate": "gate_10d_cross_section_consistency",
+                    "terminal": False,
+                },
+                {
+                    "node_id": "n08e_evaluator_review",
                     "exit_gate": "gate_11_review_closure",
                     "terminal": False,
                 },
                 {
-                    "node_id": "n08d_revision",
+                    "node_id": "n08f_revision",
                     "exit_gate": "gate_12_constitutional_compliance",
                     "terminal": True,
                 },
@@ -580,8 +653,8 @@ class TestGate09HardBlockPhase8Nodes:
                     "terminal": False,
                 },
                 {
-                    "node_id": "n08a_section_drafting",
-                    "exit_gate": "gate_10_part_b_completeness",
+                    "node_id": "n08a_excellence_drafting",
+                    "exit_gate": "gate_10a_excellence_completeness",
                     "terminal": False,
                 },
             ],
@@ -589,7 +662,7 @@ class TestGate09HardBlockPhase8Nodes:
                 {
                     "edge_id": "e07_to_08a",
                     "from_node": "n07_budget_gate",
-                    "to_node": "n08a_section_drafting",
+                    "to_node": "n08a_excellence_drafting",
                     "gate_condition": "gate_09_budget_consistency",
                 }
             ],
@@ -598,7 +671,7 @@ class TestGate09HardBlockPhase8Nodes:
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
             result = sched.run()
 
-        assert "n08a_section_drafting" not in result["dispatched_nodes"]
+        assert "n08a_excellence_drafting" not in result["dispatched_nodes"]
 
 
 # ---------------------------------------------------------------------------
@@ -717,10 +790,12 @@ class TestRunResultDict:
         with patch(_EG_TARGET, return_value=_GATE_FAIL):
             result = sched.run()
 
-        assert "n08a_section_drafting" in result["hard_blocked_nodes"]
-        assert "n08b_assembly" in result["hard_blocked_nodes"]
-        assert "n08c_evaluator_review" in result["hard_blocked_nodes"]
-        assert "n08d_revision" in result["hard_blocked_nodes"]
+        assert "n08a_excellence_drafting" in result["hard_blocked_nodes"]
+        assert "n08b_impact_drafting" in result["hard_blocked_nodes"]
+        assert "n08c_implementation_drafting" in result["hard_blocked_nodes"]
+        assert "n08d_assembly" in result["hard_blocked_nodes"]
+        assert "n08e_evaluator_review" in result["hard_blocked_nodes"]
+        assert "n08f_revision" in result["hard_blocked_nodes"]
 
 
 # ---------------------------------------------------------------------------
@@ -848,7 +923,7 @@ def _mixed_stall_and_hard_block_manifest() -> dict:
     """
     Manifest with:
     - n01 → n02 (linear chain; n01 may fail to stall n02)
-    - n07_budget_gate → n08a_section_drafting (gate_09 triggers HARD_BLOCK)
+    - n07_budget_gate → n08a_excellence_drafting (gate_09 triggers HARD_BLOCK)
 
     Used to verify that hard_blocked nodes and stalled nodes are
     independently tracked and do not interfere.
@@ -873,8 +948,8 @@ def _mixed_stall_and_hard_block_manifest() -> dict:
                 "terminal": False,
             },
             {
-                "node_id": "n08a_section_drafting",
-                "exit_gate": "gate_10_part_b_completeness",
+                "node_id": "n08a_excellence_drafting",
+                "exit_gate": "gate_10a_excellence_completeness",
                 "terminal": True,
             },
         ],
@@ -888,7 +963,7 @@ def _mixed_stall_and_hard_block_manifest() -> dict:
             {
                 "edge_id": "e07",
                 "from_node": "n07_budget_gate",
-                "to_node": "n08a_section_drafting",
+                "to_node": "n08a_excellence_drafting",
                 "gate_condition": "gate_09_budget_consistency",
             },
         ],
@@ -1083,8 +1158,8 @@ class TestRunAbortedErrorRaised:
 
         result = exc_info.value.result
         assert "hard_blocked_nodes" in result
-        # n08a_section_drafting should be hard_block_upstream
-        assert "n08a_section_drafting" in result["hard_blocked_nodes"]
+        # n08a_excellence_drafting should be hard_block_upstream
+        assert "n08a_excellence_drafting" in result["hard_blocked_nodes"]
 
     def test_aborted_result_aborted_flag_is_true(self, tmp_path: Path) -> None:
         sched = _make_scheduler(tmp_path, _two_node_linear_manifest())
@@ -1149,13 +1224,13 @@ class TestHardBlockAndStallInterplay:
         result = exc_info.value.result
         # n02_concept_refinement is stalled (pending) because n01 failed
         assert "n02_concept_refinement" in result["pending_nodes"]
-        # n08a_section_drafting is hard_blocked (not pending)
-        assert "n08a_section_drafting" in result["hard_blocked_nodes"]
-        assert "n08a_section_drafting" not in result["pending_nodes"]
+        # n08a_excellence_drafting is hard_blocked (not pending)
+        assert "n08a_excellence_drafting" in result["hard_blocked_nodes"]
+        assert "n08a_excellence_drafting" not in result["pending_nodes"]
         # stall_report only mentions the truly stalled node
         stalled_ids = [e["node_id"] for e in result["stall_report"]]
         assert "n02_concept_refinement" in stalled_ids
-        assert "n08a_section_drafting" not in stalled_ids
+        assert "n08a_excellence_drafting" not in stalled_ids
 
     def test_hard_blocked_nodes_not_in_stall_report(self, tmp_path: Path) -> None:
         """

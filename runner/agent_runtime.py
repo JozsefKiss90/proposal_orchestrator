@@ -67,8 +67,8 @@ _SELECTED_CALL_REL_PATH: str = (
 #: execute normally and fail-closed on missing inputs.
 #:
 #: ``evaluator-criteria-review`` reads from ``assembled_drafts/`` which
-#: does not exist during ``n08a_section_drafting``.  It is applicable
-#: only once assembled drafts exist (n08c, n08d).
+#: does not exist during drafting nodes (n08a/b/c).  It is applicable
+#: only once assembled drafts exist (n08e, n08f).
 _TIER5_AUDIT_SKILLS: frozenset[str] = frozenset({
     "proposal-section-traceability-check",
     "evaluator-criteria-review",
@@ -659,19 +659,26 @@ def _build_caller_context(
 #: node is expected to populate.  Phase 8 nodes produce Tier 5 artifacts;
 #: earlier phases produce Tier 4 phase outputs.
 _NODE_AUDITABLE_FALLBACK_DIRS: dict[str, tuple[str, ...]] = {
-    "n08a_section_drafting": (
+    "n08a_excellence_drafting": (
         "docs/tier5_deliverables/proposal_sections",
     ),
-    "n08b_assembly": (
+    "n08b_impact_drafting": (
+        "docs/tier5_deliverables/proposal_sections",
+    ),
+    "n08c_implementation_drafting": (
+        "docs/tier5_deliverables/proposal_sections",
+    ),
+    "n08d_assembly": (
         "docs/tier5_deliverables/assembled_drafts",
     ),
-    "n08c_evaluator_review": (
+    "n08e_evaluator_review": (
         "docs/tier5_deliverables/review_packets",
         "docs/tier5_deliverables/assembled_drafts",
     ),
-    "n08d_revision": (
+    "n08f_revision": (
         "docs/tier5_deliverables/assembled_drafts",
         "docs/tier5_deliverables/proposal_sections",
+        "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review",
     ),
 }
 

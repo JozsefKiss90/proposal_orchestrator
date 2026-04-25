@@ -1239,7 +1239,7 @@ class TestPhase8ArtifactPathInjection:
         self,
         tmp_path: Path,
         *,
-        node_id: str = "n08a_section_drafting",
+        node_id: str = "n08a_excellence_drafting",
         skill_ids: list[str] | None = None,
     ) -> dict:
         if skill_ids is None:
@@ -1409,7 +1409,7 @@ class TestResolveAuditableArtifact:
             "docs/tier5_deliverables/proposal_sections/section_1a.json",
         ]
         result = _resolve_auditable_artifact(
-            "n08a_section_drafting", outputs, tmp_path,
+            "n08a_excellence_drafting", outputs, tmp_path,
         )
         assert result == "docs/tier5_deliverables/proposal_sections/section_1a.json"
 
@@ -1435,7 +1435,7 @@ class TestResolveAuditableArtifact:
         _write_json(section_dir / "section_1a.json", {"content": "test"})
 
         result = _resolve_auditable_artifact(
-            "n08a_section_drafting", [], tmp_path,
+            "n08a_excellence_drafting", [], tmp_path,
         )
         assert result is not None
         assert "proposal_sections" in result
@@ -1444,7 +1444,7 @@ class TestResolveAuditableArtifact:
     def test_returns_none_when_no_artifacts(self, tmp_path: Path) -> None:
         from runner.agent_runtime import _resolve_auditable_artifact
         result = _resolve_auditable_artifact(
-            "n08a_section_drafting", [], tmp_path,
+            "n08a_excellence_drafting", [], tmp_path,
         )
         assert result is None
 
@@ -1455,7 +1455,7 @@ class TestResolveAuditableArtifact:
         _write_json(drafts_dir / "assembled_draft.json", {"sections": []})
 
         result = _resolve_auditable_artifact(
-            "n08b_assembly", [], tmp_path,
+            "n08d_assembly", [], tmp_path,
         )
         assert result is not None
         assert "assembled_drafts" in result
@@ -1510,7 +1510,7 @@ class TestPhase8GateResultOnlyByRunner:
         kwargs = _make_agent_env(
             tmp_path,
             agent_id="proposal_writer",
-            node_id="n08a_section_drafting",
+            node_id="n08a_excellence_drafting",
             skill_ids=["proposal-section-drafting"],
             phase_id="phase_08a_section_drafting",
             reads_from=["docs/tier3/input.json"],
@@ -1518,7 +1518,7 @@ class TestPhase8GateResultOnlyByRunner:
             artifact_registry=[
                 {
                     "path": "docs/tier5_deliverables/proposal_sections/",
-                    "produced_by": "n08a_section_drafting",
+                    "produced_by": "n08a_excellence_drafting",
                     "tier": "tier5_deliverable",
                 },
             ],

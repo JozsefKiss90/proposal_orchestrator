@@ -677,14 +677,14 @@ class TestNodeIdReconciliation:
             "version": "1.1",
             "node_registry": [
                 {"node_id": "n01_call_analysis", "terminal": False},
-                {"node_id": "n08a_section_drafting", "terminal": False},
+                {"node_id": "n08a_excellence_drafting", "terminal": False},
             ],
             "edge_registry": [],
         }
         graph = ManifestGraph.load(_write_manifest(tmp_path, data))
         ids = graph.node_ids()
         assert "n01_call_analysis" in ids
-        assert "n08a_section_drafting" in ids
+        assert "n08a_excellence_drafting" in ids
         # Short aliases must NOT appear
         assert "n01" not in ids
         assert "n08a" not in ids
@@ -696,12 +696,12 @@ class TestNodeIdReconciliation:
         """
         ctx = RunContext.initialize(tmp_path, "run-canonical")
         ctx.set_node_state("n01_call_analysis", "released")
-        ctx.set_node_state("n08a_section_drafting", "running")
+        ctx.set_node_state("n08a_excellence_drafting", "running")
         ctx.save()
 
         reloaded = RunContext.load(tmp_path, "run-canonical")
         assert reloaded.get_node_state("n01_call_analysis") == "released"
-        assert reloaded.get_node_state("n08a_section_drafting") == "running"
+        assert reloaded.get_node_state("n08a_excellence_drafting") == "running"
         # Short alias returns the default ("pending") — it is a different key
         assert reloaded.get_node_state("n01") == "pending"
 
@@ -712,10 +712,12 @@ class TestNodeIdReconciliation:
         """
         expected = frozenset(
             {
-                "n08a_section_drafting",
-                "n08b_assembly",
-                "n08c_evaluator_review",
-                "n08d_revision",
+                "n08a_excellence_drafting",
+                "n08b_impact_drafting",
+                "n08c_implementation_drafting",
+                "n08d_assembly",
+                "n08e_evaluator_review",
+                "n08f_revision",
             }
         )
         assert PHASE_8_NODE_IDS == expected
@@ -736,10 +738,12 @@ class TestNodeIdReconciliation:
         assert _extract_node_id("n05_impact_architecture exit") == "n05_impact_architecture"
         assert _extract_node_id("n06_implementation_architecture exit") == "n06_implementation_architecture"
         assert _extract_node_id("n07_budget_gate exit") == "n07_budget_gate"
-        assert _extract_node_id("n08a_section_drafting exit") == "n08a_section_drafting"
-        assert _extract_node_id("n08b_assembly exit") == "n08b_assembly"
-        assert _extract_node_id("n08c_evaluator_review exit") == "n08c_evaluator_review"
-        assert _extract_node_id("n08d_revision exit") == "n08d_revision"
+        assert _extract_node_id("n08a_excellence_drafting exit") == "n08a_excellence_drafting"
+        assert _extract_node_id("n08b_impact_drafting exit") == "n08b_impact_drafting"
+        assert _extract_node_id("n08c_implementation_drafting exit") == "n08c_implementation_drafting"
+        assert _extract_node_id("n08d_assembly exit") == "n08d_assembly"
+        assert _extract_node_id("n08e_evaluator_review exit") == "n08e_evaluator_review"
+        assert _extract_node_id("n08f_revision exit") == "n08f_revision"
 
     def test_hard_block_sets_canonical_phase8_ids_in_run_context(
         self, tmp_path: Path
@@ -757,7 +761,7 @@ class TestNodeIdReconciliation:
             )
 
         # Short-form aliases must NOT be set
-        for short_id in ("n08a", "n08b", "n08c", "n08d"):
+        for short_id in ("n08a", "n08b", "n08c", "n08d", "n08e", "n08f"):
             assert ctx.get_node_state(short_id) == "pending", (
                 f"Short alias {short_id!r} should remain pending (not be set)"
             )
@@ -789,7 +793,7 @@ class TestNodeIdReconciliation:
             node_part = evaluated_at.split()[0] if evaluated_at else ""
             # A short-form ID has the form "nXX" (2 digits, no underscore suffix)
             import re
-            if re.match(r"^n\d{2}[a-d]?$", node_part):
+            if re.match(r"^n\d{2}[a-f]?$", node_part):
                 short_form_found.append(
                     f"{gate['gate_id']}: evaluated_at={evaluated_at!r}"
                 )

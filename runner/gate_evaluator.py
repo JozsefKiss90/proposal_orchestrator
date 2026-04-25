@@ -71,6 +71,13 @@ from runner.predicates.coverage_predicates import (
     partner_budget_coverage_match,
     wp_budget_coverage_match,
 )
+from runner.predicates.criterion_predicates import (
+    cross_section_consistency,
+    impact_pathways_covered,
+    implementation_coverage_complete,
+    no_unresolved_material_claims,
+    schema_id_matches,
+)
 from runner.predicates.cycle_predicates import no_dependency_cycles
 from runner.predicates.file_predicates import (
     artifact_owned_by_run,
@@ -198,6 +205,12 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "wp_count_within_limit": wp_count_within_limit,
     "critical_path_present": critical_path_present,
     "dependency_schedule_consistency": dependency_schedule_consistency,
+    # --- criterion-aligned predicates (Phase 8 refactor) ---
+    "schema_id_matches": schema_id_matches,
+    "no_unresolved_material_claims": no_unresolved_material_claims,
+    "impact_pathways_covered": impact_pathways_covered,
+    "implementation_coverage_complete": implementation_coverage_complete,
+    "cross_section_consistency": cross_section_consistency,
 }
 
 

@@ -9,7 +9,11 @@ used_by_agents:
   - compliance_validator
   - call_analyzer
   - concept_refiner
-  - proposal_writer
+  - excellence_writer
+  - impact_writer
+  - implementation_writer
+  - proposal_integrator
+  - evaluator_reviewer
   - revision_integrator
   - budget_gate_validator
 reads_from:
@@ -58,7 +62,7 @@ declared inputs from disk via the Read tool during execution.
 |------|--------------------|-----------------|-----------|---------|
 | `CLAUDE.md` | Repository constitution | Section 13 prohibitions (13.1–13.12); Section 7 gate conditions; Section 8 budget integration rules; Section 11 deliverable rules | N/A — constitutional document | The binding authority that defines all prohibited actions; every violation check is mapped to a named section in this document |
 | `artifact_path` (caller context) | The specific phase output or deliverable artifact to audit | Phase-specific canonical artifact fields (varies by phase: call_analysis_summary, concept_refinement_summary, wp_structure, gantt, impact_architecture, implementation_architecture, budget_gate_assessment, drafting_review_status) | Context-dependent: the schema_id of the artifact being checked | The targeted artifact being audited for constitutional violations; checked for fabricated facts, schema mismatches, gate bypasses, and other Section 13 violations. In TAPM mode, read this single artifact from disk — do not scan the entire phase_outputs/ directory |
-| `docs/tier5_deliverables/` | Deliverable directory — proposal_sections/, assembled_drafts/, review_packets/, final_exports/ | content fields; traceability_footer; validation_status; section_completion_log | Context-dependent: orch.tier5.proposal_section.v1, orch.tier5.assembled_draft.v1, orch.tier5.review_packet.v1, orch.tier5.final_export.v1 | Deliverables being audited for constitutional violations; checked for budget-dependent content before gate pass, unsupported Tier 5 claims, and grant annex schema usage |
+| `docs/tier5_deliverables/` | Deliverable directory — proposal_sections/, assembled_drafts/, review_packets/, final_exports/ | content or sub_sections[].content fields; traceability_footer; validation_status; section_completion_log | Context-dependent: orch.tier5.excellence_section.v1, orch.tier5.impact_section.v1, orch.tier5.implementation_section.v1, orch.tier5.part_b_assembled_draft.v1, orch.tier5.review_packet.v1, orch.tier5.final_export.v1 (legacy orch.tier5.proposal_section.v1 also accepted) | Deliverables being audited for constitutional violations; checked for budget-dependent content before gate pass, unsupported Tier 5 claims, and grant annex schema usage |
 
 ### Outputs
 
@@ -88,7 +92,7 @@ declared inputs from disk via the Read tool during execution.
 Apply each of the 12 checks below to the artifact at `artifact_path`. For each check: assign `check_status` as "pass" or "violation". If a violation is found: record `violation_evidence` (quoted text from the artifact that evidences the violation) and `severity` (critical or major).
 
 **Check 13.1 — Grant Agreement Annex as schema source:**
-- Read the artifact's content. If the artifact is a proposal section (schema_id = "orch.tier5.proposal_section.v1") or a phase output: check whether any structural reference in the content or traceability_footer identifies a Grant Agreement Annex, Model Grant Agreement Annex, or "AGA" template as a schema source.
+- Read the artifact's content. If the artifact is a proposal section (schema_id is one of "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", "orch.tier5.implementation_section.v1", or legacy "orch.tier5.proposal_section.v1") or a phase output: check whether any structural reference in the content or traceability_footer identifies a Grant Agreement Annex, Model Grant Agreement Annex, or "AGA" template as a schema source.
 - Specific detection: look for strings matching "Annex [0-9]", "Grant Agreement Annex", "AGA Template", "Model Grant Agreement template" used as a structural authority (not as a citation). If found: violation. Severity: critical.
 
 **Check 13.2 — Invented call constraints:**

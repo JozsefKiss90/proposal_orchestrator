@@ -231,35 +231,120 @@ agent_catalog:
 
   - id: proposal_writer
     role: >
-      Drafts individual proposal sections and assembles them into a coherent whole.
-      Writes in evaluator-oriented language. Applies revision actions from the
-      evaluator review. Maintains traceability to Tier 1-4 sources throughout.
-    constitutional_scope: "Phase 8a and Phase 8b"
+      DEPRECATED by Phase 8 refactor. Replaced by excellence_writer,
+      impact_writer, implementation_writer, and proposal_integrator.
+      Retained for backward-compatibility reference only. Not bound to
+      any manifest node.
+    constitutional_scope: "None (deprecated)"
+    reads_from: []
+    writes_to: []
+    must_not:
+      - "Be invoked by any active manifest node"
+    phase_alignment: "deprecated_by_phase8_refactor"
+
+  - id: excellence_writer
+    role: >
+      Drafts the Excellence section of the RIA/IA Part B proposal, covering
+      objectives, relation to work programme, concept and methodology, ambition,
+      interdisciplinarity, and gender dimension. Writes in evaluator-oriented
+      language targeting the Excellence evaluation criterion.
+    constitutional_scope: "Phase 8a"
     reads_from:
       - docs/tier2a_instrument_schemas/application_forms/
       - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier2a_instrument_schemas/extracted/
       - docs/tier3_project_instantiation/
-      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
     writes_to:
-      - docs/tier5_deliverables/proposal_sections/
-      - docs/tier5_deliverables/assembled_drafts/
-      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+      - docs/tier5_deliverables/proposal_sections/excellence_section.json
     must_not:
       - "Introduce claims not grounded in Tier 1-4 state"
       - "Reference budget figures not validated through Phase 7 gate"
       - "Fill data gaps with fabricated content"
       - "Write to satisfy grant agreement annex formatting requirements"
-      - "Finalize budget-dependent sections before Phase 7 gate has passed"
-    phase_alignment: "phase_08_drafting_and_review"
+    phase_alignment: "phase_08a_excellence_drafting"
+
+  - id: impact_writer
+    role: >
+      Drafts the Impact section of the RIA/IA Part B proposal, covering
+      expected impacts and their pathways, measures to maximise impact
+      (dissemination, exploitation, communication), and sustainability.
+      Maps all content to Phase 5 impact architecture.
+    constitutional_scope: "Phase 8b"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+      - docs/tier2b_topic_and_call_sources/extracted/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/impact_section.json
+    must_not:
+      - "Fabricate coverage of a call expected impact not addressed by a project output"
+      - "Assert impact claims without a traceable project mechanism"
+      - "Reference budget figures not validated through Phase 7 gate"
+      - "Fill data gaps with fabricated content"
+    phase_alignment: "phase_08b_impact_drafting"
+
+  - id: implementation_writer
+    role: >
+      Drafts the Implementation section (Quality and efficiency) of the RIA/IA
+      Part B proposal, covering work plan and WP descriptions, Gantt chart,
+      deliverables table, milestones table, management structure, risk management,
+      consortium description, and resources allocation.
+    constitutional_scope: "Phase 8c"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/implementation_section.json
+    must_not:
+      - "Redesign the consortium or WP structure"
+      - "Assign roles to partners not present in Tier 3"
+      - "Reference budget figures not validated through Phase 7 gate"
+      - "Fill data gaps with fabricated content"
+    phase_alignment: "phase_08c_implementation_drafting"
+
+  - id: proposal_integrator
+    role: >
+      Assembles the three criterion-aligned sections into a coherent Part B
+      assembled draft. Performs cross-section consistency checks on objectives,
+      WP references, partner names, deliverables, milestones, KPIs, impact
+      claims, budget/resource claims, and terminology.
+    constitutional_scope: "Phase 8d"
+    reads_from:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+    must_not:
+      - "Rewrite section content during assembly; flag inconsistencies only"
+      - "Introduce new claims not present in the section artifacts"
+      - "Silently normalise contradictions between sections"
+    phase_alignment: "phase_08d_assembly"
 
   - id: evaluator_reviewer
     role: >
-      Conducts evaluator-style review of the assembled draft against applicable
-      evaluation criteria and scoring logic. Categorises weaknesses by severity.
-      Produces prioritised revision action list. Does not revise the draft.
-    constitutional_scope: "Phase 8c"
+      Conducts evaluator-style review of the assembled Part B draft against
+      applicable evaluation criteria and scoring logic. Categorises weaknesses
+      by severity. Produces prioritised revision action list. Does not revise
+      the draft.
+    constitutional_scope: "Phase 8e"
     reads_from:
-      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
       - docs/tier2a_instrument_schemas/evaluation_forms/
       - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
     writes_to:
@@ -269,20 +354,20 @@ agent_catalog:
       - "Revise the draft; review only"
       - "Evaluate against grant agreement annex requirements"
       - "Apply review criteria from a different instrument than the active instrument"
-    phase_alignment: "phase_08_drafting_and_review"
+    phase_alignment: "phase_08e_evaluator_review"
 
   - id: revision_integrator
     role: >
-      Applies revision actions from the evaluator review to the assembled draft.
-      Resolves critical and major weaknesses. Publishes the Phase 8 checkpoint
-      and produces the final export.
-    constitutional_scope: "Phase 8d"
+      Applies revision actions from the evaluator review to the assembled Part B
+      draft. Resolves critical and major weaknesses. Publishes the Phase 8
+      checkpoint and produces the final export.
+    constitutional_scope: "Phase 8f"
     reads_from:
-      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
       - docs/tier5_deliverables/review_packets/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
     writes_to:
-      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
       - docs/tier5_deliverables/final_exports/
       - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
       - docs/tier4_orchestration_state/checkpoints/
@@ -292,7 +377,7 @@ agent_catalog:
       - "Fill revision gaps with fabricated content"
       - "Declare Phase 8 complete if critical revision actions are unresolved"
       - "Overwrite a validated checkpoint"
-    phase_alignment: "phase_08_drafting_and_review"
+    phase_alignment: "phase_08f_revision"
 
   - id: compliance_validator
     role: >

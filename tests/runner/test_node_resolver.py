@@ -2,7 +2,7 @@
 Tests for runner.node_resolver — node_id → agent resolution layer.
 
 Covers §14 test cases 1–3:
-  1. node_id → agent_id resolution for all 11 nodes
+  1. node_id → agent_id resolution for all 13 nodes
   2. prompt spec loading (path existence verification)
   3. skill list resolution from manifest
 
@@ -13,7 +13,7 @@ Additional tests:
   - prompt spec path exists on disk
   - NodeResolverError for unknown node_id
   - phase_id resolution for all nodes
-  - node_ids() returns all 11 in manifest order
+  - node_ids() returns all 13 in manifest order
 """
 
 from __future__ import annotations
@@ -54,10 +54,12 @@ _EXPECTED_NODES = [
     "n05_impact_architecture",
     "n06_implementation_architecture",
     "n07_budget_gate",
-    "n08a_section_drafting",
-    "n08b_assembly",
-    "n08c_evaluator_review",
-    "n08d_revision",
+    "n08a_excellence_drafting",
+    "n08b_impact_drafting",
+    "n08c_implementation_drafting",
+    "n08d_assembly",
+    "n08e_evaluator_review",
+    "n08f_revision",
 ]
 
 _NODE_TO_AGENT = {
@@ -68,10 +70,12 @@ _NODE_TO_AGENT = {
     "n05_impact_architecture": "impact_architect",
     "n06_implementation_architecture": "implementation_architect",
     "n07_budget_gate": "budget_gate_validator",
-    "n08a_section_drafting": "proposal_writer",
-    "n08b_assembly": "proposal_writer",
-    "n08c_evaluator_review": "evaluator_reviewer",
-    "n08d_revision": "revision_integrator",
+    "n08a_excellence_drafting": "excellence_writer",
+    "n08b_impact_drafting": "impact_writer",
+    "n08c_implementation_drafting": "implementation_writer",
+    "n08d_assembly": "proposal_integrator",
+    "n08e_evaluator_review": "evaluator_reviewer",
+    "n08f_revision": "revision_integrator",
 }
 
 _NODE_TO_PHASE = {
@@ -82,10 +86,12 @@ _NODE_TO_PHASE = {
     "n05_impact_architecture": "phase_05_impact_architecture",
     "n06_implementation_architecture": "phase_06_implementation_architecture",
     "n07_budget_gate": "phase_07_budget_gate",
-    "n08a_section_drafting": "phase_08a_section_drafting",
-    "n08b_assembly": "phase_08b_assembly",
-    "n08c_evaluator_review": "phase_08c_evaluator_review",
-    "n08d_revision": "phase_08d_revision",
+    "n08a_excellence_drafting": "phase_08a_excellence_drafting",
+    "n08b_impact_drafting": "phase_08b_impact_drafting",
+    "n08c_implementation_drafting": "phase_08c_implementation_drafting",
+    "n08d_assembly": "phase_08d_assembly",
+    "n08e_evaluator_review": "phase_08e_evaluator_review",
+    "n08f_revision": "phase_08f_revision",
 }
 
 
@@ -104,10 +110,11 @@ class TestAgentIdResolution:
     ) -> None:
         assert resolver.resolve_agent_id(node_id) == expected_agent
 
-    def test_phase8_nodes_share_proposal_writer(self, resolver: NodeResolver) -> None:
-        """n08a and n08b share the same agent_id (proposal_writer)."""
-        assert resolver.resolve_agent_id("n08a_section_drafting") == "proposal_writer"
-        assert resolver.resolve_agent_id("n08b_assembly") == "proposal_writer"
+    def test_phase8_drafting_nodes_have_distinct_writers(self, resolver: NodeResolver) -> None:
+        """n08a, n08b, n08c each have their own dedicated writer agent."""
+        assert resolver.resolve_agent_id("n08a_excellence_drafting") == "excellence_writer"
+        assert resolver.resolve_agent_id("n08b_impact_drafting") == "impact_writer"
+        assert resolver.resolve_agent_id("n08c_implementation_drafting") == "implementation_writer"
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +238,7 @@ class TestPhaseIdResolution:
 
 
 class TestNodeIds:
-    def test_returns_all_11_nodes(self, resolver: NodeResolver) -> None:
+    def test_returns_all_13_nodes(self, resolver: NodeResolver) -> None:
         assert resolver.node_ids() == _EXPECTED_NODES
 
     def test_returns_list(self, resolver: NodeResolver) -> None:

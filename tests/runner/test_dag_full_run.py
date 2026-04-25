@@ -273,9 +273,9 @@ def _early_fail_manifest() -> dict:
 def _hard_block_manifest() -> dict:
     """
     n07_budget_gate (exit=gate_09_budget_consistency, no incoming edges)
-    → n08a_section_drafting (via explicit edge)
+    → n08a_excellence_drafting (via explicit edge)
 
-    n08b, n08c, n08d are in the node registry but have no incoming edges
+    n08b–n08f are in the node registry but have no incoming edges
     in this manifest; they are frozen by mark_hard_block_downstream()
     when gate_09 fails, not by edge-graph starvation.
 
@@ -286,16 +286,18 @@ def _hard_block_manifest() -> dict:
         "test_hard_block",
         nodes=[
             _node("n07_budget_gate", "gate_09_budget_consistency"),
-            _node("n08a_section_drafting", "gate_10_part_b_completeness"),
-            _node("n08b_assembly", "gate_10_part_b_completeness"),
-            _node("n08c_evaluator_review", "gate_11_review_closure"),
-            _node("n08d_revision", "gate_12_constitutional_compliance", terminal=True),
+            _node("n08a_excellence_drafting", "gate_10a_excellence_completeness"),
+            _node("n08b_impact_drafting", "gate_10b_impact_completeness"),
+            _node("n08c_implementation_drafting", "gate_10c_implementation_completeness"),
+            _node("n08d_assembly", "gate_10d_cross_section_consistency"),
+            _node("n08e_evaluator_review", "gate_11_review_closure"),
+            _node("n08f_revision", "gate_12_constitutional_compliance", terminal=True),
         ],
         edges=[
             _edge(
                 "e07_to_08a",
                 "n07_budget_gate",
-                "n08a_section_drafting",
+                "n08a_excellence_drafting",
                 "gate_09_budget_consistency",
             ),
         ],
@@ -755,7 +757,7 @@ class TestHardBlock:
 
     def test_overall_status_is_fail(self, tmp_path: Path) -> None:
         """
-        n08d is the only terminal node; it is hard_blocked (not released).
+        n08f is the only terminal node; it is hard_blocked (not released).
         No terminal reached → overall_status == 'fail'.
         """
         sched = self._sched(tmp_path)

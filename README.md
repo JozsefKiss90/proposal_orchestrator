@@ -506,7 +506,7 @@ Optional:
 
 ### Phase Sequence and DAG
 
-The system executes 8 canonical phases through 11 nodes. Phases are strictly ordered; no phase may begin until its upstream gates have passed.
+The system executes 8 canonical phases through 13 nodes. Phases are strictly ordered; no phase may begin until its upstream gates have passed.
 
 ```
 Phase 1: Call Analysis
@@ -607,12 +607,20 @@ Phase 7: Budget Gate (VALIDATED)
   n07_budget_gate  (budget_gate_validator + budget_interface_coordinator)
   Exit: gate_09_budget_consistency  [MANDATORY — BYPASS PROHIBITED]
     |
-Phase 8: Drafting & Review (4 substeps, PARTIALLY OPERATIONAL)
-  n08a_section_drafting  --> n08b_assembly  --> n08c_evaluator_review  --> n08d_revision
-  Exit: gate_10            Exit: gate_10      Exit: gate_11              Exit: gate_12
+Phase 8: Drafting & Review (6 substeps, criterion-aligned DAG)
+                              ┌─> n08a_excellence_drafting      ─gate_10a─┐
+  gate_09 (budget gate) ──────┼─> n08b_impact_drafting           ─gate_10b─┼──> n08d_assembly
+                              └─> n08c_implementation_drafting   ─gate_10c─┘        │
+                                                                               gate_10d
+                                                                                    │
+                                                                           n08e_evaluator_review
+                                                                               gate_11
+                                                                                    │
+                                                                           n08f_revision (terminal)
+                                                                               gate_12
 ```
 
-**Parallelism:** Phases 4 and 5 can execute concurrently after Phase 3. Phase 6 waits for all three (Phases 3, 4, 5).
+**Parallelism:** Phases 4 and 5 can execute concurrently after Phase 3. Phase 6 waits for all three (Phases 3, 4, 5). Within Phase 8, sections n08a/n08b/n08c execute in parallel (criterion-aligned drafting), then converge on n08d (assembly), followed by sequential n08e (review) and n08f (revision).
 
 ### Gate Behaviour
 
@@ -635,7 +643,7 @@ If any deterministic predicate fails, semantic evaluation is skipped. A gate pas
 The budget gate (`gate_09_budget_consistency`) has special constitutional status:
 
 - It is **mandatory** and cannot be bypassed, deferred, or substituted with internal estimates
-- When it fails, all Phase 8 nodes (`n08a` through `n08d`) are immediately frozen with `hard_block_upstream` status
+- When it fails, all Phase 8 nodes (`n08a` through `n08f`) are immediately frozen with `hard_block_upstream` status
 - Phase 8 cannot begin — including preparatory drafting — until a validated budget response conforming to `interface_contract.json` is present in `docs/integrations/lump_sum_budget_planner/received/`
 
 The budget gate is operational and validated. When the budget response and validation artifacts are present and structurally conformant, `gate_09_budget_consistency` passes and Phase 8 nodes are unblocked. Placeholder budget responses are supported for demo/testing provided they conform to the interface contract schema.
@@ -717,27 +725,31 @@ This separation is intentional and enforced by gates.
   - All 9 deterministic predicates (`g08_p01`–`g08_p09`) pass
   - Phase 8 nodes are unblocked when this gate passes
 
-- **Phase 8: Drafting & Review** (PARTIALLY OPERATIONAL)
+- **Phase 8: Drafting & Review** (criterion-aligned DAG)
   - Conditionally executable after Phase 7 passes
-  - `n08a_section_drafting` dispatches and invokes the `proposal-section-drafting`
-    skill (TAPM, multi-artifact) to produce per-section Tier 5 artifacts
-  - Current limitation: runtime artifact_path injection for
-    `constitutional-compliance-check` in Phase 8 context requires
-    the drafting skill to produce auditable Tier 5 output before
-    compliance checking can execute. The wiring is implemented but
-    not yet validated end-to-end.
-  - This is a runtime integration issue, not a data dependency or
-    conceptual design issue. Phases 1–7 are unaffected.
+  - Three criterion-aligned drafting nodes execute in parallel:
+    - `n08a_excellence_drafting` (Excellence section, gate_10a)
+    - `n08b_impact_drafting` (Impact section, gate_10b)
+    - `n08c_implementation_drafting` (Implementation section, gate_10c)
+  - `n08d_assembly` converges all three sections and performs cross-section
+    consistency checks (gate_10d)
+  - `n08e_evaluator_review` conducts structured review against evaluation
+    criteria (gate_11)
+  - `n08f_revision` produces final export and checkpoint (gate_12, terminal)
+  - Each section is independently gated — a failure in one criterion does
+    not block the other two from completing
 
 - **System maturity status (as of 2026-04-25):**
   - Phases 1–6: COMPLETE — implemented and validated
   - Phase 7: COMPLETE — externally simulated, gate-validated
-  - Phase 8: PARTIALLY OPERATIONAL — runtime integration incomplete
+  - Phase 8: REFACTORED — criterion-aligned DAG with 6 nodes, parallel
+    drafting, per-criterion gates, and cross-section consistency checks.
+    Runtime integration pending end-to-end validation.
 
 ### Known Limitations
 
-- **Phase 8 compliance auditing:** `constitutional-compliance-check` in Phase 8 requires the upstream `proposal-section-drafting` skill to produce Tier 5 artifacts before it can execute. The artifact_path injection mechanism is implemented (`_resolve_auditable_artifact` in `agent_runtime.py`) but the end-to-end pipeline has not been validated in a live run. If no auditable artifact is produced, the agent fails with a structured `MISSING_INPUT` error (fail-closed).
-- **`evaluator-criteria-review` in n08a:** This skill reads from `assembled_drafts/` which does not exist during `n08a_section_drafting`. It is guarded by the Tier 5 applicability check and skipped as `not_applicable` until assembled drafts exist (n08c/n08d context).
+- **Phase 8 end-to-end validation:** The criterion-aligned DAG (6 nodes, parallel drafting, per-criterion gates) is fully specified and integration-tested at the scheduler level. Runtime skill invocations (Claude transport) have not been validated end-to-end in a live run. If a drafting skill fails to produce its section artifact, the agent fails with a structured `MISSING_INPUT` error (fail-closed).
+- **`evaluator-criteria-review` scope:** In criterion-scoped mode (n08a/b/c), this skill reviews a single section. In assembled-draft mode (n08e), it reviews the full `part_b_assembled_draft.json`.
 - **Placeholder budget response:** The current budget response in `received/` is a demo placeholder with illustrative values. All numeric figures are structurally valid but not expert-approved. This is sufficient for gate validation and Phase 8 unblocking but does not represent real budget data.
 - These limitations do not affect Phases 1–7 correctness. All Phase 1–7 gates pass with validated artifacts.
 
@@ -794,7 +806,7 @@ Every run produces a summary at `.claude/runs/<run-id>/run_summary.json`:
     "n02_concept_refinement": "released",
     "...": "..."
   },
-  "terminal_nodes_reached": ["n08d_revision"],
+  "terminal_nodes_reached": ["n08f_revision"],
   "stalled_nodes": [],
   "hard_blocked_nodes": [],
   "gate_results_index": {

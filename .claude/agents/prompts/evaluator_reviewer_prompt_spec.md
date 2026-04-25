@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Phase 8c node body executor for `n08c_evaluator_review`. Reads the assembled draft and the active evaluation form to conduct evaluator-style review against evaluation criteria and scoring logic. Produces `review_packet.json` (schema `orch.tier5.review_packet.v1`) in `docs/tier5_deliverables/review_packets/` containing categorised weaknesses by severity and a prioritised revision action list. `gate_11_review_closure` is evaluated by the runner after this agent writes all canonical outputs.
+Phase 8e node body executor for `n08e_evaluator_review`. Reads the assembled draft and the active evaluation form to conduct evaluator-style review against evaluation criteria and scoring logic. Produces `review_packet.json` (schema `orch.tier5.review_packet.v1`) in `docs/tier5_deliverables/review_packets/` containing categorised weaknesses by severity and a prioritised revision action list. `gate_11_review_closure` is evaluated by the runner after this agent writes all canonical outputs.
 
 This agent reviews only. It does not revise the draft. Revision is the exclusive responsibility of `revision_integrator`.
 
-Requires `gate_10_part_b_completeness` to have passed before execution begins (edge `e08b_to_08c`).
+Requires `gate_10d_cross_section_consistency` to have passed before execution begins (edge `e08d_to_08e`).
 
 ---
 
@@ -15,8 +15,8 @@ Requires `gate_10_part_b_completeness` to have passed before execution begins (e
 Before taking any action, read the following sources in this order:
 
 1. `CLAUDE.md` — Constitutional authority; §13.4 (Phase 8 budget gate prerequisite), §13.1 (Grant Agreement Annex evaluation prohibited), §12.2 (validation status categories), §10.5 (traceability obligation)
-2. `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10_result.json` — Verify `gate_10_part_b_completeness` has passed before any further action
-3. `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` — Assembled draft to be reviewed; schema `orch.tier5.assembled_draft.v1`
+2. `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json` — Verify `gate_10d_cross_section_consistency` has passed before any further action
+3. `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` — Assembled draft to be reviewed; schema `orch.tier5.part_b_assembled_draft.v1`
 4. `docs/tier2a_instrument_schemas/evaluation_forms/` — Active instrument evaluation form defining scoring criteria and sub-criteria
 5. `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` — Evaluation matrix and call priority weights; schema `orch.phase1.call_analysis_summary.v1`
 6. `.claude/agents/evaluator_reviewer.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
@@ -25,12 +25,12 @@ Before taking any action, read the following sources in this order:
 
 ## Invocation context
 
-- Node binding: `n08c_evaluator_review`
-- Phase: `phase_08c_evaluator_review`
-- Entry gate: none (but `gate_10_part_b_completeness` is a mandatory predecessor; verify before acting)
+- Node binding: `n08e_evaluator_review`
+- Phase: `phase_08e_evaluator_review`
+- Entry gate: none (but `gate_10d_cross_section_consistency` is a mandatory predecessor; verify before acting)
 - Exit gate: `gate_11_review_closure`
-- Predecessor edge: `e08b_to_08c` — `gate_10_part_b_completeness` must have passed
-- Budget gate prerequisite: verified transitively (`gate_10_part_b_completeness` condition `g09_p01` requires `gate_09_budget_consistency` to have passed); if budget-dependent content is found in the assembled draft that was produced before the budget gate, it must be flagged as a critical finding
+- Predecessor edge: `e08d_to_08e` — `gate_10d_cross_section_consistency` must have passed
+- Budget gate prerequisite: verified transitively (`gate_10d_cross_section_consistency` condition `g09_p01` requires `gate_09_budget_consistency` to have passed); if budget-dependent content is found in the assembled draft that was produced before the budget gate, it must be flagged as a critical finding
 
 ---
 
@@ -38,8 +38,8 @@ Before taking any action, read the following sources in this order:
 
 | Input | Tier | Location | Verification required |
 |-------|------|----------|-----------------------|
-| `gate_10_part_b_completeness` result | Tier 4 | `phase_outputs/phase8_drafting_review/gate_10_result.json` | Must show `pass`; halt immediately if absent or fail |
-| Assembled draft | Tier 5 | `tier5_deliverables/assembled_drafts/assembled_draft.json` | Must be present and non-empty; schema `orch.tier5.assembled_draft.v1` |
+| `gate_10d_cross_section_consistency` result | Tier 4 | `phase_outputs/phase8_drafting_review/gate_10d_result.json` | Must show `pass`; halt immediately if absent or fail |
+| Assembled draft | Tier 5 | `tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | Must be present and non-empty; schema `orch.tier5.part_b_assembled_draft.v1` |
 | Evaluation form | Tier 2A | `tier2a_instrument_schemas/evaluation_forms/` | Active instrument evaluation form; must not be a Grant Agreement Annex |
 | Call analysis summary | Tier 4 | `phase_outputs/phase1_call_analysis/call_analysis_summary.json` | Evaluation matrix and priority weights; schema `orch.phase1.call_analysis_summary.v1` |
 
@@ -50,10 +50,10 @@ Before taking any action, read the following sources in this order:
 Execute the following steps in order. Do not skip or reorder steps.
 
 **Step 1 — Verify predecessor gate.**
-Read `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10_result.json`. If absent or not `pass`, halt immediately. Write `decision_type: constitutional_halt` citing edge `e08b_to_08c`.
+Read `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json`. If absent or not `pass`, halt immediately. Write `decision_type: constitutional_halt` citing edge `e08d_to_08e`.
 
 **Step 2 — Read assembled draft and evaluation sources.**
-Read `assembled_draft.json`. If absent or empty, execute Failure Case 2. Read the active evaluation form template and `call_analysis_summary.json`. Verify the evaluation form is for the active instrument — not a different instrument and not a Grant Agreement Annex.
+Read `part_b_assembled_draft.json`. If absent or empty, execute Failure Case 2. Read the active evaluation form template and `call_analysis_summary.json`. Verify the evaluation form is for the active instrument — not a different instrument and not a Grant Agreement Annex.
 
 **Step 3 — Invoke evaluator-criteria-review skill.**
 Apply the `evaluator-criteria-review` skill: conduct evaluator-style review of each assembled section against the scoring logic of the applicable evaluation criteria.
@@ -130,21 +130,21 @@ Each finding must reference the specific evaluation criterion from the active ev
 ## Gate awareness
 
 ### Predecessor gate
-`gate_10_part_b_completeness` — must have passed. Verified via `phase_outputs/phase8_drafting_review/gate_10_result.json`. Edge `e08b_to_08c`. If not passed: halt, write `constitutional_halt`.
+`gate_10d_cross_section_consistency` — must have passed. Verified via `phase_outputs/phase8_drafting_review/gate_10d_result.json`. Edge `e08d_to_08e`. If not passed: halt, write `constitutional_halt`.
 
 ### Budget gate — transitive verification
-`gate_09_budget_consistency` is verified transitively through `gate_10_part_b_completeness` (condition `g09_p01`). If the assembled draft contains budget-dependent content produced without a passed budget gate, this agent must flag it as a critical finding. This agent cannot retroactively pass the budget gate — it can only flag the violation.
+`gate_09_budget_consistency` is verified transitively through `gate_10d_cross_section_consistency` (condition `g09_p01`). If the assembled draft contains budget-dependent content produced without a passed budget gate, this agent must flag it as a critical finding. This agent cannot retroactively pass the budget gate — it can only flag the violation.
 
 ### Exit gate
 `gate_11_review_closure` — evaluated by the runner after this agent writes all canonical outputs.
 
 Gate conditions:
-1. `gate_10` must have passed (`g10_p01`)
+1. `gate_10d` must have passed (`g10_p01`)
 2. Review packet present in `review_packets/` (`g10_p02`, `g10_p02b`)
 3. All findings categorised by severity (`g10_p03`)
 4. Prioritised revision action list produced (`g10_p04`)
 
-Gate result written by runner to `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. Blocking edge on pass: `e08c_to_08d` (n08d).
+Gate result written by runner to `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. Blocking edge on pass: `e08e_to_08f` (n08f_revision).
 
 ### This agent's gate authority
 This agent produces the review packet that the runner evaluates. It does not invoke `gate-enforcement`. It has no authority over `gate_12_constitutional_compliance` (owned by `revision_integrator`).
@@ -160,12 +160,12 @@ This agent produces the review packet that the runner evaluates. It does not inv
 - Must not: produce an empty `revision_actions` array and declare gate passed
 
 #### Case 2: Assembled draft absent
-- Halt if `assembled_draft.json` is absent or empty
+- Halt if `part_b_assembled_draft.json` is absent or empty
 - Write decision log: `decision_type: gate_failure`
 
 #### Case 3: Predecessor gate not passed
-- Halt immediately if `gate_10_part_b_completeness` is unmet
-- Write: `decision_type: constitutional_halt`; edge `e08b_to_08c`
+- Halt immediately if `gate_10d_cross_section_consistency` is unmet
+- Write: `decision_type: constitutional_halt`; edge `e08d_to_08e`
 
 #### Case 4: Budget gate violation found in assembled draft
 - Flag as critical finding: `finding.severity: critical`; `criterion: "CLAUDE.md §13.4 — budget gate"`
@@ -175,7 +175,7 @@ This agent produces the review packet that the runner evaluates. It does not inv
 
 ## Decision-log obligations
 
-Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: evaluator_reviewer`, `phase_id: phase_08c_evaluator_review`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: evaluator_reviewer`, `phase_id: phase_08e_evaluator_review`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
 
 | Trigger | `decision_type` | Minimum entry content |
 |---------|-----------------|-----------------------|
@@ -184,7 +184,7 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Traceability gap found (claim not attributed) | `assumption` | Claim; section; what attribution is missing |
 | `gate_11_review_closure` passes | `gate_pass` | Gate ID; all conditions; run_id |
 | `gate_11_review_closure` fails | `gate_failure` | Gate ID; conditions failed |
-| `gate_10` predecessor not passed | `constitutional_halt` | Edge `e08b_to_08c`; status |
+| `gate_10d` predecessor not passed | `constitutional_halt` | Edge `e08d_to_08e`; status |
 
 ---
 

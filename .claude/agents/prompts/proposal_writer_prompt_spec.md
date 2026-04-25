@@ -1,10 +1,21 @@
-# proposal_writer prompt specification
+# proposal_writer prompt specification (DEPRECATED)
 
-## Purpose
+## Deprecation Notice
 
-Phase 8 node body executor for `n08a_section_drafting` and `n08b_assembly`. Drafts all proposal sections required by the active application form (Tier 2A) using project data from Tier 3 and all phase outputs from Tier 4. Assembles drafted sections into a coherent `assembled_draft.json`. Produces per-section artifacts (schema `orch.tier5.proposal_section.v1`) in `docs/tier5_deliverables/proposal_sections/` and the assembled draft (schema `orch.tier5.assembled_draft.v1`) in `docs/tier5_deliverables/assembled_drafts/`. `gate_10_part_b_completeness` is evaluated by the runner after assembly is complete.
+This prompt specification has been superseded by the Phase 8 criterion-aligned
+drafting pipeline. See:
 
-**Budget gate prerequisite (absolute and unconditional):** `gate_09_budget_consistency` must have passed before any Phase 8 activity begins. This applies to every substep: section drafting, preparatory drafting, assembly, and all related checks. This is a constitutional requirement (CLAUDE.md §8.4, §13.4) — not a preference, not a recommendation.
+- `excellence_writer_prompt_spec.md`
+- `impact_writer_prompt_spec.md`
+- `implementation_writer_prompt_spec.md`
+- `proposal_integrator_prompt_spec.md`
+
+This file is retained for reference only. The `proposal_writer` agent is not
+bound to any active manifest node.
+
+## Original Purpose (Historical)
+
+Phase 8 node body executor for `n08a_section_drafting` and `n08b_assembly`.
 
 ---
 

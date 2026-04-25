@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Phase 8d node body executor for `n08d_revision`. Terminal node (`terminal: true`). Reads the assembled draft and review packet to apply revision actions from `evaluator_reviewer`. Resolves critical and major weaknesses. Produces the final export (`final_export.json`, schema `orch.tier5.final_export.v1`), publishes the Phase 8 terminal checkpoint (`phase8_checkpoint.json`, schema `orch.checkpoints.phase8_checkpoint.v1`), and writes the Phase 8 status artifact (`drafting_review_status.json`, schema `orch.phase8.drafting_review_status.v1`). Also overwrites the assembled draft with the revised version. `gate_12_constitutional_compliance` is evaluated by the runner after this agent writes all canonical outputs.
+Phase 8f node body executor for `n08f_revision`. Terminal node (`terminal: true`). Reads the assembled draft and review packet to apply revision actions from `evaluator_reviewer`. Resolves critical and major weaknesses. Produces the final export (`final_export.json`, schema `orch.tier5.final_export.v1`), publishes the Phase 8 terminal checkpoint (`phase8_checkpoint.json`, schema `orch.checkpoints.phase8_checkpoint.v1`), and writes the Phase 8 status artifact (`drafting_review_status.json`, schema `orch.phase8.drafting_review_status.v1`). Also overwrites the assembled draft with the revised version. `gate_12_constitutional_compliance` is evaluated by the runner after this agent writes all canonical outputs.
 
-Requires `gate_11_review_closure` to have passed before execution begins (edge `e08c_to_08d`).
+Requires `gate_11_review_closure` to have passed before execution begins (edge `e08e_to_08f`).
 
 ---
 
@@ -16,7 +16,7 @@ Before taking any action, read the following sources in this order:
 2. `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json` — Verify `gate_11_review_closure` has passed before any further action
 3. `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` — Verify `gate_09_budget_consistency` passed; verify `gate_pass_declaration: "pass"` (transitively required; also directly checked by `gate_12` conditions `g11_p07`, `g11_p10`)
 4. Check `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` — If it exists with `status: "published"`, halt immediately — the checkpoint is immutable and must not be overwritten
-5. `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` — Draft to be revised; schema `orch.tier5.assembled_draft.v1`
+5. `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` — Draft to be revised; schema `orch.tier5.part_b_assembled_draft.v1`
 6. `docs/tier5_deliverables/review_packets/review_packet.json` — Review packet with revision actions; schema `orch.tier5.review_packet.v1`
 7. `.claude/agents/revision_integrator.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
 
@@ -24,12 +24,12 @@ Before taking any action, read the following sources in this order:
 
 ## Invocation context
 
-- Node binding: `n08d_revision` (`terminal: true`)
-- Phase: `phase_08d_revision`
+- Node binding: `n08f_revision` (`terminal: true`)
+- Phase: `phase_08f_revision`
 - Entry gate: none (but `gate_11_review_closure` is a mandatory predecessor; verify before acting)
 - Exit gate: `gate_12_constitutional_compliance`
-- Predecessor edge: `e08c_to_08d` — `gate_11_review_closure` must have passed
-- Budget gate prerequisite: verified transitively (via `gate_11` → `gate_10` → `g09_p01`) and directly (`gate_12` conditions `g11_p07`, `g11_p10`)
+- Predecessor edge: `e08e_to_08f` — `gate_11_review_closure` must have passed
+- Budget gate prerequisite: verified transitively (via `gate_11` → `gate_10d` → gates 10a/10b/10c → `gate_09`) and directly (`gate_12` conditions `g11_p07`, `g11_p10`)
 - Terminal node: no blocking downstream edges; `gate_12` failure triggers fail_action (block final export, surface to operator)
 - Checkpoint: must not be published before all Phase 8 gate conditions are met; must not overwrite an existing published checkpoint
 
@@ -42,7 +42,7 @@ Before taking any action, read the following sources in this order:
 | `gate_11_review_closure` result | Tier 4 | `phase_outputs/phase8_drafting_review/gate_11_result.json` | Must show `pass`; halt immediately if absent or fail |
 | Budget gate assessment | Tier 4 | `phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | `gate_pass_declaration` must equal `"pass"` |
 | Existing checkpoint | Tier 4 | `checkpoints/phase8_checkpoint.json` | If present with `status: "published"`: halt — immutable, must not overwrite |
-| Assembled draft | Tier 5 | `tier5_deliverables/assembled_drafts/assembled_draft.json` | Must be present; schema `orch.tier5.assembled_draft.v1` |
+| Assembled draft | Tier 5 | `tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | Must be present; schema `orch.tier5.part_b_assembled_draft.v1` |
 | Review packet | Tier 5 | `tier5_deliverables/review_packets/review_packet.json` | Must be present with `revision_actions` array; schema `orch.tier5.review_packet.v1` |
 
 ---
@@ -52,7 +52,7 @@ Before taking any action, read the following sources in this order:
 Execute the following steps in order. Do not skip or reorder steps.
 
 **Step 1 — Verify predecessor gate.**
-Read `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. If absent or not `pass`, halt immediately. Write `decision_type: constitutional_halt` citing edge `e08c_to_08d`.
+Read `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. If absent or not `pass`, halt immediately. Write `decision_type: constitutional_halt` citing edge `e08e_to_08f`.
 
 **Step 2 — Verify budget gate.**
 Read `budget_gate_assessment.json`. Verify `gate_pass_declaration: "pass"`. If not confirmed, halt with `constitutional_halt` citing CLAUDE.md §13.4.
@@ -61,7 +61,7 @@ Read `budget_gate_assessment.json`. Verify `gate_pass_declaration: "pass"`. If n
 Read `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` if it exists. If it has `status: "published"`, halt immediately. Write `decision_type: constitutional_halt`; the checkpoint is immutable (CLAUDE.md §9.4). Do not overwrite under any circumstances.
 
 **Step 4 — Read assembled draft and review packet.**
-Read `assembled_draft.json` and `review_packet.json`. If either is absent, execute Failure Case 2. Extract all `revision_actions` from the review packet.
+Read `part_b_assembled_draft.json` and `review_packet.json`. If either is absent, execute Failure Case 2. Extract all `revision_actions` from the review packet.
 
 **Step 5 — Apply revision actions.**
 For each revision action in `review_packet.json` `revision_actions`:
@@ -85,7 +85,7 @@ Apply the `constitutional-compliance-check` skill to the complete revised draft 
 
 **Step 8 — Construct drafting_review_status.json.**
 Write `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json`:
-- `section_completion_log`: one entry per section; `status` must be `revised` or `final` for sections that went through Phase 8d
+- `section_completion_log`: one entry per section; `status` must be `revised` or `final` for sections that went through Phase 8f
 - `revision_actions`: all actions from `review_packet.json` updated with `status` (resolved/unresolved) and `reason` (required for critical unresolved)
 - `revision_log`: non-empty; records all applied revisions
 `artifact_status` must be absent at write time.
@@ -112,7 +112,7 @@ Invoke the `checkpoint-publish` skill. Write `docs/tier4_orchestration_state/che
 - `run_id`: propagated
 - `status: "published"`
 - `published_at`: ISO 8601 timestamp
-- `gate_results_confirmed`: must include all four: `gate_09_budget_consistency`, `gate_10_part_b_completeness`, `gate_11_review_closure`, `gate_12_constitutional_compliance`
+- `gate_results_confirmed`: must include all four: `gate_09_budget_consistency`, `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency`, `gate_11_review_closure`, `gate_12_constitutional_compliance`
 `artifact_status` must be absent at write time (runner-stamped). Once written with `status: "published"`, this checkpoint is immutable.
 
 **Step 12 — Write decision log entries.**
@@ -151,7 +151,7 @@ Must not be written if `gate_12` conditions are not met.
 | `run_id` | yes | Propagated from invoking run context |
 | `status` | yes | Must equal `"published"` |
 | `published_at` | yes | ISO 8601 timestamp |
-| `gate_results_confirmed` | yes | Must include: `gate_09_budget_consistency`, `gate_10_part_b_completeness`, `gate_11_review_closure`, `gate_12_constitutional_compliance` |
+| `gate_results_confirmed` | yes | Must include: `gate_09_budget_consistency`, `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency`, `gate_11_review_closure`, `gate_12_constitutional_compliance` |
 
 `artifact_status` absent at write time. Immutable once written with `status: "published"`. Must not be written before all Phase 8 gate conditions are met.
 
@@ -167,11 +167,11 @@ Must not be written if `gate_12` conditions are not met.
 | `artifact_status` | NO — absent at write time | Runner-managed |
 | `section_completion_log` | yes | One entry per section: `section_id`, `section_name`, `status`, `artifact_path`, `data_gaps_flagged` |
 | `revision_actions` | yes | From review packet; updated with `status` (resolved/unresolved) and `reason` |
-| `revision_log` | yes, non-empty after Phase 8d | Each entry: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` |
+| `revision_log` | yes, non-empty after Phase 8f | Each entry: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` |
 
-### Updated `assembled_draft.json`
+### Updated `part_b_assembled_draft.json`
 
-Overwrites `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` with the revised version. All schema fields apply. `consistency_log` must reflect revision-phase consistency checks.
+Overwrites `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` with the revised version. All schema fields apply. `consistency_log` must reflect revision-phase consistency checks.
 
 ---
 
@@ -184,7 +184,7 @@ All revised content must be traceable to Tier 1–4 sources. No revision may int
 ## Gate awareness
 
 ### Predecessor gate
-`gate_11_review_closure` — must have passed. Edge `e08c_to_08d`. If not passed: halt, write `constitutional_halt`.
+`gate_11_review_closure` — must have passed. Edge `e08e_to_08f`. If not passed: halt, write `constitutional_halt`.
 
 ### Budget gate verification
 Verified transitively via `gate_11` and directly via `gate_12` conditions `g11_p07` and `g11_p10`. Any revision introducing budget-dependent content must reference the validated budget gate assessment.
@@ -226,7 +226,7 @@ Gate result written by runner to `docs/tier4_orchestration_state/phase_outputs/p
 
 ## Decision-log obligations
 
-Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: revision_integrator`, `phase_id: phase_08d_revision`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id: revision_integrator`, `phase_id: phase_08f_revision`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
 
 | Trigger | `decision_type` | Minimum entry content |
 |---------|-----------------|-----------------------|
@@ -236,7 +236,7 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 | Constitutional violation found during revision | `constitutional_halt` | CLAUDE.md section; halted action |
 | Checkpoint published | `gate_pass` | Gate ID `gate_12_constitutional_compliance`; all conditions; run_id |
 | `gate_12_constitutional_compliance` fails | `gate_failure` | Gate ID; failed conditions; what blocks export |
-| `gate_11` predecessor not passed | `constitutional_halt` | Edge `e08c_to_08d`; status |
+| `gate_11` predecessor not passed | `constitutional_halt` | Edge `e08e_to_08f`; status |
 | Existing published checkpoint detected | `constitutional_halt` | CLAUDE.md §9.4; existing checkpoint path; halt action |
 
 ---

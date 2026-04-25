@@ -82,6 +82,13 @@ from runner.predicates.coverage_predicates import (
     partner_budget_coverage_match,
     wp_budget_coverage_match,
 )
+from runner.predicates.criterion_predicates import (
+    cross_section_consistency,
+    impact_pathways_covered,
+    implementation_coverage_complete,
+    no_unresolved_material_claims,
+    schema_id_matches,
+)
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.cycle_predicates import no_dependency_cycles
 from runner.predicates.timeline_predicates import (
@@ -156,4 +163,10 @@ __all__ = [
     "all_milestones_have_criteria",
     "wp_count_within_limit",
     "critical_path_present",
+    # criterion-aligned predicates (Phase 8 refactor)
+    "schema_id_matches",
+    "no_unresolved_material_claims",
+    "impact_pathways_covered",
+    "implementation_coverage_complete",
+    "cross_section_consistency",
 ]

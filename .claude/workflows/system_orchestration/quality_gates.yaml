@@ -198,23 +198,94 @@ quality_gates:
       - prose: "Budget gate assessment written to Tier 4"
         predicate_refs: [g08_p08, g08_p09]
 
-  - id: gate_10_part_b_completeness
-    name: "Part B Completeness"
+  - id: gate_10a_excellence_completeness
+    name: "Excellence Section Completeness"
     description: >
-      All sections required by the active application form are drafted and present.
-      Each section is traceable to named Tier 1-4 sources. No section depends on
-      missing or unvalidated data without explicit flagging.
-    evaluated_at: phase_08b_assembly exit
-    fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+      Excellence section is drafted, schema-valid, owned by current run,
+      has traceability footer and validation status, and contains no
+      unresolved material claims.
+    evaluated_at: phase_08a_excellence_drafting exit
+    fail_action: "Block assembly; report Excellence section gaps"
     conditions:
       - prose: "Budget gate must have passed"
-        predicate_refs: [g09_p01]
-      - prose: "All sections required by active application form present in proposal_sections/"
-        predicate_refs: [g09_p02]
-      - prose: "Assembled draft present in assembled_drafts/"
-        predicate_refs: [g09_p03, g09_p03b]
-      - prose: "Each section traceable to named Tier 1-4 sources"
-        predicate_refs: [g09_p04]
+        predicate_refs: [g09a_p01]
+      - prose: "Excellence section artifact exists and is non-empty"
+        predicate_refs: [g09a_p02]
+      - prose: "Excellence section owned by current run"
+        predicate_refs: [g09a_p03]
+      - prose: "Schema ID matches orch.tier5.excellence_section.v1"
+        predicate_refs: [g09a_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09a_p05, g09a_p05b]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09a_p06]
+
+  - id: gate_10b_impact_completeness
+    name: "Impact Section Completeness"
+    description: >
+      Impact section is drafted, schema-valid, owned by current run,
+      covers all impact pathways and DEC measures, and contains no
+      unresolved material claims.
+    evaluated_at: phase_08b_impact_drafting exit
+    fail_action: "Block assembly; report Impact section gaps"
+    conditions:
+      - prose: "Budget gate must have passed"
+        predicate_refs: [g09b_p01]
+      - prose: "Impact section artifact exists and is non-empty"
+        predicate_refs: [g09b_p02]
+      - prose: "Impact section owned by current run"
+        predicate_refs: [g09b_p03]
+      - prose: "Schema ID matches orch.tier5.impact_section.v1"
+        predicate_refs: [g09b_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09b_p05, g09b_p05b]
+      - prose: "Impact pathways and DEC measures are covered"
+        predicate_refs: [g09b_p06]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09b_p07]
+
+  - id: gate_10c_implementation_completeness
+    name: "Implementation Section Completeness"
+    description: >
+      Implementation section is drafted, schema-valid, owned by current run,
+      covers all WPs, Gantt, milestones, and risk register references, and
+      contains no unresolved material claims.
+    evaluated_at: phase_08c_implementation_drafting exit
+    fail_action: "Block assembly; report Implementation section gaps"
+    conditions:
+      - prose: "Budget gate must have passed"
+        predicate_refs: [g09c_p01]
+      - prose: "Implementation section artifact exists and is non-empty"
+        predicate_refs: [g09c_p02]
+      - prose: "Implementation section owned by current run"
+        predicate_refs: [g09c_p03]
+      - prose: "Schema ID matches orch.tier5.implementation_section.v1"
+        predicate_refs: [g09c_p04]
+      - prose: "Traceability footer and validation status exist"
+        predicate_refs: [g09c_p05, g09c_p05b]
+      - prose: "WP, Gantt, milestone, and risk register coverage complete"
+        predicate_refs: [g09c_p06]
+      - prose: "No unresolved material claims"
+        predicate_refs: [g09c_p07]
+
+  - id: gate_10d_cross_section_consistency
+    name: "Cross-Section Consistency"
+    description: >
+      All three criterion-aligned sections are assembled into a coherent
+      Part B draft. Cross-section consistency checks pass for objectives,
+      WP references, partner names, deliverables, milestones, KPIs,
+      impact claims, and terminology.
+    evaluated_at: phase_08d_assembly exit
+    fail_action: "Block evaluator review; report cross-section inconsistencies"
+    conditions:
+      - prose: "All three criterion gates must have passed"
+        predicate_refs: [g09d_p01, g09d_p02, g09d_p03]
+      - prose: "Assembled Part B draft exists and is owned by current run"
+        predicate_refs: [g09d_p04, g09d_p05]
+      - prose: "Schema ID matches orch.tier5.part_b_assembled_draft.v1"
+        predicate_refs: [g09d_p06]
+      - prose: "Cross-section consistency verified"
+        predicate_refs: [g09d_p07]
 
   - id: gate_11_review_closure
     name: "Review Closure"
@@ -222,10 +293,10 @@ quality_gates:
       All critical review findings from the evaluator review are resolved or
       explicitly logged as unresolvable with reason. The revision log is present.
       The final export is produced.
-    evaluated_at: phase_08d_revision exit
-    fail_action: "Block final export; report unresolved critical findings"
+    evaluated_at: phase_08e_evaluator_review exit
+    fail_action: "Block revision cycle; report unresolved critical findings"
     conditions:
-      - prose: "gate_10 must have passed"
+      - prose: "gate_10d must have passed"
         predicate_refs: [g10_p01]
       - prose: "Review packet present in review_packets/"
         predicate_refs: [g10_p02, g10_p02b]
@@ -241,7 +312,7 @@ quality_gates:
       prohibitions: no fabricated project facts, no fabricated call constraints,
       no budget-dependent content finalised before budget gate, no grant agreement
       annex schema used as proposal structure.
-    evaluated_at: phase_08d_revision exit
+    evaluated_at: phase_08f_revision exit
     fail_action: "Block final export; log constitutional violation; surface to human operator"
     conditions:
       - prose: "gate_11 must have passed"

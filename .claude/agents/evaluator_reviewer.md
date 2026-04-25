@@ -1,15 +1,15 @@
 ---
 agent_id: evaluator_reviewer
-phase_id: phase_08c_evaluator_review
+phase_id: phase_08e_evaluator_review
 node_ids:
-  - n08c_evaluator_review
+  - n08e_evaluator_review
 role_summary: >
   Conducts evaluator-style review of the assembled draft against applicable
   evaluation criteria and scoring logic; categorises weaknesses by severity;
   produces a prioritised revision action list; does not revise the draft.
-constitutional_scope: "Phase 8c"
+constitutional_scope: "Phase 8e"
 reads_from:
-  - docs/tier5_deliverables/assembled_drafts/
+  - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
   - docs/tier2a_instrument_schemas/evaluation_forms/
   - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
 writes_to:
@@ -27,11 +27,11 @@ exit_gate: gate_11_review_closure
 
 ## Purpose
 
-Phase 8c node body executor for `n08c_evaluator_review`. Reads the assembled draft and the active evaluation form to conduct evaluator-style review against evaluation criteria and scoring logic. Produces `review_packet.json` in Tier 5, which contains categorised weaknesses by severity and a prioritised revision action list.
+Phase 8e node body executor for `n08e_evaluator_review`. Reads the assembled draft and the active evaluation form to conduct evaluator-style review against evaluation criteria and scoring logic. Produces `review_packet.json` in Tier 5, which contains categorised weaknesses by severity and a prioritised revision action list.
 
 This agent reviews only. It does not revise the draft. Revision is the responsibility of `revision_integrator`.
 
-Requires `gate_10_part_b_completeness` to have passed before execution begins (edge registry: `e08b_to_08c`).
+Requires `gate_10d_cross_section_consistency` to have passed before execution begins (edge registry: `e08d_to_08e`).
 
 ## Canonical Output
 
@@ -70,7 +70,7 @@ Schema: `orch.tier5.review_packet.v1`
 
 | Path | Tier | Provenance | Schema ID | Role |
 |------|------|------------|-----------|------|
-| `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.assembled_draft.v1` | Assembled draft to be reviewed |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | tier5_deliverable | run_produced | `orch.tier5.part_b_assembled_draft.v1` | Assembled draft to be reviewed |
 | `docs/tier2a_instrument_schemas/evaluation_forms/` | tier2a_source | manually_placed | — | Evaluation form defining scoring criteria and sub-criteria |
 | `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` | tier4_phase_output | run_produced | `orch.phase1.call_analysis_summary.v1` | Evaluation matrix and call priority weights |
 
@@ -96,7 +96,7 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 
 ## Predecessor Gate
 
-`gate_10_part_b_completeness` must have passed (edge registry: `e08b_to_08c`). Verify before any action is taken.
+`gate_10d_cross_section_consistency` must have passed (edge registry: `e08d_to_08e`). Verify before any action is taken.
 
 ---
 
@@ -122,13 +122,13 @@ Universal constraints from `node_body_contract.md` §3 also apply.
 
 ### Budget Gate Prerequisite (Phase 8 Agent)
 
-`gate_09_budget_consistency` must have passed. This is verified transitively: `gate_10_part_b_completeness` condition `g09_p01` requires the budget gate to have passed before sections were assembled. If the assembled draft reaching this agent contains budget-dependent content that was approved without a passed budget gate, this agent must flag it as a constitutional violation in the review packet.
+`gate_09_budget_consistency` must have passed. This is verified transitively: `gate_10d_cross_section_consistency` condition `g09_p01` requires the budget gate to have passed before sections were assembled. If the assembled draft reaching this agent contains budget-dependent content that was approved without a passed budget gate, this agent must flag it as a constitutional violation in the review packet.
 
 ### Predecessor Gate Requirements
 
-**Predecessor:** `gate_10_part_b_completeness` — must have passed. Source: edge `e08b_to_08c`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10_result.json`.
+**Predecessor:** `gate_10d_cross_section_consistency` — must have passed. Source: edge `e08d_to_08e`. Verify via `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10d_result.json`.
 
-If `gate_10_part_b_completeness` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
+If `gate_10d_cross_section_consistency` has not passed, halt immediately. Write `decision_type: constitutional_halt`.
 
 **Entry gate:** none.
 
@@ -137,12 +137,12 @@ If `gate_10_part_b_completeness` has not passed, halt immediately. Write `decisi
 **Exit gate:** `gate_11_review_closure` — evaluated after this agent writes all canonical outputs.
 
 Gate conditions (source: `manifest.compile.yaml`, `quality_gates.yaml`):
-1. `gate_10` must have passed (`g10_p01`)
+1. `gate_10d` must have passed (`g10_p01`)
 2. Review packet present in `review_packets/` (`g10_p02`, `g10_p02b`)
 3. All critical findings categorised by severity (`g10_p03`)
 4. Prioritised revision action list produced (`g10_p04`)
 
-Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. Blocking edge on pass: `e08c_to_08d` (`n08d_revision`).
+Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_11_result.json`. Blocking edge on pass: `e08e_to_08f` (`n08f_revision`).
 
 ### Failure Protocol
 
@@ -153,12 +153,12 @@ Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_revie
 - **Must not:** Produce an empty `revision_actions` array and declare gate passed.
 
 #### Case 2: Assembled draft absent
-- **Halt:** If `assembled_draft.json` is absent or empty, halt.
+- **Halt:** If `part_b_assembled_draft.json` is absent or empty, halt.
 - **Write:** Decision log `decision_type: gate_failure`.
 
 #### Case 3: Predecessor gate not passed
-- **Halt immediately** if `gate_10_part_b_completeness` is unmet.
-- **Write:** `decision_type: constitutional_halt`; edge `e08b_to_08c`.
+- **Halt immediately** if `gate_10d_cross_section_consistency` is unmet.
+- **Write:** `decision_type: constitutional_halt`; edge `e08d_to_08e`.
 
 #### Case 4: Budget gate violation found in assembled draft
 - **Flag as critical finding:** Include as a `finding` with `severity: critical`; `criterion` set to "CLAUDE.md §13.4 — budget gate".
@@ -166,7 +166,7 @@ Gate result: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_revie
 
 ### Decision-Log Write Obligations
 
-Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validation_reports and findings). Every entry: `agent_id: evaluator_reviewer`, `phase_id: phase_08c_evaluator_review`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
+Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validation_reports and findings). Every entry: `agent_id: evaluator_reviewer`, `phase_id: phase_08e_evaluator_review`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
 
 | Trigger | `decision_type` | Minimum entry content |
 |---------|-----------------|-----------------------|
@@ -175,7 +175,7 @@ Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validati
 | Traceability gap found (claim not attributed) | `assumption` | Claim; section; what attribution is missing |
 | `gate_11_review_closure` passes | `gate_pass` | Gate ID; all conditions; run_id |
 | `gate_11_review_closure` fails | `gate_failure` | Gate ID; conditions failed |
-| `gate_10` predecessor not passed | `constitutional_halt` | Edge `e08b_to_08c`; status |
+| `gate_10d` predecessor not passed | `constitutional_halt` | Edge `e08d_to_08e`; status |
 
 ---
 
@@ -187,11 +187,11 @@ Write to `docs/tier4_orchestration_state/decision_log/` (implicitly via validati
 
 ### 2. Manifest authority compliance
 
-Node binding is `n08c_evaluator_review`. Exit gate is `gate_11_review_closure` — matches manifest. This agent does not claim authority over `gate_12_constitutional_compliance` (that belongs to `revision_integrator`). The agent also does not produce a final export or checkpoint. No confusion between reviewing authority and revision authority exists in the body text.
+Node binding is `n08e_evaluator_review`. Exit gate is `gate_11_review_closure` — matches manifest. This agent does not claim authority over `gate_12_constitutional_compliance` (that belongs to `revision_integrator`). The agent also does not produce a final export or checkpoint. No confusion between reviewing authority and revision authority exists in the body text.
 
 **Drafting/review/revision authority boundary:** The body text explicitly states "This agent reviews only. It does not revise the draft. Revision is the responsibility of `revision_integrator`." Must_not includes "Revise the draft; review only." The `writes_to` does not include the assembled drafts directory for writing. Correct.
 
-**Budget gate transitivity:** The Budget Gate Prerequisite section explains that `gate_09_budget_consistency` is verified transitively (via `gate_10_part_b_completeness` condition `g09_p01`). If budget-dependent content was produced before the gate passed, this agent must flag it as a critical finding — not silently accept it. This is constitutionally stronger than a passive check.
+**Budget gate transitivity:** The Budget Gate Prerequisite section explains that `gate_09_budget_consistency` is verified transitively (via `gate_10d_cross_section_consistency` condition `g09_p01`). If budget-dependent content was produced before the gate passed, this agent must flag it as a critical finding — not silently accept it. This is constitutionally stronger than a passive check.
 
 ### 3. Forbidden-action review against CLAUDE.md §13 and §8
 

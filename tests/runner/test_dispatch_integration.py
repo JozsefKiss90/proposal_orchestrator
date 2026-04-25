@@ -117,7 +117,11 @@ def _two_node_linear_manifest(
 
 
 def _gate09_manifest() -> dict:
-    """Manifest where n07 holds gate_09_budget_consistency."""
+    """Manifest where n07 holds gate_09_budget_consistency.
+
+    Topology: n07 fans out to n08a/n08b/n08c (parallel drafting),
+    those three converge on n08d (assembly), then n08d → n08e → n08f.
+    """
     return {
         "name": "test",
         "version": "1.1",
@@ -128,22 +132,32 @@ def _gate09_manifest() -> dict:
                 "terminal": False,
             },
             {
-                "node_id": "n08a_section_drafting",
-                "exit_gate": "gate_10_part_b_completeness",
+                "node_id": "n08a_excellence_drafting",
+                "exit_gate": "gate_10a_excellence_completeness",
                 "terminal": False,
             },
             {
-                "node_id": "n08b_assembly",
-                "exit_gate": "gate_10_part_b_completeness",
+                "node_id": "n08b_impact_drafting",
+                "exit_gate": "gate_10b_impact_completeness",
                 "terminal": False,
             },
             {
-                "node_id": "n08c_evaluator_review",
+                "node_id": "n08c_implementation_drafting",
+                "exit_gate": "gate_10c_implementation_completeness",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08d_assembly",
+                "exit_gate": "gate_10d_cross_section_consistency",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08e_evaluator_review",
                 "exit_gate": "gate_11_review_closure",
                 "terminal": False,
             },
             {
-                "node_id": "n08d_revision",
+                "node_id": "n08f_revision",
                 "exit_gate": "gate_12_constitutional_compliance",
                 "terminal": True,
             },
@@ -152,8 +166,50 @@ def _gate09_manifest() -> dict:
             {
                 "edge_id": "e07_to_08a",
                 "from_node": "n07_budget_gate",
-                "to_node": "n08a_section_drafting",
+                "to_node": "n08a_excellence_drafting",
                 "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e07_to_08b",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08b_impact_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e07_to_08c",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08c_implementation_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e08a_to_08d",
+                "from_node": "n08a_excellence_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10a_excellence_completeness",
+            },
+            {
+                "edge_id": "e08b_to_08d",
+                "from_node": "n08b_impact_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10b_impact_completeness",
+            },
+            {
+                "edge_id": "e08c_to_08d",
+                "from_node": "n08c_implementation_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10c_implementation_completeness",
+            },
+            {
+                "edge_id": "e08d_to_08e",
+                "from_node": "n08d_assembly",
+                "to_node": "n08e_evaluator_review",
+                "gate_condition": "gate_10d_cross_section_consistency",
+            },
+            {
+                "edge_id": "e08e_to_08f",
+                "from_node": "n08e_evaluator_review",
+                "to_node": "n08f_revision",
+                "gate_condition": "gate_11_review_closure",
             },
         ],
     }
@@ -292,8 +348,9 @@ class TestHardBlockAgentBody:
         assert result["node_states"]["n07_budget_gate"] == "blocked_at_exit"
         assert result["overall_status"] == "fail"
         # Phase 8 nodes should be hard-blocked
-        for nid in ["n08a_section_drafting", "n08b_assembly",
-                     "n08c_evaluator_review", "n08d_revision"]:
+        for nid in ["n08a_excellence_drafting", "n08b_impact_drafting",
+                     "n08c_implementation_drafting", "n08d_assembly",
+                     "n08e_evaluator_review", "n08f_revision"]:
             assert result["node_states"][nid] == "hard_block_upstream"
         assert result["hard_blocked_nodes"] != []
 
@@ -323,8 +380,9 @@ class TestHardBlockExitGate:
 
         assert result["node_states"]["n07_budget_gate"] == "blocked_at_exit"
         assert result["overall_status"] == "fail"
-        for nid in ["n08a_section_drafting", "n08b_assembly",
-                     "n08c_evaluator_review", "n08d_revision"]:
+        for nid in ["n08a_excellence_drafting", "n08b_impact_drafting",
+                     "n08c_implementation_drafting", "n08d_assembly",
+                     "n08e_evaluator_review", "n08f_revision"]:
             assert result["node_states"][nid] == "hard_block_upstream"
 
 
@@ -617,7 +675,8 @@ class TestHardBlockInFailureDetails:
             result = sched.run()
 
         nfd = result["node_failure_details"]
-        for nid in ["n08a_section_drafting", "n08b_assembly",
-                     "n08c_evaluator_review", "n08d_revision"]:
+        for nid in ["n08a_excellence_drafting", "n08b_impact_drafting",
+                     "n08c_implementation_drafting", "n08d_assembly",
+                     "n08e_evaluator_review", "n08f_revision"]:
             assert nfd[nid]["failure_origin"] is None
             assert nfd[nid]["exit_gate_evaluated"] is False

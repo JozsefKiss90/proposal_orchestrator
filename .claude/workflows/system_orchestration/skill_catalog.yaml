@@ -385,28 +385,103 @@ skill_catalog:
     execution_mode: "tapm"
     output_contract: "multi_artifact"
     purpose: >
-      Draft all mandatory proposal sections required by the active application form
-      (Tier 2A) using project data from Tier 3 and phase outputs from Tier 4.
-      Produces per-section artifacts conforming to orch.tier5.proposal_section.v1.
-      Must verify budget gate has passed before producing any content.
-    used_by_agents:
-      - proposal_writer
-    reads_from:
-      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
-      - docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
-      - docs/tier2a_instrument_schemas/application_forms/
-      - docs/tier2a_instrument_schemas/evaluation_forms/
-      - docs/tier3_project_instantiation/
-      - docs/tier4_orchestration_state/phase_outputs/
-      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json
-    writes_to:
-      - docs/tier5_deliverables/proposal_sections/
+      DEPRECATED by Phase 8 refactor. Replaced by excellence-section-drafting,
+      impact-section-drafting, and implementation-section-drafting. Retained for
+      backward-compatibility reference only.
+    used_by_agents: []
+    reads_from: []
+    writes_to: []
     constitutional_constraints:
-      - "Must verify budget gate passed before producing any content — CLAUDE.md §8.4, §13.4"
-      - "Must not introduce claims not grounded in Tier 1-4 state — CLAUDE.md §13.10"
-      - "Must not fabricate project facts not present in Tier 3 — CLAUDE.md §13.3"
-      - "Must not use Grant Agreement Annex structure as section schema — CLAUDE.md §13.1"
-      - "Must not reference unvalidated budget figures — CLAUDE.md §8.3"
+      - "Must not be invoked by any active manifest node"
+
+  - id: excellence-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Excellence section of the RIA/IA Part B from Phase 2 concept
+      refinement, Phase 3 WP structure, and Tier 3 project data. Produces
+      excellence_section.json conforming to orch.tier5.excellence_section.v1.
+    used_by_agents:
+      - excellence_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/excellence_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not fabricate project facts not present in Tier 3"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: impact-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Impact section from Phase 5 impact architecture, DEC plans,
+      and Tier 2B expected impacts. Produces impact_section.json conforming
+      to orch.tier5.impact_section.v1.
+    used_by_agents:
+      - impact_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/impact_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not fabricate impact coverage for unmapped call expected impacts"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: implementation-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Implementation section from Phase 3 WP structure, Phase 4 Gantt,
+      Phase 6 implementation architecture. Produces implementation_section.json
+      conforming to orch.tier5.implementation_section.v1.
+    used_by_agents:
+      - implementation_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/implementation_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not redesign the consortium or WP structure"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: cross-section-consistency-check
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Check cross-section consistency of the three criterion-aligned sections
+      and produce the assembled Part B draft. Verifies objectives, WP references,
+      partner names, deliverables, milestones, KPIs, impact claims, budget
+      references, and terminology are consistent across all three sections.
+    used_by_agents:
+      - proposal_integrator
+    reads_from:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier3_project_instantiation/
+      - docs/tier2a_instrument_schemas/application_forms/
+    writes_to:
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+    constitutional_constraints:
+      - "Must not silently normalise contradictions"
+      - "Must flag all inconsistencies in the consistency_log"
 
   - id: proposal-section-traceability-check
     purpose: >
@@ -414,7 +489,11 @@ skill_catalog:
       named Tier 1-4 source. Flag unattributed assertions. Apply
       Confirmed/Inferred/Assumed/Unresolved status to each claim.
     used_by_agents:
-      - proposal_writer
+      - excellence_writer
+      - impact_writer
+      - implementation_writer
+      - proposal_integrator
+      - evaluator_reviewer
       - revision_integrator
       - traceability_auditor
     reads_from:
@@ -434,14 +513,17 @@ skill_catalog:
     purpose: >
       Assess proposal content against the scoring logic of the applicable evaluation
       criterion. Identify weaknesses by severity. Produce structured feedback aligned
-      to evaluator sub-criteria.
+      to evaluator sub-criteria. Supports two modes: assembled-draft review (reads
+      part_b_assembled_draft.json) and criterion-scoped review (reads a single
+      criterion section artifact).
     used_by_agents:
       - evaluator_reviewer
       - revision_integrator
     reads_from:
       - docs/tier2a_instrument_schemas/evaluation_forms/
       - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
-      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+      - docs/tier5_deliverables/proposal_sections/
     writes_to:
       - docs/tier5_deliverables/review_packets/
     constitutional_constraints:
@@ -460,7 +542,11 @@ skill_catalog:
       - compliance_validator
       - call_analyzer
       - concept_refiner
-      - proposal_writer
+      - excellence_writer
+      - impact_writer
+      - implementation_writer
+      - proposal_integrator
+      - evaluator_reviewer
       - revision_integrator
       - budget_gate_validator
     reads_from:

@@ -1,36 +1,36 @@
 ---
 agent_id: proposal_writer
-phase_id: phase_08_drafting_and_review
-node_ids:
-  - n08a_section_drafting
-  - n08b_assembly
+phase_id: deprecated_by_phase8_refactor
+node_ids: []
 role_summary: >
-  Drafts individual proposal sections and assembles them into a coherent whole;
-  writes in evaluator-oriented language; applies traceability to Tier 1-4 sources
-  throughout; does not reference budget figures not validated through Phase 7 gate.
-constitutional_scope: "Phase 8a and Phase 8b"
-reads_from:
-  - docs/tier2a_instrument_schemas/application_forms/
-  - docs/tier2a_instrument_schemas/evaluation_forms/
-  - docs/tier3_project_instantiation/
-  - docs/tier4_orchestration_state/phase_outputs/
-writes_to:
-  - docs/tier5_deliverables/proposal_sections/
-  - docs/tier5_deliverables/assembled_drafts/
-  - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
-invoked_skills:
-  - proposal-section-traceability-check
-  - evaluator-criteria-review
-  - constitutional-compliance-check
+  DEPRECATED. Replaced by excellence_writer, impact_writer,
+  implementation_writer, and proposal_integrator in the Phase 8
+  criterion-aligned drafting pipeline refactor. Not bound to any
+  active manifest node.
+constitutional_scope: "None (deprecated)"
+reads_from: []
+writes_to: []
+invoked_skills: []
 entry_gate: null
-exit_gate: gate_10_part_b_completeness
+exit_gate: null
 ---
 
-# proposal_writer
+# proposal_writer (DEPRECATED)
 
-## Purpose
+## Deprecation Notice
 
-Phase 8 node body executor for `n08a_section_drafting` and `n08b_assembly`. Drafts all proposal sections required by the active application form (Tier 2A) using project data from Tier 3 and phase outputs from Tier 4. Assembles drafted sections into a complete `assembled_draft.json`.
+This agent has been replaced by the Phase 8 criterion-aligned drafting pipeline:
+
+- **`excellence_writer`** — drafts Excellence section → `excellence_section.json` (schema `orch.tier5.excellence_section.v1`)
+- **`impact_writer`** — drafts Impact section → `impact_section.json` (schema `orch.tier5.impact_section.v1`)
+- **`implementation_writer`** — drafts Implementation section → `implementation_section.json` (schema `orch.tier5.implementation_section.v1`)
+- **`proposal_integrator`** — assembles sections → `part_b_assembled_draft.json` (schema `orch.tier5.part_b_assembled_draft.v1`)
+
+This file is retained for reference only. It is not bound to any manifest node.
+
+## Original Purpose (Historical)
+
+Phase 8 node body executor for `n08a_section_drafting` and `n08b_assembly`. Drafted all proposal sections and assembled them into `assembled_draft.json`.
 
 Requires `gate_09_budget_consistency` to have passed before any Phase 8 activity begins (CLAUDE.md §8.4, §13.4 — **unconditional**).
 

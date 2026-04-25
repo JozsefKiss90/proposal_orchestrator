@@ -2,10 +2,13 @@ id: phase_08_drafting_and_review
 phase: 8
 name: "Drafting and Review"
 purpose: >
-  Produce evaluator-oriented proposal section drafts for all application form
-  sections; assemble into a coherent whole; conduct evaluator-style review
-  against applicable evaluation criteria; integrate revisions; produce final
-  export. This phase has four sequential substeps.
+  Produce evaluator-oriented proposal section drafts for the three criterion-
+  aligned sections of the RIA/IA Part B (Excellence, Impact, Implementation);
+  assemble into a coherent whole with cross-section consistency checks;
+  conduct evaluator-style review against applicable evaluation criteria;
+  integrate revisions; produce final export. This phase has six substeps:
+  three parallel drafting nodes (a/b/c), followed by sequential assembly (d),
+  evaluator review (e), and revision (f).
 depends_on:
   - phase_01_call_analysis
   - phase_02_concept_refinement
@@ -16,109 +19,215 @@ depends_on:
   - phase_07_budget_gate
 substeps:
 
-  - id: phase_08a_section_drafting
-    name: "Section Drafting"
+  # =========================================================================
+  # Phase 8a — Excellence Section Drafting (parallel with 8b and 8c)
+  # =========================================================================
+  - id: phase_08a_excellence_drafting
+    name: "Excellence Section Drafting"
     purpose: >
-      Draft each proposal section required by the active application form,
-      drawing on Tier 3 and Tier 4 phase outputs. Each section must be written
-      in evaluator-oriented language targeting the applicable evaluation criterion.
-    agent: proposal_writer
+      Draft the Excellence section (Section 1) of the RIA/IA Part B proposal,
+      covering objectives, relation to work programme, concept and methodology,
+      ambition, interdisciplinarity, and gender dimension. Write in evaluator-
+      oriented language targeting the Excellence evaluation criterion.
+    agent: excellence_writer
     skills:
+      - excellence-section-drafting
       - proposal-section-traceability-check
-      - evaluator-criteria-review
       - constitutional-compliance-check
     required_inputs:
       - path: docs/tier2a_instrument_schemas/application_forms/
-        role: "Active application form template defining sections, fields, and constraints"
+        role: "Active application form template — Excellence section structure"
       - path: docs/tier2a_instrument_schemas/evaluation_forms/
-        role: "Active evaluation form defining evaluator scoring logic per section"
+        role: "Evaluation form — Excellence criterion scoring logic"
+      - path: docs/tier2a_instrument_schemas/extracted/
+        role: "Extracted instrument schemas"
+      - path: docs/tier3_project_instantiation/
+        role: "Project data — objectives, concept, consortium"
       - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
-        role: "Evaluation matrix and compliance checklist"
+        role: "Call analysis and evaluation matrix"
       - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
-        role: "Refined concept for Excellence section"
+        role: "Refined concept for Excellence narrative"
       - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
-        role: "WP structure for Implementation section"
-      - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
-        role: "Timeline and milestones for Implementation section"
-      - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
-        role: "Impact architecture for Impact section"
-      - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
-        role: "Governance, risk, and implementation narrative"
+        role: "WP structure for methodology description"
       - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
-        role: "Budget gate pass confirmation; required before budget-dependent sections are finalized"
-        validation: "Budget gate must have passed; absence is a finalization block"
+        role: "Budget gate confirmation — must have passed"
     outputs:
-      - path: docs/tier5_deliverables/proposal_sections/
+      - path: docs/tier5_deliverables/proposal_sections/excellence_section.json
         content: >
-          Individual section drafts named by section identifier from the active
-          application form. Each section includes a traceability footer identifying
-          the Tier 1-4 sources that ground the section content.
-      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
-        content: "Section drafting status log with completion status per section"
+          Excellence section artifact conforming to orch.tier5.excellence_section.v1.
+          Includes sub_sections array, validation_status, and traceability_footer.
     instructions:
-      - "Identify all sections required by the active application form from Tier 2A."
-      - "Draft each section in the order defined by the application form."
-      - "For each section, read the corresponding evaluation criterion from the evaluation form before writing."
-      - "Write to address the evaluator scoring logic, not grant annex reporting requirements."
-      - "Every factual claim must be traceable to a named Tier 3 source or Tier 4 phase output."
+      - "Verify budget gate has passed before producing content."
+      - "Read the Excellence evaluation criterion from evaluation forms before writing."
+      - "Draft sub-sections covering objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity, gender dimension."
+      - "Write to address evaluator scoring logic, not grant annex reporting requirements."
+      - "Every factual claim must be traceable to a named Tier 3 or Tier 4 source."
       - "Do not introduce claims not grounded in Tier 1-4 state."
       - "Do not reference budget figures not validated through the budget gate."
-      - "Flag any section that cannot be completed due to missing Tier 3 data; do not fill gaps with fabricated content."
-      - "Append a traceability footer to each section identifying the primary source artifacts."
+      - "Flag any sub-section that cannot be completed due to missing Tier 3 data."
+      - "Append traceability_footer identifying primary source artifacts."
+      - "Set validation_status with per-claim classification."
 
-  - id: phase_08b_assembly
-    name: "Assembly"
+  # =========================================================================
+  # Phase 8b — Impact Section Drafting (parallel with 8a and 8c)
+  # =========================================================================
+  - id: phase_08b_impact_drafting
+    name: "Impact Section Drafting"
     purpose: >
-      Assemble all drafted sections into a structurally coherent draft following
-      the section order prescribed by the active application form. Verify
-      cross-section consistency of terminology, objectives, WP references,
-      partner names, and quantitative claims.
-    agent: proposal_writer
+      Draft the Impact section (Section 2) of the RIA/IA Part B proposal,
+      covering expected impacts and their pathways, measures to maximise impact
+      (dissemination, exploitation, communication), and sustainability.
+      Map all content to Phase 5 impact architecture.
+    agent: impact_writer
     skills:
+      - impact-section-drafting
       - proposal-section-traceability-check
       - constitutional-compliance-check
-    depends_on_substep: phase_08a_section_drafting
+    required_inputs:
+      - path: docs/tier2a_instrument_schemas/application_forms/
+        role: "Active application form — Impact section structure"
+      - path: docs/tier2a_instrument_schemas/evaluation_forms/
+        role: "Evaluation form — Impact criterion scoring logic"
+      - path: docs/tier2a_instrument_schemas/extracted/
+        role: "Extracted instrument schemas"
+      - path: docs/tier2b_topic_and_call_sources/extracted/
+        role: "Expected outcomes and expected impacts from call"
+      - path: docs/tier3_project_instantiation/
+        role: "Project data — outcomes, impacts, consortium"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+        role: "Impact architecture with pathways and KPIs"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+        role: "WP structure for grounding impact claims in project activities"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+        role: "Budget gate confirmation — must have passed"
+    outputs:
+      - path: docs/tier5_deliverables/proposal_sections/impact_section.json
+        content: >
+          Impact section artifact conforming to orch.tier5.impact_section.v1.
+          Includes impact_pathway_refs, dec_coverage, validation_status,
+          and traceability_footer.
+    instructions:
+      - "Verify budget gate has passed before producing content."
+      - "Map every expected impact from Tier 2B to a project pathway in the impact architecture."
+      - "Ensure dissemination, exploitation, and communication plans are addressed."
+      - "Populate impact_pathway_refs with all referenced pathway IDs."
+      - "Set dec_coverage fields to true only when genuinely addressed."
+      - "Do not fabricate coverage of a call expected impact not addressed by a project output."
+      - "Do not assert impact claims without a traceable project mechanism."
+
+  # =========================================================================
+  # Phase 8c — Implementation Section Drafting (parallel with 8a and 8b)
+  # =========================================================================
+  - id: phase_08c_implementation_drafting
+    name: "Implementation Section Drafting"
+    purpose: >
+      Draft the Implementation section (Section 3 — Quality and efficiency)
+      of the RIA/IA Part B proposal, covering work plan and WP descriptions,
+      Gantt chart, deliverables table, milestones table, management structure,
+      risk management, consortium description, and resources allocation.
+    agent: implementation_writer
+    skills:
+      - implementation-section-drafting
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    required_inputs:
+      - path: docs/tier2a_instrument_schemas/application_forms/
+        role: "Active application form — Implementation section structure"
+      - path: docs/tier2a_instrument_schemas/evaluation_forms/
+        role: "Evaluation form — Quality criterion scoring logic"
+      - path: docs/tier2a_instrument_schemas/extracted/
+        role: "Extracted instrument schemas"
+      - path: docs/tier3_project_instantiation/
+        role: "Project data — consortium, roles, risks"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+        role: "WP structure with tasks, deliverables, dependencies"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+        role: "Gantt chart and milestone definitions"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+        role: "Management structure, risk register, governance"
+      - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+        role: "Budget gate confirmation — must have passed"
+    outputs:
+      - path: docs/tier5_deliverables/proposal_sections/implementation_section.json
+        content: >
+          Implementation section artifact conforming to
+          orch.tier5.implementation_section.v1. Includes wp_table_refs,
+          gantt_ref, milestone_refs, risk_register_ref, validation_status,
+          and traceability_footer.
+    instructions:
+      - "Verify budget gate has passed before producing content."
+      - "Populate wp_table_refs with all WP IDs from wp_structure.json."
+      - "Set gantt_ref, milestone_refs, risk_register_ref to their source artifacts."
+      - "Do not redesign the consortium or WP structure."
+      - "Do not assign roles to partners not present in Tier 3."
+      - "Do not reference budget figures not validated through the budget gate."
+
+  # =========================================================================
+  # Phase 8d — Cross-Section Assembly (depends on 8a + 8b + 8c)
+  # =========================================================================
+  - id: phase_08d_assembly
+    name: "Cross-Section Assembly"
+    purpose: >
+      Assemble the three criterion-aligned sections into a coherent Part B
+      assembled draft. Perform cross-section consistency checks on objectives,
+      WP references, partner names, deliverables, milestones, KPIs, impact
+      claims, budget/resource claims, and terminology.
+    agent: proposal_integrator
+    skills:
+      - cross-section-consistency-check
+      - proposal-section-traceability-check
+      - constitutional-compliance-check
+    depends_on_substep:
+      - phase_08a_excellence_drafting
+      - phase_08b_impact_drafting
+      - phase_08c_implementation_drafting
     required_inputs:
       - path: docs/tier5_deliverables/proposal_sections/
-        role: "Individual section drafts from Phase 8a"
+        role: "Three criterion-aligned section artifacts from Phases 8a/8b/8c"
       - path: docs/tier2a_instrument_schemas/application_forms/
         role: "Section order and assembly requirements"
+      - path: docs/tier3_project_instantiation/
+        role: "Ground truth for cross-section consistency checks"
     outputs:
-      - path: docs/tier5_deliverables/assembled_drafts/
+      - path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
         content: >
-          Assembled proposal draft in application form section order;
-          cross-section consistency log identifying terminology inconsistencies,
-          numerical discrepancies, or contradictions across sections.
+          Assembled Part B draft conforming to orch.tier5.part_b_assembled_draft.v1.
+          Contains sections array (3 entries in Part B order) and consistency_log
+          with cross-section check results.
     instructions:
-      - "Assemble sections in the order prescribed by the active application form."
+      - "Assemble sections in Part B order: Excellence (1), Impact (2), Implementation (3)."
       - "Check that all partner names are consistent across sections."
       - "Check that all WP references, task names, and deliverable identifiers are consistent."
-      - "Check that all quantitative claims (budget figures, person-months, KPI values) are consistent."
+      - "Check that all quantitative claims are consistent."
       - "Check that objectives in Excellence match the objectives driving the WP structure in Implementation."
       - "Check that impact claims in Impact are grounded in outputs of WPs in Implementation."
-      - "Flag and log any inconsistency; do not silently normalise contradictions."
+      - "Flag and log any inconsistency in consistency_log; do not silently normalise contradictions."
+      - "Do not rewrite section content during assembly; flag inconsistencies only."
 
-  - id: phase_08c_evaluator_review
+  # =========================================================================
+  # Phase 8e — Evaluator-Style Review (depends on 8d)
+  # =========================================================================
+  - id: phase_08e_evaluator_review
     name: "Evaluator-Style Review"
     purpose: >
-      Simulate evaluator assessment of the assembled draft against applicable
-      evaluation criteria and scoring logic. Produce prioritised revision
-      guidance before finalization.
+      Simulate evaluator assessment of the assembled Part B draft against
+      applicable evaluation criteria and scoring logic. Produce prioritised
+      revision guidance before finalization.
     agent: evaluator_reviewer
     skills:
       - evaluator-criteria-review
       - proposal-section-traceability-check
       - constitutional-compliance-check
-    depends_on_substep: phase_08b_assembly
+    depends_on_substep: phase_08d_assembly
     required_inputs:
-      - path: docs/tier5_deliverables/assembled_drafts/
-        role: "Assembled proposal draft"
+      - path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+        role: "Assembled Part B proposal draft"
       - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
         role: "Evaluation matrix and evaluation criteria with weightings"
       - path: docs/tier2a_instrument_schemas/evaluation_forms/
         role: "Scoring logic and sub-criterion structure"
     outputs:
-      - path: docs/tier5_deliverables/review_packets/
+      - path: docs/tier5_deliverables/review_packets/review_packet.json
         content: >
           Evaluator review report: per-criterion assessment; weaknesses
           categorized by severity (critical/major/minor); cross-cutting issues;
@@ -129,12 +238,15 @@ substeps:
       - "Review each section against the scoring logic of its applicable evaluation criterion."
       - "Assess clarity, credibility, coherence, specificity, and compliance."
       - "Flag: unsupported claims, vague impact language, missing mandatory elements, cross-section inconsistencies."
-      - "Categorise each weakness by severity: critical (likely to prevent passing), major (likely to reduce score significantly), minor (style or completeness)."
+      - "Categorise each weakness by severity: critical, major, minor."
       - "Provide a prioritised revision action list: critical first, then major, then minor."
       - "Do not revise the draft in this substep; produce the review report only."
       - "Distinguish Confirmed, Inferred, Assumed, and Unresolved elements in the review."
 
-  - id: phase_08d_revision
+  # =========================================================================
+  # Phase 8f — Revision Cycle (depends on 8e)
+  # =========================================================================
+  - id: phase_08f_revision
     name: "Revision Cycle"
     purpose: >
       Apply revision actions from the evaluator review to the assembled draft.
@@ -147,22 +259,22 @@ substeps:
       - constitutional-compliance-check
       - decision-log-update
       - checkpoint-publish
-    depends_on_substep: phase_08c_evaluator_review
+    depends_on_substep: phase_08e_evaluator_review
     required_inputs:
-      - path: docs/tier5_deliverables/assembled_drafts/
-        role: "Assembled draft to be revised"
-      - path: docs/tier5_deliverables/review_packets/
+      - path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+        role: "Assembled Part B draft to be revised"
+      - path: docs/tier5_deliverables/review_packets/review_packet.json
         role: "Review report with prioritised revision actions"
       - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
         role: "Budget gate confirmation to prevent budget-contradicting revisions"
     outputs:
-      - path: docs/tier5_deliverables/assembled_drafts/
-        content: "Revised proposal draft incorporating all critical and major revision actions"
-      - path: docs/tier5_deliverables/final_exports/
+      - path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+        content: "Revised Part B proposal draft incorporating all critical and major revision actions"
+      - path: docs/tier5_deliverables/final_exports/final_export.json
         content: "Final export of the revised proposal ready for submission formatting"
-      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+      - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json
         content: "Revision log: which actions were applied, how, and any residual minor issues"
-      - path: docs/tier4_orchestration_state/checkpoints/
+      - path: docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json
         content: "Phase 8 checkpoint confirming workflow completion and final state"
     instructions:
       - "Apply critical revision actions first."
@@ -176,10 +288,13 @@ substeps:
 
 gate_condition:
   all_of:
-    - "All sections required by active application form present in proposal_sections/"
-    - "Assembled draft present in assembled_drafts/"
-    - "Review packet present in review_packets/"
-    - "All critical revision actions resolved or explicitly logged as unresolvable with reason"
+    - "Budget gate must have passed (prerequisite for all Phase 8 substeps)"
+    - "Excellence section drafted with traceability and no unresolved claims (gate_10a)"
+    - "Impact section drafted with pathway coverage and DEC measures (gate_10b)"
+    - "Implementation section drafted with WP/Gantt/milestone/risk coverage (gate_10c)"
+    - "Part B assembled with cross-section consistency verified (gate_10d)"
+    - "Review packet present with severity-categorised findings (gate_11)"
+    - "All critical revision actions resolved or logged as unresolvable with reason"
     - "Final export present in final_exports/"
     - "Phase 8 checkpoint published to Tier 4 checkpoints/"
     - "No section contains content contradicted by a higher tier"

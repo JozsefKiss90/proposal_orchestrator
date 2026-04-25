@@ -1535,9 +1535,308 @@ tier5_deliverable_schemas:
             required: false
 
   # ---------------------------------------------------------------------------
+  # 2.1b excellence_section.json
+  # Path: docs/tier5_deliverables/proposal_sections/excellence_section.json
+  # Produced by: excellence_writer agent (Phase 8a)
+  # Consumed by: gate_10a_excellence_completeness predicates
+  # ---------------------------------------------------------------------------
+  excellence_section:
+    schema_id_value: "orch.tier5.excellence_section.v1"
+    canonical_path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.excellence_section.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      criterion:
+        type: string
+        required: true
+        description: Must equal "Excellence".
+
+      sub_sections:
+        type: array
+        required: true
+        description: >
+          Ordered array of Excellence sub-sections per the RIA/IA Part B template.
+          Covers: objectives, relation to work programme, concept and methodology,
+          ambition, interdisciplinarity, gender dimension.
+        item_schema:
+          sub_section_id:
+            type: string
+            required: true
+          title:
+            type: string
+            required: true
+          content:
+            type: string
+            required: true
+          word_count:
+            type: integer
+            required: true
+
+      validation_status:
+        type: object
+        required: true
+        description: >
+          Per-claim validation status breakdown. overall_status must not be
+          "unresolved" for the gate to pass. Checked by
+          no_unresolved_material_claims predicate.
+
+      traceability_footer:
+        type: object
+        required: true
+        description: >
+          Must be non-empty with primary_sources array. Checked by
+          json_field_present predicate in gate_10a.
+
+  # ---------------------------------------------------------------------------
+  # 2.1c impact_section.json
+  # Path: docs/tier5_deliverables/proposal_sections/impact_section.json
+  # Produced by: impact_writer agent (Phase 8b)
+  # Consumed by: gate_10b_impact_completeness predicates
+  # ---------------------------------------------------------------------------
+  impact_section:
+    schema_id_value: "orch.tier5.impact_section.v1"
+    canonical_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.impact_section.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      criterion:
+        type: string
+        required: true
+        description: Must equal "Impact".
+
+      sub_sections:
+        type: array
+        required: true
+        description: >
+          Covers: project results and expected impacts, measures to maximise impact
+          (dissemination, exploitation, communication), summary of impact pathways.
+        item_schema:
+          sub_section_id:
+            type: string
+            required: true
+          title:
+            type: string
+            required: true
+          content:
+            type: string
+            required: true
+          word_count:
+            type: integer
+            required: true
+
+      impact_pathway_refs:
+        type: array
+        required: true
+        description: >
+          References to impact_architecture.json pathways covered by this section.
+        item_type: string
+
+      dec_coverage:
+        type: object
+        required: true
+        description: >
+          Declaration of DEC plan coverage: dissemination, exploitation, communication.
+        fields:
+          dissemination_addressed:
+            type: boolean
+            required: true
+          exploitation_addressed:
+            type: boolean
+            required: true
+          communication_addressed:
+            type: boolean
+            required: true
+
+      validation_status:
+        type: object
+        required: true
+
+      traceability_footer:
+        type: object
+        required: true
+
+  # ---------------------------------------------------------------------------
+  # 2.1d implementation_section.json
+  # Path: docs/tier5_deliverables/proposal_sections/implementation_section.json
+  # Produced by: implementation_writer agent (Phase 8c)
+  # Consumed by: gate_10c_implementation_completeness predicates
+  # ---------------------------------------------------------------------------
+  implementation_section:
+    schema_id_value: "orch.tier5.implementation_section.v1"
+    canonical_path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.implementation_section.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      criterion:
+        type: string
+        required: true
+        description: Must equal "Quality and efficiency of the implementation".
+
+      sub_sections:
+        type: array
+        required: true
+        description: >
+          Covers: work plan (WP descriptions, tables, Gantt, deliverables, milestones),
+          management and risk, consortium composition, resources.
+        item_schema:
+          sub_section_id:
+            type: string
+            required: true
+          title:
+            type: string
+            required: true
+          content:
+            type: string
+            required: true
+          word_count:
+            type: integer
+            required: true
+
+      wp_table_refs:
+        type: array
+        required: true
+        description: References to WP IDs covered.
+        item_type: string
+
+      gantt_ref:
+        type: string
+        required: true
+
+      milestone_refs:
+        type: array
+        required: true
+        item_type: string
+
+      risk_register_ref:
+        type: string
+        required: true
+
+      validation_status:
+        type: object
+        required: true
+
+      traceability_footer:
+        type: object
+        required: true
+
+  # ---------------------------------------------------------------------------
+  # 2.1e part_b_assembled_draft.json
+  # Path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+  # Produced by: proposal_integrator agent (Phase 8d)
+  # Consumed by: gate_10d_cross_section_consistency predicates
+  # Replaces assembled_draft.json (orch.tier5.assembled_draft.v1)
+  # ---------------------------------------------------------------------------
+  part_b_assembled_draft:
+    schema_id_value: "orch.tier5.part_b_assembled_draft.v1"
+    canonical_path: "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+    provenance_class: run_produced
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.tier5.part_b_assembled_draft.v1".
+
+      run_id:
+        type: string
+        required: true
+
+      artifact_status:
+        type: string
+        required: false
+        enum: [valid, invalid]
+
+      sections:
+        type: array
+        required: true
+        description: >
+          Three sections in RIA/IA Part B order: Excellence, Impact, Implementation.
+        item_schema:
+          section_id:
+            type: string
+            required: true
+          criterion:
+            type: string
+            required: true
+          order:
+            type: integer
+            required: true
+          artifact_path:
+            type: string
+            required: true
+          word_count:
+            type: integer
+            required: false
+
+      consistency_log:
+        type: array
+        required: true
+        description: Cross-section consistency checks.
+        item_schema:
+          check_id:
+            type: string
+            required: true
+          description:
+            type: string
+            required: true
+          sections_checked:
+            type: array
+            required: true
+            item_type: string
+          status:
+            type: string
+            required: true
+            enum: [consistent, inconsistency_flagged, resolved]
+          inconsistency_note:
+            type: string
+            required: false
+
+  # ---------------------------------------------------------------------------
   # 2.2 review_packet.json
   # Path: docs/tier5_deliverables/review_packets/review_packet.json
-  # Produced by: evaluator_reviewer agent (Phase 8c)
+  # Produced by: evaluator_reviewer agent (Phase 8e)
   # Consumed by: gate_11_review_closure and gate_12_constitutional_compliance predicates
   # ---------------------------------------------------------------------------
   review_packet:
@@ -2708,6 +3007,19 @@ schema_id_registry:
   - schema_id: "orch.tier5.assembled_draft.v1"
     artifact: assembled_draft.json
     section: "2.1"
+    status: "deprecated — replaced by orch.tier5.part_b_assembled_draft.v1"
+  - schema_id: "orch.tier5.excellence_section.v1"
+    artifact: excellence_section.json
+    section: "2.1b"
+  - schema_id: "orch.tier5.impact_section.v1"
+    artifact: impact_section.json
+    section: "2.1c"
+  - schema_id: "orch.tier5.implementation_section.v1"
+    artifact: implementation_section.json
+    section: "2.1d"
+  - schema_id: "orch.tier5.part_b_assembled_draft.v1"
+    artifact: part_b_assembled_draft.json
+    section: "2.1e"
   - schema_id: "orch.tier5.review_packet.v1"
     artifact: review_packet.json
     section: "2.2"

@@ -5,7 +5,11 @@ purpose_summary: >
   Tier 1–4 source, flagging unattributed assertions and applying
   Confirmed/Inferred/Assumed/Unresolved status to each claim.
 used_by_agents:
-  - proposal_writer
+  - excellence_writer
+  - impact_writer
+  - implementation_writer
+  - proposal_integrator
+  - evaluator_reviewer
   - revision_integrator
   - traceability_auditor
 reads_from:
@@ -28,8 +32,8 @@ constitutional_constraints:
 
 | Path | Artifact / Content | Fields Extracted | Schema ID | Purpose |
 |------|--------------------|-----------------|-----------|---------|
-| `docs/tier5_deliverables/proposal_sections/` | Individual proposal section JSON files (<section_id>.json) | content (full section text); validation_status.claim_statuses[]; traceability_footer.primary_sources[] | `orch.tier5.proposal_section.v1` (per section file) | The proposal sections under audit; material claims are extracted from content and their stated source references in traceability_footer are verified against Tier 1–4 artifacts |
-| `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` | assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.assembled_draft.v1` | Provides the assembly index and consistency log; used when performing cross-section traceability audit on the assembled draft |
+| `docs/tier5_deliverables/proposal_sections/` | Individual proposal section JSON files (excellence_section.json, impact_section.json, implementation_section.json, or legacy <section_id>.json) | content or sub_sections[].content (full section text); validation_status.claim_statuses[]; traceability_footer.primary_sources[] | `orch.tier5.excellence_section.v1`, `orch.tier5.impact_section.v1`, `orch.tier5.implementation_section.v1`, or `orch.tier5.proposal_section.v1` | The proposal sections under audit; material claims are extracted from content and their stated source references in traceability_footer are verified against Tier 1-4 artifacts |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | part_b_assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.part_b_assembled_draft.v1` | Provides the assembly index and consistency log; used when performing cross-section traceability audit on the assembled draft |
 | `docs/tier1_normative_framework/extracted/` | Tier 1 extracted rule and compliance files | Rule entries with source references; compliance requirements; legal constraints | N/A — Tier 1 extracted directory | Reference set for verifying claims attributed to Tier 1 (legislation, programme guidance, grant architecture); Confirmed status requires naming a specific file from this directory |
 | `docs/tier2a_instrument_schemas/extracted/` | Tier 2A extracted files (section_schema_registry.json, evaluator_expectation_registry.json) | Section schema entries; evaluation criteria entries | N/A — Tier 2A extracted directory | Reference set for claims attributed to instrument schema or evaluation criteria; Confirmed status requires naming a specific Tier 2A extracted file |
 | `docs/tier2b_topic_and_call_sources/extracted/` | Tier 2B extracted files (call_constraints, expected_outcomes, expected_impacts, scope_requirements, eligibility_conditions, evaluation_priority_weights) | All extracted call requirement entries | N/A — Tier 2B extracted directory | Reference set for claims attributed to call or topic requirements; Confirmed status requires naming a specific Tier 2B extracted file and entry |
@@ -45,7 +49,7 @@ constitutional_constraints:
 
 | Output Path | Registered in manifest.compile.yaml artifact_registry? | Producing Node |
 |-------------|--------------------------------------------------------|----------------|
-| `docs/tier4_orchestration_state/validation_reports/` | Not registered as a discrete artifact_id in the artifact_registry | Multiple nodes (context-dependent: n08a_section_drafting, n08b_assembly, or n08d_revision per invoking agent) |
+| `docs/tier4_orchestration_state/validation_reports/` | Not registered as a discrete artifact_id in the artifact_registry | Multiple nodes (context-dependent: n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting, n08d_assembly, n08e_evaluator_review, or n08f_revision per invoking agent) |
 
 ## Execution Specification
 
@@ -53,8 +57,8 @@ constitutional_constraints:
 
 - Step 1.1: Confirm the invoking agent provides either: (a) a specific `section_id` as context (for per-section audit), or (b) an instruction to audit all sections from the assembled draft. If neither: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="section_id or assembled_draft audit mode required") and halt.
 - Step 1.2 (per-section mode): Confirm the section file exists at `docs/tier5_deliverables/proposal_sections/<section_id>.json`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Proposal section file <section_id>.json not found") and halt.
-- Step 1.3 (assembled draft mode): Confirm `docs/tier5_deliverables/assembled_drafts/assembled_draft.json` exists with `schema_id` = "orch.tier5.assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list; confirm each path exists.
-- Step 1.4: Schema conformance check for each section file to be audited — confirm `schema_id` = "orch.tier5.proposal_section.v1". If mismatch: record as a traceability failure for that section and continue.
+- Step 1.3 (assembled draft mode): Confirm `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list; confirm each path exists.
+- Step 1.4: Schema conformance check for each section file to be audited — confirm `schema_id` is one of the accepted section schemas: "orch.tier5.proposal_section.v1", "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", or "orch.tier5.implementation_section.v1". If mismatch: record as a traceability failure for that section and continue.
 - Step 1.5: Confirm at least one Tier 1–4 reference directory is accessible: `docs/tier1_normative_framework/extracted/`, `docs/tier2a_instrument_schemas/extracted/`, `docs/tier2b_topic_and_call_sources/extracted/`, `docs/tier3_project_instantiation/`. If none are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification") and halt.
 
 ### 2. Core Processing Logic
@@ -162,7 +166,7 @@ IF `status == "confirmed"` AND `source_ref` is null, empty, OR is only a directo
 **Trigger conditions in this skill:**
 - Step 1.1: Invoking agent provides neither a `section_id` nor an assembled-draft audit mode instruction → `failure_reason="section_id or assembled_draft audit mode required"`
 - Step 1.2 (per-section mode): Section file `<section_id>.json` does not exist at `docs/tier5_deliverables/proposal_sections/` → `failure_reason="Proposal section file <section_id>.json not found"`
-- Step 1.3 (assembled draft mode): `assembled_draft.json` is absent or schema mismatch → `failure_reason="assembled_draft.json not found or schema mismatch"`
+- Step 1.3 (assembled draft mode): `part_b_assembled_draft.json` is absent or schema mismatch → `failure_reason="part_b_assembled_draft.json not found or schema mismatch"`
 - Step 1.5: No Tier 1–4 reference directory is accessible → `failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification"`
 
 **Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
@@ -174,7 +178,7 @@ IF `status == "confirmed"` AND `source_ref` is null, empty, OR is only a directo
 ### MALFORMED_ARTIFACT
 
 **Trigger conditions in this skill:**
-- Step 1.4: A section file to be audited has `schema_id` ≠ "orch.tier5.proposal_section.v1" → recorded as a traceability failure for that section; evaluation continues. This does not produce a MALFORMED_ARTIFACT SkillResult halt — the schema mismatch is treated as a finding.
+- Step 1.4: A section file to be audited has `schema_id` not in the accepted set ("orch.tier5.proposal_section.v1", "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", "orch.tier5.implementation_section.v1") → recorded as a traceability failure for that section; evaluation continues. This does not produce a MALFORMED_ARTIFACT SkillResult halt — the schema mismatch is treated as a finding.
 
 Note: schema mismatch in section files is surfaced as a traceability finding in the report, not as a MALFORMED_ARTIFACT halt.
 
@@ -232,8 +236,8 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined in the execution logic. W
 
 ### Upstream input schema verification
 
-- **Proposal section files** (`orch.tier5.proposal_section.v1`): skill reads `content`, `validation_status.claim_statuses[]`, `traceability_footer.primary_sources[]`. All three field paths match spec §3 (`tier5_proposal_section_schema`) exactly. The spec defines `validation_status.claim_statuses[].status` enum as lowercase `[confirmed, inferred, assumed, unresolved]` — the skill uses the same lowercase vocabulary. Compliant.
-- **`assembled_draft.json`** (`orch.tier5.assembled_draft.v1`): skill reads `sections[].section_id, artifact_path`. Field paths match spec §2.1. Compliant.
+- **Proposal section files** (`orch.tier5.proposal_section.v1`, `orch.tier5.excellence_section.v1`, `orch.tier5.impact_section.v1`, `orch.tier5.implementation_section.v1`): skill reads `content` or `sub_sections[].content`, `validation_status.claim_statuses[]`, `traceability_footer.primary_sources[]`. For criterion-aligned sections, `sub_sections[].content` is concatenated to form the auditable text. All field paths match their respective spec entries. The spec defines `validation_status.claim_statuses[].status` enum as lowercase `[confirmed, inferred, assumed, unresolved]` — the skill uses the same lowercase vocabulary. Compliant.
+- **`part_b_assembled_draft.json`** (`orch.tier5.part_b_assembled_draft.v1`): skill reads `sections[].section_id, artifact_path`. Field paths match spec §2.1e. Compliant.
 - **Tier 1–4 reference directories**: skill declares all four `extracted/` and Tier 3 directories in `reads_from`; checks only path existence and content consistency for traceability verification. No schema_id binding required for reference reads.
 
 ### Artifact: `traceability_<section_id>_<timestamp>.json` (validation report)

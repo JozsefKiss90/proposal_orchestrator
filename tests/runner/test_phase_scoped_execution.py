@@ -106,7 +106,13 @@ def _three_phase_manifest() -> dict:
 
 
 def _multi_node_phase_manifest() -> dict:
-    """Phase 8 with two sub-nodes (8a, 8b), preceded by phase 7 (n07)."""
+    """Phase 8 with six sub-nodes (8a–8f), preceded by phase 7 (n07).
+
+    Topology:
+        n07 fans out to n08a/n08b/n08c (3 parallel drafting nodes)
+        n08a/n08b/n08c converge on n08d_assembly
+        n08d_assembly → n08e_evaluator_review → n08f_revision (terminal)
+    """
     return {
         "name": "test",
         "version": "1.1",
@@ -121,21 +127,57 @@ def _multi_node_phase_manifest() -> dict:
                 "terminal": False,
             },
             {
-                "node_id": "n08a_section_drafting",
+                "node_id": "n08a_excellence_drafting",
                 "phase_number": 8,
                 "phase_id": "phase_08a",
-                "agent": "section_drafter",
+                "agent": "excellence_writer",
                 "skills": [],
-                "exit_gate": "gate_10_completeness",
+                "exit_gate": "gate_10a_excellence_completeness",
                 "terminal": False,
             },
             {
-                "node_id": "n08b_assembly",
+                "node_id": "n08b_impact_drafting",
                 "phase_number": 8,
                 "phase_id": "phase_08b",
-                "agent": "assembler",
+                "agent": "impact_writer",
                 "skills": [],
-                "exit_gate": "gate_10b_assembly",
+                "exit_gate": "gate_10b_impact_completeness",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08c_implementation_drafting",
+                "phase_number": 8,
+                "phase_id": "phase_08c",
+                "agent": "implementation_writer",
+                "skills": [],
+                "exit_gate": "gate_10c_implementation_completeness",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08d_assembly",
+                "phase_number": 8,
+                "phase_id": "phase_08d",
+                "agent": "proposal_integrator",
+                "skills": [],
+                "exit_gate": "gate_10d_cross_section_consistency",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08e_evaluator_review",
+                "phase_number": 8,
+                "phase_id": "phase_08e",
+                "agent": "evaluator_reviewer",
+                "skills": [],
+                "exit_gate": "gate_11_review_closure",
+                "terminal": False,
+            },
+            {
+                "node_id": "n08f_revision",
+                "phase_number": 8,
+                "phase_id": "phase_08f",
+                "agent": "revision_integrator",
+                "skills": [],
+                "exit_gate": "gate_12_constitutional_compliance",
                 "terminal": True,
             },
         ],
@@ -143,14 +185,50 @@ def _multi_node_phase_manifest() -> dict:
             {
                 "edge_id": "e07_to_08a",
                 "from_node": "n07_budget_gate",
-                "to_node": "n08a_section_drafting",
+                "to_node": "n08a_excellence_drafting",
                 "gate_condition": "gate_09_budget_consistency",
             },
             {
-                "edge_id": "e08a_to_08b",
-                "from_node": "n08a_section_drafting",
-                "to_node": "n08b_assembly",
-                "gate_condition": "gate_10_completeness",
+                "edge_id": "e07_to_08b",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08b_impact_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e07_to_08c",
+                "from_node": "n07_budget_gate",
+                "to_node": "n08c_implementation_drafting",
+                "gate_condition": "gate_09_budget_consistency",
+            },
+            {
+                "edge_id": "e08a_to_08d",
+                "from_node": "n08a_excellence_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10a_excellence_completeness",
+            },
+            {
+                "edge_id": "e08b_to_08d",
+                "from_node": "n08b_impact_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10b_impact_completeness",
+            },
+            {
+                "edge_id": "e08c_to_08d",
+                "from_node": "n08c_implementation_drafting",
+                "to_node": "n08d_assembly",
+                "gate_condition": "gate_10c_implementation_completeness",
+            },
+            {
+                "edge_id": "e08d_to_08e",
+                "from_node": "n08d_assembly",
+                "to_node": "n08e_evaluator_review",
+                "gate_condition": "gate_10d_cross_section_consistency",
+            },
+            {
+                "edge_id": "e08e_to_08f",
+                "from_node": "n08e_evaluator_review",
+                "to_node": "n08f_revision",
+                "gate_condition": "gate_11_review_closure",
             },
         ],
     }
@@ -193,8 +271,12 @@ class TestManifestGraphPhaseQueries:
             _multi_node_phase_manifest()["edge_registry"],
         )
         assert graph.nodes_for_phase(8) == [
-            "n08a_section_drafting",
-            "n08b_assembly",
+            "n08a_excellence_drafting",
+            "n08b_impact_drafting",
+            "n08c_implementation_drafting",
+            "n08d_assembly",
+            "n08e_evaluator_review",
+            "n08f_revision",
         ]
 
     def test_no_phase_number_fields_gives_empty(self):
@@ -374,27 +456,29 @@ class TestMultiNodePhase:
 
         assert summary.overall_status == "pass"
         assert set(summary.dispatched_nodes) == {
-            "n08a_section_drafting",
-            "n08b_assembly",
+            "n08a_excellence_drafting",
+            "n08b_impact_drafting",
+            "n08c_implementation_drafting",
+            "n08d_assembly",
+            "n08e_evaluator_review",
+            "n08f_revision",
         }
 
     def test_multi_node_phase_partial_pass(self, tmp_path: Path):
-        """First substep passes, second fails at exit gate → partial_pass."""
+        """n08a and n08c pass but n08b fails at exit gate → downstream nodes
+        (n08d, n08e, n08f) stall, overall_status becomes partial_pass or
+        aborted depending on remaining pending nodes."""
         manifest_path = _write_manifest(tmp_path, _multi_node_phase_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-multi-partial")
         ctx.set_node_state("n07_budget_gate", "released")
         ctx.save()
 
-        call_count = [0]
-
-        def _gate_side_effect(*args, **kwargs):
-            call_count[0] += 1
-            # First two calls are for n08a (exit gate passes).
-            # Third call is n08b exit gate → fail.
-            if call_count[0] <= 1:
-                return _GATE_PASS
-            return _GATE_FAIL
+        def _gate_side_effect(gate_id, *args, **kwargs):
+            # n08b's exit gate fails; all others pass.
+            if gate_id == "gate_10b_impact_completeness":
+                return _GATE_FAIL
+            return _GATE_PASS
 
         with patch("runner.dag_scheduler.evaluate_gate", side_effect=_gate_side_effect):
             sched = DAGScheduler(
@@ -402,11 +486,14 @@ class TestMultiNodePhase:
                 manifest_path=manifest_path,
                 phase=8,
             )
-            summary = sched.run()
+            # n08d requires all three drafting gates; n08b blocked → stall
+            with pytest.raises(RunAbortedError) as exc_info:
+                sched.run()
 
-        assert summary.overall_status == "partial_pass"
-        assert summary.node_states["n08a_section_drafting"] == "released"
-        assert summary.node_states["n08b_assembly"] == "blocked_at_exit"
+        summary = exc_info.value.summary
+        assert summary.node_states["n08a_excellence_drafting"] == "released"
+        assert summary.node_states["n08b_impact_drafting"] == "blocked_at_exit"
+        assert summary.node_states["n08c_implementation_drafting"] == "released"
 
 
 # ---------------------------------------------------------------------------
