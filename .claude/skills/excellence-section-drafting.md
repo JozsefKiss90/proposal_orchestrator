@@ -8,6 +8,7 @@ used_by_agents:
   - excellence_writer
 reads_from:
   - docs/tier2a_instrument_schemas/extracted/
+  - docs/tier2b_topic_and_call_sources/extracted/
   - docs/tier3_project_instantiation/
   - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
   - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
@@ -33,7 +34,10 @@ in the Declared Inputs section from disk using the Read tool.
 4. `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` -- evaluation matrix and call priority weights
 5. `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json` -- refined concept, vocabulary alignment, topic mapping rationale
 6. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` -- WP structure for methodology and interdisciplinarity grounding
-7. `docs/tier3_project_instantiation/` -- project data (use Glob to discover, then Read relevant files: project_brief/, consortium/, architecture_inputs/objectives.json)
+7. `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` -- call expected outcomes for direct Tier 2B traceability of call-scope claims
+8. `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` -- call expected impacts for direct Tier 2B traceability
+9. `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` -- call scope requirements for direct Tier 2B traceability
+10. `docs/tier3_project_instantiation/` -- project data (use Glob to discover, then Read relevant files: project_brief/, consortium/, architecture_inputs/objectives.json)
 
 **Boundary constraints:**
 - Do not read files outside the declared input set.
@@ -57,6 +61,9 @@ Do not include explanations outside the JSON.
 | `docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json` | Call analysis summary | `evaluation_matrix` (criterion weights, source sections) | `orch.phase1.call_analysis_summary.v1` | Evaluation criterion weights and call-specific priorities |
 | `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json` | Concept refinement summary | Refined concept, vocabulary alignment, topic mapping rationale | `orch.phase2.concept_refinement_summary.v1` | Call-aligned concept framing; evaluator vocabulary |
 | `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` | WP structure | WP objectives, tasks, deliverables, interdependencies | `orch.phase3.wp_structure.v1` | Grounds methodology and interdisciplinarity claims in concrete project activities |
+| `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` | Call expected outcomes | Expected outcome entries with source references | N/A -- Tier 2B extracted | Direct Tier 2B source for call expected outcomes; required in traceability_footer when making call-scope claims |
+| `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` | Call expected impacts | Expected impact entries with source references | N/A -- Tier 2B extracted | Direct Tier 2B source for call expected impacts; required in traceability_footer |
+| `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` | Call scope requirements | Scope requirement entries with source references | N/A -- Tier 2B extracted | Direct Tier 2B source for call scope requirements; required in traceability_footer |
 | `docs/tier3_project_instantiation/` | Project data (project_brief/, consortium/, architecture_inputs/) | Objectives, concept note, consortium capabilities, prior experience | N/A -- Tier 3 root directory | Sole source for all project-specific claims in the Excellence section |
 
 ### Outputs
@@ -124,9 +131,11 @@ Do not include explanations outside the JSON.
   - Set `overall_status` to the weakest status across all claims (unresolved > assumed > inferred > confirmed).
   - Build `claim_statuses` array with `claim_id`, `claim_summary`, `status`, `source_ref`.
 
-- Step 2.5: **Build traceability_footer.** Populate `primary_sources` array with all Tier 1-4 artifacts used as sources for the section content. Set `no_unsupported_claims_declaration` to true only if all claims are Confirmed or Inferred.
+- Step 2.5: **Build traceability_footer.** Populate `primary_sources` array with all Tier 1-4 artifacts used as sources for the section content. **Whenever the section asserts call scope, expected outcomes, expected impacts, or call requirements, include direct Tier 2B extracted source paths** (e.g., `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json`, `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json`) in `primary_sources[]` — not just indirect Tier 4 derivatives (Phase 1/2 outputs). This is required to pass the constitutional-compliance-check §13.2 check. Set `no_unsupported_claims_declaration` to true only if all claims are Confirmed or Inferred.
 
-- Step 2.6: **Handle data gaps.** If Tier 3 is incomplete for any Excellence sub-section element: set the relevant claim status to Unresolved, set `overall_status` to "unresolved", document the gap in `claim_statuses`, and set `no_unsupported_claims_declaration: false`. Do not fabricate content to fill the gap (CLAUDE.md Section 11.5, Section 13.8).
+- Step 2.6: **Handle data gaps.** If Tier 3 is incomplete for any Excellence sub-section element: set the relevant claim status to Unresolved, document the gap in `claim_statuses`, and set `no_unsupported_claims_declaration: false`. Do not fabricate content to fill the gap (CLAUDE.md Section 11.5, Section 13.8).
+
+- Step 2.7: **Gate-readiness check.** After building `validation_status`, check `overall_status`. If `overall_status` is `"unresolved"`: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Excellence section has unresolved material claims: <list claim_ids with status unresolved>. Gate gate_10a_excellence_completeness requires no_unresolved_material_claims. Resolve the data gaps in Tier 3 before re-running.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact. A declared failure is a correct output per CLAUDE.md Section 15.
 
 ### 3. Output Construction
 
@@ -158,6 +167,8 @@ Return a single JSON object conforming to `orch.tier5.excellence_section.v1`:
   },
   "traceability_footer": {
     "primary_sources": [
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"},
       {"tier": 3, "source_path": "docs/tier3_project_instantiation/..."},
       {"tier": 4, "source_path": "docs/tier4_orchestration_state/..."}
     ],

@@ -1,0 +1,41 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_excellence_section_excellence_writer_2026-04-25T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "excellence_writer",
+  "run_id_reference": "bcfe33d6-473a-4c8b-ad26-ce134aac50fd",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_reasoning": "The artifact schema_id is 'orch.tier5.excellence_section.v1', which is a Tier 2A-derived application-form schema, not a Grant Agreement Annex schema. The traceability_footer.primary_sources[] references docs/tier2a_instrument_schemas/extracted/section_schema_registry.json and docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json \u2014 both are application-form structural authorities. No strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' appear as structural authorities in the artifact content or traceability footer."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "violation",
+      "violation_evidence": "Sub-section B.1.1 asserts specific call scope and expected-outcome claims: 'MAESTRO... directly addresses topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02, which calls for research on next-generation AI agents with advances in planning, reasoning, memory management, multi-agent coordination, and external tool and API integration. MAESTRO addresses all four scope research areas \u2014 advancing AI agent autonomy through structured planning and self-optimisation; innovation in memory-augmented AI for robust long-term reasoning; advanced multi-agent frameworks for collaborative agent coordination; and principled integration of external tools and APIs' and 'directly responsive to the call's two expected outcomes: significant improvements in AI agent autonomy, robustness, and reliability through planning, memory, and reasoning; and innovative multi-agent frameworks demonstrating effective decentralised coordination beyond individual agent capabilities.' The artifact's traceability_footer.primary_sources[] contains no reference to any path within docs/tier2b_topic_and_call_sources/extracted/. The Tier 4 phase output proxies present (docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json and docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json) are downstream derivatives of Tier 2B but are not themselves Tier 2B extracted source references and do not satisfy the traceability requirement for a direct Tier 2B extracted source path.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_reasoning": "All project-specific facts in the artifact \u2014 partner names (ATU, BIIS, CERIA, NIHS, ISIA, ELI, BAL, FIIT), capabilities (e.g., NIHS de-identified clinical data repository 3M+ patient records; ISIA sensor-instrumented Industry 4.0 pilot factory; BAL EuroHPC access; FIIT EDIH network six EU member states), objectives with measurable targets (OBJ-1 through OBJ-8), WP task identifiers, and deliverable due-months \u2014 all carry Tier 3 source references in traceability_footer.primary_sources[]: docs/tier3_project_instantiation/architecture_inputs/objectives.json, docs/tier3_project_instantiation/consortium/capabilities.json, docs/tier3_project_instantiation/consortium/partners.json, docs/tier3_project_instantiation/project_brief/concept_note.md, docs/tier3_project_instantiation/project_brief/strategic_positioning.md, and docs/tier3_project_instantiation/project_brief/project_summary.json. Claim statuses C01\u2013C14 are confirmed or inferred with Tier 3 source references. No project-fact claim is unresolved without a Tier 3 source reference."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_reasoning": "Content sub-check (budget figures in section text): A full scan of both sub_sections (B.1.1 and B.1.2) finds no patterns matching '\u20ac[0-9]+', '[0-9]+ EUR', or '[0-9]+ pers
+=== END ===

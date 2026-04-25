@@ -39,9 +39,7 @@ must have passed before any Phase 8 activity begins.
 3. Read Tier 2B expected outcomes and expected impacts.
 4. Read WP structure from Phase 3 (to ground impact claims in project activities).
 5. Read Tier 3 project data (outcomes, impacts, consortium).
-6. Draft sub-sections: expected impacts, impact pathways, DEC measures, sustainability.
-7. Populate `impact_pathway_refs` with all pathway IDs from impact architecture.
-8. Set `dec_coverage` booleans (dissemination, exploitation, communication).
-9. Build `validation_status` and `traceability_footer`.
-10. Apply `proposal-section-traceability-check` and `constitutional-compliance-check`.
-11. Write `docs/tier5_deliverables/proposal_sections/impact_section.json` (schema: `orch.tier5.impact_section.v1`). `artifact_status` must be absent.
+6. Execute `impact-section-drafting` skill: draft sub-sections (expected impacts, impact pathways, DEC measures, sustainability), populate `impact_pathway_refs`, set `dec_coverage` booleans, build `validation_status` and `traceability_footer`. Write `impact_section.json`. If any material claim is unresolved, return declared failure instead of writing a gate-blocking artifact.
+7. Apply `proposal-section-traceability-check` skill on the produced `impact_section.json`.
+8. Apply `constitutional-compliance-check` skill on the produced `impact_section.json`.
+

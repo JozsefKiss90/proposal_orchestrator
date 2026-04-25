@@ -338,13 +338,13 @@ class TestConstitutionalComplianceCheckTapmInvocation:
         assert result.status == "success", f"Got: {result.failure_reason}"
         assert mock.call_args.kwargs.get("tools") == ["Read", "Glob"]
 
-    def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
+    def test_tapm_timeout_uses_1200s(self, tmp_path: Path) -> None:
         repo_root = self._make_env(tmp_path)
         with patch(_TRANSPORT_TARGET, return_value=self._compliance_response()) as mock:
             run_skill(
                 "constitutional-compliance-check", "test-run", repo_root,
             )
-        assert mock.call_args.kwargs.get("timeout_seconds") == 600
+        assert mock.call_args.kwargs.get("timeout_seconds") == 1200
 
     def test_tapm_prompt_not_cli_prompt(self, tmp_path: Path) -> None:
         """Verify TAPM path used — no serialized inputs in prompt."""

@@ -1,0 +1,71 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-04-25T120000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "9a3f2925-8862-4eb7-bd0f-661a118d3dca",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "violation",
+      "violation_evidence": "The artifact asserts call scope requirements and constraints in the B.3.1 proposal content at multiple points: 'coordination with ADRA and the GenAI4EU central Hub per scope requirement SR-09 and call constraints CC-03/CC-04' (WP1 task T1-01 description); 'coordination with Testing and Experiment Facilities per call constraint CC-07' (WP8 task T8-02 description); 'AI-on-demand platform per scope requirement SR-10 and call constraint CC-05' (WP8 task T8-03 and WP9 task T9-01 descriptions); 'scope requirement SR-09 and call constraints CC-03/CC-04' (Management Structure and Governance paragraph). The traceability_footer.primary_sources[] contains no path within docs/tier2b_topic_and_call_sources/extracted/. The only call-constraint traceability present is CLM-020 in validation_status.claim_statuses[], which traces SR-10, CC-05, and CC-07 to Tier 4 (docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json) rather than to Tier 2B extracted files. The complete Tier 2B path is absent from the artifact's primary_sources[], making the call requirement claims untraceable to Tier 2B at the artifact footer level as required by CLAUDE.md \u00a713.2.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Not checkable from artifact content alone. This prohibition governs runtime agent behavior (whether decisions are persisted to docs/tier4_orchestration_state/decision_log/ or held only in agent memory). A Tier 5 section artifact cannot evidence or refute in-memory decision handling. Enforcement is the responsibility of the decision-log-update skill during workflow execution. Recorded as pass; non-applicable to artifact-level audit.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Not checkable from artifact content. This prohibition governs workflow and skill scope boundaries at the orchestration layer. A Tier 5 proposal section cannot contain evidence of a skill or workflow expanding its scope to redefine constitutional authorities. Recorded as pass; non-applicable to artifact-level audit.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_st
+=== END ===

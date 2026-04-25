@@ -259,12 +259,12 @@ class TestRiskRegisterBuilderTapmInvocation:
         assert result.status == "success", f"Expected success, got: {result.failure_reason}"
         assert mock.call_args.kwargs.get("tools") == ["Read", "Glob"]
 
-    def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
+    def test_tapm_timeout_uses_1200s(self, tmp_path: Path) -> None:
         repo_root = self._make_phase6_env(tmp_path)
         _fix_base_run_id(repo_root, "r2")
         with patch(_TRANSPORT_TARGET, return_value=self._enrichment_response("r2")) as mock:
             run_skill("risk-register-builder", "r2", repo_root)
-        assert mock.call_args.kwargs.get("timeout_seconds") == 600
+        assert mock.call_args.kwargs.get("timeout_seconds") == 1200
 
     def test_tapm_path_invoked_not_cli_prompt(self, tmp_path: Path) -> None:
         """Verify the TAPM code path is used (prompt doesn't contain serialized inputs)."""
@@ -317,11 +317,11 @@ class TestGovernanceModelBuilderTapmInvocation:
         assert result.status == "success"
         assert mock.call_args.kwargs.get("tools") == ["Read", "Glob"]
 
-    def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
+    def test_tapm_timeout_uses_1200s(self, tmp_path: Path) -> None:
         repo_root = self._make_phase6_env(tmp_path)
         with patch(_TRANSPORT_TARGET, return_value=self._valid_response("g2")) as mock:
             run_skill("governance-model-builder", "g2", repo_root)
-        assert mock.call_args.kwargs.get("timeout_seconds") == 600
+        assert mock.call_args.kwargs.get("timeout_seconds") == 1200
 
 
 # ===========================================================================

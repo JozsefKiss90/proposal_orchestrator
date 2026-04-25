@@ -39,9 +39,7 @@ must have passed before any Phase 8 activity begins.
 2. Read WP structure (`wp_structure.json`), Gantt (`gantt.json`), implementation architecture.
 3. Read Tier 3 project data (consortium, roles, risks).
 4. Read Tier 2A evaluation form — identify Quality criterion scoring logic.
-5. Draft sub-sections: work plan, WP descriptions, Gantt narrative, deliverables table, milestones table, management structure, risk register summary, consortium description, resources.
-6. Populate `wp_table_refs` with all WP IDs from `wp_structure.json`.
-7. Set `gantt_ref`, `milestone_refs`, `risk_register_ref` to source artifact paths.
-8. Build `validation_status` and `traceability_footer`.
-9. Apply `proposal-section-traceability-check` and `constitutional-compliance-check`.
-10. Write `docs/tier5_deliverables/proposal_sections/implementation_section.json` (schema: `orch.tier5.implementation_section.v1`). `artifact_status` must be absent.
+5. Execute `implementation-section-drafting` skill: draft sub-sections (work plan, WP descriptions, Gantt narrative, deliverables table, milestones table, management structure, risk register summary, consortium description, resources), populate `wp_table_refs`, set structural references, build `validation_status` and `traceability_footer`. Write `implementation_section.json`. If any material claim is unresolved, return declared failure instead of writing a gate-blocking artifact.
+6. Apply `proposal-section-traceability-check` skill on the produced `implementation_section.json`.
+7. Apply `constitutional-compliance-check` skill on the produced `implementation_section.json`.
+

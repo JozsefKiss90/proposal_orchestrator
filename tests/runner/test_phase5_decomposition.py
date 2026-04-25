@@ -263,7 +263,7 @@ class TestCoreBuilderExecution:
             run_skill("impact-pathway-core-builder", run_id, tmp_path)
 
         call_kwargs = mock.call_args
-        assert call_kwargs.kwargs.get("timeout_seconds") == 600
+        assert call_kwargs.kwargs.get("timeout_seconds") == 1200
 
 
 # ===========================================================================

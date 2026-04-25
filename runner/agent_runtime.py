@@ -653,11 +653,33 @@ def _build_caller_context(
 # Auditable artifact resolution for constitutional-compliance-check
 # ---------------------------------------------------------------------------
 
+#: Explicit node-to-artifact path mappings for deterministic auditable
+#: artifact resolution.  Used as the first fallback when ``all_outputs``
+#: has no matching Tier 4/5 artifact.  This avoids the fragile directory-
+#: scan approach which picks the first JSON file alphabetically — a
+#: problem when multiple sections land in the same directory.
+_NODE_PRIMARY_AUDITABLE_ARTIFACT: dict[str, str] = {
+    "n08a_excellence_drafting": (
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+    ),
+    "n08b_impact_drafting": (
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+    ),
+    "n08c_implementation_drafting": (
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+    ),
+    "n08d_assembly": (
+        "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json"
+    ),
+}
+
+
 #: Node-specific fallback directories for auditable artifact resolution.
 #: Used when no earlier skill in the agent body wrote an artifact to
-#: ``all_outputs``.  Maps node_id prefixes to the directories that the
-#: node is expected to populate.  Phase 8 nodes produce Tier 5 artifacts;
-#: earlier phases produce Tier 4 phase outputs.
+#: ``all_outputs`` and no explicit primary artifact path is defined.
+#: Maps node_id prefixes to the directories that the node is expected
+#: to populate.  Phase 8 nodes produce Tier 5 artifacts; earlier phases
+#: produce Tier 4 phase outputs.
 _NODE_AUDITABLE_FALLBACK_DIRS: dict[str, tuple[str, ...]] = {
     "n08a_excellence_drafting": (
         "docs/tier5_deliverables/proposal_sections",
@@ -709,7 +731,14 @@ def _resolve_auditable_artifact(
             if not p.endswith("gate_result.json"):
                 return p
 
-    # Fallback: check node-specific directories for existing artifacts
+    # Secondary: explicit node-to-artifact path mapping
+    explicit_path = _NODE_PRIMARY_AUDITABLE_ARTIFACT.get(node_id)
+    if explicit_path is not None:
+        abs_explicit = repo_root / explicit_path
+        if abs_explicit.is_file():
+            return explicit_path
+
+    # Tertiary: check node-specific directories for existing artifacts
     fallback_dirs = _NODE_AUDITABLE_FALLBACK_DIRS.get(node_id)
     if fallback_dirs:
         for dir_rel in fallback_dirs:

@@ -31,6 +31,7 @@ must have passed before any Phase 8 activity begins.
 | Concept refinement | `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/` |
 | WP structure | `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/` |
 | Budget gate | `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/` |
+| Call scope (Tier 2B) | `docs/tier2b_topic_and_call_sources/extracted/` |
 
 ## Reasoning sequence
 
@@ -38,9 +39,8 @@ must have passed before any Phase 8 activity begins.
 2. Read Tier 2A evaluation form — identify Excellence criterion scoring logic.
 3. Read refined concept (Phase 2), WP structure (Phase 3), call analysis (Phase 1).
 4. Read Tier 3 project data (objectives, consortium, concept note).
-5. Draft sub-sections: objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity, gender dimension.
-6. Build `validation_status` with per-claim classification (confirmed/inferred/assumed/unresolved).
-7. Build `traceability_footer` with `primary_sources` array.
-8. Apply `proposal-section-traceability-check` skill.
-9. Apply `constitutional-compliance-check` skill.
-10. Write `docs/tier5_deliverables/proposal_sections/excellence_section.json` (schema: `orch.tier5.excellence_section.v1`). `artifact_status` must be absent.
+5. Read Tier 2B extracted call scope data (expected outcomes, expected impacts, scope requirements) for direct traceability.
+6. Execute `excellence-section-drafting` skill: draft sub-sections (objectives, relation to work programme, concept and methodology, ambition, interdisciplinarity, gender dimension), build `validation_status` with per-claim classification, build `traceability_footer` with `primary_sources` array including direct Tier 2B source paths for call-scope claims. Write `excellence_section.json`. If any material claim is unresolved, return declared failure instead of writing a gate-blocking artifact.
+7. Apply `proposal-section-traceability-check` skill on the produced `excellence_section.json`.
+8. Apply `constitutional-compliance-check` skill on the produced `excellence_section.json`.
+

@@ -1,3 +1,5 @@
+# Skill Execution Specification
+
 ---
 skill_id: implementation-section-drafting
 purpose_summary: >
@@ -136,8 +138,6 @@ Do not include explanations outside the JSON.
 - Step 2.9: **Build traceability_footer.** Populate `primary_sources` array.
 
 - Step 2.10: **Handle data gaps.** Document incomplete source state as Unresolved. Do not fabricate content.
-
-- Step 2.11: **Gate-readiness check.** After building `validation_status`, check `overall_status`. If `overall_status` is `"unresolved"`: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Implementation section has unresolved material claims: <list claim_ids with status unresolved>. Gate gate_10c_implementation_completeness requires no_unresolved_material_claims. Resolve the data gaps before re-running.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
 
@@ -371,3 +371,30 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.
+
+
+# Task Metadata
+
+skill_id: implementation-section-drafting
+run_id: bcfe33d6-473a-4c8b-ad26-ce134aac50fd
+
+# Declared Inputs
+
+Read these files from disk using the Read tool. Do not read files outside this set.
+
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier2a_instrument_schemas\extracted
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier3_project_instantiation
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase3_wp_design
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase4_gantt_milestones
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase6_implementation_architecture
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase7_budget_gate
+
+# Output Requirements
+
+run_id: bcfe33d6-473a-4c8b-ad26-ce134aac50fd
+writes_to: docs/tier5_deliverables/proposal_sections/implementation_section.json
+
+Expected output schemas:
+  - docs/tier5_deliverables/proposal_sections/implementation_section.json (schema_id: 'orch.tier5.implementation_section.v1') required fields: schema_id, run_id, criterion, sub_sections, wp_table_refs, gantt_ref, milestone_refs, risk_register_ref, validation_status, traceability_footer
+
+Return a single JSON object conforming to the output schema defined in the skill specification above. Do not wrap in markdown. Do not include explanatory text.

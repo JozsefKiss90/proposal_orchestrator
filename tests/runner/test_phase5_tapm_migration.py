@@ -211,11 +211,11 @@ class TestPhase5ArtifactProductionPath:
         content = json.loads(canonical.read_text(encoding="utf-8"))
         assert content["schema_id"] == "orch.phase5.impact_architecture.v1"
 
-    def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
+    def test_tapm_timeout_uses_1200s(self, tmp_path: Path) -> None:
         repo_root = self._make_phase5_env(tmp_path)
         with patch(_TRANSPORT_TARGET, return_value=self._valid_response("r3")) as mock:
             run_skill("impact-pathway-core-builder", "r3", repo_root)
-        assert mock.call_args.kwargs.get("timeout_seconds") == 600
+        assert mock.call_args.kwargs.get("timeout_seconds") == 1200
 
 
 # ---------------------------------------------------------------------------
@@ -417,14 +417,14 @@ class TestDecCheckTapmInvocation:
         assert result.status == "success"
         assert mock.call_args.kwargs.get("tools") == ["Read", "Glob"]
 
-    def test_tapm_timeout_uses_600s(self, tmp_path: Path) -> None:
+    def test_tapm_timeout_uses_1200s(self, tmp_path: Path) -> None:
         repo_root = self._make_dec_env(tmp_path)
         with patch(_TRANSPORT_TARGET, return_value=self._valid_dec_response()) as mock:
             run_skill(
                 "dissemination-exploitation-communication-check",
                 "test-dec-run", repo_root,
             )
-        assert mock.call_args.kwargs.get("timeout_seconds") == 600
+        assert mock.call_args.kwargs.get("timeout_seconds") == 1200
 
     def test_validation_report_written(self, tmp_path: Path) -> None:
         """DEC check output goes to validation_reports/ not phase5 directory."""

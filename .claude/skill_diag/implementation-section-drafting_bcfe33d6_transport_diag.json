@@ -1,0 +1,50 @@
+{
+  "skill_id": "implementation-section-drafting",
+  "execution_mode": "tapm",
+  "failure_class": "TIMEOUT",
+  "run_id": "bcfe33d6-473a-4c8b-ad26-ce134aac50fd",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier2a_instrument_schemas/extracted/",
+    "docs/tier3_project_instantiation/",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/",
+    "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/",
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+  ],
+  "writes_to": [
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 8192,
+  "timeout_seconds": 600,
+  "elapsed_seconds": 600.0620000000345,
+  "system_prompt_chars": 1219,
+  "user_prompt_chars": 23802,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 600s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--tools",
+    "Read,Glob",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\n## Tool Access and Input Boundary\n\nYou have access to the Read and Glob tools to read files from disk.\nRead ONLY the files listed in the Declared Inputs section of the task prompt. Do not read files outside the declared set.\nDo not use the Glob tool to discover files beyond the declared input paths. If a declared input is a directory, you may use Glob to list its contents, but do not navigate outside declared directories.\nDo not use any tools other than Read and Glob.\n\nConstitutional constraints (hard failures if violated):\n- Must verify budget gate passed before producing content\n- Must not redesign the consortium or WP structure\n- Must not use Grant Agreement Annex structure\n\nYou MUST include these fields in every output artifact:\n- \"run_id\": \"bcfe33d6-473a-4c8b-ad26-ce134aac50fd\"\n- The appropriate schema_id as defined in the skill specification\n- Do NOT include an artifact_status field\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": [
+    "Read",
+    "Glob"
+  ],
+  "tapm_tools_enabled": true,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/implementation-section-drafting_bcfe33d6_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/implementation-section-drafting_bcfe33d6_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/implementation-section-drafting_bcfe33d6_user_prompt.txt",
+    "stdout": ".claude/skill_diag/implementation-section-drafting_bcfe33d6_stdout.txt",
+    "stderr": ".claude/skill_diag/implementation-section-drafting_bcfe33d6_stderr.txt"
+  }
+}

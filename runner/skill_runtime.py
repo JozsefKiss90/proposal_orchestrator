@@ -78,13 +78,16 @@ SKILL_MODEL: str = "claude-sonnet-4-6"
 #: (output minimization rules in skill specs), not by this constant.
 #: Retained for forward compatibility if the transport gains token
 #: control in a future backend migration.
-SKILL_MAX_TOKENS: int = 8192
+SKILL_MAX_TOKENS: int = 16384
 
 #: Timeout for TAPM invocations (tool-augmented mode).
 #: TAPM invocations involve multiple Read/Glob tool round-trips,
-#: each adding latency.  The default 300s is insufficient for
-#: skills that read multiple files and produce complex output.
-TAPM_TIMEOUT_SECONDS: int = 600
+#: each adding latency.  Phase 8 drafting skills (excellence, impact,
+#: implementation) read 7-10 files and produce complex structured
+#: JSON outputs, requiring significantly more time than Phase 1-7
+#: skills.  600s proved insufficient in live runs (bcfe33d6); raised
+#: to 1200s to accommodate the full read-reason-produce cycle.
+TAPM_TIMEOUT_SECONDS: int = 1200
 
 
 # ---------------------------------------------------------------------------
