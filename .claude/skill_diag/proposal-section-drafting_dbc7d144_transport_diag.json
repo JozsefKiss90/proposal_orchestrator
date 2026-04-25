@@ -1,0 +1,51 @@
+{
+  "skill_id": "proposal-section-drafting",
+  "execution_mode": "tapm",
+  "failure_class": "TIMEOUT",
+  "run_id": "dbc7d144-6063-48a3-bfb6-75cb47c4b093",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+    "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+    "docs/tier2a_instrument_schemas/application_forms/",
+    "docs/tier2a_instrument_schemas/evaluation_forms/",
+    "docs/tier3_project_instantiation/",
+    "docs/tier4_orchestration_state/phase_outputs/",
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+  ],
+  "writes_to": [
+    "docs/tier5_deliverables/proposal_sections/"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 8192,
+  "timeout_seconds": 600,
+  "elapsed_seconds": 600.25,
+  "system_prompt_chars": 1349,
+  "user_prompt_chars": 8905,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 600s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--tools",
+    "Read,Glob",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\n## Tool Access and Input Boundary\n\nYou have access to the Read and Glob tools to read files from disk.\nRead ONLY the files listed in the Declared Inputs section of the task prompt. Do not read files outside the declared set.\nDo not use the Glob tool to discover files beyond the declared input paths. If a declared input is a directory, you may use Glob to list its contents, but do not navigate outside declared directories.\nDo not use any tools other than Read and Glob.\n\nConstitutional constraints (hard failures if violated):\n- Must verify budget gate passed before producing any content \u2014 CLAUDE.md \u00a78.4, \u00a713.4\n- Must not introduce claims not grounded in Tier 1-4 state \u2014 CLAUDE.md \u00a713.10\n- Must not fabricate project facts not present in Tier 3 \u2014 CLAUDE.md \u00a713.3\n- Must not use Grant Agreement Annex structure as section schema \u2014 CLAUDE.md \u00a713.1\n- Must not reference unvalidated budget figures \u2014 CLAUDE.md \u00a78.3\n\nDo NOT include run_id, schema_id, or artifact_status fields in the output \u2014 this artifact type does not use them.\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": [
+    "Read",
+    "Glob"
+  ],
+  "tapm_tools_enabled": true,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/proposal-section-drafting_dbc7d144_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/proposal-section-drafting_dbc7d144_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/proposal-section-drafting_dbc7d144_user_prompt.txt",
+    "stdout": ".claude/skill_diag/proposal-section-drafting_dbc7d144_stdout.txt",
+    "stderr": ".claude/skill_diag/proposal-section-drafting_dbc7d144_stderr.txt"
+  }
+}

@@ -50,7 +50,7 @@ Verify your setup:
 ```bash
 python --version          # 3.10 or later
 claude --version          # Claude Code CLI installed and on PATH
-python -m pytest tests/   # test suite should pass (1486 tests as of 2026-04-23)
+python -m pytest tests/   # test suite should pass (1600+ tests as of 2026-04-25)
 ```
 
 ---
@@ -94,11 +94,11 @@ proposal_orchestator/
 |   |   +-- gate_rules_library.yaml    #   102 predicates across 11 gates
 |   |   +-- artifact_schema_specification.yaml
 |   |   +-- agent_catalog.yaml         #   18 agent definitions
-|   |   +-- skill_catalog.yaml         #   21 skill definitions
+|   |   +-- skill_catalog.yaml         #   22 skill definitions
 |   |   +-- workflow_phases/           #   Phase YAML definitions
 |   |   +-- ...
 |   +-- agents/                        #   Agent .md specifications (18 agents)
-|   +-- skills/                        #   Skill .md specifications (21 skills)
+|   +-- skills/                        #   Skill .md specifications (22 skills)
 |   +-- runs/                          #   Per-run state (run_manifest.json, run_summary.json)
 |
 +-- tests/                             # Test suite
@@ -272,7 +272,7 @@ tier5_deliverables/
 +-- review_packets/                 # Pre-submission review materials
 ```
 
-**Your action:** None — this tier is populated by Phase 8 (Drafting and Review). Phase 8 is blocked until the budget gate passes.
+**Your action:** None — this tier is populated by Phase 8 (Drafting and Review). Phase 8 is conditionally executable after Phase 7 (Budget Gate) passes.
 
 ### Integrations — Lump Sum Budget Planner
 
@@ -288,7 +288,7 @@ integrations/lump_sum_budget_planner/
 +-- validation/                     # Consistency validation artifacts
 ```
 
-**Your action:** Before Phase 7, place the validated budget response in `received/`. The budget gate will verify its structural consistency with the work package design and consortium. Phase 8 cannot proceed without a validated budget.
+**Your action:** Before Phase 7, place a budget response in `received/` that conforms to the schema defined in `interface_contract.json` (v1.0). Required top-level fields: `response_id`, `schema_version`, `work_packages` (each entry requires `wp_id` and `lump_sum`), and `partners` (each entry requires `partner_id` and `total_effort_pm`). A structural validation artifact must also be present in `validation/`. Placeholder responses are supported for demo/testing but must conform structurally to the interface contract. The budget gate verifies structural consistency with the work package design and consortium. Phase 8 cannot proceed without a validated budget.
 
 ---
 
@@ -355,7 +355,7 @@ The scheduler will execute phases in order, evaluating gates between each phase.
 
 ### Step 7 — Provide the budget (before Phase 8)
 
-When Phase 7 (Budget Gate) is reached, the scheduler will block until a validated budget response is present in `docs/integrations/lump_sum_budget_planner/received/`. Compute your lump-sum budget externally, place the response file, and re-run the scheduler.
+When Phase 7 (Budget Gate) is reached, the scheduler requires a budget response conforming to `interface_contract.json` (v1.0) in `docs/integrations/lump_sum_budget_planner/received/` and a corresponding validation artifact in `validation/`. Compute your lump-sum budget externally, place the conformant response file and validation artifact, and run the scheduler for Phase 7. Once `gate_09_budget_consistency` passes, Phase 8 nodes are unblocked.
 
 ---
 
@@ -603,11 +603,11 @@ Phase 6: Implementation Architecture
     - **Status:** COMPLETE — VALIDATED (production-ready)
   Exit: phase_06_gate
     |
-Phase 7: Budget Gate (NEXT ACTIVE PHASE)
+Phase 7: Budget Gate (VALIDATED)
   n07_budget_gate  (budget_gate_validator + budget_interface_coordinator)
   Exit: gate_09_budget_consistency  [MANDATORY — BYPASS PROHIBITED]
     |
-Phase 8: Drafting & Review (4 substeps)
+Phase 8: Drafting & Review (4 substeps, PARTIALLY OPERATIONAL)
   n08a_section_drafting  --> n08b_assembly  --> n08c_evaluator_review  --> n08d_revision
   Exit: gate_10            Exit: gate_10      Exit: gate_11              Exit: gate_12
 ```
@@ -636,9 +636,9 @@ The budget gate (`gate_09_budget_consistency`) has special constitutional status
 
 - It is **mandatory** and cannot be bypassed, deferred, or substituted with internal estimates
 - When it fails, all Phase 8 nodes (`n08a` through `n08d`) are immediately frozen with `hard_block_upstream` status
-- Phase 8 cannot begin — including preparatory drafting — until a validated budget response is present in `docs/integrations/lump_sum_budget_planner/received/`
+- Phase 8 cannot begin — including preparatory drafting — until a validated budget response conforming to `interface_contract.json` is present in `docs/integrations/lump_sum_budget_planner/received/`
 
-To unblock: place a valid budget response file in the `received/` directory and re-run the scheduler.
+The budget gate is operational and validated. When the budget response and validation artifacts are present and structurally conformant, `gate_09_budget_consistency` passes and Phase 8 nodes are unblocked. Placeholder budget responses are supported for demo/testing provided they conform to the interface contract schema.
 
 ### Phase Execution Characteristics
 
@@ -704,20 +704,43 @@ This separation is intentional and enforced by gates.
     - impact (Phase 5)
     - organisational (Tier 3 consortium)
   - It represents the transition from design validation to execution readiness.
-  - Phase 7 (Budget Gate) is the next active and blocking phase in the pipeline.
+  - Phase 7 (Budget Gate) validates budget integration before Phase 8.
 
-- **Phase 7: Budget gate** (NEXT ACTIVE PHASE — BLOCKING PHASE)
-  - Requires Phase 6 released (now satisfied)
-  - Blocked until validated budget response present in
-    `docs/integrations/lump_sum_budget_planner/received/`
-  - Budget planner integration becomes active here
-  - Requires:
-    * Phase 6 released (implementation architecture must be validated before budgeting)
-  
-- **System maturity status (as of current version):**
-- Phases 1–6: implemented and validated
-- Phase 7: pending external budget integration
-- Phase 8: blocked until budget gate passes
+- **Phase 7: Budget gate** (COMPLETE — VALIDATED, run `3c0b880c`)
+  - `gate_09_budget_consistency` passes when `interface_contract.json` v1.0
+    conformant budget response and validation artifacts are present
+  - External Lump Sum Budget Planner integration is structurally complete
+    via `docs/integrations/lump_sum_budget_planner/`
+  - Placeholder external responses are supported for demo/testing
+  - `budget_gate_assessment.json` is produced correctly by the agent body
+  - `gate_result.json` is produced by the runner's gate evaluator
+  - All 9 deterministic predicates (`g08_p01`–`g08_p09`) pass
+  - Phase 8 nodes are unblocked when this gate passes
+
+- **Phase 8: Drafting & Review** (PARTIALLY OPERATIONAL)
+  - Conditionally executable after Phase 7 passes
+  - `n08a_section_drafting` dispatches and invokes the `proposal-section-drafting`
+    skill (TAPM, multi-artifact) to produce per-section Tier 5 artifacts
+  - Current limitation: runtime artifact_path injection for
+    `constitutional-compliance-check` in Phase 8 context requires
+    the drafting skill to produce auditable Tier 5 output before
+    compliance checking can execute. The wiring is implemented but
+    not yet validated end-to-end.
+  - This is a runtime integration issue, not a data dependency or
+    conceptual design issue. Phases 1–7 are unaffected.
+
+- **System maturity status (as of 2026-04-25):**
+  - Phases 1–6: COMPLETE — implemented and validated
+  - Phase 7: COMPLETE — externally simulated, gate-validated
+  - Phase 8: PARTIALLY OPERATIONAL — runtime integration incomplete
+
+### Known Limitations
+
+- **Phase 8 compliance auditing:** `constitutional-compliance-check` in Phase 8 requires the upstream `proposal-section-drafting` skill to produce Tier 5 artifacts before it can execute. The artifact_path injection mechanism is implemented (`_resolve_auditable_artifact` in `agent_runtime.py`) but the end-to-end pipeline has not been validated in a live run. If no auditable artifact is produced, the agent fails with a structured `MISSING_INPUT` error (fail-closed).
+- **`evaluator-criteria-review` in n08a:** This skill reads from `assembled_drafts/` which does not exist during `n08a_section_drafting`. It is guarded by the Tier 5 applicability check and skipped as `not_applicable` until assembled drafts exist (n08c/n08d context).
+- **Placeholder budget response:** The current budget response in `received/` is a demo placeholder with illustrative values. All numeric figures are structurally valid but not expert-approved. This is sufficient for gate validation and Phase 8 unblocking but does not represent real budget data.
+- These limitations do not affect Phases 1–7 correctness. All Phase 1–7 gates pass with validated artifacts.
+
 ### Skill Execution Model
 
 Skills execute in one of two modes, selected per-skill via `skill_catalog.yaml`:

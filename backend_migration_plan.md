@@ -10,7 +10,7 @@
 
 ---
 
-## Current Migration Status (as of 2026-04-24, post Phase 6 validated pass)
+## Current Migration Status (as of 2026-04-25, post Phase 7 validated pass)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
@@ -20,8 +20,8 @@
 | Phase 4 | OPERATIONAL — VALIDATED | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. All deterministic predicates passing. |
 | Phase 5 | COMPLETE — VALIDATED | Gate passed (run `e3caae21`, 2026-04-22). All 9 deterministic predicates pass. DEC-check (47 findings, 0 flagged). See §22 for full remediation path. |
 | Phase 6 | COMPLETE — VALIDATED | Gate passed (run `b2d4f829`, 2026-04-24). All 10 deterministic predicates pass (`g07_p01`–`g07_p09` + `g07_p04b`). Governance model, risk register, ethics assessment, instrument sections all validated. See §24 for full implementation details. |
-| Phase 7 | NEXT PHASE | Budget Gate. Requires Phase 6 released (now satisfied). Blocked until validated budget response present in `docs/integrations/lump_sum_budget_planner/received/`. |
-| Phase 8 | PENDING | Drafting & Review. Blocked by mandatory budget gate (Phase 7). No Phase 8 substep may commence until `gate_09_budget_consistency` passes. |
+| Phase 7 | COMPLETE — VALIDATED | Gate passed (run `3c0b880c`, 2026-04-24). All 9 deterministic predicates pass (`g08_p01`–`g08_p09`). Budget response conforms to `interface_contract.json` v1.0. External integration structurally complete via placeholder response. Phase 8 unblocked. |
+| Phase 8 | PARTIALLY OPERATIONAL | Drafting & Review. Conditionally executable after Phase 7 passes. `proposal-section-drafting` skill added to n08a. Runtime artifact_path injection for `constitutional-compliance-check` implemented but not yet validated end-to-end. |
 
 ---
 
@@ -1487,8 +1487,8 @@ All 10 deterministic predicates passed:
 
 ### Phase dependencies now satisfied
 
-With Phase 6 released, the dependency chain for Phase 7 is complete:
+With Phase 7 released, the dependency chain for Phase 8 is complete:
 
-- Phase 7 (`n07_budget_gate`) requires: Phase 6 gate passed (`phase_06_gate`) → **satisfied**
-- Phase 7 is now the active phase, blocked only by the external budget planner response in `docs/integrations/lump_sum_budget_planner/received/`
-- Phase 8 remains blocked by the mandatory budget gate (`gate_09_budget_consistency`)
+- Phase 7 (`n07_budget_gate`): `gate_09_budget_consistency` passed (run `3c0b880c`, 2026-04-24). Budget response conforms to `interface_contract.json` v1.0. All 9 predicates pass.
+- Phase 8 (`n08a_section_drafting`): dependency satisfied. Node dispatches and invokes `proposal-section-drafting` (TAPM, multi-artifact). Runtime integration for downstream compliance checking is implemented but not yet validated end-to-end.
+- Phases 1–7 are fully validated. Phase 8 is the active development front.
