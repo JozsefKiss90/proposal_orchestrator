@@ -50,6 +50,20 @@ Do not include ANY text before or after the JSON object — no prose, no
 verification summaries, no markdown fencing. The response must begin with `{`
 and end with `}`. Any non-JSON output causes a pipeline failure.
 
+**Output size ceiling:** The total JSON response MUST be under 20,000 characters.
+Exceeding this limit causes transport truncation and a pipeline failure. To stay
+within budget:
+- B.3.1 work-plan content: write a concise narrative overview, NOT an expanded
+  application-form table dump. Summarize WPs in compact paragraphs (3-5 sentences
+  each). Do NOT reproduce full task lists or deliverable tables in prose.
+- B.3.2 consortium content: write a concise consortium-capacity narrative. One
+  paragraph per partner (2-3 sentences). Do NOT expand role matrices into prose.
+- Move long enumerations (dependency edges, deliverable lists, milestone lists)
+  into compact arrays or terse summary sentences, not verbose tables.
+- Keep each sub_sections[].content field under 2,000 characters.
+- Keep each claim_statuses[].source_ref under 120 characters (file path + ID only).
+- Limit claim_statuses to 15 entries maximum.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
@@ -113,7 +127,7 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
 
   - Step 2.3.2: **Deliverable table.** Build a structured deliverable table from `wp_structure.json` deliverable entries. Columns: deliverable number, deliverable name, WP, lead, type, dissemination level, due month.
 
-  - Step 2.3.3: **Gantt narrative.** From `gantt.json`, describe the project timeline, critical path, task sequencing, and dependencies. Reference specific task IDs and months.
+  - Step 2.3.3: **Gantt narrative.** From `gantt.json`, describe the project timeline, critical path, task sequencing, and dependencies. Reference specific task IDs and months. **Dependency edge count:** The `wp_structure.json` dependency map contains 16 confirmed inter-WP data-input edges forming an acyclic graph. When referring to the full dependency map, state "16 confirmed inter-WP dependency edges". If referring only to pillar-to-demonstrator edges (WP2/3/4 to WP5/6/7), explicitly say "9 pillar-to-demonstrator edges" and do not include WP8 or WP9 in that count. **FORBIDDEN wording:** Do NOT write "nine dependency edges" when describing the full dependency map. Preferred safe wording: "The dependency map contains 16 confirmed inter-WP data-input edges forming an acyclic graph; within this, the three research pillar WPs feed the three demonstrator WPs through 9 pillar-to-demonstrator edges."
 
   - Step 2.3.4: **Milestones table.** From `gantt.json` milestone entries, build a milestone table with: milestone number, milestone name, WP, due month, verification criterion, responsible partner.
 
@@ -129,11 +143,11 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
 
   - Step 2.5.1: **Partner WP lead and contributor roles.** Use `wp_structure.json` as the CANONICAL source for WP lead assignments and contributing partner lists. Tier 4 governs over Tier 3 when there is a conflict (CLAUDE.md Section 3, Priority 7 > Priority 6).
 
-  - Step 2.5.2: **FORBIDDEN: "each partner leads exactly one WP" claim.** Do NOT assert that "each of the N partners leads exactly one functional WP" or equivalent. ATU leads both WP1 and WP2 per wp_structure.json. Instead, state factually: "WP leadership is distributed across the consortium" and list the actual lead assignments from wp_structure.json.
+  - Step 2.5.2: **FORBIDDEN: "each partner leads exactly one WP" claim.** Do NOT assert that "each of the N partners leads exactly one functional WP" or equivalent. **FORBIDDEN phrases:** "each partner leads exactly one", "each of the 8 partners leads exactly one". ATU leads both WP1 and WP2 per wp_structure.json. Instead, use: "WP leadership is distributed across the consortium: ATU leads both WP1 and WP2, while BIIS, CERIA, NIHS, ISIA, ELI, FIIT, and BAL each lead one major functional WP."
 
   - Step 2.5.3: **Partner WP contributions must match Tier 4.** For each partner, state only WP participation roles that are confirmed in wp_structure.json `contributing_partners` arrays (or equivalent field). Do NOT claim a partner contributes to a WP unless wp_structure.json lists that partner for that WP. For example, if BAL is not listed as a contributing partner for WP4 in wp_structure.json, do NOT claim BAL contributes to WP4 regardless of what Tier 3 roles.json may suggest.
 
-  - Step 2.5.4: **No unsourced programme-rule assertions.** Do NOT assert Tier 1 programme-rule obligations (e.g. "required to hold Gender Equality Plans at grant signature per Tier 1 programme rules") unless the skill reads the specific Tier 1 normative source AND includes it in reads_from and traceability_footer.primary_sources[]. This skill does NOT read Tier 1 sources. Instead, for eligibility and administrative compliance topics, use a neutral source-bound formulation: "Administrative eligibility and participant declarations are handled in Part A and are not repeated in the B.3.2 narrative unless explicitly required by the section schema." Do NOT cite Tier 1 programme rules from agent knowledge.
+  - Step 2.5.4: **No unsourced programme-rule assertions.** Do NOT assert Tier 1 programme-rule obligations unless the skill reads the specific Tier 1 normative source AND includes it in reads_from and traceability_footer.primary_sources[]. This skill does NOT read Tier 1 sources. **FORBIDDEN phrases** (must not appear in any sub_sections[].content unless a Tier 1 source is explicitly read and cited): "GEP eligibility obligations", "required to hold Gender Equality Plans", "per Tier 1 programme rules", "at grant signature". Instead, for eligibility and administrative compliance topics, use: "Administrative eligibility declarations are handled outside this B.3.2 narrative and are not repeated here unless directly required by the section schema and traceable to a declared source." Do NOT cite Tier 1 programme rules from agent knowledge.
 
   - Step 2.5.5: Describe each partner's role, expertise, and contribution. Do not assign roles to partners not present in Tier 3 (Constraint 2, CLAUDE.md Section 13.3).
 
@@ -158,8 +172,10 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
   - All primary_sources[].tier values are numeric integers (not strings)
   - no_unsupported_claims_declaration is true
   - No "each partner leads exactly one WP" claim present in content
+  - No "nine dependency edges" when describing the full dependency map
   - No partner-WP-contributor claims contradicted by wp_structure.json
-  - No unsourced Tier 1 programme-rule assertions
+  - No unsourced Tier 1 programme-rule assertions or GEP forbidden phrases
+  - Total JSON response under 20,000 characters
   If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Implementation section has non-gate-ready content: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction

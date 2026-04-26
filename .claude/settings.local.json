@@ -101,7 +101,9 @@
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *phase*7* -o -name *budget*gate*)",
       "Bash(git stash:*)",
       "Bash(taskkill //F //FI \"WINDOWTITLE eq *runner*\")",
-      "Bash(pkill -f \"python -m runner\")"
+      "Bash(pkill -f \"python -m runner\")",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/tests -name *.py -type f)",
+      "Bash(find /c/Code/proposal_demo/proposal_orchestrator/tests/fixtures -type f -name *.json)"
     ]
   }
 }

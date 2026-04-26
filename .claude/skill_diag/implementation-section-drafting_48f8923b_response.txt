@@ -1,0 +1,93 @@
+=== skill_id: implementation-section-drafting ===
+=== mode: tapm ===
+=== response_text length: 4260 ===
+=== response_text (full) ===
+: implementation_architecture.json risk_register"
+      },
+      {
+        "claim_id": "CS-05",
+        "claim_summary": "ATU leads both WP1 and WP2; WP leadership distributed across consortium",
+        "status": "confirmed",
+        "source_ref": "Tier 4: wp_structure.json partner_role_matrix ATU wps_as_lead"
+      },
+      {
+        "claim_id": "CS-06",
+        "claim_summary": "Critical path T2-01 through T5-03 to T8-03 spanning 48 months",
+        "status": "confirmed",
+        "source_ref": "Tier 4: gantt.json critical_path"
+      },
+      {
+        "claim_id": "CS-07",
+        "claim_summary": "Eight partner identities, countries, organisation types, descriptions",
+        "status": "confirmed",
+        "source_ref": "Tier 3: consortium/partners.json partners[]"
+      },
+      {
+        "claim_id": "CS-08",
+        "claim_summary": "Partner scientific roles and WP lead assignments from roles.json",
+        "status": "confirmed",
+        "source_ref": "Tier 3: consortium/roles.json; Tier 4: wp_structure.json governs conflicts"
+      },
+      {
+        "claim_id": "CS-09",
+        "claim_summary": "Three governance bodies (General Assembly, PMC, EQOC) with composition and meeting frequency",
+        "status": "confirmed",
+        "source_ref": "Tier 4: implementation_architecture.json governance_matrix"
+      },
+      {
+        "claim_id": "CS-10",
+        "claim_summary": "Ethics issues triggered: Category 8 AI, Category 4 health data, Category 2 human participants",
+        "status": "confirmed",
+        "source_ref": "Tier 4: implementation_architecture.json ethics_assessment.issues"
+      },
+      {
+        "claim_id": "CS-11",
+        "claim_summary": "SR-09/CC-03/CC-04 cohesion activities with ADRA and GenAI4EU Hub mandatory",
+        "status": "confirmed",
+        "source_ref": "Tier 2: scope_requirements.json SR-09; call_constraints.json CC-03, CC-04"
+      },
+      {
+        "claim_id": "CS-12",
+        "claim_summary": "SR-10/CC-05 communicable results shared via AI-on-demand platform",
+        "status": "confirmed",
+        "source_ref": "Tier 2: scope_requirements.json SR-10; call_constraints.json CC-05"
+      },
+      {
+        "claim_id": "CS-13",
+        "claim_summary": "CC-01 TRL 2 at start to TRL 5 at end",
+        "status": "confirmed",
+        "source_ref": "Tier 2: call_constraints.json CC-01"
+      },
+      {
+        "claim_id": "CS-14",
+        "claim_summary": "D5-02 classified SEN; D7-02 classified SEN; all other deliverables PU",
+        "status": "inferred",
+        "source_ref": "Tier 4: implementation_architecture.json ETHICS-02, RISK-06; Tier 2: SR-10/CC-05"
+      },
+      {
+        "claim_id": "CS-15",
+        "claim_summary": "BAL contributing to WP1,WP2,WP3,WP5,WP6,WP7,WP8 but not WP4",
+        "status": "confirmed",
+        "source_ref": "Tier 4: wp_structure.json partner_role_matrix BAL wps_as_contributor"
+      }
+    ]
+  },
+  "traceability_footer": {
+    "primary_sources": [
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"},
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/partners.json"},
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/roles.json"},
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"},
+      {"tier": 2, "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"},
+      {"tier": 2, "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"}
+    ],
+    "no_unsupported_claims_declaration": true
+  }
+}
+
+=== END ===
