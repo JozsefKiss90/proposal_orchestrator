@@ -1,9 +1,0 @@
-=== skill_id: constitutional-compliance-check ===
-=== mode: tapm ===
-=== response_text length: 568 ===
-=== response_text (full) ===
-Applying Step 1.1 of the execution specification: the task prompt and declared inputs contain no `artifact_path` context parameter. CLAUDE.md is confirmed accessible (Step 1.3 satisfied), but Step 1.1 requires an immediate halt and MISSING_INPUT failure when `artifact_path` is absent. No artifact is written. Per the Failure Protocol universal rules, no canonical output is written on failure.
-
-{"status":"failure","failure_category":"MISSING_INPUT","failure_reason":"artifact_path required; invoking agent must specify which artifact to audit","outputs_written":[]}
-
-=== END ===

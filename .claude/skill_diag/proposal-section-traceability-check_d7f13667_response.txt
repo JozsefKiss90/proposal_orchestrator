@@ -1,0 +1,206 @@
+=== skill_id: proposal-section-traceability-check ===
+=== mode: tapm ===
+=== response_text length: 19092 ===
+=== response_text (full) ===
+{
+  "report_id": "traceability_implementation_section_implementation_writer_2026-04-26T103000Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "d7f13667-c901-4a97-8655-b03bbba8afb0",
+  "section_id_audited": "implementation_section",
+  "claim_audit_results": [
+    {
+      "claim_id": "CL-01",
+      "claim_summary": "Nine WP structure with titles, leads, tasks, deliverables, and contributing partners as presented in Tables 3.1a and 3.1b",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (schema_id: orch.phase3.wp_structure.v1): work_packages array contains all nine WPs with title, lead_partner, contributing_partners, tasks (task_id, title, responsible_partner), and deliverables (deliverable_id, title, type, due_month, responsible_partner) — all consistent with section content",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-02",
+      "claim_summary": "Task schedule (start and end months per task) across all 27 tasks",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (schema_id: orch.phase4.gantt.v1): tasks array contains all 27 tasks with task_id, wp_id, start_month, and end_month fields — all month values directly verified against section content",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-03",
+      "claim_summary": "WP start and end months (Table 3.1a) derived as min task start and max task end per WP",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json: task start_month and end_month values per wp_id; inference chain: WP start = min(task.start_month), WP end = max(task.end_month) for tasks in each WP. Verified: WP1(M1–M48), WP2(M1–M36), WP3(M1–M30), WP4(M3–M36), WP5(M12–M42), WP6(M12–M42), WP7(M12–M42), WP8(M6–M48), WP9(M1–M48). All nine WPs match section Table 3.1a.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-04",
+      "claim_summary": "Eleven milestone definitions with due months and verifiable criteria (MS1–MS11)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (milestones array: MS1 through MS11, 11 entries, each with milestone_id, title, due_month, verifiable_criterion, and responsible_wp — all consistent with Table 3.1d content)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-05",
+      "claim_summary": "Quantified milestone criteria: ≥40% plan success improvement (MS8), 500 clinical cases (MS9), ≥30 tools/APIs (MS9), ≥3 EDIH hubs (MS10)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (milestones[].verifiable_criterion: MS8='OBJ-1 target met (≥40% plan success improvement). OBJ-2 target met (≥30% coherence improvement). OBJ-3 target met (≥25% joint task completion improvement)'; MS9='Healthcare demonstrator validated on 500 clinical cases (OBJ-4)... logistics transfer demonstrator validated across 3 corridors... Tool orchestration layer validated across all demonstrators with ≥30 tools/APIs registered (OBJ-8)'; MS10='EDIH dissemination initiated in ≥3 hubs')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-06",
+      "claim_summary": "Critical path task chain T2-01→T2-02→T2-03→T5-01→T5-02→T5-03→T8-03 and WP-level path WP2→WP5→WP8→WP9",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (critical_path array: ['T2-01','T2-02','T2-03','T5-01','T5-02','T5-03','T8-03']); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (critical_path_nodes: ['WP2','WP5','WP8','WP9'] as the representative path selected from nine tied paths per critical_path_analysis.representative_path_selection_rationale)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-07",
+      "claim_summary": "Eleven risk register entries (RISK-01 through RISK-11) with likelihood, severity, and mitigation measures",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register array: RISK-01 through RISK-11, each with risk_id, description, category, likelihood, impact, mitigation, responsible_partner — all directly consistent with Table 3.1e content)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-08",
+      "claim_summary": "Governance structure: General Assembly (biannual), Project Management Committee (quarterly), Ethics and Quality Oversight Committee (ATU and NIHS)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (governance_matrix: General Assembly meeting_frequency 'Biannual (twice per year)'; Project Management Committee meeting_frequency 'Quarterly (every 3 months)'; Ethics and Quality Oversight Committee composition ['ATU','NIHS'])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-09",
+      "claim_summary": "Management role assignments: WP leads per partner and coordinator role assigned to ATU",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (management_roles array: MGR-001 Project Coordinator assigned_to 'ATU'; MGR-WPL-WP1 through MGR-WPL-WP9 with assigned_to matching wp_structure.json lead_partner per WP); docs/tier3_project_instantiation/consortium/roles.json (ATU consortium_role: 'Coordinator'; each partner wp_lead array)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-10",
+      "claim_summary": "Partner descriptions (legal names, countries, organisation types, scientific roles, expertise summaries) for all eight partners",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (partners array: 8 entries with legal_name, country, organisation_type, description per partner — all consistent with B.3.2 partner narratives); docs/tier3_project_instantiation/consortium/roles.json (roles array: scientific_role, wp_lead, wp_participant, key_responsibilities per partner). Note: the country count sub-claim ('seven European countries') is audited separately as C20.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-11",
+      "claim_summary": "SR-09, SR-10, CC-03, CC-04, CC-05, CC-06, CC-07 scope requirements and call constraints cited in WP descriptions",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-09: 'allocate tasks for cohesion activities with ADRA and GenAI4EU central Hub'; SR-10: 'Communicable results must be shared with the European R&D community through the AI-on-demand platform'); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-03: ADRA co-programmed partnership; CC-04: GenAI4EU central Hub; CC-05: AI-on-demand platform sharing; CC-06: KPIs and benchmarking mechanisms; CC-07: AI Factories and Testing and Experiment Facilities)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-12",
+      "claim_summary": "ELI (Switzerland) is eligible for participation as an associated country",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-08: 'Participation is limited to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom' — Switzerland explicitly listed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-13",
+      "claim_summary": "D1-02 (DMP) and D9-01 (dissemination and exploitation plan) are mandatory deliverables within first 6 months; D9-01 is an admissibility condition",
+      "status": "confirmed",
+      "source_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (section B.3.1 field_requirements: 'DMP and dissemination/exploitation plan required as distinct deliverables within first 6 months'; section B.2.2 field_requirements: 'Please remember that this plan is an admissibility condition, unless the work programme topic explicitly states otherwise')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-14",
+      "claim_summary": "Budget structural consistency: all nine WPs and all eight partners confirmed present in validated budget with zero blocking inconsistencies; Phase 7 budget gate passed",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json (schema_id: orch.phase7.budget_gate_assessment.v1; gate_pass_declaration: 'pass'; all 9 wp_coverage_results present_in_budget: true; all 8 partner_coverage_results present_in_budget: true; blocking_inconsistencies: [])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-15",
+      "claim_summary": "Ethics categories triggered: Category 8 AI, Category 4 personal/health data, Category 2 human participants (medical context)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (ethics_assessment.issues: ETHICS-01 category 'Category 8 — Artificial Intelligence'; ETHICS-02 category 'Category 4 — Personal Data (Special Category: Health Data)'; ETHICS-03 category 'Category 2 — Human Participants (Medical Study Context)')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-16",
+      "claim_summary": "GEP eligibility applies to ATU, CERIA, BIIS, ISIA, NIHS, FIIT as HES/REC entities in Member States or Associated Countries",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ATU: HES/DE; CERIA: REC/FR; BIIS: HES/NL; ISIA: HES/IT; NIHS: HES/SE; FIIT: REC/ES — all Member States); docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (section A.2 field_requirements: 'Gender equality plan (GEP) — Does the organisation have a GEP? (Yes/No) — eligibility criterion for public bodies, higher education establishments, and research organisations from Member States and Associated Countries')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "CL-17",
+      "claim_summary": "Dissemination levels: D5-02, D7-01, D7-02 set to SEN pending data access agreement finalisation; all other deliverables PU",
+      "status": "assumed",
+      "source_ref": "Not present in docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (deliverable entries contain no dissemination_level field) or docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json. Assumed SEN for operational-domain datasets based on data sensitivity considerations.",
+      "flag_reason": "Dissemination level classifications for D5-02, D7-01, D7-02 are not explicitly specified in any Tier 1–4 source document reviewed. The wp_structure.json deliverable objects do not include a dissemination_level field. Assignment to SEN is a project-operational assumption not directly traceable to a named source artifact; subject to revision upon review of the consortium agreement and data access agreements."
+    },
+    {
+      "claim_id": "CL-18",
+      "claim_summary": "No subcontracting arrangements or major equipment costs exceeding the 15% threshold are identified",
+      "status": "assumed",
+      "source_ref": "Not present in docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json, docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json, or docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json. Assumed absent from absence of any reference in source data.",
+      "flag_reason": "The absence of subcontracting arrangements or major equipment costs is an assumption derived from the absence of any reference in reviewed source documents, not from a positive confirmation. Subject to confirmation from the full validated budget response referenced in budget_gate_assessment.json (budget_response_placeholder.json)."
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "Project duration is 48 months",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json (max_project_duration_months: 48); docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (maximum task end_month: 48 across T1-01, T1-02, T1-03, T9-01, T9-03; MS11 due_month: 48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "The MAESTRO consortium comprises eight partners from seven European countries",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (partners array country field per partner: ATU-DE, CERIA-FR, BIIS-NL, ISIA-IT, NIHS-SE, ELI-CH, BAL-FI, FIIT-ES)",
+      "flag_reason": "The source document (partners.json) lists 8 distinct country codes (DE, FR, NL, IT, SE, CH, FI, ES) for the 8 partners. The section claims 'seven European countries' but the named source directly evidences 8 different countries. The numeric claim 'seven' is contradicted by the source; the correct count traceable to partners.json is 8 European countries."
+    },
+    {
+      "claim_id": "C21",
+      "claim_summary": "Dependency graph is a confirmed directed acyclic graph: cycle_detected false, verified by Kahn's algorithm over 36 nodes",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (cycle_detected: false; cycle_flags: []; critical_path_analysis.cycle_check_method: 'Kahn's topological sort — all 36 nodes processed to completion; zero nodes remained with in-degree > 0 after queue exhaustion, confirming DAG structure'; dependency_map.nodes array contains exactly 36 elements: WP1–WP9 [9] plus T1-01 through T9-03 [27])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C22",
+      "claim_summary": "WP2, WP3, and WP4 each provide direct data inputs to WP5, WP6, and WP7 (nine data-input edges)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges: WP2→WP5, WP3→WP5, WP4→WP5, WP2→WP6, WP3→WP6, WP4→WP6, WP2→WP7, WP3→WP7, WP4→WP7 — all edge_type: 'data_input'; exactly 9 edges from pillar WPs to demonstrator WPs)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C23",
+      "claim_summary": "Nine paths of equal length (3 edges) exist through all combinations of pillar and demonstrator WPs",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (critical_path_analysis.tied_paths: array of 9 paths each of 3-edge length [WP2/WP3/WP4]→[WP5/WP6/WP7]→WP8→WP9; critical_path_analysis.path_length_edges: 3)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C24",
+      "claim_summary": "BAL contributes as production-grade LLM engineering support across WP2, WP3, WP4, WP5, WP6, and WP7",
+      "status": "unresolved",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (partner_role_matrix BAL wps_as_contributor: ['WP1','WP2','WP3','WP5','WP6','WP7','WP8'] — WP4 absent; WP4 contributing_partners: ['ATU','BIIS'] — BAL absent)",
+      "flag_reason": "The section (B.3.2) claims BAL contributes across WP2, WP3, WP4, WP5, WP6, and WP7. However, wp_structure.json (authoritative Phase 3 output, schema_id: orch.phase3.wp_structure.v1) does not list BAL as a contributing partner for WP4: WP4.contributing_partners is ['ATU','BIIS'] and BAL's partner_role_matrix.wps_as_contributor excludes WP4. This is an internal inconsistency: B.3.1 correctly states WP4 contributing partners as ATU and BIIS (consistent with wp_structure.json), but B.3.2 adds BAL to WP4, which is contradicted by the named source. The claim of BAL contributing to WP4 is unresolved."
+    },
+    {
+      "claim_id": "C25",
+      "claim_summary": "NIHS leads the Ethics and Quality Oversight Committee",
+      "status": "unresolved",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (governance_matrix Ethics and Quality Oversight Committee: composition ['ATU','NIHS'], no single named lead; management_roles MGR-011 'Ethics Compliance Coordinator' assigned_to 'ATU'; MGR-012 'Healthcare Ethics Oversight Officer' assigned_to 'NIHS')",
+      "flag_reason": "The section (B.3.2) states 'NIHS leads WP5 (healthcare demonstrator) and the Ethics and Quality Oversight Committee'. WP5 leadership by NIHS is confirmed by wp_structure.json. However, the claim that NIHS 'leads' the Ethics and Quality Oversight Committee is not directly supported by the source: implementation_architecture.json shows the committee is co-composed of ATU and NIHS with no designated single lead, and ATU holds the Ethics Compliance Coordinator role (MGR-011) while NIHS holds only the Healthcare Ethics Oversight Officer role (MGR-012). The characterisation of NIHS as leading the committee overstates NIHS's role relative to ATU and is not confirmed by the named source artifact."
+    },
+    {
+      "claim_id": "C26",
+      "claim_summary": "Three-phase project structure: Foundation (M1–M12), Implementation (M13–M36), Validation and Dissemination (M37–M48)",
+      "status": "assumed",
+      "source_ref": "Phase structure naming and month boundaries not explicitly stated in any cited Tier 3 or Tier 4 source document (wp_structure.json, gantt.json, implementation_architecture.json, budget_gate_assessment.json, selected_call.json, partners.json, roles.json). Phase boundary timing is broadly consistent with gantt.json milestone structure (MS5 at M12, MS6 at M24, MS9 at M42) but the named three-phase framing is not documented.",
+      "flag_reason": "The named three-phase project structure (Foundation, Implementation, Validation and Dissemination) with specific month boundaries is a project-narrative characterisation not explicitly stated in any Tier 1–4 source artifact reviewed. While the inferred phase boundaries are broadly consistent with gantt.json milestone timing, the specific phase names and boundary months (M1–M12, M13–M36, M37–M48) are not attributable to a named source. This is a structural narrative assumption."
+    }
+  ],
+  "summary": {
+    "total_claims": 26,
+    "confirmed": 19,
+    "inferred": 1,
+    "assumed": 3,
+    "unresolved": 3
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-04-26T10:30:00Z"
+}
+
+=== END ===
