@@ -245,10 +245,9 @@ class TestPhase5OtherSkillsUnchanged:
         entry = _get_skill_entry("gate-enforcement", _REPO_ROOT)
         assert entry.get("execution_mode") == "tapm"
 
-    def test_proposal_section_traceability_check_unchanged(self) -> None:
+    def test_proposal_section_traceability_check_is_tapm(self) -> None:
         entry = _get_skill_entry("proposal-section-traceability-check", _REPO_ROOT)
-        mode = entry.get("execution_mode")
-        assert mode is None or mode == "cli-prompt"
+        assert entry.get("execution_mode") == "tapm"
 
 
 # ---------------------------------------------------------------------------

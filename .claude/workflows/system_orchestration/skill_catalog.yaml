@@ -452,6 +452,7 @@ skill_catalog:
       - implementation_writer
     reads_from:
       - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
       - docs/tier3_project_instantiation/
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
       - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
@@ -485,6 +486,7 @@ skill_catalog:
       - "Must flag all inconsistencies in the consistency_log"
 
   - id: proposal-section-traceability-check
+    execution_mode: "tapm"
     purpose: >
       Verify that every material claim in a proposal section is traceable to a
       named Tier 1-4 source. Flag unattributed assertions. Apply
@@ -499,13 +501,16 @@ skill_catalog:
       - traceability_auditor
     reads_from:
       - docs/tier5_deliverables/proposal_sections/
+    optional_reads_from:
       - docs/tier5_deliverables/assembled_drafts/
-      - docs/tier1_normative_framework/extracted/
-      - docs/tier2a_instrument_schemas/extracted/
-      - docs/tier2b_topic_and_call_sources/extracted/
-      - docs/tier3_project_instantiation/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
+    notes: >
+      TAPM mode: reads the specific artifact_path supplied by the invoking agent
+      via caller_context. In section mode (n08a/b/c), audits a single section file.
+      In assembled mode (n08d+), audits part_b_assembled_draft.json. The skill
+      uses Read/Glob tools to access Tier 1-4 reference artifacts on demand.
+      This bounds the prompt to ~20-30KB (vs ~380KB in cli-prompt mode).
     constitutional_constraints:
       - "Unattributed claims must be flagged, not silently accepted as Confirmed"
       - "Confirmed status requires naming the specific source artifact"

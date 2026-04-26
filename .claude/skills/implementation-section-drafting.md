@@ -9,6 +9,7 @@ used_by_agents:
   - implementation_writer
 reads_from:
   - docs/tier2a_instrument_schemas/extracted/
+  - docs/tier2b_topic_and_call_sources/extracted/
   - docs/tier3_project_instantiation/
   - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
   - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
@@ -31,10 +32,11 @@ in the Declared Inputs section from disk using the Read tool.
 1. `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` -- MUST be read first; verify `gate_pass_declaration` equals `"pass"` before any other action
 2. `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` -- section identifiers, page limits for Implementation section
 3. `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` -- Quality criterion scoring logic and sub-criteria
-4. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` -- WP definitions, tasks, deliverables, dependencies
-5. `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` -- task schedule, milestone dates, critical path
-6. `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` -- management structure, risk register, ethics, governance
-7. `docs/tier3_project_instantiation/` -- project data (use Glob to discover, then Read: consortium/partners.json, consortium/roles.json, architecture_inputs/risks.json, call_binding/selected_call.json)
+4. `docs/tier2b_topic_and_call_sources/extracted/` -- Tier 2B extracted files (use Glob to discover, then Read: scope_requirements.json, call_constraints.json). Required when asserting call constraints (CC-*) or scope requirements (SR-*) in drafted content.
+5. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` -- WP definitions, tasks, deliverables, dependencies
+6. `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` -- task schedule, milestone dates, critical path
+7. `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` -- management structure, risk register, ethics, governance
+8. `docs/tier3_project_instantiation/` -- project data (use Glob to discover, then Read: consortium/partners.json, consortium/roles.json, architecture_inputs/risks.json, call_binding/selected_call.json)
 
 **Boundary constraints:**
 - Do not read files outside the declared input set.
@@ -55,6 +57,7 @@ Do not include explanations outside the JSON.
 | `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` | Budget gate assessment | `gate_pass_declaration` | `orch.phase7.budget_gate_assessment.v1` | Verify budget gate passed; CLAUDE.md Section 8.4 absolute prerequisite |
 | `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` | Section schema registry | Implementation section entries (sub-sections, page limits, mandatory elements) | `orch.tier2a.section_schema_registry.v1` | Structural authority for Implementation section |
 | `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` | Evaluator expectations | Quality criterion entry (sub-criteria, scoring thresholds, grade descriptors) | `orch.tier2a.evaluator_expectation_registry.v1` | Evaluation framing for Quality and efficiency criterion |
+| `docs/tier2b_topic_and_call_sources/extracted/` | Tier 2B extracted files (scope_requirements.json, call_constraints.json) | Scope requirements (SR-*), call constraints (CC-*), expected outcomes, expected impacts | N/A -- Tier 2B extracted directory | Authoritative source for any call constraint (CC-*) or scope requirement (SR-*) claims in drafted content; must be cited in traceability_footer when asserting SR/CC identifiers |
 | `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` | WP structure | WP definitions, tasks, deliverables, responsible leads, dependencies | `orch.phase3.wp_structure.v1` | Primary source for work plan content, WP descriptions, deliverable tables |
 | `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` | Gantt chart | Task schedule, milestone entries, critical path | `orch.phase4.gantt.v1` | Timeline narrative, milestone table, Gantt chart description |
 | `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` | Implementation architecture | management_structure, decision_matrix, risk_register, ethics_assessment, instrument_sections | `orch.phase6.implementation_architecture.v1` | Management structure, risk register, governance, ethics content |
@@ -114,7 +117,7 @@ Do not include explanations outside the JSON.
 
 - Step 2.4: **Draft management and risk sub-sections.** From `implementation_architecture.json`:
 
-  - Step 2.4.1: **Management structure.** Describe management bodies, meeting frequency, decision-making scope, escalation paths. Draw from `management_structure` field. Roles must reference only Tier 3 consortium partners.
+  - Step 2.4.1: **Management structure.** Describe management bodies, meeting frequency, decision-making scope, escalation paths. Draw from `management_structure` field. Roles must reference only Tier 3 consortium partners. Do not assert programme-rule claims (e.g. "consortium agreement guidance") unless directly traceable to a Tier 1 normative source in reads_from. If governance structure references call constraints (CC-*) or scope requirements (SR-*), cite the specific Tier 2B extracted file in traceability_footer.primary_sources.
 
   - Step 2.4.2: **Risk register summary.** Present top risks with category, likelihood, impact, and mitigation measures from `risk_register` field.
 
@@ -176,7 +179,9 @@ Return a single JSON object conforming to `orch.tier5.implementation_section.v1`
       {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"},
       {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"},
       {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"},
-      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/partners.json"}
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/partners.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"}
     ],
     "no_unsupported_claims_declaration": true
   }
@@ -360,7 +365,7 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 | `traceability_footer` | Yes (Step 2.9) | primary_sources array | Yes |
 | `artifact_status` | ABSENT at write time (Step 4) | runner stamps post-gate | Yes |
 
-**reads_from compliance:** All declared. Compliant.
+**reads_from compliance:** All declared (including Tier 2B extracted for SR/CC traceability). Compliant.
 
 **writes_to compliance:** Single path declared. Compliant.
 

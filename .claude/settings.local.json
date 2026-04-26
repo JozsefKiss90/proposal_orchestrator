@@ -99,7 +99,9 @@
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f -path *phase6* -name *.json)",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -type f \\\\\\(-name run_summary.json -o -name run_manifest.json -o -name *gate_failure*phase*06* \\\\\\))",
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator -name *phase*7* -o -name *budget*gate*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(taskkill //F //FI \"WINDOWTITLE eq *runner*\")",
+      "Bash(pkill -f \"python -m runner\")"
     ]
   }
 }

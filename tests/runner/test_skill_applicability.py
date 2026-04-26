@@ -383,7 +383,10 @@ class TestApplicablePhaseFail:
     """When Tier 5 exists, the skill must run and fail normally on
     missing required inputs — fail-closed is preserved."""
 
-    def test_traceability_runs_when_tier5_exists(self, tmp_path: Path) -> None:
+    def test_traceability_skipped_when_no_auditable_artifact(self, tmp_path: Path) -> None:
+        """Even when Tier 5 exists, if no earlier skill in the agent body
+        produced an auditable artifact, the traceability check is skipped
+        (artifact_path injection finds nothing to audit)."""
         from unittest.mock import patch
 
         kwargs = _make_phase2_env(tmp_path, create_tier5=True)
@@ -406,25 +409,29 @@ class TestApplicablePhaseFail:
         with patch(_RUN_SKILL_TARGET, side_effect=_track):
             result = run_agent(**kwargs)
 
-        # When Tier 5 exists, the skill IS invoked (not skipped)
-        assert "proposal-section-traceability-check" in invoked_skills
+        # Traceability check is NOT invoked via run_skill — it is skipped
+        # because no auditable artifact was produced by earlier skills
+        assert "proposal-section-traceability-check" not in invoked_skills
+        # But it IS recorded in invoked_skills as a failure
+        traceability_records = [
+            r for r in result.invoked_skills
+            if r.skill_id == "proposal-section-traceability-check"
+        ]
+        assert len(traceability_records) == 1
+        assert traceability_records[0].status == "failure"
+        assert traceability_records[0].failure_category == "MISSING_INPUT"
 
-    def test_traceability_failure_propagates_when_tier5_exists(
+    def test_traceability_failure_propagates_when_no_artifact(
         self, tmp_path: Path
     ) -> None:
+        """When no auditable artifact was produced by earlier skills,
+        the traceability check is skipped with MISSING_INPUT and the
+        failure propagates to the agent result — fail-closed preserved."""
         from unittest.mock import patch
 
         kwargs = _make_phase2_env(tmp_path, create_tier5=True)
 
-        def _fail_traceability(skill_id, *args, **kw):
-            if skill_id == "proposal-section-traceability-check":
-                return _failure_skill(
-                    "MISSING_INPUT",
-                    "assembled_draft.json not found",
-                )
-            return _success_skill()
-
-        with patch(_RUN_SKILL_TARGET, side_effect=_fail_traceability):
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
             result = run_agent(**kwargs)
 
         # Failure is propagated — fail-closed preserved

@@ -1,0 +1,214 @@
+=== skill_id: impact-section-drafting ===
+=== mode: tapm ===
+=== response_text length: 33394 ===
+=== response_text (full) ===
+I now have all the required inputs. Let me perform the final processing steps and construct the output.
+
+**Input validation summary:**
+- Budget gate: `gate_pass_declaration = "pass"` ✓
+- Section schema: Impact section has B.2.1 (mandatory), B.2.2 (mandatory), B.2.3 (optional) ✓
+- Evaluator expectations: Impact criterion with two sub-criteria ✓
+- Impact architecture: schema_id `orch.phase5.impact_architecture.v1`, 5 pathways covering all 5 expected impacts ✓
+- WP structure: schema_id `orch.phase3.wp_structure.v1`, 9 WPs ✓
+- Tier 2B: 2 expected outcomes (EO-01, EO-02), 5 expected impacts (EI-01–EI-05) ✓
+- Tier 3: outcomes.json and impacts.json present ✓
+- Grant Agreement Annex guard: source_document is `af_he-ria-ia_en.pdf` (application form) — not a Grant Agreement Annex ✓
+
+**Coverage check:** All 5 expected impacts (EI-01 through EI-05) have at least one mapped pathway in impact_architecture.json. EI-04 is Inferred (from topic destination placement, explicitly documented in both expected_impacts.json and impact_architecture.json PATH-EI-04). No coverage gaps requiring fabrication.
+
+**Gate-readiness:** overall_status = "inferred" (not "unresolved") → gate check passes → output produced.
+
+{
+  "schema_id": "orch.tier5.impact_section.v1",
+  "run_id": "7d36dc9f-2608-4cb5-a10d-107c09717ec5",
+  "criterion": "Impact",
+  "sub_sections": [
+    {
+      "sub_section_id": "B.2.1",
+      "title": "Project's pathways towards impact",
+      "content": "MAESTRO makes a specific, traceable contribution to both the call expected outcomes and the wider expected impacts of the destination 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)'. Each pathway described below is grounded in concrete WP deliverables and consortium partner activities; quantified estimates are drawn from project impact KPIs defined in Phase 5.\n\n(a) Unique contribution towards call expected outcomes and wider impacts\n\nContribution to EO-01 — Significant improvements in AI agent autonomy, robustness and reliability: MAESTRO advances the three foundational architectural pillars constraining current AI agent autonomy at TRL 5 by M36. (i) The ATU-led neuro-symbolic planning engine (WP2; D2-01, D2-02) integrates MCTS and HTN symbolic planning with LLM heuristics and formal pre/post-condition verification, enabling verifiable sub-task graph decomposition and plan self-correction — directly eliminating the unverifiable single-step prompting that limits reliability in deployed systems. (ii) The BIIS-led adaptive tri-store memory architecture (WP3; D3-01, D3-02) unifies working, episodic and semantic memory with a learned controller, enabling long-horizon coherence across extended interactions without retraining. (iii) The CERIA-led external tool and API orchestration layer (WP2/WP8; D8-01) provides a typed tool registry, formal tool selection policies and post-invocation verification, removing brittleness from untyped tool calls. Together these outputs achieve statistically significant improvement over state-of-the-art baselines on ≥3 benchmark task dimensions (KPI-11, p<0.05, MAESTRO benchmark suite D8-02, WP8-FIIT).\n\nContribution to EO-02 — Innovative multi-agent frameworks for effective decentralised coordination: CERIA's formally verified multi-agent coordination protocol suite (WP4; D4-01, D4-02) provides task-delegation, negotiation and conflict-resolution protocols with mathematically proven convergence guarantees for heterogeneous agents under partial observability. The auditable multi-agent interaction trace module (T4-03) enables full auditability of inter-agent coordination. These protocols are operationally validated across three sector demonstrators (WP5, WP6, WP7), each requiring coordination of specialist sub-agents in live operational environments, providing multi-sector evidence of performance beyond the capabilities of individual agents.\n\nContribution to EI-01 — Implementation of the European Apply AI Strategy (healthcare, advanced manufacturing, in-vehicle autonomous driving): Three TRL-5 sector demonstrators constitute MAESTRO's direct implementation of the Apply AI Strategy's three prioritised sectors. NIHS deploys multi-specialist-agent clinical decision support on 500 de-identified clinical cases with HL7 FHIR integration (WP5; D5-01, D5-02), producing EU AI Act high-risk system compliance evidence and engaging ≥3 European hospital networks in formal post-project adoption planning by M48 (KPI-01). ISIA deploys manufacturing process optimisation agents with digital twin integration across production segments in an operational factory environment (WP6; D6-01, D6-02), targeting ≥15% defect reduction and ≥10% energy savings against defined KPIs (KPI-02). ELI validates MAESTRO generalisation across ≥3 international supply chain corridors (WP7; D7-01, D7-02), targeting ≥20% improvement in disruption recovery time (KPI-03), and produces a formal architectural transferability mapping to in-vehicle autonomous driving, confirming MAESTRO's reach across all three Apply AI Strategy sectors. The specific contribution of this project — not of AI R&I in general — is that the same validated MAESTRO planning, memory, coordination, and tool orchestration architecture underpins all three demonstrators, providing sector-specific evidence for a unified European AI agent framework.\n\nContribution to EI-02 — Wider industrial deployment and uptake via EDIHs: MAESTRO's EDIH-mediated deployment operates through three coordinated channels grounded in WP9. NIHS leads EDIH-facilitated engagement with European hospital network clinical informatics teams (M36–M48, ≥3 networks with formal adoption planning by M48). ISIA leads manufacturing demonstrator technology transfer to ≥5 European manufacturing SMEs via ≥2 EDIH partnerships and the EIT Manufacturing network (M36–M54). BAL releases the open-source MAESTRO framework (D9-02) on the AI-on-demand platform at M36, enabling ≥10 European SMEs and startups to build production AI agent applications by M48 (KPI-04), with ≥3 EDIHs actively disseminating MAESTRO technology (KPI-05). All three channels are coordinated through signed EDIH partnership agreements monitored under WP9.\n\nContribution to EI-03 — Open scientific advancement and sharing of AI agent R&D results via AI-on-demand: ATU, BIIS, CERIA and FIIT target ≥20 peer-reviewed publications in NeurIPS, ICML, ICLR, AAMAS and AAAI (KPI-06), with ≥3 invited keynotes, from M12 to M60. All publications are deposited in open-access repositories under Plan S-compliant CC-BY licence within six months of acceptance. FIIT releases the MAESTRO benchmark suite dataset (D8-02, M36) as community evaluation infrastructure on the AI-on-demand platform, targeting adoption by ≥5 external research groups by M48 (KPI-07) and ≥100 portfolio citations within three years (KPI-09). The open-source MAESTRO framework (D9-02, BAL, M36) provides shared European AI agent research infrastructure accessible to the European research community without proprietary access barriers.\n\nContribution to EI-04 — Open strategic autonomy in digital and emerging enabling technologies [Note: This impact is inferred from the topic's destination placement in the work programme; no explicit expected-impact statement for strategic autonomy was confirmed in the call scope or expected outcome sections — see PATH-EI-04 in impact_architecture.json]: MAESTRO's European-origin foundational capabilities — neuro-symbolic planning engine (D2-02, WP2-ATU), formally verified coordination protocols (D4-01, D4-02, WP4-CERIA), and open-source framework (D9-02, WP9-BAL) — provide sovereign AI agent infrastructure differentiated by auditability and formal verifiability rather than parameter scale alone. CERIA's D4-01 protocol specification forms the basis for ≥1 formal standardisation submission to ISO/IEC JTC 1/SC 42 or IEEE Standards Association by M48 (KPI-08), accompanied by an EU AI Act multi-agent transparency alignment report, directly extending EU strategic autonomy from research output into international AI governance norm-setting.\n\nContribution to EI-05 — Unlocking the economic potential of AI agents across diverse sectors including data analytics and coding: The neuro-symbolic planning engine (D2-02) enables verifiable multi-step goal decomposition for analytical, coding and financial workflows where execution failures are costly. The external tool and API orchestration layer (D8-01, OUT-9, WP2/WP8) provides typed API integration and post-invocation verification as a prerequisite for economically deployable agentic workflows in any sector. The adaptive memory system (D3-02) unlocks long-horizon agent applications in legal research, financial analysis and software development. The MAESTRO benchmark suite (D8-02, OUT-7) and open-source framework (D9-02, OUT-8) make these advances accessible to ≥10 European SMEs and startups by M48, targeting ≥500 GitHub stars within six months of the M36 open-source release (KPI-10).\n\nTarget groups: (i) European hospital networks and clinical informatics teams evaluating AI-assisted diagnostics in EU AI Act high-risk contexts (WP5, NIHS); (ii) European manufacturing SMEs and industrial operators evaluating AI-driven process optimisation (WP6, ISIA); (iii) Logistics and supply chain operators evaluating agent-based disruption resilience (WP7, ELI); (iv) AI researchers and academic groups requiring reproducible evaluation infrastructure for agent benchmarking (benchmark suite D8-02, WP8-FIIT); (v) European AI SMEs and startups building next-generation agent applications on open European-origin infrastructure (open-source framework D9-02, WP9-BAL); (vi) Standardisation bodies, national standardisation representatives and EU AI Act policy officials engaged in multi-agent AI coordination standards (WP4, CERIA).\n\n(b) Requirements, barriers and mitigating measures\n\nRegulatory environment (EU AI Act high-risk classification): Clinical AI deployment barriers arising from EU AI Act compliance requirements for high-risk systems. Mitigating measure: WP5 T5-03 (NIHS) produces auditable reasoning traces and EU AI Act high-risk system alignment documentation, providing a compliance evidence package for hospital network adoption planning. This factor may evolve as AI Act delegated acts and harmonised standards are developed post-2025; MAESTRO's compliance evidence package is structured to accommodate evolving guidance.\n\nMarket adoption timing for manufacturing and logistics SMEs: SME technology uptake timelines may extend beyond M48 project end. Mitigating measure: EDIH and EIT Manufacturing intermediary partnerships (BAL, WP9) provide structured adoption facilitation; the open-source community ecosystem creates adoption dynamics that persist post-project through operational dependency.\n\nIn-vehicle autonomous driving sector transfer: Full validation in the automotive domain is beyond the scope and duration of this project. WP7 (D7-02, ELI) produces formal architectural transferability mapping to in-vehicle autonomous driving as a foundation for post-project follow-on, rather than claiming full sector deployment within the project timeline.\n\nClinical data access: Ethics approval timelines and data governance requirements constrain clinical data availability for WP5 validation. Mitigating measure: NIHS has established clinical research infrastructure and existing data access agreements; the MAESTRO anonymisation protocol is documented in D1-02 (data management plan, ATU, M6) and ethics compliance is overseen through WP1 T1-03.",
+      "word_count": 1098
+    },
+    {
+      "sub_section_id": "B.2.2",
+      "title": "Measures to maximise impact - Dissemination, exploitation and communication",
+      "content": "The MAESTRO dissemination, exploitation and communication (DEC) plan satisfies the admissibility condition for Horizon Europe RIA proposals. A full DEC plan deliverable is produced at D9-01 (BAL, due M6) and updated periodically as required by the grant. WP9 (BAL-led, supported by ISIA, ELI, ATU and FIIT as contributing partners) coordinates all DEC activities, with sector-specific dissemination leads in WP5 (NIHS), WP6 (ISIA), WP7 (ELI) and WP8 (FIIT). All measures are proportionate to the scale and cross-sector ambition of the project and are selected to reach each target group through the most effective channel.\n\nDissemination\n\nScientific community (ATU, BIIS, CERIA, FIIT; M12–M60): ATU, BIIS, CERIA and FIIT execute a structured publication programme targeting ≥20 peer-reviewed publications in NeurIPS, ICML, ICLR, AAMAS and AAAI (KPI-06), with first publications from M12 covering WP2 and WP3 initial results and final portfolio contributions through M54. All publications are deposited in Zenodo and institutional repositories under Plan S-compliant CC-BY licence within six months of acceptance, in full compliance with Horizon Europe open science mandates. ≥3 invited keynotes at major AI conferences are targeted across the project lifetime, coordinated under WP9 T9-03. Top-tier AI venues are the best mechanism to reach research groups developing or evaluating agent planning, memory and coordination architectures, because publication at these venues is the primary propagation mechanism for architectural innovations in the AI research community.\n\nResearch infrastructure (FIIT; M36–M48): FIIT releases the MAESTRO benchmark suite dataset (D8-02, M36) on the AI-on-demand platform as community evaluation infrastructure, with active outreach to ≥5 external research groups for formal adoption by M48 (KPI-07). GitHub repository fork and adoption metrics, benchmark leaderboard registrations, and publication citation tracking in D8-01 provide verifiable adoption evidence.\n\nIndustrial stakeholders and EDIHs (NIHS, ISIA, BAL; M36–M54): NIHS leads EDIH-mediated dissemination of the healthcare demonstrator (D5-02) to European hospital network clinical informatics teams and national health technology assessment bodies evaluating AI agent deployment pathways (M36–M48, targeting ≥3 networks with formal adoption planning by M48, KPI-01). ISIA leads manufacturing demonstrator technology transfer to ≥5 European manufacturing SMEs via ≥2 EDIH partnerships and the EIT Manufacturing network (M36–M54), with engagement initiation at M36 and ≥5 SME engagements confirmed by M48. BAL releases the open-source MAESTRO framework (D9-02) on GitHub and the AI-on-demand platform at M36, targeting ≥500 GitHub stars within six months (KPI-10) and ≥10 European SMEs and startups with active MAESTRO-based development by M48 (KPI-04). EDIH intermediary channels are selected for industrial dissemination because they maintain validated relationships with SMEs across Europe and provide structured deployment facilitation rather than direct cold-contact outreach.\n\nStandardisation bodies and policy (CERIA; M42–M48): CERIA submits ≥1 formal proposal based on D4-01 to ISO/IEC JTC 1/SC 42 or IEEE Standards Association by M48 (KPI-08). An EU AI Act multi-agent transparency alignment report is published at M48, targeting ISO/IEC and IEEE standardisation members, national standardisation body representatives, and EU AI Act policy officials.\n\nExploitation\n\nClinical deployment pathway (NIHS; M36–M48): Formal post-project AI agent deployment adoption planning agreements with ≥3 European hospital networks, documenting a regulatory-compliant pathway for clinical decision support integration grounded in the D5-02 validated evaluation dataset and the EU AI Act high-risk system compliance evidence produced in WP5 T5-03. Post-project commercial pathway through licensing to health IT vendors and potential integration with national health IT procurement frameworks.\n\nManufacturing technology transfer (ISIA; M36–M54): Operational technology transfer of the manufacturing process optimisation demonstrator (D6-02, OUT-5) to ≥5 European manufacturing SMEs via ≥2 EDIH partnerships and the EIT Manufacturing network, establishing consulting and licensing revenue streams for ISIA in AI-driven factory optimisation. The ≥15% defect reduction and ≥10% energy savings demonstrated in the WP6 pilot factory (KPI-02) constitute the commercially transferable value proposition for SME adoption.\n\nLogistics operational integration (ELI; M42–M48): A confirmed integration roadmap for MAESTRO multi-agent coordination capabilities into ELI's operational supply chain management systems, targeting commercial deployment across ≥3 international logistics corridors and establishing ELI as an anchor European commercial operator for AI agent-driven supply chain resilience.\n\nOpen-source ecosystem (BAL; M36–M60): ≥10 European SMEs and startups actively building production AI agent applications on the MAESTRO open-source framework by M48 (D9-02, KPI-04), creating a self-sustaining European AI agent application ecosystem that reduces platform dependency on non-European proprietary solutions and generates downstream commercial AI agent products.\n\nStandardisation and protocol adoption (CERIA; M42–M54): MAESTRO formally verified coordination protocol specification (D4-01) submitted to ≥1 standardisation body (KPI-08) and adopted as reference architecture by ≥3 external multi-agent AI research projects, with normative embedding extending MAESTRO's commercial and regulatory reach through international standards.\n\nIntellectual property strategy: MAESTRO applies an open-core IPR approach calibrated to maximise European ecosystem adoption while preserving commercial exploitation pathways for sector-specific partners. The core framework, benchmark suite, evaluation infrastructure and coordination protocol specifications are released under Apache 2.0, jointly owned by the consortium, to lower barriers for European SMEs and startups and to support the AI-on-demand platform contribution mandate. Sector-specific demonstrator configurations, GDPR-anonymised clinical validation datasets, and industrial deployment parameters may be protected as trade secrets or licensed commercially by NIHS (clinical), ISIA (manufacturing) and ELI (logistics). CERIA retains attribution rights for standardisation submissions with consortium consent. BAL leads IPR management coordination under WP9 T9-02 and maintains the consortium IP register, ensuring that open-source release decisions do not unintentionally foreclose commercial licensing paths for any partner.\n\nCommunication\n\nBAL leads all public communication activities through WP9 T9-03: a project website live by M3; active social media channels targeting AI practitioners, industry decision-makers and policy audiences; and open public webinars on European AI agent development at M24 and M48. Main messages are calibrated to each target group: scientific novelty of the MAESTRO architecture for the research community; sector-specific performance gains and regulatory compliance pathways for industrial stakeholders; and European AI sovereignty and ecosystem contributions for policy audiences. The data management plan (D1-02, ATU, M6) governs FAIR (Findable, Accessible, Interoperable, Reusable) compliance and open access timelines for all project outputs. Sensitive clinical validation data from WP5 is anonymised per GDPR and EU AI Act requirements before any public release; the de-identified evaluation dataset (D5-02) is published as open data on the AI-on-demand platform.\n\nPolicy feedback: MAESTRO generates direct policy feedback for EU AI Act multi-agent system transparency requirements through CERIA's EU AI Act multi-agent transparency alignment report (M48). WP5 clinical demonstrator results (NIHS) inform the intersection of EU medical device regulation with EU AI Act high-risk AI diagnostic system requirements. These policy feedback contributions are documented in D9-03 (final dissemination and impact report, BAL, M48).\n\nSustainability: Post-project sustainability is grounded in three reinforcing mechanisms documented in the Phase 5 impact architecture. First, the open-source MAESTRO framework creates self-sustaining community maintenance dynamics once ≥10 European SMEs and startups build production applications on it by M48. Second, operational embedding at NIHS, ISIA and ELI generates post-project maintenance through live commercial operational requirements, ensuring technology is sustained through existing revenue streams rather than requiring grant continuation. Third, CERIA's standardisation submissions embed MAESTRO coordination protocols as normative international reference architecture, ensuring the coordination design persists in the standards landscape independently of any single organisation. BAL coordinates long-term exploitation strategy through WP9 and produces the final dissemination and impact report (D9-03, M48) documenting community governance handover.",
+      "word_count": 1051
+    }
+  ],
+  "impact_pathway_refs": [
+    "PATH-EI-01",
+    "PATH-EI-02",
+    "PATH-EI-03",
+    "PATH-EI-04",
+    "PATH-EI-05"
+  ],
+  "dec_coverage": {
+    "dissemination_addressed": true,
+    "exploitation_addressed": true,
+    "communication_addressed": true
+  },
+  "validation_status": {
+    "overall_status": "inferred",
+    "claim_statuses": [
+      {
+        "claim_id": "CLAIM-EO-01",
+        "claim_summary": "MAESTRO planning engine, adaptive memory, and tool orchestration layer advance AI agent autonomy, robustness and reliability (EO-01)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-03, PATH-EI-05]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/outcomes.json:OUT-1, OUT-2, OUT-9; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json:EO-01"
+      },
+      {
+        "claim_id": "CLAIM-EO-02",
+        "claim_summary": "Formally verified multi-agent coordination protocol suite demonstrates effective decentralised coordination beyond individual agent capabilities (EO-02)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-01, PATH-EI-04]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/outcomes.json:OUT-3; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json:EO-02"
+      },
+      {
+        "claim_id": "CLAIM-EI-01",
+        "claim_summary": "Three TRL-5 sector demonstrators implement the European Apply AI Strategy across healthcare, manufacturing, and with transferability mapping to in-vehicle autonomous driving (EI-01)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-01].coverage_status=Covered; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-2, IMP-3, IMP-4; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-01"
+      },
+      {
+        "claim_id": "CLAIM-EI-02",
+        "claim_summary": "EDIH-mediated industrial deployment through three coordinated channels (hospital networks, manufacturing SMEs, open-source framework) (EI-02)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-02].coverage_status=Covered; dissemination_plan.activities[edih_mediated_healthcare_technology_dissemination, eit_manufacturing_and_edih_industrial_dissemination, open_source_framework_release_and_ai_on_demand_contribution]; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-02"
+      },
+      {
+        "claim_id": "CLAIM-EI-03",
+        "claim_summary": "Open scientific advancement via ≥20 publications, benchmark suite, and open-source framework on AI-on-demand platform (EI-03)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-03].coverage_status=Covered; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1, IMP-5; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-03"
+      },
+      {
+        "claim_id": "CLAIM-EI-04",
+        "claim_summary": "European-origin foundational AI agent capabilities and standardisation submission contribute to open strategic autonomy (EI-04, inferred from topic destination placement)",
+        "status": "inferred",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-04].tier2b_source_ref.status=Inferred; inference_note: EI-04 derived from destination placement 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)'; no explicit expected-impact statement for strategic autonomy in call_entry.scope or call_entry.expected_outcome; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-04.inference_note"
+      },
+      {
+        "claim_id": "CLAIM-EI-05",
+        "claim_summary": "Planning engine, adaptive memory, and tool orchestration layer unlock economic potential of AI agents across data analytics, coding and diverse sectors (EI-05)",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:impact_pathways[PATH-EI-05].coverage_status=Covered; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1, IMP-5; Tier 2B: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-05"
+      },
+      {
+        "claim_id": "CLAIM-KPI-01",
+        "claim_summary": "≥3 European hospital networks engaged in formal post-project adoption planning by M48",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-01].tier3_source=impacts.json:IMP-2.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-2.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-02",
+        "claim_summary": "≥15% defect reduction and ≥10% energy savings in ISIA pilot factory manufacturing demonstrator",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-02].tier3_source=impacts.json:IMP-3.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-3.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-03",
+        "claim_summary": "≥20% improvement in disruption recovery time demonstrated across ≥3 international logistics corridors in ELI environment",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-03].tier3_source=impacts.json:IMP-4.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-4.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-04",
+        "claim_summary": "≥10 European SMEs and startups building on MAESTRO open-source framework by M48",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-04].tier3_source=impacts.json:IMP-5.indicators[1]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-5.indicators[1]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-06",
+        "claim_summary": "≥20 peer-reviewed publications in NeurIPS, ICML, ICLR, AAMAS, or AAAI by M60",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-06].tier3_source=impacts.json:IMP-1.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-07",
+        "claim_summary": "≥5 external research groups formally adopting MAESTRO benchmark suite by M48",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-07].tier3_source=impacts.json:IMP-5.indicators[3]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-5.indicators[3]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-08",
+        "claim_summary": "≥1 formal standardisation submission to ISO/IEC JTC 1/SC 42 or IEEE by M48",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-08].tier3_source=impacts.json:IMP-6.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-6.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-10",
+        "claim_summary": "≥500 GitHub stars on MAESTRO open-source framework within 6 months of M36 release",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-10].tier3_source=impacts.json:IMP-5.indicators[0]; Tier 3: docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-5.indicators[0]"
+      },
+      {
+        "claim_id": "CLAIM-KPI-11",
+        "claim_summary": "Statistically significant improvement (p<0.05) over SOTA baselines on ≥3 task dimensions in MAESTRO benchmark suite",
+        "status": "inferred",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:kpis[KPI-11].tier3_source=outcomes.json:OUT-7.description; inference: derived from benchmark suite design objective of standardised metrics and reproducible evaluation protocols; no explicit indicator in impacts.json confirms SOTA improvement margin prior to project execution"
+      },
+      {
+        "claim_id": "CLAIM-DEC-COMPLETENESS",
+        "claim_summary": "DEC plan is complete with substantive dissemination, exploitation and communication measures each addressing specific target groups, timelines and responsible partners",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:dissemination_plan.activities (7 entries), exploitation_plan.activities (5 entries), sustainability_mechanism; Tier 4: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:WP9 deliverables (D9-01, D9-02, D9-03)"
+      },
+      {
+        "claim_id": "CLAIM-IPR",
+        "claim_summary": "Open-core IPR strategy: Apache 2.0 for core framework; sector-specific commercial protections for NIHS, ISIA, ELI; BAL leads IP management",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:exploitation_plan.ipr_strategy"
+      },
+      {
+        "claim_id": "CLAIM-SUSTAINABILITY",
+        "claim_summary": "Post-project sustainability via three mechanisms: open-source community dynamics, operational embedding in commercial environments, normative standardisation embedding",
+        "status": "confirmed",
+        "source_ref": "Tier 4: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:sustainability_mechanism.description; responsible_partners: BAL, NIHS, ISIA, ELI, CERIA"
+      }
+    ]
+  },
+  "traceability_footer": {
+    "primary_sources": [
+      {
+        "tier": 7,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+        "note": "Budget gate verification — gate_pass_declaration=pass confirmed before any content generation"
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
+      }
+    ],
+    "no_unsupported_claims_declaration": true
+  }
+}
+
+=== END ===

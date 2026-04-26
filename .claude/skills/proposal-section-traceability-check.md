@@ -14,7 +14,6 @@ used_by_agents:
   - traceability_auditor
 reads_from:
   - docs/tier5_deliverables/proposal_sections/
-  - docs/tier5_deliverables/assembled_drafts/
   - docs/tier1_normative_framework/extracted/
   - docs/tier2a_instrument_schemas/extracted/
   - docs/tier2b_topic_and_call_sources/extracted/
@@ -26,14 +25,37 @@ constitutional_constraints:
   - "Confirmed status requires naming the specific source artifact"
 ---
 
+## Input Access (TAPM Mode)
+
+This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
+below from disk using the Read tool. The primary audit target is supplied via
+`caller_context["artifact_path"]` by the agent runtime.
+
+**Declared input files to read (in order):**
+1. The artifact at `artifact_path` (from caller_context) -- the section or assembled draft to audit
+2. Tier 1-4 reference files -- read on demand to verify traceability of material claims:
+   - `docs/tier1_normative_framework/extracted/` (use Glob to discover, then Read)
+   - `docs/tier2a_instrument_schemas/extracted/` (use Glob to discover, then Read)
+   - `docs/tier2b_topic_and_call_sources/extracted/` (use Glob to discover, then Read)
+   - `docs/tier3_project_instantiation/` (use Glob to discover, then Read relevant files)
+
+**Boundary constraints:**
+- Do not read files outside the declared input set.
+- Do not assume implicit context or reconstruct inputs from memory.
+- Read the artifact_path file first, then read reference files as needed to verify claims.
+- Base all traceability judgments ONLY on retrieved file content.
+
+Return a SINGLE valid JSON object matching the output schema below.
+Do not include explanations outside the JSON.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs
 
 | Path | Artifact / Content | Fields Extracted | Schema ID | Purpose |
 |------|--------------------|-----------------|-----------|---------|
-| `docs/tier5_deliverables/proposal_sections/` | Individual proposal section JSON files (excellence_section.json, impact_section.json, implementation_section.json, or legacy <section_id>.json) | content or sub_sections[].content (full section text); validation_status.claim_statuses[]; traceability_footer.primary_sources[] | `orch.tier5.excellence_section.v1`, `orch.tier5.impact_section.v1`, `orch.tier5.implementation_section.v1`, or `orch.tier5.proposal_section.v1` | The proposal sections under audit; material claims are extracted from content and their stated source references in traceability_footer are verified against Tier 1-4 artifacts |
-| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | part_b_assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.part_b_assembled_draft.v1` | Provides the assembly index and consistency log; used when performing cross-section traceability audit on the assembled draft |
+| `caller_context["artifact_path"]` (section mode) | Individual proposal section JSON file (excellence_section.json, impact_section.json, or implementation_section.json) resolved by agent_runtime from `_NODE_PRIMARY_AUDITABLE_ARTIFACT` | content or sub_sections[].content (full section text); validation_status.claim_statuses[]; traceability_footer.primary_sources[] | `orch.tier5.excellence_section.v1`, `orch.tier5.impact_section.v1`, `orch.tier5.implementation_section.v1`, or `orch.tier5.proposal_section.v1` | The single proposal section under audit; material claims are extracted from content and their stated source references in traceability_footer are verified against Tier 1-4 artifacts |
+| `caller_context["artifact_path"]` (assembled mode) | part_b_assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.part_b_assembled_draft.v1` | Provides the assembly index and consistency log; used when performing cross-section traceability audit on the assembled draft |
 | `docs/tier1_normative_framework/extracted/` | Tier 1 extracted rule and compliance files | Rule entries with source references; compliance requirements; legal constraints | N/A — Tier 1 extracted directory | Reference set for verifying claims attributed to Tier 1 (legislation, programme guidance, grant architecture); Confirmed status requires naming a specific file from this directory |
 | `docs/tier2a_instrument_schemas/extracted/` | Tier 2A extracted files (section_schema_registry.json, evaluator_expectation_registry.json) | Section schema entries; evaluation criteria entries | N/A — Tier 2A extracted directory | Reference set for claims attributed to instrument schema or evaluation criteria; Confirmed status requires naming a specific Tier 2A extracted file |
 | `docs/tier2b_topic_and_call_sources/extracted/` | Tier 2B extracted files (call_constraints, expected_outcomes, expected_impacts, scope_requirements, eligibility_conditions, evaluation_priority_weights) | All extracted call requirement entries | N/A — Tier 2B extracted directory | Reference set for claims attributed to call or topic requirements; Confirmed status requires naming a specific Tier 2B extracted file and entry |
@@ -55,9 +77,12 @@ constitutional_constraints:
 
 ### 1. Input Validation Sequence
 
-- Step 1.1: Confirm the invoking agent provides either: (a) a specific `section_id` as context (for per-section audit), or (b) an instruction to audit all sections from the assembled draft. If neither: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="section_id or assembled_draft audit mode required") and halt.
-- Step 1.2 (per-section mode): Confirm the section file exists at `docs/tier5_deliverables/proposal_sections/<section_id>.json`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Proposal section file <section_id>.json not found") and halt.
-- Step 1.3 (assembled draft mode): Confirm `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list; confirm each path exists.
+- Step 1.1: **Determine audit mode.** The invoking agent supplies `caller_context["artifact_path"]` — the repo-relative path to the primary artifact to audit. This is the authoritative audit target. Determine the mode from the path:
+  - If `artifact_path` ends with `excellence_section.json`, `impact_section.json`, or `implementation_section.json`: **section mode**. The skill audits only that single section file.
+  - If `artifact_path` ends with `part_b_assembled_draft.json`: **assembled mode**. The skill audits the assembled draft and all sections it references.
+  - If `artifact_path` is absent or empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="artifact_path required in caller_context — the agent runtime must inject it") and halt.
+- Step 1.2 (section mode): Confirm the section file exists at the `artifact_path`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Proposal section file <artifact_path> not found") and halt.
+- Step 1.3 (assembled mode): Confirm `artifact_path` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list; confirm each path exists.
 - Step 1.4: Schema conformance check for each section file to be audited — confirm `schema_id` is one of the accepted section schemas: "orch.tier5.proposal_section.v1", "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", or "orch.tier5.implementation_section.v1". If mismatch: record as a traceability failure for that section and continue.
 - Step 1.5: Confirm at least one Tier 1–4 reference directory is accessible: `docs/tier1_normative_framework/extracted/`, `docs/tier2a_instrument_schemas/extracted/`, `docs/tier2b_topic_and_call_sources/extracted/`, `docs/tier3_project_instantiation/`. If none are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification") and halt.
 
@@ -164,9 +189,9 @@ IF `status == "confirmed"` AND `source_ref` is null, empty, OR is only a directo
 ### MISSING_INPUT
 
 **Trigger conditions in this skill:**
-- Step 1.1: Invoking agent provides neither a `section_id` nor an assembled-draft audit mode instruction → `failure_reason="section_id or assembled_draft audit mode required"`
-- Step 1.2 (per-section mode): Section file `<section_id>.json` does not exist at `docs/tier5_deliverables/proposal_sections/` → `failure_reason="Proposal section file <section_id>.json not found"`
-- Step 1.3 (assembled draft mode): `part_b_assembled_draft.json` is absent or schema mismatch → `failure_reason="part_b_assembled_draft.json not found or schema mismatch"`
+- Step 1.1: `artifact_path` is absent or empty in `caller_context` → `failure_reason="artifact_path required in caller_context — the agent runtime must inject it"`
+- Step 1.2 (section mode): Section file at `artifact_path` does not exist → `failure_reason="Proposal section file <artifact_path> not found"`
+- Step 1.3 (assembled mode): `part_b_assembled_draft.json` is absent or schema mismatch → `failure_reason="part_b_assembled_draft.json not found or schema mismatch"`
 - Step 1.5: No Tier 1–4 reference directory is accessible → `failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification"`
 
 **Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`

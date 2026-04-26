@@ -1137,18 +1137,22 @@ def run_agent(
                 )
                 continue
 
-        # Inject artifact_path for constitutional-compliance-check.
-        # The skill audits a single targeted artifact, not the entire
-        # phase_outputs/ directory.  Resolve the primary auditable
-        # artifact from the outputs written by earlier skills in this
-        # agent body.  This bounds the TAPM prompt to ~20KB.
+        # Inject artifact_path for constitutional-compliance-check and
+        # proposal-section-traceability-check.
+        # Both skills audit a single targeted artifact, not entire
+        # directories.  Resolve the primary auditable artifact from
+        # the outputs written by earlier skills in this agent body.
+        # This bounds the TAPM prompt to ~20KB.
         #
         # For Phase 8 nodes, the primary outputs are Tier 5 deliverable
         # artifacts, not Tier 4 phase outputs.  The resolution searches
         # both Tier 4 phase outputs and Tier 5 deliverables.  If no
         # auditable artifact was produced, the agent returns a
         # structured MISSING_INPUT failure before invoking the skill.
-        if sid == "constitutional-compliance-check":
+        if sid in (
+            "constitutional-compliance-check",
+            "proposal-section-traceability-check",
+        ):
             artifact_path = _resolve_auditable_artifact(
                 node_id, all_outputs, repo_root
             )
@@ -1163,7 +1167,7 @@ def run_agent(
                 # with the generic "artifact_path required" error.
                 _fail_reason = (
                     f"No auditable artifact was produced before "
-                    f"constitutional-compliance-check for node "
+                    f"{sid!r} for node "
                     f"{node_id!r}; earlier skills did not write "
                     f"any Tier 4 phase output or Tier 5 deliverable "
                     f"artifact to audit"

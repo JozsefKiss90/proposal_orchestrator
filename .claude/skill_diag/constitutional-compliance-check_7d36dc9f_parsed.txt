@@ -1,0 +1,79 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-04-26T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "7d36dc9f-2608-4cb5-a10d-107c09717ec5",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs runtime agent behaviour (whether decisions are written to Tier 4 vs. held only in memory) and cannot be confirmed or refuted by reading a deliverable artifact. Structural compliance is enforced by the decision-log-update skill and the scheduler, not verifiable from this artifact's content.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs the scope and authority claims of workflow and skill definitions, not the content of a Tier 5 deliverable. It cannot be verified by reading a proposal section artifact.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "violation",
+      "violation_evidence": "CL-021 asserts a Horizon Europe participation condition: 'Partners ATU (DE, HES), CERIA (FR, REC), BIIS (NL, HES), ISIA (IT, HES), NIHS (SE, HES), and FIIT (ES, REC) are public bodies, higher education establishments, or research organisations from EU Member States and are required to hold Gender Equality Plans at the time of grant signature, in compliance with the eligibility criterion in application form Section A.2.' The claim's source_ref is 'docs/tier2a_instrument_schemas/extracted/section_schema_registry.json' (Tier 2A) and 'docs/tier3_project_instantiation/consortium/partners.json' (Tier 3). No path within docs/tier1_normative_framework/extracted/ appears in traceability_footer.primary_sources[] or in CL-021's source_ref. The GEP eligibility criterion is a Horizon Europe participation condition deriving from the General Annexes (Tier 1 normative framework). Its backing is operationalised through Tier 2A but no direct Tier 1 normative framework path is surfaced in this artifact's traceability footer, contrary to the requirement in CLAUDE.md \u00a713.9 that regulatory and participation condition claims carry a Tier 1 source reference.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1\u20134",
+      "check_status": "pass",
+   
+=== END ===

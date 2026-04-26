@@ -1,0 +1,44 @@
+{
+  "skill_id": "proposal-section-traceability-check",
+  "execution_mode": "cli-prompt",
+  "failure_class": "TIMEOUT",
+  "run_id": "7d36dc9f-2608-4cb5-a10d-107c09717ec5",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier5_deliverables/proposal_sections/",
+    "docs/tier1_normative_framework/extracted/",
+    "docs/tier2a_instrument_schemas/extracted/",
+    "docs/tier2b_topic_and_call_sources/extracted/",
+    "docs/tier3_project_instantiation/"
+  ],
+  "writes_to": [
+    "docs/tier4_orchestration_state/validation_reports/"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 16384,
+  "timeout_seconds": 300,
+  "elapsed_seconds": 300.06299999996554,
+  "system_prompt_chars": 626,
+  "user_prompt_chars": 441365,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 300s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\nConstitutional constraints (hard failures if violated):\n- Unattributed claims must be flagged, not silently accepted as Confirmed\n- Confirmed status requires naming the specific source artifact\n\nDo NOT include run_id, schema_id, or artifact_status fields in the output \u2014 this artifact type does not use them.\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": null,
+  "tapm_tools_enabled": false,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/proposal-section-traceability-check_7d36dc9f_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/proposal-section-traceability-check_7d36dc9f_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/proposal-section-traceability-check_7d36dc9f_user_prompt.txt",
+    "stdout": ".claude/skill_diag/proposal-section-traceability-check_7d36dc9f_stdout.txt",
+    "stderr": ".claude/skill_diag/proposal-section-traceability-check_7d36dc9f_stderr.txt"
+  }
+}

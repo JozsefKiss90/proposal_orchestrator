@@ -1,0 +1,41 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_implementation_writer_2026-04-25T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "95089f06-7db0-4b83-b24b-8f900664cb9b",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "non_applicability_note": "CLM-018 explicitly confirms the section schema source is the RIA application form (af_he-ria-ia_en.pdf) via Tier 2A section_schema_registry.json. No string matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' appears as a structural authority in the artifact content, traceability_footer, or claim source references."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "violation",
+      "violation_evidence": "The artifact content asserts multiple explicit call requirements without any corresponding Tier 2B source reference in traceability_footer.primary_sources[]: (1) sub_sections[B.3.1].content: 'coordination with ADRA and the GenAI4EU central Hub per scope requirement SR-09 and call constraints CC-03/CC-04'; (2) sub_sections[B.3.1].content: 'AI-on-demand platform per scope requirement SR-10 and call constraint CC-05'; (3) sub_sections[B.3.1].content: 'Testing and Experiment Facilities per call constraint CC-07'; (4) sub_sections[B.3.2].content: 'AI-on-demand platform contributions per scope requirement SR-10 and call constraint CC-05'; (5) sub_sections[B.3.2].content: 'coordination with Testing and Experiment Facilities per call constraint CC-07'; (6) sub_sections[B.3.1].content: 'two aligned with the primary call sectors'. The traceability_footer.primary_sources[] array contains eight entries spanning Tier 2A, Tier 3, and Tier 4 \u2014 none references any path within docs/tier2b_topic_and_call_sources/extracted/. CLM-020 traces call constraint SR-10/CC-05 only to Tier 4 (implementation_architecture.json management_roles), not to a Tier 2B extracted file. Transitive traceability via Tier 4 phase outputs does not satisfy the requirement for a direct Tier 2B source reference in the artifact's traceability footer.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "non_applicability_note": "CLM-014 confirms all eight partner names (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT), legal names, countries, and organisation types are traced to docs/tier3_project_instantiation/consortium/partners.json. CLM-015 confirms partner scientific roles, WP lead assignments, WP participation, and key responsibilities are traced to docs/tier3_project_instantiation/consortium/roles.json. Both Tier 3 paths appear in traceability_footer.primary_sources[]. The no_unsupported_claims_declaration is true. No partner capability, role, or project fact claim lacks a Tier 3 source reference."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "non_applicability_note": "The artifact has schema_id 'orch.tier5.implementation_section.v1' and is a Phase 8 Tier 5 artifact. Glob confirmed docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists on disk. The artifact explicitly asserts gate passage in multiple locations: sub_sections[B.3.1].content states 'confirmed as structurally consistent in the Phase 7 budget gate assessment (gate_pass_declaration: pass; all nine WPs present in validated budget with no blocking inconsistencies)'; CLM-017 source_ref states 'gate_pass_declaration: pass; blocking_inconsistencies: []'. No specific budget figures (\u20ac amounts, person-month counts, EUR values) are asserted as confirmed values \u2014 all specific figures are explicitly deferred to the validated Lump Sum Budget Planner response. Budget-dependent Table 3.1f content is correctly flagged as pending final assembly from the validated budget response. The TAPM input boundary prevents reading the budget_gate_assessment.json contents directly; the file's existence is confirmed via
+=== END ===

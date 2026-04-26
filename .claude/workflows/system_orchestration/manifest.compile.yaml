@@ -835,11 +835,25 @@ artifact_registry:
     consumed_by: [n07_budget_gate]
     required_for_gate: gate_09_budget_consistency
 
-  # Tier 5 deliverable artifacts
-  - artifact_id: a_t5_proposal_sections
-    path: docs/tier5_deliverables/proposal_sections/
+  # Tier 5 deliverable artifacts — one entry per section file so that
+  # _determine_can_evaluate_exit_gate checks the exact file each node
+  # must produce, not just "any .json in the directory".
+  - artifact_id: a_t5_excellence_section
+    path: docs/tier5_deliverables/proposal_sections/excellence_section.json
     tier: tier5_deliverable
-    produced_by: [n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting]
+    produced_by: n08a_excellence_drafting
+    consumed_by: [n08d_assembly]
+
+  - artifact_id: a_t5_impact_section
+    path: docs/tier5_deliverables/proposal_sections/impact_section.json
+    tier: tier5_deliverable
+    produced_by: n08b_impact_drafting
+    consumed_by: [n08d_assembly]
+
+  - artifact_id: a_t5_implementation_section
+    path: docs/tier5_deliverables/proposal_sections/implementation_section.json
+    tier: tier5_deliverable
+    produced_by: n08c_implementation_drafting
     consumed_by: [n08d_assembly]
 
   - artifact_id: a_t5_assembled_drafts
