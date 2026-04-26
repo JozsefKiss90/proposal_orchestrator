@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10c_implementation_completeness",
   "gate_kind": "exit",
-  "run_id": "aefe5901-df29-4027-891e-0d4d00695d73",
+  "run_id": "505b5bfa-66bd-42de-b31f-2e66683bf48e",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:fe0216f4f155796be9bf0ab6d38f3959bd15023930e5d6ac92fdcb28f3c9c57a",
+  "input_fingerprint": "sha256:1d5447a8b8320f3683c47fbf60e1a9cae5f6664af973e1f66b9b1647ee63f3f1",
   "input_artifact_fingerprints": {
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
-    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:b3efb6dfa80ef97d0d197a72c54ba5ddea6c364173c7f0e0816ca9ee110a7c39"
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:bbbdc5c9da5132bbb2c4acee97187e43a41653710454d33c9940d109a5c9d420"
   },
-  "evaluated_at": "2026-04-26T15:56:37.559978+00:00",
+  "evaluated_at": "2026-04-26T21:02:15.825834+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g09c_p02",
@@ -21,26 +21,14 @@
       "g09c_p04",
       "g09c_p05",
       "g09c_p05b",
-      "g09c_p06"
+      "g09c_p06",
+      "g09c_p07"
     ],
     "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [
-      {
-        "predicate_id": "g09c_p07",
-        "function": "no_unresolved_material_claims",
-        "failure_reason": "semantic_dispatch_error",
-        "constitutional_rule": "<unknown>",
-        "fail_message": "Dispatch error: Unknown semantic predicate function 'no_unresolved_material_claims'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
-        "artifacts_inspected": [],
-        "_dispatch_error": true,
-        "_dispatch_error_reason": "Unknown semantic predicate function 'no_unresolved_material_claims'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
-        "_dispatch_error_category": "UNKNOWN_FUNCTION",
-        "_diagnostic_bundle_path": null
-      }
-    ]
+    "failed": []
   },
   "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10c_result.json"
