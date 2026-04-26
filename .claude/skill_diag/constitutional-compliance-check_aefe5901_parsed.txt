@@ -1,0 +1,98 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_implementation_writer_2026-04-26T000000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "aefe5901-df29-4027-891e-0d4d00695d73",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing; annex templates govern post-award reporting, not proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment \u2014 not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by redefining phase meanings, tier meanings, or gate logic.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
+      "check_status": "violation",
+      "violation_evidence": "Sub-section B.3.2 content asserts: 'Partners with GEP eligibility obligations (ATU DE/HES, CERIA FR/REC, BIIS NL/HES, ISIA IT/HES, NIHS SE/HES, FIIT ES/REC) are required to hold Gender Equality Plans at grant signature per Tier 1 programme rules, as confirmed in the ethics self-assessment and compliance profile.' This is a direct assertion of a Horizon Europe participation-condition rule (the GEP requirement for HES/REC entities). The artifact's traceability_footer.primary_sources[] contains no path within docs/tier1_normative_framework/extracted/. All 11 primary_sources reference Tier 2A (section_schema_registry.json, evaluator_expectation_registry.json), Tier 2B (scope_requirements.json, call_constraints.json), Tier 3 (consortium/partners.json, consortium/roles.json, call_binding/selected_call.json), and Tier 4 phase output paths. No Tier 1 normative framework extracted path is present to underpin this regulatory claim. The claim explicitly invokes 'Tier 1 programme rules' as the governing authority but provides no traceability to docs/tier1_normative_framework/extracted/ as required by CLAUDE.md \u00a713.9.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1\u20134.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+
+=== END ===

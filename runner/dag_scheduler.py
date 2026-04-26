@@ -91,6 +91,14 @@ from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
+from runner.phase8_reuse import (
+    REUSE_ELIGIBLE_NODES,
+    ReuseDecision,
+    artifact_sha256,
+    compute_input_fingerprint,
+    validate_reuse_candidate,
+    write_reuse_metadata,
+)
 from runner.predicates.gate_pass_predicates import is_gate_fresh
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult, NodeExecutionResult
@@ -379,6 +387,7 @@ class RunSummary:
     dispatched_nodes: list[str]
     phase_scope: int | None = None
     phase_scope_nodes: list[str] = field(default_factory=list)
+    reuse_decisions: dict[str, dict] = field(default_factory=dict)
 
     # ------------------------------------------------------------------
     # Factory
@@ -397,6 +406,7 @@ class RunSummary:
         completed_at: str,
         phase_scope: int | None = None,
         phase_scope_nodes: list[str] | None = None,
+        reuse_decisions: dict[str, dict] | None = None,
     ) -> RunSummary:
         """
         Derive a ``RunSummary`` from scheduler state after ``run()`` exits.
@@ -553,6 +563,7 @@ class RunSummary:
             dispatched_nodes=list(dispatched_nodes),
             phase_scope=phase_scope,
             phase_scope_nodes=list(_phase_nodes),
+            reuse_decisions=reuse_decisions or {},
         )
 
     # ------------------------------------------------------------------
@@ -600,6 +611,7 @@ class RunSummary:
             "dispatched_nodes": list(self.dispatched_nodes),
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": list(self.phase_scope_nodes),
+            "reuse_decisions": dict(self.reuse_decisions),
             # --- Backward-compat derived fields ---
             "released_nodes": [
                 n for n, s in self.node_states.items() if s == "released"
@@ -644,6 +656,7 @@ class RunSummary:
             "dispatched_nodes": self.dispatched_nodes,
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": self.phase_scope_nodes,
+            "reuse_decisions": self.reuse_decisions,
         }
         path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
         return path
@@ -1145,6 +1158,8 @@ class DAGScheduler:
         #: Accumulates every gate ID passed to evaluate_gate() during run().
         #: Populated by _dispatch_node() and consumed by RunSummary.build().
         self._evaluated_gates: list[str] = []
+        #: Reuse decisions made during the run (auditable).
+        self._reuse_decisions: dict[str, dict] = {}
 
         #: Node resolver for agent_id / skill_ids / phase_id lookups.
         #: Constructed once on first access via :attr:`_node_resolver`
@@ -1302,6 +1317,7 @@ class DAGScheduler:
             completed_at=completed_at,
             phase_scope=self._phase_scope,
             phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
+            reuse_decisions=self._reuse_decisions,
         )
         summary.write(self.ctx.run_dir)
 
@@ -1472,67 +1488,119 @@ class DAGScheduler:
                 "All production nodes must have an exit gate."
             )
 
+        # ── Step 2.5: Phase 8 reuse check (n08a/n08b/n08c only) ──────
+        #
+        # If the node is a Phase 8 section drafting node and a valid
+        # reuse candidate exists, skip the agent body and proceed
+        # directly to exit gate re-evaluation.  The exit gate is
+        # always re-evaluated in the current run — reuse only skips
+        # the expensive Claude invocation, not the gate check.
+        if node_id in REUSE_ELIGIBLE_NODES:
+            fp = compute_input_fingerprint(node_id, self.repo_root)
+            decision = validate_reuse_candidate(
+                node_id, self.repo_root, current_fingerprint=fp,
+            )
+            if decision.reusable:
+                log.info(
+                    "  [%s] REUSE: artifact reusable (source_run=%s, "
+                    "fingerprint=%s..)",
+                    node_id,
+                    decision.source_run_id,
+                    (decision.input_fingerprint or "")[:12],
+                )
+                self._reuse_decisions[node_id] = {
+                    "status": "reused",
+                    "source_run_id": decision.source_run_id,
+                    "artifact_path": decision.artifact_path,
+                    "input_fingerprint": decision.input_fingerprint,
+                    "gate_id": decision.gate_id,
+                }
+                # Skip agent body — proceed to exit gate evaluation.
+                # The artifact already exists at the canonical path,
+                # so the gate evaluator will find it.
+                agent_result = None
+            else:
+                log.info(
+                    "  [%s] REUSE: not reusable (%s)",
+                    node_id, decision.reason,
+                )
+                self._reuse_decisions[node_id] = {
+                    "status": "not_reused",
+                    "reason": decision.reason,
+                }
+                agent_result = None  # will be set below in step 3
+        else:
+            agent_result = None  # will be set below in step 3
+
         # ── Step 3: Node body execution via agent runtime ─────────────
-        resolver = self._node_resolver
-        agent_id = resolver.resolve_agent_id(node_id)
-        sub_agent_id = resolver.resolve_sub_agent_id(node_id)
-        pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
-        skill_ids = resolver.resolve_skill_ids(node_id)
-        phase_id = resolver.resolve_phase_id(node_id)
-
-        log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
-        agent_result: AgentResult = run_agent(
-            agent_id,
-            node_id,
-            self.ctx.run_id,
-            self.repo_root,
-            manifest_path=self.manifest_path,
-            skill_ids=skill_ids,
-            phase_id=phase_id,
-            sub_agent_id=sub_agent_id,
-            pre_gate_agent_id=pre_gate_agent_id,
-        )
-        log.info(
-            "  [%s] agent result: status=%s  can_evaluate_exit=%s",
-            node_id,
-            agent_result.status,
-            agent_result.can_evaluate_exit_gate,
+        #   Skipped when reuse was accepted (agent_result stays None and
+        #   reuse_decisions[node_id]["status"] == "reused").
+        _reuse_accepted = (
+            self._reuse_decisions.get(node_id, {}).get("status") == "reused"
         )
 
-        # Agent-body failure OR can_evaluate_exit_gate == False:
-        # skip exit gate unconditionally (§9.2 step 3, §10.4).
-        if (
-            agent_result.status == "failure"
-            or not agent_result.can_evaluate_exit_gate
-        ):
-            self.ctx.set_node_state(
+        if not _reuse_accepted:
+            resolver = self._node_resolver
+            agent_id = resolver.resolve_agent_id(node_id)
+            sub_agent_id = resolver.resolve_sub_agent_id(node_id)
+            pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
+            skill_ids = resolver.resolve_skill_ids(node_id)
+            phase_id = resolver.resolve_phase_id(node_id)
+
+            log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
+            agent_result = run_agent(
+                agent_id,
                 node_id,
-                "blocked_at_exit",
-                failure_origin="agent_body",
-                exit_gate_evaluated=False,
-                failure_reason=agent_result.failure_reason,
-                failure_category=agent_result.failure_category,
+                self.ctx.run_id,
+                self.repo_root,
+                manifest_path=self.manifest_path,
+                skill_ids=skill_ids,
+                phase_id=phase_id,
+                sub_agent_id=sub_agent_id,
+                pre_gate_agent_id=pre_gate_agent_id,
             )
-
-            # HARD_BLOCK: if this is the budget gate node, freeze Phase 8.
-            if exit_gate_id == _HARD_BLOCK_GATE:
-                self.ctx.mark_hard_block_downstream()
-
-            self.ctx.save()
             log.info(
-                "  [%s] state -> blocked_at_exit (agent_body failure)", node_id
+                "  [%s] agent result: status=%s  can_evaluate_exit=%s",
+                node_id,
+                agent_result.status,
+                agent_result.can_evaluate_exit_gate,
             )
 
-            return NodeExecutionResult(
-                node_id=node_id,
-                final_state="blocked_at_exit",
-                exit_gate_evaluated=False,
-                failure_origin="agent_body",
-                gate_result=None,
-                agent_result=agent_result,
-                failure_reason=agent_result.failure_reason,
-                failure_category=agent_result.failure_category,
-            )
+            # Agent-body failure OR can_evaluate_exit_gate == False:
+            # skip exit gate unconditionally (§9.2 step 3, §10.4).
+            if (
+                agent_result.status == "failure"
+                or not agent_result.can_evaluate_exit_gate
+            ):
+                self.ctx.set_node_state(
+                    node_id,
+                    "blocked_at_exit",
+                    failure_origin="agent_body",
+                    exit_gate_evaluated=False,
+                    failure_reason=agent_result.failure_reason,
+                    failure_category=agent_result.failure_category,
+                )
+
+                # HARD_BLOCK: if this is the budget gate node, freeze Phase 8.
+                if exit_gate_id == _HARD_BLOCK_GATE:
+                    self.ctx.mark_hard_block_downstream()
+
+                self.ctx.save()
+                log.info(
+                    "  [%s] state -> blocked_at_exit (agent_body failure)",
+                    node_id,
+                )
+
+                return NodeExecutionResult(
+                    node_id=node_id,
+                    final_state="blocked_at_exit",
+                    exit_gate_evaluated=False,
+                    failure_origin="agent_body",
+                    gate_result=None,
+                    agent_result=agent_result,
+                    failure_reason=agent_result.failure_reason,
+                    failure_category=agent_result.failure_category,
+                )
 
         # ── Step 4: Exit gate evaluation ──────────────────────────────
         exit_result = evaluate_gate(
@@ -1561,6 +1629,38 @@ class DAGScheduler:
             )
             self.ctx.save()
             log.info("  [%s] state -> released", node_id)
+
+            # ── Write reuse metadata for Phase 8 section nodes ────
+            # Only after gate pass — never before, never on failure.
+            if node_id in REUSE_ELIGIBLE_NODES:
+                try:
+                    _cfg = REUSE_ELIGIBLE_NODES[node_id]
+                    _fp = compute_input_fingerprint(node_id, self.repo_root)
+                    _art_path = self.repo_root / _cfg["artifact_path"]
+                    _art_hash = artifact_sha256(_art_path)
+                    if _fp is not None and _art_hash is not None:
+                        write_reuse_metadata(
+                            node_id=node_id,
+                            repo_root=self.repo_root,
+                            source_run_id=self.ctx.run_id,
+                            artifact_path=_cfg["artifact_path"],
+                            schema_id=_cfg["schema_id"],
+                            gate_id=_cfg["gate_id"],
+                            input_fingerprint=_fp,
+                            artifact_hash=_art_hash,
+                        )
+                        log.info(
+                            "  [%s] reuse metadata written (fp=%s..)",
+                            node_id, _fp[:12],
+                        )
+                except Exception:
+                    # Best-effort: failure to write reuse metadata must
+                    # not block the run.  Next run will just re-execute.
+                    log.warning(
+                        "  [%s] reuse metadata write failed (non-blocking)",
+                        node_id,
+                        exc_info=True,
+                    )
 
             return NodeExecutionResult(
                 node_id=node_id,
