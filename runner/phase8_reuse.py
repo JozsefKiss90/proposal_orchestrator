@@ -40,6 +40,15 @@ REUSE_POLICY_VERSION: str = "phase8.section.v1"
 #: Repo-relative directory for reuse metadata.
 REUSE_METADATA_DIR: str = "docs/tier4_orchestration_state/reuse/phase8"
 
+#: Node-specific drafting skills to skip during reuse.
+#: Only the expensive drafting skill is skipped; audit skills
+#: (traceability-check, compliance-check) always execute.
+REUSE_SKIP_SKILLS: dict[str, str] = {
+    "n08a_excellence_drafting": "excellence-section-drafting",
+    "n08b_impact_drafting": "impact-section-drafting",
+    "n08c_implementation_drafting": "implementation-section-drafting",
+}
+
 #: Nodes eligible for reuse, mapped to their canonical artifact and gate.
 REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
     "n08a_excellence_drafting": {

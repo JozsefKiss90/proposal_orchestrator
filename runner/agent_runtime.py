@@ -826,6 +826,7 @@ def run_agent(
     phase_id: str,
     sub_agent_id: Optional[str] = None,
     pre_gate_agent_id: Optional[str] = None,
+    skip_skills: list[str] | None = None,
 ) -> AgentResult:
     """Execute an agent's body for a node and return an AgentResult.
 
@@ -858,6 +859,10 @@ def run_agent(
     pre_gate_agent_id:
         Pre-gate agent for this node (e.g.
         ``"budget_interface_coordinator"`` for n07), or ``None``.
+    skip_skills:
+        Skill IDs to skip during execution (recorded as
+        ``"reuse_skipped"``).  Used by Phase 8 reuse to skip
+        expensive drafting skills while still running audit skills.
 
     Returns
     -------
@@ -1066,7 +1071,24 @@ def run_agent(
     failure_reason_accumulator: str | None = None
     failure_category_accumulator: str | None = None
 
+    _skip_set = frozenset(skip_skills) if skip_skills else frozenset()
+
     for sid in ordered_skills:
+        # ── Reuse skip: skip drafting skills when artifact is reused ──
+        if sid in _skip_set:
+            record = SkillInvocationRecord(
+                skill_id=sid,
+                status="reuse_skipped",
+                failure_reason=(
+                    "Drafting skill skipped (artifact reused from prior run)"
+                ),
+            )
+            all_invocations.append(record)
+            logger.info(
+                "Skill %s skipped (reuse: drafting artifact reused)", sid
+            )
+            continue
+
         # ── Applicability guard: skip Tier-5 audit skills pre-Tier-5 ──
         applicable, skip_reason = _check_skill_applicability(sid, repo_root)
         if not applicable:

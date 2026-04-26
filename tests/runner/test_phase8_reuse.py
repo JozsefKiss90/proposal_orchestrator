@@ -21,6 +21,7 @@ from runner.phase8_reuse import (
     REUSE_ELIGIBLE_NODES,
     REUSE_METADATA_DIR,
     REUSE_POLICY_VERSION,
+    REUSE_SKIP_SKILLS,
     ReuseDecision,
     artifact_sha256,
     compute_input_fingerprint,
@@ -600,3 +601,441 @@ class TestRunSummaryReuse:
         data = json.loads(written_path.read_text())
         assert "reuse_decisions" in data
         assert data["reuse_decisions"]["n08a_excellence_drafting"]["status"] == "not_reused"
+
+
+# ===========================================================================
+# H. REUSE_SKIP_SKILLS mapping
+# ===========================================================================
+
+
+class TestReuseSkipSkills:
+    def test_skip_skills_covers_all_eligible_nodes(self) -> None:
+        """Every reuse-eligible node has a corresponding skip-skill."""
+        assert set(REUSE_SKIP_SKILLS.keys()) == set(REUSE_ELIGIBLE_NODES.keys())
+
+    @pytest.mark.parametrize(
+        "node_id,expected_skill",
+        [
+            ("n08a_excellence_drafting", "excellence-section-drafting"),
+            ("n08b_impact_drafting", "impact-section-drafting"),
+            ("n08c_implementation_drafting", "implementation-section-drafting"),
+        ],
+    )
+    def test_correct_skill_per_node(
+        self, node_id: str, expected_skill: str,
+    ) -> None:
+        """Each node maps to its correct drafting skill."""
+        assert REUSE_SKIP_SKILLS[node_id] == expected_skill
+
+    def test_non_reuse_nodes_not_in_skip_skills(self) -> None:
+        """n08d/e/f are NOT in REUSE_SKIP_SKILLS."""
+        for nid in ("n08d_assembly", "n08e_evaluator_review", "n08f_revision"):
+            assert nid not in REUSE_SKIP_SKILLS
+
+
+# ===========================================================================
+# I. Agent runtime skip_skills integration
+# ===========================================================================
+
+from unittest.mock import MagicMock, patch, call
+from runner.runtime_models import AgentResult, SkillResult, SkillInvocationRecord
+
+
+class TestAgentRuntimeSkipSkills:
+    """Test that run_agent(skip_skills=...) skips drafting but runs audit."""
+
+    _RUN_SKILL_TARGET = "runner.agent_runtime.run_skill"
+
+    def _make_agent_env(self, tmp_path: Path, node_id: str, skill_ids: list[str]) -> dict:
+        """Set up a minimal agent environment for run_agent() calls."""
+        import yaml as _yaml
+
+        repo = tmp_path
+        agent_id = REUSE_ELIGIBLE_NODES[node_id]["gate_id"].replace("gate_", "agent_")
+        reads_from = ["docs/tier3/input.json"]
+
+        # Agent catalog
+        catalog = {"agent_catalog": [
+            {"id": agent_id, "reads_from": reads_from, "writes_to": []},
+        ]}
+        catalog_path = repo / ".claude/workflows/system_orchestration/agent_catalog.yaml"
+        catalog_path.parent.mkdir(parents=True, exist_ok=True)
+        catalog_path.write_text(_yaml.dump(catalog), encoding="utf-8")
+
+        # Skill catalog
+        skill_catalog = [
+            {"id": sid, "reads_from": reads_from, "writes_to": [],
+             "constitutional_constraints": [], "used_by_agents": [agent_id]}
+            for sid in skill_ids
+        ]
+        skill_cat_path = repo / ".claude/workflows/system_orchestration/skill_catalog.yaml"
+        skill_cat_path.write_text(
+            _yaml.dump({"skill_catalog": skill_catalog}), encoding="utf-8"
+        )
+
+        # Manifest
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": node_id,
+                "agent": agent_id,
+                "skills": skill_ids,
+                "phase_id": "phase8",
+                "exit_gate": REUSE_ELIGIBLE_NODES[node_id]["gate_id"],
+            }],
+            "edge_registry": [],
+            "artifact_registry": [{
+                "path": REUSE_ELIGIBLE_NODES[node_id]["artifact_path"],
+                "produced_by": node_id,
+                "tier": "tier5_deliverable",
+            }],
+        }
+        manifest_path = repo / "manifest_test.yaml"
+        manifest_path.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        # Agent definition and prompt spec
+        agent_dir = repo / ".claude/agents"
+        agent_dir.mkdir(parents=True, exist_ok=True)
+        (agent_dir / f"{agent_id}.md").write_text(
+            f"# {agent_id}\nTest agent.", encoding="utf-8"
+        )
+        prompts_dir = agent_dir / "prompts"
+        prompts_dir.mkdir(parents=True, exist_ok=True)
+        prompt_content = "\n".join(f"Invoke {sid}." for sid in skill_ids)
+        (prompts_dir / f"{agent_id}_prompt_spec.md").write_text(
+            prompt_content, encoding="utf-8"
+        )
+
+        # Input artifact
+        _write_json(repo / "docs/tier3/input.json", {"data": "test"})
+
+        # Create section artifact on disk (simulates reused artifact)
+        _make_valid_artifact(repo, node_id)
+
+        return {
+            "agent_id": agent_id,
+            "node_id": node_id,
+            "run_id": "run-reuse-test",
+            "repo_root": repo,
+            "manifest_path": manifest_path,
+            "skill_ids": skill_ids,
+            "phase_id": "phase8",
+        }
+
+    @pytest.fixture(autouse=True)
+    def _clear_caches(self) -> None:
+        import runner.agent_runtime as _ar
+        import runner.skill_runtime as _sr
+        _ar._agent_catalog_cache.clear()
+        _ar._artifact_registry_cache.clear()
+        _ar._node_exit_gate_cache.clear()
+        if hasattr(_sr, "_catalog_cache"):
+            _sr._catalog_cache.clear()
+        if hasattr(_sr, "_schema_spec_cache"):
+            _sr._schema_spec_cache.clear()
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_drafting_skill_not_invoked_on_reuse(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """When skip_skills includes drafting skill, run_skill is NOT called for it."""
+        from runner.agent_runtime import run_agent
+
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+        skill_ids = [
+            drafting_skill,
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        kwargs = self._make_agent_env(tmp_path, node_id, skill_ids)
+
+        mock_skill_result = SkillResult(status="success", outputs_written=[])
+        with patch(self._RUN_SKILL_TARGET, return_value=mock_skill_result) as mock_run:
+            result = run_agent(**kwargs, skip_skills=[drafting_skill])
+
+        # Drafting skill must NOT appear in run_skill calls
+        called_skill_ids = [c.args[0] for c in mock_run.call_args_list]
+        assert drafting_skill not in called_skill_ids
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_audit_skills_invoked_on_reuse(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Traceability and compliance skills ARE invoked even when drafting is skipped."""
+        from runner.agent_runtime import run_agent
+
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+        skill_ids = [
+            drafting_skill,
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        kwargs = self._make_agent_env(tmp_path, node_id, skill_ids)
+
+        mock_skill_result = SkillResult(status="success", outputs_written=[])
+        with patch(self._RUN_SKILL_TARGET, return_value=mock_skill_result) as mock_run:
+            result = run_agent(**kwargs, skip_skills=[drafting_skill])
+
+        called_skill_ids = [c.args[0] for c in mock_run.call_args_list]
+        assert "proposal-section-traceability-check" in called_skill_ids
+        assert "constitutional-compliance-check" in called_skill_ids
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_skipped_recorded_in_invocations(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Skipped drafting skill recorded as reuse_skipped in invoked_skills."""
+        from runner.agent_runtime import run_agent
+
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+        skill_ids = [
+            drafting_skill,
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        kwargs = self._make_agent_env(tmp_path, node_id, skill_ids)
+
+        mock_skill_result = SkillResult(status="success", outputs_written=[])
+        with patch(self._RUN_SKILL_TARGET, return_value=mock_skill_result):
+            result = run_agent(**kwargs, skip_skills=[drafting_skill])
+
+        # Find the drafting skill in invoked_skills
+        drafting_records = [
+            r for r in result.invoked_skills if r.skill_id == drafting_skill
+        ]
+        assert len(drafting_records) == 1
+        assert drafting_records[0].status == "reuse_skipped"
+
+    def test_no_skip_skills_runs_all(self, tmp_path: Path) -> None:
+        """When skip_skills is None, all skills are invoked normally."""
+        from runner.agent_runtime import run_agent
+
+        node_id = "n08a_excellence_drafting"
+        skill_ids = [
+            "excellence-section-drafting",
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        kwargs = self._make_agent_env(tmp_path, node_id, skill_ids)
+
+        mock_skill_result = SkillResult(status="success", outputs_written=[])
+        with patch(self._RUN_SKILL_TARGET, return_value=mock_skill_result) as mock_run:
+            result = run_agent(**kwargs, skip_skills=None)
+
+        called_skill_ids = [c.args[0] for c in mock_run.call_args_list]
+        assert "excellence-section-drafting" in called_skill_ids
+        assert "proposal-section-traceability-check" in called_skill_ids
+        assert "constitutional-compliance-check" in called_skill_ids
+
+
+# ===========================================================================
+# J. Scheduler reuse audit integration (regression & correctness)
+# ===========================================================================
+
+
+class TestSchedulerReuseAuditIntegration:
+    """Test that scheduler passes skip_skills on reuse and gates use current-run evidence."""
+
+    _EG_TARGET = "runner.dag_scheduler.evaluate_gate"
+    _RA_TARGET = "runner.dag_scheduler.run_agent"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_passes_skip_skills_to_run_agent(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """When reuse is valid, run_agent is called with skip_skills=[drafting_skill]."""
+        import yaml as _yaml
+
+        _make_full_reuse_env(tmp_path, node_id)
+
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+        gate_id = cfg["gate_id"]
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+
+        # Minimal manifest with just the node
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": node_id,
+                "phase_number": 8,
+                "phase_id": "phase_08",
+                "agent": "test_agent",
+                "skills": [
+                    drafting_skill,
+                    "proposal-section-traceability-check",
+                    "constitutional-compliance-check",
+                ],
+                "exit_gate": gate_id,
+                "terminal": False,
+            }],
+            "edge_registry": [],
+        }
+        mp = tmp_path / "manifest.yaml"
+        mp.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        from runner.dag_scheduler import DAGScheduler, ManifestGraph
+        from runner.run_context import RunContext
+
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "run-reuse-audit")
+        ctx.save()
+        sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
+
+        # Mock node resolver
+        mock_resolver = MagicMock()
+        mock_resolver.resolve_agent_id.return_value = "test_agent"
+        mock_resolver.resolve_sub_agent_id.return_value = None
+        mock_resolver.resolve_pre_gate_agent_id.return_value = None
+        mock_resolver.resolve_skill_ids.return_value = [
+            drafting_skill,
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        mock_resolver.resolve_phase_id.return_value = "phase8"
+        sched._DAGScheduler__node_resolver = mock_resolver
+
+        success_agent = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+        with (
+            patch(self._EG_TARGET, return_value={"status": "pass"}),
+            patch(self._RA_TARGET, return_value=success_agent) as mock_run_agent,
+        ):
+            summary = sched.run()
+
+        # Verify run_agent was called with skip_skills
+        assert mock_run_agent.called
+        call_kwargs = mock_run_agent.call_args.kwargs
+        assert "skip_skills" in call_kwargs
+        assert call_kwargs["skip_skills"] == [drafting_skill]
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_decision_includes_audit_mode(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Reuse decision records mode='drafting_skipped_audit_executed'."""
+        import yaml as _yaml
+
+        _make_full_reuse_env(tmp_path, node_id)
+
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+        gate_id = cfg["gate_id"]
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": node_id,
+                "phase_number": 8,
+                "phase_id": "phase_08",
+                "agent": "test_agent",
+                "skills": [drafting_skill],
+                "exit_gate": gate_id,
+                "terminal": False,
+            }],
+            "edge_registry": [],
+        }
+        mp = tmp_path / "manifest.yaml"
+        mp.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        from runner.dag_scheduler import DAGScheduler, ManifestGraph
+        from runner.run_context import RunContext
+
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "run-mode-test")
+        ctx.save()
+        sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
+
+        mock_resolver = MagicMock()
+        mock_resolver.resolve_agent_id.return_value = "test_agent"
+        mock_resolver.resolve_sub_agent_id.return_value = None
+        mock_resolver.resolve_pre_gate_agent_id.return_value = None
+        mock_resolver.resolve_skill_ids.return_value = [drafting_skill]
+        mock_resolver.resolve_phase_id.return_value = "phase8"
+        sched._DAGScheduler__node_resolver = mock_resolver
+
+        success_agent = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+        with (
+            patch(self._EG_TARGET, return_value={"status": "pass"}),
+            patch(self._RA_TARGET, return_value=success_agent),
+        ):
+            summary = sched.run()
+
+        assert node_id in summary.reuse_decisions
+        decision = summary.reuse_decisions[node_id]
+        assert decision["status"] == "reused"
+        assert decision["mode"] == "drafting_skipped_audit_executed"
+
+    def test_non_reuse_node_gets_no_skip_skills(
+        self, tmp_path: Path,
+    ) -> None:
+        """n08d_assembly (non-reuse) does NOT get skip_skills passed."""
+        import yaml as _yaml
+
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": "n08d_assembly",
+                "phase_number": 8,
+                "phase_id": "phase_08d",
+                "agent": "proposal_integrator",
+                "skills": ["assembly-skill"],
+                "exit_gate": "gate_10d_cross_section_consistency",
+                "terminal": False,
+            }],
+            "edge_registry": [],
+        }
+        mp = tmp_path / "manifest.yaml"
+        mp.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        from runner.dag_scheduler import DAGScheduler, ManifestGraph
+        from runner.run_context import RunContext
+
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, "run-nonreuse")
+        ctx.save()
+        sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
+
+        mock_resolver = MagicMock()
+        mock_resolver.resolve_agent_id.return_value = "proposal_integrator"
+        mock_resolver.resolve_sub_agent_id.return_value = None
+        mock_resolver.resolve_pre_gate_agent_id.return_value = None
+        mock_resolver.resolve_skill_ids.return_value = ["assembly-skill"]
+        mock_resolver.resolve_phase_id.return_value = "phase_08d"
+        sched._DAGScheduler__node_resolver = mock_resolver
+
+        success_agent = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+        with (
+            patch(self._EG_TARGET, return_value={"status": "pass"}),
+            patch(self._RA_TARGET, return_value=success_agent) as mock_run_agent,
+        ):
+            summary = sched.run()
+
+        # Verify skip_skills is None for non-reuse nodes
+        call_kwargs = mock_run_agent.call_args.kwargs
+        assert call_kwargs.get("skip_skills") is None

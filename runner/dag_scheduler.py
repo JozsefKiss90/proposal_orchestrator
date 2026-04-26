@@ -93,6 +93,7 @@ from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
 from runner.phase8_reuse import (
     REUSE_ELIGIBLE_NODES,
+    REUSE_SKIP_SKILLS,
     ReuseDecision,
     artifact_sha256,
     compute_input_fingerprint,
@@ -1491,10 +1492,11 @@ class DAGScheduler:
         # ── Step 2.5: Phase 8 reuse check (n08a/n08b/n08c only) ──────
         #
         # If the node is a Phase 8 section drafting node and a valid
-        # reuse candidate exists, skip the agent body and proceed
-        # directly to exit gate re-evaluation.  The exit gate is
-        # always re-evaluated in the current run — reuse only skips
-        # the expensive Claude invocation, not the gate check.
+        # reuse candidate exists, skip the expensive drafting skill
+        # but still run audit skills (traceability-check, compliance-
+        # check) so that gate predicates have current-run evidence.
+        # The exit gate is always re-evaluated in the current run.
+        _reuse_skip_skills: list[str] | None = None
         if node_id in REUSE_ELIGIBLE_NODES:
             fp = compute_input_fingerprint(node_id, self.repo_root)
             decision = validate_reuse_candidate(
@@ -1502,23 +1504,24 @@ class DAGScheduler:
             )
             if decision.reusable:
                 log.info(
-                    "  [%s] REUSE: artifact reusable (source_run=%s, "
-                    "fingerprint=%s..)",
+                    "  [%s] REUSE: drafting skipped, audit skills executing "
+                    "(source_run=%s, fingerprint=%s..)",
                     node_id,
                     decision.source_run_id,
                     (decision.input_fingerprint or "")[:12],
                 )
                 self._reuse_decisions[node_id] = {
                     "status": "reused",
+                    "mode": "drafting_skipped_audit_executed",
                     "source_run_id": decision.source_run_id,
                     "artifact_path": decision.artifact_path,
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,
                 }
-                # Skip agent body — proceed to exit gate evaluation.
-                # The artifact already exists at the canonical path,
-                # so the gate evaluator will find it.
-                agent_result = None
+                # Skip only the drafting skill; audit skills still run.
+                drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
+                if drafting_skill:
+                    _reuse_skip_skills = [drafting_skill]
             else:
                 log.info(
                     "  [%s] REUSE: not reusable (%s)",
@@ -1528,79 +1531,70 @@ class DAGScheduler:
                     "status": "not_reused",
                     "reason": decision.reason,
                 }
-                agent_result = None  # will be set below in step 3
-        else:
-            agent_result = None  # will be set below in step 3
 
         # ── Step 3: Node body execution via agent runtime ─────────────
-        #   Skipped when reuse was accepted (agent_result stays None and
-        #   reuse_decisions[node_id]["status"] == "reused").
-        _reuse_accepted = (
-            self._reuse_decisions.get(node_id, {}).get("status") == "reused"
+        resolver = self._node_resolver
+        agent_id = resolver.resolve_agent_id(node_id)
+        sub_agent_id = resolver.resolve_sub_agent_id(node_id)
+        pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
+        skill_ids = resolver.resolve_skill_ids(node_id)
+        phase_id = resolver.resolve_phase_id(node_id)
+
+        log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
+        agent_result = run_agent(
+            agent_id,
+            node_id,
+            self.ctx.run_id,
+            self.repo_root,
+            manifest_path=self.manifest_path,
+            skill_ids=skill_ids,
+            phase_id=phase_id,
+            sub_agent_id=sub_agent_id,
+            pre_gate_agent_id=pre_gate_agent_id,
+            skip_skills=_reuse_skip_skills,
+        )
+        log.info(
+            "  [%s] agent result: status=%s  can_evaluate_exit=%s",
+            node_id,
+            agent_result.status,
+            agent_result.can_evaluate_exit_gate,
         )
 
-        if not _reuse_accepted:
-            resolver = self._node_resolver
-            agent_id = resolver.resolve_agent_id(node_id)
-            sub_agent_id = resolver.resolve_sub_agent_id(node_id)
-            pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
-            skill_ids = resolver.resolve_skill_ids(node_id)
-            phase_id = resolver.resolve_phase_id(node_id)
-
-            log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
-            agent_result = run_agent(
-                agent_id,
+        # Agent-body failure OR can_evaluate_exit_gate == False:
+        # skip exit gate unconditionally (§9.2 step 3, §10.4).
+        if (
+            agent_result.status == "failure"
+            or not agent_result.can_evaluate_exit_gate
+        ):
+            self.ctx.set_node_state(
                 node_id,
-                self.ctx.run_id,
-                self.repo_root,
-                manifest_path=self.manifest_path,
-                skill_ids=skill_ids,
-                phase_id=phase_id,
-                sub_agent_id=sub_agent_id,
-                pre_gate_agent_id=pre_gate_agent_id,
+                "blocked_at_exit",
+                failure_origin="agent_body",
+                exit_gate_evaluated=False,
+                failure_reason=agent_result.failure_reason,
+                failure_category=agent_result.failure_category,
             )
+
+            # HARD_BLOCK: if this is the budget gate node, freeze Phase 8.
+            if exit_gate_id == _HARD_BLOCK_GATE:
+                self.ctx.mark_hard_block_downstream()
+
+            self.ctx.save()
             log.info(
-                "  [%s] agent result: status=%s  can_evaluate_exit=%s",
+                "  [%s] state -> blocked_at_exit (agent_body failure)",
                 node_id,
-                agent_result.status,
-                agent_result.can_evaluate_exit_gate,
             )
 
-            # Agent-body failure OR can_evaluate_exit_gate == False:
-            # skip exit gate unconditionally (§9.2 step 3, §10.4).
-            if (
-                agent_result.status == "failure"
-                or not agent_result.can_evaluate_exit_gate
-            ):
-                self.ctx.set_node_state(
-                    node_id,
-                    "blocked_at_exit",
-                    failure_origin="agent_body",
-                    exit_gate_evaluated=False,
-                    failure_reason=agent_result.failure_reason,
-                    failure_category=agent_result.failure_category,
-                )
-
-                # HARD_BLOCK: if this is the budget gate node, freeze Phase 8.
-                if exit_gate_id == _HARD_BLOCK_GATE:
-                    self.ctx.mark_hard_block_downstream()
-
-                self.ctx.save()
-                log.info(
-                    "  [%s] state -> blocked_at_exit (agent_body failure)",
-                    node_id,
-                )
-
-                return NodeExecutionResult(
-                    node_id=node_id,
-                    final_state="blocked_at_exit",
-                    exit_gate_evaluated=False,
-                    failure_origin="agent_body",
-                    gate_result=None,
-                    agent_result=agent_result,
-                    failure_reason=agent_result.failure_reason,
-                    failure_category=agent_result.failure_category,
-                )
+            return NodeExecutionResult(
+                node_id=node_id,
+                final_state="blocked_at_exit",
+                exit_gate_evaluated=False,
+                failure_origin="agent_body",
+                gate_result=None,
+                agent_result=agent_result,
+                failure_reason=agent_result.failure_reason,
+                failure_category=agent_result.failure_category,
+            )
 
         # ── Step 4: Exit gate evaluation ──────────────────────────────
         exit_result = evaluate_gate(
