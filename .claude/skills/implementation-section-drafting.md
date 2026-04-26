@@ -125,8 +125,17 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
 
   - Step 2.4.3: **Ethics self-assessment.** Summarize ethics flags from `ethics_assessment` field.
 
-- Step 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`:
-  - Describe each partner's role, expertise, and contribution. Do not assign roles to partners not present in Tier 3 (Constraint 2, CLAUDE.md Section 13.3).
+- Step 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`, cross-referenced against Tier 4 `wp_structure.json`:
+
+  - Step 2.5.1: **Partner WP lead and contributor roles.** Use `wp_structure.json` as the CANONICAL source for WP lead assignments and contributing partner lists. Tier 4 governs over Tier 3 when there is a conflict (CLAUDE.md Section 3, Priority 7 > Priority 6).
+
+  - Step 2.5.2: **FORBIDDEN: "each partner leads exactly one WP" claim.** Do NOT assert that "each of the N partners leads exactly one functional WP" or equivalent. ATU leads both WP1 and WP2 per wp_structure.json. Instead, state factually: "WP leadership is distributed across the consortium" and list the actual lead assignments from wp_structure.json.
+
+  - Step 2.5.3: **Partner WP contributions must match Tier 4.** For each partner, state only WP participation roles that are confirmed in wp_structure.json `contributing_partners` arrays (or equivalent field). Do NOT claim a partner contributes to a WP unless wp_structure.json lists that partner for that WP. For example, if BAL is not listed as a contributing partner for WP4 in wp_structure.json, do NOT claim BAL contributes to WP4 regardless of what Tier 3 roles.json may suggest.
+
+  - Step 2.5.4: **No unsourced programme-rule assertions.** Do NOT assert Tier 1 programme-rule obligations (e.g. "required to hold Gender Equality Plans at grant signature per Tier 1 programme rules") unless the skill reads the specific Tier 1 normative source AND includes it in reads_from and traceability_footer.primary_sources[]. This skill does NOT read Tier 1 sources. Instead, for eligibility and administrative compliance topics, use a neutral source-bound formulation: "Administrative eligibility and participant declarations are handled in Part A and are not repeated in the B.3.2 narrative unless explicitly required by the section schema." Do NOT cite Tier 1 programme rules from agent knowledge.
+
+  - Step 2.5.5: Describe each partner's role, expertise, and contribution. Do not assign roles to partners not present in Tier 3 (Constraint 2, CLAUDE.md Section 13.3).
 
 - Step 2.6: **Draft resources sub-section.** Describe resource allocation at the level confirmed by the budget gate. Do not cite specific budget figures not validated in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
 
@@ -136,13 +145,22 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
   - `milestone_refs`: array of all milestone IDs from `gantt.json`.
   - `risk_register_ref`: path to `implementation_architecture.json` (`docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`).
 
-- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: wp_structure.json WP2"` or `"Tier 3: consortium/partners.json"`). Maximum 120 characters per `source_ref`. Do NOT include prose or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
+- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred classification. **GATE-CRITICAL: The output MUST NOT contain any claim_status with status = "assumed" or "unresolved".** If a claim cannot be confirmed or inferred with a valid source_ref chain, OMIT the claim from the drafted content entirely. The gate predicate `no_unresolved_material_claims` checks `validation_status.overall_status`; any value other than "confirmed" or "inferred" causes gate failure. Set `overall_status` to the weakest across all claims — must be "confirmed" or "inferred". Every claim_status MUST have a non-null source_ref. **Dissemination level claims:** If SEN/PU dissemination levels for deliverables are not directly present in wp_structure.json, gantt.json, or budget sources, mark them as "inferred" with a source chain (e.g. inferred from ethics_assessment ETHICS-02 for health data → SEN). Do NOT use "assumed" status. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: wp_structure.json WP2"` or `"Tier 3: consortium/partners.json"`). Maximum 120 characters per `source_ref`. Do NOT include prose or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
 
-- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array.
+- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. **Tier value format:** All `primary_sources[].tier` values MUST be numeric integers: Tier 2A/2B both use `"tier": 2`, Tier 3 uses `"tier": 3`, Tier 4 uses `"tier": 4`. Do NOT output string tier values. Include direct Tier 2B extracted source paths (scope_requirements.json, call_constraints.json) when the section asserts SR/CC identifiers.
 
-- Step 2.10: **Handle data gaps.** Document incomplete source state as Unresolved. Do not fabricate content.
+- Step 2.10: **Handle data gaps.** OMIT unsourceable claims from the drafted content. Do not include them with "assumed" or "unresolved" status. Do not fabricate content. If a gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
 
-- Step 2.11: **Gate-readiness check.** After building `validation_status`, check `overall_status`. If `overall_status` is `"unresolved"`: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Implementation section has unresolved material claims: <list claim_ids with status unresolved>. Gate gate_10c_implementation_completeness requires no_unresolved_material_claims. Resolve the data gaps before re-running.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
+- Step 2.11: **Gate-readiness check.** After building `validation_status`, verify:
+  - No claim_status has status "assumed" or "unresolved"
+  - All claim_statuses have non-null source_ref
+  - overall_status is "confirmed" or "inferred"
+  - All primary_sources[].tier values are numeric integers (not strings)
+  - no_unsupported_claims_declaration is true
+  - No "each partner leads exactly one WP" claim present in content
+  - No partner-WP-contributor claims contradicted by wp_structure.json
+  - No unsourced Tier 1 programme-rule assertions
+  If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Implementation section has non-gate-ready content: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
 

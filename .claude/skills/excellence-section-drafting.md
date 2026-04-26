@@ -122,24 +122,42 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
     - Evidence: does it provide concrete evidence (specific methods, prior results, references)?
     - Specificity: does it provide project-specific detail rather than generic assertions?
 
-  - Step 2.3.5: **Respect page limits.** Check word count against page limits from `section_schema_registry.json`. Flag exceedances in `validation_status`.
+  - Step 2.3.5: **SSH and Gender dimension constraints (GATE-CRITICAL).**
 
-  - Step 2.3.6: **Do not reference unvalidated budget figures.** Do not include budget amounts, person-months, or resource figures that are not confirmed in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
+    **SSH (Social Sciences and Humanities):** If SSH is not substantively specified in Tier 3 project data, the section MUST state proportionately that the project is primarily technical and that ethics/accountability aspects are embedded through already-sourced mechanisms (e.g. WP1 ethics compliance, WP5/WP6 auditability requirements, WP8 responsible AI evaluation). Use ONLY confirmed or inferred claims with explicit source_ref chains to Tier 3/Tier 4 artifacts. Do NOT claim dedicated SSH disciplinary contributions unless Tier 3 explicitly describes them.
+
+    **Gender dimension in research and innovation content:** Only include claims that can be traced to BOTH:
+      (a) Tier 2A section schema requirement for gender dimension discussion, AND
+      (b) Tier 3/Tier 4 project artifacts (e.g. healthcare demonstrator sex/gender stratification in WP5 benchmark design, ethics assessment artifacts).
+
+    **Forbidden gender/recruitment claims:** Do NOT assert "gender-balanced recruitment", "consortium gender diversity monitoring", "gender-balanced appointment of researchers", or similar HR/project-management practices unless these are explicitly described in Tier 3 project data with a specific source artifact. These claims are not derivable from general programme guidance and will produce "assumed" status with null source_ref, causing gate failure.
+
+    If a gender dimension claim is a proposal-design inference (e.g. "WP5 benchmark will be stratified by sex/gender" inferred from Tier 3 WP5 objectives and Tier 2A schema requirements), mark it "inferred" with a clear source_ref chain. If no valid inference chain exists from Tier 3/Tier 4 sources, OMIT the claim entirely.
+
+  - Step 2.3.6: **Respect page limits.** Check word count against page limits from `section_schema_registry.json`. Flag exceedances in `validation_status`.
+
+  - Step 2.3.7: **Do not reference unvalidated budget figures.** Do not include budget amounts, person-months, or resource figures that are not confirmed in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
 
 - Step 2.4: **Build validation_status.** For each material claim in the drafted content:
-  - Assign Confirmed/Inferred/Assumed/Unresolved status per CLAUDE.md Section 12.2.
+  - Assign Confirmed/Inferred status per CLAUDE.md Section 12.2.
   - Confirmed requires naming the specific Tier 1-4 source artifact.
   - Project-fact claims without Tier 3 attribution must be Unresolved.
-  - Set `overall_status` to the weakest status across all claims (unresolved > assumed > inferred > confirmed).
-  - Build `claim_statuses` array with `claim_id`, `claim_summary`, `status`, `source_ref`.
+  - **GATE-CRITICAL: The output MUST NOT contain any claim_status with status = "assumed" or "unresolved".** If a claim cannot be confirmed or inferred with a valid source_ref chain, OMIT the claim from the drafted content entirely rather than including it with "assumed" or "unresolved" status. The gate predicate `no_unresolved_material_claims` checks `validation_status.overall_status`; any value other than "confirmed" or "inferred" will cause a gate failure.
+  - Set `overall_status` to the weakest status across all claims. Because no assumed/unresolved claims are permitted in the output, overall_status must be "confirmed" or "inferred".
+  - Build `claim_statuses` array with `claim_id`, `claim_summary`, `status`, `source_ref`. Every entry MUST have a non-null `source_ref`.
   - **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 3: consortium/partners.json partner_id=ATU"` or `"Tier 4: wp_structure.json WP2.objectives"`). Do NOT include prose explanations, inference chains, or multi-sentence descriptions in `source_ref`. Maximum 120 characters per `source_ref` value. Inference chains belong in `claim_summary`, not `source_ref`.
   - **Claim count constraint:** Limit `claim_statuses` to the 15 most material claims. Group minor claims (e.g. individual partner capability assertions from the same source) into a single aggregated claim entry.
 
 - Step 2.5: **Build traceability_footer.** Populate `primary_sources` array with all Tier 1-4 artifacts used as sources for the section content. **Whenever the section asserts call scope, expected outcomes, expected impacts, or call requirements, include direct Tier 2B extracted source paths** (e.g., `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json`, `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json`) in `primary_sources[]` — not just indirect Tier 4 derivatives (Phase 1/2 outputs). This is required to pass the constitutional-compliance-check §13.2 check. Set `no_unsupported_claims_declaration` to true only if all claims are Confirmed or Inferred.
 
-- Step 2.6: **Handle data gaps.** If Tier 3 is incomplete for any Excellence sub-section element: set the relevant claim status to Unresolved, document the gap in `claim_statuses`, and set `no_unsupported_claims_declaration: false`. Do not fabricate content to fill the gap (CLAUDE.md Section 11.5, Section 13.8).
+- Step 2.6: **Handle data gaps.** If Tier 3 is incomplete for any Excellence sub-section element: OMIT the unsourceable claim from the drafted content. Do not include the claim with "assumed" or "unresolved" status. Do not fabricate content to fill the gap (CLAUDE.md Section 11.5, Section 13.8). If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`. Set `no_unsupported_claims_declaration: true` only if ALL claim_statuses are "confirmed" or "inferred".
 
-- Step 2.7: **Gate-readiness check.** After building `validation_status`, check `overall_status`. If `overall_status` is `"unresolved"`: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Excellence section has unresolved material claims: <list claim_ids with status unresolved>. Gate gate_10a_excellence_completeness requires no_unresolved_material_claims. Resolve the data gaps in Tier 3 before re-running.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact. A declared failure is a correct output per CLAUDE.md Section 15.
+- Step 2.7: **Gate-readiness check.** After building `validation_status`, verify:
+  - No claim_status has status "assumed" or "unresolved"
+  - All claim_statuses have non-null source_ref
+  - overall_status is "confirmed" or "inferred"
+  - no_unsupported_claims_declaration is true
+  If any of these conditions fail: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Excellence section has non-gate-ready claims: <list offending claim_ids>. All claims must be confirmed or inferred with non-null source_refs.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact. A declared failure is a correct output per CLAUDE.md Section 15.
 
 ### 3. Output Construction
 

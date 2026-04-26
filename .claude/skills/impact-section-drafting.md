@@ -130,13 +130,25 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
   - `communication_addressed`: true if the section addresses communication measures with specificity.
   Set to false for any category not substantively addressed.
 
-- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification. Set `overall_status` to the weakest status across all claims. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: impact_architecture.json PATH-EI-01"` or `"Tier 2B: expected_impacts.json EI-02"`). Maximum 120 characters per `source_ref`. Do NOT include prose explanations or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
+- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred classification. **GATE-CRITICAL: The output MUST NOT contain any claim_status with status = "assumed" or "unresolved".** If a claim cannot be confirmed or inferred with a valid source_ref chain, OMIT the claim from the drafted content entirely. The gate predicate `no_unresolved_material_claims` checks `validation_status.overall_status`; any value other than "confirmed" or "inferred" causes gate failure. Set `overall_status` to the weakest status across all claims — must be "confirmed" or "inferred". Every claim_status MUST have a non-null source_ref. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: impact_architecture.json PATH-EI-01"` or `"Tier 2B: expected_impacts.json EI-02"`). Maximum 120 characters per `source_ref`. Do NOT include prose explanations or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
 
-- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. Set `no_unsupported_claims_declaration`.
+- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. **GATE-CRITICAL tier value format:** All `primary_sources[].tier` values MUST be numeric integers, not strings:
+  - Tier 2A sources (docs/tier2a_instrument_schemas/...): use `"tier": 2`
+  - Tier 2B sources (docs/tier2b_topic_and_call_sources/...): use `"tier": 2`
+  - Tier 3 sources: use `"tier": 3`
+  - Tier 4 sources: use `"tier": 4`
+  Do NOT output string tier values such as "2a", "2b", "tier2b", or "Tier 2B". The sub-tier distinction (2A vs 2B) is preserved through the `source_path` field — Tier 2B sources are identifiable by their path prefix `docs/tier2b_topic_and_call_sources/extracted/...`.
+  Set `no_unsupported_claims_declaration` to `true` only if ALL claim_statuses are "confirmed" or "inferred" with non-null source_refs.
 
-- Step 2.10: **Handle data gaps.** If Phase 5 impact architecture is incomplete for any Impact sub-section element: set the relevant claim status to Unresolved, document the gap, set `no_unsupported_claims_declaration: false`. Do not fabricate content (CLAUDE.md Section 11.5, Section 13.8).
+- Step 2.10: **Handle data gaps.** If Phase 5 impact architecture is incomplete for any Impact sub-section element: OMIT the unsourceable claim from the drafted content. Do not include it with "assumed" or "unresolved" status. Do not fabricate content (CLAUDE.md Section 11.5, Section 13.8). If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
 
-- Step 2.11: **Gate-readiness check.** After building `validation_status`, check `overall_status`. If `overall_status` is `"unresolved"`: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Impact section has unresolved material claims: <list claim_ids with status unresolved>. Gate gate_10b_impact_completeness requires no_unresolved_material_claims. Resolve the data gaps before re-running.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
+- Step 2.11: **Gate-readiness check.** After building `validation_status`, verify:
+  - No claim_status has status "assumed" or "unresolved"
+  - All claim_statuses have non-null source_ref
+  - overall_status is "confirmed" or "inferred"
+  - All primary_sources[].tier values are numeric integers (not strings)
+  - no_unsupported_claims_declaration is true
+  If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Impact section has non-gate-ready claims or schema issues: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
 
@@ -175,7 +187,10 @@ Return a single JSON object conforming to `orch.tier5.impact_section.v1`:
   "traceability_footer": {
     "primary_sources": [
       {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"},
-      {"tier": 3, "source_path": "docs/tier3_project_instantiation/..."}
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/..."},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"},
+      {"tier": 2, "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"}
     ],
     "no_unsupported_claims_declaration": true
   }
