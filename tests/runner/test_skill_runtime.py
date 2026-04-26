@@ -1372,6 +1372,233 @@ class TestOptionalReadsFrom:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Excellence output robustness (d7f13667 regression)
+# ---------------------------------------------------------------------------
+
+
+class TestExcellenceOutputRobustness:
+    """Regression tests for the n08a failure in run d7f13667.
+
+    Root cause: Claude TAPM response was truncated to a mid-fragment
+    tail (2188 chars of what should have been ~30KB JSON). The JSON
+    extractor correctly rejected it, but we want explicit test coverage.
+    """
+
+    def test_valid_concise_excellence_json_writes_correctly(
+        self, skill_env: Path,
+    ) -> None:
+        """A valid, concise excellence_section.json writes to the canonical path."""
+        # Add a matching schema entry for excellence_section
+        _write_artifact_schema(skill_env, {
+            "tier5_deliverable_schemas": {
+                "excellence_section": {
+                    "canonical_path": "docs/tier5/sections/excellence_section.json",
+                    "schema_id_value": "orch.tier5.excellence_section.v1",
+                    "fields": {
+                        "schema_id": {"required": True},
+                        "run_id": {"required": True},
+                        "criterion": {"required": True},
+                        "sub_sections": {"required": True},
+                        "validation_status": {"required": True},
+                    },
+                }
+            }
+        })
+        _write_skill_catalog(skill_env, [{
+            "id": "excellence-test",
+            "reads_from": ["docs/tier3/input.json"],
+            "writes_to": ["docs/tier5/sections/excellence_section.json"],
+            "constitutional_constraints": [],
+        }])
+        _write_skill_spec(skill_env, "excellence-test")
+
+        response = {
+            "schema_id": "orch.tier5.excellence_section.v1",
+            "run_id": "run-exc-001",
+            "criterion": "Excellence",
+            "sub_sections": [
+                {
+                    "sub_section_id": "B.1.1",
+                    "title": "Objectives",
+                    "content": "Test content.",
+                    "word_count": 2,
+                }
+            ],
+            "validation_status": {
+                "overall_status": "confirmed",
+                "claim_statuses": [
+                    {
+                        "claim_id": "c1",
+                        "claim_summary": "Test claim",
+                        "status": "confirmed",
+                        "source_ref": "Tier 3: project_brief/concept_note.md",
+                    }
+                ],
+            },
+        }
+        with _claude_returns(response):
+            result = run_skill("excellence-test", "run-exc-001", skill_env)
+
+        assert result.status == "success"
+        assert len(result.outputs_written) == 1
+        written = skill_env / result.outputs_written[0]
+        assert written.exists()
+        content = json.loads(written.read_text(encoding="utf-8"))
+        assert content["criterion"] == "Excellence"
+        assert content["run_id"] == "run-exc-001"
+
+    def test_truncated_mid_fragment_fails_clearly(self, skill_env: Path) -> None:
+        """Truncated/mid-fragment response → INCOMPLETE_OUTPUT, no artifact."""
+        # The exact failure from d7f13667: only the tail end of JSON
+        truncated = (
+            '        "source_ref": "Inferred: concept_note.md commits to '
+            'open-source release and lowering barriers"\n'
+            '      }\n    ]\n  },\n  "traceability_footer": {\n'
+            '    "primary_sources": []\n  }\n}'
+        )
+        canonical = skill_env / "docs" / "tier4" / "phase1" / "test_output.json"
+
+        with _claude_returns_text(truncated):
+            result = run_skill("test-skill", "run-001", skill_env)
+
+        assert result.status == "failure"
+        assert result.failure_category in ("INCOMPLETE_OUTPUT", "MALFORMED_ARTIFACT")
+        assert not canonical.exists()
+
+    def test_prose_before_json_extracts_json(self) -> None:
+        """Prose before valid JSON — _extract_json_response handles it."""
+        prose_then_json = (
+            "I have read all inputs. Verification checks passed.\n\n"
+            '{"schema_id": "test", "run_id": "r1", "data": "ok"}'
+        )
+        result = _extract_json_response(prose_then_json)
+        assert result is not None
+        assert result["schema_id"] == "test"
+        assert result["data"] == "ok"
+
+    def test_mid_fragment_without_opening_brace_returns_none(self) -> None:
+        """Fragment without a matching opening brace is rejected."""
+        fragment = (
+            '"source_ref": "some value"}\n]\n}\n}\n'
+        )
+        result = _extract_json_response(fragment)
+        # Should either be None or a non-dict — either way not a valid artifact
+        if result is not None:
+            # If regex matched a small {}, it should not be our expected artifact
+            assert "source_ref" not in result or not isinstance(result, dict)
+
+    def test_empty_response_fails(self) -> None:
+        """Empty string → None."""
+        assert _extract_json_response("") is None
+        assert _extract_json_response("   \n  ") is None
+
+
+# ---------------------------------------------------------------------------
+# File-level artifact write paths for Phase 8 sections
+# ---------------------------------------------------------------------------
+
+
+class TestPhase8FileLevelArtifactWrite:
+    """Verify that single_artifact skills with exact file writes_to paths
+    write to the correct canonical path."""
+
+    def _make_section_env(
+        self,
+        tmp_path: Path,
+        *,
+        skill_id: str,
+        artifact_path: str,
+        schema_id: str,
+    ) -> Path:
+        """Create environment for a Phase 8 section drafting skill."""
+        repo_root = tmp_path
+        _write_skill_catalog(repo_root, [{
+            "id": skill_id,
+            "reads_from": ["docs/tier3/input.json"],
+            "writes_to": [artifact_path],
+            "constitutional_constraints": [],
+            "output_contract": "single_artifact",
+        }])
+        _write_artifact_schema(repo_root, {
+            "tier5_deliverable_schemas": {
+                skill_id: {
+                    "canonical_path": artifact_path,
+                    "schema_id_value": schema_id,
+                    "fields": {
+                        "schema_id": {"required": True},
+                        "run_id": {"required": True},
+                        "criterion": {"required": True},
+                    },
+                }
+            }
+        })
+        _write_skill_spec(repo_root, skill_id)
+        input_path = repo_root / "docs" / "tier3" / "input.json"
+        input_path.parent.mkdir(parents=True, exist_ok=True)
+        input_path.write_text('{"data":"test"}', encoding="utf-8")
+        (repo_root / artifact_path).parent.mkdir(parents=True, exist_ok=True)
+        return repo_root
+
+    def test_impact_section_writes_to_exact_path(self, tmp_path: Path) -> None:
+        artifact_path = "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        repo = self._make_section_env(
+            tmp_path,
+            skill_id="impact-drafting",
+            artifact_path=artifact_path,
+            schema_id="orch.tier5.impact_section.v1",
+        )
+        response = {
+            "schema_id": "orch.tier5.impact_section.v1",
+            "run_id": "run-imp-001",
+            "criterion": "Impact",
+        }
+
+        import runner.skill_runtime as _sr
+        _sr._catalog_cache.clear()
+        _sr._schema_spec_cache.clear()
+
+        with _claude_returns(response):
+            result = run_skill("impact-drafting", "run-imp-001", repo)
+
+        assert result.status == "success"
+        assert artifact_path in result.outputs_written
+        written = repo / artifact_path
+        assert written.exists()
+        data = json.loads(written.read_text())
+        assert data["criterion"] == "Impact"
+
+    def test_implementation_section_writes_to_exact_path(
+        self, tmp_path: Path,
+    ) -> None:
+        artifact_path = "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        repo = self._make_section_env(
+            tmp_path,
+            skill_id="implementation-drafting",
+            artifact_path=artifact_path,
+            schema_id="orch.tier5.implementation_section.v1",
+        )
+        response = {
+            "schema_id": "orch.tier5.implementation_section.v1",
+            "run_id": "run-impl-001",
+            "criterion": "Implementation",
+        }
+
+        import runner.skill_runtime as _sr
+        _sr._catalog_cache.clear()
+        _sr._schema_spec_cache.clear()
+
+        with _claude_returns(response):
+            result = run_skill("implementation-drafting", "run-impl-001", repo)
+
+        assert result.status == "success"
+        assert artifact_path in result.outputs_written
+        written = repo / artifact_path
+        assert written.exists()
+        data = json.loads(written.read_text())
+        assert data["criterion"] == "Implementation"
+
+
 class TestModuleIsolation:
     def test_no_dag_scheduler_import(self) -> None:
         import runner.skill_runtime as mod

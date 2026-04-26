@@ -382,6 +382,13 @@ def _get_artifacts_produced_by_node(
         elif isinstance(produced_by, list):
             if node_id not in produced_by:
                 continue
+            # Multi-producer artifact: a shared/collaborative output
+            # (e.g. phase8_drafting_review/ produced by all n08 nodes).
+            # No single node is solely responsible for populating it,
+            # so it must not block individual gate-readiness checks.
+            # Only sole-producer artifacts are gate-relevant per node.
+            if len(produced_by) > 1:
+                continue
         else:
             continue
 

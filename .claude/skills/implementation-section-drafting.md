@@ -46,7 +46,9 @@ in the Declared Inputs section from disk using the Read tool.
 - Do not use generic Horizon Europe knowledge as a substitute for reading Tier 1-4 sources.
 
 Return a SINGLE valid JSON object matching the output schema below.
-Do not include explanations outside the JSON.
+Do not include ANY text before or after the JSON object — no prose, no
+verification summaries, no markdown fencing. The response must begin with `{`
+and end with `}`. Any non-JSON output causes a pipeline failure.
 
 ## Canonical Inputs and Outputs
 
@@ -134,7 +136,7 @@ Do not include explanations outside the JSON.
   - `milestone_refs`: array of all milestone IDs from `gantt.json`.
   - `risk_register_ref`: path to `implementation_architecture.json` (`docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`).
 
-- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification.
+- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: wp_structure.json WP2"` or `"Tier 3: consortium/partners.json"`). Maximum 120 characters per `source_ref`. Do NOT include prose or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
 
 - Step 2.9: **Build traceability_footer.** Populate `primary_sources` array.
 

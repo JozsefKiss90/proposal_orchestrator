@@ -44,7 +44,9 @@ in the Declared Inputs section from disk using the Read tool.
 - Do not use generic Horizon Europe knowledge as a substitute for reading Tier 1-4 sources.
 
 Return a SINGLE valid JSON object matching the output schema below.
-Do not include explanations outside the JSON.
+Do not include ANY text before or after the JSON object — no prose, no
+verification summaries, no markdown fencing. The response must begin with `{`
+and end with `}`. Any non-JSON output causes a pipeline failure.
 
 ## Canonical Inputs and Outputs
 
@@ -128,7 +130,7 @@ Do not include explanations outside the JSON.
   - `communication_addressed`: true if the section addresses communication measures with specificity.
   Set to false for any category not substantively addressed.
 
-- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification. Set `overall_status` to the weakest status across all claims.
+- Step 2.8: **Build validation_status.** Per-claim Confirmed/Inferred/Assumed/Unresolved classification. Set `overall_status` to the weakest status across all claims. **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 4: impact_architecture.json PATH-EI-01"` or `"Tier 2B: expected_impacts.json EI-02"`). Maximum 120 characters per `source_ref`. Do NOT include prose explanations or inference chains in `source_ref`. Limit `claim_statuses` to the 15 most material claims; group minor claims from the same source into aggregated entries.
 
 - Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. Set `no_unsupported_claims_declaration`.
 

@@ -47,7 +47,9 @@ in the Declared Inputs section from disk using the Read tool.
 - Do not use generic Horizon Europe knowledge as a substitute for reading Tier 1-4 sources.
 
 Return a SINGLE valid JSON object matching the output schema below.
-Do not include explanations outside the JSON.
+Do not include ANY text before or after the JSON object — no prose, no
+verification summaries, no markdown fencing. The response must begin with `{`
+and end with `}`. Any non-JSON output causes a pipeline failure.
 
 ## Canonical Inputs and Outputs
 
@@ -130,6 +132,8 @@ Do not include explanations outside the JSON.
   - Project-fact claims without Tier 3 attribution must be Unresolved.
   - Set `overall_status` to the weakest status across all claims (unresolved > assumed > inferred > confirmed).
   - Build `claim_statuses` array with `claim_id`, `claim_summary`, `status`, `source_ref`.
+  - **Output size constraint for `source_ref`:** Use concise references only — file path plus field/ID (e.g. `"Tier 3: consortium/partners.json partner_id=ATU"` or `"Tier 4: wp_structure.json WP2.objectives"`). Do NOT include prose explanations, inference chains, or multi-sentence descriptions in `source_ref`. Maximum 120 characters per `source_ref` value. Inference chains belong in `claim_summary`, not `source_ref`.
+  - **Claim count constraint:** Limit `claim_statuses` to the 15 most material claims. Group minor claims (e.g. individual partner capability assertions from the same source) into a single aggregated claim entry.
 
 - Step 2.5: **Build traceability_footer.** Populate `primary_sources` array with all Tier 1-4 artifacts used as sources for the section content. **Whenever the section asserts call scope, expected outcomes, expected impacts, or call requirements, include direct Tier 2B extracted source paths** (e.g., `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json`, `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json`) in `primary_sources[]` — not just indirect Tier 4 derivatives (Phase 1/2 outputs). This is required to pass the constitutional-compliance-check §13.2 check. Set `no_unsupported_claims_declaration` to true only if all claims are Confirmed or Inferred.
 

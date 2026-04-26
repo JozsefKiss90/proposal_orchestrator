@@ -1536,3 +1536,220 @@ class TestPhase8GateResultOnlyByRunner:
             assert not output.endswith("gate_result.json"), (
                 f"gate_result.json must not be in skill outputs: {output}"
             )
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 file-level artifact write/discovery (d7f13667 regression)
+# ---------------------------------------------------------------------------
+
+
+class TestPhase8FileLevelArtifactDiscovery:
+    """Regression tests for the n08b/n08c failure in run d7f13667.
+
+    Root cause: _get_artifacts_produced_by_node returned multi-producer
+    shared artifacts (a_t4_phase8 directory) alongside sole-producer
+    file artifacts, causing _determine_can_evaluate_exit_gate to fail
+    even when the node's specific file artifact existed on disk.
+    """
+
+    def _make_phase8_env(
+        self,
+        tmp_path: Path,
+        *,
+        node_id: str,
+        artifact_file: str,
+    ) -> dict:
+        """Create environment mimicking n08b/n08c Phase 8 nodes."""
+        return _make_agent_env(
+            tmp_path,
+            agent_id="test_writer",
+            node_id=node_id,
+            skill_ids=["section-drafting"],
+            phase_id="phase8",
+            reads_from=["docs/tier3/input.json"],
+            writes_to=["docs/tier5_deliverables/proposal_sections/"],
+            artifact_registry=[
+                # Sole-producer file artifact (the one the node actually writes)
+                {
+                    "path": artifact_file,
+                    "produced_by": node_id,
+                    "tier": "tier5_deliverable",
+                },
+                # Multi-producer shared directory (the phase8 directory)
+                {
+                    "path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/",
+                    "produced_by": [
+                        "n08a_excellence_drafting",
+                        "n08b_impact_drafting",
+                        "n08c_implementation_drafting",
+                        "n08d_assembly",
+                    ],
+                    "tier": "tier4_phase_output",
+                },
+            ],
+        )
+
+    def test_impact_file_artifact_discovered(self, tmp_path: Path) -> None:
+        """impact_section.json on disk → can_evaluate_exit_gate=True."""
+        artifact = "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        kwargs = self._make_phase8_env(
+            tmp_path, node_id="n08b_impact_drafting", artifact_file=artifact,
+        )
+        # Write the artifact the skill would produce
+        _write_json(tmp_path / artifact, {"schema_id": "test", "content": "ok"})
+
+        def _track(skill_id, *args, **kw):
+            return _success_skill(outputs=[artifact])
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        assert result.can_evaluate_exit_gate is True
+
+    def test_implementation_file_artifact_discovered(self, tmp_path: Path) -> None:
+        """implementation_section.json on disk → can_evaluate_exit_gate=True."""
+        artifact = "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        kwargs = self._make_phase8_env(
+            tmp_path, node_id="n08c_implementation_drafting", artifact_file=artifact,
+        )
+        _write_json(tmp_path / artifact, {"schema_id": "test", "content": "ok"})
+
+        def _track(skill_id, *args, **kw):
+            return _success_skill(outputs=[artifact])
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+        assert result.can_evaluate_exit_gate is True
+
+    def test_missing_file_artifact_blocks_gate(self, tmp_path: Path) -> None:
+        """Missing impact_section.json → can_evaluate_exit_gate=False."""
+        artifact = "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        kwargs = self._make_phase8_env(
+            tmp_path, node_id="n08b_impact_drafting", artifact_file=artifact,
+        )
+        # Do NOT write the artifact — simulate failed/missing write
+
+        def _track(skill_id, *args, **kw):
+            return _success_skill(outputs=[])
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        # All skills succeeded but artifact missing → failure
+        assert result.status == "failure"
+        assert result.can_evaluate_exit_gate is False
+
+    def test_wrong_sibling_does_not_satisfy_gate(self, tmp_path: Path) -> None:
+        """excellence_section.json must not satisfy n08b's gate check."""
+        impact_artifact = "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        kwargs = self._make_phase8_env(
+            tmp_path, node_id="n08b_impact_drafting", artifact_file=impact_artifact,
+        )
+        # Write a DIFFERENT section file — should not satisfy n08b
+        _write_json(
+            tmp_path / "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+            {"schema_id": "test", "content": "wrong sibling"},
+        )
+
+        def _track(skill_id, *args, **kw):
+            return _success_skill(outputs=[])
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track):
+            result = run_agent(**kwargs)
+
+        assert result.can_evaluate_exit_gate is False
+
+    def test_multi_producer_artifact_excluded_from_gate_check(
+        self, tmp_path: Path,
+    ) -> None:
+        """_get_artifacts_produced_by_node skips multi-producer artifacts."""
+        from runner.agent_runtime import _get_artifacts_produced_by_node
+
+        manifest_path = tmp_path / "manifest_test.yaml"
+        # Already created by _make_phase8_env, but let's create a clean one
+        artifact = "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        self._make_phase8_env(
+            tmp_path, node_id="n08b_impact_drafting", artifact_file=artifact,
+        )
+        paths = _get_artifacts_produced_by_node(
+            "n08b_impact_drafting", tmp_path, manifest_path=manifest_path,
+        )
+        # Should contain the sole-producer file, NOT the shared directory
+        assert artifact in paths
+        assert "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/" not in paths
+
+
+# ---------------------------------------------------------------------------
+# Windows path normalization
+# ---------------------------------------------------------------------------
+
+
+class TestWindowsPathNormalization:
+    """Verify path separators don't cause false artifact-missing errors."""
+
+    def test_manifest_forward_slash_resolves_on_disk(self, tmp_path: Path) -> None:
+        """Repo-relative forward-slash paths resolve correctly via Path()."""
+        from runner.agent_runtime import _determine_can_evaluate_exit_gate
+
+        # Create manifest with forward-slash path
+        manifest_data = {
+            "artifact_registry": [
+                {
+                    "path": "docs/tier5/sections/test.json",
+                    "produced_by": "n_test",
+                    "tier": "tier5_deliverable",
+                },
+            ],
+        }
+        manifest_path = tmp_path / "manifest.yaml"
+        _write_yaml(manifest_path, manifest_data)
+
+        # Write the artifact using the OS path
+        _write_json(
+            tmp_path / "docs" / "tier5" / "sections" / "test.json",
+            {"data": "ok"},
+        )
+
+        # Clear cache
+        import runner.agent_runtime as _ar
+        _ar._artifact_registry_cache.clear()
+
+        result = _determine_can_evaluate_exit_gate(
+            "n_test", tmp_path, manifest_path=manifest_path,
+        )
+        assert result is True
+
+    def test_backslash_path_does_not_cause_false_negative(
+        self, tmp_path: Path,
+    ) -> None:
+        """Manifest paths with forward slashes should still work on Windows
+        where Path() internally uses backslashes."""
+        from runner.agent_runtime import _get_artifacts_produced_by_node
+
+        manifest_data = {
+            "artifact_registry": [
+                {
+                    "path": "docs/tier5/sections/output.json",
+                    "produced_by": "n_test",
+                    "tier": "tier5_deliverable",
+                },
+            ],
+        }
+        manifest_path = tmp_path / "manifest.yaml"
+        _write_yaml(manifest_path, manifest_data)
+
+        import runner.agent_runtime as _ar
+        _ar._artifact_registry_cache.clear()
+
+        paths = _get_artifacts_produced_by_node(
+            "n_test", tmp_path, manifest_path=manifest_path,
+        )
+        assert len(paths) == 1
+        # The path should use forward slashes (as stored in manifest)
+        assert paths[0] == "docs/tier5/sections/output.json"
+        # When joined with repo_root via Path(), it should resolve
+        abs_path = tmp_path / paths[0]
+        assert isinstance(abs_path, Path)
