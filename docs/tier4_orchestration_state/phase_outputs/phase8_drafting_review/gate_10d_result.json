@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10d_cross_section_consistency",
   "gate_kind": "exit",
-  "run_id": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
+  "run_id": "944c631f-fa50-4954-aee9-2b06a37addbb",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:0711d1ddb148131e2964c377ab92fac70a4cbe25e3940b458d3bbbc4aa499e2c",
+  "input_fingerprint": "sha256:79eb6339b5a422a6bb490dfc0489272758dc135f7a8b5c7f5610db2244e76212",
   "input_artifact_fingerprints": {
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:a8de4b099ef62cdb14e20a496438cd5341a859dbcb4b5188b74b6dc68611547c",
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:0f00b7397bd31bbd1fe18931a803626afde4d27528b942a462bc871994649703",
     "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:bf5612d35cb99a6349f83fdc63038ce590329b6fa85e6366a3d47f18bbab3c18",
     "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:45105974f5a3a61e130c15a7e86ff2050bd36f287bc739398058b82197dda3d4",
     "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:9890942b0fc41f51b23ffd5e8476c83f0a90e18b7b3e882b2e5f908d8c523b7a"
   },
-  "evaluated_at": "2026-04-27T17:43:32.462425+00:00",
+  "evaluated_at": "2026-04-27T19:21:54.214983+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -24,25 +24,39 @@
       "g09d_p03",
       "g09d_p06"
     ],
-    "failed": []
-  },
-  "semantic_predicates": {
-    "passed": [],
     "failed": [
       {
         "predicate_id": "g09d_p07",
+        "type": "coverage",
         "function": "cross_section_consistency",
-        "failure_reason": "semantic_dispatch_error",
-        "constitutional_rule": "<unknown>",
-        "fail_message": "Dispatch error: Unknown semantic predicate function 'cross_section_consistency'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
-        "artifacts_inspected": [],
-        "_dispatch_error": true,
-        "_dispatch_error_reason": "Unknown semantic predicate function 'cross_section_consistency'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
-        "_dispatch_error_category": "UNKNOWN_FUNCTION",
-        "_diagnostic_bundle_path": null
+        "args": {
+          "assembled_path": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+          "sections_dir": "docs/tier5_deliverables/proposal_sections/",
+          "tier3_path": "docs/tier3_project_instantiation/"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Cross-section inconsistencies flagged in assembled draft: 5 issue(s)",
+        "details": {
+          "assembled_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\assembled_drafts\\part_b_assembled_draft.json",
+          "flagged_count": 5,
+          "flagged_checks": [
+            "CC-01",
+            "CC-03",
+            "CC-04",
+            "CC-06",
+            "CC-09"
+          ]
+        },
+        "fail_message": "Cross-section consistency check found inconsistencies in objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, or terminology.\n",
+        "prose_condition": "Objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, and terminology are cross-consistent"
       }
     ]
   },
-  "skipped_semantic": false,
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10d_result.json"
 }

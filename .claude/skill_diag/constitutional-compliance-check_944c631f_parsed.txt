@@ -1,0 +1,64 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-04-27T120000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "944c631f-fa50-4954-aee9-2b06a37addbb",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "violation",
+      "violation_evidence": "The consistency_log names specific project facts without a formal traceability_footer.primary_sources[] structure: partner identifiers and legal names ('EuroLog International AG', 'Boreal AI Labs Oy', 'ATU', 'BIIS', 'CERIA', 'NIHS', 'ISIA', 'FIIT', 'ELI', 'BAL' \u2014 CC-03), objective IDs 'OBJ-1' through 'OBJ-8' (CC-01, CC-06), deliverable ID 'D4-01' (CC-04), work package 'WP9' (CC-01), and KPI identifier 'KPI-03' (CC-06). The artifact contains no 'traceability_footer' field and no 'primary_sources[]' array referencing docs/tier3_project_instantiation/. Inline text references such as 'Tier 3 architecture_inputs/objectives.json' and 'Tier 3 consortium/partners.json' appear within inconsistency_note strings but do not satisfy the formal traceability_footer.primary_sources[] requirement. All project-specific claims in this Tier 5 artifact are therefore structurally unattributed to Tier 3 source files.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "violation",
+      "violation_evidence": "The artifact schema_id 'orch.tier5.part_b_assembled_draft.v1' begins with 'orch.tier5.' classifying this as a Phase 8 artifact under Check 13.4. Compliance requires confirming that docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists with gate_pass_declaration: 'pass'. That file is outside the declared TAPM input boundary for this invocation and cannot be read. Budget gate passage cannot be confirmed from available inputs. Per CLAUDE.md \u00a715, the system must prefer explicit gate failure over fabricated completion; the gate is therefore treated as unconfirmed-presumed-violation. CC-08 in the consistency_log shows internal budget consistency ('consistent', no inconsistency_note) across all three sections, but internal consistency of references does not constitute confirmation that the external Phase 7 gate was evaluated and passed before Phase 8 assembly commenced.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable at artifact-level audit: this prohibition governs agent runtime behaviour (decisions held in agent memory vs. written to Tier 4) and cannot be verified by inspecting the content of a deliverable artifact. Recorded as pass per skill specification Step 2 instruction for 13.5.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable at artifact-level audit: this prohibition governs workflow and skill scope creep and cannot be evidenced by reading a Tier 5 deliverable artifact. Recorded as pass per skill specification Step 2 instruction for 13.6.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+
+=== END ===
