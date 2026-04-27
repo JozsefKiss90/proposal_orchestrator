@@ -1,0 +1,158 @@
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "f367f022-03c7-42eb-a4f6-a005e6c9b0c1",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 1880
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 1601
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 619
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency across all three sections against the canonical WP list in the Implementation section",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency across all three sections and Tier 3 partners.json ground-truth",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency across Excellence, Impact, and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Impact section B.2.1 (EI-05 pathway) cites '(OUT-9, D8-01)' as the deliverable reference for 'the external tool and API orchestration layer.' However, Implementation section B.3.1 explicitly and unambiguously identifies D8-01 as 'Evaluation framework and benchmark specification' (WP8 lead: FIIT, M12). These two characterisations of D8-01 are irreconcilable: D8-01 cannot simultaneously denote the orchestration layer artifact (a WP2/ATU output per OBJ-8, target M36) and the evaluation framework (a WP8/FIIT artifact, M12). The External Tool and API Orchestration Layer (OBJ-8, ATU lead) has no correctly identified deliverable ID in the Impact section's EI-05 grounding citation. The correct deliverable for the orchestration layer should be a WP2-series deliverable. Resolution required before finalisation."
+    },
+    {
+      "check_id": "CC-05",
+      "description": "Milestone ID consistency between Impact and Implementation sections",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-06",
+      "description": "KPI consistency: KPI naming and target values across Impact and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-07",
+      "description": "Impact claim grounding: each impact claim in the Impact section cites a WP or deliverable present in the Implementation section",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Impact section B.2.1 (EI-05 pathway) grounds the impact claim for the External Tool and API Orchestration Layer in the citation '(OUT-9, D8-01)'. D8-01 is defined in Implementation section B.3.1 as 'Evaluation framework and benchmark specification' (WP8/FIIT/M12), not the orchestration layer. The orchestration layer (OBJ-8, ATU lead, M36) — the mechanism cited for the EI-05 impact claim — is not associated with any correctly named deliverable in the Impact section's grounding citation that corresponds to Implementation's deliverable list. This is the same D8-01 mislabeling identified in CC-04. The EI-05 orchestration layer impact claim is grounded in a misidentified deliverable and lacks a valid traceable project mechanism per Implementation."
+    },
+    {
+      "check_id": "CC-08",
+      "description": "Budget and resource claim consistency: budget figures and person-month allocations across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-09",
+      "description": "Terminology consistency: key technical terms, methodology names, acronyms, and technical classification labels across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "TRL target inconsistency between sections: Excellence section B.1.1 states 'the project targets TRL 5 by project end' as a project-level claim (contextually qualified through 'two call-aligned Apply AI sector demonstrators' in healthcare and manufacturing). Impact section B.2.1 explicitly assigns TRL 4 to OUT-3 (WP4 formally verified coordination protocols, D4-01 M18; D4-02 M36), indicating that WP4's primary output does not reach TRL 5 by project end. The unqualified project-level TRL 5 statement in Excellence, read alongside Impact's explicit TRL 4 assignment for WP4 outputs, creates evaluator-facing ambiguity: an evaluator reading both sections will encounter a project-level TRL 5 claim and an output-level TRL 4 assignment for the formal coordination protocol work without a clear reconciliation. Recommended resolution: qualify the TRL 5 claim in Excellence per output or per WP (e.g., 'WP2 and WP3 outputs target TRL 5; WP4 coordination protocols target TRL 4') to achieve unambiguous consistency across sections."
+    },
+    {
+      "check_id": "CC-10",
+      "description": "Section ordering and completeness: all three Part B sections present and ordered Excellence (1), Impact (2), Implementation (3)",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-11",
+      "description": "Traceability footer consistency: non-empty primary_sources arrays and no_unsupported_claims_declaration consistent with validation_status.overall_status",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-12",
+      "description": "Validation status aggregation: record overall_status from all three section validation_status fields and flag any unresolved statuses as cross-section concerns",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": "Informational status report: all three sections report overall_status='inferred'. Excellence='inferred'; Impact='inferred'; Implementation='inferred'. No section reports overall_status='unresolved', so no blocking validation status concerns are present. The presence of inferred claims across all three sections requires downstream human review before finalisation to confirm that inferences are acceptable or to escalate any that are not supported by sufficient evidence."
+    }
+  ]
+}
