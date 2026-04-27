@@ -1,0 +1,48 @@
+{
+  "gate_id": "gate_10d_cross_section_consistency",
+  "gate_kind": "exit",
+  "run_id": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:0711d1ddb148131e2964c377ab92fac70a4cbe25e3940b458d3bbbc4aa499e2c",
+  "input_artifact_fingerprints": {
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:a8de4b099ef62cdb14e20a496438cd5341a859dbcb4b5188b74b6dc68611547c",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:bf5612d35cb99a6349f83fdc63038ce590329b6fa85e6366a3d47f18bbab3c18",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:45105974f5a3a61e130c15a7e86ff2050bd36f287bc739398058b82197dda3d4",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:9890942b0fc41f51b23ffd5e8476c83f0a90e18b7b3e882b2e5f908d8c523b7a"
+  },
+  "evaluated_at": "2026-04-27T17:43:32.462425+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g09d_p04",
+      "g09d_p05",
+      "g09d_p01",
+      "g09d_p02",
+      "g09d_p03",
+      "g09d_p06"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "g09d_p07",
+        "function": "cross_section_consistency",
+        "failure_reason": "semantic_dispatch_error",
+        "constitutional_rule": "<unknown>",
+        "fail_message": "Dispatch error: Unknown semantic predicate function 'cross_section_consistency'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
+        "artifacts_inspected": [],
+        "_dispatch_error": true,
+        "_dispatch_error_reason": "Unknown semantic predicate function 'cross_section_consistency'; available: ['no_budget_gate_contradiction', 'no_cross_tier_contradictions', 'no_forbidden_schema_authority', 'no_gap_masked_as_confirmed', 'no_higher_tier_contradiction', 'no_unresolved_scope_conflicts', 'no_unsupported_tier5_claims']",
+        "_dispatch_error_category": "UNKNOWN_FUNCTION",
+        "_diagnostic_bundle_path": null
+      }
+    ]
+  },
+  "skipped_semantic": false,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10d_result.json"
+}

@@ -1,0 +1,76 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'section_id_audited', 'audit_mode', 'artifact_path_audited', 'sections_included', 'input_validation', 'claim_audit_results', 'summary', 'no_unsupported_claims_declaration', 'unresolved_claim_ids', 'inferred_claim_ids', 'resolution_required', 'reference_files_read', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "traceability_all_sections_traceability_auditor_2026-04-27T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
+  "section_id_audited": "all_sections",
+  "audit_mode": "assembled",
+  "artifact_path_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "sections_included": [
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+  ],
+  "input_validation": {
+    "assembled_draft_schema_confirmed": true,
+    "schema_id_found": "orch.tier5.part_b_assembled_draft.v1",
+    "all_section_paths_exist": true,
+    "section_schemas_confirmed": {
+      "excellence_section.json": "orch.tier5.excellence_section.v1",
+      "impact_section.json": "orch.tier5.impact_section.v1",
+      "implementation_section.json": "orch.tier5.implementation_section.v1"
+    },
+    "tier1_4_reference_directories_accessible": true,
+    "assembled_draft_consistency_log_findings_noted": [
+      "CC-03: Implementation section B.3.2 uses abbreviated partner names 'EuroLog International' and 'Boreal AI Labs' omitting legal suffixes 'AG' and 'Oy' per partners.json \u2014 flagged as inconsistency_flagged",
+      "CC-04: D4-01 described as 'coordination protocol specification (M18)' in excellence section and as 'formal standardisation proposal... by M48' in impact section \u2014 flagged as inconsistency_flagged requiring resolution"
+    ]
+  },
+  "claim_audit_results": [
+    {
+      "claim_id": "EXC-01",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "MAESTRO addresses all four mandatory call scope areas (SR-02 robust planning, SR-03 memory management, SR-04 external tool integration, SR-05 multi-agent coordination) in a unified integrated architecture",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-02 (mandatory: true), SR-03 (mandatory: true), SR-04 (mandatory: true), SR-05 (mandatory: true); docs/tier3_project_instantiation/project_brief/concept_note.md Pillars 1\u20133 and Cross-Cutting Capability sections",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-02",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-1 target: \u226540% improvement in plan success rate over LLM-based baselines (ReAct, Reflexion) on standardised benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring more than 10 sequential steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-1.measurable_target: 'Achieve \u226540% improvement in plan success rate over pure LLM-based agent baselines (ReAct, Reflexion) on standardised agent benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring >10 sequential steps'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-03",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-2 target: \u226530% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-2.measurable_target: 'Demonstrate \u226530% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-04",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-3 target: effective coordination of \u22655 heterogeneous agents, \u226525% joint task completion improvement over independent baselines, formal mathematical proof of protocol convergence",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-3.measurable_target: 'Demonstrate effective coordination of \u22655 heterogeneous agents on shared tasks, with \u226525% improvement in joint task completion over independent agent baselines, and formal proof of protocol convergence'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-05",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-8 target: \u226530 external tools/APIs integrated; tool invocation success rate \u226595%; mean recovery time from tool failure \u22645s; full provenance traces for 100% of invocations",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-8.measurable_target: 'Typed tool registry supporting \u226530 external tools/APIs across all three demonstrator domains; tool invocation success r
+=== END ===

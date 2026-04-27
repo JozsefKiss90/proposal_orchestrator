@@ -1,3 +1,18 @@
+=== skill_id: cross-section-consistency-check ===
+=== mode: tapm ===
+=== response_text length: 6667 ===
+=== response_text (full) ===
+Now I have all the data I need. Let me perform the consistency checks and construct the output.
+
+**Key findings from analysis:**
+
+- **CC-03**: Implementation section B.3.2 uses "EuroLog International" (drops "AG") and "Boreal AI Labs" (drops "Oy") compared to Tier 3 `partners.json` canonical legal names.
+- **CC-04**: Deliverable D4-01 is described as "coordination protocol specification (D4-01, M18)" in the Excellence section, but as "formal standardisation proposal (D4-01) … by M48" in the Impact section — different description and different due month for the same deliverable ID.
+- All other checks: consistent.
+
+Word counts: Excellence = 863 + 1521 = 2384; Impact = 271 + 271 = 542; Implementation = 310 + 325 = 635.
+
+```json
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
@@ -28,130 +43,89 @@
     {
       "check_id": "CC-01",
       "description": "Objective consistency across Excellence and Implementation sections",
-      "sections_checked": [
-        "excellence",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-02",
       "description": "WP reference consistency across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-03",
       "description": "Partner name consistency across all three sections against Tier 3 partners.json",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "Implementation section B.3.2 description text uses 'EuroLog International' (omitting 'AG') and 'Boreal AI Labs' (omitting 'Oy') compared to the authoritative legal names 'EuroLog International AG' and 'Boreal AI Labs Oy' in Tier 3 consortium/partners.json. Short names ELI and BAL are consistently used across all three sections. Correction required in Implementation section B.3.2 partner description text to match canonical legal names."
     },
     {
       "check_id": "CC-04",
       "description": "Deliverable ID consistency across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "Deliverable D4-01 is described differently and assigned different due months across the Excellence and Impact sections. In Excellence B.1.2 it is characterised as 'coordination protocol specification (D4-01, M18)' — a technical research output due at month 18. In Impact B.2.1 and B.2.2 it is characterised as 'formal standardisation proposal (D4-01) to ISO/IEC JTC 1/SC 42 or IEEE by M48' — an external standards body submission due at month 48. These are materially different descriptions and incompatible due months for the same deliverable ID. Resolution is required: either D4-01 is the M18 protocol specification (and a separate deliverable ID should cover the M48 standardisation submission), or the Excellence section description and month must be corrected to reflect a standardisation proposal due M48."
     },
     {
       "check_id": "CC-05",
       "description": "Milestone ID consistency between Impact and Implementation sections",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-06",
       "description": "KPI consistency across Excellence and Impact sections",
-      "sections_checked": [
-        "excellence",
-        "impact"
-      ],
+      "sections_checked": ["excellence", "impact"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-07",
       "description": "Impact claim grounding — each impact claim in Impact section must reference a WP or deliverable present in Implementation",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-08",
       "description": "Budget and resource claim consistency across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-09",
       "description": "Terminology consistency — key technical terms, methodology names, and acronyms across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-10",
       "description": "Section ordering and completeness — all three Part B sections present in correct order (Excellence, Impact, Implementation)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-11",
       "description": "Traceability footer consistency — non-empty primary_sources arrays and no_unsupported_claims_declaration consistent with overall_status",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-12",
       "description": "Validation status aggregation — informational record of overall_status from each section",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": "Informational: all three sections carry overall_status 'inferred'. Excellence section has one inferred claim (C15: WP5 sex/gender stratification); Impact section has one inferred claim (C04: EI-04 EU strategic autonomy grounding); Implementation section has one inferred claim (CS-11: ethics-sensitive workstreams governed through WP1/WP5). No section carries overall_status 'unresolved'. Downstream review should note the inferred claims and confirm their inference chains are adequate for evaluator scrutiny."
     }
   ]
 }
+```
+
+=== END ===

@@ -1,3 +1,6 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log'] ===
+=== parsed content ===
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
@@ -66,7 +69,7 @@
         "implementation"
       ],
       "status": "inconsistency_flagged",
-      "inconsistency_note": "Deliverable D4-01 is described differently and assigned different due months across the Excellence and Impact sections. In Excellence B.1.2 it is characterised as 'coordination protocol specification (D4-01, M18)' — a technical research output due at month 18. In Impact B.2.1 and B.2.2 it is characterised as 'formal standardisation proposal (D4-01) to ISO/IEC JTC 1/SC 42 or IEEE by M48' — an external standards body submission due at month 48. These are materially different descriptions and incompatible due months for the same deliverable ID. Resolution is required: either D4-01 is the M18 protocol specification (and a separate deliverable ID should cover the M48 standardisation submission), or the Excellence section description and month must be corrected to reflect a standardisation proposal due M48."
+      "inconsistency_note": "Deliverable D4-01 is described differently and assigned different due months across the Excellence and Impact sections. In Excellence B.1.2 it is characterised as 'coordination protocol specification (D4-01, M18)' \u2014 a technical research output due at month 18. In Impact B.2.1 and B.2.2 it is characterised as 'formal standardisation proposal (D4-01) to ISO/IEC JTC 1/SC 42 or IEEE by M48' \u2014 an external standards body submission due at month 48. These are materially different descriptions and incompatible due months for the same deliverable ID. Resolution is required: either D4-01 is the M18 protocol specification (and a separate deliverable ID should cover the M48 standardisation submission), or the Excellence section description and month must be corrected to reflect a standardisation proposal due M48."
     },
     {
       "check_id": "CC-05",
@@ -90,7 +93,7 @@
     },
     {
       "check_id": "CC-07",
-      "description": "Impact claim grounding — each impact claim in Impact section must reference a WP or deliverable present in Implementation",
+      "description": "Impact claim grounding \u2014 each impact claim in Impact section must reference a WP or deliverable present in Implementation",
       "sections_checked": [
         "impact",
         "implementation"
@@ -111,7 +114,7 @@
     },
     {
       "check_id": "CC-09",
-      "description": "Terminology consistency — key technical terms, methodology names, and acronyms across all three sections",
+      "description": "Terminology consistency \u2014 key technical terms, methodology names, and acronyms across all three sections",
       "sections_checked": [
         "excellence",
         "impact",
@@ -122,36 +125,8 @@
     },
     {
       "check_id": "CC-10",
-      "description": "Section ordering and completeness — all three Part B sections present in correct order (Excellence, Impact, Implementation)",
+      "description": "Section ordering and completeness \u2014 all three Part B sections present in correct order (Excellence, Impact, Implementation)",
       "sections_checked": [
         "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null
-    },
-    {
-      "check_id": "CC-11",
-      "description": "Traceability footer consistency — non-empty primary_sources arrays and no_unsupported_claims_declaration consistent with overall_status",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null
-    },
-    {
-      "check_id": "CC-12",
-      "description": "Validation status aggregation — informational record of overall_status from each section",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": "Informational: all three sections carry overall_status 'inferred'. Excellence section has one inferred claim (C15: WP5 sex/gender stratification); Impact section has one inferred claim (C04: EI-04 EU strategic autonomy grounding); Implementation section has one inferred claim (CS-11: ethics-sensitive workstreams governed through WP1/WP5). No section carries overall_status 'unresolved'. Downstream review should note the inferred claims and confirm their inference chains are adequate for evaluator scrutiny."
-    }
-  ]
-}
+        "impa
+=== END ===

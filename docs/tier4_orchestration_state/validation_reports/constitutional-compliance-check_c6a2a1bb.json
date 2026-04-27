@@ -1,0 +1,124 @@
+{
+  "validation_report": {
+    "report_id": "compliance_check_part_b_assembled_draft_compliance_validator_2026-04-27T00:00:00Z",
+    "skill_id": "constitutional-compliance-check",
+    "invoking_agent": "compliance_validator",
+    "run_id_reference": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
+    "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+    "section13_checks": [
+      {
+        "prohibition_id": "13.1",
+        "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Artifact schema_id is 'orch.tier5.part_b_assembled_draft.v1' — a canonical assembled-draft schema, not a Grant Agreement Annex template. No strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' appear anywhere in the artifact as structural authorities. The three assembled sections reference 'docs/tier5_deliverables/proposal_sections/' paths aligned with instrument application form structure, not post-award annex templates. No violation detected."
+      },
+      {
+        "prohibition_id": "13.2",
+        "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "The assembled draft is a structural assembly-index and cross-section consistency-checking artifact. It contains no direct assertions of call requirements, scope boundaries, eligibility conditions, or expected outcomes/impacts that would require Tier 2B source attribution. The consistency_log entries (CC-01 through CC-12) describe consistency checks between sections, not call constraint claims. Call constraint claims reside in the underlying proposal sections, not in this assembly metadata layer. No violation detected at the assembled-draft artifact level."
+      },
+      {
+        "prohibition_id": "13.3",
+        "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment — not present in Tier 3",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Project-specific partner names appearing in the artifact are confined to the CC-03 consistency check entry. CC-03 explicitly identifies 'EuroLog International AG' and 'Boreal AI Labs Oy' as authoritative canonical names sourced from 'Tier 3 consortium/partners.json', and flags the Implementation section's use of truncated forms as an inconsistency requiring correction. This is a proper traceability attribution to Tier 3, not an invention. No partner names, capabilities, objectives, budget figures, team sizes, or equipment items appear in the assembled draft without a stated Tier 3 source context. No violation detected at the assembled-draft artifact level."
+      },
+      {
+        "prohibition_id": "13.4",
+        "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed; absent budget artifacts constitute a blocking gate failure",
+        "check_status": "violation",
+        "violation_evidence": "Artifact carries schema_id 'orch.tier5.part_b_assembled_draft.v1' and run_id 'c6a2a1bb-0b43-4c95-9202-934e45eece06', identifying it as a Phase 8 Tier 5 assembled draft produced in this run. Per CLAUDE.md §13.4 and §8.4, no Phase 8 artifact may exist unless gate_09 has confirmed a validated budget response is present and structurally consistent with the work package and consortium design. The budget gate assessment at 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json' is outside the declared input boundary of this skill invocation and cannot be verified as present with gate_pass_declaration: 'pass'. CLAUDE.md §15 requires preferring explicit gate failure over fabricated completion. Absence of verifiable gate confirmation for a Phase 8 artifact is a blocking constitutional finding.",
+        "severity": "critical"
+      },
+      {
+        "prohibition_id": "13.5",
+        "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Not directly checkable by reading an artifact. This prohibition governs agent runtime behaviour, not artifact content. Enforcement is the responsibility of the decision-log-update skill during agent execution. No check applicable at the artifact-content level; recorded as pass with explicit non-applicability rationale per skill specification."
+      },
+      {
+        "prohibition_id": "13.6",
+        "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Not directly checkable from an artifact. This prohibition governs workflow and skill scope definitions, not artifact content. No check applicable at the artifact-content level; recorded as pass with explicit non-applicability rationale per skill specification."
+      },
+      {
+        "prohibition_id": "13.7",
+        "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "The assembled draft's sections array references only Tier 5 proposal-section artifacts in 'docs/tier5_deliverables/proposal_sections/' — all Phase 8 outputs. No references to Phase 5, Phase 6, or other higher-phase outputs appear as inputs to this Phase 8 assembly in a manner inconsistent with canonical phase sequencing. Consistency checks CC-01 through CC-12 operate on Phase 8 section content and do not reference out-of-order phase dependencies. No evidence of silent phase reordering or gate weakening in the artifact. No violation detected."
+      },
+      {
+        "prohibition_id": "13.8",
+        "prohibition_description": "Finalising proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "CC-12 records that all three sections carry overall_status 'inferred' and that no section carries overall_status 'unresolved'. CC-03 (partner name abbreviation) and CC-04 (deliverable D4-01 description and due-month conflict) are both surfaced with status 'inconsistency_flagged' and include explicit resolution-required notes — they are not silently passed. CC-04 specifically states 'Resolution is required' and enumerates the resolution options, satisfying the requirement to explicitly flag rather than silently finalize. The assembled draft is performing its constitutional consistency-checking function. Individual section content cannot be independently verified within the declared input boundary, but the assembled draft's consistency mechanism is operating correctly. No violation detected at the assembled-draft artifact level."
+      },
+      {
+        "prohibition_id": "13.9",
+        "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "The assembled draft contains no direct regulatory claims about Horizon Europe participation conditions, grant agreement terms, financial regulation, or programme-rule assertions that would require Tier 1 normative framework source references. The consistency_log entries reference structural and content consistency between sections, not programme-rule claims. No applicable regulatory claims detected in this assembly-index artifact. No violation detected."
+      },
+      {
+        "prohibition_id": "13.10",
+        "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "The assembled draft is a Tier 5 structural index artifact. It does not contain evaluator-facing proposal text claims requiring individual Tier 1–4 source references; its content consists of section assembly metadata and consistency check results. CC-11 records that traceability footer consistency across all three underlying sections is 'consistent', confirming that the sections have non-empty primary_sources arrays and no_unsupported_claims_declaration values consistent with their overall_status. The assembled draft schema ('orch.tier5.part_b_assembled_draft.v1') does not include a traceability_footer field — this is appropriate for an assembly-index artifact whose traceability is established through the section-level footers verified by CC-11. No unresolved claims without source references are present in the assembled draft itself. No violation detected."
+      },
+      {
+        "prohibition_id": "13.11",
+        "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Not checkable from a phase output or deliverable artifact. This prohibition governs write operations to Tier 1 and Tier 2 source directories, which are not observable from a Tier 5 artifact's content. No check applicable at the artifact-content level; recorded as pass with explicit non-applicability rationale per skill specification."
+      },
+      {
+        "prohibition_id": "13.12",
+        "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+        "check_status": "pass",
+        "violation_evidence": null,
+        "severity": null,
+        "check_notes": "Not directly checkable from an artifact. This prohibition governs agent and skill execution disposition, not artifact content. No check applicable at the artifact-content level; recorded as pass with explicit non-applicability rationale per skill specification."
+      }
+    ],
+    "summary": {
+      "total_prohibitions_checked": 12,
+      "violations_found": 1
+    },
+    "timestamp": "2026-04-27T00:00:00Z"
+  },
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-04-27T00:00:00Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.4_part_b_assembled_draft_2026-04-27T00:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.4",
+      "artifact_affected": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. A Phase 8 Tier 5 artifact (schema_id: orch.tier5.part_b_assembled_draft.v1, run_id: c6a2a1bb-0b43-4c95-9202-934e45eece06) is present. The budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json was outside the declared input boundary of this skill invocation and could not be read or confirmed as present with gate_pass_declaration: 'pass'. Per CLAUDE.md §13.4 and §8.4, no Phase 8 artifact may exist and no Phase 8 substep may have commenced before gate_09 confirms a validated budget response is present and structurally consistent with the work package and consortium design. Human operator must: (1) verify that docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists; (2) confirm it carries gate_pass_declaration: 'pass'; (3) if the budget gate has not passed, retract this artifact and all other Phase 8 Tier 5 artifacts and halt Phase 8 activity pending budget gate resolution. If the budget gate is confirmed passed, this decision log entry may be closed with resolution_status updated to 'resolved' and the confirming artifact path recorded.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-04-27T00:00:00Z"
+    }
+  ]
+}

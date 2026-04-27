@@ -1,0 +1,546 @@
+{
+  "report_id": "traceability_all_sections_traceability_auditor_2026-04-27T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
+  "section_id_audited": "all_sections",
+  "audit_mode": "assembled",
+  "artifact_path_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "sections_included": [
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+  ],
+  "input_validation": {
+    "assembled_draft_schema_confirmed": true,
+    "schema_id_found": "orch.tier5.part_b_assembled_draft.v1",
+    "all_section_paths_exist": true,
+    "section_schemas_confirmed": {
+      "excellence_section.json": "orch.tier5.excellence_section.v1",
+      "impact_section.json": "orch.tier5.impact_section.v1",
+      "implementation_section.json": "orch.tier5.implementation_section.v1"
+    },
+    "tier1_4_reference_directories_accessible": true,
+    "assembled_draft_consistency_log_findings_noted": [
+      "CC-03: Implementation section B.3.2 uses abbreviated partner names 'EuroLog International' and 'Boreal AI Labs' omitting legal suffixes 'AG' and 'Oy' per partners.json — flagged as inconsistency_flagged",
+      "CC-04: D4-01 described as 'coordination protocol specification (M18)' in excellence section and as 'formal standardisation proposal... by M48' in impact section — flagged as inconsistency_flagged requiring resolution"
+    ]
+  },
+  "claim_audit_results": [
+    {
+      "claim_id": "EXC-01",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "MAESTRO addresses all four mandatory call scope areas (SR-02 robust planning, SR-03 memory management, SR-04 external tool integration, SR-05 multi-agent coordination) in a unified integrated architecture",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-02 (mandatory: true), SR-03 (mandatory: true), SR-04 (mandatory: true), SR-05 (mandatory: true); docs/tier3_project_instantiation/project_brief/concept_note.md Pillars 1–3 and Cross-Cutting Capability sections",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-02",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-1 target: ≥40% improvement in plan success rate over LLM-based baselines (ReAct, Reflexion) on standardised benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring more than 10 sequential steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-1.measurable_target: 'Achieve ≥40% improvement in plan success rate over pure LLM-based agent baselines (ReAct, Reflexion) on standardised agent benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring >10 sequential steps'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-03",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-2 target: ≥30% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-2.measurable_target: 'Demonstrate ≥30% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-04",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-3 target: effective coordination of ≥5 heterogeneous agents, ≥25% joint task completion improvement over independent baselines, formal mathematical proof of protocol convergence",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-3.measurable_target: 'Demonstrate effective coordination of ≥5 heterogeneous agents on shared tasks, with ≥25% improvement in joint task completion over independent agent baselines, and formal proof of protocol convergence'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-05",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-8 target: ≥30 external tools/APIs integrated; tool invocation success rate ≥95%; mean recovery time from tool failure ≤5s; full provenance traces for 100% of invocations",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-8.measurable_target: 'Typed tool registry supporting ≥30 external tools/APIs across all three demonstrator domains; tool invocation success rate ≥95% with verified output validation; mean recovery time from tool failure ≤5s; full provenance traces for 100% of tool invocations'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-06",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OBJ-4 target: diagnostic accuracy within 10% of specialist clinicians on 500 de-identified cases; OBJ-5 target: ≥15% defect reduction and ≥10% energy reduction at ISIA pilot factory; OBJ-6 target: ≥20% disruption recovery improvement and ≥15% delivery adherence improvement across 3 corridors",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json OBJ-4.measurable_target, OBJ-5.measurable_target, OBJ-6.measurable_target — exact textual match confirmed",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-07",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OUT-1, OUT-2, OUT-4, OUT-5, OUT-6, OUT-9 each target TRL 5 by project end, validated in operational environments",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json OUT-1.trl_achieved=5, OUT-2.trl_achieved=5, OUT-4.trl_achieved=5, OUT-5.trl_achieved=5, OUT-6.trl_achieved=5, OUT-9.trl_achieved=5",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-08",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "OUT-3 (formally verified multi-agent coordination protocol suite) is positioned at TRL 4, with scientific value in formal proof and protocol specification",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json OUT-3.trl_achieved=4; OUT-3.title='Formally verified multi-agent coordination protocol suite'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-09",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "Current AI agent research operates in three largely disconnected communities (LLM-based agents, classical planning/MAS, memory-augmented neural systems); MAESTRO's contribution is co-design across all three",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md section 'Positioning Against the State of the Art': 'Current AI agent research is concentrated in three largely disconnected communities: LLM-based agents… Classical planning and multi-agent systems… Memory-augmented neural systems… MAESTRO's distinctive contribution is the co-design of these three capabilities'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-10",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "WP2 tasks T2-01 (sub-task graph decomposition with formal pre/post-conditions), T2-02 (MCTS and HTN planning integration with LLM heuristics), T2-03 (plan monitoring and self-correction) implement neuro-symbolic planning",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP2.tasks: T2-01.title='Sub-task graph decomposition design with formal pre/post-conditions'; T2-02.title='MCTS and HTN planning integration with LLM heuristics'; T2-03.title='Plan monitoring and self-correction implementation'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-11",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "WP3 implements tri-store memory architecture (working, episodic, semantic) with learned controller via tasks T3-01–T3-03; WP4 develops formally specified coordination protocols with convergence proofs via tasks T4-01–T4-02",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP3.tasks: T3-01='Tri-store memory architecture design'; T3-02='Memory indexing and retrieval strategy implementation'; T3-03='Forgetting mechanism and coherence maintenance'; WP4.tasks: T4-01='Task-delegation and negotiation protocol design'; T4-02='Convergence and conflict resolution under partial observability'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-12",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "All 8 consortium partners (ATU, BIIS, CERIA, NIHS, ISIA, ELI, BAL, FIIT) have documented prior R&I experience and technical capabilities grounding their MAESTRO roles",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (all 8 partners present with descriptions); docs/tier3_project_instantiation/consortium/capabilities.json (all 8 partners present with technical_capabilities, relevant_experience, key_personnel, infrastructure fields populated)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-13",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "Open science strategy: open-source MAESTRO framework D9-02 (M36) under permissive licence; AI-on-demand platform contribution per SR-10; FAIR-compliant DMP D1-02 (M6, ATU); dissemination through ≥3 EDIHs across 6 EU member states",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP9.deliverables D9-02.title='Open-source software release', due_month=36; WP1.deliverables D1-02.title='Data management plan', due_month=6, responsible_partner='ATU'; docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-10; docs/tier3_project_instantiation/consortium/capabilities.json FIIT.infrastructure[EDIH network connections across 6 EU member states]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-14",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "The External Tool and API Orchestration Layer is architecturally integrated across all three research pillars (planning, memory, coordination) making it a genuine research and engineering contribution rather than a function-calling plugin",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md section 'Cross-Cutting Capability — External Tool and API Orchestration Layer': 'architecturally integrated across all three pillars'; docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP2 (lead_partner=ATU, tool orchestration in objectives) and WP8 (Integration, linked to WP2 outputs)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-15",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "WP5 healthcare benchmark (T5-01, NIHS lead) will address sex/gender stratification in cohort design per NIHS's established clinical research ethics review infrastructure",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP5.tasks T5-01.title='Clinical use case definition and diagnostic benchmark design', responsible_partner='NIHS'; docs/tier3_project_instantiation/consortium/capabilities.json NIHS.managerial_capabilities[Established clinical research ethics review infrastructure]. Inference chain: NIHS has established ethics review infrastructure (confirmed) → clinical diagnostic AI systems on patient cohort data are expected to address sex/gender stratification where clinically relevant per standard clinical research ethics practice (logical derivation not explicitly stated in any Tier 3 file)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-16",
+      "section": "excellence",
+      "sub_section": "B.1.1",
+      "claim_summary": "MAESTRO is a 48-month Research and Innovation Action coordinated by Alpenstadt Technical University (ATU, Germany)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json coordinator.organisation='Alpenstadt Technical University'; coordinator.short_name='ATU'; coordinator.country='DE'; duration_months=48",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-17",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "WP4 key output: coordination protocol specification (D4-01) due M18 and decentralised coordination software (D4-02) due M36",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP4.deliverables: D4-01.title='Multi-agent coordination protocol specification', type='report', due_month=18; D4-02.title='Decentralised coordination software', type='software', due_month=36",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EXC-18",
+      "section": "excellence",
+      "sub_section": "B.1.2",
+      "claim_summary": "Validation of demonstrator results through at least 2 Testing and Experiment Facilities accessible through FIIT, fulfilling the SR-11 requirement for AI Factory and Data Lab linkage",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-11: 'Projects must link to the resources offered by the AI Factories, including the Data Labs'; docs/tier3_project_instantiation/consortium/capabilities.json FIIT.infrastructure[AI Testing and Experiment Facility (TEF) access]; FIIT.technical_capabilities[Technology readiness assessment frameworks]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-01",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EI-01 (European Apply AI Strategy) pathway covered by three TRL-5 demonstrators in healthcare (WP5-NIHS), advanced manufacturing (WP6-ISIA), and logistics (WP7-ELI) with quantified KPI targets",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json PATH-EI-01.coverage_status='Covered'; tier2b_source_ref.status='Confirmed'; docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json EI-01.description confirms Apply AI Strategy focus on healthcare, advanced manufacturing, and in-vehicle autonomous driving",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-02",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EI-02 (EDIH-mediated industrial uptake) pathway: results routed through ≥3 EDIH partnerships and EIT Manufacturing network, targeting ≥10 European SMEs building on MAESTRO by M48 (KPI-04) and ≥3 EDIHs disseminating (KPI-05)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json PATH-EI-02.coverage_status='Covered'; KPI-04.target='≥10 European SMEs/startups with active MAESTRO-based development by M48'; KPI-05.target='≥3 EDIHs'; docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json EI-02.description confirms EDIH-mediated industrial uptake",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-03",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EI-03 (open scientific advancement) pathway: ≥20 publications in top AI venues, AI-on-demand platform contributions (D8-01 evaluation framework, D8-02 benchmark suite, D9-02 open-source framework), adoption by ≥5 external research groups (KPI-07)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json PATH-EI-03.coverage_status='Covered'; KPI-06.target='≥20 publications'; KPI-07.target='≥5 external research groups'; docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json EI-03.description confirms open scientific advancement and AI-on-demand platform sharing",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-04",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EI-04 (EU strategic autonomy) pathway addressed, inferred from topic destination placement in 'Achieving open strategic autonomy in digital and emerging enabling technologies (2026-27)'",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json PATH-EI-04.coverage_note: 'EI-04 is Inferred from topic destination placement'; docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json EI-04.status='Inferred'; EI-04.inference_note: 'inferred from destination placement; not explicit in call_entry.scope or expected_outcome'. Inference chain: topic placed in destination 'open strategic autonomy in digital enabling technologies' → MAESTRO advances next-generation AI agent capabilities → advances in these capabilities directly serve EU strategic autonomy objectives in the digital domain",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-05",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EI-05 (economic potential across diverse sectors) pathway covered by neuro-symbolic planning engine (D2-02), adaptive memory system (D3-02), and external tool/API orchestration capability (OUT-9) targeting ≥500 GitHub stars within 6 months of M36 release (KPI-10)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json PATH-EI-05.coverage_status='Covered'; KPI-10.target='≥500 GitHub stars within 6 months of M36 open-source release'; docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json EI-05.description confirms unlocking economic potential of AI agents across diverse sectors",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-06",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "Sector demonstrator KPIs: KPI-01 (≥3 hospital networks), KPI-02 (≥15% defect reduction and ≥10% energy savings), KPI-03 (≥20% disruption recovery improvement) grounded in project impacts IMP-2, IMP-3, IMP-4",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-2.indicators[≥3 hospital networks engaged in post-project adoption planning by M48]; IMP-3.indicators[≥15% defect reduction and ≥10% energy savings demonstrated in pilot factory]; IMP-4.indicators[≥20% improvement in disruption recovery time demonstrated operationally]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-07",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "EDIH deployment and open-source ecosystem targets KPI-04 (≥10 SMEs) and KPI-05 (≥3 EDIHs) grounded in Tier 3 IMP-5",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-5.indicators[≥10 European SMEs/startups building on MAESTRO framework by M48; ≥3 EDIHs actively disseminating MAESTRO technology]; docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json KPI-04.tier3_source='impacts.json:IMP-5.indicators[1]'; KPI-05.tier3_source='impacts.json:IMP-5.indicators[2]'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-08",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "Scientific publication targets: ≥20 peer-reviewed publications in top AI venues (NeurIPS, ICML, ICLR, AAMAS, AAAI) and citation KPI (KPI-06, KPI-09) grounded in IMP-1",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-1.indicators[≥20 peer-reviewed publications in top AI venues (NeurIPS, ICML, ICLR, AAMAS, AAAI); ≥100 citations of MAESTRO publications within 3 years]; docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json KPI-06.tier3_source='impacts.json:IMP-1.indicators[0]'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-09",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "D8-01 cited correctly as evaluation framework and benchmark specification (WP8-FIIT), not as orchestration layer output",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP8.deliverables D8-01.title='Evaluation framework and benchmark specification', responsible_partner='FIIT', due_month=12",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-10",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "OUT-9 is the External Tool and API Orchestration Layer (WP2/WP8), TRL 5, validated through D8-01 and D8-02",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json OUT-9.title='External Tool and API Orchestration Layer (TRL 5)'; OUT-9.trl_achieved=5; OUT-9.linked_wp_ids=['WP2','WP8']; OUT-9.linked_deliverable_ids=['D2-02','D8-01']",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-11",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "Dissemination plan with multi-channel activities including scientific publications, healthcare EDIH dissemination, manufacturing EIT/EDIH transfer, standardisation submission, and conference keynotes",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json dissemination_plan.activities (7 documented activities including peer_reviewed_scientific_publications, open_source_framework_release_and_ai_on_demand_contribution, edih_mediated_healthcare_technology_dissemination, eit_manufacturing_and_edih_industrial_dissemination, standardisation_body_submissions_and_policy_engagement, conference_keynotes_and_invited_presentations)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-12",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "Exploitation plan covering clinical adoption planning (NIHS), manufacturing technology transfer via EDIH/EIT Manufacturing (ISIA), logistics operational integration roadmap (ELI), and open-source ecosystem (BAL)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json exploitation_plan.activities (5 documented activities: edih_mediated_clinical_decision_support_adoption_planning, manufacturing_sme_technology_transfer_via_edih_and_eit_manufacturing, logistics_operational_system_integration_roadmap, open_source_ecosystem_and_downstream_commercial_adoption, standardisation_driven_protocol_adoption_by_external_multi_agent_projects)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-13",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "Post-project sustainability grounded in three mechanisms: open-source community dependency, operational embedding in NIHS/ISIA/ELI commercial environments, CERIA standardisation embedding in ISO/IEC or IEEE",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json sustainability_mechanism.description documents all three post-project sustainability mechanisms with responsible partners [BAL, NIHS, ISIA, ELI, CERIA]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-14",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "IPR open-core strategy: core framework, benchmark, evaluation infrastructure, and coordination protocol specification under Apache 2.0; sector-specific demonstrator configurations protectable as trade secrets by NIHS, ISIA, ELI; BAL leads IP management (WP9-T9-02)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json exploitation_plan.ipr_strategy: 'open-core IPR strategy... core MAESTRO framework, benchmark suite, evaluation infrastructure, and coordination protocol specifications are released under the Apache 2.0 open-source licence... Sector-specific demonstrator software configurations... may be protected as trade secrets... by NIHS for the clinical decision support configuration, ISIA for the manufacturing optimisation deployment, and ELI for the logistics integration. BAL leads IPR management coordination under WP9'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMP-15",
+      "section": "impact",
+      "sub_section": "B.2.1",
+      "claim_summary": "CERIA submits formal standardisation proposal identified as D4-01 to ISO/IEC JTC 1/SC 42 or IEEE by M48 (KPI-08); D4-01 characterized as the standardisation submission due M48",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-6.linked_deliverable_ids=['D4-01']; docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json KPI-08.traceable_to_deliverable='D4-01', target='≥1 formal submission to ISO/IEC JTC 1/SC 42 or IEEE Standards Association by M48'. CONTRADICTED BY: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP4.deliverables D4-01.title='Multi-agent coordination protocol specification', type='report', due_month=18",
+      "flag_reason": "D4-01 is characterized in the impact section (B.2.1, B.2.2) as the 'formal standardisation proposal' submitted to ISO/IEC by M48, but the authoritative structural source (wp_structure.json) defines D4-01 as 'Multi-agent coordination protocol specification', type='report', due_month=18. The M48 submission target and 'formal standardisation proposal' description in the impact section are inconsistent with the M18 protocol specification report characterization in wp_structure.json. This inconsistency is also flagged in assembled draft consistency_log CC-04 as requiring resolution. Status is Unresolved pending correction of either the deliverable description in the impact section or the WP structure definition of D4-01."
+    },
+    {
+      "claim_id": "IMP-16",
+      "section": "impact",
+      "sub_section": "B.2.2",
+      "claim_summary": "GitHub stars KPI target: ≥500 GitHub stars within 6 months of M36 open-source release (KPI-10)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json KPI-10.target='≥500 GitHub stars within 6 months of M36 open-source release'; KPI-10.traceable_to_deliverable='D9-02'; docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-5.indicators[≥500 GitHub stars on MAESTRO framework within 6 months of release]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-01",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "MAESTRO is structured into nine work packages (WP1–WP9) with described WP titles, lead partners, and running periods (WP1 M1–M48 ATU; WP2 ATU; WP3 BIIS; WP4 CERIA; WP5 NIHS M12–M42; WP6 ISIA M12–M42; WP7 ELI M12–M42; WP8 FIIT M6–M48; WP9 BAL M1–M48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json work_packages array (9 WPs with lead_partner, contributing_partners, tasks, deliverables); partner_role_matrix confirming all lead assignments",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-02",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "The dependency map contains 16 confirmed inter-WP data-input edges forming an acyclic DAG",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json dependency_map.edges (exactly 16 entries with edge_type='data_input'; cycle_detected=false); critical_path_analysis.cycle_check_method confirms DAG structure via Kahn's topological sort",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-03",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Within the 16 dependency edges, 9 are pillar-to-demonstrator edges (WP2/WP3/WP4 each feeding WP5, WP6, WP7)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json dependency_map.edges subset: WP2→WP5, WP3→WP5, WP4→WP5, WP2→WP6, WP3→WP6, WP4→WP6, WP2→WP7, WP3→WP7, WP4→WP7 = exactly 9 pillar-to-demonstrator edges confirmed",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-04",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Representative critical path WP2→WP5→WP8→WP9 with eight other tied paths of equal length (9 total tied paths) confirming balanced parallelism design",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json critical_path_nodes=['WP2','WP5','WP8','WP9']; critical_path_analysis.tied_paths (9 entries all of path_length_edges=3; representative path WP2→WP5→WP8→WP9 is one of the 9; the 8 others are the 'eight tied paths' referenced in the proposal text)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-05",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Eleven milestones MS1–MS11 span the project with specific due months (MS1=M3, MS2–MS4=M12–M15, MS5=M12, MS6=M24, MS7=M30, MS8=M36, MS9=M42, MS10=M45, MS11=M48) and verifiable achievement criteria",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json milestones array: MS1.due_month=3 (title='Architecture specification and integration contracts finalised'), MS2.due_month=12 (title='Planning engine v1.0'), MS3.due_month=12 (title='Memory architecture v1.0') confirmed from file; milestones array structure confirms 11 milestone entries with verifiable_criterion field populated for each",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-06",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "ATU leads both WP1 and WP2; all other seven partners (BIIS, CERIA, NIHS, ISIA, ELI, FIIT, BAL) each lead exactly one major functional WP",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json partner_role_matrix: ATU.wps_as_lead=['WP1','WP2']; CERIA.wps_as_lead=['WP4']; BIIS.wps_as_lead=['WP3']; ISIA.wps_as_lead=['WP6']; NIHS.wps_as_lead=['WP5']; ELI.wps_as_lead=['WP7']; BAL.wps_as_lead=['WP9']; FIIT.wps_as_lead=['WP8']",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-07",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Resource allocation confirmed by validated budget gate assessment for all 9 WPs and 8 partners; no blocking inconsistencies; specific person-month figures entered from validated lump sum budget",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json gate_pass_declaration='pass'; wp_coverage_results (all 9 WPs present_in_budget=true, inconsistencies=[]); partner_coverage_results (all 8 partners present_in_budget=true, inconsistencies=[]); blocking_inconsistencies=[]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-08",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "ADRA and GenAI4EU Hub cohesion activities per SR-09/CC-03/CC-04 coordinated by ATU in WP1",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-09: 'All proposals must allocate tasks for cohesion activities with the European Partnership on AI, Data and Robotics (ADRA) and with the CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub'; docs/tier2b_topic_and_call_sources/extracted/call_constraints.json CC-03 (ADRA co-programmed partnership); CC-04 (GenAI4EU central Hub cohesion)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-09",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "AI-on-demand platform contributions per SR-10/CC-05 managed by BAL in WP9",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-10: 'Communicable results must be shared with the European R&D community through the AI-on-demand platform'; docs/tier2b_topic_and_call_sources/extracted/call_constraints.json CC-05: same mandate confirmed",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-10",
+      "section": "implementation",
+      "sub_section": "B.3.2",
+      "claim_summary": "NIHS provides access to de-identified clinical datasets and established clinical validation pathways critical to sector validation",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json NIHS.description: 'Access to de-identified clinical datasets and established clinical validation pathways'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-11",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Ethics-sensitive workstreams governed through WP1 ethics compliance oversight (T1-03) and WP5 clinical validation governance; RISK-07 LLM pace-of-change risk mitigated through model-agnostic interfaces",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json ethics_assessment.issues ETHICS-01 (Category 8 AI), ETHICS-02 (Category 4 health data), ETHICS-03 (Category 2 human participants) — identifies ethics-sensitive workstreams; governance_matrix Ethics and Quality Oversight Committee (ATU and NIHS, minimum biannual). Inference chain: ethics issues documented in Phase 6 implementation_architecture.json → ethics governance coordinated through WP1 T1-03 and WP5 clinical validation activities per governance_matrix and management_roles → ethics-sensitive workstreams are governed through these mechanisms",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-12",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "11 implementation risks identified; RISK-10 (framework integration, medium likelihood/high impact) mitigated through API contract definition at M1–M3 and integration checkpoints every 6 months; RISK-01 through modular fallback; RISK-07 through model-agnostic interfaces",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json risk_register (11 entries RISK-01 to RISK-11); RISK-10.mitigation: 'Define shared data representations, API contracts, tool registry schemas, and integration interfaces in M1–M3... Conduct integration checkpoints every 6 months'; RISK-01.mitigation: 'Adopt a modular architecture with well-defined interfaces... Implement fallback modes where the LLM-only planner operates'; RISK-07.mitigation: 'Design all MAESTRO components with model-agnostic interfaces'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-13",
+      "section": "implementation",
+      "sub_section": "B.3.1",
+      "claim_summary": "Three governance bodies: General Assembly (all 8 partners, biannual, strategic authority), Project Management Committee (all 8 partners, quarterly, operational management), Ethics and Quality Oversight Committee (ATU and NIHS, minimum biannual)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json governance_matrix[0].body_name='General Assembly', meeting_frequency='Biannual', composition=all 8 partners; governance_matrix[1].body_name='Project Management Committee', meeting_frequency='Quarterly'; governance_matrix[2].body_name='Ethics and Quality Oversight Committee', meeting_frequency='As needed, with a minimum of biannual convening', composition=['ATU','NIHS']",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-14",
+      "section": "implementation",
+      "sub_section": "B.3.2",
+      "claim_summary": "MAESTRO directly validates healthcare and advanced manufacturing demonstrators and includes a logistics transfer demonstrator plus architectural transferability mapping toward in-vehicle autonomous-driving requirements",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP5.title='Healthcare Demonstrator — Clinical Decision Support'; WP6.title='Manufacturing Demonstrator — Process Optimisation'; WP7.title='Logistics Transfer Demonstrator — Cross-Sector Generalisation'; WP7.objectives[Confirm integrated architecture transferability beyond primary call sectors]; docs/tier3_project_instantiation/project_brief/strategic_positioning.md section 'Positioning Within the Apply AI Sectors': 'the project includes a targeted architectural mapping analysis (WP8) assessing this transferability' to autonomous driving",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-15",
+      "section": "implementation",
+      "sub_section": "B.3.2",
+      "claim_summary": "TEF linkage per CC-07 in WP8/FIIT scope; results may be validated in Testing and Experiment Facilities",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json CC-07: 'Projects selected in this topic should link to the resources offered by the AI Factories, including the Data Labs. Results may be validated in the Testing and Experiment Facilities'; docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json MGR-WPL-WP8.responsibilities[Coordination with Testing and Experiment Facilities per CC-07 (call_constraints.json)]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "IMPL-16",
+      "section": "implementation",
+      "sub_section": "B.3.2",
+      "claim_summary": "Partner legal names for ELI and BAL as stated in implementation section B.3.2 partner descriptions",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json ELI.legal_name='EuroLog International AG'; BAL.legal_name='Boreal AI Labs Oy'. Implementation section B.3.2 text uses 'EuroLog International' (omitting 'AG') and 'Boreal AI Labs' (omitting 'Oy').",
+      "flag_reason": "Implementation section B.3.2 uses abbreviated partner names 'EuroLog International' and 'Boreal AI Labs' that omit the legal entity suffixes 'AG' and 'Oy' respectively. The authoritative source docs/tier3_project_instantiation/consortium/partners.json records legal names as 'EuroLog International AG' (partner 6) and 'Boreal AI Labs Oy' (partner 7). This name inconsistency is also flagged in the assembled draft consistency_log CC-03 as 'inconsistency_flagged' with 'Correction required in Implementation section B.3.2 partner description text to match canonical legal names.' Unresolved pending correction."
+    },
+    {
+      "claim_id": "CROSS-01",
+      "section": "cross_section",
+      "sub_section": "B.1.2 vs B.2.1 and B.2.2",
+      "claim_summary": "D4-01 is described as 'coordination protocol specification (D4-01, M18)' in excellence section B.1.2 but as 'formal standardisation proposal (D4-01)... by M48' in impact section B.2.1 and B.2.2 — materially different characterizations and incompatible due months for the same deliverable ID",
+      "status": "unresolved",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP4.deliverables D4-01.title='Multi-agent coordination protocol specification', type='report', due_month=18 — supports excellence section characterization. docs/tier3_project_instantiation/architecture_inputs/impacts.json IMP-6.linked_deliverable_ids=['D4-01']; docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json KPI-08.traceable_to_deliverable='D4-01', target month M48 — supports impact section characterization. Sources are in mutual contradiction for the role and due month of D4-01.",
+      "flag_reason": "Excellence section B.1.2 characterizes D4-01 as 'coordination protocol specification (D4-01, M18)' per wp_structure.json (due_month=18, type='report'). Impact section B.2.1 and B.2.2 characterize D4-01 as the 'formal standardisation proposal' submitted to ISO/IEC JTC 1/SC 42 or IEEE 'by M48'. These are materially different descriptions — different type (protocol spec vs. standardisation proposal) and incompatible due months (M18 vs. M48) for the same deliverable ID. This cross-section inconsistency is confirmed by assembled draft consistency_log CC-04 as 'inconsistency_flagged' with 'Resolution required: either D4-01 is the M18 protocol specification (and a separate deliverable ID should cover the M48 standardisation submission), or the Excellence section description and month must be corrected.' Unresolved pending resolution of CC-04."
+    }
+  ],
+  "summary": {
+    "total_claims": 51,
+    "confirmed": 45,
+    "inferred": 3,
+    "assumed": 0,
+    "unresolved": 3
+  },
+  "no_unsupported_claims_declaration": false,
+  "unresolved_claim_ids": [
+    "IMP-15",
+    "IMPL-16",
+    "CROSS-01"
+  ],
+  "inferred_claim_ids": [
+    "EXC-15",
+    "IMP-04",
+    "IMPL-11"
+  ],
+  "resolution_required": [
+    {
+      "claim_id": "IMP-15",
+      "issue": "D4-01 described as standardisation proposal (M48) in impact section; wp_structure.json defines it as protocol specification report due M18. Clarification required on whether D4-01 is due M18 (as per wp_structure.json) or represents the M48 standardisation submission, and whether a separate deliverable ID should cover the standardisation submission activity."
+    },
+    {
+      "claim_id": "IMPL-16",
+      "issue": "Implementation section B.3.2 uses abbreviated legal names 'EuroLog International' and 'Boreal AI Labs'; authoritative partners.json has 'EuroLog International AG' and 'Boreal AI Labs Oy'. Correction required."
+    },
+    {
+      "claim_id": "CROSS-01",
+      "issue": "Material cross-section inconsistency in D4-01 characterization between excellence (M18 protocol spec) and impact (M48 standardisation proposal) sections. Requires resolution before proposal finalization. See also assembled draft consistency_log CC-04."
+    }
+  ],
+  "reference_files_read": [
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+    "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json",
+    "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+    "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/capabilities.json",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json",
+    "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
+    "docs/tier3_project_instantiation/project_brief/concept_note.md",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+  ],
+  "timestamp": "2026-04-27T00:00:00Z"
+}

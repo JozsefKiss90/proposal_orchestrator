@@ -1,21 +1,22 @@
 {
   "gate_id": "gate_10b_impact_completeness",
   "gate_kind": "exit",
-  "run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2",
+  "run_id": "c6a2a1bb-0b43-4c95-9202-934e45eece06",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:04fe518f3b9a13dc341bb5257eac9e68705fa3c6d7ff5cefb3e46ada86a7c44d",
+  "input_fingerprint": "sha256:5800855e9d7c01d3fbf3579feef83ebe8453ea49bddd2df0ffa42ad1f508a405",
   "input_artifact_fingerprints": {
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:e859e67d53c68b5efaa6f8478381e74651dc07cab0a8cc8279bdcbed34ab3bec"
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:45105974f5a3a61e130c15a7e86ff2050bd36f287bc739398058b82197dda3d4"
   },
-  "evaluated_at": "2026-04-27T11:10:13.257036+00:00",
+  "evaluated_at": "2026-04-27T17:03:54.145356+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g09b_p02",
+      "g09b_p03",
       "g09b_p01",
       "g09b_p04",
       "g09b_p05",
@@ -23,32 +24,12 @@
       "g09b_p06",
       "g09b_p07"
     ],
-    "failed": [
-      {
-        "predicate_id": "g09b_p03",
-        "type": "file",
-        "function": "artifact_owned_by_run",
-        "args": {
-          "path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
-          "run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2"
-        },
-        "failure_category": "STALE_UPSTREAM_MISMATCH",
-        "reason": "Artifact run_id '1d799589-bfc5-464d-9a10-dd5113653c50' does not match current run '62d7acae-906e-4b8f-9f85-4ff89b6a13f2': C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json.  Re-run the producing phase under the current run_id, or add this artifact path to the reuse policy's approved_artifacts list.",
-        "details": {
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
-          "artifact_run_id": "1d799589-bfc5-464d-9a10-dd5113653c50",
-          "expected_run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2"
-        },
-        "fail_message": "impact_section.json exists but its run_id does not match the current run.\n",
-        "prose_condition": "Impact section owned by current run"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10b_result.json"
 }
