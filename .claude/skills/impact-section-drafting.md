@@ -416,6 +416,33 @@ No CONSTRAINT_VIOLATION conditions are defined; all constitutional constraint fa
 
 <!-- Schema validation complete -->
 
+## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+
+All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+
+**Objective References:**
+- When referencing objectives, use the exact `id` from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`.
+- Use the exact `title` field value when naming components/systems. Do not substitute words.
+
+**Metric Completeness (MANDATORY):**
+- For EVERY objective referenced in the Impact section, ALL quantified targets from its `measurable_target` field MUST be preserved.
+- If an objective has multiple metrics (e.g., "≥20% improvement in X AND ≥15% improvement in Y"), ALL metrics must appear. Partial metric loss fails gate_10d.
+- Metrics must retain: numeric value, qualifier (≥/≤), unit/context.
+
+**Deliverable ↔ KPI Distinction (MANDATORY):**
+- Deliverables MUST be referenced using their canonical `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
+- KPIs MUST NOT be described AS deliverables. A KPI that is MEASURED BY a deliverable is not the same as that deliverable.
+- If a KPI is derived from or tracked by a deliverable, describe as "tracked through deliverable X" or "measured against deliverable X", NOT "deliverable X [= KPI activity]".
+- Specifically: D4-01 is "Multi-agent coordination protocol specification" (M18). Standardisation submission (M48) is KPI-08, NOT D4-01.
+
+**Partner References:**
+- Use either `short_name` or exact `legal_name` from `consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes.
+
+**Terminology:**
+- Use canonical component/system names from objective `title` fields.
+- Do NOT substitute synonyms (e.g., use "External Tool and API Orchestration Layer" exactly, not "orchestration capability" or "orchestration framework").
+
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.

@@ -398,6 +398,28 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 
 <!-- Schema validation complete -->
 
+## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+
+All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+
+**Objective References:**
+- ALL objective IDs from `docs/tier3_project_instantiation/architecture_inputs/objectives.json` MUST appear in the Excellence section's structured enumeration.
+- Use the exact `id` field value (e.g., "OBJ-1", "OBJ-7") — do not skip, renumber, or paraphrase.
+- Use the exact `title` field value when naming the objective's component/system. Substituting words (e.g., "capability" for "Layer") constitutes terminology drift and will fail gate_10d.
+- If Tier 3 defines N objectives, the Excellence section MUST enumerate exactly N objectives.
+
+**Partner References:**
+- When naming partners, use either `short_name` (e.g., "ATU", "ELI") or the full `legal_name` from `consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes (AG, Oy, GmbH, etc.).
+
+**Metric References:**
+- ALL quantified targets (percentages, counts) from each objective's `measurable_target` field MUST be preserved in the Excellence section.
+- Do not drop individual metrics when an objective has multiple quantified targets (e.g., "≥20% AND ≥15%" must both appear).
+
+**Terminology:**
+- Use canonical component/system names from objective `title` fields consistently.
+- Do NOT substitute synonyms for named architectural components (e.g., use "External Tool and API Orchestration Layer" exactly, not "external tool and API orchestration capability").
+
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.

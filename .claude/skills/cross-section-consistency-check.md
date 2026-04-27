@@ -353,6 +353,44 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT or INCOM
 
 <!-- Schema validation complete -->
 
+## Strengthened Validation Dimensions (GATE-CRITICAL)
+
+The 12 mandatory consistency checks (CC-01 through CC-12) must enforce the following artifact-driven validation dimensions. Each dimension operates purely on canonical artifacts — no heuristics or vague similarity.
+
+**1. Objective Coverage Completeness (CC-01):**
+- Load ALL objective IDs from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`.
+- Verify: Excellence section enumerates ALL objectives (count must match Tier 3).
+- Verify: every objective ID mentioned in Impact/Implementation exists in Tier 3.
+- FAIL deterministically if any objective is missing or unrecognized.
+
+**2. Objective Identity Consistency (CC-01):**
+- For each objective referenced across sections, the `id` and `title` from Tier 3 must be used canonically.
+- No paraphrased or partial objective references allowed.
+- If objective has component keyword in title (engine, layer, architecture, protocol, framework, system), that exact title must be used.
+
+**3. Partner Naming Consistency (CC-03):**
+- Load `legal_name` and `short_name` for each partner from `consortium/partners.json`.
+- When a partner's name appears in section content, it must match either `legal_name` exactly OR `short_name` exactly.
+- If `legal_name` has a legal entity suffix (AG, Oy, GmbH, etc.) and the name appears WITHOUT that suffix, flag as `inconsistency_flagged`.
+- No mixing of naming forms within a section without explicit mapping.
+
+**4. Deliverable ↔ KPI Alignment (CC-04, CC-06):**
+- Load deliverables from `phase3_wp_design/wp_structure.json` and KPIs from `phase5_impact_architecture/impact_architecture.json`.
+- Verify: deliverable IDs used in sections match canonical deliverable titles from wp_structure.
+- Verify: KPIs are NOT described AS deliverables. A KPI tracked by a deliverable ≠ that deliverable.
+- If a deliverable ID is attributed a different purpose across sections, flag CC-04 as `inconsistency_flagged`.
+
+**5. Metric Completeness (CC-06):**
+- For each objective referenced in sections, extract ALL quantified targets from `measurable_target` in objectives.json.
+- Verify: Impact section preserves ALL metrics (no partial loss of multi-target objectives).
+- No partial metric loss: if target says "≥20% X AND ≥15% Y", both values must appear.
+
+**6. Terminology Consistency (CC-09):**
+- Extract canonical component/system names from Tier 3 objective titles.
+- For each canonical name, identify its stem (name minus component keyword).
+- If the stem appears in a section but the full canonical name does NOT, flag as `inconsistency_flagged`.
+- Example: stem "External Tool and API Orchestration" found but "External Tool and API Orchestration Layer" absent → flag.
+
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.

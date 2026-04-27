@@ -417,6 +417,28 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 
 <!-- Schema validation complete -->
 
+## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+
+All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+
+**Partner Legal Names (MANDATORY):**
+- When naming partners in prose, use the exact `legal_name` from `docs/tier3_project_instantiation/consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes. Forbidden without the legal suffix (examples dynamically derived from partners.json): if `legal_name` ends with "AG", "Oy", "GmbH", etc., the suffix MUST be included.
+- `short_name` (e.g., "ATU", "ELI") may be used in parentheses or as abbreviations, but the first prose mention of each partner MUST use the full `legal_name`.
+
+**Objective References:**
+- When referencing objectives, use the exact `id` from `architecture_inputs/objectives.json`.
+- Use the exact `title` field value for component/system names. Do not substitute words.
+
+**Deliverable References:**
+- Use exact `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
+- Do not reassign deliverable IDs to activities they do not represent.
+
+**Terminology:**
+- Use canonical component/system names from objective `title` fields consistently.
+- Do NOT substitute synonyms for named architectural components across sections.
+- If Excellence uses "External Tool and API Orchestration Layer", Implementation MUST use the same term exactly.
+
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.
