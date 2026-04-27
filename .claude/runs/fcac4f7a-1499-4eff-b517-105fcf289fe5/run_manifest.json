@@ -1,0 +1,95 @@
+{
+  "run_id": "fcac4f7a-1499-4eff-b517-105fcf289fe5",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "created_at": "2026-04-27T12:15:23.062877+00:00",
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "released",
+    "n08a_excellence_drafting": "released",
+    "n08b_impact_drafting": "blocked_at_exit",
+    "n08c_implementation_drafting": "blocked_at_exit"
+  },
+  "accepted_upstream_gates": {
+    "phase_01_gate": {
+      "original_run_id": "a634da9d-ef08-4aca-98e1-57e9c9f6de89",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.065729+00:00",
+      "status": "pass"
+    },
+    "phase_02_gate": {
+      "original_run_id": "de497e74-ae11-4afc-bc92-7c3e3a5ed943",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.066793+00:00",
+      "status": "pass"
+    },
+    "phase_03_gate": {
+      "original_run_id": "40b0bbbd-82e1-48d6-b8d2-e05f0e898092",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.067791+00:00",
+      "status": "pass"
+    },
+    "phase_04_gate": {
+      "original_run_id": "badb62ef-fb9c-4d14-a405-5181400524b9",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.067791+00:00",
+      "status": "pass"
+    },
+    "phase_05_gate": {
+      "original_run_id": "f3151039-5007-449e-a0ad-512e364e6fbd",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.068783+00:00",
+      "status": "pass"
+    },
+    "phase_06_gate": {
+      "original_run_id": "b2d4f829-9349-424a-9fdb-25c16fc42ba5",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.069786+00:00",
+      "status": "pass"
+    },
+    "gate_09_budget_consistency": {
+      "original_run_id": "516af107-14ae-4baf-8fa5-4553cb2b7441",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+      "accepted_at": "2026-04-27T12:15:23.069786+00:00",
+      "status": "pass"
+    }
+  },
+  "node_failure_details": {
+    "n08a_excellence_drafting": {
+      "failure_origin": null,
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    },
+    "n08b_impact_drafting": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'impact-section-drafting' failed: Skill 'impact-section-drafting': Claude returned non-JSON response: '\": [\\n      {\"tier\": 4, \"source_path\": \"docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json\"},\\n      {\"tier\": 4, \"source_path\": \"docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json\"},\\n      {\"tier\": 4, \"source_path\": \"docs/tier4'",
+      "failure_category": "SKILL_FAILURE"
+    },
+    "n08c_implementation_drafting": {
+      "failure_origin": "exit_gate",
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  },
+  "reuse_decisions": {
+    "n08c_implementation_drafting": {
+      "status": "reused",
+      "mode": "drafting_skipped_audit_executed",
+      "source_run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2",
+      "artifact_run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "input_fingerprint": "2e8d0d503d5ea13d4ecda8b899cef7fdfd24e0a89060e2fa9658ac9e2c9a79b6",
+      "gate_id": "gate_10c_implementation_completeness"
+    }
+  }
+}

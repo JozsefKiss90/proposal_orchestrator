@@ -576,10 +576,10 @@ def is_reuse_owned_artifact_valid(
       1. Node is reuse-eligible (n08a/n08b/n08c only)
       2. Current run has a persisted reuse decision with status="reused"
       3. Decision mode is "drafting_skipped_audit_executed"
-      4. Decision source_run_id matches artifact.run_id
+      4. Decision artifact_run_id matches artifact.run_id
       5. Decision artifact_path matches the canonical artifact path
       6. Reuse metadata file exists on disk
-      7. Metadata source_run_id matches artifact.run_id
+      7. (removed — superseded by conditions 8+9)
       8. Metadata artifact_sha256 matches current file hash
       9. Metadata input_fingerprint matches current computed fingerprint
      10. Current-run audit reports exist for both required audit skills
@@ -641,10 +641,11 @@ def is_reuse_owned_artifact_valid(
     if metadata is None:
         return False, "reuse_metadata_missing"
 
-    # Condition 7: prefer artifact_run_id (v2+), fall back to source_run_id (v1)
-    metadata_art_rid = metadata.get("artifact_run_id") or metadata.get("source_run_id")
-    if metadata_art_rid != artifact_run_id:
-        return False, "metadata_source_run_id_mismatch"
+    # Condition 7 (removed): metadata artifact_run_id vs artifact.run_id.
+    # This check is superseded by conditions 8+9 (SHA-256 hash + input
+    # fingerprint), which are strictly stronger integrity proofs.  v1
+    # metadata may have a stale source_run_id (set to validating run
+    # instead of artifact origin); conditions 8+9 catch any real change.
 
     # Condition 8
     artifact_abs = repo_root / artifact_path

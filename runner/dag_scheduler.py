@@ -1504,18 +1504,33 @@ class DAGScheduler:
                 node_id, self.repo_root, current_fingerprint=fp,
             )
             if decision.reusable:
+                # Read the actual artifact run_id from disk (authoritative).
+                # The metadata's source_run_id may be stale from v1 format;
+                # always prefer the artifact file's own run_id field.
+                _actual_art_run_id = (
+                    read_artifact_run_id(
+                        self.repo_root / decision.artifact_path
+                    )
+                    if decision.artifact_path
+                    else None
+                )
+                _effective_art_rid = (
+                    _actual_art_run_id or decision.source_run_id
+                )
+
                 log.info(
                     "  [%s] REUSE: drafting skipped, audit skills executing "
-                    "(source_run=%s, fingerprint=%s..)",
+                    "(source_run=%s, artifact_run_id=%s, fingerprint=%s..)",
                     node_id,
                     decision.source_run_id,
+                    _effective_art_rid,
                     (decision.input_fingerprint or "")[:12],
                 )
                 reuse_dec = {
                     "status": "reused",
                     "mode": "drafting_skipped_audit_executed",
-                    "source_run_id": decision.source_run_id,
-                    "artifact_run_id": decision.source_run_id,
+                    "source_run_id": _effective_art_rid,
+                    "artifact_run_id": _effective_art_rid,
                     "artifact_path": decision.artifact_path,
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,

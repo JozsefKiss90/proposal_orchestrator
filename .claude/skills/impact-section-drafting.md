@@ -48,6 +48,30 @@ Do not include ANY text before or after the JSON object — no prose, no
 verification summaries, no markdown fencing. The response must begin with `{`
 and end with `}`. Any non-JSON output causes a pipeline failure.
 
+**Output size ceiling:** The total JSON response MUST be under 18,000 characters.
+Exceeding this limit causes transport truncation and a pipeline failure. To stay
+within budget:
+- B.2 sub-section content: write concise evaluator-oriented paragraphs, NOT
+  expanded pathway-by-pathway dumps. Summarize impact pathways in compact
+  groups (3-5 sentences per sub-section). Do NOT reproduce full KPI tables
+  or pathway detail in prose.
+- DEC content: one compact paragraph per DEC category (dissemination,
+  exploitation, communication). Do NOT list every deliverable or partner
+  involved in dissemination.
+- Keep each sub_sections[].content field under 2,000 characters.
+- Keep each claim_statuses[].source_ref under 120 characters (file path + ID only).
+- Limit claim_statuses to 15 entries maximum; group minor claims from
+  the same source into aggregated entries.
+- Do NOT repeat long lists of outcomes, deliverables, or impact pathways
+  in prose if they are already in impact_pathway_refs or validation_status.
+- Use compact primary_sources entries (path only, no prose descriptions).
+
+**Deliverable identity constraint (GATE-CRITICAL, D8-01):** D8-01 is the evaluation
+framework and benchmark specification (WP8). It MUST NOT be cited as the External
+Tool and API Orchestration Layer or any other non-evaluation artifact. If no
+dedicated orchestration-layer deliverable exists, ground the orchestration
+layer in OUT-9 / architecture inputs, not invented deliverable IDs.
+
 ## Canonical Inputs and Outputs
 
 ### Inputs

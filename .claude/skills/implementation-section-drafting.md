@@ -135,9 +135,9 @@ within budget:
 
   - Step 2.4.1: **Management structure.** Describe management bodies, meeting frequency, decision-making scope, escalation paths. Draw from `management_structure` field. Roles must reference only Tier 3 consortium partners. Do not assert programme-rule claims (e.g. "consortium agreement guidance") unless directly traceable to a Tier 1 normative source in reads_from. If governance structure references call constraints (CC-*) or scope requirements (SR-*), cite the specific Tier 2B extracted file in traceability_footer.primary_sources.
 
-  - Step 2.4.2: **Risk register summary.** Present top risks with category, likelihood, impact, and mitigation measures from `risk_register` field.
+  - Step 2.4.2: **Risk register summary.** Present top risks with category, likelihood, impact, and mitigation measures from `risk_register` field. **RISK-10 checkpoint frequency:** The source (`implementation_architecture.json`) specifies integration checkpoints every 6 months. Do NOT write "bimonthly integration checkpoints" or "bimonthly" in any context. **Required wording:** "integration checkpoints every 6 months" or "six-monthly integration checkpoints". Always use the frequency stated in the source data.
 
-  - Step 2.4.3: **Ethics self-assessment.** Summarize ethics flags from `ethics_assessment` field.
+  - Step 2.4.3: **Ethics self-assessment.** Summarize ethics flags from `ethics_assessment` field. **FORBIDDEN: numbered Horizon Europe ethics categories.** Do NOT state "Category 8", "Category 4", "Category 2", or any numbered ethics category classification unless a Tier 1 normative source is explicitly read and cited in reads_from and traceability_footer.primary_sources. This skill does NOT read Tier 1 sources. **Preferred safe wording:** "The implementation plan treats AI system risks, health-data handling, and human-participant/clinical-context considerations as ethics-sensitive workstreams, governed through WP1 ethics compliance oversight and the WP5 clinical validation governance." Do NOT use numbered ethics categories in B.3.1 or B.3.2 content.
 
 - Step 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`, cross-referenced against Tier 4 `wp_structure.json`:
 
@@ -150,6 +150,10 @@ within budget:
   - Step 2.5.4: **No unsourced programme-rule assertions.** Do NOT assert Tier 1 programme-rule obligations unless the skill reads the specific Tier 1 normative source AND includes it in reads_from and traceability_footer.primary_sources[]. This skill does NOT read Tier 1 sources. **FORBIDDEN phrases** (must not appear in any sub_sections[].content unless a Tier 1 source is explicitly read and cited): "GEP eligibility obligations", "required to hold Gender Equality Plans", "per Tier 1 programme rules", "at grant signature". Instead, for eligibility and administrative compliance topics, use: "Administrative eligibility declarations are handled outside this B.3.2 narrative and are not repeated here unless directly required by the section schema and traceable to a declared source." Do NOT cite Tier 1 programme rules from agent knowledge.
 
   - Step 2.5.5: Describe each partner's role, expertise, and contribution. Do not assign roles to partners not present in Tier 3 (Constraint 2, CLAUDE.md Section 13.3).
+
+  - Step 2.5.6: **FORBIDDEN: SR-07 "all three sectors" overclaim.** Do NOT claim "covers all three Apply AI sectors mandated by SR-07", "all three sectors are covered", or equivalent wording. The project has healthcare, advanced manufacturing, and a logistics transfer demonstrator — but in-vehicle autonomous driving is not a primary demonstrator; it is addressed through architectural transferability mapping only. **Preferred safe wording:** "MAESTRO directly validates healthcare and advanced manufacturing demonstrators and includes a logistics transfer demonstrator plus architectural transferability mapping toward in-vehicle autonomous-driving requirements."
+
+  - Step 2.5.7: **Conflict-prone contributor WP lists.** When Tier 3 `roles.json` and Tier 4 `wp_structure.json` conflict on which partners contribute to which WPs, do NOT enumerate per-partner contributor WP lists. Instead, state WP lead roles (which are consistent) and partner domain expertise from `partners.json`. If contributor roles are necessary, say they follow the authoritative work-package structure without enumerating conflict-prone contributor lists.
 
 - Step 2.6: **Draft resources sub-section.** Describe resource allocation at the level confirmed by the budget gate. Do not cite specific budget figures not validated in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
 
@@ -175,6 +179,10 @@ within budget:
   - No "nine dependency edges" when describing the full dependency map
   - No partner-WP-contributor claims contradicted by wp_structure.json
   - No unsourced Tier 1 programme-rule assertions or GEP forbidden phrases
+  - No "bimonthly" wording anywhere in content (must be "every 6 months" or "six-monthly")
+  - No "Category 8", "Category 4", "Category 2" or numbered ethics categories without Tier 1 source
+  - No "covers all three Apply AI sectors" or equivalent SR-07 overclaim
+  - No conflict-prone contributor WP lists when Tier 3/Tier 4 conflict is unresolved
   - Total JSON response under 20,000 characters
   If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Implementation section has non-gate-ready content: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 

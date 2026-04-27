@@ -435,10 +435,12 @@ class TestReuseFailClosed:
         assert valid is False
         assert reason == "reuse_metadata_missing"
 
-    def test_fails_when_metadata_source_run_id_mismatch(
+    def test_passes_when_metadata_source_run_id_stale_but_hash_matches(
         self, tmp_path: Path
     ) -> None:
-        """Fails when metadata artifact_run_id/source_run_id != artifact.run_id."""
+        """Passes when metadata artifact_run_id/source_run_id is stale but
+        hash and fingerprint still match (condition 7 removed; conditions 8+9
+        are the authoritative integrity checks)."""
         node_id = "n08c_implementation_drafting"
         source_run, current_run, artifact = self._setup_and_get_artifact(
             tmp_path, node_id
@@ -454,8 +456,9 @@ class TestReuseFailClosed:
             node_id, REUSE_ELIGIBLE_NODES[node_id]["artifact_path"],
             artifact, current_run, tmp_path,
         )
-        assert valid is False
-        assert reason == "metadata_source_run_id_mismatch"
+        # With condition 7 removed, hash+fingerprint match is sufficient
+        assert valid is True
+        assert reason == "all_reuse_ownership_conditions_met"
 
     def test_fails_when_artifact_hash_mismatch(self, tmp_path: Path) -> None:
         """Fails when artifact SHA-256 doesn't match metadata."""

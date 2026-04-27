@@ -1,0 +1,86 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_json_implementation_writer_2026-04-27T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "fcac4f7a-1499-4eff-b517-105fcf289fe5",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Structurally non-applicable to artifact-level check: whether durable decisions were held only in agent memory cannot be determined by reading the deliverable artifact itself. This prohibition is enforced by the decision-log-update skill and Tier 4 state inspection, not by auditing Tier 5 content.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Structurally non-applicable to artifact-level check: whether a workflow or skill has expanded its scope to redefine constitutional categories cannot be determined by reading the content of a Tier 5 deliverable artifact.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "violation",
+      "violation_evidence": "Sub-section B.3.1 states: 'Three ethics categories are triggered \u2014 Category 8 (AI), Category 4 (health data), Category 2 (human participants in medical context)'. These numbered ethics review categories are normative programme-defined classifications published in the Horizon Europe General Annexes (Tier 1 normative framework). Claim CS-10 in validation_status.claim_statuses traces this content only to 'Tier 4: implementation_architecture.json ethics_assessment.issues'; no path within docs/tier1_normative_framework/extracted/ appears in traceability_footer.primary_sources[]. The regulatory authority for Horizon Europe ethics category numbering is Tier 1, not Tier 4. The absence of a Tier 1 extracted-document reference in the traceability footer means this regulatory claim cannot be confirmed as drawn from the Tier 1 source documents rather than from agent-local programme knowledge.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1\u20134",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": "Structurally non-applicable to artifact-level
+=== END ===

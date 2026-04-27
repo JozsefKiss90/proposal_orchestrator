@@ -1,0 +1,172 @@
+{
+  "report_id": "traceability_B.3_traceability_auditor_2026-04-27T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "fcac4f7a-1499-4eff-b517-105fcf289fe5",
+  "section_id_audited": "B.3",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "9-WP structure in four functional layers with stated WP titles, leads, and month ranges",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (work_packages[].wp_id, lead_partner confirmed for all 9); docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (tasks[].start_month, end_month confirms WP spans: WP1 M1-48, WP2 M1-36, WP3 M1-30, WP4 M3-36, WP5 M12-42, WP6 M12-42, WP7 M12-42, WP8 M6-48, WP9 M1-48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "16 confirmed inter-WP data-input edges forming an acyclic dependency graph",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges: 16 entries all edge_type=data_input; cycle_detected: false)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "9 pillar-to-demonstrator edges from WP2/WP3/WP4 to WP5/WP6/WP7",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges: WP2→WP5, WP3→WP5, WP4→WP5, WP2→WP6, WP3→WP6, WP4→WP6, WP2→WP7, WP3→WP7, WP4→WP7 — exactly 9 by enumeration)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "Critical path T2-01→T2-02→T2-03 (M1-36), T5-01→T5-02→T5-03 (M12-42), T8-03 (M42-48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (critical_path: [T2-01,T2-02,T2-03,T5-01,T5-02,T5-03,T8-03]; task months confirmed: T2-01 M1-12, T2-02 M6-24, T2-03 M18-36, T5-01 M12-18, T5-02 M18-36, T5-03 M36-42, T8-03 M42-48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "20 essential deliverables across 9 WPs; specifically named: D1-02 (M6), D2-02 (M36), D8-01 (M12), D8-03 (M48), D9-01 (M6)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (deliverable counts per WP: 2+2+2+2+2+2+2+3+3=20; named deliverable due months all confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "11 milestones M3-M48; MS1 Architecture spec M3, MS6 Integrated MAESTRO v1.0 M24, MS9 Demonstrator validation complete M42, MS11 Project completion M48",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (milestones array: 11 entries; MS1 due_month:3, MS6 due_month:24, MS9 due_month:42, MS11 due_month:48; titles consistent with section)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "11 identified risks across technical, external, and organisational categories",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register: 11 entries RISK-01 through RISK-11; categories: technical RISK-01/02/03/07/10/11, external RISK-04/08, organisational RISK-05/06/09)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "RISK-01: medium likelihood, high impact; modular fallback design, early integration testing from M6",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[RISK-01]: likelihood:medium, impact:high; mitigation includes modular architecture with fallback modes and 'Begin integration testing from M6, not M18')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "RISK-07: high likelihood, medium impact; model-agnostic component interfaces",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[RISK-07]: likelihood:high, impact:medium; mitigation: 'Design all MAESTRO components with model-agnostic interfaces')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "RISK-04: medium likelihood, high impact; public dataset fallback including MIMIC-IV",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[RISK-04]: likelihood:medium, impact:high; mitigation explicitly names MIMIC-IV and eICU as public dataset fallback)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "RISK-10: medium likelihood, high impact; M1-M3 API contract definition and bimonthly integration checkpoints",
+      "status": "unresolved",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[RISK-10]: likelihood:medium, impact:high confirmed; M1-M3 API contract definition confirmed; mitigation states 'Conduct integration checkpoints every 6 months' — contradicts 'bimonthly')",
+      "flag_reason": "Source contradiction on checkpoint frequency: implementation_architecture.json RISK-10 mitigation states 'Conduct integration checkpoints every 6 months'. The section claims 'bimonthly integration checkpoints'. Bimonthly (every 2 months) does not equal every 6 months. The M1-M3 API contract element is confirmed; the checkpoint frequency claim is unsupported by the named source and directly contradicted by it."
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "Three ethics categories triggered: Category 8 (AI), Category 4 (health data), Category 2 (human participants in medical context)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (ethics_assessment.issues: ETHICS-01 Category 8 AI, ETHICS-02 Category 4 health data, ETHICS-03 Category 2 human participants)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "Ethics oversight by ATU (Ethics Compliance Coordinator) and NIHS (Healthcare Ethics Oversight Officer) through Ethics and Quality Oversight Committee",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (governance_matrix[Ethics and Quality Oversight Committee] composition:[ATU,NIHS]; management_roles[MGR-011] role_name:Ethics Compliance Coordinator, assigned_to:ATU; management_roles[MGR-012] role_name:Healthcare Ethics Oversight Officer, assigned_to:NIHS)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "Consortium of eight European organisations covering all three Apply AI sectors mandated by the call (SR-07)",
+      "status": "unresolved",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07: three sectors are healthcare, advanced manufacturing, and in-vehicle autonomous driving); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP5 healthcare, WP6 manufacturing confirmed; WP7 title is Logistics Transfer Demonstrator — logistics is not in-vehicle autonomous driving)",
+      "flag_reason": "SR-07 defines three Apply AI sectors as healthcare, advanced manufacturing, and in-vehicle autonomous driving. MAESTRO covers healthcare (WP5) and advanced manufacturing (WP6). WP7 is a logistics demonstrator, not in-vehicle autonomous driving. gantt.json MS9 references an 'architectural transferability mapping to in-vehicle autonomous driving' but this is a mapping exercise, not a primary demonstrator. The claim that the consortium covers 'all three' sectors is not supported by the Tier 2B source definition of those three sectors."
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "ATU (Alpenstadt Technical University, DE, HES): coordinator, WP1+WP2 lead, Chair of AI Foundations expertise in automated planning/LLM-based reasoning/neuro-symbolic AI, contributes to WP3/WP4/WP5/WP6/WP8/WP9",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ATU: legal_name, country:DE, organisation_type:HES, coordinator:true; description confirms Chair of AI Foundations, neuro-symbolic AI, automated planning, LLM-based reasoning); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (partner_role_matrix[ATU] wps_as_lead:[WP1,WP2]; wps_as_contributor:[WP3,WP4,WP5,WP6,WP8,WP9])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "CERIA (Centre Européen de Recherche en Informatique Avancée, FR, REC): WP4 lead, formal multi-agent coordination/distributed AI/game-theoretic expertise, contributes to WP2/WP3/WP6/WP7/WP8",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (CERIA: legal_name, country:FR, organisation_type:REC; description confirms formal coordination protocols, distributed AI, game-theoretic approaches); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP4 lead_partner:CERIA; partner_role_matrix[CERIA] wps_as_contributor includes WP2,WP3,WP6,WP7,WP8). Derivation: WP6 contribution present in wp_structure.json (Tier 4) but absent from docs/tier3_project_instantiation/consortium/roles.json (Tier 3: CERIA wp_participant:[WP2,WP3,WP7,WP8], no WP6).",
+      "flag_reason": "WP6 contribution for CERIA is confirmed in wp_structure.json (Tier 4) but is not listed in roles.json (Tier 3). Tier 3 outranks Tier 4 in the authority hierarchy. The WP6 participation claim is therefore derived from a lower-authority source in conflict with a higher-authority source. The conflict between roles.json and wp_structure.json on this point is unresolved at the source level."
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "BIIS (Breda Institute for Intelligent Systems, NL, HES): WP3 lead, deep learning/information retrieval/memory-augmented neural network expertise, pioneer in RAG, contributes to WP2/WP4/WP5/WP8",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (BIIS: legal_name, country:NL, organisation_type:HES; description confirms deep learning, information retrieval, memory-augmented neural networks, pioneers in retrieval-augmented generation); docs/tier3_project_instantiation/consortium/roles.json (BIIS: wp_lead:[WP3], wp_participant:[WP2,WP4,WP5,WP8] — exactly matches section claim)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C18",
+      "claim_summary": "ISIA (Istituto Superiore di Ingegneria Avanzata, IT, HES): WP6 lead, operational pilot factory/digital twin/AI for manufacturing, contributes to WP1/WP8/WP9",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ISIA: legal_name, country:IT, organisation_type:HES; description confirms digital twins, smart factory, AI for manufacturing); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP6 lead_partner:ISIA; partner_role_matrix[ISIA] wps_as_contributor:[WP1,WP8,WP9]). Derivation: WP1 contribution present in wp_structure.json (Tier 4) but absent from docs/tier3_project_instantiation/consortium/roles.json (Tier 3: ISIA wp_participant:[WP2,WP4,WP8,WP9], no WP1).",
+      "flag_reason": "WP1 contribution for ISIA is confirmed in wp_structure.json (Tier 4) but absent from roles.json (Tier 3: lists WP2,WP4,WP8,WP9). Tier 3 outranks Tier 4. WP1 claim is supported only by the lower-authority Tier 4 source, in conflict with the higher-authority Tier 3 source."
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "NIHS (Nordic Institute of Health Sciences, SE, HES): WP5 lead, de-identified clinical datasets/clinical validation pathways/healthcare AI, contributes to WP1/WP8",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (NIHS: legal_name, country:SE, organisation_type:HES; description confirms de-identified clinical datasets and established clinical validation pathways); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP5 lead_partner:NIHS; partner_role_matrix[NIHS] wps_as_contributor:[WP1,WP8]). Derivation: WP1 contribution present in wp_structure.json (Tier 4) but absent from docs/tier3_project_instantiation/consortium/roles.json (Tier 3: NIHS wp_participant:[WP2,WP3,WP8], no WP1).",
+      "flag_reason": "WP1 contribution for NIHS is confirmed in wp_structure.json (Tier 4) but absent from roles.json (Tier 3: lists WP2,WP3,WP8). Tier 3 outranks Tier 4. WP1 claim is supported only by the lower-authority Tier 4 source, in conflict with the higher-authority Tier 3 source."
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "ELI (EuroLog International AG, CH, PRC): WP7 lead, real-world logistics data/multi-corridor deployment environments across three international corridors, contributes to WP1/WP8/WP9",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ELI: legal_name, country:CH, organisation_type:PRC; description confirms real-world logistics data and deployment environments); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP7 lead_partner:ELI; WP7 objective confirms three international corridors; partner_role_matrix[ELI] wps_as_contributor:[WP1,WP8,WP9]). Derivation: WP1 contribution present in wp_structure.json (Tier 4) but absent from docs/tier3_project_instantiation/consortium/roles.json (Tier 3: ELI wp_participant:[WP4,WP8,WP9], no WP1).",
+      "flag_reason": "WP1 contribution for ELI is confirmed in wp_structure.json (Tier 4) but absent from roles.json (Tier 3: lists WP4,WP8,WP9). Tier 3 outranks Tier 4. WP1 claim is supported only by the lower-authority Tier 4 source, in conflict with the higher-authority Tier 3 source."
+    },
+    {
+      "claim_id": "C21",
+      "claim_summary": "BAL (Boreal AI Labs Oy, FI, PRC): WP9 lead, LLM fine-tuning/production-grade deployment/AI-on-demand platform integration per SR-10 and CC-05, contributes to WP2/WP3/WP5/WP6/WP7/WP8",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (BAL: legal_name, country:FI, organisation_type:PRC; description confirms LLM fine-tuning and production-grade AI deployment); docs/tier3_project_instantiation/consortium/roles.json (BAL: wp_lead:[WP9]; key_responsibilities include AI-on-demand platform integration); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-10 confirmed); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-05 confirmed); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (partner_role_matrix[BAL] wps_as_contributor:[WP1,WP2,WP3,WP5,WP6,WP7,WP8]). Derivation: WP8 contribution present in wp_structure.json (Tier 4); docs/tier3_project_instantiation/consortium/roles.json (Tier 3: BAL wp_participant:[WP2,WP3,WP4,WP5,WP6,WP7] — lists WP4 not WP8).",
+      "flag_reason": "WP8 contribution for BAL is confirmed in wp_structure.json (Tier 4) but absent from roles.json (Tier 3: lists WP4 instead). Tier 3 outranks Tier 4. WP8 claim is supported only by the lower-authority Tier 4 source. Tier 3/Tier 4 conflict on WP8 vs WP4 participation is unresolved at the source level. SR-10 and CC-05 mandate for AI-on-demand platform confirmed directly from Tier 2B sources independent of this conflict."
+    },
+    {
+      "claim_id": "C22",
+      "claim_summary": "FIIT (Fundación Ibérica de Innovación Tecnológica, ES, REC): WP8 lead, AI evaluation framework/cross-demonstrator benchmarking/EDIH network dissemination/TEF coordination per CC-07, contributes to WP5/WP6/WP7/WP9",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (FIIT: legal_name, country:ES, organisation_type:REC; description confirms AI evaluation frameworks, benchmarking, EDIH networks); docs/tier3_project_instantiation/consortium/roles.json (FIIT: wp_lead:[WP8], wp_participant:[WP5,WP6,WP7,WP9], key_responsibilities confirm TEF coordination and EDIH dissemination); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-07: 'Results may be validated in the Testing and Experiment Facilities'); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP8 lead_partner:FIIT confirmed)",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 22,
+    "confirmed": 15,
+    "inferred": 5,
+    "assumed": 0,
+    "unresolved": 2
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-04-27T00:00:00Z"
+}
