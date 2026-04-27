@@ -856,10 +856,22 @@ artifact_registry:
     produced_by: n08c_implementation_drafting
     consumed_by: [n08d_assembly]
 
+  - artifact_id: a_t5_part_b_assembled_draft
+    path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+    schema_id: orch.tier5.part_b_assembled_draft.v1
+    tier: tier5_deliverable
+    produced_by: n08d_assembly
+    consumed_by:
+      - n08e_evaluator_review
+      - n08f_revision
+      - gate_10d_cross_section_consistency
+      - gate_11_review_closure
+      - gate_12_constitutional_compliance
+
   - artifact_id: a_t5_assembled_drafts
     path: docs/tier5_deliverables/assembled_drafts/
     tier: tier5_deliverable
-    produced_by: [n08d_assembly, n08f_revision]
+    produced_by: n08f_revision
     consumed_by: [n08e_evaluator_review, n08f_revision]
 
   - artifact_id: a_t5_review_packets

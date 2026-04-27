@@ -35,8 +35,7 @@ have passed before assembly begins.
 1. Verify predecessor gates passed (gate_10a, gate_10b, gate_10c).
 2. Read all three section artifacts from `docs/tier5_deliverables/proposal_sections/`.
 3. Verify `excellence_section.json`, `impact_section.json`, `implementation_section.json` are present.
-4. Perform cross-section consistency checks (objectives, WP refs, partner names, deliverables, milestones, KPIs, impact claims, terminology).
-5. Build `sections` array in Part B order: Excellence (1), Impact (2), Implementation (3).
-6. Build `consistency_log` with check results (consistent / inconsistency_flagged / resolved).
-7. Apply `proposal-section-traceability-check` and `constitutional-compliance-check`.
-8. Write `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` (schema: `orch.tier5.part_b_assembled_draft.v1`). `artifact_status` must be absent.
+4. Invoke `cross-section-consistency-check` to perform cross-section consistency checks (objectives, WP refs, partner names, deliverables, milestones, KPIs, impact claims, terminology) and produce `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json`.
+5. After `cross-section-consistency-check` has produced the assembled draft, invoke `proposal-section-traceability-check` to audit traceability of the assembled artifact.
+6. After traceability audit, invoke `constitutional-compliance-check` to audit constitutional compliance of the assembled artifact.
+7. Assembly is complete. `artifact_status` must be absent at write time.

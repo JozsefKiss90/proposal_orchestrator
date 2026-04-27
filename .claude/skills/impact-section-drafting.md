@@ -118,6 +118,11 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
 
   - Step 2.5.3: **Ground impact claims in project activities.** Reference concrete WP deliverables and tasks from `wp_structure.json` when describing how impacts will be achieved. Every impact claim must be traceable to a project mechanism (CLAUDE.md Section 7, Phase 5 gate condition).
 
+    **Deliverable identity constraint (GATE-CRITICAL):** When citing a deliverable ID to ground an impact claim, the cited deliverable MUST match the deliverable's actual definition in `wp_structure.json`. Do not repurpose a deliverable ID to label a different capability or artifact. Specifically:
+    - D8-01 is defined in `wp_structure.json` as the evaluation framework and benchmark specification (WP8). It MUST NOT be cited as if it were the External Tool and API Orchestration Layer or any other artifact.
+    - If no dedicated deliverable exists for a capability (e.g. the External Tool and API Orchestration Layer / OUT-9), cite the relevant outcome ID and its source reference from `architecture_inputs/outcomes.json`, and reference the WP/task where the capability is described. Do not invent or reassign a deliverable ID.
+    - Permitted grounding pattern when no dedicated deliverable exists: cite the outcome (e.g. OUT-9) and note that validation is performed through the applicable evaluation framework deliverables (e.g. D8-01 and D8-02), while making clear that D8-01 itself is the evaluation framework specification, not the orchestration-layer artifact.
+
   - Step 2.5.4: **Apply evaluator sub-criteria.** Address each Impact criterion sub-criterion from the evaluation form. Apply specificity tests.
 
   - Step 2.5.5: **Do not reference unvalidated budget figures.** (CLAUDE.md Section 8.3)

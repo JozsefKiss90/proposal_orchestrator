@@ -122,7 +122,21 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
     - Evidence: does it provide concrete evidence (specific methods, prior results, references)?
     - Specificity: does it provide project-specific detail rather than generic assertions?
 
-  - Step 2.3.5: **SSH and Gender dimension constraints (GATE-CRITICAL).**
+  - Step 2.3.5: **TRL qualification constraint (GATE-CRITICAL).**
+
+    Do NOT make an unqualified project-level TRL claim such as "the project targets TRL 5 by project end" or "MAESTRO achieves TRL 5". Different work packages and outputs may have different TRL targets. The Excellence section MUST qualify TRL language to distinguish:
+    - Integrated framework and demonstrator outputs (e.g. healthcare, manufacturing, logistics demonstrators) that target TRL 5 validation.
+    - Foundational research outputs such as formally verified coordination protocols (e.g. WP4/OUT-3) that remain at TRL 4 where their primary contribution is formal specification, verification, and protocol proof.
+
+    Permitted wording patterns:
+    - "MAESTRO targets TRL 5 validation for the integrated framework and the healthcare/manufacturing/logistics demonstrators by project end, while foundational coordination-protocol outputs such as WP4/OUT-3 remain positioned at TRL 4 where their primary contribution is formal specification, verification, and protocol proof."
+    - "The overall integration and Apply AI demonstrators progress to TRL 5, while individual research outputs may have lower TRL targets where appropriate; in particular, the formally verified coordination protocol work in WP4/OUT-3 is treated as TRL 4."
+
+    Forbidden wording: any unqualified statement implying ALL project outputs reach TRL 5.
+
+    Source: `architecture_inputs/objectives.json` and `impact_architecture.json` for per-output TRL targets.
+
+  - Step 2.3.6: **SSH and Gender dimension constraints (GATE-CRITICAL).**
 
     **SSH (Social Sciences and Humanities):** If SSH is not substantively specified in Tier 3 project data, the section MUST state proportionately that the project is primarily technical and that ethics/accountability aspects are embedded through already-sourced mechanisms (e.g. WP1 ethics compliance, WP5/WP6 auditability requirements, WP8 responsible AI evaluation). Use ONLY confirmed or inferred claims with explicit source_ref chains to Tier 3/Tier 4 artifacts. Do NOT claim dedicated SSH disciplinary contributions unless Tier 3 explicitly describes them.
 
@@ -134,9 +148,9 @@ and end with `}`. Any non-JSON output causes a pipeline failure.
 
     If a gender dimension claim is a proposal-design inference (e.g. "WP5 benchmark will be stratified by sex/gender" inferred from Tier 3 WP5 objectives and Tier 2A schema requirements), mark it "inferred" with a clear source_ref chain. If no valid inference chain exists from Tier 3/Tier 4 sources, OMIT the claim entirely.
 
-  - Step 2.3.6: **Respect page limits.** Check word count against page limits from `section_schema_registry.json`. Flag exceedances in `validation_status`.
+  - Step 2.3.7: **Respect page limits.** Check word count against page limits from `section_schema_registry.json`. Flag exceedances in `validation_status`.
 
-  - Step 2.3.7: **Do not reference unvalidated budget figures.** Do not include budget amounts, person-months, or resource figures that are not confirmed in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
+  - Step 2.3.8: **Do not reference unvalidated budget figures.** Do not include budget amounts, person-months, or resource figures that are not confirmed in `budget_gate_assessment.json` (CLAUDE.md Section 8.3).
 
 - Step 2.4: **Build validation_status.** For each material claim in the drafted content:
   - Assign Confirmed/Inferred status per CLAUDE.md Section 12.2.
