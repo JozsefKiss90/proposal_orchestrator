@@ -147,6 +147,8 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
     - If no dedicated deliverable exists for a capability (e.g. the External Tool and API Orchestration Layer / OUT-9), cite the relevant outcome ID and its source reference from `architecture_inputs/outcomes.json`, and reference the WP/task where the capability is described. Do not invent or reassign a deliverable ID.
     - Permitted grounding pattern when no dedicated deliverable exists: cite the outcome (e.g. OUT-9) and note that validation is performed through the applicable evaluation framework deliverables (e.g. D8-01 and D8-02), while making clear that D8-01 itself is the evaluation framework specification, not the orchestration-layer artifact.
 
+    **D4-01 deliverable identity constraint (GATE-CRITICAL):** D4-01 is defined in `wp_structure.json` as the multi-agent coordination protocol specification (report, due M18, WP4). D4-01 MUST only be described as the M18 coordination protocol specification. **FORBIDDEN:** "formal standardisation proposal (D4-01)", "standardisation submission (D4-01)", "D4-01 submitted by M48", "D4-01 ... ISO/IEC ... by M48", or any wording that treats D4-01 as a standardisation submission or assigns it a due date other than M18. The M48 standardisation activity toward ISO/IEC JTC 1/SC 42 or IEEE is a KPI/exploitation activity (KPI-08), derived from D4-01 but NOT identical to it. **Required wording pattern:** "D4-01 remains the M18 coordination protocol specification; the M48 standardisation action is tracked as KPI-08." or "CERIA uses the D4-01 multi-agent coordination protocol specification as the technical basis for a later standardisation submission to ISO/IEC JTC 1/SC 42 or IEEE by M48 (KPI-08). The M48 standardisation submission is treated as an exploitation/standardisation activity, not as D4-01 itself."
+
   - Step 2.5.4: **Apply evaluator sub-criteria.** Address each Impact criterion sub-criterion from the evaluation form. Apply specificity tests.
 
   - Step 2.5.5: **Do not reference unvalidated budget figures.** (CLAUDE.md Section 8.3)
@@ -177,6 +179,9 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
   - overall_status is "confirmed" or "inferred"
   - All primary_sources[].tier values are numeric integers (not strings)
   - no_unsupported_claims_declaration is true
+  - No "formal standardisation proposal (D4-01)" or "standardisation submission (D4-01)" or "D4-01 ... by M48" patterns in content
+  - D4-01 described only as the M18 coordination protocol specification
+  - KPI-08/M48 standardisation activity described without assigning it as D4-01
   If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Impact section has non-gate-ready claims or schema issues: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
