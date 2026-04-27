@@ -1,0 +1,50 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-04-27T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "1d799589-bfc5-464d-9a10-dd5113653c50",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "No structural reference in content or traceability_footer identifies a Grant Agreement Annex, AGA Template, or Model Grant Agreement Annex as a schema source. The artifact's schema_id is orch.tier5.implementation_section.v1, derived from Tier 2A instrument schema authority. No strings matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural authority are present in section content or source references."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All call requirement and scope claims in the artifact (SR-09, SR-10, CC-03, CC-04, CC-05, CC-07, CC-08) are explicitly attributed to Tier 2B sources in claim_statuses: C-09 cites scope_requirements.json SR-10 and call_constraints.json CC-05; C-10 cites scope_requirements.json SR-09 and call_constraints.json CC-03/CC-04; C-11 cites call_constraints.json CC-07. The traceability_footer.primary_sources includes docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json and docs/tier2b_topic_and_call_sources/extracted/call_constraints.json. No call-constraint claim lacks a Tier 2B source reference in the artifact's traceability structure."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All named partners (ATU, BIIS, CERIA, NIHS, ISIA, ELI, FIIT, BAL), their stated capabilities, country affiliations, WP leads, and contribution lists are referenced in the traceability_footer.primary_sources via docs/tier3_project_instantiation/consortium/partners.json and docs/tier3_project_instantiation/consortium/roles.json (both Tier 3). Claim C-12 (confirmed) explicitly asserts all eight partners with capabilities and roles are sourced from Tier 3. Claim C-13 (confirmed) asserts per-partner WP contribution listings match Tier 4 partner_role_matrix which is itself derived from Tier 3 consortium data. No project-fact claim lacks a Tier 3 source reference in the artifact's traceability structure."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's schema_id 'orch.tier5.implementation_section.v1' (prefix 'orch.tier5.') identifies it as a Phase 8 Tier 5 artifact. Claim C-01 carries status 'confirmed' and asserts budget gate passed, citing source_ref 'Tier 4: phase7_budget_gate/budget_gate_assessment.json gate_pass_declaration'; this path also appears in traceability_footer.primary_sources. B.3.1 content states 'Resource allocation across all nine WPs is confirmed by the validated budget response; effort detail appears in Table 3.1f' \u2014 referencing validation without asserting raw budget figures. Scanning section content for budget-figure patterns: no instances of '\u20ac[0-9]+', '[0-9]+ EUR', or '[0-9]+ person-months' used as confirmed values were detected. Note: direct read of budget_gate_assessment.json is outside TAPM input boundary; budget gate passage is assessed from the artifact's own confirmed claim C-01 and its Tier 4 source reference."
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not directly checkable by reading an artifact. This prohibition governs runtime agent behaviour \u2014 specifically whether decisions affecting future interpretation are written to docs/tier4_orchestration_state/decision_log/ rather than retained only in agent working memory. That behaviour cannot b
+=== END ===

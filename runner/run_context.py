@@ -353,6 +353,30 @@ class RunContext:
         return gates.get(gate_id)
 
     # ------------------------------------------------------------------
+    # Reuse decisions (Phase 8 section artifact reuse)
+    # ------------------------------------------------------------------
+
+    def record_reuse_decision(self, node_id: str, decision: dict) -> None:
+        """Record a Phase 8 reuse decision in the run manifest.
+
+        Called by the scheduler after validating reuse eligibility and before
+        gate evaluation, so that the ``artifact_owned_by_run`` predicate can
+        verify reuse ownership from persisted state.
+
+        Does **not** call :meth:`save`; the caller is responsible for persisting.
+        """
+        if "reuse_decisions" not in self._manifest:
+            self._manifest["reuse_decisions"] = {}
+        self._manifest["reuse_decisions"][node_id] = decision
+
+    def get_reuse_decision(self, node_id: str) -> dict | None:
+        """Return the reuse decision for *node_id*, or ``None``."""
+        decisions = self._manifest.get("reuse_decisions")
+        if decisions is None:
+            return None
+        return decisions.get(node_id)
+
+    # ------------------------------------------------------------------
     # Reuse policy
     # ------------------------------------------------------------------
 

@@ -476,3 +476,170 @@ def validate_reuse_candidate(
         input_fingerprint=current_fingerprint,
         gate_id=gate_id,
     )
+
+
+# ---------------------------------------------------------------------------
+# Reuse ownership validation (gate predicate support)
+# ---------------------------------------------------------------------------
+
+#: Directory for current-run validation reports.
+_VALIDATION_REPORTS_DIR: str = "docs/tier4_orchestration_state/validation_reports"
+
+#: Audit skills that must have produced current-run evidence.
+_REQUIRED_AUDIT_SKILLS: tuple[str, ...] = (
+    "proposal-section-traceability-check",
+    "constitutional-compliance-check",
+)
+
+#: Mapping of artifact paths to their expected node_id for reverse lookup.
+_ARTIFACT_PATH_TO_NODE: dict[str, str] = {
+    v["artifact_path"]: k for k, v in REUSE_ELIGIBLE_NODES.items()
+}
+
+
+def _run_id_prefix(run_id: str) -> str:
+    """Return first 8 chars of run_id (UUID first segment)."""
+    return run_id.split("-")[0] if "-" in run_id else run_id[:8]
+
+
+def _audit_report_exists(skill_id: str, run_id: str, repo_root: Path) -> bool:
+    """Check if a current-run audit report exists and is parseable JSON."""
+    prefix = _run_id_prefix(run_id)
+    report_path = repo_root / _VALIDATION_REPORTS_DIR / f"{skill_id}_{prefix}.json"
+    if not report_path.is_file():
+        return False
+    try:
+        data = json.loads(report_path.read_text(encoding="utf-8"))
+        return isinstance(data, dict) and data.get("skill_id") == skill_id
+    except (json.JSONDecodeError, OSError):
+        return False
+
+
+def is_reuse_owned_artifact_valid(
+    node_id: str,
+    artifact_path: str,
+    artifact: dict,
+    current_run_id: str,
+    repo_root: Path,
+) -> tuple[bool, str]:
+    """Validate that a reused Phase 8 section artifact passes ownership.
+
+    This is called by ``artifact_owned_by_run`` when the artifact's run_id
+    does not match the current run and the artifact path belongs to a
+    reuse-eligible Phase 8 section node.
+
+    Returns (True, reason) on success or (False, reason) on failure.
+    All checks are fail-closed: any missing data causes rejection.
+
+    Acceptance conditions (all must hold):
+      1. Node is reuse-eligible (n08a/n08b/n08c only)
+      2. Current run has a persisted reuse decision with status="reused"
+      3. Decision mode is "drafting_skipped_audit_executed"
+      4. Decision source_run_id matches artifact.run_id
+      5. Decision artifact_path matches the canonical artifact path
+      6. Reuse metadata file exists on disk
+      7. Metadata source_run_id matches artifact.run_id
+      8. Metadata artifact_sha256 matches current file hash
+      9. Metadata input_fingerprint matches current computed fingerprint
+     10. Current-run audit reports exist for both required audit skills
+     11. Artifact structural validation passes (schema_id, validation_status,
+         traceability_footer)
+    """
+    artifact_run_id = artifact.get("run_id")
+
+    # Condition 1: node must be reuse-eligible
+    node_config = REUSE_ELIGIBLE_NODES.get(node_id)
+    if node_config is None:
+        return False, "node_not_reuse_eligible"
+
+    # Verify artifact_path matches canonical path for the node
+    if artifact_path != node_config["artifact_path"]:
+        return False, "artifact_path_not_canonical"
+
+    # Conditions 2-5: check persisted reuse decision from RunContext
+    from runner.run_context import RunContext, RUNS_DIR_REL
+
+    run_manifest_path = (
+        repo_root / RUNS_DIR_REL / current_run_id / "run_manifest.json"
+    )
+    if not run_manifest_path.is_file():
+        return False, "run_manifest_not_found"
+
+    try:
+        manifest = json.loads(run_manifest_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False, "run_manifest_unreadable"
+
+    decisions = manifest.get("reuse_decisions")
+    if not isinstance(decisions, dict):
+        return False, "no_reuse_decisions_in_manifest"
+
+    decision = decisions.get(node_id)
+    if not isinstance(decision, dict):
+        return False, "no_reuse_decision_for_node"
+
+    # Condition 2
+    if decision.get("status") != "reused":
+        return False, "reuse_decision_status_not_reused"
+
+    # Condition 3
+    if decision.get("mode") != "drafting_skipped_audit_executed":
+        return False, "reuse_decision_mode_wrong"
+
+    # Condition 4
+    if decision.get("source_run_id") != artifact_run_id:
+        return False, "reuse_decision_source_run_id_mismatch"
+
+    # Condition 5
+    if decision.get("artifact_path") != artifact_path:
+        return False, "reuse_decision_artifact_path_mismatch"
+
+    # Conditions 6-9: check reuse metadata file on disk
+    metadata = load_reuse_metadata(node_id, repo_root)
+    if metadata is None:
+        return False, "reuse_metadata_missing"
+
+    # Condition 7
+    if metadata.get("source_run_id") != artifact_run_id:
+        return False, "metadata_source_run_id_mismatch"
+
+    # Condition 8
+    artifact_abs = repo_root / artifact_path
+    current_hash = artifact_sha256(artifact_abs)
+    if current_hash is None or current_hash != metadata.get("artifact_sha256"):
+        return False, "artifact_hash_mismatch"
+
+    # Condition 9
+    current_fp = compute_input_fingerprint(node_id, repo_root)
+    if current_fp is None or current_fp != metadata.get("input_fingerprint"):
+        return False, "input_fingerprint_mismatch"
+
+    # Condition 10: current-run audit reports exist
+    for skill_id in _REQUIRED_AUDIT_SKILLS:
+        if not _audit_report_exists(skill_id, current_run_id, repo_root):
+            return False, f"missing_audit_report_{skill_id}"
+
+    # Condition 11: artifact structural validation
+    expected_schema = node_config["schema_id"]
+    if artifact.get("schema_id") != expected_schema:
+        return False, "schema_id_mismatch"
+
+    vs = artifact.get("validation_status")
+    if not isinstance(vs, dict):
+        return False, "missing_validation_status"
+    if vs.get("overall_status") == "unresolved":
+        return False, "validation_status_unresolved"
+
+    # Check for assumed/unresolved claims
+    claim_statuses = vs.get("claim_statuses", [])
+    for cs in claim_statuses:
+        if isinstance(cs, dict) and cs.get("status") in ("assumed", "unresolved"):
+            return False, f"claim_status_{cs.get('status')}"
+
+    tf = artifact.get("traceability_footer")
+    if not isinstance(tf, dict):
+        return False, "missing_traceability_footer"
+    if tf.get("no_unsupported_claims_declaration") is not True:
+        return False, "unsupported_claims_declaration_false"
+
+    return True, "all_reuse_ownership_conditions_met"

@@ -1510,7 +1510,7 @@ class DAGScheduler:
                     decision.source_run_id,
                     (decision.input_fingerprint or "")[:12],
                 )
-                self._reuse_decisions[node_id] = {
+                reuse_dec = {
                     "status": "reused",
                     "mode": "drafting_skipped_audit_executed",
                     "source_run_id": decision.source_run_id,
@@ -1518,6 +1518,10 @@ class DAGScheduler:
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,
                 }
+                self._reuse_decisions[node_id] = reuse_dec
+                # Persist to RunContext so gate predicates can verify
+                self.ctx.record_reuse_decision(node_id, reuse_dec)
+                self.ctx.save()
                 # Skip only the drafting skill; audit skills still run.
                 drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
                 if drafting_skill:

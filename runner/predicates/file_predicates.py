@@ -518,6 +518,36 @@ def artifact_owned_by_run(
             details={"path": str(resolved), "run_id": run_id},
         )
 
+    # Mismatch: check Phase 8 reuse ownership (n08a/n08b/n08c only)
+    from runner.phase8_reuse import (
+        _ARTIFACT_PATH_TO_NODE,
+        is_reuse_owned_artifact_valid,
+    )
+
+    # Normalize path to forward-slash repo-relative form for lookup
+    path_str = str(path).replace("\\", "/")
+    reuse_node_id = _ARTIFACT_PATH_TO_NODE.get(path_str)
+    if reuse_node_id is not None and repo_root is not None:
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id=reuse_node_id,
+            artifact_path=path_str,
+            artifact=artifact,
+            current_run_id=run_id,
+            repo_root=repo_root,
+        )
+        if valid:
+            return PredicateResult(
+                passed=True,
+                details={
+                    "path": str(resolved),
+                    "approved_via_phase8_reuse": True,
+                    "reuse_node_id": reuse_node_id,
+                    "artifact_run_id": artifact_run_id,
+                    "current_run_id": run_id,
+                    "reuse_validation_reason": reason,
+                },
+            )
+
     # Mismatch: check reuse policy before failing
     if reuse_policy_path is not None:
         policy_resolved = resolve_repo_path(reuse_policy_path, repo_root)

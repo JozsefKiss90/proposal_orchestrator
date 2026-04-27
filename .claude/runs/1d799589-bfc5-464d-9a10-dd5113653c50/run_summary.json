@@ -1,0 +1,103 @@
+{
+  "run_id": "1d799589-bfc5-464d-9a10-dd5113653c50",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "started_at": "2026-04-26T22:26:43.649223+00:00",
+  "completed_at": "2026-04-26T23:21:03.318840+00:00",
+  "overall_status": "aborted",
+  "terminal_nodes_reached": [],
+  "stalled_nodes": [
+    {
+      "node_id": "n08d_assembly",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_10c_implementation_completeness",
+          "source_node_id": "n08c_implementation_drafting",
+          "source_node_state": "blocked_at_exit"
+        }
+      ]
+    },
+    {
+      "node_id": "n08e_evaluator_review",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_10d_cross_section_consistency",
+          "source_node_id": "n08d_assembly",
+          "source_node_state": "pending"
+        }
+      ]
+    },
+    {
+      "node_id": "n08f_revision",
+      "unsatisfied_conditions": [
+        {
+          "gate_id": "gate_11_review_closure",
+          "source_node_id": "n08e_evaluator_review",
+          "source_node_state": "pending"
+        }
+      ]
+    }
+  ],
+  "hard_blocked_nodes": [],
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "released",
+    "n08a_excellence_drafting": "released",
+    "n08b_impact_drafting": "released",
+    "n08c_implementation_drafting": "blocked_at_exit",
+    "n08d_assembly": "pending",
+    "n08e_evaluator_review": "pending",
+    "n08f_revision": "pending"
+  },
+  "gate_results_index": {
+    "gate_10a_excellence_completeness": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10a_result.json",
+    "gate_10b_impact_completeness": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10b_result.json",
+    "gate_10c_implementation_completeness": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_10c_result.json"
+  },
+  "node_failure_details": {
+    "n08c_implementation_drafting": {
+      "failure_origin": "exit_gate",
+      "exit_gate_evaluated": true,
+      "failure_reason": null,
+      "failure_category": null
+    }
+  },
+  "dispatched_nodes": [
+    "n08a_excellence_drafting",
+    "n08b_impact_drafting",
+    "n08c_implementation_drafting"
+  ],
+  "phase_scope": 8,
+  "phase_scope_nodes": [
+    "n08a_excellence_drafting",
+    "n08b_impact_drafting",
+    "n08c_implementation_drafting",
+    "n08d_assembly",
+    "n08e_evaluator_review",
+    "n08f_revision"
+  ],
+  "reuse_decisions": {
+    "n08a_excellence_drafting": {
+      "status": "not_reused",
+      "reason": "previous_gate_not_passed"
+    },
+    "n08b_impact_drafting": {
+      "status": "not_reused",
+      "reason": "previous_gate_not_passed"
+    },
+    "n08c_implementation_drafting": {
+      "status": "reused",
+      "mode": "drafting_skipped_audit_executed",
+      "source_run_id": "505b5bfa-66bd-42de-b31f-2e66683bf48e",
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "input_fingerprint": "2e8d0d503d5ea13d4ecda8b899cef7fdfd24e0a89060e2fa9658ac9e2c9a79b6",
+      "gate_id": "gate_10c_implementation_completeness"
+    }
+  }
+}
