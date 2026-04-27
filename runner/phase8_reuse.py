@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 #: Policy version stamp for forward compatibility.
-REUSE_POLICY_VERSION: str = "phase8.section.v1"
+REUSE_POLICY_VERSION: str = "phase8.section.v2"
 
 #: Repo-relative directory for reuse metadata.
 REUSE_METADATA_DIR: str = "docs/tier4_orchestration_state/reuse/phase8"
@@ -237,6 +237,23 @@ def artifact_sha256(path: Path) -> str | None:
         return None
 
 
+def read_artifact_run_id(path: Path) -> str | None:
+    """Read the top-level ``run_id`` from a JSON artifact.
+
+    Returns the run_id string, or ``None`` if the file is missing,
+    malformed, not a dict, or lacks a string ``run_id`` field.
+    Fail-closed: any error returns ``None``.
+    """
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            rid = data.get("run_id")
+            return rid if isinstance(rid, str) else None
+        return None
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Reuse metadata I/O
 # ---------------------------------------------------------------------------
@@ -271,16 +288,38 @@ def write_reuse_metadata(
     gate_id: str,
     input_fingerprint: str,
     artifact_hash: str,
+    artifact_run_id: str | None = None,
+    last_validated_run_id: str | None = None,
 ) -> Path:
     """Write reuse metadata for a section node after successful gate pass.
 
+    Parameters
+    ----------
+    source_run_id:
+        Backward-compatible parameter.  Should be set to the artifact's
+        actual ``run_id`` (the producing run).  Preserved as alias for
+        ``artifact_run_id``.
+    artifact_run_id:
+        The ``run_id`` embedded in the artifact JSON — the run that
+        originally produced the artifact.  When ``None``, falls back to
+        *source_run_id*.
+    last_validated_run_id:
+        The run that most recently validated this artifact through a
+        gate pass.  When ``None``, falls back to *source_run_id*.
+
     Returns the path of the written metadata file.
     """
+    _artifact_run_id = artifact_run_id if artifact_run_id is not None else source_run_id
+    _last_validated_run_id = (
+        last_validated_run_id if last_validated_run_id is not None else source_run_id
+    )
     metadata = {
         "node_id": node_id,
         "artifact_path": artifact_path,
         "schema_id": schema_id,
-        "source_run_id": source_run_id,
+        "artifact_run_id": _artifact_run_id,
+        "last_validated_run_id": _last_validated_run_id,
+        "source_run_id": _artifact_run_id,  # backward compat alias = artifact origin
         "gate_id": gate_id,
         "gate_status": "pass",
         "input_fingerprint": input_fingerprint,
@@ -467,11 +506,13 @@ def validate_reuse_candidate(
             input_fingerprint=current_fingerprint,
         )
 
-    # All checks passed
+    # All checks passed.
+    # Prefer artifact_run_id (v2+) over source_run_id (v1 compat).
+    _meta_art_rid = metadata.get("artifact_run_id") or metadata["source_run_id"]
     return ReuseDecision(
         reusable=True,
         reason="all_checks_passed",
-        source_run_id=metadata["source_run_id"],
+        source_run_id=_meta_art_rid,
         artifact_path=artifact_rel,
         input_fingerprint=current_fingerprint,
         gate_id=gate_id,
@@ -586,8 +627,9 @@ def is_reuse_owned_artifact_valid(
     if decision.get("mode") != "drafting_skipped_audit_executed":
         return False, "reuse_decision_mode_wrong"
 
-    # Condition 4
-    if decision.get("source_run_id") != artifact_run_id:
+    # Condition 4: prefer artifact_run_id (v2+), fall back to source_run_id (v1)
+    decision_art_rid = decision.get("artifact_run_id") or decision.get("source_run_id")
+    if decision_art_rid != artifact_run_id:
         return False, "reuse_decision_source_run_id_mismatch"
 
     # Condition 5
@@ -599,8 +641,9 @@ def is_reuse_owned_artifact_valid(
     if metadata is None:
         return False, "reuse_metadata_missing"
 
-    # Condition 7
-    if metadata.get("source_run_id") != artifact_run_id:
+    # Condition 7: prefer artifact_run_id (v2+), fall back to source_run_id (v1)
+    metadata_art_rid = metadata.get("artifact_run_id") or metadata.get("source_run_id")
+    if metadata_art_rid != artifact_run_id:
         return False, "metadata_source_run_id_mismatch"
 
     # Condition 8

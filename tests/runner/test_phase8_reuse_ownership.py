@@ -176,6 +176,7 @@ def _setup_full_reuse_env(
             "status": "reused",
             "mode": "drafting_skipped_audit_executed",
             "source_run_id": source_run_id,
+            "artifact_run_id": source_run_id,
             "artifact_path": cfg["artifact_path"],
             "input_fingerprint": fp,
             "gate_id": cfg["gate_id"],
@@ -437,15 +438,16 @@ class TestReuseFailClosed:
     def test_fails_when_metadata_source_run_id_mismatch(
         self, tmp_path: Path
     ) -> None:
-        """Fails when metadata source_run_id != artifact.run_id."""
+        """Fails when metadata artifact_run_id/source_run_id != artifact.run_id."""
         node_id = "n08c_implementation_drafting"
         source_run, current_run, artifact = self._setup_and_get_artifact(
             tmp_path, node_id
         )
-        # Corrupt metadata source_run_id
+        # Corrupt both artifact_run_id and source_run_id in metadata
         meta_path = tmp_path / REUSE_METADATA_DIR / f"{node_id}.reuse.json"
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         meta["source_run_id"] = "wrong-source"
+        meta["artifact_run_id"] = "wrong-source"
         _write_json(meta_path, meta)
 
         valid, reason = is_reuse_owned_artifact_valid(
@@ -827,3 +829,387 @@ class TestRunContextReuseDecision:
 
         ctx = RunContext.initialize(tmp_path, "test-run-001")
         assert ctx.get_reuse_decision("n08c_implementation_drafting") is None
+
+
+# ===========================================================================
+# 6. read_artifact_run_id helper
+# ===========================================================================
+
+
+class TestReadArtifactRunId:
+    """Tests for the read_artifact_run_id helper."""
+
+    def test_reads_run_id_from_valid_artifact(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        art = tmp_path / "artifact.json"
+        _write_json(art, {"run_id": "abc-123", "schema_id": "test"})
+        assert read_artifact_run_id(art) == "abc-123"
+
+    def test_returns_none_for_missing_file(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        assert read_artifact_run_id(tmp_path / "missing.json") is None
+
+    def test_returns_none_for_invalid_json(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        art = tmp_path / "bad.json"
+        art.parent.mkdir(parents=True, exist_ok=True)
+        art.write_text("not json", encoding="utf-8")
+        assert read_artifact_run_id(art) is None
+
+    def test_returns_none_for_non_dict(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        art = tmp_path / "list.json"
+        _write_json(art, [1, 2, 3])
+        assert read_artifact_run_id(art) is None
+
+    def test_returns_none_for_missing_run_id_key(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        art = tmp_path / "no_rid.json"
+        _write_json(art, {"schema_id": "test"})
+        assert read_artifact_run_id(art) is None
+
+    def test_returns_none_for_non_string_run_id(self, tmp_path: Path) -> None:
+        from runner.phase8_reuse import read_artifact_run_id
+
+        art = tmp_path / "int_rid.json"
+        _write_json(art, {"run_id": 123})
+        assert read_artifact_run_id(art) is None
+
+
+# ===========================================================================
+# 7. write_reuse_metadata new fields
+# ===========================================================================
+
+
+class TestWriteMetadataNewFields:
+    """Verify artifact_run_id and last_validated_run_id in written metadata."""
+
+    def test_metadata_contains_artifact_run_id(self, tmp_path: Path) -> None:
+        path = write_reuse_metadata(
+            node_id="n08a_excellence_drafting",
+            repo_root=tmp_path,
+            source_run_id="src-run",
+            artifact_path="docs/t5/excel.json",
+            schema_id="orch.tier5.excellence_section.v1",
+            gate_id="gate_10a_excellence_completeness",
+            input_fingerprint="fp1",
+            artifact_hash="hash1",
+            artifact_run_id="art-run-001",
+            last_validated_run_id="val-run-002",
+        )
+        from runner.phase8_reuse import load_reuse_metadata
+        loaded = load_reuse_metadata("n08a_excellence_drafting", tmp_path)
+        assert loaded["artifact_run_id"] == "art-run-001"
+        assert loaded["last_validated_run_id"] == "val-run-002"
+
+    def test_source_run_id_equals_artifact_run_id_not_last_validated(
+        self, tmp_path: Path
+    ) -> None:
+        """source_run_id must be artifact_run_id (artifact origin), not
+        last_validated_run_id (validating run)."""
+        write_reuse_metadata(
+            node_id="n08b_impact_drafting",
+            repo_root=tmp_path,
+            source_run_id="ignored",
+            artifact_path="docs/t5/impact.json",
+            schema_id="orch.tier5.impact_section.v1",
+            gate_id="gate_10b_impact_completeness",
+            input_fingerprint="fp2",
+            artifact_hash="hash2",
+            artifact_run_id="art-origin",
+            last_validated_run_id="val-run",
+        )
+        from runner.phase8_reuse import load_reuse_metadata
+        loaded = load_reuse_metadata("n08b_impact_drafting", tmp_path)
+        assert loaded["source_run_id"] == "art-origin"
+        assert loaded["source_run_id"] != "val-run"
+
+    def test_fallback_when_artifact_run_id_is_none(self, tmp_path: Path) -> None:
+        """When artifact_run_id=None, falls back to source_run_id."""
+        write_reuse_metadata(
+            node_id="n08c_implementation_drafting",
+            repo_root=tmp_path,
+            source_run_id="fallback-run",
+            artifact_path="docs/t5/impl.json",
+            schema_id="orch.tier5.implementation_section.v1",
+            gate_id="gate_10c_implementation_completeness",
+            input_fingerprint="fp3",
+            artifact_hash="hash3",
+        )
+        from runner.phase8_reuse import load_reuse_metadata
+        loaded = load_reuse_metadata("n08c_implementation_drafting", tmp_path)
+        assert loaded["artifact_run_id"] == "fallback-run"
+        assert loaded["source_run_id"] == "fallback-run"
+        assert loaded["last_validated_run_id"] == "fallback-run"
+
+
+# ===========================================================================
+# 8. Backward compat and fail-closed v1 metadata
+# ===========================================================================
+
+
+class TestV1MetadataBackwardCompat:
+    """Backward compatibility with v1 metadata (no artifact_run_id key)."""
+
+    def test_v1_metadata_correct_source_run_id_passes(
+        self, tmp_path: Path
+    ) -> None:
+        """v1 metadata where source_run_id == artifact.run_id still passes
+        via fallback."""
+        node_id = "n08a_excellence_drafting"
+        source_run = "original-run-001"
+        current_run = "current-run-002"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        _make_fingerprint_inputs(tmp_path, node_id)
+        _make_valid_artifact(tmp_path, node_id, run_id=source_run)
+        _make_gate_result(tmp_path, cfg["gate_id"], "pass", run_id=source_run)
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+
+        # Write v1-style metadata (no artifact_run_id key)
+        meta_path = tmp_path / REUSE_METADATA_DIR / f"{node_id}.reuse.json"
+        meta_path.parent.mkdir(parents=True, exist_ok=True)
+        v1_metadata = {
+            "node_id": node_id,
+            "artifact_path": cfg["artifact_path"],
+            "schema_id": cfg["schema_id"],
+            "source_run_id": source_run,  # correct: matches artifact.run_id
+            "gate_id": cfg["gate_id"],
+            "gate_status": "pass",
+            "input_fingerprint": fp,
+            "artifact_sha256": art_hash,
+            "reuse_policy_version": "phase8.section.v1",
+        }
+        _write_json(meta_path, v1_metadata)
+
+        _make_audit_reports(tmp_path, current_run)
+        _make_run_manifest(tmp_path, current_run, reuse_decisions={
+            node_id: {
+                "status": "reused",
+                "mode": "drafting_skipped_audit_executed",
+                "source_run_id": source_run,
+                "artifact_path": cfg["artifact_path"],
+                "input_fingerprint": fp,
+                "gate_id": cfg["gate_id"],
+            }
+        })
+
+        artifact = json.loads(
+            (tmp_path / cfg["artifact_path"]).read_text(encoding="utf-8")
+        )
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id, cfg["artifact_path"], artifact, current_run, tmp_path,
+        )
+        assert valid is True
+
+    def test_v1_metadata_corrupted_source_run_id_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """v1 metadata where source_run_id was overwritten to a validation-run
+        ID (not artifact origin) correctly REJECTS."""
+        node_id = "n08b_impact_drafting"
+        artifact_origin_run = "original-run-001"
+        corrupted_validation_run = "validation-run-002"
+        current_run = "current-run-003"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        _make_fingerprint_inputs(tmp_path, node_id)
+        _make_valid_artifact(tmp_path, node_id, run_id=artifact_origin_run)
+        _make_gate_result(tmp_path, cfg["gate_id"], "pass")
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+
+        # Write v1-style metadata with CORRUPTED source_run_id
+        meta_path = tmp_path / REUSE_METADATA_DIR / f"{node_id}.reuse.json"
+        meta_path.parent.mkdir(parents=True, exist_ok=True)
+        v1_metadata = {
+            "node_id": node_id,
+            "artifact_path": cfg["artifact_path"],
+            "schema_id": cfg["schema_id"],
+            "source_run_id": corrupted_validation_run,  # BUG: != artifact.run_id
+            "gate_id": cfg["gate_id"],
+            "gate_status": "pass",
+            "input_fingerprint": fp,
+            "artifact_sha256": art_hash,
+            "reuse_policy_version": "phase8.section.v1",
+        }
+        _write_json(meta_path, v1_metadata)
+
+        _make_audit_reports(tmp_path, current_run)
+        _make_run_manifest(tmp_path, current_run, reuse_decisions={
+            node_id: {
+                "status": "reused",
+                "mode": "drafting_skipped_audit_executed",
+                "source_run_id": corrupted_validation_run,
+                "artifact_path": cfg["artifact_path"],
+                "input_fingerprint": fp,
+                "gate_id": cfg["gate_id"],
+            }
+        })
+
+        artifact = json.loads(
+            (tmp_path / cfg["artifact_path"]).read_text(encoding="utf-8")
+        )
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id, cfg["artifact_path"], artifact, current_run, tmp_path,
+        )
+        assert valid is False
+        assert reason == "reuse_decision_source_run_id_mismatch"
+
+
+# ===========================================================================
+# 9. Multi-run reuse regression (exact bug reproduction)
+# ===========================================================================
+
+
+class TestMultiRunReuseRegression:
+    """Reproduce the exact 3-run scenario from the bug report."""
+
+    def test_metadata_preserves_artifact_run_id_after_reuse_gate_pass(
+        self, tmp_path: Path
+    ) -> None:
+        """
+        Run A: artifact freshly produced (artifact.run_id = run_a).
+        Run B: artifact reused, gate passes, metadata rewritten.
+        After Run B, metadata must have artifact_run_id = run_a (not run_b).
+        """
+        node_id = "n08a_excellence_drafting"
+        run_a = "1d799589-bfc5-464d-9a10-dd5113653c50"
+        run_b = "f367f022-1234-5678-9abc-def012345678"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        # Run A: fresh artifact produced
+        _make_fingerprint_inputs(tmp_path, node_id)
+        _make_valid_artifact(tmp_path, node_id, run_id=run_a)
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+
+        # Run A metadata (fresh production)
+        write_reuse_metadata(
+            node_id=node_id,
+            repo_root=tmp_path,
+            source_run_id=run_a,
+            artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"],
+            gate_id=cfg["gate_id"],
+            input_fingerprint=fp,
+            artifact_hash=art_hash,
+            artifact_run_id=run_a,
+            last_validated_run_id=run_a,
+        )
+
+        # Run B: reuse gate passes, metadata rewritten with CORRECT semantics
+        from runner.phase8_reuse import read_artifact_run_id
+        art_path = tmp_path / cfg["artifact_path"]
+        _art_run_id = read_artifact_run_id(art_path)
+
+        write_reuse_metadata(
+            node_id=node_id,
+            repo_root=tmp_path,
+            source_run_id=_art_run_id or run_b,
+            artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"],
+            gate_id=cfg["gate_id"],
+            input_fingerprint=fp,
+            artifact_hash=art_hash,
+            artifact_run_id=_art_run_id or run_b,
+            last_validated_run_id=run_b,
+        )
+
+        # Verify metadata preserved artifact origin
+        from runner.phase8_reuse import load_reuse_metadata
+        loaded = load_reuse_metadata(node_id, tmp_path)
+        assert loaded["artifact_run_id"] == run_a
+        assert loaded["source_run_id"] == run_a
+        assert loaded["last_validated_run_id"] == run_b
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+    ])
+    def test_run_c_validates_after_run_b_metadata(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """
+        After Run B's correct metadata update, Run C's ownership validation
+        passes for n08a/n08b.
+        """
+        run_a = "1d799589-bfc5-464d-9a10-dd5113653c50"
+        run_b = "f367f022-1234-5678-9abc-def012345678"
+        run_c = "62d7acae-906e-4b8f-9f85-4ff89b6a13f2"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        # Set up artifact produced in Run A
+        _make_fingerprint_inputs(tmp_path, node_id)
+        _make_valid_artifact(tmp_path, node_id, run_id=run_a)
+        _make_gate_result(tmp_path, cfg["gate_id"], "pass", run_id=run_a)
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+
+        # Run B rewrites metadata with correct artifact_run_id
+        write_reuse_metadata(
+            node_id=node_id,
+            repo_root=tmp_path,
+            source_run_id=run_a,
+            artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"],
+            gate_id=cfg["gate_id"],
+            input_fingerprint=fp,
+            artifact_hash=art_hash,
+            artifact_run_id=run_a,
+            last_validated_run_id=run_b,
+        )
+
+        # Run C: set up reuse decision and audit reports
+        _make_audit_reports(tmp_path, run_c)
+        _make_run_manifest(tmp_path, run_c, reuse_decisions={
+            node_id: {
+                "status": "reused",
+                "mode": "drafting_skipped_audit_executed",
+                "source_run_id": run_a,
+                "artifact_run_id": run_a,
+                "artifact_path": cfg["artifact_path"],
+                "input_fingerprint": fp,
+                "gate_id": cfg["gate_id"],
+            }
+        })
+
+        # Verify ownership passes
+        artifact = json.loads(
+            (tmp_path / cfg["artifact_path"]).read_text(encoding="utf-8")
+        )
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id, cfg["artifact_path"], artifact, run_c, tmp_path,
+        )
+        assert valid is True, f"Expected pass for {node_id}, got: {reason}"
+
+    @pytest.mark.parametrize("node_id", list(REUSE_ELIGIBLE_NODES.keys()))
+    def test_predicate_passes_all_three_nodes_with_v2_metadata(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """artifact_owned_by_run passes for all 3 nodes with correct v2 metadata."""
+        source_run = "original-run-001"
+        current_run = "current-run-003"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        _setup_full_reuse_env(
+            tmp_path, node_id,
+            source_run_id=source_run,
+            current_run_id=current_run,
+        )
+
+        result = artifact_owned_by_run(
+            cfg["artifact_path"], current_run, repo_root=tmp_path,
+        )
+        assert result.passed is True
+        assert result.details.get("approved_via_phase8_reuse") is True

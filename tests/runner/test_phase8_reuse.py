@@ -452,6 +452,8 @@ class TestMetadataWriting:
         assert loaded is not None
         assert loaded["node_id"] == "n08a_excellence_drafting"
         assert loaded["source_run_id"] == "run-123"
+        assert loaded["artifact_run_id"] == "run-123"
+        assert loaded["last_validated_run_id"] == "run-123"
         assert loaded["artifact_path"] == "docs/tier5/sections/excellence.json"
         assert loaded["gate_id"] == "gate_10a_excellence_completeness"
         assert loaded["gate_status"] == "pass"
@@ -491,6 +493,7 @@ class TestMetadataWriting:
         assert loaded is not None
         required_keys = {
             "node_id", "artifact_path", "schema_id", "source_run_id",
+            "artifact_run_id", "last_validated_run_id",
             "gate_id", "gate_status", "input_fingerprint", "artifact_sha256",
             "created_at", "reuse_policy_version",
         }

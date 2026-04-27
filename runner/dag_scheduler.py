@@ -97,6 +97,7 @@ from runner.phase8_reuse import (
     ReuseDecision,
     artifact_sha256,
     compute_input_fingerprint,
+    read_artifact_run_id,
     validate_reuse_candidate,
     write_reuse_metadata,
 )
@@ -1514,6 +1515,7 @@ class DAGScheduler:
                     "status": "reused",
                     "mode": "drafting_skipped_audit_executed",
                     "source_run_id": decision.source_run_id,
+                    "artifact_run_id": decision.source_run_id,
                     "artifact_path": decision.artifact_path,
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,
@@ -1636,16 +1638,19 @@ class DAGScheduler:
                     _fp = compute_input_fingerprint(node_id, self.repo_root)
                     _art_path = self.repo_root / _cfg["artifact_path"]
                     _art_hash = artifact_sha256(_art_path)
+                    _art_run_id = read_artifact_run_id(_art_path)
                     if _fp is not None and _art_hash is not None:
                         write_reuse_metadata(
                             node_id=node_id,
                             repo_root=self.repo_root,
-                            source_run_id=self.ctx.run_id,
+                            source_run_id=_art_run_id or self.ctx.run_id,
                             artifact_path=_cfg["artifact_path"],
                             schema_id=_cfg["schema_id"],
                             gate_id=_cfg["gate_id"],
                             input_fingerprint=_fp,
                             artifact_hash=_art_hash,
+                            artifact_run_id=_art_run_id or self.ctx.run_id,
+                            last_validated_run_id=self.ctx.run_id,
                         )
                         log.info(
                             "  [%s] reuse metadata written (fp=%s..)",

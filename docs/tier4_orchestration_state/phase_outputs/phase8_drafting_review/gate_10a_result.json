@@ -1,7 +1,7 @@
 {
   "gate_id": "gate_10a_excellence_completeness",
   "gate_kind": "exit",
-  "run_id": "f367f022-03c7-42eb-a4f6-a005e6c9b0c1",
+  "run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
@@ -10,25 +10,44 @@
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
     "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:1e9c25876032bba599bcf71117cd93503d339946a1df3ef9bdeb9534fcf37e2c"
   },
-  "evaluated_at": "2026-04-27T00:44:41.348443+00:00",
+  "evaluated_at": "2026-04-27T10:54:45.025730+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "pass",
+  "status": "fail",
   "deterministic_predicates": {
     "passed": [
       "g09a_p02",
-      "g09a_p03",
       "g09a_p01",
       "g09a_p04",
       "g09a_p05",
       "g09a_p05b",
       "g09a_p06"
     ],
-    "failed": []
+    "failed": [
+      {
+        "predicate_id": "g09a_p03",
+        "type": "file",
+        "function": "artifact_owned_by_run",
+        "args": {
+          "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2"
+        },
+        "failure_category": "STALE_UPSTREAM_MISMATCH",
+        "reason": "Artifact run_id '1d799589-bfc5-464d-9a10-dd5113653c50' does not match current run '62d7acae-906e-4b8f-9f85-4ff89b6a13f2': C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json.  Re-run the producing phase under the current run_id, or add this artifact path to the reuse policy's approved_artifacts list.",
+        "details": {
+          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "artifact_run_id": "1d799589-bfc5-464d-9a10-dd5113653c50",
+          "expected_run_id": "62d7acae-906e-4b8f-9f85-4ff89b6a13f2"
+        },
+        "fail_message": "excellence_section.json exists but its run_id does not match the current run.\n",
+        "prose_condition": "Excellence section owned by current run"
+      }
+    ]
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": []
+    "failed": [],
+    "skipped": true
   },
-  "skipped_semantic": false,
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
 }
