@@ -1,3 +1,6 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "32705e87-6c51-46e6-870b-4cd1810702e4",
@@ -88,7 +91,7 @@
         "implementation"
       ],
       "status": "inconsistency_flagged",
-      "inconsistency_note": "Two metric inconsistencies detected for OBJ-7 (Open framework release and ecosystem contribution): (1) EDIH count mismatch — OBJ-7 canonical measurable_target in Tier 3 specifies 'technology transfer initiated through ≥3 EDIHs', and Excellence B.1.1 correctly reflects this ('≥3 EDIHs, by month 48'), but Impact section B.2.1 (PATH-EI-02) states 'technology transfer to ≥5 manufacturing SMEs via ≥2 EDIHs' and Impact B.2.2 repeats '≥5 manufacturing SMEs via ≥2 EDIHs and the EIT Manufacturing network' — the Impact section substitutes ≥2 for the canonical ≥3 with no qualifying note that this is a subset; (2) Partial metric loss — OBJ-7 canonical measurable_target includes 'results validated through ≥2 TEFs', which appears in Excellence B.1.1 but is entirely absent from the Impact section (B.2.1 and B.2.2), constituting a partial loss from a multi-target objective. Both conditions violate the metric completeness requirement for explicitly referenced objectives."
+      "inconsistency_note": "Two metric inconsistencies detected for OBJ-7 (Open framework release and ecosystem contribution): (1) EDIH count mismatch \u2014 OBJ-7 canonical measurable_target in Tier 3 specifies 'technology transfer initiated through \u22653 EDIHs', and Excellence B.1.1 correctly reflects this ('\u22653 EDIHs, by month 48'), but Impact section B.2.1 (PATH-EI-02) states 'technology transfer to \u22655 manufacturing SMEs via \u22652 EDIHs' and Impact B.2.2 repeats '\u22655 manufacturing SMEs via \u22652 EDIHs and the EIT Manufacturing network' \u2014 the Impact section substitutes \u22652 for the canonical \u22653 with no qualifying note that this is a subset; (2) Partial metric loss \u2014 OBJ-7 canonical measurable_target includes 'results validated through \u22652 TEFs', which appears in Excellence B.1.1 but is entirely absent from the Impact section (B.2.1 and B.2.2), constituting a partial loss from a multi-target objective. Both conditions violate the metric completeness requirement for explicitly referenced objectives."
     },
     {
       "check_id": "CC-07",
@@ -117,52 +120,5 @@
       "sections_checked": [
         "excellence",
         "impact",
-        "implementation"
-      ],
-      "status": "inconsistency_flagged",
-      "inconsistency_note": "OUT-1 is referred to as 'Neuro-symbolic planning framework for LLM-based agents' in Impact section B.2.1 (PATH-EI-04 narrative) but the canonical Tier 3 OBJ-1 title is 'Neuro-symbolic planning engine for autonomous task decomposition', and Excellence B.1.1 and B.1.2 consistently use 'neuro-symbolic planning engine'. The stem 'Neuro-symbolic planning' appears in Impact with the component keyword substituted ('framework' in place of 'engine'), which violates terminology consistency for a canonical component name from Tier 3 objective titles. 'Framework' and 'engine' are not synonymous designations; the engine is a specific architectural component within the broader MAESTRO framework. This inconsistency risks evaluator confusion between OUT-1 (the planning engine) and OUT-8 / D9-02 (the MAESTRO open-source framework as a whole)."
-    },
-    {
-      "check_id": "CC-10",
-      "description": "Section ordering and completeness: all three sections present and ordered per Part B RIA application form template (B.1 Excellence, B.2 Impact, B.3 Implementation)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null
-    },
-    {
-      "check_id": "CC-11",
-      "description": "Traceability footer consistency: all sections have non-empty primary_sources arrays; no_unsupported_claims_declaration is consistent with validation_status.overall_status",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null
-    },
-    {
-      "check_id": "CC-12",
-      "description": "Validation status aggregation: record of overall_status from each section's validation_status for downstream review awareness (informational check)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null
-    }
-  ],
-  "traceability_footer": {
-    "primary_sources": [
-      "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "docs/tier5_deliverables/proposal_sections/impact_section.json",
-      "docs/tier5_deliverables/proposal_sections/implementation_section.json"
-    ],
-    "no_unsupported_claims_declaration": false,
-    "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
-  }
-}
+ 
+=== END ===

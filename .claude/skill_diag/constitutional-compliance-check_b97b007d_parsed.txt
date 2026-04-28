@@ -1,0 +1,42 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_implementation_section_implementation_writer_2026-04-28T120000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "b97b007d-b330-4258-a0a4-15090e99f836",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's schema_id is 'orch.tier5.implementation_section.v1', a canonical Tier 5 application-form section schema. The traceability_footer.primary_sources[] references 'docs/tier2a_instrument_schemas/extracted/section_schema_registry.json' and 'docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json' as structural authorities \u2014 both are Tier 2A instrument schema sources, not Grant Agreement Annex templates. No string matching 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural authority was found anywhere in the artifact content, sub-sections, or traceability footer."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's B.3.2 sub-section references call constraints and scope requirements by identifiers: 'SR-09, CC-03, and CC-04' (ATU coordination activities), 'SR-10 and CC-05' (BAL AI-on-demand platform integration per claim C12), and 'CC-07' (FIIT Testing and Experiment Facility coordination). All such references are confirmed in validation_status.claim_statuses (C12: confirmed, source_ref = 'Tier 2B: scope_requirements.json SR-10; call_constraints.json CC-05'). The traceability_footer.primary_sources[] includes 'docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json' (tier: 2) and 'docs/tier2b_topic_and_call_sources/extracted/call_constraints.json' (tier: 2) \u2014 both within docs/tier2b_topic_and_call_sources/extracted/. All call-constraint and scope-requirement claims in the artifact carry a Tier 2B source reference in the traceability footer."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact's B.3.2 sub-section names eight specific partners (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) with detailed capability and role descriptions. The traceability_footer.primary_sources[] includes 'docs/tier3_project_instantiation/consortium/partners.json' (tier: 3) and 'docs/tier3_project_instantiation/consortium/roles.json' (tier: 3), both paths within docs/tier3_project_instantiation/. Claim_statuses confirm: C09 ('Partner legal names, countries, and organisation types', confirmed, Tier 3 consortium/partners.json), C10 ('NIHS provides de-identified clinical datasets and clinical validation pathways', confirmed, Tier 3 partners.json[NIHS].description), C11 ('ELI provides real-world logistics operations data across international corridors', confirmed, Tier 3 partners.json[ELI].description), C08 ('ATU leads both WP1 and WP2', confirmed, Tier 4 wp_structure.json). Equipment claims (ISIA 'operational pilot factory environment') and all partner capability descriptions are grounded under the partners.json Tier 3 source reference in the traceability footer. No project-fact claim is found to carry zero Tier 3 source reference. Note: this skill does not independently read docs/tier3_project_instantiation/; it verifies that the artifact provides a Tier 3 source reference in traceability_footer.primary_sources[], which it does."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "This is a Phase 8 artifact (schema_id 'orch.tier5.implementation_section.v1' begins with 'orch.tier5.'). The artifact's validation_status.claim_statuses includes C15: 'Budget gate passed; all 9 WPs and 8 partners confirmed in validated budget', status 'confirmed', source_ref 'Tier 4: phase7_budget_gate/budget_gate_assessment.json gate_pass_declaration=pass'. The traceability_footer.primary_sources[] includes 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gat
+=== END ===

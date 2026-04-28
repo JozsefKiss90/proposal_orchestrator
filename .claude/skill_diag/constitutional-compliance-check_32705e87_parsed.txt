@@ -1,0 +1,62 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_part_b_assembled_draft_compliance_validator_2026-04-28T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "32705e87-6c51-46e6-870b-4cd1810702e4",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing; Annex templates govern post-award implementation reporting, not proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3.",
+      "check_status": "violation",
+      "violation_evidence": "The consistency_log entries assert specific project facts traceable to Tier 3 without any corresponding docs/tier3_project_instantiation/ reference appearing in the artifact's traceability_footer.primary_sources[]. Specific instances: (1) CC-06 asserts 'OBJ-7 canonical measurable_target in Tier 3 specifies \"technology transfer initiated through \u22653 EDIHs\"' and 'results validated through \u22652 TEFs' \u2014 these are quantitative Tier 3 fact claims with no Tier 3 path in the footer; (2) CC-09 asserts 'canonical Tier 3 OBJ-1 title is \"Neuro-symbolic planning engine for autonomous task decomposition\"' and references identifiers OUT-1, OUT-8, D9-02, and the MAESTRO framework name as canonical designations \u2014 again without any docs/tier3_project_instantiation/ reference. The traceability_footer.primary_sources[] contains only ['docs/tier5_deliverables/proposal_sections/excellence_section.json', 'docs/tier5_deliverables/proposal_sections/impact_section.json', 'docs/tier5_deliverables/proposal_sections/implementation_section.json']: all Tier 5 paths, none pointing to docs/tier3_project_instantiation/. Traceability of these project-specific assertions to Tier 3 is not established at the assembled-draft artifact level.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed. Absent budget artifacts are a blocking gate failure; no Phase 8 substep may begin until gate_09 is satisfied.",
+      "check_status": "violation",
+      "violation_evidence": "The artifact carries schema_id 'orch.tier5.part_b_assembled_draft.v1', unambiguously identifying it as a Phase 8 Tier 5 artifact. CLAUDE.md \u00a78.4 and \u00a713.4 require that docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json must exist with gate_pass_declaration: 'pass' before any Phase 8 artifact may be produced or present. The budget_gate_assessment.json is outside the declared input boundary of this skill invocation and therefore cannot be confirmed as present or as carrying a passing declaration from the available inputs. Additionally, consistency_log entry CC-08 explicitly states 'Budget and resource claim consistency: budget figures and resource allocations (person-months, costs) compared across all three sections' with status 'consistent', confirming that budget-figure-dependent content exists and was evaluated in the assembled draft's constituent sections. Per CLAUDE.md \u00a715, the system must prefer explicit gate failure over fabricated completion; absence of verifiable budget gate confirmation constitutes a blocking condition, not a clearance.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibiti
+=== END ===

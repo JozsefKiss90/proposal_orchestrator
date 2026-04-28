@@ -1,3 +1,18 @@
+=== skill_id: cross-section-consistency-check ===
+=== mode: tapm ===
+=== response_text length: 8267 ===
+=== response_text (full) ===
+Now I have all the information needed. Let me perform the cross-section consistency analysis across all 12 checks.
+
+**Key findings from my analysis:**
+
+- **CC-01**: All 8 objectives (OBJ-1 through OBJ-8) are present in Excellence with exact Tier-3 canonical titles and matching measurable targets. Impact and Implementation references are consistent.
+- **CC-06**: Impact section (B.2.1 and B.2.2) uses "≥2 EDIHs" while OBJ-7 canonical Tier-3 target specifies "≥3 EDIHs". Also, OBJ-7's "≥2 TEFs" metric is absent from the Impact section (partial metric loss from multi-target objective).
+- **CC-09**: OUT-1 is referred to as "Neuro-symbolic planning **framework** for LLM-based agents" in Impact B.2.1 (PATH-EI-04) but the canonical Tier-3 OBJ-1 title and Excellence B.1.1/B.1.2 consistently use "neuro-symbolic planning **engine**".
+- All other checks (CC-02 through CC-05, CC-07 through CC-08, CC-10 through CC-12): consistent.
+
+Word counts: Excellence = 905+1050 = 1955; Impact = 282+271 = 553; Implementation = 335+300 = 635.
+
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "32705e87-6c51-46e6-870b-4cd1810702e4",
@@ -28,130 +43,84 @@
     {
       "check_id": "CC-01",
       "description": "Objective consistency across Excellence and Implementation sections, and against Tier 3 objectives.json",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-02",
       "description": "WP reference consistency: WP IDs referenced in Excellence (methodology) and Impact (pathway grounding) match canonical WP list from Implementation wp_table_refs",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-03",
       "description": "Partner name consistency across all three sections and against Tier 3 consortium/partners.json",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-04",
       "description": "Deliverable ID consistency: deliverable IDs and names referenced across Excellence, Impact, and Implementation sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-05",
       "description": "Milestone ID consistency: milestone references in Impact pathway narrative and Implementation milestone_refs",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-06",
       "description": "KPI consistency: KPI definitions, naming, and target values compared across all three sections and against Tier 3 objectives.json measurable_target fields for all explicitly referenced objectives",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "Two metric inconsistencies detected for OBJ-7 (Open framework release and ecosystem contribution): (1) EDIH count mismatch — OBJ-7 canonical measurable_target in Tier 3 specifies 'technology transfer initiated through ≥3 EDIHs', and Excellence B.1.1 correctly reflects this ('≥3 EDIHs, by month 48'), but Impact section B.2.1 (PATH-EI-02) states 'technology transfer to ≥5 manufacturing SMEs via ≥2 EDIHs' and Impact B.2.2 repeats '≥5 manufacturing SMEs via ≥2 EDIHs and the EIT Manufacturing network' — the Impact section substitutes ≥2 for the canonical ≥3 with no qualifying note that this is a subset; (2) Partial metric loss — OBJ-7 canonical measurable_target includes 'results validated through ≥2 TEFs', which appears in Excellence B.1.1 but is entirely absent from the Impact section (B.2.1 and B.2.2), constituting a partial loss from a multi-target objective. Both conditions violate the metric completeness requirement for explicitly referenced objectives."
     },
     {
       "check_id": "CC-07",
       "description": "Impact claim grounding: each impact claim in Impact section cites a WP or deliverable that exists in the Implementation section",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-08",
       "description": "Budget and resource claim consistency: budget figures and resource allocations (person-months, costs) compared across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-09",
       "description": "Terminology consistency: key technical terms, component/system names, and acronyms used across all three sections, cross-referenced against canonical Tier 3 objective titles",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "OUT-1 is referred to as 'Neuro-symbolic planning framework for LLM-based agents' in Impact section B.2.1 (PATH-EI-04 narrative) but the canonical Tier 3 OBJ-1 title is 'Neuro-symbolic planning engine for autonomous task decomposition', and Excellence B.1.1 and B.1.2 consistently use 'neuro-symbolic planning engine'. The stem 'Neuro-symbolic planning' appears in Impact with the component keyword substituted ('framework' in place of 'engine'), which violates terminology consistency for a canonical component name from Tier 3 objective titles. 'Framework' and 'engine' are not synonymous designations; the engine is a specific architectural component within the broader MAESTRO framework. This inconsistency risks evaluator confusion between OUT-1 (the planning engine) and OUT-8 / D9-02 (the MAESTRO open-source framework as a whole)."
     },
     {
       "check_id": "CC-10",
       "description": "Section ordering and completeness: all three sections present and ordered per Part B RIA application form template (B.1 Excellence, B.2 Impact, B.3 Implementation)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-11",
       "description": "Traceability footer consistency: all sections have non-empty primary_sources arrays; no_unsupported_claims_declaration is consistent with validation_status.overall_status",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     },
     {
       "check_id": "CC-12",
       "description": "Validation status aggregation: record of overall_status from each section's validation_status for downstream review awareness (informational check)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null
     }
@@ -166,3 +135,5 @@
     "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
   }
 }
+
+=== END ===
