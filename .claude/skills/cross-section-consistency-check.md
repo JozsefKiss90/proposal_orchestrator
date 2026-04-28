@@ -11,6 +11,10 @@ reads_from:
   - docs/tier5_deliverables/proposal_sections/
   - docs/tier3_project_instantiation/
   - docs/tier2a_instrument_schemas/application_forms/
+  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+  - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+  - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+  - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
 writes_to:
   - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
 constitutional_constraints:
@@ -188,6 +192,13 @@ The `sections` array must be ordered: Excellence (1), Impact (2), Implementation
 
 The `consistency_log` array must contain one entry per check (CC-01 through CC-12). All 12 checks are mandatory. Checks that find no issues must record `status: "consistent"`. Checks that find issues must record `status: "inconsistency_flagged"` with a non-empty `inconsistency_note`.
 
+**Source attribution in consistency_log entries (GATE-CRITICAL for traceability):**
+Each `consistency_log` entry MUST include either:
+- `source_refs`: an array of artifact paths used to perform that check (e.g., `["docs/tier3_project_instantiation/architecture_inputs/objectives.json", "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"]`), OR
+- `source_basis`: a compact string naming the artifact categories used (e.g., `"Tier 3 objectives, Tier 4 wp_structure"`).
+
+This ensures that consistency findings making project-fact assertions are traceable to their source artifacts. Keep references compact — use path-level references, not verbose excerpts.
+
 Word counts are computed by summing `word_count` values across sub-sections within each section artifact.
 
 **`traceability_footer`** — compact traceability summary for the assembled draft:
@@ -197,7 +208,9 @@ Word counts are computed by summing `word_count` values across sub-sections with
   "primary_sources": [
     "docs/tier5_deliverables/proposal_sections/excellence_section.json",
     "docs/tier5_deliverables/proposal_sections/impact_section.json",
-    "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
   ],
   "no_unsupported_claims_declaration": true,
   "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
@@ -205,8 +218,16 @@ Word counts are computed by summing `word_count` values across sub-sections with
 ```
 
 Rules for `traceability_footer`:
-- `primary_sources`: always the three section artifact paths.
-- `no_unsupported_claims_declaration`: set to `true` ONLY if ALL `consistency_log` entries have `status: "consistent"` or `status: "resolved"`. Set to `false` if ANY entry has `status: "inconsistency_flagged"` or `status: "unresolved"`.
+- `primary_sources` MUST include:
+  - The three section artifact paths (always).
+  - `docs/tier3_project_instantiation/architecture_inputs/objectives.json` — if `consistency_log` cites objective titles, measurable targets, or component names.
+  - `docs/tier3_project_instantiation/architecture_inputs/outcomes.json` — if `consistency_log` cites outcome titles or output/component names.
+  - `docs/tier3_project_instantiation/architecture_inputs/impacts.json` — if `consistency_log` cites impact pathway names.
+  - `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` — if `consistency_log` cites WP IDs, deliverables, tasks, milestones, or WP attribution.
+  - `docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json` — if `consistency_log` cites impact pathway mappings or KPIs.
+  - `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` — if `consistency_log` cites implementation responsibility or resource architecture.
+  - `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` — if CC-08 discusses budget/resource consistency.
+- `no_unsupported_claims_declaration`: set to `true` ONLY if ALL `consistency_log` entries have `status: "consistent"` or `status: "resolved"` AND all entries include either `source_refs` or `source_basis`. Set to `false` if ANY entry has `status: "inconsistency_flagged"` or `status: "unresolved"`.
 - `derivation_note`: always the fixed string shown above. This is project-agnostic.
 
 ### 4. Conformance Stamping

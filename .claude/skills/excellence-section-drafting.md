@@ -400,6 +400,61 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 
 <!-- Schema validation complete -->
 
+## Canonical Artifact Reference Rules (GATE-CRITICAL — Shared Cross-Section Canonicalization)
+
+These rules enforce cross-section consistency at the drafting level. Violations produce INCOMPLETE_OUTPUT. These rules apply identically across Excellence, Impact, and Implementation section drafting skills.
+
+**1. Objective Identity:**
+- When referring to an objective, use the exact `id` and canonical `title` from `architecture_inputs/objectives.json`.
+- Do not paraphrase, shorten, rename, or substitute canonical objective titles.
+- If a shorter prose label is needed, first introduce the canonical objective title in full, then optionally use the short label only within the same paragraph.
+
+**2. Component/System Terminology:**
+- Extract canonical component/system names from:
+  - `objectives.json` objective titles
+  - `outcomes.json` outcome titles/names
+  - Relevant named outputs in `impact_architecture.json` and `implementation_architecture.json`
+- Use canonical names exactly across all sections.
+- Do NOT substitute component nouns:
+  - engine ↔ framework
+  - architecture ↔ system
+  - layer ↔ capability
+  - protocol ↔ method
+  - platform ↔ tool
+- If a WP short title differs from an objective title, treat it as a WP label only, not as a replacement for the canonical component/system name.
+
+**3. Metric Completeness:**
+- For every referenced objective `measurable_target`:
+  - Preserve every quantified metric and conjunctive metric component.
+  - Preserve value, comparator, unit, denominator/baseline, and scope.
+  - Do not drop terms joined by "and", "or", commas, semicolons, or multi-clause phrases.
+- If the source says "≥X improvement in A and B over baseline C", output must preserve both "A" and "B" and baseline C.
+- Fail with INCOMPLETE_OUTPUT if any referenced objective metric is partially copied, altered, or summarized in a way that loses a component.
+
+**4. WP Attribution Discipline:**
+- Do not invent WP attributions from local reasoning.
+- When linking an objective/component/output to WPs, use only explicit mappings from:
+  - `wp_structure.json` deliverables/tasks/WP descriptions
+  - `impact_architecture.json` pathway_to_wp_refs or equivalent fields
+  - `implementation_architecture.json` if it provides objective/WP responsibility mappings
+- If no canonical mapping exists:
+  - Avoid giving a WP list for that objective/component.
+  - Use "implemented through the relevant work packages defined in the implementation architecture" or equivalent artifact-grounded wording.
+  - Do not assign a guessed WP set.
+- If a WP attribution is stated in one section, other sections must use the same artifact-grounded WP set for that same objective/component.
+
+**5. Cross-Section Self-Check Before Output:**
+Before writing the JSON artifact, scan the draft and verify:
+- Every objective reference uses canonical title and ID.
+- Every metric from each referenced objective is complete.
+- Every component/system name matches the canonical source.
+- Every WP attribution is either artifact-supported or omitted.
+- `claim_statuses` `source_ref` cites the artifact that supplied the mapping or metric.
+
+On violation: return INCOMPLETE_OUTPUT. Do not write a gate-blocking artifact.
+
+---
+
 ## Canonical Artifact Reference Constraints (GATE-CRITICAL)
 
 All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
@@ -422,6 +477,21 @@ All cross-section references MUST be resolved from canonical artifacts. Do not p
 **Terminology:**
 - Use canonical component/system names from objective `title` fields consistently.
 - Do NOT substitute synonyms for named architectural components (e.g., use "External Tool and API Orchestration Layer" exactly, not "external tool and API orchestration capability").
+
+## Excellence-Specific Canonicalization Rules (GATE-CRITICAL)
+
+**1. Methodology Terminology Consistency:**
+- B.1.2 methodology narrative MUST reuse the same canonical objective/component names introduced in B.1.1 (Objectives and ambition).
+- If B.1.1 names an objective title X, B.1.2 MUST NOT rename X to a synonym or abbreviation.
+- If a WP name is shorter than the objective title, B.1.2 may mention the WP label but MUST also preserve the canonical objective/component title when discussing the objective output.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Methodology section B.1.2 renames canonical objective/component '<name>' introduced in B.1.1"`.
+
+**2. WP Attribution in Excellence:**
+- Excellence MUST NOT assign different WP integration sets than Impact or Implementation for the same objective/component.
+- If no explicit objective-to-WP mapping exists in `wp_structure.json` or `impact_architecture.json`, avoid providing an exact WP list for that objective/component.
+- Prefer deliverable/task references from `wp_structure.json` over inferred WP bundles.
+- Do not combine WPs from multiple artifacts unless they are explicitly consistent.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Excellence assigns WP attribution for '<objective/component>' without artifact mapping support"`.
 
 ## Runtime Contract
 
