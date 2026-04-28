@@ -1,3 +1,5 @@
+# Skill Execution Specification
+
 ---
 skill_id: excellence-section-drafting
 purpose_summary: >
@@ -328,6 +330,7 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 - Step 2.3: Any mandatory sub-section from `section_schema_registry.json` cannot be drafted (no content producible from available inputs) -> `failure_reason="Mandatory sub-section <sub_section_id> cannot be drafted; required input data is absent"`
 - Step 3: Output JSON is malformed or missing required fields -> `failure_reason="Output artifact missing required fields per orch.tier5.excellence_section.v1"`
 - Objective enumeration: Any objective ID from `architecture_inputs/objectives.json` is absent from the drafted Excellence content, OR the stated objective count does not match the Tier 3 count -> `failure_reason="Excellence section enumerates <found> of <N> Tier 3 objectives; missing: <list>"`
+- Terminology drift: A canonical multi-word component name from an objective `title` is replaced with a synonym in the drafted content -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Excellence content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -399,12 +402,127 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 
 <!-- Schema validation complete -->
 
-## Drafting Guidance — Canonical References
+## Canonical Artifact Reference Rules (GATE-CRITICAL — Shared Cross-Section Canonicalization)
 
-Use objective IDs and titles exactly as stated in `architecture_inputs/objectives.json`. When enumerating objectives, include every objective ID present in that file exactly once. Preserve quantified objective metrics (values, comparators, units) when they appear in the prose. Use canonical component/system names from objective and outcome titles — do not intentionally rename them (e.g., do not write "capability" when the title says "Layer"). When linking objectives or components to WPs, use only WP/deliverable/task mappings explicitly present in `wp_structure.json`; if no explicit mapping exists, avoid exact WP lists. Use partner `short_name` or full `legal_name` from `consortium/partners.json` — do not truncate legal names by dropping suffixes (AG, Oy, GmbH, etc.).
+These rules enforce cross-section consistency at the drafting level. Violations produce INCOMPLETE_OUTPUT. These rules apply identically across Excellence, Impact, and Implementation section drafting skills.
 
-These conventions are enforced deterministically by gate predicates (gate_10a, gate_10d). The drafting skill's job is to produce evaluator-oriented content following these conventions — not to perform exhaustive post-hoc validation.
+**1. Objective Identity:**
+- When referring to an objective, use the exact `id` and canonical `title` from `architecture_inputs/objectives.json`.
+- Do not paraphrase, shorten, rename, or substitute canonical objective titles.
+- If a shorter prose label is needed, first introduce the canonical objective title in full, then optionally use the short label only within the same paragraph.
+
+**2. Component/System Terminology:**
+- Extract canonical component/system names from:
+  - `objectives.json` objective titles
+  - `outcomes.json` outcome titles/names
+  - Relevant named outputs in `impact_architecture.json` and `implementation_architecture.json`
+- Use canonical names exactly across all sections.
+- Do NOT substitute component nouns:
+  - engine ↔ framework
+  - architecture ↔ system
+  - layer ↔ capability
+  - protocol ↔ method
+  - platform ↔ tool
+- If a WP short title differs from an objective title, treat it as a WP label only, not as a replacement for the canonical component/system name.
+
+**3. Metric Completeness:**
+- For every referenced objective `measurable_target`:
+  - Preserve every quantified metric and conjunctive metric component.
+  - Preserve value, comparator, unit, denominator/baseline, and scope.
+  - Do not drop terms joined by "and", "or", commas, semicolons, or multi-clause phrases.
+- If the source says "≥X improvement in A and B over baseline C", output must preserve both "A" and "B" and baseline C.
+- Fail with INCOMPLETE_OUTPUT if any referenced objective metric is partially copied, altered, or summarized in a way that loses a component.
+
+**4. WP Attribution Discipline:**
+- Do not invent WP attributions from local reasoning.
+- When linking an objective/component/output to WPs, use only explicit mappings from:
+  - `wp_structure.json` deliverables/tasks/WP descriptions
+  - `impact_architecture.json` pathway_to_wp_refs or equivalent fields
+  - `implementation_architecture.json` if it provides objective/WP responsibility mappings
+- If no canonical mapping exists:
+  - Avoid giving a WP list for that objective/component.
+  - Use "implemented through the relevant work packages defined in the implementation architecture" or equivalent artifact-grounded wording.
+  - Do not assign a guessed WP set.
+- If a WP attribution is stated in one section, other sections must use the same artifact-grounded WP set for that same objective/component.
+
+**5. Cross-Section Self-Check Before Output:**
+Before writing the JSON artifact, scan the draft and verify:
+- Every objective reference uses canonical title and ID.
+- Every metric from each referenced objective is complete.
+- Every component/system name matches the canonical source.
+- Every WP attribution is either artifact-supported or omitted.
+- `claim_statuses` `source_ref` cites the artifact that supplied the mapping or metric.
+
+On violation: return INCOMPLETE_OUTPUT. Do not write a gate-blocking artifact.
+
+---
+
+## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+
+All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+
+**Objective Enumeration Completeness (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+- Read ALL objectives from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`. Count them: this is N.
+- The Excellence section MUST enumerate exactly N objectives. The narrative MUST explicitly state "N specific objectives" (or equivalent) where N matches the count from the artifact.
+- ALL objective IDs (every `id` field value) MUST appear in the structured enumeration. Do not skip, renumber, or paraphrase any objective — including objectives related to dissemination, open science, or exploitation.
+- Use the exact `title` field value when naming the objective's component/system. Substituting words (e.g., "capability" for "Layer") constitutes terminology drift and will fail gate_10d.
+- **Violation condition:** If any objective ID from objectives.json is absent from the Excellence section content, OR if the stated objective count does not match N → return `INCOMPLETE_OUTPUT` with `failure_reason="Excellence section enumerates <found> of <N> Tier 3 objectives; missing: <list of missing IDs>"`.
+
+**Partner References:**
+- When naming partners, use either `short_name` (e.g., "ATU", "ELI") or the full `legal_name` from `consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes (AG, Oy, GmbH, etc.).
+
+**Metric References:**
+- ALL quantified targets (percentages, counts) from each objective's `measurable_target` field MUST be preserved in the Excellence section.
+- Do not drop individual metrics when an objective has multiple quantified targets (e.g., "≥20% AND ≥15%" must both appear).
+
+**Terminology:**
+- Use canonical component/system names from objective `title` fields consistently.
+- Do NOT substitute synonyms for named architectural components (e.g., use "External Tool and API Orchestration Layer" exactly, not "external tool and API orchestration capability").
+
+## Excellence-Specific Canonicalization Rules (GATE-CRITICAL)
+
+**1. Methodology Terminology Consistency:**
+- B.1.2 methodology narrative MUST reuse the same canonical objective/component names introduced in B.1.1 (Objectives and ambition).
+- If B.1.1 names an objective title X, B.1.2 MUST NOT rename X to a synonym or abbreviation.
+- If a WP name is shorter than the objective title, B.1.2 may mention the WP label but MUST also preserve the canonical objective/component title when discussing the objective output.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Methodology section B.1.2 renames canonical objective/component '<name>' introduced in B.1.1"`.
+
+**2. WP Attribution in Excellence:**
+- Excellence MUST NOT assign different WP integration sets than Impact or Implementation for the same objective/component.
+- If no explicit objective-to-WP mapping exists in `wp_structure.json` or `impact_architecture.json`, avoid providing an exact WP list for that objective/component.
+- Prefer deliverable/task references from `wp_structure.json` over inferred WP bundles.
+- Do not combine WPs from multiple artifacts unless they are explicitly consistent.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Excellence assigns WP attribution for '<objective/component>' without artifact mapping support"`.
 
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.
+
+
+# Task Metadata
+
+skill_id: excellence-section-drafting
+run_id: 95c8131d-b80a-49f0-b849-d76cdfe5ac63
+
+# Declared Inputs
+
+Read these files from disk using the Read tool. Do not read files outside this set.
+
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier2a_instrument_schemas\extracted
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier2b_topic_and_call_sources\extracted
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier3_project_instantiation
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase1_call_analysis
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase2_concept_refinement
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase3_wp_design
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase7_budget_gate
+
+# Output Requirements
+
+run_id: 95c8131d-b80a-49f0-b849-d76cdfe5ac63
+writes_to: docs/tier5_deliverables/proposal_sections/excellence_section.json
+
+Expected output schemas:
+  - docs/tier5_deliverables/proposal_sections/excellence_section.json (schema_id: 'orch.tier5.excellence_section.v1') required fields: schema_id, run_id, criterion, sub_sections, validation_status, traceability_footer
+
+Return a single JSON object conforming to the output schema defined in the skill specification above. Do not wrap in markdown. Do not include explanatory text.

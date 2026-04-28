@@ -1,13 +1,13 @@
 """
-Targeted tests for the Phase 8 project-agnostic canonicalization patch.
+Targeted tests for Phase 8 canonicalization architecture.
 
-Covers:
-  1. Shared spec invariant tests — all three specs contain required rules
-  2. Excellence-specific tests — methodology terminology, WP attribution
-  3. Impact-specific tests — metric completeness, sourced WP attribution, terminology
-  4. Implementation-specific tests — WP labels vs canonical titles
-  5. Cross-section consistency output tests — traceability_footer, source_refs
-  6. Fingerprint invalidation tests — spec changes invalidate correct nodes
+Verifies:
+  1. Spec leanness — heavy self-validation removed, concise guidance retained
+  2. Drafting spec fail-fast scope — only cheap guards remain
+  3. Deterministic validator tests — gate predicates enforce canonicalization
+  4. Positive validator tests — correct artifacts pass
+  5. Gate integration — predicates are callable without error
+  6. Fingerprint invalidation — spec changes invalidate correct nodes
 
 All tests are static — no live Claude invocations.
 All fixture data is project-agnostic (no hard-coded real project IDs).
@@ -15,7 +15,6 @@ All fixture data is project-agnostic (no hard-coded real project IDs).
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -38,13 +37,67 @@ def _read_spec(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _write_json(path: Path, data: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
 # ===========================================================================
-# 1. SHARED SPEC INVARIANT TESTS
+# 1. SPEC LEANNESS — heavy self-validation removed
 # ===========================================================================
 
 
-class TestSharedCanonicalArtifactReferenceRules:
-    """All three section specs must contain the shared canonicalization rules."""
+class TestSpecLeanness:
+    """Drafting specs must NOT contain broad exhaustive scan requirements."""
+
+    @pytest.fixture(autouse=True)
+    def _load_specs(self) -> None:
+        self.excellence = _read_spec(EXCELLENCE_SPEC)
+        self.impact = _read_spec(IMPACT_SPEC)
+        self.implementation = _read_spec(IMPLEMENTATION_SPEC)
+
+    def test_excellence_no_cross_section_self_check(self) -> None:
+        """Excellence spec no longer requires cross-section self-check."""
+        assert "Cross-Section Self-Check Before Output" not in self.excellence
+
+    def test_excellence_no_broad_pre_output_scan(self) -> None:
+        """Excellence spec no longer requires scanning all objectives for metrics."""
+        assert "Before writing the JSON artifact, scan the draft and verify every" not in self.excellence
+        assert "scan the draft and verify" not in self.excellence
+
+    def test_excellence_no_component_extraction_from_multiple_artifacts(self) -> None:
+        """Excellence spec does not require extracting components from impact/impl architectures."""
+        assert "Extract canonical component/system names from:" not in self.excellence
+
+    def test_impact_no_cross_section_self_check(self) -> None:
+        """Impact spec no longer requires cross-section self-check."""
+        assert "Cross-Section Self-Check Before Output" not in self.impact
+
+    def test_impact_no_broad_pre_output_metric_scan(self) -> None:
+        """Impact spec no longer requires pre-output metric extraction scan."""
+        # The old block had "Pre-output scan: Before producing output, for each objective"
+        assert "Pre-output scan:" not in self.impact
+
+    def test_impact_no_terminology_pre_output_scan(self) -> None:
+        """Impact spec no longer has terminology pre-output scan block."""
+        assert "Extract the multi-word component phrase" not in self.impact
+
+    def test_implementation_no_cross_section_self_check(self) -> None:
+        """Implementation spec no longer requires cross-section self-check."""
+        assert "Cross-Section Self-Check Before Output" not in self.implementation
+
+    def test_implementation_no_broad_component_extraction(self) -> None:
+        """Implementation spec does not require component extraction from architectures."""
+        assert "Extract canonical component/system names from:" not in self.implementation
+
+
+# ===========================================================================
+# 2. CONCISE GUIDANCE RETAINED
+# ===========================================================================
+
+
+class TestConciseGuidancePresent:
+    """Drafting specs retain concise canonical reference guidance."""
 
     @pytest.fixture(autouse=True)
     def _load_specs(self) -> None:
@@ -57,258 +110,299 @@ class TestSharedCanonicalArtifactReferenceRules:
             "implementation": self.implementation,
         }
 
-    def test_all_contain_canonical_artifact_reference_rules_header(self) -> None:
-        """All three specs have the shared section header."""
+    def test_all_have_drafting_guidance_section(self) -> None:
+        """All specs have the concise 'Drafting Guidance' section."""
         for name, content in self.all_specs.items():
             assert (
-                "Canonical Artifact Reference Rules (GATE-CRITICAL — Shared Cross-Section Canonicalization)"
-                in content
-            ), f"{name} spec missing shared canonicalization header"
+                "Drafting Guidance — Canonical References" in content
+            ), f"{name} spec missing concise drafting guidance"
 
-    def test_all_forbid_objective_title_paraphrase(self) -> None:
-        """All three specs forbid paraphrasing objective titles."""
+    def test_all_mention_objectives_json(self) -> None:
+        """All specs reference objectives.json for canonical IDs/titles."""
+        for name, content in self.all_specs.items():
+            assert "objectives.json" in content, f"{name} spec missing objectives.json ref"
+
+    def test_all_mention_wp_structure(self) -> None:
+        """All specs reference wp_structure.json for WP mappings."""
+        for name, content in self.all_specs.items():
+            assert "wp_structure.json" in content, f"{name} spec missing wp_structure.json ref"
+
+    def test_all_mention_gate_predicates(self) -> None:
+        """All specs note that enforcement is by gate predicates."""
         for name, content in self.all_specs.items():
             assert (
-                "Do not paraphrase, shorten, rename, or substitute canonical objective titles"
-                in content
-            ), f"{name} spec missing objective title paraphrase prohibition"
+                "enforced deterministically by gate predicates" in content
+            ), f"{name} spec missing gate predicate delegation note"
 
-    def test_all_require_complete_measurable_target_preservation(self) -> None:
-        """All three specs require preserving all metric components."""
+    def test_all_mention_legal_name_truncation(self) -> None:
+        """All specs mention not truncating legal names."""
         for name, content in self.all_specs.items():
             assert (
-                "Preserve every quantified metric and conjunctive metric component"
-                in content
-            ), f"{name} spec missing metric completeness requirement"
-
-    def test_all_forbid_component_noun_substitution(self) -> None:
-        """All three specs list forbidden component noun substitutions."""
-        forbidden_pairs = [
-            "engine ↔ framework",
-            "architecture ↔ system",
-            "layer ↔ capability",
-            "protocol ↔ method",
-            "platform ↔ tool",
-        ]
-        for name, content in self.all_specs.items():
-            for pair in forbidden_pairs:
-                assert pair in content, (
-                    f"{name} spec missing forbidden substitution: {pair}"
-                )
-
-    def test_all_forbid_guessed_wp_attribution(self) -> None:
-        """All three specs forbid inventing WP attributions."""
-        for name, content in self.all_specs.items():
-            assert (
-                "Do not invent WP attributions from local reasoning"
-                in content
-            ), f"{name} spec missing WP attribution discipline"
-
-    def test_all_require_incomplete_output_on_violation(self) -> None:
-        """All three specs specify INCOMPLETE_OUTPUT on canonicalization violation."""
-        for name, content in self.all_specs.items():
-            assert (
-                "On violation: return INCOMPLETE_OUTPUT"
-                in content
-            ), f"{name} spec missing INCOMPLETE_OUTPUT violation instruction"
-
-    def test_all_require_cross_section_self_check(self) -> None:
-        """All three specs require a cross-section self-check before output."""
-        for name, content in self.all_specs.items():
-            assert (
-                "Cross-Section Self-Check Before Output"
-                in content
-            ), f"{name} spec missing cross-section self-check"
+                "truncate legal names" in content
+            ), f"{name} spec missing legal name guidance"
 
 
 # ===========================================================================
-# 2. EXCELLENCE-SPECIFIC TESTS
+# 3. DRAFTING SPEC FAIL-FAST SCOPE
 # ===========================================================================
 
 
-class TestExcellenceSpecificRules:
-    """Excellence spec has methodology terminology and WP attribution rules."""
+class TestFailFastScope:
+    """Drafting specs keep only cheap fail-fast guards, not broad validation."""
 
     @pytest.fixture(autouse=True)
-    def _load_spec(self) -> None:
-        self.spec = _read_spec(EXCELLENCE_SPEC)
+    def _load_specs(self) -> None:
+        self.excellence = _read_spec(EXCELLENCE_SPEC)
+        self.impact = _read_spec(IMPACT_SPEC)
 
-    def test_methodology_must_preserve_b11_names(self) -> None:
-        """Excellence spec requires B.1.2 to reuse B.1.1 canonical names."""
-        assert (
-            "B.1.2 methodology narrative MUST reuse the same canonical objective/component names introduced in B.1.1"
-            in self.spec
-        )
+    def test_excellence_keeps_budget_gate_guard(self) -> None:
+        assert "budget gate" in self.excellence.lower()
 
-    def test_methodology_forbids_renaming(self) -> None:
-        """Excellence spec forbids B.1.2 from renaming B.1.1 names."""
-        assert (
-            "B.1.2 MUST NOT rename X to a synonym or abbreviation"
-            in self.spec
-        )
+    def test_excellence_keeps_missing_input_guard(self) -> None:
+        assert "MISSING_INPUT" in self.excellence
 
-    def test_wp_attribution_consistency_with_other_sections(self) -> None:
-        """Excellence must not assign different WP sets than other sections."""
-        assert (
-            "Excellence MUST NOT assign different WP integration sets than Impact or Implementation"
-            in self.spec
-        )
+    def test_excellence_keeps_unresolved_claims_guard(self) -> None:
+        assert "assumed" in self.excellence and "unresolved" in self.excellence
 
-    def test_exact_wp_list_forbidden_without_mapping(self) -> None:
-        """Exact WP list is forbidden when no explicit artifact mapping exists."""
-        assert (
-            "avoid providing an exact WP list for that objective/component"
-            in self.spec
-        )
+    def test_excellence_keeps_objective_enumeration(self) -> None:
+        """Objective enumeration completeness is cheap and retained."""
+        assert "objective ID from" in self.excellence
 
+    def test_excellence_no_terminology_drift_failfast(self) -> None:
+        """Terminology drift is now enforced by gates, not as a skill fail-fast."""
+        assert 'Terminology drift: canonical name' not in self.excellence
 
-# ===========================================================================
-# 3. IMPACT-SPECIFIC TESTS
-# ===========================================================================
+    def test_impact_keeps_budget_gate_guard(self) -> None:
+        assert "budget gate" in self.impact.lower()
 
+    def test_impact_keeps_missing_input_guard(self) -> None:
+        assert "MISSING_INPUT" in self.impact
 
-class TestImpactSpecificRules:
-    """Impact spec has metric completeness, WP attribution, and terminology rules."""
+    def test_impact_keeps_unresolved_claims_guard(self) -> None:
+        assert "assumed" in self.impact and "unresolved" in self.impact
 
-    @pytest.fixture(autouse=True)
-    def _load_spec(self) -> None:
-        self.spec = _read_spec(IMPACT_SPEC)
+    def test_impact_keeps_d401_guard(self) -> None:
+        """D4-01 identity guard is bounded and retained."""
+        assert "D4-01" in self.impact
 
-    def test_impact_requires_complete_metric_text(self) -> None:
-        """Impact spec requires complete metric text for all referenced objectives."""
-        assert (
-            "Impact Pathways Must Not Compress Metrics"
-            in self.spec
-        )
-        assert (
-            "claim_statuses` MUST include complete metric text"
-            in self.spec
-        )
+    def test_impact_no_metric_completeness_failfast(self) -> None:
+        """Metric completeness is enforced by gate, not as skill fail-fast."""
+        assert "Partial metric loss for" not in self.impact
 
-    def test_impact_requires_sourced_wp_attribution(self) -> None:
-        """Impact spec requires sourced WP attribution or omission."""
-        assert (
-            "Impact Pathways Must Not Assign Guessed WP Sets"
-            in self.spec
-        )
-        assert (
-            "source_ref` MUST point to the artifact field that contains that WP set"
-            in self.spec
-        )
-
-    def test_impact_requires_canonical_component_names(self) -> None:
-        """Impact spec requires canonical component names, not WP labels."""
-        assert (
-            "Impact MUST use canonical objective/outcome component names"
-            in self.spec
-        )
-        assert (
-            "Impact MUST NOT use WP labels as substitutes for canonical system/component titles"
-            in self.spec
-        )
+    def test_impact_no_terminology_drift_failfast(self) -> None:
+        """Terminology drift is enforced by gate, not as skill fail-fast."""
+        assert "Terminology drift: canonical name" not in self.impact
 
 
 # ===========================================================================
-# 4. IMPLEMENTATION-SPECIFIC TESTS
+# 4. DETERMINISTIC VALIDATOR TESTS (gate predicates)
 # ===========================================================================
 
 
-class TestImplementationSpecificRules:
-    """Implementation spec distinguishes WP labels from canonical titles."""
+class TestDeterministicValidators:
+    """Gate predicates correctly enforce canonicalization rules."""
 
-    @pytest.fixture(autouse=True)
-    def _load_spec(self) -> None:
-        self.spec = _read_spec(IMPLEMENTATION_SPEC)
+    def _make_objectives(self, *specs: tuple[str, str, str]) -> dict:
+        return {
+            "objectives": [
+                {"id": oid, "title": title, "measurable_target": target,
+                 "target_month": 36, "responsible_partner": "ATU"}
+                for oid, title, target in specs
+            ]
+        }
 
-    def test_wp_labels_vs_canonical_titles_rule(self) -> None:
-        """Implementation spec distinguishes WP labels from objective/component names."""
-        assert (
-            "WP Labels vs Canonical Component Titles"
-            in self.spec
-        )
-        assert (
-            "WP table labels may retain canonical WP names from `wp_structure.json`"
-            in self.spec
-        )
+    def _make_partners(self, *specs: tuple[str, str]) -> dict:
+        return {
+            "partners": [
+                {"partner_number": i + 1, "short_name": s, "legal_name": l,
+                 "country": "DE", "organisation_type": "HES"}
+                for i, (s, l) in enumerate(specs)
+            ]
+        }
 
-    def test_forbids_wp_labels_replacing_objective_titles(self) -> None:
-        """Implementation spec forbids WP labels replacing objective titles."""
-        assert (
-            "Do NOT allow WP labels to replace objective/component names"
-            in self.spec
-        )
+    def _make_section(self, criterion: str, content: str) -> dict:
+        schema_map = {
+            "Excellence": "orch.tier5.excellence_section.v1",
+            "Impact": "orch.tier5.impact_section.v1",
+            "Implementation": "orch.tier5.implementation_section.v1",
+        }
+        result = {
+            "schema_id": schema_map[criterion],
+            "run_id": "test-run",
+            "criterion": criterion,
+            "sub_sections": [{"sub_section_id": "B.1.1", "title": "Main", "content": content}],
+        }
+        if criterion == "Impact":
+            result["impact_pathway_refs"] = []
+            result["dec_coverage"] = {"dissemination_addressed": True,
+                                      "exploitation_addressed": True,
+                                      "communication_addressed": True}
+        if criterion == "Implementation":
+            result["wp_table_refs"] = ["WP1"]
+            result["gantt_ref"] = "g.json"
+            result["milestone_refs"] = ["MS1"]
+            result["risk_register_ref"] = "r.json"
+        return result
 
-    def test_objective_to_wp_mapping_discipline(self) -> None:
-        """Implementation spec requires explicit mapping for WP ownership claims."""
-        assert (
-            "Objective-to-WP Mapping Discipline"
-            in self.spec
+    def _make_assembled(self, consistency_log=None) -> dict:
+        return {
+            "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+            "run_id": "test",
+            "sections": [
+                {"section_id": "excellence", "criterion": "Excellence", "order": 1, "artifact_path": "e.json"},
+                {"section_id": "impact", "criterion": "Impact", "order": 2, "artifact_path": "i.json"},
+                {"section_id": "implementation", "criterion": "Implementation", "order": 3, "artifact_path": "impl.json"},
+            ],
+            "consistency_log": consistency_log or [],
+        }
+
+    def _setup(self, tmp_path, *, exc="", imp_content="", impact="", objectives=None, partners=None):
+        from runner.predicates.criterion_predicates import cross_section_consistency
+        _write_json(tmp_path / "assembled.json", self._make_assembled())
+        sec = tmp_path / "sections"
+        if exc:
+            _write_json(sec / "excellence_section.json", self._make_section("Excellence", exc))
+        if impact:
+            _write_json(sec / "impact_section.json", self._make_section("Impact", impact))
+        if imp_content:
+            _write_json(sec / "implementation_section.json", self._make_section("Implementation", imp_content))
+        tier3 = tmp_path / "tier3"
+        if objectives:
+            _write_json(tier3 / "architecture_inputs" / "objectives.json", objectives)
+        if partners:
+            _write_json(tier3 / "consortium" / "partners.json", partners)
+        return cross_section_consistency
+
+    def test_missing_objective_in_excellence_fails(self, tmp_path: Path) -> None:
+        """Missing objective ID in Excellence fails objective coverage."""
+        objs = self._make_objectives(("OBJ-1", "Engine", "≥40%"), ("OBJ-2", "Memory", "≥30%"))
+        fn = self._setup(tmp_path, exc="OBJ-1 plans.", impact="Impact.", imp_content="Impl.", objectives=objs)
+        result = fn("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert not result.passed
+        assert any("OBJ-2" in str(i.get("details", "")) for i in result.details.get("issues", []))
+
+    def test_missing_metric_component_in_impact_fails(self, tmp_path: Path) -> None:
+        """Missing metric component in Impact fails metric completeness."""
+        objs = self._make_objectives(("OBJ-6", "Logistics demo", "≥20% recovery AND ≥15% adherence"))
+        fn = self._setup(tmp_path, exc="OBJ-6 logistics.", impact="OBJ-6 achieves ≥20% recovery.",
+                         imp_content="Impl.", objectives=objs)
+        result = fn("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert not result.passed
+        issues = [i for i in result.details.get("issues", []) if i.get("check") == "metric_completeness"]
+        assert len(issues) >= 1
+        assert "≥15%" in str(issues[0]["details"])
+
+    def test_component_noun_substitution_fails_terminology(self, tmp_path: Path) -> None:
+        """Component noun substitution fails canonical terminology check."""
+        objs = self._make_objectives(("OBJ-8", "External Tool and API Orchestration Layer", "≥30 tools"))
+        fn = self._setup(
+            tmp_path,
+            exc="OBJ-8 External Tool and API Orchestration Layer.",
+            impact="The external tool and API orchestration capability provides OBJ-8.",
+            imp_content="Impl.",
+            objectives=objs,
         )
-        assert (
-            "do NOT imply canonical WP ownership for an objective"
-            in self.spec
+        result = fn("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert not result.passed
+        issues = [i for i in result.details.get("issues", []) if i.get("check") == "terminology_consistency"]
+        assert len(issues) >= 1
+
+    def test_legal_name_truncation_fails_partner_naming(self, tmp_path: Path) -> None:
+        """Legal-name truncation fails partner naming check."""
+        partners = self._make_partners(("ELI", "EuroLog International AG"))
+        fn = self._setup(
+            tmp_path, exc="EuroLog International contributes.", impact="Impact.",
+            imp_content="Impl.", partners=partners,
         )
+        result = fn("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert not result.passed
+        issues = [i for i in result.details.get("issues", []) if i.get("check") == "partner_naming"]
+        assert len(issues) >= 1
+
+    def test_deliverable_repurposed_as_kpi_fails(self, tmp_path: Path) -> None:
+        """Deliverable ID repurposed as KPI/activity fails deliverable/KPI identity."""
+        from runner.predicates.criterion_predicates import cross_section_consistency
+        _write_json(tmp_path / "assembled.json", self._make_assembled())
+        sec = tmp_path / "sections"
+        _write_json(sec / "excellence_section.json", self._make_section("Excellence", "content"))
+        _write_json(sec / "impact_section.json", self._make_section(
+            "Impact", "CERIA submits formal standardisation proposal (D4-01) to ISO/IEC."))
+        _write_json(sec / "implementation_section.json", self._make_section("Implementation", "content"))
+        # Tier 4 artifacts
+        _write_json(tmp_path / "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+                    {"kpis": [{"kpi_id": "KPI-08", "description": "Standardisation", "target": "≥1",
+                               "traceable_to_deliverable": "D4-01"}]})
+        _write_json(tmp_path / "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+                    {"work_packages": [{"wp_id": "WP4", "deliverables": [
+                        {"deliverable_id": "D4-01", "title": "Multi-agent coordination protocol specification", "due_month": 18}
+                    ]}]})
+        result = cross_section_consistency("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert not result.passed
 
 
 # ===========================================================================
-# 5. CROSS-SECTION CONSISTENCY OUTPUT TESTS
+# 5. POSITIVE VALIDATOR TESTS
 # ===========================================================================
 
 
-class TestCrossSectionConsistencyTraceability:
-    """Cross-section consistency spec traceability_footer and source_refs."""
+class TestPositiveValidation:
+    """Correct artifacts pass deterministic checks."""
 
-    @pytest.fixture(autouse=True)
-    def _load_spec(self) -> None:
-        self.spec = _read_spec(CONSISTENCY_SPEC)
+    def test_all_objectives_present_passes(self, tmp_path: Path) -> None:
+        from runner.predicates.criterion_predicates import cross_section_consistency
+        objs = {"objectives": [
+            {"id": "OBJ-1", "title": "Planning Engine", "measurable_target": "≥40%"},
+            {"id": "OBJ-2", "title": "Memory Architecture", "measurable_target": "≥30%"},
+        ]}
+        _write_json(tmp_path / "assembled.json", {
+            "schema_id": "orch.tier5.part_b_assembled_draft.v1", "run_id": "t",
+            "sections": [
+                {"section_id": "excellence", "criterion": "Excellence", "order": 1, "artifact_path": "e.json"},
+                {"section_id": "impact", "criterion": "Impact", "order": 2, "artifact_path": "i.json"},
+                {"section_id": "implementation", "criterion": "Implementation", "order": 3, "artifact_path": "impl.json"},
+            ], "consistency_log": []})
+        sec = tmp_path / "sections"
+        _write_json(sec / "excellence_section.json", {
+            "schema_id": "orch.tier5.excellence_section.v1", "run_id": "t", "criterion": "Excellence",
+            "sub_sections": [{"sub_section_id": "B.1.1", "title": "M", "content": "OBJ-1 Planning Engine ≥40%. OBJ-2 Memory Architecture ≥30%."}]})
+        _write_json(sec / "impact_section.json", {
+            "schema_id": "orch.tier5.impact_section.v1", "run_id": "t", "criterion": "Impact",
+            "sub_sections": [{"sub_section_id": "B.2.1", "title": "M", "content": "OBJ-1 achieves ≥40%. OBJ-2 achieves ≥30%."}],
+            "impact_pathway_refs": [], "dec_coverage": {"dissemination_addressed": True, "exploitation_addressed": True, "communication_addressed": True}})
+        _write_json(sec / "implementation_section.json", {
+            "schema_id": "orch.tier5.implementation_section.v1", "run_id": "t", "criterion": "Implementation",
+            "sub_sections": [{"sub_section_id": "B.3.1", "title": "M", "content": "WP2 implements OBJ-1."}],
+            "wp_table_refs": ["WP1"], "gantt_ref": "g.json", "milestone_refs": ["MS1"], "risk_register_ref": "r.json"})
+        _write_json(tmp_path / "tier3/architecture_inputs/objectives.json", objs)
+        result = cross_section_consistency("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert result.passed
 
-    def test_traceability_footer_includes_tier3_paths(self) -> None:
-        """Spec requires Tier 3 objective paths in primary_sources."""
-        assert (
-            "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-            in self.spec
-        )
-
-    def test_traceability_footer_includes_tier4_wp_structure(self) -> None:
-        """Spec requires Tier 4 wp_structure path in primary_sources."""
-        assert (
-            "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
-            in self.spec
-        )
-
-    def test_consistency_log_requires_source_refs_or_source_basis(self) -> None:
-        """Spec requires source_refs or source_basis in each consistency_log entry."""
-        assert "source_refs" in self.spec
-        assert "source_basis" in self.spec
-        assert (
-            "Each `consistency_log` entry MUST include either"
-            in self.spec
-        )
-
-    def test_no_unsupported_claims_false_when_inconsistency_flagged(self) -> None:
-        """Spec sets no_unsupported_claims_declaration=false on inconsistency_flagged."""
-        assert (
-            'Set to `false` if ANY entry has `status: "inconsistency_flagged"'
-            in self.spec
-        )
-
-    def test_no_unsupported_claims_true_requires_source_refs(self) -> None:
-        """Spec requires source_refs/source_basis for true declaration."""
-        assert (
-            "all entries include either `source_refs` or `source_basis`"
-            in self.spec
-        )
-
-    def test_reads_from_includes_tier4_paths(self) -> None:
-        """Spec reads_from includes Tier 4 phase output paths for grounding."""
-        assert (
-            "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/"
-            in self.spec
-        )
-        assert (
-            "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/"
-            in self.spec
-        )
+    def test_full_legal_names_pass(self, tmp_path: Path) -> None:
+        from runner.predicates.criterion_predicates import cross_section_consistency
+        partners = {"partners": [{"partner_number": 1, "short_name": "ELI", "legal_name": "EuroLog International AG",
+                                   "country": "CH", "organisation_type": "PRC"}]}
+        _write_json(tmp_path / "assembled.json", {
+            "schema_id": "orch.tier5.part_b_assembled_draft.v1", "run_id": "t",
+            "sections": [
+                {"section_id": "excellence", "criterion": "Excellence", "order": 1, "artifact_path": "e.json"},
+                {"section_id": "impact", "criterion": "Impact", "order": 2, "artifact_path": "i.json"},
+                {"section_id": "implementation", "criterion": "Implementation", "order": 3, "artifact_path": "impl.json"},
+            ], "consistency_log": []})
+        sec = tmp_path / "sections"
+        _write_json(sec / "excellence_section.json", {
+            "schema_id": "orch.tier5.excellence_section.v1", "run_id": "t", "criterion": "Excellence",
+            "sub_sections": [{"sub_section_id": "B.1.1", "title": "M", "content": "EuroLog International AG leads."}]})
+        _write_json(sec / "impact_section.json", {
+            "schema_id": "orch.tier5.impact_section.v1", "run_id": "t", "criterion": "Impact",
+            "sub_sections": [{"sub_section_id": "B.2.1", "title": "M", "content": "EuroLog International AG validates."}],
+            "impact_pathway_refs": [], "dec_coverage": {"dissemination_addressed": True, "exploitation_addressed": True, "communication_addressed": True}})
+        _write_json(sec / "implementation_section.json", {
+            "schema_id": "orch.tier5.implementation_section.v1", "run_id": "t", "criterion": "Implementation",
+            "sub_sections": [{"sub_section_id": "B.3.1", "title": "M", "content": "EuroLog International AG participates."}],
+            "wp_table_refs": ["WP1"], "gantt_ref": "g.json", "milestone_refs": ["MS1"], "risk_register_ref": "r.json"})
+        _write_json(tmp_path / "tier3/consortium/partners.json", partners)
+        result = cross_section_consistency("assembled.json", "sections/", "tier3/", repo_root=tmp_path)
+        assert result.passed
 
 
 # ===========================================================================
@@ -321,95 +415,65 @@ class TestFingerprintInvalidation:
 
     @pytest.fixture(autouse=True)
     def _setup_paths(self, tmp_path: Path) -> None:
-        """Set up a minimal repo with fingerprint inputs."""
         from runner.phase8_reuse import FINGERPRINT_INPUTS, compute_input_fingerprint
-
         self.repo = tmp_path
         self.compute = compute_input_fingerprint
 
-        # Create minimal input files for all three nodes
         for node_id in ["n08a_excellence_drafting", "n08b_impact_drafting",
                         "n08c_implementation_drafting"]:
             for rel_path in FINGERPRINT_INPUTS[node_id]:
                 if rel_path.endswith("/"):
                     (tmp_path / rel_path).mkdir(parents=True, exist_ok=True)
-                    (tmp_path / rel_path / "data.json").write_text(
-                        '{"v": 1}', encoding="utf-8"
-                    )
+                    (tmp_path / rel_path / "data.json").write_text('{"v": 1}', encoding="utf-8")
                 else:
                     p = tmp_path / rel_path
                     p.parent.mkdir(parents=True, exist_ok=True)
                     p.write_text("spec content placeholder", encoding="utf-8")
 
     def test_excellence_spec_change_invalidates_only_n08a(self) -> None:
-        """Mutation to excellence spec changes only n08a fingerprint."""
         fp_a = self.compute("n08a_excellence_drafting", self.repo)
         fp_b = self.compute("n08b_impact_drafting", self.repo)
         fp_c = self.compute("n08c_implementation_drafting", self.repo)
 
-        # Mutate excellence spec
-        spec_path = self.repo / ".claude/skills/excellence-section-drafting.md"
-        spec_path.write_text("MUTATED SPEC CONTENT", encoding="utf-8")
+        (self.repo / ".claude/skills/excellence-section-drafting.md").write_text("MUTATED", encoding="utf-8")
 
-        fp_a2 = self.compute("n08a_excellence_drafting", self.repo)
-        fp_b2 = self.compute("n08b_impact_drafting", self.repo)
-        fp_c2 = self.compute("n08c_implementation_drafting", self.repo)
-
-        assert fp_a != fp_a2, "n08a fingerprint should change on excellence spec mutation"
-        assert fp_b == fp_b2, "n08b fingerprint should NOT change on excellence spec mutation"
-        assert fp_c == fp_c2, "n08c fingerprint should NOT change on excellence spec mutation"
+        assert self.compute("n08a_excellence_drafting", self.repo) != fp_a
+        assert self.compute("n08b_impact_drafting", self.repo) == fp_b
+        assert self.compute("n08c_implementation_drafting", self.repo) == fp_c
 
     def test_impact_spec_change_invalidates_only_n08b(self) -> None:
-        """Mutation to impact spec changes only n08b fingerprint."""
         fp_a = self.compute("n08a_excellence_drafting", self.repo)
         fp_b = self.compute("n08b_impact_drafting", self.repo)
         fp_c = self.compute("n08c_implementation_drafting", self.repo)
 
-        # Mutate impact spec
-        spec_path = self.repo / ".claude/skills/impact-section-drafting.md"
-        spec_path.write_text("MUTATED SPEC CONTENT", encoding="utf-8")
+        (self.repo / ".claude/skills/impact-section-drafting.md").write_text("MUTATED", encoding="utf-8")
 
-        fp_a2 = self.compute("n08a_excellence_drafting", self.repo)
-        fp_b2 = self.compute("n08b_impact_drafting", self.repo)
-        fp_c2 = self.compute("n08c_implementation_drafting", self.repo)
-
-        assert fp_a == fp_a2, "n08a fingerprint should NOT change on impact spec mutation"
-        assert fp_b != fp_b2, "n08b fingerprint should change on impact spec mutation"
-        assert fp_c == fp_c2, "n08c fingerprint should NOT change on impact spec mutation"
+        assert self.compute("n08a_excellence_drafting", self.repo) == fp_a
+        assert self.compute("n08b_impact_drafting", self.repo) != fp_b
+        assert self.compute("n08c_implementation_drafting", self.repo) == fp_c
 
     def test_implementation_spec_change_invalidates_only_n08c(self) -> None:
-        """Mutation to implementation spec changes only n08c fingerprint."""
         fp_a = self.compute("n08a_excellence_drafting", self.repo)
         fp_b = self.compute("n08b_impact_drafting", self.repo)
         fp_c = self.compute("n08c_implementation_drafting", self.repo)
 
-        # Mutate implementation spec
-        spec_path = self.repo / ".claude/skills/implementation-section-drafting.md"
-        spec_path.write_text("MUTATED SPEC CONTENT", encoding="utf-8")
+        (self.repo / ".claude/skills/implementation-section-drafting.md").write_text("MUTATED", encoding="utf-8")
 
-        fp_a2 = self.compute("n08a_excellence_drafting", self.repo)
-        fp_b2 = self.compute("n08b_impact_drafting", self.repo)
-        fp_c2 = self.compute("n08c_implementation_drafting", self.repo)
+        assert self.compute("n08a_excellence_drafting", self.repo) == fp_a
+        assert self.compute("n08b_impact_drafting", self.repo) == fp_b
+        assert self.compute("n08c_implementation_drafting", self.repo) != fp_c
 
-        assert fp_a == fp_a2, "n08a fingerprint should NOT change on implementation spec mutation"
-        assert fp_b == fp_b2, "n08b fingerprint should NOT change on implementation spec mutation"
-        assert fp_c != fp_c2, "n08c fingerprint should change on implementation spec mutation"
-
-    def test_consistency_spec_does_not_affect_drafting_nodes(self) -> None:
-        """Mutation to cross-section-consistency-check.md does not affect n08a/b/c."""
+    def test_validator_code_change_does_not_invalidate_drafting(self) -> None:
+        """Changes to runner/predicates/ do not force drafting reuse invalidation."""
         fp_a = self.compute("n08a_excellence_drafting", self.repo)
         fp_b = self.compute("n08b_impact_drafting", self.repo)
         fp_c = self.compute("n08c_implementation_drafting", self.repo)
 
-        # Mutate consistency spec (not in any drafting node's FINGERPRINT_INPUTS)
-        spec_path = self.repo / ".claude/skills/cross-section-consistency-check.md"
-        spec_path.parent.mkdir(parents=True, exist_ok=True)
-        spec_path.write_text("MUTATED CONSISTENCY SPEC", encoding="utf-8")
+        # Simulate a validator code change (not in fingerprint inputs)
+        p = self.repo / "runner/predicates/criterion_predicates.py"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("# modified validator", encoding="utf-8")
 
-        fp_a2 = self.compute("n08a_excellence_drafting", self.repo)
-        fp_b2 = self.compute("n08b_impact_drafting", self.repo)
-        fp_c2 = self.compute("n08c_implementation_drafting", self.repo)
-
-        assert fp_a == fp_a2, "n08a fingerprint should NOT change on consistency spec mutation"
-        assert fp_b == fp_b2, "n08b fingerprint should NOT change on consistency spec mutation"
-        assert fp_c == fp_c2, "n08c fingerprint should NOT change on consistency spec mutation"
+        assert self.compute("n08a_excellence_drafting", self.repo) == fp_a
+        assert self.compute("n08b_impact_drafting", self.repo) == fp_b
+        assert self.compute("n08c_implementation_drafting", self.repo) == fp_c

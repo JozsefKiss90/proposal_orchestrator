@@ -1,3 +1,5 @@
+# Skill Execution Specification
+
 ---
 skill_id: impact-section-drafting
 purpose_summary: >
@@ -186,6 +188,11 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
   - overall_status is "confirmed" or "inferred"
   - All primary_sources[].tier values are numeric integers (not strings)
   - no_unsupported_claims_declaration is true
+  - No "formal standardisation proposal (D4-01)" or "standardisation submission (D4-01)" or "D4-01 ... by M48" patterns in content
+  - D4-01 described only as the M18 coordination protocol specification
+  - KPI-08/M48 standardisation activity described without assigning it as D4-01
+  - **Metric completeness (Step 2.5.6):** For each objective ID/title in `sub_sections[].content`, all quantified metrics from its `measurable_target` appear with the same numeric value, comparator, and unit. No metric is missing, no value is substituted, no multi-metric target is partially represented.
+  - **Terminology consistency (Step 2.5.6):** No canonical component stem appears in the output with a different terminal keyword than the Tier 3 canonical term. No forbidden component noun substitution is present.
   If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Impact section has non-gate-ready claims or schema issues: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
@@ -348,6 +355,8 @@ No CONSTRAINT_VIOLATION conditions are defined; all constitutional constraint fa
 - Step 3: Output JSON missing required fields -> `failure_reason="Output artifact missing required fields per orch.tier5.impact_section.v1"`
 - Step 2.6: `impact_pathway_refs` array is empty when `impact_architecture.json` has pathways -> `failure_reason="impact_pathway_refs is empty despite pathways existing in impact_architecture.json"`
 - D4-01 identity violation: Any co-occurrence of "D4-01" with any of {"standardisation", "ISO", "IEC", "IEEE", "submission", "M48"} in `sub_sections[].content` or `validation_status.claim_statuses[].claim_summary` -> `failure_reason="D4-01 deliverable identity violation: D4-01 co-occurs with standardisation/ISO/IEC/IEEE/submission/M48 language; D4-01 may ONLY appear with its canonical title from wp_structure.json"`
+- Metric completeness: An objective referenced in Impact content has multiple quantified targets in its `measurable_target` field but only a subset appears in the drafted content -> `failure_reason="Partial metric loss for <obj_id>: <missing metrics> absent from Impact section"`
+- Terminology drift: A canonical multi-word component name from an objective or outcome `title` is replaced with a synonym (e.g., Engine→framework, Engine→approach, Layer→capability, Architecture→mechanism, Framework→tool, Protocol→method) -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Impact content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -421,12 +430,164 @@ No CONSTRAINT_VIOLATION conditions are defined; all constitutional constraint fa
 
 <!-- Schema validation complete -->
 
-## Drafting Guidance — Canonical References
+## Canonical Artifact Reference Rules (GATE-CRITICAL — Shared Cross-Section Canonicalization)
 
-Use objective IDs, titles, outcome names, impact pathway names, and KPI labels exactly as stated in Tier 3/Tier 4 artifacts. Preserve all quantified metrics (values, comparators, units) for any objective or impact target explicitly used in the Impact prose — do not alter numeric values, drop conjunctive metrics, or substitute units. Use canonical component/system names from `objectives.json` and `outcomes.json` — do not intentionally rename them (e.g., do not write "framework" when the source says "engine"). Do not describe KPIs as deliverables; cite deliverable IDs with their canonical title and due month from `wp_structure.json`. Do not invent WP mappings; cite explicit mappings from `impact_architecture.json` or `wp_structure.json`, or omit WP lists. Use partner `short_name` or full `legal_name` — do not truncate legal names by dropping suffixes.
+These rules enforce cross-section consistency at the drafting level. Violations produce INCOMPLETE_OUTPUT. These rules apply identically across Excellence, Impact, and Implementation section drafting skills.
 
-These conventions are enforced deterministically by gate predicates (gate_10b, gate_10d). The drafting skill's job is to produce evaluator-oriented content following these conventions — not to perform exhaustive post-hoc validation.
+**1. Objective Identity:**
+- When referring to an objective, use the exact `id` and canonical `title` from `architecture_inputs/objectives.json`.
+- Do not paraphrase, shorten, rename, or substitute canonical objective titles.
+- If a shorter prose label is needed, first introduce the canonical objective title in full, then optionally use the short label only within the same paragraph.
+
+**2. Component/System Terminology:**
+- Extract canonical component/system names from:
+  - `objectives.json` objective titles
+  - `outcomes.json` outcome titles/names
+  - Relevant named outputs in `impact_architecture.json` and `implementation_architecture.json`
+- Use canonical names exactly across all sections.
+- Do NOT substitute component nouns:
+  - engine ↔ framework
+  - architecture ↔ system
+  - layer ↔ capability
+  - protocol ↔ method
+  - platform ↔ tool
+- If a WP short title differs from an objective title, treat it as a WP label only, not as a replacement for the canonical component/system name.
+
+**3. Metric Completeness:**
+- For every referenced objective `measurable_target`:
+  - Preserve every quantified metric and conjunctive metric component.
+  - Preserve value, comparator, unit, denominator/baseline, and scope.
+  - Do not drop terms joined by "and", "or", commas, semicolons, or multi-clause phrases.
+- If the source says "≥X improvement in A and B over baseline C", output must preserve both "A" and "B" and baseline C.
+- Fail with INCOMPLETE_OUTPUT if any referenced objective metric is partially copied, altered, or summarized in a way that loses a component.
+
+**4. WP Attribution Discipline:**
+- Do not invent WP attributions from local reasoning.
+- When linking an objective/component/output to WPs, use only explicit mappings from:
+  - `wp_structure.json` deliverables/tasks/WP descriptions
+  - `impact_architecture.json` pathway_to_wp_refs or equivalent fields
+  - `implementation_architecture.json` if it provides objective/WP responsibility mappings
+- If no canonical mapping exists:
+  - Avoid giving a WP list for that objective/component.
+  - Use "implemented through the relevant work packages defined in the implementation architecture" or equivalent artifact-grounded wording.
+  - Do not assign a guessed WP set.
+- If a WP attribution is stated in one section, other sections must use the same artifact-grounded WP set for that same objective/component.
+
+**5. Cross-Section Self-Check Before Output:**
+Before writing the JSON artifact, scan the draft and verify:
+- Every objective reference uses canonical title and ID.
+- Every metric from each referenced objective is complete.
+- Every component/system name matches the canonical source.
+- Every WP attribution is either artifact-supported or omitted.
+- `claim_statuses` `source_ref` cites the artifact that supplied the mapping or metric.
+
+On violation: return INCOMPLETE_OUTPUT. Do not write a gate-blocking artifact.
+
+---
+
+## Impact-Specific Canonicalization Rules (GATE-CRITICAL)
+
+**1. Impact Pathways Must Not Compress Metrics:**
+- Any objective referenced in B.2.1 or B.2.2 MUST preserve ALL `measurable_target` components from `architecture_inputs/objectives.json`.
+- `claim_statuses` MUST include complete metric text for each referenced objective, not only shorthand.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Impact section compresses metrics for objective '<obj_id>': missing '<missing_metric>'"`.
+
+**2. Impact Pathways Must Not Assign Guessed WP Sets:**
+- If `impact_architecture.json` does not explicitly link a pathway/objective/output to a WP set, avoid exact WP attribution.
+- If a WP set is used, `source_ref` MUST point to the artifact field that contains that WP set.
+- Do not combine WPs from multiple artifacts unless they are explicitly consistent.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Impact section assigns unsourced WP set for pathway/objective '<id>'"`.
+
+**3. Component Terminology in Impact:**
+- Impact MUST use canonical objective/outcome component names from `objectives.json` and `outcomes.json`.
+- Impact MUST NOT use WP labels as substitutes for canonical system/component titles.
+- When the context discusses an objective, use the objective's canonical title. When the context discusses an outcome, use the outcome's canonical title.
+- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Impact section uses WP label '<wp_label>' as substitute for canonical component title '<canonical_title>'"`.
+
+---
+
+## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+
+All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+
+**Objective References:**
+- When referencing objectives, use the exact `id` from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`.
+- Use the exact `title` field value when naming components/systems. Do not substitute words.
+
+**Metric Completeness (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+- For EVERY objective referenced in the Impact section, ALL quantified targets from its `measurable_target` field MUST be preserved.
+- If an objective has multiple metrics (separated by semicolons, conjunctions, or listed sequentially — e.g., "≥X improvement in A; results validated through ≥Y B; technology transfer through ≥Z C"), EVERY metric MUST appear. Partial metric loss fails gate_10d.
+- Metrics must retain: exact numeric value, qualifier/comparator (≥, ≤, >, <), and unit/context.
+- **Do not substitute a different numeric value** (e.g., do not write ≥2 when the source says ≥3).
+- **Do not drop one metric from a multi-metric target.** If `measurable_target` contains "≥X A and ≥Y B", both "≥X A" and "≥Y B" must appear.
+- **Do not replace a total target with an unlabelled subset** unless the text explicitly labels it as a subset AND the full canonical target is also stated elsewhere in the Impact section.
+- **Claim_statuses fallback:** If the Impact prose for a sub-section cannot fit every metric from a referenced objective, include the complete metric set in `validation_status.claim_statuses[].claim_summary` for that objective, and ensure the main prose contains the full metric set at least once where the objective is a core pathway or exploitation target.
+- **Pre-output scan:** Before producing output, for each objective ID or title mentioned in any `sub_sections[].content` or `validation_status.claim_statuses[].claim_summary`:
+  1. Read back that objective's `measurable_target` from `architecture_inputs/objectives.json`.
+  2. Extract ALL quantified tokens (patterns: `≥N%`, `≤N%`, `≥N`, `≤N`, `>N`, `<N`, plain numeric counts with context).
+  3. For each extracted token, verify it appears in the Impact output with the same numeric value AND the same unit/context.
+  4. If any metric is missing, altered in value, or has a substituted unit → return INCOMPLETE_OUTPUT instead of writing the artifact.
+
+**Deliverable ↔ KPI Distinction (MANDATORY):**
+- Deliverables MUST be referenced using their canonical `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
+- KPIs MUST NOT be described AS deliverables. A KPI that is MEASURED BY a deliverable is not the same as that deliverable.
+- If a KPI is derived from or tracked by a deliverable, describe as "tracked through deliverable X" or "measured against deliverable X", NOT "deliverable X [= KPI activity]".
+- Each deliverable ID cited in Impact prose MUST appear alongside its canonical `title` from wp_structure.json. If the canonical title is absent while the deliverable ID is present, the deliverable may be conflated with a KPI.
+
+**D4-01 Deliverable Identity Guard (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+Before producing output, scan all `sub_sections[].content` and `validation_status.claim_statuses[].claim_summary` values. If any occurrence of the string "D4-01" co-occurs (within the same content field) with ANY of the following tokens: "standardisation", "standardization", "ISO", "IEC", "IEEE", "submission", "M48" — then FAIL with INCOMPLETE_OUTPUT. D4-01 may ONLY appear described by its canonical title and due date as defined in wp_structure.json.
+
+**Partner References:**
+- Use either `short_name` or exact `legal_name` from `consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes (AG, Oy, GmbH, Ltd, etc.).
+
+**Terminology Consistency (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+- Load canonical titles from BOTH `architecture_inputs/objectives.json` (objectives[].title) AND `architecture_inputs/outcomes.json` (outcomes[].title).
+- Extract named technical components from titles containing keywords: engine, layer, architecture, protocol, framework, system, suite, registry, platform, benchmark, demonstrator.
+- If Impact prose refers to a component whose stem matches a canonical title, it MUST use the EXACT canonical component phrase from the applicable Tier 3 source. When referencing an objective, use the objective's canonical title. When referencing an outcome, use the outcome's canonical title.
+- **Objective titles take precedence over outcome titles** when the context discusses the objective (by ID, by objective-level KPI, or by objective-level impact pathway). If an outcome linked to an objective uses a different component keyword for the same stem (e.g., outcome says "framework" while objective says "engine"), use the objective's keyword when the context is about the objective.
+- **Forbidden component noun substitutions:** Do NOT replace the terminal keyword with a synonym. Specifically forbidden:
+  - Engine → framework, approach, system, tool, method
+  - Framework → engine, tool, approach, method
+  - Layer → capability, component, module
+  - Architecture → mechanism, approach, design
+  - Protocol → method, approach, procedure
+  - System → solution, tool, platform
+  - Or any other synonym substitution of the component keyword.
+- Use "framework" only when the Tier 3 canonical source for the referenced artifact/outcome/objective uses "framework" for that specific component. Otherwise use the exact component term from Tier 3.
+- **Pre-output scan:** Before producing output, for each canonical component name from objectives.json and outcomes.json:
+  1. Extract the multi-word component phrase (the name including its terminal keyword).
+  2. Extract the stem (the phrase minus the terminal keyword, e.g., "Neuro-symbolic planning" from "Neuro-symbolic planning engine").
+  3. Search the output content for the stem. If the stem appears with a different terminal keyword than the canonical term (e.g., "Neuro-symbolic planning framework" when canonical is "Neuro-symbolic planning engine"), → return INCOMPLETE_OUTPUT.
+  4. Exception: if the output also contains the full canonical phrase AND the variant is explicitly attributed to its own canonical source (e.g., an outcome title), the variant is acceptable.
 
 ## Runtime Contract
 
 This skill is governed by the skill runtime contract at `.claude/skills/skill_runtime_contract.md`. All execution behaviour -- SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation -- must conform to that contract.
+
+
+# Task Metadata
+
+skill_id: impact-section-drafting
+run_id: 95c8131d-b80a-49f0-b849-d76cdfe5ac63
+
+# Declared Inputs
+
+Read these files from disk using the Read tool. Do not read files outside this set.
+
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier2a_instrument_schemas\extracted
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier2b_topic_and_call_sources\extracted
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier3_project_instantiation
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase5_impact_architecture
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase3_wp_design
+- C:\Code\proposal_demo\proposal_orchestrator\docs\tier4_orchestration_state\phase_outputs\phase7_budget_gate
+
+# Output Requirements
+
+run_id: 95c8131d-b80a-49f0-b849-d76cdfe5ac63
+writes_to: docs/tier5_deliverables/proposal_sections/impact_section.json
+
+Expected output schemas:
+  - docs/tier5_deliverables/proposal_sections/impact_section.json (schema_id: 'orch.tier5.impact_section.v1') required fields: schema_id, run_id, criterion, sub_sections, impact_pathway_refs, dec_coverage, validation_status, traceability_footer
+
+Return a single JSON object conforming to the output schema defined in the skill specification above. Do not wrap in markdown. Do not include explanatory text.

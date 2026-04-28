@@ -341,7 +341,6 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 - `wp_table_refs` empty when WPs exist -> `failure_reason="wp_table_refs is empty despite WPs existing in wp_structure.json"`
 - Output JSON missing required fields -> `failure_reason="Output missing required fields per orch.tier5.implementation_section.v1"`
 - Partner legal name truncation: A partner's base name (legal_name minus legal suffix) appears in B.3.2 content without the full legal_name also present -> `failure_reason="Partner legal name truncation: '<base_name>' appears without required suffix '<suffix>'; canonical legal_name is '<legal_name>'"`
-- Terminology drift: A canonical multi-word component name from an objective `title` is replaced with a synonym in Implementation content -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Implementation content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -419,74 +418,11 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 
 <!-- Schema validation complete -->
 
-## Canonical Artifact Reference Rules (GATE-CRITICAL — Shared Cross-Section Canonicalization)
+## Drafting Guidance — Canonical References
 
-These rules enforce cross-section consistency at the drafting level. Violations produce INCOMPLETE_OUTPUT. These rules apply identically across Excellence, Impact, and Implementation section drafting skills.
+Use objective IDs and titles exactly as stated in `architecture_inputs/objectives.json`. Use canonical component/system names from objective and outcome titles — do not intentionally rename them (e.g., do not write "capability" when the title says "Layer"). WP table labels from `wp_structure.json` may appear in tables, but when discussing an objective/component in prose, include its canonical title. Preserve quantified metrics when used in prose. When linking objectives to WPs, use only explicit mappings from `wp_structure.json` or `implementation_architecture.json`; if no explicit mapping exists, avoid asserting WP ownership. Use partner `short_name` or full `legal_name` — do not truncate legal names by dropping suffixes.
 
-**1. Objective Identity:**
-- When referring to an objective, use the exact `id` and canonical `title` from `architecture_inputs/objectives.json`.
-- Do not paraphrase, shorten, rename, or substitute canonical objective titles.
-- If a shorter prose label is needed, first introduce the canonical objective title in full, then optionally use the short label only within the same paragraph.
-
-**2. Component/System Terminology:**
-- Extract canonical component/system names from:
-  - `objectives.json` objective titles
-  - `outcomes.json` outcome titles/names
-  - Relevant named outputs in `impact_architecture.json` and `implementation_architecture.json`
-- Use canonical names exactly across all sections.
-- Do NOT substitute component nouns:
-  - engine ↔ framework
-  - architecture ↔ system
-  - layer ↔ capability
-  - protocol ↔ method
-  - platform ↔ tool
-- If a WP short title differs from an objective title, treat it as a WP label only, not as a replacement for the canonical component/system name.
-
-**3. Metric Completeness:**
-- For every referenced objective `measurable_target`:
-  - Preserve every quantified metric and conjunctive metric component.
-  - Preserve value, comparator, unit, denominator/baseline, and scope.
-  - Do not drop terms joined by "and", "or", commas, semicolons, or multi-clause phrases.
-- If the source says "≥X improvement in A and B over baseline C", output must preserve both "A" and "B" and baseline C.
-- Fail with INCOMPLETE_OUTPUT if any referenced objective metric is partially copied, altered, or summarized in a way that loses a component.
-
-**4. WP Attribution Discipline:**
-- Do not invent WP attributions from local reasoning.
-- When linking an objective/component/output to WPs, use only explicit mappings from:
-  - `wp_structure.json` deliverables/tasks/WP descriptions
-  - `impact_architecture.json` pathway_to_wp_refs or equivalent fields
-  - `implementation_architecture.json` if it provides objective/WP responsibility mappings
-- If no canonical mapping exists:
-  - Avoid giving a WP list for that objective/component.
-  - Use "implemented through the relevant work packages defined in the implementation architecture" or equivalent artifact-grounded wording.
-  - Do not assign a guessed WP set.
-- If a WP attribution is stated in one section, other sections must use the same artifact-grounded WP set for that same objective/component.
-
-**5. Cross-Section Self-Check Before Output:**
-Before writing the JSON artifact, scan the draft and verify:
-- Every objective reference uses canonical title and ID.
-- Every metric from each referenced objective is complete.
-- Every component/system name matches the canonical source.
-- Every WP attribution is either artifact-supported or omitted.
-- `claim_statuses` `source_ref` cites the artifact that supplied the mapping or metric.
-
-On violation: return INCOMPLETE_OUTPUT. Do not write a gate-blocking artifact.
-
----
-
-## Implementation-Specific Canonicalization Rules (GATE-CRITICAL)
-
-**1. WP Labels vs Canonical Component Titles:**
-- WP table labels may retain canonical WP names from `wp_structure.json` (e.g., "WP2: Neuro-symbolic Planning").
-- But when explaining an objective/component, include the canonical objective/component title from `objectives.json` or `outcomes.json`.
-- Do NOT allow WP labels to replace objective/component names in cross-section descriptions.
-- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Implementation uses WP label '<wp_label>' as substitute for canonical objective/component title '<canonical_title>'"`.
-
-**2. Objective-to-WP Mapping Discipline:**
-- If `implementation_architecture.json` lacks explicit objective-to-WP mapping, do NOT imply canonical WP ownership for an objective.
-- Use task/deliverable grounding from `wp_structure.json` where available.
-- If no explicit mapping is available, describe the objective's implementation using "implemented through work package activities as defined in the WP structure" rather than asserting specific WP ownership.
-- On violation: return INCOMPLETE_OUTPUT with `failure_reason="Implementation asserts WP ownership for objective '<obj_id>' without explicit mapping in implementation_architecture.json"`.
+These conventions are enforced deterministically by gate predicates (gate_10c, gate_10d). The drafting skill's job is to produce evaluator-oriented content following these conventions — not to perform exhaustive post-hoc validation.
 
 ---
 
