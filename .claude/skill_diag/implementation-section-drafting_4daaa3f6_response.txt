@@ -1,3 +1,7 @@
+=== skill_id: implementation-section-drafting ===
+=== mode: tapm ===
+=== response_text length: 11565 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.tier5.implementation_section.v1",
   "run_id": "4daaa3f6-5dbb-4896-9090-ae03285f95c5",
@@ -6,7 +10,7 @@
     {
       "sub_section_id": "B.3.1",
       "title": "Work plan and resources",
-      "content": "MAESTRO is structured into nine work packages over 48 months. Three foundational research pillar WPs run in parallel from month 1: WP2 Neuro-Symbolic Planning and Reasoning Engine (ATU lead), WP3 Adaptive Memory Architecture (BIIS lead), and WP4 Decentralised Multi-Agent Coordination (CERIA lead). Three application demonstrator WPs activate from month 12: WP5 Healthcare Demonstrator — Clinical Decision Support (NIHS lead), WP6 Manufacturing Demonstrator — Process Optimisation (ISIA lead), and WP7 Logistics Transfer Demonstrator — Cross-Sector Generalisation (ELI lead). WP8 Integration, Evaluation and Benchmarking (FIIT lead) provides the cross-cutting integration layer, delivering the unified MAESTRO framework milestone (MS6) at month 24 and initial demonstrator deployment milestone (MS7) at month 30. WP9 Dissemination, Exploitation and Communication (BAL lead) operates continuously. WP1 Project Management and Coordination (ATU lead) governs the full 48-month duration.\n\nThe dependency map contains 16 confirmed inter-WP data-input edges forming an acyclic DAG; within this, the three research pillar WPs (WP2, WP3, WP4) feed all three demonstrator WPs through 9 pillar-to-demonstrator edges, and WP8 aggregates all demonstrator outputs before WP9 dissemination. The representative critical path runs WP2→WP5→WP8→WP9. Key milestones: MS1 architecture specification and integration contracts finalised (M3); MS6 integrated framework v1.0 (M24); MS8 research pillar targets achieved (M36); MS9 demonstrator validation complete across all environments (M42); MS11 project completion (M48).\n\nThe risk register addresses 11 identified risks across technical, external, and organisational categories. Top technical risks: neuro-symbolic integration latency (RISK-01, medium likelihood, high impact, ATU — mitigated by modular fallback architecture with integration testing from M6), memory scalability (RISK-02, medium/medium, BIIS — mitigated by configurable retention policies and tiered storage), and framework integration complexity (RISK-10, medium/high, FIIT — mitigated by shared API contracts defined in months 1–3 and integration checkpoints every 6 months). Key external risks include clinical data access delays (RISK-04, medium/high, NIHS — mitigated by parallel use of public clinical datasets) and LLM development pace (RISK-07, high/medium, BAL — mitigated by model-agnostic interfaces). The implementation plan treats AI system risks, health-data handling, and human-participant/clinical-context considerations as ethics-sensitive workstreams, governed through WP1 ethics compliance oversight and the WP5 clinical validation governance. Consortium governance operates through a General Assembly (biannual strategic decisions), a Project Management Committee (quarterly operational management), and an Ethics and Quality Oversight Committee (ATU and NIHS, convened as needed).",
+      "content": "MAESTRO is structured into nine work packages over 48 months. Three foundational research pillar WPs run in parallel from month 1: WP2 Neuro-Symbolic Planning and Reasoning Engine (ATU lead), WP3 Adaptive Memory Architecture (BIIS lead), and WP4 Decentralised Multi-Agent Coordination (CERIA lead). Three application demonstrator WPs activate from month 12: WP5 Healthcare Demonstrator — Clinical Decision Support (NIHS lead), WP6 Manufacturing Demonstrator — Process Optimisation (ISIA lead), and WP7 Logistics Transfer Demonstrator — Cross-Sector Generalisation (ELI lead). WP8 Integration, Evaluation and Benchmarking (FIIT lead) provides the cross-cutting integration layer, delivering the unified MAESTRO framework milestone (MS6) at month 24 and initial demonstrator deployment milestone (MS7) at month 30. WP9 Dissemination, Exploitation and Communication (BAL lead) operates continuously. WP1 Project Management and Coordination (ATU lead) governs the full 48-month duration.\n\nThe dependency map contains 16 confirmed inter-WP data-input edges forming an acyclic DAG; within this, the three research pillar WPs (WP2, WP3, WP4) feed all three demonstrator WPs through 9 pillar-to-demonstrator edges, and WP8 aggregates all demonstrator outputs before WP9 dissemination. The representative critical path runs WP2\u2192WP5\u2192WP8\u2192WP9. Key milestones: MS1 architecture specification and integration contracts finalised (M3); MS6 integrated framework v1.0 (M24); MS8 research pillar targets achieved (M36); MS9 demonstrator validation complete across all environments (M42); MS11 project completion (M48).\n\nThe risk register addresses 11 identified risks across technical, external, and organisational categories. Top technical risks: neuro-symbolic integration latency (RISK-01, medium likelihood, high impact, ATU — mitigated by modular fallback architecture with integration testing from M6), memory scalability (RISK-02, medium/medium, BIIS — mitigated by configurable retention policies and tiered storage), and framework integration complexity (RISK-10, medium/high, FIIT — mitigated by shared API contracts defined in months 1–3 and integration checkpoints every 6 months). Key external risks include clinical data access delays (RISK-04, medium/high, NIHS — mitigated by parallel use of public clinical datasets) and LLM development pace (RISK-07, high/medium, BAL — mitigated by model-agnostic interfaces). The implementation plan treats AI system risks, health-data handling, and human-participant/clinical-context considerations as ethics-sensitive workstreams, governed through WP1 ethics compliance oversight and the WP5 clinical validation governance. Consortium governance operates through a General Assembly (biannual strategic decisions), a Project Management Committee (quarterly operational management), and an Ethics and Quality Oversight Committee (ATU and NIHS, convened as needed).",
       "word_count": 335
     },
     {
@@ -16,31 +20,9 @@
       "word_count": 300
     }
   ],
-  "wp_table_refs": [
-    "WP1",
-    "WP2",
-    "WP3",
-    "WP4",
-    "WP5",
-    "WP6",
-    "WP7",
-    "WP8",
-    "WP9"
-  ],
+  "wp_table_refs": ["WP1", "WP2", "WP3", "WP4", "WP5", "WP6", "WP7", "WP8", "WP9"],
   "gantt_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
-  "milestone_refs": [
-    "MS1",
-    "MS2",
-    "MS3",
-    "MS4",
-    "MS5",
-    "MS6",
-    "MS7",
-    "MS8",
-    "MS9",
-    "MS10",
-    "MS11"
-  ],
+  "milestone_refs": ["MS1", "MS2", "MS3", "MS4", "MS5", "MS6", "MS7", "MS8", "MS9", "MS10", "MS11"],
   "risk_register_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
   "validation_status": {
     "overall_status": "inferred",
@@ -139,47 +121,19 @@
   },
   "traceability_footer": {
     "primary_sources": [
-      {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
-      },
-      {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
-      },
-      {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
-      },
-      {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/consortium/partners.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/consortium/roles.json"
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
-      },
-      {
-        "tier": 2,
-        "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
-      }
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"},
+      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"},
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/partners.json"},
+      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/roles.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"},
+      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"},
+      {"tier": 2, "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"},
+      {"tier": 2, "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"}
     ],
     "no_unsupported_claims_declaration": true
   }
 }
+
+=== END ===

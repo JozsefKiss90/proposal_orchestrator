@@ -68,8 +68,12 @@ REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
     },
 }
 
-#: Node-specific minimum fingerprint input directories.
-#: All files under these paths are included in the hash.
+#: Node-specific minimum fingerprint input paths.
+#: All files under directory paths are included in the hash.
+#: Individual file paths are included directly.
+#: Includes both source artifacts AND drafting instruction specs
+#: (skill specs, agent MDs, prompt specs) so that changes to
+#: drafting instructions invalidate cached section artifacts.
 FINGERPRINT_INPUTS: dict[str, list[str]] = {
     "n08a_excellence_drafting": [
         "docs/tier2a_instrument_schemas/extracted/",
@@ -79,6 +83,9 @@ FINGERPRINT_INPUTS: dict[str, list[str]] = {
         "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/",
         "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
         "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/",
+        ".claude/skills/excellence-section-drafting.md",
+        ".claude/agents/excellence_writer.md",
+        ".claude/agents/prompts/excellence_writer_prompt_spec.md",
     ],
     "n08b_impact_drafting": [
         "docs/tier2a_instrument_schemas/extracted/",
@@ -87,6 +94,9 @@ FINGERPRINT_INPUTS: dict[str, list[str]] = {
         "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
         "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/",
         "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/",
+        ".claude/skills/impact-section-drafting.md",
+        ".claude/agents/impact_writer.md",
+        ".claude/agents/prompts/impact_writer_prompt_spec.md",
     ],
     "n08c_implementation_drafting": [
         "docs/tier2a_instrument_schemas/extracted/",
@@ -96,6 +106,9 @@ FINGERPRINT_INPUTS: dict[str, list[str]] = {
         "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/",
         "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/",
         "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/",
+        ".claude/skills/implementation-section-drafting.md",
+        ".claude/agents/implementation_writer.md",
+        ".claude/agents/prompts/implementation_writer_prompt_spec.md",
     ],
 }
 

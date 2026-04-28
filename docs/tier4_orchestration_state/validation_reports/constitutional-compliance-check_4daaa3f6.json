@@ -1,0 +1,98 @@
+{
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-04-28T120000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "4daaa3f6-5dbb-4896-9090-ae03285f95c5",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing instead of application form templates (Tier 2A)",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable as primary claim type in this artifact. The assembled draft (orch.tier5.part_b_assembled_draft.v1) is a structural manifest and consistency-check record. It contains no direct assertions of call requirements, scope boundaries, or eligibility conditions. The consistency_log entries describe internal consistency findings across sections; they do not originate or assert call constraints. No Tier 2B source reference check is required at this artifact level.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": "Project-specific references in this artifact appear exclusively within consistency_log notes, where they are descriptions of content found in referenced section artifacts rather than independent project fact assertions. CC-01 explicitly names 'Tier 3 objectives.json (canonical ground truth)' as the reference source for the OBJ-6 discrepancy finding. CC-03 explicitly names 'Tier 3 consortium/partners.json canonical legal_name and short_name values' as the consistency baseline. Other project-specific references (e.g., 'ELI operational scenarios across 3 supply chain corridors', 'NIHS ethics infrastructure' in CC-12) are descriptions of content in the referenced section artifacts being reported upon — not new assertions originating in this assembled draft. No project facts are independently asserted without Tier 3 attribution.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure",
+      "check_status": "violation",
+      "violation_evidence": "Artifact schema_id 'orch.tier5.part_b_assembled_draft.v1' begins with 'orch.tier5.' confirming this is a Phase 8 artifact subject to the mandatory budget gate requirement per CLAUDE.md §13.4 and §8.4. The required verification file (docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json) lies outside this skill invocation's declared TAPM input boundary and cannot be read to confirm gate_pass_declaration: 'pass'. CLAUDE.md §8.4 states: 'No Phase 8 substep (drafting, assembly, evaluator review, or revision) may commence before gate_09 confirms that a validated budget response is present and structurally consistent with the work package and consortium design.' Because budget gate compliance cannot be positively confirmed from declared inputs, this is flagged as a critical violation per fail-safe constitutional interpretation (CLAUDE.md §15: 'The system must prefer explicit gate failure over fabricated completion'). Requires human operator verification of budget gate assessment status.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Not directly checkable by reading an artifact. This prohibition governs runtime agent behavior and decision-log-update processes, not deliverable artifact content. Per skill specification §2 check 13.5, this check cannot be verified from artifact content alone and must appear with check_status 'pass'. Enforcement is the responsibility of the decision-log-update skill and the runtime infrastructure.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Not directly checkable from an artifact. Scope creep by workflows or skills is a structural governance concern verifiable only by examining skill and workflow definitions, not by inspecting a deliverable artifact's content. Per skill specification §2 check 13.6, this check cannot be verified from artifact content alone and must appear with check_status 'pass'.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": "No evidence of phase reordering in the artifact. The assembled draft presents three criterion sections in correct Part B order: Excellence (order: 1), Impact (order: 2), Implementation (order: 3). Consistency_log entries reference upstream Tier 3 inputs (Phase 1–3 data) in the expected downstream direction. Critically, CC-01 records status 'inconsistency_flagged' rather than suppressing the OBJ-6 quantifier discrepancy, which is consistent with gate-honest behavior rather than weakened gate enforcement. No reference to Phase 5 or later outputs as inputs to an earlier phase is present.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": "CC-12 reports that all three referenced sections carry overall_status 'inferred' — no section carries overall_status 'unresolved'. The §13.8 violation condition (unresolved status present but not explicitly flagged) is not met. Inferred claims are explicitly enumerated in CC-12 (Excellence C05 TRL starting point, C15 clinical benchmark equity; Impact CS-08 strategic autonomy pathway; Implementation C13 ethics workstream classification, C14 health-data dissemination level). CC-01 explicitly flags the Impact section OBJ-6 quantifier inconsistency with status 'inconsistency_flagged' rather than silently finalizing inconsistent text. No unresolved content is present without explicit flagging.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": "The assembled draft artifact contains no regulatory claims about Horizon Europe participation conditions, grant agreement terms, EU Financial Regulation provisions, or programme guidance rules. It is a structural manifest (section index) and consistency-check record. No Tier 1 source references are required and none are absent. The §13.9 check condition (regulatory claim without Tier 1 traceability_footer reference) is not triggered by the content of this artifact.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "violation",
+      "violation_evidence": "The artifact (schema_id: orch.tier5.part_b_assembled_draft.v1) is a Tier 5 deliverable and contains no 'traceability_footer' field. CLAUDE.md §11.4 requires that 'All Tier 5 content must be derivable from Tier 1–4 state' and that 'Tier 5 deliverables must not introduce claims, facts, figures, or framings that are not grounded in a higher tier.' The absence of a traceability_footer means the no_unsupported_claims_declaration field is structurally absent and cannot be verified at the artifact level. While CC-11 in the consistency_log confirms that the three referenced section artifacts have non-empty primary_sources arrays and consistent no_unsupported_claims_declarations, this is a finding about referenced child artifacts — it does not substitute for a traceability_footer in the assembled draft itself. The assembled draft as a Tier 5 artifact lacks the formal traceability mechanism required by CLAUDE.md §11.4.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": "Not checkable from a phase output or deliverable artifact. Detection of Tier 1 or Tier 2 source document modification requires comparison of those source files against their original state, which is outside this skill's declared TAPM input boundary. Per skill specification §2 check 13.11, this check cannot be verified from artifact content alone and must appear with check_status 'pass'.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": "Not directly checkable from a deliverable artifact's content. Treatment of CLAUDE.md as advisory is a runtime governance and agent-behavior concern inferable only from agent execution patterns, not from the content of a Tier 5 assembled draft. Per skill specification §2 check 13.12, this check cannot be verified from artifact content alone and must appear with check_status 'pass'.",
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 2
+  },
+  "timestamp": "2026-04-28T12:00:00Z"
+}

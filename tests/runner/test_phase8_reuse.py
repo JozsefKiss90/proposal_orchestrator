@@ -1042,3 +1042,233 @@ class TestSchedulerReuseAuditIntegration:
         # Verify skip_skills is None for non-reuse nodes
         call_kwargs = mock_run_agent.call_args.kwargs
         assert call_kwargs.get("skip_skills") is None
+
+
+# ===========================================================================
+# K. Drafting spec fingerprint invalidation
+# ===========================================================================
+
+
+#: Expected spec files per node (from production FINGERPRINT_INPUTS).
+_EXPECTED_SPECS: dict[str, dict[str, str]] = {
+    "n08a_excellence_drafting": {
+        "skill": ".claude/skills/excellence-section-drafting.md",
+        "agent": ".claude/agents/excellence_writer.md",
+        "prompt": ".claude/agents/prompts/excellence_writer_prompt_spec.md",
+    },
+    "n08b_impact_drafting": {
+        "skill": ".claude/skills/impact-section-drafting.md",
+        "agent": ".claude/agents/impact_writer.md",
+        "prompt": ".claude/agents/prompts/impact_writer_prompt_spec.md",
+    },
+    "n08c_implementation_drafting": {
+        "skill": ".claude/skills/implementation-section-drafting.md",
+        "agent": ".claude/agents/implementation_writer.md",
+        "prompt": ".claude/agents/prompts/implementation_writer_prompt_spec.md",
+    },
+}
+
+
+class TestDraftingSpecFingerprint:
+    """Verify that changes to drafting specs invalidate reuse fingerprints."""
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_skill_spec_change_invalidates_reuse(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Mutating the drafting skill spec changes the fingerprint."""
+        _make_fingerprint_inputs(tmp_path, node_id)
+        fp1 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp1 is not None
+
+        spec_path = tmp_path / _EXPECTED_SPECS[node_id]["skill"]
+        spec_path.write_text("# CHANGED SKILL SPEC\nnew instructions", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp2 is not None
+        assert fp1 != fp2, f"Skill spec change did not invalidate {node_id} fingerprint"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_agent_md_change_invalidates_reuse(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Mutating the agent MD changes the fingerprint."""
+        _make_fingerprint_inputs(tmp_path, node_id)
+        fp1 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp1 is not None
+
+        agent_path = tmp_path / _EXPECTED_SPECS[node_id]["agent"]
+        agent_path.write_text("# CHANGED AGENT MD\nnew agent def", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp2 is not None
+        assert fp1 != fp2, f"Agent MD change did not invalidate {node_id} fingerprint"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_prompt_spec_change_invalidates_reuse(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Mutating the prompt spec changes the fingerprint."""
+        _make_fingerprint_inputs(tmp_path, node_id)
+        fp1 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp1 is not None
+
+        prompt_path = tmp_path / _EXPECTED_SPECS[node_id]["prompt"]
+        prompt_path.write_text("# CHANGED PROMPT SPEC\nnew prompt", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp2 is not None
+        assert fp1 != fp2, f"Prompt spec change did not invalidate {node_id} fingerprint"
+
+
+class TestSiblingSpecIsolation:
+    """Verify that changing one node's spec does not affect another node."""
+
+    def test_impact_spec_does_not_invalidate_excellence(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing impact-section-drafting.md must not change n08a fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08a_excellence_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+
+        fp1 = compute_input_fingerprint("n08a_excellence_drafting", tmp_path)
+
+        impact_spec = tmp_path / ".claude/skills/impact-section-drafting.md"
+        impact_spec.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08a_excellence_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling impact spec change affected n08a fingerprint"
+
+    def test_impl_prompt_does_not_invalidate_impact(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing implementation_writer_prompt_spec.md must not change n08b fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08c_implementation_drafting")
+
+        fp1 = compute_input_fingerprint("n08b_impact_drafting", tmp_path)
+
+        impl_prompt = tmp_path / ".claude/agents/prompts/implementation_writer_prompt_spec.md"
+        impl_prompt.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08b_impact_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling impl prompt spec change affected n08b fingerprint"
+
+    def test_excellence_agent_does_not_invalidate_implementation(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing excellence_writer.md must not change n08c fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08c_implementation_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08a_excellence_drafting")
+
+        fp1 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+
+        excellence_agent = tmp_path / ".claude/agents/excellence_writer.md"
+        excellence_agent.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling excellence agent change affected n08c fingerprint"
+
+
+class TestTransientFilesStillExcluded:
+    """Confirm existing exclusions still work after the spec addition."""
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_gate_result_excluded(self, tmp_path: Path, node_id: str) -> None:
+        """gate_result.json inside a tracked dir does not affect fingerprint."""
+        _make_fingerprint_inputs(tmp_path, node_id)
+        fp1 = compute_input_fingerprint(node_id, tmp_path)
+
+        # Add gate_result.json inside a tracked dir
+        tracked_dir = FINGERPRINT_INPUTS[node_id][0]  # first dir entry
+        if tracked_dir.endswith("/"):
+            _write_json(tmp_path / tracked_dir / "gate_result.json", {"status": "pass"})
+        fp2 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp1 == fp2
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_metadata_excluded(self, tmp_path: Path, node_id: str) -> None:
+        """.reuse.json files inside tracked dirs don't affect fingerprint."""
+        _make_fingerprint_inputs(tmp_path, node_id)
+        fp1 = compute_input_fingerprint(node_id, tmp_path)
+
+        tracked_dir = FINGERPRINT_INPUTS[node_id][0]
+        if tracked_dir.endswith("/"):
+            _write_json(tmp_path / tracked_dir / "something.reuse.json", {"x": 1})
+        fp2 = compute_input_fingerprint(node_id, tmp_path)
+        assert fp1 == fp2
+
+
+class TestProductionMappingInvariant:
+    """Assert that the production FINGERPRINT_INPUTS mapping is correctly structured."""
+
+    @pytest.mark.parametrize("node_id,expected", [
+        ("n08a_excellence_drafting", _EXPECTED_SPECS["n08a_excellence_drafting"]),
+        ("n08b_impact_drafting", _EXPECTED_SPECS["n08b_impact_drafting"]),
+        ("n08c_implementation_drafting", _EXPECTED_SPECS["n08c_implementation_drafting"]),
+    ])
+    def test_node_includes_own_skill_spec(self, node_id: str, expected: dict) -> None:
+        assert expected["skill"] in FINGERPRINT_INPUTS[node_id]
+
+    @pytest.mark.parametrize("node_id,expected", [
+        ("n08a_excellence_drafting", _EXPECTED_SPECS["n08a_excellence_drafting"]),
+        ("n08b_impact_drafting", _EXPECTED_SPECS["n08b_impact_drafting"]),
+        ("n08c_implementation_drafting", _EXPECTED_SPECS["n08c_implementation_drafting"]),
+    ])
+    def test_node_includes_own_agent_md(self, node_id: str, expected: dict) -> None:
+        assert expected["agent"] in FINGERPRINT_INPUTS[node_id]
+
+    @pytest.mark.parametrize("node_id,expected", [
+        ("n08a_excellence_drafting", _EXPECTED_SPECS["n08a_excellence_drafting"]),
+        ("n08b_impact_drafting", _EXPECTED_SPECS["n08b_impact_drafting"]),
+        ("n08c_implementation_drafting", _EXPECTED_SPECS["n08c_implementation_drafting"]),
+    ])
+    def test_node_includes_own_prompt_spec(self, node_id: str, expected: dict) -> None:
+        assert expected["prompt"] in FINGERPRINT_INPUTS[node_id]
+
+    def test_no_n08d_fingerprint_entries(self) -> None:
+        assert "n08d_assembly" not in FINGERPRINT_INPUTS
+
+    def test_no_n08e_fingerprint_entries(self) -> None:
+        assert "n08e_evaluator_review" not in FINGERPRINT_INPUTS
+
+    def test_no_n08f_fingerprint_entries(self) -> None:
+        assert "n08f_revision" not in FINGERPRINT_INPUTS
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_node_does_not_include_sibling_skill_spec(self, node_id: str) -> None:
+        """Each node's fingerprint includes only its own skill spec, not siblings'."""
+        own_skill = _EXPECTED_SPECS[node_id]["skill"]
+        sibling_skills = [
+            spec["skill"]
+            for nid, spec in _EXPECTED_SPECS.items()
+            if nid != node_id
+        ]
+        for sibling in sibling_skills:
+            assert sibling not in FINGERPRINT_INPUTS[node_id], (
+                f"{node_id} should not include sibling spec {sibling}"
+            )
