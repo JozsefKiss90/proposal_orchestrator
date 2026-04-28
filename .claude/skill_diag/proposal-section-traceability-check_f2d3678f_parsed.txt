@@ -1,0 +1,79 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'section_id_audited', 'claim_audit_results', 'summary', 'no_unsupported_claims_declaration', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "traceability_all_sections_traceability_auditor_2026-04-28T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "f2d3678f-f4e4-44e7-ab0d-01a420e611d2",
+  "section_id_audited": "all_sections",
+  "claim_audit_results": [
+    {
+      "claim_id": "EX-C01",
+      "claim_summary": "MAESTRO addresses all four mandatory call scope areas (SR-02 planning, SR-03 memory, SR-04 tool integration, SR-05 multi-agent) in an integrated architecture",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-02, SR-03, SR-04, SR-05 \u2014 all mandatory=true, confirmed); docs/tier3_project_instantiation/project_brief/concept_note.md (Pillars 1\u20133 and Cross-Cutting Capability section confirm co-designed coverage of all four areas)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C02",
+      "claim_summary": "OBJ-1 measurable target: \u226540% plan success rate improvement over LLM baselines on WebArena, SWE-bench, GAIA for tasks requiring >10 sequential steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-1.measurable_target \u2014 direct text match to section content)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C03",
+      "claim_summary": "OBJ-2 measurable target: \u226530% improvement in task coherence over context-window-only baselines in sequences exceeding 50 agent steps",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-2.measurable_target \u2014 direct text match)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C04",
+      "claim_summary": "OBJ-3 measurable target: effective coordination of \u22655 heterogeneous agents, \u226525% joint task improvement, formal mathematical convergence proof",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-3.measurable_target \u2014 direct text match)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C05",
+      "claim_summary": "OBJ-8 measurable target: \u226530 external tools/APIs, \u226595% invocation success, \u22645s mean recovery time, 100% provenance traces",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-8.measurable_target \u2014 direct text match)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C06",
+      "claim_summary": "Demonstrator measurable targets: OBJ-4 (\u226410% vs clinicians/500 cases), OBJ-5 (\u226515% defect reduction + \u226510% energy savings), OBJ-6 (\u226520% recovery improvement + \u226515% delivery schedule adherence, 3 corridors)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-4.measurable_target, OBJ-5.measurable_target, OBJ-6.measurable_target \u2014 all directly confirmed; OBJ-6 includes both conjunctive targets, correctly represented in excellence section B.1.1)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C07",
+      "claim_summary": "OUT-1, OUT-2, OUT-4, OUT-5, OUT-6, OUT-9 target TRL 5 by project end in operational environments",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json (OUT-1.trl_achieved=5, OUT-2.trl_achieved=5, OUT-4.trl_achieved=5, OUT-5.trl_achieved=5, OUT-6.trl_achieved=5, OUT-9.trl_achieved=5 \u2014 all directly verified)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C08",
+      "claim_summary": "OUT-3 (formally verified multi-agent coordination protocol suite) positioned at TRL 4",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json (OUT-3.trl_achieved=4; OUT-3.title='Formally verified multi-agent coordination protocol suite')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C09",
+      "claim_summary": "Three disconnected state-of-the-art research communities (LLM-based agents, classical planning/MAS, memory-augmented neural systems); MAESTRO uniquely co-designs across all three",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md ('Positioning Against the State of the Art' section \u2014 three-community characterisation and co-design differentiation directly stated, content consistent with section claims)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "EX-C10",
+      "claim_summary": "WP2 tasks T2-01 to T2-03 implement sub-task graph decomposition, MCTS+HTN+LLM planning, and plan monitoring with self-correction",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP2 tasks T2-01 '
+=== END ===

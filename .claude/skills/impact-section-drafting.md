@@ -343,6 +343,9 @@ No CONSTRAINT_VIOLATION conditions are defined; all constitutional constraint fa
 - Step 2.5: Any mandatory sub-section cannot be drafted -> `failure_reason="Mandatory sub-section <sub_section_id> cannot be drafted"`
 - Step 3: Output JSON missing required fields -> `failure_reason="Output artifact missing required fields per orch.tier5.impact_section.v1"`
 - Step 2.6: `impact_pathway_refs` array is empty when `impact_architecture.json` has pathways -> `failure_reason="impact_pathway_refs is empty despite pathways existing in impact_architecture.json"`
+- D4-01 identity violation: Any co-occurrence of "D4-01" with any of {"standardisation", "ISO", "IEC", "IEEE", "submission", "M48"} in `sub_sections[].content` or `validation_status.claim_statuses[].claim_summary` -> `failure_reason="D4-01 deliverable identity violation: D4-01 co-occurs with standardisation/ISO/IEC/IEEE/submission/M48 language; D4-01 may ONLY appear with its canonical title from wp_structure.json"`
+- Metric completeness: An objective referenced in Impact content has multiple quantified targets in its `measurable_target` field but only a subset appears in the drafted content -> `failure_reason="Partial metric loss for <obj_id>: <missing metrics> absent from Impact section"`
+- Terminology drift: A canonical multi-word component name from an objective `title` is replaced with a synonym (e.g., Layer→capability, Engine→approach, Architecture→mechanism) -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Impact content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -424,24 +427,30 @@ All cross-section references MUST be resolved from canonical artifacts. Do not p
 - When referencing objectives, use the exact `id` from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`.
 - Use the exact `title` field value when naming components/systems. Do not substitute words.
 
-**Metric Completeness (MANDATORY):**
+**Metric Completeness (MANDATORY — violation → INCOMPLETE_OUTPUT):**
 - For EVERY objective referenced in the Impact section, ALL quantified targets from its `measurable_target` field MUST be preserved.
 - If an objective has multiple metrics (e.g., "≥20% improvement in X AND ≥15% improvement in Y"), ALL metrics must appear. Partial metric loss fails gate_10d.
 - Metrics must retain: numeric value, qualifier (≥/≤), unit/context.
+- **Pre-output scan:** Before producing output, for each objective ID mentioned in any `sub_sections[].content`, read back that objective's `measurable_target` from objectives.json. Extract all quantified targets (patterns: `≥N%`, `≤N%`, `≥N`, `≤N`). Verify every extracted target appears in the Impact section content. If any target is missing → INCOMPLETE_OUTPUT.
 
 **Deliverable ↔ KPI Distinction (MANDATORY):**
 - Deliverables MUST be referenced using their canonical `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
 - KPIs MUST NOT be described AS deliverables. A KPI that is MEASURED BY a deliverable is not the same as that deliverable.
 - If a KPI is derived from or tracked by a deliverable, describe as "tracked through deliverable X" or "measured against deliverable X", NOT "deliverable X [= KPI activity]".
-- Specifically: D4-01 is "Multi-agent coordination protocol specification" (M18). Standardisation submission (M48) is KPI-08, NOT D4-01.
+- Each deliverable ID cited in Impact prose MUST appear alongside its canonical `title` from wp_structure.json. If the canonical title is absent while the deliverable ID is present, the deliverable may be conflated with a KPI.
+
+**D4-01 Deliverable Identity Guard (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+Before producing output, scan all `sub_sections[].content` and `validation_status.claim_statuses[].claim_summary` values. If any occurrence of the string "D4-01" co-occurs (within the same content field) with ANY of the following tokens: "standardisation", "standardization", "ISO", "IEC", "IEEE", "submission", "M48" — then FAIL with INCOMPLETE_OUTPUT. D4-01 may ONLY appear described by its canonical title and due date as defined in wp_structure.json.
 
 **Partner References:**
 - Use either `short_name` or exact `legal_name` from `consortium/partners.json`.
-- NEVER truncate legal names by dropping legal entity suffixes.
+- NEVER truncate legal names by dropping legal entity suffixes (AG, Oy, GmbH, Ltd, etc.).
 
-**Terminology:**
-- Use canonical component/system names from objective `title` fields.
-- Do NOT substitute synonyms (e.g., use "External Tool and API Orchestration Layer" exactly, not "orchestration capability" or "orchestration framework").
+**Terminology Consistency (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+- Use canonical component/system names from objective `title` fields exactly as written.
+- If a canonical objective title contains a multi-word component name (containing keywords: Layer, Framework, Engine, Architecture, Protocol, System, Suite, Registry, Platform), the EXACT multi-word phrase MUST be reused in Impact content.
+- **Forbidden substitutions:** Do NOT replace the terminal keyword with a synonym. Specifically forbidden: replacing Layer→capability, Engine→approach, Architecture→mechanism, Framework→tool, Protocol→method, System→solution, or any other synonym substitution of the component keyword.
+- **Pre-output scan:** For each canonical component name from objectives.json, check whether a stem match (the name minus its terminal keyword) appears in the output content WITHOUT the full canonical name also appearing. If so → INCOMPLETE_OUTPUT.
 
 ## Runtime Contract
 

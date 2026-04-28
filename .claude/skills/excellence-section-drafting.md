@@ -327,6 +327,8 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 **Trigger conditions in this skill:**
 - Step 2.3: Any mandatory sub-section from `section_schema_registry.json` cannot be drafted (no content producible from available inputs) -> `failure_reason="Mandatory sub-section <sub_section_id> cannot be drafted; required input data is absent"`
 - Step 3: Output JSON is malformed or missing required fields -> `failure_reason="Output artifact missing required fields per orch.tier5.excellence_section.v1"`
+- Objective enumeration: Any objective ID from `architecture_inputs/objectives.json` is absent from the drafted Excellence content, OR the stated objective count does not match the Tier 3 count -> `failure_reason="Excellence section enumerates <found> of <N> Tier 3 objectives; missing: <list>"`
+- Terminology drift: A canonical multi-word component name from an objective `title` is replaced with a synonym in the drafted content -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Excellence content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -402,11 +404,12 @@ No CONSTRAINT_VIOLATION conditions are defined for this skill; all constitutiona
 
 All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
 
-**Objective References:**
-- ALL objective IDs from `docs/tier3_project_instantiation/architecture_inputs/objectives.json` MUST appear in the Excellence section's structured enumeration.
-- Use the exact `id` field value (e.g., "OBJ-1", "OBJ-7") — do not skip, renumber, or paraphrase.
+**Objective Enumeration Completeness (MANDATORY — violation → INCOMPLETE_OUTPUT):**
+- Read ALL objectives from `docs/tier3_project_instantiation/architecture_inputs/objectives.json`. Count them: this is N.
+- The Excellence section MUST enumerate exactly N objectives. The narrative MUST explicitly state "N specific objectives" (or equivalent) where N matches the count from the artifact.
+- ALL objective IDs (every `id` field value) MUST appear in the structured enumeration. Do not skip, renumber, or paraphrase any objective — including objectives related to dissemination, open science, or exploitation.
 - Use the exact `title` field value when naming the objective's component/system. Substituting words (e.g., "capability" for "Layer") constitutes terminology drift and will fail gate_10d.
-- If Tier 3 defines N objectives, the Excellence section MUST enumerate exactly N objectives.
+- **Violation condition:** If any objective ID from objectives.json is absent from the Excellence section content, OR if the stated objective count does not match N → return `INCOMPLETE_OUTPUT` with `failure_reason="Excellence section enumerates <found> of <N> Tier 3 objectives; missing: <list of missing IDs>"`.
 
 **Partner References:**
 - When naming partners, use either `short_name` (e.g., "ATU", "ELI") or the full `legal_name` from `consortium/partners.json`.
