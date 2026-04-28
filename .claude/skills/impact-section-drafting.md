@@ -111,7 +111,7 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
 - Step 1.4: Read `impact_architecture.json`. Check schema_id. If absent or schema mismatch: return failure with `MISSING_INPUT`.
 - Step 1.5: Read `wp_structure.json`. If absent or schema mismatch: return failure with `MISSING_INPUT`.
 - Step 1.6: Read `expected_outcomes.json` and `expected_impacts.json` from Tier 2B. If absent: return failure with `MISSING_INPUT`.
-- Step 1.7: Read Tier 3 project data: `architecture_inputs/outcomes.json`, `architecture_inputs/impacts.json`. If absent: return failure with `MISSING_INPUT`.
+- Step 1.7: Read Tier 3 project data: `architecture_inputs/objectives.json` (canonical source for all objective IDs, titles, and `measurable_target` metrics — required for metric completeness and terminology checks), `architecture_inputs/outcomes.json`, `architecture_inputs/impacts.json`. If absent: return failure with `MISSING_INPUT`.
 - Step 1.8: **Grant Agreement Annex guard** -- inspect the section schema source. If any structural reference identifies a Grant Agreement Annex, Model Grant Agreement Annex, or "AGA" template: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Section schema source appears to be a Grant Agreement Annex; CLAUDE.md Section 13.1") and halt.
 
 ### 2. Core Processing Logic
@@ -153,6 +153,13 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
 
   - Step 2.5.5: **Do not reference unvalidated budget figures.** (CLAUDE.md Section 8.3)
 
+  - Step 2.5.6: **Objective metric and terminology cross-check (GATE-CRITICAL).** For every objective referenced by ID or title in the Impact sub-section content being drafted:
+    (a) Load that objective's full entry from `architecture_inputs/objectives.json`.
+    (b) Extract every quantified metric from `measurable_target` (patterns: `≥N`, `≤N`, `≥N%`, `≤N%`, numeric counts with unit/context tokens like TEFs, EDIHs, corridors, agents, tools, months, seconds, benchmarks, domains, cases).
+    (c) Verify each extracted metric appears in the drafted content with the exact same numeric value, comparator (≥/≤/>/< ), and unit/context. Do not substitute a different numeric value. Do not drop any metric from a multi-metric target (targets joined by semicolons or conjunctions). Do not replace a total target with an unlabelled subset unless the text explicitly labels it as a subset AND the full canonical target is also stated.
+    (d) Load the objective's `title`. If it contains a technical component keyword (engine, layer, architecture, protocol, framework, system, suite, platform, benchmark, demonstrator, registry), verify the Impact prose uses the exact canonical multi-word component phrase from the objective title. Do not substitute the component keyword with a synonym.
+    (e) When an outcome from `outcomes.json` linked to the same objective uses a different component keyword for the same stem (e.g., outcome says "framework" but objective says "engine"), the objective title takes precedence when the context references the objective. The outcome title takes precedence when the context references the outcome specifically. Do not conflate the two.
+
 - Step 2.6: **Populate impact_pathway_refs.** Array of all pathway IDs from `impact_architecture.json` that are covered in the drafted section content.
 
 - Step 2.7: **Set dec_coverage.** From the drafted content and `impact_architecture.json`:
@@ -182,6 +189,8 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
   - No "formal standardisation proposal (D4-01)" or "standardisation submission (D4-01)" or "D4-01 ... by M48" patterns in content
   - D4-01 described only as the M18 coordination protocol specification
   - KPI-08/M48 standardisation activity described without assigning it as D4-01
+  - **Metric completeness (Step 2.5.6):** For each objective ID/title in `sub_sections[].content`, all quantified metrics from its `measurable_target` appear with the same numeric value, comparator, and unit. No metric is missing, no value is substituted, no multi-metric target is partially represented.
+  - **Terminology consistency (Step 2.5.6):** No canonical component stem appears in the output with a different terminal keyword than the Tier 3 canonical term. No forbidden component noun substitution is present.
   If any condition fails: do NOT produce the output artifact. Instead, return `{"status": "failure", "failure_reason": "Impact section has non-gate-ready claims or schema issues: <list specifics>.", "failure_category": "INCOMPLETE_OUTPUT"}`. This prevents writing a gate-blocking artifact.
 
 ### 3. Output Construction
@@ -345,7 +354,7 @@ No CONSTRAINT_VIOLATION conditions are defined; all constitutional constraint fa
 - Step 2.6: `impact_pathway_refs` array is empty when `impact_architecture.json` has pathways -> `failure_reason="impact_pathway_refs is empty despite pathways existing in impact_architecture.json"`
 - D4-01 identity violation: Any co-occurrence of "D4-01" with any of {"standardisation", "ISO", "IEC", "IEEE", "submission", "M48"} in `sub_sections[].content` or `validation_status.claim_statuses[].claim_summary` -> `failure_reason="D4-01 deliverable identity violation: D4-01 co-occurs with standardisation/ISO/IEC/IEEE/submission/M48 language; D4-01 may ONLY appear with its canonical title from wp_structure.json"`
 - Metric completeness: An objective referenced in Impact content has multiple quantified targets in its `measurable_target` field but only a subset appears in the drafted content -> `failure_reason="Partial metric loss for <obj_id>: <missing metrics> absent from Impact section"`
-- Terminology drift: A canonical multi-word component name from an objective `title` is replaced with a synonym (e.g., Layer→capability, Engine→approach, Architecture→mechanism) -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Impact content"`
+- Terminology drift: A canonical multi-word component name from an objective or outcome `title` is replaced with a synonym (e.g., Engine→framework, Engine→approach, Layer→capability, Architecture→mechanism, Framework→tool, Protocol→method) -> `failure_reason="Terminology drift: canonical name '<name>' replaced with variant in Impact content"`
 
 **Required response:** `SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason=<specific reason>)`
 
@@ -429,9 +438,17 @@ All cross-section references MUST be resolved from canonical artifacts. Do not p
 
 **Metric Completeness (MANDATORY — violation → INCOMPLETE_OUTPUT):**
 - For EVERY objective referenced in the Impact section, ALL quantified targets from its `measurable_target` field MUST be preserved.
-- If an objective has multiple metrics (e.g., "≥20% improvement in X AND ≥15% improvement in Y"), ALL metrics must appear. Partial metric loss fails gate_10d.
-- Metrics must retain: numeric value, qualifier (≥/≤), unit/context.
-- **Pre-output scan:** Before producing output, for each objective ID mentioned in any `sub_sections[].content`, read back that objective's `measurable_target` from objectives.json. Extract all quantified targets (patterns: `≥N%`, `≤N%`, `≥N`, `≤N`). Verify every extracted target appears in the Impact section content. If any target is missing → INCOMPLETE_OUTPUT.
+- If an objective has multiple metrics (separated by semicolons, conjunctions, or listed sequentially — e.g., "≥X improvement in A; results validated through ≥Y B; technology transfer through ≥Z C"), EVERY metric MUST appear. Partial metric loss fails gate_10d.
+- Metrics must retain: exact numeric value, qualifier/comparator (≥, ≤, >, <), and unit/context.
+- **Do not substitute a different numeric value** (e.g., do not write ≥2 when the source says ≥3).
+- **Do not drop one metric from a multi-metric target.** If `measurable_target` contains "≥X A and ≥Y B", both "≥X A" and "≥Y B" must appear.
+- **Do not replace a total target with an unlabelled subset** unless the text explicitly labels it as a subset AND the full canonical target is also stated elsewhere in the Impact section.
+- **Claim_statuses fallback:** If the Impact prose for a sub-section cannot fit every metric from a referenced objective, include the complete metric set in `validation_status.claim_statuses[].claim_summary` for that objective, and ensure the main prose contains the full metric set at least once where the objective is a core pathway or exploitation target.
+- **Pre-output scan:** Before producing output, for each objective ID or title mentioned in any `sub_sections[].content` or `validation_status.claim_statuses[].claim_summary`:
+  1. Read back that objective's `measurable_target` from `architecture_inputs/objectives.json`.
+  2. Extract ALL quantified tokens (patterns: `≥N%`, `≤N%`, `≥N`, `≤N`, `>N`, `<N`, plain numeric counts with context).
+  3. For each extracted token, verify it appears in the Impact output with the same numeric value AND the same unit/context.
+  4. If any metric is missing, altered in value, or has a substituted unit → return INCOMPLETE_OUTPUT instead of writing the artifact.
 
 **Deliverable ↔ KPI Distinction (MANDATORY):**
 - Deliverables MUST be referenced using their canonical `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
@@ -447,10 +464,24 @@ Before producing output, scan all `sub_sections[].content` and `validation_statu
 - NEVER truncate legal names by dropping legal entity suffixes (AG, Oy, GmbH, Ltd, etc.).
 
 **Terminology Consistency (MANDATORY — violation → INCOMPLETE_OUTPUT):**
-- Use canonical component/system names from objective `title` fields exactly as written.
-- If a canonical objective title contains a multi-word component name (containing keywords: Layer, Framework, Engine, Architecture, Protocol, System, Suite, Registry, Platform), the EXACT multi-word phrase MUST be reused in Impact content.
-- **Forbidden substitutions:** Do NOT replace the terminal keyword with a synonym. Specifically forbidden: replacing Layer→capability, Engine→approach, Architecture→mechanism, Framework→tool, Protocol→method, System→solution, or any other synonym substitution of the component keyword.
-- **Pre-output scan:** For each canonical component name from objectives.json, check whether a stem match (the name minus its terminal keyword) appears in the output content WITHOUT the full canonical name also appearing. If so → INCOMPLETE_OUTPUT.
+- Load canonical titles from BOTH `architecture_inputs/objectives.json` (objectives[].title) AND `architecture_inputs/outcomes.json` (outcomes[].title).
+- Extract named technical components from titles containing keywords: engine, layer, architecture, protocol, framework, system, suite, registry, platform, benchmark, demonstrator.
+- If Impact prose refers to a component whose stem matches a canonical title, it MUST use the EXACT canonical component phrase from the applicable Tier 3 source. When referencing an objective, use the objective's canonical title. When referencing an outcome, use the outcome's canonical title.
+- **Objective titles take precedence over outcome titles** when the context discusses the objective (by ID, by objective-level KPI, or by objective-level impact pathway). If an outcome linked to an objective uses a different component keyword for the same stem (e.g., outcome says "framework" while objective says "engine"), use the objective's keyword when the context is about the objective.
+- **Forbidden component noun substitutions:** Do NOT replace the terminal keyword with a synonym. Specifically forbidden:
+  - Engine → framework, approach, system, tool, method
+  - Framework → engine, tool, approach, method
+  - Layer → capability, component, module
+  - Architecture → mechanism, approach, design
+  - Protocol → method, approach, procedure
+  - System → solution, tool, platform
+  - Or any other synonym substitution of the component keyword.
+- Use "framework" only when the Tier 3 canonical source for the referenced artifact/outcome/objective uses "framework" for that specific component. Otherwise use the exact component term from Tier 3.
+- **Pre-output scan:** Before producing output, for each canonical component name from objectives.json and outcomes.json:
+  1. Extract the multi-word component phrase (the name including its terminal keyword).
+  2. Extract the stem (the phrase minus the terminal keyword, e.g., "Neuro-symbolic planning" from "Neuro-symbolic planning engine").
+  3. Search the output content for the stem. If the stem appears with a different terminal keyword than the canonical term (e.g., "Neuro-symbolic planning framework" when canonical is "Neuro-symbolic planning engine"), → return INCOMPLETE_OUTPUT.
+  4. Exception: if the output also contains the full canonical phrase AND the variant is explicitly attributed to its own canonical source (e.g., an outcome title), the variant is acceptable.
 
 ## Runtime Contract
 

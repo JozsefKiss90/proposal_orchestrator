@@ -1181,6 +1181,51 @@ class TestSiblingSpecIsolation:
         fp2 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
         assert fp1 == fp2, "Sibling excellence agent change affected n08c fingerprint"
 
+    def test_impact_spec_does_not_invalidate_implementation(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing impact-section-drafting.md must not change n08c fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08c_implementation_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+
+        fp1 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+
+        impact_spec = tmp_path / ".claude/skills/impact-section-drafting.md"
+        impact_spec.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling impact spec change affected n08c fingerprint"
+
+    def test_impact_prompt_does_not_invalidate_excellence(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing impact_writer_prompt_spec.md must not change n08a fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08a_excellence_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+
+        fp1 = compute_input_fingerprint("n08a_excellence_drafting", tmp_path)
+
+        impact_prompt = tmp_path / ".claude/agents/prompts/impact_writer_prompt_spec.md"
+        impact_prompt.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08a_excellence_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling impact prompt spec change affected n08a fingerprint"
+
+    def test_impact_prompt_does_not_invalidate_implementation(
+        self, tmp_path: Path,
+    ) -> None:
+        """Changing impact_writer_prompt_spec.md must not change n08c fingerprint."""
+        _make_fingerprint_inputs(tmp_path, "n08c_implementation_drafting")
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+
+        fp1 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+
+        impact_prompt = tmp_path / ".claude/agents/prompts/impact_writer_prompt_spec.md"
+        impact_prompt.write_text("# CHANGED", encoding="utf-8")
+
+        fp2 = compute_input_fingerprint("n08c_implementation_drafting", tmp_path)
+        assert fp1 == fp2, "Sibling impact prompt spec change affected n08c fingerprint"
+
 
 class TestTransientFilesStillExcluded:
     """Confirm existing exclusions still work after the spec addition."""
