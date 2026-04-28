@@ -1,0 +1,104 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "248b4474-e622-4b02-89ca-abc5a04d11b4",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 1955
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 577
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 635
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.json",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency: WP IDs referenced in Excellence (methodology) and Impact (impact pathway grounding) must match canonical WP list in Implementation (wp_table_refs WP1\u2013WP9)",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "The External Tool and API Orchestration Layer (OBJ-8) is attributed to 'WP2/WP8' in Impact section B.2.1, but Excellence section B.1.2 states OBJ-8 is 'architecturally integrated across WP2, WP3, and WP4.' WP8 (Integration, Evaluation and Benchmarking, FIIT lead) is not cited as an OBJ-8 integration point in Excellence; WP3 and WP4 are cited in Excellence as OBJ-8 integration points but are absent from Impact's WP attribution. The WP attribution for OBJ-8 is materially different between the two sections and neither is supported by an explicit canonical WP home for OBJ-8 in the Implementation section's wp_table_refs or narrative."
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency across all three sections, cross-checked against Tier 3 consortium/partners.json legal_name and short_name fields",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency: deliverable IDs and names referenced in Excellence (methodology deliverables), Impact (output deliverables for impact pathways), and Implementation (deliverable table references)",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-05",
+      "description": "Milestone ID consistency: milestone references in Impact (impact pathway milestones) and Implementation (milestone_refs MS1\u2013MS11)",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null
+    },
+    {
+      "check_id": "CC-06",
+      "description": "KPI consistency: KPI definitions and target values consistent across Impact and Implementation sections; metric completeness verified against Tier 3 objectives.json measurable_target fields",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Partial metric loss detected for OBJ-2 (Unified adaptive memory architecture). Tier 3 objectives.json OBJ-2 measurable_target specifies a dual-component target: '\u226530% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps.' Impact section B.2.1 states only '\u226530% improvement in task coherence in interaction sequences exceeding 50 agent steps,' omitting the second mandatory metric component 'factual consistency.' Per the Metric Completeness strengthened validation dimension, both components of a conjunctive measurable target must appear; partial metric loss constitutes a KPI inconsistency between the Impact section and the Tier 3 ground-truth objective. Excellence section B.1.1 correctly preserves both components ('task coherence and factual consistency')."
+    },
+    {
+      "check_id": "CC-07",
+      "description": "Impact claim grounding: each impact claim in the Impact section cites a project mechanism (WP, deliverable, task) that exists in the Implementation section's canonical WP structure",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consi
+=== END ===

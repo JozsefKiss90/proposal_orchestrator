@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10d_cross_section_consistency",
   "gate_kind": "exit",
-  "run_id": "32705e87-6c51-46e6-870b-4cd1810702e4",
+  "run_id": "248b4474-e622-4b02-89ca-abc5a04d11b4",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:82d605120cd80b8a1a267032a407b75402d3d9019cc3262230aeb2ac1db0f382",
+  "input_fingerprint": "sha256:5fb643c31236b6df8cbc3f33515eda67008fdc186774549dcaea66569c721927",
   "input_artifact_fingerprints": {
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:14cce605b1f50b047418d5c4bb3d60cfd78614423c99fac7b968205a1782bb7e",
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:acfe652ec32d26aee8fbec82b42a16b996454d207ce1fbdc9f14b42755909291",
     "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:7544a9ff979d8ca67e850123df292019885ab45e20b0f9b6847b6d413c34632d",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:1d6e57c4001b3bd1923b13e12e9616f5fb49d0b53ff1396757c85f5e5436c011",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:07a6e5619e4b400ecca43a80ec7203a86114944a251b838d4bbc7157323204bb",
     "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:26184ffd1337c65bd40ca7d8c57b1b624f1b36e9ace491833eb53a327b792c12"
   },
-  "evaluated_at": "2026-04-28T16:01:49.564042+00:00",
+  "evaluated_at": "2026-04-28T17:39:36.334411+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -35,11 +35,12 @@
           "tier3_path": "docs/tier3_project_instantiation/"
         },
         "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Cross-section inconsistencies flagged in assembled draft: 2 issue(s)",
+        "reason": "Cross-section inconsistencies flagged in assembled draft: 3 issue(s)",
         "details": {
           "assembled_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\assembled_drafts\\part_b_assembled_draft.json",
-          "flagged_count": 2,
+          "flagged_count": 3,
           "flagged_checks": [
+            "CC-02",
             "CC-06",
             "CC-09"
           ]
