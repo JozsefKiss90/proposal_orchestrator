@@ -36,6 +36,6 @@ have passed before assembly begins.
 2. Read all three section artifacts from `docs/tier5_deliverables/proposal_sections/`.
 3. Verify `excellence_section.json`, `impact_section.json`, `implementation_section.json` are present.
 4. Invoke `cross-section-consistency-check` to perform cross-section consistency checks (objectives, WP refs, partner names, deliverables, milestones, KPIs, impact claims, terminology) and produce `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json`.
-5. After `cross-section-consistency-check` has produced the assembled draft, invoke `proposal-section-traceability-check` to audit traceability of the assembled artifact.
+5. After `cross-section-consistency-check` has produced the assembled draft, invoke `proposal-section-traceability-check` to audit traceability of the assembled artifact. In assembled mode (artifact_path = part_b_assembled_draft.json), this skill performs a structural index audit only — it verifies the assembly index, section traceability summaries, and consistency_log integrity. It does NOT re-audit material claims in section bodies (those were already audited by gate_10a/10b/10c).
 6. After traceability audit, invoke `constitutional-compliance-check` to audit constitutional compliance of the assembled artifact.
 7. Assembly is complete. `artifact_status` must be absent at write time.

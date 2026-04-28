@@ -79,14 +79,16 @@ Do not include explanations outside the JSON.
 
 - Step 1.1: **Determine audit mode.** The invoking agent supplies `caller_context["artifact_path"]` — the repo-relative path to the primary artifact to audit. This is the authoritative audit target. Determine the mode from the path:
   - If `artifact_path` ends with `excellence_section.json`, `impact_section.json`, or `implementation_section.json`: **section mode**. The skill audits only that single section file.
-  - If `artifact_path` ends with `part_b_assembled_draft.json`: **assembled mode**. The skill audits the assembled draft and all sections it references.
+  - If `artifact_path` ends with `part_b_assembled_draft.json`: **assembled mode**. The skill performs a structural index audit of the assembled draft. It verifies the assembly index, checks that referenced sections carry valid traceability summaries, and confirms consistency_log integrity. It does NOT re-audit material claims in section bodies — each section was already audited by its own gate (gate_10a/10b/10c).
   - If `artifact_path` is absent or empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="artifact_path required in caller_context — the agent runtime must inject it") and halt.
 - Step 1.2 (section mode): Confirm the section file exists at the `artifact_path`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Proposal section file <artifact_path> not found") and halt.
-- Step 1.3 (assembled mode): Confirm `artifact_path` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list; confirm each path exists.
-- Step 1.4: Schema conformance check for each section file to be audited — confirm `schema_id` is one of the accepted section schemas: "orch.tier5.proposal_section.v1", "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", or "orch.tier5.implementation_section.v1". If mismatch: record as a traceability failure for that section and continue.
-- Step 1.5: Confirm at least one Tier 1–4 reference directory is accessible: `docs/tier1_normative_framework/extracted/`, `docs/tier2a_instrument_schemas/extracted/`, `docs/tier2b_topic_and_call_sources/extracted/`, `docs/tier3_project_instantiation/`. If none are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification") and halt.
+- Step 1.3 (assembled mode): Confirm `artifact_path` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list. Confirm exactly three required Part B sections are referenced: excellence, impact, implementation. Confirm `sections[].order` is 1, 2, 3 in sequence. Confirm each referenced file exists on disk. **Then proceed to Step 2A (assembled-mode structural audit). Do NOT proceed to Steps 1.4, 1.5, 2.1–2.6 for assembled mode.**
+- Step 1.4 (section mode only): Schema conformance check for each section file to be audited — confirm `schema_id` is one of the accepted section schemas: "orch.tier5.proposal_section.v1", "orch.tier5.excellence_section.v1", "orch.tier5.impact_section.v1", or "orch.tier5.implementation_section.v1". If mismatch: record as a traceability failure for that section and continue.
+- Step 1.5 (section mode only): Confirm at least one Tier 1–4 reference directory is accessible: `docs/tier1_normative_framework/extracted/`, `docs/tier2a_instrument_schemas/extracted/`, `docs/tier2b_topic_and_call_sources/extracted/`, `docs/tier3_project_instantiation/`. If none are accessible: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification") and halt.
 
-### 2. Core Processing Logic
+### 2. Core Processing Logic — Section Mode
+
+**Steps 2.1–2.6 apply ONLY in section mode. In assembled mode, skip entirely to Step 2A.**
 
 - Step 2.1: For each section file to be audited, extract:
   - `content`: the full section text.
@@ -111,18 +113,75 @@ Do not include explanations outside the JSON.
 - Step 2.5: Build `claim_audit_results` array: one entry per material claim from Step 2.2.
 - Step 2.6: Compute summary: `total_claims`, `confirmed` count, `inferred` count, `assumed` count, `unresolved` count.
 
+### 2A. Core Processing Logic — Assembled Mode (Structural Index Audit)
+
+**This entire step applies ONLY when audit mode is "assembled". It replaces Steps 2.1–2.6 for assembled mode.**
+
+**CRITICAL: Assembled-mode traceability MUST NOT re-audit every material claim inside section bodies. Each individual section has already been audited and passed its own gate (gate_10a, gate_10b, gate_10c). Assembled-mode traceability verifies only the structural integrity of the assembly index and checks that referenced sections carry valid traceability summaries. This prevents timeout by avoiding duplicated per-claim work.**
+
+**MUST NOT in assembled mode:**
+- Extract material claims from section body text
+- Read Tier 1–4 source directories for per-claim verification
+- Produce a per-paragraph or per-claim audit report for section content
+- Copy or emit section body text in the output
+
+Perform the following structural checks. For each, record a claim_audit_results entry with a claim_id from the ASSEMBLY-* series:
+
+- **ASSEMBLY-01: Assembled draft schema and section index present.** Verify the assembled draft has `schema_id` = "orch.tier5.part_b_assembled_draft.v1" and a non-empty `sections[]` array. Status: confirmed if present, unresolved if missing.
+
+- **ASSEMBLY-02: All three section artifacts referenced and exist.** Verify `sections[]` references exactly three section_ids: "excellence", "impact", "implementation". Verify each `artifact_path` points to an existing file on disk. Status: confirmed if all three present and exist, unresolved if any missing or absent.
+
+- **ASSEMBLY-03: Section order correct.** Verify sections are ordered: excellence (order=1), impact (order=2), implementation (order=3). Status: confirmed if correct, unresolved if wrong.
+
+- **ASSEMBLY-04: Referenced sections expose traceability_footer.primary_sources.** For each referenced section artifact, read only `traceability_footer.primary_sources[]`. Verify it is present and non-empty. Do NOT read section body content. Status: confirmed if all three have non-empty primary_sources, unresolved if any is missing or empty.
+
+- **ASSEMBLY-05: Referenced sections declare no_unsupported_claims_declaration=true.** For each referenced section artifact, read only `traceability_footer.no_unsupported_claims_declaration`. Status: confirmed if all three are true, unresolved if any is false or missing. Flag_reason must identify which section(s) have false.
+
+- **ASSEMBLY-06: Referenced sections validation_status not unresolved.** For each referenced section artifact, read only `validation_status.overall_status`. Verify it is not "unresolved". Verify `validation_status.claim_statuses[]` is present and non-empty. Status: confirmed if all pass, unresolved if any section has overall_status="unresolved" or empty claim_statuses.
+
+- **ASSEMBLY-07: Consistency log present and blocking inconsistencies absent.** Verify `consistency_log[]` exists, is non-empty, and contains entries for all expected cross-section checks. Verify no entry has `status` = "unresolved" or `status` = "inconsistency_flagged". If any entry has status "inconsistency_flagged" or "unresolved": status = unresolved with flag_reason identifying the check_id(s).
+
+- **ASSEMBLY-08: Assembled draft traceability inheritance or traceability_footer present.** If the assembled draft contains a `traceability_footer`, verify `primary_sources` is non-empty and `no_unsupported_claims_declaration` is consistent with the section-level declarations. If the assembled draft does NOT contain a `traceability_footer`, record that section-level traceability is inherited from referenced section artifacts per ASSEMBLY-04 and ASSEMBLY-05. Status: confirmed if traceability_footer is present and valid, OR if section-level traceability inheritance is confirmed. Unresolved only if no traceability coverage exists.
+
+**Step 2A.1: Determine assembled-mode `no_unsupported_claims_declaration`:** Set to true only if ALL ASSEMBLY-* checks have status "confirmed". Set to false if any ASSEMBLY-* check has status "unresolved".
+
+**Step 2A.2: Compute assembled-mode summary:** `total_claims` = count of ASSEMBLY-* checks performed (8), plus counts of confirmed/unresolved.
+
 ### 3. Output Construction
+
+**Section mode:**
 
 **Traceability report file (e.g., `traceability_<section_id>_<agent_id>_<timestamp>.json`):**
 - `report_id`: `"traceability_<section_id>_<agent_id>_<ISO8601_timestamp>"`
 - `skill_id`: `"proposal-section-traceability-check"`
 - `invoking_agent`: from agent context
 - `run_id_reference`: from agent context
-- `section_id_audited`: the section_id being audited (or "all_sections" for assembled draft mode)
+- `section_id_audited`: the section_id being audited
 - `claim_audit_results`: derived from Step 2.5 — array of `{claim_id, claim_summary, status (confirmed/inferred/assumed/unresolved), source_ref, flag_reason}`
 - `summary`: derived from Step 2.6 — `{total_claims, confirmed, inferred, assumed, unresolved}`
 - `no_unsupported_claims_declaration`: derived from Step 2.4 — boolean
 - `timestamp`: ISO 8601
+
+**Assembled mode:**
+
+**Traceability report file (e.g., `traceability_part_b_assembled_draft_<agent_id>_<timestamp>.json`):**
+- `report_id`: `"traceability_part_b_assembled_draft_<agent_id>_<ISO8601_timestamp>"`
+- `skill_id`: `"proposal-section-traceability-check"`
+- `invoking_agent`: from agent context
+- `run_id_reference`: from agent context
+- `section_id_audited`: `"part_b_assembled_draft"`
+- `audit_mode`: `"assembled_structural_index"`
+- `claim_audit_results`: exactly 8 entries (ASSEMBLY-01 through ASSEMBLY-08), each with `{claim_id, claim_summary, status (confirmed/unresolved), source_ref, flag_reason}`
+- `summary`: derived from Step 2A.2 — `{total_claims: 8, confirmed, inferred: 0, assumed: 0, unresolved}`
+- `no_unsupported_claims_declaration`: derived from Step 2A.1 — boolean
+- `timestamp`: ISO 8601
+
+**Assembled-mode output constraints:**
+- Response MUST stay below 6,000 characters total
+- No markdown fences
+- Single JSON object only
+- Do NOT emit one claim per section paragraph
+- Do NOT include copied section body text
 
 ### 4. Conformance Stamping
 
@@ -276,7 +335,7 @@ No INCOMPLETE_OUTPUT conditions are explicitly defined in the execution logic. W
 | `skill_id` | Yes | matches frontmatter | Yes |
 | `invoking_agent` | Yes | agent context | Yes |
 | `run_id_reference` | Yes | agent context | Yes |
-| `section_id_audited` | Yes | `section_id` or "all_sections" | Yes |
+| `section_id_audited` | Yes | `section_id` (section mode) or "part_b_assembled_draft" (assembled mode) | Yes |
 | `claim_audit_results[]` | Yes (Step 2.5, Step 3) | per entry: claim_id, claim_summary, status (enum: confirmed/inferred/assumed/unresolved), source_ref, flag_reason | Yes — status enum matches §12.2 vocabulary exactly |
 | `summary` | Yes (Step 2.6, Step 3) | total_claims, confirmed, inferred, assumed, unresolved | Yes |
 | `no_unsupported_claims_declaration` | Yes (Step 2.4) | boolean — matches spec's `traceability_footer.no_unsupported_claims_declaration` semantics | Yes |

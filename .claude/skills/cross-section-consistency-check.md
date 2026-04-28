@@ -55,7 +55,7 @@ Do not include explanations outside the JSON.
 
 | Path | Artifact | Schema ID | Required Fields (from artifact_schema_specification.yaml) | run_id Required | Derivation Source |
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
-| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | Assembled Part B draft | `orch.tier5.part_b_assembled_draft.v1` | schema_id, run_id, sections (array: section_id, criterion, order, artifact_path, word_count), consistency_log (array: check_id, description, sections_checked, status[consistent/inconsistency_flagged/resolved], inconsistency_note) | Yes | sections: ordered array from three input section artifacts; consistency_log: results of all cross-section consistency checks |
+| `docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json` | Assembled Part B draft | `orch.tier5.part_b_assembled_draft.v1` | schema_id, run_id, sections (array: section_id, criterion, order, artifact_path, word_count), consistency_log (array: check_id, description, sections_checked, status[consistent/inconsistency_flagged/resolved], inconsistency_note), traceability_footer (primary_sources[], no_unsupported_claims_declaration, derivation_note) | Yes | sections: ordered array from three input section artifacts; consistency_log: results of all cross-section consistency checks; traceability_footer: inherited traceability from section artifacts |
 
 **Note:** `artifact_status` must be ABSENT at write time; the runner stamps it post-gate.
 
@@ -189,6 +189,25 @@ The `sections` array must be ordered: Excellence (1), Impact (2), Implementation
 The `consistency_log` array must contain one entry per check (CC-01 through CC-12). All 12 checks are mandatory. Checks that find no issues must record `status: "consistent"`. Checks that find issues must record `status: "inconsistency_flagged"` with a non-empty `inconsistency_note`.
 
 Word counts are computed by summing `word_count` values across sub-sections within each section artifact.
+
+**`traceability_footer`** — compact traceability summary for the assembled draft:
+
+```json
+"traceability_footer": {
+  "primary_sources": [
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+  ],
+  "no_unsupported_claims_declaration": true,
+  "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
+}
+```
+
+Rules for `traceability_footer`:
+- `primary_sources`: always the three section artifact paths.
+- `no_unsupported_claims_declaration`: set to `true` ONLY if ALL `consistency_log` entries have `status: "consistent"` or `status: "resolved"`. Set to `false` if ANY entry has `status: "inconsistency_flagged"` or `status: "unresolved"`.
+- `derivation_note`: always the fixed string shown above. This is project-agnostic.
 
 ### 4. Conformance Stamping
 
@@ -343,6 +362,7 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT or INCOM
 | `run_id` | Yes (Step 3, Step 4) | invoking agent's run_id | Yes |
 | `sections[]` | Yes (Step 3) | three entries: Excellence (1), Impact (2), Implementation (3); each with section_id, criterion, order, artifact_path, word_count | Yes -- all required item_schema fields present; order is integer 1-based |
 | `consistency_log[]` | Yes (Step 2, Step 3) | 12 entries (CC-01 through CC-12); each with check_id, description, sections_checked, status (enum-compliant), inconsistency_note | Yes -- status enum restricted to {consistent, inconsistency_flagged, resolved}; all required fields present |
+| `traceability_footer` | Yes (Step 3) | primary_sources: three section artifact paths; no_unsupported_claims_declaration: derived from consistency_log statuses; derivation_note: fixed string | Yes -- inherits section-level traceability |
 | `artifact_status` | ABSENT at write time (Step 4) | runner stamps post-gate | Yes |
 
 **reads_from compliance:** All declared directories used. Compliant.
