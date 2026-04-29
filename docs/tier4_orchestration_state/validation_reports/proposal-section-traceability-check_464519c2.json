@@ -1,0 +1,165 @@
+{
+  "report_id": "traceability_implementation_traceability_auditor_2026-04-29T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "464519c2-4463-4fda-9d33-3da0800a7015",
+  "section_id_audited": "implementation",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "MAESTRO deploys nine work packages over 48 months, with named leads: WP1-ATU, WP2-ATU, WP3-BIIS, WP4-CERIA, WP5-NIHS, WP6-ISIA, WP7-ELI, WP8-FIIT, WP9-BAL",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (work_packages[].wp_id and lead_partner for all 9 WPs); docs/tier3_project_instantiation/call_binding/selected_call.json (max_project_duration_months=48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "16 confirmed inter-WP data-input edges forming an acyclic graph",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges, count=16 verified by enumeration; cycle_detected=false)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "9 pillar-to-demonstrator edges: WP2, WP3, WP4 each feeding WP5, WP6, and WP7",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges: WP2→WP5, WP3→WP5, WP4→WP5, WP2→WP6, WP3→WP6, WP4→WP6, WP2→WP7, WP3→WP7, WP4→WP7 — 9 edges confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "Critical path runs T2-01→T2-02→T2-03→T5-01→T5-02→T5-03→T8-03 (M1–M48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (critical_path array = ['T2-01','T2-02','T2-03','T5-01','T5-02','T5-03','T8-03']; T2-01 start_month=1, T8-03 end_month=48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "Eleven milestones MS1–MS11 gating progress M3–M48 (MS1 M3; MS2 M12, MS3 M12, MS4 M15; MS5 M12; MS6 M24; MS7 M30; MS8 M36; MS9 M42; MS10 M45; MS11 M48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (milestones[] array: all 11 entries MS1–MS11 with due_month values verified individually)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "Eleven risks RISK-01 through RISK-11 registered with likelihood, impact, mitigation, and responsible partner",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[] — 11 entries RISK-01 through RISK-11, each with likelihood, impact, mitigation, responsible_partner)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "Principal risk attributes: RISK-01 medium/high (modular fallback architecture 'from M1'); RISK-10 medium/high (shared API contracts M1-M3, checkpoints every 6 months); RISK-04 medium/high (public dataset fallback); RISK-08 medium/medium (auditability by design)",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (risk_register[RISK-01]: likelihood=medium, impact=high, mitigation states 'Begin integration testing from M6, not M18' — modular fallback architecture adoption from M1 is inferred as a design-time commitment not explicitly timed at M1 in source; RISK-04: likelihood=medium, impact=high, mitigation references public datasets MIMIC-IV/eICU; RISK-08: likelihood=medium, impact=medium, mitigation references auditability/transparency mechanisms; RISK-10: likelihood=medium, impact=high, mitigation explicitly states 'shared API contracts...M1–M3' and 'integration checkpoints every 6 months'). Inference: RISK-01 'from M1' derives from modular architecture being a project-start design decision; source explicitly cites M6 for integration testing, not M1.",
+      "flag_reason": "RISK-01 'from M1' timing is inferred: source (implementation_architecture.json RISK-01 mitigation) specifies integration testing 'from M6, not M18'; 'from M1' for modular architecture adoption is a logical derivation from it being a design-time commitment, not a direct statement. All other principal risk attributes (likelihood, impact, mitigation substance) are directly confirmed."
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "Implementation plan treats AI system risks, health-data handling, and human-participant/clinical-context as ethics-sensitive workstreams governed through WP1 ethics compliance oversight and WP5 clinical validation governance",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (ethics_assessment.issues: ETHICS-01 Category 8 AI, ETHICS-02 Category 4 health data, ETHICS-03 Category 2 human participants/clinical context; governance_matrix Ethics and Quality Oversight Committee composition [ATU, NIHS]; management_roles MGR-011 ATU Ethics Compliance Coordinator grounded in WP1 T1-03, MGR-012 NIHS Healthcare Ethics Oversight Officer). Inference chain: three ethics issues in ETHICS-01/02/03 collectively cover the three workstream categories named in the section; WP1 T1-03 ('Ethics compliance oversight') and WP5 T5-03 ('Clinical expert validation') ground the WP-level governance references.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "Governance: General Assembly (biannual, all eight partners), Project Management Committee (quarterly, all eight WP leads), Ethics and Quality Oversight Committee (ATU and NIHS)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (governance_matrix[0]: General Assembly, meeting_frequency='Biannual', composition all 8 partners; governance_matrix[1]: Project Management Committee, meeting_frequency='Quarterly', composition all 8 partners who are WP leads; governance_matrix[2]: Ethics and Quality Oversight Committee, composition=[ATU, NIHS])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "ATU coordinates European Commission reporting and ADRA/GenAI4EU Hub liaison (SR-09, CC-03, CC-04)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (management_roles MGR-001: 'Primary point of contact with the European Commission and ADRA'; 'Coordination with the GenAI4EU central Hub...per SR-09 and CC-03/CC-04'); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-09: 'All proposals must allocate tasks for cohesion activities with ADRA and with CSA HORIZON-CL4-2025-03-HUMAN-18: GenAI4EU central Hub'); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-03: ADRA cohesion mandate; CC-04: GenAI4EU central Hub cohesion mandate)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "MAESTRO directly validates healthcare and advanced manufacturing demonstrators; includes logistics transfer demonstrator; architectural transferability mapping toward in-vehicle autonomous-driving requirements (SR-07)",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07: 'Proposals must demonstrate application in at least one Apply AI sector. Three specifically identified sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving'); docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (MS9 verifiable_criterion: 'Architectural transferability mapping to in-vehicle autonomous driving completed')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "All nine WPs are resourced per the validated budget",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json (gate_pass_declaration='pass'; wp_coverage_results: all 9 WPs present_in_budget=true, inconsistencies=[] for each; blocking_inconsistencies=[])",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "MAESTRO assembles eight complementary partners with stated legal names, countries, organisation types, and domain expertise",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (all 8 partner entries: ATU DE/HES, CERIA FR/REC, BIIS NL/HES, ISIA IT/HES, NIHS SE/HES, ELI CH/PRC, BAL FI/PRC, FIIT ES/REC — legal_name, country, organisation_type, and description confirmed for each)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "WP leadership distributed: ATU leads WP1 and WP2; each other partner leads exactly one WP",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (partner_role_matrix[].wps_as_lead: ATU=[WP1,WP2]; CERIA=[WP4]; BIIS=[WP3]; ISIA=[WP6]; NIHS=[WP5]; ELI=[WP7]; BAL=[WP9]; FIIT=[WP8]); docs/tier3_project_instantiation/consortium/roles.json (roles[].wp_lead confirmed for all 8 partners)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "BIIS pioneers retrieval-augmented generation and neural memory architectures, addressing SR-03",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (BIIS description: 'Pioneers in retrieval-augmented generation and neural memory architectures'); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-03: 'Proposals must address effective memory and state management, including balanced integration of short-term and external long-term memory solutions')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "CERIA brings formal coordination protocols and game-theoretic multi-agent cooperation, aligned with SR-05(c)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (CERIA description: 'formal coordination protocols, distributed AI, and game-theoretic approaches to multi-agent cooperation'); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-05: '(c) developing advanced multi-agent frameworks tailored for collaborative agents, including mixed AI architectures')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "NIHS provides de-identified clinical datasets, clinical validation pathways, and HL7 FHIR integration capability",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (NIHS description: 'Access to de-identified clinical datasets and established clinical validation pathways'); docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (management_roles MGR-WPL-WP5 responsibilities: 'HL7 FHIR integration and specialist sub-agent deployment'; source_basis confirms NIHS leads T5-02 which includes HL7 FHIR integration)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C18",
+      "claim_summary": "ISIA provides operational pilot factory access, digital twin capabilities, and manufacturing KPI definition",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ISIA description: 'digital twins, smart factory systems, and AI-driven process optimisation in operational industrial settings'); docs/tier3_project_instantiation/consortium/roles.json (ISIA key_responsibilities: 'Provide operational factory environment for validation', 'Digital twin integration with MAESTRO agent framework', 'Manufacturing domain knowledge and KPI definition')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "EuroLog International AG (ELI) operates across over 80 countries, supplying real-world logistics data and supply chain AI deployment environments",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (ELI description: 'A major European logistics company operating in over 80 countries'; 'Provides real-world logistics operations data and deployment environments')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "BAL contributes production-grade LLM deployment and manages AI-on-demand platform integration per SR-10/CC-05",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (BAL description: 'production-grade AI deployment'); docs/tier3_project_instantiation/consortium/roles.json (BAL key_responsibilities: 'AI-on-demand platform integration and open-source release management'); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-10: 'Communicable results must be shared with the European R&D community through the AI-on-demand platform'); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-05: same mandate)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C21",
+      "claim_summary": "FIIT leads cross-demonstrator evaluation framework design, coordinates with Testing and Experiment Facilities per CC-07, and drives EDIH technology transfer",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (FIIT description: 'AI evaluation frameworks, benchmarking methodologies, and technology transfer through European Digital Innovation Hubs (EDIHs)'); docs/tier3_project_instantiation/consortium/roles.json (FIIT key_responsibilities: 'Design cross-demonstrator evaluation framework and KPIs', 'Coordination with Testing and Experiment Facilities', 'EDIH network dissemination and technology transfer'); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-07: 'Results may be validated in the Testing and Experiment Facilities')",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 21,
+    "confirmed": 19,
+    "inferred": 2,
+    "assumed": 0,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-04-29T00:00:00Z"
+}
