@@ -372,11 +372,17 @@ def validate_reuse_candidate(
     node_id: str,
     repo_root: Path,
     current_fingerprint: str | None = None,
+    current_run_id: str | None = None,
 ) -> ReuseDecision:
     """Check whether a section node's previous artifact can be reused.
 
     Checks all eligibility conditions fail-closed. Returns a ReuseDecision
     with reusable=True only when every condition passes.
+
+    Strict provenance (Option A): when *current_run_id* is provided,
+    the artifact's embedded ``run_id`` must equal *current_run_id*.
+    Cross-run artifacts are rejected and must be regenerated under
+    the current run.
     """
     # 1. Node must be eligible
     node_config = REUSE_ELIGIBLE_NODES.get(node_id)
@@ -452,6 +458,18 @@ def validate_reuse_candidate(
             reusable=False, reason="artifact_status_invalid",
             input_fingerprint=current_fingerprint,
         )
+
+    # 6b. Strict provenance: artifact.run_id must match current_run_id
+    #     (Option A — cross-run reuse is rejected; artifact must be
+    #     regenerated under the current run).
+    if current_run_id is not None:
+        artifact_run_id = artifact_data.get("run_id")
+        if artifact_run_id != current_run_id:
+            return ReuseDecision(
+                reusable=False,
+                reason="artifact_run_id_mismatch_strict_provenance",
+                input_fingerprint=current_fingerprint,
+            )
 
     # 7. Previous gate result must exist and be pass
     gate_result = _load_gate_result(gate_id, repo_root)

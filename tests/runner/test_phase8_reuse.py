@@ -46,12 +46,14 @@ def _write_text(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def _make_valid_artifact(repo: Path, node_id: str) -> dict:
+def _make_valid_artifact(
+    repo: Path, node_id: str, run_id: str = "prev-run-001",
+) -> dict:
     """Create a valid section artifact on disk and return its content."""
     cfg = REUSE_ELIGIBLE_NODES[node_id]
     content = {
         "schema_id": cfg["schema_id"],
-        "run_id": "prev-run-001",
+        "run_id": run_id,
         "criterion": "Test",
         "sub_sections": [],
         "validation_status": {
@@ -89,11 +91,13 @@ def _make_fingerprint_inputs(repo: Path, node_id: str) -> None:
             _write_json(repo / rel_path, {"input": "value"})
 
 
-def _make_full_reuse_env(repo: Path, node_id: str) -> str:
+def _make_full_reuse_env(
+    repo: Path, node_id: str, run_id: str = "prev-run-001",
+) -> str:
     """Set up a complete reuse-eligible environment. Returns fingerprint."""
     cfg = REUSE_ELIGIBLE_NODES[node_id]
     _make_fingerprint_inputs(repo, node_id)
-    _make_valid_artifact(repo, node_id)
+    _make_valid_artifact(repo, node_id, run_id=run_id)
     _make_gate_result(repo, cfg["gate_id"], "pass")
 
     fp = compute_input_fingerprint(node_id, repo)
@@ -106,7 +110,7 @@ def _make_full_reuse_env(repo: Path, node_id: str) -> str:
     write_reuse_metadata(
         node_id=node_id,
         repo_root=repo,
-        source_run_id="prev-run-001",
+        source_run_id=run_id,
         artifact_path=cfg["artifact_path"],
         schema_id=cfg["schema_id"],
         gate_id=cfg["gate_id"],
@@ -860,13 +864,15 @@ class TestSchedulerReuseAuditIntegration:
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_reuse_passes_skip_skills_to_run_agent(
+    def test_same_run_reuse_passes_skip_skills_to_run_agent(
         self, tmp_path: Path, node_id: str,
     ) -> None:
-        """When reuse is valid, run_agent is called with skip_skills=[drafting_skill]."""
+        """When same-run reuse is valid, run_agent is called with skip_skills=[drafting_skill]."""
         import yaml as _yaml
 
-        _make_full_reuse_env(tmp_path, node_id)
+        # Use same run_id for artifact and scheduler (same-run reuse)
+        sched_run_id = "run-reuse-audit"
+        _make_full_reuse_env(tmp_path, node_id, run_id=sched_run_id)
 
         cfg = REUSE_ELIGIBLE_NODES[node_id]
         gate_id = cfg["gate_id"]
@@ -898,7 +904,7 @@ class TestSchedulerReuseAuditIntegration:
         from runner.run_context import RunContext
 
         graph = ManifestGraph.load(mp)
-        ctx = RunContext.initialize(tmp_path, "run-reuse-audit")
+        ctx = RunContext.initialize(tmp_path, sched_run_id)
         ctx.save()
         sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
 
@@ -934,13 +940,14 @@ class TestSchedulerReuseAuditIntegration:
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_reuse_decision_includes_audit_mode(
+    def test_same_run_reuse_decision_includes_audit_mode(
         self, tmp_path: Path, node_id: str,
     ) -> None:
-        """Reuse decision records mode='drafting_skipped_audit_executed'."""
+        """Same-run reuse decision records mode='drafting_skipped_audit_executed'."""
         import yaml as _yaml
 
-        _make_full_reuse_env(tmp_path, node_id)
+        sched_run_id = "run-mode-test"
+        _make_full_reuse_env(tmp_path, node_id, run_id=sched_run_id)
 
         cfg = REUSE_ELIGIBLE_NODES[node_id]
         gate_id = cfg["gate_id"]
@@ -967,7 +974,7 @@ class TestSchedulerReuseAuditIntegration:
         from runner.run_context import RunContext
 
         graph = ManifestGraph.load(mp)
-        ctx = RunContext.initialize(tmp_path, "run-mode-test")
+        ctx = RunContext.initialize(tmp_path, sched_run_id)
         ctx.save()
         sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
 
@@ -1317,3 +1324,331 @@ class TestProductionMappingInvariant:
             assert sibling not in FINGERPRINT_INPUTS[node_id], (
                 f"{node_id} should not include sibling spec {sibling}"
             )
+
+
+# ===========================================================================
+# L. Strict provenance (Option A) — validate_reuse_candidate
+# ===========================================================================
+
+
+class TestStrictProvenance:
+    """Cross-run reuse is rejected when current_run_id is provided and
+    artifact.run_id differs.  Same-run reuse still passes."""
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reject_old_run_artifact(self, tmp_path: Path, node_id: str) -> None:
+        """Artifact from run-A rejected when current_run_id is run-B."""
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
+        decision = validate_reuse_candidate(
+            node_id, tmp_path,
+            current_fingerprint=fp,
+            current_run_id="run-B",
+        )
+        assert decision.reusable is False
+        assert decision.reason == "artifact_run_id_mismatch_strict_provenance"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_accept_current_run_artifact(self, tmp_path: Path, node_id: str) -> None:
+        """Artifact from run-B accepted when current_run_id is run-B."""
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-B")
+        decision = validate_reuse_candidate(
+            node_id, tmp_path,
+            current_fingerprint=fp,
+            current_run_id="run-B",
+        )
+        assert decision.reusable is True
+        assert decision.reason == "all_checks_passed"
+
+    def test_no_current_run_id_allows_any(self, tmp_path: Path) -> None:
+        """When current_run_id is None (backward compat), any run passes."""
+        fp = _make_full_reuse_env(tmp_path, "n08a_excellence_drafting", run_id="old-run")
+        decision = validate_reuse_candidate(
+            "n08a_excellence_drafting", tmp_path,
+            current_fingerprint=fp,
+            current_run_id=None,
+        )
+        assert decision.reusable is True
+
+    def test_strict_provenance_checked_before_gate_result(
+        self, tmp_path: Path,
+    ) -> None:
+        """Strict provenance rejects even when all other checks pass."""
+        node_id = "n08b_impact_drafting"
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
+
+        # All reuse checks pass except run_id mismatch
+        decision = validate_reuse_candidate(
+            node_id, tmp_path,
+            current_fingerprint=fp,
+            current_run_id="run-B",
+        )
+        assert decision.reusable is False
+        assert decision.reason == "artifact_run_id_mismatch_strict_provenance"
+        # Fingerprint should still be set for logging
+        assert decision.input_fingerprint == fp
+
+
+# ===========================================================================
+# M. Strict provenance — Scheduler integration
+# ===========================================================================
+
+
+class TestStrictProvenanceSchedulerIntegration:
+    """Scheduler rejects cross-run reuse and dispatches drafting normally."""
+
+    _EG_TARGET = "runner.dag_scheduler.evaluate_gate"
+    _RA_TARGET = "runner.dag_scheduler.run_agent"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_cross_run_reuse_rejected_drafting_runs(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Cross-run artifact rejected; run_agent called WITHOUT skip_skills."""
+        import yaml as _yaml
+
+        # Artifact from old run
+        _make_full_reuse_env(tmp_path, node_id, run_id="old-run-001")
+
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+        gate_id = cfg["gate_id"]
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": node_id,
+                "phase_number": 8,
+                "phase_id": "phase_08",
+                "agent": "test_agent",
+                "skills": [
+                    drafting_skill,
+                    "proposal-section-traceability-check",
+                    "constitutional-compliance-check",
+                ],
+                "exit_gate": gate_id,
+                "terminal": False,
+            }],
+            "edge_registry": [],
+        }
+        mp = tmp_path / "manifest.yaml"
+        mp.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        from runner.dag_scheduler import DAGScheduler, ManifestGraph
+        from runner.run_context import RunContext
+
+        # Scheduler has a DIFFERENT run_id → strict provenance rejects
+        current_run_id = "new-run-002"
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, current_run_id)
+        ctx.save()
+        sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
+
+        mock_resolver = MagicMock()
+        mock_resolver.resolve_agent_id.return_value = "test_agent"
+        mock_resolver.resolve_sub_agent_id.return_value = None
+        mock_resolver.resolve_pre_gate_agent_id.return_value = None
+        mock_resolver.resolve_skill_ids.return_value = [
+            drafting_skill,
+            "proposal-section-traceability-check",
+            "constitutional-compliance-check",
+        ]
+        mock_resolver.resolve_phase_id.return_value = "phase8"
+        sched._DAGScheduler__node_resolver = mock_resolver
+
+        success_agent = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+        with (
+            patch(self._EG_TARGET, return_value={"status": "pass"}),
+            patch(self._RA_TARGET, return_value=success_agent) as mock_run_agent,
+        ):
+            summary = sched.run()
+
+        # run_agent must be called without skip_skills (drafting runs normally)
+        assert mock_run_agent.called
+        call_kwargs = mock_run_agent.call_args.kwargs
+        assert call_kwargs.get("skip_skills") is None
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_cross_run_reuse_decision_records_strict_provenance(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Reuse decision shows not_reused with strict provenance reason."""
+        import yaml as _yaml
+
+        _make_full_reuse_env(tmp_path, node_id, run_id="old-run-001")
+
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+        gate_id = cfg["gate_id"]
+        drafting_skill = REUSE_SKIP_SKILLS[node_id]
+
+        manifest = {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [{
+                "node_id": node_id,
+                "phase_number": 8,
+                "phase_id": "phase_08",
+                "agent": "test_agent",
+                "skills": [drafting_skill],
+                "exit_gate": gate_id,
+                "terminal": False,
+            }],
+            "edge_registry": [],
+        }
+        mp = tmp_path / "manifest.yaml"
+        mp.write_text(_yaml.dump(manifest), encoding="utf-8")
+
+        from runner.dag_scheduler import DAGScheduler, ManifestGraph
+        from runner.run_context import RunContext
+
+        current_run_id = "new-run-002"
+        graph = ManifestGraph.load(mp)
+        ctx = RunContext.initialize(tmp_path, current_run_id)
+        ctx.save()
+        sched = DAGScheduler(graph, ctx, tmp_path, manifest_path=mp, phase=8)
+
+        mock_resolver = MagicMock()
+        mock_resolver.resolve_agent_id.return_value = "test_agent"
+        mock_resolver.resolve_sub_agent_id.return_value = None
+        mock_resolver.resolve_pre_gate_agent_id.return_value = None
+        mock_resolver.resolve_skill_ids.return_value = [drafting_skill]
+        mock_resolver.resolve_phase_id.return_value = "phase8"
+        sched._DAGScheduler__node_resolver = mock_resolver
+
+        success_agent = AgentResult(status="success", can_evaluate_exit_gate=True)
+
+        with (
+            patch(self._EG_TARGET, return_value={"status": "pass"}),
+            patch(self._RA_TARGET, return_value=success_agent),
+        ):
+            summary = sched.run()
+
+        assert node_id in summary.reuse_decisions
+        decision = summary.reuse_decisions[node_id]
+        assert decision["status"] == "not_reused"
+        assert decision["reason"] == "artifact_run_id_mismatch_strict_provenance"
+
+    def test_reuse_decision_in_run_summary_json(self, tmp_path: Path) -> None:
+        """run_summary.json contains strict provenance rejection."""
+        from runner.dag_scheduler import RunSummary
+
+        summary = RunSummary(
+            run_id="test",
+            manifest_version="1.1",
+            library_version="1.0",
+            constitution_version="abc",
+            started_at="2026-01-01T00:00:00Z",
+            completed_at="2026-01-01T00:01:00Z",
+            overall_status="pass",
+            terminal_nodes_reached=[],
+            stalled_nodes=[],
+            hard_blocked_nodes=[],
+            node_states={},
+            gate_results_index={},
+            node_failure_details={},
+            dispatched_nodes=[],
+            reuse_decisions={
+                "n08a_excellence_drafting": {
+                    "status": "not_reused",
+                    "reason": "artifact_run_id_mismatch_strict_provenance",
+                },
+            },
+        )
+        written_path = summary.write(tmp_path)
+        data = json.loads(written_path.read_text())
+        assert "reuse_decisions" in data
+        dec = data["reuse_decisions"]["n08a_excellence_drafting"]
+        assert dec["status"] == "not_reused"
+        assert dec["reason"] == "artifact_run_id_mismatch_strict_provenance"
+
+
+# ===========================================================================
+# N. No gate weakening assertions
+# ===========================================================================
+
+
+class TestNoGateWeakening:
+    """Confirm artifact_owned_by_run and gate predicates are unchanged."""
+
+    def test_artifact_owned_by_run_still_fails_old_run(
+        self, tmp_path: Path,
+    ) -> None:
+        """artifact_owned_by_run still rejects mismatched run_id."""
+        from runner.predicates.file_predicates import artifact_owned_by_run
+
+        artifact = {"run_id": "old-run", "schema_id": "test"}
+        art_path = tmp_path / "artifact.json"
+        _write_json(art_path, artifact)
+
+        result = artifact_owned_by_run(
+            str(art_path), "current-run", repo_root=tmp_path,
+        )
+        assert result.passed is False
+        assert result.failure_category == "STALE_UPSTREAM_MISMATCH"
+
+    def test_artifact_owned_by_run_passes_matching_run_id(
+        self, tmp_path: Path,
+    ) -> None:
+        """artifact_owned_by_run passes when run_id matches."""
+        from runner.predicates.file_predicates import artifact_owned_by_run
+
+        current_run = "current-run-001"
+        artifact = {"run_id": current_run, "schema_id": "test"}
+        art_path = tmp_path / "artifact.json"
+        _write_json(art_path, artifact)
+
+        result = artifact_owned_by_run(
+            str(art_path), current_run, repo_root=tmp_path,
+        )
+        assert result.passed is True
+
+
+# ===========================================================================
+# O. Metadata after fresh gate pass uses current run_id
+# ===========================================================================
+
+
+class TestMetadataAfterFreshGatePass:
+    """After regeneration and gate pass, metadata uses current run_id."""
+
+    def test_metadata_fields_use_current_run_id(self, tmp_path: Path) -> None:
+        """write_reuse_metadata stores current run_id in all fields."""
+        current_run = "fresh-run-001"
+        node_id = "n08a_excellence_drafting"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        write_reuse_metadata(
+            node_id=node_id,
+            repo_root=tmp_path,
+            source_run_id=current_run,
+            artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"],
+            gate_id=cfg["gate_id"],
+            input_fingerprint="fp-fresh",
+            artifact_hash="hash-fresh",
+            artifact_run_id=current_run,
+            last_validated_run_id=current_run,
+        )
+
+        loaded = load_reuse_metadata(node_id, tmp_path)
+        assert loaded is not None
+        assert loaded["artifact_run_id"] == current_run
+        assert loaded["source_run_id"] == current_run
+        assert loaded["last_validated_run_id"] == current_run
