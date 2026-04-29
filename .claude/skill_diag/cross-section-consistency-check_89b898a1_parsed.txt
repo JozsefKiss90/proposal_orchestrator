@@ -1,0 +1,93 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "89b898a1-67bd-47a2-b42f-ae6fa5fd57e6",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 1956
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 607
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 570
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Two partial objective title references detected in Excellence B.1.1 against Tier 3 canonical titles. (1) OBJ-1 label in Excellence uses 'Neuro-Symbolic Planning Engine', omitting the canonical qualifier 'for autonomous task decomposition'; Tier 3 objectives.json title is 'Neuro-symbolic planning engine for autonomous task decomposition'. OBJ-1 contains the component keyword 'engine', which per strengthened validation rules requires the exact canonical title. (2) OBJ-6 label in Excellence uses 'Logistics Transfer Demonstrator', omitting the canonical qualifier 'cross-sector generalisation'; Tier 3 objectives.json title is 'Logistics transfer demonstrator \u2014 cross-sector generalisation'. All eight objective IDs (OBJ-1 through OBJ-8) are present in Excellence and measurable targets (\u226540%, \u226530%, \u226525%, \u226515%/\u226510%, \u226520%/\u226515%, \u226530 tools/\u226595%, etc.) are otherwise consistent with Tier 3. Implementation section does not enumerate objective IDs directly but WP descriptions are substantively aligned with the corresponding objectives.",
+      "source_refs": [
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency across all three sections against Tier 3 ground-truth",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier3_project_instantiation/consortium/partners.json",
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "D4-01 is described with different purpose characterisations across sections. In Excellence B.1.2, D4-01 is described as 'protocol specification, month 18' \u2014 a WP4 research output produced at M18 under OBJ-3. In Impact B.2.1 and B.2.2, D4-01 is cited as the vehicle for 'formal standardisation submission to ISO/IEC JTC 1/SC 42 or IEEE by M48 (KPI-08)', attributing it to an action timed at M48. The same deliverable ID is attributed a research-output purpose at M18 (Excellence) and a standardisation-submission purpose at M48 (Impact) without explicit acknowledgement that D4-01 is being reused or updated across these contexts. Note: Tier 3 impacts.json IMP-6 does link D4-01 to the standardisation pathway, which provides upstream context, but the cross-section ambiguity in purpose and timing attribution is not resolved within the section text itself.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier3_project_insta
+=== END ===
