@@ -1,0 +1,37 @@
+{
+  "skill_id": "constitutional-compliance-check",
+  "execution_mode": "tapm",
+  "failure_class": "NONZERO_EXIT",
+  "run_id": "86baf123-b172-45b5-869c-1c1d327f5ed0",
+  "node_id": null,
+  "reads_from": [
+    "CLAUDE.md"
+  ],
+  "writes_to": [
+    "docs/tier4_orchestration_state/validation_reports/",
+    "docs/tier4_orchestration_state/decision_log/"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 16384,
+  "timeout_seconds": 1200,
+  "elapsed_seconds": 2.312000000005355,
+  "system_prompt_chars": 1179,
+  "user_prompt_chars": 32076,
+  "exception_class": "ClaudeTransportError",
+  "exception_message": "Claude CLI exited with code 1",
+  "command": null,
+  "had_partial_stdout": true,
+  "had_stderr": false,
+  "tapm_tools_requested": [
+    "Read",
+    "Glob"
+  ],
+  "tapm_tools_enabled": true,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/constitutional-compliance-check_86baf123_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/constitutional-compliance-check_86baf123_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/constitutional-compliance-check_86baf123_user_prompt.txt",
+    "stdout": ".claude/skill_diag/constitutional-compliance-check_86baf123_stdout.txt",
+    "stderr": ".claude/skill_diag/constitutional-compliance-check_86baf123_stderr.txt"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "report_id": "traceability_excellence_traceability_auditor_2026-04-29T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "86baf123-b172-45b5-869c-1c1d327f5ed0",
+  "section_id_audited": "excellence",
+  "claim_audit_results": [
+    {
+      "claim_id": "C001",
+      "claim_summary": "All 8 project objectives (OBJ-1 through OBJ-8) enumerated with verbatim titles, responsible partner, target month, and measurable targets in B.1.1",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json — OBJ-1 (ATU, M36, ≥40% plan success rate), OBJ-2 (BIIS, M30, ≥30% coherence improvement), OBJ-3 (CERIA, M36, ≥5 agents, ≥25% improvement, formal proof), OBJ-4 (NIHS, M42, within 10% clinician accuracy, 500 cases), OBJ-5 (ISIA, M42, ≥15% defect/≥10% energy reduction), OBJ-6 (ELI, M42, ≥20% recovery/≥15% adherence, 3 corridors), OBJ-7 (BAL, M48, ≥500 stars, ≥2 TEFs, ≥3 EDIHs), OBJ-8 (ATU, M36, ≥30 tools, ≥95% success, ≤5s recovery) — all titles and measurable_target fields verified verbatim against section text",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C002",
+      "claim_summary": "TRL 5 target by project end for OUT-1, OUT-2, OUT-4, OUT-5, OUT-6, and OUT-9",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json — trl_achieved=5 confirmed for OUT-1 (Neuro-symbolic planning framework), OUT-2 (Adaptive tri-store memory architecture), OUT-4 (Clinical decision support agent system), OUT-5 (Manufacturing process optimisation agent system), OUT-6 (Logistics and supply chain transfer demonstrator), OUT-9 (External Tool and API Orchestration Layer)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C003",
+      "claim_summary": "OUT-3 (Formally verified multi-agent coordination protocol suite, WP4) positioned at TRL 4, not TRL 5",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json — OUT-3 trl_achieved=4; OUT-3 linked_objectives=[OBJ-3], linked_wp_ids=[WP4], linked_deliverable_ids=[D4-01, D4-02]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C004",
+      "claim_summary": "MAESTRO begins at TRL 2 (technology concept formulated) for all foundational research components",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — CC-01 notes: 'TRL start point (TRL 2) is not explicitly stated in the concept brief but is consistent with the foundational nature of the research (developing new agent architectures, formal protocols, and unified memory systems from first principles). The TRL 2 start should be explicitly stated in the full proposal.' Derivation: WPs developing new AI architectures from first principles satisfy the TRL 2 definition (technology concept formulated); no source contradicts this start level.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C005",
+      "claim_summary": "Project addresses call topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02 and covers scope requirements SR-01 through SR-12",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — scope_coverage field shows SR-01 through SR-12 all with coverage_status=covered; docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-01 through SR-12 all have status=Confirmed against source_document HORIZON-CL4-2026-05-DIGITAL-EMERGING-02",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C006",
+      "claim_summary": "Partner responsible assignments: ATU leads OBJ-1 and OBJ-8; BIIS leads OBJ-2; CERIA leads OBJ-3; NIHS leads OBJ-4; ISIA leads OBJ-5; ELI leads OBJ-6; BAL leads OBJ-7",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json — responsible_partner field verified: OBJ-1=ATU, OBJ-2=BIIS, OBJ-3=CERIA, OBJ-4=NIHS, OBJ-5=ISIA, OBJ-6=ELI, OBJ-7=BAL (contributing_partners=[FIIT,ATU]), OBJ-8=ATU. Note: section text says '(BAL and FIIT)' for OBJ-7; source shows BAL as responsible and FIIT as contributing_partner — presentation acceptable, not factually incorrect.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C007",
+      "claim_summary": "Partner technical capabilities match WP roles (ATU: neuro-symbolic AI/planning; BIIS: memory architectures/RAG; CERIA: formal multi-agent; NIHS: clinical informatics/HL7 FHIR; ISIA: digital twins/AI manufacturing; ELI: logistics AI/supply chain; BAL: LLM engineering; FIIT: AI evaluation/benchmarking)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — technical_capabilities field verified for all 8 partners: ATU=['Neuro-symbolic AI and hybrid reasoning systems','Automated planning (HTN, MCTS, classical planning)'], BIIS=['Memory-augmented neural networks','Retrieval-augmented generation (RAG)'], CERIA=['Formal verification of multi-agent protocols'], NIHS=['Clinical decision support systems','Health data integration and interoperability (HL7 FHIR)'], ISIA=['AI for manufacturing process optimisation','Digital twin modelling and simulation'], ELI=['AI-powered supply chain optimisation'], BAL=['Large language model development and fine-tuning'], FIIT=['AI evaluation and benchmarking methodologies']; docs/tier3_project_instantiation/consortium/partners.json — partner identities confirmed",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C008",
+      "claim_summary": "WP structure, deliverable IDs, titles, and due months used in methodology match WP design (D1-02 M6, D2-01 M18, D2-02 M36, D3-01 M12, D3-02 M30, D4-01 M18, D4-02 M36, D8-01 M12, D8-02 M42, D8-03 M48, D9-01 M6, D9-02 M36, D9-03 M48, D5-02 M42, D6-02 M42, D7-02 M42)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — all deliverable IDs, titles, due_month values, and responsible_partner assignments verified: D1-02 (ATU, M6), D2-01 (ATU, M18), D2-02 (ATU, M36), D3-01 (BIIS, M12), D3-02 (BIIS, M30), D4-01 (CERIA, M18), D4-02 (CERIA, M36), D8-01 (FIIT, M12), D8-02 (FIIT, M42), D8-03 (FIIT, M48), D9-01 (BAL, M6), D9-02 (BAL, M36), D9-03 (BAL, M48), D5-02 (NIHS, M42), D6-02 (ISIA, M42), D7-02 (ELI, M42) — all match section text",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C009",
+      "claim_summary": "WP5, WP6, and WP7 demonstrators each receive D2-02, D3-02, and D4-02 as inputs; WP8 integrates all three research pillars; WP9 receives from WP8",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — dependency_map.edges confirmed: WP2→WP5 (D2-02 as input), WP3→WP5, WP4→WP5, WP2→WP6, WP3→WP6, WP4→WP6, WP2→WP7, WP3→WP7, WP4→WP7 (all edge_type=data_input referencing D2-02, D3-02, D4-02 respectively), WP8→WP9 (T9-01 depends on D8-03)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C010",
+      "claim_summary": "Cohesion activities with ADRA and GenAI4EU Hub (CSA HORIZON-CL4-2025-03-HUMAN-18) allocated through WP1 T1-03; ethics compliance coordinated through same task",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — T1-03 title: 'Ethics compliance oversight and coordination with GenAI4EU Hub', responsible_partner=ATU; docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-09: mandatory requirement for cohesion activities with ADRA and CSA HORIZON-CL4-2025-03-HUMAN-18 GenAI4EU Hub; docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — SR-09 coverage: concept explicitly names ADRA and CSA reference number verbatim",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C011",
+      "claim_summary": "WP5 clinical benchmark (T5-01) will consider sex/gender as variables in the 500-case benchmark spanning 5 diagnostic domains to ensure balanced demographic representation",
+      "status": "inferred",
+      "source_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json — B.1.2 field_requirements: 'Gender dimension in R&I content: how sex/gender analysis is taken into account in research and innovation content; justification if not considered relevant — mandatory except for topics identified in work programme as not requiring gender dimension integration'; docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — T5-01: 'Clinical use case definition and diagnostic benchmark design' (NIHS-led); docs/tier3_project_instantiation/consortium/capabilities.json — NIHS.managerial_capabilities: 'Established clinical research ethics review infrastructure'. Derivation: Tier 2A mandates gender dimension analysis → WP5 benchmark design task is the applicable locus → NIHS clinical ethics infrastructure governs → benchmark will incorporate sex/gender variables as a research content dimension.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C012",
+      "claim_summary": "Open science deliverables: DMP (D1-02, M6), dissemination and exploitation plan (D9-01, M6), open-source software release (D9-02, M36), benchmark suite dataset (D8-02, M42) shared on AI-on-demand platform in FAIR compliance",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — D1-02 (due_month=6, type=report, responsible=ATU), D9-01 (due_month=6, type=report, responsible=BAL), D9-02 (due_month=36, type=software, responsible=BAL), D8-02 (due_month=42, type=dataset, responsible=FIIT) — all verified",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C013",
+      "claim_summary": "Interdisciplinary integration across four disciplinary traditions: LLM-based AI engineering (ATU/BAL), formal methods and planning theory (ATU/CERIA), neural information retrieval and memory architectures (BIIS), and domain-applied engineering informatics (NIHS/ISIA/ELI)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — all 8 partners' technical_capabilities confirm coverage of stated traditions; docs/tier3_project_instantiation/architecture_inputs/objectives.json — pillar field shows Pillar 1 (Neuro-Symbolic Planning), Pillar 2 (Adaptive Memory), Pillar 3 (Decentralised Multi-Agent), and Demonstrators (Healthcare/Manufacturing/Logistics) mapping to four disciplinary traditions",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C014",
+      "claim_summary": "Ecosystem contribution under OBJ-7: AI-on-demand platform, AI Factories and Data Labs linkage, TEF validation (≥2 TEFs), and EDIH technology transfer (≥3 EDIHs)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json — OBJ-7 measurable_target: 'contributions accepted to AI-on-demand platform; results validated through ≥2 TEFs; technology transfer initiated through ≥3 EDIHs'; docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-10: AI-on-demand platform (mandatory), SR-11: AI Factories and Data Labs linkage (mandatory)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C015",
+      "claim_summary": "Strategic differentiation: integrated co-design of four capabilities (planning, memory, coordination, tool orchestration) versus three disconnected current research communities; ≥40% benchmark improvement framing for planning component",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — strategic_differentiation field: 'MAESTRO's primary differentiator is its integrated co-design of all four capability areas... rather than independent or loosely coupled research threads... three research communities (LLM-based agents, classical planning and multi-agent systems, and memory-augmented neural systems) operate in largely disconnected tracks'; docs/tier3_project_instantiation/architecture_inputs/objectives.json — OBJ-1 measurable_target: '≥40% improvement in plan success rate over pure LLM-based agent baselines on standardised agent benchmarks'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C016",
+      "claim_summary": "CERIA's ERC Advanced Grant on formal methods for multi-agent systems cited as grounding for WP4 convergence methodology",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — CERIA.relevant_experience: 'ERC Advanced Grant on formal methods for multi-agent systems'; docs/tier3_project_instantiation/consortium/partners.json — CERIA confirmed as 'Centre Européen de Recherche en Informatique Avancée' with multi-agent systems team expertise",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C017",
+      "claim_summary": "NIHS de-identified clinical data repository (3M+ patient records, ethics-approved) available for WP5 healthcare demonstrator benchmark",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — NIHS.infrastructure: 'De-identified clinical data repository (3M+ patient records, ethics-approved)'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C018",
+      "claim_summary": "ISIA's Industry 4.0 pilot factory with sensor-instrumented production lines used as deployment environment for WP6 manufacturing demonstrator",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — ISIA.infrastructure: 'Industry 4.0 pilot factory with sensor-instrumented production lines', 'Digital twin simulation environment'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C019",
+      "claim_summary": "ELI operational logistics data and supply chain simulation environment used across 3 international supply chain corridors for WP7 logistics demonstrator",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — ELI.infrastructure: 'Operational logistics data (anonymised shipment records across 30+ countries)', 'Supply chain simulation environment with multi-actor coordination'; docs/tier3_project_instantiation/architecture_inputs/objectives.json — OBJ-6 measurable_target: 'validated on ELI operational scenarios across 3 supply chain corridors'",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C020",
+      "claim_summary": "Prior EU-funded work cited for each partner in National and International R&I Activities subsection (ATU: HE AI-on-demand; BIIS: HE unified transformers; CERIA: ERC Advanced Grant; NIHS: HE EHDS pilot; ISIA: HE AI manufacturing; FIIT: HE AI testing and evaluation frameworks)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json — relevant_experience field verified for: ATU ('HE project contributing to the AI-on-demand platform'), BIIS ('HE project on unified transformers for text and retrieval'), CERIA ('ERC Advanced Grant on formal methods for multi-agent systems'), NIHS ('HE project on European Health Data Space pilot implementation'), ISIA ('HE project on AI for manufacturing process optimisation'), FIIT ('HE project on AI testing and evaluation frameworks')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C021",
+      "claim_summary": "Mixed-TRL profile (OUT-3 at TRL 4 while sector demonstrators reach TRL 5) is appropriate for a Research and Innovation Action",
+      "status": "inferred",
+      "source_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json — B.1.1 field_requirements: 'note that expectations differ for RIAs at lower TRL versus IAs at higher TRLs'. Derivation: Tier 2A states RIAs target lower TRLs than IAs; MAESTRO's TRL 2→TRL 4/5 range falls within this expectation; OUT-3 at TRL 4 reflects a primary formal-methods contribution that does not require full operational deployment to satisfy RIA criteria.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C022",
+      "claim_summary": "MAESTRO has no dedicated SSH disciplinary research pillars; SSH/ethics embedded through architectural and governance mechanisms (WP1 ethics oversight, EU AI Act auditability, WP5 clinical ethics, WP8 responsible AI assessment)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — all 9 WPs (WP1-WP9) have technical objectives; no WP is designated as an SSH research pillar; WP1 T1-03 provides ethics compliance oversight; docs/tier2a_instrument_schemas/extracted/section_schema_registry.json — B.1.2 field_requirements: 'Social sciences and humanities integration: show role of SSH disciplines or justification for non-relevance'",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 22,
+    "confirmed": 19,
+    "inferred": 3,
+    "assumed": 0,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-04-29T00:00:00Z"
+}
