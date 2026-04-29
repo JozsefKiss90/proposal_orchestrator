@@ -111,7 +111,7 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
 - Step 1.4: Read `impact_architecture.json`. Check schema_id. If absent or schema mismatch: return failure with `MISSING_INPUT`.
 - Step 1.5: Read `wp_structure.json`. If absent or schema mismatch: return failure with `MISSING_INPUT`.
 - Step 1.6: Read `expected_outcomes.json` and `expected_impacts.json` from Tier 2B. If absent: return failure with `MISSING_INPUT`.
-- Step 1.7: Read Tier 3 project data: `architecture_inputs/objectives.json` (canonical source for all objective IDs, titles, and `measurable_target` metrics — required for metric completeness and terminology checks), `architecture_inputs/outcomes.json`, `architecture_inputs/impacts.json`. If absent: return failure with `MISSING_INPUT`.
+- Step 1.7: Read Tier 3 project data: `architecture_inputs/objectives.json` (canonical source for objective IDs and titles), `architecture_inputs/outcomes.json`, `architecture_inputs/impacts.json`. If absent: return failure with `MISSING_INPUT`.
 - Step 1.8: **Grant Agreement Annex guard** -- inspect the section schema source. If any structural reference identifies a Grant Agreement Annex, Model Grant Agreement Annex, or "AGA" template: return SkillResult(status="failure", failure_category="CONSTITUTIONAL_HALT", failure_reason="Section schema source appears to be a Grant Agreement Annex; CLAUDE.md Section 13.1") and halt.
 
 ### 2. Core Processing Logic
@@ -153,12 +153,7 @@ layer in OUT-9 / architecture inputs, not invented deliverable IDs.
 
   - Step 2.5.5: **Do not reference unvalidated budget figures.** (CLAUDE.md Section 8.3)
 
-  - Step 2.5.6: **Objective metric and terminology cross-check (GATE-CRITICAL).** For every objective referenced by ID or title in the Impact sub-section content being drafted:
-    (a) Load that objective's full entry from `architecture_inputs/objectives.json`.
-    (b) Extract every quantified metric from `measurable_target` (patterns: `≥N`, `≤N`, `≥N%`, `≤N%`, numeric counts with unit/context tokens like TEFs, EDIHs, corridors, agents, tools, months, seconds, benchmarks, domains, cases).
-    (c) Verify each extracted metric appears in the drafted content with the exact same numeric value, comparator (≥/≤/>/< ), and unit/context. Do not substitute a different numeric value. Do not drop any metric from a multi-metric target (targets joined by semicolons or conjunctions). Do not replace a total target with an unlabelled subset unless the text explicitly labels it as a subset AND the full canonical target is also stated.
-    (d) Load the objective's `title`. If it contains a technical component keyword (engine, layer, architecture, protocol, framework, system, suite, platform, benchmark, demonstrator, registry), verify the Impact prose uses the exact canonical multi-word component phrase from the objective title. Do not substitute the component keyword with a synonym.
-    (e) When an outcome from `outcomes.json` linked to the same objective uses a different component keyword for the same stem (e.g., outcome says "framework" but objective says "engine"), the objective title takes precedence when the context references the objective. The outcome title takes precedence when the context references the outcome specifically. Do not conflate the two.
+  - Step 2.5.6: **Canonical reference conventions.** Use objective IDs, objective titles, outcome titles, impact pathway names, and KPI labels exactly as stated in Tier 3/Tier 4 artifacts. When using a quantified objective or impact target, preserve its numeric values, comparators, units, and scope. Do not invent WP mappings; cite explicit mappings from `impact_architecture.json` or `wp_structure.json`, or omit WP lists. Do not describe KPIs as deliverables unless the deliverable ID, title, type, and due month match `wp_structure.json`. Canonicalization is enforced by deterministic gate predicates (gate_10b, gate_10d). This drafting skill must follow canonical source wording, but it must not perform exhaustive post-hoc canonicalization validation.
 
 - Step 2.6: **Populate impact_pathway_refs.** Array of all pathway IDs from `impact_architecture.json` that are covered in the drafted section content.
 

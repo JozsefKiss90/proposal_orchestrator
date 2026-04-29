@@ -82,6 +82,28 @@ class TestSpecLeanness:
         """Impact spec no longer has terminology pre-output scan block."""
         assert "Extract the multi-word component phrase" not in self.impact
 
+    def test_impact_no_extract_every_quantified_metric(self) -> None:
+        """Impact spec must not contain exhaustive metric extraction instruction."""
+        assert "Extract every quantified metric" not in self.impact
+        assert "extract every quantified metric" not in self.impact
+
+    def test_impact_no_verify_each_extracted_metric(self) -> None:
+        """Impact spec must not contain exhaustive metric verification instruction."""
+        assert "Verify each extracted metric appears" not in self.impact
+        assert "verify each extracted metric appears" not in self.impact
+
+    def test_impact_no_component_keyword_scan(self) -> None:
+        """Impact spec must not require component keyword verification scan."""
+        assert "component keyword" not in self.impact
+
+    def test_impact_no_objective_title_precedence_rule(self) -> None:
+        """Impact spec must not contain objective-vs-outcome title precedence logic."""
+        assert "objective title takes precedence" not in self.impact
+
+    def test_impact_no_cross_section_self_check_instruction(self) -> None:
+        """Impact spec must not contain cross-section self-check instruction."""
+        assert "cross-section self-check" not in self.impact.lower()
+
     def test_implementation_no_cross_section_self_check(self) -> None:
         """Implementation spec no longer requires cross-section self-check."""
         assert "Cross-Section Self-Check Before Output" not in self.implementation
@@ -141,6 +163,26 @@ class TestConciseGuidancePresent:
                 "truncate legal names" in content
             ), f"{name} spec missing legal name guidance"
 
+    def test_impact_has_preserve_numeric_values(self) -> None:
+        """Impact spec retains 'preserve numeric values' concise guidance."""
+        assert "preserve" in self.impact.lower() and "numeric" in self.impact.lower()
+
+    def test_impact_has_do_not_invent_wp_mappings(self) -> None:
+        """Impact spec retains 'Do not invent WP mappings' guidance."""
+        assert "Do not invent WP mappings" in self.impact
+
+    def test_impact_has_do_not_describe_kpis_as_deliverables(self) -> None:
+        """Impact spec retains 'Do not describe KPIs as deliverables' guidance."""
+        assert "Do not describe KPIs as deliverables" in self.impact
+
+    def test_impact_has_deterministic_gate_predicates(self) -> None:
+        """Impact spec delegates canonicalization to deterministic gate predicates."""
+        assert "deterministic gate predicates" in self.impact
+
+    def test_impact_has_use_objective_ids(self) -> None:
+        """Impact spec retains 'Use objective IDs' guidance."""
+        assert "Use objective IDs" in self.impact
+
 
 # ===========================================================================
 # 3. DRAFTING SPEC FAIL-FAST SCOPE
@@ -192,6 +234,17 @@ class TestFailFastScope:
     def test_impact_no_terminology_drift_failfast(self) -> None:
         """Terminology drift is enforced by gate, not as skill fail-fast."""
         assert "Terminology drift: canonical name" not in self.impact
+
+    def test_impact_no_exhaustive_canonicalization_failfast(self) -> None:
+        """INCOMPLETE_OUTPUT must not be required for broad metric/terminology canonicalization."""
+        # Find all INCOMPLETE_OUTPUT contexts in the spec
+        # The spec should not mandate INCOMPLETE_OUTPUT for canonicalization mismatches
+        assert "return INCOMPLETE_OUTPUT" not in self.impact or \
+            "canonicalization" not in self.impact.lower().split("return incomplete_output")[0][-200:]
+        # More direct: the specific canonicalization fail-fast patterns must not exist
+        assert "missing measurable_target component" not in self.impact
+        assert "canonical terminology drift" not in self.impact
+        assert "unsupported WP attribution" not in self.impact
 
 
 # ===========================================================================
