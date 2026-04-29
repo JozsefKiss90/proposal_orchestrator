@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10d_cross_section_consistency",
   "gate_kind": "exit",
-  "run_id": "89b898a1-67bd-47a2-b42f-ae6fa5fd57e6",
+  "run_id": "3e853336-734b-4e55-b65a-e65f36f2ef63",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:7775012cca7faa1fbcc262d4ed47ab0606809a2b78ce9c8490c92392dcbd0a6a",
+  "input_fingerprint": "sha256:39c79e02e369a39b0c551561c203fc3cfa418f3f226fbe5cd083f2c676c5556d",
   "input_artifact_fingerprints": {
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:4837b4080252290ceb17b3f3cfc7461b69da5f1f0589e7d6b20505e2f4cebdb6",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:c7e541c452f51ac30ccb34c83c61d94bc4d8e54b2ed59b7398451976911d8543",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:2eaf31c2117db5d365e13b4e48b9881cd7ec8f1e4873e0001e74c9130a4ccac4",
-    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:d7c7a2196bb0070cd781060b4a1edcc5927228eb08c63a62a9e28fa6e9a85041"
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:8a5fda3840cfe740d4bdf9657779603413e38fdbd1cf35a1ef9af3d503272221",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:3440d90422e05719ff82fae485f25b17fed07f4273bbc309f2c78596a6f3df04",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:d9ab0c5457781a260de34366de5c046348d43511fa47f4ac18820d2d51a898de",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:fcf90f4fcfff4074ddead4c128e74d5c9afebcbbf703005dacb47d2e9af42677"
   },
-  "evaluated_at": "2026-04-29T10:15:07.345782+00:00",
+  "evaluated_at": "2026-04-29T16:29:11.134231+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -35,15 +35,12 @@
           "tier3_path": "docs/tier3_project_instantiation/"
         },
         "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Cross-section inconsistencies flagged in assembled draft: 4 issue(s)",
+        "reason": "Cross-section inconsistencies flagged in assembled draft: 1 issue(s)",
         "details": {
           "assembled_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\assembled_drafts\\part_b_assembled_draft.json",
-          "flagged_count": 4,
+          "flagged_count": 1,
           "flagged_checks": [
-            "CC-01",
-            "CC-04",
-            "CC-06",
-            "CC-09"
+            "CC-06"
           ]
         },
         "fail_message": "Cross-section consistency check found inconsistencies in objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, or terminology.\n",

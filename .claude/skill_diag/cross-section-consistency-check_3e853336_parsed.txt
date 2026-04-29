@@ -1,0 +1,119 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "3e853336-734b-4e55-b65a-e65f36f2ef63",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 626
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 496
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 563
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.json",
+      "sections_checked": [
+        "excellence",
+        "implementation",
+        "impact"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency: WP IDs and names referenced in Excellence and Impact match the canonical WP list in Implementation (wp_table_refs WP1-WP9)",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency: all partner names across all three sections match legal_name or short_name exactly from Tier 3 partners.json. All 8 partners (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) appear in Implementation B.3.2 with correct legal names and short names. Excellence B.1.2 uses full legal names including entity suffixes (Oy, AG). Impact uses short names consistently. No variant spellings or abbreviation mismatches detected.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/consortium/partners.json"
+      ]
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency: deliverable IDs referenced across sections (D1-02, D2-02, D3-02, D4-01, D5-02, D6-02, D7-02, D8-01, D8-02, D9-02) use consistent titles and target months wherever they appear in multiple sections. No conflicting deliverable names or IDs detected. KPIs are not described as deliverables.",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+      ]
+    },
+    {
+      "check_id": "CC-05",
+      "description": "Milestone ID consistency: Implementation section references MS1-MS11 via milestone_refs. Impact section does not reference milestones by MS-ID. No conflicting milestone references detected across sections.",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-06",
+      "description": "KPI consistency and metric completeness: KPI-01 through KPI-11 defined in Impact section. Cross-checked quantified targets from Tier 3 objectives.json measurable_target fields against Impact section metric references for each objective.",
+      "sections_checked": [
+        "excellence",
+        "impact"
+      
+=== END ===

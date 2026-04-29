@@ -1,0 +1,42 @@
+{
+  "skill_id": "excellence-section-drafting",
+  "execution_mode": "tapm",
+  "failure_class": "NONZERO_EXIT",
+  "run_id": "a4838cf2-dd43-46ec-a52d-cec8c299e5df",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier2a_instrument_schemas/extracted/",
+    "docs/tier2b_topic_and_call_sources/extracted/",
+    "docs/tier3_project_instantiation/",
+    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/",
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/"
+  ],
+  "writes_to": [
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 16384,
+  "timeout_seconds": 1200,
+  "elapsed_seconds": 3.9689999999827705,
+  "system_prompt_chars": 1225,
+  "user_prompt_chars": 16363,
+  "exception_class": "ClaudeTransportError",
+  "exception_message": "Claude CLI exited with code 1",
+  "command": null,
+  "had_partial_stdout": true,
+  "had_stderr": false,
+  "tapm_tools_requested": [
+    "Read",
+    "Glob"
+  ],
+  "tapm_tools_enabled": true,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/excellence-section-drafting_a4838cf2_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/excellence-section-drafting_a4838cf2_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/excellence-section-drafting_a4838cf2_user_prompt.txt",
+    "stdout": ".claude/skill_diag/excellence-section-drafting_a4838cf2_stdout.txt",
+    "stderr": ".claude/skill_diag/excellence-section-drafting_a4838cf2_stderr.txt"
+  }
+}
