@@ -418,35 +418,81 @@ No CONSTRAINT_VIOLATION conditions defined; all use CONSTITUTIONAL_HALT.
 
 <!-- Schema validation complete -->
 
-## Drafting Guidance — Canonical References
+## Canonical Consistency Rules (GATE-CRITICAL — Cross-Section Enforcement)
 
-Use objective IDs and titles exactly as stated in `architecture_inputs/objectives.json`. Use canonical component/system names from objective and outcome titles — do not intentionally rename them (e.g., do not write "capability" when the title says "Layer"). WP table labels from `wp_structure.json` may appear in tables, but when discussing an objective/component in prose, include its canonical title. Preserve quantified metrics when used in prose. When linking objectives to WPs, use only explicit mappings from `wp_structure.json` or `implementation_architecture.json`; if no explicit mapping exists, avoid asserting WP ownership. Use partner `short_name` or full `legal_name` — do not truncate legal names by dropping suffixes.
+These rules are enforced deterministically by gate_10d_cross_section_consistency. Violations cause gate failure. All four rules apply to every `sub_sections[].content` field in the output.
 
-These conventions are enforced deterministically by gate predicates (gate_10c, gate_10d). The drafting skill's job is to produce evaluator-oriented content following these conventions — not to perform exhaustive post-hoc validation.
+### Rule CCR-1: Canonical Objective Title Preservation
 
----
+When referencing any objective from `architecture_inputs/objectives.json`, the objective `title` field MUST be reproduced verbatim in the drafted content.
 
-## Canonical Artifact Reference Constraints (GATE-CRITICAL)
+**Prohibited:**
+- Abbreviating the title (e.g., dropping words)
+- Paraphrasing the title (e.g., substituting synonyms)
+- Truncating the title (e.g., using only the first part)
+- Extending the title (e.g., appending additional words)
+- Substituting synonyms for any word in the title
 
-All cross-section references MUST be resolved from canonical artifacts. Do not paraphrase identifiers.
+**Permitted shorthand:** After the full canonical title has been introduced once in the section, subsequent references MAY use the objective ID only (e.g., "OBJ-1"). However, the full canonical title must appear at least once in the section content.
+
+**Enforcement:** gate_10d checks that every objective `title` from Tier 3 that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim in the section content when that objective is referenced.
+
+### Rule CCR-2: Deliverable ID Semantic Consistency
+
+A deliverable ID (e.g., "D4-01") represents a single semantic artifact as defined in `wp_structure.json`. When referencing a deliverable ID in drafted content:
+
+**Required:**
+- The deliverable's purpose must match its canonical `title` from `wp_structure.json`
+- The deliverable's timing must match its canonical `due_month` from `wp_structure.json`
+
+**Prohibited:**
+- Assigning a deliverable ID a different meaning or purpose than its canonical definition
+- Changing the temporal context of a deliverable (e.g., describing a M18 deliverable as a M48 output)
+- Using a deliverable ID to refer to a KPI or impact activity instead of its canonical deliverable artifact
+
+**When a deliverable enables a downstream activity** (e.g., a protocol specification deliverable enables a standardisation submission): explicitly frame the relationship as "deliverable D4-01 (<canonical title>) enables/supports <downstream activity>". Do NOT describe the downstream activity AS the deliverable.
+
+### Rule CCR-3: Objective Metric Completeness
+
+When an objective from `architecture_inputs/objectives.json` is referenced in the drafted content and its `measurable_target` contains quantitative values, ALL quantitative targets MUST be preserved.
+
+**Required:**
+- If `measurable_target` contains multiple metrics joined by "AND" (e.g., "≥20% X AND ≥15% Y"), ALL metrics must appear in the content when that objective's targets are discussed
+- Numeric values and their comparators (≥, ≤, >, <) must be preserved exactly
+
+**Prohibited:**
+- Selecting only a subset of metrics from a multi-metric target
+- Silently omitting any quantitative target value
+- Rounding or approximating target values
+
+**Permitted reformatting:** Metrics may be presented in prose form, bullet lists, or KPI tables — but all values must be present regardless of format.
+
+### Rule CCR-4: Canonical Component / System Naming
+
+All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
+
+**Prohibited:**
+- Truncating a canonical name (e.g., dropping "External" from "External Tool and API Orchestration Layer")
+- Extending a canonical name (e.g., appending "and Reasoning" to a defined title)
+- Substituting synonyms for any word (e.g., "capability" instead of "Layer", "module" instead of "Engine")
+- Using a lowercased or differently-cased variant when the canonical name has specific casing
+
+**Permitted aliasing:** A short alias MAY be used ONLY if:
+1. The full canonical name is introduced first in the same sub-section
+2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
+
+**Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency. If Excellence uses "External Tool and API Orchestration Layer", Implementation MUST use the same term exactly.
+
+### Additional Conventions
 
 **Partner Legal Names (MANDATORY):**
-- When naming partners in prose, use the exact `legal_name` from `docs/tier3_project_instantiation/consortium/partners.json`.
-- NEVER truncate legal names by dropping legal entity suffixes. Forbidden without the legal suffix (examples dynamically derived from partners.json): if `legal_name` ends with "AG", "Oy", "GmbH", etc., the suffix MUST be included.
+- When naming partners in prose, use the exact `legal_name` from `consortium/partners.json`.
+- NEVER truncate legal names by dropping legal entity suffixes. If `legal_name` ends with "AG", "Oy", "GmbH", etc., the suffix MUST be included.
 - `short_name` (e.g., "ATU", "ELI") may be used in parentheses or as abbreviations, but the first prose mention of each partner MUST use the full `legal_name`.
 
-**Objective References:**
-- When referencing objectives, use the exact `id` from `architecture_inputs/objectives.json`.
-- Use the exact `title` field value for component/system names. Do not substitute words.
+When linking objectives to WPs, use only explicit mappings from `wp_structure.json` or `implementation_architecture.json`; if no explicit mapping exists, avoid asserting WP ownership. WP table labels from `wp_structure.json` may appear in tables, but when discussing an objective/component in prose, include its canonical title.
 
-**Deliverable References:**
-- Use exact `deliverable_id` and `title` from `phase3_wp_design/wp_structure.json`.
-- Do not reassign deliverable IDs to activities they do not represent.
-
-**Terminology:**
-- Use canonical component/system names from objective `title` fields consistently.
-- Do NOT substitute synonyms for named architectural components across sections.
-- If Excellence uses "External Tool and API Orchestration Layer", Implementation MUST use the same term exactly.
+These conventions and all CCR rules are enforced deterministically by gate predicates (gate_10c, gate_10d). The drafting skill's job is to produce evaluator-oriented content following these conventions — not to perform exhaustive post-hoc validation.
 
 ## Runtime Contract
 
