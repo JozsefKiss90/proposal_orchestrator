@@ -1,3 +1,26 @@
+=== skill_id: cross-section-consistency-check ===
+=== mode: tapm ===
+=== response_text length: 12217 ===
+=== response_text (full) ===
+Now I have all the data needed. Let me systematically perform all 12 cross-section consistency checks based on the file content I've read.
+
+**Summary of data extracted:**
+
+**Excellence section**: OBJ-1 through OBJ-8 with full titles/metrics, WP2-WP9 refs, deliverables D1-02/D2-01/D2-02/D3-01/D3-02/D4-01/D4-02/D8-01/D8-02/D9-02, partners ATU/BIIS/CERIA/NIHS/ISIA/ELI/BAL/FIIT.
+
+**Impact section**: Pathways PATH-EI-01 through PATH-EI-05, objectives OBJ-3/4/5/6 by ID, deliverables D4-01/D5-02/D6-02/D7-02/D8-02/D9-01/D9-02/D1-02, partners BAL/NIHS/ISIA/ELI/CERIA/FIIT.
+
+**Implementation section**: WP1-WP9, MS1-MS11, 8 partners all named, 20 deliverables, 11 risks.
+
+**Tier 3 objectives.json**: 8 objectives (OBJ-1 through OBJ-8) with measurable_targets.
+
+**Tier 3 partners.json**: 8 partners with legal_name and short_name.
+
+**Application form**: Part B = Section 1 (Excellence), Section 2 (Impact), Section 3 (Implementation).
+
+Key finding for CC-06: OBJ-7 measurable_target includes "≥2 TEFs" which appears in Excellence (B.1.1) and Implementation (B.3.2 via FIIT) but is absent from the Impact section — partial metric loss.
+
+```json
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "509da60b-689e-4858-ab1e-d8c5f96a2832",
@@ -28,11 +51,7 @@
     {
       "check_id": "CC-01",
       "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.json",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -45,11 +64,7 @@
     {
       "check_id": "CC-02",
       "description": "WP reference consistency — all WP IDs referenced in Excellence and Impact exist in Implementation canonical WP list (WP1–WP9)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -61,11 +76,7 @@
     {
       "check_id": "CC-03",
       "description": "Partner name consistency — all partner names across sections match either legal_name or short_name from Tier 3 partners.json; no variant spellings, no missing legal entity suffixes (AG, Oy checked), no partners absent from Tier 3",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -78,11 +89,7 @@
     {
       "check_id": "CC-04",
       "description": "Deliverable ID consistency — all deliverable IDs (D1-02, D2-01, D2-02, D3-01, D3-02, D4-01, D4-02, D5-02, D6-02, D7-02, D8-01, D8-02, D9-01, D9-02) referenced across sections use consistent IDs and titles; no deliverable ID attributed a different purpose across sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -94,10 +101,7 @@
     {
       "check_id": "CC-05",
       "description": "Milestone ID consistency — milestones MS1–MS11 referenced in Implementation section milestone_refs; Impact section does not reference milestone IDs directly, so no cross-section milestone ID conflict exists",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -108,11 +112,7 @@
     {
       "check_id": "CC-06",
       "description": "KPI consistency — verify quantified targets for objectives referenced across sections are preserved without partial metric loss",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "OBJ-7 measurable_target in Tier 3 objectives.json includes four components: (1) ≥500 GitHub stars within 6 months of release, (2) contributions accepted to AI-on-demand platform, (3) results validated through ≥2 TEFs, (4) technology transfer through ≥3 EDIHs. Excellence section B.1.1 preserves all four. Impact section preserves (1), (2), and (4) but omits (3) '≥2 TEFs' entirely — no impact pathway or DEC measure references TEF validation. Implementation section B.3.2 mentions FIIT 'coordinating with Testing and Experiment Facilities (CC-07)'. This constitutes partial metric loss for OBJ-7 in the Impact section relative to both Tier 3 and Excellence section.",
       "source_refs": [
@@ -125,10 +125,7 @@
     {
       "check_id": "CC-07",
       "description": "Impact claim grounding — each impact pathway (PATH-EI-01 through PATH-EI-05) cites WPs and deliverables that exist in Implementation section wp_table_refs and deliverable references",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -139,11 +136,7 @@
     {
       "check_id": "CC-08",
       "description": "Budget/resource claim consistency — no specific budget figures, person-month values, or cost allocations appear in any of the three sections; Implementation references budget gate passage but cites no numeric budget data; no cross-section budget value conflicts possible",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -155,11 +148,7 @@
     {
       "check_id": "CC-09",
       "description": "Terminology consistency — canonical component/system names from Tier 3 objective titles (Neuro-symbolic planning engine, Unified adaptive memory architecture, Decentralised multi-agent coordination protocols, External Tool and API Orchestration Layer) used consistently across sections with full canonical names; no stem-without-component-keyword occurrences detected; acronyms (MAESTRO, EDIH, TEF, ADRA) used consistently; minor name variants for D9-02 ('Open-source software release' vs 'Open-source MAESTRO framework') are acceptable as deliverable title vs output name",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -172,11 +161,7 @@
     {
       "check_id": "CC-10",
       "description": "Section ordering and completeness — all three sections present: Excellence (B.1.x, order 1), Impact (B.2.x, order 2), Implementation (B.3.x, order 3); ordering matches HE RIA/IA Part B structure from application form template",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -189,11 +174,7 @@
     {
       "check_id": "CC-11",
       "description": "Traceability footer consistency — all three sections have non-empty primary_sources arrays (Excellence: 14, Impact: 7, Implementation: 12); no section has no_unsupported_claims_declaration=true with overall_status='unresolved' (Excellence: inferred/true, Impact: inferred/true, Implementation: confirmed/true)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -205,11 +186,7 @@
     {
       "check_id": "CC-12",
       "description": "Validation status aggregation — Excellence: overall_status='inferred', Impact: overall_status='inferred', Implementation: overall_status='confirmed'. No section has 'unresolved' status. Two sections (Excellence, Impact) carry 'inferred' status due to claims CLM-05/CLM-13/CLM-14 (Excellence) and ei04-coverage (Impact) having 'inferred' validation; these are noted for downstream review but do not constitute a cross-section inconsistency.",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -232,3 +209,6 @@
     "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
   }
 }
+```
+
+=== END ===

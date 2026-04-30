@@ -86,15 +86,28 @@ To stay within budget:
   - Do not reference unvalidated budget figures.
   - Use objective IDs, outcome names, KPI labels, and deliverable IDs exactly as stated in source artifacts. Do not rename components or repurpose deliverable IDs. Follow all Canonical Consistency Rules (CCR-1 through CCR-4) below.
 
-- Step 2.6: **Populate impact_pathway_refs.** Array of all pathway IDs from `impact_architecture.json` covered in the drafted content.
+- Step 2.6: **Build measurable_target coverage map.** For every objective referenced anywhere in the drafted sub-sections:
+  1. Retrieve its `measurable_target` from `architecture_inputs/objectives.json`.
+  2. Decompose it into constituent components (each distinct metric clause, target dimension, or quantitative value).
+  3. For each component, identify its representation in the Impact content — via a pathway, KPI, DEC mechanism, or validation/deployment channel.
+  4. If any component lacks representation: extend the relevant sub-section content to include it before proceeding.
+  5. Do NOT mark the section as complete until every component of every referenced objective's `measurable_target` is mapped.
 
-- Step 2.7: **Set dec_coverage.** Set each boolean (`dissemination_addressed`, `exploitation_addressed`, `communication_addressed`) to true only if the section substantively addresses that category.
+- Step 2.7: **Populate impact_pathway_refs.** Array of all pathway IDs from `impact_architecture.json` covered in the drafted content.
 
-- Step 2.8: **Build validation_status.** Produce 8-10 aggregated claim_status entries grouping related claims. Each entry: claim_id, claim_summary, status ("confirmed" or "inferred"), source_ref (path + ID, max 120 chars). Set `overall_status` to the weakest status across all claims.
+- Step 2.8: **Set dec_coverage.** Set each boolean (`dissemination_addressed`, `exploitation_addressed`, `communication_addressed`) to true only if the section substantively addresses that category.
 
-- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. All `tier` values MUST be numeric integers (use 2 for Tier 2A/2B, 3 for Tier 3, 4 for Tier 4). Set `no_unsupported_claims_declaration` to `true` only if all claim_statuses are "confirmed" or "inferred" with non-null source_refs.
+- Step 2.9: **Build validation_status.** Produce 8-10 aggregated claim_status entries grouping related claims. Each entry: claim_id, claim_summary, status ("confirmed" or "inferred"), source_ref (path + ID, max 120 chars). Set `overall_status` to the weakest status across all claims.
 
-- Step 2.10: **Handle data gaps.** If Phase 5 data is incomplete for any element: OMIT the unsourceable claim. If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
+- Step 2.10: **Build traceability_footer.** Populate `primary_sources` array. All `tier` values MUST be numeric integers (use 2 for Tier 2A/2B, 3 for Tier 3, 4 for Tier 4). Set `no_unsupported_claims_declaration` to `true` only if all claim_statuses are "confirmed" or "inferred" with non-null source_refs.
+
+- Step 2.11: **Handle data gaps.** If Phase 5 data is incomplete for any element: OMIT the unsourceable claim. If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
+
+- Step 2.12: **Self-Check: KPI Completeness.** Before producing the final JSON output, verify:
+  1. No objective referenced in the Impact section has partial `measurable_target` coverage — every component of every referenced objective's target is present in the content.
+  2. No metric component that would be present in the Excellence section is absent from the Impact section — there must be no cross-section KPI inconsistency.
+  3. For each referenced objective, count the metric clauses in `measurable_target` and count their representations in the Impact content. If any count mismatches: revise the relevant sub-section content to restore full coverage before outputting.
+  If any violation is detected: revise the Impact sub-section content to include the missing components. Do NOT emit the final JSON until all measurable_target components are represented.
 
 ### 3. Output Schema
 
@@ -196,6 +209,10 @@ When an objective from `architecture_inputs/objectives.json` is referenced in th
 
 **Permitted reformatting:** Metrics may be presented in prose form, bullet lists, or KPI tables — but all values must be present regardless of format.
 
+**Impact pathway metric completeness:** When an Impact pathway, KPI, target group, demonstrator claim, deliverable claim, or exploitation/dissemination claim references or derives from an objective with a multi-clause measurable_target, copy every quantitative metric clause from that objective's measurable_target into the Impact text unless the objective is mentioned only as an ID without describing its target. Do not reduce A AND B targets to only A. If space is limited, compress prose but retain all numeric values, comparators, units, and target dimensions. For multi-metric objectives, prefer a single compact sentence containing all metric clauses joined by "AND".
+
+**Operational check:** Before writing the Impact JSON, check every objective ID or objective-derived KPI used in the Impact content. For each referenced objective, ensure all quantitative clauses from its measurable_target are present in the relevant Impact sentence or KPI sentence.
+
 ### Rule CCR-4: Canonical Component / System Naming
 
 All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
@@ -211,6 +228,28 @@ All named components, systems, layers, and architectural elements referenced in 
 2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
 
 **Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency.
+
+### Rule CCR-5: KPI Preservation Invariant (Cross-Section Consistency)
+
+For every objective referenced in this section:
+
+- Retrieve its `measurable_target` from `architecture_inputs/objectives.json`
+- Decompose it into its constituent components (each distinct metric, dimension, or target clause)
+- Ensure that ALL components are represented somewhere in the Impact section
+
+Representation rules:
+- Components may be expressed via:
+  - impact pathways
+  - KPIs or target metrics
+  - DEC measures (dissemination, exploitation, communication mechanisms)
+  - validation or deployment mechanisms
+- Exact wording is NOT required — functional presence IS required
+- A component is "functionally present" if its metric dimension, target value, and comparator can be identified in the Impact content
+
+STRICT PROHIBITION:
+- Do NOT omit any measurable_target component for any referenced objective
+- Do NOT partially represent multi-component objectives (e.g., preserving metric A but dropping metric B)
+- If Excellence preserves all components of a measurable_target, Impact MUST also preserve all components — no cross-section metric loss is permitted
 
 ### Additional Conventions
 
