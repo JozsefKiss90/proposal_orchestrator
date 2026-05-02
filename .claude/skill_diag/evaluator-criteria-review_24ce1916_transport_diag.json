@@ -1,0 +1,43 @@
+{
+  "skill_id": "evaluator-criteria-review",
+  "execution_mode": "cli-prompt",
+  "failure_class": "TIMEOUT",
+  "run_id": "24ce1916-62a2-405c-8643-539beb25803f",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier2a_instrument_schemas/evaluation_forms/",
+    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/",
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+    "docs/tier5_deliverables/proposal_sections/"
+  ],
+  "writes_to": [
+    "docs/tier5_deliverables/review_packets/"
+  ],
+  "model": "claude-opus-4-6",
+  "max_tokens_requested": 16384,
+  "timeout_seconds": 300,
+  "elapsed_seconds": 300.06199999997625,
+  "system_prompt_chars": 799,
+  "user_prompt_chars": 83159,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 300s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-opus-4-6",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\nConstitutional constraints (hard failures if violated):\n- Evaluation must apply the active instrument evaluation criteria only\n- Must not evaluate against grant agreement annex requirements\n- Weakness severity (critical/major/minor) must be assigned to each finding\n\nYou MUST include these fields in every output artifact:\n- \"run_id\": \"24ce1916-62a2-405c-8643-539beb25803f\"\n- The appropriate schema_id as defined in the skill specification\n- Do NOT include an artifact_status field\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": null,
+  "tapm_tools_enabled": false,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/evaluator-criteria-review_24ce1916_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/evaluator-criteria-review_24ce1916_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/evaluator-criteria-review_24ce1916_user_prompt.txt",
+    "stdout": ".claude/skill_diag/evaluator-criteria-review_24ce1916_stdout.txt",
+    "stderr": ".claude/skill_diag/evaluator-criteria-review_24ce1916_stderr.txt"
+  }
+}

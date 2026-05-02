@@ -1,0 +1,112 @@
+{
+  "report_id": "compliance_check_part_b_assembled_draft_compliance_validator_2026-05-02T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "24ce1916-62a2-405c-8643-539beb25803f",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "check_reasoning": {
+    "13.1": "No references to 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' found as structural authorities in the artifact. CC-10 correctly references 'Tier 2A application form af_he-ria-ia_en.pdf' as the structural authority for section ordering and completeness.",
+    "13.2": "The assembled draft is a structural assembly artifact that does not directly assert call constraints, scope requirements, expected outcomes, or expected impacts. It references section-level artifacts that handle their own call traceability. No direct call requirement claims are made without Tier 2B traceability in this artifact.",
+    "13.3": "Project facts referenced in consistency checks (8 partners, 8 objectives OBJ-1 through OBJ-8) are traced to Tier 3 via traceability_footer.primary_sources which includes 'docs/tier3_project_instantiation/architecture_inputs/objectives.json' and 'docs/tier3_project_instantiation/consortium/partners.json'.",
+    "13.4": "This is a Phase 8 artifact (schema_id: 'orch.tier5.part_b_assembled_draft.v1'). Budget gate assessment file at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json is outside the declared input boundary for this skill invocation and cannot be directly verified. However, the artifact itself contains no budget-dependent content: no '€[0-9]+', '[0-9]+ EUR', or '[0-9]+ person-months' patterns found. CC-08 explicitly confirms 'no specific budget figures or person-month allocations appear in any section; Implementation references budget gate validation but no numerical values'. No budget-dependent claims are present in the artifact content.",
+    "13.5": "Not directly checkable from artifact content alone. This check is enforced by the decision-log-update skill at the agent execution level, not by inspecting deliverable artifacts.",
+    "13.6": "Not directly checkable from a deliverable artifact. The assembled draft does not redefine phase meanings, tier meanings, or gate logic.",
+    "13.7": "No evidence of phase reordering. The artifact references valid upstream inputs: Tier 3 project instantiation data and Tier 2A application form. Section artifacts referenced are all Phase 8 outputs. No circular or out-of-sequence phase references detected.",
+    "13.8": "Applicable as a Tier 5 deliverable. CC-12 reports validation statuses: Excellence=inferred, Impact=inferred, Implementation=confirmed. No section has overall_status='unresolved'. CC-11 confirms traceability footer consistency: no section combines no_unsupported_claims_declaration=true with overall_status=unresolved. Two sections carry 'inferred' status with specific inferred claims identified (Excellence CLM-06/CLM-07, Impact strategic-autonomy claim), which is a valid §12.2 status, not an unresolved gap.",
+    "13.9": "The artifact does not make direct regulatory claims about Horizon Europe participation conditions, grant agreement terms, or financial regulation requirements. CC-10 references 'Tier 2A application form af_he-ria-ia_en.pdf', which is a proper Tier 2A source reference, not generic programme knowledge.",
+    "13.10": "Applicable as a Tier 5 artifact. traceability_footer.no_unsupported_claims_declaration is true. primary_sources references Tier 5 section artifacts and Tier 3 project instantiation data. derivation_note explains the assembly relationship: 'Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings.' No claims without source references detected.",
+    "13.11": "Not checkable from a phase output or deliverable artifact. The artifact does not contain evidence of Tier 1 or Tier 2 source modification.",
+    "13.12": "Not directly checkable from an artifact. The artifact does not contain any statement treating CLAUDE.md as advisory or optional."
+  },
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "timestamp": "2026-05-02T00:00:00Z"
+}

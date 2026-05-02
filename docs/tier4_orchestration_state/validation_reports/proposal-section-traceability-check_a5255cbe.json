@@ -1,0 +1,137 @@
+{
+  "report_id": "traceability_implementation_traceability_auditor_2026-04-30T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "a5255cbe-3934-46f8-ad16-e3521524c88a",
+  "section_id_audited": "implementation",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "MAESTRO comprises 9 work packages over 48 months",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (9 work_packages entries WP1–WP9); docs/tier3_project_instantiation/call_binding/selected_call.json (max_project_duration_months: 48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "WP leadership assignments: ATU leads WP1/WP2, BIIS leads WP3, CERIA leads WP4, NIHS leads WP5, ISIA leads WP6, ELI leads WP7, FIIT leads WP8, BAL leads WP9",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json (wp_lead fields for all 8 partners match claimed assignments); docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (lead fields for WP1–WP9 match)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "External Tool and API Orchestration Layer is a cross-cutting capability integrated across all pillars (OBJ-8)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-8: title 'External Tool and API Orchestration Layer', pillar 'Cross-cutting — External Tool and API Orchestration', contributing_partners span all pillars)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "Dependency map has 16 directed edges: WP2/WP3/WP4 each feed WP5/WP6/WP7, converging into WP8 then WP9",
+      "status": "inferred",
+      "source_ref": "traceability_footer references docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (dependency_map.edges); Tier 4 not in readable input set. Inference: described topology yields 3 pillars × 3 demos (9) + 3 pillars → WP8 (3) + 3 demos → WP8 (3) + WP8 → WP9 (1) = 16 edges, consistent with claim.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "Critical path: T2-01 → T2-02 → T2-03 → T5-01 → T5-02 → T5-03 → T8-03",
+      "status": "inferred",
+      "source_ref": "traceability_footer references docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json (critical_path); Tier 4 not in readable input set. Inference: path through neuro-symbolic planning pillar (WP2) to healthcare demonstrator (WP5) to integration (WP8) is plausible given WP2 end_month=36 and WP5 end_month=42 from workpackage_seed.json.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "Twenty deliverables across 9 WPs including D1-02 Data management plan (M6) and D9-01 Dissemination and exploitation plan (M6)",
+      "status": "inferred",
+      "source_ref": "traceability_footer references docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (deliverables); Tier 4 not in readable input set. Deliverable count and identifiers are Phase 3 outputs not present in Tier 3 seed data; cannot verify exact count of 20 from readable inputs.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "Eleven milestones spanning MS1 (Architecture specification, M3) to MS11 (Project completion, M48); MS6 (Integrated framework v1.0, M24) and MS8 (Research pillar targets, M36) as key checkpoints",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (11 milestones: MS1 month=3 title matches, MS6 month=24 title='Integrated MAESTRO framework v1.0 with tool orchestration layer', MS8 month=36 title='Research pillar targets achieved', MS11 month=48 title='Project completion and final review')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "Three governance bodies: General Assembly (biannual, all 8 partners), Project Management Committee (quarterly, ATU chair), Ethics and Quality Oversight Committee (ATU, NIHS)",
+      "status": "inferred",
+      "source_ref": "traceability_footer references docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json (governance_matrix); Tier 4 not in readable input set. Governance structure is consistent with standard EU RIA management but specific composition not verifiable from Tier 3 data.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "Risk register: 11 risks; RISK-01 neuro-symbolic integration (medium/high, modular architecture fallback), RISK-04 clinical data access (medium/high, public datasets), RISK-10 pillar integration (medium/high, shared API contracts M1-M3)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (11 risks listed; RISK-01: probability=medium, impact=high, mitigation includes 'modular architecture'; RISK-04: probability=medium, impact=high, mitigation includes 'publicly available clinical datasets'; RISK-10: probability=medium, impact=high, mitigation includes 'shared data representations, API contracts...in M1–M3')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "Resources validated via budget gate with zero blocking inconsistencies",
+      "status": "inferred",
+      "source_ref": "traceability_footer references docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json (gate_pass_declaration); Tier 4 not in readable input set. Budget gate pass is a Phase 7 output; cannot verify pass status or zero-inconsistency count from Tier 3 data.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "Consortium comprises 8 partners from 8 countries (DE, FR, NL, IT, SE, CH, FI, ES), combining academic institutions with private industry",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (8 partners: ATU/DE, CERIA/FR, BIIS/NL, ISIA/IT, NIHS/SE, ELI/CH, BAL/FI, FIIT/ES; organisation_types include HES and PRC confirming academic-industry mix)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "Partner capabilities: ATU neuro-symbolic AI, CERIA multi-agent coordination, BIIS memory-augmented networks/RAG, ISIA factory environments/digital twins, NIHS clinical datasets/ethics, ELI logistics data, BAL LLM engineering/deployment, FIIT evaluation/EDIH",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (ATU: 'Neuro-symbolic AI and hybrid reasoning systems'; CERIA: 'Multi-agent systems and distributed AI'; BIIS: 'Memory-augmented neural networks', 'Retrieval-augmented generation'; ISIA: 'Digital twin modelling and simulation'; NIHS: 'Clinical decision support systems', 'AI ethics in healthcare'; ELI: 'Global logistics network operations'; BAL: 'Large language model development', 'Production-grade AI deployment'; FIIT: 'AI evaluation and benchmarking', 'EDIH network coordination')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "ATU is project coordinator",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json (ATU consortium_role: 'Coordinator'); docs/tier3_project_instantiation/consortium/partners.json (ATU coordinator: true)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "AI-on-demand platform sharing mandated per SR-10 and CC-05",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-10: 'Communicable results must be shared with the European R&D community through the AI-on-demand platform'); docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-05: 'Communicable results must be shared...through the AI-on-demand platform')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "Healthcare and manufacturing as call-aligned Apply AI sectors (SR-07)",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07: 'Proposals must demonstrate application in at least one Apply AI sector. The three specifically identified sectors are: healthcare, advanced manufacturing, and in-vehicle autonomous driving.')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "FIIT coordinates with Testing and Experiment Facilities per CC-07",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (CC-07: 'Projects selected in this topic should link to the resources offered by the AI Factories...Results may be validated in the Testing and Experiment Facilities')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "Timeline: pillar specifications by M12-M18, software prototypes by M30-M36, demonstrators deploy from M18 and complete validation by M42",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json provides partial support: MS2(M12) planning engine v1.0, MS3(M12) memory architecture v1.0, MS4(M15) protocol specs → pillar specs M12-M15 (section says M12-M18, broader window); MS7(M30) demonstrator v1.0 deployment, MS8(M36) pillar targets → prototypes M30-M36 confirmed; MS9(M42) demonstrator validation complete confirmed. 'Deploy from M18' not precisely confirmed — workpackage_seed.json shows WP5/6/7 start M12 and MS7 initial deployment at M30.",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 17,
+    "confirmed": 11,
+    "inferred": 6,
+    "assumed": 0,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-04-30T00:00:00Z"
+}
