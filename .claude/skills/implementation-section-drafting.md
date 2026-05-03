@@ -110,7 +110,7 @@ To stay within budget:
   - `milestone_refs`: array of all milestone IDs from `gantt.json`.
   - `risk_register_ref`: path to `implementation_architecture.json`.
 
-- Step 2.8: **Build validation_status.** Produce up to 15 aggregated claim_status entries. Each entry: claim_id, claim_summary, status ("confirmed" or "inferred"), source_ref (path + ID, max 120 chars). Set `overall_status` to the weakest status across all claims. OMIT any claim that cannot be confirmed or inferred — do not include "assumed" or "unresolved" entries. For dissemination level claims not directly in source data, mark as "inferred" with a source chain.
+- Step 2.8: **Build validation_status.** Produce up to 15 aggregated claim_status entries. Each entry: claim_id, claim_summary, status ("confirmed" or "inferred"), source_ref (path + ID, max 120 chars). Set `overall_status` to the weakest status across all claims. OMIT any claim that cannot be confirmed or inferred — do not include "assumed" or "unresolved" entries. For dissemination level claims not directly in source data, mark as "inferred" with a source chain. **CCR-5 enforcement in claims:** If a claim summarizes an objective's measurable_target, the claim_summary MUST retain all metric components from the target — do not partially represent a multi-component target in claim_summary.
 
 - Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. All `tier` values MUST be numeric integers (use 2 for Tier 2A/2B, 3 for Tier 3, 4 for Tier 4). Include direct Tier 2B extracted source paths when the section asserts SR/CC identifiers. Set `no_unsupported_claims_declaration` to `true` only if all claim_statuses are "confirmed" or "inferred" with non-null source_refs.
 
@@ -232,6 +232,69 @@ All named components, systems, layers, and architectural elements referenced in 
 2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
 
 **Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency. If Excellence uses "External Tool and API Orchestration Layer", Implementation MUST use the same term exactly.
+
+### Rule CCR-5: Complete Measurable Target Preservation (GATE-CRITICAL)
+
+When Implementation mentions any objective_id from `architecture_inputs/objectives.json`, the `measurable_target` field MUST be preserved in its entirety — every metric component, every conjunct, every quantified threshold.
+
+**Required:**
+- Read the objective's canonical `measurable_target` from Tier 3 `objectives.json`.
+- If `measurable_target` contains conjunctions (AND, and, plus, comma-separated components, or multiple quantified thresholds), ALL components must appear when that objective's targets are discussed in Implementation content.
+- Each metric component must appear in both the narrative `sub_sections[].content` AND in any `validation_status.claim_statuses[]` entry that summarizes that objective's target.
+
+**Prohibited:**
+- Compressing a dual/multi-metric target into a single metric (e.g., "≥30% coherence improvement" when the target is "≥30% coherence AND factual consistency improvement")
+- Retaining only the first quantitative target and dropping subsequent conjuncts
+- Replacing a multi-component target with a generic phrase such as "performance improvement"
+- Dropping non-primary metric components from claim_summary fields
+
+**Examples (fixture-style, not project-specific rules):**
+- Target "≥30% improvement in task coherence AND factual consistency" → Implementation must mention BOTH task coherence AND factual consistency
+- Target "≥15% defect reduction AND ≥10% energy consumption reduction" → Implementation must retain BOTH defect reduction AND energy consumption reduction
+- Target "≥20% disruption recovery AND ≥15% delivery schedule adherence" → Implementation must retain BOTH recovery AND adherence
+
+**Enforcement:** gate_10d cross-section consistency check (CC-06) detects partial measurable_target loss across sections. Implementation must not be the source of such loss.
+
+### Rule CCR-6: Objective Ownership vs Integration/Support Role Separation (GATE-CRITICAL)
+
+When Implementation mentions an objective_id, the wording MUST NOT imply that a WP or partner owns, implements, delivers, or is responsible for the objective unless Tier 3 `objectives.json` (via `responsible_partner`) and/or `wp_structure.json` (via WP lead and task mappings) explicitly supports that assignment.
+
+**Required:**
+- Read `responsible_partner` and `contributing_partners` from `objectives.json` for each referenced objective.
+- Read WP lead assignments and task/deliverable mappings from `wp_structure.json`.
+- If a horizontal/integration/support WP references an objective whose `responsible_partner` is a different partner or WP, use neutral integration wording only.
+
+**Permitted neutral wording for integration/support WPs:**
+- "[Integration WP] integrates outputs from [canonical component/objective]"
+- "[Integration WP] validates interfaces for [canonical component/objective]"
+- "[Integration WP] supports deployment of [canonical component/objective]"
+- "[Integration WP] consumes the output of [canonical component/objective]"
+
+**Required ownership-safe pattern:**
+- "[Responsible partner/WP] develops/delivers [objective/component]. [Integration WP] integrates the resulting outputs/interfaces into the combined platform."
+
+**Prohibited:**
+- "[Integration WP] implements [objective]"
+- "[Integration WP] delivers [objective]"
+- "[Integration WP] is responsible for [objective]"
+- "[Integration WP] integrates all pillars including [objective]" — if this reads as assigning objective delivery to the integration WP
+- Any phrasing where an integration/support WP appears as the grammatical subject of implementing, delivering, or owning an objective whose `responsible_partner` is different
+
+**Enforcement:** gate_10d cross-section consistency check (CC-01) detects objective ownership / WP attribution conflicts between sections. Implementation must not introduce such conflicts.
+
+### Rule CCR-7: Pre-Output Consistency Self-Check
+
+Before writing `implementation_section.json`, perform this bounded check for each objective_id appearing in the drafted content:
+
+1. Verify objective_id exists in Tier 3 `objectives.json`
+2. Verify canonical title is preserved (per CCR-1)
+3. Verify ALL measurable_target components are present (per CCR-5)
+4. Verify responsible_partner is not contradicted by WP/partner wording (per CCR-6)
+5. Verify integration/support WPs are described with neutral wording only (per CCR-6)
+
+If any item fails: revise the relevant content before writing the output. Do not rely on gate_10d to catch the issue downstream.
+
+This check is bounded to objectives actually mentioned in the drafted content — it does not require scanning all Tier 3 objectives exhaustively.
 
 ### Additional Conventions
 
