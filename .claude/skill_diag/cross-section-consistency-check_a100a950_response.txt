@@ -1,3 +1,7 @@
+=== skill_id: cross-section-consistency-check ===
+=== mode: tapm ===
+=== response_text length: 12622 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
   "run_id": "a100a950-e339-4cea-9178-7d3646d2ebbb",
@@ -28,10 +32,7 @@
     {
       "check_id": "CC-01",
       "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.json",
-      "sections_checked": [
-        "excellence",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "OBJ-8 ('External Tool and API Orchestration Layer') is attributed to ATU (no WP specified) in Excellence section B.1.1, which is consistent with Tier 3 objectives.json where OBJ-8.responsible_partner='ATU' and contributing_partners=['BIIS','CERIA','BAL'] — FIIT is not listed for OBJ-8. However, Implementation section B.3.1 routes OBJ-8 delivery under WP8, which is led by FIIT ('WP8 (Fundación Ibérica de Innovación Tecnológica / FIIT, M6–M48) integrates all pillars including the External Tool and API Orchestration Layer (OBJ-8...)'). This is a cross-section inconsistency in responsible-partner attribution for OBJ-8: Excellence and Tier 3 identify ATU as responsible; Implementation section assigns OBJ-8 integration to WP8/FIIT, a partner not listed in OBJ-8's contributing_partners in Tier 3. All 8 objective titles (OBJ-1 through OBJ-8) are present and correctly stated in both Excellence (B.1.1) and Implementation (B.3.1); measurable targets are consistent across both sections for all objectives except where CC-06 flags a partial metric loss. Resolution required: confirm whether OBJ-8 is delivered through WP8/FIIT (requiring a Tier 3 update) or through ATU directly (requiring Implementation section correction).",
       "source_refs": [
@@ -44,11 +45,7 @@
     {
       "check_id": "CC-02",
       "description": "WP reference consistency — WP IDs referenced in Excellence and Impact sections must match canonical WP list in Implementation (wp_table_refs)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -61,11 +58,7 @@
     {
       "check_id": "CC-03",
       "description": "Partner name consistency across all three sections against Tier 3 canonical legal_name and short_name values",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -78,11 +71,7 @@
     {
       "check_id": "CC-04",
       "description": "Deliverable ID consistency — deliverable IDs and names consistent across sections where co-referenced",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -94,10 +83,7 @@
     {
       "check_id": "CC-05",
       "description": "Milestone ID consistency — milestone references consistent across Impact and Implementation sections",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -109,11 +95,7 @@
     {
       "check_id": "CC-06",
       "description": "KPI consistency — KPI definitions and quantified target values consistent across sections and against Tier 3 objectives measurable_target fields",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "inconsistency_flagged",
       "inconsistency_note": "OBJ-2 ('Unified adaptive memory architecture') carries a dual-metric measurable_target in Tier 3: '≥30% improvement in task coherence AND factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps'. Excellence section B.1.1 correctly preserves both metrics ('≥30% improvement in task coherence and factual consistency'). Impact section B.2.1 correctly preserves both metrics ('≥30% improvement in task coherence AND factual consistency'). However, Implementation section B.3.1 restates OBJ-2's target as '≥30% coherence improvement over context-window-only baselines in sequences exceeding 50 agent steps', omitting 'AND factual consistency'. This is a partial metric loss: a dual-metric KPI is reduced to a single-metric statement in Implementation section, inconsistent with Tier 3 measurable_target and with the Excellence and Impact sections. No KPI target value discrepancies detected for any other objective (OBJ-1, OBJ-3, OBJ-4, OBJ-5, OBJ-6, OBJ-7, OBJ-8 all consistent across sections). Resolution required: restore 'AND factual consistency' to the OBJ-2 metric statement in Implementation section B.3.1.",
       "source_refs": [
@@ -127,10 +109,7 @@
     {
       "check_id": "CC-07",
       "description": "Impact claim grounding — each impact claim in Impact section cites a project mechanism (WP, deliverable, task) present in Implementation section",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -142,11 +121,7 @@
     {
       "check_id": "CC-08",
       "description": "Budget/resource claim consistency — budget figures and resource allocations consistent across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -159,11 +134,7 @@
     {
       "check_id": "CC-09",
       "description": "Terminology consistency — canonical technical terms, component names, methodology names, and acronyms used consistently across all three sections",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -176,11 +147,7 @@
     {
       "check_id": "CC-10",
       "description": "Section ordering and completeness — all three Part B sections present in correct order (Excellence=1, Impact=2, Implementation=3)",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -192,11 +159,7 @@
     {
       "check_id": "CC-11",
       "description": "Traceability footer consistency — all sections have non-empty primary_sources; no_unsupported_claims_declaration consistent with validation_status.overall_status",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
@@ -208,11 +171,7 @@
     {
       "check_id": "CC-12",
       "description": "Validation status aggregation — informational summary of overall_status across all three sections; note any unresolved statuses as cross-section concern",
-      "sections_checked": [
-        "excellence",
-        "impact",
-        "implementation"
-      ],
+      "sections_checked": ["excellence", "impact", "implementation"],
       "status": "consistent",
       "inconsistency_note": "Informational: excellence_section.json overall_status='inferred'; impact_section.json overall_status='inferred'; implementation_section.json overall_status='confirmed'. No section carries overall_status='unresolved'. Cross-section observation: two of three sections carry 'inferred' status; downstream review should verify that the inferred claims in Excellence (C10: TRL 2 start / TRL 5 end; C13: gender dimension) and Impact (strategic-autonomy-standardisation: EI-04 inferred from topic destination) are confirmed acceptable for final submission. No blocking status concern identified.",
       "source_refs": [
@@ -238,3 +197,5 @@
     "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
   }
 }
+
+=== END ===

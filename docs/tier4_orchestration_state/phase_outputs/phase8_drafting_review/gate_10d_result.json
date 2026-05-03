@@ -1,20 +1,20 @@
 {
   "gate_id": "gate_10d_cross_section_consistency",
   "gate_kind": "exit",
-  "run_id": "97b661a6-2381-4a15-85d5-3017e0f9b5ed",
+  "run_id": "a100a950-e339-4cea-9178-7d3646d2ebbb",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:65767b7f4b91817e2afccb50d085346c28879ecbe7af201a130ae810b8cb3acb",
+  "input_fingerprint": "sha256:6869420a7e6564efe7dcc4b190ac3866dad29deb427a9e8fb45584bfe5e4032a",
   "input_artifact_fingerprints": {
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:ccd708f9d386bea1253f95886004b0170465eadc6739393bb7a7e4112c2675d8",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:24a61013e5a8a61d1e572865e4259353857f92e857e4454cd96bd6b215c7b039",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:9add9550f7f659d27a141b09ac92486741ef15f1a964cc671ea058975e876f54",
-    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:fc4c7fe927e5b13281a3fff524cd74ae40c2cfc74a87e6b81d15f14336bd58e5"
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:64f6b2a83adfbccee7f7a393bc0b2820dd2c86e3bba22ad1cc18ea61bad371df",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:f1f51db1e85ab670e6dd263cfe918188a82ac1175f447bd14e7f337c4ecb1495",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:cf32e449ae173bc5d91f64b29467afda19dd8d5fbbc99f8cd33cca0a0fd6973f",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:2b93d42b6ccc7cebb1d92116d1b3e6bc639577ce9adfc6bb0fde38dc2055db71"
   },
-  "evaluated_at": "2026-05-03T02:43:28.629063+00:00",
+  "evaluated_at": "2026-05-03T14:49:10.413069+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "pass",
+  "status": "fail",
   "deterministic_predicates": {
     "passed": [
       "g09d_p04",
@@ -22,15 +22,38 @@
       "g09d_p01",
       "g09d_p02",
       "g09d_p03",
-      "g09d_p06",
-      "g09d_p07"
+      "g09d_p06"
     ],
-    "failed": []
+    "failed": [
+      {
+        "predicate_id": "g09d_p07",
+        "type": "coverage",
+        "function": "cross_section_consistency",
+        "args": {
+          "assembled_path": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+          "sections_dir": "docs/tier5_deliverables/proposal_sections/",
+          "tier3_path": "docs/tier3_project_instantiation/"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Cross-section inconsistencies flagged in assembled draft: 2 issue(s)",
+        "details": {
+          "assembled_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\assembled_drafts\\part_b_assembled_draft.json",
+          "flagged_count": 2,
+          "flagged_checks": [
+            "CC-01",
+            "CC-06"
+          ]
+        },
+        "fail_message": "Cross-section consistency check found inconsistencies in objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, or terminology.\n",
+        "prose_condition": "Objectives, WPs, partner names, deliverables, milestones, KPIs, impact claims, budget/resource claims, and terminology are cross-consistent"
+      }
+    ]
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": []
+    "failed": [],
+    "skipped": true
   },
-  "skipped_semantic": false,
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10d_result.json"
 }
