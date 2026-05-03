@@ -14,6 +14,7 @@ used_by_agents:
   - traceability_auditor
 reads_from:
   - docs/tier5_deliverables/proposal_sections/
+  - docs/tier5_deliverables/review_packets/
   - docs/tier1_normative_framework/extracted/
   - docs/tier2a_instrument_schemas/extracted/
   - docs/tier2b_topic_and_call_sources/extracted/
@@ -56,6 +57,7 @@ Do not include explanations outside the JSON.
 |------|--------------------|-----------------|-----------|---------|
 | `caller_context["artifact_path"]` (section mode) | Individual proposal section JSON file (excellence_section.json, impact_section.json, or implementation_section.json) resolved by agent_runtime from `_NODE_PRIMARY_AUDITABLE_ARTIFACT` | content or sub_sections[].content (full section text); validation_status.claim_statuses[]; traceability_footer.primary_sources[] | `orch.tier5.excellence_section.v1`, `orch.tier5.impact_section.v1`, `orch.tier5.implementation_section.v1`, or `orch.tier5.proposal_section.v1` | The single proposal section under audit; material claims are extracted from content and their stated source references in traceability_footer are verified against Tier 1-4 artifacts |
 | `caller_context["artifact_path"]` (assembled mode) | part_b_assembled_draft.json — canonical Tier 5 artifact | sections[].section_id, artifact_path; consistency_log[] | `orch.tier5.part_b_assembled_draft.v1` | Provides the assembly index and consistency log; used when performing cross-section traceability audit on the assembled draft |
+| `caller_context["artifact_path"]` (review-packet mode) | review_packet.json — canonical Tier 5 artifact | schema_id; run_id; findings[].finding_id, section_id, criterion, description, severity, evidence, recommendation; revision_actions[].action_id, finding_id, priority, action_description, target_section, severity | `orch.tier5.review_packet.v1` | The review packet under structural integrity audit; validated for internal linkage, field completeness, and severity correctness — NOT for substantive correctness of evaluator findings |
 | `docs/tier1_normative_framework/extracted/` | Tier 1 extracted rule and compliance files | Rule entries with source references; compliance requirements; legal constraints | N/A — Tier 1 extracted directory | Reference set for verifying claims attributed to Tier 1 (legislation, programme guidance, grant architecture); Confirmed status requires naming a specific file from this directory |
 | `docs/tier2a_instrument_schemas/extracted/` | Tier 2A extracted files (section_schema_registry.json, evaluator_expectation_registry.json) | Section schema entries; evaluation criteria entries | N/A — Tier 2A extracted directory | Reference set for claims attributed to instrument schema or evaluation criteria; Confirmed status requires naming a specific Tier 2A extracted file |
 | `docs/tier2b_topic_and_call_sources/extracted/` | Tier 2B extracted files (call_constraints, expected_outcomes, expected_impacts, scope_requirements, eligibility_conditions, evaluation_priority_weights) | All extracted call requirement entries | N/A — Tier 2B extracted directory | Reference set for claims attributed to call or topic requirements; Confirmed status requires naming a specific Tier 2B extracted file and entry |
@@ -80,6 +82,7 @@ Do not include explanations outside the JSON.
 - Step 1.1: **Determine audit mode.** The invoking agent supplies `caller_context["artifact_path"]` — the repo-relative path to the primary artifact to audit. This is the authoritative audit target. Determine the mode from the path:
   - If `artifact_path` ends with `excellence_section.json`, `impact_section.json`, or `implementation_section.json`: **section mode**. The skill audits only that single section file.
   - If `artifact_path` ends with `part_b_assembled_draft.json`: **assembled mode**. The skill performs a structural index audit of the assembled draft. It verifies the assembly index, checks that referenced sections carry valid traceability summaries, and confirms consistency_log integrity. It does NOT re-audit material claims in section bodies — each section was already audited by its own gate (gate_10a/10b/10c).
+  - If `artifact_path` ends with `review_packet.json`: **review-packet mode**. The skill performs a bounded structural integrity audit of the review packet. It does NOT re-audit proposal sections, does NOT re-run evaluator review, and does NOT extract material claims from proposal content. Set `audit_mode = "review_packet_structural_index"` and `section_id_audited = "review_packet"`. **Skip directly to Step 2B. Do NOT proceed to Steps 1.2–1.5, 2.1–2.6, or 2A.**
   - If `artifact_path` is absent or empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="artifact_path required in caller_context — the agent runtime must inject it") and halt.
 - Step 1.2 (section mode): Confirm the section file exists at the `artifact_path`. If absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Proposal section file <artifact_path> not found") and halt.
 - Step 1.3 (assembled mode): Confirm `artifact_path` exists with `schema_id` = "orch.tier5.part_b_assembled_draft.v1". If absent or schema mismatch: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="part_b_assembled_draft.json not found or schema mismatch") and halt. Extract `sections[].artifact_path` list. Confirm exactly three required Part B sections are referenced: excellence, impact, implementation. Confirm `sections[].order` is 1, 2, 3 in sequence. Confirm each referenced file exists on disk. **Then proceed to Step 2A (assembled-mode structural audit). Do NOT proceed to Steps 1.4, 1.5, 2.1–2.6 for assembled mode.**
@@ -147,6 +150,45 @@ Perform the following structural checks. For each, record a claim_audit_results 
 
 **Step 2A.2: Compute assembled-mode summary:** `total_claims` = count of ASSEMBLY-* checks performed (8), plus counts of confirmed/unresolved.
 
+### 2B. Core Processing Logic — Review-Packet Mode (Structural Integrity Audit)
+
+**This entire step applies ONLY when audit mode is "review_packet_structural_index". It replaces Steps 1.2–1.5, 2.1–2.6, and 2A for review-packet mode.**
+
+**CRITICAL: Review-packet mode MUST NOT re-audit proposal sections. MUST NOT re-run evaluator review. MUST NOT extract material claims from proposal content. The review packet is a review record, not proposal content. This mode validates only the structural integrity and internal linkage of the review packet as a traceability record.**
+
+**MUST NOT in review-packet mode:**
+- Extract material claims from proposal section body text
+- Read Tier 1–4 source directories for per-claim verification
+- Re-score or re-evaluate proposal sections
+- Re-run evaluator-criteria-review logic
+- Read proposal section files or the assembled draft
+
+Perform the following structural checks. For each, record a claim_audit_results entry with a claim_id from the RP-* series:
+
+- **RP-01: Review packet exists and is valid JSON with correct schema.** Verify the file at `artifact_path` exists, is valid JSON, and has `schema_id` == "orch.tier5.review_packet.v1". Status: confirmed if present and valid, unresolved if missing or wrong schema.
+
+- **RP-02: run_id is present and matches the current run_id.** Verify `run_id` field is present and matches the run_id from agent context. Status: confirmed if match, unresolved if absent or mismatch.
+
+- **RP-03: findings[] exists and is a non-empty array with required fields.** Verify `findings` is present and is an array. If non-empty, every finding has: `finding_id`, `section_id`, `criterion`, `description`, `severity`, `evidence`, `recommendation`. It may be empty only if the evaluator found no material weaknesses. Status: confirmed if valid, unresolved if missing required fields.
+
+- **RP-04: Every severity value is valid.** Verify every `findings[].severity` value is one of: `critical`, `major`, `minor`. Status: confirmed if all valid, unresolved if any invalid or missing.
+
+- **RP-05: revision_actions[] exists and linkage constraint holds.** Verify `revision_actions` is present and is an array. If `findings[]` is non-empty, `revision_actions[]` must also be non-empty. If `findings[]` is empty, `revision_actions[]` may be empty. Status: confirmed if constraint holds, unresolved if violated.
+
+- **RP-06: Every revision action has required fields.** Verify every entry in `revision_actions[]` has: `action_id`, `finding_id`, `priority`, `action_description`, `target_section`, `severity`. Status: confirmed if all present, unresolved if any missing.
+
+- **RP-07: Every revision_actions[].finding_id references an existing finding.** Verify every `finding_id` in `revision_actions[]` matches an entry in `findings[].finding_id`. Status: confirmed if all linked, unresolved if any orphaned reference. Flag_reason must identify the unlinked action_id(s).
+
+- **RP-08: Every finding has non-empty evidence and recommendation.** Verify every `findings[].evidence` and `findings[].recommendation` is present and non-empty (not null, not empty string). Status: confirmed if all non-empty, unresolved if any empty or missing.
+
+- **RP-09: No finding has severity omitted or outside allowed set.** This is a cross-check with RP-04; verify no finding has `severity` field absent, null, or a value outside {critical, major, minor}. Status: confirmed if all valid, unresolved if any violation.
+
+- **RP-10: Review packet does not claim to finalize proposal text.** Verify the review packet contains no `finalized_text`, `final_draft`, or `revised_content` top-level keys. The review packet only records findings and revision actions. Status: confirmed if no such keys exist, unresolved if any found.
+
+**Step 2B.1: Determine review-packet-mode `no_unsupported_claims_declaration`:** Set to true only if ALL RP-* checks have status "confirmed". Set to false if any RP-* check has status "unresolved".
+
+**Step 2B.2: Compute review-packet-mode summary:** `total_claims` = 10 (RP-01 through RP-10), plus counts of confirmed/unresolved. `inferred` = 0, `assumed` = 0.
+
 ### 3. Output Construction
 
 **Section mode:**
@@ -182,6 +224,28 @@ Perform the following structural checks. For each, record a claim_audit_results 
 - Single JSON object only
 - Do NOT emit one claim per section paragraph
 - Do NOT include copied section body text
+
+**Review-packet mode:**
+
+**Traceability report file (e.g., `traceability_review_packet_<agent_id>_<timestamp>.json`):**
+- `report_id`: `"traceability_review_packet_<agent_id>_<ISO8601_timestamp>"`
+- `skill_id`: `"proposal-section-traceability-check"`
+- `invoking_agent`: from agent context
+- `run_id_reference`: from agent context
+- `section_id_audited`: `"review_packet"`
+- `audit_mode`: `"review_packet_structural_index"`
+- `claim_audit_results`: exactly 10 entries (RP-01 through RP-10), each with `{claim_id, claim_summary, status (confirmed/unresolved), source_ref, flag_reason}`
+- `summary`: derived from Step 2B.2 — `{total_claims: 10, confirmed, inferred: 0, assumed: 0, unresolved}`
+- `no_unsupported_claims_declaration`: derived from Step 2B.1 — boolean
+- `timestamp`: ISO 8601
+
+**Review-packet-mode output constraints:**
+- Response MUST stay below 4,000 characters total
+- No markdown fences
+- Single JSON object only
+- Do NOT re-audit proposal sections
+- Do NOT re-run evaluator review
+- Do NOT extract material claims from proposal content
 
 ### 4. Conformance Stamping
 
@@ -251,6 +315,7 @@ IF `status == "confirmed"` AND `source_ref` is null, empty, OR is only a directo
 - Step 1.1: `artifact_path` is absent or empty in `caller_context` → `failure_reason="artifact_path required in caller_context — the agent runtime must inject it"`
 - Step 1.2 (section mode): Section file at `artifact_path` does not exist → `failure_reason="Proposal section file <artifact_path> not found"`
 - Step 1.3 (assembled mode): `part_b_assembled_draft.json` is absent or schema mismatch → `failure_reason="part_b_assembled_draft.json not found or schema mismatch"`
+- Step 2B (review-packet mode): `review_packet.json` is absent or not valid JSON → `failure_reason="review_packet.json not found or not valid JSON at <artifact_path>"`
 - Step 1.5: No Tier 1–4 reference directory is accessible → `failure_reason="No Tier 1–4 reference artifacts accessible for traceability verification"`
 
 **Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`

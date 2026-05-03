@@ -1,0 +1,158 @@
+{
+  "report_id": "traceability_impact_impact_writer_2026-05-02T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "impact_writer",
+  "run_id_reference": "d9aa75ba-129e-405e-ab86-f342cb97f0b2",
+  "section_id_audited": "impact",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "MAESTRO maps five pathways (PATH-EI-01 to PATH-EI-05) to all call expected impacts",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json (5 pathway entries PATH-EI-01..05); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (5 impact entries EI-01..05)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "PATH-EI-01 implements the Apply AI Strategy via three TRL-5 demonstrators (healthcare, manufacturing, logistics)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:PATH-EI-01 (coverage_status=Covered, project_outputs from WP5/WP6/WP7); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-01 (Apply AI Strategy, status=Confirmed)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "OBJ-4 healthcare demonstrator targets diagnostic reasoning accuracy within 10% of specialist clinician performance on 500 de-identified cases across 5 domains validated by NIHS experts",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json:OBJ-4 (measurable_target matches exactly; responsible_partner=NIHS)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "OBJ-5 manufacturing demonstrator targets ≥15% defect reduction AND ≥10% energy consumption reduction vs baseline in ISIA pilot factory over 3 months",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json:OBJ-5 (measurable_target matches exactly; responsible_partner=ISIA)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "OBJ-6 logistics demonstrator targets ≥20% disruption recovery time improvement AND ≥15% delivery schedule adherence improvement across 3 ELI corridors",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json:OBJ-6 (measurable_target matches exactly; responsible_partner=ELI)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "Deliverables D5-02 (M42), D6-02 (M42), D7-02 (M42) assigned to respective demonstrator WPs with correct titles",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP5/D5-02 (Healthcare demonstrator evaluation dataset, due_month=42), WP6/D6-02 (Manufacturing process optimisation demonstrator software, due_month=42), WP7/D7-02 (Cross-sector generalisation evaluation dataset, due_month=42)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "PATH-EI-02 enables EDIH-mediated uptake to ≥5 manufacturing SMEs via ≥2 EDIHs and ≥10 SMEs/startups via open-source framework",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-3.indicators (≥5 SMEs, ≥2 EDIHs), IMP-5.indicators (≥10 SMEs/startups); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:PATH-EI-02",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "PATH-EI-03 targets ≥20 top-venue publications, ≥100 citations within 3 years, ≥3 keynotes, with D9-02 (M36), D8-02 (M42), ≥5 external research group adoptions",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1.indicators (≥20 publications, ≥3 keynotes, ≥100 citations); IMP-5.indicators (≥5 external groups); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: D9-02 (due_month=36), D8-02 (due_month=42)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "PATH-EI-04 (inferred from destination) strengthens EU strategic autonomy; D4-01 (M18) supports ≥1 standardisation submission to ISO/IEC JTC 1/SC 42 or IEEE with EU AI Act alignment",
+      "status": "inferred",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-04 (status=Inferred, inference_note: 'inferred from topic destination placement'); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:PATH-EI-04 (coverage_note confirms inferred); docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-6.indicators (≥1 standardisation submission). Derivation: EI-04 is not an explicit expected impact but is inferred from the call destination 'Achieving open strategic autonomy in digital and emerging enabling technologies'; the pathway maps IMP-1 and IMP-6 to this inferred impact.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "PATH-EI-05 unlocks economic potential; D8-03 (M48) documents statistically significant improvement (p<0.05) over SOTA on ≥3 benchmark categories",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-05 (economic potential, status=Confirmed); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:D8-03 (Final integration and evaluation report, due_month=48); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:KPI-11 (p<0.05 over SOTA on ≥3 categories)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "OBJ-1/2/3/8 measurable targets (≥40% plan success, ≥30% coherence, ≥25% coordination, ≥30 tools/≥95% success) stated in dissemination section",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json:OBJ-1 (≥40%), OBJ-2 (≥30%), OBJ-3 (≥25%), OBJ-8 (≥30 tools, ≥95%)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "≥20 publications in NeurIPS, ICML, ICLR, AAMAS, AAAI under CC-BY open access",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1.indicators[0] (≥20 publications, named venues); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:dissemination_plan.open_access_policy (CC-BY licence)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "OBJ-7 targets ≥500 GitHub stars within 6 months of M36 release, AI-on-demand platform contributions, ≥2 TEF validations, ≥3 EDIH technology transfers",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json:OBJ-7 (measurable_target matches exactly)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "NIHS establishes clinical adoption with ≥3 hospital networks; ISIA transfers to ≥5 SMEs through ≥2 EDIHs and EIT Manufacturing; ELI produces supply chain integration roadmap",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-2.indicators (≥3 hospital networks), IMP-3.indicators (≥5 SMEs, ≥2 EDIHs); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:exploitation_plan (EIT Manufacturing, ELI integration roadmap); docs/tier3_project_instantiation/consortium/roles.json (NIHS=Healthcare Demonstrator Lead, ISIA=Manufacturing Demonstrator Lead, ELI=Logistics Demonstrator Lead)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "IPR follows open-core strategy with Apache 2.0 core and protected sector configurations",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:exploitation_plan.ipr_strategy (open-core IPR strategy, Apache 2.0 for core, trade secrets/commercial terms for sector configurations)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "CERIA targets ≥3 external protocol adoptions and ≥1 standardisation submission",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-6.indicators (≥1 standardisation submission, ≥3 external adoptions); docs/tier3_project_instantiation/consortium/roles.json:CERIA (Pillar 3 Lead)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "BAL leads public engagement through project website, media, and stakeholder events",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:WP9 (lead_partner=BAL), T9-03 (Communication, website, and public engagement, responsible_partner=BAL); docs/tier3_project_instantiation/consortium/roles.json:BAL (key_responsibilities includes 'Lead dissemination, exploitation and communication')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C18",
+      "claim_summary": "Sustainability: open-source community ecosystem, partner operational embedding, and standardisation",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:sustainability_mechanism (three mechanisms: open-source community, operational embedding by NIHS/ISIA/ELI, standardisation by CERIA)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "Engaging ≥3 hospital networks by M48 via demonstrator pathway",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-2.indicators[0] (≥3 hospital networks engaged in post-project adoption planning by M48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "Transferability mapping to autonomous driving from logistics demonstrator",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-4.indicators[2] (Architectural transferability mapping to in-vehicle autonomous driving completed)",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 20,
+    "confirmed": 19,
+    "inferred": 1,
+    "assumed": 0,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-05-02T00:00:00Z"
+}

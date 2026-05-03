@@ -1,0 +1,122 @@
+=== skill_id: constitutional-compliance-check ===
+=== mode: tapm ===
+=== response_text length: 9902 ===
+=== response_text (full) ===
+Now I have all the information needed. I've read CLAUDE.md (specifically §13 prohibitions 13.1–13.12) and the artifact at the declared artifact_path. Let me apply all 12 checks and produce the compliance report.
+
+```json
+{
+  "report_id": "compliance_check_review_packet_evaluator_reviewer_2026-05-02T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "evaluator_reviewer",
+  "run_id_reference": "3e6a2b2a-ad72-43db-b4c0-d3ea14c11c51",
+  "artifact_audited": "docs/tier5_deliverables/review_packets/review_packet.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "check_reasoning": {
+    "13.1": "No references to Grant Agreement Annex, AGA Template, Model Grant Agreement template, or 'Annex [0-9]' used as a structural authority were found in the review packet. The artifact references application form Part B sections (B.1.1, B.1.2, B.2.1, B.2.2, B.3.1, B.3.2) and evaluation form criteria, both of which are Tier 2A instruments. No violation.",
+    "13.2": "The review packet does not independently assert call constraints, scope requirements, expected outcomes, or expected impacts. Its findings reference evaluation form sub-criteria (Tier 2A) — e.g., 'The evaluation form explicitly requires…', 'The evaluation form sub-criterion assesses…' — not Tier 2B call constraints. The review packet's purpose is to analyze proposal sections against evaluation criteria, not to assert call scope. No traceability_footer is present, but the artifact schema (orch.tier5.review_packet.v1) is a review artifact that references evaluation criteria rather than asserting call constraints. No call-constraint claims requiring Tier 2B source references were identified.",
+    "13.3": "The review packet references project-specific entities (partner names: ATU, NIHS, ISIA, ELI; WP numbers: WP2-WP9; task numbers: T5-01, T6-01, T7-01, T9-03; objectives: OBJ-4; risks: RISK-01, RISK-04, RISK-10; project name: MAESTRO). These references appear exclusively within quoted evidence extracted from proposal sections being reviewed, or within recommendation text that uses placeholder variables (e.g., 'N de-identified clinical records', 'X production lines', 'Y corridors'). The review packet quotes proposal content for analysis purposes; it does not independently assert project facts. No traceability_footer is present, but the artifact's evidence fields demonstrate derivation from the reviewed proposal sections rather than independent fabrication. No violation.",
+    "13.4": "The artifact has schema_id 'orch.tier5.review_packet.v1' (begins with 'orch.tier5.'), classifying it as a Phase 8 artifact. Verification of the budget gate status at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json is outside the declared input boundary of this skill invocation. However, the artifact content itself does not contain budget-dependent confirmed values (no patterns matching '€[0-9]+', '[0-9]+ EUR', or '[0-9]+ person-months' as confirmed figures). Finding F-07 explicitly criticizes the ABSENCE of effort allocation data, and the reference to 'the validated budget' in quoted evidence describes what the proposal section claims, not an independent budget assertion by the review packet. Full budget gate verification requires reading the budget_gate_assessment.json file, which is outside this invocation's input boundary; no budget-dependent content violations were detected within the artifact itself.",
+    "13.5": "Not directly checkable from artifact content. This prohibition concerns agent memory behavior, which cannot be verified by reading a static artifact. Enforcement is handled by the decision-log-update skill and agent runtime. Pass by non-applicability to artifact-level checks.",
+    "13.6": "Not directly checkable from artifact content. This prohibition concerns skill/workflow scope expansion, which cannot be verified by reading a review packet artifact. Pass by non-applicability to artifact-level checks.",
+    "13.7": "The review packet (Phase 8) does not reference activities from phases beyond Phase 8 as inputs. Its findings reference proposal section content (Tier 5), evaluation form criteria (Tier 2A), and call expected impacts (Tier 2B) — all legitimate inputs for Phase 8 review. No evidence of silent phase reordering.",
+    "13.8": "The review packet is a review artifact whose explicit purpose is to identify gaps, weaknesses, and improvement areas in proposal sections. It does not finalize proposal text — it critiques it. The findings (F-01 through F-09) explicitly flag incomplete, superficial, or insufficiently developed content. The review packet functions as the mechanism for identifying incomplete source state, not as finalized text concealing it. No violation.",
+    "13.9": "The review packet references evaluation form criteria (Tier 2A evaluation form sub-criteria) in its findings but does not make claims about Horizon Europe participation conditions, grant agreement terms, or financial regulation that would require Tier 1 normative framework source references. The references to evaluation criteria are appropriate for a review artifact analyzing proposal sections against the evaluation framework. No regulatory claims requiring Tier 1 sourcing were identified.",
+    "13.10": "The review packet is a Tier 5 artifact. It does not contain a traceability_footer or validation_status field, but the orch.tier5.review_packet.v1 schema is a review artifact type distinct from proposal sections. The findings contain evidence fields that quote directly from the proposal sections being reviewed, establishing traceability to those Tier 5 proposal sections. The evaluation criteria references trace to Tier 2A. The review packet does not introduce unsupported claims — it analyzes existing content. No violation detected.",
+    "13.11": "Not checkable from a review packet artifact. This prohibition concerns modification of Tier 1/Tier 2 source documents, which would require inspecting those documents for unauthorized changes. The review packet does not instruct modification of source documents. Pass by non-applicability to artifact-level checks.",
+    "13.12": "Not directly checkable from artifact content. This prohibition concerns whether CLAUDE.md is treated as advisory, which is a behavioral characteristic of agents and workflows, not a property of a static artifact. Pass by non-applicability to artifact-level checks."
+  },
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "timestamp": "2026-05-02T00:00:00Z"
+}
+```
+
+=== END ===
