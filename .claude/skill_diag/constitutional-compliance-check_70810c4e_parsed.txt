@@ -1,0 +1,50 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-05-03T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "70810c4e-0c08-48ac-a18b-e58e71d97b47",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact carries schema_id 'orch.tier5.part_b_assembled_draft.v1', a purpose-built Tier 5 orchestration schema. No reference to a Grant Agreement Annex, Model Grant Agreement Annex, AGA Template, or post-award annex structural authority appears anywhere in the artifact. CC-10 source_basis references 'docs/tier2a_instrument_schemas/application_forms/ria_ia/af_he-ria-ia_en.pdf (Standard Application Form HE RIA/IA, Version 10.0, 22 January 2026)' \u2014 the correct Tier 2A pre-award application form template \u2014 as the authority for section ordering. No Annex-based schema source is used."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The assembled draft performs cross-section consistency checks (CC-01 through CC-12) over the three Part B proposal sections. No claim asserting a call requirement, scope boundary, eligibility condition, expected outcome, or expected impact is directly made within this artifact's own content. The artifact is a structural consistency and traceability index, not a content artifact. No Tier 2B source reference is required because no call-specific constraint is asserted."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment \u2014 not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The artifact names specific partners (ATU, BIIS, CERIA, FIIT, NIHS, ISIA, ELI, BAL) and objectives (OBJ-1 through OBJ-8) within its consistency log entries (CC-01, CC-03, CC-04, CC-06, CC-09). The artifact's traceability_footer.primary_sources includes 'docs/tier3_project_instantiation/architecture_inputs/objectives.json' and 'docs/tier3_project_instantiation/consortium/partners.json', providing Tier 3 attribution for all project-specific facts named. WP and deliverable IDs trace back to 'docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json', also listed in primary_sources. No project fact is asserted without a traceability_footer reference pointing to a Tier 3 or Tier 4 path."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "This artifact carries schema_id 'orch.tier5.part_b_assembled_draft.v1' \u2014 a Phase 8 Tier 5 artifact. The budget gate artifact 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json' was read and confirms gate_pass_declaration: 'pass' with full WP coverage (WP1\u2013WP9) and partner coverage (ATU, BIIS, CERIA, FIIT, NIHS, ISIA, ELI, BAL) and no blocking inconsistencies. The assembled draft's primary_sources explicitly references this budget gate assessment. CC-08 further confirms 'No section contains explicit budget figures, cost claims, or person-month allocations.' Scan of the entire artifact finds no budget figure patterns (\u20ac[0-9]+, [0-9]+ EUR, [0-9]+ person-months). Budget gate is passed; no budget-dependent content is present; Phase 8 activity is constitutionally permissible."
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "Not directly checkable from artifact content alone. This prohibition governs agent runtime behaviour \u2014 whether durable decisions are persisted to docs/tier4_orchestration_state/decision_log/ \u2014 which cannot be verified by reading a Tier 5 deliverable artifact. Check passes on structural non-applicability to artifact-level auditing; enforcement is the responsibility of the decision-log-update skill operating during agent execution."
+=== END ===

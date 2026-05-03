@@ -1,0 +1,75 @@
+{
+  "report_id": "traceability_part_b_assembled_draft_traceability_auditor_2026-05-03T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "70810c4e-0c08-48ac-a18b-e58e71d97b47",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
+  "claim_audit_results": [
+    {
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft schema_id correct and sections[] array present and non-empty",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: schema_id=orch.tier5.part_b_assembled_draft.v1; sections[] contains 3 entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "All three section artifacts referenced by section_id (excellence, impact, implementation) and each artifact_path exists on disk",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json sections[].artifact_path: excellence_section.json (confirmed present), impact_section.json (confirmed present), implementation_section.json (confirmed present)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order is excellence=1, impact=2, implementation=3",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: sections[0].section_id=excellence order=1; sections[1].section_id=impact order=2; sections[2].section_id=implementation order=3",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced sections expose non-empty traceability_footer.primary_sources",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json traceability_footer.primary_sources: 12 entries; impact_section.json traceability_footer.primary_sources: 10 entries; implementation_section.json traceability_footer.primary_sources: 10 entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare no_unsupported_claims_declaration=true",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json no_unsupported_claims_declaration=true; impact_section.json no_unsupported_claims_declaration=true; implementation_section.json no_unsupported_claims_declaration=true",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All three referenced sections have validation_status.overall_status not equal to 'unresolved' and non-empty claim_statuses[]",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json overall_status=inferred, 15 claim_statuses; impact_section.json overall_status=inferred, 10 claim_statuses; implementation_section.json overall_status=confirmed, 15 claim_statuses",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "Consistency log present with no entries carrying status inconsistency_flagged or unresolved",
+      "status": "unresolved",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json consistency_log: 12 entries (CC-01 through CC-12)",
+      "flag_reason": "CC-04 has status=inconsistency_flagged: D8-01 is cited as ATU OBJ-8 tool orchestration output in Impact B.2.1, but identified as FIIT WP8 evaluation framework and benchmark specification in Excellence B.1.2, Impact B.2.2, and Implementation B.3.1 — conflicting attributions require resolution (either scope clarification or correction of Impact B.2.1 citation). CC-09 has status=inconsistency_flagged: WP4 name 'Decentralised Multi-Agent Coordination' drops canonical keyword 'protocols' (correct form: 'Decentralised multi-agent coordination protocols'); WP3 name 'Adaptive Memory Architecture' drops canonical qualifier 'Unified' (correct form: 'Unified adaptive memory architecture') in B.1.2 and B.3.1 — terminology requires harmonisation with canonical Tier 3 objective titles."
+    },
+    {
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability coverage present via traceability_footer and confirmed via section-level inheritance",
+      "status": "confirmed",
+      "source_ref": "Assembled draft traceability_footer.primary_sources: 8 non-empty entries. Section-level traceability inheritance confirmed per ASSEMBLY-04 and ASSEMBLY-05 (all three sections have non-empty primary_sources and no_unsupported_claims_declaration=true). Note: assembled draft declares no_unsupported_claims_declaration=false while all three sections declare true; this is driven by CC-04 and CC-09 assembly inconsistencies identified in ASSEMBLY-07, not by section-level claim issues. Status confirmed via section-level inheritance path; no traceability coverage gap exists.",
+      "flag_reason": "Assembled draft traceability_footer.no_unsupported_claims_declaration=false is inconsistent with all three section-level declarations of true. The false declaration reflects CC-04 and CC-09 assembly inconsistencies rather than section-level unattributed claims. Traceability coverage confirmed via section-level inheritance; inconsistency does not constitute absence of coverage but requires attention if the traceability_footer is relied upon directly."
+    }
+  ],
+  "summary": {
+    "total_claims": 8,
+    "confirmed": 7,
+    "inferred": 0,
+    "assumed": 0,
+    "unresolved": 1
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-05-03T00:00:00Z"
+}
