@@ -99,6 +99,13 @@ To stay within budget:
 
 - Step 2.6: **Handle data gaps.** OMIT unsourceable claims. If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
 
+- Step 2.7: **Self-Check: Canonical Terminology and Deliverable Identity.** Before producing the final JSON output, scan the generated content and verify:
+  1. Every canonical name from `objectives.json` or `outcomes.json` that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim when that concept is referenced — not shortened or paraphrased.
+  2. No WP or component label drops leading modifiers, trailing nouns, or other words present in the canonical objective title from `objectives.json`. If the WP title in `wp_structure.json` is shorter than the corresponding objective title, the full objective title must appear alongside or in place of the abbreviated WP label.
+  3. Every deliverable ID cited is referenced with its canonical title and owning WP from `wp_structure.json`. No deliverable is attributed to a different objective, WP, or partner than its canonical source supports.
+  4. Ownership verbs (delivers, produces, implements) are used only where the source artifact explicitly supports ownership; support verbs (validates, integrates, enables, benchmarks) are used otherwise.
+  If any issue is found: revise the relevant sub-section content before outputting.
+
 ### 3. Output Schema
 
 Return a single JSON object conforming to `orch.tier5.excellence_section.v1`:
@@ -162,6 +169,8 @@ When referencing any objective from `architecture_inputs/objectives.json`, the o
 
 **Enforcement:** gate_10d checks that every objective `title` from Tier 3 that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim in the section content when that objective is referenced.
 
+**WP/objective label overlap rule:** When a WP label or parenthetical description derives from or overlaps with a canonical objective title from `objectives.json`, the drafted content must either: (a) use the exact WP title from `wp_structure.json` and separately introduce the exact objective/component title from `objectives.json`, or (b) explicitly state the relationship between the WP and the canonical objective/component title without replacing one with the other. If the WP title in `wp_structure.json` is a shortened form of the corresponding objective title in `objectives.json` (e.g., the WP title drops a leading modifier or trailing noun), the canonical objective title governs component naming in evaluator-facing text because gate_10d enforces objective-title-level terminology.
+
 ### Rule CCR-2: Deliverable ID Semantic Consistency
 
 A deliverable ID (e.g., "D4-01") represents a single semantic artifact as defined in `wp_structure.json`. When referencing a deliverable ID in drafted content:
@@ -197,16 +206,18 @@ When an objective from `architecture_inputs/objectives.json` is referenced in th
 All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
 
 **Prohibited:**
-- Truncating a canonical name (e.g., dropping "External" from "External Tool and API Orchestration Layer")
-- Extending a canonical name (e.g., appending "and Reasoning" to a defined title)
-- Substituting synonyms for any word (e.g., "capability" instead of "Layer", "module" instead of "Engine")
+- Truncating a canonical name (e.g., if the source title is "A B C", do not shorten it to "B C" when the shortened form could be interpreted as a different component)
+- Extending a canonical name (e.g., appending words not in the source title)
+- Substituting synonyms for any word in the canonical name
 - Using a lowercased or differently-cased variant when the canonical name has specific casing
 
 **Permitted aliasing:** A short alias MAY be used ONLY if:
 1. The full canonical name is introduced first in the same sub-section
-2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
+2. The alias is explicitly defined at introduction (e.g., "the [full canonical name] (hereafter [alias])")
 
 **Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency.
+
+**WP label terminology rule:** When enumerating WPs with descriptive labels in parentheses, and a WP's descriptive concept derives from a canonical objective title, the full canonical objective title from `objectives.json` must be used — not a potentially abbreviated WP title from `wp_structure.json`. No WP or component label may drop leading modifiers, trailing nouns, or other words that are present in the canonical objective title. If two source artifacts provide different labels for overlapping concepts, use the higher-tier canonical artifact designated by this skill for that concept, or avoid collapsing them into one label.
 
 ### Additional Conventions
 

@@ -187,6 +187,8 @@ When referencing any objective from `architecture_inputs/objectives.json`, the o
 
 **Enforcement:** gate_10d checks that every objective `title` from Tier 3 that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim in the section content when that objective is referenced.
 
+**WP/objective label overlap rule:** When a WP label or parenthetical description derives from or overlaps with a canonical objective title from `objectives.json`, the drafted content must either: (a) use the exact WP title from `wp_structure.json` and separately introduce the exact objective/component title from `objectives.json`, or (b) explicitly state the relationship between the WP and the canonical objective/component title without replacing one with the other. If the WP title in `wp_structure.json` is a shortened form of the corresponding objective title in `objectives.json` (e.g., the WP title drops a leading modifier or trailing noun), the canonical objective title governs component naming in evaluator-facing text because gate_10d enforces objective-title-level terminology.
+
 ### Rule CCR-2: Deliverable ID Semantic Consistency
 
 A deliverable ID (e.g., "D4-01") represents a single semantic artifact as defined in `wp_structure.json`. When referencing a deliverable ID in drafted content:
@@ -222,16 +224,18 @@ When an objective from `architecture_inputs/objectives.json` is referenced in th
 All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
 
 **Prohibited:**
-- Truncating a canonical name (e.g., dropping "External" from "External Tool and API Orchestration Layer")
-- Extending a canonical name (e.g., appending "and Reasoning" to a defined title)
-- Substituting synonyms for any word (e.g., "capability" instead of "Layer", "module" instead of "Engine")
+- Truncating a canonical name (e.g., if the source title is "A B C", do not shorten it to "B C" when the shortened form could be interpreted as a different component)
+- Extending a canonical name (e.g., appending words not in the source title)
+- Substituting synonyms for any word in the canonical name
 - Using a lowercased or differently-cased variant when the canonical name has specific casing
 
 **Permitted aliasing:** A short alias MAY be used ONLY if:
 1. The full canonical name is introduced first in the same sub-section
-2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
+2. The alias is explicitly defined at introduction (e.g., "the [full canonical name] (hereafter [alias])")
 
-**Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency. If Excellence uses "External Tool and API Orchestration Layer", Implementation MUST use the same term exactly.
+**Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency. If Excellence uses a canonical component name, Implementation MUST use the same term exactly.
+
+**WP label terminology rule:** When enumerating WPs with descriptive labels in parentheses, and a WP's descriptive concept derives from a canonical objective title, the full canonical objective title from `objectives.json` must be used — not a potentially abbreviated WP title from `wp_structure.json`. No WP or component label may drop leading modifiers, trailing nouns, or other words that are present in the canonical objective title. If two source artifacts provide different labels for overlapping concepts, use the higher-tier canonical artifact designated by this skill for that concept, or avoid collapsing them into one label.
 
 ### Rule CCR-5: Complete Measurable Target Preservation (GATE-CRITICAL)
 
@@ -243,15 +247,15 @@ When Implementation mentions any objective_id from `architecture_inputs/objectiv
 - Each metric component must appear in both the narrative `sub_sections[].content` AND in any `validation_status.claim_statuses[]` entry that summarizes that objective's target.
 
 **Prohibited:**
-- Compressing a dual/multi-metric target into a single metric (e.g., "≥30% coherence improvement" when the target is "≥30% coherence AND factual consistency improvement")
+- Compressing a dual/multi-metric target into a single metric (e.g., retaining only "≥X% metric-A" when the target is "≥X% metric-A AND ≥Y% metric-B")
 - Retaining only the first quantitative target and dropping subsequent conjuncts
 - Replacing a multi-component target with a generic phrase such as "performance improvement"
 - Dropping non-primary metric components from claim_summary fields
 
-**Examples (fixture-style, not project-specific rules):**
-- Target "≥30% improvement in task coherence AND factual consistency" → Implementation must mention BOTH task coherence AND factual consistency
-- Target "≥15% defect reduction AND ≥10% energy consumption reduction" → Implementation must retain BOTH defect reduction AND energy consumption reduction
-- Target "≥20% disruption recovery AND ≥15% delivery schedule adherence" → Implementation must retain BOTH recovery AND adherence
+**Examples (abstract, not project-specific):**
+- If a target is "≥X% improvement in metric-A AND metric-B", the section must mention BOTH metric-A AND metric-B
+- If a target is "≥X% reduction in metric-A AND ≥Y% reduction in metric-B", the section must retain BOTH reductions
+- If a target contains multiple conjuncts joined by AND, every conjunct must appear in the section content
 
 **Enforcement:** gate_10d cross-section consistency check (CC-06) detects partial measurable_target loss across sections. Implementation must not be the source of such loss.
 
@@ -294,6 +298,8 @@ Before writing `implementation_section.json`, perform this bounded check for eac
 
 If any item fails: revise the relevant content before writing the output. Do not rely on gate_10d to catch the issue downstream.
 
+6. Verify every WP label or WP descriptive parenthetical: if the label contains a stem from a canonical objective title in `architecture_inputs/objectives.json`, the full canonical objective title must appear in the same label or sentence. No WP or component label may drop leading modifiers, trailing nouns, or other words that are present in the canonical objective title.
+
 This check is bounded to objectives actually mentioned in the drafted content — it does not require scanning all Tier 3 objectives exhaustively.
 
 ### Additional Conventions
@@ -301,7 +307,7 @@ This check is bounded to objectives actually mentioned in the drafted content �
 **Partner Legal Names (MANDATORY):**
 - When naming partners in prose, use the exact `legal_name` from `consortium/partners.json`.
 - NEVER truncate legal names by dropping legal entity suffixes. If `legal_name` ends with "AG", "Oy", "GmbH", etc., the suffix MUST be included.
-- `short_name` (e.g., "ATU", "ELI") may be used in parentheses or as abbreviations, but the first prose mention of each partner MUST use the full `legal_name`.
+- `short_name` values from `partners.json` may be used in parentheses or as abbreviations, but the first prose mention of each partner MUST use the full `legal_name`.
 
 When linking objectives to WPs, use only explicit mappings from `wp_structure.json` or `implementation_architecture.json`; if no explicit mapping exists, avoid asserting WP ownership. These conventions and all CCR rules are enforced deterministically by gate predicates (gate_10c, gate_10d).
 

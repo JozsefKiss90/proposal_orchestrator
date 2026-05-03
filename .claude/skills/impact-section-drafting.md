@@ -109,6 +109,15 @@ To stay within budget:
   3. For each referenced objective, count the metric clauses in `measurable_target` and count their representations in the Impact content. If any count mismatches: revise the relevant sub-section content to restore full coverage before outputting.
   If any violation is detected: revise the Impact sub-section content to include the missing components. Do NOT emit the final JSON until all measurable_target components are represented.
 
+- Step 2.13: **Self-Check: Deliverable Identity and Terminology Consistency.** Before producing the final JSON output, scan the generated content and verify:
+  1. Every deliverable ID cited in any sub_sections[].content field is referenced with its canonical title and owning WP from `wp_structure.json`.
+  2. No deliverable ID is attributed to an objective or partner that does not match the deliverable's canonical `responsible_partner` and parent WP in `wp_structure.json`.
+  3. If a deliverable is cited in the context of an objective whose `responsible_partner` differs from the deliverable's `responsible_partner`, the phrasing must use support/integration language (validates, supports, benchmarks, enables), not ownership language (delivers, produces, outputs).
+  4. Every canonical name from `objectives.json` or `outcomes.json` that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim when that concept is referenced — not shortened or paraphrased.
+  5. When a WP label overlaps with a canonical objective/component title but drops words from it, the full canonical title is separately introduced or the relationship between the WP and the objective title is stated without collapsing the two.
+  6. Every referenced objective's `measurable_target` is fully represented — no metric component is missing.
+  If any issue is found: revise the relevant sub-section content before outputting.
+
 ### 3. Output Schema
 
 Return a single JSON object conforming to `orch.tier5.impact_section.v1`:
@@ -194,6 +203,14 @@ A deliverable ID (e.g., "D4-01") represents a single semantic artifact as define
 
 **When a deliverable enables a downstream activity** (e.g., a protocol specification deliverable enables a standardisation submission): explicitly frame the relationship as "deliverable D4-01 (<canonical title>) enables/supports <downstream activity>". Do NOT describe the downstream activity AS the deliverable.
 
+**Verification procedure (mandatory before citing any deliverable ID in Impact content):**
+Before assigning a deliverable ID to an objective, partner, or activity:
+1. Look up the deliverable ID in `wp_structure.json`.
+2. Confirm the deliverable's canonical `title`, `responsible_partner`, parent `wp_id`, and `due_month`.
+3. If the deliverable's canonical owner (`responsible_partner` and WP) does not match the objective or partner being discussed, do NOT cite the deliverable as that objective's output. Instead, frame the deliverable's role accurately (e.g., as validating, supporting, or integrating the objective's outputs).
+
+**Cross-WP deliverable attribution rule:** A deliverable belonging to one WP must not be attributed as the primary output of a different WP's objective unless `wp_structure.json` explicitly supports that assignment. If deliverable D-X belongs to WP-Y in `wp_structure.json`, do not describe it as the primary output of WP-Z or of an objective whose `responsible_partner` differs from D-X's `responsible_partner`. When a deliverable supports, validates, benchmarks, or enables another objective's outputs, phrase it as such — do not describe the downstream activity AS the deliverable.
+
 ### Rule CCR-3: Objective Metric Completeness
 
 When an objective from `architecture_inputs/objectives.json` is referenced in the drafted content and its `measurable_target` contains quantitative values, ALL quantitative targets MUST be preserved.
@@ -218,16 +235,18 @@ When an objective from `architecture_inputs/objectives.json` is referenced in th
 All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
 
 **Prohibited:**
-- Truncating a canonical name (e.g., dropping "External" from "External Tool and API Orchestration Layer")
-- Extending a canonical name (e.g., appending "and Reasoning" to a defined title)
-- Substituting synonyms for any word (e.g., "capability" instead of "Layer", "module" instead of "Engine")
+- Truncating a canonical name (e.g., if the source title is "A B C", do not shorten it to "B C" when the shortened form could be interpreted as a different component)
+- Extending a canonical name (e.g., appending words not in the source title)
+- Substituting synonyms for any word in the canonical name
 - Using a lowercased or differently-cased variant when the canonical name has specific casing
 
 **Permitted aliasing:** A short alias MAY be used ONLY if:
 1. The full canonical name is introduced first in the same sub-section
-2. The alias is explicitly defined at introduction (e.g., "the Neuro-symbolic Planning Engine (hereafter NPE)")
+2. The alias is explicitly defined at introduction (e.g., "the [full canonical name] (hereafter [alias])")
 
 **Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency.
+
+**WP/objective label overlap rule:** If a generated WP label overlaps with, derives from, or abbreviates a canonical objective/component title from `objectives.json`, the draft must either: (a) use the exact WP title from `wp_structure.json` and separately introduce the exact objective/component title from `objectives.json`, or (b) explicitly state the relationship between the WP and the canonical objective/component title without replacing one with the other. Do not silently collapse a longer objective title into a shorter WP title.
 
 ### Rule CCR-5: KPI Preservation Invariant (Cross-Section Consistency)
 
