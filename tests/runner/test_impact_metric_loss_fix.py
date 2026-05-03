@@ -2,7 +2,8 @@
 Tests for partial metric loss fix in impact-section-drafting.md.
 
 Covers:
-  1. Spec invariant — new multi-metric preservation phrases present
+  1. Spec invariant — slim spec declares canonical-pack input and copying rules
+     (metric enforcement delegated to preflight predicates and gate_10b/10d)
   2. Spec anti-regression — broad self-audit patterns NOT reintroduced
   3. Fixture-based metric loss detection via cross_section_consistency
   4. Fingerprint isolation — spec change invalidates only n08b
@@ -14,7 +15,6 @@ All fixture data is project-agnostic.
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 
 import pytest
@@ -40,38 +40,45 @@ def _write_json(path: Path, data: object) -> None:
 
 
 # ===========================================================================
-# 1. SPEC INVARIANT — new multi-metric preservation phrases
+# 1. SPEC INVARIANT — slim spec delegates metric enforcement to preflight/gates
 # ===========================================================================
 
 
 class TestMetricLossSpecInvariant:
-    """Verify impact-section-drafting.md contains required multi-metric phrases."""
+    """Verify impact-section-drafting.md declares the architectural hooks that
+    replace the old verbose multi-metric preservation prose.
+
+    After Phase 8 skill slimming, metric/terminology enforcement is delegated to:
+      - canonical_reference_pack.json (built by runner/phase8_canonical_pack.py)
+      - Preflight predicates (canonical_terms_preserved, deliverable_identity_preserved,
+        partner_names_preserved) registered in gate_10b
+      - cross_section_consistency predicate at gate_10d
+    """
 
     @pytest.fixture(autouse=True)
     def load_spec(self) -> None:
         self.text = _read_impact_spec()
 
-    def test_contains_multi_clause_measurable_target(self) -> None:
-        assert "multi-clause measurable_target" in self.text
+    def test_declares_canonical_reference_pack_input(self) -> None:
+        """Skill spec must declare canonical_reference_pack.json as an input."""
+        assert "canonical_reference_pack.json" in self.text
 
-    def test_contains_copy_every_quantitative_metric_clause(self) -> None:
-        assert "copy every quantitative metric clause" in self.text
+    def test_has_canonical_copying_rules_section(self) -> None:
+        """Skill spec must contain a 'Canonical Copying Rules' section."""
+        assert "Canonical Copying Rules" in self.text
 
-    def test_contains_do_not_reduce_a_and_b(self) -> None:
-        assert "Do not reduce A AND B targets to only A" in self.text
+    def test_forbids_renaming_and_shortening(self) -> None:
+        """Skill spec must forbid renaming, shortening, or paraphrasing canonical terms."""
+        assert "Do not rename" in self.text
+        assert "shorten" in self.text
 
-    def test_contains_numeric_values_comparators_units_dimensions(self) -> None:
-        assert "numeric values, comparators, units, and target dimensions" in self.text
+    def test_incomplete_output_on_missing_section(self) -> None:
+        """Skill spec must mention INCOMPLETE_OUTPUT for missing mandatory sub-sections."""
+        assert "INCOMPLETE_OUTPUT" in self.text
 
-    def test_contains_operational_check(self) -> None:
-        assert "Before writing the Impact JSON, check every objective ID" in self.text
-
-    def test_contains_ensure_all_quantitative_clauses(self) -> None:
-        assert "ensure all quantitative clauses from its measurable_target" in self.text
-
-    def test_contains_compact_sentence_with_and(self) -> None:
-        """Multi-metric objectives should use compact AND-joined sentence."""
-        assert 'all metric clauses joined by "AND"' in self.text
+    def test_forbids_reassigning_ids(self) -> None:
+        """Skill spec must forbid reassigning IDs from source artifacts."""
+        assert "reassign IDs" in self.text
 
 
 # ===========================================================================

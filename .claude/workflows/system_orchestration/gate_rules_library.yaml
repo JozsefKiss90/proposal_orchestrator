@@ -1211,6 +1211,50 @@ gate_rules:
           (validation_status.overall_status is "unresolved").
         prose_condition: "No unresolved material claims in Excellence section"
 
+      - predicate_id: g09a_p07
+        type: coverage
+        function: partner_names_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Excellence section uses partner short names without their
+          canonical legal names from the reference pack.
+        prose_condition: "Partner names preserved from canonical reference pack"
+
+      - predicate_id: g09a_p08
+        type: coverage
+        function: deliverable_identity_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Excellence section references deliverable IDs with wrong title,
+          parent WP, or due month.
+        prose_condition: "Deliverable identities match canonical reference pack"
+
+      - predicate_id: g09a_p09
+        type: coverage
+        function: canonical_terms_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Excellence section shortens or paraphrases canonical objective
+          or WP titles from the reference pack.
+        prose_condition: "Canonical objective and WP titles preserved"
+
+      - predicate_id: g09a_p10
+        type: coverage
+        function: measurable_targets_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Excellence section references objectives but drops quantitative
+          metric components from their measurable_target values.
+        prose_condition: "All quantitative metric components from measurable_target preserved"
+
 
   # ===========================================================================
   # GATE 09b — gate_10b_impact_completeness
@@ -1307,6 +1351,50 @@ gate_rules:
         fail_message: >
           Impact section contains unresolved material claims.
         prose_condition: "No unresolved material claims in Impact section"
+
+      - predicate_id: g09b_p08
+        type: coverage
+        function: partner_names_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Impact section uses partner short names without their
+          canonical legal names from the reference pack.
+        prose_condition: "Partner names preserved from canonical reference pack"
+
+      - predicate_id: g09b_p09
+        type: coverage
+        function: deliverable_identity_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Impact section references deliverable IDs with wrong title,
+          parent WP, or due month.
+        prose_condition: "Deliverable identities match canonical reference pack"
+
+      - predicate_id: g09b_p10
+        type: coverage
+        function: canonical_terms_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Impact section shortens or paraphrases canonical objective
+          or WP titles from the reference pack.
+        prose_condition: "Canonical objective and WP titles preserved"
+
+      - predicate_id: g09b_p11
+        type: coverage
+        function: measurable_targets_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Impact section references objectives but drops quantitative
+          metric components from their measurable_target values.
+        prose_condition: "All quantitative metric components from measurable_target preserved"
 
 
   # ===========================================================================
@@ -1405,6 +1493,39 @@ gate_rules:
         fail_message: >
           Implementation section contains unresolved material claims.
         prose_condition: "No unresolved material claims in Implementation section"
+
+      - predicate_id: g09c_p08
+        type: coverage
+        function: partner_names_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Implementation section uses partner short names without their
+          canonical legal names from the reference pack.
+        prose_condition: "Partner names preserved from canonical reference pack"
+
+      - predicate_id: g09c_p09
+        type: coverage
+        function: deliverable_identity_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Implementation section references deliverable IDs with wrong
+          title, parent WP, or due month.
+        prose_condition: "Deliverable identities match canonical reference pack"
+
+      - predicate_id: g09c_p10
+        type: coverage
+        function: canonical_terms_preserved
+        args:
+          section_path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+          canonical_pack_path: "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        fail_message: >
+          Implementation section shortens or paraphrases canonical
+          objective or WP titles from the reference pack.
+        prose_condition: "Canonical objective and WP titles preserved"
 
 
   # ===========================================================================

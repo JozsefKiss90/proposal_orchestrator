@@ -54,6 +54,18 @@ def _write_manifest(tmp_path: Path, data: dict) -> Path:
     return path
 
 
+def _seed_tier3_tier4(repo: Path) -> None:
+    """Write minimal Tier 3/4 sources so the canonical reference pack builds."""
+    _obj = repo / "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    _wp = repo / "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    _pt = repo / "docs/tier3_project_instantiation/consortium/partners.json"
+    for p in (_obj, _wp, _pt):
+        p.parent.mkdir(parents=True, exist_ok=True)
+    _obj.write_text('{"objectives":[{"id":"OBJ-1","title":"T","measurable_target":"≥1"}]}', encoding="utf-8")
+    _wp.write_text('{"work_packages":[{"wp_id":"WP1","title":"T","lead_partner":"P","deliverables":[{"deliverable_id":"D1-01","title":"D","due_month":3}]}]}', encoding="utf-8")
+    _pt.write_text('{"partners":[{"short_name":"P","legal_name":"Partner One"}]}', encoding="utf-8")
+
+
 def _three_phase_manifest() -> dict:
     """Three sequential phases: phase 1 (n01), phase 2 (n02), phase 3 (n03)."""
     return {
@@ -440,6 +452,7 @@ class TestMultiNodePhase:
     """Phase with multiple nodes (e.g. phase 8 substeps)."""
 
     def test_multi_node_phase_all_pass(self, tmp_path: Path):
+        _seed_tier3_tier4(tmp_path)
         manifest_path = _write_manifest(tmp_path, _multi_node_phase_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-multi-pass")
@@ -468,6 +481,7 @@ class TestMultiNodePhase:
         """n08a and n08c pass but n08b fails at exit gate → downstream nodes
         (n08d, n08e, n08f) stall, overall_status becomes partial_pass or
         aborted depending on remaining pending nodes."""
+        _seed_tier3_tier4(tmp_path)
         manifest_path = _write_manifest(tmp_path, _multi_node_phase_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-multi-partial")

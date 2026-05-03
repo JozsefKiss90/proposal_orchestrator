@@ -1490,6 +1490,82 @@ class DAGScheduler:
                 "All production nodes must have an exit gate."
             )
 
+        # ── Step 2.4: Phase 8 canonical reference pack (n08a/b/c) ────
+        #
+        # Before dispatching any Phase 8 drafting node, ensure the
+        # canonical reference pack is current.  This is deterministic
+        # and cheap (no LLM call).  Drafting skills use this pack to
+        # copy objective titles, WP titles, deliverable identities,
+        # and partner names exactly from source artifacts.
+        #
+        # BLOCKING: if the pack cannot be built or is invalid, the
+        # node is blocked immediately.  Drafting without the pack
+        # produces preventable gate_10d failures.
+        if node_id in REUSE_ELIGIBLE_NODES:
+            try:
+                from runner.phase8_canonical_pack import (
+                    CANONICAL_PACK_REL,
+                    SCHEMA_ID as _PACK_SCHEMA_ID,
+                    build_phase8_canonical_reference_pack,
+                )
+                _pack_path = build_phase8_canonical_reference_pack(
+                    self.repo_root, self.ctx.run_id,
+                )
+                # Validate: file must exist, parse as JSON, have correct
+                # schema_id and current run_id.
+                import json as _json
+                _pack_text = _pack_path.read_text(encoding="utf-8")
+                _pack_data = _json.loads(_pack_text)
+                if (
+                    _pack_data.get("schema_id") != _PACK_SCHEMA_ID
+                    or _pack_data.get("run_id") != self.ctx.run_id
+                ):
+                    raise ValueError(
+                        f"canonical_reference_pack.json has "
+                        f"schema_id={_pack_data.get('schema_id')!r}, "
+                        f"run_id={_pack_data.get('run_id')!r}; "
+                        f"expected schema_id={_PACK_SCHEMA_ID!r}, "
+                        f"run_id={self.ctx.run_id!r}"
+                    )
+                # Required arrays must be non-empty.  Empty arrays
+                # indicate missing Tier 3/4 sources — drafting without
+                # them produces metric-loss and identity failures.
+                _required = ("objectives", "wps", "deliverables", "partners")
+                _empty = [
+                    k for k in _required
+                    if not _pack_data.get(k)
+                ]
+                if _empty:
+                    raise ValueError(
+                        f"canonical_reference_pack.json has empty "
+                        f"required arrays: {_empty}"
+                    )
+            except Exception as _pack_exc:
+                _fail_reason = (
+                    f"Canonical reference pack build/validation failed "
+                    f"for {node_id!r}: {_pack_exc}"
+                )
+                log.error("  [%s] %s", node_id, _fail_reason)
+                self.ctx.set_node_state(
+                    node_id,
+                    "blocked_at_exit",
+                    failure_origin="agent_body",
+                    exit_gate_evaluated=False,
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+                self.ctx.save()
+                return NodeExecutionResult(
+                    node_id=node_id,
+                    final_state="blocked_at_exit",
+                    exit_gate_evaluated=False,
+                    failure_origin="agent_body",
+                    gate_result=None,
+                    agent_result=None,
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+
         # ── Step 2.5: Phase 8 reuse check (n08a/n08b/n08c only) ──────
         #
         # If the node is a Phase 8 section drafting node and a valid

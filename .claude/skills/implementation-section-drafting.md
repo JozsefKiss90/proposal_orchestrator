@@ -1,9 +1,8 @@
 ---
 skill_id: implementation-section-drafting
 purpose_summary: >
-  Draft the Implementation section (Quality and efficiency) of the RIA/IA Part B
-  from Phase 3 WP structure, Phase 4 Gantt, and Phase 6 implementation
-  architecture. Produces implementation_section.json conforming to
+  Draft the Implementation section (Quality and efficiency) of the RIA/IA Part B.
+  Produces implementation_section.json conforming to
   orch.tier5.implementation_section.v1.
 used_by_agents:
   - implementation_writer
@@ -15,6 +14,7 @@ reads_from:
   - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
   - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
   - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+  - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
 writes_to:
   - docs/tier5_deliverables/proposal_sections/implementation_section.json
 constitutional_constraints:
@@ -25,102 +25,90 @@ constitutional_constraints:
 
 ## Input Access (TAPM Mode)
 
-This skill executes in Tool-Augmented Prompt Mode (TAPM). Read the files listed
-in the Declared Inputs section from disk using the Read tool.
+This skill executes in TAPM. Read declared inputs from disk using the Read tool.
 
-**Declared input files to read (in order):**
-1. `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` -- MUST be read first; verify `gate_pass_declaration` equals `"pass"` before any other action
-2. `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` -- section identifiers, page limits for Implementation section
-3. `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` -- Quality criterion scoring logic and sub-criteria
-4. `docs/tier2b_topic_and_call_sources/extracted/` -- Tier 2B extracted files (use Glob to discover, then Read: scope_requirements.json, call_constraints.json). Required when asserting call constraints (CC-*) or scope requirements (SR-*) in drafted content.
-5. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json` -- WP definitions, tasks, deliverables, dependencies
-6. `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json` -- task schedule, milestone dates, critical path
-7. `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json` -- management structure, risk register, ethics, governance
-8. `docs/tier3_project_instantiation/` -- project data (use Glob to discover, then Read: consortium/partners.json, consortium/roles.json, architecture_inputs/risks.json, call_binding/selected_call.json)
+**Declared inputs (read in order):**
+1. `docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json` -- verify `gate_pass_declaration` equals `"pass"` before any other action
+2. `docs/tier2a_instrument_schemas/extracted/section_schema_registry.json` -- Implementation section identifiers, page limits
+3. `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json` -- Quality criterion scoring logic
+4. `docs/tier2b_topic_and_call_sources/extracted/` -- Glob then Read: scope_requirements.json, call_constraints.json (required when asserting SR-*/CC-* identifiers)
+5. `docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json`
+6. `docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json`
+7. `docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json`
+8. `docs/tier3_project_instantiation/` -- Glob then Read: consortium/partners.json, consortium/roles.json, architecture_inputs/risks.json, call_binding/selected_call.json
+9. `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json` -- if present, use as authoritative source for canonical terms (objective titles, WP titles, deliverable IDs/titles/months, partner names)
 
-**Boundary constraints:**
-- Do not read files outside the declared input set.
-- Base all reasoning ONLY on retrieved file content.
+Do not read files outside this set. Base all reasoning on retrieved file content only.
 
-Return a SINGLE valid JSON object matching the output schema below.
-Do not include ANY text before or after the JSON object — no prose, no
-verification summaries, no markdown fencing. The response must begin with `{`
-and end with `}`. Any non-JSON output causes a pipeline failure.
+Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must begin with `{` and end with `}`. Non-JSON output causes a pipeline failure.
 
-**Output size ceiling:** The total JSON response MUST be under 20,000 characters.
-To stay within budget:
-- B.3.1 work-plan content: concise narrative overview, NOT an expanded table dump. Summarize WPs in compact paragraphs (3-5 sentences each). Do NOT reproduce full task lists or deliverable tables in prose.
-- B.3.2 consortium content: one paragraph per partner (2-3 sentences). Do NOT expand role matrices into prose.
-- Move long enumerations into compact arrays or terse summary sentences.
-- Keep each sub_sections[].content field under 2,000 characters.
-- Keep each claim_statuses[].source_ref under 120 characters (file path + ID only).
-- Limit claim_statuses to 15 entries maximum.
+**Output size ceiling:** Total JSON response MUST be under 20,000 characters.
+- Work-plan content: concise narrative, not expanded table dump. Summarize WPs in 3-5 sentences each.
+- Consortium content: one paragraph per partner (2-3 sentences).
+- Each sub_sections[].content under 2,000 characters.
+- Each claim_statuses[].source_ref under 120 characters.
+- Limit claim_statuses to 15 entries.
 
 ## Execution Specification
 
-### 1. Input Validation Sequence
+### 1. Input Validation
 
-- Step 1.1: Read `budget_gate_assessment.json`. Check `gate_pass_declaration` equals `"pass"`. If absent or not `"pass"`: return `{"status": "failure", "failure_reason": "Budget gate has not passed", "failure_category": "CONSTITUTIONAL_HALT"}` and halt.
-- Step 1.2: Read `section_schema_registry.json`. Identify Implementation section entries. If empty or unreadable: return failure with `MISSING_INPUT`.
-- Step 1.3: Read `evaluator_expectation_registry.json`. Identify the Quality and efficiency criterion entry. If absent: return failure with `MISSING_INPUT`.
-- Step 1.4: Read `wp_structure.json`. Check schema_id. If absent or schema mismatch: return failure with `MISSING_INPUT`.
-- Step 1.5: Read `gantt.json`. Check schema_id. If absent or schema mismatch: return failure with `MISSING_INPUT`.
-- Step 1.6: Read `implementation_architecture.json`. Check schema_id. If absent or schema mismatch: return failure with `MISSING_INPUT`.
-- Step 1.7: Read Tier 3 consortium data (`partners.json`, `roles.json`). If absent: return failure with `MISSING_INPUT`.
-- Step 1.8: **Grant Agreement Annex guard** -- if any structural reference identifies a Grant Agreement Annex as the schema source: return failure with `CONSTITUTIONAL_HALT` and halt.
+- 1.1: Read `budget_gate_assessment.json`. If `gate_pass_declaration` is not `"pass"`: return `{"status": "failure", "failure_reason": "Budget gate has not passed", "failure_category": "CONSTITUTIONAL_HALT"}`.
+- 1.2: Read `section_schema_registry.json`. Identify Implementation entries. If absent: failure `MISSING_INPUT`.
+- 1.3: Read `evaluator_expectation_registry.json`. Identify Quality and efficiency criterion. If absent: failure `MISSING_INPUT`.
+- 1.4: Read `wp_structure.json`. If absent: failure `MISSING_INPUT`.
+- 1.5: Read `gantt.json`. If absent: failure `MISSING_INPUT`.
+- 1.6: Read `implementation_architecture.json`. If absent: failure `MISSING_INPUT`.
+- 1.7: Read Tier 3 consortium data (`partners.json`, `roles.json`). If absent: failure `MISSING_INPUT`.
+- 1.8: If any structural reference identifies a Grant Agreement Annex as schema source: failure `CONSTITUTIONAL_HALT`.
 
-### 2. Core Processing Logic
+### 2. Core Processing
 
-- Step 2.1: **Identify Implementation sub-sections.** From `section_schema_registry.json`, extract the ordered list of mandatory sub-sections. Do not add sub-sections not present in the registry.
+- 2.1: **Identify sub-sections** from `section_schema_registry.json`. Do not add sub-sections not in the registry.
 
-- Step 2.2: **Read evaluation framing.** From `evaluator_expectation_registry.json`, extract the Quality and efficiency criterion's sub-criteria and scoring logic. Frame content to address these directly.
+- 2.2: **Read evaluation framing** from `evaluator_expectation_registry.json`. Frame content to address Quality and efficiency sub-criteria directly.
 
-- Step 2.3: **Draft work plan sub-sections.** For each WP in `wp_structure.json`:
+- 2.3: **Draft work plan sub-sections.** For each WP in `wp_structure.json`:
+  - **WP descriptions:** WP title, lead partner, objectives, tasks, deliverables with types and due months, person-months (only if confirmed in budget gate). Present the Phase 3 design -- do not redesign it.
+  - **Deliverable table:** from `wp_structure.json` deliverable entries.
+  - **Gantt narrative:** from `gantt.json`, describe timeline, critical path, task sequencing, dependencies. Use dependency counts exactly as stated -- do not invent or approximate.
+  - **Milestones table:** from `gantt.json` milestone entries.
 
-  - Step 2.3.1: **WP descriptions.** Draft per-WP descriptions including: WP title, lead partner, objectives, tasks with descriptions, deliverables with types and due months, person-months (only if confirmed in budget gate assessment). Present the structure as defined in Phase 3 — do not redesign it.
+- 2.4: **Draft management and risk sub-sections.** From `implementation_architecture.json`:
+  - **Management structure:** management bodies, meeting frequency, decision-making scope, escalation. Roles reference only Tier 3 consortium partners. Do not assert programme-rule claims unless directly traceable to a source in reads_from.
+  - **Risk register:** top risks with category, likelihood, impact, mitigation. Use frequencies and intervals exactly as stated.
+  - **Ethics self-assessment:** summarize ethics flags. Do not cite numbered ethics category classifications unless a Tier 1 source is explicitly read.
 
-  - Step 2.3.2: **Deliverable table.** Build from `wp_structure.json` deliverable entries. Columns: deliverable number, name, WP, lead, type, dissemination level, due month.
+- 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`, cross-referenced against `wp_structure.json`:
+  - Use `wp_structure.json` as the canonical source for WP lead assignments. Tier 4 governs over Tier 3 on conflict.
+  - Derive WP leadership distribution from data -- do not assert uniform distribution unless literally true.
+  - State only roles confirmed in `wp_structure.json`. When Tier 3 and Tier 4 conflict on contributor roles, state WP leads and domain expertise without enumerating conflict-prone contributor lists.
+  - Do not assign roles to partners not in Tier 3.
+  - Do not assert Tier 1 programme-rule obligations unless this skill reads the Tier 1 source.
+  - Do not overclaim scope-requirement coverage.
 
-  - Step 2.3.3: **Gantt narrative.** From `gantt.json`, describe the project timeline, critical path, task sequencing, and dependencies. Use dependency edge counts and categorisations exactly as stated in `wp_structure.json` — do not invent or approximate counts.
+- 2.6: **Draft resources sub-section.** Describe resource allocation at the level confirmed by the budget gate. Do not cite budget figures not validated in `budget_gate_assessment.json`.
 
-  - Step 2.3.4: **Milestones table.** From `gantt.json` milestone entries: milestone number, name, WP, due month, verification criterion, responsible partner.
+- 2.7: **Populate structural references:** `wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`.
 
-- Step 2.4: **Draft management and risk sub-sections.** From `implementation_architecture.json`:
+- 2.8: **Build validation_status.** Up to 15 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest. Omit claims that cannot be confirmed or inferred.
 
-  - Step 2.4.1: **Management structure.** Describe management bodies, meeting frequency, decision-making scope, escalation paths from the `management_structure` field. Roles must reference only Tier 3 consortium partners. Do not assert programme-rule claims unless directly traceable to a source in reads_from.
+- 2.9: **Build traceability_footer.** All `tier` values MUST be numeric integers. Include Tier 2B paths when asserting SR/CC identifiers. Set `no_unsupported_claims_declaration` true only if all claims confirmed/inferred with non-null source_refs.
 
-  - Step 2.4.2: **Risk register summary.** Present top risks with category, likelihood, impact, and mitigation from `risk_register` field. Use frequencies and intervals exactly as stated in the source data.
+- 2.10: **Handle data gaps.** Omit unsourceable claims. If a mandatory sub-section cannot be drafted: failure `INCOMPLETE_OUTPUT`.
 
-  - Step 2.4.3: **Ethics self-assessment.** Summarize ethics flags from `ethics_assessment` field. Do not cite numbered ethics category classifications unless a Tier 1 source is explicitly read and cited — this skill does not read Tier 1.
+### 3. Canonical Copying Rules
 
-- Step 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`, cross-referenced against Tier 4 `wp_structure.json`:
-  - Use `wp_structure.json` as the CANONICAL source for WP lead assignments. Tier 4 governs over Tier 3 when there is a conflict.
-  - Derive WP leadership distribution from the data — do not assert uniform distribution (e.g., "each partner leads exactly one WP") unless that is literally true per `wp_structure.json`.
-  - For partner WP contributions, state only roles confirmed in `wp_structure.json`. When Tier 3 `roles.json` and Tier 4 `wp_structure.json` conflict, state WP lead roles and partner domain expertise without enumerating conflict-prone contributor lists.
-  - Describe each partner's role, expertise, and contribution. Do not assign roles to partners not in Tier 3.
-  - Use canonical `legal_name` from `partners.json`. Short names may appear in parentheses; the full legal name must not be truncated (see CCR rules and Additional Conventions below).
-  - Do not assert Tier 1 programme-rule obligations unless this skill reads the specific Tier 1 source.
-  - Do not overclaim scope-requirement coverage; state demonstrator and sector coverage as it factually exists in Tier 3/Tier 4.
+- Use `canonical_reference_pack.json` when available.
+- Copy objective titles, outcome titles, WP titles, deliverable IDs/titles/due months, milestone IDs/titles, partner legal names, and partner short names exactly from declared source artifacts.
+- Do not rename, shorten, paraphrase, or reassign IDs.
+- Do not infer ownership. If ownership or relationship is unclear, omit the claim.
+- Do not cite a deliverable unless its ID, title, parent WP, and due month are present in the source artifact.
+- Keep the output concise and schema-conformant.
 
-- Step 2.6: **Draft resources sub-section.** Describe resource allocation at the level confirmed by the budget gate. Do not cite specific budget figures not validated in `budget_gate_assessment.json`.
+### 4. Output Schema
 
-- Step 2.7: **Populate structural references.**
-  - `wp_table_refs`: array of all WP IDs from `wp_structure.json`.
-  - `gantt_ref`: path to `gantt.json`.
-  - `milestone_refs`: array of all milestone IDs from `gantt.json`.
-  - `risk_register_ref`: path to `implementation_architecture.json`.
-
-- Step 2.8: **Build validation_status.** Produce up to 15 aggregated claim_status entries. Each entry: claim_id, claim_summary, status ("confirmed" or "inferred"), source_ref (path + ID, max 120 chars). Set `overall_status` to the weakest status across all claims. OMIT any claim that cannot be confirmed or inferred — do not include "assumed" or "unresolved" entries. For dissemination level claims not directly in source data, mark as "inferred" with a source chain. **CCR-5 enforcement in claims:** If a claim summarizes an objective's measurable_target, the claim_summary MUST retain all metric components from the target — do not partially represent a multi-component target in claim_summary.
-
-- Step 2.9: **Build traceability_footer.** Populate `primary_sources` array. All `tier` values MUST be numeric integers (use 2 for Tier 2A/2B, 3 for Tier 3, 4 for Tier 4). Include direct Tier 2B extracted source paths when the section asserts SR/CC identifiers. Set `no_unsupported_claims_declaration` to `true` only if all claim_statuses are "confirmed" or "inferred" with non-null source_refs.
-
-- Step 2.10: **Handle data gaps.** OMIT unsourceable claims. If the gap prevents drafting a mandatory sub-section entirely, return failure with `INCOMPLETE_OUTPUT`.
-
-  Follow all Canonical Consistency Rules (CCR-1 through CCR-4) below throughout all sub-sections.
-
-### 3. Output Schema
-
-Return a single JSON object conforming to `orch.tier5.implementation_section.v1`:
+Return JSON conforming to `orch.tier5.implementation_section.v1`:
 
 ```json
 {
@@ -131,14 +119,14 @@ Return a single JSON object conforming to `orch.tier5.implementation_section.v1`
     {
       "sub_section_id": "<from section_schema_registry.json>",
       "title": "<from section_schema_registry.json>",
-      "content": "<evaluator-oriented prose, grounded in Tier 1-4>",
-      "word_count": "<actual word count of content>"
+      "content": "<evaluator-oriented prose>",
+      "word_count": "<actual word count>"
     }
   ],
-  "wp_table_refs": ["WP1", "WP2", "WP3"],
-  "gantt_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
-  "milestone_refs": ["MS1", "MS2", "MS3"],
-  "risk_register_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "wp_table_refs": ["WP1", "WP2"],
+  "gantt_ref": "docs/tier4_.../gantt.json",
+  "milestone_refs": ["MS1", "MS2"],
+  "risk_register_ref": "docs/tier4_.../implementation_architecture.json",
   "validation_status": {
     "overall_status": "confirmed|inferred",
     "claim_statuses": [
@@ -146,172 +134,27 @@ Return a single JSON object conforming to `orch.tier5.implementation_section.v1`
         "claim_id": "<unique>",
         "claim_summary": "<brief>",
         "status": "confirmed|inferred",
-        "source_ref": "<tier and path, max 120 chars>"
+        "source_ref": "<path + ID, max 120 chars>"
       }
     ]
   },
   "traceability_footer": {
     "primary_sources": [
-      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"},
-      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"},
-      {"tier": 4, "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"},
-      {"tier": 3, "source_path": "docs/tier3_project_instantiation/consortium/partners.json"},
-      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"},
-      {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json"}
+      {"tier": 4, "source_path": "docs/tier4_.../wp_structure.json"},
+      {"tier": 4, "source_path": "docs/tier4_.../gantt.json"},
+      {"tier": 3, "source_path": "docs/tier3_.../partners.json"},
+      {"tier": 2, "source_path": "docs/tier2b_.../scope_requirements.json"}
     ],
     "no_unsupported_claims_declaration": true
   }
 }
 ```
 
-- `schema_id`: const "orch.tier5.implementation_section.v1"
-- `run_id`: copied from invoking agent's run_id parameter
-- `artifact_status`: MUST be absent at write time (runner stamps post-gate)
+- `schema_id`: const `"orch.tier5.implementation_section.v1"`
+- `run_id`: from invoking agent's run_id
+- `artifact_status`: MUST be absent at write time
 
-## Canonical Consistency Rules (GATE-CRITICAL — Cross-Section Enforcement)
+### 5. Write Sequence
 
-These rules are enforced deterministically by gate_10d_cross_section_consistency. Violations cause gate failure. All four rules apply to every `sub_sections[].content` field in the output.
-
-### Rule CCR-1: Canonical Objective Title Preservation
-
-When referencing any objective from `architecture_inputs/objectives.json`, the objective `title` field MUST be reproduced verbatim in the drafted content.
-
-**Prohibited:**
-- Abbreviating the title (e.g., dropping words)
-- Paraphrasing the title (e.g., substituting synonyms)
-- Truncating the title (e.g., using only the first part)
-- Extending the title (e.g., appending additional words)
-- Substituting synonyms for any word in the title
-
-**Permitted shorthand:** After the full canonical title has been introduced once in the section, subsequent references MAY use the objective ID only (e.g., "OBJ-1"). However, the full canonical title must appear at least once in the section content.
-
-**Enforcement:** gate_10d checks that every objective `title` from Tier 3 that contains a component keyword (engine, layer, architecture, protocol, framework, system) appears verbatim in the section content when that objective is referenced.
-
-**WP/objective label overlap rule:** When a WP label or parenthetical description derives from or overlaps with a canonical objective title from `objectives.json`, the drafted content must either: (a) use the exact WP title from `wp_structure.json` and separately introduce the exact objective/component title from `objectives.json`, or (b) explicitly state the relationship between the WP and the canonical objective/component title without replacing one with the other. If the WP title in `wp_structure.json` is a shortened form of the corresponding objective title in `objectives.json` (e.g., the WP title drops a leading modifier or trailing noun), the canonical objective title governs component naming in evaluator-facing text because gate_10d enforces objective-title-level terminology.
-
-### Rule CCR-2: Deliverable ID Semantic Consistency
-
-A deliverable ID (e.g., "D4-01") represents a single semantic artifact as defined in `wp_structure.json`. When referencing a deliverable ID in drafted content:
-
-**Required:**
-- The deliverable's purpose must match its canonical `title` from `wp_structure.json`
-- The deliverable's timing must match its canonical `due_month` from `wp_structure.json`
-
-**Prohibited:**
-- Assigning a deliverable ID a different meaning or purpose than its canonical definition
-- Changing the temporal context of a deliverable (e.g., describing a M18 deliverable as a M48 output)
-- Using a deliverable ID to refer to a KPI or impact activity instead of its canonical deliverable artifact
-
-**When a deliverable enables a downstream activity** (e.g., a protocol specification deliverable enables a standardisation submission): explicitly frame the relationship as "deliverable D4-01 (<canonical title>) enables/supports <downstream activity>". Do NOT describe the downstream activity AS the deliverable.
-
-### Rule CCR-3: Objective Metric Completeness
-
-When an objective from `architecture_inputs/objectives.json` is referenced in the drafted content and its `measurable_target` contains quantitative values, ALL quantitative targets MUST be preserved.
-
-**Required:**
-- If `measurable_target` contains multiple metrics joined by "AND" (e.g., "≥20% X AND ≥15% Y"), ALL metrics must appear in the content when that objective's targets are discussed
-- Numeric values and their comparators (≥, ≤, >, <) must be preserved exactly
-
-**Prohibited:**
-- Selecting only a subset of metrics from a multi-metric target
-- Silently omitting any quantitative target value
-- Rounding or approximating target values
-
-**Permitted reformatting:** Metrics may be presented in prose form, bullet lists, or KPI tables — but all values must be present regardless of format.
-
-### Rule CCR-4: Canonical Component / System Naming
-
-All named components, systems, layers, and architectural elements referenced in drafted content MUST use their canonical names exactly as defined in Tier 3 artifacts (`architecture_inputs/objectives.json` titles, `architecture_inputs/outcomes.json` titles).
-
-**Prohibited:**
-- Truncating a canonical name (e.g., if the source title is "A B C", do not shorten it to "B C" when the shortened form could be interpreted as a different component)
-- Extending a canonical name (e.g., appending words not in the source title)
-- Substituting synonyms for any word in the canonical name
-- Using a lowercased or differently-cased variant when the canonical name has specific casing
-
-**Permitted aliasing:** A short alias MAY be used ONLY if:
-1. The full canonical name is introduced first in the same sub-section
-2. The alias is explicitly defined at introduction (e.g., "the [full canonical name] (hereafter [alias])")
-
-**Enforcement:** gate_10d extracts canonical component names from Tier 3 objective titles containing component keywords (engine, layer, architecture, protocol, framework, system). If the name stem appears in section content but the full canonical name does not, gate_10d flags a terminology inconsistency. If Excellence uses a canonical component name, Implementation MUST use the same term exactly.
-
-**WP label terminology rule:** When enumerating WPs with descriptive labels in parentheses, and a WP's descriptive concept derives from a canonical objective title, the full canonical objective title from `objectives.json` must be used — not a potentially abbreviated WP title from `wp_structure.json`. No WP or component label may drop leading modifiers, trailing nouns, or other words that are present in the canonical objective title. If two source artifacts provide different labels for overlapping concepts, use the higher-tier canonical artifact designated by this skill for that concept, or avoid collapsing them into one label.
-
-### Rule CCR-5: Complete Measurable Target Preservation (GATE-CRITICAL)
-
-When Implementation mentions any objective_id from `architecture_inputs/objectives.json`, the `measurable_target` field MUST be preserved in its entirety — every metric component, every conjunct, every quantified threshold.
-
-**Required:**
-- Read the objective's canonical `measurable_target` from Tier 3 `objectives.json`.
-- If `measurable_target` contains conjunctions (AND, and, plus, comma-separated components, or multiple quantified thresholds), ALL components must appear when that objective's targets are discussed in Implementation content.
-- Each metric component must appear in both the narrative `sub_sections[].content` AND in any `validation_status.claim_statuses[]` entry that summarizes that objective's target.
-
-**Prohibited:**
-- Compressing a dual/multi-metric target into a single metric (e.g., retaining only "≥X% metric-A" when the target is "≥X% metric-A AND ≥Y% metric-B")
-- Retaining only the first quantitative target and dropping subsequent conjuncts
-- Replacing a multi-component target with a generic phrase such as "performance improvement"
-- Dropping non-primary metric components from claim_summary fields
-
-**Examples (abstract, not project-specific):**
-- If a target is "≥X% improvement in metric-A AND metric-B", the section must mention BOTH metric-A AND metric-B
-- If a target is "≥X% reduction in metric-A AND ≥Y% reduction in metric-B", the section must retain BOTH reductions
-- If a target contains multiple conjuncts joined by AND, every conjunct must appear in the section content
-
-**Enforcement:** gate_10d cross-section consistency check (CC-06) detects partial measurable_target loss across sections. Implementation must not be the source of such loss.
-
-### Rule CCR-6: Objective Ownership vs Integration/Support Role Separation (GATE-CRITICAL)
-
-When Implementation mentions an objective_id, the wording MUST NOT imply that a WP or partner owns, implements, delivers, or is responsible for the objective unless Tier 3 `objectives.json` (via `responsible_partner`) and/or `wp_structure.json` (via WP lead and task mappings) explicitly supports that assignment.
-
-**Required:**
-- Read `responsible_partner` and `contributing_partners` from `objectives.json` for each referenced objective.
-- Read WP lead assignments and task/deliverable mappings from `wp_structure.json`.
-- If a horizontal/integration/support WP references an objective whose `responsible_partner` is a different partner or WP, use neutral integration wording only.
-
-**Permitted neutral wording for integration/support WPs:**
-- "[Integration WP] integrates outputs from [canonical component/objective]"
-- "[Integration WP] validates interfaces for [canonical component/objective]"
-- "[Integration WP] supports deployment of [canonical component/objective]"
-- "[Integration WP] consumes the output of [canonical component/objective]"
-
-**Required ownership-safe pattern:**
-- "[Responsible partner/WP] develops/delivers [objective/component]. [Integration WP] integrates the resulting outputs/interfaces into the combined platform."
-
-**Prohibited:**
-- "[Integration WP] implements [objective]"
-- "[Integration WP] delivers [objective]"
-- "[Integration WP] is responsible for [objective]"
-- "[Integration WP] integrates all pillars including [objective]" — if this reads as assigning objective delivery to the integration WP
-- Any phrasing where an integration/support WP appears as the grammatical subject of implementing, delivering, or owning an objective whose `responsible_partner` is different
-
-**Enforcement:** gate_10d cross-section consistency check (CC-01) detects objective ownership / WP attribution conflicts between sections. Implementation must not introduce such conflicts.
-
-### Rule CCR-7: Pre-Output Consistency Self-Check
-
-Before writing `implementation_section.json`, perform this bounded check for each objective_id appearing in the drafted content:
-
-1. Verify objective_id exists in Tier 3 `objectives.json`
-2. Verify canonical title is preserved (per CCR-1)
-3. Verify ALL measurable_target components are present (per CCR-5)
-4. Verify responsible_partner is not contradicted by WP/partner wording (per CCR-6)
-5. Verify integration/support WPs are described with neutral wording only (per CCR-6)
-
-If any item fails: revise the relevant content before writing the output. Do not rely on gate_10d to catch the issue downstream.
-
-6. Verify every WP label or WP descriptive parenthetical: if the label contains a stem from a canonical objective title in `architecture_inputs/objectives.json`, the full canonical objective title must appear in the same label or sentence. No WP or component label may drop leading modifiers, trailing nouns, or other words that are present in the canonical objective title.
-
-This check is bounded to objectives actually mentioned in the drafted content — it does not require scanning all Tier 3 objectives exhaustively.
-
-### Additional Conventions
-
-**Partner Legal Names (MANDATORY):**
-- When naming partners in prose, use the exact `legal_name` from `consortium/partners.json`.
-- NEVER truncate legal names by dropping legal entity suffixes. If `legal_name` ends with "AG", "Oy", "GmbH", etc., the suffix MUST be included.
-- `short_name` values from `partners.json` may be used in parentheses or as abbreviations, but the first prose mention of each partner MUST use the full `legal_name`.
-
-When linking objectives to WPs, use only explicit mappings from `wp_structure.json` or `implementation_architecture.json`; if no explicit mapping exists, avoid asserting WP ownership. These conventions and all CCR rules are enforced deterministically by gate predicates (gate_10c, gate_10d).
-
-### 4. Write Sequence
-
-- Step 4.1: Create directory `docs/tier5_deliverables/proposal_sections/` if not present.
-- Step 4.2: Write `implementation_section.json` to `docs/tier5_deliverables/proposal_sections/implementation_section.json`.
+- Create `docs/tier5_deliverables/proposal_sections/` if not present.
+- Write to `docs/tier5_deliverables/proposal_sections/implementation_section.json`.

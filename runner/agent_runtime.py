@@ -81,6 +81,30 @@ _TIER5_DELIVERABLE_DIRS: tuple[str, ...] = (
     "docs/tier5_deliverables/assembled_drafts",
 )
 
+#: Phase 8 primary drafting skills.  If any of these fail, the agent
+#: body halts immediately (stale-artifact guard) to prevent audit
+#: skills from running against stale artifacts from a prior run.
+_PHASE8_PRIMARY_DRAFTING_SKILLS: frozenset[str] = frozenset({
+    "excellence-section-drafting",
+    "impact-section-drafting",
+    "implementation-section-drafting",
+})
+
+#: Maps each Phase 8 primary drafting skill to the section artifact it
+#: must produce.  After a drafting skill reports success, the agent
+#: verifies this artifact exists on disk with run_id == current run.
+_PHASE8_SKILL_EXPECTED_ARTIFACT: dict[str, str] = {
+    "excellence-section-drafting": (
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+    ),
+    "impact-section-drafting": (
+        "docs/tier5_deliverables/proposal_sections/impact_section.json"
+    ),
+    "implementation-section-drafting": (
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+    ),
+}
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -1241,6 +1265,65 @@ def run_agent(
                 resolved_inputs, result.outputs_written, repo_root
             )
 
+            # ── Phase 8 post-drafting freshness check ────────────
+            # After a primary drafting skill succeeds, verify the
+            # expected section artifact exists on disk with run_id
+            # matching the current run.  A stale artifact (wrong
+            # run_id or missing) means the skill did not actually
+            # produce usable output — halt before audit skills run.
+            if sid in _PHASE8_SKILL_EXPECTED_ARTIFACT:
+                _expected_rel = _PHASE8_SKILL_EXPECTED_ARTIFACT[sid]
+                _expected_abs = repo_root / _expected_rel
+                _freshness_ok = False
+                _freshness_detail = ""
+                try:
+                    import json as _json
+                    _art_text = _expected_abs.read_text(encoding="utf-8-sig")
+                    _art_data = _json.loads(_art_text)
+                    _art_rid = _art_data.get("run_id")
+                    if _art_rid == run_id:
+                        _freshness_ok = True
+                    else:
+                        _freshness_detail = (
+                            f"run_id mismatch: expected {run_id!r}, "
+                            f"got {_art_rid!r}"
+                        )
+                except FileNotFoundError:
+                    _freshness_detail = (
+                        f"artifact not found: {_expected_abs}"
+                    )
+                except Exception as _fe:
+                    _freshness_detail = (
+                        f"artifact unreadable: {_fe}"
+                    )
+                if not _freshness_ok:
+                    _fail_reason = (
+                        f"Post-drafting freshness check failed for "
+                        f"{sid!r}: {_freshness_detail}; "
+                        f"halting before audit skills"
+                    )
+                    logger.warning(
+                        "Phase 8 freshness guard: %s artifact stale/missing "
+                        "for node %s: %s",
+                        sid, node_id, _freshness_detail,
+                    )
+                    all_invocations.append(SkillInvocationRecord(
+                        skill_id=f"{sid}::freshness_check",
+                        status="failure",
+                        failure_reason=_fail_reason,
+                        failure_category="MISSING_INPUT",
+                    ))
+                    return AgentResult(
+                        status="failure",
+                        can_evaluate_exit_gate=False,
+                        failure_reason=_fail_reason,
+                        failure_category="MISSING_INPUT",
+                        outputs_written=all_outputs,
+                        validation_reports=all_validation_reports,
+                        decision_log_writes=all_decision_log_writes,
+                        invoked_skills=all_invocations,
+                    )
+
             # Manifest-driven sub-agent injection: after each
             # successful primary skill, check whether the declared
             # sub-agent's required inputs are now present on disk.
@@ -1313,6 +1396,34 @@ def run_agent(
                         f"{result.failure_reason}"
                     ),
                     failure_category="CONSTITUTIONAL_HALT",
+                    outputs_written=all_outputs,
+                    validation_reports=all_validation_reports,
+                    decision_log_writes=all_decision_log_writes,
+                    invoked_skills=all_invocations,
+                )
+
+            # Phase 8 stale-artifact guard: if the primary drafting
+            # skill fails, halt immediately.  Audit skills (traceability,
+            # compliance) depend on the primary artifact; running them
+            # against a stale artifact from a prior run would produce
+            # misleading results.  can_evaluate_exit_gate=False prevents
+            # a stale section from satisfying exit readiness.
+            if sid in _PHASE8_PRIMARY_DRAFTING_SKILLS:
+                _fail_reason = (
+                    f"Primary drafting skill {sid!r} failed: "
+                    f"{result.failure_reason}; "
+                    f"halting agent body (stale-artifact guard)"
+                )
+                logger.warning(
+                    "Phase 8 stale-artifact guard: %s failed, "
+                    "halting agent body for node %s",
+                    sid, node_id,
+                )
+                return AgentResult(
+                    status="failure",
+                    can_evaluate_exit_gate=False,
+                    failure_reason=_fail_reason,
+                    failure_category="SKILL_FAILURE",
                     outputs_written=all_outputs,
                     validation_reports=all_validation_reports,
                     decision_log_writes=all_decision_log_writes,

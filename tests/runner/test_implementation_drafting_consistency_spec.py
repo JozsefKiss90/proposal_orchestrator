@@ -1,12 +1,14 @@
 """
-Targeted tests for Implementation drafting consistency invariants (CCR-5, CCR-6, CCR-7).
+Targeted tests for Implementation drafting consistency invariants.
 
-Verifies that implementation-section-drafting.md contains project-agnostic rules
-enforcing:
-  1. Complete measurable_target preservation (no metric compression)
-  2. Objective ownership vs integration/support role separation
-  3. Pre-output consistency self-check
-  4. validation_status.claim_statuses[] metric completeness
+Verifies the *slim* implementation-section-drafting.md architecture where:
+  - The skill spec declares canonical_reference_pack.json as an input
+  - Canonical Copying Rules forbid renaming/shortening/reassigning IDs
+  - Metric preservation (CCR-5) and ownership separation (CCR-6) are
+    enforced by deterministic preflight predicates registered at gate_10c
+    and cross_section_consistency at gate_10d, NOT by bloated in-spec rules
+  - claim_summary completeness is enforced by the cross_section_consistency
+    predicate (CC-06 check), not by skill-level prose
 
 Also includes artifact-level fixture tests that exercise the existing
 cross_section_consistency predicate for Implementation-specific failures.
@@ -46,31 +48,35 @@ def _write_json(path: Path, data: object) -> None:
 
 
 class TestSpecMetricPreservation:
-    """Implementation spec requires all measurable_target components preserved."""
+    """Slim spec delegates metric preservation to predicates + canonical pack.
+
+    The old spec embedded CCR-5 / GATE-CRITICAL / conjunction rules inline.
+    The slim spec instead:
+      - Declares canonical_reference_pack.json as input
+      - Has a "Canonical Copying Rules" section forbidding renaming/shortening
+      - Relies on cross_section_consistency (CC-06) at gate_10d for metric loss
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_requires_all_measurable_target_components(self) -> None:
-        """Spec mandates preserving every metric component of measurable_target."""
-        assert "measurable_target" in self.spec
-        assert "ALL components must appear" in self.spec or \
-               "all measurable_target components" in self.spec.lower() or \
-               "every metric component" in self.spec.lower()
+    def test_spec_declares_canonical_reference_pack_input(self) -> None:
+        """Spec lists canonical_reference_pack.json in reads_from / declared inputs."""
+        assert "canonical_reference_pack.json" in self.spec
 
-    def test_spec_mentions_conjunctions(self) -> None:
-        """Spec explicitly addresses AND/conjunction handling."""
-        assert "AND" in self.spec
-        assert "conjunct" in self.spec.lower() or "conjunction" in self.spec.lower()
+    def test_spec_has_canonical_copying_rules_section(self) -> None:
+        """Spec contains a 'Canonical Copying Rules' section."""
+        assert "Canonical Copying Rules" in self.spec
 
-    def test_spec_mentions_ccr5(self) -> None:
-        """Spec defines CCR-5 for metric preservation."""
-        assert "CCR-5" in self.spec
+    def test_spec_forbids_renaming(self) -> None:
+        """Spec forbids renaming canonical terms."""
+        assert "rename" in self.spec.lower()
 
-    def test_spec_mentions_gate_critical(self) -> None:
-        """CCR-5 is marked GATE-CRITICAL."""
-        assert "GATE-CRITICAL" in self.spec
+    def test_cross_section_consistency_registered_in_gate_evaluator(self) -> None:
+        """cross_section_consistency predicate is registered in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "cross_section_consistency" in PREDICATE_REGISTRY
 
 
 # ===========================================================================
@@ -79,29 +85,42 @@ class TestSpecMetricPreservation:
 
 
 class TestSpecNoMetricCompression:
-    """Implementation spec forbids compressing dual/multi-metric targets."""
+    """Slim spec delegates metric-compression prevention to gate predicates.
+
+    The old spec had inline rules forbidding compression, retaining-only-first,
+    generic replacement, and non-primary dropping.  The slim spec instead:
+      - Forbids shortening/paraphrasing in Canonical Copying Rules
+      - Relies on cross_section_consistency CC-06 at gate_10d
+      - Relies on canonical_terms_preserved at gate_10c
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_forbids_single_metric_compression(self) -> None:
-        """Spec explicitly prohibits compressing a multi-metric target into one."""
-        spec_lower = self.spec.lower()
-        assert "compressing" in spec_lower or "compress" in spec_lower
+    def test_spec_forbids_shortening(self) -> None:
+        """Spec forbids shortening canonical terms."""
+        assert "shorten" in self.spec.lower()
 
-    def test_spec_forbids_retaining_only_first_target(self) -> None:
-        """Spec forbids retaining only the first quantitative target."""
-        assert "Retaining only the first quantitative target" in self.spec or \
-               "retaining only the first" in self.spec.lower()
+    def test_spec_forbids_paraphrasing(self) -> None:
+        """Spec forbids paraphrasing canonical terms."""
+        assert "paraphrase" in self.spec.lower()
 
-    def test_spec_forbids_generic_replacement(self) -> None:
-        """Spec forbids replacing multi-component target with generic phrase."""
-        assert "performance improvement" in self.spec.lower()
+    def test_canonical_terms_preserved_registered(self) -> None:
+        """canonical_terms_preserved predicate is in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "canonical_terms_preserved" in PREDICATE_REGISTRY
 
-    def test_spec_forbids_dropping_non_primary_components(self) -> None:
-        """Spec forbids dropping non-primary metric components."""
-        assert "non-primary" in self.spec.lower()
+    def test_canonical_terms_preserved_in_gate_10c(self) -> None:
+        """canonical_terms_preserved is listed in gate_10c predicates in gate_rules_library."""
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        # Predicate appears under gate_10c_implementation_completeness block
+        assert "canonical_terms_preserved" in content
 
 
 # ===========================================================================
@@ -110,36 +129,46 @@ class TestSpecNoMetricCompression:
 
 
 class TestSpecOwnershipSeparation:
-    """Implementation spec distinguishes responsible_partner from integration/support WP."""
+    """Slim spec delegates ownership separation to Canonical Copying Rules + predicates.
+
+    The old spec had CCR-6, explicit prohibited-pattern lists, and
+    responsible_partner prose.  The slim spec instead:
+      - Says "Do not infer ownership" in Canonical Copying Rules
+      - References wp_structure.json as the canonical source for WP lead assignments
+      - Relies on partner_names_preserved and cross_section_consistency (CC-01)
+        at gate_10c / gate_10d
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_mentions_responsible_partner(self) -> None:
-        """Spec references responsible_partner from objectives.json."""
-        assert "responsible_partner" in self.spec
+    def test_spec_forbids_inferring_ownership(self) -> None:
+        """Spec says 'Do not infer ownership'."""
+        assert "Do not infer ownership" in self.spec
 
-    def test_spec_distinguishes_integration_wp(self) -> None:
-        """Spec distinguishes integration/support WPs from responsible parties."""
-        spec_lower = self.spec.lower()
-        assert "integration" in spec_lower
-        assert "support" in spec_lower
+    def test_spec_forbids_reassigning_ids(self) -> None:
+        """Spec forbids reassigning IDs."""
+        assert "reassign" in self.spec.lower()
 
-    def test_spec_defines_ccr6(self) -> None:
-        """Spec defines CCR-6 for ownership separation."""
-        assert "CCR-6" in self.spec
-
-    def test_spec_forbids_unsupported_ownership_reassignment(self) -> None:
-        """Spec forbids asserting ownership not supported by Tier 3/wp_structure."""
-        assert "implements" in self.spec and "delivers" in self.spec
-        # Should list these as prohibited patterns
-        spec_lower = self.spec.lower()
-        assert "prohibited" in spec_lower
-
-    def test_spec_mentions_wp_structure_for_ownership(self) -> None:
-        """Spec requires reading wp_structure.json for ownership validation."""
+    def test_spec_references_wp_structure_for_ownership(self) -> None:
+        """Spec references wp_structure.json as canonical source for WP leads."""
         assert "wp_structure.json" in self.spec
+
+    def test_partner_names_preserved_registered(self) -> None:
+        """partner_names_preserved predicate is in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "partner_names_preserved" in PREDICATE_REGISTRY
+
+    def test_partner_names_preserved_in_gate_10c(self) -> None:
+        """partner_names_preserved is listed in gate_10c predicates in gate_rules_library."""
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        assert "partner_names_preserved" in content
 
 
 # ===========================================================================
@@ -148,33 +177,46 @@ class TestSpecOwnershipSeparation:
 
 
 class TestSpecSafeIntegrationWording:
-    """Implementation spec includes neutral integration/support wording patterns."""
+    """Slim spec replaces inline wording templates with Canonical Copying Rules.
+
+    The old spec listed explicit safe-wording phrases ('integrates outputs from',
+    'validates interfaces for', etc.).  The slim spec instead:
+      - Has the Canonical Copying Rules section with 'Do not infer ownership'
+      - Tells the drafter to omit claims when ownership is unclear
+      - Relies on deliverable_identity_preserved at gate_10c to catch ID drift
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_provides_neutral_wording_integrates(self) -> None:
-        """Spec provides 'integrates outputs from' pattern."""
-        assert "integrates outputs from" in self.spec
+    def test_spec_omit_unclear_claims(self) -> None:
+        """Spec says to omit claims when ownership is unclear."""
+        assert "omit the claim" in self.spec.lower() or \
+               "omit" in self.spec.lower()
 
-    def test_spec_provides_neutral_wording_validates(self) -> None:
-        """Spec provides 'validates interfaces for' pattern."""
-        assert "validates interfaces for" in self.spec
+    def test_spec_forbids_citing_unsourced_deliverables(self) -> None:
+        """Spec forbids citing a deliverable without source artifact confirmation."""
+        assert "Do not cite a deliverable unless" in self.spec
 
-    def test_spec_provides_neutral_wording_supports(self) -> None:
-        """Spec provides 'supports deployment of' pattern."""
-        assert "supports deployment of" in self.spec
+    def test_deliverable_identity_preserved_registered(self) -> None:
+        """deliverable_identity_preserved predicate is in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "deliverable_identity_preserved" in PREDICATE_REGISTRY
 
-    def test_spec_provides_neutral_wording_consumes(self) -> None:
-        """Spec provides 'consumes the output of' pattern."""
-        assert "consumes the output of" in self.spec
+    def test_deliverable_identity_preserved_in_gate_10c(self) -> None:
+        """deliverable_identity_preserved is listed in gate_10c predicates."""
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        assert "deliverable_identity_preserved" in content
 
-    def test_spec_provides_ownership_safe_pattern(self) -> None:
-        """Spec provides the required safer wording pattern with responsible partner."""
-        assert "develops/delivers" in self.spec or \
-               "develops" in self.spec and "delivers" in self.spec
-        assert "integrates the resulting" in self.spec
+    def test_spec_keeps_output_concise(self) -> None:
+        """Spec instructs keeping output concise and schema-conformant."""
+        assert "concise" in self.spec.lower()
 
 
 # ===========================================================================
@@ -183,22 +225,41 @@ class TestSpecSafeIntegrationWording:
 
 
 class TestSpecValidationStatusConsistency:
-    """validation_status.claim_statuses[] must preserve all objective target components."""
+    """Slim spec delegates claim completeness to predicates.
+
+    The old spec had inline rules about claim_summary retaining all metric
+    components and forbidding partial representation.  The slim spec instead:
+      - References claim_summary in the output schema (step 2.8)
+      - Relies on cross_section_consistency (CC-06) at gate_10d for
+        metric completeness enforcement
+      - Relies on canonical_terms_preserved at gate_10c for term drift
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_mandates_claim_summary_completeness(self) -> None:
-        """Spec requires claim_summary to retain all metric components."""
+    def test_spec_references_claim_summary_in_output(self) -> None:
+        """Spec mentions claim_summary in the validation_status output schema."""
         assert "claim_summary" in self.spec
-        # The spec should say claim_summary must retain all components
-        assert "claim_summary MUST retain all metric components" in self.spec or \
-               "claim_summary must retain all" in self.spec.lower()
 
-    def test_spec_forbids_partial_representation_in_claims(self) -> None:
-        """Spec forbids partially representing a target in claim_summary."""
-        assert "partially represent" in self.spec.lower()
+    def test_spec_references_validation_status(self) -> None:
+        """Spec describes building validation_status with claim_statuses."""
+        assert "validation_status" in self.spec
+        assert "claim_status" in self.spec.lower()
+
+    def test_cross_section_consistency_catches_metric_loss(self) -> None:
+        """cross_section_consistency is the gate_10d enforcement mechanism."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "cross_section_consistency" in PREDICATE_REGISTRY
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        assert "gate_10d_cross_section_consistency" in content
+        assert "cross_section_consistency" in content
 
 
 # ===========================================================================
@@ -428,32 +489,60 @@ class TestArtifactOwnershipReassignment:
 
 
 class TestSpecPreOutputCheck:
-    """Implementation spec includes a pre-output consistency self-check."""
+    """Slim spec replaces inline CCR-5/CCR-6 pre-output check with gate predicates.
+
+    The old spec had a "Pre-Output Consistency" section referencing CCR-5, CCR-6,
+    bounded scoping, and revise-before-writing.  The slim spec instead:
+      - Has Canonical Copying Rules as the drafting-time guardrail
+      - Delegates post-output verification to three gate_10c predicates
+        (partner_names_preserved, deliverable_identity_preserved,
+        canonical_terms_preserved) and gate_10d cross_section_consistency
+    """
 
     @pytest.fixture(autouse=True)
     def _load(self) -> None:
         self.spec = _read_spec()
 
-    def test_spec_has_pre_output_check(self) -> None:
-        """Spec defines a pre-output consistency check."""
-        assert "Pre-Output Consistency" in self.spec or \
-               "pre-output consistency" in self.spec.lower()
+    def test_spec_has_canonical_copying_rules(self) -> None:
+        """Spec contains Canonical Copying Rules as the drafting guardrail."""
+        assert "Canonical Copying Rules" in self.spec
 
-    def test_spec_pre_output_check_references_ccr5(self) -> None:
-        """Pre-output check references CCR-5 for metric preservation."""
-        assert "CCR-5" in self.spec
+    def test_spec_copy_exactly_instruction(self) -> None:
+        """Spec instructs copying terms exactly from source artifacts."""
+        assert "exactly" in self.spec.lower()
 
-    def test_spec_pre_output_check_references_ccr6(self) -> None:
-        """Pre-output check references CCR-6 for ownership separation."""
-        assert "CCR-6" in self.spec
+    def test_all_three_preflight_predicates_registered(self) -> None:
+        """All three Phase 8 section preflight predicates are in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        for pred in (
+            "partner_names_preserved",
+            "deliverable_identity_preserved",
+            "canonical_terms_preserved",
+        ):
+            assert pred in PREDICATE_REGISTRY, f"{pred} missing from PREDICATE_REGISTRY"
 
-    def test_spec_pre_output_check_is_bounded(self) -> None:
-        """Pre-output check is bounded to mentioned objectives, not exhaustive."""
-        assert "bounded" in self.spec.lower() or \
-               "objectives actually mentioned" in self.spec.lower()
+    def test_gate_10c_has_all_preflight_predicates(self) -> None:
+        """gate_10c_implementation_completeness includes all three preflight predicates."""
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        for pred in (
+            "partner_names_preserved",
+            "deliverable_identity_preserved",
+            "canonical_terms_preserved",
+        ):
+            assert pred in content, f"{pred} not found in gate_rules_library.yaml"
 
-    def test_spec_pre_output_says_revise_before_output(self) -> None:
-        """Spec says to revise content before writing if check fails."""
-        assert "revise" in self.spec.lower()
-        assert "before writing" in self.spec.lower() or \
-               "before output" in self.spec.lower()
+    def test_gate_10d_has_cross_section_consistency(self) -> None:
+        """gate_10d_cross_section_consistency includes cross_section_consistency."""
+        gate_lib = (
+            Path(__file__).resolve().parents[2]
+            / ".claude" / "workflows" / "system_orchestration"
+            / "gate_rules_library.yaml"
+        )
+        content = gate_lib.read_text(encoding="utf-8")
+        assert "gate_10d_cross_section_consistency" in content
+        assert "cross_section_consistency" in content

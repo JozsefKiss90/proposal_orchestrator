@@ -78,6 +78,13 @@ from runner.predicates.criterion_predicates import (
     no_unresolved_material_claims,
     schema_id_matches,
 )
+from runner.predicates.phase8_section_predicates import (
+    canonical_terms_preserved,
+    deliverable_identity_preserved,
+    measurable_targets_preserved,
+    no_stale_run_id,
+    partner_names_preserved,
+)
 from runner.predicates.cycle_predicates import no_dependency_cycles
 from runner.predicates.file_predicates import (
     artifact_owned_by_run,
@@ -211,6 +218,12 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "impact_pathways_covered": impact_pathways_covered,
     "implementation_coverage_complete": implementation_coverage_complete,
     "cross_section_consistency": cross_section_consistency,
+    # --- Phase 8 section preflight predicates ---
+    "no_stale_run_id": no_stale_run_id,
+    "partner_names_preserved": partner_names_preserved,
+    "deliverable_identity_preserved": deliverable_identity_preserved,
+    "canonical_terms_preserved": canonical_terms_preserved,
+    "measurable_targets_preserved": measurable_targets_preserved,
 }
 
 

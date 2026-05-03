@@ -1223,24 +1223,33 @@ class TestComplianceProfileDerivativeLabeling:
         )
 
     def test_current_artifact_wp9_cites_tier2b_for_ai_on_demand(self) -> None:
-        """WPL-WP9 source_basis must cite Tier 2B extracted source for the
-        AI-on-demand platform requirement, not only compliance_profile.json."""
+        """The WP9 lead management role source_basis must cite Tier 2B
+        extracted source for the AI-on-demand platform requirement, not
+        only compliance_profile.json.  After Phase 8 skill slimming the
+        role_id changed from 'WPL-WP9' to 'MGR-WPL-WP9'; we accept
+        either prefix so the test tracks the architectural requirement
+        (Tier 2B traceability for AI-on-demand) rather than a specific
+        role_id format."""
         artifact_path = (
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         wp9_role = next(
-            (r for r in artifact["management_roles"] if r["role_id"] == "WPL-WP9"),
+            (r for r in artifact["management_roles"]
+             if r["role_id"] in ("WPL-WP9", "MGR-WPL-WP9")),
             None,
         )
-        assert wp9_role is not None, "WPL-WP9 not found in management_roles"
+        assert wp9_role is not None, (
+            "Neither WPL-WP9 nor MGR-WPL-WP9 found in management_roles; "
+            f"available role_ids: {[r['role_id'] for r in artifact['management_roles']]}"
+        )
         sb = wp9_role["source_basis"]
         assert "docs/tier2b_topic_and_call_sources/extracted/" in sb, (
-            f"WPL-WP9 source_basis does not cite Tier 2B: {sb}"
+            f"{wp9_role['role_id']} source_basis does not cite Tier 2B: {sb}"
         )
         assert "scope_requirements.json" in sb or "call_constraints.json" in sb, (
-            f"WPL-WP9 source_basis does not cite scope_requirements or call_constraints: {sb}"
+            f"{wp9_role['role_id']} source_basis does not cite scope_requirements or call_constraints: {sb}"
         )
 
     def test_current_artifact_ethics_not_asserted_as_call_mandate(self) -> None:

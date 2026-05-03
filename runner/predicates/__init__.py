@@ -89,6 +89,13 @@ from runner.predicates.criterion_predicates import (
     no_unresolved_material_claims,
     schema_id_matches,
 )
+from runner.predicates.phase8_section_predicates import (
+    canonical_terms_preserved,
+    deliverable_identity_preserved,
+    measurable_targets_preserved,
+    no_stale_run_id,
+    partner_names_preserved,
+)
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.cycle_predicates import no_dependency_cycles
 from runner.predicates.timeline_predicates import (
@@ -169,4 +176,10 @@ __all__ = [
     "impact_pathways_covered",
     "implementation_coverage_complete",
     "cross_section_consistency",
+    # Phase 8 section preflight predicates
+    "no_stale_run_id",
+    "partner_names_preserved",
+    "deliverable_identity_preserved",
+    "canonical_terms_preserved",
+    "measurable_targets_preserved",
 ]

@@ -101,6 +101,24 @@ def _load_manifest() -> dict:
     return yaml.safe_load(manifest_path.read_text(encoding="utf-8-sig"))
 
 
+def _load_gate_rules_library() -> dict:
+    """Load the production gate_rules_library.yaml."""
+    repo_root = Path(__file__).resolve().parents[2]
+    lib_path = (
+        repo_root / ".claude" / "workflows" / "system_orchestration"
+        / "gate_rules_library.yaml"
+    )
+    return yaml.safe_load(lib_path.read_text(encoding="utf-8-sig"))
+
+
+def _find_gate(gate_lib: dict, gate_id: str) -> dict:
+    """Find a gate by gate_id in the gate rules library."""
+    for gate in gate_lib.get("gate_rules", []):
+        if gate.get("gate_id") == gate_id:
+            return gate
+    raise ValueError(f"Gate {gate_id!r} not found in gate_rules_library.yaml")
+
+
 # ===========================================================================
 # 1. n08d ORDERING TESTS
 # ===========================================================================
@@ -528,62 +546,74 @@ class TestN08dArtifactRegistry:
 
 
 class TestImpactD801Constraint:
-    """Verify impact-section-drafting.md forbids D8-01 orchestration mislabel."""
+    """Verify the impact-section-drafting skill delegates D8-01/deliverable-
+    identity enforcement to the new architecture:
+      1. canonical_reference_pack.json declared as input
+      2. Canonical Copying Rules section present in skill spec
+      3. Preflight predicates (deliverable_identity_preserved,
+         partner_names_preserved, canonical_terms_preserved) registered
+         in gate_10b_impact_completeness
+    """
 
-    def test_d801_constraint_present(self) -> None:
-        """The skill spec must contain a constraint preventing D8-01 from
-        being cited as the External Tool/API Orchestration Layer."""
+    def test_canonical_pack_declared_as_input(self) -> None:
+        """The skill spec must declare canonical_reference_pack.json as a
+        read input (YAML front-matter reads_from or declared-inputs list)."""
         spec = _load_skill_spec("impact-section-drafting")
-        assert "D8-01" in spec, "D8-01 should be mentioned in constraint"
-        assert "evaluation framework" in spec.lower() or \
-               "benchmark specification" in spec.lower(), (
-            "D8-01 must be described as evaluation framework / benchmark spec"
+        assert "canonical_reference_pack.json" in spec, (
+            "impact-section-drafting.md must declare "
+            "canonical_reference_pack.json as a read input"
         )
 
-    def test_d801_not_orchestration_layer(self) -> None:
-        """The skill spec must explicitly state that D8-01 MUST NOT be cited
-        as the orchestration layer."""
+    def test_canonical_copying_rules_section_present(self) -> None:
+        """The skill spec must contain a 'Canonical Copying Rules' section
+        that instructs the LLM to copy terms exactly from source artifacts."""
         spec = _load_skill_spec("impact-section-drafting")
-        # Check for the prohibition
-        assert re.search(
-            r"D8-01.*MUST NOT.*orchestration",
-            spec,
-            re.IGNORECASE | re.DOTALL,
-        ) or re.search(
-            r"D8-01.*must not.*orchestration",
-            spec,
-            re.IGNORECASE | re.DOTALL,
-        ), (
-            "impact-section-drafting.md must prohibit citing D8-01 as "
-            "the orchestration layer"
+        assert "Canonical Copying Rules" in spec, (
+            "impact-section-drafting.md must contain a "
+            "'Canonical Copying Rules' section"
+        )
+        # Must instruct not to rename, shorten, or paraphrase
+        assert "Do not rename" in spec or "do not rename" in spec, (
+            "Canonical Copying Rules must instruct not to rename terms"
         )
 
-    def test_out9_grounding_guidance(self) -> None:
-        """The skill spec must guide OUT-9 as the orchestration-layer
-        grounding when no dedicated deliverable exists."""
-        spec = _load_skill_spec("impact-section-drafting")
-        assert "OUT-9" in spec, (
-            "impact-section-drafting.md must mention OUT-9 as orchestration-"
-            "layer grounding"
+    def test_deliverable_identity_predicate_in_gate_10b(self) -> None:
+        """gate_10b_impact_completeness must include the
+        deliverable_identity_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10b = _find_gate(gate_lib, "gate_10b_impact_completeness")
+        pred_funcs = [p["function"] for p in gate_10b["predicates"]]
+        assert "deliverable_identity_preserved" in pred_funcs, (
+            "gate_10b must register deliverable_identity_preserved predicate"
         )
+
+    def test_partner_names_predicate_in_gate_10b(self) -> None:
+        """gate_10b_impact_completeness must include the
+        partner_names_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10b = _find_gate(gate_lib, "gate_10b_impact_completeness")
+        pred_funcs = [p["function"] for p in gate_10b["predicates"]]
+        assert "partner_names_preserved" in pred_funcs, (
+            "gate_10b must register partner_names_preserved predicate"
+        )
+
+    def test_canonical_terms_predicate_in_gate_10b(self) -> None:
+        """gate_10b_impact_completeness must include the
+        canonical_terms_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10b = _find_gate(gate_lib, "gate_10b_impact_completeness")
+        pred_funcs = [p["function"] for p in gate_10b["predicates"]]
+        assert "canonical_terms_preserved" in pred_funcs, (
+            "gate_10b must register canonical_terms_preserved predicate"
+        )
+
+    def test_impact_reads_architecture_inputs_outcomes(self) -> None:
+        """The skill spec must read architecture_inputs (including
+        outcomes.json) so that OUT-9 grounding is available at draft time."""
+        spec = _load_skill_spec("impact-section-drafting")
         assert "outcomes.json" in spec or "architecture_inputs" in spec, (
             "impact-section-drafting.md must reference architecture_inputs/"
-            "outcomes.json for OUT-9 grounding"
-        )
-
-    def test_deliverable_identity_constraint_is_gate_critical(self) -> None:
-        """The deliverable identity constraint must be marked GATE-CRITICAL."""
-        spec = _load_skill_spec("impact-section-drafting")
-        # Find the constraint section
-        idx_d801 = spec.find("Deliverable identity constraint")
-        assert idx_d801 >= 0, (
-            "impact-section-drafting.md must contain a 'Deliverable identity "
-            "constraint' section"
-        )
-        # Check it's marked GATE-CRITICAL
-        constraint_section = spec[idx_d801:idx_d801 + 200]
-        assert "GATE-CRITICAL" in constraint_section, (
-            "Deliverable identity constraint must be marked GATE-CRITICAL"
+            "outcomes.json so OUT-9 grounding is available"
         )
 
 
@@ -593,73 +623,78 @@ class TestImpactD801Constraint:
 
 
 class TestExcellenceTRLQualification:
-    """Verify excellence-section-drafting.md requires qualified TRL language."""
+    """Verify the excellence-section-drafting skill delegates TRL
+    qualification and canonical-term enforcement to the new architecture:
+      1. canonical_reference_pack.json declared as input
+      2. Canonical Copying Rules section present in skill spec
+      3. TRL qualification delegated to objectives.json reading at draft time
+      4. Preflight predicates (canonical_terms_preserved,
+         deliverable_identity_preserved, partner_names_preserved)
+         registered in gate_10a_excellence_completeness
+    """
 
-    def test_trl_constraint_present(self) -> None:
-        """The skill spec must contain a TRL qualification constraint."""
+    def test_trl_qualification_via_objectives(self) -> None:
+        """The skill spec must instruct the LLM to qualify TRL language
+        based on per-WP TRL targets in objectives.json."""
         spec = _load_skill_spec("excellence-section-drafting")
-        assert "TRL qualification" in spec or "TRL" in spec, (
-            "excellence-section-drafting.md must contain TRL constraint"
+        # The slim spec delegates TRL qualification to objectives.json reading
+        assert "TRL" in spec, (
+            "excellence-section-drafting.md must mention TRL"
         )
-
-    def test_forbids_unqualified_trl5(self) -> None:
-        """The skill spec must forbid unqualified 'project targets TRL 5
-        by project end'."""
-        spec = _load_skill_spec("excellence-section-drafting")
-        # Check for the prohibition
-        assert re.search(
-            r"[Ff]orbidden.*unqualified",
-            spec,
-            re.DOTALL,
-        ) or re.search(
-            r"Do NOT.*unqualified.*TRL",
-            spec,
-            re.DOTALL,
-        ), (
-            "excellence-section-drafting.md must forbid unqualified TRL claims"
+        assert "objectives.json" in spec, (
+            "excellence-section-drafting.md must reference objectives.json "
+            "for TRL qualification"
         )
 
-    def test_requires_wp4_out3_trl4_distinction(self) -> None:
-        """The skill spec must require distinguishing WP4/OUT-3 TRL 4 from
-        integrated framework TRL 5."""
+    def test_canonical_pack_declared_as_input(self) -> None:
+        """The skill spec must declare canonical_reference_pack.json as a
+        read input."""
         spec = _load_skill_spec("excellence-section-drafting")
-        assert "WP4" in spec or "WP4/OUT-3" in spec, (
-            "excellence-section-drafting.md must mention WP4/OUT-3"
-        )
-        assert "TRL 4" in spec, (
-            "excellence-section-drafting.md must mention TRL 4 for WP4/OUT-3"
-        )
-        assert "TRL 5" in spec, (
-            "excellence-section-drafting.md must mention TRL 5 for "
-            "demonstrators/framework"
+        assert "canonical_reference_pack.json" in spec, (
+            "excellence-section-drafting.md must declare "
+            "canonical_reference_pack.json as a read input"
         )
 
-    def test_trl_constraint_is_gate_critical(self) -> None:
-        """The TRL qualification constraint must be marked GATE-CRITICAL."""
+    def test_canonical_copying_rules_section_present(self) -> None:
+        """The skill spec must contain a 'Canonical Copying Rules' section
+        that instructs the LLM to copy terms exactly from source artifacts."""
         spec = _load_skill_spec("excellence-section-drafting")
-        idx_trl = spec.find("TRL qualification constraint")
-        assert idx_trl >= 0, (
-            "excellence-section-drafting.md must contain a 'TRL qualification "
-            "constraint' section"
+        assert "Canonical Copying Rules" in spec, (
+            "excellence-section-drafting.md must contain a "
+            "'Canonical Copying Rules' section"
         )
-        constraint_section = spec[idx_trl:idx_trl + 200]
-        assert "GATE-CRITICAL" in constraint_section, (
-            "TRL qualification constraint must be marked GATE-CRITICAL"
+        assert "Do not rename" in spec or "do not rename" in spec, (
+            "Canonical Copying Rules must instruct not to rename terms"
         )
 
-    def test_permitted_wording_patterns(self) -> None:
-        """The skill spec must provide permitted wording patterns showing
-        the TRL distinction."""
-        spec = _load_skill_spec("excellence-section-drafting")
-        assert "Permitted wording" in spec, (
-            "excellence-section-drafting.md must provide permitted wording "
-            "patterns for TRL"
+    def test_canonical_terms_predicate_in_gate_10a(self) -> None:
+        """gate_10a_excellence_completeness must include the
+        canonical_terms_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10a = _find_gate(gate_lib, "gate_10a_excellence_completeness")
+        pred_funcs = [p["function"] for p in gate_10a["predicates"]]
+        assert "canonical_terms_preserved" in pred_funcs, (
+            "gate_10a must register canonical_terms_preserved predicate"
         )
-        # At least one pattern must mention both TRL 5 and TRL 4
-        idx = spec.find("Permitted wording")
-        section = spec[idx:idx + 1000]
-        assert "TRL 5" in section and "TRL 4" in section, (
-            "Permitted wording section must include both TRL 5 and TRL 4"
+
+    def test_deliverable_identity_predicate_in_gate_10a(self) -> None:
+        """gate_10a_excellence_completeness must include the
+        deliverable_identity_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10a = _find_gate(gate_lib, "gate_10a_excellence_completeness")
+        pred_funcs = [p["function"] for p in gate_10a["predicates"]]
+        assert "deliverable_identity_preserved" in pred_funcs, (
+            "gate_10a must register deliverable_identity_preserved predicate"
+        )
+
+    def test_partner_names_predicate_in_gate_10a(self) -> None:
+        """gate_10a_excellence_completeness must include the
+        partner_names_preserved predicate."""
+        gate_lib = _load_gate_rules_library()
+        gate_10a = _find_gate(gate_lib, "gate_10a_excellence_completeness")
+        pred_funcs = [p["function"] for p in gate_10a["predicates"]]
+        assert "partner_names_preserved" in pred_funcs, (
+            "gate_10a must register partner_names_preserved predicate"
         )
 
 

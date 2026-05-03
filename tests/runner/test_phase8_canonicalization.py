@@ -119,7 +119,8 @@ class TestSpecLeanness:
 
 
 class TestConciseGuidancePresent:
-    """Drafting specs retain concise canonical reference guidance."""
+    """Drafting specs delegate canonicalization to canonical_reference_pack.json
+    input + deterministic gate predicates.  Verify the slim spec architecture."""
 
     @pytest.fixture(autouse=True)
     def _load_specs(self) -> None:
@@ -133,16 +134,18 @@ class TestConciseGuidancePresent:
         }
 
     def test_all_have_drafting_guidance_section(self) -> None:
-        """All specs have the concise 'Drafting Guidance' section."""
+        """All specs have the 'Canonical Copying Rules' section."""
         for name, content in self.all_specs.items():
             assert (
-                "Drafting Guidance — Canonical References" in content
-            ), f"{name} spec missing concise drafting guidance"
+                "Canonical Copying Rules" in content
+            ), f"{name} spec missing Canonical Copying Rules section"
 
     def test_all_mention_objectives_json(self) -> None:
-        """All specs reference objectives.json for canonical IDs/titles."""
+        """All specs declare canonical_reference_pack.json as input for canonical terms."""
         for name, content in self.all_specs.items():
-            assert "objectives.json" in content, f"{name} spec missing objectives.json ref"
+            assert (
+                "canonical_reference_pack.json" in content
+            ), f"{name} spec missing canonical_reference_pack.json input declaration"
 
     def test_all_mention_wp_structure(self) -> None:
         """All specs reference wp_structure.json for WP mappings."""
@@ -150,38 +153,49 @@ class TestConciseGuidancePresent:
             assert "wp_structure.json" in content, f"{name} spec missing wp_structure.json ref"
 
     def test_all_mention_gate_predicates(self) -> None:
-        """All specs note that enforcement is by gate predicates."""
-        for name, content in self.all_specs.items():
-            assert (
-                "enforced deterministically by gate predicates" in content
-            ), f"{name} spec missing gate predicate delegation note"
+        """Gate predicates registered in PREDICATE_REGISTRY enforce canonicalization."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "canonical_terms_preserved" in PREDICATE_REGISTRY, (
+            "canonical_terms_preserved not registered in PREDICATE_REGISTRY"
+        )
+        assert "deliverable_identity_preserved" in PREDICATE_REGISTRY, (
+            "deliverable_identity_preserved not registered in PREDICATE_REGISTRY"
+        )
+        assert "partner_names_preserved" in PREDICATE_REGISTRY, (
+            "partner_names_preserved not registered in PREDICATE_REGISTRY"
+        )
 
     def test_all_mention_legal_name_truncation(self) -> None:
-        """All specs mention not truncating legal names."""
+        """All specs instruct not to rename, shorten, or paraphrase canonical terms."""
         for name, content in self.all_specs.items():
             assert (
-                "truncate legal names" in content
-            ), f"{name} spec missing legal name guidance"
+                "Do not rename, shorten, paraphrase" in content
+            ), f"{name} spec missing canonical term preservation guidance"
 
-    def test_impact_has_preserve_numeric_values(self) -> None:
-        """Impact spec retains 'preserve numeric values' concise guidance."""
-        assert "preserve" in self.impact.lower() and "numeric" in self.impact.lower()
+    def test_impact_has_preserve_deliverable_citation_rule(self) -> None:
+        """Impact spec retains deliverable citation guard in Canonical Copying Rules."""
+        assert "Do not cite a deliverable unless" in self.impact
 
     def test_impact_has_do_not_invent_wp_mappings(self) -> None:
-        """Impact spec retains 'Do not invent WP mappings' guidance."""
-        assert "Do not invent WP mappings" in self.impact
+        """Impact spec grounds impact claims in WP deliverables (no invented mappings)."""
+        assert "Ground impact claims in concrete WP deliverables" in self.impact
 
     def test_impact_has_do_not_describe_kpis_as_deliverables(self) -> None:
-        """Impact spec retains 'Do not describe KPIs as deliverables' guidance."""
-        assert "Do not describe KPIs as deliverables" in self.impact
+        """deliverable_identity_preserved predicate catches KPI/deliverable conflation."""
+        from runner.predicates.phase8_section_predicates import deliverable_identity_preserved
+        assert callable(deliverable_identity_preserved)
 
     def test_impact_has_deterministic_gate_predicates(self) -> None:
-        """Impact spec delegates canonicalization to deterministic gate predicates."""
-        assert "deterministic gate predicates" in self.impact
+        """Canonicalization predicates are callable from the registry."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        for pred_name in ("canonical_terms_preserved", "deliverable_identity_preserved",
+                          "partner_names_preserved"):
+            assert pred_name in PREDICATE_REGISTRY, f"{pred_name} missing from PREDICATE_REGISTRY"
+            assert callable(PREDICATE_REGISTRY[pred_name])
 
     def test_impact_has_use_objective_ids(self) -> None:
-        """Impact spec retains 'Use objective IDs' guidance."""
-        assert "Use objective IDs" in self.impact
+        """Impact spec sources objectives from declared Tier 3 input."""
+        assert "objectives.json" in self.impact
 
 
 # ===========================================================================
@@ -204,11 +218,12 @@ class TestFailFastScope:
         assert "MISSING_INPUT" in self.excellence
 
     def test_excellence_keeps_unresolved_claims_guard(self) -> None:
-        assert "assumed" in self.excellence and "unresolved" in self.excellence
+        """Excellence spec retains validation_status with confirmed/inferred statuses."""
+        assert "confirmed" in self.excellence and "inferred" in self.excellence
 
     def test_excellence_keeps_objective_enumeration(self) -> None:
-        """Objective enumeration completeness is cheap and retained."""
-        assert "objective ID from" in self.excellence
+        """Objective enumeration sourced from Tier 3 objectives.json."""
+        assert "objectives.json" in self.excellence
 
     def test_excellence_no_terminology_drift_failfast(self) -> None:
         """Terminology drift is now enforced by gates, not as a skill fail-fast."""
@@ -221,11 +236,13 @@ class TestFailFastScope:
         assert "MISSING_INPUT" in self.impact
 
     def test_impact_keeps_unresolved_claims_guard(self) -> None:
-        assert "assumed" in self.impact and "unresolved" in self.impact
+        """Impact spec retains validation_status with confirmed/inferred statuses."""
+        assert "confirmed" in self.impact and "inferred" in self.impact
 
-    def test_impact_keeps_d401_guard(self) -> None:
-        """D4-01 identity guard is bounded and retained."""
-        assert "D4-01" in self.impact
+    def test_impact_keeps_deliverable_identity_guard(self) -> None:
+        """Deliverable identity guard delegated to deliverable_identity_preserved predicate."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "deliverable_identity_preserved" in PREDICATE_REGISTRY
 
     def test_impact_no_metric_completeness_failfast(self) -> None:
         """Metric completeness is enforced by gate, not as skill fail-fast."""

@@ -91,11 +91,27 @@ def _make_fingerprint_inputs(repo: Path, node_id: str) -> None:
             _write_json(repo / rel_path, {"input": "value"})
 
 
+def _seed_tier3_tier4(repo: Path) -> None:
+    """Write correctly-structured Tier 3/4 sources for the canonical pack."""
+    _obj = repo / "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    _wp = repo / "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    _pt = repo / "docs/tier3_project_instantiation/consortium/partners.json"
+    for p in (_obj, _wp, _pt):
+        p.parent.mkdir(parents=True, exist_ok=True)
+    if not _obj.exists():
+        _obj.write_text('{"objectives":[{"id":"OBJ-1","title":"T","measurable_target":"≥1"}]}', encoding="utf-8")
+    if not _wp.exists():
+        _wp.write_text('{"work_packages":[{"wp_id":"WP1","title":"T","lead_partner":"P","deliverables":[{"deliverable_id":"D1-01","title":"D","due_month":3}]}]}', encoding="utf-8")
+    if not _pt.exists():
+        _pt.write_text('{"partners":[{"short_name":"P","legal_name":"Partner One"}]}', encoding="utf-8")
+
+
 def _make_full_reuse_env(
     repo: Path, node_id: str, run_id: str = "prev-run-001",
 ) -> str:
     """Set up a complete reuse-eligible environment. Returns fingerprint."""
     cfg = REUSE_ELIGIBLE_NODES[node_id]
+    _seed_tier3_tier4(repo)
     _make_fingerprint_inputs(repo, node_id)
     _make_valid_artifact(repo, node_id, run_id=run_id)
     _make_gate_result(repo, cfg["gate_id"], "pass")
@@ -837,6 +853,11 @@ class TestAgentRuntimeSkipSkills:
             "constitutional-compliance-check",
         ]
         kwargs = self._make_agent_env(tmp_path, node_id, skill_ids)
+
+        # Overwrite the fixture artifact with the current run_id so the
+        # post-drafting freshness check passes when the mocked skill
+        # reports success without writing a new artifact.
+        _make_valid_artifact(tmp_path, node_id, run_id=kwargs["run_id"])
 
         mock_skill_result = SkillResult(status="success", outputs_written=[])
         with patch(self._RUN_SKILL_TARGET, return_value=mock_skill_result) as mock_run:

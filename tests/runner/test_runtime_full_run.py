@@ -143,11 +143,24 @@ def _manifest(name: str, nodes: list[dict], edges: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 
 
+def _seed_tier3_tier4(repo: Path) -> None:
+    """Write minimal Tier 3/4 sources so the canonical reference pack builds."""
+    _obj = repo / "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    _wp = repo / "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    _pt = repo / "docs/tier3_project_instantiation/consortium/partners.json"
+    for p in (_obj, _wp, _pt):
+        p.parent.mkdir(parents=True, exist_ok=True)
+    _obj.write_text('{"objectives":[{"id":"OBJ-1","title":"T","measurable_target":"≥1"}]}', encoding="utf-8")
+    _wp.write_text('{"work_packages":[{"wp_id":"WP1","title":"T","lead_partner":"P","deliverables":[{"deliverable_id":"D1-01","title":"D","due_month":3}]}]}', encoding="utf-8")
+    _pt.write_text('{"partners":[{"short_name":"P","legal_name":"Partner One"}]}', encoding="utf-8")
+
+
 def _make_scheduler(
     tmp_path: Path,
     manifest_data: dict,
     run_id: str,
 ) -> DAGScheduler:
+    _seed_tier3_tier4(tmp_path)
     mp = _write_manifest(tmp_path, manifest_data)
     graph = ManifestGraph.load(mp)
     ctx = RunContext.initialize(tmp_path, run_id)

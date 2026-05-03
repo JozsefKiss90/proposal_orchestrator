@@ -2,12 +2,13 @@
 Targeted tests for Phase 8 gate-readiness constraints.
 
 Validates that:
-  - excellence-section-drafting spec forbids assumed/unresolved claims
-  - impact-section-drafting spec requires numeric tier values
-  - implementation-section-drafting spec forbids:
-    - "each of the 8 partners leads exactly one functional WP"
-    - BAL contributing to WP4 unless Tier 4 supports it
-    - Tier 1/GEP programme-rule claims without Tier 1 source
+  - excellence-section-drafting spec declares canonical_reference_pack input,
+    Canonical Copying Rules section, and delegates enforcement to gate predicates
+  - impact-section-drafting spec requires numeric tier values and delegates
+    assumed/unresolved enforcement to gate predicates
+  - implementation-section-drafting spec declares canonical_reference_pack input,
+    wp_structure.json as canonical source, and delegates forbidden-pattern
+    enforcement to gate 10c predicates and cross_section_consistency at 10d
   - Section artifact fixtures with assumed claims fail gate predicates
   - Numeric tier values pass; string tier values fail
   - Gate 10a/10b/10c predicate routing is deterministic (type: coverage)
@@ -19,6 +20,7 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 from runner.predicates.criterion_predicates import (
     implementation_coverage_complete,
@@ -43,31 +45,63 @@ def _read_skill(name: str) -> str:
     return skill_path.read_text(encoding="utf-8")
 
 
+def _load_gate_rules_library() -> list[dict]:
+    """Load the gate rules library and return the gate_rules list."""
+    lib_path = (
+        Path(__file__).resolve().parents[2]
+        / ".claude"
+        / "workflows"
+        / "system_orchestration"
+        / "gate_rules_library.yaml"
+    )
+    with open(lib_path, encoding="utf-8") as f:
+        lib = yaml.safe_load(f)
+    return lib.get("gate_rules", [])
+
+
+def _get_predicate_functions_for_gate(gate_id: str) -> list[str]:
+    """Return list of predicate function names registered for a gate."""
+    gate_rules = _load_gate_rules_library()
+    for entry in gate_rules:
+        if entry.get("gate_id") == gate_id:
+            return [p.get("function", "") for p in entry.get("predicates", [])]
+    return []
+
+
 # ===========================================================================
 # Excellence skill spec constraints
 # ===========================================================================
 
 
 class TestExcellenceSkillSpec:
-    """Verify the excellence-section-drafting skill forbids assumed/unresolved."""
+    """Verify the excellence-section-drafting skill declares canonical_reference_pack
+    input, Canonical Copying Rules section, and delegates enforcement to gate
+    predicates registered in gate_10a_excellence_completeness.
 
-    def test_forbids_assumed_status(self) -> None:
-        spec = _read_skill("excellence-section-drafting.md")
-        assert 'MUST NOT contain any claim_status with status = "assumed"' in spec
+    Post-slimming architecture: verbose forbidden-pattern lists were removed.
+    Enforcement is now handled by:
+      - canonical_reference_pack.json as a declared input
+      - Canonical Copying Rules section in the skill spec
+      - no_unresolved_material_claims predicate at gate 10a
+      - partner_names_preserved / deliverable_identity_preserved /
+        canonical_terms_preserved predicates at gate 10a
+    """
 
-    def test_forbids_unresolved_status(self) -> None:
+    def test_declares_canonical_reference_pack_input(self) -> None:
         spec = _read_skill("excellence-section-drafting.md")
-        assert '"unresolved"' in spec
-        assert "GATE-CRITICAL" in spec
+        assert "canonical_reference_pack.json" in spec
 
-    def test_forbids_gender_balanced_recruitment(self) -> None:
+    def test_has_canonical_copying_rules_section(self) -> None:
         spec = _read_skill("excellence-section-drafting.md")
-        assert "gender-balanced recruitment" in spec
-        assert "FORBIDDEN" in spec or "Do NOT assert" in spec
+        assert "Canonical Copying Rules" in spec
 
-    def test_forbids_consortium_gender_monitoring(self) -> None:
-        spec = _read_skill("excellence-section-drafting.md")
-        assert "consortium gender diversity monitoring" in spec
+    def test_no_unresolved_predicate_registered_at_gate_10a(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10a_excellence_completeness")
+        assert "no_unresolved_material_claims" in fns
+
+    def test_partner_names_predicate_registered_at_gate_10a(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10a_excellence_completeness")
+        assert "partner_names_preserved" in fns
 
     def test_requires_non_null_source_ref(self) -> None:
         spec = _read_skill("excellence-section-drafting.md")
@@ -85,21 +119,35 @@ class TestExcellenceSkillSpec:
 
 
 class TestImpactSkillSpec:
-    """Verify the impact-section-drafting skill requires numeric tier values."""
+    """Verify the impact-section-drafting skill requires numeric tier values,
+    declares canonical_reference_pack input, and delegates enforcement to gate
+    predicates registered in gate_10b_impact_completeness.
+
+    Post-slimming architecture: verbose forbidden-string-tier lists were removed.
+    Enforcement is now handled by:
+      - canonical_reference_pack.json as a declared input
+      - Canonical Copying Rules section in the skill spec
+      - no_unresolved_material_claims predicate at gate 10b
+      - partner_names_preserved / deliverable_identity_preserved /
+        canonical_terms_preserved predicates at gate 10b
+    """
 
     def test_requires_numeric_tier_values(self) -> None:
         spec = _read_skill("impact-section-drafting.md")
         assert "numeric integers" in spec
         assert '"tier": 2' in spec
 
-    def test_forbids_string_tier_values(self) -> None:
+    def test_declares_canonical_reference_pack_input(self) -> None:
         spec = _read_skill("impact-section-drafting.md")
-        for forbidden in ['"2a"', '"2b"', '"tier2b"', '"Tier 2B"']:
-            assert forbidden in spec, f"Spec should mention forbidden value {forbidden}"
+        assert "canonical_reference_pack.json" in spec
 
-    def test_forbids_assumed_unresolved(self) -> None:
+    def test_no_unresolved_predicate_registered_at_gate_10b(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10b_impact_completeness")
+        assert "no_unresolved_material_claims" in fns
+
+    def test_has_canonical_copying_rules_section(self) -> None:
         spec = _read_skill("impact-section-drafting.md")
-        assert 'MUST NOT contain any claim_status with status = "assumed"' in spec
+        assert "Canonical Copying Rules" in spec
 
 
 # ===========================================================================
@@ -108,63 +156,64 @@ class TestImpactSkillSpec:
 
 
 class TestImplementationSkillSpec:
-    """Verify the implementation-section-drafting spec forbids known bad claims."""
+    """Verify the implementation-section-drafting spec declares
+    canonical_reference_pack input, wp_structure.json as canonical source,
+    programme-rule guardrails, and delegates forbidden-pattern enforcement
+    to gate 10c predicates and cross_section_consistency at 10d.
 
-    def test_forbids_each_partner_leads_one_wp(self) -> None:
+    Post-slimming architecture: verbose forbidden-pattern lists (FORBIDDEN
+    phrases for GEP, dependency edge counts, partner-WP distribution) were
+    removed. Enforcement is now handled by:
+      - canonical_reference_pack.json as a declared input
+      - Canonical Copying Rules section in the skill spec
+      - no_unresolved_material_claims predicate at gate 10c
+      - partner_names_preserved / deliverable_identity_preserved /
+        canonical_terms_preserved predicates at gate 10c
+      - cross_section_consistency checks at gate 10d
+    """
+
+    def test_declares_canonical_reference_pack_input(self) -> None:
         spec = _read_skill("implementation-section-drafting.md")
-        assert "each partner leads exactly one WP" in spec
-        assert "FORBIDDEN" in spec or "Do NOT assert" in spec
+        assert "canonical_reference_pack.json" in spec
 
     def test_requires_wp_structure_as_canonical(self) -> None:
         spec = _read_skill("implementation-section-drafting.md")
         assert "wp_structure.json" in spec
-        assert "CANONICAL" in spec
+        assert "canonical source" in spec
 
-    def test_forbids_unsourced_tier1_claims(self) -> None:
+    def test_programme_rule_guardrail_present(self) -> None:
+        """The slim spec retains the programme-rule guardrail: do not assert
+        Tier 1 programme-rule obligations unless the skill reads Tier 1."""
         spec = _read_skill("implementation-section-drafting.md")
-        assert "programme-rule" in spec.lower() or "programme-rule" in spec
+        assert "programme-rule" in spec
         assert "Tier 1" in spec
-        # Must not assert programme-rule claims without Tier 1 source
-        assert "does NOT read Tier 1 sources" in spec
+        # The slim spec says "Do not assert Tier 1 programme-rule obligations
+        # unless this skill reads the Tier 1 source."
+        assert "Do not assert Tier 1 programme-rule obligations" in spec
 
-    def test_forbids_gep_assertion_without_source(self) -> None:
-        spec = _read_skill("implementation-section-drafting.md")
-        # The spec should mention not citing Tier 1 programme rules from agent knowledge
-        assert "Do NOT cite Tier 1 programme rules from agent knowledge" in spec
+    def test_no_unresolved_predicate_registered_at_gate_10c(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10c_implementation_completeness")
+        assert "no_unresolved_material_claims" in fns
 
     def test_requires_numeric_tier_values(self) -> None:
         spec = _read_skill("implementation-section-drafting.md")
         assert "numeric integers" in spec
 
-    def test_forbids_assumed_unresolved(self) -> None:
+    def test_has_canonical_copying_rules_section(self) -> None:
         spec = _read_skill("implementation-section-drafting.md")
-        assert 'MUST NOT contain any claim_status with status = "assumed"' in spec
+        assert "Canonical Copying Rules" in spec
 
-    def test_forbids_nine_dependency_edges_as_full_map(self) -> None:
-        spec = _read_skill("implementation-section-drafting.md")
-        assert "16 confirmed inter-WP dependency edges" in spec
-        assert '"nine dependency edges"' in spec or "nine dependency edges" in spec
-        assert "FORBIDDEN" in spec
+    def test_partner_names_predicate_registered_at_gate_10c(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10c_implementation_completeness")
+        assert "partner_names_preserved" in fns
 
-    def test_requires_16_dependency_edges(self) -> None:
-        spec = _read_skill("implementation-section-drafting.md")
-        assert "16 confirmed inter-WP data-input edges" in spec
+    def test_deliverable_identity_predicate_registered_at_gate_10c(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10c_implementation_completeness")
+        assert "deliverable_identity_preserved" in fns
 
-    def test_forbids_each_of_8_partners_leads_one(self) -> None:
-        spec = _read_skill("implementation-section-drafting.md")
-        assert "each of the 8 partners leads exactly one" in spec
-        assert "FORBIDDEN" in spec
-
-    def test_forbids_gep_eligibility_phrases(self) -> None:
-        spec = _read_skill("implementation-section-drafting.md")
-        for phrase in [
-            "GEP eligibility obligations",
-            "required to hold Gender Equality Plans",
-            "per Tier 1 programme rules",
-            "at grant signature",
-        ]:
-            assert phrase in spec, f"Spec should list forbidden phrase: {phrase}"
-        assert "FORBIDDEN phrases" in spec
+    def test_canonical_terms_predicate_registered_at_gate_10c(self) -> None:
+        fns = _get_predicate_functions_for_gate("gate_10c_implementation_completeness")
+        assert "canonical_terms_preserved" in fns
 
     def test_requires_concise_json_output(self) -> None:
         spec = _read_skill("implementation-section-drafting.md")
@@ -656,29 +705,22 @@ class TestCurrentArtifactState:
 
     # -- Implementation: still carries aefe5901 known issues --
 
-    def test_implementation_has_each_partner_one_wp_claim(
+    def test_implementation_has_consortium_section(
         self, implementation_artifact: dict
     ) -> None:
-        """Old implementation artifact still claims each partner leads exactly one WP."""
+        """Implementation artifact must have a B.3.2 consortium sub-section."""
         b32_content = ""
         for sub in implementation_artifact.get("sub_sections", []):
             if sub.get("sub_section_id") == "B.3.2":
                 b32_content = sub.get("content", "")
                 break
-        assert (
-            "each of the 8 partners leads exactly one functional wp"
-            in b32_content.lower()
-        ), "Expected 'each of the 8 partners leads exactly one functional WP' in B.3.2"
+        assert len(b32_content) > 0, "Expected non-empty B.3.2 consortium content"
 
-    def test_implementation_has_gep_tier1_claim(
+    def test_implementation_has_wp_table_refs(
         self, implementation_artifact: dict
     ) -> None:
-        """Old implementation artifact asserts GEP per Tier 1 programme rules."""
-        b32_content = ""
-        for sub in implementation_artifact.get("sub_sections", []):
-            if sub.get("sub_section_id") == "B.3.2":
-                b32_content = sub.get("content", "")
-                break
-        assert (
-            "tier 1 programme rules" in b32_content.lower()
-        ), "Expected Tier 1 programme rules assertion in B.3.2"
+        """Implementation artifact must have populated wp_table_refs."""
+        wp_refs = implementation_artifact.get("wp_table_refs", [])
+        assert isinstance(wp_refs, list) and len(wp_refs) > 0, (
+            "Expected non-empty wp_table_refs"
+        )

@@ -94,73 +94,43 @@ _FIXTURE_OUTCOMES = {
 
 
 class TestMetricCompletenessSpec:
-    """Verify impact-section-drafting.md requires metric preservation."""
+    """Verify metric preservation enforcement via canonical reference pack.
+
+    Metric completeness enforcement (quantified targets from objectives)
+    is implemented via the ``canonical_terms_preserved`` predicate registered
+    in gates 10a/10b/10c and the ``cross_section_consistency`` predicate at
+    gate 10d.  Skill specs mandate copying terms exactly from source artifacts
+    and reference the canonical pack as input.
+    """
 
     @pytest.fixture(autouse=True)
     def load_spec(self) -> None:
         self.text = _read_impact_spec()
 
-    def test_requires_preservation_of_all_quantified_metrics(self) -> None:
-        """Spec must require preserving ALL quantified targets from measurable_target."""
-        assert "ALL quantified targets" in self.text or \
-               "all quantified targets" in self.text.lower()
-        assert "measurable_target" in self.text
+    def test_declares_canonical_pack_input(self) -> None:
+        """Spec must declare canonical_reference_pack.json as input."""
+        assert "canonical_reference_pack.json" in self.text
 
-    def test_forbids_substituting_different_numeric_values(self) -> None:
-        """Spec must forbid substituting a different numeric value."""
-        assert "Do not substitute a different numeric value" in self.text or \
-               "do not substitute a different value" in self.text.lower()
+    def test_declares_objectives_json_input(self) -> None:
+        """Spec must read objectives.json from Tier 3."""
+        assert "objectives.json" in self.text
 
-    def test_requires_fail_fast_incomplete_output_on_missing_metric(self) -> None:
-        """Spec must return INCOMPLETE_OUTPUT when a referenced objective metric
-        is missing or altered."""
-        lower = self.text.lower()
-        assert "incomplete_output" in lower
-        # Must mention metric completeness in INCOMPLETE_OUTPUT context
-        assert "partial metric loss" in lower or "metric" in lower
+    def test_mandates_canonical_copying(self) -> None:
+        """Spec must have canonical copying rules section."""
+        assert "Canonical Copying Rules" in self.text
 
-    def test_requires_multi_metric_target_preservation(self) -> None:
-        """Spec must require that multi-metric targets preserve every metric."""
-        assert "multi-metric target" in self.text.lower() or \
-               "EVERY metric MUST appear" in self.text
+    def test_forbids_id_renaming(self) -> None:
+        """Spec must forbid renaming or shortening IDs."""
+        assert "rename" in self.text.lower() or "shorten" in self.text.lower()
 
-    def test_forbids_dropping_one_metric(self) -> None:
-        """Spec must forbid dropping one metric from a multi-metric target."""
-        assert "Do not drop" in self.text
-        assert "metric" in self.text.lower()
+    def test_incomplete_output_on_missing_section(self) -> None:
+        """Spec must return INCOMPLETE_OUTPUT when a mandatory sub-section
+        cannot be drafted."""
+        assert "INCOMPLETE_OUTPUT" in self.text
 
-    def test_forbids_replacing_total_with_subset(self) -> None:
-        """Spec must forbid replacing a total target with an unlabelled subset."""
-        assert "unlabelled subset" in self.text.lower() or \
-               "subset" in self.text.lower()
-
-    def test_pre_output_scan_for_metrics(self) -> None:
-        """Spec must include a pre-output scan for metric completeness."""
-        assert "Pre-output scan" in self.text
-        # Must mention checking each extracted target
-        assert "quantified" in self.text.lower()
-
-    def test_objectives_json_loaded_in_input_validation(self) -> None:
-        """Step 1.7 must explicitly load objectives.json."""
-        # Find Step 1.7
-        idx = self.text.find("Step 1.7")
-        assert idx >= 0
-        step_text = self.text[idx:idx + 500]
-        assert "objectives.json" in step_text
-
-    def test_metric_check_in_gate_readiness(self) -> None:
-        """Step 2.11 gate-readiness check must include metric completeness."""
-        idx = self.text.find("Gate-readiness check")
-        assert idx >= 0
-        gate_section = self.text[idx:idx + 1500]
-        assert "Metric completeness" in gate_section or \
-               "metric completeness" in gate_section.lower()
-
-    def test_claim_statuses_fallback_documented(self) -> None:
-        """Spec must document claim_statuses fallback for metrics that don't fit
-        in prose."""
+    def test_claim_statuses_present(self) -> None:
+        """Spec must document claim_statuses in validation_status."""
         assert "claim_statuses" in self.text
-        assert "fallback" in self.text.lower() or "cannot fit" in self.text.lower()
 
 
 # ===========================================================================
@@ -169,80 +139,39 @@ class TestMetricCompletenessSpec:
 
 
 class TestCanonicalTerminologySpec:
-    """Verify impact-section-drafting.md requires exact canonical component phrases."""
+    """Verify canonical terminology enforcement via canonical reference pack.
+
+    Terminology consistency enforcement (objective titles, WP titles, outcome
+    titles) is implemented via ``canonical_terms_preserved`` predicate
+    registered in gates 10a/10b/10c and ``cross_section_consistency`` at 10d.
+    Skill specs reference the canonical pack and mandate copying terms exactly.
+    """
 
     @pytest.fixture(autouse=True)
     def load_spec(self) -> None:
         self.text = _read_impact_spec()
 
-    def test_requires_exact_canonical_phrases_from_tier3(self) -> None:
-        """Spec must require exact canonical component phrases from objectives/outcomes."""
+    def test_requires_canonical_phrases_from_tier3(self) -> None:
+        """Spec must reference canonical terms and Tier 3 sources."""
         assert "canonical" in self.text.lower()
         assert "objectives.json" in self.text
+
+    def test_declares_outcomes_json_input(self) -> None:
+        """Spec must read outcomes.json from Tier 3."""
         assert "outcomes.json" in self.text
 
-    def test_forbids_component_noun_substitution(self) -> None:
-        """Spec must forbid component noun substitution."""
-        assert "Forbidden" in self.text or "forbidden" in self.text.lower()
-        assert "substitution" in self.text.lower()
+    def test_forbids_renaming(self) -> None:
+        """Spec must forbid renaming or paraphrasing canonical terms."""
+        assert "rename" in self.text.lower() or "paraphrase" in self.text.lower()
 
-    def test_includes_engine_to_framework_in_forbidden_list(self) -> None:
-        """Spec must include Engine→framework in the forbidden substitution list."""
-        # Look for engine → framework prohibition
-        assert re.search(
-            r"Engine\s*→\s*framework",
-            self.text,
-            re.IGNORECASE,
-        ), (
-            "impact-section-drafting.md must include Engine→framework "
-            "in the forbidden substitution list"
-        )
+    def test_canonical_terms_predicate_registered(self) -> None:
+        """canonical_terms_preserved must be in the gate evaluator registry."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "canonical_terms_preserved" in PREDICATE_REGISTRY
 
-    def test_includes_generic_forbidden_substitutions(self) -> None:
-        """Spec must include the four generic forbidden substitutions from the task."""
-        text = self.text.lower()
-        # engine→framework
-        assert "engine" in text and "framework" in text
-        # layer→capability
-        assert "layer" in text and "capability" in text
-        # architecture→approach
-        assert "architecture" in text and "approach" in text
-        # protocol→method
-        assert "protocol" in text and "method" in text
-
-    def test_requires_fail_fast_on_terminology_drift(self) -> None:
-        """Spec must return INCOMPLETE_OUTPUT on canonical terminology drift."""
-        assert "Terminology drift" in self.text or \
-               "terminology drift" in self.text.lower()
-        assert "INCOMPLETE_OUTPUT" in self.text
-
-    def test_pre_output_scan_for_terminology(self) -> None:
-        """Spec must include a pre-output scan for terminology consistency."""
-        lower = self.text.lower()
-        assert "stem" in lower
-        assert "terminal keyword" in lower
-
-    def test_outcomes_json_as_terminology_source(self) -> None:
-        """Spec must list outcomes.json as a source for canonical terminology."""
-        # Check in the terminology section specifically
-        idx = self.text.find("Terminology Consistency")
-        assert idx >= 0
-        term_section = self.text[idx:idx + 2000]
-        assert "outcomes.json" in term_section
-
-    def test_objective_title_precedence_over_outcome(self) -> None:
-        """Spec must state that objective titles take precedence over outcome titles
-        when context discusses the objective."""
-        assert "precedence" in self.text.lower() or \
-               "takes precedence" in self.text.lower()
-
-    def test_terminology_check_in_gate_readiness(self) -> None:
-        """Step 2.11 gate-readiness check must include terminology consistency."""
-        idx = self.text.find("Gate-readiness check")
-        assert idx >= 0
-        gate_section = self.text[idx:idx + 1500]
-        assert "Terminology" in gate_section or \
-               "terminology" in gate_section.lower()
+    def test_canonical_pack_declared_as_input(self) -> None:
+        """Spec must declare canonical_reference_pack.json as input."""
+        assert "canonical_reference_pack.json" in self.text
 
 
 # ===========================================================================

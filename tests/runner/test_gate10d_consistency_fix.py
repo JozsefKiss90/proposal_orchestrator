@@ -297,65 +297,43 @@ class TestGate10dDispatch:
 
 
 class TestImplementationPartnerLegalNames:
-    """Verify implementation-section-drafting.md requires canonical legal names."""
+    """Verify partner legal name enforcement via canonical reference pack.
 
-    def test_requires_eurolog_international_ag(self) -> None:
-        """Skill spec must require 'EuroLog International AG'."""
+    Partner name enforcement is delegated to the canonical reference pack
+    and the ``partner_names_preserved`` preflight predicate registered in
+    gates 10a/10b/10c.  Skill specs reference the canonical pack as input
+    and mandate copying canonical terms exactly.
+    """
+
+    def test_skill_declares_canonical_pack_input(self) -> None:
+        """Skill spec must declare canonical_reference_pack.json as input."""
         spec = _load_skill_spec("implementation-section-drafting")
-        assert "EuroLog International AG" in spec, (
-            "implementation-section-drafting.md must require "
-            "'EuroLog International AG' (canonical legal name from partners.json)"
+        assert "canonical_reference_pack.json" in spec, (
+            "implementation-section-drafting.md must declare "
+            "canonical_reference_pack.json as input"
         )
 
-    def test_requires_boreal_ai_labs_oy(self) -> None:
-        """Skill spec must require 'Boreal AI Labs Oy'."""
+    def test_skill_mandates_canonical_copying(self) -> None:
+        """Skill spec must mandate copying partner legal names exactly."""
         spec = _load_skill_spec("implementation-section-drafting")
-        assert "Boreal AI Labs Oy" in spec, (
-            "implementation-section-drafting.md must require "
-            "'Boreal AI Labs Oy' (canonical legal name from partners.json)"
+        assert "partner legal names" in spec.lower() or \
+               "partner short names" in spec.lower(), (
+            "implementation-section-drafting.md must mandate copying "
+            "partner names from source artifacts"
         )
 
-    def test_forbids_bare_eurolog_international(self) -> None:
-        """Skill spec must forbid bare 'EuroLog International contributes'
-        without 'AG'."""
-        spec = _load_skill_spec("implementation-section-drafting")
-        assert re.search(
-            r"[Ff]orbidden.*EuroLog International.*without.*AG",
-            spec,
-            re.DOTALL,
-        ) or re.search(
-            r"FORBIDDEN.*EuroLog International contributes.*without.*AG",
-            spec,
-            re.DOTALL,
-        ), (
-            "implementation-section-drafting.md must forbid bare "
-            "'EuroLog International contributes' without 'AG'"
-        )
-
-    def test_forbids_bare_boreal_ai_labs(self) -> None:
-        """Skill spec must forbid bare 'Boreal AI Labs brings' without 'Oy'."""
-        spec = _load_skill_spec("implementation-section-drafting")
-        assert re.search(
-            r"[Ff]orbidden.*Boreal AI Labs.*without.*Oy",
-            spec,
-            re.DOTALL,
-        ) or re.search(
-            r"FORBIDDEN.*Boreal AI Labs brings.*without.*Oy",
-            spec,
-            re.DOTALL,
-        ), (
-            "implementation-section-drafting.md must forbid bare "
-            "'Boreal AI Labs brings' without 'Oy'"
-        )
+    def test_partner_names_predicate_registered(self) -> None:
+        """partner_names_preserved must be in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "partner_names_preserved" in PREDICATE_REGISTRY
 
     def test_canonical_legal_name_mandate(self) -> None:
         """Skill spec must contain a mandate to use canonical legal names
-        from partners.json."""
+        from the reference pack."""
         spec = _load_skill_spec("implementation-section-drafting")
-        assert "canonical" in spec.lower() and "legal_name" in spec or \
-               "canonical" in spec.lower() and "legal name" in spec.lower(), (
-            "implementation-section-drafting.md must mandate using canonical "
-            "legal names from partners.json"
+        assert "canonical" in spec.lower(), (
+            "implementation-section-drafting.md must reference canonical "
+            "copying rules"
         )
 
     def test_partners_json_has_correct_legal_names(self) -> None:
@@ -377,92 +355,41 @@ class TestImplementationPartnerLegalNames:
 
 
 class TestImpactD401Constraint:
-    """Verify impact-section-drafting.md forbids D4-01 as M48 standardisation."""
+    """Verify deliverable identity enforcement via canonical reference pack.
 
-    def test_forbids_formal_standardisation_proposal_d401(self) -> None:
-        """Skill spec must forbid 'formal standardisation proposal (D4-01)'."""
+    Deliverable identity enforcement (including D4-01) is delegated to the
+    canonical reference pack and ``deliverable_identity_preserved`` predicate
+    registered in gates 10a/10b/10c.  Skill specs mandate copying deliverable
+    IDs, titles, and due months exactly from source artifacts.
+    """
+
+    def test_skill_declares_canonical_pack_input(self) -> None:
+        """Skill spec must declare canonical_reference_pack.json as input."""
         spec = _load_skill_spec("impact-section-drafting")
-        assert "formal standardisation proposal (D4-01)" in spec, (
-            "impact-section-drafting.md must explicitly forbid "
-            "'formal standardisation proposal (D4-01)'"
-        )
-        # Verify it's in a FORBIDDEN context
-        idx = spec.find("formal standardisation proposal (D4-01)")
-        # Look backwards for FORBIDDEN marker
-        context = spec[max(0, idx - 200):idx + 50]
-        assert "FORBIDDEN" in context or "forbidden" in context.lower() or \
-               "MUST NOT" in context or "must not" in context.lower(), (
-            "The mention of 'formal standardisation proposal (D4-01)' must be "
-            "in a prohibition context"
+        assert "canonical_reference_pack.json" in spec, (
+            "impact-section-drafting.md must declare "
+            "canonical_reference_pack.json as input"
         )
 
-    def test_forbids_standardisation_submission_d401(self) -> None:
-        """Skill spec must forbid 'standardisation submission (D4-01)'."""
+    def test_skill_forbids_id_reassignment(self) -> None:
+        """Skill spec must forbid renaming or reassigning deliverable IDs."""
         spec = _load_skill_spec("impact-section-drafting")
-        assert "standardisation submission (D4-01)" in spec, (
-            "impact-section-drafting.md must explicitly forbid "
-            "'standardisation submission (D4-01)'"
+        assert "reassign" in spec.lower() or "rename" in spec.lower() or \
+               "do not rename" in spec.lower(), (
+            "impact-section-drafting.md must forbid renaming or reassigning IDs"
         )
 
-    def test_forbids_d401_by_m48_pattern(self) -> None:
-        """Skill spec must forbid 'D4-01 ... by M48' patterns."""
-        spec = _load_skill_spec("impact-section-drafting")
-        assert re.search(
-            r"D4-01.*(?:by |submitted by |due )M48",
-            spec,
-        ) or "D4-01 submitted by M48" in spec or \
-               "D4-01 ... by M48" in spec, (
-            "impact-section-drafting.md must forbid 'D4-01 submitted by M48' "
-            "or equivalent patterns"
-        )
+    def test_deliverable_identity_predicate_registered(self) -> None:
+        """deliverable_identity_preserved must be in PREDICATE_REGISTRY."""
+        from runner.gate_evaluator import PREDICATE_REGISTRY
+        assert "deliverable_identity_preserved" in PREDICATE_REGISTRY
 
-    def test_requires_d401_as_m18_protocol(self) -> None:
-        """Skill spec must require D4-01 to be described as M18
-        coordination protocol specification."""
+    def test_skill_mandates_cite_with_full_identity(self) -> None:
+        """Skill spec must mandate citing deliverables with ID, title, WP, month."""
         spec = _load_skill_spec("impact-section-drafting")
-        assert re.search(
-            r"D4-01.*M18.*coordination protocol",
-            spec,
-            re.IGNORECASE | re.DOTALL,
-        ), (
-            "impact-section-drafting.md must require D4-01 to be described as "
-            "the M18 coordination protocol specification"
-        )
-
-    def test_kpi08_not_assigned_as_d401(self) -> None:
-        """Skill spec must require KPI-08/M48 standardisation action to be
-        described without assigning it as D4-01."""
-        spec = _load_skill_spec("impact-section-drafting")
-        assert "KPI-08" in spec, (
-            "impact-section-drafting.md must mention KPI-08 as the M48 "
-            "standardisation activity tracker"
-        )
-
-    def test_d401_constraint_is_gate_critical(self) -> None:
-        """The D4-01 deliverable identity constraint must be marked GATE-CRITICAL."""
-        spec = _load_skill_spec("impact-section-drafting")
-        idx = spec.find("D4-01 deliverable identity constraint")
-        assert idx >= 0, (
-            "impact-section-drafting.md must contain 'D4-01 deliverable "
-            "identity constraint'"
-        )
-        section = spec[idx:idx + 200]
-        assert "GATE-CRITICAL" in section
-
-    def test_gate_readiness_check_includes_d401(self) -> None:
-        """The gate-readiness check (Step 2.11) must include D4-01 checks."""
-        spec = _load_skill_spec("impact-section-drafting")
-        idx = spec.find("Gate-readiness check")
-        assert idx >= 0
-        gate_check = spec[idx:idx + 1000]
-        assert "D4-01" in gate_check, (
-            "Gate-readiness check must include D4-01 validation"
-        )
-        assert "standardisation" in gate_check.lower() or \
-               "M48" in gate_check, (
-            "Gate-readiness check must verify D4-01 not treated as M48 "
-            "standardisation"
-        )
+        assert "deliverable" in spec.lower()
+        assert "title" in spec.lower()
+        assert "due month" in spec.lower() or "due_month" in spec
 
 
 # ===========================================================================
