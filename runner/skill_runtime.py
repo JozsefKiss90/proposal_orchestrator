@@ -69,7 +69,7 @@ ARTIFACT_SCHEMA_REL_PATH: str = (
 SKILL_SPECS_REL_DIR: str = ".claude/skills"
 
 #: Claude model used for skill execution.
-SKILL_MODEL: str = "claude-opus-4-6"
+SKILL_MODEL: str = "claude-sonnet-4-6"
 
 #: Maximum tokens for skill execution responses.
 #: NOTE: This value is passed to invoke_claude_text() for interface

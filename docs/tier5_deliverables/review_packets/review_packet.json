@@ -1,135 +1,126 @@
 {
   "schema_id": "orch.tier5.review_packet.v1",
-  "run_id": "3e6a2b2a-ad72-43db-b4c0-d3ea14c11c51",
+  "run_id": "97b661a6-2381-4a15-85d5-3017e0f9b5ed",
   "findings": [
     {
       "finding_id": "F-01",
       "section_id": "excellence",
       "criterion": "Excellence",
-      "description": "State-of-the-art analysis is superficial. Sub-criterion requires demonstrating the proposed work 'goes beyond the state of the art,' but B.1.1 devotes only a single sentence to this: 'MAESTRO advances beyond the state of the art by unifying three disconnected research communities.' No systematic comparison with existing approaches, no identification of specific limitations overcome, and no positioning against named competing frameworks or recent literature. An evaluator cannot assess ambition without a substantive baseline comparison.",
+      "description": "The gender dimension in research and innovation content is superficially dismissed rather than appropriately considered. The methodology states 'no gender-specific hypotheses apply to agent architecture research; use cases serve diverse end-user populations by design' without analysing gender-relevant aspects that are material to the proposed work — for example, gender bias in clinical training datasets used in the healthcare demonstrator (OBJ-4), or gendered patterns of interaction with AI agent interfaces. The evaluation form sub-criterion explicitly requires 'appropriate consideration of the gender dimension in research and innovation content,' and a one-sentence dismissal does not meet the grade descriptor for a score of 4 or 5.",
       "severity": "major",
-      "evidence": "\"MAESTRO advances beyond the state of the art by unifying three disconnected research communities — LLM-based agents, classical planning and multi-agent systems, and memory-augmented neural systems — into one architecture with formal guarantees\"",
-      "recommendation": "Expand B.1.1 with a dedicated state-of-the-art paragraph that names specific competing approaches (e.g., AutoGPT, LangChain agents, BabyAGI, specific MAS frameworks), identifies their concrete limitations (e.g., no formal convergence guarantees, no persistent memory, no verified tool orchestration), and explains precisely how each MAESTRO pillar overcomes those limitations."
+      "evidence": "\"Gender dimension in R&I content: no gender-specific hypotheses apply to agent architecture research; use cases serve diverse end-user populations by design.\" (B.1.2)",
+      "recommendation": "Add a substantive paragraph in B.1.2 addressing gender dimension in R&I content: (a) analysis of potential gender bias in clinical decision-support datasets and mitigation through stratified evaluation in WP5; (b) consideration of gendered interaction patterns with AI agents in user studies; (c) explicit statement on how FAIR data management will include sex-disaggregated reporting where relevant."
     },
     {
       "finding_id": "F-02",
       "section_id": "excellence",
       "criterion": "Excellence",
-      "description": "Gender dimension in R&I content is dismissed rather than appropriately considered. The evaluation form explicitly requires 'appropriate consideration of the gender dimension in research and innovation content.' B.1.2 states the gender dimension is 'not inherently relevant to the core AI architecture research.' This is problematic for a project with a healthcare clinical decision support demonstrator (OBJ-4) operating on patient diagnostic cases, where gender bias in training data and diagnostic accuracy across gender groups is a well-documented concern. Dismissive treatment risks score reduction.",
+      "description": "The evaluation form sub-criterion for methodology includes 'engagement of citizens, civil society and end users where appropriate.' The methodology section does not address engagement of citizens or civil society at all. End-user engagement is mentioned only indirectly through clinical validation with human experts in WP5. For the manufacturing (WP6) and logistics (WP7) demonstrators, no end-user engagement strategy is described despite TRL-5 validation requiring user-facing evaluation.",
       "severity": "major",
-      "evidence": "\"The gender dimension in R&I content is not inherently relevant to the core AI architecture research; demonstrator use case specifications (T5-01, T6-01, T7-01) will address gender-relevant considerations where applicable.\"",
-      "recommendation": "Replace dismissive language with a substantive analysis: (1) acknowledge gender-relevant dimensions in the healthcare demonstrator (sex/gender-disaggregated evaluation of diagnostic accuracy on the 500 clinical cases); (2) address potential gender bias in AI training data and benchmark construction in WP8; (3) if core architecture research has no gender dimension, state this with a brief justification rather than a blanket dismissal."
+      "evidence": "\"SSH: proportionate to the primarily technical research; WP5 includes clinical validation with human experts addressing responsible AI in healthcare.\" (B.1.2) — no mention of citizen, civil society, or end-user engagement for WP6/WP7.",
+      "recommendation": "Add to B.1.2 a description of end-user engagement: (a) how manufacturing operators at ISIA and logistics operators at ELI will participate in demonstrator design and evaluation; (b) whether any advisory board or civil society stakeholder consultation is planned; (c) how user feedback will be integrated into iterative design cycles in WP5–WP7."
     },
     {
       "finding_id": "F-03",
       "section_id": "excellence",
       "criterion": "Excellence",
-      "description": "No mention of engagement of citizens, civil society, or end users. The evaluation form sub-criterion includes 'engagement of citizens, civil society and end users where appropriate.' Given three real-world demonstrators (healthcare, manufacturing, logistics) with direct end-user interaction, engagement mechanisms are appropriate but entirely absent from B.1.2.",
+      "description": "The beyond-state-of-the-art argument is compressed into two sentences asserting that MAESTRO co-designs planning, memory, coordination, and tool orchestration as a unified architecture where current research treats them as disconnected. No specific competing systems, frameworks, or recent publications are cited for comparison, and the quantified gaps that the MAESTRO approach is designed to close are not explained. An evaluator assessing ambition needs more than an assertion of fragmentation in the field.",
       "severity": "minor",
-      "evidence": "No reference to citizen, civil society, or end-user engagement found in B.1.2 content.",
-      "recommendation": "Add a brief description of end-user engagement mechanisms: clinical end-users in WP5 (clinicians validating decision support), factory operators in WP6, and logistics planners in WP7. Describe how their feedback informs iterative design."
+      "evidence": "\"Beyond state of the art: MAESTRO co-designs planning, memory, coordination, and tool orchestration as a unified architecture where current research treats LLM-based agents, classical multi-agent systems, and memory-augmented neural architectures as disconnected threads.\" (B.1.1)",
+      "recommendation": "Expand the beyond-state-of-the-art paragraph in B.1.1 to: (a) name 2–3 specific competing frameworks or recent systems (e.g., AutoGPT, LangChain agent frameworks, specific multi-agent coordination baselines) and identify their limitations; (b) explain why the unified architecture approach is expected to yield the quantified improvements claimed in OBJ-1 through OBJ-3."
     },
     {
       "finding_id": "F-04",
       "section_id": "impact",
       "criterion": "Impact",
-      "description": "Impact pathways are presented as listings of objectives, metrics, and deliverable references rather than as credible causal chains. The evaluation form requires 'credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme.' B.2.1 enumerates five pathways (PATH-EI-01 to PATH-EI-05) but the actual causal logic — how project outputs lead to outcomes, how outcomes lead to broader impacts, and what conditions must hold — is not articulated. Evaluators assess whether the chain of reasoning is convincing, not whether the metrics are listed.",
+      "description": "The evaluation form Impact sub-criterion explicitly includes 'communication activities' alongside dissemination and exploitation. Communication is addressed in a single sentence in B.2.2 ('BAL leads public engagement under WP9 T9-03 including project website, social media, and stakeholder events targeting the AI research community, industrial adopters, and policy makers') without specifying concrete communication actions, timelines, target audience segmentation, or mechanisms for reaching non-specialist publics. For a score of 4 or 5, the grade descriptors require this sub-criterion to be well addressed with at most minor shortcomings.",
       "severity": "major",
-      "evidence": "\"MAESTRO delivers impact through five traceable pathways (PATH-EI-01 to PATH-EI-05) covering all call expected impacts EI-01 through EI-05\" followed by metric listings without causal narrative connecting outputs to outcomes to impacts.",
-      "recommendation": "Restructure B.2.1 to present each pathway as an explicit causal chain: Output (what the project produces) → Outcome (what changes for target groups as a result) → Impact (broader societal/economic/scientific effect). Include the conditions and assumptions that must hold at each stage."
+      "evidence": "\"Communication: BAL leads public engagement under WP9 T9-03 including project website, social media, and stakeholder events targeting the AI research community, industrial adopters, and policy makers.\" (B.2.2) — single sentence covering all communication activities.",
+      "recommendation": "Expand the communication subsection in B.2.2 to include: (a) specific communication actions (e.g., press releases at demonstrator milestones, public-facing videos, policy briefs); (b) timeline for key communication events aligned with project milestones; (c) strategy for reaching non-specialist audiences including the general public; (d) metrics for communication reach and engagement."
     },
     {
       "finding_id": "F-05",
       "section_id": "impact",
       "criterion": "Impact",
-      "description": "Barriers and external factors analysis for impact pathways is thin. B.2.1 identifies only two barriers ('EU AI Act regulatory evolution and industrial adoption inertia') with brief mitigations. For a project deploying AI agents in healthcare, manufacturing, and logistics, significant barriers exist (clinical validation regulatory pathways, data access constraints, sectoral technology adoption timelines, ethical approval processes) that are not discussed.",
+      "description": "Several pathway KPI targets are stated without supporting evidence of their achievability, weakening the credibility argument. For example, '≥500 GitHub stars within 6 months of release' and '≥10 European SMEs/startups building on D9-02 by M48' are asserted without reference to comparable open-source AI projects, community-building precedents, or market analysis. The Impact sub-criterion asks evaluators to assess 'credibility of the pathways,' which requires justification for why stated targets are realistic.",
       "severity": "minor",
-      "evidence": "\"Barriers include EU AI Act regulatory evolution and industrial adoption inertia, mitigated through open-source community governance, EDIH partnership agreements, and ≥1 standardisation submission\"",
-      "recommendation": "Expand the barriers analysis to address sector-specific adoption barriers: healthcare regulatory pathways (MDR/IVDR implications for clinical decision support tools), manufacturing data sovereignty concerns, logistics cross-border data sharing constraints. Provide specific mitigation strategies for each."
+      "evidence": "\"OBJ-7 (Open framework release and ecosystem contribution) targeting ≥500 GitHub stars within 6 months of release, AI-on-demand platform contributions, ≥2 TEF validations, AND ≥3 EDIH transfers\" (B.2.1) — targets stated without benchmarking or justification.",
+      "recommendation": "In B.2.1 or B.2.2, add brief justification for the most visible KPI targets: (a) cite comparable open-source AI agent framework adoption rates to benchmark the 500-star target; (b) reference existing EDIH engagement or letters of intent to support the SME uptake targets; (c) explain the basis for the ≥10 SME/startup adoption claim."
     },
     {
       "finding_id": "F-06",
-      "section_id": "impact",
-      "criterion": "Impact",
-      "description": "Communication plan is insufficiently developed. The evaluation form sub-criterion assesses 'suitability and quality of the measures to maximise expected outcomes and impacts... including communication activities.' B.2.2 dedicates only one sentence to communication: 'project website, social media channels, and ≥3 invited keynotes at major AI conferences.' No target audiences beyond the research community, no messaging strategy, no timeline, and no non-academic communication channels are described.",
-      "severity": "minor",
-      "evidence": "\"Communication: project website, social media channels, and ≥3 invited keynotes at major AI conferences coordinated under WP9 T9-03.\"",
-      "recommendation": "Expand the communication plan to identify non-academic target audiences (policy-makers, healthcare administrators, manufacturing industry associations, logistics sector stakeholders), define key messages per audience, describe communication channels beyond academic conferences (policy briefs, industry events, press releases), and provide a timeline of communication activities."
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "description": "The evaluation form sub-criterion requires evaluators to assess 'appropriateness of the effort assigned to work packages, and the resources overall.' Section B.3.1 contains no person-month figures, no effort breakdown by partner or work package, and no discussion of resource adequacy or allocation rationale. The cross-section consistency check (CC-08) confirms 'no specific budget figures, person-month values, or cost allocations are cited in any of the three sections.' An evaluator reading Part B cannot assess effort appropriateness from this section, which is a mandatory sub-criterion aspect.",
+      "severity": "critical",
+      "evidence": "\"Resources validated via budget gate (pass, all WPs and partners covered).\" (B.3.1) — this is an internal orchestration reference, not evaluator-facing effort justification. CC-08 confirms no PM values appear.",
+      "recommendation": "Add to B.3.1: (a) a summary table or narrative of total person-months per work package; (b) effort distribution across partners showing proportionality to their roles; (c) brief justification of resource adequacy for the most effort-intensive WPs (WP2, WP5, WP8); (d) explanation of how the overall effort level is commensurate with the project's ambition and 48-month duration."
     },
     {
       "finding_id": "F-07",
       "section_id": "implementation",
       "criterion": "Quality and efficiency of the implementation",
-      "description": "No effort allocation or resource distribution data is presented. The evaluation form sub-criterion explicitly requires assessment of 'appropriateness of the effort assigned to work packages, and the resources overall.' B.3.1 states only that 'Resource allocation across all 9 WPs and 8 partners is structurally consistent with the validated budget' without providing any person-month figures, relative effort percentages, or resource distribution across WPs. An evaluator cannot assess appropriateness of effort without this data.",
+      "description": "The evaluation form sub-criterion explicitly asks for 'assessment of risks.' Section B.3.1 mentions '11 risks (technical, external, organisational) with assigned mitigation' but does not describe any specific risk, its likelihood, impact, or mitigation strategy. An evaluator cannot assess the quality of risk management from a count alone. The risk register is referenced but its content is not presented in the evaluator-facing text.",
       "severity": "major",
-      "evidence": "\"Resource allocation across all 9 WPs and 8 partners is structurally consistent with the validated budget.\"",
-      "recommendation": "Add a summary effort allocation table or narrative showing person-months per WP and per partner. Justify the distribution relative to WP scope and complexity. Highlight that research WPs (WP2-WP4) and demonstrator WPs (WP5-WP7) receive effort proportionate to their deliverable commitments."
+      "evidence": "\"Risk register: 11 risks (technical, external, organisational) with assigned mitigation.\" (B.3.1) — risks referenced by count only, no substantive discussion.",
+      "recommendation": "Add to B.3.1 a risk assessment subsection presenting at least the 3–4 highest-impact risks with: (a) risk description; (b) likelihood and impact rating; (c) specific mitigation measures; (d) contingency actions if the risk materialises. Focus on risks most likely to concern evaluators: technical integration risk across the three pillars, clinical data access constraints, and open-source community sustainability."
     },
     {
       "finding_id": "F-08",
       "section_id": "implementation",
       "criterion": "Quality and efficiency of the implementation",
-      "description": "Risk mitigations are referenced but not described. The evaluation form sub-criterion requires 'assessment of risks.' B.3.1 mentions 11 risks and names the top 3 high-impact risks but states only that they have 'defined mitigations and responsible partners' without describing what those mitigations are. An evaluator needs to assess whether the mitigations are adequate, which requires seeing them.",
+      "description": "The evaluation form sub-criterion asks evaluators to assess 'capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise.' Section B.3.2 lists each partner's expertise area and WP leadership but provides no evidence of track record — no prior project references, no relevant publications, no previous EU project participation, and no demonstrated achievements. An evaluator assessing capacity expects evidence, not just stated expertise.",
       "severity": "major",
-      "evidence": "\"top high-impact risks: RISK-01 (neuro-symbolic integration complexity, medium likelihood/high impact), RISK-04 (clinical data access delays, medium/high), RISK-10 (pillar integration incompatibility, medium/high), each with defined mitigations and responsible partners.\"",
-      "recommendation": "For each of the top high-impact risks, describe the specific mitigation strategy: e.g., RISK-01 mitigation through modular interface contracts and fallback pure-LLM mode; RISK-04 mitigation through synthetic data generation pipeline and ethics pre-approval timeline; RISK-10 mitigation through integration gateway architecture and early WP8 specification milestones."
-    },
-    {
-      "finding_id": "F-09",
-      "section_id": "implementation",
-      "criterion": "Quality and efficiency of the implementation",
-      "description": "Partner capacity descriptions lack evidence of track record. The evaluation form sub-criterion assesses 'capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise.' B.3.2 describes each partner's role and general expertise areas but provides no evidence: no named key personnel, no relevant prior EU/national projects, no publication track records, no infrastructure specifics. Generic claims like 'world-class expertise' and 'leading research' are unsupported assertions from an evaluator's perspective.",
-      "severity": "major",
-      "evidence": "\"Alpenstadt Technical University (ATU) serves as coordinator... bringing world-class expertise in neuro-symbolic AI, automated planning, and LLM-based reasoning.\"",
-      "recommendation": "For each partner, add at minimum: (1) 1-2 named key personnel with relevant credentials; (2) 1-2 relevant prior projects demonstrating track record; (3) specific infrastructure or unique assets (e.g., NIHS: access to N de-identified clinical records; ISIA: pilot factory with X production lines; ELI: operational logistics network across Y corridors)."
+      "evidence": "\"Alpenstadt Technical University (ATU, DE, coordinator) leads WP1 and WP2, providing expertise in neuro-symbolic AI, automated planning, and LLM-based reasoning.\" (B.3.2) — expertise is claimed without supporting evidence of track record.",
+      "recommendation": "Add to B.3.2 for each partner: (a) 1–2 key relevant publications or prior projects demonstrating the claimed expertise; (b) reference to relevant infrastructure or facilities; (c) for the coordinator, evidence of prior coordination experience in EU-funded projects. This is standard practice for competitive HE RIA proposals."
     }
   ],
   "revision_actions": [
     {
       "action_id": "A-1",
-      "finding_id": "F-02",
+      "finding_id": "F-06",
       "priority": 1,
-      "action_description": "Rewrite the gender dimension paragraph in B.1.2 to provide substantive analysis of gender-relevant dimensions in the healthcare demonstrator (sex-disaggregated diagnostic evaluation), AI training data bias considerations in WP8 benchmarks, and manufacturing/logistics workforce gender representation where applicable.",
-      "target_section": "excellence",
-      "severity": "major"
+      "action_description": "Insert an effort allocation summary in B.3.1 presenting person-months per work package and per partner, with a narrative justifying the proportionality of effort to task complexity and partner roles. Source the figures from the validated budget response in the integration layer.",
+      "target_section": "implementation",
+      "severity": "critical"
     },
     {
       "action_id": "A-2",
       "finding_id": "F-01",
       "priority": 2,
-      "action_description": "Add a dedicated state-of-the-art comparison paragraph to B.1.1 that names competing approaches, identifies their specific limitations, and explains how each MAESTRO pillar overcomes them with evidence of advancement.",
+      "action_description": "Replace the single-sentence gender dimension dismissal in B.1.2 with a substantive paragraph analysing gender-relevant aspects: bias risks in clinical datasets for OBJ-4, gendered user interaction patterns, and sex-disaggregated data reporting in the DMP.",
       "target_section": "excellence",
       "severity": "major"
     },
     {
       "action_id": "A-3",
-      "finding_id": "F-04",
+      "finding_id": "F-02",
       "priority": 3,
-      "action_description": "Restructure B.2.1 to articulate each impact pathway as an explicit causal chain (Output → Outcome → Impact) with stated assumptions and conditions, rather than as a listing of metrics and deliverable references.",
-      "target_section": "impact",
+      "action_description": "Add end-user and civil society engagement description in B.1.2 covering: user participation in WP5–WP7 demonstrator design and evaluation, any advisory board or stakeholder consultation mechanism, and how user feedback feeds iterative development.",
+      "target_section": "excellence",
       "severity": "major"
     },
     {
       "action_id": "A-4",
-      "finding_id": "F-07",
+      "finding_id": "F-04",
       "priority": 4,
-      "action_description": "Add effort allocation data to B.3.1 showing person-months per WP and per partner, with justification for the distribution relative to WP scope and deliverable commitments.",
-      "target_section": "implementation",
+      "action_description": "Expand the communication subsection in B.2.2 with specific communication actions, a timeline linked to milestones, a strategy for non-specialist audiences, and measurable engagement targets.",
+      "target_section": "impact",
       "severity": "major"
     },
     {
       "action_id": "A-5",
-      "finding_id": "F-08",
+      "finding_id": "F-07",
       "priority": 5,
-      "action_description": "Expand the risk assessment in B.3.1 to describe specific mitigation strategies for at least the top 3 high-impact risks (RISK-01, RISK-04, RISK-10), including concrete actions, responsible partners, and contingency triggers.",
+      "action_description": "Add a risk assessment subsection in B.3.1 presenting the 3–4 highest-impact risks with descriptions, likelihood/impact ratings, mitigation measures, and contingency plans.",
       "target_section": "implementation",
       "severity": "major"
     },
     {
       "action_id": "A-6",
-      "finding_id": "F-09",
+      "finding_id": "F-08",
       "priority": 6,
-      "action_description": "Enhance B.3.2 partner descriptions with evidence of capacity: named key personnel with credentials, relevant prior projects, and specific infrastructure or unique assets for each partner.",
+      "action_description": "Add track record evidence for each partner in B.3.2: 1–2 relevant prior projects or publications, infrastructure references, and coordinator's EU project management experience.",
       "target_section": "implementation",
       "severity": "major"
     },
@@ -137,7 +128,7 @@
       "action_id": "A-7",
       "finding_id": "F-03",
       "priority": 7,
-      "action_description": "Add a brief end-user engagement description to B.1.2 covering clinician involvement in WP5, factory operator feedback in WP6, and logistics planner participation in WP7.",
+      "action_description": "Expand the beyond-state-of-the-art paragraph in B.1.1 to name 2–3 competing frameworks, identify their specific limitations, and explain why the unified architecture approach addresses those gaps.",
       "target_section": "excellence",
       "severity": "minor"
     },
@@ -145,15 +136,7 @@
       "action_id": "A-8",
       "finding_id": "F-05",
       "priority": 8,
-      "action_description": "Expand the barriers analysis in B.2.1 to cover sector-specific adoption barriers (healthcare regulatory pathways, manufacturing data sovereignty, cross-border logistics data sharing) with specific mitigation strategies.",
-      "target_section": "impact",
-      "severity": "minor"
-    },
-    {
-      "action_id": "A-9",
-      "finding_id": "F-06",
-      "priority": 9,
-      "action_description": "Expand the communication plan in B.2.2 to identify non-academic target audiences, define key messages per audience, describe non-academic communication channels, and provide a timeline of activities.",
+      "action_description": "Add brief credibility justification for key open-source and SME adoption KPIs in B.2.1 or B.2.2, citing comparable project adoption rates or supporting evidence such as letters of intent.",
       "target_section": "impact",
       "severity": "minor"
     }
