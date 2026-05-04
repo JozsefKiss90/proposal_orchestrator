@@ -1348,37 +1348,119 @@ class TestProductionMappingInvariant:
 
 
 # ===========================================================================
-# L. Strict provenance (Option A) — validate_reuse_candidate
+# L. Cross-run fingerprint-based reuse
 # ===========================================================================
 
 
-class TestStrictProvenance:
-    """Cross-run reuse is rejected when current_run_id is provided and
-    artifact.run_id differs.  Same-run reuse still passes."""
+class TestCrossRunReuse:
+    """Cross-run reuse is allowed when input fingerprints match.
+    run_id mismatch is not a rejection criterion."""
 
     @pytest.mark.parametrize("node_id", [
         "n08a_excellence_drafting",
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_reject_old_run_artifact(self, tmp_path: Path, node_id: str) -> None:
-        """Artifact from run-A rejected when current_run_id is run-B."""
+    def test_reuse_when_fingerprints_identical_across_runs(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Artifact from run-A reused when current run is run-B
+        and input fingerprints are identical."""
         fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
         decision = validate_reuse_candidate(
             node_id, tmp_path,
             current_fingerprint=fp,
             current_run_id="run-B",
         )
-        assert decision.reusable is False
-        assert decision.reason == "artifact_run_id_mismatch_strict_provenance"
+        assert decision.reusable is True
+        assert decision.reason == "all_checks_passed"
 
     @pytest.mark.parametrize("node_id", [
         "n08a_excellence_drafting",
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_accept_current_run_artifact(self, tmp_path: Path, node_id: str) -> None:
-        """Artifact from run-B accepted when current_run_id is run-B."""
+    def test_reuse_blocked_when_upstream_artifact_changes(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Reuse blocked when an upstream input file changes between runs."""
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
+
+        # Modify an upstream input AFTER metadata was written
+        _write_json(
+            tmp_path / "docs/tier3_project_instantiation/new_data.json",
+            {"changed": True},
+        )
+        new_fp = compute_input_fingerprint(node_id, tmp_path)
+        decision = validate_reuse_candidate(
+            node_id, tmp_path,
+            current_fingerprint=new_fp,
+            current_run_id="run-B",
+        )
+        assert decision.reusable is False
+        assert decision.reason == "fingerprint_mismatch"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_blocked_when_canonical_pack_source_changes(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Reuse blocked when canonical pack source data changes.
+        canonical_reference_pack sources (objectives, wp_structure, partners)
+        are inside fingerprinted directories, so changes invalidate reuse."""
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
+
+        # Modify objectives.json (canonical pack source, inside Tier 3 dir)
+        _write_json(
+            tmp_path / "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+            {"objectives": [{"id": "OBJ-1", "title": "Changed", "measurable_target": "≥99%"}]},
+        )
+        new_fp = compute_input_fingerprint(node_id, tmp_path)
+        decision = validate_reuse_candidate(
+            node_id, tmp_path,
+            current_fingerprint=new_fp,
+            current_run_id="run-B",
+        )
+        assert decision.reusable is False
+        assert decision.reason == "fingerprint_mismatch"
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_reuse_independent_of_run_id(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Reuse decision depends only on input fingerprint, not run_id.
+        Same environment, different current_run_id values → same decision."""
+        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
+
+        decision_b = validate_reuse_candidate(
+            node_id, tmp_path, current_fingerprint=fp, current_run_id="run-B",
+        )
+        decision_c = validate_reuse_candidate(
+            node_id, tmp_path, current_fingerprint=fp, current_run_id="run-C",
+        )
+        decision_none = validate_reuse_candidate(
+            node_id, tmp_path, current_fingerprint=fp, current_run_id=None,
+        )
+        assert decision_b.reusable is True
+        assert decision_c.reusable is True
+        assert decision_none.reusable is True
+
+    @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_same_run_reuse_still_works(
+        self, tmp_path: Path, node_id: str,
+    ) -> None:
+        """Same-run reuse continues to work (no regression)."""
         fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-B")
         decision = validate_reuse_candidate(
             node_id, tmp_path,
@@ -1388,42 +1470,14 @@ class TestStrictProvenance:
         assert decision.reusable is True
         assert decision.reason == "all_checks_passed"
 
-    def test_no_current_run_id_allows_any(self, tmp_path: Path) -> None:
-        """When current_run_id is None (backward compat), any run passes."""
-        fp = _make_full_reuse_env(tmp_path, "n08a_excellence_drafting", run_id="old-run")
-        decision = validate_reuse_candidate(
-            "n08a_excellence_drafting", tmp_path,
-            current_fingerprint=fp,
-            current_run_id=None,
-        )
-        assert decision.reusable is True
-
-    def test_strict_provenance_checked_before_gate_result(
-        self, tmp_path: Path,
-    ) -> None:
-        """Strict provenance rejects even when all other checks pass."""
-        node_id = "n08b_impact_drafting"
-        fp = _make_full_reuse_env(tmp_path, node_id, run_id="run-A")
-
-        # All reuse checks pass except run_id mismatch
-        decision = validate_reuse_candidate(
-            node_id, tmp_path,
-            current_fingerprint=fp,
-            current_run_id="run-B",
-        )
-        assert decision.reusable is False
-        assert decision.reason == "artifact_run_id_mismatch_strict_provenance"
-        # Fingerprint should still be set for logging
-        assert decision.input_fingerprint == fp
-
 
 # ===========================================================================
-# M. Strict provenance — Scheduler integration
+# M. Cross-run reuse — Scheduler integration
 # ===========================================================================
 
 
-class TestStrictProvenanceSchedulerIntegration:
-    """Scheduler rejects cross-run reuse and dispatches drafting normally."""
+class TestCrossRunReuseSchedulerIntegration:
+    """Scheduler accepts cross-run reuse when fingerprints match."""
 
     _EG_TARGET = "runner.dag_scheduler.evaluate_gate"
     _RA_TARGET = "runner.dag_scheduler.run_agent"
@@ -1433,13 +1487,13 @@ class TestStrictProvenanceSchedulerIntegration:
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_cross_run_reuse_rejected_drafting_runs(
+    def test_cross_run_reuse_accepted_drafting_skipped(
         self, tmp_path: Path, node_id: str,
     ) -> None:
-        """Cross-run artifact rejected; run_agent called WITHOUT skip_skills."""
+        """Cross-run artifact accepted; run_agent called WITH skip_skills."""
         import yaml as _yaml
 
-        # Artifact from old run
+        # Artifact from old run with matching fingerprint
         _make_full_reuse_env(tmp_path, node_id, run_id="old-run-001")
 
         cfg = REUSE_ELIGIBLE_NODES[node_id]
@@ -1470,7 +1524,7 @@ class TestStrictProvenanceSchedulerIntegration:
         from runner.dag_scheduler import DAGScheduler, ManifestGraph
         from runner.run_context import RunContext
 
-        # Scheduler has a DIFFERENT run_id → strict provenance rejects
+        # Scheduler has a DIFFERENT run_id — cross-run reuse
         current_run_id = "new-run-002"
         graph = ManifestGraph.load(mp)
         ctx = RunContext.initialize(tmp_path, current_run_id)
@@ -1497,20 +1551,20 @@ class TestStrictProvenanceSchedulerIntegration:
         ):
             summary = sched.run()
 
-        # run_agent must be called without skip_skills (drafting runs normally)
+        # run_agent must be called WITH skip_skills (drafting is skipped)
         assert mock_run_agent.called
         call_kwargs = mock_run_agent.call_args.kwargs
-        assert call_kwargs.get("skip_skills") is None
+        assert call_kwargs.get("skip_skills") == [drafting_skill]
 
     @pytest.mark.parametrize("node_id", [
         "n08a_excellence_drafting",
         "n08b_impact_drafting",
         "n08c_implementation_drafting",
     ])
-    def test_cross_run_reuse_decision_records_strict_provenance(
+    def test_cross_run_reuse_decision_records_reused(
         self, tmp_path: Path, node_id: str,
     ) -> None:
-        """Reuse decision shows not_reused with strict provenance reason."""
+        """Reuse decision shows reused with audit mode for cross-run reuse."""
         import yaml as _yaml
 
         _make_full_reuse_env(tmp_path, node_id, run_id="old-run-001")
@@ -1563,11 +1617,11 @@ class TestStrictProvenanceSchedulerIntegration:
 
         assert node_id in summary.reuse_decisions
         decision = summary.reuse_decisions[node_id]
-        assert decision["status"] == "not_reused"
-        assert decision["reason"] == "artifact_run_id_mismatch_strict_provenance"
+        assert decision["status"] == "reused"
+        assert decision["mode"] == "drafting_skipped_audit_executed"
 
     def test_reuse_decision_in_run_summary_json(self, tmp_path: Path) -> None:
-        """run_summary.json contains strict provenance rejection."""
+        """run_summary.json contains cross-run reuse decision."""
         from runner.dag_scheduler import RunSummary
 
         summary = RunSummary(
@@ -1587,8 +1641,9 @@ class TestStrictProvenanceSchedulerIntegration:
             dispatched_nodes=[],
             reuse_decisions={
                 "n08a_excellence_drafting": {
-                    "status": "not_reused",
-                    "reason": "artifact_run_id_mismatch_strict_provenance",
+                    "status": "reused",
+                    "mode": "drafting_skipped_audit_executed",
+                    "source_run_id": "old-run-001",
                 },
             },
         )
@@ -1596,8 +1651,8 @@ class TestStrictProvenanceSchedulerIntegration:
         data = json.loads(written_path.read_text())
         assert "reuse_decisions" in data
         dec = data["reuse_decisions"]["n08a_excellence_drafting"]
-        assert dec["status"] == "not_reused"
-        assert dec["reason"] == "artifact_run_id_mismatch_strict_provenance"
+        assert dec["status"] == "reused"
+        assert dec["mode"] == "drafting_skipped_audit_executed"
 
 
 # ===========================================================================

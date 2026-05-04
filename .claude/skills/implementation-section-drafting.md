@@ -77,7 +77,19 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
 - 2.4: **Draft management and risk sub-sections.** From `implementation_architecture.json`:
   - **Management structure:** management bodies, meeting frequency, decision-making scope, escalation. Roles reference only Tier 3 consortium partners. Do not assert programme-rule claims unless directly traceable to a source in reads_from.
   - **Risk register:** top risks with category, likelihood, impact, mitigation. Use frequencies and intervals exactly as stated.
-  - **Ethics self-assessment:** summarize ethics flags. Do not cite numbered ethics category classifications unless a Tier 1 source is explicitly read.
+  - **Ethics self-assessment:** summarize ethics flags from `implementation_architecture.json`.
+    **Tier 1 Ethics Category Restriction:** Do not state numbered ethics categories,
+    programme-rule category labels, or Horizon Europe ethics classification numbers
+    (e.g. "Category 8", "Category 4", "Category 2") unless Tier 1 normative sources
+    are explicitly read and cited. This skill does not read Tier 1. If the source
+    artifact contains category numbers, omit the numbers and describe only the
+    project-specific ethics issue in plain language.
+    Allowed phrasing examples:
+    - "AI-system ethics considerations are tracked for WP2/WP4/WP5/WP6."
+    - "Health-data processing and clinical expert involvement are tracked for WP5."
+    - "Ethics mitigation and oversight responsibilities are described in the implementation architecture."
+    Forbidden (unless Tier 1 is read): "Category 8", "Category 4", "Category 2",
+    or any numbered HE ethics self-assessment classification.
 
 - 2.5: **Draft consortium sub-section.** From Tier 3 `partners.json` and `roles.json`, cross-referenced against `wp_structure.json`:
   - Use `wp_structure.json` as the canonical source for WP lead assignments. Tier 4 governs over Tier 3 on conflict.
@@ -91,7 +103,7 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
 
 - 2.7: **Populate structural references:** `wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`.
 
-- 2.8: **Build validation_status.** Up to 15 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest. Omit claims that cannot be confirmed or inferred.
+- 2.8: **Build validation_status.** Up to 15 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest. Omit claims that cannot be confirmed or inferred. Ethics claim_statuses may cite `implementation_architecture.json` for project-specific ethics flags and mitigation ownership, but must not describe numbered ethics categories as "confirmed" unless Tier 1 is included in primary_sources.
 
 - 2.9: **Build traceability_footer.** All `tier` values MUST be numeric integers. Include Tier 2B paths when asserting SR/CC identifiers. Set `no_unsupported_claims_declaration` true only if all claims confirmed/inferred with non-null source_refs.
 

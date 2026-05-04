@@ -73,16 +73,21 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
   - Address each Impact criterion sub-criterion from the evaluation form.
   - Do not reference unvalidated budget figures.
   - **Measurable Target Consistency Rule (CC-06 Prevention):**
-    When drafting Impact content, if an objective ID (e.g. O1, O2) is explicitly
-    referenced, OR if an outcome ID is referenced that is linked to an objective,
-    THEN: if ANY quantitative component from that objective's measurable_target is
-    used (e.g. ≥30%, ≤5s, ≥100 units), ALL quantitative components from that
-    measurable_target MUST be included together in the same sentence or immediately
-    adjacent clause. Partial reproduction of measurable_target values is strictly
-    forbidden. If full reproduction would make the sentence too long or unnatural,
-    DO NOT include any measurable_target metrics at all — use qualitative phrasing
-    instead. This rule applies ONLY when the objective is activated by explicit ID
-    or linked outcome, in accordance with predicate activation rules.
+    When drafting Impact content, if an objective ID (e.g. OBJ-1, OBJ-7) is
+    explicitly referenced, OR if an outcome ID is referenced that is linked to an
+    objective, THEN: if ANY quantitative component from that objective's
+    measurable_target is used, EVERY quantitative component from that same
+    measurable_target MUST appear together in the same sentence or immediately
+    adjacent clause. Partial reproduction is strictly forbidden.
+    Example: if OBJ-7.measurable_target contains ≥500, ≥2, and ≥3, the drafted
+    text must either include all three values (≥500, ≥2, ≥3) together, or omit
+    all objective-level numeric target components and use qualitative phrasing.
+    Including ≥2 and ≥3 while omitting ≥500 is a violation.
+    If full reproduction would make the sentence too long or unnatural, DO NOT
+    include any measurable_target metrics at all — use qualitative phrasing instead.
+    Activation: this rule triggers ONLY on explicit objective ID reference or
+    linked outcome ID reference. Do not infer activation from deliverable mentions,
+    partner names, WP names, or domain words.
 - 2.6: **Populate impact_pathway_refs** -- array of pathway IDs covered in drafted content.
 - 2.7: **Set dec_coverage** -- each boolean true only if substantively addressed.
 - 2.8: **Build validation_status.** 8-10 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest.

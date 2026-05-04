@@ -1578,7 +1578,6 @@ class DAGScheduler:
             fp = compute_input_fingerprint(node_id, self.repo_root)
             decision = validate_reuse_candidate(
                 node_id, self.repo_root, current_fingerprint=fp,
-                current_run_id=self.ctx.run_id,
             )
             if decision.reusable:
                 # Read the actual artifact run_id from disk (authoritative).
