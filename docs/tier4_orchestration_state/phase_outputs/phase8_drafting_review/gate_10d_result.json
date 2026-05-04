@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10d_cross_section_consistency",
   "gate_kind": "exit",
-  "run_id": "70810c4e-0c08-48ac-a18b-e58e71d97b47",
+  "run_id": "790c5e0f-b276-4665-8740-4b414037fdfd",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:f4e3f7eca38df10ce910d394edab406ec66987e45ea5f4e70d3f99ebd9d8dd6b",
+  "input_fingerprint": "sha256:4e8efff0983b62e15d1434f63cd64ec61afcdf6abf597bd9a480535566ec2a4a",
   "input_artifact_fingerprints": {
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:0c211482b2a6600ffed31c1ff2cc7d67f3ae67b171c86e8d3ff81ad3fe904ce7",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:d251df6f2156960513c023fdfab0ccdd2601f561a57596c50e34272e1861d85a",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:8982546374242e287bf63d8cf1da0696892088a29f7b5c7b22aa75c998242e6a",
-    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:c689319252852f19e774115dada2ac1bced5388797ed241b541385cb5c2b389d"
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:e7db8897f9747059111c1c6c10e272c5296c44d14950cd9a95291f1380e23440",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:73cf58f2bb942f446cbe2d024837ced136cd1bf50240183caa6644ef92ef4a2f",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:1b70a569c06a10938e212146655a136839e9f75548ee53a0d455fee4d56897c7",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:eef34a3c2f69757b5ca3b404644c868fa730bfee2ce036dabac3f1148b77b9c3"
   },
-  "evaluated_at": "2026-05-03T16:41:13.892468+00:00",
+  "evaluated_at": "2026-05-04T00:18:42.438891+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -35,12 +35,14 @@
           "tier3_path": "docs/tier3_project_instantiation/"
         },
         "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Cross-section inconsistencies flagged in assembled draft: 2 issue(s)",
+        "reason": "Cross-section inconsistencies flagged in assembled draft: 4 issue(s)",
         "details": {
           "assembled_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\assembled_drafts\\part_b_assembled_draft.json",
-          "flagged_count": 2,
+          "flagged_count": 4,
           "flagged_checks": [
+            "CC-01",
             "CC-04",
+            "CC-06",
             "CC-09"
           ]
         },

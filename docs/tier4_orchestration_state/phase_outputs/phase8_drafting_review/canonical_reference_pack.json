@@ -1,0 +1,453 @@
+{
+  "schema_id": "orch.phase8.canonical_reference_pack.v1",
+  "run_id": "790c5e0f-b276-4665-8740-4b414037fdfd",
+  "objectives": [
+    {
+      "id": "OBJ-1",
+      "title": "Neuro-symbolic planning engine for autonomous task decomposition",
+      "measurable_target": "Achieve ≥40% improvement in plan success rate over pure LLM-based agent baselines (ReAct, Reflexion) on standardised agent benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring >10 sequential steps.",
+      "responsible_partner": "ATU",
+      "contributing_partners": [
+        "CERIA",
+        "BIIS",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-2",
+      "title": "Unified adaptive memory architecture",
+      "measurable_target": "Demonstrate ≥30% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps, measured on MAESTRO's long-horizon evaluation suite.",
+      "responsible_partner": "BIIS",
+      "contributing_partners": [
+        "ATU",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-3",
+      "title": "Decentralised multi-agent coordination protocols",
+      "measurable_target": "Demonstrate effective coordination of ≥5 heterogeneous agents on shared tasks, with ≥25% improvement in joint task completion over independent agent baselines, and formal proof of protocol convergence.",
+      "responsible_partner": "CERIA",
+      "contributing_partners": [
+        "ATU",
+        "BIIS"
+      ]
+    },
+    {
+      "id": "OBJ-4",
+      "title": "Healthcare demonstrator — clinical decision support",
+      "measurable_target": "Achieve diagnostic reasoning accuracy within 10% of specialist clinician performance on a benchmark of 500 de-identified clinical cases spanning 5 diagnostic domains, validated by clinical experts at NIHS.",
+      "responsible_partner": "NIHS",
+      "contributing_partners": [
+        "ATU",
+        "BIIS",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-5",
+      "title": "Manufacturing demonstrator — process optimisation",
+      "measurable_target": "Demonstrate ≥15% reduction in defect rates and ≥10% reduction in energy consumption compared to baseline operations in a pilot factory environment at ISIA, validated over a 3-month operational period.",
+      "responsible_partner": "ISIA",
+      "contributing_partners": [
+        "ATU",
+        "CERIA",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-6",
+      "title": "Logistics transfer demonstrator — cross-sector generalisation",
+      "measurable_target": "Demonstrate ≥20% improvement in disruption recovery time and ≥15% improvement in delivery schedule adherence compared to current planning systems, validated on ELI operational scenarios across 3 supply chain corridors.",
+      "responsible_partner": "ELI",
+      "contributing_partners": [
+        "CERIA",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-8",
+      "title": "External Tool and API Orchestration Layer",
+      "measurable_target": "Typed tool registry supporting ≥30 external tools/APIs across all three demonstrator domains; tool invocation success rate ≥95% with verified output validation; mean recovery time from tool failure ≤5s; full provenance traces for 100% of tool invocations.",
+      "responsible_partner": "ATU",
+      "contributing_partners": [
+        "BIIS",
+        "CERIA",
+        "BAL"
+      ]
+    },
+    {
+      "id": "OBJ-7",
+      "title": "Open framework release and ecosystem contribution",
+      "measurable_target": "Open-source release with ≥500 GitHub stars within 6 months of release; contributions accepted to AI-on-demand platform; results validated through ≥2 TEFs; technology transfer initiated through ≥3 EDIHs.",
+      "responsible_partner": "BAL",
+      "contributing_partners": [
+        "FIIT",
+        "ATU"
+      ]
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "OUT-1",
+      "title": "Neuro-symbolic planning framework for LLM-based agents",
+      "linked_objectives": [
+        "OBJ-1"
+      ],
+      "linked_wp_ids": [
+        "WP2"
+      ],
+      "linked_deliverable_ids": [
+        "D2-01",
+        "D2-02"
+      ]
+    },
+    {
+      "id": "OUT-2",
+      "title": "Adaptive tri-store memory architecture",
+      "linked_objectives": [
+        "OBJ-2"
+      ],
+      "linked_wp_ids": [
+        "WP3"
+      ],
+      "linked_deliverable_ids": [
+        "D3-01",
+        "D3-02"
+      ]
+    },
+    {
+      "id": "OUT-3",
+      "title": "Formally verified multi-agent coordination protocol suite",
+      "linked_objectives": [
+        "OBJ-3"
+      ],
+      "linked_wp_ids": [
+        "WP4"
+      ],
+      "linked_deliverable_ids": [
+        "D4-01",
+        "D4-02"
+      ]
+    },
+    {
+      "id": "OUT-4",
+      "title": "Clinical decision support agent system (TRL 5)",
+      "linked_objectives": [
+        "OBJ-4"
+      ],
+      "linked_wp_ids": [
+        "WP5"
+      ],
+      "linked_deliverable_ids": [
+        "D5-01",
+        "D5-02"
+      ]
+    },
+    {
+      "id": "OUT-5",
+      "title": "Manufacturing process optimisation agent system (TRL 5)",
+      "linked_objectives": [
+        "OBJ-5"
+      ],
+      "linked_wp_ids": [
+        "WP6"
+      ],
+      "linked_deliverable_ids": [
+        "D6-01",
+        "D6-02"
+      ]
+    },
+    {
+      "id": "OUT-6",
+      "title": "Logistics and supply chain transfer demonstrator (TRL 5)",
+      "linked_objectives": [
+        "OBJ-6"
+      ],
+      "linked_wp_ids": [
+        "WP7"
+      ],
+      "linked_deliverable_ids": [
+        "D7-01",
+        "D7-02"
+      ]
+    },
+    {
+      "id": "OUT-9",
+      "title": "External Tool and API Orchestration Layer (TRL 5)",
+      "linked_objectives": [
+        "OBJ-8"
+      ],
+      "linked_wp_ids": [
+        "WP2",
+        "WP8"
+      ],
+      "linked_deliverable_ids": [
+        "D2-02",
+        "D8-01"
+      ]
+    },
+    {
+      "id": "OUT-7",
+      "title": "MAESTRO agent evaluation benchmark suite",
+      "linked_objectives": [
+        "OBJ-7"
+      ],
+      "linked_wp_ids": [
+        "WP8"
+      ],
+      "linked_deliverable_ids": [
+        "D8-01",
+        "D8-02"
+      ]
+    },
+    {
+      "id": "OUT-8",
+      "title": "Open-source MAESTRO framework",
+      "linked_objectives": [
+        "OBJ-7"
+      ],
+      "linked_wp_ids": [
+        "WP8",
+        "WP9"
+      ],
+      "linked_deliverable_ids": [
+        "D8-01",
+        "D8-02",
+        "D9-02"
+      ]
+    }
+  ],
+  "wps": [
+    {
+      "wp_id": "WP1",
+      "title": "Project Management and Coordination",
+      "lead_partner": "ATU"
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Neuro-Symbolic Planning and Reasoning Engine",
+      "lead_partner": "ATU"
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Adaptive Memory Architecture",
+      "lead_partner": "BIIS"
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Decentralised Multi-Agent Coordination",
+      "lead_partner": "CERIA"
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Healthcare Demonstrator — Clinical Decision Support",
+      "lead_partner": "NIHS"
+    },
+    {
+      "wp_id": "WP6",
+      "title": "Manufacturing Demonstrator — Process Optimisation",
+      "lead_partner": "ISIA"
+    },
+    {
+      "wp_id": "WP7",
+      "title": "Logistics Transfer Demonstrator — Cross-Sector Generalisation",
+      "lead_partner": "ELI"
+    },
+    {
+      "wp_id": "WP8",
+      "title": "Integration, Evaluation and Benchmarking",
+      "lead_partner": "FIIT"
+    },
+    {
+      "wp_id": "WP9",
+      "title": "Dissemination, Exploitation and Communication",
+      "lead_partner": "BAL"
+    }
+  ],
+  "deliverables": [
+    {
+      "deliverable_id": "D1-01",
+      "title": "Project management and quality plan",
+      "due_month": 3,
+      "type": "report",
+      "parent_wp": "WP1"
+    },
+    {
+      "deliverable_id": "D1-02",
+      "title": "Data management plan",
+      "due_month": 6,
+      "type": "report",
+      "parent_wp": "WP1"
+    },
+    {
+      "deliverable_id": "D2-01",
+      "title": "Neuro-symbolic planning architecture specification",
+      "due_month": 18,
+      "type": "report",
+      "parent_wp": "WP2"
+    },
+    {
+      "deliverable_id": "D2-02",
+      "title": "Planning engine software prototype",
+      "due_month": 36,
+      "type": "software",
+      "parent_wp": "WP2"
+    },
+    {
+      "deliverable_id": "D3-01",
+      "title": "Memory architecture design specification",
+      "due_month": 12,
+      "type": "report",
+      "parent_wp": "WP3"
+    },
+    {
+      "deliverable_id": "D3-02",
+      "title": "Adaptive memory system software",
+      "due_month": 30,
+      "type": "software",
+      "parent_wp": "WP3"
+    },
+    {
+      "deliverable_id": "D4-01",
+      "title": "Multi-agent coordination protocol specification",
+      "due_month": 18,
+      "type": "report",
+      "parent_wp": "WP4"
+    },
+    {
+      "deliverable_id": "D4-02",
+      "title": "Decentralised coordination software",
+      "due_month": 36,
+      "type": "software",
+      "parent_wp": "WP4"
+    },
+    {
+      "deliverable_id": "D5-01",
+      "title": "Clinical decision support use case specification",
+      "due_month": 18,
+      "type": "report",
+      "parent_wp": "WP5"
+    },
+    {
+      "deliverable_id": "D5-02",
+      "title": "Healthcare demonstrator evaluation dataset",
+      "due_month": 42,
+      "type": "dataset",
+      "parent_wp": "WP5"
+    },
+    {
+      "deliverable_id": "D6-01",
+      "title": "Manufacturing use case and KPI specification",
+      "due_month": 18,
+      "type": "report",
+      "parent_wp": "WP6"
+    },
+    {
+      "deliverable_id": "D6-02",
+      "title": "Manufacturing process optimisation demonstrator software",
+      "due_month": 42,
+      "type": "software",
+      "parent_wp": "WP6"
+    },
+    {
+      "deliverable_id": "D7-01",
+      "title": "Logistics demonstrator specification and benchmark report",
+      "due_month": 24,
+      "type": "report",
+      "parent_wp": "WP7"
+    },
+    {
+      "deliverable_id": "D7-02",
+      "title": "Cross-sector generalisation evaluation dataset",
+      "due_month": 42,
+      "type": "dataset",
+      "parent_wp": "WP7"
+    },
+    {
+      "deliverable_id": "D8-01",
+      "title": "Evaluation framework and benchmark specification",
+      "due_month": 12,
+      "type": "report",
+      "parent_wp": "WP8"
+    },
+    {
+      "deliverable_id": "D8-02",
+      "title": "MAESTRO benchmark suite dataset",
+      "due_month": 42,
+      "type": "dataset",
+      "parent_wp": "WP8"
+    },
+    {
+      "deliverable_id": "D8-03",
+      "title": "Final integration and evaluation report",
+      "due_month": 48,
+      "type": "report",
+      "parent_wp": "WP8"
+    },
+    {
+      "deliverable_id": "D9-01",
+      "title": "Dissemination and exploitation plan",
+      "due_month": 6,
+      "type": "report",
+      "parent_wp": "WP9"
+    },
+    {
+      "deliverable_id": "D9-02",
+      "title": "Open-source software release",
+      "due_month": 36,
+      "type": "software",
+      "parent_wp": "WP9"
+    },
+    {
+      "deliverable_id": "D9-03",
+      "title": "Final dissemination and impact report",
+      "due_month": 48,
+      "type": "report",
+      "parent_wp": "WP9"
+    }
+  ],
+  "partners": [
+    {
+      "short_name": "ATU",
+      "legal_name": "Alpenstadt Technical University",
+      "country": "DE"
+    },
+    {
+      "short_name": "CERIA",
+      "legal_name": "Centre Européen de Recherche en Informatique Avancée",
+      "country": "FR"
+    },
+    {
+      "short_name": "BIIS",
+      "legal_name": "Breda Institute for Intelligent Systems",
+      "country": "NL"
+    },
+    {
+      "short_name": "ISIA",
+      "legal_name": "Istituto Superiore di Ingegneria Avanzata",
+      "country": "IT"
+    },
+    {
+      "short_name": "NIHS",
+      "legal_name": "Nordic Institute of Health Sciences",
+      "country": "SE"
+    },
+    {
+      "short_name": "ELI",
+      "legal_name": "EuroLog International AG",
+      "country": "CH"
+    },
+    {
+      "short_name": "BAL",
+      "legal_name": "Boreal AI Labs Oy",
+      "country": "FI"
+    },
+    {
+      "short_name": "FIIT",
+      "legal_name": "Fundación Ibérica de Innovación Tecnológica",
+      "country": "ES"
+    }
+  ],
+  "aliases": []
+}

@@ -1,0 +1,91 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "790c5e0f-b276-4665-8740-4b414037fdfd",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 658
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 572
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 613
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Excellence section claims 'eight measurable project objectives' but explicitly cites only 6 of 8 by their Tier 3 objective IDs: OBJ-1, OBJ-2, OBJ-3, OBJ-4, OBJ-5, and OBJ-8. OBJ-6 (Logistics transfer demonstrator \u2014 cross-sector generalisation, ELI/WP7) and OBJ-7 (Open framework release and ecosystem contribution, BAL) are not enumerated by ID. Per the objective coverage completeness rule, the Excellence section must enumerate ALL 8 objectives. Additionally, OBJ-6's measurable targets (\u226520% improvement in disruption recovery time AND \u226515% improvement in delivery schedule adherence, per objectives.json) are absent from the Excellence section. OBJ-7's measurable targets (\u2265500 GitHub stars within 6 months, \u22652 TEFs, \u22653 EDIHs) are absent from the Excellence section. OBJ-6 is referenced only implicitly via 'logistics operations at ELI/WP7'; OBJ-7 is referenced only via D9-02/BAL without the objective ID or measurable target. All 8 objective IDs in Tier 3 are valid and uncontradicted across sections; the issue is incomplete enumeration in the Excellence section.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency across all three sections",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/consortium/partners.json"
+      ]
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID consistency across sections",
+      "sections_checked": [
+        "excellence",
+        "impact"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Deliverable D2-02 is attributed to different purposes across sections without reconciliation. In Excellence B.1.2, D2-02 is described solely as 'planning engine software prototype' under WP2 (OBJ-1). In Impact B.2.1, D2-02 is cited as a delivery vehicle for OUT-9 (External Tool and API Orchestration Layer, OBJ-8). Tier 3 outcomes.json confirms D2-02 has legitimate dual attribution \u2014 linked to both OUT-1 (Neuro-symbolic planning framework for LLM-based agents) and OUT-9 (External Tool and API Orchestration Layer) \u2014 so the Impact section's use is consistent with Tier 3. However, the Excellence section's singular characterisation of D2-02 as 'planning engine software prototype' is incomplete and inconsistent with the Impact section's use of the same ID for the tool orchestration output. An evaluator reading the Excellence section alone would not identify D2-02 as covering the External Tool and API Orchestration Layer, creating an internal inconsistency across sections.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliver
+=== END ===
