@@ -1,0 +1,77 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'sections', 'consistency_log', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.tier5.part_b_assembled_draft.v1",
+  "run_id": "c8fdb077-9be9-4e55-95fd-2063e8540da4",
+  "sections": [
+    {
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "order": 1,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "word_count": 635
+    },
+    {
+      "section_id": "impact",
+      "criterion": "Impact",
+      "order": 2,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "word_count": 550
+    },
+    {
+      "section_id": "implementation",
+      "criterion": "Quality and efficiency of the implementation",
+      "order": 3,
+      "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "word_count": 480
+    }
+  ],
+  "consistency_log": [
+    {
+      "check_id": "CC-01",
+      "description": "Objective consistency across Excellence and Implementation sections",
+      "sections_checked": [
+        "excellence",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_basis": "Tier 3 architecture_inputs/objectives.json (8 objectives OBJ-1\u2013OBJ-8); excellence_section.json B.1.1 (enumerates all 8 objectives with canonical IDs and exact Tier 3 titles); implementation_section.json B.3.1 (WP descriptions consistent with objective scope; WP2=OBJ-1, WP3=OBJ-2, WP4=OBJ-3, WP5=OBJ-4, WP6=OBJ-5, WP7=OBJ-6, WP8=OBJ-8 cross-cutting integration, WP9=OBJ-7). All 8 Tier 3 objective IDs present in Excellence with correct canonical titles. No contradictions between Excellence objective statements and Implementation WP objectives."
+    },
+    {
+      "check_id": "CC-02",
+      "description": "WP reference consistency \u2014 WP IDs in Excellence and Impact match the canonical WP list in Implementation",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_basis": "implementation_section.json wp_table_refs (canonical list: WP1\u2013WP9); excellence_section.json B.1.2 (explicitly references WP2, WP3, WP4, WP5, WP6, WP8; all present in wp_table_refs); impact_section.json B.2.1\u2013B.2.2 (explicitly references WP2, WP3, WP4, WP5, WP6, WP7, WP8, WP9; all present in wp_table_refs). No WP ID appears in Excellence or Impact that is absent from the canonical Implementation WP list."
+    },
+    {
+      "check_id": "CC-03",
+      "description": "Partner name consistency across all three sections against Tier 3 authoritative partner registry",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "Impact section B.2.2 mixes short names (ATU, BIIS, CERIA, FIIT in the dissemination strategy sentence) and full legal names (Nordic Institute of Health Sciences, Istituto Superiore di Ingegneria Avanzata, EuroLog International AG, Boreal AI Labs Oy, Centre Europ\u00e9en de Recherche en Informatique Avanc\u00e9e in the exploitation strategy sentences) within the same sub-section without explicit mapping between naming forms. Per Strengthened Validation Dimensions CC-03, mixing of naming forms within a section without explicit mapping is not permitted. By contrast, Excellence B.1.2 uses only short names consistently throughout; Implementation B.3.2 uses paired notation (legal_name (short_name, country)) for all 8 partners consistently. All legal names present in all sections exactly match Tier 3 partners.json legal_name fields; no suffix-stripped names or corrupted names detected (EuroLog International AG with AG suffix correctly present; Boreal AI Labs Oy with Oy suffix correctly present).",
+      "source_basis": "Tier 3 consortium/partners.json (legal_name and short_name for all 8 partners); impact_section.json B.2.2 (mixed naming form usage); excellence_section.json B.1.2 (short-name-only usage); implementation_section.json B.3.2 (paired legal+short notation)"
+    },
+    {
+      "check_id": "CC-04",
+      "description": "Deliverable ID and naming consistency across sections \u2014 IDs, month assignments, and WP attribution",
+      "sections_checked": [
+        "excellence",
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_basis": "excellence_section.json B.1.2 (deliverables D1-02 M6 ATU, D8-01 M12, D8-02 M42 FIIT, D9-02 M36 BAL); impact_section.json B.2.1 (D2-02 M36, D3-02 M30, D4-01 M18, D4-02 M36, D5-02 M42 WP5, D6-02 M42 WP6, D7-02 M42 WP7, D8-02 M42 WP8, D9-02 M36 WP9); impact_section.json B.2.2 (D9-01 M6 WP9, D9-02 M36 WP9, D6-02 M42, D4-01 M18 WP4). Cross-referenced IDs: D8-02 consistent (M42, WP8/FIIT) across Excellence and Impact; D9-02 consistent (M36, WP9/BAL) across Excellence and Impact; D4-01 consistent (M18, WP4/CERIA) across Impact B.2.1 and B.2.2; D6-02 consistent (M42, WP6) acr
+=== END ===

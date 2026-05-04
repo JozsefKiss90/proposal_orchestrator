@@ -1,0 +1,59 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'section_id_audited', 'audit_mode', 'claim_audit_results', 'summary', 'no_unsupported_claims_declaration', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "traceability_impact_traceability_auditor_2026-05-04T12:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "de8c79e5-2274-432e-8994-508fbb5b8673",
+  "section_id_audited": "impact",
+  "audit_mode": "section",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "MAESTRO's three research pillars are neuro-symbolic planning (WP2, ATU), adaptive memory (WP3, BIIS), and multi-agent coordination (WP4, CERIA)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json: ATU.scientific_role='Pillar 1 Lead \u2014 Neuro-Symbolic Planning and Reasoning', wp_lead=[WP2]; BIIS.scientific_role='Pillar 2 Lead \u2014 Adaptive Memory Architecture', wp_lead=[WP3]; CERIA.scientific_role='Pillar 3 Lead \u2014 Decentralised Multi-Agent Coordination', wp_lead=[WP4]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "Planning engine software prototype (D2-02, M36) and adaptive memory system software (D3-02, M30) address call expected outcome EO-01",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json:EO-01 ('advanced planning mechanisms, memory management'); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP2.deliverables[D2-02, due_month=36], WP3.deliverables[D3-02, due_month=30]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "Multi-agent coordination protocol specification (D4-01, M18) and decentralised coordination software (D4-02, M36) address call expected outcome EO-02",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json:EO-02 ('multi-agent frameworks and protocols demonstrating effective decentralized coordination'); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json: WP4.deliverables[D4-01, due_month=18; D4-02, due_month=36]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "NIHS-led clinical decision support demonstrator (D5-02, M42, WP5) targets engagement of \u22653 hospital networks in EDIH-mediated post-project adoption planning",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-2.indicators[0] ('\u22653 hospital networks engaged in post-project adoption planning by M48'); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:KPI-01 target='\u22653 hospital networks with formal adoption planning documented by M48'; docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:WP5.deliverables[D5-02, due_month=42]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "ISIA-led manufacturing demonstrator (D6-02, M42, WP6) targets \u226515% defect reduction and \u226510% energy savings in pilot factory with transfer to \u22655 manufacturing SMEs via \u22652 EDIHs",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-3.indicators[0,1,2] (defect/energy targets, \u22655 SMEs, \u22652 EDIHs); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:KPI-02; docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:WP6.deliverables[D6-02, due_month=42]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "ELI-led logistics transfer demonstrator (D7-02, M42, WP7) targets \u226520% disruption recovery improvement across three international supply chain corridors",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-4.indicators[0] ('\u226520% improvement in disruption recovery time'), indicators[1] ('\u22653 international supply chain corridors'); docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json:KPI-03; docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json:WP7.deliverables[D7-02, due_month=42]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "EI-03 and EI-05 addressed via \u226520 peer-reviewed publications, MAESTRO benchmark suite (D8-02, M42, WP8), and BAL open-source framework (D9-02, M36, WP9) targeting \u226510 European SMEs",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json:EI-03 (AI-on-demand platform, scientific dissemination), EI-05 (economic potential across diverse sectors); docs/tier3_project_instantiation/architecture_inputs/impacts.json:IMP-1.indicators[0] (\u226520 publications), IMP-5.indicators[1] (\u226510 SMEs); docs/tier4_orchestration_state/phase_outputs/phase5_impact_ar
+=== END ===

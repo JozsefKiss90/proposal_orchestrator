@@ -1,0 +1,42 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-05-04T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "c8fdb077-9be9-4e55-95fd-2063e8540da4",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing; Annex templates govern post-award reporting, not proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "No Grant Agreement Annex, AGA Template, or Model Grant Agreement Annex is referenced as a structural authority anywhere in the artifact. CC-10 consistency_log entry explicitly attributes the RIA/IA Part B three-section structure (Excellence order 1, Impact order 2, Implementation order 3) to 'Tier 2A' (application form template), which is the constitutionally correct governing schema for proposal writing. No 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' strings appear in any structural role within the artifact."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "The assembled draft artifact does not itself assert call constraints, scope requirements, expected outcomes, or expected impacts. It is a structural index and cross-section consistency log. The traceability_footer derivation_note explicitly states 'Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings.' The only call-structure reference in the artifact body is CC-10's attribution of Part B section ordering to Tier 2A (the application form schema), which is not a call constraint claim requiring Tier 2B sourcing. CC-12 source_basis notes an inferred EU strategic autonomy claim within impact_section.json (CS-08), but that is documented as a finding about the section artifact, not an independent call constraint assertion by this assembled draft. No call constraint claim in this artifact body lacks a Tier 2B source reference because this artifact makes no such claims directly."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "All project-specific facts referenced in the consistency_log are traceable to Tier 3 sources declared in traceability_footer.primary_sources. Partner names appearing in CC-03 (ATU, BIIS, CERIA, FIIT; Nordic Institute of Health Sciences, Istituto Superiore di Ingegneria Avanzata, EuroLog International AG, Boreal AI Labs Oy, Centre Europ\u00e9en de Recherche en Informatique Avanc\u00e9e) are sourced from CC-03 source_basis citation 'Tier 3 consortium/partners.json (legal_name and short_name for all 8 partners)'; traceability_footer.primary_sources includes 'docs/tier3_project_instantiation/consortium/partners.json'. Objective IDs and measurable targets (OBJ-1 through OBJ-8, including OBJ-6 dual-target and OBJ-7 GitHub stars metric) appearing in CC-06 and CC-09 are sourced from CC-06 source_basis citation 'Tier 3 architecture_inputs/objectives.json OBJ-6 measurable_target and OBJ-7 measurable_target'; traceability_footer.primary_sources includes 'docs/tier3_project_instantiation/architecture_inputs/objectives.json'. No partner name, objective, or measurable target in this artifact is asserted without a Tier 3 source reference."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_rationale": "This artifact has schema_id 'orch.tier5.part_b_assembled_draft.v1' \u2014 it begins with 'orch.tier5.' and is therefore a Phase 8 artifact subject to this check. Evidence that the budget gate passed is present within the artifact: (1) CC-08 consistency_log source_basis states 'implementation_section.json validation_status C10 confirms budget gate passed referencing phase7_budget_gate/budget_gate_assessment.json' and 'phase7_budget_gate/budget_gate_assessment.json (budget gate confirmed passed per implementation_section.json claim C10)'; (2) t
+=== END ===

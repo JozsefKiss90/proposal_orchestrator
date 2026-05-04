@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10b_impact_completeness",
   "gate_kind": "exit",
-  "run_id": "ed93b6a8-3ddc-404a-b122-49ef4732eabf",
+  "run_id": "c8fdb077-9be9-4e55-95fd-2063e8540da4",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:492209da9129b9879c8e38df492eb6fd64c8ebe9a7085f96e1a2d3151c597825",
+  "input_fingerprint": "sha256:11f1d3885ae14fb97095cb2ee4f780aa2e2c92e051759cf80a5e93b90ba3d091",
   "input_artifact_fingerprints": {
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:32f5143a7a888af3aa26b7212eff7acee6affa087b3522ceb2854d7eef80099b"
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:fc7f59b0c8a29b0466eed50f6888bc8f97ccc940a5000243f93aa0b72d62b073"
   },
-  "evaluated_at": "2026-05-04T16:52:57.868781+00:00",
+  "evaluated_at": "2026-05-04T20:34:22.500630+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g09b_p02",
@@ -25,45 +25,15 @@
       "g09b_p07",
       "g09b_p08",
       "g09b_p09",
-      "g09b_p10"
+      "g09b_p10",
+      "g09b_p11"
     ],
-    "failed": [
-      {
-        "predicate_id": "g09b_p11",
-        "type": "coverage",
-        "function": "measurable_targets_preserved",
-        "args": {
-          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
-          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-        },
-        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Measurable target metric loss in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 1 issue(s)",
-        "details": {
-          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
-          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
-          "section_type": "impact",
-          "issues": [
-            {
-              "objective_id": "OBJ-7",
-              "measurable_target": "Open-source release with \u2265500 GitHub stars within 6 months of release; contributions accepted to AI-on-demand platform; results validated through \u22652 TEFs; technology transfer initiated through \u22653 EDIHs.",
-              "missing_components": [
-                "\u2265500"
-              ],
-              "total_components": 3,
-              "issue": "Objective OBJ-7 referenced but 1/3 metric components missing: ['\u2265500']"
-            }
-          ]
-        },
-        "fail_message": "Impact section references objectives but drops quantitative metric components from their measurable_target values.\n",
-        "prose_condition": "All quantitative metric components from measurable_target preserved"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10b_result.json"
 }
