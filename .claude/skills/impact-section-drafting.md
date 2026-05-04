@@ -72,11 +72,31 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
   - Ground impact claims in concrete WP deliverables from `wp_structure.json`.
   - Address each Impact criterion sub-criterion from the evaluation form.
   - Do not reference unvalidated budget figures.
+  - **Measurable Target Consistency Rule (CC-06 Prevention):**
+    When drafting Impact content, if an objective ID (e.g. O1, O2) is explicitly
+    referenced, OR if an outcome ID is referenced that is linked to an objective,
+    THEN: if ANY quantitative component from that objective's measurable_target is
+    used (e.g. ≥30%, ≤5s, ≥100 units), ALL quantitative components from that
+    measurable_target MUST be included together in the same sentence or immediately
+    adjacent clause. Partial reproduction of measurable_target values is strictly
+    forbidden. If full reproduction would make the sentence too long or unnatural,
+    DO NOT include any measurable_target metrics at all — use qualitative phrasing
+    instead. This rule applies ONLY when the objective is activated by explicit ID
+    or linked outcome, in accordance with predicate activation rules.
 - 2.6: **Populate impact_pathway_refs** -- array of pathway IDs covered in drafted content.
 - 2.7: **Set dec_coverage** -- each boolean true only if substantively addressed.
 - 2.8: **Build validation_status.** 8-10 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest.
 - 2.9: **Build traceability_footer.** All `tier` values MUST be numeric integers. Set `no_unsupported_claims_declaration` true only if all claims confirmed/inferred with non-null source_refs.
 - 2.10: **Handle data gaps.** Omit unsourceable claims. If a mandatory sub-section cannot be drafted: failure `INCOMPLETE_OUTPUT`.
+- 2.11: **Tier 1 Regulatory Claim Restriction.**
+  The Impact section MUST NOT introduce regulatory or policy claims that require
+  Tier 1 normative sources unless those sources are explicitly read. This includes
+  (but is not limited to): Plan S compliance statements; specific open access
+  licenses (e.g. CC-BY); mandatory publication timelines (e.g. "within six months");
+  legal obligations derived from Horizon Europe Grant Agreement or Annexes.
+  Allowed: generic statements such as "open access dissemination" or "alignment
+  with EU open science practices". If such regulatory claims are not present in
+  Tier 2A, Tier 2B, or Tier 3 inputs, they MUST be omitted.
 
 ### 3. Canonical Copying Rules
 
