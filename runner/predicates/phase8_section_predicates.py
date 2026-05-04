@@ -220,6 +220,17 @@ def partner_names_preserved(
 # ---------------------------------------------------------------------------
 
 
+# Patterns indicating exclusive/narrow deliverable purpose assignment
+_EXCLUSIVE_PURPOSE_RE = re.compile(
+    r'\b(?:sole(?:ly)?\s+(?:for\s+)?(?:the\s+)?(?:purpose|aim|focus|objective)'
+    r'|(?:exclusively|primarily|only)\s+(?:for|to|serves?|addresses?|supports?)'
+    r'|dedicated\s+(?:to|exclusively)'
+    r'|the\s+single\s+purpose'
+    r'|(?:is|are)\s+solely\b)\b',
+    re.IGNORECASE,
+)
+
+
 def deliverable_identity_preserved(
     section_path: PathLike,
     canonical_pack_path: PathLike,
@@ -227,7 +238,12 @@ def deliverable_identity_preserved(
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
     """Pass iff every deliverable ID mentioned in the section has the
-    correct title, parent WP, and due month per the canonical pack.
+    correct title, parent WP, and due month per the canonical pack,
+    and multi-outcome deliverables are not narrowly characterised.
+
+    For deliverables linked to multiple outcomes in the canonical pack,
+    the section must not assign an exclusive or narrow purpose that
+    conflicts with the broader canonical attribution.
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
@@ -261,9 +277,19 @@ def deliverable_identity_preserved(
         if did:
             canon[did] = d
 
+    # Build multi-outcome index: deliverable_id -> list of outcome IDs
+    multi_outcome_map: dict[str, list[str]] = {}
+    for outcome in pack_data.get("outcomes", []):
+        if not isinstance(outcome, dict):
+            continue
+        out_id = outcome.get("id", "")
+        for linked_did in outcome.get("linked_deliverable_ids", []):
+            if linked_did not in multi_outcome_map:
+                multi_outcome_map[linked_did] = []
+            multi_outcome_map[linked_did].append(out_id)
+
     issues: list[dict] = []
     # Find deliverable IDs mentioned in section content
-    # Pattern: D followed by digits, dash, digits (e.g. D1-01, D9-03)
     mentioned_ids = set(re.findall(r'D\d+-\d+', content))
 
     for did in mentioned_ids:
@@ -274,8 +300,7 @@ def deliverable_identity_preserved(
         c_wp = canonical.get("parent_wp", "")
         c_month = canonical.get("due_month")
 
-        # Check title: if canonical title is non-trivial, verify it
-        # appears in the section when the deliverable ID is mentioned
+        # Check title
         if c_title and len(c_title) > 5 and c_title not in content:
             issues.append({
                 "deliverable_id": did,
@@ -287,7 +312,7 @@ def deliverable_identity_preserved(
                 ),
             })
 
-        # Check due month: if present, verify it appears near the ID
+        # Check due month
         if c_month is not None:
             month_str = f"month {c_month}"
             month_str_alt = f"M{c_month}"
@@ -304,7 +329,7 @@ def deliverable_identity_preserved(
                     ),
                 })
 
-        # Check parent WP: verify the WP ID appears in the section
+        # Check parent WP
         if c_wp and c_wp not in content:
             issues.append({
                 "deliverable_id": did,
@@ -315,6 +340,31 @@ def deliverable_identity_preserved(
                     f"WP '{c_wp}' is absent from section content"
                 ),
             })
+
+        # Check multi-outcome narrowing:
+        # If this deliverable is linked to >=2 outcomes in the canonical
+        # pack, scan the text around the deliverable ID for exclusive
+        # purpose language.
+        linked_outcomes = multi_outcome_map.get(did, [])
+        if len(linked_outcomes) >= 2:
+            # Extract a window of ~300 chars around each mention of the ID
+            for match in re.finditer(re.escape(did), content):
+                start = max(0, match.start() - 150)
+                end = min(len(content), match.end() + 150)
+                window = content[start:end]
+                if _EXCLUSIVE_PURPOSE_RE.search(window):
+                    issues.append({
+                        "deliverable_id": did,
+                        "check": "multi_outcome_narrowing",
+                        "linked_outcome_ids": linked_outcomes,
+                        "issue": (
+                            f"Deliverable {did} is linked to "
+                            f"{len(linked_outcomes)} outcomes "
+                            f"({linked_outcomes}) but section text uses "
+                            f"exclusive-purpose language near the reference"
+                        ),
+                    })
+                    break  # one issue per deliverable is enough
 
     if issues:
         return PredicateResult(
@@ -344,11 +394,11 @@ def canonical_terms_preserved(
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
-    """Pass iff canonical objective titles and WP titles from the pack
+    """Pass iff canonical objective, outcome, and WP titles from the pack
     are not shortened or paraphrased in the section.
 
-    Checks that when an objective ID or WP ID is mentioned, the full
-    canonical title also appears somewhere in the section.
+    Checks that when an objective ID, outcome ID, or WP ID is mentioned,
+    the full canonical title also appears somewhere in the section.
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
@@ -379,7 +429,6 @@ def canonical_terms_preserved(
         title = obj.get("title", "")
         if not oid or not title or len(title) < 8:
             continue
-        # Only check if the ID is mentioned in the content
         if oid in content and title not in content:
             issues.append({
                 "term_type": "objective_title",
@@ -387,6 +436,25 @@ def canonical_terms_preserved(
                 "canonical_title": title,
                 "issue": (
                     f"Objective {oid} referenced but canonical title "
+                    f"'{title}' is absent — possible shortening or paraphrase"
+                ),
+            })
+
+    # Check outcome titles
+    for outcome in pack_data.get("outcomes", []):
+        if not isinstance(outcome, dict):
+            continue
+        out_id = outcome.get("id", "")
+        title = outcome.get("title", "")
+        if not out_id or not title or len(title) < 8:
+            continue
+        if out_id in content and title not in content:
+            issues.append({
+                "term_type": "outcome_title",
+                "id": out_id,
+                "canonical_title": title,
+                "issue": (
+                    f"Outcome {out_id} referenced but canonical title "
                     f"'{title}' is absent — possible shortening or paraphrase"
                 ),
             })
@@ -434,6 +502,15 @@ def canonical_terms_preserved(
 # Regex for quantitative tokens: ≥N%, ≤N%, ≥N, ≤N, >N, <N
 _QUANTITATIVE_RE = re.compile(r'[≥≤><]\s*\d+(?:\.\d+)?%?')
 
+# Patterns that claim comprehensive objective coverage
+_ALL_OBJECTIVES_RE = re.compile(
+    r'\b(?:all\s+(?:project\s+)?objectives'
+    r'|all\s+measurable\s+objectives'
+    r'|project\s+objectives\s+(?:are|include|comprise)'
+    r'|each\s+(?:of\s+the\s+)?(?:project\s+)?objectives)\b',
+    re.IGNORECASE,
+)
+
 
 def _extract_quantitative_components(target: str) -> list[str]:
     """Extract all quantitative tokens from a measurable_target string.
@@ -443,19 +520,82 @@ def _extract_quantitative_components(target: str) -> list[str]:
     return _QUANTITATIVE_RE.findall(target)
 
 
+def _detect_section_type(resolved_path: Path) -> str:
+    """Detect section type from the file name.
+
+    Returns 'excellence', 'impact', 'implementation', or 'unknown'.
+    """
+    name = resolved_path.name.lower()
+    if "excellence" in name:
+        return "excellence"
+    if "impact" in name:
+        return "impact"
+    if "implementation" in name:
+        return "implementation"
+    return "unknown"
+
+
+def _check_quantitative_components(
+    content: str, target: str, oid: str,
+) -> Optional[dict]:
+    """Check all quantitative components of a measurable_target are in content.
+
+    Returns an issue dict if components are missing, None otherwise.
+    """
+    components = _extract_quantitative_components(target)
+    if not components:
+        return None
+
+    missing = []
+    content_nospace = content.replace(" ", "")
+    for comp in components:
+        comp_normalized = comp.replace(" ", "")
+        if comp_normalized not in content_nospace:
+            bare = re.sub(r'^[≥≤><]\s*', '', comp)
+            if bare not in content:
+                missing.append(comp)
+
+    if missing:
+        return {
+            "objective_id": oid,
+            "measurable_target": target,
+            "missing_components": missing,
+            "total_components": len(components),
+            "issue": (
+                f"Objective {oid} referenced but "
+                f"{len(missing)}/{len(components)} metric "
+                f"components missing: {missing}"
+            ),
+        }
+    return None
+
+
 def measurable_targets_preserved(
     section_path: PathLike,
     canonical_pack_path: PathLike,
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
-    """Pass iff every quantitative component of every referenced
-    objective's ``measurable_target`` appears in the section content.
+    """Pass iff measurable targets are faithfully preserved in the section.
 
-    For each objective ID mentioned in the section, extracts all
-    quantitative tokens (``≥N%``, ``≤N``, etc.) from the canonical
-    ``measurable_target`` and verifies each token appears in the
-    section content.
+    Three enforcement modes based on section type:
+
+    **Excellence**: If the section claims coverage of all objectives
+    (via phrases like "all objectives", "all project objectives",
+    "each of the objectives"), every canonical objective ID must appear
+    and every objective's quantitative metric components must be present.
+    For individually-mentioned objectives, all metric components are required.
+
+    **Impact**: For individually-mentioned objective IDs, all quantitative
+    metric components must be present.  Additionally, for any outcome ID
+    mentioned in the section, objectives linked to that outcome (via the
+    canonical pack's ``outcomes[].linked_objectives``) are also required
+    to have their metrics present.
+
+    **Implementation**: Only enforces metric preservation for objectives
+    that are individually mentioned by ID.  Does not require full
+    measurable target reproduction for "all objectives" claims since the
+    implementation section may focus on WP/timeline/resources.
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
@@ -476,46 +616,65 @@ def measurable_targets_preserved(
     if not content.strip():
         return PredicateResult(passed=True)
 
+    section_type = _detect_section_type(resolved_section)
+    objectives = [o for o in pack_data.get("objectives", []) if isinstance(o, dict)]
+    outcomes = [o for o in pack_data.get("outcomes", []) if isinstance(o, dict)]
+
     issues: list[dict] = []
 
-    for obj in pack_data.get("objectives", []):
-        if not isinstance(obj, dict):
-            continue
+    # Build objective lookup
+    obj_by_id: dict[str, dict] = {}
+    for obj in objectives:
         oid = obj.get("id", "")
-        target = obj.get("measurable_target", "")
-        if not oid or not target:
-            continue
-        # Only check if the objective ID is mentioned in the section
-        if oid not in content:
-            continue
+        if oid:
+            obj_by_id[oid] = obj
 
-        components = _extract_quantitative_components(target)
-        if not components:
-            continue
+    # Determine which objectives must be checked
+    must_check_ids: set[str] = set()
 
-        missing = []
-        for comp in components:
-            # Normalize spacing for comparison
-            comp_normalized = comp.replace(" ", "")
-            # Check if the component or its bare number appears
-            if comp_normalized not in content.replace(" ", ""):
-                # Also check bare number (without comparator prefix)
-                bare = re.sub(r'^[≥≤><]\s*', '', comp)
-                if bare not in content:
-                    missing.append(comp)
+    # 1. Always check objectives explicitly mentioned by ID
+    for oid in obj_by_id:
+        if oid in content:
+            must_check_ids.add(oid)
 
-        if missing:
+    # 2. Excellence: if "all objectives" claim, require ALL objective IDs
+    claims_all = bool(_ALL_OBJECTIVES_RE.search(content))
+    if section_type == "excellence" and claims_all:
+        missing_ids = [
+            oid for oid in obj_by_id if oid not in content
+        ]
+        if missing_ids:
             issues.append({
-                "objective_id": oid,
-                "measurable_target": target,
-                "missing_components": missing,
-                "total_components": len(components),
+                "check": "all_objectives_claim",
+                "missing_objective_ids": missing_ids,
                 "issue": (
-                    f"Objective {oid} referenced but "
-                    f"{len(missing)}/{len(components)} metric "
-                    f"components missing: {missing}"
+                    f"Section claims 'all objectives' but omits "
+                    f"{len(missing_ids)} objective ID(s): {missing_ids}"
                 ),
             })
+        # All objectives are now candidates for metric checking
+        must_check_ids = set(obj_by_id.keys())
+
+    # 3. Impact: objectives linked to mentioned outcomes are also required
+    if section_type == "impact":
+        for outcome in outcomes:
+            out_id = outcome.get("id", "")
+            if out_id and out_id in content:
+                for linked_oid in outcome.get("linked_objectives", []):
+                    if linked_oid in obj_by_id:
+                        must_check_ids.add(linked_oid)
+
+    # 4. Check quantitative components for all must-check objectives
+    for oid in sorted(must_check_ids):
+        obj = obj_by_id.get(oid)
+        if not obj:
+            continue
+        target = obj.get("measurable_target", "")
+        if not target:
+            continue
+        issue = _check_quantitative_components(content, target, oid)
+        if issue:
+            issues.append(issue)
 
     if issues:
         return PredicateResult(
@@ -523,11 +682,12 @@ def measurable_targets_preserved(
             failure_category=CROSS_ARTIFACT_INCONSISTENCY,
             reason=(
                 f"Measurable target metric loss in {resolved_section}: "
-                f"{len(issues)} objective(s) with missing components"
+                f"{len(issues)} issue(s)"
             ),
             details={
                 "section_path": str(resolved_section),
                 "canonical_pack_path": str(resolved_pack),
+                "section_type": section_type,
                 "issues": issues,
             },
         )
