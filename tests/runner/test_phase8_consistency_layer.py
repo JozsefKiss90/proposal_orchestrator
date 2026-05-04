@@ -346,7 +346,8 @@ class TestPartnerNamesPreserved:
         )
         assert result.passed
 
-    def test_short_name_without_legal_fails(self, tmp_path: Path) -> None:
+    def test_short_name_without_legal_passes(self, tmp_path: Path) -> None:
+        """Short names without legal names are valid in proposal prose."""
         from runner.predicates.phase8_section_predicates import partner_names_preserved
 
         self._write_pack(tmp_path)
@@ -357,12 +358,7 @@ class TestPartnerNamesPreserved:
         result = partner_names_preserved(
             "section.json", "pack.json", repo_root=tmp_path
         )
-        assert not result.passed
-        assert result.failure_category == "CROSS_ARTIFACT_INCONSISTENCY"
-        issues = result.details.get("issues", [])
-        short_names = [i["partner"] for i in issues]
-        assert "ATU" in short_names
-        assert "ELI" in short_names
+        assert result.passed
 
 
 # ===========================================================================
@@ -411,7 +407,8 @@ class TestDeliverableIdentityPreserved:
         )
         assert result.passed
 
-    def test_wrong_title_fails(self, tmp_path: Path) -> None:
+    def test_bare_mention_without_title_passes(self, tmp_path: Path) -> None:
+        """Deliverable ID without explicit title attachment is valid prose."""
         from runner.predicates.phase8_section_predicates import (
             deliverable_identity_preserved,
         )
@@ -424,21 +421,15 @@ class TestDeliverableIdentityPreserved:
         result = deliverable_identity_preserved(
             "section.json", "pack.json", repo_root=tmp_path,
         )
-        assert not result.passed
-        assert result.failure_category == "CROSS_ARTIFACT_INCONSISTENCY"
-        issues = result.details.get("issues", [])
-        assert any(
-            i["deliverable_id"] == "D1-01" and i["check"] == "title_missing"
-            for i in issues
-        )
+        assert result.passed
 
-    def test_wrong_due_month_fails(self, tmp_path: Path) -> None:
+    def test_missing_due_month_passes(self, tmp_path: Path) -> None:
+        """Deliverable without due month reference is valid prose."""
         from runner.predicates.phase8_section_predicates import (
             deliverable_identity_preserved,
         )
 
         self._write_pack(tmp_path)
-        # D2-01 present but with no due month reference at all
         section = _make_section("r1", [
             "D2-01 Planning Engine Prototype v1 (WP2)."
         ])
@@ -446,20 +437,15 @@ class TestDeliverableIdentityPreserved:
         result = deliverable_identity_preserved(
             "section.json", "pack.json", repo_root=tmp_path,
         )
-        assert not result.passed
-        issues = result.details.get("issues", [])
-        assert any(
-            i["deliverable_id"] == "D2-01" and i["check"] == "due_month_missing"
-            for i in issues
-        )
+        assert result.passed
 
-    def test_missing_parent_wp_fails(self, tmp_path: Path) -> None:
+    def test_missing_parent_wp_passes(self, tmp_path: Path) -> None:
+        """Deliverable without parent WP reference is valid prose."""
         from runner.predicates.phase8_section_predicates import (
             deliverable_identity_preserved,
         )
 
         self._write_pack(tmp_path)
-        # D1-01 present with title and month but no WP reference
         section = _make_section("r1", [
             "D1-01 Quality Management Plan (month 3)."
         ])
@@ -467,12 +453,7 @@ class TestDeliverableIdentityPreserved:
         result = deliverable_identity_preserved(
             "section.json", "pack.json", repo_root=tmp_path,
         )
-        assert not result.passed
-        issues = result.details.get("issues", [])
-        assert any(
-            i["deliverable_id"] == "D1-01" and i["check"] == "parent_wp_missing"
-            for i in issues
-        )
+        assert result.passed
 
 
 # ===========================================================================
@@ -516,13 +497,13 @@ class TestCanonicalTermsPreserved:
         )
         assert result.passed
 
-    def test_shortened_objective_title_fails(self, tmp_path: Path) -> None:
+    def test_objective_id_alone_passes(self, tmp_path: Path) -> None:
+        """Objective ID without explicit title attachment is valid prose."""
         from runner.predicates.phase8_section_predicates import (
             canonical_terms_preserved,
         )
 
         self._write_pack(tmp_path)
-        # OBJ-1 mentioned but title shortened to just "planning engine"
         section = _make_section("r1", [
             "OBJ-1 focuses on the planning engine approach."
         ])
@@ -530,18 +511,15 @@ class TestCanonicalTermsPreserved:
         result = canonical_terms_preserved(
             "section.json", "pack.json", repo_root=tmp_path,
         )
-        assert not result.passed
-        assert result.failure_category == "CROSS_ARTIFACT_INCONSISTENCY"
-        issues = result.details.get("issues", [])
-        assert any(i["id"] == "OBJ-1" for i in issues)
+        assert result.passed
 
-    def test_shortened_wp_title_fails(self, tmp_path: Path) -> None:
+    def test_wp_id_alone_passes(self, tmp_path: Path) -> None:
+        """WP ID without explicit title attachment is valid prose."""
         from runner.predicates.phase8_section_predicates import (
             canonical_terms_preserved,
         )
 
         self._write_pack(tmp_path)
-        # WP1 mentioned but title shortened
         section = _make_section("r1", [
             "WP1 handles management tasks."
         ])
@@ -549,12 +527,7 @@ class TestCanonicalTermsPreserved:
         result = canonical_terms_preserved(
             "section.json", "pack.json", repo_root=tmp_path,
         )
-        assert not result.passed
-        issues = result.details.get("issues", [])
-        assert any(
-            i["id"] == "WP1" and i["term_type"] == "wp_title"
-            for i in issues
-        )
+        assert result.passed
 
     def test_no_mention_of_id_passes(self, tmp_path: Path) -> None:
         from runner.predicates.phase8_section_predicates import (

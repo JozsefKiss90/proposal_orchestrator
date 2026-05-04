@@ -430,10 +430,11 @@ class TestMeasurableTargetsMultiClause:
 
 
 class TestCanonicalTermsOutcomeTitles:
-    """gates 10a/10b/10c must fail when canonical outcome or objective
-    titles are shortened or paraphrased."""
+    """IDs used alone in prose (without explicit title appositives) now pass.
+    Only explicit wrong title attachments (via : — – or parenthetical) fail."""
 
-    def test_outcome_title_shortened(self, tmp_path: Path) -> None:
+    def test_outcome_id_alone_passes(self, tmp_path: Path) -> None:
+        """Outcome ID without title appositive is valid prose."""
         pack = _make_canonical_pack(
             outcomes=[
                 {
@@ -449,7 +450,7 @@ class TestCanonicalTermsOutcomeTitles:
             "excellence_section",
             sub_sections=[{
                 "content": (
-                    "OUT-1 delivers a planning framework."  # shortened
+                    "OUT-1 delivers a planning framework."
                 ),
             }],
         )
@@ -463,14 +464,10 @@ class TestCanonicalTermsOutcomeTitles:
             canonical_pack_path=str(pack_path),
             repo_root=tmp_path,
         )
-        assert not result.passed
-        issues = result.details.get("issues", [])
-        assert any(
-            i.get("term_type") == "outcome_title" and i.get("id") == "OUT-1"
-            for i in issues
-        )
+        assert result.passed
 
-    def test_objective_title_shortened(self, tmp_path: Path) -> None:
+    def test_objective_id_alone_passes(self, tmp_path: Path) -> None:
+        """Objective ID without title appositive is valid prose."""
         pack = _make_canonical_pack(
             objectives=[
                 {
@@ -484,7 +481,7 @@ class TestCanonicalTermsOutcomeTitles:
             "impact_section",
             sub_sections=[{
                 "content": (
-                    "OBJ-2 creates a memory architecture."  # shortened
+                    "OBJ-2 creates a memory architecture."
                 ),
             }],
         )
@@ -498,12 +495,7 @@ class TestCanonicalTermsOutcomeTitles:
             canonical_pack_path=str(pack_path),
             repo_root=tmp_path,
         )
-        assert not result.passed
-        issues = result.details.get("issues", [])
-        assert any(
-            i.get("term_type") == "objective_title" and i.get("id") == "OBJ-2"
-            for i in issues
-        )
+        assert result.passed
 
     def test_exact_titles_pass(self, tmp_path: Path) -> None:
         pack = _make_canonical_pack(

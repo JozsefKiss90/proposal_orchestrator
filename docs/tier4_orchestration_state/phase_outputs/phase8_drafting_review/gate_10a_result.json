@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10a_excellence_completeness",
   "gate_kind": "exit",
-  "run_id": "790c5e0f-b276-4665-8740-4b414037fdfd",
+  "run_id": "3e886495-c429-4733-9c54-1112899700fa",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:213d1dace1852222eedd3a140506c0cffdab69c44670464cc31f6d4e4ae2d7d2",
+  "input_fingerprint": "sha256:7c5295081cb25002ed2973cdb4f538eb92679c613a083912f9d1be81e5099982",
   "input_artifact_fingerprints": {
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:73cf58f2bb942f446cbe2d024837ced136cd1bf50240183caa6644ef92ef4a2f"
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:ba66272702b156c9ba9aa205bc58cd7762ef2399ce7e5d14e1409ad70729ebc3"
   },
-  "evaluated_at": "2026-05-03T23:38:55.894769+00:00",
+  "evaluated_at": "2026-05-04T00:54:09.798956+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "pass",
+  "status": "fail",
   "deterministic_predicates": {
     "passed": [
       "g09a_p02",
@@ -23,12 +23,265 @@
       "g09a_p05b",
       "g09a_p06"
     ],
-    "failed": []
+    "failed": [
+      {
+        "predicate_id": "g09a_p07",
+        "type": "coverage",
+        "function": "partner_names_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Partner name preservation issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 8 partner(s) with truncated legal names",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "partner": "ATU",
+              "expected_legal_name": "Alpenstadt Technical University",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "CERIA",
+              "expected_legal_name": "Centre Europ\u00e9en de Recherche en Informatique Avanc\u00e9e",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "BIIS",
+              "expected_legal_name": "Breda Institute for Intelligent Systems",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "ISIA",
+              "expected_legal_name": "Istituto Superiore di Ingegneria Avanzata",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "NIHS",
+              "expected_legal_name": "Nordic Institute of Health Sciences",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "ELI",
+              "expected_legal_name": "EuroLog International AG",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "BAL",
+              "expected_legal_name": "Boreal AI Labs Oy",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "FIIT",
+              "expected_legal_name": "Fundaci\u00f3n Ib\u00e9rica de Innovaci\u00f3n Tecnol\u00f3gica",
+              "issue": "short_name used but legal_name never appears"
+            }
+          ]
+        },
+        "fail_message": "Excellence section uses partner short names without their canonical legal names from the reference pack.\n",
+        "prose_condition": "Partner names preserved from canonical reference pack"
+      },
+      {
+        "predicate_id": "g09a_p08",
+        "type": "coverage",
+        "function": "deliverable_identity_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Deliverable identity issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 9 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "deliverable_id": "D1-02",
+              "check": "title_missing",
+              "canonical_title": "Data management plan",
+              "issue": "Deliverable D1-02 mentioned but its canonical title 'Data management plan' is absent from section content"
+            },
+            {
+              "deliverable_id": "D3-01",
+              "check": "title_missing",
+              "canonical_title": "Memory architecture design specification",
+              "issue": "Deliverable D3-01 mentioned but its canonical title 'Memory architecture design specification' is absent from section content"
+            },
+            {
+              "deliverable_id": "D4-01",
+              "check": "title_missing",
+              "canonical_title": "Multi-agent coordination protocol specification",
+              "issue": "Deliverable D4-01 mentioned but its canonical title 'Multi-agent coordination protocol specification' is absent from section content"
+            },
+            {
+              "deliverable_id": "D9-02",
+              "check": "title_missing",
+              "canonical_title": "Open-source software release",
+              "issue": "Deliverable D9-02 mentioned but its canonical title 'Open-source software release' is absent from section content"
+            },
+            {
+              "deliverable_id": "D9-02",
+              "check": "parent_wp_missing",
+              "canonical_parent_wp": "WP9",
+              "issue": "Deliverable D9-02 mentioned but its parent WP 'WP9' is absent from section content"
+            },
+            {
+              "deliverable_id": "D2-01",
+              "check": "title_missing",
+              "canonical_title": "Neuro-symbolic planning architecture specification",
+              "issue": "Deliverable D2-01 mentioned but its canonical title 'Neuro-symbolic planning architecture specification' is absent from section content"
+            },
+            {
+              "deliverable_id": "D4-02",
+              "check": "title_missing",
+              "canonical_title": "Decentralised coordination software",
+              "issue": "Deliverable D4-02 mentioned but its canonical title 'Decentralised coordination software' is absent from section content"
+            },
+            {
+              "deliverable_id": "D2-02",
+              "check": "title_missing",
+              "canonical_title": "Planning engine software prototype",
+              "issue": "Deliverable D2-02 mentioned but its canonical title 'Planning engine software prototype' is absent from section content"
+            },
+            {
+              "deliverable_id": "D3-02",
+              "check": "title_missing",
+              "canonical_title": "Adaptive memory system software",
+              "issue": "Deliverable D3-02 mentioned but its canonical title 'Adaptive memory system software' is absent from section content"
+            }
+          ]
+        },
+        "fail_message": "Excellence section references deliverable IDs with wrong title, parent WP, or due month.\n",
+        "prose_condition": "Deliverable identities match canonical reference pack"
+      },
+      {
+        "predicate_id": "g09a_p09",
+        "type": "coverage",
+        "function": "canonical_terms_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Canonical term preservation issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 10 term(s) shortened or absent",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-1",
+              "canonical_title": "Neuro-symbolic planning engine for autonomous task decomposition",
+              "issue": "Objective OBJ-1 referenced but canonical title 'Neuro-symbolic planning engine for autonomous task decomposition' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-2",
+              "canonical_title": "Unified adaptive memory architecture",
+              "issue": "Objective OBJ-2 referenced but canonical title 'Unified adaptive memory architecture' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-3",
+              "canonical_title": "Decentralised multi-agent coordination protocols",
+              "issue": "Objective OBJ-3 referenced but canonical title 'Decentralised multi-agent coordination protocols' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-4",
+              "canonical_title": "Healthcare demonstrator \u2014 clinical decision support",
+              "issue": "Objective OBJ-4 referenced but canonical title 'Healthcare demonstrator \u2014 clinical decision support' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-5",
+              "canonical_title": "Manufacturing demonstrator \u2014 process optimisation",
+              "issue": "Objective OBJ-5 referenced but canonical title 'Manufacturing demonstrator \u2014 process optimisation' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "objective_title",
+              "id": "OBJ-6",
+              "canonical_title": "Logistics transfer demonstrator \u2014 cross-sector generalisation",
+              "issue": "Objective OBJ-6 referenced but canonical title 'Logistics transfer demonstrator \u2014 cross-sector generalisation' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP1",
+              "canonical_title": "Project Management and Coordination",
+              "issue": "WP WP1 referenced but canonical title 'Project Management and Coordination' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP5",
+              "canonical_title": "Healthcare Demonstrator \u2014 Clinical Decision Support",
+              "issue": "WP WP5 referenced but canonical title 'Healthcare Demonstrator \u2014 Clinical Decision Support' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP6",
+              "canonical_title": "Manufacturing Demonstrator \u2014 Process Optimisation",
+              "issue": "WP WP6 referenced but canonical title 'Manufacturing Demonstrator \u2014 Process Optimisation' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP7",
+              "canonical_title": "Logistics Transfer Demonstrator \u2014 Cross-Sector Generalisation",
+              "issue": "WP WP7 referenced but canonical title 'Logistics Transfer Demonstrator \u2014 Cross-Sector Generalisation' is absent \u2014 possible shortening or paraphrase"
+            }
+          ]
+        },
+        "fail_message": "Excellence section shortens or paraphrases canonical objective or WP titles from the reference pack.\n",
+        "prose_condition": "Canonical objective and WP titles preserved"
+      },
+      {
+        "predicate_id": "g09a_p10",
+        "type": "coverage",
+        "function": "measurable_targets_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Measurable target metric loss in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 2 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "section_type": "excellence",
+          "issues": [
+            {
+              "objective_id": "OBJ-5",
+              "measurable_target": "Demonstrate \u226515% reduction in defect rates and \u226510% reduction in energy consumption compared to baseline operations in a pilot factory environment at ISIA, validated over a 3-month operational period.",
+              "missing_components": [
+                "\u226515%",
+                "\u226510%"
+              ],
+              "total_components": 2,
+              "issue": "Objective OBJ-5 referenced but 2/2 metric components missing: ['\u226515%', '\u226510%']"
+            },
+            {
+              "objective_id": "OBJ-6",
+              "measurable_target": "Demonstrate \u226520% improvement in disruption recovery time and \u226515% improvement in delivery schedule adherence compared to current planning systems, validated on ELI operational scenarios across 3 supply chain corridors.",
+              "missing_components": [
+                "\u226520%",
+                "\u226515%"
+              ],
+              "total_components": 2,
+              "issue": "Objective OBJ-6 referenced but 2/2 metric components missing: ['\u226520%', '\u226515%']"
+            }
+          ]
+        },
+        "fail_message": "Excellence section references objectives but drops quantitative metric components from their measurable_target values.\n",
+        "prose_condition": "All quantitative metric components from measurable_target preserved"
+      }
+    ]
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": []
+    "failed": [],
+    "skipped": true
   },
-  "skipped_semantic": false,
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
 }

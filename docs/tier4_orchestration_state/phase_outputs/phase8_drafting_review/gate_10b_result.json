@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10b_impact_completeness",
   "gate_kind": "exit",
-  "run_id": "790c5e0f-b276-4665-8740-4b414037fdfd",
+  "run_id": "3e886495-c429-4733-9c54-1112899700fa",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:54a9a217fac8b5170fec034910b40b751b5c2a5285c67d263986167fe83785b7",
+  "input_fingerprint": "sha256:a6a762742e01998f0d89cedaa1006b2aeec0a56baaa7496df00d5a075076885e",
   "input_artifact_fingerprints": {
     "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:78048e16f385bb5f6e7da008f090aa2ede07e9f7fb32732a31658032484747dd",
-    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:1b70a569c06a10938e212146655a136839e9f75548ee53a0d455fee4d56897c7"
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:c6236e6db3d05c8eb62e310ded611c2bc840b37a30f8720dd0d1d48949a584fa"
   },
-  "evaluated_at": "2026-05-03T23:54:32.055390+00:00",
+  "evaluated_at": "2026-05-04T01:08:35.043409+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "pass",
+  "status": "fail",
   "deterministic_predicates": {
     "passed": [
       "g09b_p02",
@@ -22,14 +22,210 @@
       "g09b_p05",
       "g09b_p05b",
       "g09b_p06",
-      "g09b_p07"
+      "g09b_p07",
+      "g09b_p11"
     ],
-    "failed": []
+    "failed": [
+      {
+        "predicate_id": "g09b_p08",
+        "type": "coverage",
+        "function": "partner_names_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Partner name preservation issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 8 partner(s) with truncated legal names",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "partner": "ATU",
+              "expected_legal_name": "Alpenstadt Technical University",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "CERIA",
+              "expected_legal_name": "Centre Europ\u00e9en de Recherche en Informatique Avanc\u00e9e",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "BIIS",
+              "expected_legal_name": "Breda Institute for Intelligent Systems",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "ISIA",
+              "expected_legal_name": "Istituto Superiore di Ingegneria Avanzata",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "NIHS",
+              "expected_legal_name": "Nordic Institute of Health Sciences",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "ELI",
+              "expected_legal_name": "EuroLog International AG",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "BAL",
+              "expected_legal_name": "Boreal AI Labs Oy",
+              "issue": "short_name used but legal_name never appears"
+            },
+            {
+              "partner": "FIIT",
+              "expected_legal_name": "Fundaci\u00f3n Ib\u00e9rica de Innovaci\u00f3n Tecnol\u00f3gica",
+              "issue": "short_name used but legal_name never appears"
+            }
+          ]
+        },
+        "fail_message": "Impact section uses partner short names without their canonical legal names from the reference pack.\n",
+        "prose_condition": "Partner names preserved from canonical reference pack"
+      },
+      {
+        "predicate_id": "g09b_p09",
+        "type": "coverage",
+        "function": "deliverable_identity_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Deliverable identity issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 12 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "deliverable_id": "D7-02",
+              "check": "title_missing",
+              "canonical_title": "Cross-sector generalisation evaluation dataset",
+              "issue": "Deliverable D7-02 mentioned but its canonical title 'Cross-sector generalisation evaluation dataset' is absent from section content"
+            },
+            {
+              "deliverable_id": "D8-02",
+              "check": "parent_wp_missing",
+              "canonical_parent_wp": "WP8",
+              "issue": "Deliverable D8-02 mentioned but its parent WP 'WP8' is absent from section content"
+            },
+            {
+              "deliverable_id": "D5-02",
+              "check": "title_missing",
+              "canonical_title": "Healthcare demonstrator evaluation dataset",
+              "issue": "Deliverable D5-02 mentioned but its canonical title 'Healthcare demonstrator evaluation dataset' is absent from section content"
+            },
+            {
+              "deliverable_id": "D4-01",
+              "check": "title_missing",
+              "canonical_title": "Multi-agent coordination protocol specification",
+              "issue": "Deliverable D4-01 mentioned but its canonical title 'Multi-agent coordination protocol specification' is absent from section content"
+            },
+            {
+              "deliverable_id": "D4-01",
+              "check": "parent_wp_missing",
+              "canonical_parent_wp": "WP4",
+              "issue": "Deliverable D4-01 mentioned but its parent WP 'WP4' is absent from section content"
+            },
+            {
+              "deliverable_id": "D9-02",
+              "check": "title_missing",
+              "canonical_title": "Open-source software release",
+              "issue": "Deliverable D9-02 mentioned but its canonical title 'Open-source software release' is absent from section content"
+            },
+            {
+              "deliverable_id": "D6-02",
+              "check": "title_missing",
+              "canonical_title": "Manufacturing process optimisation demonstrator software",
+              "issue": "Deliverable D6-02 mentioned but its canonical title 'Manufacturing process optimisation demonstrator software' is absent from section content"
+            },
+            {
+              "deliverable_id": "D2-02",
+              "check": "title_missing",
+              "canonical_title": "Planning engine software prototype",
+              "issue": "Deliverable D2-02 mentioned but its canonical title 'Planning engine software prototype' is absent from section content"
+            },
+            {
+              "deliverable_id": "D2-02",
+              "check": "parent_wp_missing",
+              "canonical_parent_wp": "WP2",
+              "issue": "Deliverable D2-02 mentioned but its parent WP 'WP2' is absent from section content"
+            },
+            {
+              "deliverable_id": "D9-01",
+              "check": "title_missing",
+              "canonical_title": "Dissemination and exploitation plan",
+              "issue": "Deliverable D9-01 mentioned but its canonical title 'Dissemination and exploitation plan' is absent from section content"
+            },
+            {
+              "deliverable_id": "D3-02",
+              "check": "title_missing",
+              "canonical_title": "Adaptive memory system software",
+              "issue": "Deliverable D3-02 mentioned but its canonical title 'Adaptive memory system software' is absent from section content"
+            },
+            {
+              "deliverable_id": "D3-02",
+              "check": "parent_wp_missing",
+              "canonical_parent_wp": "WP3",
+              "issue": "Deliverable D3-02 mentioned but its parent WP 'WP3' is absent from section content"
+            }
+          ]
+        },
+        "fail_message": "Impact section references deliverable IDs with wrong title, parent WP, or due month.\n",
+        "prose_condition": "Deliverable identities match canonical reference pack"
+      },
+      {
+        "predicate_id": "g09b_p10",
+        "type": "coverage",
+        "function": "canonical_terms_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Canonical term preservation issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 4 term(s) shortened or absent",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "term_type": "wp_title",
+              "id": "WP5",
+              "canonical_title": "Healthcare Demonstrator \u2014 Clinical Decision Support",
+              "issue": "WP WP5 referenced but canonical title 'Healthcare Demonstrator \u2014 Clinical Decision Support' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP6",
+              "canonical_title": "Manufacturing Demonstrator \u2014 Process Optimisation",
+              "issue": "WP WP6 referenced but canonical title 'Manufacturing Demonstrator \u2014 Process Optimisation' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP7",
+              "canonical_title": "Logistics Transfer Demonstrator \u2014 Cross-Sector Generalisation",
+              "issue": "WP WP7 referenced but canonical title 'Logistics Transfer Demonstrator \u2014 Cross-Sector Generalisation' is absent \u2014 possible shortening or paraphrase"
+            },
+            {
+              "term_type": "wp_title",
+              "id": "WP9",
+              "canonical_title": "Dissemination, Exploitation and Communication",
+              "issue": "WP WP9 referenced but canonical title 'Dissemination, Exploitation and Communication' is absent \u2014 possible shortening or paraphrase"
+            }
+          ]
+        },
+        "fail_message": "Impact section shortens or paraphrases canonical objective or WP titles from the reference pack.\n",
+        "prose_condition": "Canonical objective and WP titles preserved"
+      }
+    ]
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": []
+    "failed": [],
+    "skipped": true
   },
-  "skipped_semantic": false,
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10b_result.json"
 }

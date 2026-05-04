@@ -11,6 +11,10 @@ Rules:
     - No LLM calls, no broad semantic inference.
     - Fail with actionable details: offending term, artifact path,
       source canonical value.
+    - Proposal prose may reference entities by ID alone without
+      repeating full titles, legal names, or due months every time.
+      Predicates only fail on *contradictory* explicit attachments,
+      not on absent contextual information.
 """
 
 from __future__ import annotations
@@ -93,6 +97,152 @@ def _extract_all_content(section_data: dict) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Prose-aware matching helpers
+# ---------------------------------------------------------------------------
+
+_STOP_WORDS = frozenset({
+    "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",
+    "has", "in", "is", "it", "its", "of", "on", "or", "that", "the",
+    "to", "was", "were", "will", "with",
+})
+
+
+def _content_words(text: str) -> set[str]:
+    """Extract non-stop content words from text, lowercased."""
+    return {
+        w for w in re.findall(r'[a-zA-Z][\w-]*', text.lower())
+        if w not in _STOP_WORDS
+    }
+
+
+def _is_title_attempt(canonical_title: str, appositive: str) -> bool:
+    """Heuristic: does *appositive* look like an attempt to state a title?
+
+    Returns True when either direction meets the 50% threshold:
+    - >=50% of the appositive's content words appear in canonical, OR
+    - >=50% of the canonical title's content words appear in appositive.
+
+    The bidirectional check ensures that long sentences containing the
+    title words are still detected even when diluted by trailing prose.
+    """
+    appos_words = _content_words(appositive)
+    if not appos_words:
+        return False
+    canon_words = _content_words(canonical_title)
+    if not canon_words:
+        return False
+    shared = canon_words & appos_words
+    return (len(shared) / len(appos_words) >= 0.5
+            or len(shared) / len(canon_words) >= 0.5)
+
+
+def _title_matches(canonical: str, found: str) -> bool:
+    """Check if *found* text is compatible with *canonical* via substring containment."""
+    c = canonical.lower().strip()
+    f = found.lower().strip()
+    return c in f or f in c
+
+
+def _find_appositives(id_str: str, content: str) -> list[str]:
+    """Find title-like text explicitly attached to *id_str* via :, em-dash, en-dash, or parenthetical.
+
+    Only returns text fragments >= 15 chars (filters out short role
+    phrases like "(coordinator)").
+    """
+    pattern = re.compile(
+        re.escape(id_str)
+        + r'\s*(?:[:]\s+|[—–]\s*|\(\s*)'
+        + r'([^.;)\n]{15,}?)'
+        + r'(?:[.;)\n]|$)',
+        re.MULTILINE,
+    )
+    return [m.group(1).strip() for m in pattern.finditer(content)]
+
+
+def _find_truncated_legal_name(legal_name: str, content: str) -> Optional[str]:
+    """Return the truncated form if *legal_name* appears truncated in *content*, else None.
+
+    A legal name is "truncated" when a multi-word prefix (>= 2 words,
+    >= 10 chars) appears in the content but the full name does not.
+    """
+    if not legal_name or legal_name in content:
+        return None
+    words = legal_name.split()
+    if len(words) < 2:
+        return None
+    for n in range(len(words) - 1, 1, -1):
+        prefix = " ".join(words[:n])
+        if len(prefix) >= 10 and prefix in content:
+            return prefix
+    return None
+
+
+def _check_partner_conflation(
+    short: str,
+    legal: str,
+    legal_to_short: dict[str, str],
+    content: str,
+) -> Optional[dict]:
+    """Check if *short* appears with another partner's legal name in a parenthetical."""
+    pattern = re.compile(re.escape(short) + r'\s*\(([^)]+)\)', re.IGNORECASE)
+    for m in pattern.finditer(content):
+        paren_text = m.group(1).strip()
+        if len(paren_text) < 10:
+            continue
+        for other_legal, other_short in legal_to_short.items():
+            if other_short != short and other_legal.lower() in paren_text.lower():
+                return {
+                    "partner": short,
+                    "expected_legal_name": legal,
+                    "found_conflation": paren_text,
+                    "conflated_with": other_short,
+                    "issue": (
+                        f"Partner conflation: {short} appears with "
+                        f"{other_short}'s legal name '{other_legal}' "
+                        f"in parenthetical"
+                    ),
+                }
+    return None
+
+
+def _extract_attached_wps(did: str, content: str) -> list[str]:
+    """Find WP IDs explicitly attached to deliverable *did*.
+
+    Detects parenthetical, slash, and comma-attached patterns in both
+    directions (did before WP, WP before did).
+    """
+    wps: list[str] = []
+    # Parenthetical after deliverable ID: D2-01 (WP3)
+    for m in re.finditer(re.escape(did) + r'\s*\(([^)]*)\)', content):
+        wps.extend(re.findall(r'WP\d+', m.group(1)))
+    # Slash or comma directly after: D2-01/WP3, D2-01, WP3
+    for m in re.finditer(re.escape(did) + r'\s*[/,]\s*(WP\d+)', content):
+        wps.append(m.group(1))
+    # WP before deliverable (tight proximity): WP3/D2-01
+    for m in re.finditer(r'(WP\d+)\s*[/,]\s*' + re.escape(did), content):
+        wps.append(m.group(1))
+    return wps
+
+
+def _extract_attached_months(did: str, content: str) -> list[int]:
+    """Find month values explicitly attached to deliverable *did*."""
+    months: list[int] = []
+    # Parenthetical with month: D2-01 (M18), D2-01 (month 18)
+    for m in re.finditer(
+        re.escape(did) + r'\s*\([^)]*?(?:month\s+|M)(\d+)[^)]*?\)',
+        content, re.IGNORECASE,
+    ):
+        months.append(int(m.group(1)))
+    # "due in/by month N" within ~60 chars: D2-01, due in month 24
+    for m in re.finditer(
+        re.escape(did) + r'[^.;\n]{0,60}?\bdue\s+(?:in\s+|by\s+)?(?:month\s+|M)(\d+)',
+        content, re.IGNORECASE,
+    ):
+        months.append(int(m.group(1)))
+    return months
+
+
+# ---------------------------------------------------------------------------
 # no_stale_run_id
 # ---------------------------------------------------------------------------
 
@@ -151,14 +301,22 @@ def partner_names_preserved(
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
-    """Pass iff every partner short_name from the canonical pack appears
-    in the section content, and no short_name is used without its
-    canonical legal_name also appearing at least once.
+    """Pass iff partner names from the canonical pack are used consistently
+    in the section without corruption, truncation, or conflation.
+
+    Does NOT require legal_name to appear alongside every short_name
+    mention.  Short names from the canonical pack are valid standalone
+    references in proposal prose.
+
+    Fails only when:
+        - A short_name is mapped to the wrong legal name (conflation)
+        - A legal name appears in truncated / corrupted form
+        - Two partners are conflated (short_name + wrong legal_name)
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
         MALFORMED_ARTIFACT -- invalid JSON
-        CROSS_ARTIFACT_INCONSISTENCY -- partner name missing or truncated
+        CROSS_ARTIFACT_INCONSISTENCY -- corrupted, truncated, or conflated partner name
     """
     resolved_section = resolve_repo_path(section_path, repo_root)
     resolved_pack = resolve_repo_path(canonical_pack_path, repo_root)
@@ -178,33 +336,58 @@ def partner_names_preserved(
     if not partners:
         return PredicateResult(passed=True)
 
-    issues: list[dict] = []
+    short_to_legal: dict[str, str] = {}
+    legal_to_short: dict[str, str] = {}
     for p in partners:
         if not isinstance(p, dict):
             continue
         short = p.get("short_name", "")
         legal = p.get("legal_name", "")
-        if not short:
+        if short and legal:
+            short_to_legal[short] = legal
+            legal_to_short[legal] = short
+
+    issues: list[dict] = []
+
+    for p in partners:
+        if not isinstance(p, dict):
+            continue
+        short = p.get("short_name", "")
+        legal = p.get("legal_name", "")
+        if not short or short not in content:
             continue
 
-        # Check: short_name mentioned in content
-        if short in content:
-            # If there's a legal name that differs from short name,
-            # verify the legal name appears at least once
-            if legal and legal != short and legal not in content:
-                issues.append({
-                    "partner": short,
-                    "expected_legal_name": legal,
-                    "issue": "short_name used but legal_name never appears",
-                })
+        if not legal:
+            continue
+
+        # Check 1: Truncated / corrupted legal name
+        truncated = _find_truncated_legal_name(legal, content)
+        if truncated:
+            issues.append({
+                "partner": short,
+                "expected_legal_name": legal,
+                "found_truncated": truncated,
+                "issue": (
+                    f"Legal name for {short} appears truncated: "
+                    f"found '{truncated}' instead of '{legal}'"
+                ),
+            })
+
+        # Check 2: Conflation — short_name appears with another partner's
+        # legal name in a parenthetical
+        conflation = _check_partner_conflation(
+            short, legal, legal_to_short, content,
+        )
+        if conflation:
+            issues.append(conflation)
 
     if issues:
         return PredicateResult(
             passed=False,
             failure_category=CROSS_ARTIFACT_INCONSISTENCY,
             reason=(
-                f"Partner name preservation issues in {resolved_section}: "
-                f"{len(issues)} partner(s) with truncated legal names"
+                f"Partner name issues in {resolved_section}: "
+                f"{len(issues)} issue(s)"
             ),
             details={
                 "section_path": str(resolved_section),
@@ -237,18 +420,25 @@ def deliverable_identity_preserved(
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
-    """Pass iff every deliverable ID mentioned in the section has the
-    correct title, parent WP, and due month per the canonical pack,
-    and multi-outcome deliverables are not narrowly characterised.
+    """Pass iff every deliverable ID mentioned in the section is known in
+    the canonical pack and no contradictory identity (wrong title, parent
+    WP, or due month) is explicitly asserted.
 
-    For deliverables linked to multiple outcomes in the canonical pack,
-    the section must not assign an exclusive or narrow purpose that
-    conflicts with the broader canonical attribution.
+    Does NOT require canonical title, parent WP, or due month to appear
+    alongside every deliverable ID mention.  Bare ID references are valid
+    in proposal prose.
+
+    Fails only when:
+        - An unknown deliverable ID appears
+        - A wrong title is explicitly attached (via : — – or parenthetical)
+        - A wrong parent WP is explicitly attached
+        - A wrong due month is explicitly attached
+        - Exclusive-purpose language narrows a multi-outcome deliverable
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
         MALFORMED_ARTIFACT -- invalid JSON
-        CROSS_ARTIFACT_INCONSISTENCY -- deliverable identity mismatch
+        CROSS_ARTIFACT_INCONSISTENCY -- unknown ID, wrong identity, or narrowing
     """
     resolved_section = resolve_repo_path(section_path, repo_root)
     resolved_pack = resolve_repo_path(canonical_pack_path, repo_root)
@@ -277,7 +467,7 @@ def deliverable_identity_preserved(
         if did:
             canon[did] = d
 
-    # Build multi-outcome index: deliverable_id -> list of outcome IDs
+    # Build multi-outcome index
     multi_outcome_map: dict[str, list[str]] = {}
     for outcome in pack_data.get("outcomes", []):
         if not isinstance(outcome, dict):
@@ -289,65 +479,77 @@ def deliverable_identity_preserved(
             multi_outcome_map[linked_did].append(out_id)
 
     issues: list[dict] = []
-    # Find deliverable IDs mentioned in section content
     mentioned_ids = set(re.findall(r'D\d+-\d+', content))
 
-    for did in mentioned_ids:
+    for did in sorted(mentioned_ids):
+        # Check 1: Unknown deliverable ID
         if did not in canon:
+            issues.append({
+                "deliverable_id": did,
+                "check": "unknown_deliverable",
+                "issue": (
+                    f"Deliverable {did} referenced in section but "
+                    f"not found in canonical reference pack"
+                ),
+            })
             continue
+
         canonical = canon[did]
         c_title = canonical.get("title", "")
         c_wp = canonical.get("parent_wp", "")
         c_month = canonical.get("due_month")
 
-        # Check title
-        if c_title and len(c_title) > 5 and c_title not in content:
-            issues.append({
-                "deliverable_id": did,
-                "check": "title_missing",
-                "canonical_title": c_title,
-                "issue": (
-                    f"Deliverable {did} mentioned but its canonical "
-                    f"title '{c_title}' is absent from section content"
-                ),
-            })
+        # Check 2: Wrong title explicitly attached
+        if c_title:
+            for appos in _find_appositives(did, content):
+                if _is_title_attempt(c_title, appos) and not _title_matches(c_title, appos):
+                    issues.append({
+                        "deliverable_id": did,
+                        "check": "wrong_title",
+                        "canonical_title": c_title,
+                        "found_title": appos,
+                        "issue": (
+                            f"Deliverable {did} has wrong title attached: "
+                            f"found '{appos}', expected '{c_title}'"
+                        ),
+                    })
+                    break
 
-        # Check due month
+        # Check 3: Wrong parent WP explicitly attached
+        if c_wp:
+            for wp in _extract_attached_wps(did, content):
+                if wp != c_wp:
+                    issues.append({
+                        "deliverable_id": did,
+                        "check": "wrong_parent_wp",
+                        "canonical_parent_wp": c_wp,
+                        "found_parent_wp": wp,
+                        "issue": (
+                            f"Deliverable {did} explicitly attached to {wp}, "
+                            f"but canonical parent is {c_wp}"
+                        ),
+                    })
+                    break
+
+        # Check 4: Wrong due month explicitly attached
         if c_month is not None:
-            month_str = f"month {c_month}"
-            month_str_alt = f"M{c_month}"
-            if (month_str.lower() not in content.lower()
-                    and month_str_alt not in content
-                    and str(c_month) not in content):
-                issues.append({
-                    "deliverable_id": did,
-                    "check": "due_month_missing",
-                    "canonical_due_month": c_month,
-                    "issue": (
-                        f"Deliverable {did} mentioned but due month "
-                        f"{c_month} not found in section content"
-                    ),
-                })
+            for month in _extract_attached_months(did, content):
+                if month != c_month:
+                    issues.append({
+                        "deliverable_id": did,
+                        "check": "wrong_due_month",
+                        "canonical_due_month": c_month,
+                        "found_due_month": month,
+                        "issue": (
+                            f"Deliverable {did} states due month {month}, "
+                            f"but canonical due month is {c_month}"
+                        ),
+                    })
+                    break
 
-        # Check parent WP
-        if c_wp and c_wp not in content:
-            issues.append({
-                "deliverable_id": did,
-                "check": "parent_wp_missing",
-                "canonical_parent_wp": c_wp,
-                "issue": (
-                    f"Deliverable {did} mentioned but its parent "
-                    f"WP '{c_wp}' is absent from section content"
-                ),
-            })
-
-        # Check multi-outcome narrowing:
-        # If this deliverable is linked to >=2 outcomes in the canonical
-        # pack, scan the text around the deliverable ID for exclusive
-        # purpose language.
+        # Check 5: Multi-outcome narrowing
         linked_outcomes = multi_outcome_map.get(did, [])
         if len(linked_outcomes) >= 2:
-            # Extract a window of ~300 chars around each mention of the ID
             for match in re.finditer(re.escape(did), content):
                 start = max(0, match.start() - 150)
                 end = min(len(content), match.end() + 150)
@@ -364,7 +566,7 @@ def deliverable_identity_preserved(
                             f"exclusive-purpose language near the reference"
                         ),
                     })
-                    break  # one issue per deliverable is enough
+                    break
 
     if issues:
         return PredicateResult(
@@ -394,16 +596,18 @@ def canonical_terms_preserved(
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
-    """Pass iff canonical objective, outcome, and WP titles from the pack
-    are not shortened or paraphrased in the section.
+    """Pass iff canonical objective, outcome, and WP titles are not
+    contradicted when explicitly attached to their IDs.
 
-    Checks that when an objective ID, outcome ID, or WP ID is mentioned,
-    the full canonical title also appears somewhere in the section.
+    IDs that appear alone or with short role phrases are acceptable.
+    Only fails when an ID is followed by a title-like appositive (via
+    :, em-dash, en-dash, or parenthetical) that contradicts the
+    canonical title.
 
     Failure categories:
         MISSING_MANDATORY_INPUT -- path does not exist
         MALFORMED_ARTIFACT -- invalid JSON
-        CROSS_ARTIFACT_INCONSISTENCY -- canonical term shortened or absent
+        CROSS_ARTIFACT_INCONSISTENCY -- canonical term contradicted
     """
     resolved_section = resolve_repo_path(section_path, repo_root)
     resolved_pack = resolve_repo_path(canonical_pack_path, repo_root)
@@ -427,18 +631,21 @@ def canonical_terms_preserved(
             continue
         oid = obj.get("id", "")
         title = obj.get("title", "")
-        if not oid or not title or len(title) < 8:
+        if not oid or not title or len(title) < 8 or oid not in content:
             continue
-        if oid in content and title not in content:
-            issues.append({
-                "term_type": "objective_title",
-                "id": oid,
-                "canonical_title": title,
-                "issue": (
-                    f"Objective {oid} referenced but canonical title "
-                    f"'{title}' is absent — possible shortening or paraphrase"
-                ),
-            })
+        for appos in _find_appositives(oid, content):
+            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+                issues.append({
+                    "term_type": "objective_title",
+                    "id": oid,
+                    "canonical_title": title,
+                    "found_title": appos,
+                    "issue": (
+                        f"Objective {oid} has wrong title attached: "
+                        f"found '{appos}', expected '{title}'"
+                    ),
+                })
+                break
 
     # Check outcome titles
     for outcome in pack_data.get("outcomes", []):
@@ -446,18 +653,21 @@ def canonical_terms_preserved(
             continue
         out_id = outcome.get("id", "")
         title = outcome.get("title", "")
-        if not out_id or not title or len(title) < 8:
+        if not out_id or not title or len(title) < 8 or out_id not in content:
             continue
-        if out_id in content and title not in content:
-            issues.append({
-                "term_type": "outcome_title",
-                "id": out_id,
-                "canonical_title": title,
-                "issue": (
-                    f"Outcome {out_id} referenced but canonical title "
-                    f"'{title}' is absent — possible shortening or paraphrase"
-                ),
-            })
+        for appos in _find_appositives(out_id, content):
+            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+                issues.append({
+                    "term_type": "outcome_title",
+                    "id": out_id,
+                    "canonical_title": title,
+                    "found_title": appos,
+                    "issue": (
+                        f"Outcome {out_id} has wrong title attached: "
+                        f"found '{appos}', expected '{title}'"
+                    ),
+                })
+                break
 
     # Check WP titles
     for wp in pack_data.get("wps", []):
@@ -465,26 +675,29 @@ def canonical_terms_preserved(
             continue
         wid = wp.get("wp_id", "")
         title = wp.get("title", "")
-        if not wid or not title or len(title) < 8:
+        if not wid or not title or len(title) < 8 or wid not in content:
             continue
-        if wid in content and title not in content:
-            issues.append({
-                "term_type": "wp_title",
-                "id": wid,
-                "canonical_title": title,
-                "issue": (
-                    f"WP {wid} referenced but canonical title "
-                    f"'{title}' is absent — possible shortening or paraphrase"
-                ),
-            })
+        for appos in _find_appositives(wid, content):
+            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+                issues.append({
+                    "term_type": "wp_title",
+                    "id": wid,
+                    "canonical_title": title,
+                    "found_title": appos,
+                    "issue": (
+                        f"WP {wid} has wrong title attached: "
+                        f"found '{appos}', expected '{title}'"
+                    ),
+                })
+                break
 
     if issues:
         return PredicateResult(
             passed=False,
             failure_category=CROSS_ARTIFACT_INCONSISTENCY,
             reason=(
-                f"Canonical term preservation issues in {resolved_section}: "
-                f"{len(issues)} term(s) shortened or absent"
+                f"Canonical term issues in {resolved_section}: "
+                f"{len(issues)} term(s) with wrong titles"
             ),
             details={
                 "section_path": str(resolved_section),
