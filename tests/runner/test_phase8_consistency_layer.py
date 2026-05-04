@@ -648,9 +648,9 @@ DRAFTING_SKILLS = [
 ]
 
 SIZE_LIMITS = {
-    "excellence-section-drafting.md": 8_000,
+    "excellence-section-drafting.md": 9_000,
     "impact-section-drafting.md": 8_000,
-    "implementation-section-drafting.md": 10_000,
+    "implementation-section-drafting.md": 10_500,
 }
 
 BANNED_PATTERNS = ["Self-Check", "CCR-"]

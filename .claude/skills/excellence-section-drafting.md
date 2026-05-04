@@ -85,6 +85,16 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
 - Do not cite a deliverable unless its ID, title, parent WP, and due month are present in the source artifact.
 - Keep the output concise and schema-conformant.
 
+### 3a. All-Objectives Enumeration Rule
+
+When the drafted text uses any of the following phrases — "all objectives", "project objectives", "measurable objectives", "all project objectives", "each of the objectives" — or states a numeric objective count (e.g., "seven objectives", "eight measurable objectives"), the section MUST:
+
+1. **Enumerate every objective ID** present in `canonical_reference_pack.json` → `objectives[]`. No objective may be omitted.
+2. **Include all quantitative components** from each objective's `measurable_target` field (e.g., `≥40%`, `≥30%`, `≤5s`). Each numeric threshold with its comparator must appear verbatim in the section content.
+3. **Match the stated count** to the actual number of objectives in the canonical pack. Do not write a numeric count (e.g., "eight objectives") unless it equals `len(canonical_reference_pack.objectives)`.
+
+If the section cannot enumerate all objectives with their full measurable targets within the output size ceiling, do not use all-objectives or count language. Instead, reference objectives individually or by subset.
+
 ### 4. Output Schema
 
 Return JSON conforming to `orch.tier5.excellence_section.v1`:

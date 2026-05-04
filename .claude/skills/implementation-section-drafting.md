@@ -106,6 +106,14 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
 - Do not cite a deliverable unless its ID, title, parent WP, and due month are present in the source artifact.
 - Keep the output concise and schema-conformant.
 
+### 3a. Consortium Numeric Claims Rule
+
+When the drafted text states the number of consortium countries (e.g., "partners from N countries", "N EU Member States"), the count MUST be derived by computing the number of distinct values in `canonical_reference_pack.partners[].country`. Do not guess, assume, or hard-code a country count.
+
+Likewise, when stating the partner count, use `len(canonical_reference_pack.partners)`.
+
+If `canonical_reference_pack.json` is not available or does not contain a `partners` array with `country` fields, do not state a numeric country count — use qualitative language instead (e.g., "partners across multiple EU Member States").
+
 ### 4. Output Schema
 
 Return JSON conforming to `orch.tier5.implementation_section.v1`:

@@ -547,3 +547,197 @@ class TestFingerprintInvalidation:
         assert self.compute("n08a_excellence_drafting", self.repo) == fp_a
         assert self.compute("n08b_impact_drafting", self.repo) == fp_b
         assert self.compute("n08c_implementation_drafting", self.repo) == fp_c
+
+
+# ===========================================================================
+# 7. EXCELLENCE ALL-OBJECTIVES ENUMERATION RULE
+# ===========================================================================
+
+
+class TestExcellenceAllObjectivesRule:
+    """Excellence drafting spec requires full objective enumeration
+    when all-objectives or count language is used."""
+
+    @pytest.fixture(autouse=True)
+    def _load_spec(self) -> None:
+        self.spec = _read_spec(EXCELLENCE_SPEC)
+
+    def test_spec_contains_all_objectives_enumeration_section(self) -> None:
+        """The spec must contain the All-Objectives Enumeration Rule section."""
+        assert "All-Objectives Enumeration Rule" in self.spec
+
+    def test_spec_requires_every_objective_id(self) -> None:
+        """Rule requires enumerating every objective ID from canonical pack."""
+        assert "Enumerate every objective ID" in self.spec
+
+    def test_spec_requires_all_quantitative_components(self) -> None:
+        """Rule requires all quantitative components from measurable_target."""
+        assert "quantitative components" in self.spec
+        assert "measurable_target" in self.spec
+
+    def test_spec_requires_count_matches_actual(self) -> None:
+        """Rule forbids stating a count that doesn't match actual objective count."""
+        assert "len(canonical_reference_pack.objectives)" in self.spec
+
+    def test_spec_forbids_count_without_enumeration(self) -> None:
+        """Spec advises against count language when full enumeration is impossible."""
+        assert "do not use all-objectives or count language" in self.spec
+
+    def test_measurable_targets_predicate_enforces_rule(self) -> None:
+        """The measurable_targets_preserved predicate catches all-objectives
+        claims with missing objective IDs — unchanged from prior behaviour."""
+        from runner.predicates.phase8_section_predicates import measurable_targets_preserved
+
+        pack = {
+            "objectives": [
+                {"id": "OBJ-1", "title": "Engine", "measurable_target": "≥40% improvement"},
+                {"id": "OBJ-2", "title": "Memory", "measurable_target": "≥30% coherence"},
+                {"id": "OBJ-3", "title": "Coordination", "measurable_target": "≥25% completion"},
+            ],
+            "outcomes": [],
+        }
+        section = {
+            "sub_sections": [{
+                "content": (
+                    "The project defines all project objectives. "
+                    "OBJ-1 achieves ≥40% improvement. "
+                    "OBJ-2 achieves ≥30% coherence."
+                    # OBJ-3 intentionally omitted
+                ),
+            }],
+        }
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            _write_json(td_path / "pack.json", pack)
+            _write_json(td_path / "excellence_section.json", section)
+            result = measurable_targets_preserved(
+                "excellence_section.json", "pack.json", repo_root=td_path,
+            )
+        assert not result.passed
+        issues = result.details.get("issues", [])
+        # Must flag OBJ-3 as missing from "all objectives" claim
+        assert any(
+            "OBJ-3" in str(i.get("missing_objective_ids", ""))
+            for i in issues
+        )
+
+    def test_measurable_targets_still_catches_metric_omission(self) -> None:
+        """measurable_targets_preserved still catches missing quantitative
+        components when an objective IS mentioned — unchanged strictness."""
+        from runner.predicates.phase8_section_predicates import measurable_targets_preserved
+
+        pack = {
+            "objectives": [
+                {"id": "OBJ-5", "title": "Manufacturing demo",
+                 "measurable_target": "≥15% defect reduction and ≥10% energy reduction"},
+            ],
+            "outcomes": [],
+        }
+        section = {
+            "sub_sections": [{
+                "content": "OBJ-5 demonstrates significant defect reduction in manufacturing."
+            }],
+        }
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            _write_json(td_path / "pack.json", pack)
+            _write_json(td_path / "excellence_section.json", section)
+            result = measurable_targets_preserved(
+                "excellence_section.json", "pack.json", repo_root=td_path,
+            )
+        assert not result.passed
+        issues = result.details.get("issues", [])
+        assert any(i.get("objective_id") == "OBJ-5" for i in issues)
+
+
+# ===========================================================================
+# 8. IMPLEMENTATION CONSORTIUM NUMERIC CLAIMS RULE
+# ===========================================================================
+
+
+class TestImplementationCountryCountRule:
+    """Implementation drafting spec requires country count derived from
+    canonical_reference_pack, not guessed."""
+
+    @pytest.fixture(autouse=True)
+    def _load_spec(self) -> None:
+        self.spec = _read_spec(IMPLEMENTATION_SPEC)
+
+    def test_spec_contains_consortium_numeric_claims_section(self) -> None:
+        """The spec must contain the Consortium Numeric Claims Rule section."""
+        assert "Consortium Numeric Claims Rule" in self.spec
+
+    def test_spec_requires_distinct_country_derivation(self) -> None:
+        """Rule requires computing distinct country values from partners[].country."""
+        assert "canonical_reference_pack.partners[].country" in self.spec
+
+    def test_spec_requires_partner_count_from_pack(self) -> None:
+        """Rule requires partner count from len(canonical_reference_pack.partners)."""
+        assert "len(canonical_reference_pack.partners)" in self.spec
+
+    def test_spec_forbids_guessing_country_count(self) -> None:
+        """Rule explicitly forbids guessing or hard-coding."""
+        assert "Do not guess" in self.spec or "do not guess" in self.spec.lower()
+
+    def test_spec_has_fallback_for_missing_pack(self) -> None:
+        """Rule provides qualitative fallback when pack is unavailable."""
+        assert "qualitative language" in self.spec
+
+
+# ===========================================================================
+# 9. GATE_10D UNCHANGED
+# ===========================================================================
+
+
+class TestGate10dStillWorks:
+    """Verify gate_10d cross-section consistency predicate is unmodified
+    and still catches real issues."""
+
+    def test_gate_10d_catches_missing_objective(self, tmp_path: Path) -> None:
+        """gate_10d still fails when an objective ID is missing from Excellence."""
+        from runner.predicates.criterion_predicates import cross_section_consistency
+
+        objs = {"objectives": [
+            {"id": "OBJ-1", "title": "Engine", "measurable_target": "≥40%",
+             "target_month": 36, "responsible_partner": "ATU"},
+            {"id": "OBJ-2", "title": "Memory", "measurable_target": "≥30%",
+             "target_month": 36, "responsible_partner": "ATU"},
+        ]}
+        _write_json(tmp_path / "assembled.json", {
+            "schema_id": "orch.tier5.part_b_assembled_draft.v1", "run_id": "t",
+            "sections": [
+                {"section_id": "e", "criterion": "Excellence", "order": 1, "artifact_path": "e.json"},
+                {"section_id": "i", "criterion": "Impact", "order": 2, "artifact_path": "i.json"},
+                {"section_id": "impl", "criterion": "Implementation", "order": 3, "artifact_path": "impl.json"},
+            ], "consistency_log": []})
+        sec = tmp_path / "sections"
+        _write_json(sec / "excellence_section.json", {
+            "schema_id": "orch.tier5.excellence_section.v1", "run_id": "t",
+            "criterion": "Excellence",
+            "sub_sections": [{"sub_section_id": "B.1.1", "title": "M",
+                              "content": "OBJ-1 Engine ≥40%."}]})  # OBJ-2 missing
+        _write_json(sec / "impact_section.json", {
+            "schema_id": "orch.tier5.impact_section.v1", "run_id": "t",
+            "criterion": "Impact",
+            "sub_sections": [{"sub_section_id": "B.2.1", "title": "M",
+                              "content": "OBJ-1 ≥40%. OBJ-2 ≥30%."}],
+            "impact_pathway_refs": [],
+            "dec_coverage": {"dissemination_addressed": True,
+                             "exploitation_addressed": True,
+                             "communication_addressed": True}})
+        _write_json(sec / "implementation_section.json", {
+            "schema_id": "orch.tier5.implementation_section.v1", "run_id": "t",
+            "criterion": "Implementation",
+            "sub_sections": [{"sub_section_id": "B.3.1", "title": "M",
+                              "content": "Impl."}],
+            "wp_table_refs": ["WP1"], "gantt_ref": "g.json",
+            "milestone_refs": ["MS1"], "risk_register_ref": "r.json"})
+        _write_json(tmp_path / "tier3/architecture_inputs/objectives.json", objs)
+        result = cross_section_consistency(
+            "assembled.json", "sections/", "tier3/", repo_root=tmp_path,
+        )
+        assert not result.passed
+        assert any("OBJ-2" in str(i.get("details", ""))
+                   for i in result.details.get("issues", []))
