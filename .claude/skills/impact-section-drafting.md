@@ -85,9 +85,14 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
     Including ≥2 and ≥3 while omitting ≥500 is a violation.
     If full reproduction would make the sentence too long or unnatural, DO NOT
     include any measurable_target metrics at all — use qualitative phrasing instead.
-    Activation: this rule triggers ONLY on explicit objective ID reference or
-    linked outcome ID reference. Do not infer activation from deliverable mentions,
-    partner names, WP names, or domain words.
+    Activation: this rule triggers on:
+    (a) explicit objective ID reference (e.g. OBJ-6), OR
+    (b) linked outcome ID reference (e.g. OUT-6), OR
+    (c) stating quantitative performance targets for a demonstrator WP (WP5,
+        WP6, WP7) or ecosystem WP (WP9) — look up which objective is linked
+        to that WP via canonical_reference_pack.json and apply the all-or-none
+        rule to that objective's full measurable_target.
+    Do not infer activation from partner names or generic domain words alone.
 - 2.6: **Populate impact_pathway_refs** -- array of pathway IDs covered in drafted content.
 - 2.7: **Set dec_coverage** -- each boolean true only if substantively addressed.
 - 2.8: **Build validation_status.** 8-10 aggregated claim_status entries. Each: claim_id, claim_summary, status ("confirmed"/"inferred"), source_ref (max 120 chars). `overall_status` = weakest.
@@ -102,6 +107,17 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
   Allowed: generic statements such as "open access dissemination" or "alignment
   with EU open science practices". If such regulatory claims are not present in
   Tier 2A, Tier 2B, or Tier 3 inputs, they MUST be omitted.
+- 2.12: **Pillar Naming Consistency (CC-09 Prevention):**
+  When describing research pillars adjacent to their WP IDs (e.g. in
+  parenthetical or appositive position), use the canonical WP title from
+  canonical_reference_pack.json, not abbreviated stems. Specifically:
+  - WP2 → "Neuro-Symbolic Planning and Reasoning Engine" (not "neuro-symbolic planning")
+  - WP3 → "Adaptive Memory Architecture" (not "adaptive memory")
+  - WP4 → "Decentralised Multi-Agent Coordination" (not "multi-agent coordination")
+  When a WP ID appears in parenthetical or appositive position, the
+  accompanying descriptive label must include the canonical component keywords
+  (engine, architecture, decentralised). Short references without a WP ID
+  are acceptable in flowing prose.
 
 ### 3. Canonical Copying Rules
 
@@ -111,6 +127,11 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
 - Do not infer ownership. If ownership or relationship is unclear, omit the claim.
 - Do not cite a deliverable unless its ID, title, parent WP, and due month are present in the source artifact.
 - Keep the output concise and schema-conformant.
+- **Partner Naming Form Consistency (CC-03 Prevention):** Within each
+  sub-section, use ONE naming form consistently: either all short names
+  (e.g. ATU, BIIS, CERIA) or all paired notation (legal_name (short_name)).
+  Do not mix short names and full legal names within the same sub-section
+  without explicit pairing. Prefer short-name-only form for conciseness.
 
 ### 4. Output Schema
 
