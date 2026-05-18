@@ -1,0 +1,236 @@
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0ff',
+    'primaryBorderColor': '#7c3aed',
+    'lineColor': '#a78bfa',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'edgeLabelBackground': '#1a1a2e',
+    'clusterBkg': '#0d1117',
+    'clusterBorder': '#30363d'
+  },
+  'flowchart': { 'curve': 'basis', 'padding': 16, 'nodeSpacing': 25, 'rankSpacing': 40 }
+}}%%
+
+%% ═══════════════════════════════════════════════
+%%  AGENTS & SKILLS — Phase Mapping
+%% ═══════════════════════════════════════════════
+
+flowchart LR
+
+  %% ══════════════════════════
+  %% AGENTS (left column)
+  %% ══════════════════════════
+  subgraph AGENTS["<b>AGENTS</b> &nbsp; .claude/agents/ &nbsp; (22 specs)"]
+    direction TB
+
+    subgraph AG1["<b>Phase 1-2</b> Analysis & Alignment"]
+      A_CALL["call_analyzer"]
+      A_INST["instrument_schema_resolver"]
+      A_CONC["concept_refiner"]
+    end
+
+    subgraph AG3["<b>Phase 3</b> WP Design"]
+      A_WP["wp_designer"]
+      A_DEP["dependency_mapper<br/><i>(sub-agent)</i>"]
+    end
+
+    subgraph AG4["<b>Phase 4</b> Timeline"]
+      A_GANTT["gantt_designer"]
+    end
+
+    subgraph AG5["<b>Phase 5</b> Impact"]
+      A_IMPACT["impact_architect"]
+    end
+
+    subgraph AG6["<b>Phase 6</b> Implementation"]
+      A_IMPL["implementation_architect"]
+    end
+
+    subgraph AG7["<b>Phase 7</b> Budget"]
+      A_BUDV["budget_gate_validator"]
+      A_BUDI["budget_interface_coordinator"]
+    end
+
+    subgraph AG8["<b>Phase 8</b> Drafting & Review"]
+      A_EXC["excellence_writer"]
+      A_IMP["impact_writer"]
+      A_IMW["implementation_writer"]
+      A_INT["proposal_integrator"]
+      A_EVL["evaluator_reviewer"]
+      A_REV["revision_integrator"]
+    end
+
+    subgraph AGX["<b>Cross-Cutting</b>"]
+      A_COMP["compliance_validator"]
+      A_TRAC["traceability_auditor"]
+      A_STAT["state_recorder"]
+      A_NODE["node_body_contract"]
+      A_PROP["proposal_writer"]
+      A_VCHK["validation_checklist"]
+    end
+  end
+
+  %% ══════════════════════════
+  %% SKILLS (right column)
+  %% ══════════════════════════
+  subgraph SKILLS["<b>SKILLS</b> &nbsp; .claude/skills/ &nbsp; (30 specs)"]
+    direction TB
+
+    subgraph TAPM["<b>TAPM Mode</b><br/><i>Claude reads from disk via --tools Read,Glob</i>"]
+      S_CREQ["call-requirements-extraction"]
+      S_IPC["impact-pathway-core-builder"]
+      S_IDE["impact-dec-enricher"]
+      S_DEC["dissemination-exploitation-<br/>communication-check"]
+      S_GOV["governance-model-builder"]
+      S_RSK["risk-register-builder"]
+      S_EXD["excellence-section-drafting"]
+      S_IMD["impact-section-drafting"]
+      S_ISD["implementation-section-drafting"]
+    end
+
+    subgraph CLIP["<b>cli-prompt Mode</b><br/><i>Inputs serialized into stdin</i>"]
+      S_GSB["gantt-schedule-builder"]
+      S_MSC["milestone-consistency-check"]
+      S_DLU["decision-log-update"]
+      S_BIV["budget-interface-validation"]
+      S_CCB["concept-call-binding-derivation"]
+      S_CAC["concept-alignment-check"]
+      S_EMB["evaluation-matrix-builder"]
+      S_ISN["instrument-schema-normalization"]
+      S_TSC["topic-scope-check"]
+      S_WDA["wp-dependency-analysis"]
+      S_WPN["work-package-normalization"]
+    end
+
+    subgraph REVIEW["<b>Review & Validation</b>"]
+      S_CCC["constitutional-compliance-check"]
+      S_CSC["cross-section-consistency-check"]
+      S_ECR["evaluator-criteria-review"]
+      S_PST["proposal-section-traceability-check"]
+      S_PSD["proposal-section-drafting"]
+      S_GEN["gate-enforcement"]
+      S_CKP["checkpoint-publish"]
+    end
+
+    subgraph META["<b>Meta / Legacy</b>"]
+      S_SRC["skill_runtime_contract"]
+      S_VAL["validation_checklist"]
+      S_IPM["impact-pathway-mapper<br/><i>(legacy)</i>"]
+    end
+  end
+
+  %% ══════════════════════════
+  %% Agent-to-Skill connections
+  %% ══════════════════════════
+  A_CALL -->|"invokes"| S_CREQ
+  A_CALL -->|"invokes"| S_TSC
+  A_CALL -->|"invokes"| S_EMB
+  A_CALL -->|"invokes"| S_ISN
+
+  A_CONC -->|"invokes"| S_CCB
+  A_CONC -->|"invokes"| S_CAC
+
+  A_WP -->|"invokes"| S_WPN
+  A_DEP -->|"invokes"| S_WDA
+
+  A_GANTT -->|"invokes"| S_GSB
+  A_GANTT -->|"invokes"| S_MSC
+
+  A_IMPACT -->|"invokes"| S_IPC
+  A_IMPACT -->|"invokes"| S_IDE
+  A_IMPACT -->|"invokes"| S_DEC
+
+  A_IMPL -->|"invokes"| S_GOV
+  A_IMPL -->|"invokes"| S_RSK
+
+  A_BUDV -->|"invokes"| S_BIV
+
+  A_EXC -->|"invokes"| S_EXD
+  A_IMP -->|"invokes"| S_IMD
+  A_IMW -->|"invokes"| S_ISD
+  A_INT -->|"invokes"| S_CSC
+  A_EVL -->|"invokes"| S_ECR
+  A_REV -->|"invokes"| S_CKP
+
+  %% ── Styles ──
+  style AGENTS fill:#0d1117,stroke:#f59e0b,stroke-width:2px,color:#fde68a
+  style SKILLS fill:#0d1117,stroke:#06b6d4,stroke-width:2px,color:#a5f3fc
+
+  style AG1 fill:#0d1117,stroke:#60a5fa,stroke-width:1px,color:#93c5fd
+  style AG3 fill:#0d1117,stroke:#60a5fa,stroke-width:1px,color:#93c5fd
+  style AG4 fill:#0d1117,stroke:#818cf8,stroke-width:1px,color:#c4b5fd
+  style AG5 fill:#0d1117,stroke:#818cf8,stroke-width:1px,color:#c4b5fd
+  style AG6 fill:#0d1117,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style AG7 fill:#0d1117,stroke:#f87171,stroke-width:1px,color:#fecaca
+  style AG8 fill:#0d1117,stroke:#4ade80,stroke-width:1px,color:#bbf7d0
+  style AGX fill:#0d1117,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+
+  style TAPM fill:#0d1117,stroke:#7c3aed,stroke-width:1px,color:#c4b5fd
+  style CLIP fill:#0d1117,stroke:#3b82f6,stroke-width:1px,color:#93c5fd
+  style REVIEW fill:#0d1117,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style META fill:#0d1117,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+
+  %% Agent node styles
+  style A_CALL fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style A_INST fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style A_CONC fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style A_WP fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style A_DEP fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style A_GANTT fill:#1e3a5f,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  style A_IMPACT fill:#1e3a5f,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  style A_IMPL fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style A_BUDV fill:#7f1d1d,stroke:#f87171,stroke-width:1px,color:#fecaca
+  style A_BUDI fill:#7f1d1d,stroke:#f87171,stroke-width:1px,color:#fecaca
+  style A_EXC fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_IMP fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_IMW fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_INT fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_EVL fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_REV fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style A_COMP fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style A_TRAC fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style A_STAT fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style A_NODE fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style A_PROP fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style A_VCHK fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+
+  %% Skill node styles — TAPM
+  style S_CREQ fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_IPC fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_IDE fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_DEC fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_GOV fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_RSK fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_EXD fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_IMD fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style S_ISD fill:#2d1b69,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+
+  %% Skill node styles — cli-prompt
+  style S_GSB fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_MSC fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_DLU fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_BIV fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_CCB fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_CAC fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_EMB fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_ISN fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_TSC fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_WDA fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+  style S_WPN fill:#1e3a5f,stroke:#3b82f6,stroke-width:1px,color:#bfdbfe
+
+  %% Skill node styles — review
+  style S_CCC fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_CSC fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_ECR fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_PST fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_PSD fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_GEN fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style S_CKP fill:#422006,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+
+  %% Skill node styles — meta
+  style S_SRC fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style S_VAL fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style S_IPM fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af

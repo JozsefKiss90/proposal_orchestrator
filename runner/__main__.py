@@ -121,6 +121,17 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="Emit progress as JSON lines to stdout.",
     )
     parser.add_argument(
+        "--preseed-phase8-sections",
+        action="store_true",
+        default=False,
+        help=(
+            "When set, copy manually prepared Phase 8 section artifacts "
+            "from docs/tier4_orchestration_state/preseed/phase8/ into "
+            "canonical Tier 5 paths, skipping only the primary drafting "
+            "skill.  Audit skills and gates still execute normally."
+        ),
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="Enable detailed scheduler logging to stderr.",
@@ -261,6 +272,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         library_path=library_path,
         manifest_path=manifest_path,
         phase=args.phase,
+        preseed_phase8_sections=args.preseed_phase8_sections,
     )
 
     try:

@@ -1,0 +1,182 @@
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0ff',
+    'primaryBorderColor': '#7c3aed',
+    'lineColor': '#a78bfa',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'edgeLabelBackground': '#1a1a2e',
+    'clusterBkg': '#0d1117',
+    'clusterBorder': '#30363d'
+  },
+  'flowchart': { 'curve': 'basis', 'padding': 16, 'nodeSpacing': 30, 'rankSpacing': 40 }
+}}%%
+
+%% ═══════════════════════════════════════════════
+%%  RUNTIME EXECUTION STACK & NODE DISPATCH
+%% ═══════════════════════════════════════════════
+
+flowchart TB
+
+  %% ══════════════════════════════════════
+  %% LEFT SIDE: 3-Layer Call Stack
+  %% ══════════════════════════════════════
+  subgraph STACK["<b>3-LAYER RUNTIME STACK</b> &nbsp; runner/"]
+    direction TB
+
+    subgraph L0["<b>CLI Entry Point</b>"]
+      MAIN["<b>__main__.py</b><br/>python -m runner --run-id UUID<br/>--phase N --dry-run --json --verbose"]
+    end
+
+    subgraph STEP0["<b>Step 0: Call Slicer</b> (deterministic, pre-DAG)"]
+      SLICER["<b>call_slicer.py</b><br/>Extracts target call from grouped WP JSONs<br/>Produces *.slice.json (~5-8KB)<br/>Runs once, before any node dispatch"]
+    end
+
+    subgraph L1["<b>Layer 1: DAG Scheduler</b>"]
+      direction LR
+      SCHED["<b>dag_scheduler.py</b><br/>ManifestGraph<br/>Topological dispatch<br/>RunSummary"]
+      GEVAL["<b>gate_evaluator.py</b><br/>Predicate evaluation<br/>deterministic-first"]
+      RCTX["<b>run_context.py</b><br/>State persistence"]
+      MREAD["<b>manifest_reader.py</b>"]
+      GLIB["<b>gate_library.py</b>"]
+      GREG["<b>gate_result_registry.py</b><br/>Upstream bootstrap"]
+    end
+
+    subgraph L2["<b>Layer 2: Agent Runtime</b>"]
+      direction LR
+      AGRT["<b>agent_runtime.py</b><br/>Orchestration adapter<br/>Skill sequencing<br/>Failure propagation<br/>can_evaluate_exit_gate"]
+      DNORM["<b>dependency_normalizer.py</b><br/>Phase 4 pre-agent<br/>Pure Python"]
+      P8P["<b>phase8_canonical_pack.py</b><br/>Reference pack assembly"]
+      P8R["<b>phase8_reuse.py</b><br/>Reuse tracking"]
+      UPIN["<b>upstream_inputs.py</b><br/>Input resolution"]
+    end
+
+    subgraph L3["<b>Layer 3: Skill Runtime</b>"]
+      direction LR
+      SKRT["<b>skill_runtime.py</b><br/>Prompt assembly<br/>Schema validation<br/>Atomic writes"]
+      CLTR["<b>claude_transport.py</b><br/>TAPM: --tools Read,Glob<br/>cli-prompt: stdin pipe"]
+      SDISP["<b>semantic_dispatch.py</b><br/>Semantic predicates"]
+    end
+
+    subgraph PRED["<b>Predicate Modules</b> &nbsp; runner/predicates/"]
+      direction LR
+      PF["file"]
+      PS["schema"]
+      PC["coverage"]
+      PSC["scope"]
+      PCY["cycle"]
+      PT["timeline"]
+      PG["gate_pass"]
+      PCR["criterion"]
+      PP8["phase8"]
+      PSR["source_ref"]
+    end
+
+    MAIN --> SLICER
+    SLICER --> SCHED
+    SCHED -->|"dispatches nodes"| AGRT
+    SCHED -->|"evaluates gates"| GEVAL
+    AGRT -->|"invokes skills"| SKRT
+    SKRT -->|"calls Claude"| CLTR
+    GEVAL -->|"semantic checks"| SDISP
+    SDISP -->|"calls Claude"| CLTR
+    GEVAL --- PRED
+  end
+
+  %% ══════════════════════════════════════
+  %% RIGHT SIDE: Node Dispatch Contract
+  %% ══════════════════════════════════════
+  subgraph CONTRACT["<b>5-STEP NODE DISPATCH CONTRACT</b>"]
+    direction TB
+
+    S1["<b>1. SET RUNNING</b><br/>Persist to RunContext"]
+    S2{"<b>2. ENTRY GATE</b><br/>Evaluate"}
+    S3["<b>3. EXECUTE BODY</b><br/>run_agent &rarr; run_skill &rarr; Claude"]
+    S4{"<b>4. EXIT GATE</b><br/>Evaluate"}
+    S5["<b>5. RETURN RESULT</b><br/>NodeExecutionResult"]
+
+    RELEASED["RELEASED"]
+    BLOCKED_E["blocked_at_entry"]
+    BLOCKED_B["blocked_at_exit<br/><i>origin: agent_body</i>"]
+    BLOCKED_G["blocked_at_exit<br/><i>origin: exit_gate</i>"]
+
+    S1 --> S2
+    S2 -->|"PASS"| S3
+    S2 -->|"FAIL"| BLOCKED_E
+    S3 -->|"success +<br/>can_eval = true"| S4
+    S3 -->|"failure or<br/>can_eval = false"| BLOCKED_B
+    S4 -->|"PASS"| S5
+    S4 -->|"FAIL"| BLOCKED_G
+    S5 --> RELEASED
+  end
+
+  %% ══════════════════════════════════════
+  %% BOTTOM: Runtime Models
+  %% ══════════════════════════════════════
+  subgraph MODELS["<b>RUNTIME CONTRACTS</b> &nbsp; runtime_models.py"]
+    direction LR
+
+    SK_RES["<b>SkillResult</b><br/>status, outputs_written<br/>failure_reason<br/>failure_category:<br/>MISSING_INPUT |<br/>MALFORMED_ARTIFACT |<br/>CONSTRAINT_VIOLATION |<br/>INCOMPLETE_OUTPUT |<br/>CONSTITUTIONAL_HALT"]
+
+    AG_RES["<b>AgentResult</b><br/>status<br/>can_evaluate_exit_gate<br/>failure_origin: agent_body<br/>invoked_skills[]"]
+
+    NE_RES["<b>NodeExecutionResult</b><br/>node_id, final_state<br/>failure_origin:<br/>entry_gate | agent_body |<br/>exit_gate | null<br/>exit_gate_evaluated"]
+
+    SK_RES ~~~ AG_RES ~~~ NE_RES
+  end
+
+  %% ── Styles ──
+  style STACK fill:#0d1117,stroke:#60a5fa,stroke-width:2px,color:#c9d1d9
+  style CONTRACT fill:#0d1117,stroke:#8b5cf6,stroke-width:2px,color:#c9d1d9
+  style MODELS fill:#0d1117,stroke:#f59e0b,stroke-width:2px,color:#c9d1d9
+
+  style L0 fill:#0d1117,stroke:#30363d,stroke-width:1px,color:#8b949e
+  style STEP0 fill:#0d1117,stroke:#f59e0b,stroke-width:1px,color:#fde68a
+  style L1 fill:#0d1117,stroke:#60a5fa,stroke-width:1px,color:#93c5fd
+  style L2 fill:#0d1117,stroke:#4ade80,stroke-width:1px,color:#bbf7d0
+  style L3 fill:#0d1117,stroke:#818cf8,stroke-width:1px,color:#c4b5fd
+  style PRED fill:#0d1117,stroke:#30363d,stroke-width:1px,color:#8b949e
+
+  style MAIN fill:#1a1a2e,stroke:#7c3aed,stroke-width:2px,color:#e0e0ff
+  style SLICER fill:#1a1a2e,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
+  style SCHED fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style GEVAL fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style RCTX fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style MREAD fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style GLIB fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style GREG fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style AGRT fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style DNORM fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style P8P fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style P8R fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style UPIN fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style SKRT fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style CLTR fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  style SDISP fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+
+  style S1 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style S2 fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style S3 fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style S4 fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style S5 fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style RELEASED fill:#052e16,stroke:#22c55e,stroke-width:3px,color:#bbf7d0
+  style BLOCKED_E fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+  style BLOCKED_B fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+  style BLOCKED_G fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+
+  style SK_RES fill:#1a1a2e,stroke:#06b6d4,stroke-width:1px,color:#a5f3fc
+  style AG_RES fill:#1a1a2e,stroke:#4ade80,stroke-width:1px,color:#bbf7d0
+  style NE_RES fill:#1a1a2e,stroke:#818cf8,stroke-width:1px,color:#c4b5fd
+
+  style PF fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PS fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PC fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PSC fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PCY fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PT fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PG fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PCR fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PP8 fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af
+  style PSR fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#9ca3af

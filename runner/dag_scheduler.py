@@ -91,6 +91,11 @@ from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
+from runner.phase8_preseed import (
+    PRESEED_NODE_CONFIG,
+    Phase8PreseedResult,
+    maybe_apply_phase8_preseed,
+)
 from runner.phase8_reuse import (
     REUSE_ELIGIBLE_NODES,
     REUSE_SKIP_SKILLS,
@@ -1149,6 +1154,7 @@ class DAGScheduler:
         library_path: Optional[Path] = None,
         manifest_path: Optional[Path] = None,
         phase: Optional[int] = None,
+        preseed_phase8_sections: bool = False,
     ) -> None:
         self.graph: ManifestGraph = graph
         self.ctx: RunContext = ctx
@@ -1157,6 +1163,9 @@ class DAGScheduler:
         self.manifest_path: Optional[Path] = manifest_path
         #: Phase scope: when set, only nodes with this phase_number are dispatched.
         self._phase_scope: Optional[int] = phase
+        #: When True, manually prepared preseed artifacts take precedence
+        #: over both reuse and LLM drafting for n08a/n08b/n08c.
+        self._preseed_phase8_sections: bool = preseed_phase8_sections
         #: Accumulates every gate ID passed to evaluate_gate() during run().
         #: Populated by _dispatch_node() and consumed by RunSummary.build().
         self._evaluated_gates: list[str] = []
@@ -1566,6 +1575,50 @@ class DAGScheduler:
                     failure_category="MISSING_INPUT",
                 )
 
+        # ── Step 2.45: Phase 8 manual preseed (n08a/n08b/n08c only) ──
+        #
+        # When --preseed-phase8-sections is active, check for manually
+        # prepared section artifacts before reuse or LLM drafting.
+        # Preseed takes precedence over reuse when both are available.
+        # If the preseed file exists but is invalid, block the node.
+        _preseed_skip_skills: list[str] | None = None
+        if self._preseed_phase8_sections and node_id in PRESEED_NODE_CONFIG:
+            preseed_result = maybe_apply_phase8_preseed(
+                self.repo_root, self.ctx.run_id, node_id,
+            )
+            if preseed_result.error:
+                # Preseed file exists but is invalid — block the node.
+                _fail_reason = (
+                    f"Preseed validation failed for {node_id!r}: "
+                    f"{preseed_result.reason}"
+                )
+                log.error("  [%s] %s", node_id, _fail_reason)
+                self.ctx.set_node_state(
+                    node_id,
+                    "blocked_at_exit",
+                    failure_origin="preseed",
+                    exit_gate_evaluated=False,
+                    failure_reason=_fail_reason,
+                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
+                )
+                self.ctx.save()
+                return NodeExecutionResult(
+                    node_id=node_id,
+                    final_state="blocked_at_exit",
+                    exit_gate_evaluated=False,
+                    failure_origin="preseed",
+                    gate_result=None,
+                    agent_result=None,
+                    failure_reason=_fail_reason,
+                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
+                )
+            if preseed_result.applied:
+                log.info(
+                    "  [%s] PRESEED: drafting skipped, audit skills executing",
+                    node_id,
+                )
+                _preseed_skip_skills = [preseed_result.skipped_skill_id]
+
         # ── Step 2.5: Phase 8 reuse check (n08a/n08b/n08c only) ──────
         #
         # If the node is a Phase 8 section drafting node and a valid
@@ -1574,7 +1627,7 @@ class DAGScheduler:
         # check) so that gate predicates have current-run evidence.
         # The exit gate is always re-evaluated in the current run.
         _reuse_skip_skills: list[str] | None = None
-        if node_id in REUSE_ELIGIBLE_NODES:
+        if node_id in REUSE_ELIGIBLE_NODES and _preseed_skip_skills is None:
             fp = compute_input_fingerprint(node_id, self.repo_root)
             decision = validate_reuse_candidate(
                 node_id, self.repo_root, current_fingerprint=fp,
@@ -1648,7 +1701,7 @@ class DAGScheduler:
             phase_id=phase_id,
             sub_agent_id=sub_agent_id,
             pre_gate_agent_id=pre_gate_agent_id,
-            skip_skills=_reuse_skip_skills,
+            skip_skills=_preseed_skip_skills or _reuse_skip_skills,
         )
         log.info(
             "  [%s] agent result: status=%s  can_evaluate_exit=%s",

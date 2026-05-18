@@ -95,6 +95,18 @@ When the drafted text uses any of the following phrases — "all objectives", "p
 
 If the section cannot enumerate all objectives with their full measurable targets within the output size ceiling, do not use all-objectives or count language. Instead, reference objectives individually or by subset.
 
+### 3b. MAESTRO Hard Guardrail for OBJ-7 (CC-01 Prevention)
+
+For this MAESTRO run, OBJ-7 MUST NOT be summarized without its full quantified adoption target. Whenever drafting OBJ-7, "Open framework release and ecosystem contribution", include all of the following in the same OBJ-7 sentence or immediately adjacent clause:
+
+- open-source release
+- ≥500 GitHub stars within 6 months of release
+- AI-on-demand platform contribution
+- validation through ≥2 TEFs
+- technology transfer through ≥3 EDIHs
+
+Forbidden pattern: mentioning open-source release, AI-on-demand platform contribution, ≥2 TEFs, or ≥3 EDIHs while omitting ≥500 GitHub stars within 6 months of release. If space is tight, keep the full OBJ-7 bundle and compress another objective instead.
+
 ### 4. Output Schema
 
 Return JSON conforming to `orch.tier5.excellence_section.v1`:

@@ -1,0 +1,114 @@
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0ff',
+    'primaryBorderColor': '#7c3aed',
+    'lineColor': '#a78bfa',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'edgeLabelBackground': '#1a1a2e',
+    'clusterBkg': '#0d1117',
+    'clusterBorder': '#30363d'
+  },
+  'flowchart': { 'curve': 'basis', 'padding': 16, 'nodeSpacing': 30, 'rankSpacing': 45 }
+}}%%
+
+%% ═══════════════════════════════════════════════
+%%  DAG EXECUTION FLOW — 8 Phases, 13 Nodes, 11 Gates
+%% ═══════════════════════════════════════════════
+
+flowchart LR
+
+  %% ── Phase 1: Call Analysis ──
+  subgraph P1["<b>PHASE 1</b><br/>Call Analysis"]
+    n01(["<b>n01_call_analysis</b><br/>call_analyzer agent<br/><i>Skills:</i> call-requirements-extraction,<br/>topic-scope-check,<br/>evaluation-matrix-builder,<br/>instrument-schema-normalization"])
+  end
+
+  %% ── Phase 2: Concept Refinement ──
+  subgraph P2["<b>PHASE 2</b><br/>Concept Refinement"]
+    n02(["<b>n02_concept_refinement</b><br/>concept_refiner agent<br/><i>Skills:</i> concept-call-binding-derivation,<br/>concept-alignment-check"])
+  end
+
+  %% ── Phase 3: WP Design ──
+  subgraph P3["<b>PHASE 3</b><br/>WP Design & Dependencies"]
+    n03(["<b>n03_wp_design</b><br/>wp_designer + dependency_mapper<br/><i>Skills:</i> work-package-normalization,<br/>wp-dependency-analysis"])
+  end
+
+  %% ── Phase 4: Gantt & Milestones ──
+  subgraph P4["<b>PHASE 4</b><br/>Gantt & Milestones"]
+    n04(["<b>n04_gantt_milestones</b><br/>gantt_designer agent<br/><i>Pre-agent:</i> dependency_normalizer.py<br/><i>Skills:</i> gantt-schedule-builder,<br/>milestone-consistency-check"])
+  end
+
+  %% ── Phase 5: Impact Architecture ──
+  subgraph P5["<b>PHASE 5</b><br/>Impact Architecture"]
+    n05(["<b>n05_impact_architecture</b><br/>impact_architect agent<br/><i>Skills:</i> impact-pathway-core-builder,<br/>impact-dec-enricher,<br/>dissemination-exploitation-<br/>communication-check"])
+  end
+
+  %% ── Phase 6: Implementation ──
+  subgraph P6["<b>PHASE 6</b><br/>Implementation Architecture"]
+    n06(["<b>n06_implementation_arch</b><br/>implementation_architect agent<br/><i>Skills:</i> governance-model-builder,<br/>risk-register-builder,<br/>milestone-consistency-check"])
+  end
+
+  %% ── Phase 7: Budget Gate ──
+  subgraph P7["<b>PHASE 7</b><br/>Budget Gate"]
+    n07(["<b>n07_budget_gate</b><br/>budget_gate_validator +<br/>budget_interface_coordinator<br/><i>Skills:</i> budget-interface-validation"])
+  end
+
+  %% ── Phase 8: Drafting & Review ──
+  subgraph P8["<b>PHASE 8</b> — Drafting & Review"]
+    direction TB
+
+    subgraph P8_DRAFT["Parallel Criterion-Aligned Drafting"]
+      direction LR
+      n08a(["<b>n08a</b><br/>Excellence<br/>Drafting"])
+      n08b(["<b>n08b</b><br/>Impact<br/>Drafting"])
+      n08c(["<b>n08c</b><br/>Implementation<br/>Drafting"])
+    end
+
+    n08d(["<b>n08d</b><br/>Assembly &<br/>Consistency Check"])
+    n08e(["<b>n08e</b><br/>Evaluator<br/>Review"])
+    n08f(["<b>n08f</b><br/>Revision &<br/>Final Export<br/><i>(terminal node)</i>"])
+
+    n08a -->|"gate_10a"| n08d
+    n08b -->|"gate_10b"| n08d
+    n08c -->|"gate_10c"| n08d
+    n08d -->|"gate_10d"| n08e
+    n08e -->|"gate_11"| n08f
+  end
+
+  %% ── Phase-to-phase connections ──
+  n01 ==>|"gate_01_source_integrity<br/>+ phase_01_gate"| n02
+  n02 ==>|"phase_02_gate"| n03
+  n03 ==>|"phase_03_gate"| n04
+  n03 ==>|"phase_03_gate"| n05
+  n04 ==>|"phase_04_gate"| n06
+  n05 ==>|"phase_05_gate"| n06
+  n06 ==>|"phase_06_gate"| n07
+  n07 ==>|"gate_09_budget_consistency<br/>MANDATORY — BYPASS PROHIBITED"| P8_DRAFT
+
+  %% ── Styles ──
+  style P1 fill:#0d1117,stroke:#60a5fa,stroke-width:2px,color:#93c5fd
+  style P2 fill:#0d1117,stroke:#60a5fa,stroke-width:2px,color:#93c5fd
+  style P3 fill:#0d1117,stroke:#60a5fa,stroke-width:2px,color:#93c5fd
+  style P4 fill:#0d1117,stroke:#818cf8,stroke-width:2px,color:#c4b5fd
+  style P5 fill:#0d1117,stroke:#818cf8,stroke-width:2px,color:#c4b5fd
+  style P6 fill:#0d1117,stroke:#f59e0b,stroke-width:2px,color:#fde68a
+  style P7 fill:#1c1917,stroke:#f87171,stroke-width:3px,color:#fecaca
+  style P8 fill:#0d1117,stroke:#4ade80,stroke-width:2px,color:#bbf7d0
+  style P8_DRAFT fill:#071a0e,stroke:#22c55e,stroke-width:1px,color:#bbf7d0
+
+  style n01 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n02 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n03 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n04 fill:#1e3a5f,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style n05 fill:#1e3a5f,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style n06 fill:#422006,stroke:#f59e0b,stroke-width:2px,color:#fde68a
+  style n07 fill:#7f1d1d,stroke:#f87171,stroke-width:3px,color:#fecaca
+
+  style n08a fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08b fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08c fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08d fill:#14532d,stroke:#34d399,stroke-width:2px,color:#d1fae5
+  style n08e fill:#14532d,stroke:#34d399,stroke-width:2px,color:#d1fae5
+  style n08f fill:#052e16,stroke:#22c55e,stroke-width:3px,color:#bbf7d0

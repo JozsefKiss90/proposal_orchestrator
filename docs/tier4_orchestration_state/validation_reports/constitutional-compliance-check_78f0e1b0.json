@@ -1,0 +1,106 @@
+{
+  "report_id": "compliance_check_part_b_assembled_draft_proposal_integrator_2026-05-05T000000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "78f0e1b0-5611-45d8-9402-31d2f58637d8",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Grant Agreement Annex templates must not be used as the governing structural schema for proposal writing; application form templates (Tier 2A) govern proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "Artifact schema_id is 'orch.tier5.part_b_assembled_draft.v1' — an internal orchestration schema, not an AGA or Model Grant Agreement Annex schema. No occurrences of 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as structural authority appear anywhere in the artifact's content, section definitions, or traceability footer."
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents must not be invented.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "This artifact is an assembled draft index with cross-section consistency checks. It does not directly assert call requirements, scope boundaries, eligibility conditions, or expected outcomes/impacts in its own content. The consistency_log entries address internal cross-section metric completeness (CC-01, CC-06) and structural consistency (CC-02 through CC-12), none of which constitute invented call constraints. No Tier 2B source references are required for this artifact's own content, which adds only section index structure and consistency findings per its derivation_note."
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3 must not be invented.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "The artifact references specific project facts: objective IDs OBJ-1 through OBJ-8; partner short names ELI and CERIA (CC-06 inconsistency_note); system names BAL, AI-on-demand platform, TEFs, EDIHs (CC-01 inconsistency_note); quantified targets (≥2 TEFs, ≥3 EDIHs, ≥500 GitHub stars, ≥20%, ≥15%, ≥25% improvement, ≥5 heterogeneous agents). The traceability_footer.primary_sources includes 'docs/tier3_project_instantiation/architecture_inputs/objectives.json' and 'docs/tier3_project_instantiation/consortium/partners.json', providing Tier 3 provenance for objective-derived and partner-derived project facts. Individual consistency checks referencing objectives (CC-01, CC-06, CC-09) also carry 'docs/tier3_project_instantiation/architecture_inputs/objectives.json' in their source_refs. CC-03 ('partner name consistency') carries 'docs/tier3_project_instantiation/consortium/partners.json' in its source_refs. All identifiable project facts are traced to Tier 3."
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "No Phase 8 activity — including preparatory drafting — may commence before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "This is a Tier 5 Phase 8 artifact (schema_id 'orch.tier5.part_b_assembled_draft.v1'). The budget gate file 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json' is outside declared TAPM input boundaries and cannot be read directly. However, CC-08 ('Budget and resource claim consistency') lists this file in its source_refs with status 'consistent', providing indirect evidence the budget gate assessment was present and consulted during assembly. Scanning the artifact content for budget figure patterns (€[0-9]+, [0-9]+ EUR, [0-9]+ person-months as confirmed values): none present. The assembled draft does not introduce budget figures. Budget gate presence inferred from CC-08 source_ref; direct verification of gate_pass_declaration value is not possible within declared input boundary."
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Durable decisions must not be stored only in agent memory without being written to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level checks. This prohibition governs agent execution process (whether decisions are written to docs/tier4_orchestration_state/decision_log/ vs. held in memory). It cannot be verified by reading an artifact. Enforced by the decision-log-update skill. Recorded as pass per skill specification §2 check 13.5 guidance.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "A workflow or skill must not become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level checks. This prohibition governs workflow and skill scope during execution, not the content of a produced artifact. It cannot be assessed by reading a phase output or deliverable. Recorded as pass per skill specification §2 check 13.6 guidance.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Phases must not be silently reordered and gate conditions must not be weakened to allow workflow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "The assembled draft (Phase 8 artifact) references phase outputs exclusively from earlier phases: phase3_wp_design (CC-04 source_ref, traceability_footer), phase5_impact_architecture (CC-06 source_ref, traceability_footer), and phase7_budget_gate (CC-08 source_ref, traceability_footer). All upstream phase references are from phases preceding Phase 8 in canonical sequence. No reference to outputs from phases beyond the current artifact's phase is present. The section ordering (Excellence=1, Impact=2, Implementation=3) matches canonical Part B structure per CC-10. No phase reordering or gate weakening evidence detected."
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Proposal text must not be finalized when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "Two inconsistencies are explicitly flagged in the consistency_log: CC-01 (status 'inconsistency_flagged') documents partial metric representation for OBJ-7 in the Excellence section — the '≥500 GitHub stars within 6 months of release' metric from Tier 3 OBJ-7.measurable_target is absent from the Excellence B.1.1 enumeration. CC-06 (status 'inconsistency_flagged') documents partial metric loss for OBJ-6 (≥20% disruption recovery and ≥15% delivery schedule adherence both absent from Impact B.2.1) and OBJ-3 (two of three quantified targets absent from Impact B.2.1 EO-02/CERIA pathway). Both entries have detailed inconsistency_notes and populated source_refs. The traceability_footer.no_unsupported_claims_declaration is explicitly false, honestly acknowledging incomplete coverage. The artifact does not suppress or silently resolve known incompleteness. However, this skill's input boundary does not permit reading the individual section files (excellence_section.json, impact_section.json) to verify whether the flagged gaps are also marked in section content with [DATA REQUIRED:] or INCOMPLETE: language; section-level flagging verification is beyond this skill's declared input scope."
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Agent-local knowledge of Horizon Europe programme rules must not substitute for reading Tier 1 source documents when those documents are present and accessible.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "This assembled draft index does not directly assert claims about Horizon Europe legal rules, participation conditions, grant agreement terms, or financial regulation in its own content. Section labels ('Excellence', 'Impact', 'Quality and efficiency of the implementation') are evaluation criterion names functioning as structural labels, not regulatory assertions requiring Tier 1 sourcing. The traceability_footer.primary_sources contains no Tier 1 references; none are required for an artifact whose own content is limited to section index structure, cross-section consistency findings, and derivation metadata. Regulatory compliance of the underlying section content is a matter for the individual section artifacts and their own traceability footers."
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Tier 5 outputs must be traceable to specific inputs in Tier 1–4; outputs not so traceable must not be produced.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_note": "traceability_footer.no_unsupported_claims_declaration is false, indicating not all claims are declared supported. Per check 13.10, validation_status.claim_statuses[] is examined — this field is absent from the artifact (the assembled draft uses consistency_log as its finding mechanism rather than claim_statuses[]). All 'inconsistency_flagged' consistency_log entries (CC-01, CC-06) have populated source_refs pointing to Tier 3 (objectives.json) and Tier 4 (impact_architecture.json) sources. No item in the consistency_log has an absent or null source_refs array for flagged findings. The traceability_footer.derivation_note explicitly states 'Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings,' correctly scoping this artifact's own claim set to structural/consistency matters rather than proposal content claims. The primary_sources include Tier 3 and Tier 4 references. No unresolved claims with absent source_refs are present in the artifact's tracking structure."
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Tier 1 or Tier 2 source documents must not be modified to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level checks. This prohibition concerns whether Tier 1 or Tier 2 source documents have been modified — it cannot be verified by reading a Tier 5 output artifact. Verification would require comparing Tier 1/2 files against authoritative originals, which is outside this skill's declared input scope. Recorded as pass per skill specification §2 check 13.11 guidance.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "CLAUDE.md must not be treated as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": "Not applicable to artifact-level checks. This prohibition governs agent and skill process behavior — whether CLAUDE.md was consulted and obeyed during execution. It cannot be assessed by reading a produced artifact. Recorded as pass per skill specification §2 check 13.12 guidance.",
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "timestamp": "2026-05-05T00:00:00Z"
+}

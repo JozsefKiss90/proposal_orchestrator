@@ -1,0 +1,127 @@
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0ff',
+    'primaryBorderColor': '#7c3aed',
+    'lineColor': '#a78bfa',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'edgeLabelBackground': '#1a1a2e',
+    'clusterBkg': '#0d1117',
+    'clusterBorder': '#30363d'
+  },
+  'flowchart': { 'curve': 'basis', 'padding': 16, 'nodeSpacing': 40, 'rankSpacing': 50 }
+}}%%
+
+%% ═══════════════════════════════════════════════
+%%  PROPOSAL ORCHESTRATOR — SYSTEM OVERVIEW
+%% ═══════════════════════════════════════════════
+
+flowchart TB
+
+  TITLE["<b>PROPOSAL ORCHESTRATOR — SYSTEM OVERVIEW</b><br/><i>Horizon Europe DAG-Driven Proposal Generation Engine</i><br/>8 Phases &bull; 13 Nodes &bull; 11 Gates &bull; 102 Predicates &bull; 22 Agents &bull; 30 Skills"]
+  style TITLE fill:#1a0533,stroke:#7c3aed,stroke-width:3px,color:#e0e0ff
+
+  TITLE --> CONSTITUTION
+  TITLE --> RUNTIME_BLOCK
+  TITLE --> WORKFLOW_BLOCK
+  TITLE --> DATA_BLOCK
+
+  %% ── Constitution ──
+  CONSTITUTION["<b>CLAUDE.md</b><br/>Repository Constitution<br/>Highest-priority interpretive authority<br/>Governs all agents, skills, workflows"]
+  style CONSTITUTION fill:#713f12,stroke:#fbbf24,stroke-width:3px,color:#fef3c7
+
+  %% ── Runtime Engine ──
+  subgraph RUNTIME_BLOCK["<b>RUNTIME ENGINE</b> &nbsp; runner/"]
+    direction LR
+
+    CLI["<b>CLI</b><br/>__main__.py<br/>--run-id<br/>--phase<br/>--dry-run"]
+
+    SLICER["<b>Call Slicer</b><br/>call_slicer.py<br/>Step 0: bounds<br/>call inputs"]
+
+    SCHEDULER["<b>DAG Scheduler</b><br/>dag_scheduler.py<br/>Topological dispatch<br/>Stall detection"]
+
+    GATES["<b>Gate Evaluator</b><br/>gate_evaluator.py<br/>102 predicates<br/>11 gates"]
+
+    AGENT_RT["<b>Agent Runtime</b><br/>agent_runtime.py<br/>Sequences skills<br/>Failure propagation"]
+
+    SKILL_RT["<b>Skill Runtime</b><br/>skill_runtime.py<br/>Prompt assembly<br/>Schema validation"]
+
+    CLAUDE["<b>Claude Transport</b><br/>claude_transport.py<br/>TAPM / cli-prompt<br/>Claude CLI"]
+
+    CLI --> SLICER --> SCHEDULER
+    SCHEDULER --> GATES
+    SCHEDULER --> AGENT_RT --> SKILL_RT --> CLAUDE
+  end
+
+  %% ── Workflow Specs ──
+  subgraph WORKFLOW_BLOCK["<b>WORKFLOW SPECIFICATIONS</b> &nbsp; .claude/"]
+    direction LR
+
+    MANIFEST["<b>Manifest</b><br/>manifest.compile.yaml<br/>13-node DAG definition"]
+
+    GATE_RULES["<b>Gate Rules Library</b><br/>gate_rules_library.yaml<br/>102 predicates"]
+
+    AGENT_SPECS["<b>Agent Specs</b><br/>.claude/agents/<br/>22 agent .md files"]
+
+    SKILL_SPECS["<b>Skill Specs</b><br/>.claude/skills/<br/>30 skill .md files"]
+
+    CATALOGS["<b>Catalogs</b><br/>agent_catalog.yaml<br/>skill_catalog.yaml"]
+
+    SCHEMAS["<b>Artifact Schemas</b><br/>artifact_schema_<br/>specification.yaml"]
+  end
+
+  %% ── Data Tiers ──
+  subgraph DATA_BLOCK["<b>TIERED DATA MODEL</b> &nbsp; docs/"]
+    direction LR
+
+    T1["<b>Tier 1</b><br/>Normative<br/>Framework"]
+    T2A["<b>Tier 2A</b><br/>Instrument<br/>Schemas"]
+    T2B["<b>Tier 2B</b><br/>Topic & Call<br/>Sources"]
+    T3["<b>Tier 3</b><br/>Project<br/>Instantiation"]
+    T4["<b>Tier 4</b><br/>Orchestration<br/>State"]
+    T5["<b>Tier 5</b><br/>Deliverables"]
+    INT["<b>Integrations</b><br/>Budget<br/>Planner"]
+
+    T1 ~~~ T2A ~~~ T2B ~~~ T3 ~~~ T4 ~~~ T5 ~~~ INT
+  end
+
+  %% ── Cross-block connections ──
+  CONSTITUTION -.->|"governs"| RUNTIME_BLOCK
+  CONSTITUTION -.->|"governs"| WORKFLOW_BLOCK
+  SCHEDULER -.->|"reads"| MANIFEST
+  GATES -.->|"reads"| GATE_RULES
+  AGENT_RT -.->|"loads"| AGENT_SPECS
+  SKILL_RT -.->|"loads"| SKILL_SPECS
+  SCHEDULER -.->|"reads/writes"| T4
+  SKILL_RT -.->|"reads"| DATA_BLOCK
+  SKILL_RT -.->|"writes"| T5
+
+  %% ── Styles ──
+  style RUNTIME_BLOCK fill:#0d1117,stroke:#60a5fa,stroke-width:2px,color:#c9d1d9
+  style WORKFLOW_BLOCK fill:#0d1117,stroke:#7c3aed,stroke-width:2px,color:#c9d1d9
+  style DATA_BLOCK fill:#0d1117,stroke:#10b981,stroke-width:2px,color:#c9d1d9
+
+  style CLI fill:#1a1a2e,stroke:#7c3aed,stroke-width:2px,color:#e0e0ff
+  style SLICER fill:#1a1a2e,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
+  style SCHEDULER fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style GATES fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style AGENT_RT fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style SKILL_RT fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style CLAUDE fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+
+  style MANIFEST fill:#1a1a2e,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style GATE_RULES fill:#1a1a2e,stroke:#fbbf24,stroke-width:1px,color:#fef3c7
+  style AGENT_SPECS fill:#1a1a2e,stroke:#f59e0b,stroke-width:1px,color:#fed7aa
+  style SKILL_SPECS fill:#1a1a2e,stroke:#06b6d4,stroke-width:1px,color:#a5f3fc
+  style CATALOGS fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style SCHEMAS fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+
+  style T1 fill:#1a1a2e,stroke:#f43f5e,stroke-width:2px,color:#fecdd3
+  style T2A fill:#1a1a2e,stroke:#f97316,stroke-width:2px,color:#fed7aa
+  style T2B fill:#1a1a2e,stroke:#eab308,stroke-width:2px,color:#fef08a
+  style T3 fill:#1a1a2e,stroke:#22c55e,stroke-width:2px,color:#bbf7d0
+  style T4 fill:#1a1a2e,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  style T5 fill:#1a1a2e,stroke:#a855f7,stroke-width:2px,color:#e9d5ff
+  style INT fill:#1a1a2e,stroke:#ec4899,stroke-width:2px,color:#fbcfe8

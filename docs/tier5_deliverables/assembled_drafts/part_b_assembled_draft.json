@@ -1,44 +1,49 @@
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
-  "run_id": "c8fdb077-9be9-4e55-95fd-2063e8540da4",
+  "run_id": "8813ed4e-5c80-4157-a17e-9bed30552962",
   "sections": [
     {
       "section_id": "excellence",
       "criterion": "Excellence",
       "order": 1,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "word_count": 635
+      "word_count": 670
     },
     {
       "section_id": "impact",
       "criterion": "Impact",
       "order": 2,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
-      "word_count": 550
+      "word_count": 617
     },
     {
       "section_id": "implementation",
       "criterion": "Quality and efficiency of the implementation",
       "order": 3,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
-      "word_count": 480
+      "word_count": 548
     }
   ],
   "consistency_log": [
     {
       "check_id": "CC-01",
-      "description": "Objective consistency across Excellence and Implementation sections",
+      "description": "Objective consistency across Excellence, Impact, and Implementation sections",
       "sections_checked": [
         "excellence",
+        "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Tier 3 architecture_inputs/objectives.json (8 objectives OBJ-1–OBJ-8); excellence_section.json B.1.1 (enumerates all 8 objectives with canonical IDs and exact Tier 3 titles); implementation_section.json B.3.1 (WP descriptions consistent with objective scope; WP2=OBJ-1, WP3=OBJ-2, WP4=OBJ-3, WP5=OBJ-4, WP6=OBJ-5, WP7=OBJ-6, WP8=OBJ-8 cross-cutting integration, WP9=OBJ-7). All 8 Tier 3 objective IDs present in Excellence with correct canonical titles. No contradictions between Excellence objective statements and Implementation WP objectives."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
     },
     {
       "check_id": "CC-02",
-      "description": "WP reference consistency — WP IDs in Excellence and Impact match the canonical WP list in Implementation",
+      "description": "WP reference consistency: all WP IDs cited in Excellence and Impact exist in the canonical WP list (WP1–WP9) from Implementation wp_table_refs",
       "sections_checked": [
         "excellence",
         "impact",
@@ -46,68 +51,92 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "implementation_section.json wp_table_refs (canonical list: WP1–WP9); excellence_section.json B.1.2 (explicitly references WP2, WP3, WP4, WP5, WP6, WP8; all present in wp_table_refs); impact_section.json B.2.1–B.2.2 (explicitly references WP2, WP3, WP4, WP5, WP6, WP7, WP8, WP9; all present in wp_table_refs). No WP ID appears in Excellence or Impact that is absent from the canonical Implementation WP list."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-03",
-      "description": "Partner name consistency across all three sections against Tier 3 authoritative partner registry",
+      "description": "Partner name consistency: all partner names across sections match Tier 3 legal_name or short_name; legal entity suffixes (AG, Oy) verified present wherever full legal name is used",
       "sections_checked": [
         "excellence",
         "impact",
         "implementation"
       ],
-      "status": "inconsistency_flagged",
-      "inconsistency_note": "Impact section B.2.2 mixes short names (ATU, BIIS, CERIA, FIIT in the dissemination strategy sentence) and full legal names (Nordic Institute of Health Sciences, Istituto Superiore di Ingegneria Avanzata, EuroLog International AG, Boreal AI Labs Oy, Centre Européen de Recherche en Informatique Avancée in the exploitation strategy sentences) within the same sub-section without explicit mapping between naming forms. Per Strengthened Validation Dimensions CC-03, mixing of naming forms within a section without explicit mapping is not permitted. By contrast, Excellence B.1.2 uses only short names consistently throughout; Implementation B.3.2 uses paired notation (legal_name (short_name, country)) for all 8 partners consistently. All legal names present in all sections exactly match Tier 3 partners.json legal_name fields; no suffix-stripped names or corrupted names detected (EuroLog International AG with AG suffix correctly present; Boreal AI Labs Oy with Oy suffix correctly present).",
-      "source_basis": "Tier 3 consortium/partners.json (legal_name and short_name for all 8 partners); impact_section.json B.2.2 (mixed naming form usage); excellence_section.json B.1.2 (short-name-only usage); implementation_section.json B.3.2 (paired legal+short notation)"
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/consortium/partners.json"
+      ]
     },
     {
       "check_id": "CC-04",
-      "description": "Deliverable ID and naming consistency across sections — IDs, month assignments, and WP attribution",
+      "description": "Deliverable ID consistency: deliverable IDs and their described purposes are consistent across sections",
       "sections_checked": [
         "excellence",
         "impact",
         "implementation"
       ],
-      "status": "consistent",
-      "inconsistency_note": null,
-      "source_basis": "excellence_section.json B.1.2 (deliverables D1-02 M6 ATU, D8-01 M12, D8-02 M42 FIIT, D9-02 M36 BAL); impact_section.json B.2.1 (D2-02 M36, D3-02 M30, D4-01 M18, D4-02 M36, D5-02 M42 WP5, D6-02 M42 WP6, D7-02 M42 WP7, D8-02 M42 WP8, D9-02 M36 WP9); impact_section.json B.2.2 (D9-01 M6 WP9, D9-02 M36 WP9, D6-02 M42, D4-01 M18 WP4). Cross-referenced IDs: D8-02 consistent (M42, WP8/FIIT) across Excellence and Impact; D9-02 consistent (M36, WP9/BAL) across Excellence and Impact; D4-01 consistent (M18, WP4/CERIA) across Impact B.2.1 and B.2.2; D6-02 consistent (M42, WP6) across Impact B.2.1 and B.2.2. No deliverable ID attributed a different purpose or different month across sections."
+      "status": "inconsistency_flagged",
+      "inconsistency_note": "D8-02 is described as 'MAESTRO benchmark suite dataset, month 42' (WP8, FIIT) in Excellence B.1.2, but is grouped under 'AI-on-demand platform contributions (D8-02, D9-02)' in Impact B.2.1 without identifying it as the benchmark dataset artifact. These are different primary purposes attributed to the same deliverable ID. While the benchmark suite may be contributed to the AI-on-demand platform, Impact B.2.1 does not make this link explicit, creating an evaluator-visible attribution inconsistency. Resolution required: Impact B.2.1 should clarify that D8-02 is the MAESTRO benchmark suite dataset (WP8, FIIT, M42) that constitutes the AI-on-demand platform contribution.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-05",
-      "description": "Milestone ID consistency between Impact and Implementation sections",
+      "description": "Milestone ID consistency: milestone IDs referenced in Impact and Implementation are consistent",
       "sections_checked": [
         "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "implementation_section.json milestone_refs (MS1–MS11) and B.3.1 narrative (MS1 M3 architecture contracts; MS6 M24 integrated framework v1.0; MS9 M42 demonstrator validation complete; MS11 M48 project completion); impact_section.json impact_pathway_refs (PATH-EI-01–PATH-EI-05) and sub-section content (no MS-ID references present). Impact section uses impact pathway identifiers (PATH-EI-XX) rather than project milestone identifiers (MS-XX); the two identifier types are distinct and non-overlapping. No milestone IDs referenced in Impact conflict with Implementation's canonical MS1–MS11 list."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-06",
-      "description": "KPI and quantified metric consistency across sections; metric completeness against Tier 3 measurable targets (Strengthened Validation Dimension)",
+      "description": "KPI consistency: quantified targets in Impact section are complete relative to Tier 3 measurable_targets and consistent with Excellence; no partial metric loss detected",
       "sections_checked": [
         "excellence",
-        "impact"
+        "impact",
+        "implementation"
       ],
-      "status": "inconsistency_flagged",
-      "inconsistency_note": "Two partial metric losses detected against Tier 3 objectives.json measurable targets. (1) OBJ-6 dual-target loss: Tier 3 objectives.json measurable_target for OBJ-6 specifies '≥20% improvement in disruption recovery time AND ≥15% improvement in delivery schedule adherence.' Excellence B.1.1 correctly states both targets: '≥20% disruption recovery time improvement and ≥15% delivery schedule adherence improvement on ELI supply chain corridors.' Impact B.2.1 states only '≥20% disruption recovery improvement across three international supply chain corridors,' omitting the ≥15% delivery schedule adherence metric entirely. This is a cross-section metric discrepancy and partial metric loss for a dual-target objective. (2) OBJ-7 GitHub stars metric absence: Tier 3 objectives.json measurable_target for OBJ-7 includes '≥500 GitHub stars within 6 months of release' as a quantified success criterion. Neither Excellence B.1.1 (which lists open-source release via BAL, AI-on-demand platform contributions, validation through ≥2 TEFs, and technology transfer through ≥3 EDIHs) nor any sub-section of the Impact section includes this quantified metric. Both gaps constitute partial metric loss per Strengthened Validation Dimensions CC-06 requirement that the Impact section preserve ALL metrics from multi-target objectives.",
-      "source_basis": "Tier 3 architecture_inputs/objectives.json OBJ-6 measurable_target and OBJ-7 measurable_target; excellence_section.json B.1.1 (OBJ-6 and OBJ-7 objective statements); impact_section.json B.2.1 (logistics demonstrator target); phase5_impact_architecture/impact_architecture.json (KPI-03 reference for logistics metric)"
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
     },
     {
       "check_id": "CC-07",
-      "description": "Impact claim grounding — each impact claim in Impact section cites a WP or deliverable present in Implementation",
+      "description": "Impact claim grounding: each impact claim in the Impact section cites a WP or deliverable mechanism present in the Implementation section wp_table_refs",
       "sections_checked": [
         "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "impact_section.json B.2.1 impact mechanism references: WP2 (neuro-symbolic planning), WP3 (adaptive memory), WP4 (multi-agent coordination), WP5 (clinical demonstrator D5-02), WP6 (manufacturing demonstrator D6-02), WP7 (logistics demonstrator D7-02), WP8 (benchmark suite D8-02), WP9 (open-source D9-02), WP4 (standardisation D4-01); implementation_section.json wp_table_refs (WP1–WP9 canonical list). All WPs cited as impact mechanisms in Impact section are present in the canonical Implementation WP list. No orphan WP references detected."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-08",
-      "description": "Budget and resource claim consistency across all three sections",
+      "description": "Budget and resource claim consistency: no explicit budget figures or person-month allocations appear in any section content; no cross-section budget inconsistency possible",
       "sections_checked": [
         "excellence",
         "impact",
@@ -115,23 +144,32 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json B.1.1–B.1.2 (no explicit budget figures or person-month allocations in section content); impact_section.json B.2.1–B.2.2 (no explicit budget figures or person-month allocations in section content); implementation_section.json B.3.1–B.3.2 (no explicit budget figures or person-month allocations in section content; validation_status C10 confirms budget gate passed referencing phase7_budget_gate/budget_gate_assessment.json); phase7_budget_gate/budget_gate_assessment.json (budget gate confirmed passed per implementation_section.json claim C10). No cross-section budget value discrepancies exist because no section asserts specific budget or resource figures in prose."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-09",
-      "description": "Terminology consistency — canonical component/system names and technical terminology across sections (Strengthened Validation Dimension)",
+      "description": "Terminology consistency: canonical component/system names from Tier 3 objective titles used with their component keywords across all sections",
       "sections_checked": [
         "excellence",
         "impact",
         "implementation"
       ],
       "status": "inconsistency_flagged",
-      "inconsistency_note": "Impact section B.2.1 uses shortened descriptive labels for the three research pillar systems that omit canonical component-type keywords present in Tier 3 objective titles and used correctly in Excellence B.1.1. Specifically: (a) Impact B.2.1 uses 'neuro-symbolic planning (WP2, ATU)' — stem present without canonical keyword 'engine'; Tier 3 OBJ-1 canonical title is 'Neuro-symbolic planning engine for autonomous task decomposition'; Excellence B.1.1 uses full canonical title. (b) Impact B.2.1 uses 'adaptive memory (WP3, BIIS)' — stem present without keywords 'unified' and 'architecture'; Tier 3 OBJ-2 canonical title is 'Unified adaptive memory architecture'; Excellence B.1.1 uses full canonical title. (c) Impact B.2.1 uses 'multi-agent coordination (WP4, CERIA)' — stem present without keywords 'decentralised' and 'protocols'; Tier 3 OBJ-3 canonical title is 'Decentralised multi-agent coordination protocols'; Excellence B.1.1 uses full canonical title. Additionally, Implementation B.3.1 WP4 is named 'Decentralised Multi-Agent Coordination' without 'protocols,' which deviates from the OBJ-3 canonical title, though this reflects an established WP-level naming convention across phase outputs. The 'External Tool and API Orchestration Layer' canonical name (OBJ-8) is used correctly in Excellence B.1.2 and does not appear in abbreviated form in any section. Per Strengthened Validation Dimensions CC-09, stems appearing without canonical component keywords are flagged as inconsistency_flagged.",
-      "source_basis": "Tier 3 architecture_inputs/objectives.json (canonical objective titles OBJ-1, OBJ-2, OBJ-3, OBJ-8); excellence_section.json B.1.1 (canonical objective title usage) and B.1.2 (External Tool and API Orchestration Layer); impact_section.json B.2.1 (pillar shorthand labels); implementation_section.json B.3.1 (WP-level naming)"
+      "inconsistency_note": "Tier 3 canonical title for OBJ-3 is 'Decentralised multi-agent coordination protocols'; 'protocols' is a listed component keyword. The stem 'Decentralised multi-agent coordination' appears WITHOUT the keyword in: Implementation B.3.1 ('WP4 (Decentralised Multi-Agent Coordination, CERIA, M3–M36)'), Implementation B.3.2 ('leads WP4 (Decentralised Multi-Agent Coordination)'), and Impact B.2.1 ('CERIA's Decentralised Multi-Agent Coordination (WP4, D4-02)'). The full canonical name appears only in Excellence B.1.1. Per strengthened validation, stem appearing without component keyword in two sections must be flagged. Resolution: Impact B.2.1 and Implementation B.3.1/B.3.2 references to WP4 should append 'Protocols' to align with the canonical Tier 3 objective title.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      ]
     },
     {
       "check_id": "CC-10",
-      "description": "Section ordering and completeness — all three Part B criterion sections present in correct RIA/IA order",
+      "description": "Section ordering and completeness: all three Part B sections present and ordered per HE RIA/IA application form template (Excellence=1, Impact=2, Implementation=3)",
       "sections_checked": [
         "excellence",
         "impact",
@@ -139,11 +177,16 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json (schema_id orch.tier5.excellence_section.v1; criterion=Excellence; sub_sections B.1.1 Objectives and ambition, B.1.2 Methodology); impact_section.json (schema_id orch.tier5.impact_section.v1; criterion=Impact; sub_sections B.2.1 Pathways towards impact, B.2.2 Measures to maximise impact); implementation_section.json (schema_id orch.tier5.implementation_section.v1; criterion=Quality and efficiency of the implementation; sub_sections B.3.1 Work plan and resources, B.3.2 Capacity of participants); RIA/IA Part B structure per Tier 2A: Section 1 Excellence (order 1), Section 2 Impact (order 2), Section 3 Implementation (order 3). All three sections present with correct schema IDs and correct ordering."
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+        "docs/tier2a_instrument_schemas/application_forms/ria_ia/af_he-ria-ia_en.pdf"
+      ]
     },
     {
       "check_id": "CC-11",
-      "description": "Traceability footer consistency — non-empty primary_sources and no_unsupported_claims_declaration alignment with overall_status across all three sections",
+      "description": "Traceability footer consistency: all sections have non-empty primary_sources arrays; no section combines no_unsupported_claims_declaration=true with overall_status=unresolved",
       "sections_checked": [
         "excellence",
         "impact",
@@ -151,19 +194,27 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json traceability_footer (primary_sources: 13 entries non-empty; no_unsupported_claims_declaration: true; validation_status.overall_status: inferred; inferred claims C11 and C15 have stated inference chains — not unresolved; CC-11 trigger condition [unresolved + true declaration] not met); impact_section.json traceability_footer (primary_sources: 10 entries non-empty; no_unsupported_claims_declaration: true; validation_status.overall_status: inferred; inferred claim CS-08 EI-04 has explicit inference note 'inferred from destination placement; no explicit call scope statement' — not unresolved; CC-11 trigger condition not met); implementation_section.json traceability_footer (primary_sources: 9 entries non-empty; no_unsupported_claims_declaration: true; validation_status.overall_status: confirmed — fully consistent)"
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     },
     {
       "check_id": "CC-12",
-      "description": "Validation status aggregation — informational summary of overall_status across all three sections; cross-section concern flag for downstream review",
+      "description": "Validation status aggregation: overall_status recorded for each section; unresolved statuses flagged for downstream review",
       "sections_checked": [
         "excellence",
         "impact",
         "implementation"
       ],
       "status": "consistent",
-      "inconsistency_note": null,
-      "source_basis": "excellence_section.json validation_status.overall_status=inferred (driven by C11 TRL-2 start point and C15 gender dimension as inferred claims with stated reasoning); impact_section.json validation_status.overall_status=inferred (driven by CS-08 EI-04 EU strategic autonomy inferred from destination placement); implementation_section.json validation_status.overall_status=confirmed (all 15 claims confirmed with named source references). No section has overall_status=unresolved. Downstream reviewers should note that inferred claims in Excellence (C11, C15) and Impact (CS-08) require confirming evidence before final submission; these are flagged transparently and do not constitute unresolved contradictions."
+      "inconsistency_note": "Informational: Excellence overall_status=inferred (TRL progression claim inferred; all eight OBJ-level claims confirmed); Impact overall_status=inferred (EI-04 EU strategic autonomy mapping inferred from destination placement only, per CS-06); Implementation overall_status=confirmed (all 15 claims confirmed against phase outputs and Tier 3). No section has overall_status=unresolved. No blocking downstream gate concern from validation status alone.",
+      "source_refs": [
+        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+        "docs/tier5_deliverables/proposal_sections/impact_section.json",
+        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+      ]
     }
   ],
   "traceability_footer": {
@@ -173,10 +224,8 @@
       "docs/tier5_deliverables/proposal_sections/implementation_section.json",
       "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
       "docs/tier3_project_instantiation/consortium/partners.json",
-      "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
       "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
       "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
-      "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
       "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
     ],
     "no_unsupported_claims_declaration": false,

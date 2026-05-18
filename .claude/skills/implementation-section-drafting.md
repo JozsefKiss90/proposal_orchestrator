@@ -99,6 +99,7 @@ Return a SINGLE valid JSON object. No prose, no markdown fencing. Response must 
   - Do not assert Tier 1 programme-rule obligations unless this skill reads the Tier 1 source.
   - Do not overclaim scope-requirement coverage.
 
+
 - 2.6: **Draft resources sub-section.** Describe resource allocation at the level confirmed by the budget gate. Do not cite budget figures not validated in `budget_gate_assessment.json`.
 
 - 2.7: **Populate structural references:** `wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`.
@@ -125,6 +126,27 @@ When the drafted text states the number of consortium countries (e.g., "partners
 Likewise, when stating the partner count, use `len(canonical_reference_pack.partners)`.
 
 If `canonical_reference_pack.json` is not available or does not contain a `partners` array with `country` fields, do not state a numeric country count — use qualitative language instead (e.g., "partners across multiple EU Member States").
+
+
+### 3b. WP Title Attachment Rule (gate_10c canonical term preservation)
+
+When drafting B.3.2 consortium capacity text, do not attach partner capability descriptions directly to a WP ID using a colon, dash, parenthetical, or appositive unless the canonical WP title appears immediately with that WP ID. The deterministic gate treats nearby appositive text as a WP title; therefore capability prose must be separated from WP-title notation.
+
+Use this safe pattern whenever a partner lead role and capability description appear in the same sentence:
+
+- `leads WP2 (Neuro-Symbolic Planning and Reasoning Engine); expertise in ...`
+- `leads WP4 (Decentralised Multi-Agent Coordination); expertise in ...`
+- `leads WP6 (Manufacturing Demonstrator — Process Optimisation); expertise in ...`
+- `leads WP8 (Integration, Evaluation and Benchmarking); expertise in ...`
+
+Forbidden patterns:
+
+- `leads WP2: expertise in ...`
+- `leads WP4: formal multi-agent coordination protocols ...`
+- `leads WP6: operational pilot factory environment ...`
+- `leads WP8: AI evaluation methodology ...`
+
+General rule: after any `WP*` reference followed by punctuation that introduces descriptive text, first write the exact canonical title from `canonical_reference_pack.wps[].title`, then separate capability descriptions with a semicolon or a new sentence. Do not let a capability phrase become the apparent title attached to the WP ID.
 
 ### 4. Output Schema
 
