@@ -1373,6 +1373,29 @@ class DAGScheduler:
                         bench_summary.total_estimated_input_tokens
                         + bench_summary.total_estimated_output_tokens,
                     )
+
+                    # Phase B analytics: transform ledger into aggregate artifacts
+                    try:
+                        from runner.benchmark.report_builder import run_phase_b_analytics
+                        _run_summary_path = (
+                            self.repo_root / ".claude" / "runs"
+                            / self.ctx.run_id / "run_summary.json"
+                        )
+                        _phase_b_paths = run_phase_b_analytics(
+                            _bench_dir,
+                            run_summary_path=_run_summary_path,
+                        )
+                        if _phase_b_paths:
+                            log.info(
+                                "Phase B analytics written: %d artifacts",
+                                len(_phase_b_paths),
+                            )
+                    except Exception:
+                        log.debug(
+                            "Phase B analytics failed (non-blocking)",
+                            exc_info=True,
+                        )
+
             except Exception:
                 log.debug(
                     "Benchmark finalization failed (non-blocking)", exc_info=True
