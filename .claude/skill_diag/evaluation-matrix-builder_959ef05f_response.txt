@@ -1,3 +1,7 @@
+=== skill_id: evaluation-matrix-builder ===
+=== mode: tapm ===
+=== response_text length: 8679 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
   "run_id": "959ef05f-9401-44d9-aa25-f676b1240472",
@@ -85,5 +89,42 @@
       "source_section": "Section 2 — Other Questions: Assessment of lump sum cost estimations",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
+  ],
+  "call_analysis_notes": "Evaluation form used: ef_he-ria-ia_en.pdf (Horizon Europe Evaluation Form for HE RIA and IA, Version 4.0, 12 November 2025). The resolved instrument type was set to 'RIA' on the basis that the active evaluation form corresponds to the RIA/IA instrument type and the Tier 2B evaluation_priority_weights.json references source_document 'HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json', a Cluster 4 Digital/Emerging topic consistent with the RIA instrument. Weights overlay applied from evaluation_priority_weights.json: all three standard criteria (Excellence, Impact, Implementation) were matched and their weights overlaid. All Tier 2B weight values are null, which is consistent with the evaluation form's explicit statement that 'Scores are normally NOT weighted' for standard single-stage calls. No weights were assigned from prior knowledge; all weight fields remain null per Tier 2B source data, with weight_source recorded as 'tier2b_evaluation_priority_weights.json' for each matched criterion. One unmatched Tier 2B entry: criterion_id 'Portfolio_Coverage' (source_section: 'procedure_exceptions', source_document: 'HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json') has no corresponding scored criterion in the evaluation form. It has been incorporated into the compliance_checklist as CR-07, representing a procedural award priority, not a scored evaluation criterion. The evaluation form v4.0 reflects updates from HE WP26-27, including an updated Impact criterion text and added lump sum budget assessment instructions; CR-08 in the compliance_checklist captures the lump sum assessment requirement added in v4.0. Individual threshold per criterion: 3/5. Overall threshold: 10/15 (sum of three criterion scores).",
+  "instruments": [
+    {
+      "instrument_type": "RIA",
+      "criteria": [
+        {
+          "criterion_id": "Excellence",
+          "criterion_name": "Excellence",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Clarity and pertinence of the project's objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art.",
+            "Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate consideration of the gender dimension in research and innovation content, and the quality of open science practices, including sharing and management of research outputs and engagement of citizens, civil society and end users where appropriate."
+          ]
+        },
+        {
+          "criterion_id": "Impact",
+          "criterion_name": "Impact",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme.",
+            "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities."
+          ]
+        },
+        {
+          "criterion_id": "Implementation",
+          "criterion_name": "Quality and efficiency of the implementation",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources overall.",
+            "Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise."
+          ]
+        }
+      ]
+    }
   ]
 }
+
+=== END ===
