@@ -41,11 +41,11 @@ from typing import Any, Optional
 
 import yaml
 
+from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     DEFAULT_TIMEOUT_SECONDS,
     ClaudeCLITimeoutError,
     ClaudeTransportError,
-    invoke_claude_text,
 )
 from runner.runtime_models import SkillResult
 
@@ -1202,6 +1202,10 @@ def run_skill(
                 max_tokens=SKILL_MAX_TOKENS,
                 tools=["Read", "Glob"],
                 timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                _bench_run_id=run_id,
+                _bench_skill_id=skill_id,
+                _bench_node_id=node_id,
+                _bench_invocation_type="skill_tapm",
             )
         except ClaudeTransportError as exc:
             _elapsed = time.monotonic() - _skill_t0
@@ -1283,6 +1287,10 @@ def run_skill(
                 user_prompt=user_prompt,
                 model=SKILL_MODEL,
                 max_tokens=SKILL_MAX_TOKENS,
+                _bench_run_id=run_id,
+                _bench_skill_id=skill_id,
+                _bench_node_id=node_id,
+                _bench_invocation_type="skill_cli_prompt",
             )
         except ClaudeTransportError as exc:
             _elapsed = time.monotonic() - _skill_t0

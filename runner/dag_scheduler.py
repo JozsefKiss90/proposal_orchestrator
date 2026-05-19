@@ -74,6 +74,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -1227,129 +1228,205 @@ class DAGScheduler:
             no exit gate defined.
         """
         started_at: str = datetime.now(timezone.utc).isoformat()
+        _run_t0 = time.monotonic()
         dispatched: list[str] = []
 
         # ------------------------------------------------------------------
-        # Step 0: Call slicing (deterministic input bounding)
+        # Benchmark: create ledger and activate context
         # ------------------------------------------------------------------
+        from runner.benchmark.context import get_ledger, set_ledger
+        from runner.benchmark.ledger import BenchmarkLedger
+        from runner.benchmark.models import RunBenchmarkSummary
+
+        _bench_dir = self.repo_root / ".claude" / "benchmark" / self.ctx.run_id
+        _bench_ledger: BenchmarkLedger | None = None
         try:
-            call_slice_path = generate_call_slice(self.repo_root)
-            log.info("Call slice generated: %s", call_slice_path)
-        except CallSlicerError as exc:
-            log.warning("Call slicer skipped (non-blocking): %s", exc)
+            _bench_ledger = BenchmarkLedger(
+                ledger_path=_bench_dir / "invocation_ledger.jsonl"
+            )
+            set_ledger(_bench_ledger)
+        except Exception:
+            log.debug("Benchmark ledger creation failed (non-blocking)", exc_info=True)
 
-        # ------------------------------------------------------------------
-        # Phase scope resolution
-        # ------------------------------------------------------------------
-        scope_node_ids: set[str] | None = None
-        if self._phase_scope is not None:
-            phase_nodes = self.graph.nodes_for_phase(self._phase_scope)
-            if not phase_nodes:
-                raise DAGSchedulerError(
-                    f"No nodes found for phase {self._phase_scope}.  "
-                    f"Known phases: {self.graph.phase_numbers()!r}"
+        try:
+
+            # ------------------------------------------------------------------
+            # Step 0: Call slicing (deterministic input bounding)
+            # ------------------------------------------------------------------
+            try:
+                call_slice_path = generate_call_slice(self.repo_root)
+                log.info("Call slice generated: %s", call_slice_path)
+            except CallSlicerError as exc:
+                log.warning("Call slicer skipped (non-blocking): %s", exc)
+
+            # ------------------------------------------------------------------
+            # Phase scope resolution
+            # ------------------------------------------------------------------
+            scope_node_ids: set[str] | None = None
+            if self._phase_scope is not None:
+                phase_nodes = self.graph.nodes_for_phase(self._phase_scope)
+                if not phase_nodes:
+                    raise DAGSchedulerError(
+                        f"No nodes found for phase {self._phase_scope}.  "
+                        f"Known phases: {self.graph.phase_numbers()!r}"
+                    )
+                scope_node_ids = set(phase_nodes)
+                log.info(
+                    "Phase-scoped execution: phase=%d  nodes=%s",
+                    self._phase_scope,
+                    phase_nodes,
                 )
-            scope_node_ids = set(phase_nodes)
-            log.info(
-                "Phase-scoped execution: phase=%d  nodes=%s",
-                self._phase_scope,
-                phase_nodes,
-            )
-        else:
-            log.info("Full DAG execution mode")
+            else:
+                log.info("Full DAG execution mode")
 
-        # ------------------------------------------------------------------
-        # Dispatch loop
-        # ------------------------------------------------------------------
-        while True:
-            ready = [
-                nid
-                for nid in self.graph.node_ids()
-                if self.graph.is_ready(nid, self.ctx)
-                and (scope_node_ids is None or nid in scope_node_ids)
-            ]
-            if not ready:
-                # Log why no nodes are ready when in phase-scoped mode.
-                if scope_node_ids is not None:
-                    for nid in scope_node_ids:
-                        state = self.ctx.get_node_state(nid)
-                        if state == "pending":
-                            unmet = []
-                            for cond in self.graph.incoming_conditions(nid):
-                                src_st = self.ctx.get_node_state(
-                                    cond.source_node_id
-                                )
-                                if src_st != "released":
-                                    unmet.append(
-                                        f"{cond.source_node_id}={src_st}"
-                                        f" (requires {cond.gate_id})"
+            # ------------------------------------------------------------------
+            # Dispatch loop
+            # ------------------------------------------------------------------
+            while True:
+                ready = [
+                    nid
+                    for nid in self.graph.node_ids()
+                    if self.graph.is_ready(nid, self.ctx)
+                    and (scope_node_ids is None or nid in scope_node_ids)
+                ]
+                if not ready:
+                    # Log why no nodes are ready when in phase-scoped mode.
+                    if scope_node_ids is not None:
+                        for nid in scope_node_ids:
+                            state = self.ctx.get_node_state(nid)
+                            if state == "pending":
+                                unmet = []
+                                for cond in self.graph.incoming_conditions(nid):
+                                    src_st = self.ctx.get_node_state(
+                                        cond.source_node_id
                                     )
-                            if unmet:
-                                log.info(
-                                    "  [%s] blocked by unmet upstream: %s",
-                                    nid,
-                                    "; ".join(unmet),
-                                )
-                break
+                                    if src_st != "released":
+                                        unmet.append(
+                                            f"{cond.source_node_id}={src_st}"
+                                            f" (requires {cond.gate_id})"
+                                        )
+                                if unmet:
+                                    log.info(
+                                        "  [%s] blocked by unmet upstream: %s",
+                                        nid,
+                                        "; ".join(unmet),
+                                    )
+                    break
 
-            for nid in ready:
-                # Re-check: an earlier dispatch in this batch may have
-                # frozen this node (e.g. gate_09 HARD_BLOCK).
-                if not self.graph.is_ready(nid, self.ctx):
-                    log.info("  [%s] skipped (no longer ready)", nid)
-                    continue
-                if scope_node_ids is not None and nid not in scope_node_ids:
-                    continue
-                log.info("  Dispatching: %s", nid)
-                self._dispatch_node(nid)
-                dispatched.append(nid)
-                # _dispatch_node reloads self.ctx; subsequent is_ready()
-                # calls use the updated state directly.
+                for nid in ready:
+                    # Re-check: an earlier dispatch in this batch may have
+                    # frozen this node (e.g. gate_09 HARD_BLOCK).
+                    if not self.graph.is_ready(nid, self.ctx):
+                        log.info("  [%s] skipped (no longer ready)", nid)
+                        continue
+                    if scope_node_ids is not None and nid not in scope_node_ids:
+                        continue
+                    log.info("  Dispatching: %s", nid)
+                    self._dispatch_node(nid)
+                    dispatched.append(nid)
+                    # _dispatch_node reloads self.ctx; subsequent is_ready()
+                    # calls use the updated state directly.
 
-        # ------------------------------------------------------------------
-        # Stall detection (scoped when phase filter is active)
-        # ------------------------------------------------------------------
-        stall_report = self._settle_stalled_nodes(
-            scope_node_ids=scope_node_ids
-        )
-
-        # ------------------------------------------------------------------
-        # Build RunSummary and write to disk
-        # ------------------------------------------------------------------
-        completed_at: str = datetime.now(timezone.utc).isoformat()
-
-        summary = RunSummary.build(
-            ctx=self.ctx,
-            graph=self.graph,
-            dispatched_nodes=dispatched,
-            evaluated_gates=self._evaluated_gates,
-            stalled_nodes=stall_report,
-            started_at=started_at,
-            completed_at=completed_at,
-            phase_scope=self._phase_scope,
-            phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
-            reuse_decisions=self._reuse_decisions,
-        )
-        summary.write(self.ctx.run_dir)
-
-        log.info(
-            "Run complete: overall_status=%s  dispatched=%d  stalled=%d",
-            summary.overall_status,
-            len(dispatched),
-            len(stall_report),
-        )
-
-        if summary.overall_status == "aborted":
-            stalled_ids = [e["node_id"] for e in stall_report]
-            raise RunAbortedError(
-                f"Run {self.ctx.run_id!r} aborted: "
-                f"{len(summary.pending_nodes)} node(s) remain pending with "
-                f"no further progress possible.  "
-                f"Stalled nodes: {stalled_ids!r}",
-                summary,
+            # ------------------------------------------------------------------
+            # Stall detection (scoped when phase filter is active)
+            # ------------------------------------------------------------------
+            stall_report = self._settle_stalled_nodes(
+                scope_node_ids=scope_node_ids
             )
 
-        return summary
+            # ------------------------------------------------------------------
+            # Benchmark: finalize and write artifacts
+            # ------------------------------------------------------------------
+            try:
+                if _bench_ledger is not None:
+                    _run_t1 = time.monotonic()
+                    _completed_bench = datetime.now(timezone.utc).isoformat()
+                    records = _bench_ledger.records
+                    bench_summary = RunBenchmarkSummary(
+                        run_id=self.ctx.run_id,
+                        started_at=started_at,
+                        completed_at=_completed_bench,
+                        total_invocations=len(records),
+                        total_estimated_input_tokens=sum(
+                            r.estimated_input_tokens for r in records
+                        ),
+                        total_estimated_output_tokens=sum(
+                            r.estimated_output_tokens for r in records
+                        ),
+                        total_wall_clock_seconds=round(_run_t1 - _run_t0, 4),
+                        node_records=[
+                            {"node_id": nid, "dispatched": True}
+                            for nid in dispatched
+                        ],
+                    )
+                    _summary_path = _bench_dir / "run_benchmark_summary.json"
+                    _summary_path.parent.mkdir(parents=True, exist_ok=True)
+                    _summary_path.write_text(
+                        json.dumps(bench_summary.to_dict(), indent=2),
+                        encoding="utf-8",
+                    )
+                    log.info(
+                        "Benchmark artifacts written: %s "
+                        "(invocations=%d, est_tokens=%d)",
+                        _bench_dir,
+                        bench_summary.total_invocations,
+                        bench_summary.total_estimated_input_tokens
+                        + bench_summary.total_estimated_output_tokens,
+                    )
+            except Exception:
+                log.debug(
+                    "Benchmark finalization failed (non-blocking)", exc_info=True
+                )
+
+            # ------------------------------------------------------------------
+            # Build RunSummary and write to disk
+            # ------------------------------------------------------------------
+            completed_at: str = datetime.now(timezone.utc).isoformat()
+
+            summary = RunSummary.build(
+                ctx=self.ctx,
+                graph=self.graph,
+                dispatched_nodes=dispatched,
+                evaluated_gates=self._evaluated_gates,
+                stalled_nodes=stall_report,
+                started_at=started_at,
+                completed_at=completed_at,
+                phase_scope=self._phase_scope,
+                phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
+                reuse_decisions=self._reuse_decisions,
+            )
+            summary.write(self.ctx.run_dir)
+
+            log.info(
+                "Run complete: overall_status=%s  dispatched=%d  stalled=%d",
+                summary.overall_status,
+                len(dispatched),
+                len(stall_report),
+            )
+
+            if summary.overall_status == "aborted":
+                stalled_ids = [e["node_id"] for e in stall_report]
+                raise RunAbortedError(
+                    f"Run {self.ctx.run_id!r} aborted: "
+                    f"{len(summary.pending_nodes)} node(s) remain pending with "
+                    f"no further progress possible.  "
+                    f"Stalled nodes: {stalled_ids!r}",
+                    summary,
+                )
+
+            return summary
+
+        finally:
+            # Benchmark cleanup: close ledger and clear context variable
+            try:
+                if _bench_ledger is not None:
+                    _bench_ledger.close()
+            except Exception:
+                pass
+            try:
+                set_ledger(None)
+            except Exception:
+                pass
 
     # ------------------------------------------------------------------
     # Stall detection

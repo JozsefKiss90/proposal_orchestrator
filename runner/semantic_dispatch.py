@@ -53,10 +53,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
+from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     ClaudeCLITimeoutError,
     ClaudeTransportError,
-    invoke_claude_text,
 )
 from runner.paths import resolve_repo_path
 
@@ -648,6 +648,9 @@ def invoke_agent(
             user_prompt=user_prompt,
             model=AGENT_MODEL,
             max_tokens=AGENT_MAX_TOKENS,
+            _bench_run_id=run_id,
+            _bench_predicate_id=pred_id,
+            _bench_invocation_type="semantic_predicate",
         )
     except ClaudeTransportError as exc:
         diag_path = _write_semantic_diagnostics(
