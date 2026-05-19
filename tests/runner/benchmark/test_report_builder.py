@@ -270,3 +270,44 @@ class TestReportBuilderEdgeCases:
             assert "system_prompt" not in content or "system_prompt_chars" in content
             assert "user_prompt" not in content or "user_prompt_chars" in content
             assert "response_text" not in content
+
+
+class TestReportBuilderInference:
+    """Verify report_builder passes context for node/phase inference."""
+
+    def test_single_node_inference_end_to_end(self, tmp_path):
+        """Records without node_id get node inferred from summaries."""
+        bench_dir = tmp_path / ".claude" / "benchmark" / "test-run"
+        _create_ledger(bench_dir)  # default record has node_id=None
+        _create_phase_a_summary(bench_dir)
+        run_summary_path = tmp_path / ".claude" / "runs" / "test-run" / "run_summary.json"
+        _create_run_summary(run_summary_path)
+
+        run_phase_b_analytics(bench_dir, run_summary_path=run_summary_path)
+
+        pa = json.loads(
+            (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
+        )
+        assert pa["phases_observed"] == [1]
+        assert pa["nodes_observed"] == ["n01_call_analysis"]
+        assert pa["per_phase"]["1"]["invocations"] == 1
+        assert pa["per_node"]["n01_call_analysis"]["invocations"] == 1
+
+        te = json.loads(
+            (bench_dir / "token_economics.json").read_text(encoding="utf-8")
+        )
+        assert te["phases_1_7_estimated_total_tokens"] == te["total_estimated_tokens"]
+        assert te["phase_8_estimated_total_tokens"] == 0
+
+    def test_inference_from_phase_a_summary_without_run_summary(self, tmp_path):
+        """When no run_summary is given, phase_a_summary node_records is used."""
+        bench_dir = tmp_path / ".claude" / "benchmark" / "test-run"
+        _create_ledger(bench_dir)
+        _create_phase_a_summary(bench_dir)
+        # No run_summary
+        run_phase_b_analytics(bench_dir)
+
+        pa = json.loads(
+            (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
+        )
+        assert pa["nodes_observed"] == ["n01_call_analysis"]

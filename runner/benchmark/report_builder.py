@@ -100,6 +100,8 @@ def _run_phase_b_analytics_inner(
     token_economics = build_token_economics(
         records,
         run_id=run_id,
+        run_summary=run_summary,
+        phase_a_summary=phase_a_summary,
     )
 
     timing_profile = build_timing_profile(

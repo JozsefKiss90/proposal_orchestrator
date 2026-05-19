@@ -1,3 +1,6 @@
+=== parsed OK ===
+=== top-level keys: ['constraints', 'outcomes', 'impacts', 'requirements', 'conditions', 'criteria'] ===
+=== parsed content ===
 {
   "constraints": [
     {
@@ -58,7 +61,7 @@
     },
     {
       "constraint_id": "CC-08",
-      "description": "Maximum EU contribution per project is €19,000,000 (fixed; min and max contribution are both €19,000,000).",
+      "description": "Maximum EU contribution per project is \u20ac19,000,000 (fixed; min and max contribution are both \u20ac19,000,000).",
       "constraint_type": "eligibility",
       "source_section": "expected_eu_contribution_per_project_eur",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
@@ -74,7 +77,7 @@
     },
     {
       "constraint_id": "CC-10",
-      "description": "Financial Support to Third Parties (FSTP) provisions apply: maximum €300,000 per grant at stage 2, €2,250,000 per grant at stage 3, and €2,550,000 maximum per third party across both stages.",
+      "description": "Financial Support to Third Parties (FSTP) provisions apply: maximum \u20ac300,000 per grant at stage 2, \u20ac2,250,000 per grant at stage 3, and \u20ac2,550,000 maximum per third party across both stages.",
       "constraint_type": "other",
       "source_section": "fstp_provisions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
@@ -91,27 +94,5 @@
     {
       "constraint_id": "CC-12",
       "description": "This topic implements the co-programmed European Partnership on AI, data, and robotics (ADRA); proposals must contribute to partnership objectives and develop synergies with relevant International, European, national, or regional initiatives.",
-      "constraint_type": "partnership",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    },
-    {
-      "constraint_id": "CC-13",
-      "description": "Maximum project duration is 48 months (standard maximum for large RIA actions under Horizon Europe).",
-      "constraint_type": "eligibility",
-      "source_section": "max_project_duration_months",
-      "source_document": "selected_call.json",
-      "status": "Assumed",
-      "assumption_note": "The selected_call.json states: 'Max project duration not explicitly stated in the topic text; 48 months is the standard maximum for large RIA actions under Horizon Europe. Verify against General Annex B for the applicable instrument constraints.' The topic-specific call extract documents are silent on project duration; this value requires verification against General Annex B."
-    },
-    {
-      "constraint_id": "CC-14",
-      "description": "Results may be validated in the Testing and Experiment Facilities and further deployed via the European Digital Innovation Hubs (EDIHs); proposals should demonstrate a pathway to deployment.",
-      "constraint_type": "scope",
-      "source_section": "call_entry.scope",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Confirmed"
-    }
-  ]
-}
+      "constraint_type": "partnership
+=== END ===

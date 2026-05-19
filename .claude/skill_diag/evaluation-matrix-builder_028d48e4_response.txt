@@ -1,3 +1,7 @@
+=== skill_id: evaluation-matrix-builder ===
+=== mode: tapm ===
+=== response_text length: 8049 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
   "run_id": "028d48e4-0d0d-48d9-8882-502a45bc9bf8",
@@ -78,5 +82,42 @@
       "source_section": "Section 2. Other Questions — Assessment of lump sum cost estimations",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
+  ],
+  "call_analysis_notes": "Evaluation form used: ef_he-ria-ia_en.pdf (Version 4.0, 12 November 2025) — Horizon Europe Evaluation Form for RIA and IA instruments, sourced from docs/tier2a_instrument_schemas/evaluation_forms/ria_ia/. Resolved instrument type set to 'RIA': inferred from evaluation_priority_weights.json, whose assumption_notes uniformly reference 'Standard Horizon Europe RIA evaluation criterion per General Annex F', and from the call source documents (HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json and .slice.json); docs/tier3_project_instantiation/call_binding/selected_call.json was not in the declared input set for this skill invocation and could not be read directly. Weights overlay applied: all three matched criteria (Excellence, Impact, Implementation) carry weight: null in evaluation_priority_weights.json; null values have been propagated to the evaluation_matrix with weight_source set to 'tier2b_evaluation_priority_weights.json' to maintain full traceability. No non-null weights were assigned from prior knowledge. The evaluation form states scores are normally NOT weighted; any weighting applies only for ranking in specific action types, not threshold determination. Individual criterion threshold: 3/5; overall threshold: 10/15 (sum of three scores). Unmatched Tier 2B weight entry: 'SectorPortfolioCoverage' present in evaluation_priority_weights.json has no corresponding criterion in the evaluation form; per the evaluation form and Tier 2B source, it is a post-threshold grant award procedure exception (not a scored evaluation sub-criterion) and has not been added to the evaluation_matrix. The Tier 2B criterion_id 'Implementation' was matched to the evaluation form criterion 'Quality and efficiency of the implementation' (form Section 3). Version 4.0 of the form adds lump sum budget assessment instructions and updates the Impact criterion following HE WP26-27.",
+  "instruments": [
+    {
+      "instrument_type": "RIA",
+      "criteria": [
+        {
+          "criterion_id": "Excellence",
+          "criterion_name": "Excellence",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Clarity and pertinence of the project's objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art.",
+            "Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate consideration of the gender dimension in research and innovation content, and the quality of open science practices, including sharing and management of research outputs and engagement of citizens, civil society and end users where appropriate."
+          ]
+        },
+        {
+          "criterion_id": "Impact",
+          "criterion_name": "Impact",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme.",
+            "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities."
+          ]
+        },
+        {
+          "criterion_id": "Implementation",
+          "criterion_name": "Quality and Efficiency of the Implementation",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources overall.",
+            "Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise."
+          ]
+        }
+      ]
+    }
   ]
 }
+
+=== END ===

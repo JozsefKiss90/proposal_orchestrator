@@ -296,3 +296,184 @@ class TestBuildTokenEconomics:
         result = build_token_economics([])
         assert "warning" in result
         assert "not billing-grade" in result["warning"]
+
+    def test_phases_1_7_with_inference_from_run_summary(self):
+        """Records lacking node_id should use run_summary for phase inference."""
+        records = [
+            _make_record(node_id=None, estimated_input_tokens=100, estimated_output_tokens=50),
+            _make_record(node_id=None, estimated_input_tokens=200, estimated_output_tokens=30),
+        ]
+        run_summary = {
+            "phase_scope": 1,
+            "phase_scope_nodes": ["n01_call_analysis"],
+            "dispatched_nodes": ["n01_call_analysis"],
+        }
+        result = build_token_economics(
+            records,
+            run_summary=run_summary,
+        )
+        assert result["phases_1_7_estimated_total_tokens"] == 380
+        assert result["phase_8_estimated_total_tokens"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Inference regression tests (node_id=None, single-node summaries)
+# ---------------------------------------------------------------------------
+
+class TestInferenceSingleNode:
+    """When ledger records lack node_id but summaries identify a single node."""
+
+    SINGLE_NODE_RUN_SUMMARY = {
+        "phase_scope": 1,
+        "phase_scope_nodes": ["n01_call_analysis"],
+        "dispatched_nodes": ["n01_call_analysis"],
+    }
+
+    SINGLE_NODE_PHASE_A_SUMMARY = {
+        "node_records": [{"node_id": "n01_call_analysis", "dispatched": True}],
+    }
+
+    def _four_records_no_node_id(self):
+        return [
+            _make_record(invocation_id=f"inv-{i}", node_id=None,
+                         estimated_input_tokens=1000 * (i + 1),
+                         estimated_output_tokens=500 * (i + 1))
+            for i in range(4)
+        ]
+
+    def test_phase_analytics_phases_observed(self):
+        result = build_phase_analytics(
+            self._four_records_no_node_id(),
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["phases_observed"] == [1]
+
+    def test_phase_analytics_nodes_observed(self):
+        result = build_phase_analytics(
+            self._four_records_no_node_id(),
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["nodes_observed"] == ["n01_call_analysis"]
+
+    def test_phase_analytics_per_phase_invocations(self):
+        result = build_phase_analytics(
+            self._four_records_no_node_id(),
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["per_phase"]["1"]["invocations"] == 4
+
+    def test_phase_analytics_per_node_invocations(self):
+        result = build_phase_analytics(
+            self._four_records_no_node_id(),
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["per_node"]["n01_call_analysis"]["invocations"] == 4
+
+    def test_token_economics_phases_1_7(self):
+        records = self._four_records_no_node_id()
+        result = build_token_economics(
+            records,
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["phases_1_7_estimated_total_tokens"] == result["total_estimated_tokens"]
+        assert result["phase_8_estimated_total_tokens"] == 0
+
+    def test_inference_from_phase_a_summary_only(self):
+        """Inference works from phase_a_summary alone (no run_summary)."""
+        result = build_phase_analytics(
+            self._four_records_no_node_id(),
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["nodes_observed"] == ["n01_call_analysis"]
+        assert 1 in result["phases_observed"]
+
+    def test_inference_from_dispatched_nodes_only(self):
+        """Inference uses dispatched_nodes when phase_scope_nodes absent."""
+        run_summary = {
+            "phase_scope": 2,
+            "dispatched_nodes": ["n02_concept_refinement"],
+        }
+        result = build_phase_analytics(
+            [_make_record(node_id=None)],
+            run_summary=run_summary,
+        )
+        assert result["nodes_observed"] == ["n02_concept_refinement"]
+        assert result["phases_observed"] == [2]
+
+    def test_explicit_node_id_preserved(self):
+        """Records with explicit node_id are not overwritten by inference."""
+        records = [_make_record(node_id="n03_wp_design")]
+        result = build_phase_analytics(
+            records,
+            run_summary=self.SINGLE_NODE_RUN_SUMMARY,
+            phase_a_summary=self.SINGLE_NODE_PHASE_A_SUMMARY,
+        )
+        assert result["nodes_observed"] == ["n03_wp_design"]
+        assert result["phases_observed"] == [3]
+
+
+class TestInferenceAmbiguousMultiNode:
+    """When multiple nodes are possible, do not guess a node_id."""
+
+    def test_multi_phase_scope_nodes_no_node_assigned(self):
+        records = [_make_record(node_id=None)]
+        run_summary = {
+            "phase_scope": 8,
+            "phase_scope_nodes": ["n08a_excellence_drafting", "n08b_impact_drafting"],
+            "dispatched_nodes": ["n08a_excellence_drafting", "n08b_impact_drafting"],
+        }
+        phase_a_summary = {
+            "node_records": [
+                {"node_id": "n08a_excellence_drafting", "dispatched": True},
+                {"node_id": "n08b_impact_drafting", "dispatched": True},
+            ],
+        }
+        result = build_phase_analytics(
+            records,
+            run_summary=run_summary,
+            phase_a_summary=phase_a_summary,
+        )
+        # No node should be assigned
+        assert result["nodes_observed"] == []
+        assert result["per_node"] == {}
+        # Phase can still be inferred from phase_scope
+        assert result["phases_observed"] == [8]
+
+    def test_multi_dispatched_nodes_no_node_assigned(self):
+        records = [_make_record(node_id=None)]
+        run_summary = {
+            "phase_scope": 1,
+            "dispatched_nodes": ["n01_call_analysis", "n02_concept_refinement"],
+        }
+        result = build_phase_analytics(records, run_summary=run_summary)
+        assert result["nodes_observed"] == []
+        # phase still inferred from phase_scope
+        assert result["phases_observed"] == [1]
+
+    def test_multi_node_records_no_node_assigned(self):
+        records = [_make_record(node_id=None)]
+        phase_a_summary = {
+            "node_records": [
+                {"node_id": "n01_call_analysis", "dispatched": True},
+                {"node_id": "n02_concept_refinement", "dispatched": True},
+            ],
+        }
+        result = build_phase_analytics(records, phase_a_summary=phase_a_summary)
+        assert result["nodes_observed"] == []
+
+    def test_ambiguous_does_not_crash(self):
+        """Malformed summaries must not crash analytics."""
+        records = [_make_record(node_id=None)]
+        run_summary = {"phase_scope_nodes": 42}  # wrong type
+        phase_a_summary = {"node_records": "bad"}  # wrong type
+        result = build_phase_analytics(
+            records,
+            run_summary=run_summary,
+            phase_a_summary=phase_a_summary,
+        )
+        assert result["total_invocations"] == 1

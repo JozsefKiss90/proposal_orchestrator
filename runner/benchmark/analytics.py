@@ -45,8 +45,11 @@ def build_phase_analytics(
     phase_a_summary
         Optional Phase A ``run_benchmark_summary.json`` dict.
     """
-    # Enrich records with inferred phase
-    enriched = [_enrich_with_phase(r, run_summary) for r in records]
+    # Enrich records with inferred phase and node_id
+    enriched = [
+        _enrich_record(r, run_summary=run_summary, phase_a_summary=phase_a_summary)
+        for r in records
+    ]
 
     phases_observed = sorted({r["_phase"] for r in enriched if r["_phase"] is not None})
     nodes_observed = sorted({r.get("node_id") for r in enriched if r.get("node_id")})
@@ -99,6 +102,8 @@ def build_token_economics(
     records: list[dict],
     *,
     run_id: str = "",
+    run_summary: dict | None = None,
+    phase_a_summary: dict | None = None,
 ) -> dict[str, Any]:
     """Build token economics from invocation record dicts.
 
@@ -108,6 +113,10 @@ def build_token_economics(
         Deserialized invocation records (each a dict from JSONL).
     run_id
         The run identifier.
+    run_summary
+        Optional ``run_summary.json`` dict for phase inference.
+    phase_a_summary
+        Optional Phase A ``run_benchmark_summary.json`` dict.
     """
     total_in = sum(r.get("estimated_input_tokens", 0) for r in records)
     total_out = sum(r.get("estimated_output_tokens", 0) for r in records)
@@ -192,7 +201,10 @@ def build_token_economics(
     )
 
     # Phase 8 vs Phases 1-7
-    enriched = [_enrich_with_phase(r, None) for r in records]
+    enriched = [
+        _enrich_record(r, run_summary=run_summary, phase_a_summary=phase_a_summary)
+        for r in records
+    ]
     phase8_total = sum(
         r.get("estimated_input_tokens", 0) + r.get("estimated_output_tokens", 0)
         for r in enriched if r.get("_phase") == 8
@@ -253,27 +265,93 @@ def _infer_phase_from_node_id(node_id: str | None) -> int | None:
     return None
 
 
-def _infer_phase_from_run_summary(
-    record: dict,
+def _resolve_single_node(
     run_summary: dict | None,
-) -> int | None:
-    """Infer phase from run_summary when node_id is missing."""
-    if not run_summary:
-        return None
+    phase_a_summary: dict | None,
+) -> str | None:
+    """Identify an unambiguous single node from available summaries.
 
-    phase_scope = run_summary.get("phase_scope")
-    if phase_scope is not None:
-        return phase_scope
-
+    Returns a node_id only when exactly one node can be determined.
+    Precedence:
+    B. run_summary.phase_scope_nodes has exactly one entry
+    C. run_summary.dispatched_nodes has exactly one entry
+    D. phase_a_summary.node_records has exactly one dispatched entry
+    """
+    try:
+        if run_summary:
+            # B: phase_scope_nodes
+            psn = run_summary.get("phase_scope_nodes")
+            if isinstance(psn, list) and len(psn) == 1 and isinstance(psn[0], str):
+                return psn[0]
+            # C: dispatched_nodes
+            dn = run_summary.get("dispatched_nodes")
+            if isinstance(dn, list) and len(dn) == 1 and isinstance(dn[0], str):
+                return dn[0]
+        if phase_a_summary:
+            # D: node_records with dispatched=true
+            nr = phase_a_summary.get("node_records")
+            if isinstance(nr, list):
+                dispatched = [
+                    e["node_id"]
+                    for e in nr
+                    if isinstance(e, dict)
+                    and e.get("dispatched") is True
+                    and isinstance(e.get("node_id"), str)
+                ]
+                if len(dispatched) == 1:
+                    return dispatched[0]
+    except Exception:
+        pass
     return None
 
 
-def _enrich_with_phase(record: dict, run_summary: dict | None) -> dict:
-    """Return a copy of record with ``_phase`` added."""
+def _enrich_record(
+    record: dict,
+    *,
+    run_summary: dict | None = None,
+    phase_a_summary: dict | None = None,
+) -> dict:
+    """Return a copy of *record* with ``_phase`` and possibly ``node_id`` enriched.
+
+    Inference precedence
+    --------------------
+    A. record.node_id exists -> phase from node_id prefix; keep node_id.
+    B. node_id missing, run_summary.phase_scope_nodes has exactly 1 node
+       -> assign that node_id; phase = phase_scope.
+    C. node_id missing, run_summary.dispatched_nodes has exactly 1 node
+       -> assign that node_id; phase from node_id or phase_scope.
+    D. node_id missing, phase_a_summary.node_records has exactly 1
+       dispatched node -> assign that node_id; phase from node_id.
+    E. Multiple nodes possible -> do not guess node_id.  Phase may still
+       be inferred from run_summary.phase_scope if unambiguous.
+    """
     enriched = dict(record)
-    phase = _infer_phase_from_node_id(record.get("node_id"))
-    if phase is None:
-        phase = _infer_phase_from_run_summary(record, run_summary)
+    node_id = record.get("node_id")
+
+    # A: record already has node_id
+    if node_id:
+        enriched["_phase"] = _infer_phase_from_node_id(node_id)
+        return enriched
+
+    # B/C/D: try to resolve a single unambiguous node
+    inferred_node = _resolve_single_node(run_summary, phase_a_summary)
+
+    if inferred_node:
+        enriched["node_id"] = inferred_node
+        phase = _infer_phase_from_node_id(inferred_node)
+        if phase is None and run_summary:
+            ps = run_summary.get("phase_scope")
+            if isinstance(ps, int):
+                phase = ps
+        enriched["_phase"] = phase
+        return enriched
+
+    # E: cannot determine node, but phase_scope may still be unambiguous
+    phase = None
+    if run_summary:
+        ps = run_summary.get("phase_scope")
+        if isinstance(ps, int):
+            phase = ps
     enriched["_phase"] = phase
     return enriched
 

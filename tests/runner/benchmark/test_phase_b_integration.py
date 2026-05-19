@@ -125,7 +125,45 @@ class TestPhaseBIntegrationWithRealFixtures:
             (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
         )
         assert pa["phase_scope"] == 1
-        assert 1 in pa["phases_observed"]
+        assert pa["phases_observed"] == [1]
+
+    def test_phase_analytics_nodes_observed(self, phase_a_fixture):
+        """Fixture records lack node_id; inference should assign n01_call_analysis."""
+        bench_dir, run_summary_path = phase_a_fixture
+        run_phase_b_analytics(bench_dir, run_summary_path=run_summary_path)
+
+        pa = json.loads(
+            (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
+        )
+        assert pa["nodes_observed"] == ["n01_call_analysis"]
+
+    def test_per_phase_invocations(self, phase_a_fixture):
+        bench_dir, run_summary_path = phase_a_fixture
+        run_phase_b_analytics(bench_dir, run_summary_path=run_summary_path)
+
+        pa = json.loads(
+            (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
+        )
+        assert pa["per_phase"]["1"]["invocations"] == EXPECTED_INVOCATION_COUNT
+
+    def test_per_node_invocations(self, phase_a_fixture):
+        bench_dir, run_summary_path = phase_a_fixture
+        run_phase_b_analytics(bench_dir, run_summary_path=run_summary_path)
+
+        pa = json.loads(
+            (bench_dir / "phase_analytics.json").read_text(encoding="utf-8")
+        )
+        assert pa["per_node"]["n01_call_analysis"]["invocations"] == EXPECTED_INVOCATION_COUNT
+
+    def test_phases_1_7_token_total(self, phase_a_fixture):
+        bench_dir, run_summary_path = phase_a_fixture
+        run_phase_b_analytics(bench_dir, run_summary_path=run_summary_path)
+
+        te = json.loads(
+            (bench_dir / "token_economics.json").read_text(encoding="utf-8")
+        )
+        assert te["phases_1_7_estimated_total_tokens"] == te["total_estimated_tokens"]
+        assert te["phase_8_estimated_total_tokens"] == 0
 
     def test_all_invocations_are_tapm(self, phase_a_fixture):
         """All 4 fixture invocations are TAPM."""
