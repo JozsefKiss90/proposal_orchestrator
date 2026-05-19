@@ -516,6 +516,7 @@ def _assemble_tapm_prompt(
     node_id: str | None = None,
     caller_context: dict[str, Any] | None = None,
     optional_reads_from: list[str] | None = None,
+    output_contract: str = "single_artifact",
 ) -> tuple[str, str]:
     """Assemble TAPM (Tool-Augmented Prompt Mode) prompts for Claude.
 
@@ -690,6 +691,42 @@ def _assemble_tapm_prompt(
         user_prompt += "\nExpected output schemas:\n"
         for h in schema_hints:
             user_prompt += h + "\n"
+
+    if output_contract == "multi_artifact" and schema_hints:
+        # Explicit multi-artifact response format instructions.
+        # Extract the anchor field (first required field) from each hint
+        # so Claude knows exactly which top-level keys to include.
+        anchor_fields: list[str] = []
+        for h in schema_hints:
+            # Hints look like:
+            #   "  - <path> required fields: field1, field2"
+            if "required fields:" in h:
+                fields_part = h.split("required fields:", 1)[1].strip()
+                first_field = fields_part.split(",")[0].strip()
+                if first_field:
+                    anchor_fields.append(first_field)
+        if anchor_fields:
+            user_prompt += (
+                "\n## CRITICAL: Multi-Artifact Response Format\n\n"
+                "This skill produces MULTIPLE artifacts in a single response. "
+                "Your JSON response MUST be a single flat object containing ALL "
+                "of the following top-level keys — one for each artifact:\n\n"
+            )
+            for af in anchor_fields:
+                user_prompt += f"- \"{af}\"\n"
+            user_prompt += (
+                "\nExample structure (showing keys only):\n"
+                "```\n{\n"
+            )
+            for af in anchor_fields:
+                user_prompt += f"  \"{af}\": [...],\n"
+            user_prompt += (
+                "}\n```\n"
+                "Every key listed above MUST be present in your response. "
+                "A response missing any of these keys is a validation failure. "
+                "Do NOT nest artifacts under file names or paths — use the "
+                "flat structure shown above.\n"
+            )
 
     user_prompt += (
         "\nReturn a single JSON object conforming to the output schema "
@@ -1150,6 +1187,7 @@ def run_skill(
     optional_reads_from: list[str] = entry.get("optional_reads_from", [])
     writes_to: list[str] = entry.get("writes_to", [])
     constraints: list[str] = entry.get("constitutional_constraints", [])
+    output_contract: str = entry.get("output_contract", "single_artifact")
 
     # Load skill spec
     try:
@@ -1187,6 +1225,7 @@ def run_skill(
             node_id=node_id,
             caller_context=caller_context,
             optional_reads_from=optional_reads_from or None,
+            output_contract=output_contract,
         )
         logger.info(
             "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
@@ -1463,7 +1502,7 @@ def run_skill(
     # multi-artifact validation for skills with broad writes_to
     # directories (e.g. gate-enforcement writing to phase_outputs/).
 
-    output_contract = entry.get("output_contract", "single_artifact")
+    # output_contract already extracted in Phase A alongside other catalog fields.
 
     outputs_written: list[str] = []
 

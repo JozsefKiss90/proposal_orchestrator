@@ -1,3 +1,7 @@
+=== skill_id: evaluation-matrix-builder ===
+=== mode: tapm ===
+=== response_text length: 9637 ===
+=== response_text (full) ===
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
   "run_id": "4bb9ce95-342c-4662-8a95-d30a9388b621",
@@ -78,5 +82,42 @@
       "source_section": "Section 2 — Other Questions — Exclusive focus on civil applications",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
+  ],
+  "call_analysis_notes": "Evaluation form used: ef_he-ria-ia_en.pdf (Horizon Europe Evaluation Form HE RIA and IA, Version 4.0, 12 November 2025). Three evaluation criteria extracted from the evaluation section of the form: (1) Excellence — sub-criteria covering objectives/ambition/state-of-the-art and methodology/gender dimension/open science; (2) Impact — sub-criteria covering pathways credibility and dissemination/exploitation measures; (3) Quality and efficiency of the implementation — sub-criteria covering work plan quality/risk/effort and consortium capacity/expertise. Scoring scale: 0–5 (half-marks allowed); individual threshold per criterion: 3/5; overall threshold: 10/15 (sum of three criteria). For two-stage calls, stage 1 evaluates only Excellence and Impact with a raised threshold of 4 per criterion. Weights overlay from evaluation_priority_weights.json (source document: HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json): all three criteria carry null weights in the Tier 2B file — no explicit weighting table is provided in the call extract. The evaluation form itself states that scores are normally NOT weighted (weighting applies only for ranking in certain action types). weight_source set to 'tier2b_evaluation_priority_weights.json' for all three criteria to confirm the overlay lookup was performed. Criterion_id matching: Tier 2B entry 'Quality and Efficiency of the Implementation' matched to evaluation form criterion 'Quality and efficiency of the implementation' via case-insensitive string match — no unmatched Tier 2B weight entries remain. resolved_instrument_type set to 'RIA' on the basis of: (a) all three entries in evaluation_priority_weights.json carry assumption_notes referencing 'Standard Horizon Europe RIA evaluation criterion'; (b) source document HORIZON-CL4-2026-05-DIGITAL-EMERGING-02 is consistent with a RIA-type action under Cluster 4 Digital; (c) the evaluation form ef_he-ria-ia_en.pdf covers both RIA and IA, and RIA is the instrument class signalled by the Tier 2B context. Note: selected_call.json was not in the declared inputs for this skill invocation; the resolved_instrument_type is an inference from Tier 2B context signals and should be confirmed against selected_call.json by the invoking agent. Seven compliance requirements derived from Section 2 (Other Questions) of the evaluation form; all assigned status 'requires_review' pending project-specific content review.",
+  "instruments": [
+    {
+      "instrument_type": "RIA",
+      "criteria": [
+        {
+          "criterion_id": "Excellence",
+          "criterion_name": "Excellence",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Clarity and pertinence of the project's objectives, and the extent to which the proposed work is ambitious, and goes beyond the state of the art",
+            "Soundness of the proposed methodology, including the underlying concepts, models, assumptions, inter-disciplinary approaches, appropriate consideration of the gender dimension in research and innovation content, and the quality of open science practices, including sharing and management of research outputs and engagement of citizens, civil society and end users where appropriate"
+          ]
+        },
+        {
+          "criterion_id": "Impact",
+          "criterion_name": "Impact",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Credibility of the pathways to achieve the expected outcomes and impacts specified in the work programme",
+            "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities"
+          ]
+        },
+        {
+          "criterion_id": "Quality and efficiency of the implementation",
+          "criterion_name": "Quality and efficiency of the implementation",
+          "threshold_score": 3,
+          "evaluator_expectations": [
+            "Quality and effectiveness of the work plan, assessment of risks, and appropriateness of the effort assigned to work packages, and the resources overall",
+            "Capacity and role of each participant, and the extent to which the consortium as a whole brings together the necessary expertise"
+          ]
+        }
+      ]
+    }
   ]
 }
+
+=== END ===

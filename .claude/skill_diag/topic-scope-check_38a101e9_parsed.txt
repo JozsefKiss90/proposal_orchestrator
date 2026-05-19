@@ -1,0 +1,72 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-05-19T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agents powered by large AI language models (LLMs) capable of interpreting instructions, generating plans, using tools, and performing actions autonomously to achieve complex real-world tasks.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 1 develops a hybrid neuro-symbolic planning engine combining LLM-based reasoning with symbolic planning methods (Monte Carlo Tree Search, hierarchical task networks) to decompose high-level goals into structured sub-task graphs with formally specified pre-conditions, post-conditions, verification checkpoints, and self-correction through plan monitoring.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 2 develops a unified adaptive memory architecture integrating working memory, episodic memory, and semantic memory, governed by a memory controller that manages information flow across stores to sustain coherent long-horizon agent behaviour extending beyond any single LLM context window.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 3 develops decentralised multi-agent coordination protocols enabling heterogeneous agents to negotiate task assignments, establish shared commitments with provable convergence guarantees, resolve resource and plan conflicts, and produce auditable delegation and negotiation traces.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "A cross-cutting External Tool and API Orchestration Layer provides a typed tool registry with capability models, formal tool selection and invocation policies integrated with the neuro-symbolic planning engine, standardised API adapters (including HL7 FHIR and OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces \u2014 architecturally integrated across all three research pillars.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through a healthcare clinical decision support demonstrator (Apply AI sector: healthcare) co-designed with clinical partners, with quantitative KPIs including diagnostic accuracy, reasoning trace completeness, and tool invocation success rate benchmarked against clinician baselines.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through an advanced manufacturing process optimisation demonstrator (Apply AI sector: advanced manufacturing) co-designed with manufacturing partners, with quantitative KPIs including defect rate reduction, energy savings, and multi-agent coordination latency benchmarked against operational baselines.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through a logistics and supply chain demonstrator as a cross-sector transfer demonstrator explicitly framed as confirming architecture portability beyond the minimum sector requirement, co-designed with logistics industry partners across international supply chain corridors.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO does not address in-vehicle autonomous driving as a full demonstrator sector; it provides only a targeted architectural mapping analysis (WP8) to assess transferability of the MAESTRO architecture to autonomous driving settings.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-10",
+      "status": "flagged",
+      "flag_reason": "CC-10 establishes a portfolio coverage mechanism requiring that grants are awarded to ensure at least one funded proposal per each of the three specifically identified Apply AI sectors \u2014 healthcare, advanced manufacturing, and in-vehicle autonomous driving. MAESTRO covers healthcare and advanced manufacturing with full demonstrators but addresses in-vehicle autonomous driving only through an architectural mapping analysis (WP8), which falls short of a demonstrator. While SR-07 requires application in at least one Apply AI sector and MAESTRO satisfies this through two call-identified sectors, the architectural mapping analysis can
+=== END ===
