@@ -1,11 +1,12 @@
 """
-Phase B report builder — reads Phase A artifacts, writes analytics artifacts.
+Benchmark report builder — reads Phase A artifacts, writes Phase B and Phase C artifacts.
 
 Responsibilities:
 - Read ``invocation_ledger.jsonl``
 - Read Phase A ``run_benchmark_summary.json``
 - Optionally read ``run_summary.json``
 - Write Phase B artifacts atomically (write-to-temp + rename)
+- Write Phase C provider_projection.json (failure-isolated from Phase B)
 - Swallow all failures safely — never propagate to orchestration
 - Return list of paths written
 
@@ -28,12 +29,69 @@ from runner.benchmark.timing import build_timing_profile
 logger = logging.getLogger(__name__)
 
 
+def run_benchmark_reports(
+    bench_dir: Path,
+    *,
+    run_summary_path: Path | None = None,
+    catalog_path: Path | None = None,
+    repo_root: Path | None = None,
+) -> list[Path]:
+    """Execute all benchmark report phases (B + C) and write artifacts.
+
+    Phase B artifacts are written first. If Phase C fails, Phase B artifacts
+    are still returned. All exceptions are swallowed — never propagates to
+    orchestration.
+
+    Parameters
+    ----------
+    bench_dir
+        Path to ``.claude/benchmark/<run_id>/`` containing Phase A artifacts.
+    run_summary_path
+        Optional path to ``.claude/runs/<run_id>/run_summary.json``.
+    catalog_path
+        Optional explicit path to provider_catalog.json for Phase C.
+    repo_root
+        Repository root for resolving default catalog path.
+
+    Returns
+    -------
+    list[Path]
+        Paths of all artifacts written. Empty list on total failure.
+    """
+    written: list[Path] = []
+
+    # Phase B
+    try:
+        phase_b_paths = _run_phase_b_analytics_inner(
+            bench_dir, run_summary_path=run_summary_path
+        )
+        written.extend(phase_b_paths)
+    except Exception:
+        logger.debug("Phase B analytics failed (non-blocking)", exc_info=True)
+        return written
+
+    # Phase C — failure-isolated from Phase B
+    try:
+        phase_c_paths = _run_phase_c_projection(
+            bench_dir,
+            catalog_path=catalog_path,
+            repo_root=repo_root,
+        )
+        written.extend(phase_c_paths)
+    except Exception:
+        logger.debug("Phase C projection failed (non-blocking)", exc_info=True)
+
+    return written
+
+
 def run_phase_b_analytics(
     bench_dir: Path,
     *,
     run_summary_path: Path | None = None,
 ) -> list[Path]:
     """Execute Phase B analytics and write artifacts.
+
+    Backward-compatible wrapper. Calls Phase B only (no Phase C).
 
     Parameters
     ----------
@@ -255,5 +313,87 @@ def _build_expanded_summary(
     }
 
     expanded["benchmark_stage"] = "phase_b_analytics"
+
+    return expanded
+
+
+# ---------------------------------------------------------------------------
+# Phase C — Provider Projection
+# ---------------------------------------------------------------------------
+
+def _run_phase_c_projection(
+    bench_dir: Path,
+    *,
+    catalog_path: Path | None = None,
+    repo_root: Path | None = None,
+) -> list[Path]:
+    """Run Phase C provider projection and update summary. May raise."""
+    from runner.benchmark.provider_projection import build_provider_projection
+    from runner.benchmark.routing_analyzer import build_routing_recommendations
+
+    # Build projection
+    projection = build_provider_projection(
+        bench_dir,
+        catalog_path=catalog_path,
+        repo_root=repo_root,
+    )
+
+    # Add routing recommendations
+    token_economics = _read_json(bench_dir / "token_economics.json")
+    phase_analytics = _read_json(bench_dir / "phase_analytics.json")
+    if token_economics:
+        routing_recs = build_routing_recommendations(token_economics, phase_analytics)
+        projection["routing_recommendations"] = routing_recs
+
+    # Write provider_projection.json
+    written: list[Path] = []
+    proj_path = bench_dir / "provider_projection.json"
+    _write_json_atomic(proj_path, projection)
+    written.append(proj_path)
+
+    # Expand run_benchmark_summary.json with Phase C data
+    current_summary = _read_json(bench_dir / "run_benchmark_summary.json")
+    if current_summary:
+        expanded = _expand_summary_with_phase_c(current_summary, projection, proj_path)
+        summary_path = bench_dir / "run_benchmark_summary.json"
+        _write_json_atomic(summary_path, expanded)
+        written.append(summary_path)
+
+    return written
+
+
+def _expand_summary_with_phase_c(
+    current_summary: dict,
+    projection: dict,
+    proj_path: Path,
+) -> dict:
+    """Add Phase C fields to run_benchmark_summary, preserving all prior fields."""
+    expanded: dict[str, Any] = {}
+    expanded.update(current_summary)
+
+    # Provider projection summary
+    projections = projection.get("projections", [])
+    suitable_count = sum(
+        1 for p in projections if p.get("supports_all_modes", False)
+    )
+    recommendations = projection.get("recommendations", {})
+    lowest = recommendations.get("lowest_projected_cost")
+
+    expanded["provider_projection_summary"] = {
+        "total_providers_evaluated": len(projections),
+        "suitable_providers": suitable_count,
+        "lowest_projected_cost_usd": (
+            lowest["projected_total_cost_usd"] if lowest else None
+        ),
+        "lowest_projected_cost_provider": (
+            lowest["display_name"] if lowest else None
+        ),
+    }
+
+    expanded["phase_c_artifact_paths"] = {
+        "provider_projection": proj_path.name,
+    }
+
+    expanded["benchmark_stage"] = "phase_c_provider_projection"
 
     return expanded

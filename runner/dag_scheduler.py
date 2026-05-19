@@ -1374,25 +1374,26 @@ class DAGScheduler:
                         + bench_summary.total_estimated_output_tokens,
                     )
 
-                    # Phase B analytics: transform ledger into aggregate artifacts
+                    # Benchmark reports: Phase B analytics + Phase C projection
                     try:
-                        from runner.benchmark.report_builder import run_phase_b_analytics
+                        from runner.benchmark.report_builder import run_benchmark_reports
                         _run_summary_path = (
                             self.repo_root / ".claude" / "runs"
                             / self.ctx.run_id / "run_summary.json"
                         )
-                        _phase_b_paths = run_phase_b_analytics(
+                        _report_paths = run_benchmark_reports(
                             _bench_dir,
                             run_summary_path=_run_summary_path,
+                            repo_root=self.repo_root,
                         )
-                        if _phase_b_paths:
+                        if _report_paths:
                             log.info(
-                                "Phase B analytics written: %d artifacts",
-                                len(_phase_b_paths),
+                                "Benchmark reports written: %d artifacts",
+                                len(_report_paths),
                             )
                     except Exception:
                         log.debug(
-                            "Phase B analytics failed (non-blocking)",
+                            "Benchmark reports failed (non-blocking)",
                             exc_info=True,
                         )
 
