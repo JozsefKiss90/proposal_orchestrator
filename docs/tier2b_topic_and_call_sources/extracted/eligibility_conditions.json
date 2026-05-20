@@ -2,17 +2,17 @@
   "conditions": [
     {
       "condition_id": "EC-01",
-      "description": "Participation restricted to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
       "condition_type": "geographic",
-      "source_section": "eligibility_restrictions.eligible_entities",
+      "source_section": "Eligibility Restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-02",
-      "description": "Entities controlled by non-eligible countries may be excluded from participation unless sufficient guarantees are provided.",
+      "description": "Entities controlled by non-eligible countries may be excluded unless guarantees are provided.",
       "condition_type": "geographic",
-      "source_section": "eligibility_restrictions.control_restrictions",
+      "source_section": "Eligibility Restrictions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
@@ -20,47 +20,52 @@
       "condition_id": "EC-03",
       "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
       "condition_type": "trl_level",
-      "source_section": "technology_readiness_level",
+      "source_section": "Technology Readiness Level",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-04",
-      "description": "Maximum EU contribution per project is €19,000,000; both the minimum and maximum expected EU contribution are €19,000,000 (fixed amount).",
+      "description": "Maximum EU contribution per project is €19,000,000. Both the minimum and maximum contributions are set at €19,000,000 (effectively a fixed-amount grant).",
       "condition_type": "budget_limit",
-      "source_section": "expected_eu_contribution_per_project_eur",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "source_section": "Financial Information",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-05",
-      "description": "Portfolio coverage procedure: grants will be awarded to ensure at least one funded project focuses on each of the three sectors — healthcare, advanced manufacturing, and in-vehicle autonomous driving — subject to proposals passing all evaluation thresholds.",
+      "description": "Maximum project duration is 48 months.",
       "condition_type": "other",
-      "source_section": "procedure_exceptions",
-      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
-      "status": "Confirmed"
+      "source_section": "Call Binding Metadata",
+      "source_document": "selected_call.json",
+      "status": "Assumed",
+      "assumption_note": "The 48-month maximum is recorded in selected_call.json with an explicit note that it is not stated in the topic text and represents the standard maximum for large RIA actions under Horizon Europe. Verification against Tier 1 normative sources (General Annex B) is required before this is treated as a binding constraint."
     },
     {
       "condition_id": "EC-06",
-      "description": "Financial Support to Third Parties (FSTP) financial ceilings: maximum €300,000 per grant at stage 2; maximum €2,250,000 per grant at stage 3; maximum €2,550,000 per third party.",
-      "condition_type": "budget_limit",
-      "source_section": "fstp_provisions",
+      "description": "Financial support to third parties (FSTP) is applicable with the following limits: maximum per grant at stage 2 of €300,000; maximum per grant at stage 3 of €2,250,000; maximum per third party of €2,550,000.",
+      "condition_type": "other",
+      "source_section": "FSTP Provisions",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-07",
-      "description": "Standard Horizon Europe RIA minimum consortium requirements apply: at least 3 independent legal entities from 3 different eligible countries.",
+      "description": "Standard Horizon Europe RIA minimum consortium composition requirements apply: at least 3 legal entities from 3 different Member States or associated countries.",
       "condition_type": "consortium_composition",
+      "source_section": "Eligibility Conditions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "Standard Horizon Europe RIA minimum consortium requirement per General Annex B; not explicitly stated in the topic-specific call extract documents. The topic source documents are silent on minimum consortium size and composition requirements beyond geographic eligibility restrictions. Verification against General Annex B is required."
+      "assumption_note": "The call slice eligibility_conditions field is empty and the curated extract does not specify minimum consortium composition requirements for this topic. The standard Horizon Europe RIA minimum of 3 legal entities from 3 different eligible countries (from General Annex B) is assumed to apply but must be verified against Tier 1 normative sources before use in compliance checking."
     },
     {
       "condition_id": "EC-08",
-      "description": "Open access requirements apply to research results and publications produced under this grant, consistent with Horizon Europe open science obligations.",
+      "description": "Open access to research results and publications is required, consistent with Horizon Europe open science requirements.",
       "condition_type": "open_access",
+      "source_section": "Eligibility Conditions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "Standard Horizon Europe open access mandate per the Programme Guide and General Annex F; not explicitly stated in the topic-specific call extract documents. The topic requirement to share communicable results via the AI-on-demand platform (call_entry.scope field of HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json) implies open sharing obligations, but the full open access mandate derives from the normative framework (Tier 1), not this Tier 2B source."
+      "assumption_note": "Open access requirements are standard for Horizon Europe RIA actions under the Model Grant Agreement but are not explicitly stated in this topic’s call text or curated extract. This condition is assumed on the basis of the standard Horizon Europe open science mandate; verification against Tier 1 normative sources is required."
     }
   ]
 }

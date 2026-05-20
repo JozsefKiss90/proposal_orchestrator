@@ -1,0 +1,150 @@
+=== skill_id: topic-scope-check ===
+=== mode: tapm ===
+=== response_text length: 10703 ===
+=== response_text (full) ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-05-20T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops AI agent architectures powered by large language models that can plan, utilise tools, and perform actions autonomously to accomplish complex real-world tasks.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates structured neuro-symbolic planning and reasoning (including Monte Carlo Tree Search, hierarchical task networks, LLM-driven heuristic evaluation) with formal verification, plan monitoring, and self-correction mechanisms enabling advanced self-planning and self-optimisation.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates a memory-augmented AI architecture integrating working memory, episodic memory, and a semantic knowledge graph, managed by a memory controller, to sustain long-term reasoning and enable experience-based learning without retraining.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops decentralised multi-agent coordination protocols with formal task-delegation, conflict resolution mechanisms, and auditable multi-agent interactions enabling heterogeneous collaborative agents with provable convergence guarantees.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops an External Tool and API Orchestration Layer providing a typed tool registry with capability models, formal tool selection and invocation policies, standardised API adapters abstracting heterogeneous protocols (including HL7 FHIR and OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured 6-month integration progress monitoring checkpoints with measurable performance targets benchmarked against operational baselines.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO allocates dedicated tasks for cohesion activities with the co-programmed European Partnership on AI, Data and Robotics (ADRA) and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All research outputs — frameworks, models, benchmarks, the External Tool and API Orchestration Layer, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO will link to resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-05",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates its research through two of the three call-identified Apply AI sectors: healthcare (clinical decision support) and advanced manufacturing (process optimisation), both validated in operational environments.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All MAESTRO demonstrators target TRL 5 validation in operational environments, co-designed with industry partners in healthcare, manufacturing, and logistics.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The requested EU contribution is €18,500,000.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO includes a logistics and supply chain operations demonstrator as a cross-sector transfer domain to demonstrate generalisability and architectural portability beyond the call's three named Apply AI sectors.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "Logistics and supply chain is not among the three call-identified portfolio-priority Apply AI sectors defined in SR-14 and CC-11 (healthcare, advanced manufacturing, in-vehicle autonomous driving). While no Tier 2B constraint explicitly excludes logistics as an additional validation domain, no scope_requirements.json entry confirms logistics as a recognised sector for this call. The logistics demonstrator is positioned as a cross-sector transfer exercise, which is architecturally relevant but may be assessed differently from the three call-named sectors by evaluators applying portfolio coverage logic under CC-11. The absence of a corresponding scope element means in-scope status cannot be confirmed; scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "MAESTRO explicitly does not validate in the in-vehicle autonomous driving sector (the third call-identified portfolio-priority sector per SR-14 and CC-11) and instead provides only a targeted architectural mapping analysis assessing autonomous driving transferability (WP8).",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "In-vehicle autonomous driving is one of the three call-identified portfolio-priority sectors (SR-14; CC-11). MAESTRO does not include an autonomous driving demonstrator; the concept provides only a 'targeted architectural mapping analysis' for this sector. While CC-11's portfolio coverage mechanism operates at the award portfolio level (the EC ensures at least one funded proposal per sector — not requiring any single proposal to cover all three), the explicit absence of an autonomous driving demonstrator is a strategic positioning risk: it removes MAESTRO from consideration as the portfolio-coverage proposal for that sector and relies entirely on other funded proposals covering autonomous driving. This gap and its implications for portfolio selection probability should be surfaced and resolved before concept finalisation."
+    },
+    {
+      "claim": "The proposed project duration is 48 months.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-08",
+      "status": "flagged",
+      "flag_reason": "CC-08 (maximum project duration 48 months) is classified as 'Assumed' in call_constraints.json, with an assumption_note requiring verification against General Annex B before it can be treated as a binding constraint. The project's proposed 48-month duration sits at the stated maximum; if the verified binding maximum differs, the proposed duration would require adjustment. This cannot be confirmed as within-constraint until CC-08 status is upgraded from Assumed to Confirmed against General Annex B."
+    },
+    {
+      "claim": "The strategic positioning document uses the internal label 'SR-04' to refer to a call scope requirement mandating integration of external tools and APIs to overcome limitations of large AI models, identifying this as an 'essential required element'.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "The proposal's internal reference label 'SR-04' for the external tool and API integration requirement conflicts with the Tier 2B scope_requirements.json labelling, in which SR-04 is the requirement for ADRA/GenAI4EU cohesion activities allocation. The substantive claim — that external tool and API integration is a required project element — is grounded in SR-01 (which defines AI agents that plan, utilise tools, and perform actions autonomously). The mislabelled cross-reference creates a traceability ambiguity: evaluators and reviewers cross-checking strategic_positioning.md against Tier 2B scope_requirements.json will find 'SR-04' pointing to a different requirement. This discrepancy should be corrected in the concept note and strategic positioning to reference SR-01 before submission."
+    },
+    {
+      "claim": "MAESTRO's open-source framework and standardised agent interaction protocols will lower barriers for European SMEs and startups to build on next-generation AI agent technology, reducing strategic dependency on non-European AI platforms.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No specific Tier 2B scope element in scope_requirements.json explicitly identifies open-source framework release for European SMEs and startups, or reduction of strategic dependency on non-European AI platforms, as a required or recognised project activity. The nearest Tier 2B elements are SR-05 (sharing results via the AI-on-demand platform) and SR-08 (deployment via EDIHs), but neither covers open-source release targeting SME adoption as a distinct scope-defined activity. The claim is not contradicted by any constraint in call_constraints.json but cannot be confirmed in-scope without a matching Tier 2B scope element; scope boundary is defined by Tier 2B only per CLAUDE.md §13.2."
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope",
+    "Procedure",
+    "Technology Readiness Level",
+    "Financial Information",
+    "Call Binding Metadata"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-05-20T12:00:00Z"
+}
+
+=== END ===

@@ -1,8 +1,8 @@
 ---
 skill_id: call-requirements-extraction
 purpose_summary: >
-  Extract binding topic-specific requirements from work programme and call extract
-  documents, producing structured output with a source section reference for every
+  Extract binding topic-specific requirements from the Step 0 call slice and curated
+  call extract, producing structured output with a source section reference for every
   extracted element.
 used_by_agents:
   - call_analyzer
@@ -20,9 +20,8 @@ constitutional_constraints:
 ## Input Access (TAPM Mode)
 
 Read the files listed in the Declared Inputs section from disk using the Read tool.
-For call data, read the Step 0 call slice (*.slice.json) and the curated call extract file.
-Do not read grouped JSON files (cluster_CL*.grouped.json) or work programme directories.
-Do not read files outside the declared input set.
+Your source files are: the Step 0 call slice (`*.slice.json`), the curated call extract (`<topic_code>.json`), and `selected_call.json`. These three files contain all data needed for extraction.
+Do NOT read any files outside the declared input set — in particular, do NOT read `work_programmes/` directories or grouped JSON files (`cluster_CL*.grouped.json`).
 Return your output as a single JSON object in your response.
 
 ## Canonical Inputs and Outputs
@@ -39,12 +38,12 @@ Return your output as a single JSON object in your response.
 
 | Path | Artifact | Schema ID | Required Fields (from artifact_schema_specification.yaml) | run_id Required | Derivation Source |
 |------|----------|-----------|----------------------------------------------------------|-----------------|-------------------|
-| `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` | call_constraints.json | N/A — Tier 2B extracted (not a phase output canonical artifact) | constraint entries with source_section and source_document per item; Confirmed/Inferred/Assumed/Unresolved status per item | No — Tier 2B extracted artifact, not a phase output | Extracted directly from work programme and call extract source documents |
-| `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` | expected_outcomes.json | N/A — Tier 2B extracted | expected outcome entries with source_section, source_document, and status per item | No | Extracted from work programme expected outcomes sections |
-| `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` | expected_impacts.json | N/A — Tier 2B extracted | expected impact entries with source_section, source_document, and status per item; impact_id used as join key in Phase 5 | No | Extracted from work programme expected impacts sections |
-| `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` | scope_requirements.json | N/A — Tier 2B extracted | scope boundary entries with source_section, source_document, and status per item | No | Extracted from topic scope sections of work programme and call extract |
-| `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json` | eligibility_conditions.json | N/A — Tier 2B extracted | eligibility condition entries with source_section, source_document, and status per item | No | Extracted from eligibility and participation conditions in work programme |
-| `docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json` | evaluation_priority_weights.json | N/A — Tier 2B extracted | criterion-level weight entries with source_section, source_document per item | No | Extracted from evaluation criteria weighting tables in call extract and work programme |
+| `docs/tier2b_topic_and_call_sources/extracted/call_constraints.json` | call_constraints.json | N/A — Tier 2B extracted (not a phase output canonical artifact) | constraint entries with source_section and source_document per item; Confirmed/Inferred/Assumed/Unresolved status per item | No — Tier 2B extracted artifact, not a phase output | Extracted from call slice and curated call extract |
+| `docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json` | expected_outcomes.json | N/A — Tier 2B extracted | expected outcome entries with source_section, source_document, and status per item | No | Extracted from call slice expected_outcome field |
+| `docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json` | expected_impacts.json | N/A — Tier 2B extracted | expected impact entries with source_section, source_document, and status per item; impact_id used as join key in Phase 5 | No | Extracted from call slice expected_outcome field (impacts co-located with outcomes in call text) |
+| `docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json` | scope_requirements.json | N/A — Tier 2B extracted | scope boundary entries with source_section, source_document, and status per item | No | Extracted from call slice scope field and curated call extract |
+| `docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json` | eligibility_conditions.json | N/A — Tier 2B extracted | eligibility condition entries with source_section, source_document, and status per item | No | Extracted from call slice eligibility and participation fields |
+| `docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json` | evaluation_priority_weights.json | N/A — Tier 2B extracted | criterion-level weight entries with source_section, source_document per item | No | Extracted from curated call extract evaluation criteria and call slice procedure fields |
 
 ### Artifact Registry Cross-Reference
 
@@ -61,22 +60,22 @@ Return your output as a single JSON object in your response.
 
 ### 1. Input Validation Sequence
 
-- Step 1.1: Presence check — confirm `docs/tier2b_topic_and_call_sources/work_programmes/` exists and is non-empty (dir_non_empty). If empty: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="work_programmes/ directory is empty; cannot extract call requirements without source documents") and halt.
-- Step 1.2: Presence check — confirm `docs/tier2b_topic_and_call_sources/call_extracts/` exists and is non-empty (dir_non_empty). If empty: log as Assumed (work programme is the sole source) and continue; do not halt.
+- Step 1.1: Presence check — confirm `docs/tier2b_topic_and_call_sources/call_extracts/` exists and contains the Step 0 call slice (`*.slice.json`) for the target topic. If the call slice is absent: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="call_extracts/ does not contain a .slice.json file for the target topic; cannot extract call requirements without the call slice") and halt.
+- Step 1.2: Presence check — confirm that the curated call extract (`<topic_code>.json`) also exists in `call_extracts/`. If absent: log as Assumed (the call slice is the sole source) and continue; do not halt.
 - Step 1.3: Confirm that the invoking agent has provided the target topic identifier (from `docs/tier3_project_instantiation/call_binding/selected_call.json`) as context. If not provided: return SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="selected_call topic identifier required to scope extraction") and halt.
-- Step 1.4: Confirm source documents in work_programmes/ are readable (not corrupted or inaccessible). If any file is unreadable: log as Unresolved in pre-extraction notes; continue with readable files only, but flag in all output files that coverage may be incomplete.
+- Step 1.4: Confirm source documents in call_extracts/ (the call slice and curated extract) are readable (not corrupted or inaccessible). If any file is unreadable: log as Unresolved in pre-extraction notes; continue with readable files only, but flag in all output files that coverage may be incomplete.
 
 ### 2. Core Processing Logic
 
-- Step 2.1: Index all files in `docs/tier2b_topic_and_call_sources/work_programmes/` and `docs/tier2b_topic_and_call_sources/call_extracts/`. For each file, record the filename and parse the section structure (section identifiers and headings).
-- Step 2.2: Locate sections in the work programme documents that correspond to the target topic identifier from selected_call.json. Mark these sections as the primary extraction scope.
-- Step 2.3: Extract **call_constraints** entries: for each section stating what the call requires, excludes, or mandates (e.g., technology readiness levels, excluded activities, mandatory consortium types), create one entry. Each entry must carry: a `constraint_id` (unique, e.g., "CC-01"), `description` (verbatim or close paraphrase of the source text), `source_section` (e.g., "Section 2.1.3"), `source_document` (filename), and `status`. Status assignment rules: Confirmed = the constraint is explicitly stated as a requirement, exclusion, or mandate in the source text. Inferred = the constraint is logically derivable from stated requirements (must state the derivation chain in an `inference_note` field). Assumed = the constraint is structurally expected for this instrument type but not explicitly stated (must declare the assumption in an `assumption_note` field). Unresolved = the work programme and call extract give conflicting signals about the constraint (must name both sources and describe the conflict in a `conflict_note` field).
-- Step 2.4: Extract **expected_outcomes** entries: for each outcome statement in the work programme (typically under "Expected outcomes" headings), create one entry. Each entry must carry: `outcome_id` (unique, e.g., "EO-01"), `description`, `source_section`, `source_document`, `status` (same assignment rules as Step 2.3). The `outcome_id` value becomes the join key for Phase 2 alignment checking.
-- Step 2.5: Extract **expected_impacts** entries: for each impact statement in the work programme (typically under "Expected impacts" headings), create one entry. Each entry must carry: `impact_id` (unique, e.g., "EI-01"), `description`, `source_section`, `source_document`, `status`. The `impact_id` value is the join key for Phase 5 impact pathway mapping and must be preserved exactly as assigned here throughout all downstream phases.
-- Step 2.6: Extract **scope_requirements** entries: for each statement defining the thematic scope, required focus areas, or explicitly excluded topics, create one entry. Each entry must carry: `scope_element_id` (unique, e.g., "SR-01"), `description`, `boundary_type` (one of: `required_focus`, `excluded_topic`, `conditional_requirement`), `source_section`, `source_document`, `status`.
-- Step 2.7: Extract **eligibility_conditions** entries: for each participation eligibility condition (minimum consortium size, partner type requirements, country restrictions, ethics requirements), create one entry. Each entry must carry: `condition_id` (unique, e.g., "EC-01"), `description`, `condition_type` (one of: `consortium_composition`, `partner_type`, `country_restriction`, `ethics`, `other`), `source_section`, `source_document`, `status`.
-- Step 2.8: Extract **evaluation_priority_weights** entries: for each evaluation criterion with an explicit or implied weighting (often in weighting tables or "evaluation criteria" sections of the call extract), create one entry. Each entry must carry: `criterion_id` (matching the form criterion label, e.g., "Excellence", "Impact"), `weight` (numeric percentage if stated, null if not stated), `priority_note` (any call-specific priority statement), `source_section`, `source_document`, `status`.
-- Step 2.9: If the call extract contains information that supplements or conflicts with the work programme for any of the six extraction categories above: for supplementary information, add additional entries from the call extract with `source_document` pointing to the call extract file. For conflicting information: set `status` to "Unresolved" on all affected entries and populate `conflict_note` naming both sources.
+- Step 2.1: Read the declared input files in `docs/tier2b_topic_and_call_sources/call_extracts/`: the Step 0 call slice (`*.slice.json`) and the curated call extract (`<topic_code>.json`). Also read `selected_call.json`. These three files are the complete extraction source set. Do NOT read files outside call_extracts/ or selected_call.json.
+- Step 2.2: Parse the call slice's `call_entry` object — its `scope`, `expected_outcome`, `eligibility_conditions`, `procedure`, and `technology_readiness_level` fields are the primary extraction scope. Cross-reference with structured fields in the curated call extract.
+- Step 2.3: Extract **call_constraints** entries: for each section in the call slice or curated extract stating what the call requires, excludes, or mandates (e.g., technology readiness levels, excluded activities, mandatory consortium types), create one entry. Each entry must carry: a `constraint_id` (unique, e.g., "CC-01"), `description` (verbatim or close paraphrase of the source text), `source_section` (e.g., "Scope" or "Eligibility Conditions"), `source_document` (filename of the call slice or curated extract), and `status`. Status assignment rules: Confirmed = the constraint is explicitly stated as a requirement, exclusion, or mandate in the source text. Inferred = the constraint is logically derivable from stated requirements (must state the derivation chain in an `inference_note` field). Assumed = the constraint is structurally expected for this instrument type but not explicitly stated (must declare the assumption in an `assumption_note` field). Unresolved = the call slice and curated extract give conflicting signals about the constraint (must name both sources and describe the conflict in a `conflict_note` field).
+- Step 2.4: Extract **expected_outcomes** entries: for each outcome statement in the call slice's `expected_outcome` field, create one entry. Each entry must carry: `outcome_id` (unique, e.g., "EO-01"), `description`, `source_section`, `source_document`, `status` (same assignment rules as Step 2.3). The `outcome_id` value becomes the join key for Phase 2 alignment checking.
+- Step 2.5: Extract **expected_impacts** entries: for each impact statement in the call slice's `expected_outcome` field (impacts are often co-located with outcomes in the call text), create one entry. Each entry must carry: `impact_id` (unique, e.g., "EI-01"), `description`, `source_section`, `source_document`, `status`. The `impact_id` value is the join key for Phase 5 impact pathway mapping and must be preserved exactly as assigned here throughout all downstream phases.
+- Step 2.6: Extract **scope_requirements** entries: for each statement in the call slice's `scope` field defining the thematic scope, required focus areas, or explicitly excluded topics, create one entry. Each entry must carry: `scope_element_id` (unique, e.g., "SR-01"), `description`, `boundary_type` (one of: `required_focus`, `excluded_topic`, `conditional_requirement`), `source_section`, `source_document`, `status`.
+- Step 2.7: Extract **eligibility_conditions** entries: for each participation eligibility condition in the call slice (minimum consortium size, partner type requirements, country restrictions, ethics requirements), create one entry. Each entry must carry: `condition_id` (unique, e.g., "EC-01"), `description`, `condition_type` (one of: `consortium_composition`, `partner_type`, `country_restriction`, `ethics`, `other`), `source_section`, `source_document`, `status`.
+- Step 2.8: Extract **evaluation_priority_weights** entries: for each evaluation criterion with an explicit or implied weighting (from the curated call extract's structured fields or the call slice's procedure section), create one entry. Each entry must carry: `criterion_id` (matching the form criterion label, e.g., "Excellence", "Impact"), `weight` (numeric percentage if stated, null if not stated), `priority_note` (any call-specific priority statement), `source_section`, `source_document`, `status`.
+- Step 2.9: If the curated call extract contains information that supplements or conflicts with the call slice for any of the six extraction categories above: for supplementary information, add additional entries with `source_document` pointing to the curated extract file. For conflicting information: set `status` to "Unresolved" on all affected entries and populate `conflict_note` naming both sources.
 - Step 2.10: Count total entries across all six output files. If any output file would be empty (zero entries): do not write that file. Return SkillResult(status="failure", failure_category="INCOMPLETE_OUTPUT", failure_reason="<filename> contains zero extractable entries; source document may not correspond to the target topic") and halt.
 
 ### 3. Output Construction
@@ -85,7 +84,7 @@ For each of the six output JSON files, the structure is an array of entries as d
 
 **`call_constraints.json`:**
 - Root field: `constraints` — array of entries produced in Step 2.3
-- Each entry: `constraint_id` (string, unique), `description` (string), `constraint_type` (string, one of: eligibility/scope/methodological/partnership/reporting/other — required per tier2b_extracted_schemas.call_constraints spec), `source_section` (string, non-empty), `source_document` (string, filename from work_programmes/ or call_extracts/), `status` (one of: "Confirmed", "Inferred", "Assumed", "Unresolved"), and conditionally: `inference_note` (if Inferred), `assumption_note` (if Assumed), `conflict_note` (if Unresolved)
+- Each entry: `constraint_id` (string, unique), `description` (string), `constraint_type` (string, one of: eligibility/scope/methodological/partnership/reporting/other — required per tier2b_extracted_schemas.call_constraints spec), `source_section` (string, non-empty), `source_document` (string, filename from call_extracts/), `status` (one of: "Confirmed", "Inferred", "Assumed", "Unresolved"), and conditionally: `inference_note` (if Inferred), `assumption_note` (if Assumed), `conflict_note` (if Unresolved)
 
 **`expected_outcomes.json`:**
 - Root field: `outcomes` — array of entries produced in Step 2.4 (matches tier2b_extracted_schemas.expected_outcomes spec)
@@ -131,7 +130,7 @@ These are Tier 2B extracted artifacts, not phase output canonical artifacts. No 
 
 **Decision point in execution logic:** Step 2.3–2.9 — at the moment each extracted entry is created. Every constraint, outcome, impact, scope element, eligibility condition, and evaluation weight entry is subject to this constraint at the instant it is written.
 
-**Exact failure condition:** Any extracted entry is assigned `status: "Confirmed"` or `status: "Inferred"` without a non-empty `source_section` and a non-empty `source_document` that identifies an actual file in `docs/tier2b_topic_and_call_sources/work_programmes/` or `docs/tier2b_topic_and_call_sources/call_extracts/`. Equivalently: any entry is constructed from agent prior knowledge of Horizon Europe rather than from the source documents read in Step 2.1–2.2.
+**Exact failure condition:** Any extracted entry is assigned `status: "Confirmed"` or `status: "Inferred"` without a non-empty `source_section` and a non-empty `source_document` that identifies an actual file in `docs/tier2b_topic_and_call_sources/call_extracts/` (the call slice or curated extract). Equivalently: any entry is constructed from agent prior knowledge of Horizon Europe rather than from the source documents read in Step 2.1–2.2.
 
 **Enforcement mechanism — deterministic branching rule:**
 
@@ -204,7 +203,7 @@ IF `status ∈ {Assumed, Unresolved}` AND (`source_section` is absent/empty OR `
 ### MISSING_INPUT
 
 **Trigger conditions in this skill:**
-- Step 1.1: `docs/tier2b_topic_and_call_sources/work_programmes/` directory is empty or absent → `failure_reason="work_programmes/ directory is empty; cannot extract call requirements without source documents"`
+- Step 1.1: `docs/tier2b_topic_and_call_sources/call_extracts/` does not contain a `.slice.json` file for the target topic → `failure_reason="call_extracts/ does not contain a .slice.json file for the target topic; cannot extract call requirements without the call slice"`
 - Step 1.3: Invoking agent has not provided the target topic identifier from `selected_call.json` → `failure_reason="selected_call topic identifier required to scope extraction"`
 
 **Required response:** `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason=<specific reason>)`
@@ -324,7 +323,7 @@ This skill reads from source document directories (not structured schema-validat
 
 ### Conformance summary
 
-- **reads_from compliance:** Reads only from `docs/tier2b_topic_and_call_sources/work_programmes/` and `docs/tier2b_topic_and_call_sources/call_extracts/` — both declared in frontmatter. Compliant.
+- **reads_from compliance:** Reads only from `docs/tier2b_topic_and_call_sources/call_extracts/` and `docs/tier3_project_instantiation/call_binding/selected_call.json` — both declared in frontmatter. Compliant.
 - **writes_to compliance:** Writes only to `docs/tier2b_topic_and_call_sources/extracted/` — declared in frontmatter. Compliant.
 - **`schema_id` / `run_id` / `artifact_status`:** Spec treats these artifacts as `manually_placed` (no schema_id_value). Step 4 correctly states these fields do not apply and must not be added. Compliant.
 - **Validation status vocabulary:** Skill correctly enforces Confirmed/Inferred/Assumed/Unresolved per CLAUDE.md §12.2 across all six files, via Constraint 3 (INCOMPLETE_OUTPUT). This augments the base spec (which is silent on status fields for Tier 2B) without conflicting with it.

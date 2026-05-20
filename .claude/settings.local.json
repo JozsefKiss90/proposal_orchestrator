@@ -106,7 +106,14 @@
       "Bash(find /c/Code/proposal_demo/proposal_orchestrator/tests/fixtures -type f -name *.json)",
       "Bash(echo \"exit: $?\")",
       "Bash(npx --yes @mermaid-js/mermaid-cli --version)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(powershell -c \"\\(Get-Item ''C:\\\\Code\\\\proposal_demo\\\\proposal_orchestrator\\\\docs\\\\tier2b_topic_and_call_sources\\\\call_extracts\\\\HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json''\\).Length\")",
+      "Bash(tasklist)",
+      "Bash(powershell -c \"Get-Process | Where-Object {$_ocessName -like ''''*claude*''''} | Format-Table ProcessName,Id,CPU,WorkingSet -AutoSize\")",
+      "Bash(timeout 30 claude -p --model claude-sonnet-4-6 --tools \"Read,Glob\" --system-prompt \"Reply with exactly: OK\")",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(timeout 60 claude -p --model claude-sonnet-4-6 --tools \"Read,Glob\" --system-prompt \"You are a JSON extractor. Reply with only the requested value.\")",
+      "Bash(du -sh C:/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/work_programmes/*)"
     ]
   }
 }
