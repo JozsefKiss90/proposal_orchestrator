@@ -1,9 +1,9 @@
 {
   "schema_id": "orch.phase4.scheduling_constraints.v1",
-  "run_id": "badb62ef-fb9c-4d14-a405-5181400524b9",
-  "source_wp_structure_run_id": "40b0bbbd-82e1-48d6-b8d2-e05f0e898092",
+  "run_id": "27e1486a-d276-491f-8a81-acdf100bc45e",
+  "source_wp_structure_run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
   "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-  "normalization_timestamp": "2026-04-23T17:00:45.972733+00:00",
+  "normalization_timestamp": "2026-05-20T13:12:43.790635+00:00",
   "project_duration_months": 48,
   "wp_bounds": {
     "WP1": {
@@ -47,6 +47,20 @@
   "non_strict_constraints": [
     {
       "from": "WP2",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP3",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
       "to": "WP5",
       "original_edge_type": "data_input",
       "action": "preserved",
@@ -65,6 +79,13 @@
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP5",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "from": "WP2",
@@ -88,6 +109,13 @@
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
+      "from": "WP8",
+      "to": "WP6",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
       "from": "WP2",
       "to": "WP7",
       "original_edge_type": "data_input",
@@ -109,46 +137,32 @@
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
+      "from": "WP8",
+      "to": "WP7",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
       "from": "WP2",
       "to": "WP8",
-      "original_edge_type": "data_input",
+      "original_edge_type": "partial_output",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "from": "WP3",
       "to": "WP8",
-      "original_edge_type": "data_input",
+      "original_edge_type": "partial_output",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "from": "WP4",
       "to": "WP8",
-      "original_edge_type": "data_input",
+      "original_edge_type": "partial_output",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP5",
-      "to": "WP8",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP6",
-      "to": "WP8",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP7",
-      "to": "WP8",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "from": "WP8",
@@ -162,6 +176,26 @@
     {
       "edge": {
         "from": "WP2",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
         "to": "WP5"
       },
       "original_type": "data_input",
@@ -188,6 +222,16 @@
       "normalized_type": "non_strict",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP5"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "edge": {
@@ -221,6 +265,16 @@
     },
     {
       "edge": {
+        "from": "WP8",
+        "to": "WP6"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
         "from": "WP2",
         "to": "WP7"
       },
@@ -251,63 +305,43 @@
     },
     {
       "edge": {
+        "from": "WP8",
+        "to": "WP7"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
         "from": "WP2",
         "to": "WP8"
       },
-      "original_type": "data_input",
+      "original_type": "partial_output",
       "normalized_type": "non_strict",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "edge": {
         "from": "WP3",
         "to": "WP8"
       },
-      "original_type": "data_input",
+      "original_type": "partial_output",
       "normalized_type": "non_strict",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "edge": {
         "from": "WP4",
         "to": "WP8"
       },
-      "original_type": "data_input",
+      "original_type": "partial_output",
       "normalized_type": "non_strict",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "WP5",
-        "to": "WP8"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "WP6",
-        "to": "WP8"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "WP7",
-        "to": "WP8"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
     },
     {
       "edge": {

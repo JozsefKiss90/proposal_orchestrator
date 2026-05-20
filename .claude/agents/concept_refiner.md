@@ -21,7 +21,6 @@ writes_to:
 invoked_skills:
   - concept-alignment-check
   - topic-scope-check
-  - proposal-section-traceability-check
   - decision-log-update
 entry_gate: null
 exit_gate: phase_02_gate
@@ -62,14 +61,6 @@ Schema: `orch.phase2.concept_refinement_summary.v1`
 **Constitutional constraints:**
 - Scope boundary is defined by Tier 2B only; must not infer scope from generic programme knowledge.
 - Out-of-scope flags must be written to the decision log.
-
-### `proposal-section-traceability-check`
-**Purpose:** Verify that every material claim is traceable to a named Tier 1–4 source; apply Confirmed/Inferred/Assumed/Unresolved status.
-**Trigger:** Before finalizing `concept_refinement_summary.json`; checks all claims in the concept output.
-**Output / side-effect:** Traceability status applied to all claims; unattributed assertions flagged in `docs/tier4_orchestration_state/validation_reports/`.
-**Constitutional constraints:**
-- Unattributed claims must be flagged, not silently accepted as Confirmed.
-- Confirmed status requires naming the specific source artifact.
 
 ### `decision-log-update`
 **Purpose:** Write a durable decision record to the Tier 4 decision log whenever a material interpretation is made or a conflict is resolved.
@@ -231,7 +222,7 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 
 Node binding is `n02_concept_refinement`. The exit gate is `phase_02_gate`. The manifest lists `n02_concept_refinement` with no `entry_gate` field — this file correctly reflects `entry_gate: null`. The manifest skill list for `n02_concept_refinement` does **not** include `gate-enforcement` (this was a reconciliation fix noted in `skill_catalog.yaml` comments). This agent does not list `gate-enforcement` in its `invoked_skills` — consistent with the manifest. The gate is evaluated by the runner; the agent declares the pass state by producing complete outputs, not by invoking a gate-enforcement skill directly. This is the correct pattern for `n02`.
 
-**Previously reported mismatch re-check:** The prior pass flagged a potential gate-enforcement mismatch for `concept_refiner`. Examining the current file: `invoked_skills` does NOT include `gate-enforcement`. This is consistent with `manifest.compile.yaml` node `n02_concept_refinement` (which lists `concept-alignment-check`, `topic-scope-check`, `proposal-section-traceability-check`, `decision-log-update` — no `gate-enforcement`). The `skill_catalog.yaml` comment on `gate-enforcement` explicitly notes: "concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)". The mismatch is **resolved in the current file**. No residual conflict.
+**Previously reported mismatch re-check:** The prior pass flagged a potential gate-enforcement mismatch for `concept_refiner`. Examining the current file: `invoked_skills` does NOT include `gate-enforcement`. This is consistent with `manifest.compile.yaml` node `n02_concept_refinement` (which lists `concept-alignment-check`, `concept-call-binding-derivation`, `topic-scope-check`, `decision-log-update` — no `gate-enforcement`). The `skill_catalog.yaml` comment on `gate-enforcement` explicitly notes: "concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)". The mismatch is **resolved in the current file**. No residual conflict. Note: `proposal-section-traceability-check` was removed from n02 because the skill is designed exclusively for Tier 5 deliverable artifacts (Phase 8); its `used_by_agents` does not include `concept_refiner`. Phase 2 traceability is enforced by the `concept-alignment-check` skill which requires `tier2b_source_ref` and `tier3_evidence_ref` on every mapping entry.
 
 The Predecessor Gate section states: "If `phase_01_gate` has not passed, halt immediately". This is enforcement of a gate condition, not declaration of one — constitutionally correct.
 

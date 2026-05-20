@@ -1,0 +1,2283 @@
+# Skill Execution Specification
+
+---
+skill_id: gantt-schedule-builder
+purpose_summary: >
+  Assign all tasks to months consistent with the normalized dependency constraints,
+  define milestone due months and verifiable achievement criteria, identify the
+  critical path, and produce the canonical gantt.json artifact (schema orch.phase4.gantt.v1).
+used_by_agents:
+  - gantt_designer
+reads_from:
+  - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+  - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+  - docs/tier3_project_instantiation/call_binding/selected_call.json
+  - docs/tier3_project_instantiation/consortium/roles.json
+  - docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+writes_to:
+  - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
+constitutional_constraints:
+  - "Must not assign tasks to months beyond the project duration from selected_call.json"
+  - "Must not schedule a task start before prerequisite task completion per strict constraints"
+  - "Must not produce milestones without verifiable achievement criteria"
+  - "Must not silently adjust project duration to accommodate scheduling conflicts"
+---
+
+## Output Nature
+
+The output of this skill is the **canonical Phase 4 gate artifact** `gantt.json` (schema `orch.phase4.gantt.v1`). It must contain every task from `wp_structure.json` with assigned start/end months, every milestone with a verifiable criterion, and a non-empty critical path.
+
+The scheduling decisions must respect the normalized dependency constraints from `scheduling_constraints.json`: strict constraints (task-level `finish_to_start`) enforce temporal ordering; non-strict constraints (reclassified WP-level edges, `data_input` edges) are informational and do not enforce ordering.
+
+---
+
+## Canonical Inputs and Outputs
+
+### Inputs
+
+| Path | Content | Purpose |
+|------|---------|---------|
+| `wp_structure.json` | WP structure with tasks, deliverables, dependency_map | Source of all task_ids, wp_ids, partner assignments |
+| `scheduling_constraints.json` | Normalized strict/non-strict edge classifications | Determines which dependencies enforce temporal ordering |
+| `selected_call.json` | Project duration in months | Authoritative temporal bound (`max_project_duration_months` or `project_duration_months`) |
+| `roles.json` | Partner role assignments per WP | Validates task responsible_partner assignments |
+| `milestones_seed.json` | Pre-existing milestone definitions | Source for milestone_id, title, due_month, verifiable_criterion |
+
+### Output
+
+| Path | Schema ID | Required Fields |
+|------|-----------|-----------------|
+| `gantt.json` | `orch.phase4.gantt.v1` | `schema_id`, `run_id`, `tasks` (array), `milestones` (array), `critical_path` (array) |
+
+`artifact_status` must be ABSENT at write time (runner stamps post-gate).
+
+---
+
+## Execution Specification
+
+### 1. Input Validation
+
+- Step 1.1: Confirm `wp_structure.json` exists and contains a non-empty `work_packages` array and a `dependency_map` with `edges`. If absent or empty: return failure with `MISSING_INPUT`.
+- Step 1.2: Confirm `scheduling_constraints.json` exists with `strict_constraints` and `non_strict_constraints` arrays. If absent: return failure with `MISSING_INPUT`.
+- Step 1.3: Confirm `selected_call.json` exists and contains a project duration field (`max_project_duration_months` or `project_duration_months`). If absent or null: return failure with `MISSING_INPUT`.
+- Step 1.4: Confirm `roles.json` exists. If absent: return failure with `MISSING_INPUT`.
+- Step 1.5: Read `milestones_seed.json`. If it contains a `milestones` array, use those milestone definitions as the basis for the output milestones. If absent or empty, derive milestones from WP deliverable completion points.
+- Step 1.6: Check `dependency_map` for cycles (`cycle_detected` field). If cycles are present: return failure with `CONSTRAINT_VIOLATION` — do not schedule tasks on a cyclic graph.
+
+### 2. Task-to-Month Assignment
+
+For every task in every WP in `wp_structure.json`:
+
+- Extract WP temporal bounds from `scheduling_constraints.json` `wp_bounds` (or from `workpackage_seed.json` if referenced in wp_structure).
+- Assign `start_month` and `end_month` respecting:
+  - `start_month >= 1`
+  - `end_month <= project_duration_months` (from `selected_call.json`)
+  - For each **strict constraint** in `scheduling_constraints.json.strict_constraints`: if a strict edge `from → to` exists, the `to` task's `start_month` must be > the `from` task's `end_month`.
+  - **Non-strict constraints** (data_input, reclassified WP-level edges) do NOT enforce temporal ordering — tasks may overlap.
+- Each task must have: `task_id` (matching wp_structure), `wp_id` (parent WP), `start_month`, `end_month`, `responsible_partner` (from roles.json or wp_structure task data).
+
+If any task cannot be assigned months within the project duration due to strict constraints, do NOT silently adjust the duration. Record the conflict and return the schedule as-is — the gate predicate `dependency_schedule_consistency` will catch violations.
+
+### 3. Milestone Definition
+
+For each milestone in `milestones_seed.json` (or derived from deliverable completion points):
+
+- Assign `milestone_id` (from seed, or generated as "MS1", "MS2", etc.)
+- Assign `title` (from seed, or derived from linked WP/deliverable)
+- Assign `due_month`: must be consistent with task completion months for the linked WP. Must be ≤ project_duration_months.
+- Write a `verifiable_criterion`: a concrete, externally verifiable statement. Must NOT be a placeholder like "work package completed" or "deliverables submitted". Must describe what specific evidence or result demonstrates milestone achievement.
+- Assign `responsible_wp` (wp_id from wp_structure)
+- Optionally assign `depends_on_tasks`: array of `task_id` strings from the output `tasks` array whose `wp_id` matches `responsible_wp`. Include only the tasks that must complete for the milestone's `verifiable_criterion` to be testable — identify these from the milestone's title, criterion, and the task scopes. All task_ids must exist in the output `tasks` array and must belong to the milestone's `responsible_wp`. Including this field is preferred as it enables precise downstream milestone validation, but it is not mandatory.
+- Optionally assign `milestone_type`: If `depends_on_tasks` is present and contains ALL task_ids for the `responsible_wp` in the output schedule, set to `"wp_completion"`. If `depends_on_tasks` is present but is a proper subset, set to `"intermediate_checkpoint"`. Including this field is preferred but not mandatory.
+- If `depends_on_tasks` is provided: `due_month` must be >= max(`end_month`) of tasks listed in `depends_on_tasks`.
+
+### 4. Critical Path Identification
+
+Identify the critical path: the longest chain of strict-dependency-linked tasks from project start to project end.
+
+- The critical path must be a non-empty array of `task_id` and/or `milestone_id` strings.
+- Derive from the strict constraints and the task month assignments.
+
+### 5. Output Construction
+
+Construct `gantt.json`:
+
+```json
+{
+  "schema_id": "orch.phase4.gantt.v1",
+  "run_id": "<propagated from invoking context>",
+  "tasks": [ ... ],
+  "milestones": [
+    {
+      "milestone_id": "MS1",
+      "title": "Architecture specification finalised",
+      "due_month": 3,
+      "verifiable_criterion": "API contracts documented and accepted by all pillar leads",
+      "responsible_wp": "WP1",
+      "depends_on_tasks": ["T1-01"],
+      "milestone_type": "intermediate_checkpoint"
+    }
+  ],
+  "critical_path": [ ... ]
+}
+```
+
+Do NOT include `artifact_status` (runner-managed).
+
+Return this as a single JSON object — no markdown wrapping, no explanatory prose.
+
+---
+
+## Output Minimization Rules
+
+1. Return only one JSON object. No markdown wrapping, no commentary.
+2. `tasks[].task_id` must exactly match `wp_structure.json` task_ids — do not rename.
+3. `milestones[].verifiable_criterion` must be concrete and specific, not generic.
+4. Do not add fields beyond those defined by the schema. The fields `depends_on_tasks` and `milestone_type` are schema-defined optional fields; including them is preferred for precise validation but not mandatory.
+5. Do not include rationale or explanatory text inside field values.
+
+---
+
+## Failure Protocol
+
+### MISSING_INPUT
+Missing or empty wp_structure.json, scheduling_constraints.json, selected_call.json, or roles.json. No output written.
+
+### CONSTRAINT_VIOLATION
+Dependency cycles detected in the input graph. No output written.
+
+### INCOMPLETE_OUTPUT
+If scheduling is fundamentally impossible (e.g., strict constraints create an irreconcilable conflict within the project duration), write the best-effort schedule and let the gate predicates identify specific violations. Do not fabricate completion — a schedule with acknowledged violations is a valid output; the gate determines pass/fail.
+
+### CONSTITUTIONAL_HALT
+Not applicable to this skill. Duration manipulation and partner fabrication are prevented by the constitutional constraints above.
+
+---
+
+## Constitutional Constraint Enforcement
+
+### "Must not assign tasks to months beyond the project duration"
+Every `tasks[].end_month` must be ≤ `project_duration_months` from `selected_call.json`. Gate predicate `timeline_within_duration` verifies this.
+
+### "Must not schedule a task start before prerequisite task completion"
+For each strict constraint `from → to` in `scheduling_constraints.json`, `to` task start_month must be > `from` task end_month. Gate predicate `dependency_schedule_consistency` verifies this.
+
+### "Must not produce milestones without verifiable achievement criteria"
+Every `milestones[].verifiable_criterion` must be non-empty and concrete. Gate predicate `all_milestones_have_criteria` verifies this.
+
+### "Must not silently adjust project duration"
+The project duration is read from `selected_call.json` and used as-is. If tasks cannot fit: produce the schedule and let the gate fail. Per CLAUDE.md §13.7: silent duration manipulation is prohibited.
+
+---
+
+## Runtime Contract
+
+This skill is governed by the skill runtime contract. All execution behaviour — SkillResult envelope, failure protocol, schema stamping, artifact_status abstention, and scheduler separation — must conform to that contract.
+
+
+# Canonical Inputs
+
+## docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json
+
+```json
+{
+  "gate_id": "phase_03_gate",
+  "gate_kind": "exit",
+  "run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:f1f719a7ebbbed6dd7c796840a4d47fdd578c8e5aab6b6242f92c8befb085919",
+  "input_artifact_fingerprints": {
+    "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "sha256:0c848d478707442bab2bcbc4330a07ce44cf3fde48eece9fecdb34f502980a72",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "sha256:51fe5409a984faa4dd6e93f10b8084378d341d9f438b6423e90d48a944662c35",
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json": "sha256:6acb037f4457fde9dfc12ff6270be697291a34352c114977bc5a56316d8026c0"
+  },
+  "evaluated_at": "2026-05-20T13:10:49.945565+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "pass",
+  "deterministic_predicates": {
+    "passed": [
+      "g04_p02",
+      "g04_p02b",
+      "g04_p01",
+      "g04_p03",
+      "g04_p04",
+      "g04_p07",
+      "g04_p06",
+      "g04_p05"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": []
+  },
+  "skipped_semantic": false,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase3_wp_design\\gate_result.json"
+}
+```
+
+## docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+
+```json
+{
+  "schema_id": "orch.phase3.wp_structure.v1",
+  "run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "title": "Project Management and Coordination",
+      "objectives": [
+        "Establish and maintain consortium governance, financial management, and reporting throughout the project.",
+        "Ensure ethics compliance, risk management, and quality assurance across all WPs."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": [
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T1-01",
+          "title": "Establish consortium governance and reporting procedures",
+          "responsible_partner": "ATU",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1-02",
+          "title": "Coordinate financial and administrative management",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA",
+            "BIIS",
+            "ISIA",
+            "NIHS",
+            "ELI",
+            "BAL",
+            "FIIT"
+          ]
+        },
+        {
+          "task_id": "T1-03",
+          "title": "Monitor quality assurance and risk management",
+          "responsible_partner": "ATU",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D1-01",
+          "title": "Data Management Plan",
+          "type": "report",
+          "due_month": 6,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D1-02",
+          "title": "Project Management Handbook",
+          "type": "report",
+          "due_month": 6,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D1-03",
+          "title": "Mid-term coordination report",
+          "type": "report",
+          "due_month": 24,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D1-04",
+          "title": "Ethics and compliance report",
+          "type": "report",
+          "due_month": 48,
+          "responsible_partner": "ATU"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Neuro-Symbolic Planning and Reasoning Engine",
+      "objectives": [
+        "Develop hybrid neuro-symbolic planning engine integrating MCTS, HTN, and LLM-based heuristics.",
+        "Implement plan monitoring and self-correction from verified intermediate states."
+      ],
+      "lead_partner": "ATU",
+      "contributing_partners": [
+        "CERIA",
+        "BIIS",
+        "BAL"
+      ],
+      "tasks": [
+        {
+          "task_id": "T2-01",
+          "title": "Design sub-task graph decomposition with formal pre/post-conditions",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T2-02",
+          "title": "Implement MCTS/HTN planning with LLM-based heuristics",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "BIIS"
+          ]
+        },
+        {
+          "task_id": "T2-03",
+          "title": "Develop plan monitoring and self-correction mechanism",
+          "responsible_partner": "CERIA",
+          "contributing_partners": [
+            "BAL"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D2-01",
+          "title": "Planning engine design specification",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D2-02",
+          "title": "Planning engine prototype",
+          "type": "software",
+          "due_month": 24,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D2-03",
+          "title": "Planning engine evaluation report",
+          "type": "report",
+          "due_month": 36,
+          "responsible_partner": "BIIS"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Adaptive Memory Architecture",
+      "objectives": [
+        "Design and implement unified tri-store memory architecture with learned controller.",
+        "Validate memory retrieval, forgetting, and coherence over long interaction horizons."
+      ],
+      "lead_partner": "BIIS",
+      "contributing_partners": [
+        "ATU",
+        "CERIA",
+        "BAL"
+      ],
+      "tasks": [
+        {
+          "task_id": "T3-01",
+          "title": "Design tri-store memory architecture specification",
+          "responsible_partner": "BIIS",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T3-02",
+          "title": "Implement learned memory controller",
+          "responsible_partner": "BIIS",
+          "contributing_partners": [
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T3-03",
+          "title": "Evaluate memory retrieval and coherence strategies",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "BAL"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D3-01",
+          "title": "Memory architecture design report",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "BIIS"
+        },
+        {
+          "deliverable_id": "D3-02",
+          "title": "Memory system prototype",
+          "type": "software",
+          "due_month": 24,
+          "responsible_partner": "BIIS"
+        },
+        {
+          "deliverable_id": "D3-03",
+          "title": "Memory evaluation report",
+          "type": "report",
+          "due_month": 30,
+          "responsible_partner": "BIIS"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Decentralised Multi-Agent Coordination",
+      "objectives": [
+        "Develop formally specified task-delegation and negotiation protocols for heterogeneous agents.",
+        "Validate convergence guarantees and conflict resolution under partial observability."
+      ],
+      "lead_partner": "CERIA",
+      "contributing_partners": [
+        "ATU",
+        "BIIS"
+      ],
+      "tasks": [
+        {
+          "task_id": "T4-01",
+          "title": "Design formally specified task-delegation protocols",
+          "responsible_partner": "CERIA",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T4-02",
+          "title": "Implement convergence and conflict resolution mechanisms",
+          "responsible_partner": "CERIA",
+          "contributing_partners": [
+            "BIIS"
+          ]
+        },
+        {
+          "task_id": "T4-03",
+          "title": "Validate auditable multi-agent interaction traces",
+          "responsible_partner": "BIIS",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D4-01",
+          "title": "Multi-agent coordination protocol specification",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "CERIA"
+        },
+        {
+          "deliverable_id": "D4-02",
+          "title": "Coordination protocol software implementation",
+          "type": "software",
+          "due_month": 24,
+          "responsible_partner": "CERIA"
+        },
+        {
+          "deliverable_id": "D4-03",
+          "title": "Coordination validation report",
+          "type": "report",
+          "due_month": 36,
+          "responsible_partner": "CERIA"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "partial_output",
+          "notes": "Planning engine concepts underpin coordination design"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "partial_output",
+          "notes": "Semantic memory hosts typed tool registry for coordination"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Healthcare Demonstrator \u2014 Clinical Decision Support",
+      "objectives": [
+        "Co-design and validate MAESTRO framework in a clinical decision support system with HL7 FHIR integration.",
+        "Demonstrate specialist sub-agent reasoning for imaging, lab, and clinical guideline tasks."
+      ],
+      "lead_partner": "NIHS",
+      "contributing_partners": [
+        "ATU",
+        "BIIS",
+        "BAL",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T5-01",
+          "title": "Define clinical use cases and diagnostic benchmarks",
+          "responsible_partner": "NIHS",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T5-02",
+          "title": "Integrate MAESTRO framework with HL7 FHIR data sources",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "BIIS"
+          ]
+        },
+        {
+          "task_id": "T5-03",
+          "title": "Conduct clinical expert validation of specialist sub-agents",
+          "responsible_partner": "NIHS",
+          "contributing_partners": [
+            "BAL",
+            "FIIT"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D5-01",
+          "title": "Clinical use case specification and benchmarks",
+          "type": "report",
+          "due_month": 18,
+          "responsible_partner": "NIHS"
+        },
+        {
+          "deliverable_id": "D5-02",
+          "title": "Healthcare demonstrator prototype",
+          "type": "software",
+          "due_month": 36,
+          "responsible_partner": "ATU"
+        },
+        {
+          "deliverable_id": "D5-03",
+          "title": "Clinical validation report",
+          "type": "report",
+          "due_month": 42,
+          "responsible_partner": "NIHS"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "data_input",
+          "notes": "Planning engine deployed in clinical sub-agents"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "data_input",
+          "notes": "Memory architecture supports clinical knowledge retrieval"
+        },
+        {
+          "depends_on_wp_id": "WP4",
+          "dependency_type": "data_input",
+          "notes": "Coordination protocols govern specialist sub-agent interaction"
+        },
+        {
+          "depends_on_wp_id": "WP8",
+          "dependency_type": "partial_output",
+          "notes": "Integrated MAESTRO framework available from M12"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP6",
+      "title": "Manufacturing Demonstrator \u2014 Process Optimisation",
+      "objectives": [
+        "Co-design and validate MAESTRO framework for manufacturing process optimisation in a pilot factory.",
+        "Demonstrate real-time multi-agent coordination across production segments over operational period."
+      ],
+      "lead_partner": "ISIA",
+      "contributing_partners": [
+        "ATU",
+        "CERIA",
+        "BAL",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T6-01",
+          "title": "Define production line scenarios and KPIs",
+          "responsible_partner": "ISIA",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T6-02",
+          "title": "Integrate MAESTRO with digital twin environments",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T6-03",
+          "title": "Validate multi-agent coordination in pilot factory",
+          "responsible_partner": "ISIA",
+          "contributing_partners": [
+            "BAL",
+            "FIIT"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D6-01",
+          "title": "Manufacturing use case specification and KPIs",
+          "type": "report",
+          "due_month": 18,
+          "responsible_partner": "ISIA"
+        },
+        {
+          "deliverable_id": "D6-02",
+          "title": "Manufacturing demonstrator prototype",
+          "type": "software",
+          "due_month": 36,
+          "responsible_partner": "ISIA"
+        },
+        {
+          "deliverable_id": "D6-03",
+          "title": "Manufacturing pilot validation report",
+          "type": "report",
+          "due_month": 42,
+          "responsible_partner": "ISIA"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "data_input",
+          "notes": "Planning engine deployed for production scheduling"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "data_input",
+          "notes": "Memory architecture supports process knowledge retention"
+        },
+        {
+          "depends_on_wp_id": "WP4",
+          "dependency_type": "data_input",
+          "notes": "Coordination protocols govern multi-agent production coordination"
+        },
+        {
+          "depends_on_wp_id": "WP8",
+          "dependency_type": "partial_output",
+          "notes": "Integrated MAESTRO framework available from M12"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP7",
+      "title": "Logistics Transfer Demonstrator \u2014 Cross-Sector Generalisation",
+      "objectives": [
+        "Validate MAESTRO framework for logistics and supply chain operations across 3 international corridors.",
+        "Confirm cross-sector generalisation of the integrated planning\u2013memory\u2013coordination architecture."
+      ],
+      "lead_partner": "ELI",
+      "contributing_partners": [
+        "CERIA",
+        "BAL",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T7-01",
+          "title": "Define multi-actor logistics scenarios and disruption benchmarks",
+          "responsible_partner": "ELI",
+          "contributing_partners": [
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T7-02",
+          "title": "Deploy agent-based planning with supply chain negotiation",
+          "responsible_partner": "CERIA",
+          "contributing_partners": [
+            "BAL"
+          ]
+        },
+        {
+          "task_id": "T7-03",
+          "title": "Validate on operational data across international corridors",
+          "responsible_partner": "ELI",
+          "contributing_partners": [
+            "FIIT"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D7-01",
+          "title": "Logistics use case specification and benchmarks",
+          "type": "report",
+          "due_month": 18,
+          "responsible_partner": "ELI"
+        },
+        {
+          "deliverable_id": "D7-02",
+          "title": "Logistics demonstrator prototype",
+          "type": "software",
+          "due_month": 36,
+          "responsible_partner": "ELI"
+        },
+        {
+          "deliverable_id": "D7-03",
+          "title": "Cross-sector generalisation validation report",
+          "type": "report",
+          "due_month": 42,
+          "responsible_partner": "ELI"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "data_input",
+          "notes": "Planning engine deployed for logistics route optimisation"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "data_input",
+          "notes": "Memory architecture stores logistics execution traces"
+        },
+        {
+          "depends_on_wp_id": "WP4",
+          "dependency_type": "data_input",
+          "notes": "Coordination protocols manage supply chain actor negotiation"
+        },
+        {
+          "depends_on_wp_id": "WP8",
+          "dependency_type": "partial_output",
+          "notes": "Integrated MAESTRO framework available from M12"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP8",
+      "title": "Integration, Evaluation and Benchmarking",
+      "objectives": [
+        "Integrate research pillars and tool orchestration layer into unified MAESTRO evaluation framework.",
+        "Produce community-adoptable MAESTRO benchmark suite with standardised cross-demonstrator KPIs."
+      ],
+      "lead_partner": "FIIT",
+      "contributing_partners": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL"
+      ],
+      "tasks": [
+        {
+          "task_id": "T8-01",
+          "title": "Define cross-cutting evaluation framework and KPIs",
+          "responsible_partner": "FIIT",
+          "contributing_partners": [
+            "ATU",
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T8-02",
+          "title": "Integrate research pillars into unified MAESTRO framework",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "BIIS",
+            "CERIA"
+          ]
+        },
+        {
+          "task_id": "T8-03",
+          "title": "Produce MAESTRO benchmark suite for community adoption",
+          "responsible_partner": "FIIT",
+          "contributing_partners": [
+            "ISIA",
+            "NIHS",
+            "ELI",
+            "BAL"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D8-01",
+          "title": "Evaluation framework and benchmark specification",
+          "type": "report",
+          "due_month": 12,
+          "responsible_partner": "FIIT"
+        },
+        {
+          "deliverable_id": "D8-02",
+          "title": "Integrated MAESTRO framework release",
+          "type": "software",
+          "due_month": 36,
+          "responsible_partner": "FIIT"
+        },
+        {
+          "deliverable_id": "D8-03",
+          "title": "MAESTRO benchmark suite",
+          "type": "dataset",
+          "due_month": 42,
+          "responsible_partner": "FIIT"
+        },
+        {
+          "deliverable_id": "D8-04",
+          "title": "Final integration and evaluation report",
+          "type": "report",
+          "due_month": 48,
+          "responsible_partner": "FIIT"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "partial_output",
+          "notes": "Integration draws on planning engine outputs"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "partial_output",
+          "notes": "Integration draws on memory architecture outputs"
+        },
+        {
+          "depends_on_wp_id": "WP4",
+          "dependency_type": "partial_output",
+          "notes": "Integration draws on coordination protocol outputs"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP9",
+      "title": "Dissemination, Exploitation and Communication",
+      "objectives": [
+        "Manage open-source framework release, AI-on-demand platform contributions, and EDIH network dissemination.",
+        "Execute per-partner exploitation strategies and coordinate project communication activities."
+      ],
+      "lead_partner": "BAL",
+      "contributing_partners": [
+        "ATU",
+        "ISIA",
+        "ELI",
+        "FIIT"
+      ],
+      "tasks": [
+        {
+          "task_id": "T9-01",
+          "title": "Manage open-source release and community building",
+          "responsible_partner": "BAL",
+          "contributing_partners": [
+            "ATU"
+          ]
+        },
+        {
+          "task_id": "T9-02",
+          "title": "Lead EDIH network dissemination and AI-on-demand contributions",
+          "responsible_partner": "BAL",
+          "contributing_partners": [
+            "ELI",
+            "ISIA"
+          ]
+        },
+        {
+          "task_id": "T9-03",
+          "title": "Execute exploitation strategy and project communication",
+          "responsible_partner": "ATU",
+          "contributing_partners": [
+            "FIIT"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D9-01",
+          "title": "Dissemination and exploitation plan",
+          "type": "report",
+          "due_month": 6,
+          "responsible_partner": "BAL"
+        },
+        {
+          "deliverable_id": "D9-02",
+          "title": "Open-source framework release package",
+          "type": "software",
+          "due_month": 36,
+          "responsible_partner": "BAL"
+        },
+        {
+          "deliverable_id": "D9-03",
+          "title": "Final exploitation and impact report",
+          "type": "report",
+          "due_month": 48,
+          "responsible_partner": "BAL"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP8",
+          "dependency_type": "data_input",
+          "notes": "Dissemination uses integration outputs and benchmark results"
+        }
+      ]
+    }
+  ],
+  "dependency_map": {
+    "nodes": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5",
+      "WP6",
+      "WP7",
+      "WP8",
+      "WP9",
+      "T1-01",
+      "T1-02",
+      "T1-03",
+      "T2-01",
+      "T2-02",
+      "T2-03",
+      "T3-01",
+      "T3-02",
+      "T3-03",
+      "T4-01",
+      "T4-02",
+      "T4-03",
+      "T5-01",
+      "T5-02",
+      "T5-03",
+      "T6-01",
+      "T6-02",
+      "T6-03",
+      "T7-01",
+      "T7-02",
+      "T7-03",
+      "T8-01",
+      "T8-02",
+      "T8-03",
+      "T9-01",
+      "T9-02",
+      "T9-03"
+    ],
+    "edges": [
+      {
+        "from": "WP2",
+        "to": "WP4",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP3",
+        "to": "WP4",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP2",
+        "to": "WP5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "WP5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP4",
+        "to": "WP5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP8",
+        "to": "WP5",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP2",
+        "to": "WP6",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "WP6",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP4",
+        "to": "WP6",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP8",
+        "to": "WP6",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP2",
+        "to": "WP7",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "WP7",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP4",
+        "to": "WP7",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP8",
+        "to": "WP7",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP2",
+        "to": "WP8",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP3",
+        "to": "WP8",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP4",
+        "to": "WP8",
+        "edge_type": "partial_output"
+      },
+      {
+        "from": "WP8",
+        "to": "WP9",
+        "edge_type": "data_input"
+      }
+    ],
+    "cycle_detected": false,
+    "cycle_flags": [],
+    "critical_path_nodes": [
+      "WP2",
+      "WP4",
+      "WP8",
+      "WP5"
+    ]
+  },
+  "partner_role_matrix": [
+    {
+      "partner_id": "ATU",
+      "wps_as_lead": [
+        "WP1",
+        "WP2"
+      ],
+      "wps_as_contributor": [
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP8",
+        "WP9"
+      ]
+    },
+    {
+      "partner_id": "CERIA",
+      "wps_as_lead": [
+        "WP4"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP6",
+        "WP7",
+        "WP8"
+      ]
+    },
+    {
+      "partner_id": "BIIS",
+      "wps_as_lead": [
+        "WP3"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP8"
+      ]
+    },
+    {
+      "partner_id": "ISIA",
+      "wps_as_lead": [
+        "WP6"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP8",
+        "WP9"
+      ]
+    },
+    {
+      "partner_id": "NIHS",
+      "wps_as_lead": [
+        "WP5"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP8"
+      ]
+    },
+    {
+      "partner_id": "ELI",
+      "wps_as_lead": [
+        "WP7"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP8",
+        "WP9"
+      ]
+    },
+    {
+      "partner_id": "BAL",
+      "wps_as_lead": [
+        "WP9"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5",
+        "WP6",
+        "WP7",
+        "WP8"
+      ]
+    },
+    {
+      "partner_id": "FIIT",
+      "wps_as_lead": [
+        "WP8"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP5",
+        "WP6",
+        "WP7",
+        "WP9"
+      ]
+    }
+  ],
+  "normalization_issues": [
+    {
+      "severity": "advisory",
+      "field": "tasks",
+      "wp_id": "all",
+      "note": "Tasks synthesized for all 9 WPs; workpackage_seed.json contained no tasks arrays. Functional-label tasks derived from WP titles and descriptions; task_ids assigned as T<wp>-<seq>."
+    },
+    {
+      "severity": "advisory",
+      "field": "deliverables",
+      "wp_id": "all",
+      "note": "Deliverables synthesized for all 9 WPs; workpackage_seed.json contained no deliverables arrays. Types and due_months set within each WP end_month; deliverable_ids assigned as D<wp>-<seq>."
+    },
+    {
+      "severity": "advisory",
+      "field": "dependencies",
+      "wp_id": "WP4,WP5,WP6,WP7,WP8,WP9",
+      "note": "Dependencies derived from WP descriptions; workpackage_seed.json contained no explicit dependency entries. WP1, WP2, WP3 have no inbound dependencies (start M1 or M3 with no prerequisites)."
+    },
+    {
+      "severity": "advisory",
+      "field": "valid_partner_ids",
+      "wp_id": "all",
+      "note": "valid_partner_ids inferred from participants arrays in workpackage_seed.json (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT); partners.json was not provided as explicit caller context. All WP lead_partner and responsible_partner values are confirmed within this inferred set."
+    }
+  ]
+}
+```
+
+## docs/tier3_project_instantiation/call_binding/selected_call.json
+
+```json
+{
+  "call_id": "HORIZON-CL4-2026-05",
+  "topic_code": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02",
+  "topic_title": "Next-Generation AI Agents for Real-World Applications in the Apply AI sectors (RIA) (Partnership in AI, Data and Robotics)",
+  "instrument_type": "RIA",
+  "work_programme": "cluster_digital",
+  "work_programme_area": "cluster_digital",
+  "work_programme_document": "wp-7-digital-industry-and-space_horizon-2026-2027_en.pdf",
+  "work_programme_pages": "130-133",
+  "destination": "Achieving open strategic autonomy in digital and emerging enabling technologies",
+  "submission_deadline": "2026-04-15",
+  "call_opening": "2026-01-15",
+  "max_project_duration_months": 48,
+  "max_eu_contribution": 19000000,
+  "indicative_topic_budget": 38000000,
+  "indicative_number_of_projects": 2,
+  "trl_start": 2,
+  "trl_end": 5,
+  "partnership": "AI, Data and Robotics",
+  "eligibility_restrictions": "Participation limited to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom. Entities controlled by non-eligible countries may be excluded unless guarantees are provided.",
+  "notes": "Max project duration not explicitly stated in the topic text; 48 months is the standard maximum for large RIA actions under Horizon Europe. Verify against General Annex B for the applicable instrument constraints."
+}
+```
+
+## docs/tier3_project_instantiation/consortium/roles.json
+
+```json
+{
+  "roles": [
+    {
+      "partner": "ATU",
+      "consortium_role": "Coordinator",
+      "scientific_role": "Pillar 1 Lead \u2014 Neuro-Symbolic Planning and Reasoning",
+      "wp_lead": [
+        "WP1",
+        "WP2"
+      ],
+      "wp_participant": [
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP8",
+        "WP9"
+      ],
+      "key_responsibilities": [
+        "Overall project coordination and management",
+        "Lead design of neuro-symbolic planning engine",
+        "Integration of symbolic planning with LLM-based reasoning",
+        "Coordination with ADRA and GenAI4EU central Hub"
+      ]
+    },
+    {
+      "partner": "CERIA",
+      "consortium_role": "Partner",
+      "scientific_role": "Pillar 3 Lead \u2014 Decentralised Multi-Agent Coordination",
+      "wp_lead": [
+        "WP4"
+      ],
+      "wp_participant": [
+        "WP2",
+        "WP3",
+        "WP7",
+        "WP8"
+      ],
+      "key_responsibilities": [
+        "Lead design of multi-agent delegation and negotiation protocols",
+        "Formal verification of coordination convergence properties",
+        "Multi-agent conflict resolution mechanisms",
+        "Support logistics demonstrator with multi-actor coordination"
+      ]
+    },
+    {
+      "partner": "BIIS",
+      "consortium_role": "Partner",
+      "scientific_role": "Pillar 2 Lead \u2014 Adaptive Memory Architecture",
+      "wp_lead": [
+        "WP3"
+      ],
+      "wp_participant": [
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP8"
+      ],
+      "key_responsibilities": [
+        "Lead design of unified memory architecture (working, episodic, semantic)",
+        "Memory controller for information flow management",
+        "Retrieval-augmented generation integration",
+        "Evaluation of memory impact on long-horizon coherence"
+      ]
+    },
+    {
+      "partner": "ISIA",
+      "consortium_role": "Partner",
+      "scientific_role": "Manufacturing Demonstrator Lead",
+      "wp_lead": [
+        "WP6"
+      ],
+      "wp_participant": [
+        "WP2",
+        "WP4",
+        "WP8",
+        "WP9"
+      ],
+      "key_responsibilities": [
+        "Lead manufacturing process optimisation demonstrator",
+        "Provide operational factory environment for validation",
+        "Digital twin integration with MAESTRO agent framework",
+        "Manufacturing domain knowledge and KPI definition"
+      ]
+    },
+    {
+      "partner": "NIHS",
+      "consortium_role": "Partner",
+      "scientific_role": "Healthcare Demonstrator Lead",
+      "wp_lead": [
+        "WP5"
+      ],
+      "wp_participant": [
+        "WP2",
+        "WP3",
+        "WP8"
+      ],
+      "key_responsibilities": [
+        "Lead clinical decision support demonstrator",
+        "Provide de-identified clinical datasets and validation pathways",
+        "Clinical domain modelling and diagnostic reasoning benchmarks",
+        "Ethics oversight for healthcare AI application"
+      ]
+    },
+    {
+      "partner": "ELI",
+      "consortium_role": "Partner",
+      "scientific_role": "Logistics Demonstrator Lead",
+      "wp_lead": [
+        "WP7"
+      ],
+      "wp_participant": [
+        "WP4",
+        "WP8",
+        "WP9"
+      ],
+      "key_responsibilities": [
+        "Lead supply chain planning demonstrator",
+        "Provide real-world logistics data and operational environments",
+        "Multi-actor supply chain coordination scenarios",
+        "Exploitation pathway for logistics sector adoption"
+      ]
+    },
+    {
+      "partner": "BAL",
+      "consortium_role": "Partner",
+      "scientific_role": "LLM Engineering and Platform Integration Lead",
+      "wp_lead": [
+        "WP9"
+      ],
+      "wp_participant": [
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "key_responsibilities": [
+        "LLM fine-tuning and adaptation for agent architectures",
+        "Production-grade agent deployment infrastructure",
+        "Lead dissemination, exploitation and communication",
+        "AI-on-demand platform integration and open-source release management"
+      ]
+    },
+    {
+      "partner": "FIIT",
+      "consortium_role": "Partner",
+      "scientific_role": "Evaluation and Benchmarking Lead",
+      "wp_lead": [
+        "WP8"
+      ],
+      "wp_participant": [
+        "WP5",
+        "WP6",
+        "WP7",
+        "WP9"
+      ],
+      "key_responsibilities": [
+        "Lead integration, evaluation and benchmarking work package",
+        "Design cross-demonstrator evaluation framework and KPIs",
+        "Coordination with Testing and Experiment Facilities",
+        "EDIH network dissemination and technology transfer"
+      ]
+    }
+  ]
+}
+```
+
+## docs\tier4_orchestration_state\phase_outputs\phase4_gantt_milestones\scheduling_constraints.json
+
+```json
+{
+  "schema_id": "orch.phase4.scheduling_constraints.v1",
+  "run_id": "27e1486a-d276-491f-8a81-acdf100bc45e",
+  "source_wp_structure_run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+  "normalization_timestamp": "2026-05-20T13:12:43.790635+00:00",
+  "project_duration_months": 48,
+  "wp_bounds": {
+    "WP1": {
+      "start_month": 1,
+      "end_month": 48
+    },
+    "WP2": {
+      "start_month": 1,
+      "end_month": 36
+    },
+    "WP3": {
+      "start_month": 1,
+      "end_month": 30
+    },
+    "WP4": {
+      "start_month": 3,
+      "end_month": 36
+    },
+    "WP5": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP6": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP7": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP8": {
+      "start_month": 6,
+      "end_month": 48
+    },
+    "WP9": {
+      "start_month": 1,
+      "end_month": 48
+    }
+  },
+  "strict_constraints": [],
+  "non_strict_constraints": [
+    {
+      "from": "WP2",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP3",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP5",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP6",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP7",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP3",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP4",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP8",
+      "to": "WP9",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "normalization_log": [
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP5"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP6"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP7"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP9"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "unresolved_constraints": []
+}
+```
+
+## docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+
+```json
+{
+  "schema_id": "orch.phase4.scheduling_constraints.v1",
+  "run_id": "27e1486a-d276-491f-8a81-acdf100bc45e",
+  "source_wp_structure_run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+  "normalization_timestamp": "2026-05-20T13:12:43.790635+00:00",
+  "project_duration_months": 48,
+  "wp_bounds": {
+    "WP1": {
+      "start_month": 1,
+      "end_month": 48
+    },
+    "WP2": {
+      "start_month": 1,
+      "end_month": 36
+    },
+    "WP3": {
+      "start_month": 1,
+      "end_month": 30
+    },
+    "WP4": {
+      "start_month": 3,
+      "end_month": 36
+    },
+    "WP5": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP6": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP7": {
+      "start_month": 12,
+      "end_month": 42
+    },
+    "WP8": {
+      "start_month": 6,
+      "end_month": 48
+    },
+    "WP9": {
+      "start_month": 1,
+      "end_month": 48
+    }
+  },
+  "strict_constraints": [],
+  "non_strict_constraints": [
+    {
+      "from": "WP2",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP3",
+      "to": "WP4",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP5",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP6",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP6",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP7",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP8",
+      "to": "WP7",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP2",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP3",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP4",
+      "to": "WP8",
+      "original_edge_type": "partial_output",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "from": "WP8",
+      "to": "WP9",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "normalization_log": [
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP4"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP5"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP6"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP6"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP7"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP7"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP8"
+      },
+      "original_type": "partial_output",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "edge_type 'partial_output': treated as non-strict (no scheduling rule defined)"
+    },
+    {
+      "edge": {
+        "from": "WP8",
+        "to": "WP9"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "unresolved_constraints": []
+}
+```
+
+## docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+
+```json
+{
+  "milestones": [
+    {
+      "id": "MS1",
+      "title": "Architecture specification and integration contracts finalised",
+      "month": 3,
+      "responsible_partner": "ATU",
+      "linked_work_packages": [
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP8"
+      ],
+      "verification_criterion": "Shared data representations, API contracts, and integration interfaces for all three pillars and the External Tool and API Orchestration Layer are documented, reviewed, and accepted by all pillar leads. Tool registry schema and API adapter interface specifications finalised. Integration test harness is operational.",
+      "type": "management"
+    },
+    {
+      "id": "MS2",
+      "title": "Planning engine v1.0 \u2014 baseline neuro-symbolic integration",
+      "month": 12,
+      "responsible_partner": "ATU",
+      "linked_work_packages": [
+        "WP2"
+      ],
+      "verification_criterion": "Planning engine decomposes \u22655 benchmark task types into sub-task graphs with verifiable pre/post-conditions. End-to-end evaluation on \u22651 standardised agent benchmark showing measurable improvement over LLM-only baseline.",
+      "type": "technical"
+    },
+    {
+      "id": "MS3",
+      "title": "Memory architecture v1.0 \u2014 tri-store prototype operational",
+      "month": 12,
+      "responsible_partner": "BIIS",
+      "linked_work_packages": [
+        "WP3"
+      ],
+      "verification_criterion": "Working, episodic, and semantic memory stores are individually operational with basic memory controller. Evaluation on synthetic long-horizon tasks (>20 steps) shows coherence improvement over context-window-only baseline.",
+      "type": "technical"
+    },
+    {
+      "id": "MS4",
+      "title": "Multi-agent protocol specification with convergence proofs",
+      "month": 15,
+      "responsible_partner": "CERIA",
+      "linked_work_packages": [
+        "WP4"
+      ],
+      "verification_criterion": "Formal specification of task-delegation and negotiation protocols complete. Convergence proofs delivered for \u22653 core task classes. Simulation validation with \u22655 heterogeneous agents on synthetic coordination tasks.",
+      "type": "technical"
+    },
+    {
+      "id": "MS5",
+      "title": "Demonstrator use cases defined and domain data secured",
+      "month": 12,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": [
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "verification_criterion": "Clinical use cases, manufacturing scenarios, and logistics corridors are fully specified with acceptance criteria. Ethics approvals for clinical data access granted. Factory access agreement signed. Logistics data access terms agreed.",
+      "type": "management"
+    },
+    {
+      "id": "MS6",
+      "title": "Integrated MAESTRO framework v1.0 with tool orchestration layer",
+      "month": 24,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": [
+        "WP2",
+        "WP3",
+        "WP4",
+        "WP8"
+      ],
+      "verification_criterion": "All three pillars and the External Tool and API Orchestration Layer integrated into a single framework. Tool registry populated with \u226510 tools/APIs. End-to-end evaluation on cross-cutting benchmarks demonstrates all three capabilities and tool orchestration operating together. Framework deployable in demonstrator environments.",
+      "type": "technical"
+    },
+    {
+      "id": "MS7",
+      "title": "Demonstrator v1.0 \u2014 initial deployment in all three demonstrator environments",
+      "month": 30,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": [
+        "WP5",
+        "WP6",
+        "WP7"
+      ],
+      "verification_criterion": "MAESTRO framework deployed in healthcare (call-aligned), manufacturing (call-aligned), and logistics (cross-sector transfer) demonstrator environments. External Tool and API Orchestration Layer operational with domain-specific adapters in each environment. Initial functional evaluation completed in each sector. Identified gaps documented for framework refinement.",
+      "type": "technical"
+    },
+    {
+      "id": "MS8",
+      "title": "Research pillar targets achieved",
+      "month": 36,
+      "responsible_partner": "ATU",
+      "linked_work_packages": [
+        "WP2",
+        "WP3",
+        "WP4"
+      ],
+      "verification_criterion": "OBJ-1 target met (\u226540% plan success improvement). OBJ-2 target met (\u226530% coherence improvement). OBJ-3 target met (\u226525% joint task completion improvement). All results reproducible and documented.",
+      "type": "technical"
+    },
+    {
+      "id": "MS9",
+      "title": "Demonstrator validation complete \u2014 all demonstrator environments",
+      "month": 42,
+      "responsible_partner": "FIIT",
+      "linked_work_packages": [
+        "WP5",
+        "WP6",
+        "WP7",
+        "WP8"
+      ],
+      "verification_criterion": "Healthcare demonstrator validated on 500 clinical cases (OBJ-4). Manufacturing demonstrator validated over 3-month operational period (OBJ-5). Logistics transfer demonstrator validated across 3 corridors (OBJ-6). Tool orchestration layer validated across all demonstrators with \u226530 tools/APIs registered (OBJ-8). Cross-demonstrator evaluation report completed. Architectural transferability mapping to in-vehicle autonomous driving completed.",
+      "type": "technical"
+    },
+    {
+      "id": "MS10",
+      "title": "Open-source release and platform contributions delivered",
+      "month": 45,
+      "responsible_partner": "BAL",
+      "linked_work_packages": [
+        "WP8",
+        "WP9"
+      ],
+      "verification_criterion": "MAESTRO framework released as open-source on GitHub. Benchmark suite published on AI-on-demand platform. Documentation and tutorials available. EDIH dissemination initiated in \u22653 hubs.",
+      "type": "dissemination"
+    },
+    {
+      "id": "MS11",
+      "title": "Project completion and final review",
+      "month": 48,
+      "responsible_partner": "ATU",
+      "linked_work_packages": [
+        "WP1",
+        "WP9"
+      ],
+      "verification_criterion": "All deliverables submitted. Final exploitation plans per partner delivered. TEF validation reports completed. Final review documentation compiled.",
+      "type": "management"
+    }
+  ]
+}
+```
+
+# Output Requirements
+
+run_id: 27e1486a-d276-491f-8a81-acdf100bc45e
+writes_to: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
+
+Return a single JSON object conforming to the output schema defined in the skill specification above. Do not wrap in markdown. Do not include explanatory text.

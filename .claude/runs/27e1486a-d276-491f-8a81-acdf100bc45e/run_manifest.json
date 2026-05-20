@@ -1,0 +1,42 @@
+{
+  "run_id": "27e1486a-d276-491f-8a81-acdf100bc45e",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "created_at": "2026-05-20T13:12:43.671840+00:00",
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "blocked_at_exit"
+  },
+  "accepted_upstream_gates": {
+    "phase_01_gate": {
+      "original_run_id": "bfe4da09-ac28-4cde-80eb-23634aae8d86",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "accepted_at": "2026-05-20T13:12:43.672841+00:00",
+      "status": "pass"
+    },
+    "phase_02_gate": {
+      "original_run_id": "0a1a4c0a-51bc-4812-8f8e-46221fe083ba",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/gate_result.json",
+      "accepted_at": "2026-05-20T13:12:43.674241+00:00",
+      "status": "pass"
+    },
+    "phase_03_gate": {
+      "original_run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/gate_result.json",
+      "accepted_at": "2026-05-20T13:12:43.675446+00:00",
+      "status": "pass"
+    }
+  },
+  "node_failure_details": {
+    "n04_gantt_milestones": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'decision-log-update' failed: Skill 'decision-log-update': model-signaled failure: Decision log entry gap_risk_flagged_gantt_designer_2026-05-20T13-25-00Z could not be written to docs/tier4_orchestration_state/decision_log/; write was rejected due to missing filesystem permission. Decisions held only in agent memory do not constitute durable decisions per CLAUDE.md \u00a79.4. Write must be retried with appropriate permissions or the operator must be notified of the write failure. The entry to be written covers 2 unresolved heuristic flags (MS1, MS5) from the phase_04 milestone consistency check (run_id badb62ef-fb9c-4d14-a405-5181400524b9), tier authority: CLAUDE.md \u00a77 phase_04_gantt_milestones gate condition and CLAUDE.md \u00a712.2.",
+      "failure_category": "SKILL_FAILURE"
+    }
+  }
+}

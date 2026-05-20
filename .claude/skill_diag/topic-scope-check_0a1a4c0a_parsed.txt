@@ -1,0 +1,65 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_call_analyzer_2026-05-20T000000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "call_analyzer",
+  "phase_context": "phase_01_call_analysis",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agent architectures powered by large language models that plan, utilise tools, and perform actions autonomously to accomplish complex real-world tasks \u2014 the project's core research subject across three integrated pillars and a cross-cutting External Tool and API Orchestration Layer.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project incorporates structured planning and reasoning methods \u2014 a neuro-symbolic planning engine combining LLM-based reasoning with symbolic planning, MCTS, and hierarchical task networks \u2014 with validation and monitoring techniques including plan monitoring, self-correction from verified intermediate states, and verifiable sub-task decomposition with formally specified pre- and post-conditions.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Adaptive memory architecture unifying working memory, episodic memory, and semantic memory with a memory controller for long-horizon reasoning \u2014 framed as innovation in memory-augmented AI agents for robust long-term reasoning and lifelong learning.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Decentralised multi-agent coordination protocols with formal task-delegation, negotiation, convergence guarantees, conflict resolution, and auditable interaction traces \u2014 positioned as an advanced multi-agent framework for collaborative heterogeneous agents including mixed AI architectures.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "External Tool and API Orchestration Layer as an architecturally central cross-cutting capability providing a typed tool registry, formal tool selection and invocation policies integrated with the planning engine, standardised API adapters (REST, GraphQL, HL7 FHIR, OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces stored in the adaptive memory architecture.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare clinical decision support sector demonstrator (Apply AI sector: healthcare) co-designed with clinical partners, validated against real diagnostic pathways with quantitative KPIs including diagnostic accuracy, reasoning trace completeness, and tool invocation success rate, benchmarked against clinician baselines.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced manufacturing process optimisation sector demonstrator (Apply AI sector: advanced manufacturing) validated in operational factory environments with quantitative KPIs including defect rate reduction, energy savings, and multi-agent coordination latency.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Logistics and supply chain cross-sector transfer demonstrator validating architecture portability through long-horizon planning, multi-agent negotiation across warehouses, carriers, and customs actors, and tool orchestration for logistics tracking, customs clearance, and carrier scheduling APIs \u2014 explicitly positioned as demonstrating capability 'beyond the call's specifically identified Apply AI sectors.'",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "Logistics and supply chain is not one of the three portfolio-priority Apply AI sectors named in SR-14 and CC-11 (healthcare, advanced manufacturing, in-vehicle autonomous driving). The concept explicitly acknowledges this demonstrator is positioned beyond the call's specifically identified Apply AI sectors. While SR-01 provides general scope for AI agent demonstrations and neither scope_requirements.json nor call_constraints.json contains an explicit exclusion of logistics as an application domain, the demonstrator's relationship to the call's Apply AI portfolio rationale is borderline: SR-14 and CC-11 identify specific sectors for portfolio management, and evaluators focused on Apply AI sector alignment may question whether a logistics demonstrator constitutes a portfolio-relevant sector contribution. The framing as a cross-sector transfer de
+=== END ===

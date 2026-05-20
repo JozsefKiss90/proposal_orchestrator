@@ -1,0 +1,152 @@
+=== skill_id: topic-scope-check ===
+=== mode: tapm ===
+=== response_text length: 11791 ===
+=== response_text (full) ===
+{
+  "decision_id": "scope_check_call_analyzer_2026-05-20T000000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "call_analyzer",
+  "phase_context": "phase_01_call_analysis",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agent architectures powered by large language models that plan, utilise tools, and perform actions autonomously to accomplish complex real-world tasks — the project's core research subject across three integrated pillars and a cross-cutting External Tool and API Orchestration Layer.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project incorporates structured planning and reasoning methods — a neuro-symbolic planning engine combining LLM-based reasoning with symbolic planning, MCTS, and hierarchical task networks — with validation and monitoring techniques including plan monitoring, self-correction from verified intermediate states, and verifiable sub-task decomposition with formally specified pre- and post-conditions.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Adaptive memory architecture unifying working memory, episodic memory, and semantic memory with a memory controller for long-horizon reasoning — framed as innovation in memory-augmented AI agents for robust long-term reasoning and lifelong learning.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Decentralised multi-agent coordination protocols with formal task-delegation, negotiation, convergence guarantees, conflict resolution, and auditable interaction traces — positioned as an advanced multi-agent framework for collaborative heterogeneous agents including mixed AI architectures.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "External Tool and API Orchestration Layer as an architecturally central cross-cutting capability providing a typed tool registry, formal tool selection and invocation policies integrated with the planning engine, standardised API adapters (REST, GraphQL, HL7 FHIR, OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces stored in the adaptive memory architecture.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare clinical decision support sector demonstrator (Apply AI sector: healthcare) co-designed with clinical partners, validated against real diagnostic pathways with quantitative KPIs including diagnostic accuracy, reasoning trace completeness, and tool invocation success rate, benchmarked against clinician baselines.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced manufacturing process optimisation sector demonstrator (Apply AI sector: advanced manufacturing) validated in operational factory environments with quantitative KPIs including defect rate reduction, energy savings, and multi-agent coordination latency.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Logistics and supply chain cross-sector transfer demonstrator validating architecture portability through long-horizon planning, multi-agent negotiation across warehouses, carriers, and customs actors, and tool orchestration for logistics tracking, customs clearance, and carrier scheduling APIs — explicitly positioned as demonstrating capability 'beyond the call's specifically identified Apply AI sectors.'",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "Logistics and supply chain is not one of the three portfolio-priority Apply AI sectors named in SR-14 and CC-11 (healthcare, advanced manufacturing, in-vehicle autonomous driving). The concept explicitly acknowledges this demonstrator is positioned beyond the call's specifically identified Apply AI sectors. While SR-01 provides general scope for AI agent demonstrations and neither scope_requirements.json nor call_constraints.json contains an explicit exclusion of logistics as an application domain, the demonstrator's relationship to the call's Apply AI portfolio rationale is borderline: SR-14 and CC-11 identify specific sectors for portfolio management, and evaluators focused on Apply AI sector alignment may question whether a logistics demonstrator constitutes a portfolio-relevant sector contribution. The framing as a cross-sector transfer demonstrator is a valid positioning, but the proposal must robustly justify this as demonstrating architecture portability and generalisability rather than implicitly claiming logistics as a fourth Apply AI portfolio sector. This flag requires explicit proposal text treatment."
+    },
+    {
+      "claim": "In-vehicle autonomous driving — a named portfolio-priority sector per SR-14 and CC-11 — is addressed only through a targeted architectural mapping analysis (WP8) assessing transferability. The concept explicitly does not claim autonomous driving as a demonstrator sector, citing absence of automotive sector partners.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "In-vehicle autonomous driving is one of three portfolio-priority Apply AI sectors under SR-14 and CC-11. MAESTRO does not deliver an autonomous driving sector demonstrator; it provides only an architectural mapping analysis (WP8) as transferability evidence. While CC-11 is a portfolio-level constraint — meaning individual proposals are not each required to cover all three sectors and MAESTRO may legitimately target the healthcare and advanced manufacturing portfolio slots — evaluators applying portfolio management criteria under CC-11 will note that MAESTRO cannot be counted toward satisfying the in-vehicle autonomous driving portfolio coverage slot. The proposal should explicitly declare which two portfolio-priority sectors it targets and clarify that the WP8 architectural transferability analysis is supplementary evidence, not a substitute for a validated sector demonstrator. This flag requires explicit proposal text treatment to avoid evaluator ambiguity about portfolio positioning."
+    },
+    {
+      "claim": "MAESTRO allocates dedicated tasks for cohesion activities with the co-programmed European Partnership on AI, Data and Robotics (ADRA) and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All research outputs — frameworks, models, benchmarks, External Tool and API Orchestration Layer, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-05",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints, with measurable performance targets benchmarked against operational baselines and current state-of-the-art agent systems.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Activities start at TRL 2 and demonstrators are validated at TRL 5 in operational environments across all Apply AI sector demonstrators by project end.",
+      "scope_element_ref": "CC-01",
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Requested EU contribution of €19,000,000 and project duration of 48 months.",
+      "scope_element_ref": "CC-07",
+      "constraint_ref": "CC-08",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Open-source framework and standardised agent interaction protocols will lower barriers for European SMEs and startups, reducing strategic dependency on non-European AI platforms.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The concept note and strategic positioning use scope requirement reference numbers — '(SR-04)' for the call's external tool/API integration mandate, '(SR-07)' for portfolio sector coverage, '(CC-10)' for the portfolio coverage mechanism — that do not match the identifiers in scope_requirements.json and call_constraints.json, where SR-04 = ADRA cohesion tasks, SR-07 = reuse of public results from previous funded actions, CC-10 = eligibility rule for entities controlled by non-eligible countries, and CC-11 = portfolio coverage mechanism.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-11",
+      "status": "flagged",
+      "flag_reason": "The concept note and strategic positioning use SR-XX and CC-XX reference identifiers that do not correspond to the identifiers assigned in scope_requirements.json and call_constraints.json. Specifically: concept '(SR-04)' = external tool/API integration mandate, but scope_requirements.json SR-04 = ADRA cohesion tasks; concept '(SR-07)' = portfolio sector coverage, but scope_requirements.json SR-07 = reuse of public results from previous funded actions; concept '(CC-10)' = portfolio coverage mechanism, but call_constraints.json CC-10 = eligibility rule for entities controlled by non-eligible countries (portfolio coverage is CC-11). This discrepancy indicates the concept was drafted using the original call document's internal numbering scheme, which diverges from the numbering applied during Tier 2B extraction. The substantive claims are not affected, but the reference number mismatch creates traceability inconsistencies that could undermine cross-reference accuracy in the final proposal. The Tier 2B extraction numbering scheme must be reconciled with the call document's numbering before proposal text is finalised to ensure that scope requirement cross-references in the proposal are internally consistent and evaluator-verifiable."
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope",
+    "Procedure",
+    "Technology Readiness Level",
+    "Financial Information",
+    "Call Binding Metadata",
+    "Eligibility Restrictions",
+    "FSTP Provisions"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-05-20T00:00:00Z"
+}
+
+=== END ===

@@ -422,6 +422,12 @@ def _assemble_skill_prompt(
         "You MUST return a single JSON object as your response — no prose, "
         "no markdown wrapping, no explanation. The JSON must conform to the "
         "output schema described in the skill specification.\n\n"
+        "IMPORTANT: The runtime handles all file I/O. When the skill "
+        "specification refers to 'writing' an artifact or file, produce the "
+        "artifact content as your JSON response. The runtime will perform the "
+        "actual file write. Do NOT return SkillResult failure envelopes "
+        "(status/failure_reason/failure_category). Always return the artifact "
+        "JSON object itself.\n\n"
         "Constitutional constraints (hard failures if violated):\n"
     )
     for c in constraints:

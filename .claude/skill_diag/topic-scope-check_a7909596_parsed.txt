@@ -1,0 +1,71 @@
+=== parsed OK ===
+=== top-level keys: ['decision_id', 'decision_type', 'invoking_agent', 'phase_context', 'scope_findings', 'tier2b_source_refs', 'tier_authority_applied', 'resolution_status', 'timestamp'] ===
+=== parsed content ===
+{
+  "decision_id": "scope_check_concept_refiner_2026-05-20T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO develops next-generation AI agent architectures grounded in structured planning with verifiable reasoning, persistent and adaptive memory, and decentralised multi-agent coordination, unified by an External Tool and API Orchestration Layer that enables agents to discover, select, invoke, verify, and compose external tools and APIs as first-class elements of reasoning and action.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops a hybrid neuro-symbolic planning engine combining LLM-based reasoning with formal symbolic planning methods, decomposing high-level goals into executable sub-task graphs with pre-conditions, post-conditions, and verification checkpoints, and supporting self-correction through plan monitoring and replanning from verified intermediate states.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO designs a unified adaptive memory architecture integrating working memory (attention-managed short-term store), episodic memory (retrieval-augmented store of past task episodes enabling learning from prior experience), and semantic memory (persistent knowledge graph), with a memory controller managing information flow across all three stores.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops decentralised multi-agent coordination protocols enabling heterogeneous agents to collaborate on shared objectives, including a formal task-delegation protocol with provable convergence, conflict resolution mechanisms, and auditable structured interaction traces for every delegation, negotiation step, and joint decision.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO develops an External Tool and API Orchestration Layer comprising: a typed tool registry with capability models, input/output schemas, preconditions, and reliability metadata; formal tool selection and invocation policies integrated with the neuro-symbolic planning engine; standardised API adapters abstracting heterogeneous protocols (REST, GraphQL, HL7 FHIR, OPC-UA); post-invocation verification and grounding; execution monitoring with fallback/recovery strategies; and auditable tool execution traces stored in the adaptive memory architecture.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through a healthcare clinical decision support demonstrator in which an AI agent system assists clinicians in diagnostic reasoning by autonomously gathering patient data via HL7 FHIR APIs, planning differential diagnoses, and coordinating specialist sub-agents for imaging analysis and lab interpretation, with full provenance tracking for regulatory auditability.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through an advanced manufacturing process optimisation demonstrator in which a multi-agent system autonomously monitors, diagnoses, and optimises manufacturing processes in real time, with OPC-UA industrial connectors, digital twin APIs, and sensor data streams integrated through standardised adapters with real-time validation.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO validates through a logistics and supply chain operational resilience demonstrator \u2014 positioned as a cross-sector transfer demonstrator \u2014 in which an agent-based planning system coordinates logistics operations across warehouses, carriers, and customs, managing logistics tracking, customs clearance, and carrier scheduling APIs, confirming architecture portability beyond the call's three portfolio-priority sectors.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "WP8 includes a targeted architectural mapping analysis assessing MAESTRO architecture transferability to in-vehicle autonomous driving settings, covering real-time multi-agent coordination, tool integration with sensor APIs and V2X communication, and verified planning under safety constraints.",
+      "scope_element_ref": "SR-14",
+      "constraint_ref": null,
+      "status": "in_scope"
+=== END ===

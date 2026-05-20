@@ -1,0 +1,28 @@
+{
+  "run_id": "a7909596-b7fa-4086-9106-231f55711657",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "created_at": "2026-05-20T11:37:56.753437+00:00",
+  "node_states": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "blocked_at_exit"
+  },
+  "accepted_upstream_gates": {
+    "phase_01_gate": {
+      "original_run_id": "bfe4da09-ac28-4cde-80eb-23634aae8d86",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json",
+      "accepted_at": "2026-05-20T11:37:56.757448+00:00",
+      "status": "pass"
+    }
+  },
+  "node_failure_details": {
+    "n02_concept_refinement": {
+      "failure_origin": "agent_body",
+      "exit_gate_evaluated": false,
+      "failure_reason": "Skill 'proposal-section-traceability-check' failed: Skill 'proposal-section-traceability-check': model-signaled failure: artifact_path 'docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json' does not match any recognized audit mode for this skill. Section mode requires a path ending in excellence_section.json, impact_section.json, or implementation_section.json; assembled mode requires part_b_assembled_draft.json; review-packet mode requires review_packet.json. Additionally, this path falls outside the declared input boundary for this invocation (declared inputs: docs/tier5_deliverables/proposal_sections, docs/tier5_deliverables/assembled_drafts). The skill cannot determine an audit mode, cannot read the artifact within its declared input scope, and cannot produce a valid traceability report. A valid proposal section or assembled draft artifact_path must be supplied via caller_context.",
+      "failure_category": "SKILL_FAILURE"
+    }
+  }
+}

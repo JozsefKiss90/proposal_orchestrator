@@ -79,10 +79,7 @@ Confirm that `concept-call-binding-derivation` (Step 3.5) has produced `docs/tie
 **Step 6 — Verify compliance_profile.json on disk.**
 Confirm that `concept-call-binding-derivation` (Step 3.5) has produced `docs/tier3_project_instantiation/call_binding/compliance_profile.json` with all required fields populated. If absent or empty, the Phase 2 gate will fail on predicate `g03_p04`.
 
-**Step 7 — Invoke proposal-section-traceability-check skill.**
-Before finalizing `concept_refinement_summary.json`, apply the `proposal-section-traceability-check` skill to all material claims. Assign Confirmed/Inferred/Assumed/Unresolved status to each claim. Confirmed status requires naming the specific source artifact. Write any unattributed assertions to `docs/tier4_orchestration_state/validation_reports/`.
-
-**Step 8 — Construct concept_refinement_summary.json.**
+**Step 7 — Construct concept_refinement_summary.json.**
 Write `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json` with:
 - `schema_id`: `"orch.phase2.concept_refinement_summary.v1"` (exact string)
 - `run_id`: propagated from invoking run context (required)
@@ -91,7 +88,7 @@ Write `docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/co
 - `scope_conflict_log`: array; empty if no conflicts; any `resolution_status: unresolved` entry blocks `phase_02_gate`
 - `strategic_differentiation`: non-empty, non-placeholder narrative grounded in Tier 3 project brief
 
-**Step 9 — Write decision log entries.**
+**Step 8 — Write decision log entries.**
 Invoke the `decision-log-update` skill for every material decision made during execution (vocabulary alignment decisions, scope boundary interpretations, tier conflicts resolved, uncovered outcomes flagged). Write to `docs/tier4_orchestration_state/decision_log/`. Every entry requires: `agent_id: concept_refiner`, `phase_id: phase_02_concept_refinement`, `run_id`, `timestamp`, `decision_type`, `rationale`, source references.
 
 ---

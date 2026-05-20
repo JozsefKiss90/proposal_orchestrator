@@ -1,0 +1,76 @@
+{
+  "run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "total_estimated_input_tokens": 95466,
+  "total_estimated_output_tokens": 23900,
+  "total_estimated_tokens": 119366,
+  "tokens_by_invocation_type": {
+    "skill_cli_prompt": {
+      "estimated_input_tokens": 58860,
+      "estimated_output_tokens": 1012,
+      "estimated_total_tokens": 59872
+    },
+    "skill_tapm": {
+      "estimated_input_tokens": 36606,
+      "estimated_output_tokens": 22888,
+      "estimated_total_tokens": 59494
+    }
+  },
+  "tokens_by_skill_id": {
+    "gate-enforcement": {
+      "estimated_input_tokens": 12077,
+      "estimated_output_tokens": 1210,
+      "estimated_total_tokens": 13287
+    },
+    "instrument-schema-normalization": {
+      "estimated_input_tokens": 8394,
+      "estimated_output_tokens": 9284,
+      "estimated_total_tokens": 17678
+    },
+    "milestone-consistency-check": {
+      "estimated_input_tokens": 58860,
+      "estimated_output_tokens": 1012,
+      "estimated_total_tokens": 59872
+    },
+    "work-package-normalization": {
+      "estimated_input_tokens": 8826,
+      "estimated_output_tokens": 4849,
+      "estimated_total_tokens": 13675
+    },
+    "wp-dependency-analysis": {
+      "estimated_input_tokens": 7309,
+      "estimated_output_tokens": 7545,
+      "estimated_total_tokens": 14854
+    }
+  },
+  "tokens_by_semantic_predicate_id": {},
+  "largest_invocation_by_estimated_total_tokens": {
+    "invocation_id": "e4af6da8b37e4d64873e05a372dfd3f2",
+    "skill_id": "milestone-consistency-check",
+    "predicate_id": null,
+    "invocation_type": "skill_cli_prompt",
+    "value": 59872
+  },
+  "largest_invocation_by_prompt_chars": {
+    "invocation_id": "e4af6da8b37e4d64873e05a372dfd3f2",
+    "skill_id": "milestone-consistency-check",
+    "predicate_id": null,
+    "invocation_type": "skill_cli_prompt",
+    "value": 206011
+  },
+  "tapm_vs_cli_prompt": {
+    "tapm": {
+      "estimated_input_tokens": 36606,
+      "estimated_output_tokens": 22888,
+      "estimated_total_tokens": 59494
+    },
+    "cli_prompt": {
+      "estimated_input_tokens": 58860,
+      "estimated_output_tokens": 1012,
+      "estimated_total_tokens": 59872
+    }
+  },
+  "phase_8_estimated_total_tokens": 0,
+  "phases_1_7_estimated_total_tokens": 119366,
+  "semantic_predicate_estimated_total_tokens": 0,
+  "warning": "All token values are estimates based on character-to-token ratios. They are not billing-grade."
+}
