@@ -618,3 +618,246 @@ class TestAgentResultNotFailed:
             if r.skill_id == "proposal-section-traceability-check"
         ]
         assert traceability[0].status == "not_applicable"
+
+
+# ---------------------------------------------------------------------------
+# 7. Traceability skill skipped when resolved artifact is Tier 4
+# ---------------------------------------------------------------------------
+
+
+def _make_phase5_env(
+    tmp_path: Path,
+    *,
+    skill_ids: list[str] | None = None,
+    create_tier5: bool = True,
+) -> dict:
+    """Create a synthetic Phase 5 environment for run_agent().
+
+    By default creates Tier 5 content (from a prior Phase 8 run) so
+    that the applicability guard passes, exposing the Tier 4 artifact
+    resolution path.
+    """
+    repo_root = tmp_path
+    agent_id = "impact_architect"
+    node_id = "n05_impact_architecture"
+
+    if skill_ids is None:
+        skill_ids = [
+            "impact-pathway-core-builder",
+            "proposal-section-traceability-check",
+        ]
+
+    reads_from = [
+        "docs/tier3_project_instantiation/architecture_inputs/",
+        "docs/tier2b_topic_and_call_sources/extracted/",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
+    ]
+
+    # Agent catalog
+    _write_yaml(
+        repo_root
+        / ".claude"
+        / "workflows"
+        / "system_orchestration"
+        / "agent_catalog.yaml",
+        {
+            "agent_catalog": [
+                {
+                    "id": agent_id,
+                    "reads_from": reads_from,
+                    "writes_to": [
+                        "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/"
+                    ],
+                }
+            ]
+        },
+    )
+
+    # Skill catalog
+    skill_catalog = []
+    for sid in skill_ids:
+        entry: dict[str, Any] = {
+            "id": sid,
+            "reads_from": reads_from.copy(),
+            "writes_to": [
+                "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/"
+            ],
+            "constitutional_constraints": [],
+            "used_by_agents": [agent_id],
+        }
+        if sid == "proposal-section-traceability-check":
+            entry["reads_from"] = [
+                "docs/tier5_deliverables/proposal_sections/",
+                "docs/tier5_deliverables/assembled_drafts/",
+                "docs/tier1_normative_framework/extracted/",
+                "docs/tier2a_instrument_schemas/extracted/",
+                "docs/tier2b_topic_and_call_sources/extracted/",
+                "docs/tier3_project_instantiation/",
+            ]
+            entry["writes_to"] = [
+                "docs/tier4_orchestration_state/validation_reports/"
+            ]
+        skill_catalog.append(entry)
+
+    _write_yaml(
+        repo_root
+        / ".claude"
+        / "workflows"
+        / "system_orchestration"
+        / "skill_catalog.yaml",
+        {"skill_catalog": skill_catalog},
+    )
+
+    # Manifest with artifact registry
+    artifact_registry = [
+        {
+            "path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+            "produced_by": node_id,
+            "tier": "tier4_phase_output",
+        }
+    ]
+    manifest_path = repo_root / "manifest_test.yaml"
+    _write_yaml(
+        manifest_path,
+        {
+            "name": "test",
+            "version": "1.1",
+            "node_registry": [
+                {
+                    "node_id": node_id,
+                    "agent": agent_id,
+                    "skills": skill_ids,
+                    "phase_id": "phase_05_impact_architecture",
+                    "exit_gate": "phase_05_gate",
+                }
+            ],
+            "edge_registry": [],
+            "artifact_registry": artifact_registry,
+        },
+    )
+
+    # Agent definition and prompt spec
+    agent_dir = repo_root / ".claude" / "agents"
+    (agent_dir / f"{agent_id}.md").parent.mkdir(parents=True, exist_ok=True)
+    (agent_dir / f"{agent_id}.md").write_text(
+        f"# {agent_id}\nImpact architect agent.", encoding="utf-8"
+    )
+    prompts_dir = agent_dir / "prompts"
+    prompts_dir.mkdir(parents=True, exist_ok=True)
+    prompt_content = f"# {agent_id} prompt spec\n\n"
+    for sid in skill_ids:
+        prompt_content += f"Invoke {sid}.\n"
+    (prompts_dir / f"{agent_id}_prompt_spec.md").write_text(
+        prompt_content, encoding="utf-8"
+    )
+
+    # Create input directories with minimal content
+    _write_json(
+        repo_root / "docs" / "tier3_project_instantiation" / "architecture_inputs" / "impacts.json",
+        {"impacts": []},
+    )
+    _write_json(
+        repo_root / "docs" / "tier2b_topic_and_call_sources" / "extracted" / "expected_impacts.json",
+        {"expected_impacts": []},
+    )
+
+    # Populate Tier 5 (simulating prior Phase 8 run content)
+    if create_tier5:
+        _write_json(
+            repo_root / "docs" / "tier5_deliverables" / "proposal_sections" / "impact_section.json",
+            {"content": "prior run impact section", "schema_id": "orch.tier5.impact_section.v1"},
+        )
+
+    return {
+        "agent_id": agent_id,
+        "node_id": node_id,
+        "run_id": "run-test-phase5",
+        "repo_root": repo_root,
+        "manifest_path": manifest_path,
+        "skill_ids": skill_ids,
+        "phase_id": "phase_05_impact_architecture",
+    }
+
+
+class TestTraceabilitySkippedForTier4Artifact:
+    """proposal-section-traceability-check must be skipped when the
+    resolved auditable artifact is a Tier 4 phase output, even when
+    Tier 5 directories contain content from a prior run."""
+
+    def test_skipped_when_tier4_artifact_resolved(
+        self, tmp_path: Path
+    ) -> None:
+        """When earlier skills produce a Tier 4 artifact, the
+        traceability skill is skipped as not_applicable rather than
+        invoked with an incompatible path."""
+        from unittest.mock import patch
+
+        kwargs = _make_phase5_env(tmp_path, create_tier5=True)
+
+        # The first skill (impact-pathway-core-builder) writes a Tier 4 artifact
+        tier4_artifact = (
+            "docs/tier4_orchestration_state/phase_outputs/"
+            "phase5_impact_architecture/impact_architecture.json"
+        )
+        _write_json(
+            tmp_path / tier4_artifact,
+            {"schema_id": "orch.phase5.impact_architecture.v1"},
+        )
+
+        def _mock_skill(skill_id, *args, **kw):
+            if skill_id == "impact-pathway-core-builder":
+                return _success_skill(outputs=[tier4_artifact])
+            # Should not reach traceability skill
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_mock_skill):
+            result = run_agent(**kwargs)
+
+        assert result.status == "success"
+
+        # Traceability check was skipped, not failed
+        traceability = [
+            r
+            for r in result.invoked_skills
+            if r.skill_id == "proposal-section-traceability-check"
+        ]
+        assert len(traceability) == 1
+        assert traceability[0].status == "not_applicable"
+        assert "Tier 5 deliverable" in (traceability[0].failure_reason or "")
+        assert "Tier 4 phase output" in (traceability[0].failure_reason or "")
+
+    def test_not_skipped_when_tier5_artifact_resolved(
+        self, tmp_path: Path
+    ) -> None:
+        """When the resolved artifact IS a Tier 5 deliverable, the
+        traceability skill is invoked normally."""
+        from unittest.mock import patch
+
+        kwargs = _make_phase5_env(
+            tmp_path,
+            skill_ids=[
+                "impact-pathway-core-builder",
+                "proposal-section-traceability-check",
+            ],
+            create_tier5=True,
+        )
+
+        tier5_artifact = (
+            "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        )
+
+        invoked_skills: list[str] = []
+
+        def _mock_skill(skill_id, *args, **kw):
+            invoked_skills.append(skill_id)
+            if skill_id == "impact-pathway-core-builder":
+                # This skill writes a Tier 5 artifact (unusual for Phase 5
+                # but tests the path)
+                return _success_skill(outputs=[tier5_artifact])
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_mock_skill):
+            result = run_agent(**kwargs)
+
+        # Traceability skill was invoked (not skipped)
+        assert "proposal-section-traceability-check" in invoked_skills

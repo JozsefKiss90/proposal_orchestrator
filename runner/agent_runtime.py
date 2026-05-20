@@ -1210,6 +1210,35 @@ def run_agent(
                 node_id, all_outputs, repo_root
             )
             if artifact_path is not None:
+                # proposal-section-traceability-check only supports
+                # Tier 5 deliverable artifacts (proposal sections,
+                # assembled drafts, review packets).  If the resolved
+                # artifact is a Tier 4 phase output, skip the skill
+                # rather than invoking it with an incompatible path.
+                if (
+                    sid == "proposal-section-traceability-check"
+                    and not artifact_path.startswith(
+                        "docs/tier5_deliverables/"
+                    )
+                ):
+                    _skip_reason = (
+                        f"Skill {sid!r} requires a Tier 5 deliverable "
+                        f"artifact but the resolved auditable artifact "
+                        f"({artifact_path!r}) is a Tier 4 phase output; "
+                        f"skipping as not applicable for non-Tier-5 "
+                        f"artifacts"
+                    )
+                    record = SkillInvocationRecord(
+                        skill_id=sid,
+                        status="not_applicable",
+                        failure_reason=_skip_reason,
+                    )
+                    all_invocations.append(record)
+                    logger.info(
+                        "Skill %s skipped (non-Tier-5 artifact): %s",
+                        sid, _skip_reason,
+                    )
+                    continue
                 if not caller_context:
                     caller_context = {}
                 caller_context["artifact_path"] = artifact_path
