@@ -113,7 +113,8 @@
       "Bash(timeout 30 claude -p --model claude-sonnet-4-6 --tools \"Read,Glob\" --system-prompt \"Reply with exactly: OK\")",
       "Bash(echo \"EXIT_CODE=$?\")",
       "Bash(timeout 60 claude -p --model claude-sonnet-4-6 --tools \"Read,Glob\" --system-prompt \"You are a JSON extractor. Reply with only the requested value.\")",
-      "Bash(du -sh C:/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/work_programmes/*)"
+      "Bash(du -sh C:/Code/proposal_demo/proposal_orchestrator/docs/tier2b_topic_and_call_sources/work_programmes/*)",
+      "Bash(cd:*)"
     ]
   }
 }

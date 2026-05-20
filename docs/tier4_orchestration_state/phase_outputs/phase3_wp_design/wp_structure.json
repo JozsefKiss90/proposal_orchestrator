@@ -1,13 +1,13 @@
 {
   "schema_id": "orch.phase3.wp_structure.v1",
-  "run_id": "dea468f1-8bba-436f-890f-34335190d5a2",
+  "run_id": "bd706f8f-b915-42ee-a19c-99d21ec5c0dd",
   "work_packages": [
     {
       "wp_id": "WP1",
       "title": "Project Management and Coordination",
       "objectives": [
-        "Establish and maintain consortium governance, financial management, and reporting throughout the project.",
-        "Ensure ethics compliance, risk management, and quality assurance across all WPs."
+        "Ensure effective consortium governance, administrative and financial management throughout the project.",
+        "Maintain quality assurance, risk management, and ethics compliance oversight across all work packages."
       ],
       "lead_partner": "ATU",
       "contributing_partners": [
@@ -22,27 +22,19 @@
       "tasks": [
         {
           "task_id": "T1-01",
-          "title": "Establish consortium governance and reporting procedures",
+          "title": "Consortium governance setup and ongoing coordination",
           "responsible_partner": "ATU",
           "contributing_partners": []
         },
         {
           "task_id": "T1-02",
-          "title": "Coordinate financial and administrative management",
+          "title": "Quality assurance, ethics compliance and risk monitoring",
           "responsible_partner": "ATU",
-          "contributing_partners": [
-            "CERIA",
-            "BIIS",
-            "ISIA",
-            "NIHS",
-            "ELI",
-            "BAL",
-            "FIIT"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T1-03",
-          "title": "Monitor quality assurance and risk management",
+          "title": "Project reporting and liaison with ADRA and GenAI4EU Hub",
           "responsible_partner": "ATU",
           "contributing_partners": []
         }
@@ -50,30 +42,23 @@
       "deliverables": [
         {
           "deliverable_id": "D1-01",
-          "title": "Data Management Plan",
+          "title": "Data management plan",
           "type": "report",
           "due_month": 6,
           "responsible_partner": "ATU"
         },
         {
           "deliverable_id": "D1-02",
-          "title": "Project Management Handbook",
+          "title": "Consortium management and governance handbook",
           "type": "report",
-          "due_month": 6,
+          "due_month": 3,
           "responsible_partner": "ATU"
         },
         {
           "deliverable_id": "D1-03",
-          "title": "Mid-term coordination report",
+          "title": "Mid-term management and quality assurance report",
           "type": "report",
           "due_month": 24,
-          "responsible_partner": "ATU"
-        },
-        {
-          "deliverable_id": "D1-04",
-          "title": "Ethics and compliance report",
-          "type": "report",
-          "due_month": 48,
           "responsible_partner": "ATU"
         }
       ],
@@ -83,8 +68,8 @@
       "wp_id": "WP2",
       "title": "Neuro-Symbolic Planning and Reasoning Engine",
       "objectives": [
-        "Develop hybrid neuro-symbolic planning engine integrating MCTS, HTN, and LLM-based heuristics.",
-        "Implement plan monitoring and self-correction from verified intermediate states."
+        "Design and implement a hybrid neuro-symbolic planning engine with sub-task graph decomposition and formal pre/post-conditions.",
+        "Integrate MCTS and HTN planning with LLM-based heuristics and develop plan monitoring and self-correction mechanisms."
       ],
       "lead_partner": "ATU",
       "contributing_partners": [
@@ -97,48 +82,42 @@
           "task_id": "T2-01",
           "title": "Design sub-task graph decomposition with formal pre/post-conditions",
           "responsible_partner": "ATU",
-          "contributing_partners": [
-            "CERIA"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T2-02",
-          "title": "Implement MCTS/HTN planning with LLM-based heuristics",
+          "title": "Implement MCTS and HTN planning integrated with LLM-based heuristics",
           "responsible_partner": "ATU",
-          "contributing_partners": [
-            "BIIS"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T2-03",
-          "title": "Develop plan monitoring and self-correction mechanism",
-          "responsible_partner": "CERIA",
-          "contributing_partners": [
-            "BAL"
-          ]
+          "title": "Develop plan monitoring, self-correction and tool invocation policy mechanisms",
+          "responsible_partner": "ATU",
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D2-01",
-          "title": "Planning engine design specification",
+          "title": "Neuro-symbolic planning engine architecture specification",
           "type": "report",
           "due_month": 12,
           "responsible_partner": "ATU"
         },
         {
           "deliverable_id": "D2-02",
-          "title": "Planning engine prototype",
+          "title": "Planning engine software prototype",
           "type": "software",
           "due_month": 24,
           "responsible_partner": "ATU"
         },
         {
           "deliverable_id": "D2-03",
-          "title": "Planning engine evaluation report",
+          "title": "Planning engine evaluation and validation report",
           "type": "report",
           "due_month": 36,
-          "responsible_partner": "BIIS"
+          "responsible_partner": "ATU"
         }
       ],
       "dependencies": []
@@ -147,8 +126,8 @@
       "wp_id": "WP3",
       "title": "Adaptive Memory Architecture",
       "objectives": [
-        "Design and implement unified tri-store memory architecture with learned controller.",
-        "Validate memory retrieval, forgetting, and coherence over long interaction horizons."
+        "Design and implement a unified tri-store memory architecture with a learned memory controller.",
+        "Develop memory indexing, retrieval, forgetting and coherence maintenance mechanisms for long-horizon agent interactions."
       ],
       "lead_partner": "BIIS",
       "contributing_partners": [
@@ -159,47 +138,41 @@
       "tasks": [
         {
           "task_id": "T3-01",
-          "title": "Design tri-store memory architecture specification",
+          "title": "Design tri-store memory architecture and learned memory controller",
           "responsible_partner": "BIIS",
-          "contributing_partners": [
-            "ATU"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T3-02",
-          "title": "Implement learned memory controller",
+          "title": "Implement memory indexing, retrieval and forgetting mechanisms",
           "responsible_partner": "BIIS",
-          "contributing_partners": [
-            "CERIA"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T3-03",
-          "title": "Evaluate memory retrieval and coherence strategies",
-          "responsible_partner": "ATU",
-          "contributing_partners": [
-            "BAL"
-          ]
+          "title": "Validate coherence maintenance and tool-experience storage over long horizons",
+          "responsible_partner": "BIIS",
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D3-01",
-          "title": "Memory architecture design report",
+          "title": "Tri-store memory architecture design specification",
           "type": "report",
           "due_month": 12,
           "responsible_partner": "BIIS"
         },
         {
           "deliverable_id": "D3-02",
-          "title": "Memory system prototype",
+          "title": "Adaptive memory architecture software prototype",
           "type": "software",
           "due_month": 24,
           "responsible_partner": "BIIS"
         },
         {
           "deliverable_id": "D3-03",
-          "title": "Memory evaluation report",
+          "title": "Memory architecture evaluation report",
           "type": "report",
           "due_month": 30,
           "responsible_partner": "BIIS"
@@ -211,8 +184,8 @@
       "wp_id": "WP4",
       "title": "Decentralised Multi-Agent Coordination",
       "objectives": [
-        "Develop formally specified task-delegation and negotiation protocols for heterogeneous agents.",
-        "Validate convergence guarantees and conflict resolution under partial observability."
+        "Develop formally specified task-delegation and negotiation protocols for heterogeneous AI agents.",
+        "Provide convergence guarantees, conflict resolution under partial observability, and auditable multi-agent interaction traces."
       ],
       "lead_partner": "CERIA",
       "contributing_partners": [
@@ -222,24 +195,20 @@
       "tasks": [
         {
           "task_id": "T4-01",
-          "title": "Design formally specified task-delegation protocols",
+          "title": "Design formal task-delegation and negotiation protocols",
           "responsible_partner": "CERIA",
-          "contributing_partners": [
-            "ATU"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T4-02",
-          "title": "Implement convergence and conflict resolution mechanisms",
+          "title": "Develop convergence guarantees and conflict resolution mechanisms",
           "responsible_partner": "CERIA",
-          "contributing_partners": [
-            "BIIS"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T4-03",
-          "title": "Validate auditable multi-agent interaction traces",
-          "responsible_partner": "BIIS",
+          "title": "Implement auditable interaction traces and shared tool access governance",
+          "responsible_partner": "CERIA",
           "contributing_partners": []
         }
       ],
@@ -248,43 +217,32 @@
           "deliverable_id": "D4-01",
           "title": "Multi-agent coordination protocol specification",
           "type": "report",
-          "due_month": 12,
+          "due_month": 15,
           "responsible_partner": "CERIA"
         },
         {
           "deliverable_id": "D4-02",
           "title": "Coordination protocol software implementation",
           "type": "software",
-          "due_month": 24,
+          "due_month": 27,
           "responsible_partner": "CERIA"
         },
         {
           "deliverable_id": "D4-03",
-          "title": "Coordination validation report",
+          "title": "Decentralised coordination evaluation and validation report",
           "type": "report",
           "due_month": 36,
           "responsible_partner": "CERIA"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "partial_output",
-          "notes": "Planning engine concepts underpin coordination design"
-        },
-        {
-          "depends_on_wp_id": "WP3",
-          "dependency_type": "partial_output",
-          "notes": "Semantic memory hosts typed tool registry for coordination"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP5",
       "title": "Healthcare Demonstrator — Clinical Decision Support",
       "objectives": [
-        "Co-design and validate MAESTRO framework in a clinical decision support system with HL7 FHIR integration.",
-        "Demonstrate specialist sub-agent reasoning for imaging, lab, and clinical guideline tasks."
+        "Co-design and validate the MAESTRO agent framework in a clinical decision support system targeting diagnostic reasoning.",
+        "Deploy specialist sub-agents for imaging, laboratory and guideline reasoning integrated with HL7 FHIR clinical data sources."
       ],
       "lead_partner": "NIHS",
       "contributing_partners": [
@@ -296,82 +254,54 @@
       "tasks": [
         {
           "task_id": "T5-01",
-          "title": "Define clinical use cases and diagnostic benchmarks",
+          "title": "Define clinical use cases, diagnostic benchmarks and FHIR integration requirements",
           "responsible_partner": "NIHS",
-          "contributing_partners": [
-            "ATU"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T5-02",
-          "title": "Integrate MAESTRO framework with HL7 FHIR data sources",
-          "responsible_partner": "ATU",
-          "contributing_partners": [
-            "BIIS"
-          ]
+          "title": "Integrate MAESTRO framework with clinical data sources and specialist sub-agents",
+          "responsible_partner": "NIHS",
+          "contributing_partners": []
         },
         {
           "task_id": "T5-03",
-          "title": "Conduct clinical expert validation of specialist sub-agents",
+          "title": "Conduct clinical expert validation of decision support system",
           "responsible_partner": "NIHS",
-          "contributing_partners": [
-            "BAL",
-            "FIIT"
-          ]
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D5-01",
-          "title": "Clinical use case specification and benchmarks",
+          "title": "Clinical use case requirements and benchmark specification",
           "type": "report",
           "due_month": 18,
           "responsible_partner": "NIHS"
         },
         {
           "deliverable_id": "D5-02",
-          "title": "Healthcare demonstrator prototype",
+          "title": "Healthcare demonstrator system prototype",
           "type": "software",
           "due_month": 36,
-          "responsible_partner": "ATU"
+          "responsible_partner": "NIHS"
         },
         {
           "deliverable_id": "D5-03",
-          "title": "Clinical validation report",
+          "title": "Clinical validation results report",
           "type": "report",
           "due_month": 42,
           "responsible_partner": "NIHS"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "data_input",
-          "notes": "Planning engine deployed in clinical sub-agents"
-        },
-        {
-          "depends_on_wp_id": "WP3",
-          "dependency_type": "data_input",
-          "notes": "Memory architecture supports clinical knowledge retrieval"
-        },
-        {
-          "depends_on_wp_id": "WP4",
-          "dependency_type": "data_input",
-          "notes": "Coordination protocols govern specialist sub-agent interaction"
-        },
-        {
-          "depends_on_wp_id": "WP8",
-          "dependency_type": "partial_output",
-          "notes": "Integrated MAESTRO framework available from M12"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP6",
       "title": "Manufacturing Demonstrator — Process Optimisation",
       "objectives": [
-        "Co-design and validate MAESTRO framework for manufacturing process optimisation in a pilot factory.",
-        "Demonstrate real-time multi-agent coordination across production segments over operational period."
+        "Co-design and validate the MAESTRO agent framework for manufacturing process optimisation in digital twin environments.",
+        "Demonstrate multi-agent real-time coordination across production segments in a pilot factory setting."
       ],
       "lead_partner": "ISIA",
       "contributing_partners": [
@@ -383,41 +313,34 @@
       "tasks": [
         {
           "task_id": "T6-01",
-          "title": "Define production line scenarios and KPIs",
+          "title": "Define production line scenarios, KPIs and digital twin integration requirements",
           "responsible_partner": "ISIA",
-          "contributing_partners": [
-            "ATU"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T6-02",
-          "title": "Integrate MAESTRO with digital twin environments",
-          "responsible_partner": "ATU",
-          "contributing_partners": [
-            "CERIA"
-          ]
+          "title": "Deploy multi-agent real-time coordination across production segments",
+          "responsible_partner": "ISIA",
+          "contributing_partners": []
         },
         {
           "task_id": "T6-03",
-          "title": "Validate multi-agent coordination in pilot factory",
+          "title": "Validate MAESTRO framework in pilot factory operational trial",
           "responsible_partner": "ISIA",
-          "contributing_partners": [
-            "BAL",
-            "FIIT"
-          ]
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D6-01",
-          "title": "Manufacturing use case specification and KPIs",
+          "title": "Manufacturing demonstrator requirements and KPI specification",
           "type": "report",
           "due_month": 18,
           "responsible_partner": "ISIA"
         },
         {
           "deliverable_id": "D6-02",
-          "title": "Manufacturing demonstrator prototype",
+          "title": "Manufacturing demonstrator system prototype",
           "type": "software",
           "due_month": 36,
           "responsible_partner": "ISIA"
@@ -430,35 +353,14 @@
           "responsible_partner": "ISIA"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "data_input",
-          "notes": "Planning engine deployed for production scheduling"
-        },
-        {
-          "depends_on_wp_id": "WP3",
-          "dependency_type": "data_input",
-          "notes": "Memory architecture supports process knowledge retention"
-        },
-        {
-          "depends_on_wp_id": "WP4",
-          "dependency_type": "data_input",
-          "notes": "Coordination protocols govern multi-agent production coordination"
-        },
-        {
-          "depends_on_wp_id": "WP8",
-          "dependency_type": "partial_output",
-          "notes": "Integrated MAESTRO framework available from M12"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP7",
       "title": "Logistics Transfer Demonstrator — Cross-Sector Generalisation",
       "objectives": [
-        "Validate MAESTRO framework for logistics and supply chain operations across 3 international corridors.",
-        "Confirm cross-sector generalisation of the integrated planning–memory–coordination architecture."
+        "Co-design and validate the MAESTRO agent framework for logistics and supply chain operations as a cross-sector transfer demonstrator.",
+        "Confirm that the integrated MAESTRO architecture generalises across sectors beyond the primary demonstrators."
       ],
       "lead_partner": "ELI",
       "contributing_partners": [
@@ -469,40 +371,34 @@
       "tasks": [
         {
           "task_id": "T7-01",
-          "title": "Define multi-actor logistics scenarios and disruption benchmarks",
+          "title": "Define multi-actor logistics scenarios and disruption recovery benchmarks",
           "responsible_partner": "ELI",
-          "contributing_partners": [
-            "CERIA"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T7-02",
-          "title": "Deploy agent-based planning with supply chain negotiation",
-          "responsible_partner": "CERIA",
-          "contributing_partners": [
-            "BAL"
-          ]
+          "title": "Deploy agent-based planning and negotiation across supply chain actors and corridors",
+          "responsible_partner": "ELI",
+          "contributing_partners": []
         },
         {
           "task_id": "T7-03",
-          "title": "Validate on operational data across international corridors",
+          "title": "Validate cross-sector generalisation on operational logistics data",
           "responsible_partner": "ELI",
-          "contributing_partners": [
-            "FIIT"
-          ]
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D7-01",
-          "title": "Logistics use case specification and benchmarks",
+          "title": "Logistics demonstrator requirements and benchmark specification",
           "type": "report",
           "due_month": 18,
           "responsible_partner": "ELI"
         },
         {
           "deliverable_id": "D7-02",
-          "title": "Logistics demonstrator prototype",
+          "title": "Logistics demonstrator system prototype",
           "type": "software",
           "due_month": 36,
           "responsible_partner": "ELI"
@@ -515,35 +411,14 @@
           "responsible_partner": "ELI"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "data_input",
-          "notes": "Planning engine deployed for logistics route optimisation"
-        },
-        {
-          "depends_on_wp_id": "WP3",
-          "dependency_type": "data_input",
-          "notes": "Memory architecture stores logistics execution traces"
-        },
-        {
-          "depends_on_wp_id": "WP4",
-          "dependency_type": "data_input",
-          "notes": "Coordination protocols manage supply chain actor negotiation"
-        },
-        {
-          "depends_on_wp_id": "WP8",
-          "dependency_type": "partial_output",
-          "notes": "Integrated MAESTRO framework available from M12"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP8",
       "title": "Integration, Evaluation and Benchmarking",
       "objectives": [
-        "Integrate research pillars and tool orchestration layer into unified MAESTRO evaluation framework.",
-        "Produce community-adoptable MAESTRO benchmark suite with standardised cross-demonstrator KPIs."
+        "Define the cross-cutting evaluation framework and benchmark suite for the unified MAESTRO framework.",
+        "Integrate all research pillars and coordinate cross-demonstrator evaluation with standardised KPIs."
       ],
       "lead_partner": "FIIT",
       "contributing_partners": [
@@ -558,88 +433,54 @@
       "tasks": [
         {
           "task_id": "T8-01",
-          "title": "Define cross-cutting evaluation framework and KPIs",
+          "title": "Define cross-cutting evaluation framework and benchmark suite",
           "responsible_partner": "FIIT",
-          "contributing_partners": [
-            "ATU",
-            "CERIA"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T8-02",
-          "title": "Integrate research pillars into unified MAESTRO framework",
-          "responsible_partner": "ATU",
-          "contributing_partners": [
-            "BIIS",
-            "CERIA"
-          ]
+          "title": "Integrate MAESTRO research pillars and tool orchestration layer",
+          "responsible_partner": "FIIT",
+          "contributing_partners": []
         },
         {
           "task_id": "T8-03",
-          "title": "Produce MAESTRO benchmark suite for community adoption",
+          "title": "Conduct cross-demonstrator evaluation and produce community benchmark suite",
           "responsible_partner": "FIIT",
-          "contributing_partners": [
-            "ISIA",
-            "NIHS",
-            "ELI",
-            "BAL"
-          ]
+          "contributing_partners": []
         }
       ],
       "deliverables": [
         {
           "deliverable_id": "D8-01",
-          "title": "Evaluation framework and benchmark specification",
+          "title": "MAESTRO evaluation framework and benchmark specification",
           "type": "report",
-          "due_month": 12,
+          "due_month": 18,
           "responsible_partner": "FIIT"
         },
         {
           "deliverable_id": "D8-02",
-          "title": "Integrated MAESTRO framework release",
+          "title": "Integrated MAESTRO framework software release",
           "type": "software",
           "due_month": 36,
           "responsible_partner": "FIIT"
         },
         {
           "deliverable_id": "D8-03",
-          "title": "MAESTRO benchmark suite",
+          "title": "MAESTRO benchmark suite dataset and final evaluation report",
           "type": "dataset",
-          "due_month": 42,
-          "responsible_partner": "FIIT"
-        },
-        {
-          "deliverable_id": "D8-04",
-          "title": "Final integration and evaluation report",
-          "type": "report",
           "due_month": 48,
           "responsible_partner": "FIIT"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "partial_output",
-          "notes": "Integration draws on planning engine outputs"
-        },
-        {
-          "depends_on_wp_id": "WP3",
-          "dependency_type": "partial_output",
-          "notes": "Integration draws on memory architecture outputs"
-        },
-        {
-          "depends_on_wp_id": "WP4",
-          "dependency_type": "partial_output",
-          "notes": "Integration draws on coordination protocol outputs"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP9",
       "title": "Dissemination, Exploitation and Communication",
       "objectives": [
-        "Manage open-source framework release, AI-on-demand platform contributions, and EDIH network dissemination.",
-        "Execute per-partner exploitation strategies and coordinate project communication activities."
+        "Manage open-source framework release, EDIH network dissemination and technology transfer.",
+        "Execute exploitation strategy per partner and deliver project communication, website and public engagement."
       ],
       "lead_partner": "BAL",
       "contributing_partners": [
@@ -651,28 +492,21 @@
       "tasks": [
         {
           "task_id": "T9-01",
-          "title": "Manage open-source release and community building",
+          "title": "Manage open-source release and AI-on-demand platform contributions",
           "responsible_partner": "BAL",
-          "contributing_partners": [
-            "ATU"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T9-02",
-          "title": "Lead EDIH network dissemination and AI-on-demand contributions",
+          "title": "Lead EDIH network dissemination and technology transfer",
           "responsible_partner": "BAL",
-          "contributing_partners": [
-            "ELI",
-            "ISIA"
-          ]
+          "contributing_partners": []
         },
         {
           "task_id": "T9-03",
-          "title": "Execute exploitation strategy and project communication",
-          "responsible_partner": "ATU",
-          "contributing_partners": [
-            "FIIT"
-          ]
+          "title": "Develop and execute exploitation strategy and communication activities",
+          "responsible_partner": "BAL",
+          "contributing_partners": []
         }
       ],
       "deliverables": [
@@ -685,26 +519,20 @@
         },
         {
           "deliverable_id": "D9-02",
-          "title": "Open-source framework release package",
+          "title": "Open-source software release and community platform",
           "type": "software",
-          "due_month": 36,
+          "due_month": 30,
           "responsible_partner": "BAL"
         },
         {
           "deliverable_id": "D9-03",
-          "title": "Final exploitation and impact report",
+          "title": "Final exploitation and communication report",
           "type": "report",
           "due_month": 48,
           "responsible_partner": "BAL"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP8",
-          "dependency_type": "data_input",
-          "notes": "Dissemination uses integration outputs and benchmark results"
-        }
-      ]
+      "dependencies": []
     }
   ],
   "dependency_map": {
@@ -749,104 +577,159 @@
     "edges": [
       {
         "from": "WP2",
-        "to": "WP4",
-        "edge_type": "partial_output"
-      },
-      {
-        "from": "WP3",
-        "to": "WP4",
-        "edge_type": "partial_output"
-      },
-      {
-        "from": "WP2",
         "to": "WP5",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP3",
-        "to": "WP5",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP4",
-        "to": "WP5",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP8",
-        "to": "WP5",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP2",
         "to": "WP6",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP3",
-        "to": "WP6",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP4",
-        "to": "WP6",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP8",
-        "to": "WP6",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP2",
         "to": "WP7",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP3",
-        "to": "WP7",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP4",
-        "to": "WP7",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP8",
-        "to": "WP7",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP2",
         "to": "WP8",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP3",
+        "to": "WP5",
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP3",
         "to": "WP8",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP4",
+        "to": "WP5",
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP4",
+        "to": "WP6",
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP4",
+        "to": "WP7",
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP4",
         "to": "WP8",
-        "edge_type": "partial_output"
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP5",
+        "to": "WP8",
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP6",
+        "to": "WP8",
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "WP7",
+        "to": "WP8",
+        "edge_type": "finish_to_start"
       },
       {
         "from": "WP8",
         "to": "WP9",
+        "edge_type": "finish_to_start"
+      },
+      {
+        "from": "T2-02",
+        "to": "T5-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T3-02",
+        "to": "T5-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T4-02",
+        "to": "T5-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T2-02",
+        "to": "T6-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T4-02",
+        "to": "T6-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T2-02",
+        "to": "T7-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T4-02",
+        "to": "T7-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T2-02",
+        "to": "T8-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T3-02",
+        "to": "T8-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T4-02",
+        "to": "T8-02",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T5-03",
+        "to": "T8-03",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T6-03",
+        "to": "T8-03",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T7-03",
+        "to": "T8-03",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T8-02",
+        "to": "T9-01",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T8-03",
+        "to": "T9-02",
         "edge_type": "data_input"
       }
-    ],
-    "cycle_detected": false,
-    "cycle_flags": [],
-    "critical_path_nodes": [
-      "WP2",
-      "WP4",
-      "WP8",
-      "WP5"
     ]
   },
+  "cycle_detected": false,
+  "cycle_flags": [],
+  "critical_path_nodes": [
+    "WP2",
+    "WP5",
+    "WP8",
+    "WP9"
+  ],
   "partner_role_matrix": [
     {
       "partner_id": "ATU",
@@ -864,6 +747,19 @@
       ]
     },
     {
+      "partner_id": "BIIS",
+      "wps_as_lead": [
+        "WP3"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2",
+        "WP4",
+        "WP5",
+        "WP8"
+      ]
+    },
+    {
       "partner_id": "CERIA",
       "wps_as_lead": [
         "WP4"
@@ -878,15 +774,12 @@
       ]
     },
     {
-      "partner_id": "BIIS",
+      "partner_id": "NIHS",
       "wps_as_lead": [
-        "WP3"
+        "WP5"
       ],
       "wps_as_contributor": [
         "WP1",
-        "WP2",
-        "WP4",
-        "WP5",
         "WP8"
       ]
     },
@@ -902,16 +795,6 @@
       ]
     },
     {
-      "partner_id": "NIHS",
-      "wps_as_lead": [
-        "WP5"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP8"
-      ]
-    },
-    {
       "partner_id": "ELI",
       "wps_as_lead": [
         "WP7"
@@ -919,6 +802,19 @@
       "wps_as_contributor": [
         "WP1",
         "WP8",
+        "WP9"
+      ]
+    },
+    {
+      "partner_id": "FIIT",
+      "wps_as_lead": [
+        "WP8"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP5",
+        "WP6",
+        "WP7",
         "WP9"
       ]
     },
@@ -936,45 +832,44 @@
         "WP7",
         "WP8"
       ]
-    },
-    {
-      "partner_id": "FIIT",
-      "wps_as_lead": [
-        "WP8"
-      ],
-      "wps_as_contributor": [
-        "WP1",
-        "WP5",
-        "WP6",
-        "WP7",
-        "WP9"
-      ]
     }
   ],
   "normalization_issues": [
     {
-      "severity": "advisory",
-      "field": "tasks",
-      "wp_id": "all",
-      "note": "Tasks synthesized for all 9 WPs; workpackage_seed.json contained no tasks arrays. Functional-label tasks derived from WP titles and descriptions; task_ids assigned as T<wp>-<seq>."
+      "issue_id": "NI-01",
+      "severity": "assumption",
+      "affected_element": "valid_partner_ids",
+      "description": "valid_partner_ids not provided in invoking agent context. Partner IDs derived from participants arrays in workpackage_seed.json (declared Tier 3 input). Derived set: ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT. All lead_partner and contributing_partners values validated against this derived set; all pass."
     },
     {
-      "severity": "advisory",
-      "field": "deliverables",
-      "wp_id": "all",
-      "note": "Deliverables synthesized for all 9 WPs; workpackage_seed.json contained no deliverables arrays. Types and due_months set within each WP end_month; deliverable_ids assigned as D<wp>-<seq>."
+      "issue_id": "NI-02",
+      "severity": "assumption",
+      "affected_element": "resolved_instrument_type",
+      "description": "resolved_instrument_type not provided in invoking agent context. Inferred as 'RIA' from the single instrument entry present in section_schema_registry.json."
     },
     {
+      "issue_id": "NI-03",
       "severity": "advisory",
-      "field": "dependencies",
-      "wp_id": "WP4,WP5,WP6,WP7,WP8,WP9",
-      "note": "Dependencies derived from WP descriptions; workpackage_seed.json contained no explicit dependency entries. WP1, WP2, WP3 have no inbound dependencies (start M1 or M3 with no prerequisites)."
+      "affected_element": "WP1.tasks,WP2.tasks,WP3.tasks,WP4.tasks,WP5.tasks,WP6.tasks,WP7.tasks,WP8.tasks,WP9.tasks",
+      "description": "Tasks synthesized for all 9 WPs: workpackage_seed.json contains no tasks arrays. Three tasks per WP synthesized from WP objectives and descriptions using functional-label titles. task_ids assigned as T<wp_number>-0N. responsible_partner set to WP lead_partner for all synthesized tasks."
     },
     {
+      "issue_id": "NI-04",
       "severity": "advisory",
-      "field": "valid_partner_ids",
-      "wp_id": "all",
-      "note": "valid_partner_ids inferred from participants arrays in workpackage_seed.json (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT); partners.json was not provided as explicit caller context. All WP lead_partner and responsible_partner values are confirmed within this inferred set."
+      "affected_element": "WP1.deliverables,WP2.deliverables,WP3.deliverables,WP4.deliverables,WP5.deliverables,WP6.deliverables,WP7.deliverables,WP8.deliverables,WP9.deliverables",
+      "description": "Deliverables synthesized for all 9 WPs: workpackage_seed.json contains no deliverables arrays. Two to three deliverables per WP synthesized from WP objectives and end_month values. deliverable_ids assigned as D<wp_number>-0N. due_months set to WP end_month or earlier within WP active period. responsible_partner set to WP lead_partner for all synthesized deliverables."
+    },
+    {
+      "issue_id": "NI-05",
+      "severity": "advisory",
+      "affected_element": "project_duration_months constraint",
+      "description": "project_duration_months is null in section_schema_registry.json for RIA instrument (duration is call-specific and entered by applicant). Deliverable due_month constraint (due_month <= project_duration_months) could not be validated. Due months are set to WP end_month values (maximum: 48). If confirmed project_duration_months is shorter than any WP end_month, affected deliverable due_months must be revised."
+    },
+    {
+      "issue_id": "NI-06",
+      "severity": "advisory",
+      "affected_element": "dependency_map.edges",
+      "description": "No dependencies arrays present in workpackage_seed.json seed entries. dependency_map edges are empty. WP-level dependency edges must be added by wp-dependency-analysis skill based on start_month sequences and logical inter-WP dependencies."
     }
   ]
 }
