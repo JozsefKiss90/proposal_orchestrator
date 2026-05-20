@@ -1,0 +1,56 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'governance_matrix', 'management_roles', 'risk_register', 'ethics_assessment', 'instrument_sections_addressed', 'traceability_footer'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+  "governance_matrix": [
+    {
+      "body_name": "General Assembly",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Strategic decisions requiring formal consortium vote: major amendments to the Description of Action, intellectual property licensing strategy, changes to consortium membership, formal resolution of disputes escalated from the Project Management Board, and any other matters that under the Consortium Agreement require unanimous or qualified-majority vote.",
+      "meeting_frequency": "Minimum twice per year and upon request by any consortium member; meeting frequency not prescribed in Tier 1 extracted sources (governance_principles.json: no_prescribed_meeting_frequency) or Tier 3 consortium data \u2014 selected as a project-operational assumption.",
+      "escalation_path": "Final decision-making body within the consortium. Disputes not resolved at General Assembly level may be referred to the dispute resolution mechanism established under the Consortium Agreement, consistent with Tier 1 guidance that a consortium agreement should complement and must not contradict the grant agreement (governance_principles.json: consortium_agreement_guidance). The Project Coordinator (ATU) notifies the programme officer when escalated matters affect proper-implementation obligations under the grant agreement (governance_principles.json: grant_agreement_implementation_articles).",
+      "source_basis": "Tier 3 consortium/partners.json (all eight partner_ids confirm composition); roles.json (ATU designated Coordinator). Tier 1 governance_principles.json: consortium_agreement_guidance; grant_agreement_implementation_articles; no_prescribed_governance_body_names (body name is project-operational choice); no_prescribed_meeting_frequency (meeting cadence is project-operational choice).",
+      "assumption_note": "Body name 'General Assembly' and minimum-twice-per-year meeting frequency are project-operational design choices not prescribed in Tier 1 extracted sources. governance_principles.json confirms no mandatory governance body names or meeting frequencies are stated for HE RIA proposals."
+    },
+    {
+      "body_name": "Project Management Board",
+      "composition": [
+        "ATU",
+        "CERIA",
+        "BIIS",
+        "ISIA",
+        "NIHS",
+        "ELI",
+        "BAL",
+        "FIIT"
+      ],
+      "decision_scope": "Operational project management: progress monitoring against milestones and deliverables; risk register updates; quality assurance and ethics compliance oversight; financial monitoring; preparation and approval of periodic reports to the European Commission; coordination of cohesion reports to ADRA and GenAI4EU Hub per Tier 2B call requirements SR-04 and CC-06; operational decisions that do not require a formal General Assembly vote.",
+      "meeting_frequency": "Monthly; meeting frequency not prescribed in Tier 1 extracted sources (governance_principles.json: no_prescribed_meeting_frequency) or Tier 3 consortium data \u2014 selected as a project-operational assumption reflecting the coordination requirements of a nine-WP eight-partner project with active ADRA cohesion obligations.",
+      "escalation_path": "Decisions within the agreed operational mandate are final at PMB level. Matters requiring a formal consortium vote are escalated to the General Assembly. Critical compliance or ethics issues are escalated immediately to the Project Coordinator (ATU); if warranted, reported to the European Commission consistent with proper-implementation obligations under the grant agreement (governance_principles.json: grant_agreement_implementation_articles).",
+      "source_basis": "Tier 3 roles.json (ATU key_responsibilities: 'Overall project coordination and management'; all partners hold WP leads). Tier 4 wp_structure.json (partner_role_matrix confirms all eight partners lead at least one WP). Tier 2B scope_requirements.json SR-04 (ADRA cohesion, mandatory, Confirmed); call_constraints.json CC-06 (ADRA cohesion, Confirmed). Tier 1 governance_principles.json: no_prescribed_governance_body_names; no_prescribed_meeting_frequency; grant_agreement_implementation_articles.",
+      "assumption_note": "Body name 'Project Management Board' and monthly meeting frequency are project-operational design choices. ATU chairs PMB in its capacity as Project Coordinator per roles.json; chair designation is a project-operational inference from the coordinator role, not prescribed in Tier 1 extracted sources."
+    },
+    {
+      "body_name": "Technical Steering Committee",
+      "composition": [
+        "ATU",
+        "BIIS",
+        "CERIA",
+        "NIHS",
+        "ISIA",
+        "ELI",
+        "FIIT"
+      ],
+      "decision_scope": "Technical and scientific integration
+=== END ===
