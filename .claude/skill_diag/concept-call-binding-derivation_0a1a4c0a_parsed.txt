@@ -1,0 +1,27 @@
+=== parsed OK ===
+=== top-level keys: ['mappings', 'eligibility_confirmed', 'ethics_review_required', 'gender_plan_required', 'open_science_requirements'] ===
+=== parsed content ===
+{
+  "mappings": [
+    {
+      "topic_element_id": "EO-01",
+      "tier2b_source_ref": "Expected Outcome \u2014 HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md: 'Vision' section ('truly autonomous AI systems'), 'Pillar 1 \u2014 Neuro-Symbolic Planning and Reasoning' (planning engine, verification checkpoints, plan monitoring, self-correction), 'Pillar 2 \u2014 Adaptive Memory Architecture' (working memory, episodic memory, semantic memory, memory controller); strategic_positioning.md: 'Positioning Against the Expected Outcomes' first paragraph (neuro-symbolic approach providing formal guarantees, tool orchestration layer enhancing reliability); project_summary.json: abstract field ('neuro-symbolic planning and reasoning engines', 'adaptive memory architectures', 'robust multi-step reasoning')",
+      "mapping_description": "MAESTRO directly addresses EO-01 through two integrated research pillars and a cross-cutting capability. Pillar 1 (Neuro-Symbolic Planning and Reasoning) develops a hybrid planning engine that decomposes high-level goals into formally verifiable sub-task graphs with monitoring and self-correction, delivering improvements in autonomy and reliability not achievable by pure LLM-based approaches. Pillar 2 (Adaptive Memory Architecture) designs a unified working/episodic/semantic memory system with a memory controller managing information flow across stores, enabling coherent long-horizon agent behaviour and directly addressing memory management. The External Tool and API Orchestration Layer provides post-invocation verification, grounding in verified external data, and execution monitoring with fallback/recovery, directly enhancing agent robustness and reliability. All three elements collectively produce significant improvements in autonomy, robustness, and reliability through advanced planning, memory management, and reasoning capabilities as required by EO-01."
+    },
+    {
+      "topic_element_id": "EO-02",
+      "tier2b_source_ref": "Expected Outcome \u2014 HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md: 'Pillar 3 \u2014 Decentralised Multi-Agent Coordination' (formal task-delegation protocol, conflict resolution mechanisms, auditable traces, heterogeneous agents collaborating on shared objectives); strategic_positioning.md: 'Positioning Against the Expected Outcomes' second paragraph (formally specified delegation and negotiation protocols with convergence guarantees); project_summary.json: abstract ('decentralised multi-agent coordination protocols that enable heterogeneous AI agents to negotiate, delegate, and jointly execute tasks with provable convergence guarantees')",
+      "mapping_description": "MAESTRO directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination). The concept develops: (1) a formal task-delegation protocol where agents decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence guarantees; (2) conflict resolution mechanisms for plan interference, contested resources, and inconsistent world models; and (3) fully auditable delegation and negotiation traces that humans can inspect. The External Tool and API Orchestration Layer extends multi-agent capability by governing shared tool access, delegated tool invocation, and conflict resolution when multiple agents require the same external resource. This constitutes an innovative multi-agent framework demonstrating effective decentralised coordination and collaboration among multiple heterogeneous AI agents with capabilities beyond individual agents."
+    }
+  ],
+  "eligibility_confirmed": false,
+  "ethics_review_required": true,
+  "gender_plan_required": true,
+  "open_science_requirements": [
+    "Open access to research results and publications is required, consistent with Horizon Europe open science requirements. (Source: EC-08, eligibility_conditions.json \u2014 status: Assumed; note: standard Horizon Europe open science mandate not explicitly stated in this topic's call text; verification against Tier 1 normative sources required)",
+    "Communicable results should be shared with the European R&D community through the AI-on-demand platform. (Source: CC-04, call_constraints.json \u2014 status: Confirmed; source_section: Scope, source_document: HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json)"
+  ]
+}
+=== END ===

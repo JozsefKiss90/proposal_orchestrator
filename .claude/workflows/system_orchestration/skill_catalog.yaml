@@ -1,0 +1,663 @@
+skill_catalog:
+# Optional field per entry:
+#   execution_mode: "cli-prompt" | "tapm"
+#     Default: "cli-prompt" (when absent)
+#     "tapm": Tool-Augmented Prompt Mode — Claude reads declared
+#             inputs from disk via Read/Glob tools instead of
+#             receiving them serialized in the prompt.
+#
+#   output_contract: "single_artifact" | "multi_artifact" | "payload"
+#     Default: "single_artifact" (when absent)
+#     "single_artifact": Skill produces exactly one canonical artifact.
+#     "multi_artifact": Skill produces multiple canonical artifacts in
+#                       a single response. The runtime extracts and
+#                       validates each sub-artifact independently.
+#     "payload": Skill returns an in-memory payload via SkillResult.
+#                No canonical artifact is written by the skill runtime.
+#                Used for skills whose primary output is consumed by
+#                the invoking agent or runner (e.g. gate-enforcement).
+#
+#   payload_required_fields: (only for output_contract: "payload")
+#     List of field names required in the payload response.
+#     The runtime validates that all listed fields are present.
+
+  - id: call-requirements-extraction
+    execution_mode: "tapm"
+    output_contract: "multi_artifact"
+    purpose: >
+      Extract binding topic-specific requirements from work programme and call
+      extract documents. Produces structured output with source section references
+      for every extracted element.
+    used_by_agents:
+      - call_analyzer
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/call_extracts/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier2b_topic_and_call_sources/extracted/
+    constitutional_constraints:
+      - "Must not invent call requirements not present in source documents"
+      - "Must carry source section references for every extracted element"
+      - "Must apply Confirmed/Inferred/Assumed/Unresolved status"
+
+  - id: evaluation-matrix-builder
+    execution_mode: "tapm"
+    output_contract: "multi_artifact"
+    purpose: >
+      Build a structured evaluation matrix from the applicable evaluation form and
+      call priority weights. Maps evaluation criteria, sub-criteria, scoring
+      thresholds, and relative weights.
+    used_by_agents:
+      - call_analyzer
+      - instrument_schema_resolver
+    reads_from:
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
+    constitutional_constraints:
+      - "Evaluation criteria must reflect the active evaluation form, not a generic template"
+      - "Sub-criterion weights must be traceable to Tier 2B extracted files"
+
+  - id: instrument-schema-normalization
+    execution_mode: "tapm"
+    purpose: >
+      Resolve the active instrument type to its application form section schema.
+      Extract section identifiers, field requirements, page limits, mandatory
+      elements, and structural constraints.
+    used_by_agents:
+      - instrument_schema_resolver
+      - proposal_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    writes_to:
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    constitutional_constraints:
+      - "Must resolve from the actual Tier 2A application form, not from generic memory"
+      - "Must never substitute a Grant Agreement Annex as a section schema source"
+      - "Page limits and section constraints must be read from the template, not assumed"
+
+  - id: topic-scope-check
+    execution_mode: "tapm"
+    purpose: >
+      Verify that a project concept or proposal section is within the thematic
+      scope defined by Tier 2B scope requirements. Flag any out-of-scope claims.
+    used_by_agents:
+      - call_analyzer
+      - concept_refiner
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Scope boundary is defined by Tier 2B only; must not infer scope from generic programme knowledge"
+      - "Out-of-scope flags must be written to decision log"
+
+  - id: concept-alignment-check
+    execution_mode: "tapm"
+    purpose: >
+      Check the alignment between the project concept and the call expected
+      outcomes and scope requirements. Identify vocabulary gaps, framing mismatches,
+      and uncovered expected outcomes. Produce concept refinement summary with
+      topic mapping rationale for downstream derivation.
+    used_by_agents:
+      - concept_refiner
+    reads_from:
+      - docs/tier3_project_instantiation/project_brief/
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+      - docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Alignment must be tested against Tier 2B extracted files, not assumed from concept vocabulary"
+      - "Uncovered expected outcomes must be flagged, not silently assumed covered"
+
+  - id: concept-call-binding-derivation
+    execution_mode: "tapm"
+    output_contract: "multi_artifact"
+    purpose: >
+      Derive Tier 3 call binding artifacts (topic_mapping.json and
+      compliance_profile.json) from the concept refinement summary and
+      Tier 2B extracted files. Lightweight deterministic transformation
+      of topic_mapping_rationale entries into structured mappings and
+      derivation of compliance flags from call constraints and eligibility
+      conditions.
+    used_by_agents:
+      - concept_refiner
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+      - docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+    writes_to:
+      - docs/tier3_project_instantiation/call_binding/topic_mapping.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+    constitutional_constraints:
+      - "topic_mapping entries must be derived from topic_mapping_rationale in concept_refinement_summary.json, not invented"
+      - "compliance_profile flags must be derived from Tier 2B call_constraints and eligibility_conditions, not assumed from generic programme knowledge"
+      - "Must fail closed if concept_refinement_summary.json is absent or empty"
+
+  - id: work-package-normalization
+    execution_mode: "tapm"
+    purpose: >
+      Normalize a work package structure to ensure each WP has all required elements:
+      unique identifier, title, objective, tasks with identifiers, deliverables with
+      due months and types, milestones with verifiable criteria, and a responsible lead.
+      Produces the minimal schema-complete Phase 3 gate artifact (wp_structure.json).
+    used_by_agents:
+      - wp_designer
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    notes: >
+      Phase 3 bounded-execution: TAPM mode reads declared inputs from disk
+      via Read tool. Output must be a minimal canonical artifact — schema-
+      complete and gate-sufficient, not a rich planning dossier. Dependency
+      enrichment is delegated to dependency_mapper; schedule richness to Phase 4.
+    constitutional_constraints:
+      - "WP leads must be drawn from Tier 3 consortium data only"
+      - "WP count must not exceed instrument limits from Tier 2A"
+      - "Deliverables must have due months within project duration"
+
+  - id: wp-dependency-analysis
+    execution_mode: "tapm"
+    purpose: >
+      Analyse inter-WP and inter-task dependencies. Produce a directed acyclic graph
+      representation. Identify critical path, dependency cycles, and dependencies
+      incompatible with project duration.
+    used_by_agents:
+      - dependency_mapper
+      - wp_designer
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    notes: >
+      Phase 3 bounded-execution: TAPM mode reads wp_structure.json from disk
+      via Read tool. Extends dependency_map in place; does not rewrite the
+      full WP structure. Only reads from the declared phase3_wp_design directory.
+    constitutional_constraints:
+      - "Must flag dependency cycles; must not silently remove them"
+      - "Critical path must be traceable to the dependency map"
+      - "Must not declare the map complete with undeclared dependencies"
+
+  - id: gantt-schedule-builder
+    execution_mode: "tapm"
+    purpose: >
+      Assign all tasks to months consistent with the normalized dependency
+      constraints. Define milestone due months and verifiable achievement
+      criteria. Identify the critical path. Produce the canonical gantt.json
+      artifact (schema orch.phase4.gantt.v1).
+    used_by_agents:
+      - gantt_designer
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+      - docs/tier3_project_instantiation/consortium/roles.json
+      - docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json
+    constitutional_constraints:
+      - "Must not assign tasks to months beyond the project duration from selected_call.json"
+      - "Must not schedule a task start before prerequisite task completion per strict constraints"
+      - "Must not produce milestones without verifiable achievement criteria"
+      - "Must not silently adjust project duration to accommodate scheduling conflicts"
+
+  - id: milestone-consistency-check
+    purpose: >
+      Verify milestone due months against deliverable due months and (when available)
+      task schedule. Confirm every milestone has a verifiable achievement criterion
+      testable at the stated due month. Operates in dual mode: DEGRADED (WP-level
+      validation only, when gantt.json is absent) or FULL (schedule-level validation,
+      when gantt.json is present).
+    used_by_agents:
+      - gantt_designer
+      - wp_designer
+      - implementation_architect
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    notes: >
+      Operates in dual mode:
+        - Phase 3 (n03_wp_design): DEGRADED — WP-level validation only (no gantt.json).
+          Validates milestone IDs, WP linkage, duration bounds, deliverable alignment,
+          and verifiable criteria using wp_structure.json alone.
+        - Phase 4+ (n04_gantt_milestones, n06_implementation_architecture): FULL —
+          schedule-level validation (requires gantt.json). Validates milestone due months
+          against task completion months and dependency map timing.
+      gantt.json is an optional input. Its absence triggers DEGRADED mode, not a
+      MISSING_INPUT failure. This prevents phase-leakage failures when the skill is
+      invoked during Phase 3 before gantt.json exists.
+    constitutional_constraints:
+      - "Milestones with non-verifiable criteria must be flagged"
+      - "Milestone due months must be consistent with task completion months (FULL mode) or WP duration bounds (DEGRADED mode)"
+
+  - id: impact-pathway-core-builder
+    execution_mode: "tapm"
+    purpose: >
+      Produce the structural backbone of Phase 5: impact pathways mapping call
+      expected impacts to project outputs, and KPIs traceable to WP deliverables.
+      Writes impact_architecture.json with dissemination/exploitation/sustainability
+      fields set to null (populated by impact-dec-enricher).
+    used_by_agents:
+      - impact_architect
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+      - docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    constitutional_constraints:
+      - "Every call expected impact must be explicitly mapped or flagged as uncovered"
+      - "Impact claims must trace to a named WP deliverable or activity"
+      - "Generic impact language must not substitute for project-specific pathways"
+
+  - id: impact-dec-enricher
+    execution_mode: "tapm"
+    output_contract: "enrich_artifact"
+    enrichment_base_artifact: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+    purpose: >
+      Enrich the existing impact_architecture.json by populating dissemination_plan,
+      exploitation_plan, and sustainability_mechanism fields. Emits only the three
+      DEC fields as a compact JSON patch; the runtime merges them into the existing
+      base artifact produced by impact-pathway-core-builder. Does NOT emit or modify
+      impact_pathways or kpis — those are preserved by the runtime merge.
+    used_by_agents:
+      - impact_architect
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    constitutional_constraints:
+      - "DEC plans must be specific to the project; generic templates are insufficient"
+      - "Target groups must be defined with specificity"
+      - "Must preserve existing impact_pathways and kpis fields without modification"
+
+  - id: dissemination-exploitation-communication-check
+    execution_mode: "tapm"
+    purpose: >
+      Verify that dissemination, exploitation, and communication plans address the
+      relevant call and instrument requirements. Check target group specificity,
+      channel definition, and timeline alignment with WP structure.
+    used_by_agents:
+      - impact_architect
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    constitutional_constraints:
+      - "DEC plans must be specific to the project; generic templates are insufficient"
+      - "Target groups must be defined with specificity"
+
+  - id: governance-model-builder
+    execution_mode: "tapm"
+    purpose: >
+      Build the project governance model and implementation architecture base
+      artifact: management body composition, meeting frequency and decision scope,
+      escalation paths, ethics self-assessment, and instrument-mandated section
+      coverage. Derives governance from Tier 3 consortium data and WP structure;
+      ethics assessment from compliance profile; instrument sections from section
+      schema registry.
+    used_by_agents:
+      - implementation_architect
+    reads_from:
+      - docs/tier1_normative_framework/extracted/governance_principles.json
+      - docs/tier1_normative_framework/extracted/implementation_constraints.json
+      - docs/tier3_project_instantiation/consortium/partners.json
+      - docs/tier3_project_instantiation/consortium/roles.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    constitutional_constraints:
+      - "Governance roles must be assigned to Tier 3 consortium members only"
+      - "Management structure must be consistent with WP lead assignments"
+      - "Ethics self-assessment must not be omitted, null, or 'N/A'"
+      - "Tier 1 programme-rule claims must be sourced to docs/tier1_normative_framework/extracted/; if no Tier 1 rule exists, the output must mark the element as an explicit assumption rather than generic 'standard RIA practice'"
+      - "Call-specific mandate claims sourced to compliance_profile.json require Tier 2B traceability or derivative labeling per CLAUDE.md §13.2"
+
+  - id: risk-register-builder
+    execution_mode: "tapm"
+    output_contract: "enrich_artifact"
+    enrichment_base_artifact: "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+    purpose: >
+      Populate the risk register from Tier 3 risk seeds. Map each seed to the
+      gate-required register format with category, likelihood, impact, and
+      mitigation fields. Emits only risk_register; the runtime merges it into
+      the existing implementation_architecture.json.
+    used_by_agents:
+      - implementation_architect
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/risks.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    constitutional_constraints:
+      - "Risks not in Tier 3 seeds must be flagged for operator review, not silently added"
+      - "Mitigation measures must be traceable to project activities, not generic"
+
+  - id: budget-interface-validation
+    purpose: >
+      Validate budget request conformance to the interface contract before submission,
+      and validate budget response conformance and structural consistency upon receipt.
+      Produces validation artifacts.
+    used_by_agents:
+      - budget_interface_coordinator
+      - budget_gate_validator
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/integrations/lump_sum_budget_planner/request_templates/
+      - docs/integrations/lump_sum_budget_planner/received/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/integrations/lump_sum_budget_planner/validation/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    constitutional_constraints:
+      - "Must not generate or estimate budget figures"
+      - "Must not accept a response that does not conform to the interface contract"
+      - "Must not declare the budget gate passed if blocking inconsistencies exist"
+      - "Must not treat absent response as a non-failing state"
+
+  - id: proposal-section-drafting
+    execution_mode: "tapm"
+    output_contract: "multi_artifact"
+    purpose: >
+      DEPRECATED by Phase 8 refactor. Replaced by excellence-section-drafting,
+      impact-section-drafting, and implementation-section-drafting. Retained for
+      backward-compatibility reference only.
+    used_by_agents: []
+    reads_from: []
+    writes_to: []
+    constitutional_constraints:
+      - "Must not be invoked by any active manifest node"
+
+  - id: excellence-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Excellence section of the RIA/IA Part B from Phase 2 concept
+      refinement, Phase 3 WP structure, and Tier 3 project data. Produces
+      excellence_section.json conforming to orch.tier5.excellence_section.v1.
+    used_by_agents:
+      - excellence_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/excellence_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not fabricate project facts not present in Tier 3"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: impact-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Impact section from Phase 5 impact architecture, DEC plans,
+      and Tier 2B expected impacts. Produces impact_section.json conforming
+      to orch.tier5.impact_section.v1.
+    used_by_agents:
+      - impact_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/impact_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not fabricate impact coverage for unmapped call expected impacts"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: implementation-section-drafting
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Draft the Implementation section from Phase 3 WP structure, Phase 4 Gantt,
+      Phase 6 implementation architecture. Produces implementation_section.json
+      conforming to orch.tier5.implementation_section.v1.
+    used_by_agents:
+      - implementation_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/implementation_section.json
+    constitutional_constraints:
+      - "Must verify budget gate passed before producing content"
+      - "Must not redesign the consortium or WP structure"
+      - "Must not use Grant Agreement Annex structure"
+
+  - id: cross-section-consistency-check
+    execution_mode: "tapm"
+    output_contract: "single_artifact"
+    purpose: >
+      Check cross-section consistency of the three criterion-aligned sections
+      and produce the assembled Part B draft. Verifies objectives, WP references,
+      partner names, deliverables, milestones, KPIs, impact claims, budget
+      references, and terminology are consistent across all three sections.
+    used_by_agents:
+      - proposal_integrator
+    reads_from:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier3_project_instantiation/
+      - docs/tier2a_instrument_schemas/application_forms/
+    writes_to:
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+    constitutional_constraints:
+      - "Must not silently normalise contradictions"
+      - "Must flag all inconsistencies in the consistency_log"
+
+  - id: proposal-section-traceability-check
+    execution_mode: "tapm"
+    purpose: >
+      Verify that every material claim in a proposal section is traceable to a
+      named Tier 1-4 source. Flag unattributed assertions. Apply
+      Confirmed/Inferred/Assumed/Unresolved status to each claim.
+    used_by_agents:
+      - excellence_writer
+      - impact_writer
+      - implementation_writer
+      - proposal_integrator
+      - evaluator_reviewer
+      - revision_integrator
+      - traceability_auditor
+    reads_from:
+      - docs/tier5_deliverables/proposal_sections/
+    optional_reads_from:
+      - docs/tier5_deliverables/assembled_drafts/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    notes: >
+      TAPM mode: reads the specific artifact_path supplied by the invoking agent
+      via caller_context. In section mode (n08a/b/c), audits a single section file.
+      In assembled mode (n08d+), audits part_b_assembled_draft.json. The skill
+      uses Read/Glob tools to access Tier 1-4 reference artifacts on demand.
+      This bounds the prompt to ~20-30KB (vs ~380KB in cli-prompt mode).
+    constitutional_constraints:
+      - "Unattributed claims must be flagged, not silently accepted as Confirmed"
+      - "Confirmed status requires naming the specific source artifact"
+
+  - id: evaluator-criteria-review
+    execution_mode: "tapm"
+    purpose: >
+      Assess proposal content against the scoring logic of the applicable evaluation
+      criterion. Identify weaknesses by severity. Produce structured feedback aligned
+      to evaluator sub-criteria. Supports two modes: assembled-draft review (reads
+      part_b_assembled_draft.json) and criterion-scoped review (reads a single
+      criterion section artifact).
+    used_by_agents:
+      - evaluator_reviewer
+      - revision_integrator
+    reads_from:
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+      - docs/tier5_deliverables/proposal_sections/
+    writes_to:
+      - docs/tier5_deliverables/review_packets/
+    constitutional_constraints:
+      - "Evaluation must apply the active instrument evaluation criteria only"
+      - "Must not evaluate against grant agreement annex requirements"
+      - "Weakness severity (critical/major/minor) must be assigned to each finding"
+
+  - id: constitutional-compliance-check
+    execution_mode: "tapm"
+    purpose: >
+      Verify that a phase output or deliverable does not violate any prohibition in
+      CLAUDE.md. Checks for fabricated project facts, fabricated call constraints,
+      budget-dependent content before gate, grant annex schema usage, and other
+      constitutional violations.
+    used_by_agents:
+      - compliance_validator
+      - call_analyzer
+      - concept_refiner
+      - excellence_writer
+      - impact_writer
+      - implementation_writer
+      - proposal_integrator
+      - evaluator_reviewer
+      - revision_integrator
+      - budget_gate_validator
+    reads_from:
+      - CLAUDE.md
+    optional_reads_from:
+      - docs/tier5_deliverables/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    notes: >
+      TAPM mode: reads CLAUDE.md and the specific artifact_path supplied by the
+      invoking agent via caller_context. The agent runtime resolves artifact_path
+      from the node's produced phase output artifacts. The skill does NOT
+      recursively read all phase_outputs/ — it audits only the targeted artifact.
+      This bounds the prompt to ~20KB (vs ~295KB in cli-prompt mode).
+    constitutional_constraints:
+      - "Must check against CLAUDE.md Section 13 prohibitions as a minimum"
+      - "Constitutional violations must be flagged; they must not be silently resolved"
+      - "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md"
+
+  - id: gate-enforcement
+    execution_mode: "tapm"
+    output_contract: "payload"
+    payload_required_fields:
+      - gate_id
+      - run_id
+      - overall_status
+      - evaluated_at
+      - deterministic_predicates
+      - semantic_predicates
+    purpose: >
+      Evaluate all deterministic and semantic predicates for a named phase gate
+      against the canonical phase artifact, and return a structured predicate
+      evaluation summary as a SkillResult payload to the invoking agent. The
+      runner — not this skill — writes the GateResult artifact and declares
+      gate pass or fail.
+    used_by_agents:
+      - call_analyzer
+      # concept_refiner removed: manifest n02 skills do not include gate-enforcement (manifest governs per CLAUDE.md §3)
+      - wp_designer
+      - gantt_designer
+      - impact_architect
+      - implementation_architect
+      - budget_gate_validator
+      - proposal_writer
+      - revision_integrator
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier4_orchestration_state/decision_log/
+    notes: >
+      TAPM mode: reads the phase-specific canonical artifact and Tier 3
+      reference data from disk via Read tool. The invoking agent supplies
+      gate_id as context; the skill reads only the artifact mapped to that
+      gate. Must not broaden reads beyond the declared phase output directory
+      and Tier 3 project instantiation directory.
+    constitutional_constraints:
+      - "Gate conditions are defined in this workflow and in CLAUDE.md; they must not be weakened"
+      - "Gate failure must be declared explicitly; fabricated completion is a constitutional violation"
+      - "A gate cannot be declared passed without confirming all gate conditions"
+
+  - id: decision-log-update
+    purpose: >
+      Write a durable decision record to the Tier 4 decision log. Records the
+      decision taken, alternatives considered, the tier authority applied, and
+      the rationale. Required whenever a material interpretation is made or a
+      conflict is resolved.
+    used_by_agents:
+      - concept_refiner
+      - wp_designer
+      - gantt_designer
+      - impact_architect
+      - implementation_architect
+      - budget_gate_validator
+      - revision_integrator
+      - state_recorder
+      - compliance_validator
+      - traceability_auditor
+    reads_from:
+      - "Any phase context requiring durable recording"
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Decisions held only in agent memory do not constitute durable decisions"
+      - "Every resolved tier conflict must produce a decision log entry"
+      - "Decision log entries must identify the tier authority applied"
+
+  - id: checkpoint-publish
+    execution_mode: "tapm"
+    purpose: >
+      Write a formal checkpoint artifact to Tier 4 checkpoints/ confirming that a
+      phase or phase group has completed with a known validated state. Preserves a
+      reproducible snapshot of the state at the checkpoint.
+    used_by_agents:
+      - revision_integrator
+      - state_recorder
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier4_orchestration_state/checkpoints/
+    constitutional_constraints:
+      - "Validated checkpoints must not be overwritten by subsequent reruns"
+      - "A checkpoint must not be published before all gate conditions for the phase are met"

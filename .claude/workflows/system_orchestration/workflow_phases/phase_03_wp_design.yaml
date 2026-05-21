@@ -1,0 +1,84 @@
+id: phase_03_wp_design_and_dependency_mapping
+phase: 3
+name: "Work Package Design and Dependency Mapping"
+purpose: >
+  Design the full work package structure: work packages, tasks, deliverables,
+  inter-WP dependencies, partner-role assignments, and milestone linkages.
+  Dependency mapping is a required sub-task of this phase. The dependency map
+  is a required input to Phase 4 and Phase 6 and must be present in Tier 4
+  before those phases proceed.
+agent: wp_designer
+skills:
+  - work-package-normalization
+  - wp-dependency-analysis
+  - milestone-consistency-check
+  - instrument-schema-normalization
+  - gate-enforcement
+depends_on:
+  - phase_02_concept_refinement
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      role: "Refined concept, topic mapping, and compliance profile"
+      validation: "Phase 2 gate must have passed"
+    - path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      role: "Provisional WP seeds; may be minimal but must be non-empty"
+      validation: "Must be non-empty; absence is a gate failure"
+    - path: docs/tier3_project_instantiation/architecture_inputs/objectives.json
+      role: "Project objectives to be addressed by WP structure"
+      validation: "Must be non-empty"
+    - path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      role: "Instrument-specific WP count limits, deliverable constraints, milestone conventions"
+    - path: docs/tier3_project_instantiation/consortium/partners.json
+      role: "Partner list for responsibility assignment"
+    - path: docs/tier3_project_instantiation/consortium/roles.json
+      role: "Partner role definitions for WP lead and task lead assignments"
+  conditional:
+    - path: docs/tier3_project_instantiation/source_materials/prior_proposals/
+      condition: "Read if present to avoid repeating known structural weaknesses"
+    - path: docs/tier3_project_instantiation/source_materials/partner_inputs/
+      condition: "Read if present to incorporate partner-provided task or deliverable inputs"
+outputs:
+  tier3_updated:
+    - path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      content: "Updated WP seed incorporating full structure if changes made during design"
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      content: >
+        Full WP architecture: WPs with objectives, tasks (numbered/titled/described),
+        deliverables (number/title/type/due-month/responsible-partner), milestones
+        (number/title/verifiable-criterion/due-month/associated-WP), inter-WP
+        dependency map (directed acyclic graph), partner-role assignment matrix,
+        structural gaps or Tier 2A non-compliances.
+instructions:
+  - "Design WPs from project objectives in Tier 3, not from prior templates."
+  - "Each WP must have: unique identifier, title, objective, tasks, at least one deliverable, lead partner, declared dependencies."
+  - "Each task must have: unique identifier, title, description, lead partner, contributing partners."
+  - "Each deliverable must have: unique identifier, title, type, due month, responsible partner."
+  - "Each milestone must have: unique identifier, title, verifiable achievement criterion, due month, responsible WP."
+  - "Perform dependency mapping: identify prerequisites for each WP and task; represent as a directed acyclic graph."
+  - "Identify and flag any dependency cycles; do not silently remove them."
+  - "Check total WP count against instrument limits from Tier 2A section_schema_registry."
+  - "Assign partners from Tier 3 consortium data only; do not invent partner responsibilities."
+  - "Flag any project objective not addressed by at least one WP."
+  - "Flag any call expected outcome not addressed by at least one deliverable."
+validation:
+  must_confirm:
+    - "All WPs have objectives, tasks, at least one deliverable, a lead, and declared dependencies"
+    - "WP count is within instrument limits from Tier 2A"
+    - "All deliverables have due months within project duration"
+    - "All milestones have verifiable achievement criteria"
+    - "Dependency map is complete and acyclic"
+    - "All assigned partners exist in Tier 3 consortium data"
+gate_condition:
+  all_of:
+    - "Full WP structure written to Tier 4"
+    - "Dependency map written to Tier 4"
+    - "All WPs have at least one deliverable and a responsible lead"
+    - "WP count compliant with Tier 2A instrument constraints"
+    - "No dependency cycles in the dependency map"
+    - "All assigned partners present in Tier 3 consortium data"
+  fail_behavior: >
+    Declare gate failure. Write gap report and structural non-compliances to
+    phase3_wp_design/. Do not proceed to Phase 4 or Phase 5. Surface to
+    human operator.

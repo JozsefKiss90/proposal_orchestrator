@@ -1,0 +1,31 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'topic_mapping_rationale', 'scope_coverage', 'scope_conflict_log', 'strategic_differentiation'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase2.concept_refinement_summary.v1",
+  "run_id": "a7909596-b7fa-4086-9106-231f55711657",
+  "topic_mapping_rationale": {
+    "EO-01": {
+      "topic_element_id": "EO-01",
+      "mapping_to_concept": "MAESTRO directly addresses EO-01 through two co-designed research pillars. Pillar 1 (Neuro-Symbolic Planning and Reasoning) develops a hybrid planning engine combining LLM-based reasoning with symbolic planning methods \u2014 including MCTS and hierarchical task networks \u2014 producing formally verifiable sub-task graphs with pre/post-conditions and verification checkpoints, self-correction via plan monitoring and replanning from verified intermediate states, and long-horizon robustness absent from chain-of-thought-only approaches. This directly delivers improvements in agent autonomy and reliability through advanced planning mechanisms and reasoning capabilities. Pillar 2 (Adaptive Memory Architecture) develops a unified working/episodic/semantic memory architecture with a memory controller governing retrieval, commitment, and forgetting, enabling persistent coherent agent behaviour over extended interactions beyond any single LLM context window \u2014 directly delivering improvements through memory management. The cross-cutting External Tool and API Orchestration Layer further enhances robustness and reliability by grounding agent reasoning in verified external data (post-invocation validation) and providing principled fallback/recovery for tool failures. The strategic_positioning.md document explicitly maps these mechanisms to EO-01 under 'Positioning Against the Expected Outcomes'.",
+      "tier2b_source_ref": "Expected Outcome | HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md (Vision section \u2014 'structured planning with verifiable reasoning, persistent and adaptive memory \u2026 to produce agents that are robust, trustworthy, and deployable'; Pillar 1 section \u2014 'Neuro-Symbolic Planning and Reasoning', 'verification checkpoints', 'plan monitoring', 'self-correction'; Pillar 2 section \u2014 'Adaptive Memory Architecture', 'working memory', 'episodic memory', 'semantic memory', 'memory controller'); project_summary.json (abstract \u2014 'next-generation AI agent architectures', 'persistent memory management', 'planning and reasoning engines', keywords: 'planning and reasoning', 'memory-augmented AI'); strategic_positioning.md (Positioning Against the Expected Outcomes \u2014 first expected outcome paragraph)",
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    },
+    "EO-02": {
+      "topic_element_id": "EO-02",
+      "mapping_to_concept": "MAESTRO directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination), which develops formal task-delegation protocols where agents decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence guarantees \u2014 mechanisms that directly deliver effective decentralised coordination beyond the capabilities of individual agents. Conflict resolution mechanisms handle plan interference, contested resources, and inconsistent world models across multiple concurrent agents. All delegation, negotiation, and joint decisions produce auditable structured traces. The External Tool and API Orchestration Layer extends multi-agent capability by governing shared tool access across collaborating agents, managing delegated tool invocations, and resolving conflicts when multiple agents require the same external resource. The healthcare demonstrator (specialist sub-agents coordinating diagnostic reasoning) and manufacturing demonstrator (multi-agent process optimisation across production line segments) provide concrete validation. The strategic_positioning.md document explicitly maps Pillar 3 and the tool orchestration layer to EO-02.",
+      "tier2b_source_ref": "Expected Outcome | HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "tier3_evidence_ref": "concept_note.md (Pillar 3 section \u2014 'Decentralised Multi-Agent Coordination', 'formal task-delegation protocol', 'conflict resolution mechanisms', 'heterogeneous agents \u2026 to collaborate on shared objectives'; Vision section \u2014 'many real-world tasks exceed the scope of any single agent'; Validation and Demonstrators section \u2014 healthcare multi-agent specialist coordination, manufacturing multi-agent process optimisation); project_summary.json (abstract \u2014 'decentralised multi-agent coordination protocols \u2026 provable convergence guarantees'; keywords: 'multi-agent systems'); strategic_positioning.md (Positioning Against the Expected Outcomes \u2014 second expected outcome paragraph)",
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    }
+  },
+  "scope_coverage": {
+    "SR-01": {
+      "scope_element_id": "SR-01",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "MAESTRO explicitly frame
+=== END ===

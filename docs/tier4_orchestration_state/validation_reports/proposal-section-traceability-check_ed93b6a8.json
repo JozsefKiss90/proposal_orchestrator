@@ -1,0 +1,130 @@
+{
+  "report_id": "traceability_implementation_implementation_writer_2026-05-04T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "implementation_writer",
+  "run_id_reference": "ed93b6a8-3ddc-404a-b122-49ef4732eabf",
+  "section_id_audited": "implementation",
+  "claim_audit_results": [
+    {
+      "claim_id": "C1",
+      "claim_summary": "MAESTRO structured as 9 WPs over 48 months in three functional layers",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — work_packages[].wp_id (9 WPs, all with confirmed lead_partner); docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — milestones[milestone_id=MS11].due_month=48",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C2",
+      "claim_summary": "WP2 tasks T2-01 (M1–12), T2-02 (M6–24), T2-03 (M18–36); deliverables D2-01 (M18), D2-02 (M36)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — tasks[T2-01].start=1,end=12; tasks[T2-02].start=6,end=24; tasks[T2-03].start=18,end=36; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json — deliverables[D2-01].due_month=18; deliverables[D2-02].due_month=36",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C3",
+      "claim_summary": "WP3 tasks T3-01 (M1–12), T3-02 (M6–24), T3-03 (M18–30); deliverables D3-01 (M12), D3-02 (M30)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — tasks[T3-01].start=1,end=12; tasks[T3-02].start=6,end=24; tasks[T3-03].start=18,end=30; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json — deliverables[D3-01].due_month=12; deliverables[D3-02].due_month=30",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C4",
+      "claim_summary": "WP4 tasks T4-01 (M3–15), T4-02 (M12–24), T4-03 (M18–36); deliverables D4-01 (M18), D4-02 (M36)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — tasks[T4-01].start=3,end=15; tasks[T4-02].start=12,end=24; tasks[T4-03].start=18,end=36; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json — deliverables[D4-01].due_month=18; deliverables[D4-02].due_month=36",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C5",
+      "claim_summary": "Demonstrator WPs (WP5, WP6, WP7) each follow use-case definition (M12–18), deployment (M18–36), and validation (M36–42) phases",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — tasks[T5-01].start=12,end=18; tasks[T5-02].start=18,end=36; tasks[T5-03].start=36,end=42; tasks[T6-01/T7-01 through T6-03/T7-03] follow identical phase structure",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C6",
+      "claim_summary": "WP8 delivers D8-01 (M12), D8-02 (M42), D8-03 (M48); WP9 delivers D9-01 (M6), D9-02 (M36), D9-03 (M48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json — deliverables[D8-01].due_month=12; deliverables[D8-02].due_month=42; deliverables[D8-03].due_month=48; deliverables[D9-01].due_month=6; deliverables[D9-02].due_month=36; deliverables[D9-03].due_month=48",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C7",
+      "claim_summary": "Dependency map contains 16 confirmed data-input edges; representative critical path T2-01→T2-02→T2-03→T5-01→T5-02→T5-03→T8-03",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — dependency_map.edges (16 entries, all edge_type=data_input); docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — critical_path=[T2-01,T2-02,T2-03,T5-01,T5-02,T5-03,T8-03]",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "11 milestones MS1–MS11; MS1 (Architecture specification, M3), MS8 (Research pillar targets, M36), MS9 (Demonstrator validation, M42), MS11 (Project completion, M48)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — milestones[] (11 entries: MS1.due_month=3; MS8.due_month=36; MS9.due_month=42; MS11.due_month=48)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "Risk register identifies 11 risks; RISK-01 (medium/high, modular architecture + fallback modes from M6), RISK-04 (medium/high, ethics applications M1 + data abstraction layer), RISK-09 (low/high, deputy PI + consortium commitment clauses), RISK-10 (medium/high, shared API contracts M1–M3 + 6-monthly integration checkpoints)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json — risk_register[RISK-01].likelihood=medium,impact=high; risk_register[RISK-04].likelihood=medium,impact=high; risk_register[RISK-09].likelihood=low,impact=high; risk_register[RISK-10].likelihood=medium,impact=high; all mitigations text-verified against source",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "Three governance bodies: General Assembly (all 8 partners, biannual), Project Management Committee (all 8 partners, quarterly), Ethics and Quality Oversight Committee (ATU and NIHS, minimum biannual)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json — governance_matrix[body_name=General Assembly].meeting_frequency=biannual,composition=all 8; governance_matrix[PMC].meeting_frequency=quarterly; governance_matrix[EQOC].composition=[ATU,NIHS],meeting_frequency=minimum biannual",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C11",
+      "claim_summary": "Ethics self-assessment triggers Category 8 (AI, WP2/WP4/WP5/WP6), Category 4 (health data, WP5), Category 2 (clinical expert, WP5 T5-03); ATU holds Ethics Compliance Coordinator role; NIHS holds Healthcare Ethics Oversight role",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json — ethics_assessment.issues[ETHICS-01].category=Category 8; issues[ETHICS-02].category=Category 4; issues[ETHICS-03].category=Category 2; management_roles[MGR-011].assigned_to=ATU; management_roles[MGR-012].assigned_to=NIHS",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "8-partner consortium spanning 8 countries (DE, FR, NL, IT, SE, CH, FI, ES), combining higher education institutions, research centres, and private organisations",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json — partners[].country (ATU=DE, CERIA=FR, BIIS=NL, ISIA=IT, NIHS=SE, ELI=CH, BAL=FI, FIIT=ES); partners[].organisation_type (ATU/BIIS/ISIA/NIHS=HES; CERIA/FIIT=REC; ELI/BAL=PRC)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "Legal names, short names, WP lead roles, and primary capability descriptions for all 8 partners (ATU coordinates WP1/WP2; CERIA leads WP4; BIIS leads WP3; ISIA leads WP6; NIHS leads WP5; ELI leads WP7; BAL leads WP9; FIIT leads WP8)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json — partners[].legal_name, short_name, description, coordinator (all 8 entries); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — work_packages[].lead_partner (all 9 WPs); docs/tier3_project_instantiation/consortium/roles.json — roles[].wp_lead (all 8 partners)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "Each partner holds exactly one WP lead role matched to their primary competence",
+      "status": "unresolved",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — partner_role_matrix[partner_id=ATU].wps_as_lead=[WP1,WP2] (contradicts claim; ATU holds two WP lead roles)",
+      "flag_reason": "The claim states each partner holds exactly one WP lead role. wp_structure.json partner_role_matrix shows ATU.wps_as_lead = ['WP1','WP2'] — ATU holds two WP lead roles (WP1 and WP2). The referenced source directly contradicts the claim. All other partners hold one WP lead role. The claim requires correction: ATU holds two WP lead roles."
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "The consortium covers healthcare, advanced manufacturing, and logistics — described as 'the Apply AI sectors identified in SR-07'",
+      "status": "unresolved",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-07.description: 'The three specifically identified sectors are: healthcare, advanced manufacturing, and in-vehicle autonomous driving' (logistics not listed as an SR-07 Apply AI sector; claim misattributes logistics to SR-07)",
+      "flag_reason": "scope_requirements.json SR-07 identifies 'healthcare, advanced manufacturing, and in-vehicle autonomous driving' as the three specifically identified Apply AI sectors. Logistics is not an SR-07 Apply AI sector. WP7 is explicitly framed in wp_structure.json as a cross-sector transfer demonstrator 'beyond primary call sectors', not a primary call sector. The section's claim that logistics is one of 'the Apply AI sectors identified in SR-07' is contradicted by the Tier 2B source. The pre-existing CS-11 claim status ('confirmed') in the section's validation_status is incorrect — the Tier 2B source does not confirm logistics as an SR-07 Apply AI sector."
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "Budget gate passed; validated budget covers all 9 WPs and all 8 partners with no blocking inconsistencies",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json — gate_pass_declaration=pass; wp_coverage_results[WP1..WP9].present_in_budget=true; partner_coverage_results[ATU..FIIT].present_in_budget=true; blocking_inconsistencies=[]",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 16,
+    "confirmed": 14,
+    "inferred": 0,
+    "assumed": 0,
+    "unresolved": 2
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-05-04T00:00:00Z"
+}

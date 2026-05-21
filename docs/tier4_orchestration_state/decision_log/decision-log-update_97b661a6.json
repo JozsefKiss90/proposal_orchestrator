@@ -1,0 +1,16 @@
+{
+  "decision_id": "constitutional_violation_compliance_validator_2026-05-03T00-00-00Z",
+  "decision_type": "constitutional_violation",
+  "invoking_agent": "compliance_validator",
+  "phase_context": "phase_08_drafting_review",
+  "run_id_reference": "97b661a6-2381-4a15-85d5-3017e0f9b5ed",
+  "decision_description": "Constitutional compliance check of docs/tier5_deliverables/review_packets/review_packet.json detected a CLAUDE.md §13.3 violation: the review packet references project-specific partners (ATU, BAL, ISIA, ELI), capabilities (neuro-symbolic AI, automated planning, and LLM-based reasoning), objectives (OBJ-1, OBJ-3, OBJ-4, OBJ-7), and WP/task/deliverable assignments (WP1–WP9, T9-03, D9-02) throughout its findings and revision_actions without a traceability_footer providing Tier 3 source references. While these references appear primarily in evidence fields quoting proposal section text that has already been traced, the review packet artifact as a Tier 5 deliverable lacks the traceability mechanism required to confirm Tier 3 provenance of these project-fact claims. This constitutes a §13.3 violation: producing a Tier 5 artifact containing project facts not demonstrably traceable to Tier 3.",
+  "alternatives_considered": [
+    "Option A: Add a traceability_footer to the review packet schema (orch.tier5.review_packet.v1) linking quoted project facts to their Tier 3 source documents (docs/tier3_project_instantiation/consortium/partners.json, docs/tier3_project_instantiation/architecture_inputs/objectives.json, etc.), thereby providing direct Tier 3 provenance for all project-specific references in findings and revision_actions.",
+    "Option B: Determine that review packet findings quoting from already-traced proposal sections (excellence_section.json, impact_section.json, implementation_section.json — all of which have confirmed traceability_footers with no_unsupported_claims_declaration=true) inherit traceability from those source artifacts, and amend the review_packet schema specification accordingly to document this transitive traceability principle."
+  ],
+  "tier_authority_applied": "CLAUDE.md §13.3",
+  "rationale": "CLAUDE.md §13.3 prohibits inventing project facts not present in Tier 3. The review packet is a Tier 5 deliverable (schema_id: orch.tier5.review_packet.v1) and therefore subject to §11.4 (Tier 5 deliverables must be derived from Tier 1–4 state) and §13.10 (outputs in Tier 5 must be traceable to specific inputs in Tier 1–4). The artifact contains project-specific partner names, capabilities, objective identifiers, and WP/task/deliverable assignments without any traceability_footer.primary_sources[] referencing docs/tier3_project_instantiation/ paths. Although the project facts appear in evidence fields that quote from proposal sections which themselves have confirmed Tier 3 traceability, the review packet artifact lacks its own traceability mechanism to demonstrate this provenance chain. The violation is structural — the schema does not currently support traceability declaration — and requires human operator resolution to determine whether direct traceability or transitive traceability inheritance is the correct resolution approach.",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-05-03T00:00:00Z"
+}

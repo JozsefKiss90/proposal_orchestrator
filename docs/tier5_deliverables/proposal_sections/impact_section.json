@@ -1,0 +1,136 @@
+{
+  "schema_id": "orch.tier5.impact_section.v1",
+  "run_id": "10d3ecfb-ade3-4fd6-aa32-f6d0bcb9f7ab",
+  "criterion": "Impact",
+  "sub_sections": [
+    {
+      "sub_section_id": "B.2.1",
+      "title": "Project's pathways towards impact",
+      "content": "MAESTRO's impact pathway flows from four foundational research pillars through sector-validated demonstrators to European-scale AI adoption and open strategic autonomy. WP2 (Neuro-Symbolic Planning and Reasoning Engine, ATU lead) delivers the planning engine (D2-02, M24) and the External Tool and API Orchestration Layer — with a typed tool registry supporting ≥30 external tools/APIs, tool invocation success rate ≥95%, mean recovery time from tool failure ≤5s, and full provenance traces for 100% of tool invocations — advancing EO-01 agent autonomy and reliability. WP3 (Adaptive Memory Architecture, BIIS lead) delivers the adaptive tri-store memory architecture (D3-02, M24) for long-horizon agent coherence; WP4 (Decentralised Multi-Agent Coordination, CERIA lead) targets coordination of ≥5 heterogeneous agents, ≥25% improvement in joint task completion over independent agent baselines, and formal proof of protocol convergence, directly addressing EO-02. Against EI-01 and EI-06, three TRL-5 demonstrators advance Apply AI Strategy adoption across priority sectors: WP5 Healthcare Demonstrator — Clinical Decision Support (NIHS lead, D5-02, M36) targets diagnostic reasoning accuracy within 10% of specialist clinician performance on 500 de-identified clinical cases spanning 5 diagnostic domains; WP6 Manufacturing Demonstrator — Process Optimisation (ISIA lead, D6-02, M36) targets ≥15% defect reduction and ≥10% energy savings; and WP7 Logistics Transfer Demonstrator — Cross-Sector Generalisation (ELI lead, D7-02, M36) targets ≥20% improvement in disruption recovery time and ≥15% improvement in delivery schedule adherence, validated on ELI operational scenarios across 3 supply chain corridors. Against EI-02, EI-03, EI-04, and EI-05, the open MAESTRO framework and ecosystem (WP9, BAL lead) targets ≥500 GitHub stars within 6 months of release, AI-on-demand platform contribution, validation through ≥2 TEFs, and technology transfer through ≥3 EDIHs; note that specific AI Factories or TEF partnerships are not confirmed in Tier 3 project data — EI-05 is partially covered through open release and cross-demonstrator validation infrastructure and flagged as inferred. Primary target groups include the European AI research community, European hospital networks and clinical informatics teams, manufacturing SMEs in the EIT Manufacturing ecosystem, logistics and supply chain operators, and European AI developers and startups seeking sovereign AI infrastructure.",
+      "word_count": 308
+    },
+    {
+      "sub_section_id": "B.2.2",
+      "title": "Measures to maximise impact - Dissemination, exploitation and communication",
+      "content": "MAESTRO's Dissemination and Exploitation Plan (D9-01, WP9, M6), led by BAL, is an admissibility-condition deliverable structured across scientific dissemination, sector exploitation, and open ecosystem development. For scientific dissemination, ATU, BIIS, and CERIA target ≥20 peer-reviewed publications in top AI venues (NeurIPS, ICML, ICLR, AAMAS, AAAI) from M12, and the MAESTRO benchmark suite (D8-01, WP8, M18) is contributed to the AI-on-demand platform targeting adoption by ≥5 external research groups by M48. Sector exploitation is structured per partner: NIHS leads clinical adoption engagement with ≥3 European hospital networks by M48 and clinical validation report submission to ≥1 national health technology assessment body following D5-02 validation at M36; ISIA and BAL transfer the manufacturing demonstrator to ≥5 European manufacturing SMEs via EIT Manufacturing and ≥2 EDIHs; ELI pursues operational integration across ≥3 supply chain corridors with an ELI integration roadmap completed by M48; and CERIA submits ≥1 standardisation proposal to ISO/IEC JTC 1/SC 42 or IEEE by M48 based on formally verified coordination protocol results (D4-01, M15). The open-source MAESTRO framework (D8-02, WP8, M36; D9-02, WP9, M30) is released under an open licence targeting ≥10 European SMEs and startups building AI agent applications by M48, with BAL activating ≥3 EDIHs as dissemination channels across all demonstrated sectors. Communication targets the research community, clinical practitioners, manufacturing operators, policymakers, and the public through the project website, scientific conferences, and an EU AI Act multi-agent transparency alignment report published by CERIA. IPR follows a differentiated strategy: core research outputs (WP2, WP3, WP4, WP8) are released under open licences to maximise European ecosystem accessibility; sector demonstrators (WP5/NIHS, WP6/ISIA, WP7/ELI) are governed by a Joint Technology Transfer Agreement negotiated by M12. All scientific publications are made available via open access dissemination aligned with EU open science practices.",
+      "word_count": 289
+    }
+  ],
+  "impact_pathway_refs": [
+    "PATHWAY-EI-01",
+    "PATHWAY-EI-02",
+    "PATHWAY-EI-03",
+    "PATHWAY-EI-04",
+    "PATHWAY-EI-05",
+    "PATHWAY-EI-06"
+  ],
+  "dec_coverage": {
+    "dissemination_addressed": true,
+    "exploitation_addressed": true,
+    "communication_addressed": true
+  },
+  "validation_status": {
+    "overall_status": "inferred",
+    "claim_statuses": [
+      {
+        "claim_id": "CS-01",
+        "claim_summary": "EO-01/EO-02 coverage via WP2/WP3/WP4 research pillars (planning, memory, coordination)",
+        "status": "confirmed",
+        "source_ref": "impact_architecture.json PATHWAY-EI-02; objectives.json OBJ-1,OBJ-2,OBJ-3"
+      },
+      {
+        "claim_id": "CS-02",
+        "claim_summary": "WP4/CERIA: ≥5 heterogeneous agents, ≥25% joint task completion, formal proof of convergence",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-3.measurable_target; impact_architecture.json PATHWAY-EI-02"
+      },
+      {
+        "claim_id": "CS-03",
+        "claim_summary": "WP5/NIHS healthcare: accuracy within 10% clinician on 500 cases spanning 5 domains",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-4.measurable_target; outcomes.json OUT-4; wp_structure.json D5-02 M36"
+      },
+      {
+        "claim_id": "CS-04",
+        "claim_summary": "WP6/ISIA manufacturing: ≥15% defect reduction and ≥10% energy savings in pilot factory",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-5.measurable_target; impacts.json IMP-3.indicators"
+      },
+      {
+        "claim_id": "CS-05",
+        "claim_summary": "WP7/ELI logistics: ≥20% disruption recovery, ≥15% delivery adherence, 3 corridors",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-6.measurable_target; impacts.json IMP-4.indicators"
+      },
+      {
+        "claim_id": "CS-06",
+        "claim_summary": "WP9/BAL open framework: ≥500 GitHub stars, AI-on-demand, ≥2 TEFs, ≥3 EDIHs",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-7.measurable_target; impacts.json IMP-5.indicators"
+      },
+      {
+        "claim_id": "CS-07",
+        "claim_summary": "WP2/ATU tool orchestration: ≥30 tools, ≥95% invocation success, ≤5s recovery, 100% provenance",
+        "status": "confirmed",
+        "source_ref": "objectives.json OBJ-8.measurable_target; outcomes.json OUT-9"
+      },
+      {
+        "claim_id": "CS-08",
+        "claim_summary": "EI-05 TEF/AI Factory engagement — partial coverage, specific facilities not confirmed in Tier 3",
+        "status": "inferred",
+        "source_ref": "impact_architecture.json PATHWAY-EI-05 coverage_status; impacts.json IMP-1"
+      },
+      {
+        "claim_id": "CS-09",
+        "claim_summary": "DEC plan: ≥3 EDIHs active, AI-on-demand benchmark contribution, ≥5 external groups adopt suite",
+        "status": "confirmed",
+        "source_ref": "impact_architecture.json dissemination_plan; exploitation_plan; impacts.json IMP-5"
+      }
+    ]
+  },
+  "traceability_footer": {
+    "primary_sources": [
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
+      }
+    ],
+    "no_unsupported_claims_declaration": true
+  }
+}

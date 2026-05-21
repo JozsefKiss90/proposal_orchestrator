@@ -1,0 +1,137 @@
+tier_bindings:
+  tier1:
+    path: docs/tier1_normative_framework/
+    role: rules
+    description: >
+      Primary legislation, programme regulation, specific programme decision,
+      EU Financial Regulation, programme guide, general annexes, annotated grant
+      agreement, and model grant architectures. Governs non-negotiable legal and
+      regulatory compliance.
+    extracted_artifacts: docs/tier1_normative_framework/extracted/
+    read_authority: "highest documentary authority in the tier model"
+    write_constraint: >
+      Source documents are read-only. Extracted files are populated from source
+      documents only, never authored from memory.
+
+  tier2a:
+    path: docs/tier2a_instrument_schemas/
+    role: structural_schemas
+    description: >
+      Application form templates and evaluation form templates for all active
+      Horizon Europe instruments. Extracted registries covering instrument
+      definitions, section schemas, evaluator expectation patterns, and template
+      adapter mappings.
+    extracted_artifacts: docs/tier2a_instrument_schemas/extracted/
+    read_authority: "structural authority for the selected instrument"
+    write_constraint: "Source templates are read-only; extracted/ populated from source documents"
+    critical_constraint: >
+      Tier 2A application form templates are the governing structural schema for
+      proposal writing. Grant Agreement Annexes are not Tier 2A documents and
+      must never be substituted as proposal schemas.
+
+  tier2b:
+    path: docs/tier2b_topic_and_call_sources/
+    role: topic_and_call_sources
+    description: >
+      Work programme documents for all active Horizon Europe work programme areas;
+      call extracts for specific topics. Extracted files covering call constraints,
+      eligibility conditions, expected outcomes, expected impacts, scope
+      requirements, and evaluation priority weights.
+    subpaths:
+      work_programmes: docs/tier2b_topic_and_call_sources/work_programmes/
+      call_extracts: docs/tier2b_topic_and_call_sources/call_extracts/
+      extracted: docs/tier2b_topic_and_call_sources/extracted/
+    read_authority: "call- and topic-specific constraint authority"
+    write_constraint: >
+      All extracted data must faithfully represent source work programme and call
+      documents. Speculative paraphrase is prohibited. Every extracted item must
+      carry a source section reference.
+
+  tier3:
+    path: docs/tier3_project_instantiation/
+    role: project_instantiation
+    description: >
+      Project brief, consortium data, call binding, architecture inputs, source
+      materials, and integration artifacts. The sole authoritative source for
+      project-specific facts.
+    subpaths:
+      project_brief: docs/tier3_project_instantiation/project_brief/
+      consortium: docs/tier3_project_instantiation/consortium/
+      call_binding: docs/tier3_project_instantiation/call_binding/
+      architecture_inputs: docs/tier3_project_instantiation/architecture_inputs/
+      source_materials: docs/tier3_project_instantiation/source_materials/
+      integration: docs/tier3_project_instantiation/integration/
+    read_authority: "sole source of project-specific facts"
+    write_constraint: >
+      Agents may update Tier 3 artifacts only where explicitly specified in a
+      phase output definition. All project-specific claims in deliverables must
+      trace to Tier 3. Fabricating Tier 3 facts is a constitutional violation.
+    project_specificity_trigger: >
+      The system becomes project-specific when Tier 3 is populated. Partial
+      population is a managed state that must be acknowledged in orchestration
+      state; it does not halt the workflow unless a required input is absent.
+
+  tier4:
+    path: docs/tier4_orchestration_state/
+    role: orchestration_state
+    description: >
+      Phase outputs, decision log, checkpoints, and validation reports. The
+      authoritative durable record of workflow execution and decisions.
+    subpaths:
+      phase_outputs: docs/tier4_orchestration_state/phase_outputs/
+      decision_log: docs/tier4_orchestration_state/decision_log/
+      checkpoints: docs/tier4_orchestration_state/checkpoints/
+      validation_reports: docs/tier4_orchestration_state/validation_reports/
+    read_authority: "authoritative record of phase execution state"
+    write_constraint: >
+      Every canonical phase must write outputs to Tier 4 before downstream
+      phases depend on them. Validated checkpoints must not be overwritten.
+      Agent memory does not substitute for Tier 4 artifacts.
+
+  tier5:
+    path: docs/tier5_deliverables/
+    role: deliverables
+    description: >
+      Proposal sections, assembled drafts, final exports, and review packets.
+      The evaluator-facing output layer.
+    subpaths:
+      proposal_sections: docs/tier5_deliverables/proposal_sections/
+      assembled_drafts: docs/tier5_deliverables/assembled_drafts/
+      final_exports: docs/tier5_deliverables/final_exports/
+      review_packets: docs/tier5_deliverables/review_packets/
+    read_authority: "output layer only; not an input to orchestration reasoning"
+    write_constraint: >
+      All Tier 5 content must be derivable from Tier 1-4 state. Tier 5 must
+      not introduce claims not grounded in a higher tier. Budget-dependent
+      content must not be finalized before the budget gate passes.
+
+  integrations:
+    path: docs/integrations/
+    role: external_systems
+    systems:
+      lump_sum_budget_planner:
+        path: docs/integrations/lump_sum_budget_planner/
+        interface_contract: docs/integrations/lump_sum_budget_planner/interface_contract.json
+        request_templates: docs/integrations/lump_sum_budget_planner/request_templates/
+        received: docs/integrations/lump_sum_budget_planner/received/
+        validation: docs/integrations/lump_sum_budget_planner/validation/
+        role: "sole external financial computation system"
+        constraint: >
+          This repository does not compute lump-sum budgets. Budget data consumed
+          here must arrive through received/ and be validated through validation/.
+
+  runtime:
+    path: .claude/
+    role: runtime_execution_layer
+    description: >
+      Agent definitions, skill definitions, workflow definitions, agent memory,
+      cache, logs, and run records. Operational artifacts supporting execution.
+      Not constitutional source truth.
+    subpaths:
+      agents: .claude/agents/
+      skills: .claude/skills/
+      workflows: .claude/workflows/
+      agent_memory: .claude/agent-memory/
+      cache: .claude/cache/
+      logs: .claude/logs/
+      runs: .claude/runs/

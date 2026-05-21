@@ -1,0 +1,486 @@
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0ff',
+    'primaryBorderColor': '#7c3aed',
+    'lineColor': '#a78bfa',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'noteTextColor': '#f0f0f0',
+    'noteBkgColor': '#2d1b69',
+    'noteBorderColor': '#7c3aed',
+    'edgeLabelBackground': '#1a1a2e',
+    'clusterBkg': '#0d1117',
+    'clusterBorder': '#30363d'
+  },
+  'flowchart': {
+    'curve': 'basis',
+    'padding': 20,
+    'nodeSpacing': 50,
+    'rankSpacing': 60
+  }
+}}%%
+
+%% ============================================================
+%% PROPOSAL ORCHESTRATOR — SYSTEM ARCHITECTURE
+%% Horizon Europe DAG-Driven Proposal Generation Engine
+%% ============================================================
+
+flowchart TB
+
+  %% ══════════════════════════════════════════════════════════
+  %% TITLE BLOCK
+  %% ══════════════════════════════════════════════════════════
+  title["<b>PROPOSAL ORCHESTRATOR</b><br/><i>Horizon Europe DAG-Driven Proposal Generation Engine</i><br/>───────────────────────────────────────<br/>8 Phases | 13 Nodes | 11 Gates | 102 Predicates<br/>22 Agents | 30 Skills | 3-Layer Runtime Stack"]
+  style title fill:#1a0533,stroke:#7c3aed,stroke-width:3px,color:#e0e0ff
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 1: RUNTIME EXECUTION STACK
+  %% ══════════════════════════════════════════════════════════
+  subgraph RUNTIME["<b>RUNTIME EXECUTION STACK</b> &nbsp; runner/"]
+    direction TB
+
+    subgraph CLI_LAYER["<b>Layer 0: CLI Entry Point</b>"]
+      direction LR
+      main["<b>__main__.py</b><br/>CLI argument parsing<br/>--run-id, --phase, --dry-run,<br/>--json, --verbose"]
+    end
+
+    subgraph SLICER_LAYER["<b>Step 0: Call Slicer</b> (deterministic pre-processing)"]
+      direction LR
+      slicer["<b>call_slicer.py</b><br/>Extracts target call entry<br/>from grouped WP JSONs<br/>Produces *.slice.json (~5-8KB)<br/>Runs once per DAG run"]
+    end
+
+    subgraph SCHEDULER_LAYER["<b>Layer 1: DAG Scheduler</b>"]
+      direction LR
+      scheduler["<b>dag_scheduler.py</b><br/>ManifestGraph | RunSummary<br/>Topological dispatch<br/>Stall detection"]
+      gate_eval["<b>gate_evaluator.py</b><br/>Predicate evaluation<br/>102 predicates across 11 gates<br/>Deterministic-first, then semantic"]
+      run_ctx["<b>run_context.py</b><br/>Per-run state persistence<br/>Node states, failure metadata"]
+      manifest["<b>manifest_reader.py</b><br/>Loads manifest.compile.yaml<br/>Resolves node graph"]
+      gate_lib["<b>gate_library.py</b><br/>gate_rules_library.yaml<br/>Predicate registry"]
+      gate_reg["<b>gate_result_registry.py</b><br/>Bootstrap upstream states<br/>from durable gate results"]
+    end
+
+    subgraph AGENT_LAYER["<b>Layer 2: Agent Runtime</b>"]
+      direction LR
+      agent_rt["<b>agent_runtime.py</b><br/>Orchestration adapter<br/>Sequences skill invocations<br/>Failure propagation<br/>can_evaluate_exit_gate"]
+      dep_norm["<b>dependency_normalizer.py</b><br/>Phase 4 deterministic<br/>dependency normalization<br/>(pure Python, pre-agent)"]
+      p8_pack["<b>phase8_canonical_pack.py</b><br/>Canonical reference pack<br/>assembly for Phase 8"]
+      p8_reuse["<b>phase8_reuse.py</b><br/>Reuse tracking for<br/>Phase 8 drafting nodes"]
+      upstream["<b>upstream_inputs.py</b><br/>Resolve declared inputs<br/>from disk per manifest"]
+    end
+
+    subgraph SKILL_LAYER["<b>Layer 3: Skill Runtime</b>"]
+      direction LR
+      skill_rt["<b>skill_runtime.py</b><br/>Claude transport adapter<br/>Prompt assembly | Schema validation<br/>Atomic writes | _validate_skill_output()"]
+      transport["<b>claude_transport.py</b><br/>Claude CLI transport layer<br/>TAPM: --tools 'Read,Glob'<br/>cli-prompt: stdin pipe<br/>No API key required"]
+      sem_disp["<b>semantic_dispatch.py</b><br/>Semantic predicate dispatch<br/>Constitutional compliance<br/>via Claude invocation"]
+    end
+
+    subgraph PREDICATES["<b>Predicate Modules</b> &nbsp; runner/predicates/"]
+      direction LR
+      pred_file["<b>file_predicates</b><br/>File existence checks"]
+      pred_schema["<b>schema_predicates</b><br/>JSON schema conformance"]
+      pred_cov["<b>coverage_predicates</b><br/>Cross-artifact coverage"]
+      pred_scope["<b>scope_coverage</b><br/>Call scope alignment"]
+      pred_cycle["<b>cycle_predicates</b><br/>Dependency acyclicity"]
+      pred_time["<b>timeline_predicates</b><br/>Schedule consistency"]
+      pred_gate["<b>gate_pass_predicates</b><br/>Upstream gate status"]
+      pred_crit["<b>criterion_predicates</b><br/>Phase 8 section checks"]
+      pred_p8["<b>phase8_section</b><br/>Section artifact checks"]
+      pred_src["<b>source_ref_predicates</b><br/>Source reference validation"]
+    end
+
+    subgraph MODELS["<b>Runtime Models</b>"]
+      direction LR
+      models["<b>runtime_models.py</b><br/>SkillResult | AgentResult<br/>NodeExecutionResult<br/>Failure categories"]
+    end
+
+    %% Layer connections
+    main --> slicer
+    slicer --> scheduler
+    scheduler --> gate_eval
+    scheduler --> agent_rt
+    agent_rt --> skill_rt
+    skill_rt --> transport
+    gate_eval --> sem_disp
+    sem_disp --> transport
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 2: WORKFLOW SPECIFICATIONS
+  %% ══════════════════════════════════════════════════════════
+  subgraph WORKFLOW["<b>WORKFLOW SPECIFICATIONS</b> &nbsp; .claude/workflows/system_orchestration/"]
+    direction TB
+
+    subgraph WF_CORE["<b>Core Manifests</b>"]
+      direction LR
+      wf_manifest["<b>manifest.compile.yaml</b><br/>Compiled DAG definition<br/>13 nodes, dependencies,<br/>gate bindings, agent bindings"]
+      wf_gates["<b>gate_rules_library.yaml</b><br/>102 predicates<br/>11 gate definitions<br/>deterministic + semantic"]
+      wf_schema["<b>artifact_schema_specification.yaml</b><br/>Canonical artifact schemas<br/>for all phase outputs"]
+    end
+
+    subgraph WF_CATALOGS["<b>Catalogs</b>"]
+      direction LR
+      wf_agents["<b>agent_catalog.yaml</b><br/>22 agent definitions<br/>Phase bindings, skill sequences"]
+      wf_skills["<b>skill_catalog.yaml</b><br/>30 skill definitions<br/>TAPM vs cli-prompt mode<br/>Input/output declarations"]
+    end
+
+    subgraph WF_PHASES["<b>Phase Definitions</b> &nbsp; workflow_phases/"]
+      direction LR
+      wp01["phase_01<br/>call_analysis"]
+      wp02["phase_02<br/>concept_refinement"]
+      wp03["phase_03<br/>wp_design"]
+      wp04["phase_04<br/>gantt_milestones"]
+      wp05["phase_05<br/>impact_architecture"]
+      wp06["phase_06<br/>implementation"]
+      wp07["phase_07<br/>budget_gate"]
+      wp08["phase_08<br/>drafting_review"]
+    end
+
+    subgraph WF_RULES["<b>Governance Rules</b>"]
+      direction LR
+      wf_global["<b>global_rules.yaml</b><br/>Cross-phase constraints"]
+      wf_state["<b>state_rules.yaml</b><br/>State machine definitions"]
+      wf_tier["<b>tier_bindings.yaml</b><br/>Tier-to-phase mappings"]
+      wf_integ["<b>integration_rules.yaml</b><br/>Budget integration protocol"]
+      wf_qual["<b>quality_gates.yaml</b><br/>Gate evaluation logic"]
+    end
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 3: AGENTS
+  %% ══════════════════════════════════════════════════════════
+  subgraph AGENTS["<b>AGENTS</b> &nbsp; .claude/agents/ &nbsp; (22 agent specifications)"]
+    direction TB
+
+    subgraph AG_P1["<b>Phase 1-2: Analysis & Alignment</b>"]
+      direction LR
+      ag_call["<b>call_analyzer</b><br/>Parse WP, extract<br/>call constraints"]
+      ag_instr["<b>instrument_schema_resolver</b><br/>Resolve instrument<br/>structure"]
+      ag_concept["<b>concept_refiner</b><br/>Align concept<br/>with call scope"]
+    end
+
+    subgraph AG_P3["<b>Phase 3: WP Design</b>"]
+      direction LR
+      ag_wp["<b>wp_designer</b><br/>Design WP structure<br/>tasks, deliverables"]
+      ag_dep["<b>dependency_mapper</b><br/>Map inter-WP<br/>dependencies (sub-agent)"]
+    end
+
+    subgraph AG_P4P5["<b>Phase 4-5: Timeline & Impact</b>"]
+      direction LR
+      ag_gantt["<b>gantt_designer</b><br/>Timeline, milestones<br/>critical path"]
+      ag_impact["<b>impact_architect</b><br/>Impact pathways<br/>KPIs, DEC plans"]
+    end
+
+    subgraph AG_P6P7["<b>Phase 6-7: Implementation & Budget</b>"]
+      direction LR
+      ag_impl["<b>implementation_architect</b><br/>Governance, risk,<br/>ethics, management"]
+      ag_budget["<b>budget_gate_validator</b><br/>Validate budget<br/>structural consistency"]
+      ag_budint["<b>budget_interface_coordinator</b><br/>Budget exchange<br/>protocol (pre-gate)"]
+    end
+
+    subgraph AG_P8["<b>Phase 8: Drafting & Review</b>"]
+      direction LR
+      ag_exc["<b>excellence_writer</b><br/>Excellence criterion<br/>section draft"]
+      ag_imp["<b>impact_writer</b><br/>Impact criterion<br/>section draft"]
+      ag_imw["<b>implementation_writer</b><br/>Implementation criterion<br/>section draft"]
+      ag_integ["<b>proposal_integrator</b><br/>Assembly &<br/>consistency"]
+      ag_eval["<b>evaluator_reviewer</b><br/>Structured review<br/>against eval criteria"]
+      ag_rev["<b>revision_integrator</b><br/>Final revision<br/>& checkpoint"]
+    end
+
+    subgraph AG_CROSS["<b>Cross-Cutting Agents</b>"]
+      direction LR
+      ag_comply["<b>compliance_validator</b><br/>Constitutional<br/>compliance"]
+      ag_trace["<b>traceability_auditor</b><br/>Source traceability<br/>verification"]
+      ag_state["<b>state_recorder</b><br/>Tier 4 state<br/>persistence"]
+      ag_node["<b>node_body_contract</b><br/>5-step dispatch<br/>contract spec"]
+    end
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 4: SKILLS
+  %% ══════════════════════════════════════════════════════════
+  subgraph SKILLS["<b>SKILLS</b> &nbsp; .claude/skills/ &nbsp; (30 skill specifications)"]
+    direction TB
+
+    subgraph SK_TAPM["<b>TAPM Mode</b> (Tool-Augmented Prompt Mode)<br/><i>Claude reads inputs from disk via --tools 'Read,Glob'</i>"]
+      direction LR
+      sk_callreq["call-requirements-<br/>extraction"]
+      sk_ipcore["impact-pathway-<br/>core-builder"]
+      sk_ipdec["impact-dec-<br/>enricher"]
+      sk_dec_chk["dissemination-exploitation-<br/>communication-check"]
+      sk_gov["governance-model-<br/>builder"]
+      sk_risk["risk-register-<br/>builder"]
+      sk_exc_draft["excellence-section-<br/>drafting"]
+      sk_imp_draft["impact-section-<br/>drafting"]
+      sk_impl_draft["implementation-section-<br/>drafting"]
+    end
+
+    subgraph SK_CLIP["<b>cli-prompt Mode</b> (Full prompt serialization)<br/><i>All inputs serialized into stdin pipe</i>"]
+      direction LR
+      sk_gantt["gantt-schedule-<br/>builder"]
+      sk_mile["milestone-consistency-<br/>check"]
+      sk_decide["decision-log-<br/>update"]
+      sk_budget["budget-interface-<br/>validation"]
+      sk_concept["concept-call-binding-<br/>derivation"]
+      sk_align["concept-alignment-<br/>check"]
+      sk_eval_mtx["evaluation-matrix-<br/>builder"]
+      sk_instr["instrument-schema-<br/>normalization"]
+      sk_scope["topic-scope-check"]
+      sk_wp_dep["wp-dependency-<br/>analysis"]
+      sk_wp_norm["work-package-<br/>normalization"]
+    end
+
+    subgraph SK_REVIEW["<b>Review & Validation Skills</b>"]
+      direction LR
+      sk_const["constitutional-compliance-<br/>check"]
+      sk_cross["cross-section-<br/>consistency-check"]
+      sk_eval_rev["evaluator-criteria-<br/>review"]
+      sk_trace["proposal-section-<br/>traceability-check"]
+      sk_prop["proposal-section-<br/>drafting"]
+      sk_gate["gate-enforcement"]
+      sk_ckpt["checkpoint-publish"]
+    end
+
+    subgraph SK_META["<b>Meta / Contract Skills</b>"]
+      direction LR
+      sk_contract["skill_runtime_contract<br/><i>Defines SkillResult schema</i>"]
+      sk_valid["validation_checklist<br/><i>Review patterns</i>"]
+      sk_legacy["impact-pathway-mapper<br/><i>Legacy, replaced by core-builder</i>"]
+    end
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 5: DAG PHASE EXECUTION FLOW
+  %% ══════════════════════════════════════════════════════════
+  subgraph DAG["<b>DAG EXECUTION FLOW</b> &nbsp; 8 Phases | 13 Nodes | 11 Gates"]
+    direction LR
+
+    subgraph P1["<b>Phase 1</b><br/>Call Analysis"]
+      n01(["<b>n01</b><br/>call_analysis"])
+    end
+
+    subgraph P2["<b>Phase 2</b><br/>Concept Refinement"]
+      n02(["<b>n02</b><br/>concept_refinement"])
+    end
+
+    subgraph P3["<b>Phase 3</b><br/>WP Design"]
+      n03(["<b>n03</b><br/>wp_design<br/>+ dependency_mapper"])
+    end
+
+    subgraph P4["<b>Phase 4</b><br/>Gantt & Milestones"]
+      n04(["<b>n04</b><br/>gantt_milestones"])
+    end
+
+    subgraph P5["<b>Phase 5</b><br/>Impact Architecture"]
+      n05(["<b>n05</b><br/>impact_architecture"])
+    end
+
+    subgraph P6["<b>Phase 6</b><br/>Implementation"]
+      n06(["<b>n06</b><br/>implementation_arch"])
+    end
+
+    subgraph P7["<b>Phase 7</b><br/>Budget Gate"]
+      n07(["<b>n07</b><br/>budget_gate"])
+    end
+
+    subgraph P8["<b>Phase 8</b> — Drafting & Review (Criterion-Aligned DAG)"]
+      direction TB
+      n08a(["<b>n08a</b><br/>excellence_drafting"])
+      n08b(["<b>n08b</b><br/>impact_drafting"])
+      n08c(["<b>n08c</b><br/>implementation_drafting"])
+      n08d(["<b>n08d</b><br/>assembly"])
+      n08e(["<b>n08e</b><br/>evaluator_review"])
+      n08f(["<b>n08f</b><br/>revision<br/><i>(terminal)</i>"])
+    end
+
+    %% Phase flow connections
+    n01 -->|"gate_01 + phase_01_gate"| n02
+    n02 -->|"phase_02_gate"| n03
+    n03 -->|"phase_03_gate"| n04
+    n03 -->|"phase_03_gate"| n05
+    n04 -->|"phase_04_gate"| n06
+    n05 -->|"phase_05_gate"| n06
+    n06 -->|"phase_06_gate"| n07
+    n07 -->|"gate_09 MANDATORY"| n08a
+    n07 -->|"gate_09 MANDATORY"| n08b
+    n07 -->|"gate_09 MANDATORY"| n08c
+    n08a -->|"gate_10a"| n08d
+    n08b -->|"gate_10b"| n08d
+    n08c -->|"gate_10c"| n08d
+    n08d -->|"gate_10d"| n08e
+    n08e -->|"gate_11"| n08f
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 6: TIER MODEL (Data Architecture)
+  %% ══════════════════════════════════════════════════════════
+  subgraph TIERS["<b>TIER MODEL</b> &nbsp; docs/ &nbsp; (Authoritative Source Truth)"]
+    direction LR
+
+    tier1["<b>Tier 1</b><br/>Normative Framework<br/>─────────────────<br/>Legislation<br/>Programme Guidance<br/>Grant Architecture<br/><i>extracted/</i>"]
+
+    tier2a["<b>Tier 2A</b><br/>Instrument Schemas<br/>─────────────────<br/>Application Forms<br/>Evaluation Forms<br/>RIA/IA, CSA, MSCA,<br/>ERC, COFUND, EIC<br/><i>extracted/</i>"]
+
+    tier2b["<b>Tier 2B</b><br/>Topic & Call Sources<br/>─────────────────<br/>Work Programmes<br/>Call Extracts<br/><i>extracted/:</i><br/>call_constraints<br/>scope_requirements<br/>eligibility_conditions<br/>expected_outcomes<br/>expected_impacts<br/>eval_priority_weights"]
+
+    tier3["<b>Tier 3</b><br/>Project Instantiation<br/>─────────────────<br/>project_brief/<br/>consortium/<br/>call_binding/<br/>architecture_inputs/<br/>source_materials/"]
+
+    tier4["<b>Tier 4</b><br/>Orchestration State<br/>─────────────────<br/>phase_outputs/<br/>decision_log/<br/>checkpoints/<br/>validation_reports/"]
+
+    tier5["<b>Tier 5</b><br/>Deliverables<br/>─────────────────<br/>proposal_sections/<br/>assembled_drafts/<br/>final_exports/<br/>review_packets/"]
+
+    integ["<b>Integrations</b><br/>Budget Planner<br/>─────────────────<br/>interface_contract<br/>request_templates/<br/>received/<br/>validation/"]
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 7: AUTHORITY HIERARCHY
+  %% ══════════════════════════════════════════════════════════
+  subgraph AUTHORITY["<b>AUTHORITY HIERARCHY</b> &nbsp; (Constitutional Governance)"]
+    direction TB
+    auth1["<b>1.</b> Explicit Human Instruction"]
+    auth2["<b>2.</b> CLAUDE.md (Constitution)"]
+    auth3["<b>3.</b> Tier 1 — Normative Framework"]
+    auth4["<b>4.</b> Tier 2A — Instrument Schemas"]
+    auth5["<b>5.</b> Tier 2B — Topic & Call Sources"]
+    auth6["<b>6.</b> Tier 3 — Project Instantiation"]
+    auth7["<b>7.</b> Tier 4 — Orchestration State"]
+    auth8["<b>8.</b> Workflows & Skills"]
+    auth9["<b>9.</b> Agent Memory & Caches"]
+
+    auth1 --> auth2 --> auth3 --> auth4 --> auth5 --> auth6 --> auth7 --> auth8 --> auth9
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% SECTION 8: NODE DISPATCH CONTRACT
+  %% ══════════════════════════════════════════════════════════
+  subgraph DISPATCH["<b>5-STEP NODE DISPATCH CONTRACT</b>"]
+    direction LR
+    step1["<b>1.</b> Set state<br/>to RUNNING"]
+    step2["<b>2.</b> Evaluate<br/>ENTRY GATE"]
+    step3["<b>3.</b> Execute<br/>NODE BODY<br/>(run_agent)"]
+    step4["<b>4.</b> Evaluate<br/>EXIT GATE"]
+    step5["<b>5.</b> Return<br/>NodeExecution<br/>Result"]
+
+    step1 --> step2
+    step2 -->|"pass"| step3
+    step2 -->|"fail"| blocked_entry["blocked_at_entry"]
+    step3 -->|"success + can_eval"| step4
+    step3 -->|"failure"| blocked_body["blocked_at_exit<br/>(agent_body)"]
+    step4 -->|"pass"| step5
+    step4 -->|"fail"| blocked_gate["blocked_at_exit<br/>(exit_gate)"]
+    step5 --> released["RELEASED"]
+  end
+
+  %% ══════════════════════════════════════════════════════════
+  %% INTER-SECTION CONNECTIONS
+  %% ══════════════════════════════════════════════════════════
+  title -.-> RUNTIME
+  title -.-> WORKFLOW
+  title -.-> AGENTS
+  title -.-> SKILLS
+  title -.-> DAG
+  title -.-> TIERS
+
+  %% Runtime reads workflow specs
+  manifest -.->|"reads"| wf_manifest
+  gate_lib -.->|"reads"| wf_gates
+
+  %% Scheduler dispatches DAG nodes
+  scheduler -.->|"dispatches"| DAG
+
+  %% Agent runtime invokes agents
+  agent_rt -.->|"invokes"| AGENTS
+
+  %% Skill runtime invokes skills
+  skill_rt -.->|"invokes"| SKILLS
+
+  %% DAG writes to Tier 4 and Tier 5
+  DAG -.->|"writes phase outputs"| tier4
+  DAG -.->|"writes deliverables"| tier5
+
+  %% Tier data flows into DAG
+  tier2b -.->|"call constraints"| P1
+  tier3 -.->|"project data"| P2
+  integ -.->|"budget response"| P7
+
+  %% ══════════════════════════════════════════════════════════
+  %% STYLES
+  %% ══════════════════════════════════════════════════════════
+
+  %% Phase node styles
+  style n01 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n02 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n03 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n04 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n05 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n06 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style n07 fill:#7f1d1d,stroke:#f87171,stroke-width:3px,color:#fecaca
+  style n08a fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08b fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08c fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08d fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08e fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style n08f fill:#052e16,stroke:#22c55e,stroke-width:3px,color:#bbf7d0
+
+  %% Subgraph styles
+  style RUNTIME fill:#0d1117,stroke:#30363d,stroke-width:2px,color:#c9d1d9
+  style WORKFLOW fill:#0d1117,stroke:#7c3aed,stroke-width:2px,color:#c9d1d9
+  style AGENTS fill:#0d1117,stroke:#f59e0b,stroke-width:2px,color:#c9d1d9
+  style SKILLS fill:#0d1117,stroke:#06b6d4,stroke-width:2px,color:#c9d1d9
+  style DAG fill:#0d1117,stroke:#ec4899,stroke-width:2px,color:#c9d1d9
+  style TIERS fill:#0d1117,stroke:#10b981,stroke-width:2px,color:#c9d1d9
+  style AUTHORITY fill:#0d1117,stroke:#f43f5e,stroke-width:2px,color:#c9d1d9
+  style DISPATCH fill:#0d1117,stroke:#8b5cf6,stroke-width:2px,color:#c9d1d9
+
+  %% Tier styles
+  style tier1 fill:#1a1a2e,stroke:#f43f5e,stroke-width:2px,color:#fecdd3
+  style tier2a fill:#1a1a2e,stroke:#f97316,stroke-width:2px,color:#fed7aa
+  style tier2b fill:#1a1a2e,stroke:#eab308,stroke-width:2px,color:#fef08a
+  style tier3 fill:#1a1a2e,stroke:#22c55e,stroke-width:2px,color:#bbf7d0
+  style tier4 fill:#1a1a2e,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  style tier5 fill:#1a1a2e,stroke:#a855f7,stroke-width:2px,color:#e9d5ff
+  style integ fill:#1a1a2e,stroke:#ec4899,stroke-width:2px,color:#fbcfe8
+
+  %% Authority styles
+  style auth1 fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+  style auth2 fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style auth3 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style auth4 fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style auth5 fill:#1e3a5f,stroke:#60a5fa,stroke-width:1px,color:#e0f0ff
+  style auth6 fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style auth7 fill:#14532d,stroke:#4ade80,stroke-width:1px,color:#dcfce7
+  style auth8 fill:#1a1a2e,stroke:#7c3aed,stroke-width:1px,color:#e0e0ff
+  style auth9 fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+
+  %% Dispatch styles
+  style step1 fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style step2 fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style step3 fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style step4 fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style step5 fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style released fill:#052e16,stroke:#22c55e,stroke-width:3px,color:#bbf7d0
+  style blocked_entry fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+  style blocked_body fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+  style blocked_gate fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fecaca
+
+  %% Runtime component styles
+  style main fill:#1a1a2e,stroke:#7c3aed,stroke-width:2px,color:#e0e0ff
+  style slicer fill:#1a1a2e,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
+  style scheduler fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#e0f0ff
+  style gate_eval fill:#713f12,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+  style run_ctx fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style manifest fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style gate_lib fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style gate_reg fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style agent_rt fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#dcfce7
+  style dep_norm fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style p8_pack fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style p8_reuse fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style upstream fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style skill_rt fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  style transport fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  style sem_disp fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db
+  style models fill:#1a1a2e,stroke:#6b7280,stroke-width:1px,color:#d1d5db

@@ -1,0 +1,24 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-04-21T120000Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "Canonical artifact docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json does not exist. The phase5_impact_architecture directory is entirely absent from docs/tier4_orchestration_state/phase_outputs/, confirming that Phase 5 (Impact Architecture) has not been executed for run 6d4ba767-280b-4175-9ad4-33768965e2d1. All 12 deterministic predicates and 1 semantic predicate failed because no artifact is present to evaluate. Resolution requires executing the impact_architect agent to produce impact_architecture.json with schema_id 'orch.phase5.impact_architecture.v1' before this gate can be re-evaluated.",
+  "predicates_failed": [
+    "artifact_present",
+    "schema_id_match",
+    "run_id_match",
+    "artifact_not_invalid",
+    "impact_pathways_non_empty",
+    "all_expected_impacts_mapped",
+    "pathways_have_project_outputs",
+    "kpis_non_empty",
+    "kpis_traceable_to_deliverables",
+    "dissemination_plan_non_null",
+    "exploitation_plan_non_null",
+    "sustainability_mechanism_non_null",
+    "no_generic_impact_language"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory; a phase is not complete until its gate condition is satisfied), §7 Phase 5 gate condition (all Tier 2B expected impacts mapped; all KPIs traceable; dissemination, exploitation, and sustainability plans present), §12.4 (missing mandatory inputs trigger gate failure; must not be papered over), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-04-21T12:00:00Z"
+}

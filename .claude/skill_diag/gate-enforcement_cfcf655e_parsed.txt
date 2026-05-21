@@ -1,0 +1,119 @@
+=== parsed OK ===
+=== top-level keys: ['run_id', 'schema_id', 'gate_id', 'overall_status', 'hard_block', 'evaluated_at', 'deterministic_predicates', 'semantic_predicates', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "run_id": "cfcf655e-cfef-4f74-a1ea-878feb0a4014",
+  "schema_id": "orch.gate_enforcement.predicate_evaluation.v1",
+  "gate_id": "gate_09_budget_consistency",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-05-20T12:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      {
+        "predicate_id": "artifact_present",
+        "type": "deterministic",
+        "function": "check_file_exists",
+        "args": {
+          "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        },
+        "result": true,
+        "prose_condition": "Canonical artifact exists at declared path"
+      },
+      {
+        "predicate_id": "schema_id_match",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {
+          "field": "schema_id",
+          "expected": "orch.phase7.budget_gate_assessment.v1",
+          "actual": "orch.phase7.budget_gate_assessment.v1"
+        },
+        "result": true,
+        "prose_condition": "artifact.schema_id equals expected value orch.phase7.budget_gate_assessment.v1"
+      },
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {
+          "field": "run_id",
+          "expected": "cfcf655e-cfef-4f74-a1ea-878feb0a4014",
+          "actual": "cfcf655e-cfef-4f74-a1ea-878feb0a4014"
+        },
+        "result": true,
+        "prose_condition": "artifact.run_id equals current run_id cfcf655e-cfef-4f74-a1ea-878feb0a4014"
+      },
+      {
+        "predicate_id": "artifact_not_invalid",
+        "type": "deterministic",
+        "function": "check_field_absent_or_not_invalid",
+        "args": {
+          "field": "artifact_status"
+        },
+        "result": true,
+        "prose_condition": "artifact.artifact_status is absent; artifact is not marked invalid"
+      },
+      {
+        "predicate_id": "gate_pass_declaration_pass",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {
+          "field": "gate_pass_declaration",
+          "expected": "pass",
+          "actual": "pass"
+        },
+        "result": true,
+        "prose_condition": "artifact.gate_pass_declaration equals 'pass' (structural field check only; legitimacy of this declaration is subject to semantic evaluation)"
+      },
+      {
+        "predicate_id": "budget_response_reference_non_empty",
+        "type": "deterministic",
+        "function": "check_field_non_empty_string",
+        "args": {
+          "field": "budget_response_reference",
+          "actual": "budget_response_placeholder.json"
+        },
+        "result": true,
+        "prose_condition": "artifact.budget_response_reference is a non-empty string; note: value 'budget_response_placeholder.json' contains literal 'placeholder' \u2014 legitimacy is subject to semantic evaluation"
+      },
+      {
+        "predicate_id": "validation_artifact_reference_non_empty",
+        "type": "deterministic",
+        "function": "check_field_non_empty_string",
+        "args": {
+          "field": "validation_artifact_reference",
+          "actual": "budget_validation_response_2026-05-20T120000Z.json"
+        },
+        "result": true,
+        "prose_condition": "artifact.validation_artifact_reference is a non-empty string"
+      },
+      {
+        "predicate_id": "no_unresolved_blocking_inconsistencies",
+        "type": "deterministic",
+        "function": "check_array_no_entry_with_field_value",
+        "args": {
+          "array": "blocking_inconsistencies",
+          "field": "resolution",
+          "prohibited_value": "unresolved",
+          "array_length": 0
+        },
+        "result": true,
+        "prose_condition": "blocking_inconsistencies is an empty array; no entry with resolution: 'unresolved' exists"
+      }
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "no_internal_budget_figures",
+        "function": "semantic_eval_no_internal_budget_figures",
+        "agent": "budget_gate_validator",
+        "constitutional_rule": "CLAUDE.md \u00a78.1 (budget computation exclusively the responsibility of the external Lump Sum Budget Planner), \u00a78.3 (no agent may invent, substitute, approximate, or silently generate budget figures), \u00a78.4 (absent budget artifacts in received/ constitute a blocking gate failure, not a hold state), \u00a715 (explicit gate failure preferred over fabricated completion)",
+        "findings": [
+          {
+            "claim": "artifact.budget_response_reference is 'budget_response_placeholder.json' \u2014 a literal placeholder filename. This value signals the budget_gate_assessment was not constructed from a validated budget response received from the external Lump Sum Budget Planner system; the reference is a fabricated substitute, not a real received artifact.",
+            "violated_rule": "CLAUDE.md \u00a78.1: Budget computation is excl
+=== END ===

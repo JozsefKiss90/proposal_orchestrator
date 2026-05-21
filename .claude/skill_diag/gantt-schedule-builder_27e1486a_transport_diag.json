@@ -1,0 +1,44 @@
+{
+  "skill_id": "gantt-schedule-builder",
+  "execution_mode": "cli-prompt",
+  "failure_class": "TIMEOUT",
+  "run_id": "27e1486a-d276-491f-8a81-acdf100bc45e",
+  "node_id": null,
+  "reads_from": [
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+  ],
+  "writes_to": [
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
+  ],
+  "model": "claude-sonnet-4-6",
+  "max_tokens_requested": 16384,
+  "timeout_seconds": 300,
+  "elapsed_seconds": 301.03100000007544,
+  "system_prompt_chars": 917,
+  "user_prompt_chars": 70944,
+  "exception_class": "ClaudeCLITimeoutError",
+  "exception_message": "Claude CLI invocation timed out after 300s",
+  "command": [
+    "claude",
+    "-p",
+    "--model",
+    "claude-sonnet-4-6",
+    "--system-prompt",
+    "You are a skill execution engine for the Horizon Europe Proposal Orchestration System. You execute skill specifications precisely. You MUST return a single JSON object as your response \u2014 no prose, no markdown wrapping, no explanation. The JSON must conform to the output schema described in the skill specification.\n\nConstitutional constraints (hard failures if violated):\n- Must not assign tasks to months beyond the project duration from selected_call.json\n- Must not schedule a task start before prerequisite task completion per strict constraints\n- Must not produce milestones without verifiable achievement criteria\n- Must not silently adjust project duration to accommodate scheduling conflicts\n\nYou MUST include these fields in every output artifact:\n- \"run_id\": \"27e1486a-d276-491f-8a81-acdf100bc45e\"\n- The appropriate schema_id as defined in the skill specification\n- Do NOT include an artifact_status field\n"
+  ],
+  "had_partial_stdout": false,
+  "had_stderr": false,
+  "tapm_tools_requested": null,
+  "tapm_tools_enabled": false,
+  "diagnostic_files": {
+    "meta": ".claude/skill_diag/gantt-schedule-builder_27e1486a_transport_diag.json",
+    "system_prompt": ".claude/skill_diag/gantt-schedule-builder_27e1486a_system_prompt.txt",
+    "user_prompt": ".claude/skill_diag/gantt-schedule-builder_27e1486a_user_prompt.txt",
+    "stdout": ".claude/skill_diag/gantt-schedule-builder_27e1486a_stdout.txt",
+    "stderr": ".claude/skill_diag/gantt-schedule-builder_27e1486a_stderr.txt"
+  }
+}

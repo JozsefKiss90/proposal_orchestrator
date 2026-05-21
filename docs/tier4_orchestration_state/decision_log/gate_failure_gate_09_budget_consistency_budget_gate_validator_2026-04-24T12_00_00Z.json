@@ -1,0 +1,20 @@
+{
+  "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-04-24T12:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "gate_09_budget_consistency",
+  "failure_reason": "The canonical Phase 7 artifact docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json does not exist. The phase7_budget_gate directory is entirely absent from the Tier 4 phase_outputs tree. All 8 deterministic predicates (artifact_present, schema_id_match, run_id_match, artifact_not_invalid, gate_pass_declaration_equals_pass, budget_response_reference_non_empty, validation_artifact_reference_non_empty, no_blocking_inconsistencies_unresolved) and 1 semantic predicate (no_internal_budget_figures) have failed. This constitutes a hard-blocking gate failure per CLAUDE.md §8.4: absent budget artifacts are a blocking gate failure, not a hold state. Phase 8 is fully blocked. No Phase 8 substep — including preparatory drafting — may commence until this gate passes with a validated budget response received through docs/integrations/lump_sum_budget_planner/received/ and a structurally consistent budget_gate_assessment.json written to Tier 4.",
+  "predicates_failed": [
+    "artifact_present",
+    "schema_id_match",
+    "run_id_match",
+    "artifact_not_invalid",
+    "gate_pass_declaration_equals_pass",
+    "budget_response_reference_non_empty",
+    "validation_artifact_reference_non_empty",
+    "no_blocking_inconsistencies_unresolved",
+    "no_internal_budget_figures"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6.2 (gates are mandatory; a phase is not complete until its gate condition is satisfied), §6.5 (if a phase cannot complete because required inputs are absent, the system must declare a gate failure and halt), §7 Phase 7 gate definition (budget gate cannot be bypassed, deferred, or substituted with internally generated budget estimates), §8.4 (absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ constitute a blocking gate failure; Phase 8 is fully blocked), §12.4 (missing mandatory inputs must trigger a gate failure; they must not be papered over), §13.4 (commencing any Phase 8 activity before the budget gate has passed is constitutionally prohibited), §15 (the system must prefer explicit gate failure over fabricated completion; a declared failure is an honest and correct output)",
+  "resolution_required": true,
+  "timestamp": "2026-04-24T12:00:00Z"
+}

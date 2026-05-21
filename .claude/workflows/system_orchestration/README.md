@@ -1,0 +1,541 @@
+# system_orchestration — Workflow Package
+
+**Version:** 1.1
+**Constitutional authority:** `CLAUDE.md` (authority_hierarchy_position: 8)
+**DAG-runner entry point:** `manifest.compile.yaml`
+
+---
+
+## Package Structure
+
+This directory is the canonical workflow specification for the Horizon Europe Proposal Orchestration System. It supersedes the monolithic `.claude/workflows/system_orchestration.yaml` (v1.0), which is retained as a reference artifact only.
+
+```
+system_orchestration/
+├── README.md                         # This file
+├── meta.yaml                         # Package identity, constitutional authority, instrument scope, source manifest
+├── global_rules.yaml                 # Global execution rules and forbidden patterns
+├── tier_bindings.yaml                # Tier model: paths, roles, read/write constraints
+├── quality_gates.yaml                # All 12 quality gates
+├── agent_catalog.yaml                # 16 agent definitions with scope and must_not constraints
+├── skill_catalog.yaml                # 19 skill definitions with constitutional constraints
+├── state_rules.yaml                  # State durability, checkpoint, decision logging rules
+├── integration_rules.yaml            # Lump Sum Budget Planner integration rules (v1.1 corrected)
+├── design_notes.yaml                 # Design rationale and architectural decisions
+├── workflow_phases/
+│   ├── phase_01_call_analysis.yaml
+│   ├── phase_02_concept_refinement.yaml
+│   ├── phase_03_wp_design.yaml
+│   ├── phase_04_gantt_milestones.yaml
+│   ├── phase_05_impact_architecture.yaml
+│   ├── phase_06_implementation_architecture.yaml
+│   ├── phase_07_budget_gate.yaml     # Phase 7 semantic correction applied (see below)
+│   └── phase_08_drafting_review.yaml # Contains substeps 08a–08d
+├── manifest.compile.yaml             # Compiled DAG manifest (DAG-runner entry point)
+├── artifact_schema_specification.yaml  # Field-level schemas for all 13 canonical artifact types
+├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
+├── gate_rules_library_plan.md        # Implementation plan (reference only — complete)
+├── dag_scheduler_plan.md             # DAG scheduler implementation plan (Steps 1–6 complete)
+├── dag_scheduler_guide.md            # Operator/developer guide: CLI invocation, artifacts, exit codes
+├── agent-generation-plan.md          # Agent generation plan (Steps 1–10 complete)
+└── skill_implementation_plan.md      # Skill implementation plan (Steps 1–10 complete)
+```
+
+The agent layer lives at `.claude/agents/` (not inside this package directory):
+
+```
+.claude/agents/                       # Agent execution layer (16 agents + contract + prompts + checklist)
+├── node_body_contract.md             # Shared contract: all agents must conform
+├── validation_checklist.md           # Step 10 checklist: 16 agents × 9 columns + cross-agent handoffs
+├── call_analyzer.md                  # Phase 1 — call analysis
+├── instrument_schema_resolver.md     # Phase 1 — instrument schema resolution
+├── concept_refiner.md                # Phase 2 — concept refinement
+├── wp_designer.md                    # Phase 3 — work package design
+├── dependency_mapper.md              # Phase 3 — WP dependency analysis (sub-agent)
+├── gantt_designer.md                 # Phase 4 — Gantt & milestones
+├── impact_architect.md               # Phase 5 — impact architecture
+├── implementation_architect.md       # Phase 6 — implementation architecture
+├── budget_interface_coordinator.md   # Phase 7 — budget request preparation
+├── budget_gate_validator.md          # Phase 7 — budget gate validation
+├── proposal_writer.md               # Phase 8a/8b — section drafting & assembly
+├── evaluator_reviewer.md            # Phase 8c — evaluator review
+├── revision_integrator.md           # Phase 8d — revision & checkpoint
+├── compliance_validator.md          # Cross-phase — constitutional compliance
+├── traceability_auditor.md          # Cross-phase — traceability audit
+├── state_recorder.md                # Cross-phase — decision logging & checkpoints
+└── prompts/                         # 16 prompt specification files (Step 9)
+    ├── call_analyzer_prompt_spec.md
+    ├── instrument_schema_resolver_prompt_spec.md
+    ├── concept_refiner_prompt_spec.md
+    ├── wp_designer_prompt_spec.md
+    ├── dependency_mapper_prompt_spec.md
+    ├── gantt_designer_prompt_spec.md
+    ├── impact_architect_prompt_spec.md
+    ├── implementation_architect_prompt_spec.md
+    ├── budget_interface_coordinator_prompt_spec.md
+    ├── budget_gate_validator_prompt_spec.md
+    ├── proposal_writer_prompt_spec.md
+    ├── evaluator_reviewer_prompt_spec.md
+    ├── revision_integrator_prompt_spec.md
+    ├── compliance_validator_prompt_spec.md
+    ├── traceability_auditor_prompt_spec.md
+    └── state_recorder_prompt_spec.md
+```
+
+The skill layer lives at `.claude/skills/` (not inside this package directory):
+
+```
+.claude/skills/                       # Skill execution layer (19 skills + contract + checklist)
+├── skill_runtime_contract.md         # Shared contract: all skills must conform
+├── validation_checklist.md           # Step 10 checklist: 19 skills × 10 columns, all pass
+├── call-requirements-extraction.md   # Phase 1 — extract call requirements from Tier 2B
+├── evaluation-matrix-builder.md      # Phase 1 — build evaluation matrix
+├── instrument-schema-normalization.md # Phase 1 — resolve instrument schema
+├── topic-scope-check.md             # Phase 1/2 — verify scope against Tier 2B
+├── concept-alignment-check.md       # Phase 2 — check concept/call alignment
+├── work-package-normalization.md    # Phase 3 — normalize WP structure
+├── wp-dependency-analysis.md        # Phase 3 — dependency DAG + cycle detection
+├── milestone-consistency-check.md   # Phase 3/4/6 — milestone validation
+├── impact-pathway-mapper.md         # Phase 5 — map outputs to impacts
+├── dissemination-exploitation-communication-check.md  # Phase 5 — DEC plan validation
+├── governance-model-builder.md      # Phase 6 — governance model
+├── risk-register-builder.md         # Phase 6 — risk register
+├── budget-interface-validation.md   # Phase 7 — budget request/response validation
+├── proposal-section-traceability-check.md  # Phase 8 — claim traceability audit
+├── evaluator-criteria-review.md     # Phase 8 — evaluator criteria assessment
+├── constitutional-compliance-check.md # Cross-phase — CLAUDE.md §13 audit
+├── gate-enforcement.md              # Cross-phase — gate predicate evaluation
+├── decision-log-update.md           # Cross-phase — durable decision recording
+└── checkpoint-publish.md            # Cross-phase — checkpoint publication
+```
+
+The runner implementation lives at the repository root (not inside this package directory):
+
+```
+runner/                               # DAG-runner implementation package
+├── __init__.py                       # Runner package root / implementation sequence note
+├── paths.py                          # Repository-root discovery and path resolution
+├── versions.py                       # Manifest/library/constitution version constants
+├── gate_result_registry.py           # §6.3 gate result path table (gate_id → tier4-relative path)
+├── upstream_inputs.py                # Gate freshness: gate_id → upstream required input paths
+├── gate_library.py                   # Step 10 + Approach B: GateLibrary loader/validator + predicate registry
+├── manifest_reader.py                # Approach B: ManifestReader — loads manifest.compile.yaml, exposes predicate_refs
+├── run_context.py                    # Step 10: RunContext (run manifest + reuse policy)
+├── gate_evaluator.py                 # Step 10+11 + Approach B: evaluate_gate() — manifest-driven or library-driven predicate resolution
+├── semantic_dispatch.py              # Step 11: Semantic predicate dispatch layer
+├── dag_scheduler.py                  # DAG scheduler: ManifestGraph, DAGScheduler, RunSummary, RunAbortedError
+├── __main__.py                       # CLI entry point (python -m runner)
+└── predicates/
+    ├── __init__.py                   # Predicate API exports
+    ├── types.py                      # PredicateResult + failure-category constants
+    ├── file_predicates.py            # Step 3+10: exists, non_empty, non_empty_json, dir_non_empty, artifact_owned_by_run
+    ├── gate_pass_predicates.py       # Step 4: gate_pass_recorded
+    ├── schema_predicates.py          # Step 5: §4.2 schema predicates + §4.8 canonical field predicates
+    ├── source_ref_predicates.py      # Step 6: §4.3 source reference predicates
+    ├── coverage_predicates.py        # Step 7: §4.4 coverage / cross-artifact join predicates
+    ├── cycle_predicates.py           # Step 8: §4.5 cycle predicate
+    └── timeline_predicates.py        # Step 9: §4.6 timeline predicates
+tests/
+├── conftest.py                       # repo_root fixture
+└── runner/
+    ├── test_gate_library.py          # Step 10 + Approach B unit tests: GateLibrary (28 tests)
+    ├── test_manifest_reader.py       # Approach B unit tests: ManifestReader + integration (19 tests)
+    ├── test_run_context.py           # Step 10 unit tests: RunContext (26 tests)
+    ├── test_gate_evaluator.py        # Step 10+11 unit tests: evaluate_gate + semantic integration (50 tests)
+    ├── test_semantic_dispatch.py     # Step 11 unit tests: dispatch + agent invocation + validation (61 tests)
+    ├── test_gate_scenarios.py        # Step 12 integration tests: per-gate fixture scenarios (27 tests)
+    ├── test_manifest_graph.py        # DAG Steps 1: ManifestGraph unit tests (21 tests)
+    ├── test_dag_scheduler.py         # DAG Steps 2–5: DAGScheduler + CLI tests (122 tests)
+    ├── test_dag_full_run.py          # DAG Step 6: full-DAG end-to-end scenarios (55 tests)
+    ├── fixtures/
+    │   ├── __init__.py
+    │   ├── repo_builders.py          # Step 12: synthetic repo root, RunContext, gate library builders
+    │   ├── artifact_writers.py       # Step 12: canonical Tier 3/4/5 artifact writers
+    │   └── gate_result_writers.py    # Step 12: pre-fabricated gate result writers
+    └── predicates/
+        ├── test_file_predicates.py       # Step 3 unit tests (55 tests)
+        ├── test_gate_pass_predicates.py  # Step 4 unit tests (9 tests)
+        ├── test_schema_predicates.py     # Step 5 unit tests (65 tests)
+        ├── test_source_ref_predicates.py # Step 6 unit tests (28 tests)
+        ├── test_coverage_predicates.py   # Step 7 unit tests (71 tests)
+        ├── test_cycle_predicates.py      # Step 8 unit tests (30 tests)
+        └── test_timeline_predicates.py   # Step 9 unit tests (52 tests)
+```
+
+---
+
+## Constitutional Hierarchy
+
+This workflow package is subordinate to `CLAUDE.md`. In all interpretive conflicts:
+
+```
+CLAUDE.md  >  this workflow  >  agent definitions  >  skill definitions  >  agent memory
+```
+
+Any provision of this workflow that conflicts with `CLAUDE.md` is invalid. Conflicts must be logged and resolved; they must not be silently resolved in favour of the workflow.
+
+---
+
+## Phase Sequence and Gate Logic
+
+The workflow executes as a DAG. All gates are blocking. Gate failure is a valid output; fabricated completion is a constitutional violation.
+
+| Phase | Node ID | Agent | Exit Gate |
+|-------|---------|-------|-----------|
+| 1 — Call Analysis | n01 | call_analyzer | phase_01_gate |
+| 2 — Concept Refinement | n02 | concept_refiner | phase_02_gate |
+| 3 — WP Design & Dependency Mapping | n03 | wp_designer + dependency_mapper | phase_03_gate |
+| 4 — Gantt & Milestones | n04 | gantt_designer | phase_04_gate |
+| 5 — Impact Architecture | n05 | impact_architect | phase_05_gate |
+| 6 — Implementation Architecture | n06 | implementation_architect | phase_06_gate |
+| 7 — Budget Gate | n07 | budget_gate_validator | gate_09_budget_consistency |
+| 8a — Section Drafting | n08a | proposal_writer | gate_10_part_b_completeness |
+| 8b — Assembly | n08b | proposal_writer | gate_10_part_b_completeness |
+| 8c — Evaluator Review | n08c | evaluator_reviewer | gate_11_review_closure |
+| 8d — Revision | n08d | revision_integrator | gate_12_constitutional_compliance |
+
+**Parallel paths:** Phase 4 and Phase 5 can proceed concurrently after Phase 3. Phase 6 requires Phases 3, 4, and 5. Phase 5 requires both Phase 2 and Phase 3 gates to have passed (edges e02_to_05 + e03_to_05 with additional_condition: phase_03_gate); it is not independently parallel after Phase 2.
+
+**Directory argument rule:** Directory paths appear in the workflow package only in narrowly defined cases: source admissibility checks, external integration checks, section-collection predicates, and semantic scope arguments. Deterministic validation of structured workflow state operates on canonical artifact JSON files, not directories.
+
+## Runner Implementation Status
+
+The runner (gate evaluation + DAG scheduler) is fully implemented.
+
+**Completed implementation steps**
+- **Step 1 — Artifact schema specification** completed in `artifact_schema_specification.yaml`
+- **Step 2 — Gate rules library scaffolding** completed in `gate_rules_library.yaml`
+- **Step 3 — File predicates** completed in `runner/predicates/file_predicates.py`
+- **Step 4 — Gate-pass predicate** completed in `runner/predicates/gate_pass_predicates.py`
+- **Step 5 — Schema predicates** completed in `runner/predicates/schema_predicates.py`
+- **Step 6 — Source reference predicates** completed in `runner/predicates/source_ref_predicates.py`
+- **Step 7 — Coverage predicates** completed in `runner/predicates/coverage_predicates.py`
+- **Step 8 — Cycle predicate** completed in `runner/predicates/cycle_predicates.py`
+- **Step 9 — Timeline predicates** completed in `runner/predicates/timeline_predicates.py`
+- **Step 10 — Runner evaluate_gate integration** completed:
+  - `runner/gate_library.py` — GateLibrary loader/validator (version checks, structural validation)
+  - `runner/run_context.py` — RunContext (run manifest, reuse policy, node state, HARD_BLOCK propagation)
+  - `runner/gate_evaluator.py` — evaluate_gate() entry point (predicate dispatch, fingerprinting, GateResult writing, node-state updates)
+  - `runner/predicates/file_predicates.py` extended with `artifact_owned_by_run`
+- **DAG Steps 1–6 — DAG Scheduler** completed:
+  - `runner/dag_scheduler.py` — `ManifestGraph` (read-only DAG from manifest), `DAGScheduler` (synchronous gate-evaluation loop), `RunSummary` (typed run outcome artifact), `RunAbortedError` (stall / abort exception), `DAGSchedulerError` (configuration errors)
+  - `runner/__main__.py` — CLI entry point (`python -m runner`) with `--dry-run`, `--json`, `--repo-root`, `--library-path`, `--manifest-path`; exit codes 0/1/2/3
+  - `tests/runner/test_manifest_graph.py` — 21 unit tests for `ManifestGraph`
+  - `tests/runner/test_dag_scheduler.py` — 122 tests covering dispatch loop, stall detection, HARD_BLOCK, RunSummary schema, CLI behavior
+  - `tests/runner/test_dag_full_run.py` — 55 end-to-end integration tests covering linear pass, parallel-path fork-join, early failure stall, HARD_BLOCK, partial-pass scenarios
+- **Step 12 — Test fixtures** completed:
+  - `tests/runner/fixtures/repo_builders.py` — synthetic repo root builder, RunContext helpers, gate library and predicate dict builders
+  - `tests/runner/fixtures/artifact_writers.py` — canonical Tier 3/4/5 artifact writers (all phase outputs, integration artifacts)
+  - `tests/runner/fixtures/gate_result_writers.py` — pre-fabricated gate result writers (pass/fail, version-controllable)
+  - `tests/runner/test_gate_scenarios.py` — 27 integration scenario tests covering all 11 gates and all 10 failure dimensions from the plan
+- **Step 11 — Semantic predicate dispatch layer** completed (agent-invocation corrective pass applied):
+  - `runner/semantic_dispatch.py` — `SemanticPredicateConfig`, `SEMANTIC_REGISTRY` (7 configuration entries), `invoke_agent()` (reads artifacts, invokes Claude via runtime transport, parses response), `dispatch_semantic_predicate()`, `validate_semantic_result()`
+  - `runner/gate_evaluator.py` extended — semantic dispatch loop integrated; malformed/fail/pass routing; node state `released`/`blocked_at_exit` set after semantic evaluation; `skipped_semantic` flag when deterministic predicates fail
+- **Approach B migration — Manifest-driven predicate composition** completed (see migration note below):
+  - `quality_gates.yaml` — all 11 gates augmented with `conditions:` blocks carrying `{prose:, predicate_refs:}` entries
+  - `manifest.compile.yaml` — all 11 gates in `gate_registry` converted from plain-string conditions to structured `{prose:, predicate_refs:}` conditions; upstream gate_pass conditions added where previously implicit
+  - `runner/gate_library.py` — extended with `_predicate_index` and `get_predicate(predicate_id)` method; library becomes implementation registry for Approach B
+  - `runner/manifest_reader.py` (new) — `ManifestReader` class: loads `manifest.compile.yaml`, indexes `gate_registry` by `gate_id`, provides `get_predicate_refs(gate_id) → Optional[list[str]]`
+  - `runner/gate_evaluator.py` — step 4 updated: tries `ManifestReader.get_predicate_refs()` first (Approach B); falls back silently to library gate entry predicates when manifest is absent or raises `ManifestReaderError` (Approach A fallback)
+
+**Current executable predicate layer**
+The following predicates are implemented and tested:
+
+File predicates (Step 3):
+- `exists(path)`
+- `non_empty(path)`
+- `non_empty_json(path)`
+- `dir_non_empty(path)`
+
+Gate-pass predicate (Step 4):
+- `gate_pass_recorded(gate_id, run_id, tier4_root, *, repo_root=None)`
+
+Supporting modules added in Step 4:
+- `runner/versions.py` — `MANIFEST_VERSION`, `LIBRARY_VERSION`, `CONSTITUTION_VERSION` constants
+- `runner/gate_result_registry.py` — maps gate_id → tier4-relative canonical gate result path (§6.3)
+- `runner/upstream_inputs.py` — maps gate_id → upstream artifact paths for freshness checking
+
+Schema predicates — §4.2 (Step 5):
+- `json_field_present(path, field)`
+- `json_fields_present(path, fields)`
+- `instrument_type_matches_schema(call_path, schema_path)`
+- `interface_contract_conforms(response_path, contract_path)`
+
+Canonical field predicates — §4.8 (Step 5):
+- `risk_register_populated(path)`
+- `ethics_assessment_explicit(path)`
+- `governance_matrix_present(path)`
+- `no_blocking_inconsistencies(path)`
+- `budget_gate_confirmation_present(path)`
+- `findings_categorised_by_severity(path)`
+- `revision_action_list_present(path)`
+- `all_critical_revisions_resolved(path)`
+- `checkpoint_published(path)`
+
+Source reference predicates — §4.3 (Step 6):
+- `source_refs_present(path)`
+- `all_mappings_have_source_refs(path)`
+
+Coverage predicates — §4.4 (Step 7):
+- `wp_budget_coverage_match(wp_path, budget_path)`
+- `partner_budget_coverage_match(partners_path, budget_path)`
+- `all_impacts_mapped(impact_path, expected_impacts_path)`
+- `kpis_traceable_to_wps(impact_path, wp_path)`
+- `all_sections_drafted(sections_path, schema_path)`
+- `all_partners_in_tier3(wp_path, partners_path)`
+- `all_management_roles_in_tier3(impl_path, partners_path)`
+- `all_tasks_have_months(gantt_path, wp_path)`
+- `instrument_sections_addressed(impl_path, schema_path)`
+- `all_sections_have_traceability_footer(sections_path)`
+- `all_wps_have_deliverable_and_lead(wp_path)`
+
+Cycle predicate — §4.5 (Step 8):
+- `no_dependency_cycles(wp_path)`
+
+Timeline predicates — §4.6 (Step 9):
+- `timeline_within_duration(gantt_path, call_path)`
+- `all_milestones_have_criteria(gantt_path)`
+- `wp_count_within_limit(wp_path, schema_path)`
+- `critical_path_present(gantt_path)`
+
+Ownership predicate — §7 (Step 10):
+- `artifact_owned_by_run(path, run_id, *, reuse_policy_path=None, repo_root=None)`
+
+Runner integration — (Step 10):
+- `runner.gate_library.GateLibrary.load(library_path, *, repo_root, expected_manifest_version)` — loads and validates `gate_rules_library.yaml`; raises `ManifestVersionMismatchError` on version conflict
+- `runner.gate_library.GateLibrary.get_predicate(predicate_id)` — (Approach B) looks up a predicate by ID across all gates; raises `GateLibraryError` if not found
+- `runner.run_context.RunContext.initialize(repo_root, run_id)` — creates `.claude/runs/<run_id>/run_manifest.json` and `reuse_policy.json`
+- `runner.run_context.RunContext.load(repo_root, run_id)` — loads existing run state
+- `runner.gate_evaluator.evaluate_gate(gate_id, run_id, repo_root, *, library_path, manifest_path)` — evaluates all deterministic predicates (Approach B manifest-driven or Approach A library-driven), dispatches semantic predicates, writes GateResult to Tier 4, updates node state
+
+Manifest-driven predicate composition — (Approach B):
+- `runner.manifest_reader.ManifestReader.load(manifest_path, *, repo_root)` — loads `manifest.compile.yaml`; raises `ManifestReaderError` on missing file, invalid YAML, or missing `gate_registry`
+- `runner.manifest_reader.ManifestReader.get_predicate_refs(gate_id)` — returns ordered flat list of predicate IDs from all `predicate_refs` conditions; returns `None` when gate absent or no predicate_refs found (caller interprets as Approach A fallback)
+- `runner.manifest_reader.ManifestReader.has_predicate_refs(gate_id)` — convenience bool wrapper
+- `runner.manifest_reader.ManifestReader.gate_ids()` — returns all gate IDs in insertion order
+
+Semantic dispatch — (Step 11):
+- `runner.semantic_dispatch.validate_semantic_result(result)` — validates a semantic predicate result dict against the §4.9 contract; returns `(True,"")` or `(False, reason)`
+- `runner.semantic_dispatch.dispatch_semantic_predicate(pred_entry, run_id, repo_root)` — delegates to `invoke_agent()`; unknown functions return a sentinel dispatch-error result that intentionally fails validation
+- `runner.semantic_dispatch.invoke_agent(pred_entry, run_id, repo_root)` — reads artifact files from disk, constructs system/user prompts embedding artifact content and the constitutional rule, invokes `claude-sonnet-4-6` via the runtime transport (`runner/claude_transport.py`), parses the JSON response, and overrides `predicate_id` and `artifacts_inspected` from ground truth; unknown functions and non-dict/non-parseable responses produce a `_dispatch_error` sentinel
+- `SemanticPredicateConfig` — frozen dataclass: `function`, `agent`, `constitutional_rule`, `description`; replaces the old callable-registry pattern
+- `SEMANTIC_REGISTRY` — 7 registered entries (configuration only; no local handler callables):
+  - `no_unresolved_scope_conflicts` — agent: `concept_refiner`; rule: CLAUDE.md §7 Phase 2 gate
+  - `no_cross_tier_contradictions` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §11.4, §13.3
+  - `no_unsupported_tier5_claims` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.3
+  - `no_budget_gate_contradiction` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §8.4, §13.4
+  - `no_higher_tier_contradiction` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.2, §11.3
+  - `no_forbidden_schema_authority` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §13.1
+  - `no_gap_masked_as_confirmed` — agent: `constitutional_compliance_check`; rule: CLAUDE.md §12.2
+
+All five failure categories are in use across the implemented predicates:
+- `MISSING_MANDATORY_INPUT` — file/directory absent, gate result absent, unknown gate_id
+- `MALFORMED_ARTIFACT` — invalid JSON, missing required fields, bad timestamps, null required values, unsupported container type, non-dict array element
+- `STALE_UPSTREAM_MISMATCH` — run_id mismatch, manifest_version mismatch, freshness violation
+- `POLICY_VIOLATION` — gate status not "pass", sentinel ethics value, unresolved inconsistencies, invalid severity enum, budget gate not passed, unresolved critical revisions without reason, checkpoint not published, missing/blank source references
+- `CROSS_ARTIFACT_INCONSISTENCY` — cross-file join failures (missing WP/partner/task/impact/section coverage), internal WP structure violations
+
+**Current non-goals**
+The DAG scheduler drives gate evaluation over pre-produced artifacts.
+The following behaviors are **intentionally out of scope** and not implemented:
+- Node body execution (invoking agents or skills to produce phase outputs) — this is the subject of the Skill Runtime + Agent Runtime Integration Plan
+- Parallel / concurrent node dispatch
+- Rerun / resume logic (incremental re-entry into a prior run)
+- Semantic agent orchestration beyond calling ``evaluate_gate()``
+
+**Test status**
+- Step 3 file predicates: 55 tests in `tests/runner/predicates/test_file_predicates.py`
+- Step 4 gate-pass predicate: 9 tests in `tests/runner/predicates/test_gate_pass_predicates.py`
+- Step 5 schema predicates: 71 tests in `tests/runner/predicates/test_schema_predicates.py`
+- Step 6 source reference predicates: 28 tests in `tests/runner/predicates/test_source_ref_predicates.py`
+- Step 7 coverage predicates: 71 tests in `tests/runner/predicates/test_coverage_predicates.py`
+- Step 8 cycle predicate: 30 tests in `tests/runner/predicates/test_cycle_predicates.py`
+- Step 9 timeline predicates: 52 tests in `tests/runner/predicates/test_timeline_predicates.py`
+- Step 10 GateLibrary + Approach B predicate registry: 28 tests in `tests/runner/test_gate_library.py`
+- Step 10 RunContext: 26 tests in `tests/runner/test_run_context.py`
+- Step 10+11 evaluate_gate + semantic integration: 50 tests in `tests/runner/test_gate_evaluator.py`
+- Step 11 semantic dispatch + agent invocation + validation: 61 tests in `tests/runner/test_semantic_dispatch.py`
+- Step 12 gate fixture scenarios: 27 tests in `tests/runner/test_gate_scenarios.py`
+- Approach B ManifestReader + integration: 19 tests in `tests/runner/test_manifest_reader.py`
+- DAG Step 1 ManifestGraph: 21 tests in `tests/runner/test_manifest_graph.py`
+- DAG Steps 2–5 DAGScheduler + CLI: 122 tests in `tests/runner/test_dag_scheduler.py`
+- DAG Step 6 full-DAG scenarios: 55 tests in `tests/runner/test_dag_full_run.py`
+- **Total: 762 tests, all passing**
+
+---
+
+## Agent Layer — Implementation Status
+
+The agent execution layer is fully implemented. 16 agent definition files, `node_body_contract.md`, 16 prompt specification files, and `validation_checklist.md` have been produced at `.claude/agents/`.
+
+**Completed steps (agent-generation-plan.md)**
+- **Step 1 — Initialize generation context** — all mandatory sources read
+- **Step 2 — Scaffold all agent files** — 16 `.md` files + `node_body_contract.md` created
+- **Step 3 — Fill in standard front matter** — all front matter fields populated from `agent_catalog.yaml` and `manifest.compile.yaml`; 2 catalog corrections applied (concept_refiner gate-enforcement removal, budget_interface_coordinator writes_to alignment)
+- **Step 4 — Bind skills** — `invoked_skills` populated from manifest `skills` fields; trigger conditions and expected outputs documented
+- **Step 5 — Bind canonical inputs and outputs** — `canonical_inputs` and `canonical_outputs` tables populated with paths, schema IDs, and extraction specs
+- **Step 6 — Align with artifact schemas** — field-level output specs added for all `required: true` fields from `artifact_schema_specification.yaml`; `run_id` inheritance and `schema_id` stamping confirmed; `artifact_status` left absent
+- **Step 7 — Implement gate awareness and failure behaviour** — predecessor gate verification, failure protocol (4 categories), and decision-log write obligations added to all 16 agents
+- **Step 8 — Review for constitutional conflicts** — CLAUDE.md §13 review conducted; all 16 agents pass `constitutional_review_passed` column
+- **Step 9 — Write prompt specification files** — 16 `prompts/<agent_id>_prompt_spec.md` files produced with mandatory reading order, reasoning sequence, output construction rules, traceability obligations, and failure protocol
+- **Step 10 — Add a validation checklist** — `.claude/agents/validation_checklist.md` produced; 16/16 agents complete across all 9 columns; 13 cross-agent handoffs validated (11 pass, 2 minor caveats flagged for operator review)
+
+---
+
+## Skill Layer — Implementation Status
+
+The skill execution layer is fully implemented. 19 skill definition files, `skill_runtime_contract.md`, and `validation_checklist.md` have been produced at `.claude/skills/`.
+
+**Completed steps (skill_implementation_plan.md)**
+- **Step 1 — Initialize implementation context** — all mandatory sources read
+- **Step 2 — Scaffold all skill files** — 19 `.md` files + `skill_runtime_contract.md` created
+- **Step 3 — Fill in standard front matter** — all front matter fields populated verbatim from `skill_catalog.yaml`
+- **Step 4 — Bind canonical inputs and outputs** — all `reads_from`/`writes_to` paths expanded to specific artifacts with extraction/field specs
+- **Step 5 — Implement execution logic** — deterministic execution specifications with input validation, core processing, output construction, conformance stamping, and write sequences
+- **Step 6 — Enforce constitutional constraints** — every catalog constraint mapped to a hard failure condition with explicit decision points and CLAUDE.md §13 cross-references
+- **Step 7 — Implement failure protocol** — all five failure categories (MISSING_INPUT, MALFORMED_ARTIFACT, CONSTRAINT_VIOLATION, INCOMPLETE_OUTPUT, CONSTITUTIONAL_HALT) handled in all 19 skills
+- **Step 8 — Validate outputs against artifact schemas** — all canonical outputs verified against `artifact_schema_specification.yaml`; corrections applied where needed
+- **Step 9 — Review against CLAUDE.md** — all 19 skills reviewed against §13 prohibitions; 1 finding corrected (`impact-pathway-mapper` Step 2.6.2 heuristic matching replaced with explicit Tier 3 linkage requirement)
+- **Step 10 — Produce validation checklist** — `.claude/skills/validation_checklist.md` produced; all 19 skills pass all 10 columns; 1 systematic gap (missing `skill_runtime_contract.md` reference) remediated
+
+**Skill file structure per skill:**
+Each skill `.md` file contains: YAML front matter, Canonical Inputs table, Execution Specification (deterministic steps), Output Construction, Constitutional Constraint Enforcement (per constraint: decision point, failure condition, enforcement mechanism, hard failure confirmation, CLAUDE.md cross-reference), Failure Protocol (all 5 categories), Schema Validation, and Runtime Contract reference.
+
+---
+
+## Integration Status — Next Step
+
+Three layers are now independently specified:
+
+| Layer | Status | Artifacts |
+|-------|--------|-----------|
+| DAG scheduler (runner) | Fully implemented + tested (762 tests) | `runner/` package, CLI entry point |
+| Agent layer | Fully implemented (Steps 1–10) | 16 agents + contract + 16 prompt specs + checklist at `.claude/agents/` |
+| Skill layer | Fully implemented (Steps 1–10) | 19 skills + contract + checklist at `.claude/skills/` |
+
+**The next integration target is the Skill Runtime + Agent Runtime Integration Plan**, which will bridge:
+- The DAG scheduler's `_dispatch_node()` call (currently evaluates gates only; does not invoke agents)
+- The agent layer's execution specifications (currently define what agents do; no runtime invocation mechanism)
+- The skill layer's `run_skill()` interface (currently specified in `skill_runtime_contract.md`; no runtime implementation)
+
+This plan will define how `_dispatch_node()` invokes an agent, how an agent invokes skills via `run_skill()`, how `SkillResult` flows back to the agent, and how the agent's completion triggers gate evaluation.
+
+---
+
+## DAG Scheduler — Execution Layer (Implemented)
+
+The DAG scheduler evaluates all gate rules in the manifest DAG in dependency order against pre-produced artifacts. It does **not** invoke agents or produce phase outputs.
+
+### Key components
+
+**`ManifestGraph`** — read-only in-memory graph built from `manifest.compile.yaml`. Provides `node_ids()` (registry order), `entry_gate()`, `exit_gate()`, `is_terminal()`, `incoming_conditions()`, and `is_ready(node_id, ctx)`.
+
+**`DAGScheduler`** — synchronous single-threaded dispatch loop. Each iteration computes all ready nodes (pending + all incoming conditions satisfied) and dispatches them in manifest registry order. After the loop, stalled pending nodes are identified and `run_summary.json` is written.
+
+**Node state machine** — states are defined in `runner.run_context.NODE_STATES`:
+- `pending` → `running` → `released` (exit gate pass) or `blocked_at_exit` (exit gate fail)
+- `pending` → `running` → `blocked_at_entry` (entry gate fail, no exit gate evaluated)
+- `hard_block_upstream` — set on all Phase 8 nodes when `gate_09_budget_consistency` fails
+
+**HARD_BLOCK behavior** — when `gate_09_budget_consistency` fails, `RunContext.mark_hard_block_downstream()` is called immediately. All four Phase 8 nodes (`n08a_section_drafting`, `n08b_assembly`, `n08c_evaluator_review`, `n08d_revision`) are set to `hard_block_upstream` and are never dispatched.
+
+**`RunSummary`** — typed dataclass written to `.claude/runs/<run_id>/run_summary.json`. Contains `overall_status` (`pass` / `partial_pass` / `fail` / `aborted`), `terminal_nodes_reached`, `stalled_nodes`, `hard_blocked_nodes`, `node_states`, `gate_results_index`, and `dispatched_nodes`. Always written before `run()` returns or raises.
+
+**CLI entry point** — invoked as `python -m runner --run-id <uuid> [options]`.
+
+| Exit code | Meaning |
+|-----------|---------|
+| 0 | `overall_status == "pass"` |
+| 1 | `overall_status == "fail"` or `"partial_pass"` |
+| 2 | `RunAbortedError` (pending nodes remain) |
+| 3 | Configuration error or unhandled exception |
+
+Dry-run (`--dry-run`): initializes `RunContext`, prints initially-ready nodes, exits 0. Does **not** evaluate gates or write `run_summary.json`. JSON output mode (`--json`): emits progress as one JSON object per line with `event`, `timestamp`, and relevant fields.
+
+See `dag_scheduler_guide.md` for a concise operator reference.
+
+### Scope boundaries
+
+The scheduler is intentionally out of scope for:
+- **Node body execution** — the scheduler drives gate evaluation over already-produced artifacts; it does not invoke agents or skills
+- **Parallel dispatch** — dispatch is single-threaded; Phase 4/5 parallel paths are processed sequentially within the same ready-node batch
+- **Rerun / resume logic** — each `run()` call starts from current `RunContext` state; no prior summary is consulted
+- **Semantic agent orchestration beyond `evaluate_gate()`** — `evaluate_gate()` handles semantic dispatch internally
+
+---
+
+## Approach B Migration — Manifest-Driven Predicate Composition
+
+### What changed
+
+**Before (Approach A):** `evaluate_gate()` loaded the gate rules library, looked up the gate by `gate_id`, and used the gate entry's own `predicates` list as the predicates to run. The manifest (`manifest.compile.yaml`) carried conditions as plain prose strings; it was a documentation layer, not an execution input.
+
+**After (Approach B):** `evaluate_gate()` first loads the manifest and calls `ManifestReader.get_predicate_refs(gate_id)`. If the manifest returns a list of predicate IDs, those IDs are resolved one-by-one via `GateLibrary.get_predicate(predicate_id)` to obtain full predicate definitions. The manifest is now the **composition source** (what predicates run and in what order per condition); the library is the **implementation registry** (the full definition of each predicate).
+
+When the manifest is absent or raises `ManifestReaderError`, `evaluate_gate()` silently falls back to Approach A (library gate entry predicates). This fallback preserves backward compatibility for all synthetic test environments that do not carry a manifest.
+
+### Files modified
+
+| File | Change |
+|------|--------|
+| `quality_gates.yaml` | All 11 gates: added `conditions:` blocks with `{prose:, predicate_refs:}` entries |
+| `manifest.compile.yaml` | All 11 gates in `gate_registry`: conditions converted from plain strings to structured `{prose:, predicate_refs:}` objects |
+| `runner/gate_library.py` | Added `_predicate_index` (cross-gate predicate lookup) and `get_predicate(predicate_id)` method |
+| `runner/manifest_reader.py` | New file: `ManifestReader` class — loads manifest, indexes gates, provides `get_predicate_refs()` |
+| `runner/gate_evaluator.py` | Step 4 rewritten: tries manifest-driven path first; falls back to library path on `ManifestReaderError` or `None` return |
+
+### Predicate ID namespace
+
+All 97 predicates across 11 gates follow the `g<gate_number>_p<sequence>` scheme (e.g., `g01_p01` through `g11_p13`). Predicate IDs in `predicate_refs` must match the `predicate_id` fields in `gate_rules_library.yaml` exactly.
+
+### Evaluation order
+
+Predicate evaluation order is governed by `PREDICATE_TYPE_ORDER` in `gate_evaluator.py` (file → gate_pass → schema → source_ref → coverage → cycle → timeline → semantic). Predicates are sorted by type after the predicate list is resolved, so `predicate_refs` ordering within conditions affects grouping semantics in the manifest but not execution order.
+
+### Fallback behaviour
+
+Existing tests (503) that create synthetic repos without a manifest file continue to pass via the Approach A fallback. No existing test was modified. The 24 new tests (`TestGetPredicate` + `TestApproachBIntegration` + `TestManifestReaderLoad` + `TestGetPredicateRefs` + `TestIntrospection`) verify the Approach B path directly.
+
+---
+
+## Phase 7 Semantic Correction (v1.0 → v1.1)
+
+The monolithic `system_orchestration.yaml` (v1.0) contained a `hold_behavior` key in Phase 7 and a `response_absent` failure mode classified as a non-failing "budget hold" state. This conflicted with:
+
+- **CLAUDE.md §8.4:** Budget gate must pass before Phase 8 finalization.
+- **CLAUDE.md §7 (Phase 7 gate condition):** Requires a validated budget response to be present.
+
+**Correction applied in v1.1:**
+
+- `hold_behavior` key removed from `phase_07_budget_gate.yaml`.
+- `response_absent` in `integration_rules.yaml` reclassified as a **blocking gate failure**.
+- `design_notes.yaml` updated to document the removal of the hold/failure distinction.
+- `manifest.compile.yaml` gate_09 sets `absent_artifacts_behavior: blocking_gate_failure`.
+- `agent_catalog.yaml` budget_gate_validator `must_not` list includes: `"Treat absence of a response as a non-failing hold state"`.
+
+**Effect:** Absent budget artifacts in `docs/integrations/lump_sum_budget_planner/received/` always produce a blocking gate failure in all compiled representations. Phase 8 cannot proceed in any mode — preparation or finalization — until the budget gate passes.
+
+---
+
+## How to Amend This Package
+
+1. Identify the source file containing the concern to amend (see package structure above).
+2. Read `CLAUDE.md` §14 to confirm the amendment is constitutionally admissible.
+3. Edit the relevant source file.
+4. If the amendment affects phase definitions, gate conditions, agent scopes, or integration rules, review `CLAUDE.md` for alignment.
+5. Regenerate `manifest.compile.yaml` to reflect the amended source state.
+6. Log the amendment decision in `docs/tier4_orchestration_state/decision_log/`.
+
+**Amendments must be made by explicit human instruction.** Agents and skills may not autonomously amend this workflow package.
+
+---
+
+## Migration Note
+
+The monolithic `.claude/workflows/system_orchestration.yaml` (v1.0) is superseded by this package. It is retained as a historical reference. When operating this system:
+
+The package now also includes an incremental runner implementation under `runner/`; this code is subordinate to the workflow/package contracts and does not replace `manifest.compile.yaml` as the orchestration entry point.
+
+- Use `manifest.compile.yaml` as the DAG-runner entry point.
+- Use the source files in this directory for reading, amending, and auditing.
+- Do not use the monolithic file as the source of truth; it contains the uncorrected Phase 7 hold_behavior that this package corrects.

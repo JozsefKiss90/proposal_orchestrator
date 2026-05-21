@@ -1,0 +1,75 @@
+{
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-05-05T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "8813ed4e-5c80-4157-a17e-9bed30552962",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
+  "claim_audit_results": [
+    {
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft schema_id correct and sections[] non-empty",
+      "status": "confirmed",
+      "source_ref": "part_b_assembled_draft.json: schema_id=orch.tier5.part_b_assembled_draft.v1; sections[] contains 3 entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "All three section artifacts referenced (excellence, impact, implementation) and exist on disk",
+      "status": "confirmed",
+      "source_ref": "sections[]: excellence→docs/tier5_deliverables/proposal_sections/excellence_section.json (exists); impact→docs/tier5_deliverables/proposal_sections/impact_section.json (exists); implementation→docs/tier5_deliverables/proposal_sections/implementation_section.json (exists)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order correct: excellence=1, impact=2, implementation=3",
+      "status": "confirmed",
+      "source_ref": "part_b_assembled_draft.json sections[].order: excellence=1, impact=2, implementation=3",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced section artifacts expose non-empty traceability_footer.primary_sources",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: 11 primary_sources entries; impact_section.json: 10 primary_sources entries; implementation_section.json: 11 primary_sources entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare no_unsupported_claims_declaration=true",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: traceability_footer.no_unsupported_claims_declaration=true; impact_section.json: traceability_footer.no_unsupported_claims_declaration=true; implementation_section.json: traceability_footer.no_unsupported_claims_declaration=true",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "No referenced section has overall_status=unresolved; all claim_statuses[] non-empty",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: overall_status=inferred, 15 claim_statuses; impact_section.json: overall_status=inferred, 10 claim_statuses; implementation_section.json: overall_status=confirmed, 15 claim_statuses",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "Consistency log present and no entries with status=inconsistency_flagged or status=unresolved",
+      "status": "unresolved",
+      "source_ref": "part_b_assembled_draft.json consistency_log: 12 entries total; CC-04 status=inconsistency_flagged; CC-09 status=inconsistency_flagged",
+      "flag_reason": "CC-04 (D8-02 deliverable description inconsistency: described as 'MAESTRO benchmark suite dataset' in Excellence B.1.2 but grouped as unnamed 'AI-on-demand platform contribution' in Impact B.2.1, without identifying it as the benchmark dataset artifact) and CC-09 (terminology inconsistency: OBJ-3 canonical Tier 3 title 'Decentralised multi-agent coordination protocols' appears without 'Protocols' keyword in Impact B.2.1 and Implementation B.3.1/B.3.2) both carry status=inconsistency_flagged; resolution required before assembly gate passage"
+    },
+    {
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability_footer present with non-empty primary_sources; traceability coverage confirmed",
+      "status": "confirmed",
+      "source_ref": "part_b_assembled_draft.json traceability_footer: 8 primary_sources entries present; no_unsupported_claims_declaration=false at assembly level (appropriate downgrade consistent with CC-04 and CC-09 inconsistency_flagged findings in consistency_log; individual section-level declarations are all true); per spec, unresolved applies only when no traceability coverage exists — coverage is confirmed",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 8,
+    "confirmed": 7,
+    "inferred": 0,
+    "assumed": 0,
+    "unresolved": 1
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-05-05T00:00:00Z"
+}

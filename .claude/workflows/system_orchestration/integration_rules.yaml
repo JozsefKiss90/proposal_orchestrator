@@ -1,0 +1,77 @@
+integration_rules:
+
+  lump_sum_budget_planner:
+    identity: "Sole external financial computation system for this repository"
+    interface_contract: docs/integrations/lump_sum_budget_planner/interface_contract.json
+    exchange_directories:
+      outbound_requests: docs/integrations/lump_sum_budget_planner/request_templates/
+      inbound_responses: docs/integrations/lump_sum_budget_planner/received/
+      validation_artifacts: docs/integrations/lump_sum_budget_planner/validation/
+
+    what_this_repository_may_do:
+      - "Prepare structured budget request payloads conforming to the interface contract"
+      - "Consume validated budget responses from the received/ directory"
+      - "Perform structural consistency validation between budget responses and WP/consortium design"
+      - "Block workflow progress if budget data is absent, non-conformant, or inconsistent"
+
+    what_this_repository_must_not_do:
+      - "Compute, estimate, approximate, or invent budget figures"
+      - "Substitute an internally generated budget estimate for an absent external response"
+      - "Accept a budget response that does not conform to the interface contract schema"
+      - "Declare the budget gate passed if a budget response is absent or unvalidated"
+      - "Finalize budget-dependent proposal content before the budget gate passes"
+
+    request_preparation:
+      trigger: "Absence of a budget response in received/ when Phase 7 is entered"
+      agent: budget_interface_coordinator
+      inputs:
+        - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+        - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+        - docs/tier3_project_instantiation/consortium/
+        - docs/integrations/lump_sum_budget_planner/request_templates/
+      output: docs/tier3_project_instantiation/integration/budget_request.json
+      constraint: "Request must conform to interface_contract.json before submission"
+
+    response_validation:
+      trigger: "Presence of a new artifact in received/"
+      agent: budget_gate_validator
+      skill: budget-interface-validation
+      checks:
+        - "Schema conformance against interface_contract.json"
+        - "WP coverage: every Phase 3 WP has a budget entry"
+        - "Partner coverage: every Tier 3 consortium partner has an allocation"
+        - "Effort distribution consistency with Phase 4 Gantt"
+      output: docs/integrations/lump_sum_budget_planner/validation/
+      pass_condition: "All checks pass with no blocking inconsistencies"
+      fail_condition: >
+        One or more checks fail. Write failure report to validation/.
+        Write blocking inconsistencies to phase7_budget_gate/.
+        Surface to human operator for external system correction and resubmission.
+
+    # SEMANTIC CORRECTION (v1.1):
+    # The prior monolithic file listed response_absent as a non-failing "budget hold" state.
+    # This conflicted with CLAUDE.md §8.4 and §7 (Phase 7 gate condition). Corrected below:
+    # absent response is now a blocking gate failure in all cases.
+    failure_modes:
+      - id: response_absent
+        description: "No response received from the external system"
+        behavior: >
+          Declare gate failure. Prepare a budget request if not already prepared and
+          log it to integration/budget_request.json. Write gate failure report to
+          phase7_budget_gate/. Surface to human operator. Block Phase 8 in all modes.
+          Await corrected external response before re-evaluating gate.
+          There is no non-failing hold state for absent budget artifacts.
+
+      - id: response_non_conformant
+        description: "Response does not conform to interface contract schema"
+        behavior: "Reject response; write rejection reason to validation/; request corrected response; gate failure"
+
+      - id: blocking_inconsistency
+        description: "Response is structurally inconsistent with WP or consortium design"
+        behavior: "Declare gate failure; write inconsistencies; request correction and resubmission"
+
+    prohibited_substitution: >
+      Under no circumstances may an agent substitute an internally generated budget
+      approximation or estimate for an absent or rejected external budget response.
+      If the external response cannot be obtained or corrected, the workflow halts
+      at the budget gate and the human operator must intervene.

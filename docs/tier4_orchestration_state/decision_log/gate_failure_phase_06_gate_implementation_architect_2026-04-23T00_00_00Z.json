@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_06_gate_implementation_architect_2026-04-23T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_06_gate",
+  "failure_reason": "Semantic predicate 'instrument_sections_complete' failed. Two of the three mandatory sections recorded in instrument_sections_addressed do not carry status 'addressed' as required by the phase_06_gate condition: (1) B.3.1 (Work plan and resources) has status 'partially_addressed' — the artifact notes that governance matrix and management_roles constitute Phase 6's contribution but full WP tables (3.1a–h) are Phase 3/4 outputs; (2) B.3.2 (Capacity of participants and consortium as a whole) has status 'grounded' — the artifact states that full B.3.2 drafting is a Phase 8 activity. The gate condition in CLAUDE.md §7 Phase 6 requires that all instrument-mandated implementation sections are addressed; 'partially_addressed' and 'grounded' do not satisfy this requirement. All 13 deterministic predicates passed. Gate is blocked pending resolution.",
+  "predicates_failed": [
+    "instrument_sections_complete"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 Phase 6 gate condition (All instrument-mandated implementation sections are addressed; Consortium management roles are assigned and non-overlapping), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-04-23T00:00:00Z"
+}

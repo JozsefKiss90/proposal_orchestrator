@@ -1,0 +1,124 @@
+=== skill_id: gate-enforcement ===
+=== mode: tapm ===
+=== response_text length: 9120 ===
+=== response_text (full) ===
+{
+  "run_id": "cfcf655e-cfef-4f74-a1ea-878feb0a4014",
+  "schema_id": "orch.gate_enforcement.predicate_evaluation.v1",
+  "gate_id": "gate_09_budget_consistency",
+  "overall_status": "fail",
+  "hard_block": false,
+  "evaluated_at": "2026-05-20T12:00:00Z",
+  "deterministic_predicates": {
+    "passed": [
+      {
+        "predicate_id": "artifact_present",
+        "type": "deterministic",
+        "function": "check_file_exists",
+        "args": {"path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"},
+        "result": true,
+        "prose_condition": "Canonical artifact exists at declared path"
+      },
+      {
+        "predicate_id": "schema_id_match",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {"field": "schema_id", "expected": "orch.phase7.budget_gate_assessment.v1", "actual": "orch.phase7.budget_gate_assessment.v1"},
+        "result": true,
+        "prose_condition": "artifact.schema_id equals expected value orch.phase7.budget_gate_assessment.v1"
+      },
+      {
+        "predicate_id": "run_id_match",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {"field": "run_id", "expected": "cfcf655e-cfef-4f74-a1ea-878feb0a4014", "actual": "cfcf655e-cfef-4f74-a1ea-878feb0a4014"},
+        "result": true,
+        "prose_condition": "artifact.run_id equals current run_id cfcf655e-cfef-4f74-a1ea-878feb0a4014"
+      },
+      {
+        "predicate_id": "artifact_not_invalid",
+        "type": "deterministic",
+        "function": "check_field_absent_or_not_invalid",
+        "args": {"field": "artifact_status"},
+        "result": true,
+        "prose_condition": "artifact.artifact_status is absent; artifact is not marked invalid"
+      },
+      {
+        "predicate_id": "gate_pass_declaration_pass",
+        "type": "deterministic",
+        "function": "check_field_equals",
+        "args": {"field": "gate_pass_declaration", "expected": "pass", "actual": "pass"},
+        "result": true,
+        "prose_condition": "artifact.gate_pass_declaration equals 'pass' (structural field check only; legitimacy of this declaration is subject to semantic evaluation)"
+      },
+      {
+        "predicate_id": "budget_response_reference_non_empty",
+        "type": "deterministic",
+        "function": "check_field_non_empty_string",
+        "args": {"field": "budget_response_reference", "actual": "budget_response_placeholder.json"},
+        "result": true,
+        "prose_condition": "artifact.budget_response_reference is a non-empty string; note: value 'budget_response_placeholder.json' contains literal 'placeholder' — legitimacy is subject to semantic evaluation"
+      },
+      {
+        "predicate_id": "validation_artifact_reference_non_empty",
+        "type": "deterministic",
+        "function": "check_field_non_empty_string",
+        "args": {"field": "validation_artifact_reference", "actual": "budget_validation_response_2026-05-20T120000Z.json"},
+        "result": true,
+        "prose_condition": "artifact.validation_artifact_reference is a non-empty string"
+      },
+      {
+        "predicate_id": "no_unresolved_blocking_inconsistencies",
+        "type": "deterministic",
+        "function": "check_array_no_entry_with_field_value",
+        "args": {"array": "blocking_inconsistencies", "field": "resolution", "prohibited_value": "unresolved", "array_length": 0},
+        "result": true,
+        "prose_condition": "blocking_inconsistencies is an empty array; no entry with resolution: 'unresolved' exists"
+      }
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [
+      {
+        "predicate_id": "no_internal_budget_figures",
+        "function": "semantic_eval_no_internal_budget_figures",
+        "agent": "budget_gate_validator",
+        "constitutional_rule": "CLAUDE.md §8.1 (budget computation exclusively the responsibility of the external Lump Sum Budget Planner), §8.3 (no agent may invent, substitute, approximate, or silently generate budget figures), §8.4 (absent budget artifacts in received/ constitute a blocking gate failure, not a hold state), §15 (explicit gate failure preferred over fabricated completion)",
+        "findings": [
+          {
+            "claim": "artifact.budget_response_reference is 'budget_response_placeholder.json' — a literal placeholder filename. This value signals the budget_gate_assessment was not constructed from a validated budget response received from the external Lump Sum Budget Planner system; the reference is a fabricated substitute, not a real received artifact.",
+            "violated_rule": "CLAUDE.md §8.1: Budget computation is exclusively the responsibility of the external Lump Sum Budget Planner system. §8.3: No agent may invent, substitute, approximate, or silently generate budget figures.",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json#budget_response_reference",
+            "severity": "critical"
+          },
+          {
+            "claim": "All nine WP coverage assertions (WP1–WP9, present_in_budget: true) and all eight partner coverage assertions (ATU, BIIS, CERIA, NIHS, ISIA, ELI, FIIT, BAL, present_in_budget: true) are internally fabricated claims about budget coverage. They cannot be traced to a real validated external budget response because the budget_response_reference is a placeholder. These assertions constitute internally generated budget coverage claims, violating §8.3.",
+            "violated_rule": "CLAUDE.md §8.3: No agent may invent, substitute, approximate, or silently generate budget figures. §8.4: Absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ constitute a blocking gate failure, not a hold state.",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json#wp_coverage_results, #partner_coverage_results",
+            "severity": "critical"
+          },
+          {
+            "claim": "artifact.gate_pass_declaration is set to 'pass' on the basis of a placeholder budget reference. This is a fabricated gate completion declaration. No Phase 8 activity may commence. Per CLAUDE.md §13.4 and §8.4, absent or placeholder budget artifacts constitute a blocking gate failure; the declaration of 'pass' here is constitutionally invalid and must be overridden by this gate enforcement evaluation.",
+            "violated_rule": "CLAUDE.md §15: The system must prefer explicit gate failure over fabricated completion. A fabricated completion is a constitutional violation. §13.4: Commencing any Phase 8 activity before the budget gate passes is prohibited; absent budget artifacts are a blocking gate failure.",
+            "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json#gate_pass_declaration",
+            "severity": "critical"
+          }
+        ]
+      }
+    ]
+  },
+  "decision_log_entry": {
+    "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-05-20T120000Z",
+    "decision_type": "gate_failure",
+    "gate_id": "gate_09_budget_consistency",
+    "failure_reason": "Semantic predicate 'no_internal_budget_figures' failed on three critical findings: (1) artifact.budget_response_reference is the literal string 'budget_response_placeholder.json', indicating the budget gate assessment was constructed from a fabricated placeholder reference, not from a validated budget response received from the external Lump Sum Budget Planner system; (2) all nine WP coverage assertions and eight partner coverage assertions (present_in_budget: true) are internally fabricated claims about budget coverage that cannot be traced to a real external budget response; (3) the gate_pass_declaration of 'pass' in the artifact is constitutionally invalid — it was set on the basis of a placeholder reference and constitutes fabricated gate completion. Per CLAUDE.md §8.1, §8.3, §8.4, and §15, this gate fails. Phase 8 remains fully blocked until a real validated budget response is received from the external Lump Sum Budget Planner system, a conformant budget_gate_assessment.json is produced from that real response, and this gate is re-evaluated.",
+    "predicates_failed": ["no_internal_budget_figures"],
+    "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory; a phase is not complete until its gate condition is satisfied), §7 (gate_09_budget_consistency gate definition), §8.1 (budget computation exclusively external), §8.3 (no internal budget figures; no agent may invent, substitute, approximate, or silently generate budget figures), §8.4 (absent budget artifacts in received/ constitute a blocking gate failure, not a hold state; Phase 8 fully blocked until gate_09 passes), §12.4 (missing mandatory inputs trigger gate failure), §15 (explicit gate failure preferred over fabricated completion; fabricated completion is a constitutional violation)",
+    "resolution_required": true,
+    "timestamp": "2026-05-20T12:00:00Z"
+  }
+}
+
+=== END ===

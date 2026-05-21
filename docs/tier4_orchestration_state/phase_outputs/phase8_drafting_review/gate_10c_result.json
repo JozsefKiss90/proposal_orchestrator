@@ -1,0 +1,65 @@
+{
+  "gate_id": "gate_10c_implementation_completeness",
+  "gate_kind": "exit",
+  "run_id": "10d3ecfb-ade3-4fd6-aa32-f6d0bcb9f7ab",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:54b0083ec2b92e8a3551398e6b774ebd7b8d3310a9bb647ba6c2022d0255052b",
+  "input_artifact_fingerprints": {
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:799b2e6bc5a9fb6df4e36c901e28af64478558faa918f9d8cdfd26398fc39069",
+    "docs/tier5_deliverables/proposal_sections/implementation_section.json": "sha256:35d920609bf6796cf35bbfe58711eb1d3a0ce429db4b7510f9c64b14fe876aeb"
+  },
+  "evaluated_at": "2026-05-20T18:54:50.227333+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g09c_p02",
+      "g09c_p03",
+      "g09c_p01",
+      "g09c_p04",
+      "g09c_p05",
+      "g09c_p05b",
+      "g09c_p06",
+      "g09c_p07",
+      "g09c_p08",
+      "g09c_p10"
+    ],
+    "failed": [
+      {
+        "predicate_id": "g09c_p09",
+        "type": "coverage",
+        "function": "deliverable_identity_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Deliverable identity issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\implementation_section.json: 1 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\implementation_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "deliverable_id": "D9-01",
+              "check": "wrong_title",
+              "canonical_title": "Dissemination and exploitation plan",
+              "found_title": "M6, mandatory exploitation plan",
+              "issue": "Deliverable D9-01 has wrong title attached: found 'M6, mandatory exploitation plan', expected 'Dissemination and exploitation plan'"
+            }
+          ]
+        },
+        "fail_message": "Implementation section references deliverable IDs with wrong title, parent WP, or due month.\n",
+        "prose_condition": "Deliverable identities match canonical reference pack"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10c_result.json"
+}

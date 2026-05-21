@@ -1,0 +1,75 @@
+{
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-05-05T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "78f0e1b0-5611-45d8-9402-31d2f58637d8",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
+  "claim_audit_results": [
+    {
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft schema_id correct and sections[] non-empty",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: schema_id=orch.tier5.part_b_assembled_draft.v1; sections[] contains 3 entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "All three section artifacts referenced by section_id and artifact_path, and all three files exist on disk",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: excellence->excellence_section.json, impact->impact_section.json, implementation->implementation_section.json; all three files confirmed present via Read",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order correct: excellence=1, impact=2, implementation=3",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: sections[0].order=1 (excellence), sections[1].order=2 (impact), sections[2].order=3 (implementation)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced sections expose non-empty traceability_footer.primary_sources",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: 13 primary_sources entries; impact_section.json: 11 primary_sources entries; implementation_section.json: 9 primary_sources entries",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare no_unsupported_claims_declaration=true",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: traceability_footer.no_unsupported_claims_declaration=true; impact_section.json: traceability_footer.no_unsupported_claims_declaration=true; implementation_section.json: traceability_footer.no_unsupported_claims_declaration=true",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All three sections have validation_status.overall_status != unresolved and non-empty claim_statuses[]",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json: overall_status=inferred, 15 claim_statuses; impact_section.json: overall_status=inferred, 10 claim_statuses; implementation_section.json: overall_status=confirmed, 15 claim_statuses",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "Consistency log present and free of inconsistency_flagged or unresolved entries",
+      "status": "unresolved",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: consistency_log[] has 12 entries; CC-01 and CC-06 carry status=inconsistency_flagged",
+      "flag_reason": "Two consistency_log entries are status=inconsistency_flagged. CC-01: Excellence B.1.1 omits OBJ-7 measurable_target item 2 (>=500 GitHub stars within 6 months of release) present in Tier 3 objectives.json. CC-06: Impact B.2.1 omits both quantified targets for OBJ-6 (>=20% disruption recovery and >=15% schedule adherence) and two of three quantified targets for OBJ-3 (>=5 heterogeneous agents and >=25% joint task completion), where Excellence B.1.1 correctly states all targets for both objectives. These are blocking cross-section inconsistencies."
+    },
+    {
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability_footer present with non-empty primary_sources",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: traceability_footer.primary_sources has 8 entries covering Tier 2-4 artifacts; traceability_footer.no_unsupported_claims_declaration=false, consistent with CC-01 and CC-06 flags; derivation_note documents that section-level claim traceability is inherited from referenced section artifacts",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 8,
+    "confirmed": 7,
+    "inferred": 0,
+    "assumed": 0,
+    "unresolved": 1
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-05-05T00:00:00Z"
+}

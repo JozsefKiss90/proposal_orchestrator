@@ -1,0 +1,2073 @@
+name: system_orchestration
+description: >
+  Authoritative orchestration specification for the Horizon Europe Proposal
+  Orchestration System. This workflow is universal and programme-agnostic by
+  default. It becomes call-specific through Tier 2B population and project-specific
+  through Tier 3 population. It operationalises the repository constitution
+  defined in CLAUDE.md and must not be interpreted or executed in a manner
+  that conflicts with it. This file governs the intended system including agents
+  and skills not yet fully implemented; it is a specification, not an implementation
+  mirror.
+
+version: "1.0"
+
+constitutional_authority:
+  document: CLAUDE.md
+  location: ./CLAUDE.md
+  status: >
+    This workflow is subordinate to CLAUDE.md. Where any provision of this
+    workflow conflicts with CLAUDE.md, CLAUDE.md governs without exception.
+    This workflow operationalises the constitution; it does not reinterpret,
+    weaken, or supersede it.
+  authority_hierarchy_position: 8
+  amendment_rule: >
+    This workflow may be amended only by explicit human instruction. Any
+    amendment that changes phase definitions, gate conditions, agent scopes,
+    or integration rules must be preceded by a review of CLAUDE.md for
+    constitutional alignment. Constitutional conflicts discovered after
+    writing must be logged and resolved in the next revision cycle.
+
+repository_scope:
+  system_type: "Universal Horizon Europe proposal orchestration engine"
+  programme_specificity: "Programme-agnostic by default; governed by Tier 1 normative framework"
+  instrument_coverage:
+    - RIA
+    - IA
+    - CSA
+    - MSCA-DN
+    - MSCA-PF
+    - MSCA-SE
+    - MSCA-COFUND
+    - COFUND
+    - ERC-StG
+    - ERC-CoG
+    - ERC-AdG
+    - ERC-SyG
+    - ERC-PoC
+    - EIC
+  call_specificity: "Acquired through Tier 2B population only"
+  project_specificity: "Acquired through Tier 3 population only"
+  optimisation_target: >
+    Evaluation success under applicable Horizon Europe evaluation criteria.
+    Not grant-preparation formatting, grant agreement annex compliance, or
+    financial reporting readiness. Proposal writing serves the evaluator,
+    not the grant officer.
+  project_assumptions_default: >
+    None. No project facts may be assumed in the absence of Tier 3 population.
+
+global_rules:
+  deterministic: true
+  fail_on_missing_required_inputs: true
+  require_tier_traceability: true
+  write_durable_outputs_to_tier4: true
+  forbid_project_fact_fabrication: true
+  forbid_call_constraint_fabrication: true
+  forbid_budget_estimate_invention: true
+  require_budget_gate_before_finalization: true
+  require_constitutional_compliance_check: true
+  evaluation_target: "evaluator-oriented proposal deliverables"
+  authority_model: "constitution-first"
+  workflow_mode: "phase-based, gate-driven"
+  project_assumptions_default: "none unless populated in Tier 3"
+  overwrite_validated_checkpoints: false
+  agent_memory_status: "operational aid only; not constitutional source truth"
+  conflict_resolution: >
+    Conflicts between tiers must be logged in the decision log and surfaced
+    to the human operator. Silent resolution by a lower-priority authority
+    is prohibited.
+  gate_failure_behavior: >
+    Gate failures must be declared explicitly. A declared gate failure is a
+    valid and correct output. Fabricated completion is a constitutional violation.
+  forbidden_patterns:
+    - "Using Grant Agreement Annex templates as proposal structural schemas"
+    - "Inventing call constraints absent from Tier 2B"
+    - "Inventing project facts absent from Tier 3"
+    - "Bypassing the budget gate to finalize budget-dependent content"
+    - "Storing durable decisions only in agent memory"
+    - "Silently reordering phases or weakening gate conditions"
+    - "Finalizing proposal text from incomplete or contradictory source state without flagging"
+    - "Treating CLAUDE.md as advisory or optional"
+
+# ==============================================================
+# TIER BINDINGS
+# ==============================================================
+
+tier_bindings:
+  tier1:
+    path: docs/tier1_normative_framework/
+    role: rules
+    description: >
+      Primary legislation, programme regulation, specific programme decision,
+      EU Financial Regulation, programme guide, general annexes, annotated grant
+      agreement, and model grant architectures. Governs non-negotiable legal and
+      regulatory compliance.
+    extracted_artifacts: docs/tier1_normative_framework/extracted/
+    read_authority: "highest documentary authority in the tier model"
+    write_constraint: >
+      Source documents are read-only. Extracted files are populated from source
+      documents only, never authored from memory.
+
+  tier2a:
+    path: docs/tier2a_instrument_schemas/
+    role: structural_schemas
+    description: >
+      Application form templates and evaluation form templates for all active
+      Horizon Europe instruments. Extracted registries covering instrument
+      definitions, section schemas, evaluator expectation patterns, and template
+      adapter mappings.
+    extracted_artifacts: docs/tier2a_instrument_schemas/extracted/
+    read_authority: "structural authority for the selected instrument"
+    write_constraint: "Source templates are read-only; extracted/ populated from source documents"
+    critical_constraint: >
+      Tier 2A application form templates are the governing structural schema for
+      proposal writing. Grant Agreement Annexes are not Tier 2A documents and
+      must never be substituted as proposal schemas.
+
+  tier2b:
+    path: docs/tier2b_topic_and_call_sources/
+    role: topic_and_call_sources
+    description: >
+      Work programme documents for all active Horizon Europe work programme areas;
+      call extracts for specific topics. Extracted files covering call constraints,
+      eligibility conditions, expected outcomes, expected impacts, scope
+      requirements, and evaluation priority weights.
+    subpaths:
+      work_programmes: docs/tier2b_topic_and_call_sources/work_programmes/
+      call_extracts: docs/tier2b_topic_and_call_sources/call_extracts/
+      extracted: docs/tier2b_topic_and_call_sources/extracted/
+    read_authority: "call- and topic-specific constraint authority"
+    write_constraint: >
+      All extracted data must faithfully represent source work programme and call
+      documents. Speculative paraphrase is prohibited. Every extracted item must
+      carry a source section reference.
+
+  tier3:
+    path: docs/tier3_project_instantiation/
+    role: project_instantiation
+    description: >
+      Project brief, consortium data, call binding, architecture inputs, source
+      materials, and integration artifacts. The sole authoritative source for
+      project-specific facts.
+    subpaths:
+      project_brief: docs/tier3_project_instantiation/project_brief/
+      consortium: docs/tier3_project_instantiation/consortium/
+      call_binding: docs/tier3_project_instantiation/call_binding/
+      architecture_inputs: docs/tier3_project_instantiation/architecture_inputs/
+      source_materials: docs/tier3_project_instantiation/source_materials/
+      integration: docs/tier3_project_instantiation/integration/
+    read_authority: "sole source of project-specific facts"
+    write_constraint: >
+      Agents may update Tier 3 artifacts only where explicitly specified in a
+      phase output definition. All project-specific claims in deliverables must
+      trace to Tier 3. Fabricating Tier 3 facts is a constitutional violation.
+    project_specificity_trigger: >
+      The system becomes project-specific when Tier 3 is populated. Partial
+      population is a managed state that must be acknowledged in orchestration
+      state; it does not halt the workflow unless a required input is absent.
+
+  tier4:
+    path: docs/tier4_orchestration_state/
+    role: orchestration_state
+    description: >
+      Phase outputs, decision log, checkpoints, and validation reports. The
+      authoritative durable record of workflow execution and decisions.
+    subpaths:
+      phase_outputs: docs/tier4_orchestration_state/phase_outputs/
+      decision_log: docs/tier4_orchestration_state/decision_log/
+      checkpoints: docs/tier4_orchestration_state/checkpoints/
+      validation_reports: docs/tier4_orchestration_state/validation_reports/
+    read_authority: "authoritative record of phase execution state"
+    write_constraint: >
+      Every canonical phase must write outputs to Tier 4 before downstream
+      phases depend on them. Validated checkpoints must not be overwritten.
+      Agent memory does not substitute for Tier 4 artifacts.
+
+  tier5:
+    path: docs/tier5_deliverables/
+    role: deliverables
+    description: >
+      Proposal sections, assembled drafts, final exports, and review packets.
+      The evaluator-facing output layer.
+    subpaths:
+      proposal_sections: docs/tier5_deliverables/proposal_sections/
+      assembled_drafts: docs/tier5_deliverables/assembled_drafts/
+      final_exports: docs/tier5_deliverables/final_exports/
+      review_packets: docs/tier5_deliverables/review_packets/
+    read_authority: "output layer only; not an input to orchestration reasoning"
+    write_constraint: >
+      All Tier 5 content must be derivable from Tier 1–4 state. Tier 5 must
+      not introduce claims not grounded in a higher tier. Budget-dependent
+      content must not be finalized before the budget gate passes.
+
+  integrations:
+    path: docs/integrations/
+    role: external_systems
+    systems:
+      lump_sum_budget_planner:
+        path: docs/integrations/lump_sum_budget_planner/
+        interface_contract: docs/integrations/lump_sum_budget_planner/interface_contract.json
+        request_templates: docs/integrations/lump_sum_budget_planner/request_templates/
+        received: docs/integrations/lump_sum_budget_planner/received/
+        validation: docs/integrations/lump_sum_budget_planner/validation/
+        role: "sole external financial computation system"
+        constraint: >
+          This repository does not compute lump-sum budgets. Budget data consumed
+          here must arrive through received/ and be validated through validation/.
+
+  runtime:
+    path: .claude/
+    role: runtime_execution_layer
+    description: >
+      Agent definitions, skill definitions, workflow definitions, agent memory,
+      cache, logs, and run records. Operational artifacts supporting execution.
+      Not constitutional source truth.
+    subpaths:
+      agents: .claude/agents/
+      skills: .claude/skills/
+      workflows: .claude/workflows/
+      agent_memory: .claude/agent-memory/
+      cache: .claude/cache/
+      logs: .claude/logs/
+      runs: .claude/runs/
+
+# ==============================================================
+# CANONICAL WORKFLOW
+# ==============================================================
+
+workflow:
+
+  - id: phase_01_call_analysis
+    phase: 1
+    name: "Call Analysis"
+    purpose: >
+      Parse the selected work programme and call topic to extract evaluation
+      criteria, expected outcomes, expected impacts, scope requirements, eligibility
+      conditions, and evaluation priority weights. Establish the compliance frame
+      for all downstream phases.
+    agent: call_analyzer
+    skills:
+      - call-requirements-extraction
+      - evaluation-matrix-builder
+      - topic-scope-check
+      - constitutional-compliance-check
+    depends_on: []
+    required_inputs:
+      mandatory:
+        - path: docs/tier3_project_instantiation/call_binding/selected_call.json
+          role: "Identifies target topic, work programme area, instrument type, call identifier"
+          validation: "Must be non-empty; must identify a specific topic with a resolvable work programme reference"
+        - path: docs/tier2b_topic_and_call_sources/work_programmes/
+          role: "Work programme source documents for the relevant area"
+          validation: "Subdirectory for the area in selected_call.json must contain a source document"
+      conditional:
+        - path: docs/tier2b_topic_and_call_sources/call_extracts/
+          condition: "If a call-specific extract is present it must be read alongside the work programme"
+        - path: docs/tier2a_instrument_schemas/application_forms/
+          condition: "Instrument application form must be read to confirm section constraints"
+        - path: docs/tier2a_instrument_schemas/evaluation_forms/
+          condition: "Instrument evaluation form must be read to extract evaluator criteria"
+    outputs:
+      tier2b_extracted:
+        - path: docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+          content: "Binding topic scope, exclusions, and call-level constraints"
+        - path: docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json
+          content: "Consortium eligibility, participation rules, legal entity requirements"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+          content: "Call-specified expected outcomes with source section references"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+          content: "Call-specified expected impacts with source section references"
+        - path: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+          content: "Thematic scope boundaries, mandatory topics, and explicit exclusions"
+        - path: docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+          content: "Criterion weights, sub-criterion structure, and scoring thresholds"
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+          content: >
+            Phase summary: confirmed call identity, instrument type, evaluation matrix,
+            compliance checklist, extracted constraint summaries with source section
+            references, eligibility conditions, and validation status report using
+            Confirmed/Inferred/Assumed/Unresolved categories.
+    instructions:
+      - "Read selected_call.json to identify target topic, instrument type, work programme reference."
+      - "Locate and read the source work programme for the identified area from Tier 2B."
+      - "Extract content specifically applicable to the identified topic, not the work programme generally."
+      - "Extract expected outcomes and expected impacts exactly as stated; do not paraphrase."
+      - "Extract evaluation criteria, sub-criteria, and call-specific scoring weights from the evaluation form."
+      - "Extract eligibility conditions including consortium composition rules and geographic constraints."
+      - "Record source section references for every extracted element."
+      - "Apply Confirmed/Inferred/Assumed/Unresolved status to each extracted element."
+      - "Do not infer call constraints beyond what is explicitly stated in source documents."
+    validation:
+      must_confirm:
+        - "Call identifier and topic code are resolved and non-ambiguous"
+        - "Instrument type is identified and an application form exists in Tier 2A"
+        - "An evaluation form exists in Tier 2A for the identified instrument"
+        - "All six Tier 2B extracted files are populated and non-empty"
+        - "Each extracted item carries a source section reference"
+    gate_condition:
+      all_of:
+        - "All six Tier 2B extracted JSON files are non-empty with source section references"
+        - "selected_call.json is confirmed populated and consistent with Tier 2B source"
+        - "Instrument type resolved to a Tier 2A application form and evaluation form"
+        - "Evaluation matrix and compliance checklist written to Tier 4 phase output"
+      fail_behavior: >
+        Declare gate failure. Write failure report to phase1_call_analysis/.
+        Do not proceed to Phase 2. Surface to human operator.
+
+  - id: phase_02_concept_refinement
+    phase: 2
+    name: "Concept Refinement"
+    purpose: >
+      Align the project concept with confirmed call scope, expected outcomes, and
+      evaluation priorities. Refine concept note vocabulary and framing without
+      altering scientific substance. Produce the topic mapping and compliance
+      profile that govern downstream phases.
+    agent: concept_refiner
+    skills:
+      - concept-alignment-check
+      - topic-scope-check
+      - proposal-section-traceability-check
+      - decision-log-update
+    depends_on:
+      - phase_01_call_analysis
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+          role: "Phase 1 outputs: evaluation matrix, compliance checklist, extracted constraints"
+          validation: "Phase 1 gate must have passed"
+        - path: docs/tier3_project_instantiation/project_brief/concept_note.md
+          role: "Source concept for alignment and refinement"
+          validation: "Must be non-empty; absence is a gate failure"
+        - path: docs/tier3_project_instantiation/project_brief/project_summary.json
+          role: "Structured project summary with provisional objectives"
+          validation: "Must be non-empty"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+          role: "Call-specific expected outcomes for alignment check"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+          role: "Call-specific expected impacts for alignment check"
+        - path: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+          role: "Topic scope boundaries for concept scope validation"
+      conditional:
+        - path: docs/tier3_project_instantiation/project_brief/strategic_positioning.md
+          condition: "Read if present; populate if absent and concept provides sufficient basis"
+        - path: docs/tier3_project_instantiation/source_materials/
+          condition: "Read all available source materials to ground concept refinement in project evidence"
+    outputs:
+      tier3_updated:
+        - path: docs/tier3_project_instantiation/call_binding/topic_mapping.json
+          content: >
+            Mapping from project objectives to call expected outcomes and impacts;
+            each mapping carries source reference from Tier 2B and project evidence
+            source from Tier 3.
+        - path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+          content: >
+            Eligibility confirmed, instrument confirmed, scope alignment status,
+            identified compliance gaps requiring attention.
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+          content: >
+            Refined concept summary with call alignment evidence; topic mapping
+            rationale; strategic differentiation statement; scope conflicts and
+            their resolution; validation status report.
+    instructions:
+      - "Do not invent a new project concept; work from the concept note in Tier 3."
+      - "Read concept note and project summary against Tier 2B extracted constraints."
+      - "Identify vocabulary, framing, and emphasis gaps between concept and call expected outcomes."
+      - "Refine to use call-consistent terminology without altering scientific substance."
+      - "Confirm project objectives address at least one expected outcome per evaluation sub-criterion."
+      - "Produce topic mapping: for each call expected outcome, identify which project objective addresses it."
+      - "Flag any expected outcome the concept does not address; do not fabricate coverage."
+      - "Record all decisions and gap resolutions in the Tier 4 decision log."
+    validation:
+      must_confirm:
+        - "Topic mapping complete with at least one objective mapped per mandatory expected outcome"
+        - "Compliance profile populated and flags any unresolved eligibility concerns"
+        - "No unresolved scope conflict between concept and Tier 2B"
+    gate_condition:
+      all_of:
+        - "topic_mapping.json is non-empty and all mappings carry source references"
+        - "compliance_profile.json is non-empty"
+        - "No unresolved scope conflicts between concept and Tier 2B"
+        - "Phase 2 summary written to Tier 4"
+      fail_behavior: >
+        Declare gate failure. Log scope conflicts and missing mappings in decision
+        log. Write failure report to phase2_concept_refinement/. Do not proceed
+        to Phase 3. Surface to human operator.
+
+  - id: phase_03_wp_design_and_dependency_mapping
+    phase: 3
+    name: "Work Package Design and Dependency Mapping"
+    purpose: >
+      Design the full work package structure: work packages, tasks, deliverables,
+      inter-WP dependencies, partner-role assignments, and milestone linkages.
+      Dependency mapping is a required sub-task of this phase. The dependency map
+      is a required input to Phase 4 and Phase 6 and must be present in Tier 4
+      before those phases proceed.
+    agent: wp_designer
+    skills:
+      - work-package-normalization
+      - wp-dependency-analysis
+      - milestone-consistency-check
+      - instrument-schema-normalization
+      - gate-enforcement
+    depends_on:
+      - phase_02_concept_refinement
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+          role: "Refined concept, topic mapping, and compliance profile"
+          validation: "Phase 2 gate must have passed"
+        - path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+          role: "Provisional WP seeds; may be minimal but must be non-empty"
+          validation: "Must be non-empty; absence is a gate failure"
+        - path: docs/tier3_project_instantiation/architecture_inputs/objectives.json
+          role: "Project objectives to be addressed by WP structure"
+          validation: "Must be non-empty"
+        - path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+          role: "Instrument-specific WP count limits, deliverable constraints, milestone conventions"
+        - path: docs/tier3_project_instantiation/consortium/partners.json
+          role: "Partner list for responsibility assignment"
+        - path: docs/tier3_project_instantiation/consortium/roles.json
+          role: "Partner role definitions for WP lead and task lead assignments"
+      conditional:
+        - path: docs/tier3_project_instantiation/source_materials/prior_proposals/
+          condition: "Read if present to avoid repeating known structural weaknesses"
+        - path: docs/tier3_project_instantiation/source_materials/partner_inputs/
+          condition: "Read if present to incorporate partner-provided task or deliverable inputs"
+    outputs:
+      tier3_updated:
+        - path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+          content: "Updated WP seed incorporating full structure if changes made during design"
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+          content: >
+            Full WP architecture: WPs with objectives, tasks (numbered/titled/described),
+            deliverables (number/title/type/due-month/responsible-partner), milestones
+            (number/title/verifiable-criterion/due-month/associated-WP), inter-WP
+            dependency map (directed acyclic graph), partner-role assignment matrix,
+            structural gaps or Tier 2A non-compliances.
+    instructions:
+      - "Design WPs from project objectives in Tier 3, not from prior templates."
+      - "Each WP must have: unique identifier, title, objective, tasks, at least one deliverable, lead partner, declared dependencies."
+      - "Each task must have: unique identifier, title, description, lead partner, contributing partners."
+      - "Each deliverable must have: unique identifier, title, type, due month, responsible partner."
+      - "Each milestone must have: unique identifier, title, verifiable achievement criterion, due month, responsible WP."
+      - "Perform dependency mapping: identify prerequisites for each WP and task; represent as a directed acyclic graph."
+      - "Identify and flag any dependency cycles; do not silently remove them."
+      - "Check total WP count against instrument limits from Tier 2A section_schema_registry."
+      - "Assign partners from Tier 3 consortium data only; do not invent partner responsibilities."
+      - "Flag any project objective not addressed by at least one WP."
+      - "Flag any call expected outcome not addressed by at least one deliverable."
+    validation:
+      must_confirm:
+        - "All WPs have objectives, tasks, at least one deliverable, a lead, and declared dependencies"
+        - "WP count is within instrument limits from Tier 2A"
+        - "All deliverables have due months within project duration"
+        - "All milestones have verifiable achievement criteria"
+        - "Dependency map is complete and acyclic"
+        - "All assigned partners exist in Tier 3 consortium data"
+    gate_condition:
+      all_of:
+        - "Full WP structure written to Tier 4"
+        - "Dependency map written to Tier 4"
+        - "All WPs have at least one deliverable and a responsible lead"
+        - "WP count compliant with Tier 2A instrument constraints"
+        - "No dependency cycles in the dependency map"
+        - "All assigned partners present in Tier 3 consortium data"
+      fail_behavior: >
+        Declare gate failure. Write gap report and structural non-compliances to
+        phase3_wp_design/. Do not proceed to Phase 4 or Phase 5. Surface to
+        human operator.
+
+  - id: phase_04_gantt_and_milestones
+    phase: 4
+    name: "Gantt and Milestones"
+    purpose: >
+      Produce the project timeline: assign all tasks to months, define milestone
+      events with verifiable achievement criteria, confirm the timeline fits within
+      project duration, and verify the critical path is consistent with the Phase 3
+      dependency map.
+    agent: gantt_designer
+    skills:
+      - milestone-consistency-check
+      - gate-enforcement
+      - decision-log-update
+    depends_on:
+      - phase_03_wp_design_and_dependency_mapping
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+          role: "Full WP structure with tasks, deliverables, milestones, and dependency map"
+          validation: "Phase 3 gate must have passed"
+        - path: docs/tier3_project_instantiation/call_binding/selected_call.json
+          role: "Project duration in months as specified in the call"
+          validation: "Duration field must be present and non-null"
+        - path: docs/tier3_project_instantiation/consortium/roles.json
+          role: "Partner roles for milestone responsibility assignment"
+    outputs:
+      tier3_updated:
+        - path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+          content: "Populated milestone records: identifiers, due months, verifiable criteria, responsible WP"
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+          content: >
+            Gantt structure: all tasks with start month, end month, duration,
+            responsible partner; milestone table with verifiable criteria; critical
+            path summary; timeline compliance confirmation against call-specified
+            project duration; identified scheduling conflicts or critical path risks.
+    instructions:
+      - "Assign start and end months to every task from Phase 3."
+      - "Ensure task scheduling respects the dependency map; no task starts before prerequisites complete."
+      - "Ensure all task end months fall within the call-specified project duration."
+      - "Confirm all deliverable due months are consistent with the task schedule."
+      - "Confirm all milestone due months are consistent with task and deliverable schedule."
+      - "Identify the critical path as the longest dependency chain from start to end."
+      - "Flag any milestone whose verifiable criterion is not testable at the stated due month."
+      - "Flag scheduling conflicts where dependencies cannot be satisfied within project duration."
+      - "Do not change project duration to fit an oversized WP structure; flag the violation instead."
+    validation:
+      must_confirm:
+        - "Every task from Phase 3 has assigned start and end months"
+        - "All task start months respect upstream dependencies"
+        - "All deliverables have due months consistent with task schedule"
+        - "All milestones have verifiable achievement criteria"
+        - "Timeline fits within call-specified project duration"
+        - "No unresolved critical path dependency"
+    gate_condition:
+      all_of:
+        - "All tasks assigned to months within project duration"
+        - "All milestones have verifiable criteria and due months"
+        - "Critical path identified and consistent with dependency map"
+        - "milestones_seed.json populated in Tier 3"
+        - "Gantt structure and milestone table written to Tier 4"
+      fail_behavior: >
+        Declare gate failure. Write scheduling conflicts and duration violations to
+        phase4_gantt_milestones/. Phase 5 may proceed independently if it depends
+        only on Phase 2 outputs. Do not proceed to Phase 6. Surface to human operator.
+
+  - id: phase_05_impact_architecture
+    phase: 5
+    name: "Impact Architecture"
+    purpose: >
+      Construct the impact narrative: define the pathway from project outputs to
+      expected outcomes to broader impacts, mapped against the call expected impact
+      criteria. Define KPIs, dissemination and exploitation logic, and sustainability
+      mechanisms.
+    agent: impact_architect
+    skills:
+      - impact-pathway-mapper
+      - dissemination-exploitation-communication-check
+      - proposal-section-traceability-check
+      - gate-enforcement
+    depends_on:
+      - phase_02_concept_refinement
+      - phase_03_wp_design_and_dependency_mapping
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+          role: "Refined concept and topic mapping for impact grounding"
+          validation: "Phase 2 gate must have passed"
+        - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+          role: "WP structure providing the project activities that generate outputs"
+          validation: "Phase 3 gate must have passed"
+        - path: docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+          role: "Project-level intended outcomes"
+          validation: "Must be non-empty"
+        - path: docs/tier3_project_instantiation/architecture_inputs/impacts.json
+          role: "Project-level intended impacts"
+          validation: "Must be non-empty"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+          role: "Call-specified expected outcomes for impact pathway mapping"
+        - path: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+          role: "Call-specified expected impacts for impact pathway mapping"
+        - path: docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+          role: "Criterion weights to inform emphasis and KPI specificity"
+    outputs:
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+          content: >
+            Full impact architecture: output-to-outcome pathway per project output;
+            outcome-to-impact pathway per outcome; cross-reference of each call
+            expected impact to at least one project output; KPI set (specific,
+            measurable, time-bound, traceable to WPs); dissemination and exploitation
+            plan structure; communication strategy summary; sustainability mechanism;
+            target group definitions; validation status report.
+    instructions:
+      - "Define the impact pathway from activities to outputs, outputs to outcomes, outcomes to impacts."
+      - "For every expected impact in Tier 2B, identify at least one project output contributing to it."
+      - "Flag any expected impact with no traceable project output as a gap; do not fabricate coverage."
+      - "For each impact claim, identify the mechanism: which WP, which deliverable, which activity."
+      - "Define KPIs that are specific, measurable, time-bound, and traceable to named WP deliverables."
+      - "Do not use generic programme-level impact language; all claims must be project-specific."
+      - "Define dissemination: what is disseminated, to whom, through which channels, at which point."
+      - "Define exploitation: how project outputs will be used or developed beyond the grant period."
+      - "Define the communication strategy: public-facing activities, target audiences, objectives."
+      - "Define sustainability: how results will persist or be maintained after funding ends."
+      - "Ensure all impact claims are proportionate to the project scale as indicated in Tier 3."
+    validation:
+      must_confirm:
+        - "Every call expected impact has at least one mapped project output"
+        - "Every KPI is traceable to a named WP deliverable"
+        - "Dissemination, exploitation, and communication plans are present"
+        - "Sustainability mechanism is defined"
+        - "No impact claim is asserted without a traceable project mechanism"
+    gate_condition:
+      all_of:
+        - "All call expected impacts have at least one mapped project output"
+        - "KPI set is defined and traceable to WP deliverables"
+        - "Dissemination and exploitation logic is defined"
+        - "Sustainability mechanism is defined"
+        - "Full impact architecture written to Tier 4"
+      fail_behavior: >
+        Declare gate failure. Write unmapped expected impacts and missing elements
+        to phase5_impact_architecture/. Do not proceed to Phase 8. Surface to
+        human operator.
+
+  - id: phase_06_implementation_architecture
+    phase: 6
+    name: "Implementation Architecture"
+    purpose: >
+      Define the implementation approach: management structure, decision-making,
+      quality assurance, risk management, ethics self-assessment, and all
+      instrument-mandated implementation elements. Translate WP and timeline
+      structure into a coherent implementation narrative.
+    agent: implementation_architect
+    skills:
+      - governance-model-builder
+      - risk-register-builder
+      - milestone-consistency-check
+      - constitutional-compliance-check
+      - gate-enforcement
+    depends_on:
+      - phase_03_wp_design_and_dependency_mapping
+      - phase_04_gantt_and_milestones
+      - phase_05_impact_architecture
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+          role: "WP structure for partner-role and management architecture grounding"
+          validation: "Phase 3 gate must have passed"
+        - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+          role: "Timeline and milestones for monitoring and quality assurance logic"
+          validation: "Phase 4 gate must have passed"
+        - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+          role: "Impact logic for exploitation governance and sustainability design"
+          validation: "Phase 5 gate must have passed"
+        - path: docs/tier3_project_instantiation/consortium/partners.json
+          role: "Partner composition for management structure design"
+          validation: "Must be non-empty"
+        - path: docs/tier3_project_instantiation/consortium/roles.json
+          role: "Partner roles for governance and decision-making matrix"
+          validation: "Must be non-empty"
+        - path: docs/tier3_project_instantiation/consortium/capabilities.json
+          role: "Partner capabilities for credibility of role assignments"
+        - path: docs/tier3_project_instantiation/architecture_inputs/risks.json
+          role: "Identified project risks for risk register population"
+          validation: "Must be non-empty; absence is a gate failure"
+        - path: docs/tier3_project_instantiation/call_binding/compliance_profile.json
+          role: "Compliance obligations mandated by the instrument"
+        - path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+          role: "Instrument-mandated implementation sections (ethics, gender plan, etc.)"
+    outputs:
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+          content: >
+            Management structure narrative; decision-making and governance matrix;
+            quality assurance and monitoring plan; populated risk register with
+            likelihood, impact, mitigation, and monitoring per risk; ethics
+            self-assessment explicitly stated; gender and diversity plan if
+            instrument-mandated; partner role assignments with capability
+            justifications; implementation narrative coherence summary.
+    instructions:
+      - "Design management structure from Tier 3 consortium data; do not redesign the consortium."
+      - "Define a governance body with membership, meeting frequency, and decision scope."
+      - "Define a decision-making matrix: who decides what, under what conditions, with what escalation."
+      - "Define a quality assurance plan: internal review milestones, deliverable review process."
+      - "Populate the risk register from Tier 3 risks.json: assign likelihood, impact, mitigation, and monitoring per risk."
+      - "Identify any material risk not covered in risks.json; add to register and flag for Tier 3 update."
+      - "Perform ethics self-assessment: explicitly state whether the project involves human subjects, personal data, dual-use risks, or other ethics flags. Do not omit."
+      - "If the instrument schema mandates a gender and diversity plan, produce one; do not omit it."
+      - "Ensure all partner role assignments are consistent with Tier 3 consortium data and Phase 3 WP assignments."
+      - "Ensure all management milestones from Phase 4 are reflected in the monitoring plan."
+    validation:
+      must_confirm:
+        - "All instrument-mandated implementation sections are addressed"
+        - "Risk register is populated with at least the risks from Tier 3 risks.json"
+        - "Ethics self-assessment is explicitly stated and not omitted"
+        - "Governance and decision-making matrix is defined"
+        - "All management roles assigned to named Tier 3 consortium partners"
+    gate_condition:
+      all_of:
+        - "Risk register is populated"
+        - "Ethics self-assessment is explicitly present (not omitted)"
+        - "Governance matrix is defined"
+        - "All management roles assigned to Tier 3 consortium members"
+        - "All instrument-mandated implementation sections addressed per Tier 2A schema"
+        - "Implementation architecture written to Tier 4"
+      fail_behavior: >
+        Declare gate failure. Write omitted sections and missing elements to
+        phase6_implementation_architecture/. Do not proceed to Phase 7. Surface
+        to human operator.
+
+  - id: phase_07_budget_gate
+    phase: 7
+    name: "Budget Gate"
+    purpose: >
+      Confirm that a validated external budget response from the Lump Sum Budget
+      Planner is available, structurally consistent with WP design, timeline, and
+      consortium roles. This phase does not compute budget figures. It validates
+      structural integrity and blocks finalization if gate conditions are not met.
+    agent: budget_gate_validator
+    skills:
+      - budget-interface-validation
+      - gate-enforcement
+      - decision-log-update
+      - constitutional-compliance-check
+    depends_on:
+      - phase_03_wp_design_and_dependency_mapping
+      - phase_04_gantt_and_milestones
+      - phase_06_implementation_architecture
+    required_inputs:
+      mandatory:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+          role: "WP structure for budget-to-WP consistency check"
+          validation: "Phase 3 gate must have passed"
+        - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+          role: "Timeline for effort distribution consistency check"
+          validation: "Phase 4 gate must have passed"
+        - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+          role: "Partner roles and effort assignments for budget-to-consortium check"
+          validation: "Phase 6 gate must have passed"
+        - path: docs/integrations/lump_sum_budget_planner/received/
+          role: "External budget response artifacts from the Lump Sum Budget Planner"
+          validation: "Must contain at least one non-empty response artifact; absence triggers budget hold"
+        - path: docs/integrations/lump_sum_budget_planner/validation/
+          role: "Validation artifacts confirming the received budget response has been validated"
+          validation: "Must contain at least one validation artifact"
+        - path: docs/integrations/lump_sum_budget_planner/interface_contract.json
+          role: "Schema and protocol governing valid budget response structure"
+      conditional:
+        - path: docs/tier3_project_instantiation/integration/budget_request.json
+          condition: "If budget request has not been sent, budget_interface_coordinator must prepare it first"
+    pre_gate_action:
+      description: >
+        If no budget response is present in received/, invoke budget_interface_coordinator
+        to prepare a budget request and submit it to the external Lump Sum Budget Planner.
+        Phase 7 gate cannot pass until a validated response is received. The workflow
+        enters a budget hold state awaiting the external response.
+      agent: budget_interface_coordinator
+      skill: budget-interface-validation
+      output: docs/tier3_project_instantiation/integration/budget_request.json
+    outputs:
+      tier4_artifacts:
+        - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+          content: >
+            Budget gate assessment: confirmation of receipt; structural consistency
+            check results (budget WP breakdown vs Phase 3 WP structure; partner effort
+            vs Phase 6 consortium roles; timeline alignment vs Phase 4 Gantt); interface
+            contract conformance; blocking inconsistencies if any; gate pass or gate
+            failure declaration; if failure, specification of corrections required.
+    instructions:
+      - "Do not compute, estimate, or generate budget figures internally."
+      - "Check whether a budget response artifact is present in integrations/received/."
+      - "If no response is present, invoke budget_interface_coordinator to prepare a request; declare budget hold, not failure."
+      - "Check whether validation artifacts are present in integrations/validation/."
+      - "Verify the budget response conforms to the interface contract schema."
+      - "Check that every WP from Phase 3 has a corresponding budget entry in the response."
+      - "Check that every partner from Tier 3 has a corresponding effort/cost allocation."
+      - "Check that effort distribution is consistent with the Phase 4 Gantt."
+      - "Identify blocking inconsistencies: budget entries for non-existent WPs; partner allocations with no corresponding role."
+      - "If blocking inconsistencies exist, declare gate failure and specify what must be corrected in the external budget."
+      - "Do not declare the gate passed if any blocking inconsistency is unresolved."
+    validation:
+      must_confirm:
+        - "External budget response is present in received/"
+        - "Validation artifact is present in validation/"
+        - "Budget response conforms to interface contract schema"
+        - "All Phase 3 WPs have budget entries"
+        - "All Tier 3 partners have effort/cost allocations"
+        - "No blocking structural inconsistency exists"
+    gate_condition:
+      all_of:
+        - "Non-empty budget response artifact present in integrations/received/"
+        - "Validation artifact present in integrations/validation/"
+        - "Interface contract conformance confirmed"
+        - "All Phase 3 WPs have corresponding budget entries"
+        - "All consortium partners have corresponding budget allocations"
+        - "No blocking inconsistency logged without resolution"
+        - "Budget gate assessment written to Tier 4"
+      mandatory: true
+      bypass_prohibited: true
+      fail_behavior: >
+        Declare gate failure. Write blocking inconsistencies and missing artifacts to
+        phase7_budget_gate/. Block Phase 8 finalization. Surface to human operator
+        with specification of required corrections.
+      hold_behavior: >
+        If response is absent but a request has been prepared, declare budget hold.
+        Write hold status to phase7_budget_gate/. Await external response. Phase 8
+        section drafting may proceed in preparation mode; finalization is blocked
+        until gate passes.
+
+  - id: phase_08_drafting_and_review
+    phase: 8
+    name: "Drafting and Review"
+    purpose: >
+      Produce evaluator-oriented proposal section drafts for all application form
+      sections; assemble into a coherent whole; conduct evaluator-style review
+      against applicable evaluation criteria; integrate revisions; produce final
+      export. This phase has four sequential substeps.
+    depends_on:
+      - phase_01_call_analysis
+      - phase_02_concept_refinement
+      - phase_03_wp_design_and_dependency_mapping
+      - phase_04_gantt_and_milestones
+      - phase_05_impact_architecture
+      - phase_06_implementation_architecture
+      - phase_07_budget_gate
+    substeps:
+
+      - id: phase_08a_section_drafting
+        name: "Section Drafting"
+        purpose: >
+          Draft each proposal section required by the active application form,
+          drawing on Tier 3 and Tier 4 phase outputs. Each section must be written
+          in evaluator-oriented language targeting the applicable evaluation criterion.
+        agent: proposal_writer
+        skills:
+          - proposal-section-traceability-check
+          - evaluator-criteria-review
+          - constitutional-compliance-check
+        required_inputs:
+          - path: docs/tier2a_instrument_schemas/application_forms/
+            role: "Active application form template defining sections, fields, and constraints"
+          - path: docs/tier2a_instrument_schemas/evaluation_forms/
+            role: "Active evaluation form defining evaluator scoring logic per section"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+            role: "Evaluation matrix and compliance checklist"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+            role: "Refined concept for Excellence section"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+            role: "WP structure for Implementation section"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+            role: "Timeline and milestones for Implementation section"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+            role: "Impact architecture for Impact section"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+            role: "Governance, risk, and implementation narrative"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+            role: "Budget gate pass confirmation; required before budget-dependent sections are finalized"
+            validation: "Budget gate must have passed; absence is a finalization block"
+        outputs:
+          - path: docs/tier5_deliverables/proposal_sections/
+            content: >
+              Individual section drafts named by section identifier from the active
+              application form. Each section includes a traceability footer identifying
+              the Tier 1-4 sources that ground the section content.
+          - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+            content: "Section drafting status log with completion status per section"
+        instructions:
+          - "Identify all sections required by the active application form from Tier 2A."
+          - "Draft each section in the order defined by the application form."
+          - "For each section, read the corresponding evaluation criterion from the evaluation form before writing."
+          - "Write to address the evaluator scoring logic, not grant annex reporting requirements."
+          - "Every factual claim must be traceable to a named Tier 3 source or Tier 4 phase output."
+          - "Do not introduce claims not grounded in Tier 1-4 state."
+          - "Do not reference budget figures not validated through the budget gate."
+          - "Flag any section that cannot be completed due to missing Tier 3 data; do not fill gaps with fabricated content."
+          - "Append a traceability footer to each section identifying the primary source artifacts."
+
+      - id: phase_08b_assembly
+        name: "Assembly"
+        purpose: >
+          Assemble all drafted sections into a structurally coherent draft following
+          the section order prescribed by the active application form. Verify
+          cross-section consistency of terminology, objectives, WP references,
+          partner names, and quantitative claims.
+        agent: proposal_writer
+        skills:
+          - proposal-section-traceability-check
+          - constitutional-compliance-check
+        depends_on_substep: phase_08a_section_drafting
+        required_inputs:
+          - path: docs/tier5_deliverables/proposal_sections/
+            role: "Individual section drafts from Phase 8a"
+          - path: docs/tier2a_instrument_schemas/application_forms/
+            role: "Section order and assembly requirements"
+        outputs:
+          - path: docs/tier5_deliverables/assembled_drafts/
+            content: >
+              Assembled proposal draft in application form section order;
+              cross-section consistency log identifying terminology inconsistencies,
+              numerical discrepancies, or contradictions across sections.
+        instructions:
+          - "Assemble sections in the order prescribed by the active application form."
+          - "Check that all partner names are consistent across sections."
+          - "Check that all WP references, task names, and deliverable identifiers are consistent."
+          - "Check that all quantitative claims (budget figures, person-months, KPI values) are consistent."
+          - "Check that objectives in Excellence match the objectives driving the WP structure in Implementation."
+          - "Check that impact claims in Impact are grounded in outputs of WPs in Implementation."
+          - "Flag and log any inconsistency; do not silently normalise contradictions."
+
+      - id: phase_08c_evaluator_review
+        name: "Evaluator-Style Review"
+        purpose: >
+          Simulate evaluator assessment of the assembled draft against applicable
+          evaluation criteria and scoring logic. Produce prioritised revision
+          guidance before finalization.
+        agent: evaluator_reviewer
+        skills:
+          - evaluator-criteria-review
+          - proposal-section-traceability-check
+          - constitutional-compliance-check
+        depends_on_substep: phase_08b_assembly
+        required_inputs:
+          - path: docs/tier5_deliverables/assembled_drafts/
+            role: "Assembled proposal draft"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+            role: "Evaluation matrix and evaluation criteria with weightings"
+          - path: docs/tier2a_instrument_schemas/evaluation_forms/
+            role: "Scoring logic and sub-criterion structure"
+        outputs:
+          - path: docs/tier5_deliverables/review_packets/
+            content: >
+              Evaluator review report: per-criterion assessment; weaknesses
+              categorized by severity (critical/major/minor); cross-cutting issues;
+              prioritised revision action list.
+          - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+            content: "Review report summary and revision action list"
+        instructions:
+          - "Review each section against the scoring logic of its applicable evaluation criterion."
+          - "Assess clarity, credibility, coherence, specificity, and compliance."
+          - "Flag: unsupported claims, vague impact language, missing mandatory elements, cross-section inconsistencies."
+          - "Categorise each weakness by severity: critical (likely to prevent passing), major (likely to reduce score significantly), minor (style or completeness)."
+          - "Provide a prioritised revision action list: critical first, then major, then minor."
+          - "Do not revise the draft in this substep; produce the review report only."
+          - "Distinguish Confirmed, Inferred, Assumed, and Unresolved elements in the review."
+
+      - id: phase_08d_revision
+        name: "Revision Cycle"
+        purpose: >
+          Apply revision actions from the evaluator review to the assembled draft.
+          Resolve critical and major weaknesses while preserving structural
+          consistency. Produce the final revised draft for export.
+        agent: revision_integrator
+        skills:
+          - proposal-section-traceability-check
+          - evaluator-criteria-review
+          - constitutional-compliance-check
+          - decision-log-update
+          - checkpoint-publish
+        depends_on_substep: phase_08c_evaluator_review
+        required_inputs:
+          - path: docs/tier5_deliverables/assembled_drafts/
+            role: "Assembled draft to be revised"
+          - path: docs/tier5_deliverables/review_packets/
+            role: "Review report with prioritised revision actions"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+            role: "Budget gate confirmation to prevent budget-contradicting revisions"
+        outputs:
+          - path: docs/tier5_deliverables/assembled_drafts/
+            content: "Revised proposal draft incorporating all critical and major revision actions"
+          - path: docs/tier5_deliverables/final_exports/
+            content: "Final export of the revised proposal ready for submission formatting"
+          - path: docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+            content: "Revision log: which actions were applied, how, and any residual minor issues"
+          - path: docs/tier4_orchestration_state/checkpoints/
+            content: "Phase 8 checkpoint confirming workflow completion and final state"
+        instructions:
+          - "Apply critical revision actions first."
+          - "Apply major revision actions second."
+          - "For each revision, ensure the change does not create a new inconsistency with other sections."
+          - "Do not introduce content that contradicts the validated budget or Tier 3 project facts."
+          - "Do not resolve a gap by fabricating content; flag unresolvable gaps in the revision log."
+          - "After critical and major revisions, produce a revision log confirming what was changed."
+          - "Publish the Phase 8 checkpoint to Tier 4 checkpoints/."
+          - "Write the final export to Tier 5 final_exports/."
+    gate_condition:
+      all_of:
+        - "All sections required by active application form present in proposal_sections/"
+        - "Assembled draft present in assembled_drafts/"
+        - "Review packet present in review_packets/"
+        - "All critical revision actions resolved or explicitly logged as unresolvable with reason"
+        - "Final export present in final_exports/"
+        - "Phase 8 checkpoint published to Tier 4 checkpoints/"
+        - "No section contains content contradicted by a higher tier"
+        - "Budget gate confirmation present and no section contradicts the validated budget"
+      fail_behavior: >
+        Declare gate failure. Write unresolved critical issues and missing sections
+        to phase8_drafting_review/. Do not mark proposal as complete. Surface to
+        human operator.
+
+# ==============================================================
+# QUALITY GATES
+# ==============================================================
+
+quality_gates:
+
+  - id: gate_01_source_integrity
+    name: "Source Integrity"
+    description: >
+      All required Tier 2B source documents and Tier 3 call binding data are
+      present and non-empty before the workflow starts. The selected call is
+      resolvable to a work programme area with a source document.
+    evaluated_at: phase_01_call_analysis entry
+    fail_action: "Halt workflow; report missing sources to human operator"
+
+  - id: gate_02_call_alignment
+    name: "Call Alignment"
+    description: >
+      The project concept is demonstrably aligned with the identified call scope,
+      expected outcomes, and expected impacts. Topic mapping is complete and
+      carries source references. No unresolved scope conflict exists.
+    evaluated_at: phase_02_concept_refinement exit
+    fail_action: "Block Phase 3 and Phase 5; report scope conflicts"
+
+  - id: gate_03_concept_coherence
+    name: "Concept Coherence"
+    description: >
+      The concept note and project summary are internally coherent. Objectives
+      are specific and measurable. The project rationale is grounded in Tier 3
+      data and aligned with Tier 2B call framing.
+    evaluated_at: phase_02_concept_refinement exit
+    fail_action: "Block Phase 3; flag incoherence for human review"
+
+  - id: gate_04_wp_coherence
+    name: "Work Package Coherence"
+    description: >
+      All WPs have objectives, tasks, deliverables, responsible leads, and
+      declared dependencies. WP count complies with instrument limits. All
+      assigned partners exist in Tier 3. Dependency map is acyclic.
+    evaluated_at: phase_03_wp_design_and_dependency_mapping exit
+    fail_action: "Block Phase 4, Phase 5, and Phase 6; report structural non-compliances"
+
+  - id: gate_05_dependency_coherence
+    name: "Dependency Coherence"
+    description: >
+      The inter-WP and inter-task dependency map is complete, acyclic, and
+      consistent with the project logic. No critical path dependency is
+      unresolved. The map is written to Tier 4 as a durable artifact.
+    evaluated_at: phase_03_wp_design_and_dependency_mapping exit
+    fail_action: "Block Phase 4; flag dependency cycles for resolution"
+
+  - id: gate_06_schedule_completeness
+    name: "Schedule Completeness"
+    description: >
+      All tasks are assigned to months within project duration. All milestones
+      have verifiable achievement criteria. Timeline is consistent with the
+      dependency map. Critical path fits within project duration.
+    evaluated_at: phase_04_gantt_and_milestones exit
+    fail_action: "Block Phase 6; report scheduling conflicts and duration violations"
+
+  - id: gate_07_impact_specificity
+    name: "Impact Specificity"
+    description: >
+      Every call expected impact has at least one traceable project output.
+      All KPIs are specific, measurable, and traceable to WP deliverables.
+      No generic programme-level impact language is asserted without
+      project-specific grounding.
+    evaluated_at: phase_05_impact_architecture exit
+    fail_action: "Block Phase 8; report unmapped expected impacts"
+
+  - id: gate_08_implementation_consistency
+    name: "Implementation Consistency"
+    description: >
+      Risk register is populated. Ethics self-assessment is explicitly present.
+      Governance and decision-making matrix is defined. All instrument-mandated
+      implementation sections are addressed. All management roles assigned to
+      Tier 3 consortium members.
+    evaluated_at: phase_06_implementation_architecture exit
+    fail_action: "Block Phase 7; report omitted sections and missing assignments"
+
+  - id: gate_09_budget_consistency
+    name: "Budget Consistency"
+    description: >
+      An external budget response is present and validated. Budget WP breakdown
+      is consistent with Phase 3 WP structure. Partner allocations are consistent
+      with Tier 3 consortium roles. No blocking structural inconsistency exists.
+    evaluated_at: phase_07_budget_gate exit
+    mandatory: true
+    bypass_prohibited: true
+    fail_action: "Block Phase 8 finalization; report blocking inconsistencies and required corrections"
+
+  - id: gate_10_part_b_completeness
+    name: "Part B Completeness"
+    description: >
+      All sections required by the active application form are drafted and present.
+      Each section is traceable to named Tier 1-4 sources. No section depends on
+      missing or unvalidated data without explicit flagging.
+    evaluated_at: phase_08b_assembly exit
+    fail_action: "Block phase_08c; report missing sections and unflagged data gaps"
+
+  - id: gate_11_review_closure
+    name: "Review Closure"
+    description: >
+      All critical review findings from the evaluator review are resolved or
+      explicitly logged as unresolvable with reason. The revision log is present.
+      The final export is produced.
+    evaluated_at: phase_08d_revision exit
+    fail_action: "Block final export; report unresolved critical findings"
+
+  - id: gate_12_constitutional_compliance
+    name: "Constitutional Compliance"
+    description: >
+      The proposal deliverables do not contain content that violates CLAUDE.md
+      prohibitions: no fabricated project facts, no fabricated call constraints,
+      no budget-dependent content finalised before budget gate, no grant agreement
+      annex schema used as proposal structure.
+    evaluated_at: phase_08d_revision exit
+    fail_action: "Block final export; log constitutional violation; surface to human operator"
+
+# ==============================================================
+# AGENT CATALOG
+# ==============================================================
+
+agent_catalog:
+
+  - id: call_analyzer
+    role: >
+      Parses work programme and call documents to extract topic-specific constraints,
+      evaluation criteria, expected outcomes and impacts, eligibility conditions, and
+      scope requirements. Populates Tier 2B extracted files and writes the Phase 1
+      Tier 4 output.
+    constitutional_scope: "Phase 1"
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/work_programmes/
+      - docs/tier2b_topic_and_call_sources/call_extracts/
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    must_not:
+      - "Invent call constraints not present in source work programme or call extract documents"
+      - "Paraphrase expected outcomes or expected impacts; must quote or closely restate source text"
+      - "Operate without a populated selected_call.json"
+      - "Substitute generic programme knowledge for source document content"
+      - "Declare Phase 1 gate passed if any Tier 2B extracted file is empty"
+    phase_alignment: "phase_01_call_analysis"
+
+  - id: instrument_schema_resolver
+    role: >
+      Resolves the active instrument type to its application form template and
+      evaluation form template in Tier 2A. Extracts the section schema, evaluator
+      expectation patterns, and template adapter mappings. Updates Tier 2A extracted
+      files for use by downstream agents.
+    constitutional_scope: "Phase 1 auxiliary; invoked by call_analyzer or independently"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier2a_instrument_schemas/extracted/
+    must_not:
+      - "Use Grant Agreement Annex templates as application form schema"
+      - "Invent section constraints not present in the active application form"
+      - "Resolve instrument type by assumption; must resolve from selected_call.json"
+    phase_alignment: "phase_01_call_analysis"
+
+  - id: concept_refiner
+    role: >
+      Aligns the project concept with confirmed call scope and evaluation priorities.
+      Refines the concept note vocabulary and framing without altering scientific
+      substance. Produces the topic mapping and compliance profile for Tier 3.
+    constitutional_scope: "Phase 2"
+    reads_from:
+      - docs/tier3_project_instantiation/project_brief/
+      - docs/tier3_project_instantiation/source_materials/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    writes_to:
+      - docs/tier3_project_instantiation/call_binding/topic_mapping.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Invent a new project concept not grounded in Tier 3"
+      - "Fabricate coverage of an expected outcome not addressed by the project"
+      - "Operate before Phase 1 gate has passed"
+      - "Produce a topic mapping with unmapped mandatory expected outcomes without flagging them"
+    phase_alignment: "phase_02_concept_refinement"
+
+  - id: wp_designer
+    role: >
+      Designs the full work package structure from project objectives and concept,
+      aligned with instrument structural constraints. Produces WP definitions, task
+      structures, deliverables, milestones, and partner assignments. Coordinates
+      with dependency_mapper for dependency map production.
+    constitutional_scope: "Phase 3"
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier3_project_instantiation/architecture_inputs/objectives.json
+      - docs/tier3_project_instantiation/consortium/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+    writes_to:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    must_not:
+      - "Assign WP leads or task leads to partners not present in Tier 3 consortium data"
+      - "Exceed instrument WP count limits from Tier 2A"
+      - "Produce WPs without at least one deliverable"
+      - "Operate before Phase 2 gate has passed"
+      - "Declare Phase 3 gate passed without a completed dependency map in Tier 4"
+    phase_alignment: "phase_03_wp_design_and_dependency_mapping"
+
+  - id: dependency_mapper
+    role: >
+      Produces the inter-WP and inter-task dependency map as a directed acyclic
+      graph. Identifies dependency cycles, critical paths, and dependencies
+      incompatible with project duration. Operates as a required sub-task within
+      Phase 3.
+    constitutional_scope: "Phase 3 sub-task"
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    must_not:
+      - "Declare a dependency map complete if any WP has undeclared dependencies"
+      - "Silently resolve dependency cycles; must flag them"
+      - "Operate on WP structure that has not been produced by wp_designer"
+    phase_alignment: "phase_03_wp_design_and_dependency_mapping"
+
+  - id: gantt_designer
+    role: >
+      Produces the project timeline by assigning all tasks to months consistent
+      with the dependency map. Defines milestone due months and verifiable
+      achievement criteria. Identifies critical path and scheduling conflicts.
+    constitutional_scope: "Phase 4"
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier3_project_instantiation/call_binding/selected_call.json
+      - docs/tier3_project_instantiation/consortium/roles.json
+    writes_to:
+      - docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    must_not:
+      - "Assign tasks to months beyond the project duration"
+      - "Schedule a task start before prerequisite task completion"
+      - "Produce milestones without verifiable achievement criteria"
+      - "Silently adjust project duration to accommodate an oversized WP structure"
+      - "Operate before Phase 3 gate has passed"
+    phase_alignment: "phase_04_gantt_and_milestones"
+
+  - id: impact_architect
+    role: >
+      Constructs the impact architecture: output-to-outcome-to-impact pathways,
+      KPI definitions, dissemination and exploitation logic, communication strategy,
+      and sustainability mechanisms. Maps all pathways against call expected impacts
+      from Tier 2B.
+    constitutional_scope: "Phase 5"
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+      - docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    must_not:
+      - "Fabricate coverage of a call expected impact not addressed by a project output"
+      - "Assert impact claims without a traceable project mechanism"
+      - "Use generic programme-level impact language without project-specific grounding"
+      - "Produce KPIs not traceable to named WP deliverables"
+      - "Operate before Phase 2 and Phase 3 gates have passed"
+    phase_alignment: "phase_05_impact_architecture"
+
+  - id: implementation_architect
+    role: >
+      Defines the implementation approach: management structure, governance, quality
+      assurance, risk register, ethics self-assessment, and instrument-mandated
+      elements. Translates WP structure and timeline into a coherent implementation
+      narrative.
+    constitutional_scope: "Phase 6"
+    reads_from:
+      - docs/tier3_project_instantiation/consortium/
+      - docs/tier3_project_instantiation/architecture_inputs/risks.json
+      - docs/tier3_project_instantiation/call_binding/compliance_profile.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Redesign the consortium; partner composition is fixed by Tier 3"
+      - "Assign management roles to partners not present in Tier 3"
+      - "Omit the ethics self-assessment"
+      - "Omit instrument-mandated implementation sections identified in Tier 2A"
+      - "Operate before Phases 3, 4, and 5 gates have passed"
+    phase_alignment: "phase_06_implementation_architecture"
+
+  - id: budget_interface_coordinator
+    role: >
+      Prepares budget request payloads from Phase 3 and Phase 4 outputs, conforming
+      to the Lump Sum Budget Planner interface contract. Logs request status in Tier 3
+      integration artifacts. Does not compute budget figures.
+    constitutional_scope: "Phase 7 pre-gate action"
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/integrations/lump_sum_budget_planner/request_templates/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier3_project_instantiation/consortium/
+    writes_to:
+      - docs/tier3_project_instantiation/integration/budget_request.json
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Compute, estimate, or invent budget figures"
+      - "Deviate from the interface contract schema in request construction"
+      - "Declare the budget gate passed"
+      - "Fabricate a budget response in the absence of an external response"
+    phase_alignment: "phase_07_budget_gate"
+
+  - id: budget_gate_validator
+    role: >
+      Validates the structural consistency of the external budget response against
+      Phase 3 WP structure, Phase 4 timeline, and Tier 3 consortium composition.
+      Declares the budget gate pass or fail. Does not compute budget figures.
+    constitutional_scope: "Phase 7"
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/received/
+      - docs/integrations/lump_sum_budget_planner/validation/
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+      - docs/tier3_project_instantiation/integration/budget_response.json
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Declare gate passed if budget response is absent from received/"
+      - "Declare gate passed if validation artifacts are absent"
+      - "Substitute an internally generated budget estimate for an absent external response"
+      - "Silently accept a budget response that does not conform to the interface contract"
+      - "Bypass blocking inconsistencies"
+    phase_alignment: "phase_07_budget_gate"
+
+  - id: proposal_writer
+    role: >
+      Drafts individual proposal sections and assembles them into a coherent whole.
+      Writes in evaluator-oriented language. Applies revision actions from the
+      evaluator review. Maintains traceability to Tier 1-4 sources throughout.
+    constitutional_scope: "Phase 8a, Phase 8b, and Phase 8d"
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/
+    writes_to:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+    must_not:
+      - "Introduce claims not grounded in Tier 1-4 state"
+      - "Reference budget figures not validated through Phase 7 gate"
+      - "Fill data gaps with fabricated content"
+      - "Write to satisfy grant agreement annex formatting requirements"
+      - "Finalize budget-dependent sections before Phase 7 gate has passed"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: evaluator_reviewer
+    role: >
+      Conducts evaluator-style review of the assembled draft against applicable
+      evaluation criteria and scoring logic. Categorises weaknesses by severity.
+      Produces prioritised revision action list. Does not revise the draft.
+    constitutional_scope: "Phase 8c"
+    reads_from:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    writes_to:
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+    must_not:
+      - "Revise the draft; review only"
+      - "Evaluate against grant agreement annex requirements"
+      - "Apply review criteria from a different instrument than the active instrument"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: revision_integrator
+    role: >
+      Applies revision actions from the evaluator review to the assembled draft.
+      Resolves critical and major weaknesses. Publishes the Phase 8 checkpoint
+      and produces the final export.
+    constitutional_scope: "Phase 8d"
+    reads_from:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    writes_to:
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/final_exports/
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/
+      - docs/tier4_orchestration_state/checkpoints/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Introduce content that contradicts the validated budget"
+      - "Fill revision gaps with fabricated content"
+      - "Declare Phase 8 complete if critical revision actions are unresolved"
+      - "Overwrite a validated checkpoint"
+    phase_alignment: "phase_08_drafting_and_review"
+
+  - id: compliance_validator
+    role: >
+      Cross-checks all phase outputs and deliverables against Tier 1 compliance
+      principles, Tier 2A instrument constraints, and the constitutional prohibitions
+      in CLAUDE.md. Invocable at any phase gate or on demand.
+    constitutional_scope: "Cross-phase; invocable at any gate"
+    reads_from:
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier5_deliverables/
+      - CLAUDE.md
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Approve content that violates constitutional prohibitions"
+      - "Substitute Tier 1 document knowledge for reading Tier 1 extracted files when present"
+    phase_alignment: "cross-phase"
+
+  - id: traceability_auditor
+    role: >
+      Audits phase outputs and deliverables for source traceability. Confirms that
+      every material claim can be traced to a named Tier 1-4 source. Applies
+      Confirmed/Inferred/Assumed/Unresolved status categories to claims and flags
+      unattributed assertions.
+    constitutional_scope: "Cross-phase; invocable at any gate"
+    reads_from:
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier5_deliverables/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    must_not:
+      - "Accept unattributed claims as Confirmed"
+      - "Mark a claim Confirmed without identifying the specific source artifact"
+    phase_alignment: "cross-phase"
+
+  - id: state_recorder
+    role: >
+      Writes durable decision log entries, checkpoint artifacts, and validation
+      report summaries to Tier 4. Ensures all decisions made during orchestration
+      are written to docs/ rather than held only in agent memory.
+    constitutional_scope: "Cross-phase; invocable by any agent at any decision point"
+    reads_from:
+      - "Any phase context requiring durable recording"
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+      - docs/tier4_orchestration_state/checkpoints/
+      - docs/tier4_orchestration_state/validation_reports/
+    must_not:
+      - "Substitute in-memory notes for written Tier 4 artifacts"
+      - "Overwrite a checkpoint that has been formally validated"
+    phase_alignment: "cross-phase"
+
+# ==============================================================
+# SKILL CATALOG
+# ==============================================================
+
+skill_catalog:
+
+  - id: call-requirements-extraction
+    purpose: >
+      Extract binding topic-specific requirements from work programme and call
+      extract documents. Produces structured output with source section references
+      for every extracted element.
+    used_by_agents:
+      - call_analyzer
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/work_programmes/
+      - docs/tier2b_topic_and_call_sources/call_extracts/
+    writes_to:
+      - docs/tier2b_topic_and_call_sources/extracted/
+    constitutional_constraints:
+      - "Must not invent call requirements not present in source documents"
+      - "Must carry source section references for every extracted element"
+      - "Must apply Confirmed/Inferred/Assumed/Unresolved status"
+
+  - id: evaluation-matrix-builder
+    purpose: >
+      Build a structured evaluation matrix from the applicable evaluation form and
+      call priority weights. Maps evaluation criteria, sub-criteria, scoring
+      thresholds, and relative weights.
+    used_by_agents:
+      - call_analyzer
+      - instrument_schema_resolver
+    reads_from:
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+    constitutional_constraints:
+      - "Evaluation criteria must reflect the active evaluation form, not a generic template"
+      - "Sub-criterion weights must be traceable to Tier 2B extracted files"
+
+  - id: instrument-schema-normalization
+    purpose: >
+      Resolve the active instrument type to its application form section schema.
+      Extract section identifiers, field requirements, page limits, mandatory
+      elements, and structural constraints.
+    used_by_agents:
+      - instrument_schema_resolver
+      - proposal_writer
+    reads_from:
+      - docs/tier2a_instrument_schemas/application_forms/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    writes_to:
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    constitutional_constraints:
+      - "Must resolve from the actual Tier 2A application form, not from generic memory"
+      - "Must never substitute a Grant Agreement Annex as a section schema source"
+      - "Page limits and section constraints must be read from the template, not assumed"
+
+  - id: topic-scope-check
+    purpose: >
+      Verify that a project concept or proposal section is within the thematic
+      scope defined by Tier 2B scope requirements. Flag any out-of-scope claims.
+    used_by_agents:
+      - call_analyzer
+      - concept_refiner
+    reads_from:
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+      - docs/tier2b_topic_and_call_sources/extracted/call_constraints.json
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Scope boundary is defined by Tier 2B only; must not infer scope from generic programme knowledge"
+      - "Out-of-scope flags must be written to decision log"
+
+  - id: concept-alignment-check
+    purpose: >
+      Check the alignment between the project concept and the call expected
+      outcomes and scope requirements. Identify vocabulary gaps, framing mismatches,
+      and uncovered expected outcomes.
+    used_by_agents:
+      - concept_refiner
+    reads_from:
+      - docs/tier3_project_instantiation/project_brief/
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Alignment must be tested against Tier 2B extracted files, not assumed from concept vocabulary"
+      - "Uncovered expected outcomes must be flagged, not silently assumed covered"
+
+  - id: work-package-normalization
+    purpose: >
+      Normalize a work package structure to ensure each WP has all required elements:
+      unique identifier, title, objective, tasks with identifiers, deliverables with
+      due months and types, milestones with verifiable criteria, and a responsible lead.
+    used_by_agents:
+      - wp_designer
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    constitutional_constraints:
+      - "WP leads must be drawn from Tier 3 consortium data only"
+      - "WP count must not exceed instrument limits from Tier 2A"
+      - "Deliverables must have due months within project duration"
+
+  - id: wp-dependency-analysis
+    purpose: >
+      Analyse inter-WP and inter-task dependencies. Produce a directed acyclic graph
+      representation. Identify critical path, dependency cycles, and dependencies
+      incompatible with project duration.
+    used_by_agents:
+      - dependency_mapper
+      - wp_designer
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    constitutional_constraints:
+      - "Must flag dependency cycles; must not silently remove them"
+      - "Critical path must be traceable to the dependency map"
+      - "Must not declare the map complete with undeclared dependencies"
+
+  - id: milestone-consistency-check
+    purpose: >
+      Verify milestone due months against task schedule and deliverable due months.
+      Confirm every milestone has a verifiable achievement criterion testable at
+      the stated due month.
+    used_by_agents:
+      - gantt_designer
+      - wp_designer
+      - implementation_architect
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    constitutional_constraints:
+      - "Milestones with non-verifiable criteria must be flagged"
+      - "Milestone due months must be consistent with task completion months"
+
+  - id: impact-pathway-mapper
+    purpose: >
+      Map project outputs to call expected outcomes and expected impacts. Produce
+      a structured pathway showing output-to-outcome-to-impact chains with source
+      references for call-side expectations and project-side mechanisms.
+    used_by_agents:
+      - impact_architect
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+      - docs/tier3_project_instantiation/architecture_inputs/impacts.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+    constitutional_constraints:
+      - "Every call expected impact must be explicitly mapped or flagged as uncovered"
+      - "Impact claims must trace to a named WP deliverable or activity"
+      - "Generic impact language must not substitute for project-specific pathways"
+
+  - id: dissemination-exploitation-communication-check
+    purpose: >
+      Verify that dissemination, exploitation, and communication plans address the
+      relevant call and instrument requirements. Check target group specificity,
+      channel definition, and timeline alignment with WP structure.
+    used_by_agents:
+      - impact_architect
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+      - docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    constitutional_constraints:
+      - "DEC plans must be specific to the project; generic templates are insufficient"
+      - "Target groups must be defined with specificity"
+
+  - id: governance-model-builder
+    purpose: >
+      Build the project governance model: management body composition, meeting
+      frequency and decision scope, escalation paths, and quality assurance
+      procedures. Derives governance from Tier 3 consortium data and WP structure.
+    used_by_agents:
+      - implementation_architect
+    reads_from:
+      - docs/tier3_project_instantiation/consortium/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    constitutional_constraints:
+      - "Governance roles must be assigned to Tier 3 consortium members only"
+      - "Management structure must be consistent with WP lead assignments"
+
+  - id: risk-register-builder
+    purpose: >
+      Populate the risk register from Tier 3 risk seeds. Assign likelihood, impact,
+      mitigation, and monitoring for each risk. Identify material risks not in the
+      seed file and flag for Tier 3 update.
+    used_by_agents:
+      - implementation_architect
+    reads_from:
+      - docs/tier3_project_instantiation/architecture_inputs/risks.json
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+    constitutional_constraints:
+      - "Risks not in Tier 3 seeds must be flagged for operator review, not silently added"
+      - "Mitigation measures must be traceable to project activities, not generic"
+
+  - id: budget-interface-validation
+    purpose: >
+      Validate budget request conformance to the interface contract before submission,
+      and validate budget response conformance and structural consistency upon receipt.
+      Produces validation artifacts.
+    used_by_agents:
+      - budget_interface_coordinator
+      - budget_gate_validator
+    reads_from:
+      - docs/integrations/lump_sum_budget_planner/interface_contract.json
+      - docs/integrations/lump_sum_budget_planner/request_templates/
+      - docs/integrations/lump_sum_budget_planner/received/
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+    writes_to:
+      - docs/integrations/lump_sum_budget_planner/validation/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    constitutional_constraints:
+      - "Must not generate or estimate budget figures"
+      - "Must not accept a response that does not conform to the interface contract"
+      - "Must not declare the budget gate passed if blocking inconsistencies exist"
+
+  - id: proposal-section-traceability-check
+    purpose: >
+      Verify that every material claim in a proposal section is traceable to a
+      named Tier 1-4 source. Flag unattributed assertions. Apply
+      Confirmed/Inferred/Assumed/Unresolved status to each claim.
+    used_by_agents:
+      - proposal_writer
+      - revision_integrator
+      - traceability_auditor
+    reads_from:
+      - docs/tier5_deliverables/proposal_sections/
+      - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+    constitutional_constraints:
+      - "Unattributed claims must be flagged, not silently accepted as Confirmed"
+      - "Confirmed status requires naming the specific source artifact"
+
+  - id: evaluator-criteria-review
+    purpose: >
+      Assess proposal content against the scoring logic of the applicable evaluation
+      criterion. Identify weaknesses by severity. Produce structured feedback aligned
+      to evaluator sub-criteria.
+    used_by_agents:
+      - evaluator_reviewer
+      - revision_integrator
+    reads_from:
+      - docs/tier2a_instrument_schemas/evaluation_forms/
+      - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
+      - docs/tier5_deliverables/assembled_drafts/
+    writes_to:
+      - docs/tier5_deliverables/review_packets/
+    constitutional_constraints:
+      - "Evaluation must apply the active instrument evaluation criteria only"
+      - "Must not evaluate against grant agreement annex requirements"
+      - "Weakness severity (critical/major/minor) must be assigned to each finding"
+
+  - id: constitutional-compliance-check
+    purpose: >
+      Verify that a phase output or deliverable does not violate any prohibition in
+      CLAUDE.md. Checks for fabricated project facts, fabricated call constraints,
+      budget-dependent content before gate, grant annex schema usage, and other
+      constitutional violations.
+    used_by_agents:
+      - compliance_validator
+      - call_analyzer
+      - concept_refiner
+      - proposal_writer
+      - revision_integrator
+      - budget_gate_validator
+    reads_from:
+      - CLAUDE.md
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier5_deliverables/
+    writes_to:
+      - docs/tier4_orchestration_state/validation_reports/
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Must check against CLAUDE.md Section 13 prohibitions as a minimum"
+      - "Constitutional violations must be flagged; they must not be silently resolved"
+      - "CLAUDE.md governs this skill; this skill does not govern CLAUDE.md"
+
+  - id: gate-enforcement
+    purpose: >
+      Evaluate whether a phase gate condition is met. Declare pass or failure. Write
+      gate status to Tier 4. Block downstream phases if gate has not passed.
+    used_by_agents:
+      - call_analyzer
+      - concept_refiner
+      - wp_designer
+      - gantt_designer
+      - impact_architect
+      - implementation_architect
+      - budget_gate_validator
+      - proposal_writer
+      - revision_integrator
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Gate conditions are defined in this workflow and in CLAUDE.md; they must not be weakened"
+      - "Gate failure must be declared explicitly; fabricated completion is a constitutional violation"
+      - "A gate cannot be declared passed without confirming all gate conditions"
+
+  - id: decision-log-update
+    purpose: >
+      Write a durable decision record to the Tier 4 decision log. Records the
+      decision taken, alternatives considered, the tier authority applied, and
+      the rationale. Required whenever a material interpretation is made or a
+      conflict is resolved.
+    used_by_agents:
+      - concept_refiner
+      - wp_designer
+      - gantt_designer
+      - impact_architect
+      - implementation_architect
+      - budget_gate_validator
+      - revision_integrator
+      - state_recorder
+      - compliance_validator
+      - traceability_auditor
+    reads_from:
+      - "Any phase context requiring durable recording"
+    writes_to:
+      - docs/tier4_orchestration_state/decision_log/
+    constitutional_constraints:
+      - "Decisions held only in agent memory do not constitute durable decisions"
+      - "Every resolved tier conflict must produce a decision log entry"
+      - "Decision log entries must identify the tier authority applied"
+
+  - id: checkpoint-publish
+    purpose: >
+      Write a formal checkpoint artifact to Tier 4 checkpoints/ confirming that a
+      phase or phase group has completed with a known validated state. Preserves a
+      reproducible snapshot of the state at the checkpoint.
+    used_by_agents:
+      - revision_integrator
+      - state_recorder
+    reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/
+      - docs/tier3_project_instantiation/
+    writes_to:
+      - docs/tier4_orchestration_state/checkpoints/
+    constitutional_constraints:
+      - "Validated checkpoints must not be overwritten by subsequent reruns"
+      - "A checkpoint must not be published before all gate conditions for the phase are met"
+
+# ==============================================================
+# STATE RULES
+# ==============================================================
+
+state_rules:
+
+  tier4_durability:
+    rule: >
+      All durable outputs from canonical phases must be written to
+      docs/tier4_orchestration_state/phase_outputs/ before downstream phases
+      depend on them. In-memory outputs do not satisfy gate conditions or phase
+      completion requirements.
+    enforcement: gate-enforcement skill at every phase exit
+
+  checkpoint_preservation:
+    rule: >
+      Checkpoints written to docs/tier4_orchestration_state/checkpoints/ after a
+      gate has been formally validated must not be overwritten. If a phase is rerun
+      after a checkpoint has been published, the rerun must produce a new checkpoint
+      artifact; it must not modify the prior validated artifact.
+    enforcement: checkpoint-publish skill
+
+  decision_logging:
+    rule: >
+      Every material interpretation decision, tier conflict resolution, gap
+      declaration, and gate failure must be written to
+      docs/tier4_orchestration_state/decision_log/. Decisions held only in agent
+      memory are not durable and do not govern future interpretation.
+    enforcement: decision-log-update skill; mandatory for all agents at decision points
+
+  rerun_behavior:
+    rule: >
+      When a phase is rerun, it must deterministically update Tier 4 state from its
+      documented inputs. It must not rely on in-memory state from a prior run. If
+      inputs have changed since the prior run, the phase must re-execute fully and
+      write updated artifacts. If inputs are unchanged, the phase may confirm prior
+      artifacts without re-executing.
+
+  conflict_logging:
+    rule: >
+      When a conflict between tiers cannot be resolved by the authority hierarchy,
+      it must be logged as Unresolved in the decision log and surfaced to the human
+      operator. It must not be silently resolved by selecting the more convenient source.
+
+  agent_memory_boundary:
+    rule: >
+      .claude/agent-memory/ is an operational aid. Its contents do not constitute
+      constitutional source truth. When a conflict exists between agent memory and
+      documented Tier 3 or Tier 4 state, documented state governs. Agents must read
+      current Tier 3 and Tier 4 artifacts, not rely on memory of prior states.
+    corollary: >
+      .claude/cache/, .claude/logs/, and .claude/runs/ are runtime state directories.
+      They may be rebuilt or cleared without affecting the constitutional validity of
+      docs/ state.
+
+  validation_status_vocabulary:
+    rule: >
+      All validation reports and phase output assessments must categorize each
+      evaluated element using exactly the following status values:
+        Confirmed: directly evidenced by a named source in Tier 1-3
+        Inferred: derived by logical reasoning from confirmed evidence; inference chain stated
+        Assumed: adopted in the absence of direct evidence; assumption explicitly declared
+        Unresolved: conflicting evidence or missing information; resolution required before downstream use
+    enforcement: traceability-auditor skill; mandatory in all validation_reports/
+
+  index_maintenance:
+    rule: >
+      The docs/index/ registries must be maintained to reflect current repository
+      state. Additions of new source documents, updated extracted files, or new
+      project instantiation artifacts must be reflected in the relevant registry.
+
+# ==============================================================
+# INTEGRATION RULES
+# ==============================================================
+
+integration_rules:
+
+  lump_sum_budget_planner:
+    identity: "Sole external financial computation system for this repository"
+    interface_contract: docs/integrations/lump_sum_budget_planner/interface_contract.json
+    exchange_directories:
+      outbound_requests: docs/integrations/lump_sum_budget_planner/request_templates/
+      inbound_responses: docs/integrations/lump_sum_budget_planner/received/
+      validation_artifacts: docs/integrations/lump_sum_budget_planner/validation/
+
+    what_this_repository_may_do:
+      - "Prepare structured budget request payloads conforming to the interface contract"
+      - "Consume validated budget responses from the received/ directory"
+      - "Perform structural consistency validation between budget responses and WP/consortium design"
+      - "Block workflow progress if budget data is absent, non-conformant, or inconsistent"
+
+    what_this_repository_must_not_do:
+      - "Compute, estimate, approximate, or invent budget figures"
+      - "Substitute an internally generated budget estimate for an absent external response"
+      - "Accept a budget response that does not conform to the interface contract schema"
+      - "Declare the budget gate passed if a budget response is absent or unvalidated"
+      - "Finalize budget-dependent proposal content before the budget gate passes"
+
+    request_preparation:
+      trigger: "Absence of a budget response in received/ when Phase 7 is entered"
+      agent: budget_interface_coordinator
+      inputs:
+        - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+        - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+        - docs/tier3_project_instantiation/consortium/
+        - docs/integrations/lump_sum_budget_planner/request_templates/
+      output: docs/tier3_project_instantiation/integration/budget_request.json
+      constraint: "Request must conform to interface_contract.json before submission"
+
+    response_validation:
+      trigger: "Presence of a new artifact in received/"
+      agent: budget_gate_validator
+      skill: budget-interface-validation
+      checks:
+        - "Schema conformance against interface_contract.json"
+        - "WP coverage: every Phase 3 WP has a budget entry"
+        - "Partner coverage: every Tier 3 consortium partner has an allocation"
+        - "Effort distribution consistency with Phase 4 Gantt"
+      output: docs/integrations/lump_sum_budget_planner/validation/
+      pass_condition: "All checks pass with no blocking inconsistencies"
+      fail_condition: >
+        One or more checks fail. Write failure report to validation/.
+        Write blocking inconsistencies to phase7_budget_gate/.
+        Surface to human operator for external system correction and resubmission.
+
+    allowed_failure_modes:
+      - id: response_absent
+        description: "No response received from the external system"
+        behavior: "Declare budget hold; await response; block finalization only"
+      - id: response_non_conformant
+        description: "Response does not conform to interface contract schema"
+        behavior: "Reject response; write rejection reason to validation/; request corrected response"
+      - id: blocking_inconsistency
+        description: "Response is structurally inconsistent with WP or consortium design"
+        behavior: "Declare gate failure; write inconsistencies; request correction and resubmission"
+
+    prohibited_substitution: >
+      Under no circumstances may an agent substitute an internally generated budget
+      approximation or estimate for an absent or rejected external budget response.
+      If the external response cannot be obtained or corrected, the workflow halts
+      at the budget gate and the human operator must intervene.
+
+# ==============================================================
+# DESIGN NOTES
+# ==============================================================
+
+design_notes:
+
+  universal_design_rationale:
+    - >
+      This workflow is intentionally universal and programme-agnostic. It does not
+      embed assumptions about any specific call, instrument, consortium, or project.
+      All specificity enters through Tier 2B population (call specificity) and Tier 3
+      population (project specificity). The same workflow governs proposal preparation
+      across RIA, IA, CSA, MSCA variants, ERC instruments, EIC, COFUND, and future
+      instrument types without structural modification.
+    - >
+      Additional instruments and calls are supported by adding source documents to
+      Tier 2A and Tier 2B respectively. The constitutional phase logic, gate
+      conditions, and agent obligations remain unchanged.
+
+  workflow_as_authoritative_specification:
+    - >
+      This workflow is an authoritative orchestration specification, not an
+      implementation mirror. It defines the intended system including agents and
+      skills that may not yet be fully implemented. Agents and skills defined in
+      this catalog are implementation targets. The workflow governs how the system
+      must behave when implemented.
+    - >
+      When implementing an agent or skill, the implementer must read the relevant
+      catalog entry and produce behavior consistent with the defined role,
+      reads_from, writes_to, and must_not constraints.
+
+  evaluator_orientation:
+    - >
+      The entire system is optimized for evaluation success, not grant administration
+      readiness. Proposal sections are written to address evaluator scoring criteria
+      as defined by the applicable evaluation form (Tier 2A) and call-specific
+      priorities (Tier 2B). Grant agreement annex formatting requirements are not
+      evaluation criteria and must not drive proposal structure.
+    - >
+      Any proposal writing agent that produces content structured for a grant
+      agreement annex rather than an application form section is in violation of
+      this workflow and of CLAUDE.md.
+
+  tier3_as_project_container:
+    - >
+      Project-specific content must not be embedded in this workflow, in agent
+      definitions, or in skill definitions. All project-specific facts live in
+      Tier 3 and are read by agents at runtime. A fresh project begins by populating
+      Tier 3; it does not require changes to this workflow file.
+    - >
+      Tier 3 partial population is a managed state, not an error. When Tier 3 is
+      partially populated, the system operates in a constrained mode and must declare
+      which phases can and cannot proceed given the available data.
+
+  dependency_mapping_formalization:
+    - >
+      Dependency mapping is formalized as a required sub-task of Phase 3, not an
+      ad hoc post-processing step. The dependency map produced in Phase 3 is a
+      required input to Phase 4 (Gantt scheduling) and Phase 6 (implementation
+      narrative). Its absence from Tier 4 at the end of Phase 3 is a gate failure.
+
+  phase_8_substep_rationale:
+    - >
+      Phase 8 is decomposed into four sequential substeps (8a through 8d) because
+      drafting, assembly, review, and revision have distinct agent responsibilities,
+      distinct gate conditions, and distinct output types. Merging them into a single
+      step would obscure the structural requirement that revision actions must be
+      grounded in a formal evaluator review, not applied speculatively.
+
+  budget_gate_design:
+    - >
+      The budget gate is a validation gate, not a computation phase. This repository
+      does not perform budget computation. Phase 7 validates structural consistency
+      between the external budget response and the WP/consortium design. The budget
+      hold state (response absent but request prepared) is distinguished from gate
+      failure (response present but inconsistent) to allow partial Phase 8 preparation
+      while awaiting the external response. Finalization is blocked in both states
+      until the gate passes.
+
+  constitutional_subordination:
+    - >
+      This workflow is subordinate to CLAUDE.md. If any provision of this workflow
+      is found to conflict with CLAUDE.md, CLAUDE.md governs. The conflict must be
+      logged and this workflow must be amended in the next revision cycle to remove
+      the inconsistency. This workflow does not amend or supersede CLAUDE.md by
+      virtue of being more specific or more recently written.

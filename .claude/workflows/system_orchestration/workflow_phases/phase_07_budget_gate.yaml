@@ -1,0 +1,106 @@
+id: phase_07_budget_gate
+phase: 7
+name: "Budget Gate"
+purpose: >
+  Confirm that a validated external budget response from the Lump Sum Budget
+  Planner is available, structurally consistent with WP design, timeline, and
+  consortium roles. This phase does not compute budget figures. It validates
+  structural integrity and declares a blocking gate failure if required budget
+  artifacts are absent or inconsistent.
+agent: budget_gate_validator
+skills:
+  - budget-interface-validation
+  - gate-enforcement
+  - decision-log-update
+  - constitutional-compliance-check
+depends_on:
+  - phase_03_wp_design_and_dependency_mapping
+  - phase_04_gantt_and_milestones
+  - phase_06_implementation_architecture
+required_inputs:
+  mandatory:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      role: "WP structure for budget-to-WP consistency check"
+      validation: "Phase 3 gate must have passed"
+    - path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
+      role: "Timeline for effort distribution consistency check"
+      validation: "Phase 4 gate must have passed"
+    - path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      role: "Partner roles and effort assignments for budget-to-consortium check"
+      validation: "Phase 6 gate must have passed"
+    - path: docs/integrations/lump_sum_budget_planner/received/
+      role: "External budget response artifacts from the Lump Sum Budget Planner"
+      validation: >
+        Must contain at least one non-empty response artifact. Absence is a
+        blocking gate failure. No internal substitute is admissible.
+    - path: docs/integrations/lump_sum_budget_planner/validation/
+      role: "Validation artifacts confirming the received budget response has been validated"
+      validation: "Must contain at least one validation artifact"
+    - path: docs/integrations/lump_sum_budget_planner/interface_contract.json
+      role: "Schema and protocol governing valid budget response structure"
+  conditional:
+    - path: docs/tier3_project_instantiation/integration/budget_request.json
+      condition: "If budget request has not been sent, budget_interface_coordinator must prepare it first"
+pre_gate_action:
+  description: >
+    If no budget response is present in received/, invoke budget_interface_coordinator
+    to prepare a budget request and submit it to the external Lump Sum Budget Planner.
+    Absence of a response after request preparation is a blocking gate failure.
+    The gate cannot pass until a validated response is received. There is no
+    non-failing hold state: the gate is either passed or failed.
+  agent: budget_interface_coordinator
+  skill: budget-interface-validation
+  output: docs/tier3_project_instantiation/integration/budget_request.json
+outputs:
+  tier4_artifacts:
+    - path: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+      content: >
+        Budget gate assessment: confirmation of receipt; structural consistency
+        check results (budget WP breakdown vs Phase 3 WP structure; partner effort
+        vs Phase 6 consortium roles; timeline alignment vs Phase 4 Gantt); interface
+        contract conformance; blocking inconsistencies if any; gate pass or gate
+        failure declaration; if failure, specification of corrections required.
+instructions:
+  - "Do not compute, estimate, or generate budget figures internally."
+  - "Check whether a budget response artifact is present in integrations/received/."
+  - "If no response is present, invoke budget_interface_coordinator to prepare a request; declare gate failure and surface to human operator."
+  - "Check whether validation artifacts are present in integrations/validation/."
+  - "Verify the budget response conforms to the interface contract schema."
+  - "Check that every WP from Phase 3 has a corresponding budget entry in the response."
+  - "Check that every partner from Tier 3 has a corresponding effort/cost allocation."
+  - "Check that effort distribution is consistent with the Phase 4 Gantt."
+  - "Identify blocking inconsistencies: budget entries for non-existent WPs; partner allocations with no corresponding role."
+  - "If blocking inconsistencies exist, declare gate failure and specify what must be corrected in the external budget."
+  - "Do not declare the gate passed if any blocking inconsistency is unresolved."
+validation:
+  must_confirm:
+    - "External budget response is present in received/"
+    - "Validation artifact is present in validation/"
+    - "Budget response conforms to interface contract schema"
+    - "All Phase 3 WPs have budget entries"
+    - "All Tier 3 partners have effort/cost allocations"
+    - "No blocking structural inconsistency exists"
+gate_condition:
+  all_of:
+    - "Non-empty budget response artifact present in integrations/received/"
+    - "Validation artifact present in integrations/validation/"
+    - "Interface contract conformance confirmed"
+    - "All Phase 3 WPs have corresponding budget entries"
+    - "All consortium partners have corresponding budget allocations"
+    - "No blocking inconsistency logged without resolution"
+    - "Budget gate assessment written to Tier 4"
+  mandatory: true
+  bypass_prohibited: true
+  fail_behavior: >
+    Declare gate failure. Write blocking inconsistencies and missing artifacts to
+    phase7_budget_gate/. Block Phase 8 finalization entirely. Surface to human
+    operator with specification of required corrections. Await corrected external
+    response before re-evaluating gate. There is no partial-pass or hold state:
+    absent or inconsistent budget artifacts always produce a blocking gate failure.
+
+# SEMANTIC CORRECTION NOTE (v1.1):
+# The prior monolithic file (system_orchestration.yaml v1.0) contained a
+# hold_behavior key permitting a non-failing "budget hold" when the response
+# was absent. This conflicted with CLAUDE.md §8.4 and §7 (Phase 7 gate
+# condition). That allowance is removed. Absence of required budget artifacts
+# in received/ now compiles unconditionally as a blocking gate failure.

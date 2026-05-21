@@ -1,0 +1,21 @@
+{
+  "decision_id": "gate_failure_phase_04_gate_gantt_designer_2026-04-21T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_04_gate",
+  "failure_reason": "The canonical phase 4 artifact 'docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json' is absent. All 10 deterministic predicates (artifact_present, schema_id_match, run_id_match, artifact_not_invalid, tasks_non_empty, all_tasks_have_start_end_months, all_tasks_end_within_duration, milestones_non_empty, all_milestones_have_due_month_and_criterion, critical_path_non_empty) have failed because the artifact does not exist. The phase4_gantt_milestones directory contains only scheduling_constraints.json; gantt.json has not been produced. Phase 4 (Gantt and Milestones) must complete and write its gantt.json output before this gate can pass.",
+  "predicates_failed": [
+    "artifact_present",
+    "schema_id_match",
+    "run_id_match",
+    "artifact_not_invalid",
+    "tasks_non_empty",
+    "all_tasks_have_start_end_months",
+    "all_tasks_end_within_duration",
+    "milestones_non_empty",
+    "all_milestones_have_due_month_and_criterion",
+    "critical_path_non_empty"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (phase-specific gate definitions — Phase 4 gate condition requires all tasks assigned to months, all milestones have verifiable criterion, timeline fits within call-specified duration, no critical path dependency unresolved), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-04-21T00:00:00Z"
+}

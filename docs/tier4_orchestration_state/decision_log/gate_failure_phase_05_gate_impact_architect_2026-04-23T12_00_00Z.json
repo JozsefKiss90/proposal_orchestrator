@@ -1,0 +1,16 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-04-23T12:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "Predicate all_expected_impact_ids_covered failed: the Tier 2B expected_impacts.json file (docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json) is outside the declared TAPM input scope for this gate-enforcement skill invocation. The impact_architecture.json artifact documents 5 impact_pathways covering expected_impact_ids EI-01 through EI-05, each with a traceable tier2b_source_ref pointing to expected_impacts.json in the HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json source document. However, without reading the Tier 2B expected_impacts.json, it cannot be independently confirmed that EI-01 through EI-05 is the exhaustive and complete set of expected impact IDs defined by the call. Per CLAUDE.md §6.2 and §15, the gate cannot be declared passed without confirming all gate conditions, and explicit gate failure is preferred over fabricated completion.",
+  "predicates_failed": [
+    "all_expected_impact_ids_covered"
+  ],
+  "artifact_evaluated": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+  "artifact_schema_id": "orch.phase5.impact_architecture.v1",
+  "artifact_run_id": "f3151039-5007-449e-a0ad-512e364e6fbd",
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (phase-specific gate definitions for Phase 5), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "resolution_note": "To resolve: re-invoke gate-enforcement for phase_05_gate with docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json included in the declared TAPM input set, or with expected_impacts.json contents serialised into the skill invocation context, so that the all_expected_impact_ids_covered predicate can be independently evaluated against the authoritative Tier 2B source.",
+  "timestamp": "2026-04-23T12:00:00Z"
+}

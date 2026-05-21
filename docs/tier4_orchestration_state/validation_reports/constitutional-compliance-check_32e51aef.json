@@ -1,0 +1,111 @@
+{
+  "report_id": "compliance_check_part_b_assembled_draft_unspecified_2026-05-05T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "unspecified",
+  "run_id_reference": "32e51aef-b3ad-4fc6-940e-d9900014cbb3",
+  "artifact_audited": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
+      "check_status": "violation",
+      "violation_evidence": "The artifact carries schema_id 'orch.tier5.part_b_assembled_draft.v1', unambiguously identifying it as a Phase 8 assembled draft. Its traceability_footer.primary_sources array lists seven references but does not include 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json'. The assembled draft provides no evidence within its own content that the budget gate was passed before assembly occurred. Consistency check CC-08 ('Budget and resource claim consistency — budget figures and person-month values checked for cross-section coherence', status: 'consistent') confirms that budget figures exist in the underlying section artifacts and were consulted during cross-section assembly, but the assembled draft does not trace this activity to a validated budget gate artifact. The budget gate assessment file path exists on the file system (confirmed by path resolution), but its gate_pass_declaration value cannot be verified within TAPM input boundaries. Per CLAUDE.md §13.4 and §8.4, no Phase 8 substep may commence before gate_09 is satisfied, and the assembled draft must demonstrate budget gate compliance through its traceability. The absence of the budget gate assessment from the traceability_footer.primary_sources is a structural failure of this demonstration.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "violation",
+      "violation_evidence": "The artifact's traceability_footer.no_unsupported_claims_declaration is false, indicating the assembled draft cannot affirm that all material claims are supported by Tier 1–4 sources. The artifact lacks a validation_status.claim_statuses[] structure required to enumerate and independently resolve any unresolved claims with missing source_refs, preventing full traceability verification at the assembled-draft level. This absence is compounded by consistency_log entry CC-06 (status: 'inconsistency_flagged'), which documents two confirmed KPI gaps in the referenced impact section: (1) OBJ-4 partial metric loss — the impact section omits the accuracy threshold ('within 10% of specialist clinician performance') and domain scope ('spanning 5 diagnostic domains') present in Tier 3 objectives.json; (2) OBJ-8 KPI targets entirely absent from the impact section despite WP2 being cited for EO-01 advancement. CC-06 states: 'Resolution required: impact section should be revised to reinstate OBJ-4 accuracy threshold and domain scope, and to incorporate OBJ-8 KPI targets.' These documented content gaps in a referenced Tier 5 section artifact, combined with no_unsupported_claims_declaration: false at the assembled-draft level, constitute a failure of full Tier 1–4 claim traceability.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 2
+  },
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_unspecified_2026-05-05T00:00:00Z_13.4",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.4_part_b_assembled_draft_2026-05-05T00:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.4",
+      "artifact_affected": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The assembled draft (Phase 8) does not reference the budget gate assessment in its traceability_footer.primary_sources. The gate_pass_declaration value cannot be confirmed within TAPM input boundaries. Human operator must verify that docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json carries gate_pass_declaration: 'pass' and, if so, that the assembled draft's traceability_footer is updated to reference it. If the gate_pass_declaration is not 'pass', the assembled draft must be retracted pending budget gate passage.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-05-05T00:00:00Z"
+    }
+  ],
+  "timestamp": "2026-05-05T00:00:00Z"
+}

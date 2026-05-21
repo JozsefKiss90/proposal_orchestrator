@@ -1,0 +1,628 @@
+﻿{
+  "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+  "loaded_artifacts": [
+    "run_benchmark_summary.json",
+    "phase_analytics.json",
+    "token_economics.json",
+    "timing_profile.json",
+    "provider_projection.json",
+    "invocation_ledger.jsonl"
+  ],
+  "data_quality_warnings": [],
+  "run_benchmark_summary": {
+    "benchmark_schema_version": "1.0.0",
+    "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+    "started_at": "2026-05-20T17:14:31.321849+00:00",
+    "completed_at": "2026-05-20T17:37:16.297061+00:00",
+    "total_invocations": 5,
+    "total_estimated_input_tokens": 123591,
+    "total_estimated_output_tokens": 18522,
+    "total_wall_clock_seconds": 1364.984,
+    "node_records": [
+      {
+        "node_id": "n06_implementation_architecture",
+        "dispatched": true
+      }
+    ],
+    "phase_analytics_summary": {
+      "phases_observed": [
+        6
+      ],
+      "nodes_observed": [
+        "n06_implementation_architecture"
+      ],
+      "total_invocations": 5
+    },
+    "token_economics_summary": {
+      "total_estimated_input_tokens": 123591,
+      "total_estimated_output_tokens": 18522,
+      "total_estimated_tokens": 142113
+    },
+    "timing_summary": {
+      "total_wall_clock_seconds": 1364.984,
+      "mean_invocation_seconds": 272.8628,
+      "median_invocation_seconds": 164.985
+    },
+    "phase_b_artifact_paths": {
+      "phase_analytics": "phase_analytics.json",
+      "token_economics": "token_economics.json",
+      "timing_profile": "timing_profile.json"
+    },
+    "benchmark_stage": "phase_c_provider_projection",
+    "provider_projection_summary": {
+      "total_providers_evaluated": 11,
+      "suitable_providers": 11,
+      "lowest_projected_cost_usd": 0.029652,
+      "lowest_projected_cost_provider": "GPT-4o Mini (Azure OpenAI)"
+    },
+    "phase_c_artifact_paths": {
+      "provider_projection": "provider_projection.json"
+    }
+  },
+  "phase_analytics": {
+    "benchmark_schema_version": "1.0.0",
+    "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+    "phase_scope": null,
+    "phases_observed": [
+      6
+    ],
+    "nodes_observed": [
+      "n06_implementation_architecture"
+    ],
+    "total_invocations": 5,
+    "per_phase": {
+      "6": {
+        "invocations": 5,
+        "estimated_input_tokens": 123591,
+        "estimated_output_tokens": 18522,
+        "estimated_total_tokens": 142113,
+        "wall_clock_seconds": 1364.314,
+        "tapm_count": 4,
+        "cli_prompt_count": 1,
+        "semantic_predicate_count": 0,
+        "failed_count": 0,
+        "timeout_count": 0
+      }
+    },
+    "per_node": {
+      "n06_implementation_architecture": {
+        "invocations": 5,
+        "estimated_input_tokens": 123591,
+        "estimated_output_tokens": 18522,
+        "estimated_total_tokens": 142113,
+        "wall_clock_seconds": 1364.314,
+        "tapm_count": 4,
+        "cli_prompt_count": 1,
+        "semantic_predicate_count": 0,
+        "failed_count": 0,
+        "timeout_count": 0
+      }
+    }
+  },
+  "token_economics": {
+    "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+    "total_estimated_input_tokens": 123591,
+    "total_estimated_output_tokens": 18522,
+    "total_estimated_tokens": 142113,
+    "tokens_by_invocation_type": {
+      "skill_cli_prompt": {
+        "estimated_input_tokens": 88504,
+        "estimated_output_tokens": 1018,
+        "estimated_total_tokens": 89522
+      },
+      "skill_tapm": {
+        "estimated_input_tokens": 35087,
+        "estimated_output_tokens": 17504,
+        "estimated_total_tokens": 52591
+      }
+    },
+    "tokens_by_skill_id": {
+      "constitutional-compliance-check": {
+        "estimated_input_tokens": 9513,
+        "estimated_output_tokens": 3667,
+        "estimated_total_tokens": 13180
+      },
+      "gate-enforcement": {
+        "estimated_input_tokens": 12077,
+        "estimated_output_tokens": 1566,
+        "estimated_total_tokens": 13643
+      },
+      "governance-model-builder": {
+        "estimated_input_tokens": 11471,
+        "estimated_output_tokens": 9842,
+        "estimated_total_tokens": 21313
+      },
+      "milestone-consistency-check": {
+        "estimated_input_tokens": 88504,
+        "estimated_output_tokens": 1018,
+        "estimated_total_tokens": 89522
+      },
+      "risk-register-builder": {
+        "estimated_input_tokens": 2026,
+        "estimated_output_tokens": 2429,
+        "estimated_total_tokens": 4455
+      }
+    },
+    "tokens_by_semantic_predicate_id": {},
+    "largest_invocation_by_estimated_total_tokens": {
+      "invocation_id": "1accc605718542a498f5700d01c9af10",
+      "skill_id": "milestone-consistency-check",
+      "predicate_id": null,
+      "invocation_type": "skill_cli_prompt",
+      "value": 89522
+    },
+    "largest_invocation_by_prompt_chars": {
+      "invocation_id": "1accc605718542a498f5700d01c9af10",
+      "skill_id": "milestone-consistency-check",
+      "predicate_id": null,
+      "invocation_type": "skill_cli_prompt",
+      "value": 309767
+    },
+    "tapm_vs_cli_prompt": {
+      "tapm": {
+        "estimated_input_tokens": 35087,
+        "estimated_output_tokens": 17504,
+        "estimated_total_tokens": 52591
+      },
+      "cli_prompt": {
+        "estimated_input_tokens": 88504,
+        "estimated_output_tokens": 1018,
+        "estimated_total_tokens": 89522
+      }
+    },
+    "phase_8_estimated_total_tokens": 0,
+    "phases_1_7_estimated_total_tokens": 142113,
+    "semantic_predicate_estimated_total_tokens": 0,
+    "warning": "All token values are estimates based on character-to-token ratios. They are not billing-grade."
+  },
+  "timing_profile": {
+    "total_wall_clock_seconds": 1364.984,
+    "sum_invocation_wall_clock_seconds": 1364.314,
+    "idle_non_model_seconds_estimate": 0.67,
+    "mean_invocation_seconds": 272.8628,
+    "median_invocation_seconds": 164.985,
+    "p95_invocation_seconds": 726.094,
+    "p99_invocation_seconds": 726.094,
+    "min_invocation_seconds": 87.985,
+    "max_invocation_seconds": 726.094,
+    "timeout_count": 0,
+    "failed_invocation_count": 0,
+    "timing_by_invocation_type": {
+      "skill_cli_prompt": {
+        "count": 1,
+        "total_seconds": 144.141,
+        "mean_seconds": 144.141,
+        "median_seconds": 144.141,
+        "min_seconds": 144.141,
+        "max_seconds": 144.141
+      },
+      "skill_tapm": {
+        "count": 4,
+        "total_seconds": 1220.173,
+        "mean_seconds": 305.0433,
+        "median_seconds": 203.047,
+        "min_seconds": 87.985,
+        "max_seconds": 726.094
+      }
+    },
+    "timing_by_skill_id": {
+      "constitutional-compliance-check": {
+        "count": 1,
+        "total_seconds": 241.109,
+        "mean_seconds": 241.109,
+        "median_seconds": 241.109,
+        "min_seconds": 241.109,
+        "max_seconds": 241.109
+      },
+      "gate-enforcement": {
+        "count": 1,
+        "total_seconds": 164.985,
+        "mean_seconds": 164.985,
+        "median_seconds": 164.985,
+        "min_seconds": 164.985,
+        "max_seconds": 164.985
+      },
+      "governance-model-builder": {
+        "count": 1,
+        "total_seconds": 726.094,
+        "mean_seconds": 726.094,
+        "median_seconds": 726.094,
+        "min_seconds": 726.094,
+        "max_seconds": 726.094
+      },
+      "milestone-consistency-check": {
+        "count": 1,
+        "total_seconds": 144.141,
+        "mean_seconds": 144.141,
+        "median_seconds": 144.141,
+        "min_seconds": 144.141,
+        "max_seconds": 144.141
+      },
+      "risk-register-builder": {
+        "count": 1,
+        "total_seconds": 87.985,
+        "mean_seconds": 87.985,
+        "median_seconds": 87.985,
+        "min_seconds": 87.985,
+        "max_seconds": 87.985
+      }
+    },
+    "timing_by_semantic_predicate_id": {}
+  },
+  "provider_projection": {
+    "benchmark_schema_version": "1.0.0",
+    "run_id": "b6660a45-8c69-429a-870e-bcf8abd248fb",
+    "projection_timestamp": "2026-05-20T17:37:16.311754+00:00",
+    "pricing_basis": {
+      "source": "static_provider_catalog",
+      "warning": "Static configurable estimates; not authoritative billing data."
+    },
+    "observed_workload": {
+      "total_invocations": 5,
+      "total_estimated_input_tokens": 123591,
+      "total_estimated_output_tokens": 18522,
+      "total_estimated_tokens": 142113,
+      "max_single_invocation_input_tokens": 89522,
+      "max_single_invocation_output_tokens": 89522,
+      "max_single_invocation_total_tokens": 89522,
+      "requires_tool_support": true,
+      "requires_system_prompt": true,
+      "tapm_invocation_count": 4,
+      "cli_prompt_invocation_count": 1,
+      "semantic_predicate_invocation_count": 0,
+      "phase_8_estimated_total_tokens": 0,
+      "phases_1_7_estimated_total_tokens": 142113
+    },
+    "projections": [
+      {
+        "provider_id": "current_claude_code_max",
+        "model_id": "claude-sonnet-4-6",
+        "display_name": "Claude Sonnet 4.6 (via Claude Code Max)",
+        "billing_model": "subscription",
+        "projected_input_cost_usd": 0.0,
+        "projected_output_cost_usd": 0.0,
+        "projected_total_cost_usd": 200.0,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": false,
+        "migration_complexity": "adapter_needed",
+        "capability_tier": "unknown",
+        "security_posture": {
+          "private_networking_possible": false,
+          "data_residency_possible": false,
+          "zero_data_retention_possible": false,
+          "notes": [
+            "Consumer SaaS subscription; no enterprise data controls by default."
+          ]
+        },
+        "warnings": [
+          "Subscription billing Ś projected cost is monthly subscription, not per-run."
+        ]
+      },
+      {
+        "provider_id": "anthropic_api",
+        "model_id": "claude-sonnet-4-6",
+        "display_name": "Claude Sonnet 4.6 (Anthropic API)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.370773,
+        "projected_output_cost_usd": 0.27783,
+        "projected_total_cost_usd": 0.648603,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": false,
+        "migration_complexity": "adapter_needed",
+        "capability_tier": "unknown",
+        "security_posture": {
+          "private_networking_possible": false,
+          "data_residency_possible": false,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Zero data retention available via API policy. No private networking. Verify with provider."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "together_ai",
+        "model_id": "meta-llama/Llama-3.1-70B-Instruct-Turbo",
+        "display_name": "Llama 3.1 70B Instruct Turbo (Together AI)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.10876,
+        "projected_output_cost_usd": 0.016299,
+        "projected_total_cost_usd": 0.125059,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "mid",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": false,
+          "zero_data_retention_possible": false,
+          "notes": [
+            "Dedicated/private deployments may be available via enterprise contract. Verify with provider."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "together_ai",
+        "model_id": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+        "display_name": "Llama 3.1 405B Instruct Turbo (Together AI)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.432569,
+        "projected_output_cost_usd": 0.064827,
+        "projected_total_cost_usd": 0.497396,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "high",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": false,
+          "zero_data_retention_possible": false,
+          "notes": [
+            "Dedicated/private deployments may be available via enterprise contract. Verify with provider."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "fireworks_ai",
+        "model_id": "accounts/fireworks/models/llama-v3p1-70b-instruct",
+        "display_name": "Llama 3.1 70B Instruct (Fireworks AI)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.111232,
+        "projected_output_cost_usd": 0.01667,
+        "projected_total_cost_usd": 0.127902,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "mid",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": false,
+          "zero_data_retention_possible": false,
+          "notes": [
+            "Dedicated deployments available. Verify enterprise options with provider."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "aws_bedrock",
+        "model_id": "anthropic.claude-sonnet-4-6-v1",
+        "display_name": "Claude Sonnet 4.6 (AWS Bedrock)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.370773,
+        "projected_output_cost_usd": 0.27783,
+        "projected_total_cost_usd": 0.648603,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": false,
+        "migration_complexity": "adapter_needed",
+        "capability_tier": "high",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full AWS VPC integration. Data residency via AWS region selection. Verify data retention policy with AWS."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "aws_bedrock",
+        "model_id": "meta.llama3-1-70b-instruct-v1",
+        "display_name": "Llama 3.1 70B Instruct (AWS Bedrock)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.327516,
+        "projected_output_cost_usd": 0.064827,
+        "projected_total_cost_usd": 0.392343,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": false,
+        "migration_complexity": "adapter_needed",
+        "capability_tier": "mid",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full AWS VPC integration. Data residency via AWS region selection. Verify data retention policy with AWS."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "azure_openai",
+        "model_id": "gpt-4o",
+        "display_name": "GPT-4o (Azure OpenAI)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.308978,
+        "projected_output_cost_usd": 0.18522,
+        "projected_total_cost_usd": 0.494198,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "high",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full Azure VNet integration. Data residency via Azure region. Abuse monitoring opt-out available. Verify with Azure."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "azure_openai",
+        "model_id": "gpt-4o-mini",
+        "display_name": "GPT-4o Mini (Azure OpenAI)",
+        "billing_model": "per_token",
+        "projected_input_cost_usd": 0.018539,
+        "projected_output_cost_usd": 0.011113,
+        "projected_total_cost_usd": 0.029652,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "mid",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full Azure VNet integration. Data residency via Azure region. Abuse monitoring opt-out available. Verify with Azure."
+          ]
+        },
+        "warnings": []
+      },
+      {
+        "provider_id": "local_openai_compatible",
+        "model_id": "local/llama-3.1-70b-instruct",
+        "display_name": "Llama 3.1 70B Instruct (Local)",
+        "billing_model": "infrastructure",
+        "projected_input_cost_usd": 0.0,
+        "projected_output_cost_usd": 0.0,
+        "projected_total_cost_usd": 0.0,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "mid",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full on-premises control. All data stays local. No external network dependency for inference."
+          ]
+        },
+        "warnings": [
+          "Infrastructure billing Ś token cost is zero but GPU/power/maintenance cost is external.",
+          "Requires GPU hardware for local deployment."
+        ]
+      },
+      {
+        "provider_id": "local_openai_compatible",
+        "model_id": "local/llama-3.1-8b-instruct",
+        "display_name": "Llama 3.1 8B Instruct (Local)",
+        "billing_model": "infrastructure",
+        "projected_input_cost_usd": 0.0,
+        "projected_output_cost_usd": 0.0,
+        "projected_total_cost_usd": 0.0,
+        "context_window_sufficient": true,
+        "oversized_invocations": 0,
+        "tool_support_sufficient": true,
+        "system_prompt_supported": true,
+        "supports_all_modes": true,
+        "openai_compatible": true,
+        "migration_complexity": "drop_in",
+        "capability_tier": "low",
+        "security_posture": {
+          "private_networking_possible": true,
+          "data_residency_possible": true,
+          "zero_data_retention_possible": true,
+          "notes": [
+            "Full on-premises control. All data stays local. No external network dependency for inference."
+          ]
+        },
+        "warnings": [
+          "Infrastructure billing Ś token cost is zero but GPU/power/maintenance cost is external.",
+          "Requires GPU hardware for local deployment."
+        ]
+      }
+    ],
+    "recommendations": {
+      "lowest_projected_cost": {
+        "provider_id": "azure_openai",
+        "model_id": "gpt-4o-mini",
+        "display_name": "GPT-4o Mini (Azure OpenAI)",
+        "projected_total_cost_usd": 0.029652
+      },
+      "best_capability_match": {
+        "provider_id": "together_ai",
+        "model_id": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+        "display_name": "Llama 3.1 405B Instruct Turbo (Together AI)",
+        "capability_tier": "high"
+      },
+      "best_openai_compatible_candidate": {
+        "provider_id": "azure_openai",
+        "model_id": "gpt-4o",
+        "display_name": "GPT-4o (Azure OpenAI)"
+      },
+      "best_private_network_candidate": {
+        "provider_id": "together_ai",
+        "model_id": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+        "display_name": "Llama 3.1 405B Instruct Turbo (Together AI)"
+      },
+      "not_suitable": [],
+      "migration_warnings": []
+    },
+    "routing_recommendations": [
+      {
+        "workload_segment": "phase_1_7_skill_work",
+        "estimated_tokens": 142113,
+        "candidate_tier": "high",
+        "notes": [
+          "Structured extraction/normalization workload.",
+          "Validate quality before downshifting to lower-tier models."
+        ]
+      },
+      {
+        "workload_segment": "tapm_tool_augmented_work",
+        "estimated_tokens": 52591,
+        "candidate_tier": "mid_or_high",
+        "notes": [
+          "Requires tool use (Read, Glob) support.",
+          "Provider must support function calling / tool use API."
+        ]
+      },
+      {
+        "workload_segment": "cli_prompt_work",
+        "estimated_tokens": 89522,
+        "candidate_tier": "mid",
+        "notes": [
+          "Plain prompt-response work without tool use.",
+          "Broader provider compatibility Ś no tool support required."
+        ]
+      }
+    ]
+  }
+}

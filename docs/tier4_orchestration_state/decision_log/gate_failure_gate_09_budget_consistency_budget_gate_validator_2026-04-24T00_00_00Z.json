@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-04-24T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "gate_09_budget_consistency",
+  "failure_reason": "Semantic predicate no_internal_budget_figures failed. The budget_response_reference value 'budget_response_placeholder.json' contains the literal token 'placeholder', indicating the budget gate assessment was conducted and its gate_pass_declaration set to 'pass' against a placeholder file rather than a genuine response received from the external Lump Sum Budget Planner system. All deterministic structural predicates passed on their literal field-value terms (the string is non-empty; blocking_inconsistencies is empty; gate_pass_declaration field value equals 'pass'). However, semantic evaluation reveals that the pass declaration itself is an internally generated validation outcome not grounded in a real external budget response, constituting a de facto internal substitution of external budget validation in violation of CLAUDE.md §8. Phase 8 must not commence until a genuine external budget response is received through docs/integrations/lump_sum_budget_planner/received/ and the budget gate assessment is re-executed against that real response.",
+  "predicates_failed": [
+    "no_internal_budget_figures"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (gates are mandatory; a phase is not complete until its gate condition is satisfied), §7 (gate_09_budget_consistency phase-specific gate definitions), §8.1 (budget computation exclusively the responsibility of the external Lump Sum Budget Planner system), §8.3 (no agent may invent, substitute, approximate, or silently generate budget figures or validation outcomes), §8.4 (absent genuine budget artifacts in received/ constitute a blocking gate failure, not a hold state; no Phase 8 substep may commence before gate_09 is satisfied against a real external response), §12.4 (missing mandatory inputs trigger a gate failure; they must not be papered over by optimistic inference), §15 (the system must prefer explicit gate failure over fabricated completion; a declared failure is an honest and correct output)",
+  "resolution_required": true,
+  "timestamp": "2026-04-24T00:00:00Z"
+}

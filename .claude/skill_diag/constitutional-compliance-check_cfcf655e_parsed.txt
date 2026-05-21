@@ -1,0 +1,65 @@
+=== parsed OK ===
+=== top-level keys: ['report_id', 'skill_id', 'invoking_agent', 'run_id_reference', 'artifact_audited', 'section13_checks', 'summary', 'timestamp', 'decision_log_entries'] ===
+=== parsed content ===
+{
+  "report_id": "compliance_check_phase7_budget_gate_assessment_budget_gate_validator_2026-05-20T12:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "budget_gate_validator",
+  "run_id_reference": "cfcf655e-cfef-4f74-a1ea-878feb0a4014",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts \u2014 partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment \u2014 not present in Tier 3",
+      "check_status": "violation",
+      "violation_evidence": "The artifact's partner_coverage_results names eight specific partner IDs as project facts: \"partner_id\": \"ATU\", \"partner_id\": \"BIIS\", \"partner_id\": \"CERIA\", \"partner_id\": \"NIHS\", \"partner_id\": \"ISIA\", \"partner_id\": \"ELI\", \"partner_id\": \"FIIT\", \"partner_id\": \"BAL\". The artifact's wp_coverage_results names nine WP IDs as project facts: WP1 through WP9. The artifact contains no traceability_footer field and no primary_sources[] entries whatsoever. Per CLAUDE.md \u00a713.3, every project-specific fact must be traceable to Tier 3; the complete absence of a traceability_footer means none of these partner or WP identifiers carry a Tier 3 source reference.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity \u2014 including preparatory drafting \u2014 before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "[NON-APPLICABLE: This prohibition concerns agent memory handling during execution and cannot be verified from artifact content alone; it is enforced by the decision-log-update skill and runtime layer, not by reading a phase output artifact.]",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "[NON-APPLICABLE: This prohibition concerns runtime scope boundaries of workflows and skills and cannot be determined from the content of a phase output artifact alone.]",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "violation",
+      "violation_evidence": "The artifact declares \"gate_pass_declaration\": \"pass\" while \"budget_response_reference\": \"budget_response_placeholder.json\". CLAUDE.md \u00a77 Phase 7 gate condition mandates that 'A validated budget response is present in the integration received/ directory.' CLAUDE.md \u00a78.4 states: 'Absent budget artifacts in docs/integrations/lump_sum_budget_planner/received/ constitute a blocking gate failure, not a hold state.' The filename 'budget_response_placeholder.json' carries the term 'placeholder', which raises a critical concern that the mandatory budget gate is being declared passed against a placeholder artifact rather than an actual validated response from the external Lump Sum Budget Planner system. Declaring gate_pass_declaration: pass against an incomplete or non-genuine budget response constitutes weakening the mandatory gate condition to allow downstream workflow progress when inputs are incomplete.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": "[NON-APPLICABLE: This prohibition is applicable to Tier 5 deliverable artifacts containing proposal text with validation_status fields. The artifact under audit is a Tier 4 phase output (schema_id: orch.phase7.budget_gate_assessment.v1)
+=== END ===
