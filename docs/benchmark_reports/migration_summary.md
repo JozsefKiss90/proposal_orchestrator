@@ -8,7 +8,7 @@ Generated from Phase D benchmark reports. Supports the decision to proceed from 
 
 ## 1. Executive Summary
 
-The Proposal Orchestrator currently runs on **Claude Code Max** using `claude -p` as the runtime transport. This backend is convenient for development but is **not closed-network** and is **not data-leak-free** for sensitive proposal artifacts. Migration to an alternative backend is necessary for institutional deployment.
+The Proposal Orchestrator currently runs on **Claude Sonnet 4.6** using `claude -p` as the runtime transport. This backend is convenient for development but is **not closed-network** and is **not data-leak-free** for sensitive proposal artifacts. Migration to an alternative backend is necessary for institutional deployment.
 
 Phase A-D benchmarking has produced **8 phase-level reports** covering **41 model invocations** across the full orchestration pipeline (Phases 1-8). The benchmark dataset captures an estimated **837,278 tokens** and approximately **3.0 hours of wall-clock runtime**.
 
@@ -147,7 +147,7 @@ Key observations:
 
 ## 8. Security and Deployment Implications
 
-### A. Current Claude Code Max
+### A. Current Claude Sonnet 4.6
 
 - Convenient development baseline with subscription pricing.
 - **Not closed-network.** Prompts and responses transit Anthropic infrastructure.
@@ -213,6 +213,22 @@ Transport abstraction is complete only if:
 - Token accounting integrated where provider exposes usage
 - Full benchmark suite remains regression-clean
 
+## Provider Security Qualification
+
+Candidate provider must document:
+
+- Explicit no-training guarantee
+- Configurable Zero Data Retention
+- Prompt retention policy
+- Response retention policy
+- Logging retention period
+- Region/data residency options
+- Subprocessor disclosure
+- DPA availability
+- Contractual deletion process
+- Export/deletion capability
+- Tool-call payload handling
+- Customer-controlled privacy configuration
 ---
 
 ## 10. Recommended Migration Strategy
