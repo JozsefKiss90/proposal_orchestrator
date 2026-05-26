@@ -277,4 +277,136 @@ Phase E does not require resolving provider selection, pricing negotiation, or d
 
 ---
 
-*This summary was produced from Phase D benchmark reports. It does not implement Phase E. No runtime code, benchmark engine code, provider catalog values, or benchmark artifacts were modified in its production.*
+## 13. Phase F — TAPM Tool Emulation
+
+### Motivation
+
+Phase E established the transport abstraction layer: provider configuration, OpenAI-compatible HTTP backend, error normalisation, and capability metadata. However, Phase E alone does not close the TAPM gap. When the orchestrator runs a TAPM skill on Claude CLI, Claude natively handles `Read` and `Glob` tool calls inside the `claude -p --tools "Read,Glob"` subprocess. Non-Claude backends have no native file-access tooling. The model emits `tool_calls`; nothing answers them unless the Python runtime intercepts, executes, and re-injects results.
+
+Phase F implements this interception layer — the **TAPM tool emulation loop** — so that any OpenAI-compatible backend can execute the same TAPM skills that currently run on Claude CLI, with equivalent filesystem access semantics and identical governance boundaries.
+
+### Architecture
+
+The tool emulation loop follows a strict linear pipeline. The model never receives direct filesystem access; all tool execution is Python-controlled.
+
+```
+OpenAI-compatible model
+        ↓
+tool_calls emitted (assistant message)
+        ↓
+Python ToolLoop (runner/transport/tool_loop.py)
+        ↓
+ToolExecutor (runner/transport/tool_executor.py)
+        ↓
+tool result injection (tool role message)
+        ↓
+continue completion (next backend round)
+```
+
+**Invariant:** Filesystem mutation remains exclusively Python-controlled. The `ToolExecutor` provides **read-only** access (`Read`, `Glob`). Artifact writes remain the sole responsibility of `skill_runtime._atomic_write()`. This preserves the existing governance boundary defined in CLAUDE.md §17.
+
+### Phase F Scope
+
+Phase F comprises four implementation tracks:
+
+#### F.1 — Core Tool-Call Transport Compatibility
+
+Ensure the round-trip `assistant → tool_calls → tool results → assistant` message flow works correctly across all supported OpenAI-compatible backends.
+
+| Requirement | Description |
+|-------------|-------------|
+| **Tool-call extraction** | `OpenAICompatBackend._parse_response()` must extract `tool_calls` from `choices[0].message.tool_calls` and return them in the `ToolLoopBackend` protocol format: `{"id": str, "type": "function", "function": {"name": str, "arguments": str}}`. |
+| **Tool-result injection** | `run_tool_loop()` must append tool results as `{"role": "tool", "tool_call_id": str, "content": str}` messages. The `tool_call_id` must match the originating tool call's `id` field exactly. |
+| **Argument format tolerance** | The loop must accept `arguments` as either a JSON string or a pre-parsed dict (provider-dependent). Malformed arguments produce a structured JSON error result, not a loop abort. |
+| **Multi-tool-call handling** | When the assistant emits multiple `tool_calls` in a single response, all calls are executed sequentially within the same round, and all results are injected before the next backend invocation. |
+| **Round-trip fidelity** | The `content` field of assistant messages that also contain `tool_calls` must be preserved in the conversation history (some providers return `null`, some return partial text). |
+| **Round budget** | `max_rounds` (default 25) bounds total backend invocations. Exhaustion produces `ToolLoopResponse(exhausted_rounds=True)` with whatever content was last available. |
+| **Timeout enforcement** | Wall-clock `timeout_seconds` applies to the entire loop, not per-round. Timeout produces the same `exhausted_rounds=True` response. |
+
+**Validation:** Unit tests with `FakeBackend` covering: zero tool calls (pass-through), single Read, single Glob, multi-tool single round, multi-round chained reads, malformed arguments, unknown tool name, round exhaustion, and timeout.
+
+#### F.2 — Tool Schema Normalisation
+
+Provide standardised OpenAI function-calling tool schemas for `Read` and `Glob` that are compatible with all target backends.
+
+| Schema | Module | Key properties |
+|--------|--------|----------------|
+| `READ_TOOL_SCHEMA` | `runner/transport/tool_executor.py` | `file_path` (required, string), `offset` (optional, integer), `limit` (optional, integer) |
+| `GLOB_TOOL_SCHEMA` | `runner/transport/tool_executor.py` | `pattern` (required, string), `path` (optional, string) |
+
+Normalisation requirements:
+
+- Schemas use the OpenAI `{"type": "function", "function": {...}}` envelope format, which is accepted by Bedrock (via bedrock-mantle), Together AI, Ollama, and generic OpenAI-compatible endpoints.
+- Parameter types use JSON Schema primitives (`string`, `integer`, `object`). No provider-specific extensions.
+- `description` fields are terse and action-oriented to minimise prompt token overhead across providers with different system prompt budgets.
+- Schemas are passed to `OpenAICompatBackend` via the `tools` constructor parameter and included in every request payload when non-empty.
+- Providers that silently ignore the `tools` field (rare, but possible with some Ollama model configurations) will never emit `tool_calls`, causing the loop to terminate on the first round with a final text-only response. This is a **capability gap**, not an error — it is surfaced by capability gating (F.4).
+
+**Validation:** Schema round-trip tests confirming that `READ_TOOL_SCHEMA` and `GLOB_TOOL_SCHEMA` survive JSON serialisation/deserialisation and that `ToolExecutor.execute_tool_call()` accepts the argument shapes defined in the schemas.
+
+#### F.3 — Deterministic TAPM Equivalence Tests
+
+Verify that the TAPM tool emulation loop produces functionally equivalent filesystem access behaviour to Claude CLI's native `--tools "Read,Glob"` mode.
+
+Equivalence is defined as: for a given set of declared input files and a given skill prompt, the tool emulation path and the Claude CLI path must access the same files, enforce the same sandbox boundaries, and produce structurally compatible outputs (same JSON schema, same required fields).
+
+| Test category | What it validates |
+|---------------|-------------------|
+| **Read sandbox enforcement** | Paths outside `repo_root` are denied. Symlinks escaping the repo boundary are denied after `.resolve()`. Declared-input prefix enforcement (`allowed_prefixes`) restricts access to the skill's `reads_from` declaration. |
+| **Read byte budgets** | Single-file limit (`MAX_FILE_READ_BYTES` = 500KB) and cumulative limit (`MAX_TOTAL_READ_BYTES` = 5MB) are enforced. Over-budget reads return structured JSON errors. |
+| **Read line slicing** | `offset` and `limit` parameters produce the same line range as Claude Code's native Read tool (1-based offset, inclusive). |
+| **Glob sandbox enforcement** | Search base must be inside `repo_root`. Results are filtered post-glob to remove any symlink escapes. Declared-input prefix enforcement applies to both the search base and each result. |
+| **Glob result limits** | Results are capped at `MAX_GLOB_RESULTS` (200) and returned in sorted deterministic order. |
+| **Error structure equivalence** | All denial and error conditions produce `{"error": "..."}` JSON strings, matching the structured error contract that skill prompts expect. |
+| **End-to-end skill output equivalence** | For a reference TAPM skill (e.g. Phase 1 `call-requirements-extraction`), the tool emulation path produces a JSON artifact with the same schema and required fields as the Claude CLI reference artifact. Field-level content equivalence is not required (different models produce different text); structural and schema equivalence is. |
+
+**Implementation:** Tests use `FakeBackend` with pre-programmed tool call sequences that mirror observed Claude CLI tool access patterns from benchmark telemetry. No live model invocation is required for deterministic equivalence tests.
+
+#### F.4 — Capability Gating
+
+The orchestrator must not attempt TAPM tool emulation on backends that do not support tool calling. Capability gating uses the static `ProviderCapabilities.tool_calling` field to enforce this at skill dispatch time.
+
+| Capability | Gating rule |
+|------------|-------------|
+| `tool_calling = True` | Backend may execute TAPM skills via the tool emulation loop. Tool schemas are included in request payloads. |
+| `tool_calling = False` | Backend is restricted to cli-prompt mode skills only. TAPM skill dispatch must fail with `MISSING_INPUT` failure category before any backend invocation occurs. |
+
+Current capability declarations:
+
+| Backend | `tool_calling` | TAPM eligible |
+|---------|----------------|---------------|
+| `claude_cli` | `True` | Yes (native, no emulation needed) |
+| `bedrock` | `True` | Yes |
+| `together_ai` | `True` | Yes |
+| `ollama` | `True` | Yes (model-dependent; some quantised models may ignore tool schemas) |
+| `openai_compatible` | `True` | Yes (provider-dependent) |
+
+**Runtime gating contract:** Before constructing the tool loop for a TAPM skill invocation, the skill runtime must check `config.capabilities.tool_calling`. If `False`, the skill runtime returns `SkillResult(status="failure", failure_category="MISSING_INPUT", failure_reason="Backend does not support tool calling; cannot execute TAPM skill")` without invoking the backend.
+
+**Model-level tool-call fidelity:** Static capability gating confirms the provider *API* supports tool calling. It does not guarantee that a specific *model* will emit well-formed tool calls. Models that accept tool schemas but never emit `tool_calls` (or emit malformed ones) will produce empty or error-laden tool loop responses. This is a quality issue, not a gating issue — it is surfaced by equivalence testing (F.3), not blocked by capability gating.
+
+### Phase F Acceptance Criteria
+
+Phase F is complete when all of the following hold:
+
+1. `run_tool_loop()` correctly drives the `backend → tool_calls → ToolExecutor → tool result → backend` cycle for at least: zero-tool, single-Read, single-Glob, multi-tool, multi-round, malformed-argument, unknown-tool, round-exhaustion, and timeout scenarios.
+2. `READ_TOOL_SCHEMA` and `GLOB_TOOL_SCHEMA` are structurally valid OpenAI function-calling schemas accepted without modification by Bedrock, Together AI, and Ollama endpoints.
+3. Deterministic equivalence tests confirm sandbox enforcement, byte budgets, line slicing, glob limits, and error structure parity between the tool emulation path and Claude CLI native tool behaviour.
+4. Capability gating prevents TAPM skill dispatch on backends where `tool_calling = False`, returning a structured `SkillResult` failure before any backend invocation.
+5. All filesystem writes remain exclusively in `skill_runtime._atomic_write()`. The `ToolExecutor` and `run_tool_loop()` perform no filesystem mutations.
+6. The existing Claude CLI transport path is unaffected. All pre-existing tests pass without modification.
+7. No changes to the DAG scheduler, gate evaluator, agent runtime, or runtime contracts (CLAUDE.md §17).
+
+### Governance Boundary
+
+Phase F does not alter any constitutional boundary. Specifically:
+
+- **No new write surface.** The ToolExecutor is read-only. `skill_runtime._atomic_write()` remains the sole artifact write path.
+- **No gate evaluation.** The tool loop has no knowledge of gates. Gate evaluation remains a scheduler responsibility.
+- **No artifact schema awareness.** The tool loop returns raw text. Schema validation occurs in the skill runtime after the loop completes.
+- **No scheduler modification.** The DAG scheduler, node dispatch contract, and failure semantics are unchanged.
+- **No agent-level changes.** Agent runtime sequencing and context passing are unchanged.
+
+---
+
+*This summary was produced from Phase D benchmark reports and updated to include Phase F (TAPM Tool Emulation) scope following the completion of Phase E transport abstraction. No runtime code, benchmark engine code, provider catalog values, or benchmark artifacts were modified in its production.*

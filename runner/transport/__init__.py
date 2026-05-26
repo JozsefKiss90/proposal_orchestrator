@@ -25,9 +25,14 @@ from runner.transport.capabilities import (  # noqa: F401
     ProviderCapabilities,
 )
 from runner.transport.config import (  # noqa: F401
+    PRESET_REGISTRY,
     VALID_BACKENDS,
     ProviderConfig,
+    TransportPreset,
+    get_transport_preset,
+    list_transport_presets,
     resolve_provider_config,
+    resolve_provider_config_from_preset,
 )
 from runner.transport.errors import (  # noqa: F401
     ErrorCategory,

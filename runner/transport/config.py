@@ -13,6 +13,11 @@ Backend selection:
     - ``openai_compatible``: Generic OpenAI-compatible endpoint.
 
 Environment variables:
+    ``ORCHESTRATOR_TRANSPORT_PRESET``
+        Optional preset name (e.g. ``BEDROCK_EU_DEVELOPMENT``).
+        When set, supplies default backend, endpoint, model, and
+        capabilities.  Explicit ``ORCHESTRATOR_TRANSPORT_*`` variables
+        override preset defaults.
     ``ORCHESTRATOR_TRANSPORT_BACKEND``
         Backend selector.  Default: ``claude_cli``.
     ``ORCHESTRATOR_TRANSPORT_ENDPOINT``
@@ -80,6 +85,184 @@ _BEDROCK_MODEL_ID_PATTERN: re.Pattern[str] = re.compile(
 
 
 # ---------------------------------------------------------------------------
+# TransportPreset
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class TransportPreset:
+    """Static transport configuration preset.
+
+    Presets are named bundles of default configuration values that reduce
+    operational mistakes when switching between providers.  They are
+    static aids, not dynamic capability detection.
+
+    Explicit ``ORCHESTRATOR_TRANSPORT_*`` environment variables override
+    preset defaults.
+
+    Attributes
+    ----------
+    name:
+        Unique preset identifier (e.g. ``BEDROCK_EU_DEVELOPMENT``).
+    backend_name:
+        The backend this preset targets (one of :data:`VALID_BACKENDS`).
+    description:
+        Human-readable summary.
+    default_endpoint:
+        Default base URL.  ``None`` if no default (must be env-supplied).
+    default_model:
+        Default model identifier.  ``None`` if none.
+    requires_api_key:
+        Whether the preset requires ``ORCHESTRATOR_TRANSPORT_API_KEY``.
+    default_region:
+        Default AWS region (Bedrock presets only).  ``None`` otherwise.
+    capabilities:
+        Static capability metadata.
+    intended_use:
+        Short description of when to use this preset.
+    production_suitable:
+        Whether the preset is intended for institutional production use.
+    notes:
+        Operational notes and caveats.
+    """
+
+    name: str
+    backend_name: str
+    description: str
+    default_endpoint: str | None
+    default_model: str | None
+    requires_api_key: bool
+    default_region: str | None
+    capabilities: ProviderCapabilities
+    intended_use: str
+    production_suitable: bool
+    notes: tuple[str, ...] = ()
+
+
+# -- Pre-defined presets ---------------------------------------------------
+
+CLAUDE_REFERENCE = TransportPreset(
+    name="CLAUDE_REFERENCE",
+    backend_name="claude_cli",
+    description="Claude CLI reference backend for output equivalence testing",
+    default_endpoint=None,
+    default_model=None,
+    requires_api_key=False,
+    default_region=None,
+    capabilities=CAPABILITIES_REGISTRY["claude_cli"],
+    intended_use="reference backend / output equivalence testing",
+    production_suitable=False,
+    notes=(
+        "Uses the local claude CLI via subscription.",
+        "Not closed-network; prompts transit Anthropic infrastructure.",
+    ),
+)
+
+BEDROCK_EU_DEVELOPMENT = TransportPreset(
+    name="BEDROCK_EU_DEVELOPMENT",
+    backend_name="bedrock",
+    description="AWS Bedrock via bedrock-mantle, EU (Ireland), development",
+    default_endpoint=BEDROCK_URL_TEMPLATE.format(region="eu-west-1"),
+    default_model=DEFAULT_BEDROCK_MODEL,
+    requires_api_key=True,
+    default_region="eu-west-1",
+    capabilities=CAPABILITIES_REGISTRY["bedrock"],
+    intended_use="EU Bedrock development validation",
+    production_suitable=False,
+    notes=(
+        "Uses eu-west-1 (Ireland) region.",
+        "Streaming usage accounting (stream_options.include_usage) is UNVERIFIED.",
+        "Use long-term API keys for development; short-term key rotation is a production step.",
+    ),
+)
+
+BEDROCK_EU_PRODUCTION = TransportPreset(
+    name="BEDROCK_EU_PRODUCTION",
+    backend_name="bedrock",
+    description="AWS Bedrock via bedrock-mantle, EU, institutional production",
+    default_endpoint=BEDROCK_URL_TEMPLATE.format(region="eu-west-1"),
+    default_model=DEFAULT_BEDROCK_MODEL,
+    requires_api_key=True,
+    default_region="eu-west-1",
+    capabilities=CAPABILITIES_REGISTRY["bedrock"],
+    intended_use="EU institutional deployment",
+    production_suitable=True,
+    notes=(
+        "Production use requires region and model availability validation in the Bedrock console.",
+        "Configure VPC endpoint via PrivateLink for closed-network operation.",
+        "Enable CloudTrail logging for Bedrock API calls.",
+        "Download and execute GDPR DPA via AWS Artifact.",
+        "Implement short-term API key rotation via BedrockTokenGenerator SDK.",
+        "Streaming usage accounting (stream_options.include_usage) is UNVERIFIED.",
+    ),
+)
+
+TOGETHER_VALIDATION = TransportPreset(
+    name="TOGETHER_VALIDATION",
+    backend_name="together_ai",
+    description="Together AI for low-friction OpenAI-compatible validation",
+    default_endpoint=DEFAULT_TOGETHER_AI_URL,
+    default_model=None,
+    requires_api_key=True,
+    default_region=None,
+    capabilities=CAPABILITIES_REGISTRY["together_ai"],
+    intended_use="low-friction OpenAI-compatible provider validation",
+    production_suitable=False,
+    notes=(
+        "Useful for rapid Phase E iteration and cost-optimized testing.",
+        "Not suitable for institutional production (3 security GAPs, 4 PARTIALs).",
+    ),
+)
+
+OLLAMA_LOCAL = TransportPreset(
+    name="OLLAMA_LOCAL",
+    backend_name="ollama",
+    description="Local Ollama instance for backend smoke testing",
+    default_endpoint=DEFAULT_OLLAMA_URL,
+    default_model=None,
+    requires_api_key=False,
+    default_region=None,
+    capabilities=CAPABILITIES_REGISTRY["ollama"],
+    intended_use="local backend smoke testing",
+    production_suitable=False,
+    notes=(
+        "Requires a running Ollama instance on localhost:11434.",
+        "Model must be pulled locally before use.",
+    ),
+)
+
+GENERIC_OPENAI_COMPATIBLE = TransportPreset(
+    name="GENERIC_OPENAI_COMPATIBLE",
+    backend_name="openai_compatible",
+    description="Generic OpenAI-compatible endpoint (endpoint required via env)",
+    default_endpoint=None,
+    default_model=None,
+    requires_api_key=True,
+    default_region=None,
+    capabilities=CAPABILITIES_REGISTRY["openai_compatible"],
+    intended_use="generic OpenAI-compatible backend integration",
+    production_suitable=False,
+    notes=(
+        "ORCHESTRATOR_TRANSPORT_ENDPOINT must be set explicitly.",
+        "ORCHESTRATOR_TRANSPORT_MODEL must be set explicitly.",
+    ),
+)
+
+#: Registry of all available presets, keyed by name.
+PRESET_REGISTRY: dict[str, TransportPreset] = {
+    p.name: p
+    for p in (
+        CLAUDE_REFERENCE,
+        BEDROCK_EU_DEVELOPMENT,
+        BEDROCK_EU_PRODUCTION,
+        TOGETHER_VALIDATION,
+        OLLAMA_LOCAL,
+        GENERIC_OPENAI_COMPATIBLE,
+    )
+}
+
+
+# ---------------------------------------------------------------------------
 # ProviderConfig
 # ---------------------------------------------------------------------------
 
@@ -108,6 +291,7 @@ class ProviderConfig:
     api_key_set: bool
     model: str | None
     capabilities: ProviderCapabilities
+    preset_name: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -129,6 +313,116 @@ def validate_bedrock_model_id(model_id: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Preset helpers
+# ---------------------------------------------------------------------------
+
+
+def list_transport_presets() -> dict[str, TransportPreset]:
+    """Return a copy of the preset registry."""
+    return dict(PRESET_REGISTRY)
+
+
+def get_transport_preset(name: str) -> TransportPreset:
+    """Look up a preset by name.
+
+    Raises
+    ------
+    ValueError
+        If *name* is not a recognised preset.
+    """
+    if name not in PRESET_REGISTRY:
+        raise ValueError(
+            f"Unknown transport preset: {name!r}. "
+            f"Available presets: {sorted(PRESET_REGISTRY.keys())}"
+        )
+    return PRESET_REGISTRY[name]
+
+
+def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
+    """Resolve a :class:`ProviderConfig` from a named preset.
+
+    The preset supplies default values for backend, endpoint, model,
+    region, and capabilities.  Explicit ``ORCHESTRATOR_TRANSPORT_*``
+    environment variables override preset defaults, with one safety
+    rule: if ``ORCHESTRATOR_TRANSPORT_BACKEND`` is set and disagrees
+    with the preset's ``backend_name``, a ``ValueError`` is raised to
+    prevent accidental mixed configuration.
+
+    Parameters
+    ----------
+    preset_name:
+        A key from :data:`PRESET_REGISTRY`.
+
+    Returns
+    -------
+    ProviderConfig
+        The resolved configuration.
+
+    Raises
+    ------
+    ValueError
+        If the preset is unknown, if a required API key is missing, or
+        if ``ORCHESTRATOR_TRANSPORT_BACKEND`` conflicts with the preset.
+    """
+    preset = get_transport_preset(preset_name)
+
+    # Safety: reject conflicting backend override.
+    explicit_backend = os.environ.get("ORCHESTRATOR_TRANSPORT_BACKEND")
+    if explicit_backend is not None and explicit_backend != preset.backend_name:
+        raise ValueError(
+            f"ORCHESTRATOR_TRANSPORT_BACKEND={explicit_backend!r} conflicts "
+            f"with preset {preset_name!r} (backend_name={preset.backend_name!r}). "
+            f"Remove ORCHESTRATOR_TRANSPORT_BACKEND or use a matching preset."
+        )
+
+    # Resolve with env overrides falling back to preset defaults.
+    endpoint = os.environ.get("ORCHESTRATOR_TRANSPORT_ENDPOINT")
+    api_key = os.environ.get("ORCHESTRATOR_TRANSPORT_API_KEY")
+    model = os.environ.get("ORCHESTRATOR_TRANSPORT_MODEL")
+
+    # Endpoint: env override > preset default > region-based construction.
+    resolved_endpoint = endpoint or preset.default_endpoint
+    if not resolved_endpoint and preset.backend_name == "bedrock":
+        region = os.environ.get("AWS_REGION", preset.default_region or DEFAULT_AWS_REGION)
+        resolved_endpoint = BEDROCK_URL_TEMPLATE.format(region=region)
+
+    # Model: env override > preset default.
+    resolved_model = model or preset.default_model
+
+    # API key validation.
+    if preset.requires_api_key and not api_key:
+        raise ValueError(
+            f"Preset {preset_name!r} requires ORCHESTRATOR_TRANSPORT_API_KEY. "
+            f"Set the environment variable before using this preset."
+        )
+
+    # Bedrock model ID validation.
+    if preset.backend_name == "bedrock" and resolved_model:
+        if not validate_bedrock_model_id(resolved_model):
+            raise ValueError(
+                f"Invalid Bedrock model ID: {resolved_model!r}. "
+                f"Expected format: <provider>.<model> "
+                f"(e.g. anthropic.claude-sonnet-4-20250514-v1:0)"
+            )
+
+    # Generic openai_compatible requires explicit endpoint.
+    if preset.backend_name == "openai_compatible" and not resolved_endpoint:
+        raise ValueError(
+            f"Preset {preset_name!r} requires ORCHESTRATOR_TRANSPORT_ENDPOINT. "
+            f"Set the environment variable before using this preset."
+        )
+
+    return ProviderConfig(
+        backend_name=preset.backend_name,
+        base_url=resolved_endpoint,
+        api_key_set=bool(api_key),
+        model=resolved_model,
+        capabilities=preset.capabilities,
+        preset_name=preset_name,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Configuration resolution
 # ---------------------------------------------------------------------------
 
@@ -136,9 +430,9 @@ def validate_bedrock_model_id(model_id: str) -> bool:
 def resolve_provider_config() -> ProviderConfig:
     """Resolve provider configuration from environment variables.
 
-    Reads ``ORCHESTRATOR_TRANSPORT_*`` and ``AWS_REGION`` environment
-    variables.  Does not instantiate any backend — returns a pure
-    configuration object.
+    If ``ORCHESTRATOR_TRANSPORT_PRESET`` is set, delegates to
+    :func:`resolve_provider_config_from_preset`.  Otherwise reads
+    ``ORCHESTRATOR_TRANSPORT_BACKEND`` and related variables directly.
 
     Returns
     -------
@@ -151,6 +445,12 @@ def resolve_provider_config() -> ProviderConfig:
         If the backend name is invalid, or if required environment
         variables are missing for the selected backend.
     """
+    # Preset path: if ORCHESTRATOR_TRANSPORT_PRESET is set, use it.
+    preset_name = os.environ.get("ORCHESTRATOR_TRANSPORT_PRESET")
+    if preset_name is not None:
+        return resolve_provider_config_from_preset(preset_name)
+
+    # Legacy path: direct env var resolution.
     backend = os.environ.get("ORCHESTRATOR_TRANSPORT_BACKEND", "claude_cli")
 
     if backend not in VALID_BACKENDS:

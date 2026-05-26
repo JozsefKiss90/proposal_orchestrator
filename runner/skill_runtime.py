@@ -48,6 +48,9 @@ from runner.claude_transport import (
     ClaudeTransportError,
 )
 from runner.runtime_models import SkillResult
+from runner.transport.config import ProviderConfig, resolve_provider_config
+from runner.transport.tool_executor import GLOB_TOOL_SCHEMA, READ_TOOL_SCHEMA
+from runner.transport.tool_loop import ToolLoopResponse, run_tool_loop
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +91,40 @@ SKILL_MAX_TOKENS: int = 16384
 #: skills.  600s proved insufficient in live runs (bcfe33d6); raised
 #: to 1200s to accommodate the full read-reason-produce cycle.
 TAPM_TIMEOUT_SECONDS: int = 1200
+
+
+# ---------------------------------------------------------------------------
+# Transport backend resolution
+# ---------------------------------------------------------------------------
+
+#: Cached provider config (resolved once per process from env vars).
+_provider_config_cache: ProviderConfig | None = None
+_provider_config_resolved: bool = False
+
+
+def _resolve_transport_backend() -> ProviderConfig:
+    """Resolve the active transport backend from environment variables.
+
+    Returns a :class:`ProviderConfig` describing the active backend.
+    The result is cached for the lifetime of the process.
+
+    When ``ORCHESTRATOR_TRANSPORT_BACKEND`` is unset (or set to
+    ``"claude_cli"``), returns a config with ``backend_name="claude_cli"``.
+    """
+    global _provider_config_cache, _provider_config_resolved
+    if _provider_config_resolved:
+        assert _provider_config_cache is not None
+        return _provider_config_cache
+    _provider_config_cache = resolve_provider_config()
+    _provider_config_resolved = True
+    return _provider_config_cache
+
+
+def _reset_transport_backend_cache() -> None:
+    """Reset the cached provider config.  Test-only."""
+    global _provider_config_cache, _provider_config_resolved
+    _provider_config_cache = None
+    _provider_config_resolved = False
 
 
 # ---------------------------------------------------------------------------
@@ -1213,12 +1250,36 @@ def run_skill(
         skill_id, mode, node_id or "-", run_id[:8],
     )
 
+    # ── Resolve transport backend ────────────────────────────────────
+    try:
+        provider_config = _resolve_transport_backend()
+    except ValueError as exc:
+        return SkillResult(
+            status="failure",
+            failure_reason=f"Transport backend resolution failed: {exc}",
+            failure_category="MISSING_INPUT",
+        )
+    _use_claude_cli = provider_config.backend_name == "claude_cli"
+
     if mode == "tapm":
         # ── TAPM Path: Phases A'-C' ──────────────────────────────────
         #
-        # Skip _resolve_inputs() and _validate_skill_inputs(): Claude
-        # reads declared inputs from disk via the Read tool.
+        # Skip _resolve_inputs() and _validate_skill_inputs(): the LLM
+        # reads declared inputs from disk via the Read/Glob tools.
         # Skip _assemble_skill_prompt(): use _assemble_tapm_prompt().
+
+        # F.4 Capability gating: non-Claude backends must support
+        # tool calling to execute TAPM skills.
+        if not _use_claude_cli and not provider_config.capabilities.tool_calling:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: backend "
+                    f"{provider_config.backend_name!r} does not support "
+                    f"tool calling; cannot execute TAPM skill"
+                ),
+                failure_category="MISSING_INPUT",
+            )
 
         system_prompt, user_prompt = _assemble_tapm_prompt(
             skill_spec=skill_spec,
@@ -1234,55 +1295,135 @@ def run_skill(
             output_contract=output_contract,
         )
         logger.info(
-            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds  backend=%s",
             skill_id, len(system_prompt), len(user_prompt),
-            TAPM_TIMEOUT_SECONDS,
+            TAPM_TIMEOUT_SECONDS, provider_config.backend_name,
         )
 
-        try:
-            response_text = invoke_claude_text(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model=SKILL_MODEL,
-                max_tokens=SKILL_MAX_TOKENS,
-                tools=["Read", "Glob"],
-                timeout_seconds=TAPM_TIMEOUT_SECONDS,
-                _bench_run_id=run_id,
-                _bench_skill_id=skill_id,
-                _bench_node_id=node_id,
-                _bench_invocation_type="skill_tapm",
-            )
-        except ClaudeTransportError as exc:
-            _elapsed = time.monotonic() - _skill_t0
-            diag_paths = _write_transport_failure_diagnostics(
-                skill_id=skill_id,
-                run_id=run_id,
-                node_id=node_id,
-                mode=mode,
-                reads_from=reads_from,
-                writes_to=writes_to,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                exc=exc,
-                repo_root=repo_root,
-                elapsed_seconds=_elapsed,
-                timeout_seconds=TAPM_TIMEOUT_SECONDS,
-                tools=["Read", "Glob"],
-            )
-            meta_rel = diag_paths.get("meta", "")
-            logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
-                "elapsed=%.1fs  diag=%s",
-                skill_id, _elapsed, meta_rel,
-            )
-            return SkillResult(
-                status="failure",
-                failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
-                    f"Diagnostics written to {meta_rel}"
-                ),
-                failure_category="INCOMPLETE_OUTPUT",
-            )
+        if _use_claude_cli:
+            # ── Claude CLI TAPM path (existing) ──────────────────────
+            try:
+                response_text = invoke_claude_text(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    model=SKILL_MODEL,
+                    max_tokens=SKILL_MAX_TOKENS,
+                    tools=["Read", "Glob"],
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    _bench_run_id=run_id,
+                    _bench_skill_id=skill_id,
+                    _bench_node_id=node_id,
+                    _bench_invocation_type="skill_tapm",
+                )
+            except ClaudeTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                diag_paths = _write_transport_failure_diagnostics(
+                    skill_id=skill_id,
+                    run_id=run_id,
+                    node_id=node_id,
+                    mode=mode,
+                    reads_from=reads_from,
+                    writes_to=writes_to,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    exc=exc,
+                    repo_root=repo_root,
+                    elapsed_seconds=_elapsed,
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    tools=["Read", "Glob"],
+                )
+                meta_rel = diag_paths.get("meta", "")
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  diag=%s",
+                    skill_id, _elapsed, meta_rel,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Claude transport failed: "
+                        f"{exc}. Diagnostics written to {meta_rel}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+        else:
+            # ── OpenAI-compatible TAPM path (Phase F tool emulation) ─
+            from runner.transport.config import build_openai_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_openai_backend(
+                    provider_config,
+                    tools=[READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA],
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"OpenAI-compatible backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            # Compute declared-input prefixes for sandbox enforcement.
+            # Each reads_from entry contributes the directory portion
+            # as an allowed prefix so the ToolExecutor can read within
+            # the skill's declared input boundary.
+            allowed_prefixes: list[str] = []
+            for rf in reads_from + (optional_reads_from or []):
+                if _is_contextual_descriptor(rf):
+                    continue
+                allowed_prefixes.append(rf)
+
+            try:
+                loop_result: ToolLoopResponse = run_tool_loop(
+                    backend=backend,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    repo_root=repo_root,
+                    allowed_prefixes=allowed_prefixes or None,
+                    timeout_seconds=float(TAPM_TIMEOUT_SECONDS),
+                )
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            response_text = loop_result.text
+            if loop_result.exhausted_rounds:
+                logger.warning(
+                    "  skill WARN   id=%s  tool loop exhausted after "
+                    "%d rounds (files_read=%d)",
+                    skill_id, loop_result.rounds,
+                    len(loop_result.files_read),
+                )
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: tool loop returned "
+                        f"empty response after {loop_result.rounds} "
+                        f"rounds (exhausted={loop_result.exhausted_rounds})"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
 
     elif mode == "cli-prompt":
         # ── CLI-Prompt Path: Phases A-C (unchanged) ──────────────────
@@ -1320,53 +1461,110 @@ def run_skill(
             repo_root=repo_root,
         )
         logger.info(
-            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds  backend=%s",
             skill_id, len(system_prompt), len(user_prompt),
-            DEFAULT_TIMEOUT_SECONDS,
+            DEFAULT_TIMEOUT_SECONDS, provider_config.backend_name,
         )
 
-        # Phase C: Claude invocation via runtime transport
-        try:
-            response_text = invoke_claude_text(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model=SKILL_MODEL,
-                max_tokens=SKILL_MAX_TOKENS,
-                _bench_run_id=run_id,
-                _bench_skill_id=skill_id,
-                _bench_node_id=node_id,
-                _bench_invocation_type="skill_cli_prompt",
-            )
-        except ClaudeTransportError as exc:
-            _elapsed = time.monotonic() - _skill_t0
-            diag_paths = _write_transport_failure_diagnostics(
-                skill_id=skill_id,
-                run_id=run_id,
-                node_id=node_id,
-                mode=mode,
-                reads_from=reads_from,
-                writes_to=writes_to,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                exc=exc,
-                repo_root=repo_root,
-                elapsed_seconds=_elapsed,
-                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
-            )
-            meta_rel = diag_paths.get("meta", "")
-            logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
-                "elapsed=%.1fs  diag=%s",
-                skill_id, _elapsed, meta_rel,
-            )
-            return SkillResult(
-                status="failure",
-                failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
-                    f"Diagnostics written to {meta_rel}"
-                ),
-                failure_category="INCOMPLETE_OUTPUT",
-            )
+        if _use_claude_cli:
+            # ── Claude CLI cli-prompt path (existing) ────────────────
+            try:
+                response_text = invoke_claude_text(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    model=SKILL_MODEL,
+                    max_tokens=SKILL_MAX_TOKENS,
+                    _bench_run_id=run_id,
+                    _bench_skill_id=skill_id,
+                    _bench_node_id=node_id,
+                    _bench_invocation_type="skill_cli_prompt",
+                )
+            except ClaudeTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                diag_paths = _write_transport_failure_diagnostics(
+                    skill_id=skill_id,
+                    run_id=run_id,
+                    node_id=node_id,
+                    mode=mode,
+                    reads_from=reads_from,
+                    writes_to=writes_to,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    exc=exc,
+                    repo_root=repo_root,
+                    elapsed_seconds=_elapsed,
+                    timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                )
+                meta_rel = diag_paths.get("meta", "")
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  diag=%s",
+                    skill_id, _elapsed, meta_rel,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Claude transport failed: "
+                        f"{exc}. Diagnostics written to {meta_rel}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+        else:
+            # ── OpenAI-compatible cli-prompt path ────────────────────
+            # No tools — single-round completion with serialized inputs.
+            from runner.transport.config import build_openai_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_openai_backend(
+                    provider_config,
+                    timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"OpenAI-compatible backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            try:
+                result = backend([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ])
+                response_text = result.get("content") or ""
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"backend returned empty response"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
 
     else:
         return SkillResult(
