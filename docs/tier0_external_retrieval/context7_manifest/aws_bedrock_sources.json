@@ -1,0 +1,164 @@
+{
+  "schema_id": "orch.external.context7.manifest.v1",
+  "provider": "aws",
+  "service": "bedrock",
+  "retrieval_method": "context7",
+  "library_id": "/websites/aws_amazon_bedrock_userguide",
+  "created_at_utc": "2026-05-24T14:30:00Z",
+  "updated_at_utc": "2026-05-24T14:30:00Z",
+  "local_sources_allowed": false,
+  "purpose": "Context7-only retrieval coverage baseline",
+  "documents": [
+    {
+      "doc_id": "aws-bedrock-runtime-overview",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/runtime/runtime_overview.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/endpoints.md",
+      "source_title": "Endpoints supported by Amazon Bedrock / APIs supported by Amazon Bedrock",
+      "retrieval_query": "Bedrock Runtime API overview supported operations Converse InvokeModel endpoints service quotas regional availability",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-converse-api",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/converse/converse_api.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.md",
+      "source_title": "Converse API / Conversation inference",
+      "retrieval_query": "Bedrock Runtime overview Converse API InvokeModel API request response schemas Anthropic Claude model invocation boto3 code examples",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-invoke-model-api",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/invoke_model/invoke_model_api.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-messages-api.md",
+      "source_title": "InvokeModel API / Messages API",
+      "retrieval_query": "Bedrock Runtime overview Converse API InvokeModel API request response schemas Anthropic Claude model invocation boto3 code examples",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-claude-boto3-invocation",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/invoke_model/claude_boto3_invocation.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-runtime_example_bedrock-runtime_InvokeModel_AnthropicClaude_section.md",
+      "source_title": "Invoke Anthropic Claude Model with Python SDK",
+      "retrieval_query": "Bedrock Runtime overview Converse API InvokeModel API request response schemas Anthropic Claude model invocation boto3 code examples",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-iam-requirements",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/auth/iam_requirements.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-prereq.md",
+      "source_title": "Amazon Bedrock IAM policies / IAM prerequisites for inference",
+      "retrieval_query": "IAM permissions policy bedrock runtime actions service role access control bedrock:InvokeModel bedrock:Converse identity-based policy",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-model-identifiers",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/model_ids/model_identifiers.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/foundation-models-reference.md",
+      "source_title": "Foundation models reference / Model IDs",
+      "retrieval_query": "Bedrock model IDs Anthropic Claude model identifiers supported models list foundation model IDs cross-region inference",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-streaming-invocation",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/streaming/streaming_invocation.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.md",
+      "source_title": "ConverseStream Response Events / Streaming invocation",
+      "retrieval_query": "Bedrock Runtime ConverseStream streaming response converse_stream messageStart contentBlockDelta messageStop event stream processing",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-tool-use-config",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/tool_use/tool_use_config.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.md",
+      "source_title": "Tool use with Amazon Bedrock",
+      "retrieval_query": "Converse API tool use toolConfig toolChoice function calling tool_use content block tool result",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-guardrails-config",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/guardrails/guardrails_config.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-use-converse-api.md",
+      "source_title": "Use guardrails with the Converse API",
+      "retrieval_query": "IAM requirements authentication model IDs regional endpoints streaming invocation tool use toolConfig guardrails configuration",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-request-schemas",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/schemas/request_schemas.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-messages-api.md",
+      "source_title": "Bedrock Runtime request schemas",
+      "retrieval_query": "Bedrock Runtime overview Converse API InvokeModel API request response schemas Anthropic Claude model invocation boto3 code examples",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-response-schemas",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/schemas/response_schemas.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.md",
+      "source_title": "Bedrock Runtime response schemas",
+      "retrieval_query": "Bedrock Runtime overview Converse API InvokeModel API request response schemas Anthropic Claude model invocation boto3 code examples",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-error-handling-patterns",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/error_handling/error_handling_patterns.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/scaling-throughput-best-practices.md",
+      "source_title": "Scaling and throughput best practices / Understanding HTTP error responses",
+      "retrieval_query": "error handling retry patterns rate limits throttling guidance request throttling exception handling",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-authentication-requirements",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/auth/authentication_requirements.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-prereq.md",
+      "source_title": "Authentication requirements for Amazon Bedrock",
+      "retrieval_query": "IAM permissions policy bedrock runtime actions service role access control bedrock:InvokeModel bedrock:Converse identity-based policy",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-regional-endpoint-config",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/regional_endpoints/regional_endpoint_config.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/endpoints.md",
+      "source_title": "Endpoints supported by Amazon Bedrock",
+      "retrieval_query": "Bedrock Runtime API overview supported operations Converse InvokeModel endpoints service quotas regional availability",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-throttling-guidance",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/rate_limits/throttling_guidance.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/scaling-throughput-best-practices.md",
+      "source_title": "Scaling and throughput best practices",
+      "retrieval_query": "error handling retry patterns rate limits throttling guidance request throttling exception handling",
+      "retrieval_status": "retrieved"
+    },
+    {
+      "doc_id": "aws-bedrock-retry-patterns",
+      "snapshot_path": "docs/tier0_external_retrieval/raw/aws/bedrock/retry_patterns/retry_patterns.md",
+      "source_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/scaling-throughput-best-practices.md",
+      "source_title": "Scaling and throughput best practices / Configure retry strategy",
+      "retrieval_query": "error handling retry patterns rate limits throttling guidance request throttling exception handling",
+      "retrieval_status": "retrieved"
+    }
+  ],
+  "missing_topics": [],
+  "coverage_notes": [
+    {
+      "topic": "model_identifiers",
+      "note": "Only model IDs appearing in Context7 retrieval results were captured. Not a comprehensive list of all supported Bedrock models."
+    },
+    {
+      "topic": "authentication_requirements",
+      "note": "No dedicated authentication configuration documentation was retrieved. Coverage derived from IAM policy and client initialization examples."
+    },
+    {
+      "topic": "regional_endpoint_configuration",
+      "note": "Regional availability list (which regions support which models) was not retrieved. Only endpoint format and cross-region inference patterns."
+    },
+    {
+      "topic": "request_schemas",
+      "note": "Partial coverage. Schema fields were extracted from code examples rather than dedicated schema reference documentation."
+    },
+    {
+      "topic": "response_schemas",
+      "note": "Partial coverage. Schema fields were extracted from code examples rather than dedicated schema reference documentation."
+    }
+  ]
+}
