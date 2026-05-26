@@ -121,9 +121,9 @@ Phase E does NOT use IAM authentication. The `bedrock-mantle` API key path elimi
 
 ### Credential Precedence
 
-For `bedrock-mantle`: `OPENAI_API_KEY` environment variable > OpenAI client constructor `api_key` parameter.
+For `bedrock-mantle`: OpenAI client constructor `api_key` parameter > `OPENAI_API_KEY` environment variable (standard OpenAI SDK precedence).
 
-No AWS credential chain (profiles, instance metadata, STS) is involved when using the `bedrock-mantle` endpoint with API keys.
+No AWS credential chain is involved at HTTP request time when using bedrock-mantle with API keys. However, generating short-term API keys programmatically requires IAM credentials via the AWS default provider chain. Long-term keys (generated via Bedrock console) have no IAM runtime dependency.
 
 ---
 
@@ -278,7 +278,7 @@ Tool call arguments are streamed incrementally as partial JSON in `delta.tool_ca
 
 ### Streaming Usage
 
-In streaming mode, the `usage` object appears in the final chunk or in the `metadata` event (Converse API). For `bedrock-mantle` Chat Completions streaming, usage is returned in the final chunk when `stream_options: {"include_usage": true}` is set, following the OpenAI convention.
+In streaming mode, the `usage` object appears in the final chunk or in the `metadata` event (Converse API). Streaming usage via `stream_options: {"include_usage": true}` on bedrock-mantle is UNVERIFIED. Non-streaming Chat Completions responses return `usage.prompt_tokens`, `usage.completion_tokens`, and `usage.total_tokens` (confirmed, Bedrock UG p.1081). If streaming usage is unavailable, the backend should extract usage from the accumulated non-streaming response or operate in non-streaming mode for Bedrock.
 
 ### Integration with Benchmark Engine
 
