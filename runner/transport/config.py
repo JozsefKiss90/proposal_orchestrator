@@ -45,7 +45,9 @@ import os
 import re
 from dataclasses import dataclass
 from typing import Any
+from dotenv import load_dotenv
 
+load_dotenv()
 from runner.transport.capabilities import (
     CAPABILITIES_REGISTRY,
     ProviderCapabilities,
