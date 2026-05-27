@@ -60,6 +60,7 @@ from runner.transport.capabilities import (
 VALID_BACKENDS: frozenset[str] = frozenset({
     "claude_cli",
     "bedrock",
+    "bedrock_converse",
     "together_ai",
     "ollama",
     "openai_compatible",
@@ -250,6 +251,25 @@ GENERIC_OPENAI_COMPATIBLE = TransportPreset(
     ),
 )
 
+BEDROCK_CONVERSE_US = TransportPreset(
+    name="BEDROCK_CONVERSE_US",
+    backend_name="bedrock_converse",
+    description="Native Bedrock Converse API via boto3, US region, IAM auth",
+    default_endpoint=None,
+    default_model="us.anthropic.claude-sonnet-4-6",
+    requires_api_key=False,
+    default_region="us-east-1",
+    capabilities=CAPABILITIES_REGISTRY["bedrock_converse"],
+    intended_use="Native Bedrock access with Claude via inference profiles",
+    production_suitable=True,
+    notes=(
+        "Uses boto3 with IAM credentials (env vars, ~/.aws/credentials, or instance profile).",
+        "Model IDs are inference profile IDs (e.g. us.anthropic.claude-sonnet-4-6).",
+        "No API key needed — authentication is via standard AWS credential chain.",
+        "Does not use bedrock-mantle OpenAI-compatible proxy.",
+    ),
+)
+
 #: Registry of all available presets, keyed by name.
 PRESET_REGISTRY: dict[str, TransportPreset] = {
     p.name: p
@@ -260,6 +280,7 @@ PRESET_REGISTRY: dict[str, TransportPreset] = {
         TOGETHER_VALIDATION,
         OLLAMA_LOCAL,
         GENERIC_OPENAI_COMPATIBLE,
+        BEDROCK_CONVERSE_US,
     )
 }
 
@@ -482,6 +503,9 @@ def resolve_provider_config() -> ProviderConfig:
     if backend == "bedrock":
         return _resolve_bedrock(endpoint, api_key, model, capabilities)
 
+    if backend == "bedrock_converse":
+        return _resolve_bedrock_converse(model, capabilities)
+
     if backend == "together_ai":
         return _resolve_together_ai(endpoint, api_key, model, capabilities)
 
@@ -522,6 +546,21 @@ def _resolve_bedrock(
         base_url=endpoint,
         api_key_set=True,
         model=resolved_model,
+        capabilities=capabilities,
+    )
+
+
+def _resolve_bedrock_converse(
+    model: str | None,
+    capabilities: ProviderCapabilities,
+) -> ProviderConfig:
+    """Resolve native Bedrock Converse configuration."""
+    region = os.environ.get("AWS_REGION", "us-east-1")
+    return ProviderConfig(
+        backend_name="bedrock_converse",
+        base_url=None,
+        api_key_set=False,
+        model=model,
         capabilities=capabilities,
     )
 
@@ -653,6 +692,47 @@ def build_openai_backend(
         model=config.model,
         tools=tools,
         timeout_seconds=timeout_seconds,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+
+
+def build_converse_backend(
+    config: ProviderConfig,
+    *,
+    tools: list[dict[str, Any]] | None = None,
+    temperature: float = 0.0,
+    max_tokens: int = 4096,
+) -> Any:
+    """Construct a :class:`BedrockConverseBackend` from a resolved config.
+
+    Parameters
+    ----------
+    config:
+        A resolved :class:`ProviderConfig` with ``backend_name="bedrock_converse"``.
+    tools:
+        Optional tool schemas for TAPM-mode requests (OpenAI format, converted internally).
+    temperature:
+        Sampling temperature.
+    max_tokens:
+        Maximum completion tokens.
+    """
+    if config.backend_name != "bedrock_converse":
+        raise ValueError(
+            f"build_converse_backend requires bedrock_converse backend, "
+            f"got {config.backend_name!r}"
+        )
+    if config.model is None:
+        raise ValueError("model is required for bedrock_converse backend")
+
+    from runner.transport.bedrock_converse import BedrockConverseBackend
+
+    region = os.environ.get("AWS_REGION", "us-east-1")
+
+    return BedrockConverseBackend(
+        model_id=config.model,
+        region_name=region,
+        tools=tools,
         temperature=temperature,
         max_tokens=max_tokens,
     )

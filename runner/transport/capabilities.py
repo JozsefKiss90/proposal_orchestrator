@@ -102,8 +102,19 @@ GENERIC_OPENAI_CAPABILITIES = ProviderCapabilities(
 )
 
 #: Lookup by backend name.
+BEDROCK_CONVERSE_CAPABILITIES = ProviderCapabilities(
+    streaming=False,
+    tool_calling=True,
+    structured_output="full",
+    usage_streaming="unsupported",
+    auth_type="iam",
+    openai_compatible=False,
+)
+
+#: Lookup by backend name.
 CAPABILITIES_REGISTRY: dict[str, ProviderCapabilities] = {
     "bedrock": BEDROCK_CAPABILITIES,
+    "bedrock_converse": BEDROCK_CONVERSE_CAPABILITIES,
     "together_ai": TOGETHER_AI_CAPABILITIES,
     "ollama": OLLAMA_CAPABILITIES,
     "claude_cli": CLAUDE_CLI_CAPABILITIES,

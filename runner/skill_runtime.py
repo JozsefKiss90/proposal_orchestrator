@@ -1260,6 +1260,7 @@ def run_skill(
             failure_category="MISSING_INPUT",
         )
     _use_claude_cli = provider_config.backend_name == "claude_cli"
+    _use_converse = provider_config.backend_name == "bedrock_converse"
 
     if mode == "tapm":
         # ── TAPM Path: Phases A'-C' ──────────────────────────────────
@@ -1346,6 +1347,60 @@ def run_skill(
                     ),
                     failure_category="INCOMPLETE_OUTPUT",
                 )
+        elif _use_converse:
+            # ── Native Bedrock Converse TAPM path ─────────────────
+            from runner.transport.config import build_converse_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_converse_backend(
+                    provider_config,
+                    tools=[READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA],
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"Bedrock Converse backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            allowed_prefixes: list[str] = []
+            for rf in reads_from + (optional_reads_from or []):
+                if _is_contextual_descriptor(rf):
+                    continue
+                allowed_prefixes.append(rf)
+
+            try:
+                loop_result: ToolLoopResponse = run_tool_loop(
+                    backend=backend,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    repo_root=repo_root,
+                    allowed_prefixes=allowed_prefixes or None,
+                    timeout_seconds=float(TAPM_TIMEOUT_SECONDS),
+                )
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
         else:
             # ── OpenAI-compatible TAPM path (Phase F tool emulation) ─
             from runner.transport.config import build_openai_backend
@@ -1369,15 +1424,11 @@ def run_skill(
                     failure_category="MISSING_INPUT",
                 )
 
-            # Compute declared-input prefixes for sandbox enforcement.
-            # Each reads_from entry contributes the directory portion
-            # as an allowed prefix so the ToolExecutor can read within
-            # the skill's declared input boundary.
-            allowed_prefixes: list[str] = []
+            allowed_prefixes_oai: list[str] = []
             for rf in reads_from + (optional_reads_from or []):
                 if _is_contextual_descriptor(rf):
                     continue
-                allowed_prefixes.append(rf)
+                allowed_prefixes_oai.append(rf)
 
             try:
                 loop_result: ToolLoopResponse = run_tool_loop(
@@ -1385,7 +1436,7 @@ def run_skill(
                     system_prompt=system_prompt,
                     user_prompt=user_prompt,
                     repo_root=repo_root,
-                    allowed_prefixes=allowed_prefixes or None,
+                    allowed_prefixes=allowed_prefixes_oai or None,
                     timeout_seconds=float(TAPM_TIMEOUT_SECONDS),
                 )
             except OpenAICompatTransportError as exc:
@@ -1509,6 +1560,61 @@ def run_skill(
                     ),
                     failure_category="INCOMPLETE_OUTPUT",
                 )
+        elif _use_converse:
+            # ── Native Bedrock Converse cli-prompt path ───────────────
+            from runner.transport.config import build_converse_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_converse_backend(
+                    provider_config,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"Bedrock Converse backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            try:
+                result = backend([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ])
+                response_text = result.get("content") or ""
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"backend returned empty response"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
         else:
             # ── OpenAI-compatible cli-prompt path ────────────────────
             # No tools — single-round completion with serialized inputs.
