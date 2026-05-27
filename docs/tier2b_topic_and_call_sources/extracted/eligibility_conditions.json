@@ -1,3 +1,54 @@
 {
-  "conditions": []
+  "conditions": [
+    {
+      "condition_id": "EC-01",
+      "description": "Participation is limited to legal entities established in EU Member States, Iceland, Norway, and associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "condition_type": "geographic",
+      "source_section": "eligibility_restrictions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-02",
+      "description": "Entities controlled by non-eligible countries may be excluded unless guarantees are provided.",
+      "condition_type": "geographic",
+      "source_section": "eligibility_restrictions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-03",
+      "description": "Activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "condition_type": "trl_level",
+      "source_section": "technology_readiness_level",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-04",
+      "description": "Maximum EU contribution per project is EUR 19,000,000.",
+      "condition_type": "budget_limit",
+      "source_section": "max_contribution / expected_eu_contribution",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "condition_id": "EC-05",
+      "description": "The instrument type is Research and Innovation Actions (RIA). Standard RIA consortium composition rules apply (minimum 3 independent legal entities from 3 different EU Member States or associated countries).",
+      "condition_type": "consortium_composition",
+      "source_section": "call_type / type_of_action",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Assumed",
+      "assumption_note": "The call slice and curated extract do not explicitly state minimum consortium size. The minimum 3-partner rule is structurally expected for RIA under Horizon Europe General Annexes. Verify against General Annex B."
+    },
+    {
+      "condition_id": "EC-06",
+      "description": "Open access obligations apply to publications and research data as standard for Horizon Europe RIA actions.",
+      "condition_type": "open_access",
+      "source_section": "call_type / type_of_action",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+      "status": "Assumed",
+      "assumption_note": "Open access is not explicitly stated in the call slice or curated extract but is a standard mandatory condition for all Horizon Europe RIA actions per the Grant Agreement conditions. Assumed based on instrument type."
+    }
+  ]
 }

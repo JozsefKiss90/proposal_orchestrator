@@ -91,9 +91,16 @@ class BedrockConverseBackend:
         self._tools = tools or []
         self._last_usage: dict[str, int] | None = None
 
+        from botocore.config import Config as BotoConfig
+
         self._client = boto3.client(
             "bedrock-runtime",
             region_name=region_name,
+            config=BotoConfig(
+                read_timeout=600,
+                connect_timeout=30,
+                retries={"max_attempts": 0},
+            ),
         )
 
     # -- ToolLoopBackend protocol ------------------------------------------
@@ -132,24 +139,45 @@ class BedrockConverseBackend:
     def _build_request(
         self, messages: list[dict[str, Any]]
     ) -> dict[str, Any]:
-        """Convert OpenAI messages to Converse API kwargs."""
+        """Convert OpenAI messages to Converse API kwargs.
+
+        The Converse API enforces strict role alternation (user →
+        assistant → user → ...).  The OpenAI tool loop emits
+        individual ``role: "tool"`` messages, one per tool call.
+        These must be merged into a single ``role: "user"`` message
+        containing all ``toolResult`` blocks.
+        """
         system_blocks: list[dict[str, Any]] = []
         converse_messages: list[dict[str, Any]] = []
+        # Accumulator for consecutive tool result blocks
+        pending_tool_results: list[dict[str, Any]] = []
+
+        def _flush_tool_results() -> None:
+            """Merge accumulated tool results into one user message."""
+            if pending_tool_results:
+                converse_messages.append({
+                    "role": "user",
+                    "content": list(pending_tool_results),
+                })
+                pending_tool_results.clear()
 
         for msg in messages:
             role = msg.get("role", "")
             content = msg.get("content", "")
 
             if role == "system":
+                _flush_tool_results()
                 system_blocks.append({"text": content or ""})
 
             elif role == "user":
+                _flush_tool_results()
                 converse_messages.append({
                     "role": "user",
                     "content": [{"text": content or ""}],
                 })
 
             elif role == "assistant":
+                _flush_tool_results()
                 blocks: list[dict[str, Any]] = []
                 if content:
                     blocks.append({"text": content})
@@ -178,18 +206,17 @@ class BedrockConverseBackend:
                     })
 
             elif role == "tool":
-                # Convert OpenAI tool result to Converse toolResult
+                # Accumulate — will be flushed as a single user message
                 tool_call_id = msg.get("tool_call_id", "")
                 tool_content = msg.get("content", "")
-                converse_messages.append({
-                    "role": "user",
-                    "content": [{
-                        "toolResult": {
-                            "toolUseId": tool_call_id,
-                            "content": [{"text": tool_content}],
-                        }
-                    }],
+                pending_tool_results.append({
+                    "toolResult": {
+                        "toolUseId": tool_call_id,
+                        "content": [{"text": tool_content}],
+                    }
                 })
+
+        _flush_tool_results()
 
         kwargs: dict[str, Any] = {
             "modelId": self._model_id,

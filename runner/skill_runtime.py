@@ -1401,6 +1401,26 @@ def run_skill(
                     failure_category="INCOMPLETE_OUTPUT",
                 )
 
+            response_text = loop_result.text
+            if loop_result.exhausted_rounds:
+                logger.warning(
+                    "  skill WARN   id=%s  tool loop exhausted after "
+                    "%d rounds (files_read=%d)",
+                    skill_id, loop_result.rounds,
+                    len(loop_result.files_read),
+                )
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: tool loop returned "
+                        f"empty response after {loop_result.rounds} "
+                        f"rounds (exhausted={loop_result.exhausted_rounds})"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
         else:
             # ── OpenAI-compatible TAPM path (Phase F tool emulation) ─
             from runner.transport.config import build_openai_backend
