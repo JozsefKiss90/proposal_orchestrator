@@ -1,0 +1,50 @@
+{
+  "benchmark_schema_version": "1.0.0",
+  "run_id": "2c9d72cb-5f73-45a0-8c08-8b23f47dcd7d",
+  "started_at": "2026-05-27T18:53:34.286048+00:00",
+  "completed_at": "2026-05-27T18:59:31.412963+00:00",
+  "total_invocations": 1,
+  "total_estimated_input_tokens": 11865,
+  "total_estimated_output_tokens": 512,
+  "total_wall_clock_seconds": 357.125,
+  "node_records": [
+    {
+      "node_id": "n02_concept_refinement",
+      "dispatched": true
+    }
+  ],
+  "phase_analytics_summary": {
+    "phases_observed": [
+      2
+    ],
+    "nodes_observed": [
+      "n02_concept_refinement"
+    ],
+    "total_invocations": 1
+  },
+  "token_economics_summary": {
+    "total_estimated_input_tokens": 11865,
+    "total_estimated_output_tokens": 512,
+    "total_estimated_tokens": 12377
+  },
+  "timing_summary": {
+    "total_wall_clock_seconds": 357.125,
+    "mean_invocation_seconds": 85.313,
+    "median_invocation_seconds": 85.313
+  },
+  "phase_b_artifact_paths": {
+    "phase_analytics": "phase_analytics.json",
+    "token_economics": "token_economics.json",
+    "timing_profile": "timing_profile.json"
+  },
+  "benchmark_stage": "phase_c_provider_projection",
+  "provider_projection_summary": {
+    "total_providers_evaluated": 11,
+    "suitable_providers": 11,
+    "lowest_projected_cost_usd": 0.002087,
+    "lowest_projected_cost_provider": "GPT-4o Mini (Azure OpenAI)"
+  },
+  "phase_c_artifact_paths": {
+    "provider_projection": "provider_projection.json"
+  }
+}

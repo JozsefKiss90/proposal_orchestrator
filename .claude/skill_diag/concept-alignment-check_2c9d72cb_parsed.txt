@@ -1,0 +1,52 @@
+=== parsed OK ===
+=== top-level keys: ['schema_id', 'run_id', 'topic_mapping_rationale', 'scope_coverage', 'scope_conflict_log', 'strategic_differentiation', 'decision_log_entry'] ===
+=== parsed content ===
+{
+  "schema_id": "orch.phase2.concept_refinement_summary.v1",
+  "run_id": "2c9d72cb-5f73-45a0-8c08-8b23f47dcd7d",
+  "topic_mapping_rationale": {
+    "EO-01": {
+      "topic_element_id": "EO-01",
+      "mapping_to_concept": "MAESTRO directly addresses this outcome through two co-designed research pillars and a cross-cutting capability. Pillar 1 (Neuro-Symbolic Planning and Reasoning) advances planning mechanisms by developing a hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with verifiable intermediate states, integrates search-based algorithms (MCTS, hierarchical task networks) with LLM-driven heuristic evaluation, and supports self-correction through plan monitoring and replanning \u2014 directly improving agent autonomy and robustness. Pillar 2 (Adaptive Memory Architecture) advances memory management through a unified three-tier memory system (working memory, episodic memory, semantic memory) governed by a memory controller that manages information flow between stores, sustaining coherent long-horizon agent behaviour and improving reliability over extended interactions. The External Tool and API Orchestration Layer further enhances reliability by grounding agent reasoning in verified external data and providing principled fallback/recovery mechanisms for tool failures. The concept uses the exact vocabulary of the expected outcome: 'autonomy', 'robustness', 'reliability', 'planning', 'memory management', and 'reasoning' all appear verbatim in the concept corpus.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "locations": [
+          "Vision paragraph (lines describing brittleness in long-horizon planning, coherence, and reliability)",
+          "Pillar 1 \u2014 Neuro-Symbolic Planning and Reasoning section",
+          "Pillar 2 \u2014 Adaptive Memory Architecture section",
+          "Cross-Cutting Capability \u2014 External Tool and API Orchestration Layer section (verification and fallback/recovery subsections)"
+        ]
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    },
+    "EO-02": {
+      "topic_element_id": "EO-02",
+      "mapping_to_concept": "MAESTRO directly addresses this outcome through Pillar 3 (Decentralised Multi-Agent Coordination). The concept develops formal task-delegation protocols where agents decompose tasks, negotiate subtask assignments, and establish shared commitment structures with provable convergence \u2014 constituting 'innovative multi-agent frameworks and protocols'. The research explicitly targets 'effective decentralised coordination and collaboration among multiple AI agents beyond the capabilities of individual agents' by enabling heterogeneous agents specialised in different tools, domains, or reasoning styles to collaborate on shared objectives. Conflict resolution mechanisms handle situations where agent plans interfere or resources are contested. The External Tool and API Orchestration Layer extends multi-agent capability by governing shared tool access, delegated tool invocation, and conflict resolution when multiple agents require the same external resource. The concept uses the exact vocabulary of the expected outcome: 'multi-agent', 'frameworks', 'protocols', 'decentralised coordination', 'collaboration', and 'multiple AI agents' all appear verbatim or as direct equivalents in the concept corpus.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "locations": [
+          "Pillar 3 \u2014 Decentralised Multi-Agent Coordination section (full section)",
+          "Cross-Cutting Capability \u2014 External Tool and API Orchestration Layer section (multi-agent coordination subsections)",
+          "Validation and Demonstrators \u2014 Advanced Manufacturing demonstrator (multi-agent coordination under timing constraints)"
+        ]
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    }
+  },
+  "scope_coverage": {
+    "SR-01": {
+      "scope_element_id": "SR-01",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly frames MAESTRO as developing 'next-generation AI agent architectures' that are autonomous systems powered by large language models. The project abstract in project_summary.json states the project 'develops next-generation AI agent architectures' combining planning, memory management, reasoning, and tool integration 'to autonomously accomplish complex real-world tasks'. The concept_note.md Vision section describes agents that 'plan, utilize tools and perform actions autonomously to achieve specified goals based on high-level instr
+=== END ===

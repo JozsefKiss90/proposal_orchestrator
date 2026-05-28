@@ -1,0 +1,751 @@
+=== skill_id: concept-alignment-check ===
+=== mode: tapm ===
+=== response_text length: 64304 ===
+=== response_text (full) ===
+Now I have all the data needed. Let me perform the full analysis and construct the output.
+
+**Concept Corpus Analysis:**
+
+The concept corpus (concept_note.md + project_summary.json + strategic_positioning.md) covers:
+- AI agents, autonomy, robustness, reliability
+- Planning mechanisms (neuro-symbolic planning, hierarchical task networks, Monte Carlo Tree Search, sub-task graphs, self-correction, plan monitoring)
+- Memory management (working memory, episodic memory, semantic memory, memory controller, adaptive memory architecture, long-term memory)
+- Reasoning capabilities (LLM-based reasoning, chain-of-thought, neuro-symbolic reasoning)
+- Multi-agent frameworks and protocols (decentralised coordination, task-delegation protocol, conflict resolution, convergence guarantees)
+- External tools and APIs (External Tool and API Orchestration Layer, typed tool registry, API adapters, HL7 FHIR, OPC-UA)
+- KPIs, benchmarking, progress monitoring
+- ADRA, GenAI4EU Hub cohesion activities
+- Healthcare and advanced manufacturing demonstrators
+- AI-on-demand platform, EDIHs, AI Factories, Data Labs
+- TRL 2–5
+- Open-source, prior EU-funded actions reuse
+- Consortium: 8 partners, coordinator in DE, 48 months, EUR 19M
+
+**EO-01 Analysis:**
+Key terms: "autonomy", "robustness", "reliability", "AI agents", "planning mechanisms", "memory management", "reasoning capabilities"
+- All terms appear verbatim in concept corpus. Specific mechanisms: Pillar 1 (neuro-symbolic planning), Pillar 2 (adaptive memory architecture), External Tool and API Orchestration Layer. → Confirmed
+
+**EO-02 Analysis:**
+Key terms: "multi-agent frameworks", "protocols", "decentralized coordination", "collaboration", "multiple AI agents"
+- "multi-agent frameworks" appears in concept (project_summary.json keywords: "multi-agent systems"; concept_note.md: "multi-agent coordination protocols"); "protocols" appears; "decentralised coordination" appears (concept_note.md Pillar 3); "collaboration" appears; "multiple AI agents" appears. Specific mechanism: Pillar 3 decentralised multi-agent coordination with formal task-delegation protocol and convergence guarantees. → Confirmed
+
+**Scope Coverage Analysis:**
+
+SR-01 (mandatory): Next-generation AI agents as autonomous systems powered by large AI language models that can plan, utilize tools and perform actions autonomously. → concept_note.md explicitly describes LLM-based agents, autonomous planning, tool use. Covered.
+
+SR-02 (mandatory): Robust planning, reasoning, and search mechanisms; breaking down complex tasks into structured subgoals. → Pillar 1: sub-task graphs, Monte Carlo Tree Search, hierarchical task networks. Covered.
+
+SR-03 (mandatory): Effective memory and state management; short-term and external long-term memory. → Pillar 2: working memory, episodic memory, semantic memory, memory controller. Covered.
+
+SR-04 (mandatory): Integrating external tools and APIs to overcome limitations in large AI models. → External Tool and API Orchestration Layer explicitly addresses this. Covered.
+
+SR-05 (not mandatory): Self-planning and self-optimization. → concept_note.md: "self-correction through plan monitoring", "self-optimization" not verbatim but plan monitoring/replanning is described. Partially covered (self-optimization not explicitly named).
+
+SR-06 (not mandatory): Memory-augmented AI agents for long-term reasoning and lifelong learning. → Pillar 2 covers memory-augmented agents and long-term reasoning; "lifelong learning" not explicitly stated but episodic memory and continuous update described. Partially covered.
+
+SR-07 (not mandatory): Multi-agent frameworks for collaborative agents, mixed AI architectures. → Pillar 3 covers multi-agent frameworks; "mixed AI architectures" mentioned in strategic_positioning.md context. Covered.
+
+SR-08 (not mandatory): Multimodal reasoning capabilities. → Not explicitly addressed in concept corpus. Not covered / not_applicable — the concept focuses on LLM-based agents but does not explicitly claim multimodal reasoning as a research area.
+
+SR-09 (mandatory): KPIs, benchmarking, progress monitoring. → concept_note.md explicitly states "qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints." Covered.
+
+SR-10 (mandatory): ADRA cohesion activities and GenAI4EU Hub. → concept_note.md: "The project implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub." Covered.
+
+SR-11 (mandatory): Portfolio coverage — at least one proposal per sector (healthcare, advanced manufacturing, in-vehicle autonomous driving). → MAESTRO covers healthcare and advanced manufacturing directly; in-vehicle autonomous driving is addressed only via architectural mapping analysis (WP8), not a full demonstrator. This is partially covered — the concept acknowledges the gap and provides a mitigation (architectural mapping) but does not deliver a full in-vehicle autonomous driving demonstrator. This is a scope coverage gap worth noting.
+
+**Call Constraints:**
+
+CC-01 (methodological): KPIs, benchmarking, progress monitoring. → Same as SR-09. Covered.
+
+CC-02 (methodological): Build on and reuse public results from prior funded actions. → concept_note.md explicitly states building on Horizon 2020 ICT-48 projects, ADRA pilot projects, Horizon Europe Cluster 4 actions. Covered.
+
+CC-03 (reporting): Share results via AI-on-demand platform. → concept_note.md: "All research outputs...will be shared with the European R&D community through the AI-on-demand platform." Covered.
+
+CC-04 (partnership): Link to AI Factories and Data Labs. → concept_note.md: "The project will link to the resources offered by AI Factories and Data Labs." Covered.
+
+CC-05 (methodological): Validate in Testing and Experiment Facilities; deploy via EDIHs; contribute to Apply AI strategy. → concept_note.md: "Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs)." Covered.
+
+CC-06 (partnership): ADRA co-programmed partnership; cohesion activities with ADRA and GenAI4EU Hub. → Same as SR-10. Covered.
+
+CC-07 (partnership): Build synergies with relevant projects and initiatives. → concept_note.md: "MAESTRO will build synergies with relevant European, national, and international initiatives beyond the ADRA partnership. Specifically, the project will coordinate with the EuroHPC Joint Undertaking...national AI strategies...Horizon Europe Cluster 4 projects...OECD AI Policy Observatory." Covered.
+
+CC-08 (scope): TRL 2 to TRL 5. → strategic_positioning.md: "Research activities start at TRL 2...and progress to TRL 5...spanning the full TRL 2–5 range required by the call." Covered.
+
+CC-09 (eligibility): Max EU contribution EUR 19M. → project_summary.json: "requested_eu_contribution": 19000000. Covered.
+
+CC-10 (eligibility): Participation limited to eligible countries. → concept_note.md does not explicitly state consortium country eligibility. project_summary.json shows coordinator in DE (Germany, EU Member State). No explicit statement about all partners being from eligible countries. Partially covered — coordinator is DE (eligible), but no explicit statement about all 8 partners' eligibility.
+
+CC-11 (other): Portfolio coverage — at least one proposal per sector. → Same as SR-11. Partially covered.
+
+CC-12 (other): FSTP provisions. → Not addressed in concept corpus. Not_applicable — FSTP is a call mechanism, not a proposal requirement per se; the concept does not need to explicitly address FSTP unless it plans to use it.
+
+CC-13 (other): Submission deadline 2026-04-15. → Not addressed in concept corpus (administrative, not a concept requirement). Not_applicable.
+
+CC-14 (other/assumed): Max project duration 48 months. → project_summary.json: "duration_months": 48. Covered.
+
+**Scope Conflicts:**
+
+1. SR-11 / CC-11: In-vehicle autonomous driving sector — MAESTRO does not deliver a full demonstrator for this sector. The concept acknowledges this and provides an architectural mapping analysis (WP8) as mitigation. This is a conditional gap — the portfolio coverage mechanism means another proposal may cover this sector, but MAESTRO's coverage is incomplete. This is a framing issue: the call expects at least one proposal per sector, and MAESTRO's positioning is that it covers two of three, relying on the portfolio mechanism for the third. This is not a conflict per se but a coverage gap.
+
+2. No framing mismatches identified — the concept consistently frames outcomes as research advances for European AI ecosystem, consistent with the call's framing.
+
+3. CC-10 / EC-01: Consortium eligibility — not explicitly confirmed for all partners. Minor gap.
+
+**Strategic Differentiation (from strategic_positioning.md):**
+MAESTRO's primary differentiator is the co-design of three mutually reinforcing research pillars (neuro-symbolic planning and reasoning, adaptive memory architecture, decentralised multi-agent coordination) unified by a cross-cutting External Tool and API Orchestration Layer, producing an integrated architecture rather than combining independent research threads. The neuro-symbolic approach provides formal guarantees (verifiable sub-task decomposition, plan monitoring with provable recovery) that pure LLM-based approaches cannot offer. The formally specified delegation and negotiation protocols with convergence guarantees distinguish MAESTRO from ad-hoc LLM-based agent communication. The architecturally central External Tool and API Orchestration Layer — with typed tool registry, formal invocation policies, standardised API adapters, post-invocation verification, and auditable traces — distinguishes MAESTRO from agent architectures treating tool use as simple function-calling. Validation spans two call-identified Apply AI sectors (healthcare, advanced manufacturing) plus a cross-sector logistics transfer demonstrator, demonstrating generalisability. The consortium combines leading European AI research institutions with sector-specific industry partners and a technology transfer partner.
+
+Now constructing the full JSON output:
+
+```json
+{
+  "schema_id": "orch.phase2.concept_refinement_summary.v1",
+  "run_id": "69fe2594-42ea-411d-98c4-81b6eb9e4e6c",
+  "topic_mapping_rationale": {
+    "EO-01": {
+      "topic_element_id": "EO-01",
+      "mapping_to_concept": "MAESTRO directly addresses EO-01 through two of its three core research pillars and the cross-cutting tool orchestration layer. Pillar 1 (Neuro-Symbolic Planning and Reasoning) advances planning mechanisms by developing a hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with verifiable intermediate states, integrates search-based planning algorithms (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation, and supports self-correction through plan monitoring and replanning. Pillar 2 (Adaptive Memory Architecture) advances memory management by designing a unified memory architecture integrating working memory, episodic memory, and semantic memory with a memory controller that manages information flow between stores. The External Tool and API Orchestration Layer advances reliability by grounding agent reasoning in verified external data and providing principled fallback/recovery mechanisms. Together these mechanisms produce improvements in autonomy, robustness, and reliability of AI agents as stated in EO-01.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Sections: Vision (autonomy, robustness, reliability framing); Pillar 1 — Neuro-Symbolic Planning and Reasoning (planning mechanisms); Pillar 2 — Adaptive Memory Architecture (memory management); Cross-Cutting Capability — External Tool and API Orchestration Layer (reliability and grounding)"
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    },
+    "EO-02": {
+      "topic_element_id": "EO-02",
+      "mapping_to_concept": "MAESTRO directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination) and the External Tool and API Orchestration Layer's multi-agent governance capabilities. Pillar 3 develops multi-agent coordination protocols enabling heterogeneous agents to collaborate on shared objectives, defines a formal task-delegation protocol with provable convergence, develops conflict resolution mechanisms, and ensures auditable multi-agent interactions. The External Tool and API Orchestration Layer extends multi-agent capability by governing shared tool access, delegated tool invocation, and conflict resolution when multiple agents require the same external resource. The project_summary.json abstract explicitly states 'decentralised multi-agent coordination protocols that enable heterogeneous AI agents to negotiate, delegate, and jointly execute tasks with provable convergence guarantees.' The strategic_positioning.md explicitly positions Pillar 3 against EO-02, noting that formally specified delegation and negotiation protocols with convergence guarantees distinguish MAESTRO from ad-hoc LLM-based agent communication patterns.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Section: Pillar 3 — Decentralised Multi-Agent Coordination (formal task-delegation protocol, conflict resolution mechanisms, auditable multi-agent interactions); Cross-Cutting Capability — External Tool and API Orchestration Layer (multi-agent tool governance); project_summary.json abstract (decentralised multi-agent coordination protocols with provable convergence guarantees)"
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    }
+  },
+  "scope_coverage": {
+    "SR-01": {
+      "scope_element_id": "SR-01",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly addresses next-generation AI agents as autonomous systems powered by large language models. The concept_note.md Vision section states that MAESTRO addresses limitations of current LLM-based agents and develops new AI agent architectures. The project_summary.json abstract states 'MAESTRO develops next-generation AI agent architectures' and lists 'large language models' as a keyword. The concept describes agents that plan, utilise tools, and perform actions autonomously to achieve specified goals based on high-level instructions across all three pillars.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Vision section (LLM-based agents, autonomous systems framing); project_summary.json (keywords: 'AI agents', 'large language models', 'autonomous systems'; abstract: 'next-generation AI agent architectures')"
+      },
+      "notes": null
+    },
+    "SR-02": {
+      "scope_element_id": "SR-02",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "Pillar 1 (Neuro-Symbolic Planning and Reasoning) directly addresses robust planning, reasoning, and search mechanisms. The concept describes decomposing high-level goals into executable sub-task graphs (structured subgoals), integrating search-based planning algorithms including Monte Carlo Tree Search and hierarchical task networks with LLM-driven heuristic evaluation, and supporting self-correction through plan monitoring. These mechanisms explicitly address the requirement for breaking complex tasks into structured subgoals.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Pillar 1 — Neuro-Symbolic Planning and Reasoning section (sub-task graphs, Monte Carlo Tree Search, hierarchical task networks, plan monitoring, self-correction)"
+      },
+      "notes": null
+    },
+    "SR-03": {
+      "scope_element_id": "SR-03",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "Pillar 2 (Adaptive Memory Architecture) directly addresses effective memory and state management. The concept describes a unified memory architecture integrating working memory (short-term store for current goals, active plan state, recent observations), episodic memory (retrieval-augmented store of past task episodes), and semantic memory (persistent knowledge graph). A memory controller manages information flow between stores, balancing short-term and external long-term memory solutions as required by SR-03.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Pillar 2 — Adaptive Memory Architecture section (working memory, episodic memory, semantic memory, memory controller, long-term memory)"
+      },
+      "notes": null
+    },
+    "SR-04": {
+      "scope_element_id": "SR-04",
+      "constraint_ref": "CC-05",
+      "coverage_status": "covered",
+      "coverage_description": "The External Tool and API Orchestration Layer is an architecturally central cross-cutting capability explicitly designed to address SR-04. The concept describes a typed tool registry and capability model, formal tool selection and invocation policies, standardised API adapters for heterogeneous protocols (REST, GraphQL, HL7 FHIR, OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces. The strategic_positioning.md explicitly positions this layer against SR-04, stating it is 'architecturally central — not an afterthought.'",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Cross-Cutting Capability — External Tool and API Orchestration Layer section (typed tool registry, tool selection policies, API adapters, verification, monitoring, fallback/recovery, auditable traces); strategic_positioning.md section 'Positioning Against SR-04 — External Tools and APIs'"
+      },
+      "notes": null
+    },
+    "SR-09": {
+      "scope_element_id": "SR-09",
+      "constraint_ref": "CC-01",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints. Each demonstrator (healthcare clinical decision support, advanced manufacturing process optimisation) defines measurable performance targets benchmarked against operational baselines and current state-of-the-art agent systems. Specific KPIs mentioned include diagnostic accuracy, reasoning trace completeness, tool invocation success rate, defect rate reduction, energy savings, and multi-agent coordination latency.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section (qualitative and quantitative KPIs, standardised benchmarking, 6-month integration checkpoints); Validation and Demonstrators section (quantitative KPIs per demonstrator)"
+      },
+      "notes": null
+    },
+    "SR-10": {
+      "scope_element_id": "SR-10",
+      "constraint_ref": "CC-06",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that MAESTRO implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18). This directly satisfies the mandatory cohesion activities requirement.",
+      "tier2b_source_ref": {
+        "source_section": "Scope / mandatory_cohesion_activities",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).'"
+      },
+      "notes": null
+    },
+    "SR-11": {
+      "scope_element_id": "SR-11",
+      "constraint_ref": "CC-11",
+      "coverage_status": "partially_covered",
+      "coverage_description": "MAESTRO validates directly in two of the three call-identified portfolio-priority sectors: healthcare (clinical decision support demonstrator) and advanced manufacturing (process optimisation demonstrator). The third sector — in-vehicle autonomous driving — is not addressed through a full demonstrator. The concept includes a targeted architectural mapping analysis (WP8) assessing transferability of the MAESTRO architecture to autonomous driving settings, but this does not constitute a sector demonstrator. The concept explicitly acknowledges this gap and notes that the portfolio coverage mechanism (CC-11) is designed to ensure at least one funded proposal per sector, positioning MAESTRO as covering two of three sectors.",
+      "tier2b_source_ref": {
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Validation and Demonstrators section (healthcare and advanced manufacturing demonstrators; logistics cross-sector transfer demonstrator; WP8 architectural mapping for autonomous driving); strategic_positioning.md section 'Positioning Within the Apply AI Sectors'"
+      },
+      "notes": "MAESTRO covers healthcare and advanced manufacturing as full demonstrators. In-vehicle autonomous driving is addressed only via architectural mapping analysis (WP8), not a full demonstrator. The concept explicitly acknowledges this and relies on the portfolio coverage mechanism for the third sector. This is not a blocking gap for MAESTRO's proposal but should be clearly communicated in the proposal narrative."
+    },
+    "CC-01": {
+      "scope_element_id": "CC-01",
+      "constraint_ref": "SR-09",
+      "coverage_status": "covered",
+      "coverage_description": "Identical coverage to SR-09. The concept explicitly incorporates qualitative and quantitative KPIs, standardised benchmarking, and structured progress monitoring at 6-month integration checkpoints across all demonstrators.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section (qualitative and quantitative KPIs, standardised benchmarking, 6-month integration checkpoints)"
+      },
+      "notes": null
+    },
+    "CC-02": {
+      "scope_element_id": "CC-02",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that MAESTRO will build on publicly available results from relevant prior EU-funded actions, including Horizon 2020 ICT-48 projects on AI-on-demand and human-centric AI, ADRA partnership pilot projects on trustworthy AI systems, and Horizon Europe Cluster 4 actions on cognitive AI and human–machine collaboration. The concept states the project will 'systematically identify, assess, and integrate reusable components, benchmarks, datasets, and architectural patterns from these prior actions.'",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'MAESTRO will build on publicly available results from relevant prior EU-funded actions...'"
+      },
+      "notes": null
+    },
+    "CC-03": {
+      "scope_element_id": "CC-03",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that all research outputs — frameworks, models, benchmarks, the External Tool and API Orchestration Layer, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'All research outputs...will be shared with the European R&D community through the AI-on-demand platform.'"
+      },
+      "notes": null
+    },
+    "CC-04": {
+      "scope_element_id": "CC-04",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that the project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.'"
+      },
+      "notes": null
+    },
+    "CC-05": {
+      "scope_element_id": "CC-05",
+      "constraint_ref": "SR-04",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs). The concept also states that the project contributes directly to the Apply AI Strategy.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).' and 'MAESTRO directly serves the Apply AI Strategy...'"
+      },
+      "notes": null
+    },
+    "CC-06": {
+      "scope_element_id": "CC-06",
+      "constraint_ref": "SR-10",
+      "coverage_status": "covered",
+      "coverage_description": "Identical coverage to SR-10. The concept explicitly states MAESTRO implements the ADRA co-programmed partnership and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).'"
+      },
+      "notes": null
+    },
+    "CC-07": {
+      "scope_element_id": "CC-07",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly describes building synergies with the EuroHPC Joint Undertaking, relevant national AI strategies (German AI Strategy, French National AI Strategy, Finnish AI programme), ongoing Horizon Europe Cluster 4 projects, and the OECD AI Policy Observatory for international alignment on AI agent governance frameworks.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'MAESTRO will build synergies with relevant European, national, and international initiatives beyond the ADRA partnership. Specifically, the project will coordinate with the EuroHPC Joint Undertaking...'"
+      },
+      "notes": null
+    },
+    "CC-08": {
+      "scope_element_id": "CC-08",
+      "constraint_ref": "EC-03",
+      "coverage_status": "covered",
+      "coverage_description": "The strategic_positioning.md explicitly states that research activities start at TRL 2 (fundamental research on neuro-symbolic planning formalisms, memory architecture design, and multi-agent coordination theory) and progress to TRL 5 (technology validated in relevant operational environments) across two call-identified Apply AI sectors plus a transfer sector, spanning the full TRL 2–5 range required by the call.",
+      "tier2b_source_ref": {
+        "source_section": "technology_readiness_level",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "strategic_positioning.md",
+        "location": "Risks Addressed by the Positioning section: 'Research activities start at TRL 2 (fundamental research on neuro-symbolic planning formalisms, memory architecture design, and multi-agent coordination theory) and progress to TRL 5 (technology validated in relevant operational environments)...spanning the full TRL 2–5 range required by the call.'"
+      },
+      "notes": null
+    },
+    "CC-09": {
+      "scope_element_id": "CC-09",
+      "constraint_ref": "EC-04",
+      "coverage_status": "covered",
+      "coverage_description": "The project_summary.json explicitly states requested_eu_contribution of EUR 19,000,000, which equals the maximum EU contribution per project stated in CC-09.",
+      "tier2b_source_ref": {
+        "source_section": "Budget",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "project_summary.json",
+        "location": "Field: requested_eu_contribution: 19000000"
+      },
+      "notes": "The requested contribution equals the maximum allowed. This is compliant but leaves no budget headroom. The proposal narrative should confirm this is intentional and justified by the scope of work."
+    },
+    "CC-10": {
+      "scope_element_id": "CC-10",
+      "constraint_ref": "EC-01",
+      "coverage_status": "partially_covered",
+      "coverage_description": "The project_summary.json identifies the coordinator as Alpenstadt Technical University in Germany (DE), which is an EU Member State and therefore eligible. The concept notes 8 partners but does not explicitly state the countries or eligibility of all consortium partners. No explicit statement confirming all partners are from eligible countries is present in the concept corpus.",
+      "tier2b_source_ref": {
+        "source_section": "eligibility_restrictions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "project_summary.json",
+        "location": "coordinator.country: 'DE'; number_of_partners: 8"
+      },
+      "notes": "Coordinator country (DE) is confirmed eligible. Partner countries are not listed in the project brief. Full eligibility confirmation requires partner country declarations in the proposal. This is a documentation gap, not necessarily a substantive eligibility issue."
+    },
+    "CC-11": {
+      "scope_element_id": "CC-11",
+      "constraint_ref": "SR-11",
+      "coverage_status": "partially_covered",
+      "coverage_description": "MAESTRO covers healthcare and advanced manufacturing as full demonstrators. In-vehicle autonomous driving is addressed only via architectural mapping analysis (WP8), not a full demonstrator. The concept explicitly acknowledges this and relies on the portfolio coverage mechanism for the third sector.",
+      "tier2b_source_ref": {
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "strategic_positioning.md",
+        "location": "Positioning Within the Apply AI Sectors section: explicit acknowledgement that MAESTRO does not claim in-vehicle autonomous driving as a demonstrator sector; WP8 architectural mapping analysis described"
+      },
+      "notes": "The portfolio coverage mechanism (CC-11) is designed to ensure at least one funded proposal per sector across the portfolio, not to require each individual proposal to cover all three sectors. MAESTRO's two-sector coverage (healthcare + advanced manufacturing) is a valid positioning strategy. The architectural mapping for autonomous driving (WP8) provides additional evidence of transferability."
+    },
+    "CC-12": {
+      "scope_element_id": "CC-12",
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "Financial support to third parties (FSTP) is a call mechanism that proposals may optionally utilise; it is not a requirement that proposals must address in their concept. The concept corpus does not reference FSTP, which is consistent with a proposal that does not plan to use this mechanism.",
+      "tier2b_source_ref": {
+        "source_section": "fstp_provisions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": null,
+      "notes": "FSTP is an optional call mechanism. Not addressing it in the concept is not a gap. If the proposal intends to use FSTP, this must be explicitly addressed in the full proposal. The concept brief does not indicate FSTP use."
+    },
+    "CC-13": {
+      "scope_element_id": "CC-13",
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "Submission deadline and call opening dates are administrative call parameters, not concept content requirements. The concept brief is not expected to address these in its narrative.",
+      "tier2b_source_ref": {
+        "source_section": "deadline / deadline_model",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": null,
+      "notes": "Administrative constraint. Not applicable to concept content evaluation. The proposal submission process must comply with the 2026-04-15 deadline."
+    },
+    "CC-14": {
+      "scope_element_id": "CC-14",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The project_summary.json explicitly states duration_months: 48, which is within the maximum project duration of 48 months stated in CC-14.",
+      "tier2b_source_ref": {
+        "source_section": "max_project_duration_months / notes",
+        "source_document": "selected_call.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "project_summary.json",
+        "location": "Field: duration_months: 48"
+      },
+      "notes": "CC-14 is marked as Assumed in call_constraints.json (not explicitly stated in topic text; derived from selected_call.json). The 48-month duration should be verified against General Annex B for the applicable instrument constraints."
+    }
+  },
+  "scope_conflict_log": [
+    {
+      "conflict_id": "SCL-01",
+      "description": "SR-11 / CC-11 — In-vehicle autonomous driving sector coverage gap: MAESTRO does not deliver a full demonstrator for the in-vehicle autonomous driving sector, which is one of three call-identified portfolio-priority sectors. The concept provides only an architectural mapping analysis (WP8) assessing transferability to autonomous driving settings. The call's portfolio coverage mechanism (SR-11, CC-11) requires grants to be awarded to ensure at least one proposal per sector, implying the call expects proposals to cover at least one sector fully. MAESTRO covers two sectors (healthcare, advanced manufacturing) but not the third.",
+      "resolution_status": "unresolved",
+      "resolution_note": null,
+      "tier2b_source_ref": {
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "conflict_type": "coverage_gap"
+    },
+    {
+      "conflict_id": "SCL-02",
+      "description": "CC-10 / EC-01 — Consortium eligibility documentation gap: The concept corpus identifies the coordinator as being in Germany (DE, eligible) and states 8 partners, but does not explicitly confirm the countries or eligibility status of the remaining 7 partners. The eligibility restriction requires all participating legal entities to be established in EU Member States or specified associated countries. This is a documentation gap in the concept brief that must be resolved in the full proposal.",
+      "resolution_status": "unresolved",
+      "resolution_note": null,
+      "tier2b_source_ref": {
+        "source_section": "eligibility_restrictions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "conflict_type": "conditional_unmet"
+    }
+  ],
+  "strategic_differentiation": "MAESTRO's primary strategic differentiator is the co-design of three mutually reinforcing research pillars — neuro-symbolic planning and reasoning, adaptive memory architecture, and decentralised multi-agent coordination — unified by a cross-cutting External Tool and API Orchestration Layer, producing an integrated architecture rather than combining independent research threads from disconnected communities. The neuro-symbolic planning approach provides formal guarantees (verifiable sub-task decomposition, plan monitoring with provable recovery) that pure LLM-based approaches cannot offer, while retaining neural flexibility. The formally specified delegation and negotiation protocols with convergence guarantees distinguish MAESTRO from ad-hoc LLM-based agent communication patterns. The architecturally central External Tool and API Orchestration Layer — providing a typed tool registry with capability models, formal tool selection and invocation policies integrated with the planning engine, standardised API adapters abstracting heterogeneous protocols (HL7 FHIR, OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces — distinguishes MAESTRO from agent architectures treating tool use as simple function-calling interfaces. Validation spans two call-identified Apply AI sectors (healthcare clinical decision support, advanced manufacturing process optimisation) plus a cross-sector logistics and supply chain transfer demonstrator, demonstrating generalisability of the architecture beyond the minimum sector requirement. The consortium combines leading European AI research institutions with sector-specific industry partners providing real deployment environments and domain-specific tool/API ecosystems, plus a technology transfer partner ensuring framework adoption through the AI-on-demand platform and EDIHs. MAESTRO explicitly positions against the risk of producing 'yet another LLM wrapper framework' through the neuro-symbolic approach and principled tool orchestration layer, and against the risk of research-only output through co-design with industry partners and validation in operational environments at TRL 2–5."
+}
+```
+
+{
+  "schema_id": "orch.phase2.concept_refinement_summary.v1",
+  "run_id": "69fe2594-42ea-411d-98c4-81b6eb9e4e6c",
+  "topic_mapping_rationale": {
+    "EO-01": {
+      "topic_element_id": "EO-01",
+      "mapping_to_concept": "MAESTRO directly addresses EO-01 through two of its three core research pillars and the cross-cutting External Tool and API Orchestration Layer. Pillar 1 (Neuro-Symbolic Planning and Reasoning) advances planning mechanisms by developing a hybrid neuro-symbolic planning engine that decomposes high-level goals into executable sub-task graphs with verifiable intermediate states, integrates search-based planning algorithms (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation, and supports self-correction through plan monitoring and replanning — directly producing improvements in agent autonomy and robustness. Pillar 2 (Adaptive Memory Architecture) advances memory management by designing a unified memory architecture integrating working memory, episodic memory, and semantic memory with a memory controller that manages information flow between stores, sustaining coherent long-horizon agent behaviour and improving reliability. The External Tool and API Orchestration Layer further advances reliability by grounding agent reasoning in verified external data and providing principled fallback/recovery mechanisms for tool failures. Together these mechanisms produce significant improvements in autonomy, robustness, and reliability of AI agents as stated in EO-01.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Vision section (autonomy, robustness, reliability framing); Pillar 1 — Neuro-Symbolic Planning and Reasoning (planning mechanisms, sub-task graphs, plan monitoring, self-correction); Pillar 2 — Adaptive Memory Architecture (memory management, working memory, episodic memory, semantic memory, memory controller); Cross-Cutting Capability — External Tool and API Orchestration Layer (reliability, grounding, fallback/recovery); project_summary.json abstract (planning mechanisms, memory management, reasoning capabilities)"
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    },
+    "EO-02": {
+      "topic_element_id": "EO-02",
+      "mapping_to_concept": "MAESTRO directly addresses EO-02 through Pillar 3 (Decentralised Multi-Agent Coordination) and the multi-agent governance capabilities of the External Tool and API Orchestration Layer. Pillar 3 develops multi-agent coordination protocols enabling heterogeneous agents to collaborate on shared objectives, defines a formal task-delegation protocol with provable convergence guarantees, develops conflict resolution mechanisms for situations where agent plans interfere or resources are contested, and ensures auditable multi-agent interactions. The External Tool and API Orchestration Layer extends multi-agent capability by governing shared tool access, delegated tool invocation, and conflict resolution when multiple agents require the same external resource. The project_summary.json abstract explicitly states 'decentralised multi-agent coordination protocols that enable heterogeneous AI agents to negotiate, delegate, and jointly execute tasks with provable convergence guarantees.' The strategic_positioning.md explicitly positions Pillar 3 against EO-02, noting that formally specified delegation and negotiation protocols with convergence guarantees distinguish MAESTRO from ad-hoc LLM-based agent communication patterns, demonstrating effective coordination beyond the capabilities of individual agents.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Pillar 3 — Decentralised Multi-Agent Coordination section (multi-agent coordination protocols, formal task-delegation protocol, conflict resolution mechanisms, auditable multi-agent interactions, convergence guarantees); Cross-Cutting Capability — External Tool and API Orchestration Layer (multi-agent tool governance, shared tool access, delegated tool invocation); project_summary.json abstract (decentralised multi-agent coordination protocols with provable convergence guarantees); strategic_positioning.md section 'Positioning Against the Expected Outcomes' (EO-02 positioning)"
+      },
+      "status": "Confirmed",
+      "vocabulary_gaps": []
+    }
+  },
+  "scope_coverage": {
+    "SR-01": {
+      "scope_element_id": "SR-01",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly addresses next-generation AI agents as autonomous systems powered by large language models. The concept_note.md Vision section frames MAESTRO as developing new AI agent architectures that overcome limitations of current LLM-based agents. The project_summary.json abstract states 'MAESTRO develops next-generation AI agent architectures' and lists 'large language models' and 'autonomous systems' as keywords. The concept describes agents that plan, utilise tools, and perform actions autonomously to achieve specified goals based on high-level instructions across all three research pillars.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Vision section (LLM-based agents, autonomous systems framing, high-level instructions); project_summary.json (keywords: 'AI agents', 'large language models', 'autonomous systems'; abstract: 'next-generation AI agent architectures')"
+      },
+      "notes": null
+    },
+    "SR-02": {
+      "scope_element_id": "SR-02",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "Pillar 1 (Neuro-Symbolic Planning and Reasoning) directly addresses robust planning, reasoning, and search mechanisms for breaking complex tasks into structured subgoals. The concept describes decomposing high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints; integrating search-based planning algorithms including Monte Carlo Tree Search and hierarchical task networks with LLM-driven heuristic evaluation; and supporting self-correction through plan monitoring that detects execution failures and replans from verified intermediate states.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Pillar 1 — Neuro-Symbolic Planning and Reasoning section (sub-task graphs, pre-conditions, post-conditions, verification checkpoints, Monte Carlo Tree Search, hierarchical task networks, plan monitoring, self-correction, replanning)"
+      },
+      "notes": null
+    },
+    "SR-03": {
+      "scope_element_id": "SR-03",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "Pillar 2 (Adaptive Memory Architecture) directly addresses effective memory and state management through a balanced integration of short-term and external long-term memory solutions. The concept describes a unified memory architecture integrating working memory (structured short-term store for current goals, active plan state, and recent observations), episodic memory (retrieval-augmented store of past task episodes indexed by context similarity), and semantic memory (persistent knowledge graph). A memory controller manages information flow between these stores, deciding what to commit to long-term memory, what to retrieve, and when to forget.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Pillar 2 — Adaptive Memory Architecture section (working memory, episodic memory, semantic memory, memory controller, long-term memory, short-term store, retrieval-augmented store, persistent knowledge graph)"
+      },
+      "notes": null
+    },
+    "SR-04": {
+      "scope_element_id": "SR-04",
+      "constraint_ref": "CC-05",
+      "coverage_status": "covered",
+      "coverage_description": "The External Tool and API Orchestration Layer is an architecturally central cross-cutting capability explicitly designed to address SR-04. The concept describes a typed tool registry and capability model, formal tool selection and invocation policies integrated with the neuro-symbolic planning engine, standardised API adapters for heterogeneous protocols (REST, GraphQL, HL7 FHIR, OPC-UA), post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces. The strategic_positioning.md explicitly positions this layer against SR-04, stating it is 'architecturally central — not an afterthought' and distinguishes MAESTRO from agent architectures treating tool use as a simple function-calling interface.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Cross-Cutting Capability — External Tool and API Orchestration Layer section (typed tool registry, tool selection policies, API adapters, HL7 FHIR, OPC-UA, verification, monitoring, fallback/recovery, auditable traces); strategic_positioning.md section 'Positioning Against SR-04 — External Tools and APIs'"
+      },
+      "notes": null
+    },
+    "SR-09": {
+      "scope_element_id": "SR-09",
+      "constraint_ref": "CC-01",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints. Each demonstrator defines measurable performance targets benchmarked against operational baselines and current state-of-the-art agent systems. Specific KPIs mentioned include diagnostic accuracy, reasoning trace completeness, tool invocation success rate (healthcare), defect rate reduction, energy savings, and multi-agent coordination latency (advanced manufacturing).",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section (qualitative and quantitative KPIs, standardised benchmarking, 6-month integration checkpoints); Validation and Demonstrators section (quantitative KPIs per demonstrator: diagnostic accuracy, reasoning trace completeness, tool invocation success rate, defect rate reduction, energy savings, multi-agent coordination latency)"
+      },
+      "notes": null
+    },
+    "SR-10": {
+      "scope_element_id": "SR-10",
+      "constraint_ref": "CC-06",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that MAESTRO implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18), directly satisfying the mandatory cohesion activities requirement.",
+      "tier2b_source_ref": {
+        "source_section": "Scope / mandatory_cohesion_activities",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).'"
+      },
+      "notes": null
+    },
+    "SR-11": {
+      "scope_element_id": "SR-11",
+      "constraint_ref": "CC-11",
+      "coverage_status": "partially_covered",
+      "coverage_description": "MAESTRO validates directly in two of the three call-identified portfolio-priority sectors: healthcare (clinical decision support demonstrator) and advanced manufacturing (process optimisation demonstrator). The third sector — in-vehicle autonomous driving — is not addressed through a full demonstrator. The concept includes a targeted architectural mapping analysis (WP8) assessing transferability of the MAESTRO architecture to autonomous driving settings, but this does not constitute a sector demonstrator. The concept explicitly acknowledges this gap and notes that the portfolio coverage mechanism is designed to ensure at least one funded proposal per sector.",
+      "tier2b_source_ref": {
+        "source_section": "procedure_exceptions",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Validation and Demonstrators section (healthcare and advanced manufacturing demonstrators; logistics cross-sector transfer demonstrator; WP8 architectural mapping for autonomous driving); strategic_positioning.md section 'Positioning Within the Apply AI Sectors' (explicit acknowledgement of no in-vehicle autonomous driving demonstrator)"
+      },
+      "notes": "MAESTRO covers healthcare and advanced manufacturing as full demonstrators. In-vehicle autonomous driving is addressed only via architectural mapping analysis (WP8), not a full demonstrator. The concept explicitly acknowledges this and relies on the portfolio coverage mechanism for the third sector. This is not a blocking gap for MAESTRO's proposal but should be clearly communicated in the proposal narrative. Also appears in scope_conflict_log as SCL-01."
+    },
+    "CC-01": {
+      "scope_element_id": "CC-01",
+      "constraint_ref": "SR-09",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly incorporates qualitative and quantitative KPIs, standardised benchmarking, and structured progress monitoring at 6-month integration checkpoints across all demonstrators, satisfying the methodological constraint for assessing and demonstrating progress.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'MAESTRO incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints.'"
+      },
+      "notes": null
+    },
+    "CC-02": {
+      "scope_element_id": "CC-02",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that MAESTRO will build on publicly available results from relevant prior EU-funded actions, including Horizon 2020 ICT-48 projects on AI-on-demand and human-centric AI, ADRA partnership pilot projects on trustworthy AI systems, and Horizon Europe Cluster 4 actions on cognitive AI and human–machine collaboration. The concept states the project will systematically identify, assess, and integrate reusable components, benchmarks, datasets, and architectural patterns from these prior actions.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'MAESTRO will build on publicly available results from relevant prior EU-funded actions, including outputs from Horizon 2020 ICT-48 projects on AI-on-demand and human-centric AI, ADRA partnership pilot projects on trustworthy AI systems, and Horizon Europe Cluster 4 actions on cognitive AI and human–machine collaboration.'"
+      },
+      "notes": null
+    },
+    "CC-03": {
+      "scope_element_id": "CC-03",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that all research outputs — frameworks, models, benchmarks, the External Tool and API Orchestration Layer, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'All research outputs — frameworks, models, benchmarks, the External Tool and API Orchestration Layer, and demonstrator results — will be shared with the European R&D community through the AI-on-demand platform.'"
+      },
+      "notes": null
+    },
+    "CC-04": {
+      "scope_element_id": "CC-04",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that the project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.'"
+      },
+      "notes": null
+    },
+    "CC-05": {
+      "scope_element_id": "CC-05",
+      "constraint_ref": "SR-04",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs), and that the project contributes directly to the Apply AI Strategy.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).' and 'MAESTRO directly serves the Apply AI Strategy by advancing the foundational capabilities that enable trustworthy AI deployment in key European economic sectors.'"
+      },
+      "notes": null
+    },
+    "CC-06": {
+      "scope_element_id": "CC-06",
+      "constraint_ref": "SR-10",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states MAESTRO implements the ADRA co-programmed partnership and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18), satisfying the partnership constraint.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'The project implements the co-programmed European Partnership on AI, Data and Robotics (ADRA) and will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).'"
+      },
+      "notes": null
+    },
+    "CC-07": {
+      "scope_element_id": "CC-07",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly describes building synergies with the EuroHPC Joint Undertaking, relevant national AI strategies (German AI Strategy, French National AI Strategy, Finnish AI programme), ongoing Horizon Europe Cluster 4 projects in the Digital and Emerging Technologies destination, and the OECD AI Policy Observatory for international alignment on AI agent governance frameworks.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "concept_note.md",
+        "location": "Contribution to EU Objectives section: 'MAESTRO will build synergies with relevant European, national, and international initiatives beyond the ADRA partnership. Specifically, the project will coordinate with the EuroHPC Joint Undertaking...national AI strategies...Horizon Europe Cluster 4 projects...OECD AI Policy Observatory...'"
+      },
+      "notes": null
+    },
+    "CC-08": {
+      "scope_element_id": "CC-08",
+      "constraint_ref": "EC-03",
+      "coverage_status": "covered",
+      "coverage_description": "The strategic_positioning.md explicitly states that research activities start at TRL 2 (fundamental research on neuro-symbolic planning formalisms, memory architecture design, and multi-agent coordination theory) and progress to TRL 5 (technology validated in relevant operational environments) across two call-identified Apply AI sectors plus a transfer sector, spanning the full TRL 2–5 range required by the call.",
+      "tier2b_source_ref": {
+        "source_section": "technology_readiness_level",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "strategic_positioning.md",
+        "location": "Risks Addressed by the Positioning section: 'Research activities start at TRL 2 (fundamental research on neuro-symbolic planning formalisms, memory architecture design, and multi-agent coordination theory) and progress to TRL 5 (technology validated in relevant operational environments)...spanning the full TRL 2–5 range required by the call.'"
+      },
+      "notes": null
+    },
+    "CC-09": {
+      "scope_element_id": "CC-09",
+      "constraint_ref": "EC-04",
+      "coverage_status": "covered",
+      "coverage_description": "The project_summary.json explicitly states a requested EU contribution of EUR 19,000,000, which equals the maximum EU contribution per project stated in CC-09 (EUR 19,000,000). The proposal is compliant with the budget ceiling.",
+      "tier2b_source_ref": {
+        "source_section": "Budget",
+        "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
+      },
+      "tier3_evidence_ref": {
+        "file": "project_summary.json",
+        "location": "Field: requested_eu_contribution: 19000000"
+      },
+      "notes": "The requested contribution equals the maximum allowed. This is compliant but leaves no budget headroom. The proposal narrative should confirm this is intentional and justified by the scope of work."
+    },
+    "CC-10": {
+      "scope_element_id": "CC-10",
+      "constraint_ref": "EC-01",
+      "coverage_status": "partially_covered",
+      "coverage_description": "The project_summary.json identifies the coordinator as Alpenstadt Technical University in Germany (DE), which is an EU Member State and therefore eligible under CC-10. The concept states 8 partners but does not explicitly list
+=== END ===
