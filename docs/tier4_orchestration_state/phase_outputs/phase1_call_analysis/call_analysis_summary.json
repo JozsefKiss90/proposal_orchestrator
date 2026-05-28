@@ -1,13 +1,12 @@
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
-  "run_id": "348625b3-0875-426d-ab6e-7630ff527bc0",
+  "run_id": "a7f1437e-17d8-420c-a45c-d191373fdee3",
   "resolved_instrument_type": "RIA",
   "evaluation_matrix": {
     "Excellence": {
       "criterion_id": "Excellence",
       "criterion_name": "Excellence",
       "weight": null,
-      "weight_source": null,
       "source_section": "Section 1 — Excellence",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
@@ -15,53 +14,65 @@
       "criterion_id": "Impact",
       "criterion_name": "Impact",
       "weight": null,
-      "weight_source": null,
       "source_section": "Section 2 — Impact",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
-    "Quality and Efficiency of Implementation": {
-      "criterion_id": "Quality and Efficiency of Implementation",
-      "criterion_name": "Quality and Efficiency of Implementation",
+    "Implementation": {
+      "criterion_id": "Implementation",
+      "criterion_name": "Implementation",
       "weight": null,
-      "weight_source": null,
-      "source_section": "Section 3 — Quality and Efficiency of Implementation",
+      "source_section": "Section 3 — Implementation",
+      "source_document": "ef_he-ria-ia_en.pdf"
+    },
+    "PortfolioCoverage": {
+      "criterion_id": "PortfolioCoverage",
+      "criterion_name": "Portfolio Coverage (Sector Balance)",
+      "weight": null,
+      "source_section": "Procedural — procedure_exceptions",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
   },
   "compliance_checklist": [
     {
       "requirement_id": "CR-01",
-      "description": "Proposal must be submitted by the deadline and comply with page limits and formatting requirements as specified in the call conditions.",
+      "description": "Proposal must pass all evaluation thresholds for Excellence, Impact, and Implementation before portfolio coverage selection applies.",
       "status": "requires_review",
-      "source_section": "Administrative and Eligibility Checks",
+      "source_section": "Section 1–3 — Threshold scoring",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
     {
       "requirement_id": "CR-02",
-      "description": "Consortium must meet minimum participant requirements: at least three independent legal entities established in three different EU Member States or Associated Countries.",
+      "description": "Minimum threshold score must be achieved for each individual criterion (Excellence, Impact, Implementation) on the 0–5 scale.",
       "status": "requires_review",
-      "source_section": "Eligibility Conditions — Consortium",
+      "source_section": "Section 1–3 — Scoring thresholds",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
     {
       "requirement_id": "CR-03",
-      "description": "Each participant must be a legal entity (public or private body, including international organisations) and must not be subject to exclusion criteria under the Financial Regulation.",
+      "description": "Proposal must meet minimum consortium eligibility requirements (minimum number of independent legal entities from eligible countries).",
       "status": "requires_review",
-      "source_section": "Eligibility Conditions — Participants",
+      "source_section": "Eligibility — Consortium requirements",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
     {
       "requirement_id": "CR-04",
-      "description": "The proposal must fall within the scope of the call topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02 and address the stated expected outcomes and impacts.",
-      "status": "requires_review",
-      "source_section": "Scope Compliance",
+      "description": "Portfolio coverage procedural rule: at least one proposal per sector (healthcare, advanced manufacturing, in-vehicle autonomous driving) must be funded subject to threshold passage.",
+      "status": "confirmed",
+      "source_section": "Procedural — procedure_exceptions",
       "source_document": "ef_he-ria-ia_en.pdf"
     },
     {
       "requirement_id": "CR-05",
-      "description": "Mandatory cohesion activities with ADRA and GenAI4EU Hub must be included as required by the call's procedure_exceptions field.",
+      "description": "Proposals must demonstrate contribution to the Apply AI Strategy and plan for deployment via EDIHs and Testing and Experiment Facilities.",
       "status": "requires_review",
-      "source_section": "Scope / procedure_exceptions / mandatory_cohesion_activities",
+      "source_section": "Section 2 — Impact / Scope requirements",
+      "source_document": "ef_he-ria-ia_en.pdf"
+    },
+    {
+      "requirement_id": "CR-06",
+      "description": "Proposals must include tasks for ADRA cohesion activities and GenAI4EU Hub collaboration as part of the implementation plan.",
+      "status": "requires_review",
+      "source_section": "Section 3 — Implementation / Scope requirements",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
   ]

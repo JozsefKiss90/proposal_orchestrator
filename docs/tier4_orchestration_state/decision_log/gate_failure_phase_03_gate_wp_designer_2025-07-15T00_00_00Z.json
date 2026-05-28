@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_03_gate_wp_designer_2025-07-15T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_03_gate",
+  "failure_reason": "Deterministic predicate 'run_id_match' failed: artifact run_id 'bd706f8f-b915-42ee-a19c-99d21ec5c0dd' does not match the current orchestration run_id 'a7f1437e-17d8-420c-a45c-d191373fdee3'. The wp_structure.json artifact at docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json was produced under a prior run and must be regenerated under run_id a7f1437e-17d8-420c-a45c-d191373fdee3 before this gate can pass.",
+  "predicates_failed": [
+    "run_id_match"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (phase-specific gate definitions), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2025-07-15T00:00:00Z"
+}

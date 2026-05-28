@@ -81,7 +81,7 @@ SKILL_MODEL: str = "claude-sonnet-4-6"
 #: (output minimization rules in skill specs), not by this constant.
 #: Retained for forward compatibility if the transport gains token
 #: control in a future backend migration.
-SKILL_MAX_TOKENS: int = 16384
+SKILL_MAX_TOKENS: int = 32768
 
 #: Timeout for TAPM invocations (tool-augmented mode).
 #: TAPM invocations involve multiple Read/Glob tool round-trips,
@@ -1001,17 +1001,31 @@ def _extract_json_response(text: str) -> dict | None:
         except json.JSONDecodeError:
             pass
 
-    # 3. Try any JSON object in the text
-    obj_match = re.search(r"\{.*\}", stripped, re.DOTALL)
-    if obj_match:
+    # 3. Try any JSON object in the text.
+    #    LLMs often emit narrative reasoning before the JSON payload.  A greedy
+    #    forward regex (r"\{.*\}") would match from the first '{' in the prose
+    #    to the last '}' in the JSON, producing an invalid blob.  Instead, we
+    #    try raw_decode from every '{' position and return the largest valid
+    #    dict found by character span (end - start).  Character span is a better
+    #    heuristic than key count because the root skill output object may have
+    #    few top-level keys (e.g. {"instruments": [...]}) while deeply nested
+    #    child objects may have many keys.
+    decoder = json.JSONDecoder()
+    best: dict | None = None
+    best_span: int = 0
+    for i, ch in enumerate(stripped):
+        if ch != "{":
+            continue
         try:
-            data = json.loads(obj_match.group())
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
+            data, end = decoder.raw_decode(stripped, i)
+            span = end - i
+            if isinstance(data, dict) and span > best_span:
+                best = data
+                best_span = span
+        except (json.JSONDecodeError, ValueError):
+            continue
 
-    return None
+    return best
 
 
 def _validate_skill_output(

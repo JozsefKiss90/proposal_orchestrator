@@ -124,7 +124,10 @@
       "mcp__serena__find_symbol",
       "Bash(pip show:*)",
       "Bash(find tests:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(for phase:*)",
+      "Bash(ORCHESTRATOR_PRODUCTION_MODE=true ORCHESTRATOR_TRANSPORT_PRESET=\"\" ORCHESTRATOR_TRANSPORT_BACKEND=\"\" python -m runner --run-id test-prodmode-verify --phase 1)",
+      "Bash(ORCHESTRATOR_PRODUCTION_MODE=true ORCHESTRATOR_TRANSPORT_BACKEND=claude_cli python -c \"from runner.transport.config import resolve_provider_config; resolve_provider_config\\(\\)\" 2>&1)"
     ]
   },
   "enabledMcpjsonServers": [

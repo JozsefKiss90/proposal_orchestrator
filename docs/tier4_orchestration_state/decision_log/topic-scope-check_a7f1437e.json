@@ -1,0 +1,201 @@
+{
+  "decision_id": "scope_check_call_analyzer_2025-01-31T00:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "call_analyzer",
+  "phase_context": "phase_01_call_analysis",
+  "scope_findings": [
+    {
+      "claim": "MAESTRO focuses on next-generation AI agent architectures powered by large language models that can plan, utilise tools, and perform actions autonomously to achieve specified goals based on high-level instructions.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 1 develops a hybrid neuro-symbolic planning engine combining LLM-based reasoning with symbolic planning methods, decomposing high-level goals into executable sub-task graphs with formally specified pre-conditions, post-conditions, and verification checkpoints.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The planning engine integrates search-based planning algorithms (Monte Carlo Tree Search, hierarchical task networks) with LLM-driven heuristic evaluation and supports self-correction through plan monitoring and replanning from verified intermediate states.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 2 designs a unified adaptive memory architecture integrating working memory, episodic memory, and semantic memory, with a memory controller managing information flow between stores to sustain coherent long-term agent behaviour.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The memory architecture features a retrieval-augmented episodic store indexed by context similarity enabling the agent to learn from prior experience without retraining, and a persistent semantic knowledge graph continuously updated through agent interactions.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Pillar 3 develops decentralised multi-agent coordination protocols enabling heterogeneous agents to collaborate on shared objectives, including a formal task-delegation protocol with provable convergence and conflict resolution mechanisms.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Multi-agent interactions are auditable — every delegation, negotiation step, and joint decision produces a structured trace that humans can inspect and understand.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The External Tool and API Orchestration Layer provides a typed tool registry and capability model, formal tool selection and invocation policies, standardised API adapters, post-invocation verification and grounding, execution monitoring with fallback/recovery, and auditable tool execution traces.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The orchestration layer abstracts heterogeneous external APIs (REST, GraphQL, HL7 FHIR, OPC-UA) into a uniform invocation interface and integrates with the neuro-symbolic planning engine, adaptive memory architecture, and multi-agent coordination layer.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO enhances AI agent autonomy through advanced self-planning and self-optimisation capabilities, including self-correction through plan monitoring and replanning.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Healthcare demonstrator: an AI agent system assisting clinicians in diagnostic reasoning by autonomously gathering patient data via HL7 FHIR API integration, planning differential diagnoses, and coordinating specialist sub-agents for imaging analysis, lab result interpretation, and treatment guideline retrieval.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Advanced manufacturing demonstrator: a multi-agent system that autonomously monitors, diagnoses, and optimises manufacturing processes in real time, with agents coordinating across production line segments using OPC-UA industrial connectors, digital twin APIs, and sensor data streams.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Logistics and supply chain cross-sector transfer demonstrator: an agent-based planning system coordinating logistics operations across multiple actors, validating the generalisability and portability of the MAESTRO architecture beyond the call's specifically identified Apply AI sectors.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "SR-11 identifies three portfolio-priority sectors: healthcare, advanced manufacturing, and in-vehicle autonomous driving. Logistics and supply chain is not one of the three call-identified sectors. The concept explicitly acknowledges this, framing logistics as a cross-sector transfer demonstrator beyond the minimum sector requirement. The claim is not excluded by any scope boundary entry, and the concept does not claim logistics as a primary sector focus; however, no Tier 2B scope element positively confirms logistics as an in-scope Apply AI sector. Status is flagged as borderline: the activity is a natural extension of the multi-agent coordination and planning research (SR-02, SR-07) but the sector itself is not confirmed in-scope by SR-11."
+    },
+    {
+      "claim": "MAESTRO includes a targeted architectural mapping analysis (WP8) assessing the transferability of the MAESTRO architecture to in-vehicle autonomous driving settings, including sensor APIs and V2X communication interfaces.",
+      "scope_element_ref": "SR-11",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "In-vehicle autonomous driving is one of the three call-identified portfolio-priority sectors (SR-11; CC-11). The concept explicitly states the consortium does not include automotive sector partners and does not claim in-vehicle autonomous driving as a demonstrator sector. The architectural mapping analysis (WP8) is framed as a transferability assessment rather than a full demonstrator. This is flagged because: (a) SR-11 and CC-11 require at least one funded proposal to focus on in-vehicle autonomous driving for portfolio coverage; (b) MAESTRO does not position itself as the in-vehicle autonomous driving proposal; (c) the WP8 mapping analysis may be insufficient to satisfy the portfolio coverage requirement if evaluators expect a substantive demonstrator. The claim is not out-of-scope per se, but the adequacy of a mapping analysis versus a full demonstrator for SR-11/CC-11 compliance is unresolved and requires clarification."
+    },
+    {
+      "claim": "MAESTRO incorporates qualitative and quantitative KPIs, standardised benchmarking across all demonstrators, and structured progress monitoring at 6-month integration checkpoints.",
+      "scope_element_ref": "SR-09",
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO will allocate dedicated tasks for cohesion activities with ADRA and the GenAI4EU central Hub (CSA HORIZON-CL4-2025-03-HUMAN-18).",
+      "scope_element_ref": "SR-10",
+      "constraint_ref": "CC-06",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO will build on publicly available results from relevant prior EU-funded actions including Horizon 2020 ICT-48 projects, ADRA partnership pilot projects, and Horizon Europe Cluster 4 actions.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All research outputs will be shared with the European R&D community through the AI-on-demand platform.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-03",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Demonstrator results will be validated in Testing and Experiment Facilities and disseminated via European Digital Innovation Hubs (EDIHs).",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-05",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project will link to the resources offered by AI Factories and Data Labs for compute-intensive training and evaluation.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO will build synergies with EuroHPC Joint Undertaking, national AI strategies (German, French, Finnish), ongoing Horizon Europe Cluster 4 projects, and the OECD AI Policy Observatory.",
+      "scope_element_ref": "SR-12",
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Research activities start at TRL 2 (fundamental research on neuro-symbolic planning formalisms, memory architecture design, and multi-agent coordination theory) and progress to TRL 5 (technology validated in relevant operational environments) across two call-identified Apply AI sectors plus a transfer sector.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-08",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project requests EUR 19,000,000 EU contribution and has a duration of 48 months.",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-09",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "All consortium partners are established in EU Member States (DE, FR, NL, IT, SE, FI, ES) or Horizon Europe Associated Countries (CH).",
+      "scope_element_ref": null,
+      "constraint_ref": "CC-10",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "MAESTRO's open-source framework, External Tool and API Orchestration Layer, and standardised agent interaction protocols will lower barriers for European SMEs and startups, strengthening the European AI ecosystem's competitiveness and reducing strategic dependency on non-European AI platforms.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "The claim about reducing strategic dependency on non-European AI platforms and strengthening European AI ecosystem competitiveness is a policy-level framing. No Tier 2B scope element in scope_requirements.json explicitly confirms or excludes this framing as a project objective. It is consistent with the general orientation of SR-01 (next-generation AI agents) and SR-12 (synergies with European initiatives) but no specific scope element positively confirms this strategic competitiveness objective as an in-scope project claim. Flagged per Constraint 1: no Tier 2B scope element found to confirm this specific claim is in-scope beyond general alignment with SR-01 and SR-12."
+    },
+    {
+      "claim": "MAESTRO advances multimodal reasoning capabilities through the integration of imaging analysis APIs in the healthcare demonstrator and sensor data streams in the manufacturing demonstrator.",
+      "scope_element_ref": "SR-08",
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "SR-08 identifies advancing multimodal reasoning capabilities as a potential (non-mandatory) research area. The concept does not explicitly claim multimodal reasoning as a named research pillar; the imaging analysis and sensor data stream integrations are framed as tool/API integration activities under SR-04 and the External Tool and API Orchestration Layer. The overlap with SR-08 is partial and implicit. Flagged as borderline: the claim could be interpreted as falling under SR-04 (tool/API integration) or SR-08 (multimodal reasoning), and the concept does not clearly position these activities as multimodal reasoning research contributions."
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope",
+    "procedure_exceptions",
+    "technology_readiness_level",
+    "Budget",
+    "eligibility_restrictions",
+    "fstp_provisions"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2025-01-31T00:00:00Z"
+}

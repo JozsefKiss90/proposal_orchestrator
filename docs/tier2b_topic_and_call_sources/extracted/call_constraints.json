@@ -66,7 +66,7 @@
     },
     {
       "constraint_id": "CC-09",
-      "description": "Maximum EU contribution per project is EUR 19,000,000. Indicative total topic budget is EUR 38,000,000 for an indicative 2 projects.",
+      "description": "Maximum EU contribution per project is EUR 19,000,000; indicative total topic budget is EUR 38,000,000 for an indicative 2 projects.",
       "constraint_type": "eligibility",
       "source_section": "Budget",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
@@ -98,20 +98,20 @@
     },
     {
       "constraint_id": "CC-13",
-      "description": "Submission deadline is 2026-04-15; call opens 2026-01-15. Single-stage deadline model applies.",
+      "description": "Submission deadline is 2026-04-15; call opens 2026-01-15; single-stage deadline model applies.",
       "constraint_type": "other",
-      "source_section": "deadline / deadline_model",
+      "source_section": "deadline / opening_date / deadline_model",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-14",
-      "description": "Maximum project duration is 48 months (standard maximum for large RIA actions under Horizon Europe). Not explicitly stated in the topic text; derived from selected_call.json with a note that it should be verified against General Annex B.",
+      "description": "Maximum project duration is 48 months. This is the standard maximum for large RIA actions under Horizon Europe; the topic text does not explicitly state this figure.",
       "constraint_type": "other",
-      "source_section": "max_project_duration_months / notes",
+      "source_section": "max_project_duration_months",
       "source_document": "selected_call.json",
       "status": "Assumed",
-      "assumption_note": "selected_call.json notes: 'Max project duration not explicitly stated in the topic text; 48 months is the standard maximum for large RIA actions under Horizon Europe. Verify against General Annex B for the applicable instrument constraints.' The slice.json and curated extract do not state a duration limit explicitly."
+      "assumption_note": "selected_call.json notes: 'Max project duration not explicitly stated in the topic text; 48 months is the standard maximum for large RIA actions under Horizon Europe. Verify against General Annex B for the applicable instrument constraints.' Carried as Assumed pending verification."
     }
   ]
 }
