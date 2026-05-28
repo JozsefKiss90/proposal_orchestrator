@@ -29,7 +29,17 @@ EXPECTED_TOTAL_TOKENS = 62572
 
 @pytest.fixture
 def phase_b_fixture(tmp_path):
-    """Copy real Phase B fixtures + catalog to a temp directory."""
+    """Copy real Phase B fixtures + catalog to a temp directory.
+
+    Skips when the fixture benchmark data is not present on disk.
+    Benchmark data lives in .claude/benchmark/ which is gitignored.
+    """
+    if not (FIXTURE_BENCH_DIR / "invocation_ledger.jsonl").exists():
+        pytest.skip(
+            f"Fixture benchmark data not found: {FIXTURE_BENCH_DIR}. "
+            "Benchmark data is gitignored and only available after local DAG runs."
+        )
+
     bench_dir = tmp_path / ".claude" / "benchmark" / FIXTURE_RUN_ID
     bench_dir.mkdir(parents=True, exist_ok=True)
 
