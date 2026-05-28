@@ -88,8 +88,8 @@ CLI Entry Point (__main__.py)
 | Production backend enforcement | RESOLVED | ~~CRITICAL~~ RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE=true` enforces `PRODUCTION_BACKENDS` (bedrock_converse, bedrock). Preset `production_suitable` flag checked at runtime. Non-production backends rejected with clear error. 34 security tests verify enforcement. (Phase 1 — P1-1, P1-2, P1-5) |
 | Logging safety | CONDITIONAL PASS | MEDIUM | Prompts not logged via `logging` module. But diagnostic files on disk contain full prompts. |
 | Token telemetry safety | PASS | — | Benchmark hook captures char counts only; prompt content is never captured. |
-| CI/CD security validation | FAIL | HIGH | No CI/CD pipeline exists (no `.github/workflows/`). No automated security tests in CI. |
-| Path resolution testing | FAIL | MEDIUM | `runner/paths.py` (29+ call sites) has zero dedicated unit tests. `find_repo_root()` follows symlinks. |
+| CI/CD security validation | PARTIALLY RESOLVED | ~~HIGH~~ MEDIUM | No CI/CD pipeline yet (P2-4 deferred — requires GitHub Actions setup). Pre-commit secret scanning hook added (P2-5). 39 sandbox hardening tests added. |
+| Path resolution testing | RESOLVED | ~~MEDIUM~~ RESOLVED | `tests/test_paths.py` added with 17 tests covering `find_repo_root()` and `resolve_repo_path()`: subdirectory discovery, missing markers, double-marker requirement, max depth, symlink traversal, path normalization, absolute/relative handling. (Phase 2 — P2-6) |
 
 ---
 
@@ -277,15 +277,13 @@ With 95 test files and 1600+ tests, the test suite is comprehensive. But there i
 **Severity:** MEDIUM
 **File:** `runner/paths.py` (83 lines, 2 functions)
 **Risk:** Path resolution is security-foundational but untested.
-**Status:** FAIL
+**Status:** RESOLVED (Phase 2 — P2-6, 2026-05-28)
 
-`find_repo_root()` and `resolve_repo_path()` are used in 29+ call sites across the codebase (gate evaluator, semantic dispatch, all predicate modules, call slicer). Neither function has a dedicated test file or any unit tests. `find_repo_root()` walks up the filesystem following resolved symlinks; a controlled symlink chain in a compromised environment could trick it into returning a wrong repository root, which would cascade through all path resolution and sandbox enforcement.
+`tests/test_paths.py` created with 17 tests covering:
+- `find_repo_root()`: subdirectory discovery, root-itself, missing markers (CLAUDE.md only, .git only), both-marker requirement, filesystem root stop, 20-level max depth, symlink traversal (returns resolved path), absolute path guarantee, .git-as-file (worktree) support
+- `resolve_repo_path()`: absolute unchanged, relative joined, relative without root, forward-slash normalization on all platforms, Path object input, `../` traversal in relative paths, absolute ignores repo_root
 
-**Remediation:** Repository-side. Create `tests/test_paths.py` with:
-- Symlink traversal tests for `find_repo_root()`
-- Path traversal (`../`) tests for `resolve_repo_path()`
-- Missing marker tests (no CLAUDE.md, no .git)
-- Windows vs Linux path normalization tests
+**Remediation:** Complete.
 
 ### 7.8 MEDIUM: AWS Credentials in `.env`
 
@@ -341,7 +339,7 @@ The `.env` file contains plaintext `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KE
 | Diagnostic prompt capture | Always-on, writes full content | Disable by default; gate behind debug flag | HIGH |
 | `.gitignore` completeness | RESOLVED (P0-1) — expanded to ~40 entries | N/A | ~~HIGH~~ RESOLVED |
 | Transport failure prompt sanitization | Full prompts written to disk | Truncate or omit prompt content in production mode | HIGH |
-| Secret detection pre-commit | None | Add `detect-secrets` or `trufflehog` hook | MEDIUM |
+| Secret detection pre-commit | RESOLVED (P2-5) — `.pre-commit-config.yaml` with detect-secrets, private-key detection, large-file guard | N/A | ~~MEDIUM~~ RESOLVED |
 
 ---
 
@@ -557,8 +555,8 @@ All of the following must be satisfied before institutional production deploymen
 - [x] Semantic dispatch routed through multi-backend config (RESOLVED — Phase 1, P1-3)
 - [ ] Diagnostic prompt capture disabled by default (or production-sanitized)
 - [x] `.gitignore` expanded to cover `.claude/` and standard patterns (RESOLVED — Phase 0, P0-1)
-- [ ] CI/CD pipeline created with full test suite execution
-- [ ] Secret scanning pre-commit hook installed
+- [ ] CI/CD pipeline created with full test suite execution (DEFERRED — P2-4 requires GitHub Actions setup)
+- [x] Secret scanning pre-commit hook installed (RESOLVED — Phase 2, P2-5)
 - [ ] AWS VPC PrivateLink endpoint configured for Bedrock
 - [ ] IAM role scoped to target models and regions
 - [ ] CloudTrail enabled for Bedrock API events
@@ -645,4 +643,60 @@ All three CRITICAL findings (7.1, 7.2, 7.3) are resolved. No CRITICAL findings r
 
 ---
 
-*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. Phase 1 remediation record appended 2026-05-28. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*
+---
+
+## 21. Phase 2 Remediation Record
+
+**Date:** 2026-05-28
+**Scope:** Phase 2 (Infrastructure and Compliance — repository-side items) from `security_hardening_implementation_plan.md`
+
+### Implemented (Repository-Side)
+
+| Item | Status | Details |
+|------|--------|---------|
+| P2-5 | RESOLVED | `.pre-commit-config.yaml` created with: `detect-secrets` v1.5.0 (credential detection), `detect-private-key` (private key detection), `check-added-large-files` (500KB limit), `check-merge-conflict`, `check-yaml`, `check-case-conflict`, `end-of-file-fixer`, `trailing-whitespace`. |
+| P2-6 | RESOLVED | `tests/test_paths.py` created with 17 tests for `find_repo_root()` and `resolve_repo_path()`. Covers: subdirectory discovery, root-itself, missing markers, double-marker requirement, max depth (20 levels), symlink traversal, absolute path guarantee, .git-as-file (worktree), path normalization across platforms. |
+| Sandbox hardening | RESOLVED | `tests/test_sandbox_hardening.py` created with 39 tests. Covers: path injection edge cases (empty/null/whitespace/integer/NUL), Windows reserved names, `../` traversal, glob injection, 11 dangerous tool rejections (Write/Edit/Bash/Delete/exec/subprocess/eval/WebFetch/WebSearch/NotebookEdit/os.system), case-sensitive tool names, tool loop max-rounds and timeout enforcement, malformed arguments, `shell=False` subprocess verification (source audit), declared-input boundary exhaustive checks, `is_within` edge cases. |
+
+### Deferred (Non-Repository-Side)
+
+| Item | Status | Reason |
+|------|--------|--------|
+| P2-1 | DEFERRED | VPC PrivateLink endpoint — AWS infrastructure, requires AWS admin. |
+| P2-2 | DEFERRED | Scoped IAM role — AWS infrastructure, requires AWS admin. |
+| P2-3 | DEFERRED | CloudTrail — AWS infrastructure, requires AWS admin. |
+| P2-4 | DEFERRED | CI/CD pipeline — requires GitHub Actions setup (deployment-side). |
+| P2-7 | DEFERRED | GDPR DPA — operational/legal, requires compliance officer. |
+| P2-8 | DEFERRED | Model availability validation — operational, requires DevOps. |
+| P2-9 | DEFERRED | CloudWatch prompt logging verification — AWS infrastructure. |
+
+### Findings Status After Phase 2
+
+| Finding | Original Severity | Status After Phase 2 |
+|---------|------------------|---------------------|
+| 7.1 Default backend is Claude CLI | CRITICAL | RESOLVED (P1-1) |
+| 7.2 No production backend enforcement | CRITICAL | RESOLVED (P1-1, P1-2) |
+| 7.3 Semantic dispatch bypasses backend | CRITICAL | RESOLVED (P1-3) |
+| 7.4 Full prompt/response on disk | HIGH | TEMPORARILY ACCEPTED (RA-01–RA-04) — deferred to Phase 3 |
+| 7.5 `.gitignore` minimal | HIGH | RESOLVED (P0-1) |
+| 7.6 No CI/CD pipeline | HIGH | PARTIALLY RESOLVED — pre-commit hooks added (P2-5), CI/CD pipeline deferred (P2-4) |
+| 7.7 `runner/paths.py` untested | MEDIUM | RESOLVED (P2-6) |
+| 7.8 AWS credentials in `.env` | MEDIUM | DEFERRED (P0-2 operational) |
+| Sandbox enforcement | N/A (audit) | PASS — 39 hardening tests confirm: tool rejection, path traversal prevention, symlink escape detection, declared-input enforcement, subprocess shell=False, tool loop bounds |
+
+### CRITICAL Findings: None remaining
+
+All three CRITICAL findings (7.1, 7.2, 7.3) were resolved in Phase 1. No new CRITICAL findings introduced.
+
+### HIGH Findings: 2 remaining
+
+- 7.4 (diagnostic persistence) — TEMPORARILY ACCEPTED, deferred to Phase 3
+- 7.6 (CI/CD pipeline) — PARTIALLY RESOLVED (pre-commit hooks present; GitHub Actions pipeline deferred)
+
+### MEDIUM Findings: 1 remaining
+
+- 7.8 (AWS credentials in `.env`) — DEFERRED (operational)
+
+---
+
+*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. Phase 1 remediation record appended 2026-05-28. Phase 2 remediation record appended 2026-05-28. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*
