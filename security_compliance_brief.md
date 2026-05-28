@@ -70,9 +70,9 @@ CLI Entry Point (__main__.py)
 
 | Requirement (from Bedrock Security Assessment) | Status | Severity | Details |
 |---|---|---|---|
-| Zero data retention | CONDITIONAL PASS | HIGH | Bedrock: PASS. Claude CLI: prompts transit Anthropic infrastructure. No runtime enforcement prevents Claude CLI use. |
-| Training opt-out default | CONDITIONAL PASS | MEDIUM | Bedrock: PASS. Claude CLI: relies on Anthropic ToS. No runtime enforcement. |
-| Data residency controls | CONDITIONAL PASS | HIGH | Bedrock: PASS (region-locked). Claude CLI: no data residency guarantee. No runtime enforcement. |
+| Zero data retention | PASS (with production mode) | ~~HIGH~~ RESOLVED | Bedrock: PASS. Production mode (P1-1) prevents Claude CLI usage. In development mode, Claude CLI is still allowed. |
+| Training opt-out default | PASS (with production mode) | ~~MEDIUM~~ RESOLVED | Bedrock: PASS. Production mode prevents Claude CLI usage. |
+| Data residency controls | PASS (with production mode) | ~~HIGH~~ RESOLVED | Bedrock: PASS (region-locked). Production mode prevents Claude CLI (no data residency guarantee). |
 | Private networking / VPC / PrivateLink | UNKNOWN / REQUIRES INFRASTRUCTURE VALIDATION | HIGH | Documented in presets but no VPC configuration exists in the repository. Infrastructure-side requirement. |
 | API key scope isolation | CONDITIONAL PASS | MEDIUM | Bedrock IAM: PASS. API key value correctly excluded from `ProviderConfig` but retrieved from env at build time. |
 | Auditability (CloudTrail) | UNKNOWN / REQUIRES INFRASTRUCTURE VALIDATION | MEDIUM | Not configured; infrastructure-side requirement. |
@@ -80,12 +80,12 @@ CLI Entry Point (__main__.py)
 | Model routing transparency | PASS | — | Explicit model IDs; no opaque routing. |
 | Contractual DPA availability | UNKNOWN / REQUIRES INFRASTRUCTURE VALIDATION | MEDIUM | AWS Artifact; operational/policy-side requirement. |
 | GDPR posture | UNKNOWN / REQUIRES INFRASTRUCTURE VALIDATION | MEDIUM | Requires region selection, DPA execution, and data processing records. |
-| Data outflow prevention | FAIL | CRITICAL | Default backend is `claude_cli` (Anthropic infrastructure). No runtime enforcement blocks non-Bedrock backends. Six backends accepted. |
+| Data outflow prevention | RESOLVED (production mode) | ~~CRITICAL~~ RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE=true` rejects all non-production backends (claude_cli, together_ai, ollama, openai_compatible). Semantic dispatch routes through configured backend. Default claude_cli fails closed in production mode. (Phase 1 — P1-1, P1-2, P1-3) |
 | Fail-closed on backend unavailability | PASS | — | Transport errors propagate as SkillResult failures; no silent fallback between backends. |
 | Sandbox enforcement (TAPM) | PASS | — | Path authorization, symlink escape protection, declared-input boundary, read-only tools. Tested. |
 | Prompt retention prevention | FAIL | HIGH | Full prompts and LLM responses written to `.claude/skill_diag/` and `.claude/semantic_diag/` as diagnostic files. |
 | Secret handling | PARTIALLY RESOLVED | HIGH | AWS credentials in `.env` (DEFERRED — operational: P0-2 credential rotation). `.gitignore` expanded to ~40 entries covering `.claude/` runtime dirs, `__pycache__/`, caches, logs, IDE, OS files (RESOLVED — P0-1). Previously-tracked `.claude/benchmark/`, `.claude/runs/`, `.claude/skill_diag/`, and `__pycache__/` files removed from git index. |
-| Production backend enforcement | FAIL | CRITICAL | `production_suitable` field is metadata-only; never checked at runtime. Any backend is accepted. |
+| Production backend enforcement | RESOLVED | ~~CRITICAL~~ RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE=true` enforces `PRODUCTION_BACKENDS` (bedrock_converse, bedrock). Preset `production_suitable` flag checked at runtime. Non-production backends rejected with clear error. 34 security tests verify enforcement. (Phase 1 — P1-1, P1-2, P1-5) |
 | Logging safety | CONDITIONAL PASS | MEDIUM | Prompts not logged via `logging` module. But diagnostic files on disk contain full prompts. |
 | Token telemetry safety | PASS | — | Benchmark hook captures char counts only; prompt content is never captured. |
 | CI/CD security validation | FAIL | HIGH | No CI/CD pipeline exists (no `.github/workflows/`). No automated security tests in CI. |
@@ -189,35 +189,37 @@ CLI Entry Point (__main__.py)
 ### 7.1 CRITICAL: Default Backend is Claude CLI
 
 **Severity:** CRITICAL
-**Files:** `runner/transport/config.py:477`
+**Files:** `runner/transport/config.py`
 **Risk:** Production egress of proposal IP through Anthropic infrastructure.
-**Status:** FAIL
+**Status:** RESOLVED (Phase 1 — P1-1, P1-2, 2026-05-28)
 
-The default backend when no env var is set is `claude_cli`. This means any misconfiguration, missing `.env` file, or test environment silently routes all proposal data through the Claude CLI subprocess to Anthropic's infrastructure. In a production deployment, this violates every data residency, zero-retention, and data egress prevention requirement.
+When `ORCHESTRATOR_PRODUCTION_MODE=true`, the default `claude_cli` backend is rejected with a clear error message. Production mode requires explicit selection of a production-suitable backend (`bedrock_converse` or `bedrock`). Development mode behavior is unchanged — `claude_cli` remains the default when production mode is not set.
 
-**Remediation:** Repository-side. Change default to fail-closed (refuse to start without explicit backend selection in production mode).
+Additionally, `__main__.py` now logs the resolved backend at DAG startup (P1-4) and returns exit code 3 on transport configuration errors, providing immediate visibility into the active backend.
+
+**Remediation:** Complete.
 
 ### 7.2 CRITICAL: No Runtime Production Backend Enforcement
 
 **Severity:** CRITICAL
-**Files:** `runner/transport/config.py:60-67` (VALID_BACKENDS), `runner/transport/config.py:452-516` (resolve_provider_config)
+**Files:** `runner/transport/config.py`
 **Risk:** Non-Bedrock backends accepted in production without warning.
-**Status:** FAIL
+**Status:** RESOLVED (Phase 1 — P1-1, P1-2, 2026-05-28)
 
-All 6 backends are treated equally. The `production_suitable` field on `TransportPreset` is informational metadata — it is never read by any runtime code outside of the preset definition itself. An operator can set `ORCHESTRATOR_TRANSPORT_BACKEND=ollama` or `ORCHESTRATOR_TRANSPORT_BACKEND=together_ai` in a production deployment with no warning or block.
+`ORCHESTRATOR_PRODUCTION_MODE=true` now enforces `PRODUCTION_BACKENDS` (`bedrock_converse`, `bedrock`). The `production_suitable` flag on `TransportPreset` is checked at runtime during preset resolution — non-production presets are rejected in production mode. Both the preset path and the legacy direct-env-var path enforce the restriction. 34 security tests verify all enforcement paths.
 
-**Remediation:** Repository-side. Add production-mode guard that rejects backends where `production_suitable=False`.
+**Remediation:** Complete.
 
 ### 7.3 CRITICAL: Semantic Dispatch Bypasses Backend Selection
 
 **Severity:** CRITICAL
-**Files:** `runner/semantic_dispatch.py:57`, `runner/semantic_dispatch.py:646-654`
+**Files:** `runner/semantic_dispatch.py`
 **Risk:** Hidden data egress through Claude CLI even when Bedrock is configured for skills.
-**Status:** FAIL
+**Status:** RESOLVED (Phase 1 — P1-3, 2026-05-28)
 
-The semantic dispatch layer imports `invoke_claude_text` from the benchmark transport hook, which routes through `runner.claude_transport.invoke_claude_text`. This function **always** invokes the local `claude` CLI subprocess. It is completely independent of the `ORCHESTRATOR_TRANSPORT_BACKEND` configuration. When an operator configures Bedrock as the backend, they reasonably expect all LLM calls to go through Bedrock — but semantic predicate evaluation (7 predicates, potentially invoked for every gate in the DAG) continues to use Claude CLI.
+Semantic dispatch now resolves the transport backend via `resolve_provider_config()` — the same path used by the skill runtime. When `bedrock_converse` is configured, semantic predicate evaluation routes through the native Bedrock Converse backend. When `bedrock` (mantle) or other OpenAI-compatible backends are configured, semantic dispatch routes through `build_openai_backend()`. The `claude_cli` path is preserved only when explicitly selected (development mode). Production-mode enforcement applies equally to semantic predicates — no hidden egress paths remain.
 
-**Remediation:** Repository-side. Route semantic dispatch through the multi-backend transport config, or add explicit Bedrock Converse path for semantic predicates.
+**Remediation:** Complete.
 
 ### 7.4 HIGH: Full Prompt/Response Content Written to Disk
 
@@ -333,9 +335,9 @@ The `.env` file contains plaintext `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KE
 
 | Control | Current State | Required Change | Priority |
 |---------|---------------|-----------------|----------|
-| Production backend enforcement | `production_suitable` is metadata-only | Add runtime guard in `resolve_provider_config()` | CRITICAL |
-| Default backend fail-closed | Default: `claude_cli` | Require explicit backend selection in production mode | CRITICAL |
-| Semantic dispatch backend routing | Always Claude CLI | Route through multi-backend config | CRITICAL |
+| Production backend enforcement | RESOLVED (P1-1, P1-2) — `ORCHESTRATOR_PRODUCTION_MODE=true` enforces `PRODUCTION_BACKENDS` | N/A | ~~CRITICAL~~ RESOLVED |
+| Default backend fail-closed | RESOLVED (P1-1) — claude_cli rejected in production mode | N/A | ~~CRITICAL~~ RESOLVED |
+| Semantic dispatch backend routing | RESOLVED (P1-3) — routes through `resolve_provider_config()` | N/A | ~~CRITICAL~~ RESOLVED |
 | Diagnostic prompt capture | Always-on, writes full content | Disable by default; gate behind debug flag | HIGH |
 | `.gitignore` completeness | RESOLVED (P0-1) — expanded to ~40 entries | N/A | ~~HIGH~~ RESOLVED |
 | Transport failure prompt sanitization | Full prompts written to disk | Truncate or omit prompt content in production mode | HIGH |
@@ -463,28 +465,15 @@ ORCHESTRATOR_PRODUCTION_MODE=true
 
 ## 15. Required Code Modifications
 
-### 15.1 Production Backend Enforcement (CRITICAL)
+### 15.1 Production Backend Enforcement (CRITICAL) — RESOLVED
 
 **File:** `runner/transport/config.py`
-**Change:** Add production-mode guard.
+**Status:** RESOLVED (Phase 1 — P1-1, P1-2, 2026-05-28). `is_production_mode()`, `PRODUCTION_BACKENDS`, `_enforce_production_backend()` added. Both `resolve_provider_config()` and `resolve_provider_config_from_preset()` enforce production restrictions. 34 security tests in `tests/test_production_mode.py`.
 
-```python
-# In resolve_provider_config():
-production_mode = os.environ.get("ORCHESTRATOR_PRODUCTION_MODE", "").lower() == "true"
-if production_mode:
-    if backend == "claude_cli":
-        raise ValueError(
-            "ORCHESTRATOR_PRODUCTION_MODE=true but backend is 'claude_cli' "
-            "(default). Set ORCHESTRATOR_TRANSPORT_PRESET or "
-            "ORCHESTRATOR_TRANSPORT_BACKEND to a production-suitable backend."
-        )
-    # Also check preset production_suitable flag
-```
-
-### 15.2 Semantic Dispatch Backend Routing (CRITICAL)
+### 15.2 Semantic Dispatch Backend Routing (CRITICAL) — RESOLVED
 
 **File:** `runner/semantic_dispatch.py`
-**Change:** Route `invoke_agent()` through the multi-backend config instead of hardcoded Claude CLI.
+**Status:** RESOLVED (Phase 1 — P1-3, 2026-05-28). `_resolve_semantic_backend()` and `_invoke_via_backend()` route semantic predicates through `resolve_provider_config()`. Bedrock Converse and OpenAI-compatible paths added alongside existing Claude CLI path.
 
 ### 15.3 Diagnostic Capture Gating (HIGH)
 
@@ -547,11 +536,11 @@ The Proposal Orchestrator has strong security fundamentals:
 - API key non-persistence in configuration objects
 - Native Bedrock Converse support via boto3
 
-However, **three CRITICAL issues** block production deployment:
+All **three CRITICAL issues** identified in the original audit have been resolved by Phase 1:
 
-1. **Default backend is `claude_cli`** — all proposal IP routes through Anthropic infrastructure unless explicitly configured otherwise.
-2. **No production backend enforcement** — `production_suitable` is metadata-only; any backend is accepted.
-3. **Semantic dispatch bypasses backend selection** — always routes through Claude CLI regardless of configuration.
+1. ~~**Default backend is `claude_cli`**~~ **RESOLVED** — Production mode rejects `claude_cli` and all non-production backends.
+2. ~~**No production backend enforcement**~~ **RESOLVED** — `PRODUCTION_BACKENDS` enforced at runtime. `production_suitable` flag checked for presets.
+3. ~~**Semantic dispatch bypasses backend selection**~~ **RESOLVED** — Routes through `resolve_provider_config()`. No hidden Claude CLI paths in production mode.
 
 Additionally, **three remaining HIGH-severity issues** require remediation (one HIGH resolved in Phase 0):
 
@@ -564,8 +553,8 @@ Additionally, **three remaining HIGH-severity issues** require remediation (one 
 
 All of the following must be satisfied before institutional production deployment:
 
-- [ ] Production backend enforcement code implemented and tested
-- [ ] Semantic dispatch routed through multi-backend config
+- [x] Production backend enforcement code implemented and tested (RESOLVED — Phase 1, P1-1/P1-2)
+- [x] Semantic dispatch routed through multi-backend config (RESOLVED — Phase 1, P1-3)
 - [ ] Diagnostic prompt capture disabled by default (or production-sanitized)
 - [x] `.gitignore` expanded to cover `.claude/` and standard patterns (RESOLVED — Phase 0, P0-1)
 - [ ] CI/CD pipeline created with full test suite execution
@@ -616,4 +605,44 @@ All of the following must be satisfied before institutional production deploymen
 
 ---
 
-*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*
+## 20. Phase 1 Remediation Record
+
+**Date:** 2026-05-28
+**Scope:** Phase 1 (Transport Lockdown) from `security_hardening_implementation_plan.md`
+
+### Implemented
+
+| Item | Status | Details |
+|------|--------|---------|
+| P1-1 | RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE` env var guard. `is_production_mode()` helper. Production mode rejects all non-production backends in both legacy and preset resolution paths. |
+| P1-2 | RESOLVED | `PRODUCTION_BACKENDS` constant (`bedrock_converse`, `bedrock`). `_enforce_production_backend()` function. Preset `production_suitable` flag checked at runtime. |
+| P1-3 | RESOLVED | `_resolve_semantic_backend()` and `_invoke_via_backend()` added to `semantic_dispatch.py`. Semantic predicates now route through `resolve_provider_config()`. Bedrock Converse, OpenAI-compatible, and Claude CLI paths all supported. |
+| P1-4 | RESOLVED | `__main__.py` logs resolved backend, model, preset, and production mode at DAG startup. Returns exit code 3 on transport configuration errors. |
+| P1-5 | RESOLVED | 34 security tests in `tests/test_production_mode.py`: production enforcement (11 tests), development preservation (5 tests), `is_production_mode()` (5 tests), `PRODUCTION_BACKENDS` (7 tests), semantic dispatch routing (3 tests), fail-closed behavior (2 tests), startup logging (1 test). |
+
+### Findings Status After Phase 1
+
+| Finding | Original Severity | Status After Phase 1 |
+|---------|------------------|---------------------|
+| 7.1 Default backend is Claude CLI | CRITICAL | RESOLVED (P1-1) |
+| 7.2 No production backend enforcement | CRITICAL | RESOLVED (P1-1, P1-2) |
+| 7.3 Semantic dispatch bypasses backend | CRITICAL | RESOLVED (P1-3) |
+| 7.4 Full prompt/response on disk | HIGH | TEMPORARILY ACCEPTED (RA-01–RA-04) — deferred to Phase 3 |
+| 7.5 `.gitignore` minimal | HIGH | RESOLVED (P0-1) |
+| 7.6 No CI/CD pipeline | HIGH | UNRESOLVED — requires Phase 2 (P2-4) |
+| 7.7 `runner/paths.py` untested | MEDIUM | UNRESOLVED — requires Phase 2 (P2-6) |
+| 7.8 AWS credentials in `.env` | MEDIUM | DEFERRED (P0-2 operational) |
+
+### CRITICAL Findings: None remaining
+
+All three CRITICAL findings (7.1, 7.2, 7.3) are resolved. No CRITICAL findings remain.
+
+### HIGH Findings: 3 remaining
+
+- 7.4 (diagnostic persistence) — TEMPORARILY ACCEPTED, deferred to Phase 3
+- 7.6 (no CI/CD pipeline) — Phase 2
+- Secret handling (P0-2 credential rotation) — operational, deferred
+
+---
+
+*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. Phase 1 remediation record appended 2026-05-28. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*

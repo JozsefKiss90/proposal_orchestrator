@@ -116,11 +116,36 @@ def mock_transport():
     Patch ``runner.semantic_dispatch.invoke_claude_text`` so no real
     CLI calls happen.
 
+    Also resets the semantic backend cache and forces ``claude_cli`` as
+    the resolved backend, so that ``_invoke_via_backend`` routes through
+    the mocked ``invoke_claude_text`` path.
+
     Yields the mock function.  Tests set ``mock_transport.return_value``
     to control responses.
     """
-    with patch("runner.semantic_dispatch.invoke_claude_text") as mock_fn:
-        yield mock_fn
+    import runner.semantic_dispatch as sd_module
+    from runner.transport.config import ProviderConfig
+    from runner.transport.capabilities import CAPABILITIES_REGISTRY
+
+    # Force the semantic dispatch backend cache to claude_cli so that
+    # _invoke_via_backend routes through the mocked invoke_claude_text.
+    saved_cache = sd_module._semantic_provider_cache
+    saved_resolved = sd_module._semantic_provider_resolved
+    sd_module._semantic_provider_cache = ProviderConfig(
+        backend_name="claude_cli",
+        base_url=None,
+        api_key_set=False,
+        model=None,
+        capabilities=CAPABILITIES_REGISTRY["claude_cli"],
+    )
+    sd_module._semantic_provider_resolved = True
+
+    try:
+        with patch("runner.semantic_dispatch.invoke_claude_text") as mock_fn:
+            yield mock_fn
+    finally:
+        sd_module._semantic_provider_cache = saved_cache
+        sd_module._semantic_provider_resolved = saved_resolved
 
 
 # ---------------------------------------------------------------------------

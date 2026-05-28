@@ -59,6 +59,7 @@ from runner.claude_transport import (
     ClaudeTransportError,
 )
 from runner.paths import resolve_repo_path
+from runner.transport.config import resolve_provider_config, ProviderConfig
 
 # ---------------------------------------------------------------------------
 # Schema constants  (§4.9)
@@ -579,6 +580,88 @@ def _extract_json(text: str) -> Optional[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Backend resolution for semantic dispatch
+# ---------------------------------------------------------------------------
+
+_semantic_provider_cache: ProviderConfig | None = None
+_semantic_provider_resolved: bool = False
+
+
+def _resolve_semantic_backend() -> ProviderConfig:
+    """Resolve the transport backend for semantic predicate evaluation.
+
+    Shares the same ``resolve_provider_config()`` resolution as the skill
+    runtime, ensuring that production-mode enforcement applies equally to
+    semantic predicates.  The result is cached for the lifetime of the
+    process.
+    """
+    global _semantic_provider_cache, _semantic_provider_resolved
+    if _semantic_provider_resolved:
+        assert _semantic_provider_cache is not None
+        return _semantic_provider_cache
+    _semantic_provider_cache = resolve_provider_config()
+    _semantic_provider_resolved = True
+    return _semantic_provider_cache
+
+
+def _invoke_via_backend(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    run_id: str,
+    pred_id: str,
+    provider_config: ProviderConfig,
+) -> str:
+    """Invoke the LLM via the resolved backend.
+
+    For ``claude_cli``, delegates to the existing benchmark-instrumented
+    ``invoke_claude_text()``.  For ``bedrock_converse``, uses the native
+    Bedrock Converse backend.  For other OpenAI-compatible backends, uses
+    ``build_openai_backend()``.
+
+    Returns the raw response text.  Raises on transport failure.
+    """
+    if provider_config.backend_name == "claude_cli":
+        return invoke_claude_text(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            model=AGENT_MODEL,
+            max_tokens=AGENT_MAX_TOKENS,
+            _bench_run_id=run_id,
+            _bench_predicate_id=pred_id,
+            _bench_invocation_type="semantic_predicate",
+        )
+
+    if provider_config.backend_name == "bedrock_converse":
+        from runner.transport.config import build_converse_backend
+
+        backend = build_converse_backend(
+            provider_config,
+            temperature=0.0,
+            max_tokens=AGENT_MAX_TOKENS,
+        )
+        result = backend(messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ])
+        return result.get("content", "")
+
+    # OpenAI-compatible path (bedrock-mantle, together_ai, ollama, etc.)
+    from runner.transport.config import build_openai_backend
+
+    backend = build_openai_backend(
+        provider_config,
+        temperature=0.0,
+        max_tokens=AGENT_MAX_TOKENS,
+    )
+    result = backend(messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ])
+    return result.get("content", "")
+
+
+# ---------------------------------------------------------------------------
 # Agent invocation
 # ---------------------------------------------------------------------------
 
@@ -589,11 +672,12 @@ def invoke_agent(
     repo_root: Path,
 ) -> dict:
     """
-    Invoke the designated agent via the Claude runtime transport.
+    Invoke the designated agent via the configured runtime transport.
 
     Reads artifact content, builds prompts, invokes ``claude-sonnet-4-6``
-    through the local ``claude`` CLI, and returns the raw result dict for
-    validation by :func:`validate_semantic_result`.
+    through the resolved transport backend (Claude CLI, Bedrock Converse,
+    or OpenAI-compatible), and returns the raw result dict for validation
+    by :func:`validate_semantic_result`.
 
     Parameters
     ----------
@@ -641,18 +725,29 @@ def invoke_agent(
     system_prompt = _build_system_prompt(config)
     user_prompt = _build_user_prompt(config, artifact_contents, resolved_args)
 
-    # Invoke the agent via the Claude runtime transport
+    # Resolve backend and invoke the agent
     try:
-        response_text: str = invoke_claude_text(
+        provider_config = _resolve_semantic_backend()
+    except ValueError as exc:
+        return _dispatch_error_result(
+            pred_id,
+            func_name,
+            f"Transport backend resolution failed: {exc}",
+            agent=config.agent,
+            constitutional_rule=config.constitutional_rule,
+            artifacts_inspected=inspected_paths,
+            failure_category="TRANSPORT_FAILURE",
+        )
+
+    try:
+        response_text: str = _invoke_via_backend(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
-            model=AGENT_MODEL,
-            max_tokens=AGENT_MAX_TOKENS,
-            _bench_run_id=run_id,
-            _bench_predicate_id=pred_id,
-            _bench_invocation_type="semantic_predicate",
+            run_id=run_id,
+            pred_id=pred_id,
+            provider_config=provider_config,
         )
-    except ClaudeTransportError as exc:
+    except (ClaudeTransportError, Exception) as exc:
         diag_path = _write_semantic_diagnostics(
             func_name=func_name,
             run_id=run_id,

@@ -66,6 +66,12 @@ VALID_BACKENDS: frozenset[str] = frozenset({
     "openai_compatible",
 })
 
+#: Backends allowed when ORCHESTRATOR_PRODUCTION_MODE=true.
+PRODUCTION_BACKENDS: frozenset[str] = frozenset({
+    "bedrock_converse",
+    "bedrock",
+})
+
 #: Default Bedrock model (Claude Sonnet 4 on Bedrock).
 DEFAULT_BEDROCK_MODEL: str = "anthropic.claude-sonnet-4-20250514-v1:0"
 
@@ -336,6 +342,34 @@ def validate_bedrock_model_id(model_id: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Production mode enforcement
+# ---------------------------------------------------------------------------
+
+
+def is_production_mode() -> bool:
+    """Return ``True`` when ``ORCHESTRATOR_PRODUCTION_MODE`` is ``"true"``."""
+    return os.environ.get("ORCHESTRATOR_PRODUCTION_MODE", "").lower() == "true"
+
+
+def _enforce_production_backend(config: ProviderConfig) -> None:
+    """Reject non-production backends when production mode is active.
+
+    Raises
+    ------
+    ValueError
+        If the resolved backend is not in :data:`PRODUCTION_BACKENDS`.
+    """
+    if config.backend_name not in PRODUCTION_BACKENDS:
+        raise ValueError(
+            f"ORCHESTRATOR_PRODUCTION_MODE=true but backend "
+            f"{config.backend_name!r} is not production-suitable. "
+            f"Production-allowed backends: {sorted(PRODUCTION_BACKENDS)}. "
+            f"Set ORCHESTRATOR_TRANSPORT_PRESET or "
+            f"ORCHESTRATOR_TRANSPORT_BACKEND to a production backend."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Preset helpers
 # ---------------------------------------------------------------------------
 
@@ -388,6 +422,15 @@ def resolve_provider_config_from_preset(preset_name: str) -> ProviderConfig:
         if ``ORCHESTRATOR_TRANSPORT_BACKEND`` conflicts with the preset.
     """
     preset = get_transport_preset(preset_name)
+
+    # Production mode: reject non-production presets.
+    if is_production_mode() and not preset.production_suitable:
+        raise ValueError(
+            f"ORCHESTRATOR_PRODUCTION_MODE=true but preset "
+            f"{preset_name!r} is not production-suitable "
+            f"(production_suitable=False). Use a production preset "
+            f"(e.g. BEDROCK_CONVERSE_US, BEDROCK_EU_PRODUCTION)."
+        )
 
     # Safety: reject conflicting backend override.
     explicit_backend = os.environ.get("ORCHESTRATOR_TRANSPORT_BACKEND")
@@ -471,15 +514,27 @@ def resolve_provider_config() -> ProviderConfig:
     # Preset path: if ORCHESTRATOR_TRANSPORT_PRESET is set, use it.
     preset_name = os.environ.get("ORCHESTRATOR_TRANSPORT_PRESET")
     if preset_name is not None:
+        # Preset path includes its own production enforcement.
         return resolve_provider_config_from_preset(preset_name)
 
     # Legacy path: direct env var resolution.
+    production_mode = is_production_mode()
     backend = os.environ.get("ORCHESTRATOR_TRANSPORT_BACKEND", "claude_cli")
 
     if backend not in VALID_BACKENDS:
         raise ValueError(
             f"Invalid backend: {backend!r}. "
             f"Valid backends: {sorted(VALID_BACKENDS)}"
+        )
+
+    # Production mode: reject non-production backends early.
+    if production_mode and backend not in PRODUCTION_BACKENDS:
+        raise ValueError(
+            f"ORCHESTRATOR_PRODUCTION_MODE=true but backend "
+            f"{backend!r} is not production-suitable. "
+            f"Production-allowed backends: {sorted(PRODUCTION_BACKENDS)}. "
+            f"Set ORCHESTRATOR_TRANSPORT_PRESET or "
+            f"ORCHESTRATOR_TRANSPORT_BACKEND to a production backend."
         )
 
     endpoint = os.environ.get("ORCHESTRATOR_TRANSPORT_ENDPOINT")

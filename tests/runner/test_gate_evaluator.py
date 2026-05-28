@@ -1060,15 +1060,35 @@ class TestSemanticDispatchIntegration:
             "fail_message": "",
         }
 
-        with patch("runner.semantic_dispatch.invoke_claude_text") as mock_transport:
-            mock_transport.return_value = json.dumps(api_payload)
+        import runner.semantic_dispatch as sd_module
+        from runner.transport.config import ProviderConfig
+        from runner.transport.capabilities import CAPABILITIES_REGISTRY
 
-            result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+        # Force semantic backend cache to claude_cli so _invoke_via_backend
+        # routes through the mocked invoke_claude_text.
+        saved_cache = sd_module._semantic_provider_cache
+        saved_resolved = sd_module._semantic_provider_resolved
+        sd_module._semantic_provider_cache = ProviderConfig(
+            backend_name="claude_cli",
+            base_url=None,
+            api_key_set=False,
+            model=None,
+            capabilities=CAPABILITIES_REGISTRY["claude_cli"],
+        )
+        sd_module._semantic_provider_resolved = True
+        try:
+            with patch("runner.semantic_dispatch.invoke_claude_text") as mock_transport:
+                mock_transport.return_value = json.dumps(api_payload)
 
-        assert result["status"] == "pass"
-        assert "p_chain_test" in result["semantic_predicates"]["passed"]
-        # Confirm the transport was invoked (not short-circuited at a higher level)
-        assert mock_transport.called
+                result = evaluate_gate(_GATE_SEM, run_id, tmp_path, library_path=lib_path)
+
+            assert result["status"] == "pass"
+            assert "p_chain_test" in result["semantic_predicates"]["passed"]
+            # Confirm the transport was invoked (not short-circuited at a higher level)
+            assert mock_transport.called
+        finally:
+            sd_module._semantic_provider_cache = saved_cache
+            sd_module._semantic_provider_resolved = saved_resolved
 
 
 # ---------------------------------------------------------------------------

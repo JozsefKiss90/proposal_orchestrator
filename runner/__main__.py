@@ -208,6 +208,29 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 3
 
     # ------------------------------------------------------------------
+    # Backend resolution and startup logging
+    # ------------------------------------------------------------------
+    try:
+        from runner.transport.config import resolve_provider_config, is_production_mode
+
+        _pc = resolve_provider_config()
+        _prod = is_production_mode()
+        _out(
+            f"[BACKEND] transport={_pc.backend_name}  "
+            f"model={_pc.model or '(default)'}  "
+            f"preset={_pc.preset_name or '(none)'}  "
+            f"production_mode={_prod}",
+            "backend_info",
+            backend=_pc.backend_name,
+            model=_pc.model,
+            preset=_pc.preset_name,
+            production_mode=_prod,
+        )
+    except ValueError as exc:
+        _err(f"Transport configuration error: {exc}")
+        return 3
+
+    # ------------------------------------------------------------------
     # Phase-scoped continuation bootstrap
     # ------------------------------------------------------------------
     # When --phase is specified, seed upstream prerequisite nodes as
