@@ -344,11 +344,20 @@ def _write_semantic_diagnostics(
         return None
 
     prefix = f"{func_name}_{run_id[:8]}"
+
+    # -- Persistence policy --
+    from runner.persistence_policy import (
+        allows_content_persistence,
+        sanitize_error_message,
+    )
+
+    _content_allowed = allows_content_persistence()
+
     meta: dict[str, Any] = {
         "function": func_name,
         "run_id": run_id,
         "category": category,
-        "reason": reason,
+        "reason": sanitize_error_message(reason),
         "system_prompt_size": len(system_prompt) if system_prompt else 0,
         "user_prompt_size": len(user_prompt) if user_prompt else 0,
     }
@@ -365,16 +374,19 @@ def _write_semantic_diagnostics(
     file_map: dict[str, tuple[str, str | None]] = {
         "meta": (f"{prefix}_dispatch_meta.json", None),
     }
-    if system_prompt is not None:
-        file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
-    if user_prompt is not None:
-        file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
-    if response_text is not None:
-        file_map["response"] = (f"{prefix}_response.txt", response_text)
-    if exc is not None and hasattr(exc, "stderr") and exc.stderr:
-        file_map["stderr"] = (f"{prefix}_stderr.txt", exc.stderr)
-    if exc is not None and hasattr(exc, "stdout") and exc.stdout:
-        file_map["stdout"] = (f"{prefix}_stdout.txt", exc.stdout)
+
+    # Content companion files only under full diagnostic level.
+    if _content_allowed:
+        if system_prompt is not None:
+            file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
+        if user_prompt is not None:
+            file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
+        if response_text is not None:
+            file_map["response"] = (f"{prefix}_response.txt", response_text)
+        if exc is not None and hasattr(exc, "stderr") and exc.stderr:
+            file_map["stderr"] = (f"{prefix}_stderr.txt", exc.stderr)
+        if exc is not None and hasattr(exc, "stdout") and exc.stdout:
+            file_map["stdout"] = (f"{prefix}_stdout.txt", exc.stdout)
 
     meta["diagnostic_files"] = {
         k: f".claude/semantic_diag/{fname}" for k, (fname, _) in file_map.items()
@@ -386,13 +398,15 @@ def _write_semantic_diagnostics(
     except OSError:
         return None
 
-    for key, (fname, content) in file_map.items():
-        if key == "meta" or content is None:
-            continue
-        try:
-            (diag_dir / fname).write_text(content, encoding="utf-8")
-        except OSError:
-            pass
+    # Write content companion files only under full policy.
+    if _content_allowed:
+        for key, (fname, content) in file_map.items():
+            if key == "meta" or content is None:
+                continue
+            try:
+                (diag_dir / fname).write_text(content, encoding="utf-8")
+            except OSError:
+                pass
 
     return f".claude/semantic_diag/{file_map['meta'][0]}"
 

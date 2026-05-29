@@ -883,6 +883,14 @@ def _write_transport_failure_diagnostics(
         if elapsed_seconds is None:
             elapsed_seconds = exc.elapsed_seconds
 
+    # -- Persistence policy --
+    from runner.persistence_policy import (
+        allows_content_persistence,
+        sanitize_error_message,
+    )
+
+    _content_allowed = allows_content_persistence()
+
     # -- transport_diag.json --
     meta: dict[str, Any] = {
         "skill_id": skill_id,
@@ -899,7 +907,7 @@ def _write_transport_failure_diagnostics(
         "system_prompt_chars": len(system_prompt),
         "user_prompt_chars": len(user_prompt),
         "exception_class": type(exc).__name__,
-        "exception_message": str(exc),
+        "exception_message": sanitize_error_message(str(exc)),
         "command": command,
         "had_partial_stdout": bool(partial_stdout.strip()),
         "had_stderr": bool(partial_stderr.strip()),
@@ -909,11 +917,14 @@ def _write_transport_failure_diagnostics(
 
     file_map: dict[str, tuple[str, str | None]] = {
         "meta": (f"{prefix}_transport_diag.json", None),
-        "system_prompt": (f"{prefix}_system_prompt.txt", system_prompt),
-        "user_prompt": (f"{prefix}_user_prompt.txt", user_prompt),
-        "stdout": (f"{prefix}_stdout.txt", partial_stdout),
-        "stderr": (f"{prefix}_stderr.txt", partial_stderr),
     }
+
+    # Content companion files are only included under full diagnostic level.
+    if _content_allowed:
+        file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
+        file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
+        file_map["stdout"] = (f"{prefix}_stdout.txt", partial_stdout)
+        file_map["stderr"] = (f"{prefix}_stderr.txt", partial_stderr)
 
     # Populate diagnostic_files in meta before writing.
     meta["diagnostic_files"] = {
@@ -928,14 +939,15 @@ def _write_transport_failure_diagnostics(
     except OSError:
         pass
 
-    # Write companion files (prompts, stdout, stderr).
-    for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
-        fname, content = file_map[key]
-        try:
-            (diag_dir / fname).write_text(content or "", encoding="utf-8")
-            written[key] = f".claude/skill_diag/{fname}"
-        except OSError:
-            pass
+    # Write companion files (prompts, stdout, stderr) — only under full policy.
+    if _content_allowed:
+        for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
+            fname, content = file_map[key]
+            try:
+                (diag_dir / fname).write_text(content or "", encoding="utf-8")
+                written[key] = f".claude/skill_diag/{fname}"
+            except OSError:
+                pass
 
     return written
 
@@ -1720,46 +1732,51 @@ def run_skill(
 
     assert response_text is not None  # guaranteed by api_error check
 
-    # ── Diagnostic capture (temporary) ──────────────────────────────
+    # ── Diagnostic capture (policy-controlled) ─────────────────────
     _diag_dir = repo_root / ".claude" / "skill_diag"
     _diag_dir.mkdir(parents=True, exist_ok=True)
-    _diag_path = _diag_dir / f"{skill_id}_{run_id[:8]}_response.txt"
-    try:
-        _diag_path.write_text(
-            f"=== skill_id: {skill_id} ===\n"
-            f"=== mode: {mode} ===\n"
-            f"=== response_text length: {len(response_text)} ===\n"
-            f"=== response_text (full) ===\n{response_text}\n"
-            f"=== END ===\n",
-            encoding="utf-8",
-        )
-    except OSError:
-        pass  # Best-effort diagnostic
+
+    from runner.persistence_policy import allows_content_persistence
+
+    if allows_content_persistence():
+        _diag_path = _diag_dir / f"{skill_id}_{run_id[:8]}_response.txt"
+        try:
+            _diag_path.write_text(
+                f"=== skill_id: {skill_id} ===\n"
+                f"=== mode: {mode} ===\n"
+                f"=== response_text length: {len(response_text)} ===\n"
+                f"=== response_text (full) ===\n{response_text}\n"
+                f"=== END ===\n",
+                encoding="utf-8",
+            )
+        except OSError:
+            pass  # Best-effort diagnostic
 
     parsed = _extract_json_response(response_text)
 
-    # Diagnostic: log parse result
-    try:
-        _diag_parse_path = _diag_dir / f"{skill_id}_{run_id[:8]}_parsed.txt"
-        if parsed is not None:
-            _diag_parse_path.write_text(
-                f"=== parsed OK ===\n"
-                f"=== top-level keys: {list(parsed.keys())} ===\n"
-                f"=== parsed content ===\n"
-                f"{json.dumps(parsed, indent=2)[:5000]}\n"
-                f"=== END ===\n",
-                encoding="utf-8",
-            )
-        else:
-            _diag_parse_path.write_text(
-                f"=== parsed FAILED (None) ===\n"
-                f"=== response_text first 1000 chars ===\n"
-                f"{response_text[:1000]}\n"
-                f"=== END ===\n",
-                encoding="utf-8",
-            )
-    except OSError:
-        pass
+    # Diagnostic: log parse result (content-level, policy-controlled)
+    if allows_content_persistence():
+        try:
+            _diag_parse_path = _diag_dir / f"{skill_id}_{run_id[:8]}_parsed.txt"
+            if parsed is not None:
+                _diag_parse_path.write_text(
+                    f"=== parsed OK ===\n"
+                    f"=== top-level keys: {list(parsed.keys())} ===\n"
+                    f"=== parsed content ===\n"
+                    f"{json.dumps(parsed, indent=2)[:5000]}\n"
+                    f"=== END ===\n",
+                    encoding="utf-8",
+                )
+            else:
+                _diag_parse_path.write_text(
+                    f"=== parsed FAILED (None) ===\n"
+                    f"=== response_text first 1000 chars ===\n"
+                    f"{response_text[:1000]}\n"
+                    f"=== END ===\n",
+                    encoding="utf-8",
+                )
+        except OSError:
+            pass
 
     if parsed is None:
         return SkillResult(

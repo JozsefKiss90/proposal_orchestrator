@@ -83,10 +83,10 @@ CLI Entry Point (__main__.py)
 | Data outflow prevention | RESOLVED (production mode) | ~~CRITICAL~~ RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE=true` rejects all non-production backends (claude_cli, together_ai, ollama, openai_compatible). Semantic dispatch routes through configured backend. Default claude_cli fails closed in production mode. (Phase 1 — P1-1, P1-2, P1-3) |
 | Fail-closed on backend unavailability | PASS | — | Transport errors propagate as SkillResult failures; no silent fallback between backends. |
 | Sandbox enforcement (TAPM) | PASS | — | Path authorization, symlink escape protection, declared-input boundary, read-only tools. Tested. |
-| Prompt retention prevention | FAIL | HIGH | Full prompts and LLM responses written to `.claude/skill_diag/` and `.claude/semantic_diag/` as diagnostic files. |
+| Prompt retention prevention | RESOLVED (Phase 3 — P3-1, P3-2, P3-3) | ~~HIGH~~ RESOLVED | Environment-scoped persistence policy (`runner/persistence_policy.py`) controls diagnostic file writes. Production mode (`ORCHESTRATOR_PRODUCTION_MODE=true`) defaults to `metadata` level: prompt/response content files are never written. Error messages in metadata JSON are sanitized (truncated to 200 chars). Development mode preserves full diagnostic persistence unchanged. |
 | Secret handling | PARTIALLY RESOLVED | HIGH | AWS credentials in `.env` (DEFERRED — operational: P0-2 credential rotation). `.gitignore` expanded to ~40 entries covering `.claude/` runtime dirs, `__pycache__/`, caches, logs, IDE, OS files (RESOLVED — P0-1). Previously-tracked `.claude/benchmark/`, `.claude/runs/`, `.claude/skill_diag/`, and `__pycache__/` files removed from git index. |
 | Production backend enforcement | RESOLVED | ~~CRITICAL~~ RESOLVED | `ORCHESTRATOR_PRODUCTION_MODE=true` enforces `PRODUCTION_BACKENDS` (bedrock_converse, bedrock). Preset `production_suitable` flag checked at runtime. Non-production backends rejected with clear error. 34 security tests verify enforcement. (Phase 1 — P1-1, P1-2, P1-5) |
-| Logging safety | CONDITIONAL PASS | MEDIUM | Prompts not logged via `logging` module. But diagnostic files on disk contain full prompts. |
+| Logging safety | PASS (with production mode) | ~~MEDIUM~~ RESOLVED | Prompts not logged via `logging` module. Diagnostic files on disk are policy-controlled: production mode writes metadata only (no prompt/response content). |
 | Token telemetry safety | PASS | — | Benchmark hook captures char counts only; prompt content is never captured. |
 | CI/CD security validation | PARTIALLY RESOLVED | ~~HIGH~~ MEDIUM | No CI/CD pipeline yet (P2-4 deferred — requires GitHub Actions setup). Pre-commit secret scanning hook added (P2-5). 39 sandbox hardening tests added. |
 | Path resolution testing | RESOLVED | ~~MEDIUM~~ RESOLVED | `tests/test_paths.py` added with 17 tests covering `find_repo_root()` and `resolve_repo_path()`: subdirectory discovery, missing markers, double-marker requirement, max depth, symlink traversal, path normalization, absolute/relative handling. (Phase 2 — P2-6) |
@@ -105,7 +105,7 @@ CLI Entry Point (__main__.py)
 | Together AI HTTP endpoint | HIGH — third-party US-based service; no DPA | Supported; no production block |
 | Ollama localhost | LOW — local only | Supported |
 | Generic OpenAI-compatible | HIGH — arbitrary endpoint; no TLS enforcement | Supported; no production block |
-| Diagnostic files on disk | HIGH — full prompt/response content written to `.claude/skill_diag/` | Active in all modes |
+| Diagnostic files on disk | RESOLVED — policy-controlled via `runner/persistence_policy.py` | Production: metadata only (no content). Development: full (preserves observability). |
 
 ### 4.2 Secret Exposure Surfaces
 
@@ -225,18 +225,21 @@ Semantic dispatch now resolves the transport backend via `resolve_provider_confi
 
 **Severity:** HIGH
 **Files:**
-- `runner/skill_runtime.py:1710-1748` — diagnostic capture writes full response text
-- `runner/skill_runtime.py:838-940` — transport failure diagnostics write full system+user prompts
-- `runner/semantic_dispatch.py:316-396` — semantic diagnostics write full prompts and responses
+- `runner/skill_runtime.py` — diagnostic capture writes full response text
+- `runner/skill_runtime.py` — transport failure diagnostics write full system+user prompts
+- `runner/semantic_dispatch.py` — semantic diagnostics write full prompts and responses
+- `runner/persistence_policy.py` — environment-scoped persistence policy (NEW)
 **Output paths:** `.claude/skill_diag/`, `.claude/semantic_diag/`
-**Risk:** Proposal IP (full proposal content, project data, partner details, budget information) is persisted in plaintext diagnostic files after every skill invocation and every transport failure.
-**Status:** FAIL
+**Risk:** Proposal IP (full proposal content, project data, partner details, budget information) was persisted in plaintext diagnostic files after every skill invocation and every transport failure.
+**Status:** RESOLVED (Phase 3 — P3-1, P3-2, P3-3, 2026-05-29)
 
-The skill runtime writes **every** LLM response to `{skill_id}_{run_id}_response.txt` at line 1714 as a "diagnostic capture (temporary)" — but there is no mechanism to remove these files. Transport failure diagnostics write full `system_prompt.txt` and `user_prompt.txt` files. These files contain the complete serialized proposal content.
+Environment-scoped persistence policy implemented in `runner/persistence_policy.py`. Production mode (`ORCHESTRATOR_PRODUCTION_MODE=true`) defaults to `metadata` diagnostic level: response content files (`_response.txt`, `_parsed.txt`), prompt files (`_system_prompt.txt`, `_user_prompt.txt`), and stdout/stderr files are never written. Metadata-only files (`_transport_diag.json`, `_dispatch_meta.json`, `_phase_e.txt`) continue to be written in all modes (they contain no prompt/response content). Error messages in metadata JSON are sanitized (truncated to 200 chars) in production to prevent prompt content leakage via exception echoing.
 
-**Remediation:** Repository-side.
-- Remove the unconditional response diagnostic capture (lines 1710-1748), or gate it behind a `ORCHESTRATOR_DEBUG_DIAGNOSTICS=true` env var disabled by default.
-- Ensure transport failure diagnostics either omit prompt content in production or are encrypted/auto-purged.
+Development mode preserves full diagnostic persistence unchanged — `ORCHESTRATOR_DIAGNOSTIC_LEVEL=full` (default when production mode is unset) writes all diagnostic files as before. `ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata` can be used in development to restrict output. Setting `ORCHESTRATOR_DIAGNOSTIC_LEVEL=full` in production mode is rejected as a policy violation (fail-closed).
+
+40 tests in `tests/test_persistence_policy.py` verify all persistence policy behavior.
+
+**Remediation:** Complete.
 
 ### 7.5 HIGH: `.gitignore` is Dangerously Minimal
 
@@ -336,9 +339,9 @@ The `.env` file contains plaintext `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KE
 | Production backend enforcement | RESOLVED (P1-1, P1-2) — `ORCHESTRATOR_PRODUCTION_MODE=true` enforces `PRODUCTION_BACKENDS` | N/A | ~~CRITICAL~~ RESOLVED |
 | Default backend fail-closed | RESOLVED (P1-1) — claude_cli rejected in production mode | N/A | ~~CRITICAL~~ RESOLVED |
 | Semantic dispatch backend routing | RESOLVED (P1-3) — routes through `resolve_provider_config()` | N/A | ~~CRITICAL~~ RESOLVED |
-| Diagnostic prompt capture | Always-on, writes full content | Disable by default; gate behind debug flag | HIGH |
+| Diagnostic prompt capture | RESOLVED (P3-1, P3-2) — policy-controlled via `ORCHESTRATOR_DIAGNOSTIC_LEVEL` | N/A | ~~HIGH~~ RESOLVED |
 | `.gitignore` completeness | RESOLVED (P0-1) — expanded to ~40 entries | N/A | ~~HIGH~~ RESOLVED |
-| Transport failure prompt sanitization | Full prompts written to disk | Truncate or omit prompt content in production mode | HIGH |
+| Transport failure prompt sanitization | RESOLVED (P3-2, P3-3) — prompt content omitted in production; error messages sanitized | N/A | ~~HIGH~~ RESOLVED |
 | Secret detection pre-commit | RESOLVED (P2-5) — `.pre-commit-config.yaml` with detect-secrets, private-key detection, large-file guard | N/A | ~~MEDIUM~~ RESOLVED |
 
 ---
@@ -386,7 +389,7 @@ The `.env` file contains plaintext `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KE
 | `.claude/semantic_diag/{func}_{run}_user_prompt.txt` | Semantic user prompt (on failure) | **YES** (artifact content) | HIGH |
 | `.claude/semantic_diag/{func}_{run}_response.txt` | Semantic response (on failure) | **YES** | HIGH |
 
-**Verdict:** Disk diagnostics contain full proposal IP. **FAIL**
+**Verdict:** Disk diagnostics are policy-controlled. Production mode writes metadata only (no prompt/response content). Development mode preserves full diagnostics for migration observability. **PASS (with production mode)**
 
 ### 12.3 Benchmark Telemetry
 
@@ -473,15 +476,15 @@ ORCHESTRATOR_PRODUCTION_MODE=true
 **File:** `runner/semantic_dispatch.py`
 **Status:** RESOLVED (Phase 1 — P1-3, 2026-05-28). `_resolve_semantic_backend()` and `_invoke_via_backend()` route semantic predicates through `resolve_provider_config()`. Bedrock Converse and OpenAI-compatible paths added alongside existing Claude CLI path.
 
-### 15.3 Diagnostic Capture Gating (HIGH)
+### 15.3 Diagnostic Capture Gating (HIGH) — RESOLVED
 
-**File:** `runner/skill_runtime.py`
-**Change:** Gate the unconditional response diagnostic capture (lines 1710-1748) behind `ORCHESTRATOR_DEBUG_DIAGNOSTICS=true`. Default to disabled.
+**File:** `runner/skill_runtime.py`, `runner/persistence_policy.py`
+**Status:** RESOLVED (Phase 3 — P3-1, P3-2, 2026-05-29). Environment-scoped persistence policy implemented via `runner/persistence_policy.py`. Response diagnostic capture and parsed output capture gated behind `allows_content_persistence()`. Production mode defaults to `metadata` level (no content written). Development mode preserves full persistence unchanged.
 
-### 15.4 Transport Failure Prompt Sanitization (HIGH)
+### 15.4 Transport Failure Prompt Sanitization (HIGH) — RESOLVED
 
-**Files:** `runner/skill_runtime.py:838-940`, `runner/semantic_dispatch.py:316-396`
-**Change:** In production mode, write only metadata (char counts, error details) to diagnostic files. Omit full prompt/response text.
+**Files:** `runner/skill_runtime.py`, `runner/semantic_dispatch.py`, `runner/persistence_policy.py`
+**Status:** RESOLVED (Phase 3 — P3-2, P3-3, 2026-05-29). Transport failure prompt companion files (`_system_prompt.txt`, `_user_prompt.txt`, `_stdout.txt`, `_stderr.txt`) and semantic diagnostic content files (`_system_prompt.txt`, `_user_prompt.txt`, `_response.txt`) are only written under `full` diagnostic level. Exception messages in metadata JSON files (`_transport_diag.json`, `_dispatch_meta.json`) are sanitized via `sanitize_error_message()` — truncated to 200 chars in production mode to prevent prompt content leakage through error echoing.
 
 ### 15.5 `.gitignore` Expansion (HIGH) — RESOLVED
 
@@ -540,10 +543,10 @@ All **three CRITICAL issues** identified in the original audit have been resolve
 2. ~~**No production backend enforcement**~~ **RESOLVED** — `PRODUCTION_BACKENDS` enforced at runtime. `production_suitable` flag checked for presets.
 3. ~~**Semantic dispatch bypasses backend selection**~~ **RESOLVED** — Routes through `resolve_provider_config()`. No hidden Claude CLI paths in production mode.
 
-Additionally, **three remaining HIGH-severity issues** require remediation (one HIGH resolved in Phase 0):
+Additionally, **HIGH-severity issues** status:
 
-4. **Full prompt/response content persisted to disk** in diagnostic files. (TEMPORARILY ACCEPTED — RA-01 through RA-04, pending Phase 3 gate prerequisites)
-5. ~~**`.gitignore` covers only 2 patterns** — sensitive directories at risk of accidental commit.~~ **RESOLVED** (Phase 0 — P0-1, 2026-05-28). `.gitignore` expanded to ~40 entries. Previously-tracked runtime files removed from git index.
+4. ~~**Full prompt/response content persisted to disk**~~ **RESOLVED** (Phase 3 — P3-1, P3-2, P3-3, 2026-05-29). Environment-scoped persistence policy implemented. Production mode writes metadata only. Development mode preserves full diagnostics. 40 tests verify enforcement.
+5. ~~**`.gitignore` covers only 2 patterns**~~ **RESOLVED** (Phase 0 — P0-1, 2026-05-28).
 6. **No CI/CD pipeline** — security tests are not automated. (DEFERRED — Phase 2, P2-4)
 7. **AWS credentials in plaintext `.env`** — operational credential management risk. (DEFERRED — Phase 0 operational item P0-2: credential rotation is non-repository-side)
 
@@ -553,7 +556,7 @@ All of the following must be satisfied before institutional production deploymen
 
 - [x] Production backend enforcement code implemented and tested (RESOLVED — Phase 1, P1-1/P1-2)
 - [x] Semantic dispatch routed through multi-backend config (RESOLVED — Phase 1, P1-3)
-- [ ] Diagnostic prompt capture disabled by default (or production-sanitized)
+- [x] Diagnostic prompt capture policy-controlled (RESOLVED — Phase 3, P3-1/P3-2/P3-3)
 - [x] `.gitignore` expanded to cover `.claude/` and standard patterns (RESOLVED — Phase 0, P0-1)
 - [ ] CI/CD pipeline created with full test suite execution (DEFERRED — P2-4 requires GitHub Actions setup)
 - [x] Secret scanning pre-commit hook installed (RESOLVED — Phase 2, P2-5)
@@ -699,4 +702,66 @@ All three CRITICAL findings (7.1, 7.2, 7.3) were resolved in Phase 1. No new CRI
 
 ---
 
-*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. Phase 1 remediation record appended 2026-05-28. Phase 2 remediation record appended 2026-05-28. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*
+---
+
+## 22. Phase 3 Remediation Record
+
+**Date:** 2026-05-29
+**Scope:** Phase 3 (Production Hardening — environment-scoped persistence) from `security_hardening_implementation_plan.md`
+
+### Implemented
+
+| Item | Status | Details |
+|------|--------|---------|
+| P3-1 | RESOLVED | `runner/persistence_policy.py` created. Environment-scoped persistence policy with two diagnostic levels (`full`, `metadata`). Policy matrix: development defaults to `full` (current behavior preserved); production defaults to `metadata` (no content files written); production + `full` rejected as policy violation (fail-closed). `ORCHESTRATOR_DIAGNOSTIC_LEVEL` env var controls level. Cached resolution with `reset_diagnostic_level_cache()` for testing. |
+| P3-2 | RESOLVED | Persistence policy enforcement applied to all diagnostic write points. `runner/skill_runtime.py`: response diagnostic capture (`_response.txt`, `_parsed.txt`) gated behind `allows_content_persistence()`. Transport failure prompt companion files (`_system_prompt.txt`, `_user_prompt.txt`, `_stdout.txt`, `_stderr.txt`) gated behind `allows_content_persistence()`. Metadata-only files (`_transport_diag.json`, `_phase_e.txt`) always written. `runner/semantic_dispatch.py`: semantic diagnostic content files (`_system_prompt.txt`, `_user_prompt.txt`, `_response.txt`, `_stderr.txt`, `_stdout.txt`) gated behind `allows_content_persistence()`. Metadata JSON (`_dispatch_meta.json`) always written. |
+| P3-3 | RESOLVED | Diagnostic sanitization implemented via `sanitize_error_message()` in `runner/persistence_policy.py`. In production mode, error/exception messages in metadata JSON files are truncated to 200 characters to prevent prompt content leakage through error echoing. Applied to `exception_message` in `_transport_diag.json` (skill runtime) and `reason` in `_dispatch_meta.json` (semantic dispatch). Development mode returns messages unchanged. |
+| Tests | RESOLVED | `tests/test_persistence_policy.py` created with 40 tests across 10 test classes: `TestDevelopmentPersistence` (7), `TestProductionPersistence` (6), `TestPolicyValidation` (3), `TestDiagnosticSanitization` (5), `TestBenchmarkCompatibility` (3), `TestCaching` (2), `TestSkillRuntimeDiagnosticPolicy` (3), `TestTransportFailureDiagnosticPolicy` (3), `TestSemanticDispatchDiagnosticPolicy` (3), `TestLoggingConfigurationValidation` (2), `TestDiagnosticLevelEnum` (3). |
+| `.env.example` | RESOLVED | `ORCHESTRATOR_DIAGNOSTIC_LEVEL` documentation added with level descriptions and production behavior notes. |
+
+### Risk Acceptance Resolution
+
+| Risk ID | Description | Original Status | Status After Phase 3 |
+|---------|-------------|----------------|---------------------|
+| RA-01 | Full LLM response written to `_response.txt` | TEMPORARILY ACCEPTED | RESOLVED — gated behind `allows_content_persistence()`. Not written in production. |
+| RA-02 | Parsed JSON output written to `_parsed.txt` | TEMPORARILY ACCEPTED | RESOLVED — gated behind `allows_content_persistence()`. Not written in production. |
+| RA-03 | Full prompts written on transport failure | TEMPORARILY ACCEPTED | RESOLVED — prompt companion files gated behind `allows_content_persistence()`. Not written in production. |
+| RA-04 | Full prompts/responses written on semantic dispatch failure | TEMPORARILY ACCEPTED | RESOLVED — content files gated behind `allows_content_persistence()`. Not written in production. |
+| RA-05 | Transport failure metadata includes prompt char counts | PERMANENT (no content risk) | UNCHANGED — char counts are metadata, not content. Safe in all modes. |
+
+### Findings Status After Phase 3
+
+| Finding | Original Severity | Status After Phase 3 |
+|---------|------------------|---------------------|
+| 7.1 Default backend is Claude CLI | CRITICAL | RESOLVED (P1-1) |
+| 7.2 No production backend enforcement | CRITICAL | RESOLVED (P1-1, P1-2) |
+| 7.3 Semantic dispatch bypasses backend | CRITICAL | RESOLVED (P1-3) |
+| 7.4 Full prompt/response on disk | HIGH | RESOLVED (P3-1, P3-2, P3-3) — environment-scoped persistence policy enforced |
+| 7.5 `.gitignore` minimal | HIGH | RESOLVED (P0-1) |
+| 7.6 No CI/CD pipeline | HIGH | PARTIALLY RESOLVED — pre-commit hooks added (P2-5), CI/CD pipeline deferred (P2-4) |
+| 7.7 `runner/paths.py` untested | MEDIUM | RESOLVED (P2-6) |
+| 7.8 AWS credentials in `.env` | MEDIUM | DEFERRED (P0-2 operational) |
+
+### CRITICAL Findings: None remaining
+
+All three CRITICAL findings (7.1, 7.2, 7.3) were resolved in Phase 1.
+
+### HIGH Findings: 1 remaining
+
+- 7.6 (CI/CD pipeline) — PARTIALLY RESOLVED (pre-commit hooks present; GitHub Actions pipeline deferred to P2-4)
+
+### MEDIUM Findings: 1 remaining
+
+- 7.8 (AWS credentials in `.env`) — DEFERRED (operational — P0-2 credential rotation)
+
+### Deferred Hardening Items
+
+| Item | Status | Reason |
+|------|--------|--------|
+| P3-4 | DEFERRED | Deployment host lockdown — requires infrastructure provisioning. Not a repository-side change. |
+| P3-5 | DEFERRED | Network egress restrictions — AWS VPC/PrivateLink. Requires AWS admin. |
+| P3-6 | DEFERRED | Final production compliance verification — blocked on P3-4, P3-5, and remaining Phase 2 AWS items. |
+
+---
+
+*Document produced by security compliance audit, 2026-05-28. Phase 0 remediation record appended 2026-05-28. Phase 1 remediation record appended 2026-05-28. Phase 2 remediation record appended 2026-05-28. Phase 3 remediation record appended 2026-05-29. This is an assessment document, not a certification. Implementation of remediation steps is required before production deployment.*
