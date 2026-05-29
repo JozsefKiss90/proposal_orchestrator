@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2025-01-31T12:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "Deterministic predicate 'all_expected_impacts_covered' failed: the reference file 'expected_impacts.json' does not exist at docs/tier3_project_instantiation/expected_impacts.json. The predicate requires every expected_impact_id from this file to appear in at least one impact pathway. Without the canonical reference file, full coverage cannot be confirmed. The available impacts.json uses IMP-* IDs (project-level) while pathways use EI-* IDs (call-level), and IMP-6 has no corresponding pathway entry. The predicate cannot be declared passed without confirming all gate conditions per CLAUDE.md §6.2 and §6.5.",
+  "predicates_failed": [
+    "all_expected_impacts_covered"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (phase-specific gate definitions), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2025-01-31T12:00:00Z"
+}

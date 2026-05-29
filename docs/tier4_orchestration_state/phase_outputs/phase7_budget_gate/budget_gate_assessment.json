@@ -1,62 +1,62 @@
 {
   "schema_id": "orch.phase7.budget_gate_assessment.v1",
-  "run_id": "cfcf655e-cfef-4f74-a1ea-878feb0a4014",
+  "run_id": "7bb43cb3-f5aa-4dda-a767-264de6d9d97f",
   "gate_pass_declaration": "pass",
   "budget_response_reference": "budget_response_placeholder.json",
-  "validation_artifact_reference": "budget_validation_response_2026-05-20T120000Z.json",
+  "validation_artifact_reference": "budget_validation_response_2026-04-24T14:00:00Z.json",
   "wp_coverage_results": [
     {
       "wp_id": "WP1",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[0].wp_id=WP1",
+      "budget_line_reference": "work_packages[wp_id=WP1]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP2",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[1].wp_id=WP2",
+      "budget_line_reference": "work_packages[wp_id=WP2]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP3",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[2].wp_id=WP3",
+      "budget_line_reference": "work_packages[wp_id=WP3]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP4",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[3].wp_id=WP4",
+      "budget_line_reference": "work_packages[wp_id=WP4]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP5",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[4].wp_id=WP5",
+      "budget_line_reference": "work_packages[wp_id=WP5]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP6",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[5].wp_id=WP6",
+      "budget_line_reference": "work_packages[wp_id=WP6]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP7",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[6].wp_id=WP7",
+      "budget_line_reference": "work_packages[wp_id=WP7]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP8",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[7].wp_id=WP8",
+      "budget_line_reference": "work_packages[wp_id=WP8]",
       "inconsistencies": []
     },
     {
       "wp_id": "WP9",
       "present_in_budget": true,
-      "budget_line_reference": "work_packages[8].wp_id=WP9",
+      "budget_line_reference": "work_packages[wp_id=WP9]",
       "inconsistencies": []
     }
   ],
@@ -64,51 +64,103 @@
     {
       "partner_id": "ATU",
       "present_in_budget": true,
-      "budget_line_reference": "partners[0].partner_id=ATU",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "BIIS",
-      "present_in_budget": true,
-      "budget_line_reference": "partners[2].partner_id=BIIS",
+      "budget_line_reference": "partners[partner_id=ATU]",
       "inconsistencies": []
     },
     {
       "partner_id": "CERIA",
       "present_in_budget": true,
-      "budget_line_reference": "partners[1].partner_id=CERIA",
+      "budget_line_reference": "partners[partner_id=CERIA]",
       "inconsistencies": []
     },
     {
-      "partner_id": "NIHS",
+      "partner_id": "BIIS",
       "present_in_budget": true,
-      "budget_line_reference": "partners[4].partner_id=NIHS",
+      "budget_line_reference": "partners[partner_id=BIIS]",
       "inconsistencies": []
     },
     {
       "partner_id": "ISIA",
       "present_in_budget": true,
-      "budget_line_reference": "partners[3].partner_id=ISIA",
+      "budget_line_reference": "partners[partner_id=ISIA]",
+      "inconsistencies": []
+    },
+    {
+      "partner_id": "NIHS",
+      "present_in_budget": true,
+      "budget_line_reference": "partners[partner_id=NIHS]",
       "inconsistencies": []
     },
     {
       "partner_id": "ELI",
       "present_in_budget": true,
-      "budget_line_reference": "partners[5].partner_id=ELI",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "FIIT",
-      "present_in_budget": true,
-      "budget_line_reference": "partners[7].partner_id=FIIT",
+      "budget_line_reference": "partners[partner_id=ELI]",
       "inconsistencies": []
     },
     {
       "partner_id": "BAL",
       "present_in_budget": true,
-      "budget_line_reference": "partners[6].partner_id=BAL",
+      "budget_line_reference": "partners[partner_id=BAL]",
+      "inconsistencies": []
+    },
+    {
+      "partner_id": "FIIT",
+      "present_in_budget": true,
+      "budget_line_reference": "partners[partner_id=FIIT]",
       "inconsistencies": []
     }
   ],
-  "blocking_inconsistencies": []
+  "blocking_inconsistencies": [],
+  "non_blocking_findings": [
+    {
+      "finding_id": "NBF-01",
+      "severity": "non_blocking",
+      "description": "Budget response is a demo placeholder with illustrative values. All numeric cost and effort figures are structurally valid placeholders, not expert-approved budget outputs from the external Lump Sum Budget Planner system. This finding does not affect gate_pass_declaration."
+    }
+  ],
+  "gate_assessment_notes": "All three conditions for gate_pass_declaration=pass are satisfied. (1) received/ directory is non-empty: budget_response_placeholder.json is present. (2) Budget response conforms to interface_contract.json v1.0 (protocol: lump_sum_budget_planner_v1): all four required response-level fields are present and correctly typed (response_id: string present; schema_version: string present; work_packages: array present with 9 entries; partners: array present with 8 entries); all work_package entries contain wp_id (string) and lump_sum (number) per contract work_package_entry required fields; all partner entries contain partner_id (string) and total_effort_pm (number) per contract partner_entry required fields. (3) No blocking_inconsistencies with resolution=unresolved exist. WP coverage check: all 9 wp_ids from wp_structure.json (schema_id: orch.phase3.wp_structure.v1, run_id: 3d8ea1cb-1c17-4c52-a714-5476dab83f48) — WP1 through WP9 — are present in the budget response work_packages array. Partner coverage check: all 8 partner_ids from wp_structure.json partner_role_matrix — ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT — are present in the budget response partners array. Constitutional constraint 1 compliance: no numeric budget values have been materialized, stored, quoted, or written to this artifact; structural coverage check only (wp_id and partner_id presence/absence verified; field type presence verified without value materialization).",
+  "validation_provenance": {
+    "invocation_mode": "response_validation",
+    "interface_contract_version": "1.0",
+    "interface_contract_protocol": "lump_sum_budget_planner_v1",
+    "wp_structure_schema_id": "orch.phase3.wp_structure.v1",
+    "wp_structure_run_id": "3d8ea1cb-1c17-4c52-a714-5476dab83f48",
+    "wp_ids_checked_against": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5",
+      "WP6",
+      "WP7",
+      "WP8",
+      "WP9"
+    ],
+    "partner_ids_checked_against": [
+      "ATU",
+      "CERIA",
+      "BIIS",
+      "ISIA",
+      "NIHS",
+      "ELI",
+      "BAL",
+      "FIIT"
+    ],
+    "conformance_status": "conforms",
+    "response_schema_required_fields_checked": [
+      "response_id",
+      "schema_version",
+      "work_packages",
+      "partners"
+    ],
+    "wp_entry_required_fields_checked": [
+      "wp_id",
+      "lump_sum"
+    ],
+    "partner_entry_required_fields_checked": [
+      "partner_id",
+      "total_effort_pm"
+    ],
+    "assessment_timestamp": "2026-04-24T14:00:00Z"
+  }
 }

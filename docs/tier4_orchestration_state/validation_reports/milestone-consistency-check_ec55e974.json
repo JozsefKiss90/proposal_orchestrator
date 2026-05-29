@@ -2,7 +2,7 @@
   "report_id": "milestone_consistency_implementation_architect_2026-05-28T20:00:00Z",
   "skill_id": "milestone-consistency-check",
   "invoking_agent": "implementation_architect",
-  "run_id_reference": "3d8ea1cb-1c17-4c52-a714-5476dab83f48",
+  "run_id_reference": "ec55e974-c9d5-4ab4-b6e6-7a8341de8154",
   "mode": "FULL",
   "validated_scope": [
     "wp_structure",
@@ -15,7 +15,7 @@
       "task_completion_month": 48,
       "verifiable_criterion_present": true,
       "consistency_status": "flagged",
-      "flag_reason": "Milestone due_month (3) precedes completion of dependent tasks (max end_month of depends_on_tasks: 48). T1-01 ends at M48; milestone is due at M3.",
+      "flag_reason": "Milestone due_month (3) precedes completion of dependent tasks (max end_month of depends_on_tasks: 48). T1-01 ends at M48; milestone is due at M3. Note: MS1 is an early-project architecture checkpoint; the depends_on_tasks reference to T1-01 (a continuous management task spanning M1-M48) appears to be a loose linkage rather than a strict completion dependency. Human review recommended to confirm whether T1-01 is the correct depends_on_tasks reference or whether a more specific early-phase task should be cited.",
       "flag_class": "task_dependency"
     },
     {
@@ -60,7 +60,7 @@
       "task_completion_month": 36,
       "verifiable_criterion_present": true,
       "consistency_status": "flagged",
-      "flag_reason": "Milestone due_month (30) precedes completion of dependent tasks (max end_month of depends_on_tasks: 36). T8-02 ends at M36; milestone is due at M30.",
+      "flag_reason": "Milestone due_month (30) precedes completion of dependent tasks (max end_month of depends_on_tasks: 36). T8-02 ends at M36; milestone MS6 is due at M30. The milestone claims integrated framework v1.0 is available at M30, but the task responsible for unified MAESTRO framework integration (T8-02) does not complete until M36.",
       "flag_class": "task_dependency"
     },
     {

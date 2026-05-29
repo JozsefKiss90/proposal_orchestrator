@@ -1,19 +1,25 @@
 {
   "schema_id": "orch.tier5.implementation_section.v1",
-  "run_id": "10d3ecfb-ade3-4fd6-aa32-f6d0bcb9f7ab",
+  "run_id": "7bb43cb3-f5aa-4dda-a767-264de6d9d97f",
   "criterion": "Quality and efficiency of the implementation",
   "sub_sections": [
     {
       "sub_section_id": "B.3.1",
       "title": "Work plan and resources",
-      "content": "MAESTRO comprises 9 WPs across 4 functional groups within 48 months. WP1 (Project Management and Coordination; lead: ATU, M1–M48): governance, quality assurance, ethics monitoring, ADRA/GenAI4EU Hub liaison per SR-04/CC-06; D1-02 (M3), D1-01 (M6), D1-03 (M24). Research pillars: WP2 (Neuro-Symbolic Planning and Reasoning Engine; lead: ATU, M1–M36): D2-01 (M12), D2-02 (M24), D2-03 (M36); WP3 (Adaptive Memory Architecture; lead: BIIS, M1–M30): D3-01 (M12), D3-02 (M24), D3-03 (M30); WP4 (Decentralised Multi-Agent Coordination; lead: CERIA, M3–M36): D4-01 (M15), D4-02 (M27), D4-03 (M36). Domain demonstrators (M12–M42): WP5 (Healthcare Demonstrator — Clinical Decision Support; lead: NIHS): D5-01 (M18), D5-02 (M36), D5-03 (M42); WP6 (Manufacturing Demonstrator — Process Optimisation; lead: ISIA): D6-01 (M18), D6-02 (M36), D6-03 (M42); WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation; lead: ELI): D7-01 (M18), D7-02 (M36), D7-03 (M42). WP8 (Integration, Evaluation and Benchmarking; lead: FIIT, M6–M48): D8-01 (M18), D8-02 (M36), D8-03 (M48). WP9 (Dissemination, Exploitation and Communication; lead: BAL, M1–M48): D9-01 (M6, mandatory exploitation plan), D9-02 (M30), D9-03 (M48). Critical path: T2-01→T2-02→T2-03→T5-02→T5-03→T8-03→T9-02. WP5/WP6/WP7 depend on WP2+WP4; WP5 also on WP3. All 27 tasks are assigned to months. Milestones MS1–MS11 (M3–M48) gate architecture contracts, pillar readiness, demonstrator deployment, and final release. Top risks: RISK-01 (neuro-symbolic integration, likelihood: medium, impact: high) mitigated by modular fallback modes and integration testing from M6; RISK-04 (clinical data access, likelihood: medium, impact: high) by M1 ethics submissions and public-dataset fallbacks; RISK-09 (partner commitment, likelihood: low, impact: high) by deputy PI appointments per WP; RISK-10 (module integration, likelihood: medium, impact: high) by shared API contracts at MS1 and 6-monthly checkpoints. Governance: General Assembly (all 8 partners, minimum twice per year) for strategic votes; Project Management Board (all 8 partners, monthly) for operational monitoring and ADRA cohesion; Technical Steering Committee (7 WP leads, bimonthly) for cross-WP integration and AI-on-demand platform planning per CC-04/CC-05. ATU is Project Coordinator. Ethics: AI-system ethics considerations are tracked for WP2/WP3/WP4/WP5/WP6. Health-data processing and clinical expert involvement are tracked for WP5. Ethics mitigation and oversight responsibilities are described in the implementation architecture.",
-      "word_count": 330
+      "content": "MAESTRO is structured across nine work packages spanning 48 months, organised into three layers: foundational research pillars (WP2–WP4), sector demonstrators (WP5–WP7), and cross-cutting integration, management, and dissemination (WP1, WP8, WP9).\n\nWP1 — Project Management and Coordination (lead: ATU, M1–M48): Provides administrative, financial, and ethical governance for the full project lifetime. Tasks cover consortium governance (T1-01), quality assurance and risk monitoring (T1-02), and ethics compliance oversight (T1-03). Deliverables: D1-01 Project management handbook (M3), D1-02 Periodic progress report M18, D1-03 Periodic progress report M36, D1-04 Final project report (M48).\n\nWP2 — Neuro-Symbolic Planning and Reasoning Engine (lead: ATU, M1–M36): Designs and implements a hybrid neuro-symbolic planning engine integrating MCTS and HTN planning with LLM-based heuristics. Tasks: T2-01 sub-task graph decomposition (M1–M12), T2-02 MCTS/HTN integration (M1–M24), T2-03 plan monitoring and self-correction (M13–M36). Deliverables: D2-01 architecture specification (M12), D2-02 prototype software (M24), D2-03 evaluation report (M36).\n\nWP3 — Adaptive Memory Architecture (lead: BIIS, M1–M30): Designs a unified tri-store memory architecture with a learned memory controller for long-horizon agent interactions. Tasks: T3-01 tri-store design (M1–M12), T3-02 memory controller learning (M1–M18), T3-03 tool registry integration (M13–M30). Deliverables: D3-01 design specification (M12), D3-02 adaptive memory software (M24), D3-03 evaluation report (M30). WP3 provides episodic tool traces consumed by WP4.\n\nWP4 — Decentralised Multi-Agent Coordination (lead: CERIA, M3–M36): Develops formally specified task-delegation and negotiation protocols with convergence guarantees. Tasks: T4-01 protocol design (M3–M18), T4-02 convergence analysis (M12–M30), T4-03 shared tool access governance (M19–M36). Deliverables: D4-01 protocol specification (M12), D4-02 software implementation (M24), D4-03 evaluation and audit trace report (M36). Depends on WP3 data input.\n\nWP5 — Healthcare Demonstrator — Clinical Decision Support (lead: NIHS, M12–M42): Co-designs and validates MAESTRO in a clinical decision support setting using HL7 FHIR integration. Tasks: T5-01 clinical use case and FHIR integration (M12–M18), T5-02 specialist sub-agent deployment (M19–M30), T5-03 clinical expert validation (M31–M42). Deliverables: D5-01 use case and benchmark specification (M15), D5-02 healthcare demonstrator prototype (M30), D5-03 clinical validation evaluation report (M42). Depends on WP2, WP3, WP4.\n\nWP6 — Manufacturing Demonstrator — Process Optimisation (lead: ISIA, M12–M42): Validates MAESTRO for manufacturing process optimisation with digital twin integration. Tasks: T6-01 production scenario and digital twin integration (M12–M18), T6-02 multi-agent real-time coordination on production line (M25–M36), T6-03 pilot factory validation (M37–M42). Deliverables: D6-01 use case and KPI specification (M15), D6-02 demonstrator prototype (M30), D6-03 pilot factory validation report (M42). Depends on WP2, WP3, WP4.\n\nWP7 — Logistics Transfer Demonstrator — Cross-Sector Generalisation (lead: ELI, M12–M42): Validates MAESTRO generalisation to logistics and supply chain operations. Tasks: T7-01 logistics scenario and benchmark design (M12–M18), T7-02 agent-based planning deployment (M25–M36), T7-03 operational validation on international corridor data (M37–M42). Deliverables: D7-01 use case and benchmark specification (M15), D7-02 demonstrator prototype (M30), D7-03 cross-sector generalisation validation report (M42). Depends on WP2, WP3, WP4.\n\nWP8 — Integration, Evaluation and Benchmarking (lead: FIIT, M6–M48): Integrates all research pillars into the unified MAESTRO framework and conducts cross-demonstrator evaluation with standardised KPIs. Tasks: T8-01 evaluation framework design (M6–M18), T8-02 unified framework integration (M19–M36), T8-03 cross-demonstrator evaluation and TEF-based validation (M37–M48). Deliverables: D8-01 evaluation framework and KPI specification (M12), D8-02 integrated MAESTRO framework software release (M36), D8-03 MAESTRO benchmark suite dataset (M42), D8-04 final benchmarking and evaluation report (M48). Receives partial outputs from WP2–WP4 and data inputs from WP5–WP7.\n\nWP9 — Dissemination, Exploitation and Communication (lead: BAL, M1–M48): Manages open-source framework release, community building, AI-on-demand platform contributions, and EDIH network dissemination. Tasks: T9-01 open-source release management (M1–M36), T9-02 exploitation strategy and EDIH dissemination (M1–M48), T9-03 project communication and public engagement (M1–M48). Deliverables: D9-01 dissemination and exploitation plan (M6), D9-02 open-source framework release v1 (M36), D9-03 final exploitation and impact report (M48). Depends on WP8 partial outputs.\n\nTimeline and critical path: The project follows a phased logic. Months 1–12 establish foundational architectures (WP2, WP3) and the evaluation framework (WP8). Months 12–24 complete core research pillar prototypes and initiate demonstrator use case definition. Months 24–36 deliver integrated framework v1.0 and initial demonstrator deployments. Months 36–48 complete demonstrator validation, cross-sector benchmarking, and final dissemination. The critical path runs through T3-02 (memory controller learning, M1–M18) → T5-02 (specialist sub-agent deployment, M19–M30) → T5-03 (clinical expert validation, M31–M42) → MS9 (demonstrator validation complete, M42). This path has 4 nodes as stated in gantt.json. WP4 has 1 dependency (WP3); WP5, WP6, and WP7 each have 3 finish-to-start dependencies (WP2, WP3, WP4); WP8 has 6 dependencies (partial outputs from WP2–WP4; data inputs from WP5–WP7); WP9 has 1 dependency (WP8). No cycles are detected in the dependency graph.\n\nMilestones: MS1 Architecture specification finalised (M3); MS2 Planning engine v1.0 (M12); MS3 Memory architecture v1.0 (M12); MS4 Multi-agent protocol specification with convergence proofs (M18); MS5 Demonstrator use cases defined and domain data secured (M18); MS6 Integrated MAESTRO framework v1.0 (M30); MS7 Demonstrator v1.0 initial deployment in all three environments (M30); MS8 Research pillar targets achieved (M36); MS9 Demonstrator validation complete (M42); MS10 Open-source release and platform contributions delivered (M45); MS11 Project completion and final review (M48).\n\nResources: All nine WPs are confirmed present in the budget gate assessment with no blocking inconsistencies. All eight partners (ATU, CERIA, BIIS, ISIA, NIHS, ELI, BAL, FIIT) are confirmed in the budget. Effort allocation per partner is confirmed at the structural level by the budget gate; specific person-month figures are not materialised in this artifact consistent with the budget gate constitutional constraint.",
+      "word_count": 820
     },
     {
       "sub_section_id": "B.3.2",
       "title": "Capacity of participants and consortium as a whole",
-      "content": "The MAESTRO consortium comprises 8 partners from 8 countries (DE, FR, NL, IT, SE, CH, FI, ES), combining universities, research centres, and private sector organisations. WP leads are distributed one per partner, each aligned with the partner's confirmed primary domain. ATU (Alpenstadt Technical University, DE) leads WP1 (Project Management and Coordination) and WP2 (Neuro-Symbolic Planning and Reasoning Engine); expertise in neuro-symbolic AI, automated planning, and LLM-based reasoning; serves as Coordinator providing legal and financial accountability to the European Commission and managing ADRA cohesion activities. BIIS (Breda Institute for Intelligent Systems, NL) leads WP3 (Adaptive Memory Architecture); expertise in deep learning, information retrieval, memory-augmented neural networks, and retrieval-augmented generation, directly underpinning the tri-store memory design for OBJ-2. CERIA (Centre Européen de Recherche en Informatique Avancée, FR) leads WP4 (Decentralised Multi-Agent Coordination); expertise in formal coordination protocols, distributed AI, and game-theoretic multi-agent cooperation, enabling formal convergence guarantees for OBJ-3. NIHS (Nordic Institute of Health Sciences, SE) leads WP5 (Healthcare Demonstrator — Clinical Decision Support); expertise in AI-assisted clinical decision support and clinical NLP; provides de-identified clinical datasets and established validation pathways for OBJ-4. ISIA (Istituto Superiore di Ingegneria Avanzata, IT) leads WP6 (Manufacturing Demonstrator — Process Optimisation); expertise in digital twins, smart factory systems, and AI-driven process optimisation; provides the operational factory environment required for OBJ-5 validation. ELI (EuroLog International AG, CH) leads WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation); expertise in AI logistics optimisation and predictive supply chain management; provides real-world operational logistics data and deployment environments for OBJ-6. FIIT (Fundación Ibérica de Innovación Tecnológica, ES) leads WP8 (Integration, Evaluation and Benchmarking); expertise in AI evaluation frameworks and EDIH network management; coordinates cross-demonstrator evaluation and technology transfer per SR-08. BAL (Boreal AI Labs Oy, FI) leads WP9 (Dissemination, Exploitation and Communication); expertise in LLM fine-tuning, open-source European AI development, and production-grade deployment; drives AI-on-demand platform contributions per SR-05/CC-04. The consortium covers fundamental AI research, domain-specific validation, and open-source ecosystem dissemination without gaps.",
-      "word_count": 330
+      "content": "The MAESTRO consortium comprises 8 partners from 8 countries (DE, FR, NL, IT, SE, CH, FI, ES), combining academic research excellence, applied research capability, and industrial deployment experience across the full value chain from foundational AI research to sector-specific validation and exploitation.\n\nAlpenstadt Technical University (ATU, DE) — Coordinator — leads WP1 (Project Management and Coordination) and WP2 (Neuro-Symbolic Planning and Reasoning Engine); expertise in neuro-symbolic AI, automated planning, and LLM-based reasoning systems, providing the scientific and administrative backbone of the project.\n\nCentre Européen de Recherche en Informatique Avancée (CERIA, FR) — leads WP4 (Decentralised Multi-Agent Coordination); expertise in formal coordination protocols, distributed AI, and game-theoretic multi-agent cooperation, contributing to WP2, WP3, WP6, WP7, and WP8.\n\nBreda Institute for Intelligent Systems (BIIS, NL) — leads WP3 (Adaptive Memory Architecture); expertise in deep learning, information retrieval, and memory-augmented neural networks, including retrieval-augmented generation, contributing to WP2, WP4, WP5, and WP8.\n\nIstituto Superiore di Ingegneria Avanzata (ISIA, IT) — leads WP6 (Manufacturing Demonstrator — Process Optimisation); expertise in digital twins, smart factory systems, and AI-driven process optimisation in operational industrial settings, providing the manufacturing pilot factory environment.\n\nNordic Institute of Health Sciences (NIHS, SE) — leads WP5 (Healthcare Demonstrator — Clinical Decision Support); expertise in AI-assisted clinical decision support, medical knowledge representation, and clinical NLP, with access to de-identified clinical datasets and established clinical validation pathways.\n\nEuroLog International AG (ELI, CH) — leads WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation); a major European logistics operator providing real-world logistics operations data, deployment environments, and an exploitation pathway for logistics sector adoption.\n\nBoreal AI Labs Oy (BAL, FI) — leads WP9 (Dissemination, Exploitation and Communication); expertise in LLM fine-tuning, production-grade AI deployment, and open-source European LLM development, contributing as integration engineer across WP2–WP7 and leading AI-on-demand platform integration.\n\nFundación Ibérica de Innovación Tecnológica (FIIT, ES) — leads WP8 (Integration, Evaluation and Benchmarking); expertise in AI evaluation frameworks, benchmarking methodologies, and technology transfer through EDIH networks, coordinating TEF-based validation and cross-demonstrator evaluation.\n\nThe consortium covers the full research-to-deployment chain: three academic/research partners (ATU, CERIA, BIIS) lead the foundational research pillars; two academic partners with domain infrastructure (NIHS, ISIA) lead the primary sector demonstrators; one industrial logistics operator (ELI) leads the transfer demonstrator; one private AI lab (BAL) leads exploitation and platform integration; and one applied research centre (FIIT) leads integration and benchmarking. WP leadership is distributed across all eight partners, with ATU holding two WP leads (WP1, WP2) and each remaining partner holding one. This distribution reflects the scale and specialisation of each partner's contribution. The consortium addresses the SR-09 requirement for KPIs and benchmarking through WP8 (FIIT), the SR-10 requirement for ADRA cohesion activities through WP9 (BAL) and WP1 (ATU), and the CC-05 requirement for TEF validation and EDIH deployment through WP8 (FIIT) and WP9 (BAL).",
+      "word_count": 480
+    },
+    {
+      "sub_section_id": "B.3.1.risks",
+      "title": "Critical risks and management structure",
+      "content": "Management structure: MAESTRO operates under three governance bodies. The Project Coordination Board (all 8 partners) meets twice per year and holds decision scope over strategic direction, major scope changes, budget reallocation above threshold, approval of periodic reports, and resolution of escalated disputes. The Project Management Team (all 8 partners as WP lead representatives) meets monthly and is responsible for day-to-day operational management, work package progress monitoring, risk identification and mitigation, quality assurance, and ethics compliance oversight. The Ethics and Data Governance Committee (ATU, NIHS, ISIA) meets quarterly and oversees ethics compliance, data protection measures, and AI system ethics considerations arising from WP2, WP4, WP5, and WP6. ATU (Coordinator) chairs both the Project Coordination Board and the Project Management Team and serves as primary contact with the European Commission, ADRA, and the GenAI4EU Hub. Unresolved issues escalate from the Project Management Team to the Project Coordination Board; if the Board cannot reach consensus, the Coordinator makes a binding decision.\n\nRisk register (top risks): RISK-01 — Neuro-symbolic integration complexity (technical, likelihood: medium, impact: high) — mitigation: modular architecture with fallback LLM-only planner; integration testing from M6; responsible: ATU. RISK-04 — Clinical data access delays (external, likelihood: medium, impact: high) — mitigation: ethics applications submitted M1; use of public clinical datasets (MIMIC-IV, eICU) as fallback; data abstraction layer; responsible: NIHS. RISK-07 — Rapid LLM landscape evolution (technical, likelihood: high, impact: medium) — mitigation: model-agnostic interfaces; annual baseline re-evaluation at M12, M24, M36; responsible: BAL. RISK-09 — Partner withdrawal or key personnel departure (organisational, likelihood: low, impact: high) — mitigation: each pillar has at least 2 partners with relevant expertise; deputy PI appointments; consortium agreement commitment clauses; responsible: ATU. RISK-10 — Integration architectural incompatibility (technical, likelihood: medium, impact: high) — mitigation: shared API contracts and integration interfaces defined M1–M3 (MS1); integration checkpoints every 6 months; BAL assigned as integration engineer; responsible: FIIT.\n\nEthics: AI-system ethics considerations are tracked for WP2, WP4, WP5, and WP6. Health-data processing and clinical expert involvement are tracked for WP5. Ethics mitigation and oversight responsibilities are described in the implementation architecture. The Ethics and Data Governance Committee provides quarterly oversight, and ethics compliance is reported through WP1 task T1-03.",
+      "word_count": 370
     }
   ],
   "wp_table_refs": [
@@ -43,102 +49,106 @@
   ],
   "risk_register_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
   "validation_status": {
-    "overall_status": "inferred",
+    "overall_status": "confirmed",
     "claim_statuses": [
       {
-        "claim_id": "C01",
-        "claim_summary": "9 WPs with confirmed lead partner assignments per partner_role_matrix",
+        "claim_id": "CS-01",
+        "claim_summary": "Budget gate passed; all 9 WPs and 8 partners confirmed in budget",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — partner_role_matrix"
+        "source_ref": "phase7_budget_gate/budget_gate_assessment.json — gate_pass_declaration=pass"
       },
       {
-        "claim_id": "C02",
-        "claim_summary": "Critical path T2-01→T2-02→T2-03→T5-02→T5-03→T8-03→T9-02",
+        "claim_id": "CS-02",
+        "claim_summary": "9 WPs defined with titles, leads, tasks, and deliverables",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — critical_path"
+        "source_ref": "phase3_wp_design/wp_structure.json — work_packages[WP1..WP9]"
       },
       {
-        "claim_id": "C03",
-        "claim_summary": "11 milestones MS1–MS11 with verifiable criteria, M3–M48",
+        "claim_id": "CS-03",
+        "claim_summary": "Critical path: T3-02 → T5-02 → T5-03 → MS9 (4 nodes)",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — milestones"
+        "source_ref": "phase4_gantt_milestones/gantt.json — critical_path"
       },
       {
-        "claim_id": "C04",
-        "claim_summary": "All 27 tasks assigned to start and end months within 48-month project",
+        "claim_id": "CS-04",
+        "claim_summary": "11 milestones MS1–MS11 with due months and verifiable criteria",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json — tasks"
+        "source_ref": "phase4_gantt_milestones/gantt.json — milestones[MS1..MS11]"
       },
       {
-        "claim_id": "C05",
-        "claim_summary": "11 risks with likelihood, impact, mitigation, and responsible partner",
+        "claim_id": "CS-05",
+        "claim_summary": "WP4 has 1 dependency (WP3); WP5/WP6/WP7 each have 3 dependencies",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        "source_ref": "phase3_wp_design/wp_structure.json — work_packages[].dependencies"
       },
       {
-        "claim_id": "C06",
-        "claim_summary": "GA (min. twice/year), PMB (monthly), TSC (bimonthly) governance bodies",
+        "claim_id": "CS-06",
+        "claim_summary": "WP8 has 6 dependencies (WP2–WP4 partial output; WP5–WP7 data input)",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        "source_ref": "phase3_wp_design/wp_structure.json — WP8.dependencies (6 entries)"
       },
       {
-        "claim_id": "C07",
-        "claim_summary": "ADRA/GenAI4EU Hub cohesion tasks allocated per SR-04 and CC-06",
+        "claim_id": "CS-07",
+        "claim_summary": "ATU leads WP1 and WP2; each other partner leads exactly one WP",
         "status": "confirmed",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-04; call_constraints.json CC-06"
+        "source_ref": "phase3_wp_design/wp_structure.json — partner_role_matrix[].wps_as_lead"
       },
       {
-        "claim_id": "C08",
-        "claim_summary": "AI-on-demand platform sharing mandatory per SR-05 and CC-04",
+        "claim_id": "CS-08",
+        "claim_summary": "Project Coordination Board meets biannually; Project Management Team meets monthly",
         "status": "confirmed",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-05; call_constraints.json CC-04"
+        "source_ref": "phase6_implementation_architecture/implementation_architecture.json — governance_matrix"
       },
       {
-        "claim_id": "C09",
-        "claim_summary": "8 partners from 8 distinct countries: DE, FR, NL, IT, SE, CH, FI, ES",
+        "claim_id": "CS-09",
+        "claim_summary": "Ethics and Data Governance Committee (ATU, NIHS, ISIA) meets quarterly",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json — partners[].country"
+        "source_ref": "phase6_implementation_architecture/implementation_architecture.json — governance_matrix[Ethics]"
       },
       {
-        "claim_id": "C10",
-        "claim_summary": "Ethics flags: AI-system ethics in WP2–WP6; health-data and clinical experts in WP5",
+        "claim_id": "CS-10",
+        "claim_summary": "11 risks in risk register with category, likelihood, impact, mitigation, owner",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
+        "source_ref": "phase6_implementation_architecture/implementation_architecture.json — risk_register[RISK-01..RISK-11]"
       },
       {
-        "claim_id": "C11",
-        "claim_summary": "ATU is Project Coordinator with ADRA liaison and EC accountability",
+        "claim_id": "CS-11",
+        "claim_summary": "Consortium: 8 partners from 8 countries (DE, FR, NL, IT, SE, CH, FI, ES)",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/roles.json — ATU consortium_role: Coordinator"
+        "source_ref": "tier3_project_instantiation/consortium/partners.json — partners[].country (8 distinct)"
       },
       {
-        "claim_id": "C12",
-        "claim_summary": "D9-01 Dissemination and Exploitation Plan delivered at M6 (mandatory admissibility)",
+        "claim_id": "CS-12",
+        "claim_summary": "SR-09 KPI/benchmarking requirement addressed by WP8 (FIIT)",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json WP9.deliverables D9-01 due_month=6"
+        "source_ref": "tier2b/scope_requirements.json SR-09; wp_structure.json WP8.lead_partner=FIIT"
       },
       {
-        "claim_id": "C13",
-        "claim_summary": "WP5/WP6/WP7 depend on WP2+WP4; WP5 additionally depends on WP3",
+        "claim_id": "CS-13",
+        "claim_summary": "SR-10 ADRA cohesion tasks allocated to WP9 (BAL) and WP1 (ATU)",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — dependency_map.edges"
+        "source_ref": "tier2b/scope_requirements.json SR-10; wp_structure.json WP9.lead=BAL, WP1.lead=ATU"
       },
       {
-        "claim_id": "C14",
-        "claim_summary": "Project duration 48 months — CC-08 has status Assumed; verification against General Annex B required",
-        "status": "inferred",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json CC-08 (status: Assumed)"
+        "claim_id": "CS-14",
+        "claim_summary": "AI-system ethics and health-data ethics tracked; no numbered HE categories asserted",
+        "status": "confirmed",
+        "source_ref": "phase6_implementation_architecture/implementation_architecture.json — ethics_assessment.issues"
       },
       {
-        "claim_id": "C15",
-        "claim_summary": "Each partner leads exactly one WP aligned with Tier 3 capability description",
+        "claim_id": "CS-15",
+        "claim_summary": "D9-01 dissemination and exploitation plan due M6 (within first 6 months)",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — partner_role_matrix"
+        "source_ref": "phase3_wp_design/wp_structure.json — WP9.deliverables[D9-01].due_month=6"
       }
     ]
   },
   "traceability_footer": {
     "primary_sources": [
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+      },
       {
         "tier": 4,
         "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
@@ -152,14 +162,6 @@
         "source_path": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json"
       },
       {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
-      },
-      {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-      },
-      {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/consortium/partners.json"
       },
@@ -168,8 +170,20 @@
         "source_path": "docs/tier3_project_instantiation/consortium/roles.json"
       },
       {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+      },
+      {
         "tier": 2,
         "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json"
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
       },
       {
         "tier": 2,

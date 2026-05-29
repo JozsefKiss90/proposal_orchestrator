@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10a_excellence_completeness",
   "gate_kind": "exit",
-  "run_id": "10d3ecfb-ade3-4fd6-aa32-f6d0bcb9f7ab",
+  "run_id": "7bb43cb3-f5aa-4dda-a767-264de6d9d97f",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:fe17daa1daf14a0defc3263b13e0a039e94648aa78852ef7a07e35f09b960cf0",
+  "input_fingerprint": "sha256:b2b88866fbf7215d1c074ccc123c52b9c81dc48f98ac01ece358a3e64fe33ad8",
   "input_artifact_fingerprints": {
-    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:799b2e6bc5a9fb6df4e36c901e28af64478558faa918f9d8cdfd26398fc39069",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:5d309bd1fd06615ade3310e96d1c5c57febcad85bdf2d43dcda7ff643f4c6aba"
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:1841ccb9c299b384882c20791235d15434763f9983f8e35d335f2e0a2b63b441",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:b974466e24b0bc4ef3f5abf69bbefbb26e7a60b254006e77d36e11b98b6b104a"
   },
-  "evaluated_at": "2026-05-20T18:19:49.613443+00:00",
+  "evaluated_at": "2026-05-28T20:10:42.218578+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "pass",
+  "status": "fail",
   "deterministic_predicates": {
     "passed": [
       "g09a_p02",
@@ -23,16 +23,85 @@
       "g09a_p05b",
       "g09a_p06",
       "g09a_p07",
-      "g09a_p08",
       "g09a_p09",
       "g09a_p10"
     ],
-    "failed": []
+    "failed": [
+      {
+        "predicate_id": "g09a_p08",
+        "type": "coverage",
+        "function": "deliverable_identity_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Deliverable identity issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 7 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "deliverable_id": "D2-01",
+              "check": "wrong_title",
+              "canonical_title": "Neuro-symbolic planning engine architecture specification",
+              "found_title": "architecture specification, month 12",
+              "issue": "Deliverable D2-01 has wrong title attached: found 'architecture specification, month 12', expected 'Neuro-symbolic planning engine architecture specification'"
+            },
+            {
+              "deliverable_id": "D2-02",
+              "check": "wrong_title",
+              "canonical_title": "Planning engine prototype software",
+              "found_title": "prototype software, month 24",
+              "issue": "Deliverable D2-02 has wrong title attached: found 'prototype software, month 24', expected 'Planning engine prototype software'"
+            },
+            {
+              "deliverable_id": "D2-03",
+              "check": "wrong_title",
+              "canonical_title": "Planning engine evaluation report",
+              "found_title": "evaluation report, month 36",
+              "issue": "Deliverable D2-03 has wrong title attached: found 'evaluation report, month 36', expected 'Planning engine evaluation report'"
+            },
+            {
+              "deliverable_id": "D3-01",
+              "check": "wrong_title",
+              "canonical_title": "Memory architecture design specification",
+              "found_title": "design specification, month 12",
+              "issue": "Deliverable D3-01 has wrong title attached: found 'design specification, month 12', expected 'Memory architecture design specification'"
+            },
+            {
+              "deliverable_id": "D3-03",
+              "check": "wrong_title",
+              "canonical_title": "Memory architecture evaluation report",
+              "found_title": "evaluation report, month 30",
+              "issue": "Deliverable D3-03 has wrong title attached: found 'evaluation report, month 30', expected 'Memory architecture evaluation report'"
+            },
+            {
+              "deliverable_id": "D4-01",
+              "check": "wrong_title",
+              "canonical_title": "Multi-agent coordination protocol specification",
+              "found_title": "protocol specification, month 12",
+              "issue": "Deliverable D4-01 has wrong title attached: found 'protocol specification, month 12', expected 'Multi-agent coordination protocol specification'"
+            },
+            {
+              "deliverable_id": "D4-02",
+              "check": "wrong_title",
+              "canonical_title": "Coordination protocol software implementation",
+              "found_title": "software implementation, month 24",
+              "issue": "Deliverable D4-02 has wrong title attached: found 'software implementation, month 24', expected 'Coordination protocol software implementation'"
+            }
+          ]
+        },
+        "fail_message": "Excellence section references deliverable IDs with wrong title, parent WP, or due month.\n",
+        "prose_condition": "Deliverable identities match canonical reference pack"
+      }
+    ]
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": []
+    "failed": [],
+    "skipped": true
   },
-  "skipped_semantic": false,
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
 }

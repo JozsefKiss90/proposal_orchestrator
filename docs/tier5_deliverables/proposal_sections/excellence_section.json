@@ -1,113 +1,113 @@
 {
   "schema_id": "orch.tier5.excellence_section.v1",
-  "run_id": "10d3ecfb-ade3-4fd6-aa32-f6d0bcb9f7ab",
+  "run_id": "7bb43cb3-f5aa-4dda-a767-264de6d9d97f",
   "criterion": "Excellence",
   "sub_sections": [
     {
       "sub_section_id": "B.1.1",
       "title": "Objectives and ambition",
-      "content": "MAESTRO targets topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02, developing next-generation AI agent architectures that unify structured planning, persistent memory, and decentralised multi-agent coordination from TRL 2 to TRL 5 over 48 months, across eight measurable objectives. OBJ-1 (Neuro-symbolic planning engine for autonomous task decomposition): achieve ≥40% improvement in plan success rate over pure LLM-based baselines (ReAct, Reflexion) on benchmarks WebArena, SWE-bench, and GAIA for tasks requiring >10 sequential steps. OBJ-2 (Unified adaptive memory architecture): demonstrate ≥30% improvement in task coherence and factual consistency over context-window-only baselines in sequences exceeding 50 agent steps, measured on MAESTRO's long-horizon evaluation suite. OBJ-3 (Decentralised multi-agent coordination protocols): demonstrate effective coordination of ≥5 heterogeneous agents, ≥25% improvement in joint task completion over independent baselines, and formal proof of protocol convergence. OBJ-4 (Healthcare demonstrator — clinical decision support): achieve diagnostic reasoning accuracy within 10% of specialist clinician performance on 500 de-identified clinical cases spanning 5 diagnostic domains, validated by NIHS. OBJ-5 (Manufacturing demonstrator — process optimisation): demonstrate ≥15% reduction in defect rates and ≥10% reduction in energy consumption at ISIA, validated over a 3-month pilot factory operational period. OBJ-6 (Logistics transfer demonstrator — cross-sector generalisation): demonstrate ≥20% improvement in disruption recovery time and ≥15% improvement in delivery schedule adherence, validated on ELI operational scenarios across 3 supply chain corridors. OBJ-8 (External Tool and API Orchestration Layer): deploy a typed tool registry supporting ≥30 external tools/APIs, achieve tool invocation success rate ≥95%, maintain mean recovery time from tool failure ≤5s, and ensure full provenance traces for 100% of tool invocations. OBJ-7 (Open framework release and ecosystem contribution): deliver open-source release with ≥500 GitHub stars within 6 months of release, contribute to the AI-on-demand platform, validate results through ≥2 TEFs, and initiate technology transfer through ≥3 EDIHs. MAESTRO goes beyond the state of the art by co-designing neuro-symbolic planning (WP2), adaptive memory (WP3), and decentralised coordination (WP4) into a unified architecture integrated by an External Tool and API Orchestration Layer, providing formal planning guarantees, principled long-term memory management, and convergence-proved inter-agent protocols unavailable in existing purely LLM-driven agent frameworks such as ReAct or AutoGPT-style systems.",
-      "word_count": 335
+      "content": "MAESTRO — Multi-Agent Ecosystem for Strategic Task Reasoning and Orchestration — targets the fundamental limitations that prevent today's AI agents from operating reliably in real-world, high-value settings: fragile long-horizon planning, loss of coherence over extended interactions, and the absence of principled mechanisms for external tool integration and multi-agent coordination. The project pursues eight measurable objectives spanning three tightly integrated research pillars and a cross-cutting orchestration capability. OBJ-1 (Neuro-symbolic planning engine for autonomous task decomposition) targets ≥40% improvement in plan success rate over pure LLM-based baselines (ReAct, Reflexion) on standardised benchmarks (WebArena, SWE-bench, GAIA) for tasks requiring >10 sequential steps, achieved by month 36. OBJ-2 (Unified adaptive memory architecture) targets ≥30% improvement in task coherence and factual consistency over context-window-only baselines in interaction sequences exceeding 50 agent steps, achieved by month 30. OBJ-3 (Decentralised multi-agent coordination protocols) targets effective coordination of ≥5 heterogeneous agents with ≥25% improvement in joint task completion over independent agent baselines and formal proof of protocol convergence, by month 36. OBJ-4 (Healthcare demonstrator — clinical decision support) targets diagnostic reasoning accuracy within 10% of specialist clinician performance on 500 de-identified clinical cases across 5 diagnostic domains, by month 42. OBJ-5 (Manufacturing demonstrator — process optimisation) targets ≥15% reduction in defect rates and ≥10% reduction in energy consumption versus baseline operations in a pilot factory, by month 42. OBJ-6 (Logistics transfer demonstrator — cross-sector generalisation) targets ≥20% improvement in disruption recovery time and ≥15% improvement in delivery schedule adherence versus current planning systems across 3 supply chain corridors, by month 42. OBJ-8 (External Tool and API Orchestration Layer) targets a typed tool registry supporting ≥30 external tools/APIs, tool invocation success rate ≥95%, mean recovery time from tool failure ≤5s, and full provenance traces for 100% of tool invocations, by month 36. OBJ-7 (Open framework release and ecosystem contribution) targets an open-source release with ≥500 GitHub stars within 6 months of release, contributions accepted to the AI-on-demand platform, results validated through ≥2 TEFs, and technology transfer initiated through ≥3 EDIHs, by month 48. MAESTRO goes decisively beyond the state of the art by co-designing three mutually reinforcing capabilities — neuro-symbolic planning, adaptive memory, and decentralised coordination — into a unified architecture rather than combining independent research threads; this integration is not achievable from off-the-shelf components. The neuro-symbolic planning engine provides formal guarantees (verifiable sub-task decomposition, provable recovery) that pure LLM-based approaches cannot offer, while the External Tool and API Orchestration Layer treats tool integration as an architecturally central research contribution rather than a function-calling afterthought. Research activities start at TRL 2 (fundamental research on planning formalisms, memory architecture design, and coordination theory) and progress to TRL 5 (technology validated in relevant operational environments) across healthcare and advanced manufacturing, spanning the full TRL 2–5 range appropriate for a RIA.",
+      "word_count": 430
     },
     {
       "sub_section_id": "B.1.2",
       "title": "Methodology",
-      "content": "MAESTRO's methodology integrates four interlocking layers, each grounded in WP tasks and deliverables. Layer 1 comprises three research-pillar WPs progressing from architecture specification to validated prototypes: WP2 (Neuro-Symbolic Planning and Reasoning Engine, ATU lead) implements MCTS and HTN planning with LLM-based heuristics and plan self-correction, producing the Neuro-symbolic planning engine architecture specification (D2-01, month 12) and Planning engine software prototype (D2-02, month 24); WP3 (Adaptive Memory Architecture, BIIS lead) designs a tri-store memory system with a learned controller managing working, episodic, and semantic stores, producing the Tri-store memory architecture design specification (D3-01, month 12) and Adaptive memory architecture software prototype (D3-02, month 24); WP4 (Decentralised Multi-Agent Coordination, CERIA lead) delivers formally verified delegation and negotiation protocols with convergence guarantees, producing the Multi-agent coordination protocol specification (D4-01, month 15) and Coordination protocol software implementation (D4-02, month 27). Layer 2 is the cross-cutting External Tool and API Orchestration Layer co-developed in WP2 and integrated by WP8 (Integration, Evaluation and Benchmarking, FIIT lead), providing a typed tool registry, standardised API adapters for HL7 FHIR, OPC-UA, REST, and GraphQL, post-invocation verification, execution monitoring with fallback/recovery, and auditable tool execution traces. Layer 3 comprises co-designed sector demonstrators validating the integrated architecture at TRL 5 against quantitative KPIs per scope requirement SR-03: WP5 (Healthcare Demonstrator — Clinical Decision Support, NIHS lead), WP6 (Manufacturing Demonstrator — Process Optimisation, ISIA lead), and WP7 (Logistics Transfer Demonstrator — Cross-Sector Generalisation, ELI lead). Layer 4 is WP8, which integrates all pillars and produces the MAESTRO benchmark suite dataset and final evaluation report (D8-03, month 48) for community-level reproducible evaluation. The methodology is explicitly interdisciplinary, combining formal methods, machine learning, distributed systems, clinical informatics, and manufacturing engineering to satisfy the co-design requirements of the sector demonstrators. SSH dimensions are not mandated by this primarily technical call topic; no substantive SSH research questions arise, and a proportionate justification will be provided in the application. Gender dimension in R&I content has been assessed; the applicable call topic does not require gender integration, and a proportionate justification will be provided per Section B.1.2 requirements. Open science practices include: a Data Management Plan (D1-01, month 6), an Open-source software release and community platform (D9-02, month 30), the MAESTRO benchmark suite dataset and final evaluation report (D8-03, month 48), and contributions to the AI-on-demand platform, ensuring FAIR-compliant outputs accessible to the European R&D community.",
-      "word_count": 303
+      "content": "MAESTRO's methodology is structured around three research pillars and a cross-cutting orchestration layer, each grounded in a dedicated work package and validated through sector demonstrators. WP2 (Neuro-Symbolic Planning and Reasoning Engine, led by Alpenstadt Technical University) develops a hybrid planning engine that decomposes high-level goals into executable sub-task graphs with formally specified pre/post-conditions, integrates Monte Carlo Tree Search and hierarchical task networks with LLM-driven heuristic evaluation, and supports self-correction through plan monitoring and replanning from verified intermediate states — delivering D2-01 (architecture specification, month 12), D2-02 (prototype software, month 24), and D2-03 (evaluation report, month 36). WP3 (Adaptive Memory Architecture, led by Breda Institute for Intelligent Systems) implements a unified tri-store memory system integrating working memory, episodic memory, and semantic memory with a learned memory controller that manages information flow, retrieval, and forgetting — delivering D3-01 (design specification, month 12), D3-02 (adaptive memory system software, month 24), and D3-03 (evaluation report, month 30). WP4 (Decentralised Multi-Agent Coordination, led by Centre Européen de Recherche en Informatique Avancée) develops formally specified task-delegation and negotiation protocols with provable convergence guarantees, conflict resolution mechanisms, and auditable interaction traces — delivering D4-01 (protocol specification, month 12), D4-02 (software implementation, month 24), and D4-03 (coordination evaluation and audit trace report, month 36). The cross-cutting External Tool and API Orchestration Layer, developed within WP2 and WP3 with contributions from Boreal AI Labs Oy, provides a typed tool registry, formal tool selection policies, standardised API adapters for heterogeneous protocols (HL7 FHIR, OPC-UA), post-invocation verification, execution monitoring with fallback/recovery, and full provenance traces — directly addressing the call's mandatory SR-04 requirement. WP8 (Integration, Evaluation and Benchmarking, led by Fundación Ibérica de Innovación Tecnológica) integrates all pillars into the unified MAESTRO framework (D8-02, month 36), produces a community benchmark suite (D8-03, month 42), and conducts TEF-based cross-demonstrator evaluation (D8-04, month 48). Demonstrators in WP5 (healthcare, led by Nordic Institute of Health Sciences), WP6 (manufacturing, led by Istituto Superiore di Ingegneria Avanzata), and WP7 (logistics, led by EuroLog International AG) co-design validation scenarios with industry partners, apply quantitative KPIs, and provide operational deployment environments. The interdisciplinary approach combines formal methods and symbolic AI (Alpenstadt Technical University, Centre Européen de Recherche en Informatique Avancée), neural information retrieval and memory-augmented learning (Breda Institute for Intelligent Systems), clinical informatics (Nordic Institute of Health Sciences), smart manufacturing and digital twins (Istituto Superiore di Ingegneria Avanzata), logistics AI (EuroLog International AG), LLM engineering (Boreal AI Labs Oy), and AI evaluation and technology transfer (Fundación Ibérica de Innovación Tecnológica). The project is primarily technical in nature; social sciences and humanities integration is not a primary research dimension, though ethical oversight of AI agent behaviour in clinical settings is addressed through WP1 ethics compliance tasks led by Alpenstadt Technical University. The gender dimension in research content is addressed through the clinical validation design in WP5, where demographic disaggregation of diagnostic performance across the 500-case benchmark is incorporated as a KPI. Open science practices include open-source release of the MAESTRO framework (D9-02, month 36), publication of all benchmarks and datasets, and contribution of all models and results to the AI-on-demand platform; a Data Management Plan will be delivered as D9-01 (month 6) by Boreal AI Labs Oy, ensuring FAIR data principles are applied across all demonstrator datasets. Progress is monitored through 6-month integration checkpoints, standardised KPIs across all demonstrators, and the evaluation framework established in D8-01 (month 12).",
+      "word_count": 520
     }
   ],
   "validation_status": {
-    "overall_status": "inferred",
+    "overall_status": "confirmed",
     "claim_statuses": [
       {
-        "claim_id": "C-01",
-        "claim_summary": "Eight objective IDs and titles exactly from canonical reference pack (OBJ-1 through OBJ-8, OBJ-7)",
+        "claim_id": "CS-01",
+        "claim_summary": "OBJ-1: ≥40% plan success rate improvement over LLM baselines on WebArena/SWE-bench/GAIA for >10-step tasks by M36",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[OBJ-1,OBJ-2,OBJ-3,OBJ-4,OBJ-5,OBJ-6,OBJ-8,OBJ-7]"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-1"
       },
       {
-        "claim_id": "C-02",
-        "claim_summary": "OBJ-1: ≥40% plan success rate over ReAct/Reflexion on WebArena, SWE-bench, GAIA for >10 steps",
+        "claim_id": "CS-02",
+        "claim_summary": "OBJ-2: ≥30% improvement in task coherence over context-window baselines in >50-step sequences by M30",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-1].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-2"
       },
       {
-        "claim_id": "C-03",
-        "claim_summary": "OBJ-2: ≥30% task coherence and factual consistency over context-window baseline in >50 steps",
+        "claim_id": "CS-03",
+        "claim_summary": "OBJ-3: ≥5 heterogeneous agents coordinated, ≥25% joint task completion improvement, convergence proof by M36",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-2].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-3"
       },
       {
-        "claim_id": "C-04",
-        "claim_summary": "OBJ-3: ≥5 heterogeneous agents, ≥25% joint task completion improvement, formal convergence proof",
+        "claim_id": "CS-04",
+        "claim_summary": "OBJ-4: Diagnostic accuracy within 10% of specialist clinicians on 500 de-identified cases across 5 domains by M42",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-3].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-4"
       },
       {
-        "claim_id": "C-05",
-        "claim_summary": "OBJ-4: within 10% clinician accuracy on 500 de-identified cases, 5 diagnostic domains, validated by NIHS",
+        "claim_id": "CS-05",
+        "claim_summary": "OBJ-5: ≥15% defect rate reduction and ≥10% energy reduction in pilot factory by M42",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-4].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-5"
       },
       {
-        "claim_id": "C-06",
-        "claim_summary": "OBJ-5: ≥15% defect reduction, ≥10% energy reduction at ISIA pilot factory over 3-month period",
+        "claim_id": "CS-06",
+        "claim_summary": "OBJ-6: ≥20% disruption recovery improvement and ≥15% schedule adherence improvement across 3 corridors by M42",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-5].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-6"
       },
       {
-        "claim_id": "C-07",
-        "claim_summary": "OBJ-6: ≥20% disruption recovery, ≥15% schedule adherence, ELI scenarios across 3 supply chain corridors",
+        "claim_id": "CS-07",
+        "claim_summary": "OBJ-8: ≥30 tools/APIs, ≥95% invocation success, ≤5s recovery, 100% provenance traces by M36",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-6].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-8"
       },
       {
-        "claim_id": "C-08",
-        "claim_summary": "OBJ-8: ≥30 tools/APIs, ≥95% invocation success rate, ≤5s mean recovery, 100% provenance traces",
+        "claim_id": "CS-08",
+        "claim_summary": "OBJ-7: Open-source release ≥500 GitHub stars within 6 months; AI-on-demand contribution; ≥2 TEFs; ≥3 EDIHs by M48",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-8].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json → OBJ-7"
       },
       {
-        "claim_id": "C-09",
-        "claim_summary": "OBJ-7: open-source release, ≥500 GitHub stars within 6 months, AI-on-demand platform, ≥2 TEFs, ≥3 EDIHs",
+        "claim_id": "CS-09",
+        "claim_summary": "TRL 2 start to TRL 5 end across healthcare and manufacturing demonstrators",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json objectives[id=OBJ-7].measurable_target"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md → Risks Addressed section"
       },
       {
-        "claim_id": "C-10",
-        "claim_summary": "TRL 2 starting point and TRL 5 end point for all demonstrators",
-        "status": "inferred",
-        "source_ref": "tier4/phase2/concept_refinement_summary.json scope_coverage[CC-01]; TRL 5 confirmed, TRL 2 start inferred"
+        "claim_id": "CS-10",
+        "claim_summary": "WP2–WP9 structure, lead partners, deliverable IDs, titles, and due months",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
       },
       {
-        "claim_id": "C-11",
-        "claim_summary": "WP lead assignments: WP2 ATU, WP3 BIIS, WP4 CERIA, WP5 NIHS, WP6 ISIA, WP7 ELI, WP8 FIIT, WP9 BAL",
+        "claim_id": "CS-11",
+        "claim_summary": "Partner legal names, short names, countries, and roles as stated",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json wps[]"
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json"
       },
       {
-        "claim_id": "C-12",
-        "claim_summary": "All partner short names and legal names as stated in canonical pack (8 partners)",
+        "claim_id": "CS-12",
+        "claim_summary": "Neuro-symbolic planning engine integrates MCTS and HTN with LLM heuristics and self-correction",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json partners[]"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md → Pillar 1 section"
       },
       {
-        "claim_id": "C-13",
-        "claim_summary": "AI-on-demand platform contribution is a mandatory scope requirement (SR-05)",
+        "claim_id": "CS-13",
+        "claim_summary": "Tri-store memory (working, episodic, semantic) with learned memory controller",
         "status": "confirmed",
-        "source_ref": "tier2b/extracted/scope_requirements.json SR-05"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md → Pillar 2 section"
       },
       {
-        "claim_id": "C-14",
-        "claim_summary": "Deliverable IDs, titles, and months: D1-01 month 6, D2-01 month 12, D2-02 month 24, D9-02 month 30, D8-03 month 48",
+        "claim_id": "CS-14",
+        "claim_summary": "External Tool and API Orchestration Layer: typed registry, HL7 FHIR, OPC-UA adapters, provenance traces",
         "status": "confirmed",
-        "source_ref": "tier4/phase8/canonical_reference_pack.json deliverables[D1-01,D2-01,D2-02,D9-02,D8-03]"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md → Cross-Cutting Capability section"
       },
       {
-        "claim_id": "C-15",
-        "claim_summary": "ADRA and GenAI4EU Hub cohesion task allocation is a mandatory scope requirement (SR-04)",
+        "claim_id": "CS-15",
+        "claim_summary": "DMP delivered as D9-01 by BAL at month 6; open-source framework as D9-02 at month 36",
         "status": "confirmed",
-        "source_ref": "tier2b/extracted/scope_requirements.json SR-04"
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json → WP9"
       }
     ]
   },
@@ -131,19 +131,23 @@
       },
       {
         "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
-      },
-      {
-        "tier": 3,
         "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
       },
       {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
       },
       {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/partners.json"
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
         "tier": 4,
@@ -155,7 +159,7 @@
       },
       {
         "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
       }
     ],
     "no_unsupported_claims_declaration": true

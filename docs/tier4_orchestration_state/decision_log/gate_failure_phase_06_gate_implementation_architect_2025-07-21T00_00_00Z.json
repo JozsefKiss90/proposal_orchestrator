@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_06_gate_implementation_architect_2025-07-21T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_06_gate",
+  "failure_reason": "Semantic predicate 'instrument_sections_complete' failed: all entries in instrument_sections_addressed use status values 'required' or 'optional' rather than the required 'addressed' status. The gate predicate requires that all mandatory sections from section_schema_registry.json have status: 'addressed' (not 'deferred' without reason). No mandatory section entry carries status: 'addressed', meaning the predicate condition cannot be confirmed as satisfied. All 16 mandatory section entries (A.1, A.1.declarations, A.2, A.3, A.4, A.5, B.cover, B.1, B.1.1, B.1.2, B.2, B.2.1, B.2.2, B.3, B.3.1, B.3.2) carry status: 'required' instead of status: 'addressed'.",
+  "predicates_failed": [
+    "instrument_sections_complete"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (phase-specific gate definitions), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2025-07-21T00:00:00Z"
+}
