@@ -1,0 +1,41 @@
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\05_secrets_manager> aws secretsmanager create-secret `
+>>   --name "proposal-orchestrator/env-config" `
+>>   --description "Proposal Orchestrator environment configuration" `
+>>   --kms-key-id "alias/proposal-orchestrator" `
+>>   --secret-string '{"ORCHESTRATOR_TRANSPORT_PRESET":"BEDROCK_CONVERSE_US","ORCHESTRATOR_PRODUCTION_MODE":"true","ORCHESTRATOR_DIAGNOSTIC_LEVEL":"metadata","AWS_DEFAULT_REGION":"us-east-1","SKILL_MODEL":"us.anthropic.claude-sonnet-4-6"}' `
+>>   --tags Key=project,Value=proposal-orchestrator Key=environment,Value=production `
+>>   --region us-east-1 `
+>>   --output json
+{                                                                                                                                                                     
+    "ARN": "arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/env-config-eLye1o",
+    "Name": "proposal-orchestrator/env-config",
+    "VersionId": "1c8af07f-c028-41ee-acdf-6da92c0c4b2b"
+}
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\05_secrets_manager> aws secretsmanager describe-secret `
+>>   --secret-id "proposal-orchestrator/env-config" `
+>>   --region us-east-1 `
+>>   --output json
+{                                                                                                                                                                     
+    "ARN": "arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/env-config-eLye1o",
+    "Name": "proposal-orchestrator/env-config",
+    "Description": "Proposal Orchestrator environment configuration",
+    "KmsKeyId": "alias/proposal-orchestrator",
+    "LastChangedDate": "2026-06-01T13:10:03.958000+02:00",
+    "Tags": [
+        {
+            "Key": "project",
+            "Value": "proposal-orchestrator"
+        },
+        {
+            "Key": "environment",
+            "Value": "production"
+        }
+    ],
+    "VersionIdsToStages": {
+        "1c8af07f-c028-41ee-acdf-6da92c0c4b2b": [
+            "AWSCURRENT"                                                                                                                                              
+        ]                                                                                                                                                             
+    },                                                                                                                                                                
+    "CreatedDate": "2026-06-01T13:10:03.888000+02:00"                                                                                                                 
+}                   

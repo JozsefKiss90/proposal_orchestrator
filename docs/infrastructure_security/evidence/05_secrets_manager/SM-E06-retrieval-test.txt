@@ -1,0 +1,43 @@
+sh-5.2$ {
+  echo "=== SM-E06: Secret Retrieval Test ==="
+  echo "Date: $(date -u)"
+  echo ""
+
+  echo "--- Caller Identity ---"
+  aws sts get-caller-identity --output json
+  echo ""
+
+  echo "--- Retrieve secret (name only, not value) ---"
+  aws secretsmanager get-secret-value \
+    --secret-id "proposal-orchestrator/env-config" \
+    --query "Name" \
+    --region us-east-1 \
+    --output text
+  echo ""
+  echo "get_secret_exit_code=$?"
+
+  echo ""
+  echo "--- Verify KMS key association ---"
+  aws secretsmanager describe-secret \
+    --secret-id "proposal-orchestrator/env-config" \
+    --query "KmsKeyId" \
+    --region us-east-1 \
+    --output text
+} 2>&1 | tee /tmp/SM-E06-retrieval-test.txt
+=== SM-E06: Secret Retrieval Test ===
+Date: Mon Jun  1 11:25:40 UTC 2026
+
+--- Caller Identity ---
+{
+    "UserId": "AROATMJDAWYJXA3K7TPEV:i-0045af36dbf5f1272",
+    "Account": "232538551827",
+    "Arn": "arn:aws:sts::232538551827:assumed-role/proposal-orchestrator-ec2-ssm-role/i-0045af36dbf5f1272"
+}
+
+--- Retrieve secret (name only, not value) ---
+proposal-orchestrator/env-config
+
+get_secret_exit_code=0
+
+--- Verify KMS key association ---
+alias/proposal-orchestrator
