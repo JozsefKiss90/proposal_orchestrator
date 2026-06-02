@@ -1,0 +1,437 @@
+Control Group 6 — CloudTrail
+
+  Controls
+
+  DC-23  CloudTrail trail created with KMS encryption
+  DC-24  Log file validation enabled
+  DC-25  Trail S3 bucket secured (encryption, deny HTTP, versioning)
+  DC-26  CloudTrail capturing Bedrock InvokeModel events
+  DC-27  S3 lifecycle policy for trail logs (archive 90d, delete 365d)
+
+  Infrastructure Reference (from CG1-CG5)
+
+  Account:       232538551827
+  Region:        us-east-1
+  KMS key ID:    887638e8-358b-4664-9270-368aec0ea1f1
+  KMS alias:     alias/proposal-orchestrator
+  KMS key ARN:   arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1
+  Trail name:    proposal-orchestrator-bedrock-trail
+  Instance host: i-0045af36dbf5f1272
+
+  Prerequisites Confirmed
+
+  - KMS key policy (CG4) already includes AllowCloudTrailEncryption with:
+      Principal: cloudtrail.amazonaws.com
+      Actions: GenerateDataKey*, DescribeKey
+      Condition: SourceArn = arn:aws:cloudtrail:us-east-1:232538551827:trail/proposal-orchestrator-bedrock-trail
+
+  ============================================================================
+  Step 1: Create the S3 Bucket for Trail Logs
+  ============================================================================
+
+  S3 bucket names must be globally unique. Use the account ID as a suffix:
+
+  BUCKET_NAME="proposal-orchestrator-cloudtrail-232538551827"
+
+  # 1a. Create the bucket
+  aws s3api create-bucket \
+    --bucket "${BUCKET_NAME}" \
+    --region us-east-1 \
+    --output json
+
+  Note: For us-east-1 you do NOT need --create-bucket-configuration.
+  For any other region you would need:
+    --create-bucket-configuration LocationConstraint=<region>
+
+  # 1b. Block all public access
+  aws s3api put-public-access-block \
+    --bucket "${BUCKET_NAME}" \
+    --public-access-block-configuration \
+      "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
+  # 1c. Tag the bucket
+  aws s3api put-bucket-tagging \
+    --bucket "${BUCKET_NAME}" \
+    --tagging 'TagSet=[{Key=project,Value=proposal-orchestrator},{Key=environment,Value=production},{Key=purpose,Value=cloudtrail-logs}]'
+
+  ============================================================================
+  Step 2: Apply S3 Bucket Policy
+  ============================================================================
+
+  Save the following to a file called trail_bucket_policy.json:
+
+  ---- BEGIN trail_bucket_policy.json ----
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "AWSCloudTrailAclCheck",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:GetBucketAcl",
+              "Resource": "arn:aws:s3:::proposal-orchestrator-cloudtrail-232538551827",
+              "Condition": {
+                  "StringEquals": {
+                      "aws:SourceArn": "arn:aws:cloudtrail:us-east-1:232538551827:trail/proposal-orchestrator-bedrock-trail"
+                  }
+              }
+          },
+          {
+              "Sid": "AWSCloudTrailWrite",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:PutObject",
+              "Resource": "arn:aws:s3:::proposal-orchestrator-cloudtrail-232538551827/cloudtrail/proposal-orchestrator/AWSLogs/232538551827/*",
+              "Condition": {
+                  "StringEquals": {
+                      "s3:x-amz-acl": "bucket-owner-full-control",
+                      "aws:SourceArn": "arn:aws:cloudtrail:us-east-1:232538551827:trail/proposal-orchestrator-bedrock-trail"
+                  }
+              }
+          },
+          {
+              "Sid": "DenyUnencryptedObjects",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:PutObject",
+              "Resource": "arn:aws:s3:::proposal-orchestrator-cloudtrail-232538551827/*",
+              "Condition": {
+                  "StringNotEquals": {
+                      "s3:x-amz-server-side-encryption": "aws:kms"
+                  }
+              }
+          },
+          {
+              "Sid": "DenyInsecureTransport",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                  "arn:aws:s3:::proposal-orchestrator-cloudtrail-232538551827",
+                  "arn:aws:s3:::proposal-orchestrator-cloudtrail-232538551827/*"
+              ],
+              "Condition": {
+                  "Bool": {
+                      "aws:SecureTransport": "false"
+                  }
+              }
+          }
+      ]
+  }
+  ---- END trail_bucket_policy.json ----
+
+  Notes on the policy:
+  - AWSCloudTrailAclCheck: CloudTrail checks bucket ACL before writing.
+    SourceArn condition scopes it to our specific trail.
+  - AWSCloudTrailWrite: Allows CloudTrail to write log files under the
+    configured prefix. SourceArn + bucket-owner-full-control conditions.
+  - DenyUnencryptedObjects: Rejects any PutObject without KMS encryption.
+    CloudTrail always writes with aws:kms, so this blocks non-CloudTrail
+    unencrypted writes.
+  - DenyInsecureTransport: Rejects any request over plain HTTP.
+
+  Apply the policy:
+
+  aws s3api put-bucket-policy \
+    --bucket "${BUCKET_NAME}" \
+    --policy file://trail_bucket_policy.json
+
+  ============================================================================
+  Step 3: Enable Versioning on the Bucket
+  ============================================================================
+
+  aws s3api put-bucket-versioning \
+    --bucket "${BUCKET_NAME}" \
+    --versioning-configuration Status=Enabled
+
+  ============================================================================
+  Step 4: Configure S3 Lifecycle Policy
+  ============================================================================
+
+  Save the following to lifecycle_policy.json:
+
+  ---- BEGIN lifecycle_policy.json ----
+  {
+      "Rules": [
+          {
+              "ID": "proposal-orchestrator-cloudtrail-lifecycle",
+              "Status": "Enabled",
+              "Filter": {
+                  "Prefix": "cloudtrail/proposal-orchestrator/"
+              },
+              "Transitions": [
+                  {
+                      "Days": 90,
+                      "StorageClass": "GLACIER_IR"
+                  }
+              ],
+              "Expiration": {
+                  "Days": 365
+              },
+              "NoncurrentVersionExpiration": {
+                  "NoncurrentDays": 30
+              }
+          }
+      ]
+  }
+  ---- END lifecycle_policy.json ----
+
+  Notes:
+  - GLACIER_IR (Glacier Instant Retrieval) after 90 days — cost-optimized
+    but still allows immediate read if needed for audit.
+  - Permanent deletion after 365 days. Adjust if institutional policy
+    requires longer retention.
+  - NoncurrentVersionExpiration after 30 days cleans up old versions
+    (versioning is enabled for integrity, but old versions don't need
+    indefinite retention).
+
+  Apply:
+
+  aws s3api put-bucket-lifecycle-configuration \
+    --bucket "${BUCKET_NAME}" \
+    --lifecycle-configuration file://lifecycle_policy.json
+
+  ============================================================================
+  Step 5: Create the CloudTrail Trail
+  ============================================================================
+
+  aws cloudtrail create-trail \
+    --name "proposal-orchestrator-bedrock-trail" \
+    --s3-bucket-name "${BUCKET_NAME}" \
+    --s3-key-prefix "cloudtrail/proposal-orchestrator" \
+    --kms-key-id "arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1" \
+    --is-multi-region-trail \
+    --enable-log-file-validation \
+    --no-include-global-service-events \
+    --region us-east-1 \
+    --output json
+
+  IMPORTANT: Use the full KMS key ARN (not the alias) for --kms-key-id.
+  CloudTrail requires the key ARN for encryption configuration.
+
+  Wait — regarding --is-multi-region-trail and --no-include-global-service-events:
+
+  The hardening plan says Multi-region: No. Use these flags instead:
+
+  aws cloudtrail create-trail \
+    --name "proposal-orchestrator-bedrock-trail" \
+    --s3-bucket-name "${BUCKET_NAME}" \
+    --s3-key-prefix "cloudtrail/proposal-orchestrator" \
+    --kms-key-id "arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1" \
+    --no-is-multi-region-trail \
+    --include-global-service-events \
+    --enable-log-file-validation \
+    --region us-east-1 \
+    --output json
+
+  Notes:
+  - --no-is-multi-region-trail: Single-region trail (us-east-1 only).
+  - --include-global-service-events: Captures IAM, STS, and other global
+    service events (important for tracking role assumption).
+  - --enable-log-file-validation: Enables digest files for tamper detection.
+  - --kms-key-id: Full ARN of the CMK from CG4.
+
+  ============================================================================
+  Step 6: Start Logging
+  ============================================================================
+
+  aws cloudtrail start-logging \
+    --name "proposal-orchestrator-bedrock-trail" \
+    --region us-east-1
+
+  Verify logging is active:
+
+  aws cloudtrail get-trail-status \
+    --name "proposal-orchestrator-bedrock-trail" \
+    --region us-east-1 \
+    --output json
+
+  Expected: "IsLogging": true, "LatestDeliveryTime" populated after a few minutes.
+
+  ============================================================================
+  Step 7: Trigger a Test Bedrock Call and Verify Event Capture
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and make a Bedrock call:
+
+  aws bedrock-runtime converse \
+    --model-id us.anthropic.claude-sonnet-4-6 \
+    --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+    --inference-config '{"maxTokens":10}' \
+    --region us-east-1
+
+  Wait 5-15 minutes for CloudTrail to deliver the event, then check:
+
+  aws cloudtrail lookup-events \
+    --lookup-attributes AttributeKey=EventName,AttributeValue=Converse \
+    --max-results 5 \
+    --region us-east-1 \
+    --output json
+
+  If no results for "Converse", also try "InvokeModel":
+
+  aws cloudtrail lookup-events \
+    --lookup-attributes AttributeKey=EventName,AttributeValue=InvokeModel \
+    --max-results 5 \
+    --region us-east-1 \
+    --output json
+
+  Expected: At least one event showing the Bedrock call with caller identity
+  matching assumed-role/proposal-orchestrator-ec2-ssm-role.
+
+  Note: CloudTrail event delivery can take 5-15 minutes. If no events appear
+  immediately, wait and retry. Do NOT re-create the trail — just wait.
+
+  ============================================================================
+  Step 8: Collect Evidence
+  ============================================================================
+
+  {
+    echo "=== CG6: CloudTrail Evidence Collection ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    BUCKET_NAME="proposal-orchestrator-cloudtrail-232538551827"
+
+    echo "=== CT-E01: Trail Configuration ==="
+    aws cloudtrail describe-trails \
+      --trail-name-list "proposal-orchestrator-bedrock-trail" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CT-E02: Trail Status ==="
+    aws cloudtrail get-trail-status \
+      --name "proposal-orchestrator-bedrock-trail" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CT-E03: Log File Validation ==="
+    aws cloudtrail describe-trails \
+      --trail-name-list "proposal-orchestrator-bedrock-trail" \
+      --query "trailList[0].LogFileValidationEnabled" \
+      --region us-east-1 \
+      --output text
+    echo ""
+
+    echo "=== CT-E04: KMS Encryption Key ==="
+    aws cloudtrail describe-trails \
+      --trail-name-list "proposal-orchestrator-bedrock-trail" \
+      --query "trailList[0].KmsKeyId" \
+      --region us-east-1 \
+      --output text
+    echo ""
+
+    echo "=== CT-E05: Event Selectors ==="
+    aws cloudtrail get-event-selectors \
+      --trail-name "proposal-orchestrator-bedrock-trail" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CT-E06: Recent Bedrock Events (Converse) ==="
+    aws cloudtrail lookup-events \
+      --lookup-attributes AttributeKey=EventName,AttributeValue=Converse \
+      --max-results 5 \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CT-E06b: Recent Bedrock Events (InvokeModel) ==="
+    aws cloudtrail lookup-events \
+      --lookup-attributes AttributeKey=EventName,AttributeValue=InvokeModel \
+      --max-results 5 \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CT-E07: S3 Bucket Policy ==="
+    aws s3api get-bucket-policy \
+      --bucket "${BUCKET_NAME}" \
+      --output json
+    echo ""
+
+    echo "=== CT-E08: S3 Lifecycle Configuration ==="
+    aws s3api get-bucket-lifecycle-configuration \
+      --bucket "${BUCKET_NAME}" \
+      --output json
+    echo ""
+
+    echo "=== CT-E09: S3 Versioning Status ==="
+    aws s3api get-bucket-versioning \
+      --bucket "${BUCKET_NAME}" \
+      --output json
+    echo ""
+
+    echo "=== S3 Public Access Block ==="
+    aws s3api get-public-access-block \
+      --bucket "${BUCKET_NAME}" \
+      --output json
+  } 2>&1 | tee CG6_logs.txt
+
+  Save output to:
+  - docs/infrastructure_security/evidence/06_cloudtrail/CG6_logs.txt
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  |   #   |        Criterion        |                           PASS                           |                     FAIL                     |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-1  | Trail exists + logging  | proposal-orchestrator-bedrock-trail exists,               | No trail, or IsLogging: false                |
+  |       |                         | IsLogging: true                                          |                                              |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-2  | KMS encryption          | KmsKeyId matches CMK 887638e8-358b-4664-9270-            | No KmsKeyId, or default AWS-managed key      |
+  |       |                         | 368aec0ea1f1                                             |                                              |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-3  | Log file validation     | LogFileValidationEnabled: true                           | Validation disabled                          |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-4  | Event capture           | Converse or InvokeModel event appears in                 | No Bedrock events after test call + 15 min   |
+  |       |                         | lookup-events with correct caller identity               | wait                                         |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-5  | S3 bucket policy        | AWSCloudTrailAclCheck + AWSCloudTrailWrite with          | Missing statements, no SourceArn, no deny    |
+  |       |                         | SourceArn; DenyUnencryptedObjects;                       | for unencrypted/HTTP                         |
+  |       |                         | DenyInsecureTransport                                    |                                              |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-6  | S3 versioning           | Status: Enabled                                          | Versioning not enabled                       |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-7  | S3 lifecycle            | Transition to GLACIER_IR at 90d,                         | No lifecycle policy                          |
+  |       |                         | Expiration at 365d                                       |                                              |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CT-8  | S3 public access block  | All four public access block settings true               | Any public access block setting false        |
+  +-------+-------------------------+----------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  Troubleshooting
+  ============================================================================
+
+  "Insufficient permissions to create trail with KMS encryption"
+    -> Verify KMS key policy has AllowCloudTrailEncryption statement with
+       the correct trail SourceArn. Check CG4 evidence KMS-E03.
+
+  "S3 bucket policy does not allow CloudTrail to write"
+    -> Apply the bucket policy (Step 2) BEFORE creating the trail (Step 5).
+       CloudTrail validates the bucket policy during create-trail.
+
+  "No events in lookup-events after test call"
+    -> CloudTrail delivery takes 5-15 minutes. Wait and retry.
+    -> Verify IsLogging: true with get-trail-status.
+    -> Try both EventName=Converse and EventName=InvokeModel.
+
+  ============================================================================
+  What Happens After CG6
+  ============================================================================
+
+  CG6 completion means the audit trail is active. Proceed to:
+  - CG7 (CloudWatch) — verify invocation logging disabled, operational logs
+  - CG8 (Data Egress Prevention) — host SG, flow logs, egress tests
+
+  Once CG6 evidence is collected and reviewed, proceed to CG7.
+
+  Please run Steps 1-8 above, save the evidence, and confirm when ready for review.

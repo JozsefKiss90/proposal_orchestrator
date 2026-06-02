@@ -41,7 +41,7 @@ from typing import Any, Optional
 
 import yaml
 
-from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
+from runner.benchmark.transport_hook import InstrumentedBackend, instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     DEFAULT_TIMEOUT_SECONDS,
     ClaudeCLITimeoutError,
@@ -1395,6 +1395,17 @@ def run_skill(
                     failure_category="MISSING_INPUT",
                 )
 
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
+                timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                tool_names=["Read", "Glob"],
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_tapm",
+            )
+
             allowed_prefixes: list[str] = []
             for rf in reads_from + (optional_reads_from or []):
                 if _is_contextual_descriptor(rf):
@@ -1469,6 +1480,17 @@ def run_skill(
                     ),
                     failure_category="MISSING_INPUT",
                 )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
+                timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                tool_names=["Read", "Glob"],
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_tapm",
+            )
 
             allowed_prefixes_oai: list[str] = []
             for rf in reads_from + (optional_reads_from or []):
@@ -1627,6 +1649,16 @@ def run_skill(
                     failure_category="MISSING_INPUT",
                 )
 
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
+                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_cli_prompt",
+            )
+
             try:
                 result = backend([
                     {"role": "system", "content": system_prompt},
@@ -1683,6 +1715,16 @@ def run_skill(
                     ),
                     failure_category="MISSING_INPUT",
                 )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
+                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_cli_prompt",
+            )
 
             try:
                 result = backend([

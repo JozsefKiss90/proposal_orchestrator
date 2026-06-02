@@ -1,0 +1,264 @@
+Control Group 4 — KMS Encryption
+
+  Controls
+
+  DC-18  Customer-managed KMS key with alias proposal-orchestrator, automatic annual rotation enabled
+  DC-19  KMS key policy scoped to admin role(s), Bedrock execution role, and CloudTrail service
+
+  Infrastructure Reference (from CG1/CG2)
+
+  Account:       232538551827
+  Region:        us-east-1
+  Bedrock role:  proposal-orchestrator-bedrock-role
+  Instance host: i-0045af36dbf5f1272
+  Trail name:    proposal-orchestrator-bedrock-trail  (will be created in CG6)
+
+  ============================================================================
+  Step 1: Create the Customer-Managed Key (CMK)
+  ============================================================================
+
+  Run from CloudShell or local CLI (with admin permissions):
+
+  # 1a. Create the symmetric CMK
+  aws kms create-key \
+    --description "Proposal Orchestrator — encryption for Secrets Manager, CloudTrail, CloudWatch Logs" \
+    --key-usage ENCRYPT_DECRYPT \
+    --key-spec SYMMETRIC_DEFAULT \
+    --tags '[{"TagKey":"project","TagValue":"proposal-orchestrator"},{"TagKey":"environment","TagValue":"production"}]' \
+    --region us-east-1 \
+    --output json > CG4-key-create-output.json
+
+  # Note the KeyId from the output — you will need it for the next steps.
+  # Example: "KeyId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+  # 1b. Create the alias
+  aws kms create-alias \
+    --alias-name alias/proposal-orchestrator \
+    --target-key-id <KEY_ID_FROM_STEP_1a> \
+    --region us-east-1
+
+  ============================================================================
+  Step 2: Enable Automatic Key Rotation
+  ============================================================================
+
+  aws kms enable-key-rotation \
+    --key-id alias/proposal-orchestrator \
+    --region us-east-1
+
+  # Verify rotation is enabled
+  aws kms get-key-rotation-status \
+    --key-id alias/proposal-orchestrator \
+    --region us-east-1 \
+    --output json
+
+  Expected output: "KeyRotationEnabled": true
+
+  ============================================================================
+  Step 3: Apply the Scoped Key Policy
+  ============================================================================
+
+  IMPORTANT: The key policy MUST include the root account principal to prevent
+  lockout. Without it, if the admin role is deleted, the key becomes
+  unmanageable. This is an AWS best practice.
+
+  Before running, determine your admin role ARN. This is the role you are
+  currently using. You can check with:
+
+    aws sts get-caller-identity --output json
+
+  Save the following policy to a file called kms_key_policy.json, replacing
+  the <ADMIN_ROLE_NAME> placeholder with your actual admin role name:
+
+  ---- BEGIN kms_key_policy.json ----
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "AllowRootFullAccess",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "arn:aws:iam::232538551827:root"
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+          },
+          {
+              "Sid": "AllowKeyAdministration",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "arn:aws:iam::232538551827:role/<ADMIN_ROLE_NAME>"
+              },
+              "Action": [
+                  "kms:Create*",
+                  "kms:Describe*",
+                  "kms:Enable*",
+                  "kms:List*",
+                  "kms:Put*",
+                  "kms:Update*",
+                  "kms:Revoke*",
+                  "kms:Disable*",
+                  "kms:Get*",
+                  "kms:Delete*",
+                  "kms:TagResource",
+                  "kms:UntagResource",
+                  "kms:ScheduleKeyDeletion",
+                  "kms:CancelKeyDeletion"
+              ],
+              "Resource": "*"
+          },
+          {
+              "Sid": "AllowBedrockRoleUsage",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role"
+              },
+              "Action": [
+                  "kms:Decrypt",
+                  "kms:DescribeKey"
+              ],
+              "Resource": "*"
+          },
+          {
+              "Sid": "AllowCloudTrailEncryption",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": [
+                  "kms:GenerateDataKey*",
+                  "kms:DescribeKey"
+              ],
+              "Resource": "*",
+              "Condition": {
+                  "StringEquals": {
+                      "aws:SourceArn": "arn:aws:cloudtrail:us-east-1:232538551827:trail/proposal-orchestrator-bedrock-trail"
+                  }
+              }
+          },
+          {
+              "Sid": "AllowCloudWatchLogsEncryption",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "logs.us-east-1.amazonaws.com"
+              },
+              "Action": [
+                  "kms:Encrypt*",
+                  "kms:Decrypt*",
+                  "kms:ReEncrypt*",
+                  "kms:GenerateDataKey*",
+                  "kms:Describe*"
+              ],
+              "Resource": "*",
+              "Condition": {
+                  "ArnEquals": {
+                      "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:us-east-1:232538551827:log-group:/proposal-orchestrator/*"
+                  }
+              }
+          }
+      ]
+  }
+  ---- END kms_key_policy.json ----
+
+  Notes on the policy:
+  - AllowRootFullAccess: Prevents lockout. AWS best practice for all CMKs.
+  - AllowKeyAdministration: Replace <ADMIN_ROLE_NAME> with your admin role.
+    If you use multiple admin roles or an SSO permission set, list them all
+    in the Principal array.
+  - AllowBedrockRoleUsage: Decrypt + DescribeKey only — minimum needed for
+    Secrets Manager secret retrieval by the Bedrock execution role.
+  - AllowCloudTrailEncryption: Scoped to the specific trail via SourceArn.
+    GenerateDataKey is needed because CloudTrail uses envelope encryption.
+  - AllowCloudWatchLogsEncryption: Scoped to /proposal-orchestrator/* log
+    groups only. Needed for CG7 (DC-30) operational log encryption.
+
+  Apply the policy:
+
+  aws kms put-key-policy \
+    --key-id alias/proposal-orchestrator \
+    --policy-name default \
+    --policy file://kms_key_policy.json \
+    --region us-east-1
+
+  ============================================================================
+  Step 4: Collect Evidence
+  ============================================================================
+
+  Run all evidence commands and save outputs:
+
+  {
+    echo "=== CG4: KMS Evidence Collection ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "=== KMS-E01: Key Description ==="
+    aws kms describe-key \
+      --key-id alias/proposal-orchestrator \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== KMS-E02: Key Rotation Status ==="
+    aws kms get-key-rotation-status \
+      --key-id alias/proposal-orchestrator \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== KMS-E03: Key Policy ==="
+    aws kms get-key-policy \
+      --key-id alias/proposal-orchestrator \
+      --policy-name default \
+      --region us-east-1 \
+      --output text
+    echo ""
+
+    echo "=== KMS-E04: Key Aliases ==="
+    aws kms list-aliases \
+      --key-id alias/proposal-orchestrator \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== Admin Caller Identity ==="
+    aws sts get-caller-identity --output json
+  } 2>&1 | tee CG4_logs.txt
+
+  Save the output to:
+  - docs/infrastructure_security/evidence/04_kms/CG4_logs.txt
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  |   #   |      Criterion      |                           PASS                           |                    FAIL                     |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-1 | CMK exists          | Customer-managed key with alias/proposal-orchestrator    | No CMK, or only AWS-managed keys            |
+  |       |                     | exists, KeyState = Enabled, KeySpec = SYMMETRIC_DEFAULT  |                                             |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-2 | Key rotation        | KeyRotationEnabled: true                                 | Rotation disabled                           |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-3 | Key policy - admin  | AllowKeyAdministration scoped to named admin role(s)     | Wildcard principal or no admin statement     |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-4 | Key policy - usage  | AllowBedrockRoleUsage scoped to                          | Wildcard principal, or actions beyond        |
+  |       |                     | proposal-orchestrator-bedrock-role with Decrypt +        | Decrypt/DescribeKey                         |
+  |       |                     | DescribeKey only                                         |                                             |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-5 | Key policy -        | AllowCloudTrailEncryption scoped to                      | No CloudTrail statement, or missing         |
+  |       | CloudTrail          | cloudtrail.amazonaws.com with SourceArn condition        | SourceArn condition                         |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+  | KMS-6 | Root access         | Root principal has full access (lockout prevention)      | No root access statement (lockout risk)     |
+  +-------+---------------------+----------------------------------------------------------+---------------------------------------------+
+
+  ============================================================================
+  What Happens After CG4
+  ============================================================================
+
+  The CMK created here is a prerequisite for:
+  - CG5 (Secrets Manager) — secrets encrypted with this CMK
+  - CG6 (CloudTrail) — trail logs encrypted with this CMK
+  - CG7 (CloudWatch) — operational log groups encrypted with this CMK
+
+  Once CG4 evidence is collected and reviewed, proceed to CG5.
+
+  Please run Steps 1-4 above, save the evidence, and confirm when ready for review.

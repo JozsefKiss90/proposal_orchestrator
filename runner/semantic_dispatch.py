@@ -53,7 +53,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
+from runner.benchmark.transport_hook import InstrumentedBackend, instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     ClaudeCLITimeoutError,
     ClaudeTransportError,
@@ -654,6 +654,14 @@ def _invoke_via_backend(
             temperature=0.0,
             max_tokens=AGENT_MAX_TOKENS,
         )
+        backend = InstrumentedBackend(
+            backend,
+            model=provider_config.model or "",
+            timeout_seconds=300,
+            bench_run_id=run_id,
+            bench_predicate_id=pred_id,
+            bench_invocation_type="semantic_predicate",
+        )
         result = backend(messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -667,6 +675,14 @@ def _invoke_via_backend(
         provider_config,
         temperature=0.0,
         max_tokens=AGENT_MAX_TOKENS,
+    )
+    backend = InstrumentedBackend(
+        backend,
+        model=provider_config.model or "",
+        timeout_seconds=300,
+        bench_run_id=run_id,
+        bench_predicate_id=pred_id,
+        bench_invocation_type="semantic_predicate",
     )
     result = backend(messages=[
         {"role": "system", "content": system_prompt},
