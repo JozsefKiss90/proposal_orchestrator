@@ -135,7 +135,8 @@
       "Read(//c/Code/proposal_demo/proposal_orchestrator/.claude/runs/$id/**)",
       "Bash(fi)",
       "Bash(echo $ORCHESTRATOR_TRANSPORT_BACKEND)",
-      "Bash(echo $ORCHESTRATOR_TRANSPORT_PRESET)"
+      "Bash(echo $ORCHESTRATOR_TRANSPORT_PRESET)",
+      "Bash(find . -not -path ./.git/* -not -path ./node_modules/* -type f)"
     ]
   },
   "enabledMcpjsonServers": [

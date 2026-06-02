@@ -1,0 +1,52 @@
+# Version control
+.git/
+.gitignore
+
+# Tests (not needed in production image)
+tests/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment and secrets
+.env
+.env.*
+*.env
+
+# Runtime state (rebuilt at runtime)
+.claude/runs/
+.claude/cache/
+.claude/logs/
+.claude/agent-memory/
+
+# Build artifacts
+deploy_deps/
+orchestrator-deploy.tar.gz
+*.tar.gz
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation source PDFs (large, not needed by runner)
+# Uncomment to exclude if image size is a concern:
+# docs/tier0_external_retrieval/
+# docs/tier1_normative_framework/sources/
+
+# Deployment and infrastructure docs (not needed at runtime)
+aws_deployment_hardening_plan.md
+docs/infrastructure_security/
+docs/benchmark_reports/
+docs/internal_llm_migration_plan.md
+backend_migration_plan.md
+
+# Skill diagnostics
+.claude/skill_diag/
+
+# Memory files
+.claude/projects/
