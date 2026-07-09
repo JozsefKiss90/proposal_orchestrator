@@ -16,7 +16,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.paths import resolve_repo_path
@@ -30,7 +30,7 @@ from runner.predicates.types import (
 from runner.upstream_inputs import UPSTREAM_REQUIRED_INPUTS
 from runner.versions import MANIFEST_VERSION
 
-PathLike = str | os.PathLike[str]
+PathLike = Union[str, os.PathLike[str]]
 
 # Every GateResult artifact must carry all of these fields with non-null values.
 _MANDATORY_FIELDS: frozenset[str] = frozenset({

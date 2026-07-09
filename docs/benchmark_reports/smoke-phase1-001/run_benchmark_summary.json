@@ -1,0 +1,50 @@
+{
+  "benchmark_schema_version": "1.0.0",
+  "run_id": "smoke-phase1-001",
+  "started_at": "2026-06-02T22:18:09.650154+00:00",
+  "completed_at": "2026-06-02T22:24:16.321141+00:00",
+  "total_invocations": 16,
+  "total_estimated_input_tokens": 416708,
+  "total_estimated_output_tokens": 22131,
+  "total_wall_clock_seconds": 366.671,
+  "node_records": [
+    {
+      "node_id": "n01_call_analysis",
+      "dispatched": true
+    }
+  ],
+  "phase_analytics_summary": {
+    "phases_observed": [
+      1
+    ],
+    "nodes_observed": [
+      "n01_call_analysis"
+    ],
+    "total_invocations": 16
+  },
+  "token_economics_summary": {
+    "total_estimated_input_tokens": 416708,
+    "total_estimated_output_tokens": 22131,
+    "total_estimated_tokens": 438839
+  },
+  "timing_summary": {
+    "total_wall_clock_seconds": 366.671,
+    "mean_invocation_seconds": 22.8222,
+    "median_invocation_seconds": 3.3583
+  },
+  "phase_b_artifact_paths": {
+    "phase_analytics": "phase_analytics.json",
+    "token_economics": "token_economics.json",
+    "timing_profile": "timing_profile.json"
+  },
+  "benchmark_stage": "phase_c_provider_projection",
+  "provider_projection_summary": {
+    "total_providers_evaluated": 0,
+    "suitable_providers": 0,
+    "lowest_projected_cost_usd": null,
+    "lowest_projected_cost_provider": null
+  },
+  "phase_c_artifact_paths": {
+    "provider_projection": "provider_projection.json"
+  }
+}

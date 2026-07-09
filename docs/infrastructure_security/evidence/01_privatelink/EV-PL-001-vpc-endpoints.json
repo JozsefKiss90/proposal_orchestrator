@@ -1,0 +1,65 @@
+﻿{
+    "VpcEndpoints": [
+        {
+            "VpcEndpointId": "vpce-0843d225c5b1ef6d5",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-050a09774560fd774",
+            "ServiceName": "com.amazonaws.us-east-1.bedrock-runtime",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AllowBedrockConverseOnly\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": [\n          \"arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role\",\n          \"arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role\"\n        ]\n      },\n      \"Action\": [\n        \"bedrock:InvokeModel\",\n        \"bedrock:InvokeModelWithResponseStream\"\n      ],\n      \"Resource\": [\n        \"arn:aws:bedrock:*::foundation-model/anthropic.claude-*\",\n        \"arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*\"\n      ]\n    }\n  ]\n}\n",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-023c6e3ea5451ea47",
+                "subnet-01d969bb1421a3042"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-013d5e4d4eb55dfd9",
+                    "GroupName": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-02fc82df7f843ceca",
+                "eni-0d50353eb22bcee15"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1b.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1a.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "bedrock-runtime.us-east-1.amazonaws.com",
+                    "HostedZoneId": "Z02497652TWWZCKLF3X1M"
+                }
+            ],
+            "CreationTimestamp": "2026-05-29T14:50:13.104000+00:00",
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-bedrock-runtime"
+                }
+            ],
+            "OwnerId": "232538551827",
+            "ServiceRegion": "us-east-1"
+        }
+    ]
+}
+

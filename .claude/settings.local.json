@@ -136,7 +136,18 @@
       "Bash(fi)",
       "Bash(echo $ORCHESTRATOR_TRANSPORT_BACKEND)",
       "Bash(echo $ORCHESTRATOR_TRANSPORT_PRESET)",
-      "Bash(find . -not -path ./.git/* -not -path ./node_modules/* -type f)"
+      "Bash(find . -not -path ./.git/* -not -path ./node_modules/* -type f)",
+      "Bash(aws ssm:*)",
+      "Bash(aws s3:*)",
+      "Bash(pip download:*)",
+      "Bash(tar czf:*)",
+      "Bash(nslookup s3.us-east-1.amazonaws.com)",
+      "Bash(nslookup proposal-orchestrator-deploy-232538551827.s3.us-east-1.amazonaws.com)",
+      "Bash(aws ec2:*)",
+      "Bash(aws iam:*)",
+      "Bash(while read:*)",
+      "Bash(do sha256sum:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"docs/infrastructure_security/evidence/11_audit_package/collect_evidence.ps1\" -SkipHostTests)"
     ]
   },
   "enabledMcpjsonServers": [

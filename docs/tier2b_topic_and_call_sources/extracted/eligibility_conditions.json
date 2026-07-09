@@ -28,27 +28,35 @@
       "condition_id": "EC-04",
       "description": "Maximum EU contribution per project is EUR 19,000,000.",
       "condition_type": "budget_limit",
-      "source_section": "max_contribution / expected_eu_contribution",
+      "source_section": "call_entry financial fields (max_contribution / min__contribution)",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-05",
-      "description": "The instrument type is Research and Innovation Actions (RIA). Standard RIA consortium composition rules apply under Horizon Europe General Annexes.",
+      "description": "The instrument type is Research and Innovation Actions (RIA). Standard RIA consortium composition rules apply (minimum 3 independent legal entities from 3 different EU Member States or associated countries).",
       "condition_type": "consortium_composition",
-      "source_section": "call_type / type_of_action",
+      "source_section": "call_entry (call_type / type_of_action)",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
       "status": "Assumed",
-      "assumption_note": "The call slice and curated extract do not explicitly state minimum consortium size or partner type requirements beyond the geographic restriction. RIA instrument type is confirmed; standard Horizon Europe RIA consortium rules (minimum 3 legal entities from 3 different Member States or associated countries) are structurally expected but not explicitly stated in the source documents."
+      "assumption_note": "The call slice and curated extract do not explicitly state a minimum consortium size. The minimum of 3 independent legal entities from 3 different countries is the standard Horizon Europe RIA requirement per General Annex B. This is assumed based on instrument type; must be verified against the applicable General Annex."
     },
     {
       "condition_id": "EC-06",
-      "description": "Open access to research results is expected as per standard Horizon Europe RIA obligations.",
+      "description": "Open access obligations apply as standard for Horizon Europe RIA actions.",
       "condition_type": "open_access",
-      "source_section": "Scope",
+      "source_section": "call_entry (type_of_action)",
       "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
-      "status": "Inferred",
-      "inference_note": "The scope explicitly requires sharing communicable results through the AI-on-demand platform with the European R&D community. This, combined with the RIA instrument type confirmed in the call slice, implies standard Horizon Europe open access obligations apply. The derivation chain is: RIA instrument type (call_type field) + explicit result-sharing mandate (Scope field) → open access obligation."
+      "status": "Assumed",
+      "assumption_note": "Open access requirements are not explicitly stated in the call slice or curated extract but are structurally mandated for all Horizon Europe RIA actions under the Grant Agreement conditions. Assumed based on instrument type; must be verified against the applicable General Annex."
+    },
+    {
+      "condition_id": "EC-07",
+      "description": "Financial support to third parties (FSTP) is permitted: maximum EUR 300,000 per grant at stage 2, maximum EUR 2,250,000 per grant at stage 3, and maximum EUR 2,550,000 per third party.",
+      "condition_type": "other",
+      "source_section": "fstp_provisions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+      "status": "Confirmed"
     }
   ]
 }

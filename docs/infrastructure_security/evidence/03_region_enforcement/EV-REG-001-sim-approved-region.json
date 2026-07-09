@@ -1,0 +1,53 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "bedrock:InvokeModel",
+            "EvalResourceName": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+            "EvalDecision": "allowed",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-bedrock-invoke",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 3,
+                        "Column": 17
+                    },
+                    "EndPosition": {
+                        "Line": 23,
+                        "Column": 6
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
+                    "EvalResourceDecision": "allowed",
+                    "MatchedStatements": [
+                        {
+                            "SourcePolicyId": "proposal-orchestrator-bedrock-invoke",
+                            "SourcePolicyType": "IAM Policy",
+                            "StartPosition": {
+                                "Line": 3,
+                                "Column": 17
+                            },
+                            "EndPosition": {
+                                "Line": 23,
+                                "Column": 6
+                            }
+                        }
+                    ],
+                    "MissingContextValues": [],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}
+

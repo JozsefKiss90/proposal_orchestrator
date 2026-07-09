@@ -1,0 +1,66 @@
+{
+  "run_id": "smoke-phase1-001",
+  "total_estimated_input_tokens": 416708,
+  "total_estimated_output_tokens": 22131,
+  "total_estimated_tokens": 438839,
+  "tokens_by_invocation_type": {
+    "skill_tapm": {
+      "estimated_input_tokens": 416708,
+      "estimated_output_tokens": 22131,
+      "estimated_total_tokens": 438839
+    }
+  },
+  "tokens_by_skill_id": {
+    "call-requirements-extraction": {
+      "estimated_input_tokens": 35264,
+      "estimated_output_tokens": 6659,
+      "estimated_total_tokens": 41923
+    },
+    "evaluation-matrix-builder": {
+      "estimated_input_tokens": 218510,
+      "estimated_output_tokens": 2390,
+      "estimated_total_tokens": 220900
+    },
+    "instrument-schema-normalization": {
+      "estimated_input_tokens": 133893,
+      "estimated_output_tokens": 10154,
+      "estimated_total_tokens": 144047
+    },
+    "topic-scope-check": {
+      "estimated_input_tokens": 29041,
+      "estimated_output_tokens": 2928,
+      "estimated_total_tokens": 31969
+    }
+  },
+  "tokens_by_semantic_predicate_id": {},
+  "largest_invocation_by_estimated_total_tokens": {
+    "invocation_id": "39fc2d73ed864e798e8693becf8c4a96",
+    "skill_id": "evaluation-matrix-builder",
+    "predicate_id": null,
+    "invocation_type": "skill_tapm",
+    "value": 204549
+  },
+  "largest_invocation_by_prompt_chars": {
+    "invocation_id": "39fc2d73ed864e798e8693becf8c4a96",
+    "skill_id": "evaluation-matrix-builder",
+    "predicate_id": null,
+    "invocation_type": "skill_tapm",
+    "value": 243262
+  },
+  "tapm_vs_cli_prompt": {
+    "tapm": {
+      "estimated_input_tokens": 0,
+      "estimated_output_tokens": 0,
+      "estimated_total_tokens": 0
+    },
+    "cli_prompt": {
+      "estimated_input_tokens": 0,
+      "estimated_output_tokens": 0,
+      "estimated_total_tokens": 0
+    }
+  },
+  "phase_8_estimated_total_tokens": 0,
+  "phases_1_7_estimated_total_tokens": 438839,
+  "semantic_predicate_estimated_total_tokens": 0,
+  "warning": "All token values are estimates based on character-to-token ratios. They are not billing-grade."
+}

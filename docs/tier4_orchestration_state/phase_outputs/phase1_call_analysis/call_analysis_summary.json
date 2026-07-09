@@ -1,78 +1,82 @@
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
-  "run_id": "a7f1437e-17d8-420c-a45c-d191373fdee3",
+  "run_id": "smoke-phase1-001",
   "resolved_instrument_type": "RIA",
   "evaluation_matrix": {
     "Excellence": {
       "criterion_id": "Excellence",
       "criterion_name": "Excellence",
       "weight": null,
-      "source_section": "Section 1 — Excellence",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "weight_source": null,
+      "source_section": "Scope / expected_outcome",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
     "Impact": {
       "criterion_id": "Impact",
       "criterion_name": "Impact",
       "weight": null,
-      "source_section": "Section 2 — Impact",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "weight_source": null,
+      "source_section": "Scope / procedure_exceptions / mandatory_cohesion_activities / platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
-    "Implementation": {
-      "criterion_id": "Implementation",
-      "criterion_name": "Implementation",
+    "Quality_and_Efficiency_of_Implementation": {
+      "criterion_id": "Quality_and_Efficiency_of_Implementation",
+      "criterion_name": "Quality and Efficiency of Implementation",
       "weight": null,
-      "source_section": "Section 3 — Implementation",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "weight_source": null,
+      "source_section": "Scope / mandatory_cohesion_activities",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
-    "PortfolioCoverage": {
-      "criterion_id": "PortfolioCoverage",
+    "Portfolio_Coverage": {
+      "criterion_id": "Portfolio_Coverage",
       "criterion_name": "Portfolio Coverage (Sector Balance)",
       "weight": null,
-      "source_section": "Procedural — procedure_exceptions",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "weight_source": null,
+      "source_section": "procedure_exceptions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
     }
   },
   "compliance_checklist": [
     {
       "requirement_id": "CR-01",
-      "description": "Proposal must pass all evaluation thresholds for Excellence, Impact, and Implementation before portfolio coverage selection applies.",
+      "description": "Proposals must address at least one of the three mandatory sectors: healthcare, advanced manufacturing, or in-vehicle autonomous driving. At least one funded proposal per sector must be ensured by the portfolio coverage award procedure exception.",
       "status": "requires_review",
-      "source_section": "Section 1–3 — Threshold scoring",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "source_section": "procedure_exceptions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json"
     },
     {
       "requirement_id": "CR-02",
-      "description": "Minimum threshold score must be achieved for each individual criterion (Excellence, Impact, Implementation) on the 0–5 scale.",
+      "description": "Proposals must include mandatory cohesion activities with ADRA and the GenAI4EU Hub, with explicit task allocation in the work plan.",
       "status": "requires_review",
-      "source_section": "Section 1–3 — Scoring thresholds",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "source_section": "mandatory_cohesion_activities",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
     {
       "requirement_id": "CR-03",
-      "description": "Proposal must meet minimum consortium eligibility requirements (minimum number of independent legal entities from eligible countries).",
+      "description": "Proposals must include qualitative and quantitative KPIs, benchmarking mechanisms, and progress monitoring plans as required by the call scope.",
       "status": "requires_review",
-      "source_section": "Eligibility — Consortium requirements",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "source_section": "Scope / expected_outcome",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
     {
       "requirement_id": "CR-04",
-      "description": "Portfolio coverage procedural rule: at least one proposal per sector (healthcare, advanced manufacturing, in-vehicle autonomous driving) must be funded subject to threshold passage.",
-      "status": "confirmed",
-      "source_section": "Procedural — procedure_exceptions",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "description": "Proposals must demonstrate linkage to AI Factories and EDIH deployment as specified in the call platform requirements.",
+      "status": "requires_review",
+      "source_section": "platform_requirements",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
     {
       "requirement_id": "CR-05",
-      "description": "Proposals must demonstrate contribution to the Apply AI Strategy and plan for deployment via EDIHs and Testing and Experiment Facilities.",
+      "description": "Proposals must build on and reuse public results from previously funded actions where applicable, as required by the call scope.",
       "status": "requires_review",
-      "source_section": "Section 2 — Impact / Scope requirements",
-      "source_document": "ef_he-ria-ia_en.pdf"
+      "source_section": "Scope / mandatory_cohesion_activities",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json"
     },
     {
       "requirement_id": "CR-06",
-      "description": "Proposals must include tasks for ADRA cohesion activities and GenAI4EU Hub collaboration as part of the implementation plan.",
+      "description": "Minimum consortium composition requirements apply per Horizon Europe General Annex B (RIA instrument): at least 3 independent legal entities from 3 different EU Member States or Associated Countries.",
       "status": "requires_review",
-      "source_section": "Section 3 — Implementation / Scope requirements",
+      "source_section": "General Annex B \u2014 Eligibility Conditions",
       "source_document": "ef_he-ria-ia_en.pdf"
     }
   ]

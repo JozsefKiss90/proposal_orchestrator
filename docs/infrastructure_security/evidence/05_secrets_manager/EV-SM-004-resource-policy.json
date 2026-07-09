@@ -1,0 +1,6 @@
+﻿{
+    "ARN": "arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/env-config-eLye1o",
+    "Name": "proposal-orchestrator/env-config",
+    "ResourcePolicy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"AllowBedrockRoleAccess\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role\"\n    },\n    \"Action\" : [ \"secretsmanager:GetSecretValue\", \"secretsmanager:DescribeSecret\" ],\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"AllowValidationHostRoleAccess\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role\"\n    },\n    \"Action\" : [ \"secretsmanager:GetSecretValue\", \"secretsmanager:DescribeSecret\" ],\n    \"Resource\" : \"*\"\n  } ]\n}"
+}
+

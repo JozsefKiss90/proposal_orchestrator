@@ -1,0 +1,53 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "bedrock:InvokeModel",
+            "EvalResourceName": "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-1-70b-instruct-v1:0",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-explicit-deny",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 32,
+                        "Column": 6
+                    },
+                    "EndPosition": {
+                        "Line": 44,
+                        "Column": 6
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": true
+            },
+            "EvalDecisionDetails": {},
+            "ResourceSpecificResults": [
+                {
+                    "EvalResourceName": "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-1-70b-instruct-v1:0",
+                    "EvalResourceDecision": "explicitDeny",
+                    "MatchedStatements": [
+                        {
+                            "SourcePolicyId": "proposal-orchestrator-explicit-deny",
+                            "SourcePolicyType": "IAM Policy",
+                            "StartPosition": {
+                                "Line": 32,
+                                "Column": 6
+                            },
+                            "EndPosition": {
+                                "Line": 44,
+                                "Column": 6
+                            }
+                        }
+                    ],
+                    "MissingContextValues": [],
+                    "PermissionsBoundaryDecisionDetail": {
+                        "AllowedByPermissionsBoundary": true
+                    }
+                }
+            ]
+        }
+    ]
+}
+

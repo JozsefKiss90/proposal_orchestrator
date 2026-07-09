@@ -1,0 +1,44 @@
+﻿{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-076f724aed2429771",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "232538551827",
+                            "GroupId": "sg-013d5e4d4eb55dfd9"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": [
+                        {
+                            "PrefixListId": "pl-63a5400a"
+                        }
+                    ]
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-host-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-076f724aed2429771",
+            "OwnerId": "232538551827",
+            "GroupName": "proposal-orchestrator-host-sg",
+            "Description": "Security group for Proposal Orchestrator deployment host",
+            "IpPermissions": []
+        }
+    ]
+}
+

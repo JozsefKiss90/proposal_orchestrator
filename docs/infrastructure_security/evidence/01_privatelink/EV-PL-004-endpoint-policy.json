@@ -1,0 +1,4 @@
+﻿[
+    "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AllowBedrockConverseOnly\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\": [\n          \"arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role\",\n          \"arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role\"\n        ]\n      },\n      \"Action\": [\n        \"bedrock:InvokeModel\",\n        \"bedrock:InvokeModelWithResponseStream\"\n      ],\n      \"Resource\": [\n        \"arn:aws:bedrock:*::foundation-model/anthropic.claude-*\",\n        \"arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*\"\n      ]\n    }\n  ]\n}\n"
+]
+

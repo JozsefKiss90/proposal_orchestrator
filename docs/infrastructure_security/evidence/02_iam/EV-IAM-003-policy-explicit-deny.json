@@ -1,0 +1,54 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "DenyBedrockAdministration",
+                    "Effect": "Deny",
+                    "Action": [
+                        "bedrock:CreateModelCustomizationJob",
+                        "bedrock:CreateProvisionedModelThroughput",
+                        "bedrock:DeleteModelInvocationLoggingConfiguration",
+                        "bedrock:PutModelInvocationLoggingConfiguration",
+                        "bedrock:CreateGuardrail",
+                        "bedrock:DeleteGuardrail",
+                        "bedrock:TagResource",
+                        "bedrock:UntagResource"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Sid": "DenyNonBedrockServices",
+                    "Effect": "Deny",
+                    "Action": [
+                        "ec2:*",
+                        "s3:*",
+                        "iam:*",
+                        "lambda:*",
+                        "sqs:*",
+                        "sns:*",
+                        "dynamodb:*"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Sid": "DenyNonClaudeModels",
+                    "Effect": "Deny",
+                    "Action": [
+                        "bedrock:InvokeModel",
+                        "bedrock:InvokeModelWithResponseStream"
+                    ],
+                    "NotResource": [
+                        "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                        "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*"
+                    ]
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-05-29T17:47:33+00:00"
+    }
+}
+
