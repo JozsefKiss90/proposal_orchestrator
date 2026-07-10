@@ -3,29 +3,38 @@
 > **Purpose.** This is the seed document for a `/grilling` session (`.claude/skills/grill-me` → `.claude/skills/grilling`). It states the problems, the proposed solutions, an implementation-and-purge plan, and — most importantly — a **decision tree** in which every node carries a *recommended answer*. During grilling we walk the tree one decision at a time, resolving dependencies before moving on. Nothing here is enacted until we reach shared understanding and you confirm.
 >
 > **Scope confirmed with the operator (2026-07-09):**
-> 1. Target instrument is treated as an **open fork** (Decision D1, the root); Phase 8 is designed instrument-parameterised.
+> 1. The root decision was reframed from instrument to **goal** and **resolved to G3** (see ratifications below and D1); Phase 8 is designed instrument-parameterised so G2 stays reachable.
 > 2. This brief includes a **sequenced implementation plan and an exact purge/retain manifest** (nothing executed here).
 > 3. The Obsidian graph is an **authoring surface + deterministic compiler to canonical JSON**; the DAG runner's runtime contracts stay unchanged.
 > 4. The Obsidian integration is **call-agnostic and configurable across all projects** — a generic template/schema/compiler that a per-project vault instantiates — mirroring the orchestrator's §2 agnosticism. Added on operator instruction, 2026-07-09; see §2.7 and D15–D16.
 >
 > **Constitutional note.** Several proposed changes touch `CLAUDE.md` (§8 budget, §17 runtime, phase/gate definitions). Per §14, constitutional amendments require explicit human instruction. Where a change is constitutional, it is tagged **[AMENDMENT]** and must be ratified before implementation, not folded in silently.
+>
+> **Grilling ratifications — v2 (2026-07-09).** This document has been through a `/grilling` pass with four parallel fact-check agents. Ratified changes are folded into v2:
+> - **Root decision reframed instrument → goal.** Live goal = **G3**: instrument-parameterise, run the MSCA project end-to-end *now*, keep a full 40–50 pp RIA proposal reachable as a later demo with its own real project (D1).
+> - **"Done" = an honestly blocked proposal**, not an all-green run (§12.4/§15). D14 is subordinate to D11 — honesty wins.
+> - **The Obsidian graph is decoupled from the length fix.** Decomposed `enrich_artifact`-style drafting (already shipping in Phases 5–6) carries length on its own; the graph earns its place on authoring, traceability, and multi-project agnosticism — not on length (§2, D2).
+> - **Fact corrections** (verified on disk): ELTE-as-host is *refuted*, not merely unconfirmed ("do not invent a role"); "MSCA-PF" is an *inference*, one of five MSCA forms on disk; the drafting ceilings are mostly *soft* prompt guidance (only `< 20 KB JSON` is imperative); the canonical-preservation gates are *contradiction detectors*, not completeness requirers (more prose = harder, not easier); **no chunked writer exists**; `MSCA/` is an *embedded git repo* and we are on branch `AWS_deployment`; **Dataview is installed but not enabled**. Details inline and in Appendix A.
 
 ---
 
 ## 0. TL;DR (the thesis to attack)
 
-The orchestrator does not under-produce Part B because of the schema or the gates. It under-produces because **each drafting skill is a single Claude-transport invocation capped at ~18–20 KB of JSON** ("3–5 concise sentences per sub-section"). The gates enforce *structure, traceability, and canonical-term preservation* — **none of them enforce a length minimum**, and several *canonical-preservation* predicates actually get **easier** as prose gets longer and more complete.
+Two problems hide under "Part B is too short," and the grilling separated them:
 
-So the path to full-scale (up to the active instrument's hard page limit) is:
+**Transport (soft, cheap).** Each drafting skill is one `claude -p` call whose *only* hard limit is "total JSON < 20 KB"; the "3–5 sentences per sub-section" rules are soft prompt guidance. The Phase 8 gates enforce structure, traceability, and canonical-term preservation — **no length minimum anywhere across the 89 predicates**. So lifting length is cheap: raise the soft caps and split drafting into bounded units. This does **not** require the Obsidian subsystem — decomposed `enrich_artifact`-style drafting already ships in Phases 5–6.
 
-1. **Decouple authoring from the transport ceiling.** Full Part B prose is authored/curated as Obsidian graph nodes (the natural home for evaluator-facing narrative), not squeezed through one sub-20 KB skill call.
-2. **Keep the Tier 5 JSON schema as the validator contract.** A deterministic compiler *extracts* the section artifacts (`sub_sections[]`, `word_count`, `validation_status.claim_statuses[]`, `traceability_footer`) from the graph, carrying provenance from graph front-matter (`source_refs`, `evidence_strength`) into the exact fields the gates read. Runtime contracts (Section 17) are untouched.
-3. **Make the whole thing instrument-parameterised**, because the live target (MSCA, single-researcher) is a different instrument from the demo (RIA, 8-partner consortium), with different sections, a different page limit, and a *different budget regime* (unit costs, not lump sum).
-4. **Purge the MAESTRO instantiation** from Tier 3/4/5 (and the call-specific Tier 2B/2A extracts) and re-instantiate from the MSCA vault — honestly, which means most MSCA project facts start life flagged `unconfirmed`, and the gates *should* block finalization until they are confirmed. That is the constitution working, not failing.
+**Substance (binding, hard).** Honest 40 pp needs 40 pp of *grounded* Tier 3. MAESTRO is fictional (and slated for purge); the MSCA vault is `source_grounded` on methodology but its researcher, host, and call are unconfirmed or absent. No prompt-ceiling change manufactures grounded content. **This is the real constraint**, and it is why the honest-block behaviour is the headline, not the page count.
 
-5. **Keep the graph layer itself generic.** The whole Obsidian integration is a call-agnostic engine capability — a generic schema/taxonomy/compiler configured per project — that the MSCA vault merely *instantiates*. It ships empty and project-neutral, exactly like the tiers (§2.7).
+So the plan, reframed:
 
-If that thesis is wrong, the cheapest place to break it is Section 2 (the length root-cause) and Section 3 (the validator contract).
+1. **Pick the goal, not the instrument.** Root decision is **G3** (D1): instrument-parameterise; run the MSCA project honestly now; keep 40–50 pp RIA reachable later with a real consortium project.
+2. **Fix length with decomposed drafting, independent of the graph.** Bounded per-unit skill calls + runtime merge, raising the soft caps. A chunked writer is *new* runtime (none exists) and only needed if a single unit must exceed 20 KB — likely avoidable.
+3. **Keep the Tier 5 JSON schema as the validator contract.** Whatever authors the prose, the section artifacts (`sub_sections[]`, `word_count`, `validation_status.claim_statuses[]`, `traceability_footer`) must carry provenance into the exact fields the gates read. Because the canonical gates are contradiction *detectors*, the canonical reference pack must come from the *same* source as the prose (D13, now load-bearing).
+4. **Re-instantiate from the MSCA vault honestly.** Most people/call facts start `unconfirmed`; the gates *should* block finalization until confirmed. A proposal blocked on named gaps is a correct output — the demo's headline (D11, D14, D17).
+5. **The Obsidian graph is a separate, call-agnostic track** justified by authoring ergonomics, traceability, and multi-project reuse (§2.7, D15–D16) — not by length. It ships empty and project-neutral; the MSCA vault is instance #1.
+
+If the thesis is wrong, the cheapest place to break it is the transport-vs-substance split (§1.2–1.3) and the goal fork (D1).
 
 ---
 
@@ -43,7 +52,7 @@ All paths and numbers below were read from the repository on 2026-07-09. Confide
 | Assembled draft | `…/assembled_drafts/part_b_assembled_draft.json` | — | `sections[]` (by reference) + `consistency_log[]` |
 | Review packet | `…/review_packets/review_packet.json` | — | `findings[]` (severity), `revision_actions[]` |
 
-The three sections total well under ~3,000 words of prose. A RIA/IA Part B hard limit is **40 pages (45 for lump-sum)** — `section_schema_registry.json → part_b_page_limit_hard: 40`. That is the ~10× gap the operator describes. (For MSCA-PF the relevant limit is different — see D1.)
+The three sections total ~3,350 words (Excellence 950, Impact 730, Implementation 1,670). A RIA/IA Part B hard limit is **40 pages (45 for lump-sum)** — `section_schema_registry.json → part_b_page_limit_hard: 40`. That is the ~10× gap the operator describes. (For an MSCA action the relevant limit is different and shorter — see D1.)
 
 ### 1.2 Why it is short — the real root cause
 
@@ -55,7 +64,7 @@ The cap is in the **drafting skills**, not the schema or gates:
 | `impact-section-drafting.md` | **< 18,000 chars** | content < 2,000 chars |
 | `implementation-section-drafting.md` | **< 20,000 chars** | content < 2,000 chars; "one paragraph per partner" |
 
-These ceilings exist for a sound architectural reason (Section 17.5): a skill is one `claude -p` call that returns **one JSON object**, which Python then parses, `_validate_skill_output()`s, and `_atomic_write()`s. A 40-page section cannot survive that path as a single response without truncation/parse risk. **The ceiling is a transport constraint, not a quality decision** — which is exactly why we can lift the length without touching the gate logic.
+These ceilings exist for a sound architectural reason (Section 17.5): a skill is one `claude -p` call that returns **one JSON object**, which Python then parses, `_validate_skill_output()`s, and `_atomic_write()`s. **But only the `< 20 KB total JSON` line is imperative** — the per-sub-section "3–5 sentences" / "< 2,000–2,500 chars" rules are *soft prompt guidance* to the writer agent; nothing downstream enforces them (confirmed against `phase8_section_predicates.py`). So the transport ceiling is real but shallow: raising the soft caps is close to a one-line prompt change, and exceeding 20 KB per section is handled by splitting drafting into bounded units (D2/D5), not a rewrite. **The ceiling is a transport constraint, not a quality decision — and not the binding constraint on a full-length proposal** (that is substance; §1.4 and Section 6).
 
 ### 1.3 What the Phase 8 gates actually check (the contract we must not break)
 
@@ -74,15 +83,15 @@ From `gate_rules_library.yaml` (gates `gate_10a/b/c` completeness, `gate_10d` co
 - **Implementation-specific** — `wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`.
 - **Assembly/review** — `gate_10d` cross-section consistency; `gate_11` findings-by-severity + non-empty `revision_actions`; `gate_12` final constitutional compliance.
 
-**Key consequence for the design:** longer, more complete prose makes the *canonical-preservation* predicates **easier** (more room to spell out full legal names, full targets). The predicate that gets **harder** at 40 pages is the constitutional one — *no fabricated facts; everything traceable to Tier 1–4*. That is the real budget we spend when we scale length, and it is the reason the graph's provenance metadata (`source_refs`, `evidence_strength`) has to flow into `claim_statuses` and `traceability_footer`.
+**Key consequence for the design (corrected in grilling — I had this backwards).** The canonical-preservation predicates in `phase8_section_predicates.py` are **contradiction detectors, not completeness requirers**: `partner_names_preserved` does *not* demand a legal name beside every short name — it fires when a short name is conflated with the *wrong* legal name. So longer prose is **harder**, not easier: more text = more surface for a contradictory apposition. Two consequences: (i) the binding constraint on length remains the constitutional one — *no fabricated facts; everything traceable to Tier 1–4*; and (ii) the canonical reference pack must be generated from the **same** source as the prose, or the two drift into exactly the contradictions these gates catch — which promotes D13 from nice-to-have to **load-bearing**, and makes graph provenance (`source_refs`, `evidence_strength`) flowing into `claim_statuses`/`traceability_footer` a correctness requirement, not a nicety.
 
 ### 1.4 The demo project vs the live target (the mismatch that drives everything)
 
 | | Demo (in `docs/` now) | Live target (`MSCA/` vault) |
 |---|---|---|
 | Project | **MAESTRO** — multi-agent AI orchestration (fictional) | Crop water-stress monitoring & irrigation decision support (real, "MSCA-style") |
-| Instrument | **RIA** (`selected_call.json → HORIZON-CL4-2026-05`, `instrument_type: RIA`) | MSCA — most consistent with **Postdoctoral Fellowship (PF)**: PI + host (ELTE) + associated partner (AgroVIR) |
-| Consortium | 8 partners (ATU, BIIS, CERIA, …) with legal names, roles | **Largely unconfirmed** — "AgroVIR-*like*" partner only; "ELTE does not appear in any source"; PI inferred from authorship |
+| Instrument | **RIA** (`selected_call.json → HORIZON-CL4-2026-05`, `instrument_type: RIA`) | **"MSCA-style"** (the vault's own word). PF is the likeliest of *five* MSCA forms on disk (`pf/dn/se/cofund/cofund-ce`) but is itself an **inference**, not a vault statement — to be confirmed, not assumed |
+| Spine / consortium | 8 partners (ATU, BIIS, CERIA, …) with legal names, roles | Researcher-at-a-host spine is *definitional* for a fellowship, yet **all three of researcher, host, supervisor are unconfirmed or absent**. **ELTE-as-host is refuted, not merely unconfirmed** — `ELTE Role.md`: "ELTE not mentioned in any source; do not invent a role." AgroVIR appears only as "AgroVIR-*like*"; PI inferred from authorship |
 | Part B length | 40 pp (45 lump-sum) | MSCA-PF B1 is materially shorter (~10 pp) with a different section set |
 | Budget | Lump-sum planner integration (placeholder response present) | MSCA is **unit-cost** (living/mobility/family + institutional unit costs) — the lump-sum gate does not apply as-is |
 
@@ -95,11 +104,11 @@ Two facts make this more than a content swap:
 
 ### 1.5 The Obsidian graph today
 
-`MSCA/methodology_graph/` is a mature Obsidian vault (Dataview + Smart Connections plugins) of ~90 nodes across numbered folders `00_meta … 10_research_questions`, `90_dashboards`, `99_governance`. It covers **methodology only** — core architecture, state of the art, routes, decision framework, infrastructure, risks/SWOT, partners, terminology, research questions. Governance is explicit:
+`MSCA/methodology_graph/` is a mature Obsidian vault of **87 nodes across 13 folders** (`00_meta … 10_research_questions`, `90_dashboards`, `99_governance`). It covers **methodology only** — core architecture, state of the art, routes, decision framework, infrastructure, risks/SWOT, partners, terminology, research questions. Governance is explicit:
 
 - **`Methodology Graph Schema`** fixes a YAML front-matter contract for every node: `id` (`METH-<CAT>-<NNN>`), `node_type` (controlled vocab), `evidence_strength` ∈ {`source_grounded`, `synthesis`, `inference`, `unconfirmed`}, `confidence`, `maturity`, `source_refs`, `evidence_basis`, `upstream_nodes`/`downstream_nodes`/`related_nodes`, `open_questions`, `validation_needs`, etc.
 - **Wikilinks resolve by basename**; every node links up to a hub and cites ≥1 source.
-- **Dashboards** are Dataview queries over `#methodology-graph`.
+- **Dashboards** are Dataview queries over `#methodology-graph` — but **Dataview is installed and *not enabled*** (only Smart Connections is enabled in `community-plugins.json`), so every dashboard is currently inert. Enabling Dataview is a prerequisite for the graph track, not an afterthought.
 
 **The load-bearing alignment:** the graph's `evidence_strength` taxonomy is essentially the constitution's validation taxonomy (§12.2):
 
@@ -128,6 +137,8 @@ Introduce an **instrument profile** resolved from `selected_call.json → instru
 The criterion-aligned n08a/n08b/n08c DAG maps cleanly to *both* (MSCA-PF B1 is literally an Excellence/Impact/Implementation triptych), so the DAG topology does not change — only the profile behind it.
 
 ### 2.2 Author full prose in the graph; **extract** the JSON (the operator's instinct, made precise)
+
+> **Decoupling note (v2).** This graph-as-author path is the *steady-state* model for substance and traceability — it is **not** the length fix. Length is solved separately and first by decomposed drafting (D2b), with no graph dependency. Everything in §2.2–§2.4 belongs to the graph track (§2.7), sequenced after the length fix.
 
 Retain the Tier 5 section schemas as the validator contract. Move authoring of the evaluator-facing narrative into the graph as new `proposal_section` nodes (one per sub-section). A **deterministic compiler** (Section 2.4) then produces `excellence_section.json` etc. by extraction, not generation:
 
@@ -228,15 +239,15 @@ The graph integration is an **engine capability, not an MSCA artifact**. It is a
 
 Walk top-to-bottom; children assume their parent is resolved. Each node states the question, why it matters, dependencies, options, and a **Recommended** answer to react to.
 
-### D1 — Target instrument for the live MSCA run *(root; unlocks D2, D5, D11, D12, D14)*
+### D1 — Live goal (root; **RESOLVED: G3**) *(reframed from "instrument"; unlocks D2, D11, D12, D14, D17)*
 
-Why it matters: sets page target, section set, budget regime, and whether the WP/governance phases apply.
+The grilling exposed that the original "which instrument?" hid the decision that matters — the *goal*. Instrument follows from it.
 
-- **(a)** MSCA Postdoctoral Fellowship — matches the project shape; ~10 pp B1; needs MSCA Tier 2A extraction; unit-cost budget (lump-sum gate N/A).
-- **(b)** Keep RIA/IA — reuse existing Tier 2A; 40–45 pp; but forces a single-fellow project into a multi-partner consortium schema (fabrication pressure).
-- **(c)** Another MSCA action (DN/SE/COFUND) — different again; not supported by the vault's single-PI framing.
+- **G1** — run the engine end-to-end, honestly, on the real project. Ends in an honest block (unconfirmed researcher/host/call), not green. Smallest scope.
+- **G2** — demonstrate a full 40–50 pp proposal. Needs a real consortium-grade project; neither fictional MAESTRO nor the thin crop vault qualifies. The blocking task is *sourcing a project*, not engineering.
+- **G3** — both, sequential: instrument-parameterise, ship the honest MSCA run now, keep 40 pp-RIA reachable as a later demo with its own project.
 
-**Recommended: (a) MSCA-PF**, *and* build Phase 8 instrument-parameterised (§2.1) so the same machinery still demonstrates a 40–45 pp RIA later. Rationale: the vault is unambiguously a single-researcher fellowship; (b) would require inventing consortium facts, which §13.3 forbids. If the *demo goal* is specifically "show 40–50 pp," raise that now — it changes the recommendation toward keeping RIA with a *different, consortium-grade* project rather than the MSCA one.
+**Resolved: G3** (operator, 2026-07-09). Consequences: (i) "full-scale" means *up to the active instrument's limit*, not 40 pp by default; (ii) the instrument is now a **sub-decision**, not the root — for the live run, target the actual MSCA action the operator will submit to (PF is likely but unconfirmed; do not hard-code it); (iii) even the *call* and the *researcher/host* are unconfirmed inputs, so the honest block may land early unless a minimal confirmed spine is gathered first (D17). Instrument-parameterisation (§2.1) is retained precisely so G2 stays reachable without rework.
 
 ### D2 — Phase 8 content-production model *(depends on D1)*
 
@@ -244,14 +255,14 @@ Why it matters: sets page target, section set, budget regime, and whether the WP
 - **(b)** Decomposed multi-invocation drafting (one skill call per sub-section/WP, then merge — mirrors the existing Phase 5/6 `enrich_artifact` pattern).
 - **(c)** Hybrid: graph is the source of truth; where a sub-section is not yet authored, a decomposed drafting skill proposes a draft *into the graph* for human curation.
 
-**Recommended: (c) Hybrid**, with (a) as the steady state. The graph holds the authoritative prose; decomposed drafting is the "cold-start" helper that never writes Tier 5 directly — it writes graph nodes a human then blesses. Keeps humans in the evaluator-quality loop and keeps every transport call bounded.
+**Recommended: (b) now, (c) later.** The grilling established the length fix is **(b) alone** — decomposed `enrich_artifact`-style drafting already ships (Phase 5 `impact-dec-enricher`, Phase 6 `risk-register-builder`): base artifact + compact JSON patch + runtime merge, every call bounded. That closes the transport gap with existing machinery and **no graph dependency**. (a)/(c) — graph as the authoritative prose source with drafting as a cold-start helper that writes *into* the graph for human blessing — is the better steady state for *substance and traceability*, but it rides on the separate graph track (§2.7) and must not be a prerequisite for fixing length. Sequence: ship (b); adopt (c) when the graph track lands.
 
 ### D3 — What `sub_sections[].content` holds, and how it is written *(depends on D2)*
 
 - **(a)** Full prose in `content`; runtime does a chunked/streamed atomic write to escape the 20 KB response ceiling.
 - **(b)** `content` holds a faithful extract/summary; full prose lives only in the graph and the exported Part B document; add `content_ref`.
 
-**Recommended: (a)** — validators must see the real text (esp. `measurable_targets_preserved`, `canonical_terms_preserved`). Add optional `source_nodes` for provenance. Implement a chunked writer in `skill_runtime.py` for extraction outputs only.
+**Recommended: (a)** — validators must see the real text (esp. `measurable_targets_preserved`, `canonical_terms_preserved`). Add optional `source_nodes` for provenance. **Caveat banked in grilling:** no chunked writer exists today — every path funnels through `_atomic_write` — so a chunked/streamed writer in `skill_runtime.py` is *genuinely new runtime*, not an additive tweak. It is only needed if a single bounded unit must exceed 20 KB; with per-unit decomposition (D5), most sections avoid it, so treat the chunked writer as **optional/deferred**, not Stage-1 work.
 
 ### D4 — Schema versioning *(depends on D3)*
 
@@ -277,7 +288,7 @@ The invariant: no field is authored in both directions. **Recommended:** `graph_
 - **(a)** Extend `MSCA/methodology_graph/` in place (rename conceptually to "proposal graph").
 - **(b)** New `MSCA/proposal_graph/` vault cross-linked to the methodology one.
 
-**Recommended: (a) one vault per project** — for the MSCA instance keep a single graph (one dashboard set, one link namespace; add folders `11…18`); the methodology content becomes the Excellence/§B.1.2 evidence base rather than a separate island. Per §2.7 this vault is **reference instance #1 of a call-agnostic template**, not a bespoke structure; where the *generic* template lives is D16.
+**Recommended: (a) one vault per project** — for the MSCA instance keep a single graph (one dashboard set, one link namespace; add folders `11…18`); the methodology content becomes the Excellence/§B.1.2 evidence base rather than a separate island. Per §2.7 this vault is **reference instance #1 of a call-agnostic template**, not a bespoke structure; where the *generic* template lives is D16. **Grilling caveat:** `MSCA/` is an *embedded git repo* (its own `.git`, no `.gitmodules` — a gitlink), so "extend the folder in place" actually edits a nested repository with its own history and its own scoped skills; placement and versioning must treat it as a submodule-like boundary, not a plain subfolder.
 
 ### D9 — Compiler placement in the run *(depends on D2, D6)*
 
@@ -288,7 +299,7 @@ The invariant: no field is authored in both directions. **Recommended:** `graph_
 - **(a)** Hard-delete MAESTRO artifacts from Tier 3/4/5 + call-specific extracts.
 - **(b)** Snapshot to a git branch/tag first, then reset to empty skeletons.
 
-**Recommended: (b)** — `git switch -c archive/maestro-demo && git commit`, tag it, then reset on `main`. Non-destructive, reproducible, and the demo stays runnable for regression. Detailed manifest in Section 5.
+**Recommended: (b), reworked for the real repo state.** Grilling found the plan was written against a state that doesn't exist: we are on branch **`AWS_deployment`** (ahead of origin by 3), **not `main`**; `archive/maestro-demo` does not exist; and **`MSCA/` is an embedded repo** (gitlink). So: snapshot from the *current* branch (`git switch -c archive/maestro-demo` from `AWS_deployment`), commit/tag, then reset the MAESTRO instantiation per Section 5 — and handle the `MSCA/` gitlink explicitly (commit inside the nested repo, or convert to a proper submodule) so its history isn't silently orphaned. Detailed manifest in Section 5.
 
 ### D11 — Unconfirmed MSCA facts *(depends on D1)*
 
@@ -309,11 +320,11 @@ The vault says partners are unconfirmed (ELTE absent from sources; AgroVIR only 
 
 The gate compares prose against `canonical_reference_pack.json`. At 40 pp the pack must be complete.
 
-**Recommended:** generate the pack from the graph's confirmed nodes as part of compilation, so canonical names/targets/deliverables come from the same source as the prose — eliminating drift between what is written and what is checked.
+**Recommended (now load-bearing, per the §1.3 correction):** generate the pack from the *same* source as the prose (confirmed graph nodes) as part of compilation. Because the canonical gates are contradiction detectors, any drift between pack and prose is exactly what fails them — so a shared source is not an optimisation, it is what keeps full-length sections green. If length is fixed by decomposed drafting *without* the graph (D2b), the pack must instead be generated from the same Tier 3/Tier 4 JSON the drafting reads.
 
 ### D14 — Definition of done for "full-scale, end-to-end" *(depends on D1)*
 
-**Recommended:** a single `--from-graph` run for the MSCA-PF call that (i) compiles graph→docs, (ii) passes Phases 1–7 with confirmed-or-flagged Tier 3, (iii) produces B1 sections at the profile's page target with all Phase 8 gates green, (iv) exports a human-readable Part B (`docx`/`pdf`), and (v) leaves every claim traceable to a graph node. Anything still `unconfirmed` is surfaced, not hidden.
+**Recommended (subordinate to D11 — honesty wins):** under G3, "done" for the live run is **not** all-green. It is: the engine runs the *source-grounded* methodology through Phases 1–7, drafts what the confirmed Tier 3 supports, and then **blocks precisely on the named unconfirmed facts** (researcher, host, call), naming each gap. A legitimately blocked proposal is a correct terminal state (§12.4, §15) and is the demo's headline. The all-green `--from-graph` run at the profile's page target is the **G2** definition of done, reached later once a real project fills the pages. Both export a human-readable Part B (`docx`/`pdf`) with every claim traceable to its source node; anything `unconfirmed` is surfaced, not hidden.
 
 ### D15 — Config-driven binding mechanism *(new; depends on D6, D9)*
 
@@ -333,6 +344,15 @@ Where does the reusable template live, and how is a new project's graph created?
 
 **Recommended: (a)** — a scaffolding skill is what makes "configurable across all projects" real, and keeps every instance schema-conformant from birth. The MSCA vault's `Methodology Graph Schema` node is already ~90% generic; generalize it *into* the template, then re-stamp MSCA as instance #1.
 
+### D17 — Depth of the honest block (minimal confirmed spine) *(new; depends on D1 = G3)*
+
+G3 + honesty-wins adds a task the first brief lacked: how much *confirmed* Tier 3 to gather before the run, so the block lands somewhere **informative** rather than at the door. A naive run blocks at Phase 1 (no `selected_call`) or Phase 2 (no researcher/host) — honest, but a boring demo.
+
+- **(a)** Gather a minimal confirmed spine first — a real MSCA call, a real researcher, a real host — so the engine visibly does call analysis, concept alignment, and WP/impact architecture on the `source_grounded` methodology, then blocks only on what is genuinely open.
+- **(b)** Run immediately on today's vault and accept an early, shallow block as the first honest iteration.
+
+**Recommended: (a)** — the value of the honest-block demo scales with how deep it lands. The methodology is the strong, `source_grounded` part of the vault; the people and the call are the gaps. A good demo runs the former and blocks on the latter. This also gives the graph track its first concrete job: author the confirmed methodology substance and mark researcher/host/call as explicit `unconfirmed` placeholders so the block is legible, not a crash.
+
 ---
 
 ## 4. Sequenced implementation plan
@@ -341,11 +361,11 @@ Ordered so each stage is independently verifiable and nothing is executed before
 
 **Stage 0 — Ratify constitutional changes (blocks everything instrument-related).** Draft §14 amendment records for D12 (budget regime) and any phase/gate scope change from D1. Human sign-off. *Verify:* amendment records exist in `CLAUDE.md`; affected workflows reviewed (§14.3).
 
-**Stage 1 — Snapshot & purge (D10).** Branch `archive/maestro-demo`, tag, then reset the MAESTRO instantiation per the Section 5 manifest. *Verify:* `git status` clean on `main`; purged paths are empty skeletons; archive branch runs the old demo.
+**Stage 1 — Snapshot & purge (D10).** From the *current* branch (`AWS_deployment`, not `main`), create + tag `archive/maestro-demo`; handle the embedded `MSCA/` gitlink explicitly (nested commit or convert to submodule); then reset the MAESTRO instantiation per the Section 5 manifest. *Verify:* archive branch runs the old demo; `MSCA/` history preserved, not orphaned; purged paths are empty skeletons.
 
-**Stage 2 — Instrument profile + MSCA Tier 2A/2B extraction (D1).** Add an `instrument_profile` resolver keyed on `selected_call.json`. Extract MSCA-PF Tier 2A (`section_schema_registry`, `evaluator_expectation_registry`, `instrument_registry`, page limit) from `af_he-msca-pf_en.pdf`; re-derive Tier 2B extracts from the MSCA work programme for the chosen call. *Verify:* Phase 1 gate passes for the MSCA call; `instrument_registry.json` non-empty; page limit reflects MSCA-PF.
+**Stage 2 — Instrument profile + MSCA Tier 2A/2B extraction (D1).** First **confirm the actual MSCA action + call** the operator will submit to (PF likely, not assumed). Add an `instrument_profile` resolver keyed on `selected_call.json`. Extract that action's Tier 2A (`section_schema_registry`, `evaluator_expectation_registry`, `instrument_registry`, page limit) from its form PDF (e.g. `af_he-msca-pf_en.pdf`); re-derive Tier 2B extracts from the MSCA work programme for the chosen call. *Verify:* Phase 1 gate passes for the MSCA call; `instrument_registry.json` non-empty; page limit **read from the form, not assumed**.
 
-**Stage 3 — Generic graph template + config (D7, D8, D15, D16).** Generalize the methodology schema into a call-agnostic template: schema spec + folder taxonomy `11…18` + dashboard *templates* + `graph.config.yaml` template + optional `obsidian-graph` scaffolding skill. Re-stamp `MSCA/methodology_graph/` as instance #1 conforming to it. *Verify:* Dataview dashboards render; schema-lint passes; the **"no project nouns" lint passes on the generic layer**; a throwaway second instance scaffolds and compiles cleanly with only its config changed.
+**Stage 3 — Generic graph template + config (D7, D8, D15, D16).** Generalize the methodology schema into a call-agnostic template: schema spec + folder taxonomy `11…18` + dashboard *templates* + `graph.config.yaml` template + optional `obsidian-graph` scaffolding skill. **Enable Dataview** in `community-plugins.json` (currently installed but disabled), then re-stamp `MSCA/methodology_graph/` as instance #1 conforming to the template. *Verify:* Dataview dashboards render (they are inert until Dataview is enabled); schema-lint passes; the **"no project nouns" lint passes on the generic layer**; a throwaway second instance scaffolds and compiles cleanly with only its config changed.
 
 **Stage 4 — Compiler + projector (D6, D9).** Build `runner/graph_compiler.py` (graph→docs, deterministic, pre-Call-Slicer, `--from-graph`) and the `docs_to_graph` projector for Tier 4/gate mirror nodes. *Verify:* compile is idempotent (byte-stable re-emit); compile report maps every node→artifact; `sync_direction` lint passes; **no Section 17 module touched**.
 
@@ -353,7 +373,7 @@ Ordered so each stage is independently verifiable and nothing is executed before
 
 **Stage 6 — Phase 8 extraction path (D2, D3, D4, D5, D13).** Add the extraction skill(s) that read `17` nodes and emit section JSON; add the chunked writer; generate `canonical_reference_pack.json` from the graph. Keep decomposed drafting as the cold-start helper writing *into the graph*. *Verify:* section JSONs validate against schema; all `gate_10a/b/c` predicates green on full-length content; `canonical_*_preserved` pass.
 
-**Stage 7 — End-to-end MSCA run + export (D14).** `--from-graph` run for the MSCA-PF call through Phases 1–8; export Part B to `docx`/`pdf`. *Verify:* all gates green or honestly blocked on named unconfirmed facts; exported page count within the profile limit; spot-check 10 claims trace to graph nodes. **Use a subagent to re-verify traceability independently.**
+**Stage 7 — End-to-end MSCA run + export (D14, D17).** `--from-graph` run for the confirmed MSCA call through Phases 1–8; export Part B to `docx`/`pdf`. *Verify (per D14):* every gate is **green or honestly blocked on a named unconfirmed fact** — a legitimate block is a pass, not a failure; exported page count within the profile limit; spot-check 10 claims trace to graph nodes. **Use a subagent to re-verify traceability independently.**
 
 ---
 
@@ -410,7 +430,7 @@ After reset, run `python -m runner --run-id <uuid> --phase 1 --dry-run` and conf
 
 ## 7. Open questions to resolve during grilling
 
-1. Is the live goal genuinely MSCA-PF, or is "40–50 pp" a hard requirement that points back at RIA with a different project? (D1, D14)
+1. **Resolved: G3** (goal-first, instrument-parameterised). Residual: which specific MSCA action + call does the live run target (PF likely, unconfirmed), and who confirms it? (D1, D17)
 2. Who confirms the real consortium (PI name, ELTE role, AgroVIR commitment)? Until then, how much may a run legitimately produce? (D11)
 3. Are we willing to make the §8 budget amendment now, or defer MSCA Phase 7 behind a documented block? (D12)
 4. Does the graph become *the* project source of truth (Tier 3 authored only in Obsidian), or a parallel surface we reconcile? (D6)
@@ -429,7 +449,8 @@ After reset, run `python -m runner --run-id <uuid> --phase 1 --dry-run` and conf
 - Tier 2B extracts reference `HORIZON-CL4-2026-05-DIGITAL-EMERGING-02`; MSCA work programme PDF + `HORIZON-MSCA.json` present.
 - `selected_call.json` = RIA, CL4, 48 months, €19M.
 - Budget integration is lump-sum-specific (`how-to-manage-your-lump-sum-grants_en.pdf`, placeholder response present).
-- MSCA vault: ~90 methodology nodes, strict YAML schema, `evidence_strength` taxonomy, Dataview + Smart Connections, partners largely `unconfirmed`.
+- MSCA vault: **87 methodology nodes / 13 folders**, strict YAML schema, `evidence_strength` taxonomy. **Dataview installed but *disabled*** (only Smart Connections enabled); dashboards inert until enabled. Researcher/host/call **unconfirmed or refuted** (ELTE explicitly "do not invent").
+- Grilling fact-checks (2026-07-09): drafting ceilings are **soft** except `< 20 KB JSON`; canonical-preservation predicates are **contradiction detectors, not completeness requirers**; **no chunked writer** (`_atomic_write` only); `enrich_artifact` decomposition already ships (Phase 5/6); repo on branch **`AWS_deployment`**, `MSCA/` is an **embedded repo** (gitlink); engine counts **13 nodes / 14 gates / 20 agents / 27 skills / 89 predicates**.
 
 ## Appendix B — Graph `evidence_strength` ⇄ constitution mapping
 

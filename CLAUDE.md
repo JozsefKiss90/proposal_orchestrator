@@ -122,7 +122,7 @@ Contains: The Lump Sum Budget Planner integration, comprising the interface cont
 
 Purpose: Mediates the exchange of budget computation data between this repository and the external Lump Sum Budget Planner system.
 
-Constraints: This repository does not perform lump-sum budget computation. The integration directory is the exclusive channel for budget data exchange. Budget data that has not been received through the `received/` subdirectory and validated through `validation/` may not be used as the basis for finalized proposal content. The interface contract governs the structure of requests and responses.
+Constraints: This repository does not perform lump-sum budget computation. For lump-sum instruments, the integration directory is the exclusive channel for budget data exchange, and budget data that has not been received through the `received/` subdirectory and validated through `validation/` may not be used as the basis for finalized proposal content. For unit-cost instruments, the budget is derived internally per §8.1 rather than exchanged through this integration. The interface contract governs the structure of requests and responses.
 
 ---
 
@@ -214,13 +214,13 @@ The system operates through a sequence of canonical phases, each of which is gat
 
 ### Phase 7 — Budget Gate
 
-**Purpose:** Confirm that a validated budget from the external Lump Sum Budget Planner is available, internally consistent, and structurally compatible with the work package design, timeline, and consortium roles before final proposal content is completed.
+**Purpose:** Confirm that the applicable budget — a validated external response for lump-sum instruments, or the internal deterministic derivation (§8.1) for unit-cost instruments — is available, internally consistent, and structurally compatible with the work package design (or single-researcher work plan and host), timeline, and consortium/roles before final proposal content is completed.
 
-**Required inputs:** Completed Phases 3, 4, and 6. A populated and validated budget response in `docs/integrations/lump_sum_budget_planner/received/`. Validation artifacts in `docs/integrations/lump_sum_budget_planner/validation/`.
+**Required inputs:** Completed Phases 3, 4, and 6. For lump-sum instruments: a populated and validated budget response in `docs/integrations/lump_sum_budget_planner/received/` with validation artifacts in `docs/integrations/lump_sum_budget_planner/validation/`. For unit-cost instruments: confirmed effort months (Phase 4), published unit rates (Tier 2B), and the host-country coefficient required by the §8.1 derivation.
 
 **Required outputs:** Budget gate assessment written to `phase7_budget_gate/` confirming: receipt of budget response, structural consistency with WP structure, consistency with partner roles and effort, absence of blocking contradictions.
 
-**Gate condition:** A validated budget response is present in the integration `received/` directory. Validation has confirmed structural consistency with WPs and consortium. No blocking inconsistencies are unresolved. This gate is mandatory. It cannot be bypassed, deferred, or substituted with internally generated budget estimates.
+**Gate condition:** The applicable budget is present, complete, and structurally consistent with the work package/consortium (or, for a single-researcher instrument, the work plan and host). For **lump-sum instruments**, this is a validated external response in the integration `received/` directory. For **unit-cost instruments**, this is the internal deterministic derivation (§8.1), with every budget component — including host-dependent lines — resolved to Confirmed or operator-declared Assumed. No blocking inconsistencies are unresolved. This gate is mandatory and its categorical block on Phase 8 (§8.4) is unconditional and instrument-independent. It cannot be bypassed, deferred, or — for lump-sum instruments — substituted with internally generated budget **estimates**; deterministic unit-cost **derivation** (no judgment, byte-equal-checked) is not an estimate and is the sanctioned budget source for unit-cost instruments.
 
 ---
 
@@ -240,15 +240,25 @@ The system operates through a sequence of canonical phases, each of which is gat
 
 The following rules govern budget data handling throughout the system and are non-negotiable:
 
-**8.1** This repository does not compute, estimate, or generate lump-sum budgets. Budget computation is exclusively the responsibility of the external Lump Sum Budget Planner system.
+**8.1** For **lump-sum instruments**, this repository does not compute, estimate, or generate budgets; budget computation is exclusively the responsibility of the external Lump Sum Budget Planner system, because lump-sum figures require judgment and are not replayable. For **unit-cost instruments** (e.g. MSCA), the budget is computed internally by **deterministic derivation** from published unit costs — `confirmed_months(Phase 4) × published_rates(Tier 2B) × host_country_coefficient` — validated by a byte-equal replay check; this is a derivation, not an estimate, and carries no judgment, so determinism supplies the anti-fabrication guarantee that externalisation supplies for lump-sum.
 
 **8.2** This repository may: prepare structured budget requests using templates in `docs/integrations/lump_sum_budget_planner/request_templates/`; consume validated budget responses from `docs/integrations/lump_sum_budget_planner/received/`; perform structural consistency validation between budget responses and work package/consortium design; and block workflow progress when budget data is absent, inconsistent, or unvalidated.
 
 **8.3** No agent may invent, substitute, approximate, or silently generate budget figures. If a budget response has not been received and validated, any proposal content that depends on budget-confirmed effort allocations, resource claims, or cost justifications must be flagged as incomplete and must not be finalized.
 
-**8.4** The budget gate (Phase 7) must pass before any Phase 8 activity begins. Phase 8 is fully blocked — including preparatory drafting — until the budget gate passes. Absent budget artifacts in `docs/integrations/lump_sum_budget_planner/received/` constitute a blocking gate failure, not a hold state. No Phase 8 substep (drafting, assembly, evaluator review, or revision) may commence before gate_09 confirms that a validated budget response is present and structurally consistent with the work package and consortium design.
+**8.4** The budget gate (Phase 7) must pass before any Phase 8 activity begins. Phase 8 is fully blocked — including preparatory drafting — until the budget gate passes; this categorical block is unconditional and instrument-independent. The **source** of the budget the gate validates is instrument-conditional: for **lump-sum instruments**, a validated external response must be present in `docs/integrations/lump_sum_budget_planner/received/`, and its absence constitutes a blocking gate failure, not a hold state; for **unit-cost instruments**, the internal deterministic derivation (§8.1) must be complete with every budget component — including host-dependent lines — resolved to Confirmed or operator-declared Assumed, and an incomplete or unresolved derivation constitutes the same blocking gate failure. In both cases, no Phase 8 substep (drafting, assembly, evaluator review, or revision) may commence before gate_09 confirms a complete, structurally consistent budget.
 
 **8.5** The interface contract at `docs/integrations/lump_sum_budget_planner/interface_contract.json` defines the schema and exchange protocol for budget requests and responses. All requests must conform to the interface contract. Responses that do not conform to the interface contract must be rejected and flagged, not silently accepted.
+
+### Constitutional Amendment Record — Section 8 / Section 7 (C1: instrument-conditional budget gate)
+
+| Field | Value |
+|-------|-------|
+| Section amended | §8.1; §8.4; §7 Phase 7 (Purpose, Required inputs, Gate condition); and — per the §14.4 consistency requirement — §17.6.7 and the Section 5 Lump Sum Budget Planner integration constraints, both of which had asserted budget computation is exclusively external. |
+| Prior rule | Budget computation was exclusively external (the Lump Sum Budget Planner); the budget gate presumed a validated lump-sum response in `…/received/`; §7 prohibited substitution with "internally generated budget estimates"; §17.6.7 and §5 named the external system as the exclusive budget source. |
+| New rule | The budget gate is **instrument-conditional by source**. Lump-sum instruments are unchanged (external response in `received/`). For **unit-cost instruments** (e.g. MSCA), the budget is computed internally by deterministic derivation from published unit costs (`confirmed_months × published_rates × host_country_coefficient`), validated by a byte-equal replay check; this derivation is not an estimate and carries no judgment. The **categorical Phase-8 block (§8.4) is preserved verbatim and instrument-independent**: `gate_09` passes only when every budget component — including host-dependent lines — resolves to Confirmed or operator-declared Assumed. §17.6.7 and §5 are scoped so "exclusively external" applies to lump-sum only; for unit-cost the §8.1 deterministic derivation is the sole sanctioned source. |
+| Reason for change | §8 externalises lump-sum budgeting because lump-sum figures carry un-replayable judgment, and externalisation is the anti-fabrication guarantee. Unit-cost budgets carry no judgment (fixed arithmetic on published constants) and are byte-equal-verifiable, so determinism supplies the equivalent anti-fabrication guarantee while externalisation adds none and blocks the §2 programme-agnostic mission. Source-conditionalisation realises §2 agnosticism without weakening the categorical block (which would violate §13.7). |
+| Impacted components | `runner/gate_evaluator.py` (`gate_09` instrument-conditional); a new deterministic unit-cost budget deriver (§17.5.3-class, per C2) + its byte-equal CI check; the `instrument_profile` resolver; `docs/integrations/lump_sum_budget_planner/**` (retained, lump-sum only); Tier 2B rate extraction (Stage 2, subject to §10.6). Constitutional clauses scoped: §5 integration constraints, §7, §8.1, §8.4, §17.6.7. §8.2/§8.3 reviewed and unchanged (permissive / anti-fabrication rules remain valid); §13.4 unchanged (categorical block preserved; "absent budget artifacts" reads instrument-neutrally). No change to the DAG scheduler, node-state machine, or gate-evaluation authority. |
 
 ---
 
@@ -400,8 +410,9 @@ When in doubt about the admissibility of an action, the agent must consult this 
 - agents
 - skills
 - gate conditions
+- deterministic components (per §17.5.3)
 
-This binding must not be overridden by agent implementations.
+This binding must not be overridden by agent implementations. A node body may declare a deterministic component in its manifest node spec; such a binding is a first-class, enumerated binding and does not constitute a non-enumerated-element inconsistency under §14.4.
 
 **16.6** Agents are not authorities. They are execution mechanisms subordinate to:
 - CLAUDE.md
@@ -414,6 +425,16 @@ This binding must not be overridden by agent implementations.
 - gate conditions
 
 must be treated as a failure, not as an alternative valid interpretation.
+
+### Constitutional Amendment Record — Section 16.5 Bindable Vocabulary (C3)
+
+| Field | Value |
+|-------|-------|
+| Section amended | §16.5. |
+| Prior rule | §16.5 bound `{phases (nodes), agents, skills, gate conditions}`, and "this binding must not be overridden by agent implementations." |
+| New rule | The bindable vocabulary is extended to include deterministic components (per §17.5.3, C2). A node body may declare a deterministic component in its manifest node spec; such a binding is first-class and enumerated, and does not constitute a non-enumerated-element inconsistency under §14.4. The no-override rule is unchanged and now also governs deterministic-component bindings. |
+| Reason for change | The deterministic components introduced by C2 must be declared in the manifest for §16.5 auditability; the enumerated bindable set must therefore admit them, or declaring one would itself be an internal inconsistency (§14.4). |
+| Impacted components | The compiled workflow manifest (node specs declaring deterministic components); §16.5 text; kept consistent with §17.5.3 (C2). |
 
 ---
 
@@ -491,6 +512,7 @@ The runtime stack communicates through three structured result types. These are 
 - `failure_origin`: always `"agent_body"` (this type is only constructed by the agent runtime)
 - `failure_category`: one of the skill categories plus `SKILL_FAILURE`, `AGENT_EXECUTION_ERROR`
 - `invoked_skills`: ordered record of all skill invocations and their results
+- `invoked_components`: ordered record of all deterministic-component invocations and their results (per §17.5.3; additive)
 
 **17.4.3 `NodeExecutionResult`** — returned by `_dispatch_node()` to the scheduler's `run()` loop:
 - `node_id`: canonical manifest node ID
@@ -505,7 +527,7 @@ The runtime stack communicates through three structured result types. These are 
 
 **17.5.2** The skill runtime (`run_skill()`) is a **Claude runtime transport adapter** that: loads the skill specification, resolves canonical inputs from disk, assembles a structured prompt, invokes Claude through the runtime transport (`runner/claude_transport.py`), parses the structured JSON response, validates it against the expected schema, writes the validated output atomically to the canonical path, and returns a `SkillResult`. It contains prompt assembly, transport invocation, response parsing, validation, and I/O logic — not domain knowledge. The runtime transport routes invocations through the local `claude` CLI, authenticated via the user's Claude Code Max subscription. No Anthropic API key is required for runtime execution.
 
-**17.5.3** The agent runtime (`run_agent()`) is an **orchestration adapter** that: loads agent and prompt specifications, resolves canonical inputs, sequences skill invocations through `run_skill()`, manages context passing between invocations, handles failure propagation, and determines `can_evaluate_exit_gate` from disk state. It does not perform domain reasoning itself.
+**17.5.3** The agent runtime (`run_agent()`) is an **orchestration adapter** that: loads agent and prompt specifications, resolves canonical inputs, sequences skill invocations through `run_skill()`, manages context passing between invocations, handles failure propagation, and determines `can_evaluate_exit_gate` from disk state. It does not perform domain reasoning itself. In addition to sequencing skills, the agent runtime may invoke **deterministic, Claude-free composition components** within the node body — analogous to the Step-0 Call Slicer but node-body-scoped — which read declared input artifacts and write canonical artifacts via `_atomic_write`. Such components perform no domain reasoning and no inference; each is closed by a determinism guarantee (byte-equal replay or pure lookup). They are **not skills** (a skill is defined by Claude invocation, §17.5.2); skill semantics and the §17.6 prohibitions are unaffected — Python still owns writes, the scheduler still owns gate evaluation (§17.6.2), and skills still may not invoke skills (§17.6.4). Each such invocation is recorded in `AgentResult.invoked_components` and is bound in the manifest per §16.5.
 
 **17.5.4** If Claude's response is malformed, incomplete, or violates a constitutional constraint, the runtime returns a failure result. It does not retry, improvise, or silently repair the response.
 
@@ -525,7 +547,7 @@ The following runtime-layer constraints supplement the general prohibitions in S
 
 **17.6.6** `can_evaluate_exit_gate` must be determined by inspecting actual file-system state (artifacts present on disk), not by assuming that successful skill invocations imply artifact presence.
 
-**17.6.7** No runtime layer may fabricate, estimate, or substitute budget figures. Budget computation remains exclusively the responsibility of the external Lump Sum Budget Planner system per Section 8.
+**17.6.7** No runtime layer may fabricate, estimate, or substitute budget figures. For **lump-sum instruments**, budget computation remains exclusively the responsibility of the external Lump Sum Budget Planner system per Section 8. For **unit-cost instruments**, the budget is produced solely by the sanctioned deterministic derivation of §8.1 — a byte-equal-checked computation from published unit costs, which is neither fabrication nor estimation — and by no other means.
 
 ---
 
@@ -559,5 +581,15 @@ The following runtime-layer constraints supplement the general prohibitions in S
 | Status | **IN PROGRESS.** Implementation follows `backend_migration_plan.md`. Section 17 amendment will be applied when the migration is complete and validated. Until then, Section 17 as written remains in force. |
 | Reason for change | Prompt-size bottleneck: current transport serializes 150-800KB per skill invocation (98.5% irrelevant for Phase 1). TAPM reduces this to ~5-30KB while preserving all runtime contracts and constitutional guarantees. |
 | Impacted components | `runner/skill_runtime.py` (dual-mode execution, TAPM prompt assembly), `runner/claude_transport.py` (tool-enabled invocation), `runner/call_slicer.py` (new Step 0 deterministic preprocessing), skill `.md` specifications (input-boundary instructions for TAPM mode). Scheduler, gate evaluator, agent runtime, runtime contracts, and failure semantics are unchanged. |
+
+### Constitutional Amendment Record — Section 17 Deterministic Components (C2)
+
+| Field | Value |
+|-------|-------|
+| Section amended | §17.5.3 (agent runtime role); §17.4.2 (additive `AgentResult.invoked_components` field). |
+| Prior rule | §17.5.3 cast the agent runtime purely as an orchestration adapter that sequences skills and determines `can_evaluate_exit_gate` from disk; it did not invoke components that write canonical artifacts. |
+| New rule | The agent runtime may invoke deterministic, Claude-free composition components within the node body — analogous to the Step-0 Call Slicer but node-body-scoped — which read declared input artifacts and write canonical artifacts via `_atomic_write`, performing no domain reasoning and no inference, each closed by a determinism guarantee (byte-equal replay or pure lookup). These are not skills (§17.5.1–.2 unchanged); Python still owns writes, the scheduler still owns gate evaluation (§17.6.2), and skills still may not invoke skills (§17.6.4). Each invocation is recorded in `AgentResult.invoked_components` and bound in the manifest per §16.5 (C3). |
+| Reason for change | Decomposed drafting must compose bounded per-sub-section drafts into a section artifact, and unit-cost budgeting, canonical-pack generation, and assumption-application are deterministic transforms that write canonical artifacts. Modelling these as skills would redefine the skill contract (§17.5.2 — `run_skill` has only Claude-invoking modes) and ripple through `SkillResult` and all skills. The Call Slicer establishes deterministic non-Claude passes as §17-legitimate; this extends the pattern from Step 0 to the node body while preserving every runtime contract. |
+| Impacted components | `runner/agent_runtime.py` (invokes components; new additive `AgentResult.invoked_components`); the four milestone-1 deterministic components — section assembler, assumption-applier, canonical-pack deriver, unit-cost budget deriver. No change to `run_skill()`, the DAG scheduler, or gate-evaluation authority. Requires §16.5 (C3) to bind these components. |
 
 *Repository constitution. In force from creation. Amendments require explicit human instruction per Section 14.*
