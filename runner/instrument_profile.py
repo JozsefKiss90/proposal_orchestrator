@@ -31,12 +31,9 @@ Constitutional authority:
 from __future__ import annotations
 
 import json
-import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
-
-logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -84,7 +81,7 @@ class InstrumentProfile:
     instrument_type: str
     """The selected call's instrument type (e.g. ``"RIA"``, ``"MSCA-PF"``)."""
 
-    sub_sections: list[dict] = field(default_factory=list)
+    sub_sections: list[dict[str, Any]] = field(default_factory=list)
     """The full sub-section set from ``section_schema_registry.json`` — each a
     dict with at least ``section_id``, ``section_name``, ``mandatory``,
     ``section_type``.  Phase 8 reads section structure from here, not from an
@@ -114,7 +111,7 @@ class InstrumentProfile:
         ]
 
     @property
-    def drafting_sub_sections(self) -> list[dict]:
+    def drafting_sub_sections(self) -> list[dict[str, Any]]:
         """Sub-sections that are drafted prose (``section_type`` in the
         proposal/implementation set) — the Phase 8 drafting granularity."""
         return [
@@ -150,11 +147,13 @@ def _read_json(path: Path, label: str) -> Any:
 
 def _find_instrument_entry(
     data: Any, instrument_type: str, label: str
-) -> dict:
-    """Find the ``instruments[]`` entry for *instrument_type* (Form B shape).
+) -> dict[str, Any]:
+    """Find the ``instruments[]`` entry for *instrument_type*.
 
-    Fails closed when the registry is empty, malformed, or does not contain
-    *instrument_type* — no silent default.
+    Expects the canonical registry shape ``{"instruments": [ {...}, ... ]}``
+    where each entry carries an ``instrument_type`` key.  Fails closed when the
+    registry is empty, malformed, or does not contain *instrument_type* — no
+    silent default.
     """
     if not isinstance(data, dict):
         raise InstrumentProfileError(
