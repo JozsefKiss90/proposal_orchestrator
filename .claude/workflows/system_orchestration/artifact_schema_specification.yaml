@@ -1569,9 +1569,12 @@ tier5_deliverable_schemas:
         type: array
         required: true
         description: >
-          Ordered array of Excellence sub-sections per the RIA/IA Part B template.
-          Covers: objectives, relation to work programme, concept and methodology,
-          ambition, interdisciplinarity, gender dimension.
+          Ordered array of Excellence sub-sections, per the active instrument's
+          Part B template (the sub-section set is instrument-specific and lives
+          in the Tier 2A section_schema_registry; sub_section_id is a free string,
+          not an instrument-fixed enum). For RIA/IA: objectives, methodology,
+          ambition. For MSCA-PF: objectives/ambition, methodology, supervision and
+          knowledge transfer, researcher experience.
         item_schema:
           sub_section_id:
             type: string
@@ -1585,6 +1588,14 @@ tier5_deliverable_schemas:
           word_count:
             type: integer
             required: true
+          page_estimate:
+            type: integer
+            required: false
+            description: >
+              Additive-optional (D4; schema stays v1, zero required additions).
+              Estimated page span of this sub-section for length tracking against
+              the profile's hard page limit. Carried verbatim by the section
+              assembler when present; never derived.
 
       validation_status:
         type: object
@@ -1651,6 +1662,12 @@ tier5_deliverable_schemas:
           word_count:
             type: integer
             required: true
+          page_estimate:
+            type: integer
+            required: false
+            description: >
+              Additive-optional (D4; schema stays v1). Estimated page span for
+              length tracking; carried verbatim by the section assembler.
 
       impact_pathway_refs:
         type: array
@@ -1733,6 +1750,12 @@ tier5_deliverable_schemas:
           word_count:
             type: integer
             required: true
+          page_estimate:
+            type: integer
+            required: false
+            description: >
+              Additive-optional (D4; schema stays v1). Estimated page span for
+              length tracking; carried verbatim by the section assembler.
 
       wp_table_refs:
         type: array

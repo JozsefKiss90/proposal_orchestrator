@@ -10,6 +10,27 @@
       "evaluator_expectation_ref": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
       "source_document": "af_he-ria-ia_en.pdf",
       "note": "Instrument-level metadata for the profile resolver (runner/instrument_profile.py). The sub-section set and hard Part B page limit are read from section_schema_registry.json; this registry supplies budget_regime and phases_in_scope. Populated for RIA from the existing extracted schemas (ticket 2). MSCA-PF is added by ticket 5."
+    },
+    {
+      "instrument_type": "MSCA-PF",
+      "budget_regime": "unit_cost",
+      "budget_regime_provenance": "MSCA-PF is a unit-cost instrument (CLAUDE.md §8.1 / C1: 'unit-cost instruments (e.g. MSCA)'). The EU contribution takes the form of unit contributions - living / mobility / family allowances for the recruited researcher plus institutional unit contributions (research-training-networking, management-and-indirect) - per the MSCA Work Programme 2026-2027, '2. MSCA POSTDOCTORAL FELLOWSHIPS, 2.1 Applicable unit contributions' (Decision of 11 March 2021 authorising unit contributions for MSCA). The budget gate (Phase 7) uses the internal deterministic unit-cost derivation (C1), not the external Lump Sum Budget Planner. Rate table: docs/tier2b_topic_and_call_sources/extracted/unit_cost_rates.json. Source: wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf pp.78-80 of 112.",
+      "phases_in_scope": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phases_in_scope_provenance": "MSCA-PF runs the full canonical phase sequence (Phases 1-8). The DAG topology is unchanged; only the profile behind it differs (brief §2.1). The 'consortium' is a single postdoctoral researcher hosted by a beneficiary (plus an associated partner hosting the outgoing phase for Global Fellowships). Work packages, gantt/milestones, impact architecture, implementation, and the unit-cost budget gate all apply to a fellowship work plan.",
+      "section_schema_ref": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+      "evaluator_expectation_ref": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+      "unit_cost_rates_ref": "docs/tier2b_topic_and_call_sources/extracted/unit_cost_rates.json",
+      "source_document": "wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+      "note": "Instrument-level metadata for the profile resolver (runner/instrument_profile.py). The sub-section set and hard Part B page limit (10 pp) are read from section_schema_registry.json; this registry supplies budget_regime (unit_cost, C1) and phases_in_scope. Added for MSCA-PF by ticket 5."
     }
   ]
 }

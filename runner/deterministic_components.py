@@ -73,13 +73,42 @@ def _run_dependency_normalizer(run_id: str, repo_root: Path) -> list[Path]:
     return [normalize_dependencies(run_id, repo_root)]
 
 
+def _run_excellence_section_assembler(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter: assemble the Excellence section from its per-sub-section drafts."""
+    from runner.section_assembler import assemble_section
+
+    return [assemble_section(run_id, repo_root, "excellence")]
+
+
+def _run_impact_section_assembler(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter: assemble the Impact section from its per-sub-section drafts."""
+    from runner.section_assembler import assemble_section
+
+    return [assemble_section(run_id, repo_root, "impact")]
+
+
+def _run_implementation_section_assembler(
+    run_id: str, repo_root: Path
+) -> list[Path]:
+    """Adapter: assemble the Implementation section from its drafts."""
+    from runner.section_assembler import assemble_section
+
+    return [assemble_section(run_id, repo_root, "implementation")]
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
-#: Additional milestone-1 components (section assembler, assumption-applier,
-#: canonical-pack deriver, unit-cost budget deriver) register here as they
-#: are built — binding and logging then work uniformly for each.
+#: The section assemblers (one per Phase-8 criterion node) compose the
+#: decomposed per-sub-section drafts into a section JSON by array-append,
+#: closed by the byte-equal replay check ``assembler(drafts) == section_json``.
+#: Additional milestone-1 components (assumption-applier, canonical-pack
+#: deriver, unit-cost budget deriver) register here as they are built —
+#: binding and logging then work uniformly for each.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
+    "excellence_section_assembler": _run_excellence_section_assembler,
+    "impact_section_assembler": _run_impact_section_assembler,
+    "implementation_section_assembler": _run_implementation_section_assembler,
 }
 
 

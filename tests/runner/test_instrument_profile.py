@@ -220,7 +220,26 @@ class TestFailClosed:
         with pytest.raises(InstrumentProfileError, match="phases_in_scope"):
             resolve_instrument_profile(tmp_path, instrument_type="RIA")
 
-    def test_real_registries_do_not_yet_have_msca(self) -> None:
-        # MSCA-PF is added by ticket 5; until then the resolver fails closed.
-        with pytest.raises(InstrumentProfileError):
-            resolve_instrument_profile(find_repo_root(), instrument_type="MSCA-PF")
+    def test_real_registries_resolve_msca_pf(self) -> None:
+        # MSCA-PF was added to the real Tier 2A registries in ticket 5.
+        profile = resolve_instrument_profile(
+            find_repo_root(), instrument_type="MSCA-PF"
+        )
+        assert profile.instrument_type == "MSCA-PF"
+        # Page limit read from the PF Part B template (§10.6), not assumed.
+        assert profile.hard_page_limit == 10
+        # MSCA is a unit-cost instrument (C1).
+        assert profile.budget_regime == "unit_cost"
+        # Decomposed-drafting granularity: the nine B1 leaf sub-sections.
+        assert [s["section_id"] for s in profile.drafting_sub_sections] == [
+            "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "3.1", "3.2",
+        ]
+
+    def test_real_registries_still_resolve_ria(self) -> None:
+        # The RIA entry is untouched by the MSCA-PF addition (regression).
+        profile = resolve_instrument_profile(
+            find_repo_root(), instrument_type="RIA"
+        )
+        assert profile.instrument_type == "RIA"
+        assert profile.hard_page_limit == 40
+        assert profile.budget_regime == "lump_sum"
