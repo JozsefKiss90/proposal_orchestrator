@@ -49,10 +49,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
-import tempfile
 from pathlib import Path
 from typing import Any
+
+from runner.atomic_write import atomic_write_json
 
 logger = logging.getLogger(__name__)
 
@@ -221,32 +221,6 @@ def _union_source_refs(
             if key not in seen:
                 seen[key] = {"tier": key[0], "source_path": key[1]}
     return [seen[key] for key in sorted(seen)]
-
-
-def _atomic_write_json(artifact: dict[str, Any], output_path: Path) -> None:
-    """Write *artifact* as pretty JSON atomically, raising on any failure."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    content = json.dumps(artifact, indent=2, ensure_ascii=False)
-
-    fd, tmp_path = tempfile.mkstemp(
-        dir=str(output_path.parent),
-        suffix=".tmp",
-        prefix="section_assembler_",
-    )
-    try:
-        os.write(fd, content.encode("utf-8"))
-        os.close(fd)
-        fd = -1
-        # On Windows os.rename requires the target not to exist.
-        if output_path.exists():
-            output_path.unlink()
-        os.rename(tmp_path, str(output_path))
-    except Exception:
-        if fd >= 0:
-            os.close(fd)
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-        raise
 
 
 def _load_drafts_in_order(
@@ -472,7 +446,7 @@ def assemble_section(run_id: str, repo_root: Path, slug: str) -> Path:
 
     # ── Atomic write ─────────────────────────────────────────────────────
     output_path = repo_root / PROPOSAL_SECTIONS_REL / f"{slug}_section.json"
-    _atomic_write_json(artifact, output_path)
+    atomic_write_json(artifact, output_path, prefix="section_assembler_")
     logger.info(
         "Assembled %s section: %d sub-sections, %d claim(s), %d source(s)",
         slug,

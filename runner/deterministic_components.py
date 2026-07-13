@@ -96,19 +96,40 @@ def _run_implementation_section_assembler(
     return [assemble_section(run_id, repo_root, "implementation")]
 
 
+def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the unit-cost budget deriver (§8.1 / C1).
+
+    Derives the MSCA-style unit-cost budget deterministically from published
+    rates and writes ``unit_cost_budget.json``.  Closed by the byte-equal
+    replay check ``unit_cost_budget(months, rates, host_coeff) == figure``.
+
+    The deriver returns ``None`` (writing nothing) for non-unit-cost
+    instruments — the lump-sum gate branch owns those budgets — so the
+    adapter records no outputs in that case.
+    """
+    from runner.unit_cost_budget import derive_unit_cost_budget
+
+    written = derive_unit_cost_budget(run_id, repo_root)
+    return [written] if written is not None else []
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
 #: decomposed per-sub-section drafts into a section JSON by array-append,
 #: closed by the byte-equal replay check ``assembler(drafts) == section_json``.
-#: Additional milestone-1 components (assumption-applier, canonical-pack
-#: deriver, unit-cost budget deriver) register here as they are built —
-#: binding and logging then work uniformly for each.
+#: The unit-cost budget deriver (§8.1 / C1) computes the MSCA-style budget
+#: deterministically from published rates, closed by
+#: ``unit_cost_budget(months, rates, host_coeff) == figure``.  Remaining
+#: milestone-1 components (assumption-applier, canonical-pack deriver)
+#: register here as they are built — binding and logging then work
+#: uniformly for each.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
     "excellence_section_assembler": _run_excellence_section_assembler,
     "impact_section_assembler": _run_impact_section_assembler,
     "implementation_section_assembler": _run_implementation_section_assembler,
+    "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
 }
 
 

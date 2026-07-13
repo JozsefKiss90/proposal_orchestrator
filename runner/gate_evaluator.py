@@ -108,6 +108,7 @@ from runner.predicates.schema_predicates import (
     no_blocking_inconsistencies,
     revision_action_list_present,
     risk_register_populated,
+    unit_cost_budget_resolved,
 )
 from runner.predicates.source_ref_predicates import (
     all_mappings_have_source_refs,
@@ -182,6 +183,7 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "ethics_assessment_explicit": ethics_assessment_explicit,
     "governance_matrix_present": governance_matrix_present,
     "no_blocking_inconsistencies": no_blocking_inconsistencies,
+    "unit_cost_budget_resolved": unit_cost_budget_resolved,
     "budget_gate_confirmation_present": budget_gate_confirmation_present,
     "findings_categorised_by_severity": findings_categorised_by_severity,
     "revision_action_list_present": revision_action_list_present,
@@ -401,11 +403,111 @@ def _is_hard_block_failure(
     if not gate_entry.get("hard_block_on_missing_received_dir"):
         return False
     for fp in failed_predicates:
+        # Lump-sum branch: the external ``received/`` response is absent.
         if fp.get("function") == "dir_non_empty":
             path_arg = (fp.get("args") or {}).get("path", "")
             if "received" in str(path_arg):
                 return True
+        # Unit-cost branch (C1): the internal deterministic derivation is
+        # unresolved (missing/blocked ``unit_cost_budget.json``), or the
+        # instrument budget regime could not be resolved to select a source.
+        # Both are an absent/unresolved budget source — the same categorical
+        # Phase-8 block as a missing lump-sum response (§8.4).
+        if fp.get("function") in (
+            "unit_cost_budget_resolved",
+            _INSTRUMENT_UNRESOLVED_FUNC,
+        ):
+            return True
     return False
+
+
+#: Synthetic predicate ``function`` used to record an instrument-resolution
+#: fail-closed on a gate carrying ``applies_when`` predicates.  It is not a
+#: real predicate — it is the fail-closed marker the evaluator emits when a
+#: gate's applicable-predicate set cannot be selected because the instrument
+#: budget regime is unresolvable (§12.4, fail closed).
+_INSTRUMENT_UNRESOLVED_FUNC: str = "instrument_budget_regime_resolvable"
+
+
+def _resolve_budget_regime(repo_root: Path) -> Optional[str]:
+    """Resolve the selected call's budget regime, or ``None`` if unresolvable.
+
+    Thin wrapper over :func:`runner.instrument_profile.resolve_instrument_profile`
+    that never raises: any failure to resolve the instrument profile (absent
+    call binding, unknown instrument, malformed registry) returns ``None`` so
+    the caller can fail the gate closed with a clear reason rather than crash.
+    """
+    try:
+        from runner.instrument_profile import resolve_instrument_profile
+
+        return resolve_instrument_profile(repo_root).budget_regime
+    except Exception:  # noqa: BLE001 — any resolution failure ⇒ None (fail closed upstream)
+        return None
+
+
+def _partition_predicates_by_instrument(
+    all_predicates: list[dict],
+    repo_root: Path,
+) -> tuple[list[dict], list[dict], Optional[str]]:
+    """Filter instrument-conditional predicates by the resolved budget regime.
+
+    A predicate may carry an ``applies_when: {budget_regime: <regime>}`` tag
+    (C1): it is evaluated only when the selected call's budget regime matches.
+    This is how ``gate_09`` is **instrument-conditional on source** — the
+    lump-sum ``received/`` predicates apply only to lump-sum instruments; the
+    unit-cost derivation predicates apply only to unit-cost instruments — with
+    the lump-sum predicates preserved verbatim (RIA reachable, D1) and no
+    instrument literal on the gate path (§2, programme-agnostic).
+
+    Predicates with **no** ``applies_when`` always apply (the common case;
+    unchanged behaviour for every existing gate and synthetic-library test).
+
+    Returns
+    -------
+    (applicable, skipped, resolution_error)
+        *applicable* — predicates to evaluate.
+        *skipped* — records of predicates skipped as not-applicable for the
+        resolved regime (informational; recorded in the gate result).
+        *resolution_error* — a human-readable reason when the gate has
+        ``applies_when`` predicates but the budget regime is unresolvable, in
+        which case the gate must **fail closed** (§12.4); ``None`` otherwise.
+    """
+    if not any(p.get("applies_when") for p in all_predicates):
+        return all_predicates, [], None
+
+    regime = _resolve_budget_regime(repo_root)
+    applicable: list[dict] = []
+    skipped: list[dict] = []
+
+    for pred in all_predicates:
+        applies_when = pred.get("applies_when")
+        if not applies_when:
+            applicable.append(pred)
+            continue
+        want_regime = applies_when.get("budget_regime")
+        if regime is not None and want_regime == regime:
+            applicable.append(pred)
+        else:
+            skipped.append({
+                "predicate_id": pred.get("predicate_id", "<unknown>"),
+                "applies_when": applies_when,
+                "resolved_budget_regime": regime,
+                "reason": (
+                    "not applicable for resolved budget_regime"
+                    if regime is not None
+                    else "budget_regime unresolvable"
+                ),
+            })
+
+    resolution_error: Optional[str] = None
+    if regime is None:
+        resolution_error = (
+            "gate has instrument-conditional predicates (applies_when) but "
+            "the selected call's budget_regime could not be resolved from "
+            "selected_call.json / the instrument registries; failing closed "
+            "(§12.4) — the budget source cannot be selected."
+        )
+    return applicable, skipped, resolution_error
 
 
 # ---------------------------------------------------------------------------
@@ -528,6 +630,16 @@ def evaluate_gate(
         # Approach A fallback: library gate entry provides the predicates list
         all_predicates = gate_entry.get("predicates") or []
 
+    # Instrument-conditional predicate filtering (C1): a predicate carrying
+    # ``applies_when: {budget_regime: ...}`` is evaluated only when it matches
+    # the selected call's regime.  This is how gate_09 branches on source
+    # (lump-sum ``received/`` vs unit-cost internal derivation) with the
+    # lump-sum predicates preserved verbatim.  Predicates with no applies_when
+    # are unaffected (every other gate, and every synthetic-library test).
+    all_predicates, skipped_predicates, applies_when_error = (
+        _partition_predicates_by_instrument(all_predicates, repo_root)
+    )
+
     deterministic_preds = [
         p for p in all_predicates if p.get("type") in DETERMINISTIC_TYPES
     ]
@@ -580,6 +692,25 @@ def evaluate_gate(
                     "prose_condition": pred.get("prose_condition", ""),
                 }
             )
+
+    # Instrument-conditional fail-closed: the gate declared ``applies_when``
+    # predicates but the budget regime was unresolvable, so the applicable
+    # predicate set could not be selected.  Record a deterministic failure so
+    # the gate blocks (§12.4) rather than passing on a subset.
+    if applies_when_error is not None:
+        failed_det_entries.append(
+            {
+                "predicate_id": "instrument_conditional_gate",
+                "type": "schema",
+                "function": _INSTRUMENT_UNRESOLVED_FUNC,
+                "args": {},
+                "failure_category": "MISSING_MANDATORY_INPUT",
+                "reason": applies_when_error,
+                "details": {},
+                "fail_message": applies_when_error,
+                "prose_condition": "Instrument budget_regime resolvable",
+            }
+        )
 
     # ------------------------------------------------------------------
     # 7. Decide overall status
@@ -717,6 +848,11 @@ def evaluate_gate(
         "skipped_semantic": skipped_semantic,
         "report_written_to": str(result_path),
     }
+
+    # Record instrument-conditional predicates skipped as not-applicable for
+    # the resolved budget regime (C1) — informational, for auditability.
+    if skipped_predicates:
+        gate_result["skipped_not_applicable_predicates"] = skipped_predicates
 
     if hard_block:
         gate_result["hard_block"] = True

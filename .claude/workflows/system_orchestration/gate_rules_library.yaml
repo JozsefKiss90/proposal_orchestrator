@@ -1001,9 +1001,17 @@ gate_rules:
     mandatory: true
     bypass_prohibited: true
     hard_block_on_missing_received_dir: true
+    # Instrument-conditional on source (C1, §8.1/§8.4).  Predicates tagged
+    # ``applies_when: {budget_regime: lump_sum}`` are evaluated only for
+    # lump-sum instruments (external Lump Sum Budget Planner response in
+    # received/); those tagged ``unit_cost`` only for unit-cost instruments
+    # (internal deterministic derivation, unit_cost_budget.json).  g08_p01 is
+    # unconditional.  The categorical HARD_BLOCK on Phase 8 is preserved
+    # verbatim and instrument-independent (the scheduler blocks on ANY gate_09
+    # exit failure; the gate evaluator annotates hard_block for either source).
     predicates:
 
-      # --- gate_pass predicates ---
+      # --- gate_pass predicates (instrument-independent) ---
       - predicate_id: g08_p01
         type: gate_pass
         function: gate_pass_recorded
@@ -1022,6 +1030,8 @@ gate_rules:
       # and must emit a HARD_BLOCK result code on g08_p02 failure in addition
       # to the standard fail status. All downstream Phase 8 nodes are frozen.
       - predicate_id: g08_p02
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: dir_non_empty
         args:
@@ -1036,6 +1046,8 @@ gate_rules:
         prose_condition: "Non-empty budget response artifact present in integrations/received/"
 
       - predicate_id: g08_p03
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: dir_non_empty
         args:
@@ -1048,6 +1060,8 @@ gate_rules:
         prose_condition: "Validation artifact present in integrations/validation/"
 
       - predicate_id: g08_p08
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: non_empty_json
         args:
@@ -1060,6 +1074,8 @@ gate_rules:
         prose_condition: "Budget gate assessment written to Tier 4"
 
       - predicate_id: g08_p09
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: artifact_owned_by_run
         args:
@@ -1073,6 +1089,8 @@ gate_rules:
 
       # --- schema predicates ---
       - predicate_id: g08_p04
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: interface_contract_conforms
         args:
@@ -1086,6 +1104,8 @@ gate_rules:
         prose_condition: "Interface contract conformance confirmed"
 
       - predicate_id: g08_p07
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: no_blocking_inconsistencies
         args:
@@ -1099,6 +1119,8 @@ gate_rules:
 
       # --- coverage predicates ---
       - predicate_id: g08_p05
+        applies_when:
+          budget_regime: lump_sum
         type: coverage
         function: wp_budget_coverage_match
         args:
@@ -1111,6 +1133,8 @@ gate_rules:
         prose_condition: "All Phase 3 WPs have corresponding budget entries"
 
       - predicate_id: g08_p06
+        applies_when:
+          budget_regime: lump_sum
         type: coverage
         function: partner_budget_coverage_match
         args:
@@ -1121,6 +1145,55 @@ gate_rules:
           a corresponding effort or cost allocation in the budget response.
           Every partner must have a budget allocation.
         prose_condition: "All consortium partners have corresponding budget allocations"
+
+      # --- unit-cost predicates (C1) ---
+      # For unit-cost instruments (e.g. MSCA-PF) the budget source is the
+      # internal deterministic derivation (unit_cost_budget.json), not the
+      # external lump-sum received/ response.  These predicates apply only when
+      # the resolved budget_regime is unit_cost; the lump-sum predicates above
+      # are skipped as not-applicable.  A missing/blocked derivation is the same
+      # categorical HARD_BLOCK as a missing lump-sum response (§8.4).
+      - predicate_id: g08_uc01
+        applies_when:
+          budget_regime: unit_cost
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          unit_cost_budget.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/.
+          The unit-cost budget deriver (§8.1) must write its canonical
+          derivation artifact before this gate can pass.
+        prose_condition: "Unit-cost budget derivation written to Tier 4"
+
+      - predicate_id: g08_uc02
+        applies_when:
+          budget_regime: unit_cost
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+          run_id: "${run_id}"
+        fail_message: >
+          unit_cost_budget.json exists but its run_id does not match the
+          current run. Re-run Phase 7 to regenerate the derivation.
+        prose_condition: "Unit-cost budget derivation owned by current run"
+
+      - predicate_id: g08_uc03
+        applies_when:
+          budget_regime: unit_cost
+        type: schema
+        function: unit_cost_budget_resolved
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          The unit-cost budget derivation is not fully resolved: one or more
+          budget components (including host-dependent lines) are Unresolved,
+          or gate_pass_declaration is not "pass". Every component must resolve
+          to Confirmed or operator-declared Assumed before the budget gate can
+          pass. An unresolved host coefficient blocks (§8.4).
+        prose_condition: "Unit-cost budget fully resolved (no Unresolved components)"
 
 
   # ===========================================================================

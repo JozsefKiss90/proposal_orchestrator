@@ -134,6 +134,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         ),
     )
     parser.add_argument(
+        "--export-docx",
+        action="store_true",
+        default=False,
+        help=(
+            "After the run, render the assembled Part B (or whatever section "
+            "artifacts exist) to a .docx in docs/tier5_deliverables/final_exports/. "
+            "Best-effort: an export failure does not change the run exit code."
+        ),
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="Enable detailed scheduler logging to stderr.",
@@ -333,6 +343,32 @@ def main(argv: Optional[list[str]] = None) -> int:
         "summary",
         **summary_fields,
     )
+
+    # ------------------------------------------------------------------
+    # Optional Part B .docx export (best-effort; never changes exit code)
+    # ------------------------------------------------------------------
+    if args.export_docx:
+        try:
+            from runner.docx_exporter import export_part_b_docx
+
+            out = export_part_b_docx(repo_root)
+            if out is None:
+                _out(
+                    "[EXPORT] No section content to export to .docx",
+                    "export_docx",
+                    exported=False,
+                )
+            else:
+                rel = str(out.relative_to(repo_root)).replace("\\", "/")
+                _out(
+                    f"[EXPORT] Part B exported to {rel}",
+                    "export_docx",
+                    exported=True,
+                    path=rel,
+                )
+        except Exception as exc:  # noqa: BLE001 — export is best-effort
+            _err(f"Part B .docx export failed (non-blocking): {exc}")
+
     return exit_code
 
 

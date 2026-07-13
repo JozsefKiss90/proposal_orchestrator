@@ -1191,6 +1191,106 @@ def no_blocking_inconsistencies(
     )
 
 
+def unit_cost_budget_resolved(
+    path: PathLike,
+    *,
+    repo_root: Optional[Path] = None,
+) -> PredicateResult:
+    """
+    Pass iff the **unit-cost** budget derivation at *path* is fully resolved.
+
+    This is the unit-cost branch of the budget gate (CLAUDE.md §8.1 / §8.4,
+    C1): for a unit-cost instrument the budget source is the internal
+    deterministic derivation (``unit_cost_budget.json``), not the external
+    lump-sum ``received/`` response.  The gate passes only when **every**
+    budget component — including the host-dependent living-allowance line —
+    resolves to Confirmed or operator-declared Assumed.  An unresolved
+    confirmed-months figure or host coefficient blocks (the categorical
+    Phase-8 block, §8.4, is preserved verbatim by the scheduler and the
+    HARD_BLOCK annotation).
+
+    Pass condition:
+        * valid JSON object with ``gate_pass_declaration == "pass"``,
+        * ``unresolved_components`` absent or empty.
+
+    Failure categories
+    ------------------
+    ``MISSING_MANDATORY_INPUT``
+        Path does not exist — the deriver did not write the artifact.
+    ``MALFORMED_ARTIFACT``
+        Invalid JSON, non-object JSON, or ``unresolved_components`` is not an
+        array.
+    ``POLICY_VIOLATION``
+        Structurally valid but ``gate_pass_declaration != "pass"`` or one or
+        more budget components are unresolved (the honest budget block).
+
+    Parameters
+    ----------
+    path:
+        Path to the canonical ``unit_cost_budget.json`` file.
+    repo_root:
+        Repository root for relative path resolution.
+    """
+    resolved = resolve_repo_path(path, repo_root)
+    parsed, err = _read_json_object(resolved)
+    if err is not None:
+        return err
+
+    unresolved = parsed.get("unresolved_components", [])
+    if not isinstance(unresolved, list):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"'unresolved_components' must be an array; "
+                f"got {type(unresolved).__name__} in {resolved}"
+            ),
+            details={"path": str(resolved)},
+        )
+
+    declaration = parsed.get("gate_pass_declaration")
+    if declaration != "pass":
+        return PredicateResult(
+            passed=False,
+            failure_category=POLICY_VIOLATION,
+            reason=(
+                f"Unit-cost budget is not resolved: gate_pass_declaration="
+                f"{declaration!r} with {len(unresolved)} unresolved "
+                f"component(s) {unresolved} in {resolved}.  Every budget "
+                f"component must resolve to Confirmed or operator-declared "
+                f"Assumed before the budget gate can pass (§8.4)."
+            ),
+            details={
+                "path": str(resolved),
+                "gate_pass_declaration": declaration,
+                "unresolved_components": unresolved,
+            },
+        )
+
+    if unresolved:
+        return PredicateResult(
+            passed=False,
+            failure_category=POLICY_VIOLATION,
+            reason=(
+                f"Unit-cost budget declares 'pass' but has {len(unresolved)} "
+                f"unresolved component(s) {unresolved} in {resolved} "
+                f"(inconsistent derivation)."
+            ),
+            details={
+                "path": str(resolved),
+                "unresolved_components": unresolved,
+            },
+        )
+
+    return PredicateResult(
+        passed=True,
+        details={
+            "path": str(resolved),
+            "total_eur": parsed.get("total_eur"),
+        },
+    )
+
+
 def budget_gate_confirmation_present(
     path: PathLike,
     *,

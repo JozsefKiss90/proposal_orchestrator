@@ -144,6 +144,15 @@ node_registry:
     source_file: workflow_phases/phase_07_budget_gate.yaml
     agent: budget_gate_validator
     pre_gate_agent: budget_interface_coordinator
+    # Deterministic components (§16.5/C3): the unit-cost budget deriver (C1)
+    # runs in the node body before skill sequencing.  It writes the internal
+    # deterministic derivation (unit_cost_budget.json) for unit-cost
+    # instruments; gate_09's unit-cost branch validates it.  For lump-sum
+    # instruments the deriver still writes an assessment naming its inputs, but
+    # the lump-sum gate branch validates the external received/ response
+    # instead — the two sources never overlap (§8.4, C1).
+    deterministic_components:
+      - unit_cost_budget_deriver
     skills:
       - budget-interface-validation
       - gate-enforcement
@@ -162,6 +171,12 @@ node_registry:
     name: "Excellence Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: excellence_writer
+    # Ticket 7 delivers the decomposed-drafting driver (runner/decomposed_drafting.py)
+    # and the byte-equal composition proof (Excellence drafts -> section_assembler ->
+    # full-length section).  The governed wiring that binds excellence_section_assembler
+    # here and rewrites this node's drafting skill to produce section_drafts/excellence/
+    # lands with the E2E run (ticket 13), per section_assembler.py's "don't bind an
+    # assembler over a directory no skill yet populates" rule.
     skills:
       - excellence-section-drafting
       - proposal-section-traceability-check
@@ -533,9 +548,16 @@ gate_registry:
     mandatory: true
     bypass_prohibited: true
     absent_artifacts_behavior: blocking_gate_failure
+    # Instrument-conditional on source (C1): the lump-sum predicates
+    # (g08_p02..p09) and the unit-cost predicates (g08_uc01..uc03) each carry
+    # an ``applies_when: {budget_regime: ...}`` tag in the gate rules library;
+    # the gate evaluator selects the applicable set from the resolved
+    # instrument budget regime.  g08_p01 is unconditional.  The categorical
+    # HARD_BLOCK on Phase 8 is preserved verbatim and instrument-independent.
     conditions:
       - prose: "Phase 6 gate must have passed"
         predicate_refs: [g08_p01]
+      # --- lump-sum branch (applies_when: budget_regime == lump_sum) ---
       - prose: "Non-empty budget response artifact present in integrations/received/"
         predicate_refs: [g08_p02]
       - prose: "Validation artifact present in integrations/validation/"
@@ -550,6 +572,11 @@ gate_registry:
         predicate_refs: [g08_p07]
       - prose: "Budget gate assessment written to Tier 4"
         predicate_refs: [g08_p08, g08_p09]
+      # --- unit-cost branch (applies_when: budget_regime == unit_cost) ---
+      - prose: "Unit-cost budget derivation written to Tier 4, owned by run"
+        predicate_refs: [g08_uc01, g08_uc02]
+      - prose: "Unit-cost budget fully resolved (no Unresolved components)"
+        predicate_refs: [g08_uc03]
     blocking_edges:
       - e07_to_08a
     fail_action: >

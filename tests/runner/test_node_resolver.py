@@ -284,10 +284,17 @@ class TestDeterministicComponentResolution:
             "n04_gantt_milestones"
         ) == ["dependency_normalizer"]
 
+    def test_n07_binds_unit_cost_budget_deriver(
+        self, resolver: NodeResolver
+    ) -> None:
+        # C1 (ticket 8): the unit-cost budget deriver runs in the n07 node body.
+        assert resolver.resolve_deterministic_components(
+            "n07_budget_gate"
+        ) == ["unit_cost_budget_deriver"]
+
     @pytest.mark.parametrize("node_id", [
         "n01_call_analysis",
         "n03_wp_design",
-        "n07_budget_gate",
         "n08a_excellence_drafting",
     ])
     def test_nodes_without_binding_return_empty(
