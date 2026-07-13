@@ -21,6 +21,7 @@ from typing import Any
 import pytest
 
 from runner.deterministic_components import COMPONENT_REGISTRY, invoke_component
+from runner.working_assumptions import WorkingAssumptionsError
 from runner.unit_cost_budget import (
     OUTPUT_REL,
     SCHEMA_ID,
@@ -259,11 +260,24 @@ class TestComponentGreen:
         assert data["derivation"]["host_country_coefficient_percent"] == 100.0
 
     def test_declared_host_flips_to_assumed(self, tmp_path: Path) -> None:
-        """A host declared in working_assumptions.json greens as Assumed."""
+        """A host declared in working_assumptions.json (via the shared ticket-15
+        substrate) greens as Assumed."""
         _seed(tmp_path, project_duration_months=24)
         _write(
             tmp_path / "docs/tier3_project_instantiation/working_assumptions.json",
-            {"host_country": "AT"},
+            {
+                "record_type": "working_assumptions",
+                "provenance_class": "manually_placed",
+                "declarations": [
+                    {
+                        "key": "host_country",
+                        "value": "AT",
+                        "declared_by": "operator@example.org",
+                        "declared_on": "2026-07-13T10:00:00Z",
+                        "checklist_ref": "HOST",
+                    }
+                ],
+            },
         )
         out = derive_unit_cost_budget(RUN_ID, tmp_path)
         data = json.loads(out.read_text("utf-8"))
@@ -346,6 +360,23 @@ class TestComponentFailClosed:
             {"instrument_type": "MSCA-PF", "budget_regime": "unit_cost"},
         )
         with pytest.raises(UnitCostBudgetError, match="unit_cost_rates.json not found"):
+            derive_unit_cost_budget(RUN_ID, tmp_path)
+
+    def test_malformed_working_assumptions_surfaces_loudly(
+        self, tmp_path: Path
+    ) -> None:
+        """A present-but-malformed declaration file raises via the shared reader
+        (ticket 15) rather than being silently swallowed into a block — an
+        operator declaration that did not parse must be legible."""
+        _seed(tmp_path, project_duration_months=24)
+        _write(
+            tmp_path / "docs/tier3_project_instantiation/working_assumptions.json",
+            {
+                "provenance_class": "manually_placed",
+                "declarations": [{"key": "host_country"}],  # missing value/attribution
+            },
+        )
+        with pytest.raises(WorkingAssumptionsError):
             derive_unit_cost_budget(RUN_ID, tmp_path)
 
 

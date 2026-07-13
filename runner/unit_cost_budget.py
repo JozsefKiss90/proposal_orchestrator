@@ -46,6 +46,11 @@ Constitutional constraints (§8, §17.5.3, §17.6.7):
       malformed rate table or genuinely missing infrastructure; an
       *unresolved* input (months / host) is not an error — it is written as
       an honest ``"fail"`` (blocked) assessment, so the gate can block on it.
+    * A *present-but-malformed* ``working_assumptions.json`` raises
+      :class:`~runner.working_assumptions.WorkingAssumptionsError` from the
+      shared reader (ticket 15) — an operator declaration that did not parse is
+      surfaced loudly, not silently swallowed into a block.  An **absent or
+      empty** declaration file is a valid α state (host ``Unresolved``).
 """
 
 from __future__ import annotations
@@ -56,6 +61,11 @@ from pathlib import Path
 from typing import Any, Optional
 
 from runner.atomic_write import atomic_write_json
+from runner.working_assumptions import (
+    WORKING_ASSUMPTIONS_REL,
+    WorkingAssumptions,
+    load_working_assumptions,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,14 +79,11 @@ UNIT_COST_RATES_REL: str = (
 SELECTED_CALL_REL: str = (
     "docs/tier3_project_instantiation/call_binding/selected_call.json"
 )
-#: Tier 3 operator declaration file (host country / working assumptions).
-#: Read-only here (the engine never writes it); the applier + reader that
-#: fully consume it are tickets 9/15.  This module only *reads* a declared
-#: host country if the file is present — an absent file is a valid state
-#: that yields the honest block (α).
-WORKING_ASSUMPTIONS_REL: str = (
-    "docs/tier3_project_instantiation/working_assumptions.json"
-)
+#: Tier 3 operator declaration file (host country / working assumptions).  The
+#: canonical path and the reader live in ``runner.working_assumptions`` (the
+#: shared declaration substrate, ticket 15); ``WORKING_ASSUMPTIONS_REL`` is
+#: re-exported here for backward compatibility.  Read-only (the engine never
+#: writes it); an absent file is a valid state that yields the honest block (α).
 OUTPUT_REL: str = (
     "docs/tier4_orchestration_state/phase_outputs"
     "/phase7_budget_gate/unit_cost_budget.json"
@@ -295,21 +302,6 @@ def _read_json(path: Path, label: str) -> Any:
         raise UnitCostBudgetError(f"{label} is not valid JSON: {exc}") from exc
 
 
-def _read_optional_json(path: Path) -> Optional[dict[str, Any]]:
-    """Read an optional JSON object; return ``None`` when absent/unreadable.
-
-    Used for ``working_assumptions.json`` — an absent file is a **valid**
-    state (the honest block, α), never an error.
-    """
-    if not path.is_file():
-        return None
-    try:
-        data = json.loads(path.read_text(encoding="utf-8-sig"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    return data if isinstance(data, dict) else None
-
-
 def _resolve_confirmed_months(
     call_data: dict[str, Any],
 ) -> tuple[Optional[int], str, str]:
@@ -354,7 +346,7 @@ def _lookup_coefficient(
 
 def _resolve_host_country(
     call_data: dict[str, Any],
-    working_assumptions: Optional[dict[str, Any]],
+    working_assumptions: WorkingAssumptions,
 ) -> tuple[Optional[str], str, str]:
     """Resolve the host country ISO code.
 
@@ -364,23 +356,23 @@ def _resolve_host_country(
     override — flagged ``Assumed``).  When neither is present the host is
     ``Unresolved`` (the honest block, α).
 
-    The ``working_assumptions.json`` reader here is intentionally minimal:
-    it reads a declared ``host_country`` if the file exists.  The full
-    declaration substrate + applier are tickets 9/15; this module only needs
-    the host-coefficient lookup (D11/D12).
+    The declared host is read through the shared declaration substrate
+    (``runner.working_assumptions``, ticket 15) — the same reader the claim
+    layer (ticket 9) consumes, so one host declaration resolves both the
+    living-allowance coefficient here and the ``Assumed`` claims there
+    (D11/D12).
     """
     confirmed = call_data.get("host_country")
     if isinstance(confirmed, str) and confirmed.strip():
         return confirmed.strip(), STATUS_CONFIRMED, f"{SELECTED_CALL_REL} -> host_country"
 
-    if working_assumptions:
-        declared = working_assumptions.get("host_country")
-        if isinstance(declared, str) and declared.strip():
-            return (
-                declared.strip(),
-                STATUS_ASSUMED,
-                f"{WORKING_ASSUMPTIONS_REL} -> host_country (operator-declared)",
-            )
+    declared = working_assumptions.declared_value("host_country")
+    if isinstance(declared, str) and declared.strip():
+        return (
+            declared.strip(),
+            STATUS_ASSUMED,
+            f"{WORKING_ASSUMPTIONS_REL} -> host_country (operator-declared)",
+        )
     return (
         None,
         STATUS_UNRESOLVED,
@@ -459,9 +451,7 @@ def derive_unit_cost_budget(run_id: str, repo_root: Path) -> Optional[Path]:
     if not isinstance(rates, dict):
         raise UnitCostBudgetError("unit_cost_rates.json root is not an object")
 
-    working_assumptions = _read_optional_json(
-        repo_root / WORKING_ASSUMPTIONS_REL
-    )
+    working_assumptions = load_working_assumptions(repo_root)
 
     months, months_status, months_source = _resolve_confirmed_months(call_data)
     host_country, host_status, host_source = _resolve_host_country(

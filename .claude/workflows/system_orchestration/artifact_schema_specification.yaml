@@ -2714,6 +2714,92 @@ tier3_source_schemas:
             type: string
             required: true
 
+  # ---------------------------------------------------------------------------
+  # 6.6 working_assumptions.json
+  # Path: docs/tier3_project_instantiation/working_assumptions.json
+  # Read by: runner.working_assumptions.load_working_assumptions (the shared
+  #   reader, ticket 15); consumed by the unit-cost budget deriver's host lookup
+  #   (ticket 8) and the assumed_claims_are_operator_declared W1 predicate
+  #   (ticket 9). The engine READS this file and NEVER writes it.
+  # ---------------------------------------------------------------------------
+  working_assumptions:
+    canonical_path: "docs/tier3_project_instantiation/working_assumptions.json"
+    provenance_class: manually_placed
+    description: >
+      Operator-authored working assumptions — the single mechanism that turns
+      an honest block into a *conscious* green (MILESTONE1_DECISION_RECORD.md
+      D11). A human operator declares facts the engine cannot confirm (host
+      country, fellowship duration, spine identities) so a blocked run can
+      proceed with those facts flagged Assumed — never Confirmed. Both
+      consumers read it from one shared reader, so a single host declaration
+      resolves the unit-cost living-allowance coefficient (ticket 8) AND the
+      Assumed identity claims (ticket 9) from one source (D11/D12). The engine
+      never writes this file (provenance_class manually_placed, §9). An ABSENT
+      or EMPTY file (missing, blank, {}, or {"declarations": []}) is a VALID
+      state — it yields the honest block (mode α), not an error. A
+      present-but-malformed file fails closed.
+
+    fields:
+      provenance_class:
+        type: string
+        required: false
+        enum: [manually_placed]
+        description: >
+          Conditionally required: MUST be "manually_placed" when the file
+          carries declarations; not required (and not checked) when there are
+          zero declarations. Marks the file user-authored and engine-read-only.
+          Enforced by the shared reader.
+      record_type:
+        type: string
+        required: false
+        description: Documentary tag; "working_assumptions" by convention.
+      declarations:
+        type: array
+        required: false
+        description: >
+          The operator declarations. ABSENT, null, or an empty array are all
+          valid states (no declarations → honest block α), so this field is not
+          required. Each entry carries a stable key, the operator-declared
+          value, and attribution + timestamp — sufficient for W1's
+          `claim_summary == declared value` check (ticket 9) and the budget
+          deriver's host-coefficient lookup (ticket 8).
+        item_schema:
+          key:
+            type: string
+            required: true
+            description: >
+              Stable declaration key. Doubles as the claim_id W1 matches on
+              (ticket 9) and the semantic lookup key the budget deriver uses
+              (e.g. "host_country", ticket 8). Must be unique within the file.
+          value:
+            type: [string, number, boolean, array, object]
+            required: true
+            description: >
+              The operator-declared value. The shared reader accepts any
+              non-null JSON value and rejects only null or a blank string; in
+              practice it is a scalar (a string identity / ISO country code, or
+              an integer duration). W1 checks it equals the backing claim's
+              claim_summary.
+          declared_by:
+            type: string
+            required: true
+            description: Attribution — who declared the assumption.
+          declared_on:
+            type: string
+            required: true
+            description: Timestamp — when it was declared (ISO 8601 by convention).
+          rationale:
+            type: string
+            required: false
+            description: Optional operator justification.
+          checklist_ref:
+            type: string
+            required: false
+            description: >
+              Optional link to a confirmation_checklist.json spine token (e.g.
+              "HOST"), so one host declaration is discoverable by the same token
+              that names the gap it fills (D11/D12).
+
 
 # =============================================================================
 # SECTION 7 — TIER 2B EXTRACTED FILE SCHEMAS

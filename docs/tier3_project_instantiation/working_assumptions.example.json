@@ -1,0 +1,23 @@
+{
+  "_template_note": "COPY this file to 'working_assumptions.json' (same directory) and edit it to declare working assumptions. This '.example.json' is an inert template — the engine reads ONLY 'working_assumptions.json' and NEVER writes it (provenance_class: manually_placed, CLAUDE.md §9). With no live 'working_assumptions.json' the run yields the honest block (mode α), which is a correct terminal state (§12.4). Each declaration turns an Unresolved spine fact into a conscious Assumed (never Confirmed): the W1 predicate (ticket 9) requires every Assumed claim to trace back to a declaration here. Schema: .claude/workflows/system_orchestration/artifact_schema_specification.yaml -> tier3_source_schemas.working_assumptions.",
+  "record_type": "working_assumptions",
+  "provenance_class": "manually_placed",
+  "declarations": [
+    {
+      "key": "host_country",
+      "value": "BE",
+      "declared_by": "operator@example.org",
+      "declared_on": "2026-07-13T10:00:00Z",
+      "rationale": "Host institution located in Belgium. One host declaration resolves BOTH the unit-cost living-allowance coefficient (Phase 7, ticket 8) AND the Assumed HOST identity claims (Phase 8, ticket 9) — D11/D12.",
+      "checklist_ref": "HOST"
+    },
+    {
+      "key": "DURATION",
+      "value": 24,
+      "declared_by": "operator@example.org",
+      "declared_on": "2026-07-13T10:00:00Z",
+      "rationale": "24-month European Fellowship working assumption; re-scales the workpackage/milestone timeline.",
+      "checklist_ref": "DURATION"
+    }
+  ]
+}
