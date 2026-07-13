@@ -95,6 +95,10 @@ node_registry:
     name: "Gantt and Milestones"
     source_file: workflow_phases/phase_04_gantt_milestones.yaml
     agent: gantt_designer
+    # Deterministic components (§16.5/C3): pure-Python, Claude-free node-body
+    # passes invoked by the agent runtime before skill sequencing (§17.5.3/C2).
+    deterministic_components:
+      - dependency_normalizer
     skills:
       - gantt-schedule-builder
       - milestone-consistency-check

@@ -154,6 +154,28 @@ class NodeResolver:
         """Return the ``pre_gate_agent`` field for *node_id*, or ``None``."""
         return self._get_entry(node_id).get("pre_gate_agent")
 
+    def resolve_deterministic_components(self, node_id: str) -> list[str]:
+        """Return the ``deterministic_components`` list for *node_id*.
+
+        This is the C3 / §16.5 binding: a node body may declare one or more
+        deterministic components (§17.5.3) in its manifest node spec.  The
+        binding value is a list of component ids resolved by
+        :func:`runner.deterministic_components.invoke_component`.
+
+        Returns an empty list if the node has no ``deterministic_components``
+        field (the common case — most nodes bind none).
+        """
+        entry = self._get_entry(node_id)
+        components = entry.get("deterministic_components")
+        if components is None:
+            return []
+        if not isinstance(components, list):
+            raise NodeResolverError(
+                f"Node {node_id!r} 'deterministic_components' field is not a "
+                f"list: {type(components).__name__}"
+            )
+        return list(components)
+
     def resolve_skill_ids(self, node_id: str) -> list[str]:
         """Return the ``skills`` list for *node_id* in manifest order.
 

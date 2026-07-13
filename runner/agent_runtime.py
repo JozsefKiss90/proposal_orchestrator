@@ -33,8 +33,13 @@ from typing import Any, Optional
 
 import yaml
 
+from runner.deterministic_components import invoke_component
 from runner.node_resolver import NodeResolver, NodeResolverError
-from runner.runtime_models import AgentResult, SkillInvocationRecord
+from runner.runtime_models import (
+    AgentResult,
+    ComponentInvocationRecord,
+    SkillInvocationRecord,
+)
 from runner.skill_runtime import run_skill
 
 logger = logging.getLogger(__name__)
@@ -851,6 +856,7 @@ def run_agent(
     sub_agent_id: Optional[str] = None,
     pre_gate_agent_id: Optional[str] = None,
     skip_skills: list[str] | None = None,
+    deterministic_components: list[str] | None = None,
 ) -> AgentResult:
     """Execute an agent's body for a node and return an AgentResult.
 
@@ -887,6 +893,13 @@ def run_agent(
         Skill IDs to skip during execution (recorded as
         ``"reuse_skipped"``).  Used by Phase 8 reuse to skip
         expensive drafting skills while still running audit skills.
+    deterministic_components:
+        Ordered list of deterministic-component ids bound to this node in
+        the manifest (§16.5 / C3).  Invoked as pure-Python, Claude-free
+        node-body passes before skill sequencing; each is recorded in
+        ``AgentResult.invoked_components`` (C2).  A component fault fails
+        the agent body with ``failure_category="AGENT_EXECUTION_ERROR"``
+        and ``can_evaluate_exit_gate=False``.
 
     Returns
     -------
@@ -897,6 +910,7 @@ def run_agent(
     """
 
     all_invocations: list[SkillInvocationRecord] = []
+    all_invoked_components: list[ComponentInvocationRecord] = []
     all_outputs: list[str] = []
     all_validation_reports: list[str] = []
     all_decision_log_writes: list[str] = []
@@ -952,42 +966,41 @@ def run_agent(
             failure_category="MISSING_INPUT",
         )
 
-    # ── Phase B+: Deterministic dependency normalization (n04 only) ────
+    # ── Phase B+: Deterministic components (manifest-bound, §17.5.3/C2) ─
     #
-    # The dependency normalizer is a pure-Python preprocessor that reads
-    # wp_structure.json + workpackage_seed.json + selected_call.json and
-    # produces scheduling_constraints.json before the gantt_designer agent
-    # body executes.  This follows the same architectural pattern as the
-    # sub-agent injection for n03 (lines 996-1048): manifest-derived,
-    # node-specific preprocessing within the agent runtime.
-
-    if node_id == "n04_gantt_milestones":
-        try:
-            from runner.dependency_normalizer import (
-                normalize_dependencies,
-                DependencyNormalizerError,
-            )
-            sc_path = normalize_dependencies(run_id, repo_root)
-            logger.info(
-                "Dependency normalization completed: %s",
-                sc_path.relative_to(repo_root),
-            )
+    # Deterministic components are pure-Python, Claude-free node-body passes
+    # bound to the node via the manifest ``deterministic_components`` key
+    # (§16.5 / C3).  They read declared inputs and write canonical artifacts
+    # before skill sequencing.  This generic path replaced the former
+    # hardcoded n04 dependency-normalizer branch: the normalizer now binds
+    # and logs through this same mechanism, with byte-identical output.
+    #
+    # A component fault fails the agent body with AGENT_EXECUTION_ERROR and
+    # can_evaluate_exit_gate=False (the scheduler then skips the exit gate,
+    # §17.3.1).  Components cannot evaluate gates and are never invoked by
+    # skills (§17.6.2, §17.6.4); Python owns every write.
+    for component_id in deterministic_components or []:
+        record = invoke_component(component_id, run_id, repo_root)
+        all_invoked_components.append(record)
+        if record.status == "success":
+            # Make component outputs available to subsequent skills.
             _refresh_inputs_from_outputs(
-                resolved_inputs,
-                [str(sc_path.relative_to(repo_root))],
-                repo_root,
+                resolved_inputs, record.outputs_written, repo_root
             )
-        except Exception as exc:
-            # DependencyNormalizerError or any unexpected error → fail closed
+        else:
             return AgentResult(
                 status="failure",
                 can_evaluate_exit_gate=False,
-                failure_reason=f"Dependency normalization failed: {exc}",
-                failure_category="MISSING_INPUT",
+                failure_reason=(
+                    f"Deterministic component {component_id!r} failed: "
+                    f"{record.failure_reason}"
+                ),
+                failure_category="AGENT_EXECUTION_ERROR",
                 outputs_written=all_outputs,
                 validation_reports=all_validation_reports,
                 decision_log_writes=all_decision_log_writes,
                 invoked_skills=all_invocations,
+                invoked_components=all_invoked_components,
             )
 
     # ── Phase C: Pre-gate agent (n07 special case) ─────────────────────
@@ -1050,6 +1063,7 @@ def run_agent(
                         validation_reports=all_validation_reports,
                         decision_log_writes=all_decision_log_writes,
                         invoked_skills=all_invocations,
+                        invoked_components=all_invoked_components,
                     )
                 # Non-halt pre-gate failure: log and continue to primary
                 # agent — it may still be able to produce required outputs
@@ -1351,6 +1365,7 @@ def run_agent(
                         validation_reports=all_validation_reports,
                         decision_log_writes=all_decision_log_writes,
                         invoked_skills=all_invocations,
+                        invoked_components=all_invoked_components,
                     )
 
             # Manifest-driven sub-agent injection: after each
@@ -1402,6 +1417,7 @@ def run_agent(
                                     validation_reports=all_validation_reports,
                                     decision_log_writes=all_decision_log_writes,
                                     invoked_skills=all_invocations,
+                                    invoked_components=all_invoked_components,
                                 )
                             had_failure = True
                             failure_reason_accumulator = (
@@ -1429,6 +1445,7 @@ def run_agent(
                     validation_reports=all_validation_reports,
                     decision_log_writes=all_decision_log_writes,
                     invoked_skills=all_invocations,
+                    invoked_components=all_invoked_components,
                 )
 
             # Phase 8 stale-artifact guard: if the primary drafting
@@ -1457,6 +1474,7 @@ def run_agent(
                     validation_reports=all_validation_reports,
                     decision_log_writes=all_decision_log_writes,
                     invoked_skills=all_invocations,
+                    invoked_components=all_invoked_components,
                 )
 
             # Non-halt failure: record and continue.
@@ -1513,6 +1531,7 @@ def run_agent(
                             validation_reports=all_validation_reports,
                             decision_log_writes=all_decision_log_writes,
                             invoked_skills=all_invocations,
+                            invoked_components=all_invoked_components,
                         )
                     had_failure = True
                     failure_reason_accumulator = (
@@ -1566,6 +1585,7 @@ def run_agent(
             validation_reports=all_validation_reports,
             decision_log_writes=all_decision_log_writes,
             invoked_skills=all_invocations,
+            invoked_components=all_invoked_components,
         )
 
     if not can_evaluate:
@@ -1585,6 +1605,7 @@ def run_agent(
             validation_reports=all_validation_reports,
             decision_log_writes=all_decision_log_writes,
             invoked_skills=all_invocations,
+            invoked_components=all_invoked_components,
         )
 
     # Happy path: all skills succeeded and gate artifacts are on disk.
@@ -1595,6 +1616,7 @@ def run_agent(
         validation_reports=all_validation_reports,
         decision_log_writes=all_decision_log_writes,
         invoked_skills=all_invocations,
+        invoked_components=all_invoked_components,
     )
 
 

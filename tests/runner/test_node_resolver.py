@@ -269,3 +269,32 @@ class TestNodeResolverError:
                 manifest_path=tmp_path / "does_not_exist.yaml",
                 repo_root=tmp_path,
             )
+
+
+# ---------------------------------------------------------------------------
+# Deterministic-component binding resolution (C3 / §16.5)
+# ---------------------------------------------------------------------------
+
+
+class TestDeterministicComponentResolution:
+    """The manifest ``deterministic_components`` binding is resolved per node."""
+
+    def test_n04_binds_dependency_normalizer(self, resolver: NodeResolver) -> None:
+        assert resolver.resolve_deterministic_components(
+            "n04_gantt_milestones"
+        ) == ["dependency_normalizer"]
+
+    @pytest.mark.parametrize("node_id", [
+        "n01_call_analysis",
+        "n03_wp_design",
+        "n07_budget_gate",
+        "n08a_excellence_drafting",
+    ])
+    def test_nodes_without_binding_return_empty(
+        self, resolver: NodeResolver, node_id: str
+    ) -> None:
+        assert resolver.resolve_deterministic_components(node_id) == []
+
+    def test_unknown_node_raises(self, resolver: NodeResolver) -> None:
+        with pytest.raises(NodeResolverError):
+            resolver.resolve_deterministic_components("n99_nonexistent")

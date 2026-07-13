@@ -128,6 +128,47 @@ class SkillInvocationRecord:
 
 
 # ---------------------------------------------------------------------------
+# ComponentInvocationRecord
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ComponentInvocationRecord:
+    """Record of a single deterministic-component invocation within an agent
+    execution.
+
+    Deterministic components (CLAUDE.md §17.5.3, C2) are Claude-free,
+    node-body-scoped passes that read declared input artifacts and write
+    canonical artifacts via ``_atomic_write``.  They perform no domain
+    reasoning and are each closed by a determinism guarantee (byte-equal
+    replay or pure lookup).  Unlike skills, they are pure-Python — the
+    agent runtime invokes them directly rather than through Claude.
+
+    Collected by the agent runtime for inclusion in
+    :class:`AgentResult` via ``invoked_components`` (C2 / §17.4.2).
+    """
+
+    component_id: str
+    """Deterministic-component identifier bound in the manifest node spec
+    (§16.5 / C3)."""
+
+    status: str
+    """``"success"`` or ``"failure"``."""
+
+    outputs_written: list[str] = field(default_factory=list)
+    """Paths of artifacts written by this component, relative to
+    *repo_root*."""
+
+    failure_reason: str | None = None
+    """Human-readable failure description; ``None`` on success.
+
+    A component fault is always surfaced by the agent runtime as
+    ``failure_origin="agent_body"`` with
+    ``failure_category="AGENT_EXECUTION_ERROR"`` and
+    ``can_evaluate_exit_gate=False``."""
+
+
+# ---------------------------------------------------------------------------
 # AgentResult
 # ---------------------------------------------------------------------------
 
@@ -178,6 +219,13 @@ class AgentResult:
 
     invoked_skills: list[SkillInvocationRecord] = field(default_factory=list)
     """Ordered record of skill invocations and their results."""
+
+    invoked_components: list[ComponentInvocationRecord] = field(
+        default_factory=list
+    )
+    """Ordered record of deterministic-component invocations and their
+    results (C2 / §17.4.2).  Additive field: defaults to an empty list so
+    that nodes with no bound components are unaffected."""
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,179 @@
+"""Tests for runner.deterministic_components — manifest-bound component substrate.
+
+Covers the C2/C3 substrate (CLAUDE.md §17.5.3, §16.5):
+  - invoke_component success / unknown-id / raised-exception → records
+  - output path normalization to repo-relative POSIX strings
+  - the n04 dependency_normalizer is registered and runs through the
+    generic path with byte-identical output (migration regression)
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from runner.deterministic_components import (
+    COMPONENT_REGISTRY,
+    invoke_component,
+    _to_repo_relative,
+)
+from runner.dependency_normalizer import (
+    normalize_dependencies,
+    OUTPUT_REL,
+    WP_STRUCTURE_REL,
+    WP_SEED_REL,
+    SELECTED_CALL_REL,
+)
+from runner.runtime_models import ComponentInvocationRecord
+
+
+# ---------------------------------------------------------------------------
+# invoke_component — generic behavior
+# ---------------------------------------------------------------------------
+
+
+class TestInvokeComponentSuccess:
+    def test_success_record_with_repo_relative_outputs(self, tmp_path: Path) -> None:
+        """A registered component that writes an artifact → success record."""
+
+        def _fake(run_id: str, repo_root: Path) -> list[Path]:
+            out = repo_root / "docs" / "tier4" / "out.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"run_id": run_id}), encoding="utf-8")
+            return [out]
+
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setitem(COMPONENT_REGISTRY, "fake", _fake)
+            record = invoke_component("fake", "run-x", tmp_path)
+
+        assert isinstance(record, ComponentInvocationRecord)
+        assert record.component_id == "fake"
+        assert record.status == "success"
+        assert record.failure_reason is None
+        # Absolute path returned by the component is normalized to repo-relative
+        assert record.outputs_written == ["docs/tier4/out.json"]
+
+    def test_empty_outputs_still_success(self, tmp_path: Path) -> None:
+        """A component that writes nothing still yields a success record."""
+
+        def _noop(run_id: str, repo_root: Path) -> list[Path]:
+            return []
+
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setitem(COMPONENT_REGISTRY, "noop", _noop)
+            record = invoke_component("noop", "run-x", tmp_path)
+
+        assert record.status == "success"
+        assert record.outputs_written == []
+
+
+class TestInvokeComponentFailure:
+    def test_unknown_component_is_failure_record(self, tmp_path: Path) -> None:
+        """An unbound component id → failure record naming the unknown id."""
+        record = invoke_component("does_not_exist", "run-x", tmp_path)
+        assert record.status == "failure"
+        assert record.component_id == "does_not_exist"
+        assert "Unknown deterministic component" in (record.failure_reason or "")
+        assert "does_not_exist" in (record.failure_reason or "")
+
+    def test_raised_exception_becomes_failure_record(self, tmp_path: Path) -> None:
+        """A component that raises → failure record (never propagates)."""
+
+        def _boom(run_id: str, repo_root: Path):
+            raise ValueError("kaboom")
+
+        with pytest.MonkeyPatch.context() as mp:
+            mp.setitem(COMPONENT_REGISTRY, "boom", _boom)
+            record = invoke_component("boom", "run-x", tmp_path)
+
+        assert record.status == "failure"
+        assert "kaboom" in (record.failure_reason or "")
+        assert "ValueError" in (record.failure_reason or "")
+
+
+class TestPathNormalization:
+    def test_absolute_path_normalized(self, tmp_path: Path) -> None:
+        p = tmp_path / "docs" / "a" / "b.json"
+        assert _to_repo_relative(p, tmp_path) == "docs/a/b.json"
+
+    def test_relative_path_preserved_with_forward_slashes(self, tmp_path: Path) -> None:
+        assert _to_repo_relative("docs\\a\\b.json", tmp_path) == "docs/a/b.json"
+
+
+# ---------------------------------------------------------------------------
+# n04 dependency_normalizer migration regression (byte-identical output)
+# ---------------------------------------------------------------------------
+
+
+def _write_dep_fixtures(tmp_path: Path) -> None:
+    """Minimal fixtures for the Phase-4 dependency normalizer."""
+    wp = tmp_path / WP_STRUCTURE_REL
+    wp.parent.mkdir(parents=True, exist_ok=True)
+    wp.write_text(json.dumps({
+        "schema_id": "orch.phase3.wp_structure.v1",
+        "run_id": "run-phase3",
+        "work_packages": [
+            {"wp_id": "WP1", "title": "Mgmt", "lead_partner": "P1",
+             "tasks": [{"task_id": "T1-01", "title": "t"}], "deliverables": [],
+             "dependencies": []},
+            {"wp_id": "WP2", "title": "Res", "lead_partner": "P2",
+             "tasks": [{"task_id": "T2-01", "title": "t"}], "deliverables": [],
+             "dependencies": []},
+        ],
+        "dependency_map": {
+            "nodes": ["WP1", "WP2", "T1-01", "T2-01"],
+            "edges": [
+                {"from": "WP2", "to": "WP1", "edge_type": "finish_to_start"},
+                {"from": "T1-01", "to": "T2-01", "edge_type": "data_input"},
+            ],
+        },
+    }), encoding="utf-8")
+
+    seed = tmp_path / WP_SEED_REL
+    seed.parent.mkdir(parents=True, exist_ok=True)
+    seed.write_text(json.dumps({"work_packages": [
+        {"id": "WP1", "start_month": 12, "end_month": 48},
+        {"id": "WP2", "start_month": 1, "end_month": 36},
+    ]}), encoding="utf-8")
+
+    call = tmp_path / SELECTED_CALL_REL
+    call.parent.mkdir(parents=True, exist_ok=True)
+    call.write_text(json.dumps({
+        "call_id": "T", "topic_code": "T", "instrument_type": "RIA",
+        "max_project_duration_months": 48,
+    }), encoding="utf-8")
+
+
+class TestDependencyNormalizerMigration:
+    def test_dependency_normalizer_registered(self) -> None:
+        assert "dependency_normalizer" in COMPONENT_REGISTRY
+
+    def test_component_output_matches_direct_call(self, tmp_path: Path) -> None:
+        """Invoking via the component path yields output identical (modulo the
+        wall-clock timestamp) to calling normalize_dependencies directly."""
+        _write_dep_fixtures(tmp_path)
+
+        # Direct (legacy) path
+        direct_path = normalize_dependencies("run-1", tmp_path)
+        direct = json.loads(direct_path.read_text(encoding="utf-8"))
+
+        # Generic component path (same run_id → same content modulo timestamp)
+        record = invoke_component("dependency_normalizer", "run-1", tmp_path)
+        assert record.status == "success"
+        assert record.outputs_written == [OUTPUT_REL]
+
+        via_component = json.loads(
+            (tmp_path / OUTPUT_REL).read_text(encoding="utf-8")
+        )
+
+        direct.pop("normalization_timestamp", None)
+        via_component.pop("normalization_timestamp", None)
+        assert via_component == direct
+
+    def test_component_failure_on_missing_inputs(self, tmp_path: Path) -> None:
+        """No fixtures on disk → the normalizer raises → failure record."""
+        record = invoke_component("dependency_normalizer", "run-1", tmp_path)
+        assert record.status == "failure"
+        assert record.failure_reason

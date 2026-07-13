@@ -27,6 +27,7 @@ import yaml
 
 from runner.runtime_models import AgentResult, SkillInvocationRecord, SkillResult
 from runner.agent_runtime import run_agent, AgentRuntimeError
+from runner.deterministic_components import COMPONENT_REGISTRY
 
 
 # ---------------------------------------------------------------------------
@@ -1753,3 +1754,97 @@ class TestWindowsPathNormalization:
         # When joined with repo_root via Path(), it should resolve
         abs_path = tmp_path / paths[0]
         assert isinstance(abs_path, Path)
+
+
+# ---------------------------------------------------------------------------
+# Deterministic-component invocation (C2 / C3 substrate)
+# ---------------------------------------------------------------------------
+
+
+class TestDeterministicComponentInvocation:
+    """The agent runtime invokes manifest-bound deterministic components
+    within the node body (before skills), records each in
+    ``invoked_components``, and fails closed on a component fault."""
+
+    def test_bound_component_runs_before_skills_and_is_recorded(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        order: list[str] = []
+
+        def _fake_component(run_id: str, repo_root: Path) -> list[Path]:
+            order.append("component")
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "component"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            order.append(skill_id)
+            return _success_skill()
+
+        with patch.dict(COMPONENT_REGISTRY, {"fake_writer": _fake_component}), \
+             patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(
+                **kwargs, deterministic_components=["fake_writer"]
+            )
+
+        assert result.status == "success"
+        assert result.can_evaluate_exit_gate is True
+        # Component ran before any skill.
+        assert order[0] == "component"
+        assert "skill-a" in order
+        # Recorded in invoked_components.
+        assert len(result.invoked_components) == 1
+        rec = result.invoked_components[0]
+        assert rec.component_id == "fake_writer"
+        assert rec.status == "success"
+        assert "docs/tier4/phase1/output.json" in rec.outputs_written
+
+    def test_component_fault_blocks_agent_body(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+
+        def _boom(run_id: str, repo_root: Path):
+            raise RuntimeError("component broke")
+
+        skill_mock = MagicMock(return_value=_success_skill())
+        with patch.dict(COMPONENT_REGISTRY, {"fake_fail": _boom}), \
+             patch(_RUN_SKILL_TARGET, skill_mock):
+            result = run_agent(
+                **kwargs, deterministic_components=["fake_fail"]
+            )
+
+        assert result.status == "failure"
+        assert result.failure_category == "AGENT_EXECUTION_ERROR"
+        assert result.can_evaluate_exit_gate is False
+        assert result.failure_origin == "agent_body"
+        # A faulting component halts before skill sequencing.
+        skill_mock.assert_not_called()
+        assert len(result.invoked_components) == 1
+        assert result.invoked_components[0].status == "failure"
+
+    def test_unknown_component_id_blocks(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        skill_mock = MagicMock(return_value=_success_skill())
+        with patch(_RUN_SKILL_TARGET, skill_mock):
+            result = run_agent(
+                **kwargs, deterministic_components=["nope"]
+            )
+        assert result.status == "failure"
+        assert result.failure_category == "AGENT_EXECUTION_ERROR"
+        assert result.can_evaluate_exit_gate is False
+        skill_mock.assert_not_called()
+
+    def test_no_components_leaves_invoked_components_empty(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(**kwargs)  # no deterministic_components
+
+        assert result.status == "success"
+        assert result.invoked_components == []

@@ -1790,6 +1790,9 @@ class DAGScheduler:
         pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
         skill_ids = resolver.resolve_skill_ids(node_id)
         phase_id = resolver.resolve_phase_id(node_id)
+        deterministic_components = resolver.resolve_deterministic_components(
+            node_id
+        )
 
         log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
         agent_result = run_agent(
@@ -1803,6 +1806,7 @@ class DAGScheduler:
             sub_agent_id=sub_agent_id,
             pre_gate_agent_id=pre_gate_agent_id,
             skip_skills=_preseed_skip_skills or _reuse_skip_skills,
+            deterministic_components=deterministic_components,
         )
         log.info(
             "  [%s] agent result: status=%s  can_evaluate_exit=%s",
