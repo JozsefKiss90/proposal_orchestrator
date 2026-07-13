@@ -1,0 +1,53 @@
+{
+  "record_type": "reinstantiation_provenance",
+  "stage": "Milestone 1 — Stage 1 (Purge to skeleton & re-instantiate on the MSCA work branch)",
+  "date": "2026-07-13",
+  "authority": [
+    "CLAUDE.md §9.5 (reproducibility / durable decisions)",
+    "tickets.md ticket 3",
+    "MILESTONE1_DECISION_RECORD.md D10",
+    "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md §5 (purge/retain manifest), §5.3 (fail-closed dry-run)"
+  ],
+  "work_branch": "msca-pf-milestone1",
+  "work_branch_base": {
+    "commit": "d1f66c7",
+    "ref_at_cut": "AWS_deployment HEAD (pre-purge)",
+    "rationale": "Cut from current HEAD rather than literally from backend_migration. backend_migration is a strict ancestor (46 commits behind, 0 ahead) and predates Stage 0: it lacks the C1/C2/C3 CLAUDE.md amendments, the milestone decision record, tickets.md, and the tickets 1-2 engine work. Cutting from HEAD is 'off the backend_migration line' while preserving that foundation. Operator-confirmed."
+  },
+  "archive_branch": {
+    "ref": "archive/maestro-demo",
+    "commit": "d1f66c7",
+    "purpose": "Preserves the runnable MAESTRO/RIA demo end-to-end for regression safety (the pre-purge state)."
+  },
+  "embedded_msca_vault": {
+    "path": "MSCA",
+    "topology": "Embedded git repo referenced as a gitlink (mode 160000); NOT a registered submodule (no .gitmodules). Submodule-vs-absorb topology deferred to D8.",
+    "recorded_gitlink_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "working_tree_state_at_record": "dirty (uncommitted ADR churn + untracked .scratch/ and .smart-env/)",
+    "handling": "Operator decision: record the current gitlink SHA as re-instantiation provenance; do NOT commit the vault's uncommitted changes. A byte-exact clean pin-and-record is deferred (D8/D10).",
+    "provenance_note": "This SHA pins the source vault used for re-instantiation. Because the working tree was left dirty and uncommitted, the recorded SHA reflects the last committed gitlink, not the current working tree."
+  },
+  "purge_manifest_source": "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md §5",
+  "reset_to_skeleton": [
+    "docs/tier3_project_instantiation/{project_brief,consortium,call_binding,architecture_inputs,integration}/*",
+    "docs/tier4_orchestration_state/{phase_outputs,decision_log,validation_reports,checkpoints,reuse}/*",
+    "docs/tier5_deliverables/{proposal_sections,assembled_drafts,review_packets,final_exports}/*",
+    "docs/tier2b_topic_and_call_sources/extracted/* (CL4 MAESTRO call slices — regenerate for the MSCA call, ticket 6)",
+    "docs/integrations/lump_sum_budget_planner/{received,validation}/*",
+    ".claude/runs/<uuid>/* (MAESTRO run contexts; test-* fixture run dirs preserved)"
+  ],
+  "retained": [
+    "runner/**, .claude/{workflows,skills,agents}/**, tests/**",
+    "CLAUDE.md, README.md, MSCA/**",
+    "docs/tier1_normative_framework/**",
+    "docs/tier2a_instrument_schemas/{application_forms,evaluation_forms}/**",
+    "docs/tier2b_topic_and_call_sources/{work_programmes,call_extracts}/**",
+    "docs/index/** (master registries — update, not delete)",
+    "docs/integrations/lump_sum_budget_planner/{interface_contract.json,request_templates}/**"
+  ],
+  "reconciliation_notes": [
+    "docs/tier2a_instrument_schemas/extracted/ is RETAINED (RIA). The §5.1 action for Tier 2A extracted is 'Regenerate for MSCA-PF' (a ticket-5 action), not 'Reset'. Retaining it keeps the ticket-2 instrument-profile resolver coherent; ticket 5 regenerates it for MSCA-PF.",
+    "MAESTRO-specific regression tests under tests/** that read the purged Tier 3/4/5 data are structurally orphaned by this purge (tests/** is retained, the data is not). They remain green on archive/maestro-demo and are to be re-fixtured for MSCA in tickets 5-6."
+  ],
+  "integrity_check": "§5.3 fail-closed dry-run: python -m runner --run-id <uuid> --phase 1 --dry-run (enumerates ready nodes, evaluates no gates, exits clean)."
+}
