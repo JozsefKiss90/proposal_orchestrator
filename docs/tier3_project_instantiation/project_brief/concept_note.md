@@ -34,14 +34,14 @@ The tool is presented as a **standalone research demonstrator** (an MVP / `[[Web
 
 Ten questions taken faithfully from the analyst synthesis (prompt.txt §10) must be answered to turn this two-route concept into a committed methodology: RQ1 crop (tomato *tentative* — default to "horticultural row crops"); RQ2 route scope; RQ3 target field state; RQ4–RQ5, RQ7, RQ9 the validation protocol; RQ6 the decision objective; RQ8 PlanetScope access; RQ10 the TRL target. These are recorded as open decisions, not resolved here.
 
-## Unresolved identity spine (the honest block) *(Unresolved / Refuted — `[[Partner Roles Overview]]`)*
+## Unresolved identity spine (the honest block) *(all Unresolved — `[[Partner Roles Overview]]`)*
 
 Consistent with the anti-fabrication discipline (CLAUDE.md §13.3), **no partner or person is invented**:
 
 - **Fellow / lead researcher** — *Unresolved.* A PI Role is *inferred* from first-person authorship of the design narrative and ownership of the calibration method (doi:10.1016/j.envsoft.2022.105556), but the name and affiliation are unconfirmed, and whether that person is the PF fellow or the PF supervisor is itself open (`[[PI Role]]`).
 - **Host / beneficiary organisation** — *Unresolved.* No host is named in any source.
 - **Supervisor** — *Unresolved.* Not named.
-- **ELTE (Eötvös Loránd University)** — *Refuted.* ELTE is **absent from all primary sources**; no role, contribution or affiliation can be derived. Do not invent a role (`[[ELTE Role]]`).
+- **ELTE (Eötvös Loránd University)** — *Unresolved; do not invent.* ELTE is **absent from all primary sources**; no role, contribution or affiliation can be derived, so the engine must never assert it (`[[ELTE Role]]`). Absence of evidence is not evidence against: if the team genuinely secures ELTE as host, the operator may confirm it or declare it via `working_assumptions.json`.
 - **AgroVIR-type validation partner** — *Unresolved.* Appears only as "AgroVIR-like partners" assisting with feedback, farmer access, testing and validation — *not* owning or operating the tool; no committed partnership is stated (`[[AgroVIR Validation Partner Role]]`).
 - **Validation farms / field sites, EO data providers, meteorological providers** — *Unresolved.* Implied by the methodology's infrastructure but none is named (`[[Unconfirmed Partner Placeholders]]`).
 

@@ -173,10 +173,14 @@ node_registry:
     agent: excellence_writer
     # Ticket 7 delivers the decomposed-drafting driver (runner/decomposed_drafting.py)
     # and the byte-equal composition proof (Excellence drafts -> section_assembler ->
-    # full-length section).  The governed wiring that binds excellence_section_assembler
-    # here and rewrites this node's drafting skill to produce section_drafts/excellence/
-    # lands with the E2E run (ticket 13), per section_assembler.py's "don't bind an
-    # assembler over a directory no skill yet populates" rule.
+    # full-length section).  Ticket 9 adds the excellence_assumption_applier (the β
+    # honesty flip: declared unresolved -> assumed, pre-assembly).  The governed wiring
+    # that binds these here — deterministic_components: [excellence_assumption_applier,
+    # excellence_section_assembler] (the applier MUST run before the assembler, so the
+    # flip precedes composition) — and rewrites this node's drafting skill to produce
+    # section_drafts/excellence/ lands with the E2E run (ticket 13), per
+    # section_assembler.py's "don't bind an assembler over a directory no skill yet
+    # populates" rule.
     skills:
       - excellence-section-drafting
       - proposal-section-traceability-check

@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 from runner.atomic_write import atomic_write_json
+from runner.claim_status import worst_status
 from runner.instrument_profile import resolve_instrument_profile
 from runner.section_assembler import (
     SECTION_DRAFTS_ROOT_REL,
@@ -70,16 +71,6 @@ _SLUG_CRITERION: dict[str, str] = {
     "impact": "Impact",
     "implementation": "Implementation",
 }
-
-#: Claim-status severity order (worst wins) for deriving the section's
-#: ``overall_status`` from its per-sub-section claim statuses.
-_STATUS_SEVERITY: dict[str, int] = {
-    "confirmed": 0,
-    "inferred": 1,
-    "assumed": 2,
-    "unresolved": 3,
-}
-_SEVERITY_STATUS: dict[int, str] = {v: k for k, v in _STATUS_SEVERITY.items()}
 
 #: Production drafter model / token budget.  The token budget is deliberately
 #: generous (soft caps lifted, D5): each call drafts a single sub-section, so
@@ -191,15 +182,15 @@ def _derive_overall_status(drafts: list[dict[str, Any]]) -> str:
     The section is only as resolved as its least-resolved claim: any
     ``unresolved`` claim makes the section ``unresolved`` (the honest block),
     any ``assumed`` makes it ``assumed``, and so on.  No claims ⇒ ``confirmed``.
+    Delegates to :func:`runner.claim_status.worst_status` so the drafter and the
+    assumption-applier (ticket 9) derive this identically (§12.2).
     """
-    worst = 0
-    for draft in drafts:
-        for claim in draft.get("claim_statuses", []):
-            if isinstance(claim, dict):
-                sev = _STATUS_SEVERITY.get(str(claim.get("status", "")).lower())
-                if sev is not None and sev > worst:
-                    worst = sev
-    return _SEVERITY_STATUS[worst]
+    return worst_status(
+        claim.get("status", "")
+        for draft in drafts
+        for claim in draft.get("claim_statuses", [])
+        if isinstance(claim, dict)
+    )
 
 
 # ---------------------------------------------------------------------------

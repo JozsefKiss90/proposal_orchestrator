@@ -60,6 +60,28 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
+
+def declared_claim_summary(value: Any) -> str:
+    """Render an operator-declared value as the string a claim carries.
+
+    A section claim's ``claim_summary`` is always a string (§ schema), while a
+    declaration's ``value`` may be any non-null JSON scalar (an ISO country
+    code, an integer duration, …).  This is the **single** normalisation both
+    ticket-9 consumers share, so they cannot drift:
+
+      * the **applier** stamps ``claim_summary = declared_claim_summary(value)``
+        when it flips a declared ``unresolved → assumed`` claim, and
+      * the **W1 predicate** accepts an ``assumed`` claim iff its
+        ``claim_summary`` equals ``declared_claim_summary(value)`` for the
+        matching declaration.
+
+    A string value is used verbatim (identity); any non-string is rendered as
+    canonical, key-sorted JSON so the mapping is deterministic and byte-stable.
+    """
+    if isinstance(value, str):
+        return value
+    return json.dumps(value, ensure_ascii=False, sort_keys=True)
+
 # ---------------------------------------------------------------------------
 # Constants — the convention
 # ---------------------------------------------------------------------------

@@ -5,8 +5,8 @@
     "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
     "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
     "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. This file declares the STRUCTURAL roles with every IDENTITY left Unresolved (or, for ELTE, Refuted). No name is invented (CLAUDE.md §13.3). partners.json and capabilities.json are intentionally left unpopulated (the consortium/ directory retains only its .gitkeep) because zero partners are confirmed in any source. Populate these roles only from operator-confirmed facts or working_assumptions.json (ticket 15).",
-    "status_vocabulary": "validation_status values are the four CLAUDE.md §12.2 categories (here: Unresolved) EXCEPT 'Refuted' (ELTE), a deliberate ticket-14 extension for the 'absent from all sources; do not invent a role' disposition that §12.2's four categories (scoped to validation_reports/) cannot express."
+    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. This file declares the STRUCTURAL roles with every IDENTITY left Unresolved (including ELTE, which is Unresolved and additionally flagged do_not_invent: true, since the sources provide no basis for it). No name is invented (CLAUDE.md §13.3). partners.json and capabilities.json are intentionally left unpopulated (the consortium/ directory retains only its .gitkeep) because zero partners are confirmed in any source. Populate these roles only from operator-confirmed facts or working_assumptions.json (ticket 15).",
+    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories (here: Unresolved). No fifth category is introduced. Where the sources provide no basis for a role (ELTE), the status stays Unresolved and the disposition is carried by descriptive fields - source_disposition: 'absent_from_sources' and do_not_invent: true. A fifth status value would bypass both honesty gates (no_unresolved_material_claims fails only on 'unresolved'; W1 governs only 'assumed') and would be a de facto change to §12.2's vocabulary without an amendment (§14.1). See decision_log/status-vocabulary-correction_2026-07-13.json."
   },
   "spine_status": "unresolved",
   "roles": [
@@ -42,13 +42,15 @@
       "checklist_ref": "VALIDATION_PARTNER",
       "note": "'AgroVIR-like' role-type only; not committed."
     },
-    {
+ {
       "role_token": "ELTE",
       "role": "(Raised in build context only)",
       "identity": null,
-      "validation_status": "Refuted",
+      "validation_status": "Unresolved",
+      "source_disposition": "absent_from_sources",
+      "do_not_invent": true,
       "checklist_ref": "ELTE",
-      "note": "ELTE absent from all sources; do not invent a role."
+      "note": "ELTE is absent from all sources (vault ELTE Role, METH-PART-002, evidence_strength: unconfirmed). The engine must never invent this role. Absence of evidence is not evidence against: the operator MAY still confirm ELTE, or declare it via working_assumptions.json, if it is genuinely the host."
     }
   ]
 }

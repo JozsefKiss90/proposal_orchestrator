@@ -96,6 +96,29 @@ def _run_implementation_section_assembler(
     return [assemble_section(run_id, repo_root, "implementation")]
 
 
+def _run_excellence_assumption_applier(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter: apply operator declarations to the Excellence drafts (pre-assembly)."""
+    from runner.assumption_applier import apply_assumptions
+
+    return apply_assumptions(run_id, repo_root, "excellence")
+
+
+def _run_impact_assumption_applier(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter: apply operator declarations to the Impact drafts (pre-assembly)."""
+    from runner.assumption_applier import apply_assumptions
+
+    return apply_assumptions(run_id, repo_root, "impact")
+
+
+def _run_implementation_assumption_applier(
+    run_id: str, repo_root: Path
+) -> list[Path]:
+    """Adapter: apply operator declarations to the Implementation drafts (pre-assembly)."""
+    from runner.assumption_applier import apply_assumptions
+
+    return apply_assumptions(run_id, repo_root, "implementation")
+
+
 def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
     """Adapter for the unit-cost budget deriver (§8.1 / C1).
 
@@ -120,15 +143,20 @@ def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
 #: closed by the byte-equal replay check ``assembler(drafts) == section_json``.
 #: The unit-cost budget deriver (§8.1 / C1) computes the MSCA-style budget
 #: deterministically from published rates, closed by
-#: ``unit_cost_budget(months, rates, host_coeff) == figure``.  Remaining
-#: milestone-1 components (assumption-applier, canonical-pack deriver)
-#: register here as they are built — binding and logging then work
-#: uniformly for each.
+#: ``unit_cost_budget(months, rates, host_coeff) == figure``.  The
+#: assumption-appliers (β honesty layer, ticket 9) flip enumerated declared
+#: ``unresolved → assumed`` claims in the section drafts pre-assembly, closed by
+#: idempotent byte-equal replay.  The remaining milestone-1 component
+#: (canonical-pack deriver, ticket 10) registers here as it is built — binding
+#: and logging then work uniformly for each.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
     "excellence_section_assembler": _run_excellence_section_assembler,
     "impact_section_assembler": _run_impact_section_assembler,
     "implementation_section_assembler": _run_implementation_section_assembler,
+    "excellence_assumption_applier": _run_excellence_assumption_applier,
+    "impact_assumption_applier": _run_impact_assumption_applier,
+    "implementation_assumption_applier": _run_implementation_assumption_applier,
     "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
 }
 

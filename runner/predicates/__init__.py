@@ -83,6 +83,7 @@ from runner.predicates.coverage_predicates import (
     wp_budget_coverage_match,
 )
 from runner.predicates.criterion_predicates import (
+    assumed_claims_are_operator_declared,
     cross_section_consistency,
     impact_pathways_covered,
     implementation_coverage_complete,
@@ -173,6 +174,7 @@ __all__ = [
     # criterion-aligned predicates (Phase 8 refactor)
     "schema_id_matches",
     "no_unresolved_material_claims",
+    "assumed_claims_are_operator_declared",
     "impact_pathways_covered",
     "implementation_coverage_complete",
     "cross_section_consistency",
