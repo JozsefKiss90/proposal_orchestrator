@@ -293,9 +293,23 @@ class TestDeterministicComponentResolution:
         ) == ["unit_cost_budget_deriver"]
 
     @pytest.mark.parametrize("node_id", [
+        "n08a_excellence_drafting",
+        "n08b_impact_drafting",
+        "n08c_implementation_drafting",
+    ])
+    def test_phase8_drafting_nodes_bind_canonical_pack_deriver(
+        self, resolver: NodeResolver, node_id: str
+    ) -> None:
+        # Ticket 10: the canonical pack deriver runs in each Phase-8 drafting
+        # node body (before the drafting skill), replacing the scheduler build.
+        assert resolver.resolve_deterministic_components(node_id) == [
+            "canonical_pack_deriver"
+        ]
+
+    @pytest.mark.parametrize("node_id", [
         "n01_call_analysis",
         "n03_wp_design",
-        "n08a_excellence_drafting",
+        "n08d_assembly",
     ])
     def test_nodes_without_binding_return_empty(
         self, resolver: NodeResolver, node_id: str

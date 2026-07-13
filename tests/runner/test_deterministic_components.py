@@ -177,3 +177,64 @@ class TestDependencyNormalizerMigration:
         record = invoke_component("dependency_normalizer", "run-1", tmp_path)
         assert record.status == "failure"
         assert record.failure_reason
+
+
+# ---------------------------------------------------------------------------
+# canonical_pack_deriver registration (ticket 10)
+# ---------------------------------------------------------------------------
+
+
+def _write_pack_fixtures(tmp_path: Path) -> None:
+    """Minimal Tier 3/4 fixtures for the canonical pack deriver."""
+    base = tmp_path / "docs"
+    obj = base / "tier3_project_instantiation" / "architecture_inputs" / "objectives.json"
+    obj.parent.mkdir(parents=True, exist_ok=True)
+    obj.write_text(json.dumps({
+        "objectives": [{"id": "OBJ-1", "title": "T", "measurable_target": "x"}],
+    }), encoding="utf-8")
+    wp = base / "tier4_orchestration_state" / "phase_outputs" / "phase3_wp_design" / "wp_structure.json"
+    wp.parent.mkdir(parents=True, exist_ok=True)
+    wp.write_text(json.dumps({
+        "work_packages": [{"wp_id": "WP1", "title": "Mgmt", "lead_partner": "P1",
+                           "deliverables": [{"deliverable_id": "D1-01", "title": "d", "due_month": 3}]}],
+    }), encoding="utf-8")
+    partners = base / "tier3_project_instantiation" / "consortium" / "partners.json"
+    partners.parent.mkdir(parents=True, exist_ok=True)
+    partners.write_text(json.dumps({
+        "partners": [{"short_name": "P1", "legal_name": "Partner One"}],
+    }), encoding="utf-8")
+
+
+class TestCanonicalPackDeriverComponent:
+    def test_canonical_pack_deriver_registered(self) -> None:
+        assert "canonical_pack_deriver" in COMPONENT_REGISTRY
+
+    def test_component_writes_pack_via_generic_path(self, tmp_path: Path) -> None:
+        """Invoking via the component path writes the canonical pack and
+        records its repo-relative output."""
+        from runner.phase8_canonical_pack import CANONICAL_PACK_REL
+
+        _write_pack_fixtures(tmp_path)
+        record = invoke_component("canonical_pack_deriver", "run-1", tmp_path)
+        assert record.status == "success"
+        assert record.outputs_written == [CANONICAL_PACK_REL]
+        assert (tmp_path / CANONICAL_PACK_REL).is_file()
+
+    def test_component_fails_closed_on_malformed_assumptions(
+        self, tmp_path: Path
+    ) -> None:
+        """A malformed working_assumptions.json → the deriver raises → failure
+        record (never propagates)."""
+        from runner.working_assumptions import WORKING_ASSUMPTIONS_REL
+
+        _write_pack_fixtures(tmp_path)
+        wa = tmp_path / WORKING_ASSUMPTIONS_REL
+        wa.parent.mkdir(parents=True, exist_ok=True)
+        # Real declarations but missing the mandatory provenance_class.
+        wa.write_text(json.dumps({
+            "declarations": [{"key": "k", "value": "v", "declared_by": "o",
+                              "declared_on": "2026-07-14"}],
+        }), encoding="utf-8")
+        record = invoke_component("canonical_pack_deriver", "run-1", tmp_path)
+        assert record.status == "failure"
+        assert "provenance_class" in (record.failure_reason or "")

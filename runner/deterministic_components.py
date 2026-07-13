@@ -136,6 +136,23 @@ def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
     return [written] if written is not None else []
 
 
+def _run_canonical_pack_deriver(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the Phase-8 canonical reference pack deriver (ticket 10).
+
+    Generates ``canonical_reference_pack.json`` from Tier 3 confirmed facts
+    (objectives / outcomes / WPs / deliverables / partners) *and* the operator's
+    declared working assumptions (Tier 3 ``working_assumptions.json``), tagging
+    every entry with ``provenance`` so an assumed value can never masquerade as a
+    confirmed canonical fact.  A pure lookup + verbatim copy + constant provenance
+    tag — no inference.  Fails closed on a malformed ``working_assumptions.json``.
+    """
+    from runner.phase8_canonical_pack import (
+        build_phase8_canonical_reference_pack,
+    )
+
+    return [build_phase8_canonical_reference_pack(repo_root, run_id)]
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -146,9 +163,11 @@ def _run_unit_cost_budget_deriver(run_id: str, repo_root: Path) -> list[Path]:
 #: ``unit_cost_budget(months, rates, host_coeff) == figure``.  The
 #: assumption-appliers (β honesty layer, ticket 9) flip enumerated declared
 #: ``unresolved → assumed`` claims in the section drafts pre-assembly, closed by
-#: idempotent byte-equal replay.  The remaining milestone-1 component
-#: (canonical-pack deriver, ticket 10) registers here as it is built — binding
-#: and logging then work uniformly for each.
+#: idempotent byte-equal replay.  The canonical-pack deriver (ticket 10)
+#: regenerates the reference pack the preservation gates check prose against,
+#: from the same source as the prose (Tier 3 confirmed facts + declared
+#: assumptions) with per-entry provenance, closed by pure lookup.  With this the
+#: full milestone-1 roster binds and logs uniformly through the C2/C3 substrate.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
     "excellence_section_assembler": _run_excellence_section_assembler,
@@ -158,6 +177,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "impact_assumption_applier": _run_impact_assumption_applier,
     "implementation_assumption_applier": _run_implementation_assumption_applier,
     "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
+    "canonical_pack_deriver": _run_canonical_pack_deriver,
 }
 
 
