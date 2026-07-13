@@ -1,0 +1,112 @@
+{
+  "record_type": "tier3_hand_lift_provenance",
+  "ticket": "tickets.md ticket 14 (Hand-lift MSCA Tier 3 from the vault)",
+  "date": "2026-07-13",
+  "authority": [
+    "CLAUDE.md §5 Tier 3, §9.4/§9.5 (durable, reproducible decisions), §12.2 (validation-status categories), §13.3 (no fabricated project facts), §10.6 (source documents govern)",
+    "MILESTONE1_DECISION_RECORD.md D17 (honest block), D11 (block-default)",
+    "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md Appendix B (evidence_strength -> constitution mapping)"
+  ],
+  "purpose": "Durable, per-fact provenance record of the one-time hand-lift of MSCA project data from the methodology vault into Tier 3. Cites the pinned vault SHA and, per lifted artifact, the source vault nodes and the evidence_strength -> validation_status mapping applied - so milestone-2's deterministic graph compiler (D2-A / D9) can regenerate Tier 3 from the same vault and diff against this hand-lift. This file IS the compiler's test fixture.",
+
+  "source_vault": {
+    "path": "MSCA/methodology_graph/",
+    "recorded_gitlink_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "sha_source": "docs/tier4_orchestration_state/reinstantiation_provenance.json (ticket 3, §9.5)",
+    "node_count": 87,
+    "evidence_strength_distribution": {"source_grounded": 67, "synthesis": 14, "inference": 2, "unconfirmed": 4},
+    "primary_sources_cited_by_vault": [
+      "Source - Methodology Idea (methodology_idea.txt, PI first-person design narrative)",
+      "Source - Methodology Synthesis Prompt (prompt.txt, 10-section analyst synthesis)",
+      "Source - Literature Review (literature_review.pdf: Report A gap matrix; Report B probabilistic-novelty precedents)",
+      "Source - LLM Wiki Method (Karpathy governance method)"
+    ]
+  },
+
+  "appendix_b_mapping_applied": {
+    "source_grounded": "Confirmed",
+    "synthesis": "Inferred (framing) - flagged in-artifact",
+    "inference": "Inferred - flagged in-artifact",
+    "unconfirmed": "NOT lifted as fact -> Unresolved, enumerated in confirmation_checklist.json",
+    "note": "Only source_grounded vault content is lifted as Confirmed. Synthesis/inference nodes are lifted at most as Inferred and flagged. No unconfirmed vault node is lifted as a Tier 3 fact; no vault inference is promoted to a Tier 3 fact."
+  },
+
+  "lifted_artifacts": [
+    {
+      "artifact": "project_brief/project_summary.json",
+      "validation_status_summary": "Confirmed keywords/domain; Inferred title/abstract (synthesis); Unresolved identity spine",
+      "source_vault_nodes": ["Methodology Graph - Meta Node (METH-META-001, synthesis)", "Core Architecture (METH-CORE-001, synthesis)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006, synthesis)", "09_terminology/* (source_grounded, keywords)"]
+    },
+    {
+      "artifact": "project_brief/concept_note.md",
+      "validation_status_summary": "Confirmed research substance; Inferred framing; Unresolved spine (explicit honest-block section)",
+      "source_vault_nodes": ["Core Architecture (METH-CORE-001)", "Diagnostic Branch (METH-CORE-002)", "Prognostic Branch (METH-CORE-003)", "Uncertainty Chain (METH-CORE-004)", "Route A (METH-ROUTE-001)", "Route B (METH-ROUTE-002)", "Sub Pixel Problem (METH-ROUTE-005)", "Downscaling Critique (METH-ROUTE-004)", "AquaCrop Decision Interface (METH-DEC-001)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Profit Based Objective Function (METH-DEC-005)", "Research Gap Matrix (METH-SOTA-007)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)", "Risk Register (METH-RISK-002)", "Ten Research Questions (METH-RQ-001)", "Partner Roles Overview (METH-PART-001)", "PI Role (METH-PART-003)", "ELTE Role (METH-PART-002)"]
+    },
+    {
+      "artifact": "project_brief/strategic_positioning.md",
+      "validation_status_summary": "Confirmed research positioning; Unresolved career/training/host positioning",
+      "source_vault_nodes": ["Research Gap Matrix (METH-SOTA-007)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)", "Uncertainty Chain (METH-CORE-004)", "Route A (METH-ROUTE-001)", "Route B (METH-ROUTE-002)", "Risk Register (METH-RISK-002)", "Partner Roles Overview (METH-PART-001)"],
+      "non_vault_source": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json (MSCA-PF criteria weights + Part B-1 sub-sections)"
+    },
+    {
+      "artifact": "architecture_inputs/objectives.json",
+      "validation_status_summary": "OBJ-1/2/3 Confirmed; OBJ-4 Inferred; OBJ-5 Unresolved (career)",
+      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A/B (METH-ROUTE-001/002)", "05_decision_framework/* (METH-DEC-001..006)", "Validation and Field Trial Layer (METH-INFRA-009)", "Web MVP (METH-INFRA-010, synthesis)", "Ten Research Questions (METH-RQ-001)"]
+    },
+    {
+      "artifact": "architecture_inputs/outcomes.json",
+      "validation_status_summary": "OUT-1/2/3 Confirmed; OUT-4/5 Inferred; OUT-6 Unresolved",
+      "source_vault_nodes": ["Route A/B (METH-ROUTE-001/002)", "05_decision_framework/* (METH-DEC-001..006)", "Validation and Field Trial Layer (METH-INFRA-009)", "Web MVP (METH-INFRA-010, synthesis)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006, synthesis)"]
+    },
+    {
+      "artifact": "architecture_inputs/impacts.json",
+      "validation_status_summary": "IMP-1/2/3 Confirmed; IMP-4 Unresolved (career)",
+      "source_vault_nodes": ["Research Gap Matrix (METH-SOTA-007)", "Operational Decision Support Gap (METH-SOTA-005)", "Profit Based Objective Function (METH-DEC-005)", "Route B (METH-ROUTE-002)", "Control Stand Variant (METH-ROUTE-003)"],
+      "non_vault_source": "MSCA-PF Impact criterion 2.1/2.3 (section_schema_registry.json); call-specific expected impacts governed by Tier 2B (Phase 1)"
+    },
+    {
+      "artifact": "architecture_inputs/workpackage_seed.json",
+      "validation_status_summary": "WP1/2/3 Confirmed research; WP4 Unresolved (training); WP5 Inferred (dissemination). Timeline/effort Assumed (24-mo EF scaffold).",
+      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A/B (METH-ROUTE-001/002)", "06_infrastructure/* (METH-INFRA-002..009)", "05_decision_framework/* (METH-DEC-001..006)", "Validation and Field Trial Layer (METH-INFRA-009)", "Web MVP (METH-INFRA-010, synthesis)"]
+    },
+    {
+      "artifact": "architecture_inputs/risks.json",
+      "validation_status_summary": "RISK-01..10 Inferred (hazard source_grounded; likelihood/impact synthesis estimates). Lifted from Risk Register R1-R10.",
+      "source_vault_nodes": ["Risk Register (METH-RISK-002, synthesis)", "Data Access Risks (METH-RISK-004)", "Validation Risks (METH-RISK-003)", "Model Complexity Risks (METH-RISK-005)", "Operationalisation Risks (METH-RISK-006)"]
+    },
+    {
+      "artifact": "architecture_inputs/milestones_seed.json",
+      "validation_status_summary": "MS1/2/3/5 Confirmed research criteria; MS4/6 Inferred. due_month on 24-mo EF scaffold (Assumed).",
+      "source_vault_nodes": ["06_infrastructure/* (METH-INFRA-002..009)", "Diagnostic Branch (METH-CORE-002)", "05_decision_framework/* (METH-DEC-002..006)", "Validation and Field Trial Layer (METH-INFRA-009)", "Web MVP (METH-INFRA-010, synthesis)"]
+    }
+  ],
+
+  "not_lifted_as_fact": [
+    {"node": "ELTE Role (METH-PART-002)", "evidence_strength": "unconfirmed", "reason": "ELTE absent from all sources; REFUTED, not merely unconfirmed. Do not invent a role. -> confirmation_checklist ELTE."},
+    {"node": "AgroVIR Validation Partner Role (METH-PART-005)", "evidence_strength": "unconfirmed", "reason": "'AgroVIR-like' role-type only; no committed partnership. -> confirmation_checklist VALIDATION_PARTNER."},
+    {"node": "Partner Roles Overview (METH-PART-001)", "evidence_strength": "unconfirmed", "reason": "No committed partner named in any source. -> confirmation_checklist spine_identity."},
+    {"node": "Unconfirmed Partner Placeholders (METH-PART-006)", "evidence_strength": "unconfirmed", "reason": "Checklist of implied-but-unconfirmed partners/providers. -> confirmation_checklist DATA_PROVIDERS."},
+    {"node": "PI Role (METH-PART-003)", "evidence_strength": "inference", "reason": "PI inferred from authorship; DOI 10.1016/j.envsoft.2022.105556 is source_grounded but the PERSON's name/institution are unconfirmed, so no named fellow/supervisor is lifted. -> confirmation_checklist FELLOW."},
+    {"node": "Methodology Contributor Role (METH-PART-004)", "evidence_strength": "inference", "reason": "'the colleague'; no name; even distinct-person status unresolved. Not lifted as a person."}
+  ],
+
+  "identity_silent_in_vault": {
+    "title": "silent (only a domain descriptor) -> working title used, flagged Inferred",
+    "acronym": "silent -> null (Unresolved); not invented",
+    "supervisor": "absent entirely -> Unresolved",
+    "duration": "absent -> Unresolved (24-mo EF working scaffold, Assumed)",
+    "call": "silent on specifics -> operator-confirmed externally (selected_call.json), NOT lifted from vault",
+    "crop": "tomato tentative/unconfirmed -> 'horticultural row crops' default (RQ1)",
+    "trl_target": "silent/unconfirmed -> Unresolved (RQ10)",
+    "only_source_grounded_identity_datum": "DOI 10.1016/j.envsoft.2022.105556 (PI-stated calibration method)"
+  },
+
+  "cross_references": {
+    "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "selected_call": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "reinstantiation_provenance": "docs/tier4_orchestration_state/reinstantiation_provenance.json",
+    "decision_log_entry": "docs/tier4_orchestration_state/decision_log/tier3-hand-lift-msca-pf_2026-07-13.json"
+  },
+  "seed_forward_references_note": "Deliverable IDs (D1.1, D1.2, D2.1-2.3, D3.1-3.2, D5.1) referenced in outcomes.json/impacts.json are SEED forward-references to deliverables that Phase 3 defines; they are intentionally not yet backed by a Tier 3 deliverables list (WP4 training has none, consistent with its Unresolved content). Effort person-months (8+7+5+2+2=24) and the 24-month EF timeline are an Assumed scaffold. Phases 3-4 repopulate these seeds.",
+  "terminal_state": "honest_block (alpha) - source_grounded methodology lifted; identity spine Unresolved and enumerated. gate_01_source_integrity is satisfied on the call/source spine (selected_call.json + Tier 2A/2B sources present)."
+}

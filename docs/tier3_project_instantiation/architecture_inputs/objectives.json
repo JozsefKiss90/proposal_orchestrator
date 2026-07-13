@@ -1,0 +1,85 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "artifact": "architecture_inputs/objectives.json",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->not lifted (Unresolved, see confirmation_checklist.json)",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "role_token_convention": "FELLOW = postdoctoral researcher/applicant; HOST = beneficiary/host organisation; SUPERVISOR = supervisor at host. These are STRUCTURAL roles of any MSCA-PF action, not invented identities. Every identity behind a role token is Unresolved - see confirmation_checklist.json.",
+    "timeline_scaffold": "target_month values are on a 24-month European-Fellowship WORKING SCAFFOLD (Assumed; EF/GF choice and duration are Unresolved)."
+  },
+  "objectives": [
+    {
+      "id": "OBJ-1",
+      "title": "Probabilistic multi-sensor diagnosis of the latent field state",
+      "description": "Develop and calibrate a probabilistic diagnostic method that fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, optional PlanetScope), in-situ soil sensors, weather data and field observations into estimates of the latent field state (root-zone soil moisture, crop water stress, canopy condition), returning full posteriors rather than point estimates. Two interchangeable routes are in scope: Route A (direct one-step probabilistic fusion) and Route B (homogeneous-patch proxy).",
+      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables with explicit, honest uncertainty (posterior/prediction intervals). The precise target field state (RQ3) and whether one or both routes are implemented (RQ2) are open project decisions; the verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
+      "target_month": 12,
+      "pillar": "Diagnostic branch",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": ["SUPERVISOR", "HOST"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Latent Field State (METH-TERM-010)", "Uncertainty Chain (METH-CORE-004)"],
+      "evidence_strength": "source_grounded",
+      "open_decisions": ["RQ2 (route scope)", "RQ3 (target field state)"]
+    },
+    {
+      "id": "OBJ-2",
+      "title": "Uncertainty-aware decision engine for irrigation choice",
+      "description": "Develop the prognostic decision engine that turns the diagnosed field state into an irrigation recommendation: calibrate the FAO AquaCrop model in an uncertainty-aware way that retains an honest parameter posterior, run counterfactual irrigation simulations over weather ensembles, and select the option with the best expected economic return.",
+      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by expected profit (expected crop value minus costs) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The exact decision objective (profit vs weighted multi-objective) is an open decision (RQ6).",
+      "target_month": 15,
+      "pillar": "Prognostic branch",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": ["SUPERVISOR"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["AquaCrop Decision Interface (METH-DEC-001)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)"],
+      "evidence_strength": "source_grounded",
+      "open_decisions": ["RQ6 (decision objective)"]
+    },
+    {
+      "id": "OBJ-3",
+      "title": "Field validation and honest uncertainty calibration",
+      "description": "Design and execute a validation protocol establishing that the diagnosis and the decision recommendations are credible: collect ground truth, assess whether the reported uncertainty is well calibrated (e.g. whether 90% prediction intervals contain the truth about 90% of the time), and, for Route B, test that the chosen homogeneous patch genuinely covaries with the target crop.",
+      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4), uncertainty-calibration metrics (RQ5), pilot-success criteria (RQ7) and a patch-covariation test (RQ9). These four items define a protocol that does not yet exist and must be specified with the (unresolved) host and validation sites; no validation numbers are asserted.",
+      "target_month": 20,
+      "pillar": "Validation",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": ["HOST", "SUPERVISOR"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Control Stand Variant (METH-ROUTE-003)", "Ten Research Questions (METH-RQ-001)"],
+      "evidence_strength": "source_grounded",
+      "open_decisions": ["RQ4 (ground truth)", "RQ5 (uncertainty calibration)", "RQ7 (pilot success)", "RQ9 (patch covariation)"]
+    },
+    {
+      "id": "OBJ-4",
+      "title": "Standalone research demonstrator (web MVP)",
+      "description": "Integrate the diagnosis and decision engine into a standalone research demonstrator (a web MVP / user interface) that presents recommendations with their uncertainty, as a research artefact rather than an operational product.",
+      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target (research prototype vs validated MVP vs operational pilot) is an open project decision (RQ10) and is NOT asserted.",
+      "target_month": 24,
+      "pillar": "Demonstrator",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": ["HOST"],
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Infrastructure Architecture (METH-INFRA-001)", "Observation to Decision Pipeline (METH-CORE-005)"],
+      "evidence_strength": "synthesis",
+      "note": "The demonstrator framing is vault synthesis (Web MVP node is synthesis, confidence low); the TRL target is Unresolved (RQ10).",
+      "open_decisions": ["RQ10 (TRL target)"]
+    },
+    {
+      "id": "OBJ-5",
+      "title": "Advancement of the fellow's competences and career",
+      "description": "Enhance the researcher's scientific, technical and transferable competences and career perspectives through the fellowship's training, supervision and two-way transfer of knowledge (MSCA-PF Impact criterion 2.1 / Excellence criterion 1.3).",
+      "measurable_target": "UNRESOLVED - the training programme, skills-development plan and career measures depend on the (unresolved) fellow, supervisor and host and cannot be specified without them.",
+      "target_month": 24,
+      "pillar": "Researcher career development",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": ["SUPERVISOR", "HOST"],
+      "validation_status": "Unresolved",
+      "source_vault_nodes": [],
+      "evidence_strength": "unconfirmed",
+      "note": "Spine-dependent. No source vault node supports a training/career plan; the supervisor is absent from the vault entirely. Blocked pending spine confirmation - see confirmation_checklist.json (FELLOW, SUPERVISOR, HOST)."
+    }
+  ]
+}

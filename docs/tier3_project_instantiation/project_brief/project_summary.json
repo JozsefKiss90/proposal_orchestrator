@@ -1,0 +1,112 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "ticket": "tickets.md ticket 14 (Hand-lift MSCA Tier 3 from the vault)",
+    "authority": [
+      "CLAUDE.md §5 Tier 3 (project instantiation), §9.5 (reproducibility), §12.2 (validation-status categories), §13.3 (no fabricated project facts)",
+      "MILESTONE1_DECISION_RECORD.md D17 (honest block on the researcher / host / call spine), D11 (block-default)",
+      "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md Appendix B (evidence_strength -> constitution mapping)"
+    ],
+    "source_vault": {
+      "path": "MSCA/methodology_graph/",
+      "recorded_gitlink_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+      "sha_source": "docs/tier4_orchestration_state/reinstantiation_provenance.json (ticket 3, §9.5)"
+    },
+    "appendix_b_mapping": {
+      "source_grounded": "Confirmed",
+      "synthesis": "Inferred (framing)",
+      "inference": "Inferred",
+      "unconfirmed": "Unresolved (not lifted as fact; enumerated in the confirmation checklist)"
+    },
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+  },
+
+  "title": "Uncertainty-aware multi-sensor diagnosis and economically optimised irrigation decision support for row crops",
+  "title_status": {
+    "validation_status": "Inferred",
+    "note": "Working descriptive title synthesised from the novelty short-form ('From multi-sensor observation to probabilistic diagnosis to economically optimised irrigation decision'). The official project title and acronym are a project decision, not stated in any source vault node.",
+    "source_vault_node": "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"
+  },
+  "acronym": null,
+  "acronym_status": {
+    "validation_status": "Unresolved",
+    "note": "No acronym is given in any source vault node; do not invent one."
+  },
+
+  "instrument_type": "MSCA-PF",
+  "action_confirmation_ref": "docs/tier4_orchestration_state/decision_log/action-confirmation-msca-pf_2026-07-13.json",
+  "fellowship_type": null,
+  "fellowship_type_status": {
+    "validation_status": "Unresolved",
+    "note": "European Postdoctoral Fellowship (EF) vs Global Postdoctoral Fellowship (GF) is not determinable from the vault; it depends on the (unresolved) host and any Third-Country outgoing host. Project decision.",
+    "call_constraint": "EF 12-24 months; GF outgoing 12-24 months + mandatory 12-month return (24-36 total). Source: section_schema_registry.json MSCA-PF; selected_call.json."
+  },
+
+  "host_organisation": {
+    "validation_status": "Unresolved",
+    "role": "Beneficiary / host institution (MSCA-PF single-beneficiary model)",
+    "organisation": null,
+    "short_name": null,
+    "country": null,
+    "type": null,
+    "note": "The host/beneficiary is NOT named in any source vault node. Partner Roles Overview (METH-PART-001) records the lead institution as unconfirmed. ELTE is refuted (absent from all sources; do not invent a role). Confirm before submission - see confirmation_checklist.json item HOST."
+  },
+  "researcher": {
+    "validation_status": "Unresolved",
+    "role": "Experienced researcher / postdoctoral fellow (the applicant)",
+    "name": null,
+    "note": "The fellow is NOT named. The vault infers a PI Role (METH-PART-003) from first-person authorship of the design narrative and ownership of the uncertainty-aware calibration method (doi:10.1016/j.envsoft.2022.105556), but the person's name and affiliation are explicitly unconfirmed, and whether that PI is the PF fellow or the PF supervisor is itself unresolved. Confirm - see confirmation_checklist.json item FELLOW."
+  },
+  "supervisor": {
+    "validation_status": "Unresolved",
+    "role": "Supervisor at the host institution",
+    "name": null,
+    "note": "No supervisor is named in any source vault node. Confirm - see confirmation_checklist.json item SUPERVISOR."
+  },
+
+  "duration_months": null,
+  "duration_status": {
+    "validation_status": "Unresolved",
+    "call_constraint_max_months": 36,
+    "working_scaffold_months": 24,
+    "note": "The specific project duration is a project decision tied to the (unresolved) EF/GF choice. The architecture_inputs seeds (workpackage_seed, milestones_seed) are built on a 24-month European-Fellowship WORKING SCAFFOLD, flagged Assumed throughout, not Confirmed. Confirm duration with the fellow/host before submission."
+  },
+  "requested_eu_contribution_eur": null,
+  "requested_eu_contribution_status": {
+    "validation_status": "Unresolved",
+    "note": "MSCA-PF is a unit-cost instrument; the budget is not a Tier 3 fact. It is derived internally and deterministically in Phase 7 (months x published unit rates x host-country coefficient) per CLAUDE.md §8.1 / ticket 8. The host-country coefficient is host-dependent and therefore blocked until the host is confirmed or operator-declared."
+  },
+  "start_date": null,
+
+  "research_domain": [
+    "crop_water_stress",
+    "irrigation_decision_support"
+  ],
+  "abstract": "This postdoctoral research project develops and validates an uncertainty-aware, end-to-end decision framework for crop water-stress monitoring and irrigation decision support in row crops. It fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, and, where available, high-resolution PlanetScope imagery), in-situ soil sensors, weather data and field observations into probabilistic estimates of the latent field state - root-zone soil moisture, crop water stress and canopy condition - carrying uncertainty honestly from observation to decision. Two interchangeable diagnostic routes share a single decision engine: a rigorous one-step probabilistic-fusion route (Route A), which feeds the satellite as one more covariate into a probabilistic machine-learning model (e.g. a Bayesian hierarchical model or Gaussian process) and goes straight to the field state with its uncertainty; and a lighter homogeneous-patch proxy route (Route B) that sidesteps the sub-pixel resolution problem by reading a nearby covarying patch the coarse pixel can resolve cleanly. From the diagnosed state onward the path is the same for both routes: the state drives uncertainty-aware AquaCrop calibration and counterfactual irrigation simulation over weather ensembles, recommending the option with the best expected economic return. The scientific novelty, argued against a systematic literature review, is the end-to-end coupling of learned multimodal fusion, explicit probabilistic crop-water-state estimation and economically optimised irrigation, which the literature reports as underdeveloped for row crops.",
+  "abstract_status": {
+    "validation_status": "Inferred",
+    "note": "Synthesis summary. The framing (two routes, one shared decision engine, red-thread uncertainty) is vault synthesis (Core Architecture METH-CORE-001, Methodology Graph Meta Node METH-META-001); the individual claims it summarises are source_grounded (Route A/B METH-ROUTE-001/002, prompt.txt sections). No crop, site, partner, or number is asserted beyond the sources - 'row crops' is used because the specific crop (tomato) is unconfirmed (RQ1)."
+  },
+  "keywords": [
+    "crop water stress",
+    "irrigation decision support",
+    "multi-sensor data fusion",
+    "probabilistic machine learning",
+    "uncertainty propagation",
+    "Sentinel-1 SAR",
+    "Sentinel-2",
+    "AquaCrop",
+    "root-zone soil moisture",
+    "counterfactual simulation",
+    "expected profit",
+    "Bayesian hierarchical model"
+  ],
+  "keywords_status": {
+    "validation_status": "Confirmed",
+    "note": "Every keyword is a source_grounded terminology node in MSCA/methodology_graph/09_terminology/ (or a source_grounded route/decision concept)."
+  },
+
+  "spine_status": "unresolved",
+  "spine_note": "MSCA-PF is a single-fellow, single-beneficiary action. The research substance is lifted from the source_grounded methodology vault; the identity spine (fellow, host, supervisor, associated/validation partners, data providers) is deliberately left Unresolved because no source vault node names it. This is the honest block (D17): the run exercises the confirmed methodology and blocks-or-greens on the spine, which the operator supplies as confirmed facts or beta-declared working assumptions. See confirmation_checklist.json."
+}

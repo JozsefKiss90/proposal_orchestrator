@@ -1,0 +1,97 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "artifact": "architecture_inputs/milestones_seed.json",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "schema_note": "Field names follow runner/predicates/timeline_predicates.py (milestone_id, due_month, verifiable_criterion, responsible_wp). This is a Phase-4 SEED; the gantt_designer repopulates it in Phase 4.",
+    "timeline_note": "due_month values are on the 24-month EF WORKING SCAFFOLD (Assumed; EF/GF and duration Unresolved). Milestones show months elapsed, not dates (MSCA Gantt convention).",
+    "responsible_note": "responsible_wp is a work-package id; responsible_partner uses the structural role token FELLOW (identity Unresolved)."
+  },
+  "milestones": [
+    {
+      "milestone_id": "MS1",
+      "title": "Multi-sensor data pipeline operational; Data Management Plan delivered",
+      "due_month": 6,
+      "verifiable_criterion": "Sentinel-1, Sentinel-2, soil-sensor and weather data are ingested, quality-controlled and harmonised over the field boundaries on the geospatial/time-series platform; the Data Management Plan is delivered as an open-science deliverable by month 6.",
+      "responsible_wp": "WP1",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP1", "WP5"],
+      "type": "technical",
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Earth Observation Layer (METH-INFRA-002)", "Ground Sensing Layer (METH-INFRA-003)", "Geospatial and Time Series Data Platform (METH-INFRA-005)"],
+      "evidence_strength": "source_grounded",
+      "note": "The DMP-by-month-6 element is the MSCA-PF open-science structural requirement (sub-section 1.2)."
+    },
+    {
+      "milestone_id": "MS2",
+      "title": "Diagnostic method v1 producing calibrated field-state posteriors",
+      "due_month": 12,
+      "verifiable_criterion": "Route A and/or Route B produce posterior estimates of the target latent field state (e.g. root-zone soil moisture, crop water stress) with explicit uncertainty over at least one growing season's data; route scope (RQ2) and field-state definition (RQ3) recorded as decided.",
+      "responsible_wp": "WP1",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP1"],
+      "type": "technical",
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Latent Field State (METH-TERM-010)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "milestone_id": "MS3",
+      "title": "Uncertainty-aware decision engine integrated",
+      "due_month": 15,
+      "verifiable_criterion": "AquaCrop is calibrated retaining an honest parameter posterior; counterfactual irrigation simulations run over weather ensembles; the profit-based recommendation logic selects decisions by expected economic return under uncertainty, end to end from a diagnosed state.",
+      "responsible_wp": "WP2",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP2"],
+      "type": "technical",
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "milestone_id": "MS4",
+      "title": "Standalone research demonstrator exercises the end-to-end pipeline",
+      "due_month": 18,
+      "verifiable_criterion": "The web MVP runs the full observation-to-decision pipeline and presents irrigation recommendations with their uncertainty for at least one field case; TRL target (RQ10) recorded.",
+      "responsible_wp": "WP2",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP2", "WP3"],
+      "type": "technical",
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Observation to Decision Pipeline (METH-CORE-005)"],
+      "evidence_strength": "synthesis",
+      "note": "Demonstrator framing is vault synthesis; TRL target Unresolved."
+    },
+    {
+      "milestone_id": "MS5",
+      "title": "Field validation and uncertainty calibration complete",
+      "due_month": 22,
+      "verifiable_criterion": "Ground truth collected (RQ4); uncertainty-calibration metrics evaluated - e.g. prediction-interval coverage assessed against nominal (RQ5); Route B patch-covariation tested (RQ9); pilot-success criteria (RQ7) applied to the demonstrator.",
+      "responsible_wp": "WP3",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP3"],
+      "type": "validation",
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Control Stand Variant (METH-ROUTE-003)"],
+      "evidence_strength": "source_grounded",
+      "note": "Research criterion Confirmed; the validation sites/farms supplying ground truth are Unresolved (spine-dependent)."
+    },
+    {
+      "milestone_id": "MS6",
+      "title": "Results disseminated and fellowship outcomes consolidated",
+      "due_month": 24,
+      "verifiable_criterion": "At least one open-access publication submitted covering the probabilistic fusion-to-decision framework; open data/models released under FAIR principles; dissemination/exploitation and communication actions executed per the plan.",
+      "responsible_wp": "WP5",
+      "responsible_partner": "FELLOW",
+      "linked_work_packages": ["WP5"],
+      "type": "dissemination",
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Probabilistic Fusion Novelty Claim (METH-SOTA-006)", "State of the Art - Multi Sensor Crop Water Stress Monitoring (METH-SOTA-001)"],
+      "evidence_strength": "synthesis",
+      "note": "Open-science dissemination is an MSCA-PF structural requirement; specific venues/audiences Unresolved (spine-dependent)."
+    }
+  ]
+}

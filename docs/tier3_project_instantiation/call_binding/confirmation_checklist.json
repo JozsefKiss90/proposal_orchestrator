@@ -1,0 +1,119 @@
+{
+  "record_type": "spine_confirmation_checklist",
+  "ticket": "tickets.md ticket 14 (Hand-lift MSCA Tier 3 from the vault)",
+  "date": "2026-07-13",
+  "authority": [
+    "CLAUDE.md §13.3 (no fabricated project facts), §12.2 (validation-status categories), §12.4 (gate failure is a valid output)",
+    "MILESTONE1_DECISION_RECORD.md D11 (block-default), D17 (honest block on the researcher/host/call spine)",
+    "MSCA vault: Partner Roles Overview (METH-PART-001), ELTE Role (METH-PART-002), Unconfirmed Partner Placeholders (METH-PART-006), Ten Research Questions (METH-RQ-001)"
+  ],
+  "purpose": "Enumerates every identity-spine gap and open project decision left Unresolved by the ticket-14 hand-lift, so an honest block is legible and each gap has a named confirmation action. The engine never invents these (D11); the operator supplies them as confirmed facts or beta-declares them via working_assumptions.json (ticket 15), which turns an honest block into a conscious green (W1, ticket 9).",
+  "role_token_convention": "FELLOW = postdoctoral researcher/applicant; HOST = beneficiary/host organisation; SUPERVISOR = supervisor at host. Structural roles of any MSCA-PF action; the IDENTITY behind each is Unresolved. Role tokens appear in architecture_inputs/*.json in place of names.",
+  "status_vocabulary": "status values use the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved) EXCEPT 'Refuted', a deliberate ticket-14 extension used only for ELTE. §12.2's four categories are scoped to validation_reports/ and cannot express 'the sources actively provide no basis; do not invent a role' - the disposition the ticket mandates for ELTE, distinct from a merely-Unresolved gap awaiting confirmation.",
+
+  "spine_identity": [
+    {
+      "id": "FELLOW",
+      "role": "Experienced researcher / postdoctoral fellow (the applicant)",
+      "status": "Unresolved",
+      "what_source_says": "No fellow is named in any source vault node. A PI Role is INFERRED from first-person authorship of the design narrative and ownership of the calibration method (doi:10.1016/j.envsoft.2022.105556); the person's name and affiliation are explicitly unconfirmed, and whether that person is the PF fellow or the PF supervisor is itself open.",
+      "source_vault_nodes": ["PI Role (METH-PART-003, inference)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
+      "confirmation_action": "Confirm the fellow's identity, CV and eligibility (mobility rule, PhD/4-yr FTE experience). Required for Excellence 1.4 and Impact 2.1 and the Part B-2 CV.",
+      "blocks": ["Excellence 1.4", "Impact 2.1", "OBJ-5", "OUT-6", "IMP-4", "WP4"]
+    },
+    {
+      "id": "HOST",
+      "role": "Beneficiary / host organisation",
+      "status": "Unresolved",
+      "what_source_says": "No host/beneficiary is named in any source. The lead institution is an explicit unconfirmed placeholder.",
+      "source_vault_nodes": ["Unconfirmed Partner Placeholders (METH-PART-006, unconfirmed)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
+      "confirmation_action": "Confirm the host organisation, its country (drives the unit-cost country coefficient in Phase 7), infrastructure and hosting arrangements. Required for Implementation 3.2 and the unit-cost budget (ticket 8).",
+      "blocks": ["Implementation 3.2", "unit-cost budget gate_09 host coefficient", "WP3/WP4/WP5 host elements"]
+    },
+    {
+      "id": "SUPERVISOR",
+      "role": "Supervisor at the host institution",
+      "status": "Unresolved",
+      "what_source_says": "No supervisor appears ANYWHERE in the vault (notable for an MSCA-PF, which is supervisor-centric).",
+      "source_vault_nodes": [],
+      "confirmation_action": "Confirm the supervisor's identity, track record and supervision/training plan. Required for Excellence 1.3.",
+      "blocks": ["Excellence 1.3", "WP4"]
+    },
+    {
+      "id": "ELTE",
+      "role": "(Raised in build context only - possible host/partner)",
+      "status": "Refuted",
+      "what_source_says": "ELTE (Eötvös Loránd University) is ABSENT from all primary sources. No role, contribution or affiliation can be derived. The vault node exists only to hold the open question and PREVENT fabrication: 'do not invent a role.'",
+      "source_vault_nodes": ["ELTE Role (METH-PART-002, unconfirmed)"],
+      "confirmation_action": "Do NOT lift ELTE into any proposal role. Only if the proposal team independently confirms ELTE's involvement may it be added - it cannot be derived from any source.",
+      "blocks": []
+    },
+    {
+      "id": "VALIDATION_PARTNER",
+      "role": "Validation / farmer-access partner (AgroVIR-type)",
+      "status": "Unresolved",
+      "what_source_says": "Appears only as the role-type phrase 'AgroVIR-like partners' assisting with feedback, farmer access, testing and validation - NOT owning or operating the tool. No committed partnership, contract or farm is stated.",
+      "source_vault_nodes": ["AgroVIR Validation Partner Role (METH-PART-005, unconfirmed)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
+      "confirmation_action": "Confirm (or not) a named validation partner and the scope of its assistance. Do not present AgroVIR as a secured partner.",
+      "blocks": ["WP3 validation sites", "Implementation 3.2 associated partners"]
+    },
+    {
+      "id": "DATA_PROVIDERS",
+      "role": "EO and meteorological data providers; validation farms/field sites",
+      "status": "Unresolved",
+      "what_source_says": "Implied by the methodology's infrastructure but none is named. Sentinel-1/2 are open Copernicus data; PlanetScope access is itself open (RQ8); no meteo provider or field site is named.",
+      "source_vault_nodes": ["Unconfirmed Partner Placeholders (METH-PART-006, unconfirmed)", "Earth Observation Layer (METH-INFRA-002)", "Weather and Climate Data Layer (METH-INFRA-004)"],
+      "confirmation_action": "Confirm PlanetScope access (RQ8), the meteorological data source, and validation farms/field sites.",
+      "blocks": ["WP1 PlanetScope", "WP3 field sites", "RISK-01", "RISK-04"]
+    },
+    {
+      "id": "FELLOWSHIP_TYPE",
+      "role": "European Fellowship (EF) vs Global Fellowship (GF)",
+      "status": "Unresolved",
+      "what_source_says": "Not determinable from the vault; depends on the (unresolved) host and any Third-Country outgoing host.",
+      "source_vault_nodes": [],
+      "confirmation_action": "Confirm EF vs GF. Determines duration bounds, the transfer-of-knowledge model (two-way vs three-way) and whether a return phase applies.",
+      "blocks": ["Excellence 1.3 transfer model", "duration", "Implementation 3.2 outgoing host"]
+    },
+    {
+      "id": "DURATION",
+      "role": "Project duration in months",
+      "status": "Unresolved",
+      "what_source_says": "No duration figure appears anywhere in the vault. Call constraint: EF 12-24 months; GF 24-36 (incl. 12-month return). The architecture_inputs seeds use a 24-month EF WORKING SCAFFOLD, flagged Assumed throughout.",
+      "source_vault_nodes": [],
+      "confirmation_action": "Confirm the project duration (tied to EF/GF). Re-scale the workpackage_seed / milestones_seed timeline once confirmed.",
+      "blocks": ["workpackage_seed timeline", "milestones_seed due_month", "unit-cost budget months"]
+    },
+    {
+      "id": "CALL_BINDING",
+      "role": "Selected MSCA-PF call",
+      "status": "Confirmed",
+      "what_source_says": "The vault is silent on the specific call (only 'MSCA-style proposal'). The call binding is OPERATOR-CONFIRMED (not derived from the vault): HORIZON-MSCA-2026-PF-01, instrument MSCA-PF, deadline 2026-09-09, recorded in selected_call.json with action_confirmation_ref to the ticket-5 decision log.",
+      "source_vault_nodes": [],
+      "confirmation_action": "None - already operator-confirmed. If the operator later cannot stand behind it, declare via working_assumptions.json (ticket 15); never let the engine guess.",
+      "blocks": []
+    }
+  ],
+
+  "open_scientific_decisions": [
+    {"id": "RQ1", "question": "First crop: tomato (tentative) or horticultural row crops?", "status": "Unresolved", "default": "horticultural row crops", "source_vault_node": "Ten Research Questions (METH-RQ-001)"},
+    {"id": "RQ2", "question": "Route A and Route B both, or one main + one fallback/comparison?", "status": "Unresolved", "source_vault_node": "Route Comparison (METH-ROUTE-006)"},
+    {"id": "RQ3", "question": "Target field state: soil moisture, crop water stress, yield risk, irrigation priority, or all?", "status": "Unresolved", "source_vault_node": "Latent Field State (METH-TERM-010)"},
+    {"id": "RQ4", "question": "What ground-truth measurements will be collected?", "status": "Unresolved", "source_vault_node": "Validation and Field Trial Layer (METH-INFRA-009)"},
+    {"id": "RQ5", "question": "How will uncertainty be evaluated (e.g. 90% PI coverage ~90%)?", "status": "Unresolved", "source_vault_node": "Uncertainty Chain (METH-CORE-004)"},
+    {"id": "RQ6", "question": "Decision objective: profit, water-use efficiency, yield stability, drought-risk, or weighted?", "status": "Unresolved", "default": "profit (expected crop value - costs)", "source_vault_node": "Profit Based Objective Function (METH-DEC-005)"},
+    {"id": "RQ7", "question": "What counts as pilot success?", "status": "Unresolved", "source_vault_node": "Decision Recommendation Logic (METH-DEC-006)"},
+    {"id": "RQ8", "question": "Is PlanetScope access secured or only optional?", "status": "Unresolved", "source_vault_node": "PlanetScope Usage Gap (METH-SOTA-003)"},
+    {"id": "RQ9", "question": "How will homogeneous-patch/control-stand covariation be validated?", "status": "Unresolved", "source_vault_node": "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)"},
+    {"id": "RQ10", "question": "TRL target: research prototype, validated MVP, or operational pilot?", "status": "Unresolved", "source_vault_node": "Web MVP and User Interface Layer (METH-INFRA-010)"}
+  ],
+
+  "summary": {
+    "spine_unresolved_count": 8,
+    "spine_refuted_count": 1,
+    "spine_confirmed_count": 1,
+    "open_scientific_decisions_count": 10,
+    "terminal_state": "honest_block (alpha)",
+    "note": "With no operator declarations this Tier 3 yields the honest block (mode alpha): the source_grounded methodology runs, and the run blocks on the enumerated spine. One host declaration (working_assumptions.json) unlocks both the unit-cost budget host coefficient and the Assumed identity claims (D11/D12), moving toward mode beta (conscious green)."
+  }
+}

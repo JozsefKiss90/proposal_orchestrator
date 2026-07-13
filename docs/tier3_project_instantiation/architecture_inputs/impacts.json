@@ -1,0 +1,88 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "artifact": "architecture_inputs/impacts.json",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "indicators_note": "Indicators are qualitative and verifiable; no numeric targets are invented (the vault asserts none). Call-specific expected impacts are governed by Tier 2B (Phase 1) and are not restated here. Timelines are on the 24-month EF working scaffold (Assumed).",
+    "impact_alignment_note": "expected_impact_alignment references the MSCA-PF Impact criterion 2.3 (scientific, societal, economic impact) per section_schema_registry.json; the authoritative call-specific expected impacts live in docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json."
+  },
+  "impacts": [
+    {
+      "id": "IMP-1",
+      "title": "Scientific advance in probabilistic multi-sensor crop-water-state estimation",
+      "description": "The project would establish a defensible probabilistic-fusion decision framework in an area the literature reports as underdeveloped: few works couple learned multimodal fusion directly with explicit probabilistic crop-water-state outputs and irrigation optimisation end-to-end. It targets the empty 'real-time decision support x PlanetScope' cell of the reviewed gap matrix.",
+      "type": "scientific",
+      "linked_outcomes": ["OUT-1", "OUT-2", "OUT-3"],
+      "expected_impact_alignment": "MSCA-PF criterion 2.3 - scientific impact: advancing the state of the art beyond the immediate scope of the project.",
+      "indicators": [
+        "Open-access publication(s) establishing the end-to-end probabilistic fusion-to-decision framework",
+        "Demonstrated honest uncertainty propagation from observation to decision (calibration evidence, RQ5)",
+        "Novelty defended against the reviewed precedents (BME, copula, dynamic Bayesian networks, MF-FusionNet)"
+      ],
+      "timeline": "M12-M24 (publications from mid-project; contingent on the validation protocol)",
+      "linked_wp_ids": ["WP1", "WP2", "WP3", "WP5"],
+      "linked_deliverable_ids": ["D1.2", "D2.2", "D5.1"],
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Research Gap Matrix (METH-SOTA-007)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)", "Operational Decision Support Gap (METH-SOTA-005)", "Uncertainty Chain (METH-CORE-004)"],
+      "evidence_strength": "source_grounded (gap facts) / synthesis (novelty framing)",
+      "note": "Downgraded to Inferred: the underlying gap facts are source_grounded (Research Gap Matrix METH-SOTA-007, Operational Decision Support Gap METH-SOTA-005), but the impact as stated rests on the novelty framing (Probabilistic Fusion Novelty Claim METH-SOTA-006), which is vault synthesis. Consistent with the source_grounded-hazard/synthesis-estimate handling in risks.json and with OUT-4/OUT-5. IMP-2 and IMP-3 remain Confirmed - their source nodes are wholly source_grounded."
+    },
+    {
+      "id": "IMP-2",
+      "title": "Economic and societal impact: water-use efficiency and farm resilience",
+      "description": "By recommending irrigation decisions on expected economic return under uncertainty rather than yield alone, the framework targets improved water-use efficiency and economic resilience for row-crop horticulture - moving from a monitoring dashboard to a decision-support tool.",
+      "type": "economic",
+      "linked_outcomes": ["OUT-2", "OUT-4"],
+      "expected_impact_alignment": "MSCA-PF criterion 2.3 - economic/societal impact: contribution to sustainable water use and agricultural decision-making.",
+      "indicators": [
+        "Irrigation recommendations scored by expected profit (crop value minus water/energy/input/operational costs)",
+        "Demonstrator exercised on the observation-to-decision pipeline with uncertainty-aware recommendations",
+        "Pilot-success criteria defined (RQ7) - specific magnitude contingent on the decision objective (RQ6) and TRL (RQ10)"
+      ],
+      "timeline": "M15-M24",
+      "linked_wp_ids": ["WP2", "WP3"],
+      "linked_deliverable_ids": ["D2.1", "D2.3"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)", "Expected Profit (METH-TERM-016)", "Irrigation Water Requirement (METH-TERM-021)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "IMP-3",
+      "title": "Environmental co-benefit through landscape-compatible sensing",
+      "description": "Route B's reliance on nearby homogeneous, semi-natural covarying patches aligns the methodology with landscape sustainability and extensive agriculture: keeping natural/semi-natural patches in the landscape is a co-benefit of the sensing approach, and the same proxy trick can scale beyond horticulture.",
+      "type": "environmental",
+      "linked_outcomes": ["OUT-1"],
+      "expected_impact_alignment": "MSCA-PF criterion 2.3 - societal/environmental impact: ecosystem continuity and sustainable land use.",
+      "indicators": [
+        "Route B validated as a landscape-compatible sensing strategy (covariation test, RQ9)",
+        "Ecological co-benefit articulated as part of the methodology's strategic upside"
+      ],
+      "timeline": "M12-M24",
+      "linked_wp_ids": ["WP1", "WP3"],
+      "linked_deliverable_ids": ["D1.1", "D3.2"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Control Stand Variant (METH-ROUTE-003)"],
+      "evidence_strength": "source_grounded",
+      "note": "The ecological co-benefit is source_grounded in methodology_idea.txt; the 'could turn out even better than Route A' claim is flagged inference in the vault and is NOT lifted as an impact."
+    },
+    {
+      "id": "IMP-4",
+      "title": "Advancement of the researcher's career and the European Research Area",
+      "description": "The fellowship's contribution to the researcher's career perspectives, employability and skills development, and thereby to European research capacity (MSCA-PF Impact criterion 2.1).",
+      "type": "career",
+      "linked_outcomes": ["OUT-6"],
+      "expected_impact_alignment": "MSCA-PF criterion 2.1 - career perspectives and employability of the researcher.",
+      "indicators": ["UNRESOLVED - depends on the fellow, supervisor and host"],
+      "timeline": "M1-M24",
+      "linked_wp_ids": ["WP4"],
+      "linked_deliverable_ids": [],
+      "validation_status": "Unresolved",
+      "source_vault_nodes": [],
+      "evidence_strength": "unconfirmed",
+      "note": "Spine-dependent; no vault support. Blocked pending FELLOW/SUPERVISOR/HOST confirmation - see confirmation_checklist.json."
+    }
+  ]
+}

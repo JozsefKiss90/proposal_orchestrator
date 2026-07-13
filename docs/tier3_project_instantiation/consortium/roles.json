@@ -1,0 +1,54 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift_spine",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. This file declares the STRUCTURAL roles with every IDENTITY left Unresolved (or, for ELTE, Refuted). No name is invented (CLAUDE.md §13.3). partners.json and capabilities.json are intentionally left unpopulated (the consortium/ directory retains only its .gitkeep) because zero partners are confirmed in any source. Populate these roles only from operator-confirmed facts or working_assumptions.json (ticket 15).",
+    "status_vocabulary": "validation_status values are the four CLAUDE.md §12.2 categories (here: Unresolved) EXCEPT 'Refuted' (ELTE), a deliberate ticket-14 extension for the 'absent from all sources; do not invent a role' disposition that §12.2's four categories (scoped to validation_reports/) cannot express."
+  },
+  "spine_status": "unresolved",
+  "roles": [
+    {
+      "role_token": "FELLOW",
+      "role": "Experienced researcher / postdoctoral fellow (applicant)",
+      "identity": null,
+      "validation_status": "Unresolved",
+      "checklist_ref": "FELLOW"
+    },
+    {
+      "role_token": "HOST",
+      "role": "Beneficiary / host organisation",
+      "identity": null,
+      "country": null,
+      "validation_status": "Unresolved",
+      "checklist_ref": "HOST",
+      "note": "Country drives the Phase-7 unit-cost host-country coefficient (ticket 8); Unresolved until confirmed or beta-declared."
+    },
+    {
+      "role_token": "SUPERVISOR",
+      "role": "Supervisor at the host institution",
+      "identity": null,
+      "validation_status": "Unresolved",
+      "checklist_ref": "SUPERVISOR",
+      "note": "Absent from the vault entirely."
+    },
+    {
+      "role_token": "VALIDATION_PARTNER",
+      "role": "Validation / farmer-access partner (AgroVIR-type)",
+      "identity": null,
+      "validation_status": "Unresolved",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "note": "'AgroVIR-like' role-type only; not committed."
+    },
+    {
+      "role_token": "ELTE",
+      "role": "(Raised in build context only)",
+      "identity": null,
+      "validation_status": "Refuted",
+      "checklist_ref": "ELTE",
+      "note": "ELTE absent from all sources; do not invent a role."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "artifact": "architecture_inputs/outcomes.json",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "trl_note": "trl_achieved is null throughout: the TRL target is an open project decision (RQ10) and is not asserted."
+  },
+  "outcomes": [
+    {
+      "id": "OUT-1",
+      "title": "Probabilistic multi-sensor field-state diagnosis method",
+      "description": "A calibrated probabilistic method (and its software implementation) that fuses radar, optical, soil-sensor, weather and field-observation data into posterior estimates of the latent field state, via Route A (direct probabilistic fusion) and/or Route B (homogeneous-patch proxy).",
+      "type": "scientific_and_technical",
+      "linked_objectives": ["OBJ-1"],
+      "trl_achieved": null,
+      "exploitation_route": "Open research software and methods; peer-reviewed publication; contribution to the standalone research demonstrator. Specific exploitation partners are spine-dependent and Unresolved.",
+      "linked_wp_ids": ["WP1"],
+      "linked_deliverable_ids": ["D1.1", "D1.2"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Diagnostic Branch (METH-CORE-002)", "Probabilistic Machine Learning (METH-TERM-009)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "OUT-2",
+      "title": "Uncertainty-aware AquaCrop decision engine",
+      "description": "An integrated decision engine that calibrates AquaCrop while retaining an honest parameter posterior, runs counterfactual irrigation simulations over weather ensembles, and recommends the option with the best expected economic return.",
+      "type": "scientific_and_technical",
+      "linked_objectives": ["OBJ-2"],
+      "trl_achieved": null,
+      "exploitation_route": "Open research software; publication; integration into the demonstrator. Downstream operational exploitation depends on the (unresolved) host and validation partners.",
+      "linked_wp_ids": ["WP2"],
+      "linked_deliverable_ids": ["D2.1", "D2.2"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "OUT-3",
+      "title": "Field-validation dataset and uncertainty-calibration evidence",
+      "description": "A validation dataset (ground truth, sensor comparison) and calibration evidence establishing whether the diagnosis and decision recommendations are credible and whether reported uncertainty is well calibrated, including a test of Route B's patch-covariation assumption.",
+      "type": "scientific_and_technical",
+      "linked_objectives": ["OBJ-3"],
+      "trl_achieved": null,
+      "exploitation_route": "Open validation data and protocol; publication. The validation sites, farms and ground-truth arrangements are spine-dependent and Unresolved (RQ4).",
+      "linked_wp_ids": ["WP3"],
+      "linked_deliverable_ids": ["D3.1", "D3.2"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Ground Truth (METH-TERM-003)", "Control Stand Variant (METH-ROUTE-003)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "OUT-4",
+      "title": "Standalone research demonstrator (web MVP)",
+      "description": "An end-to-end demonstrator presenting irrigation recommendations with their uncertainty, integrating the diagnosis and decision engine as a research artefact.",
+      "type": "demonstrator",
+      "linked_objectives": ["OBJ-4"],
+      "trl_achieved": null,
+      "exploitation_route": "Standalone research demonstrator with partners assisting (feedback, farmer access, testing) rather than owning or operating it. TRL target Unresolved (RQ10).",
+      "linked_wp_ids": ["WP2", "WP3"],
+      "linked_deliverable_ids": ["D2.3"],
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Infrastructure Architecture (METH-INFRA-001)"],
+      "evidence_strength": "synthesis",
+      "note": "Demonstrator framing is vault synthesis (Web MVP node confidence low); partners assist not own (prompt.txt §8)."
+    },
+    {
+      "id": "OUT-5",
+      "title": "Peer-reviewed publications and open science outputs",
+      "description": "Open-access publications, open research data and open models covering the probabilistic fusion diagnosis, the uncertainty-aware decision engine and the validation, with a Data Management Plan delivered by month 6 (MSCA open-science requirement, sub-section 1.2).",
+      "type": "scientific_and_technical",
+      "linked_objectives": ["OBJ-1", "OBJ-2", "OBJ-3"],
+      "trl_achieved": null,
+      "exploitation_route": "Open-access dissemination; open data/models under FAIR principles. Specific venues and target audiences are not asserted and are refined with the host.",
+      "linked_wp_ids": ["WP5"],
+      "linked_deliverable_ids": ["D5.1"],
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["State of the Art - Multi Sensor Crop Water Stress Monitoring (METH-SOTA-001)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"],
+      "evidence_strength": "synthesis",
+      "note": "Open-science posture is an MSCA-PF structural requirement (sub-section 1.2) combined with the vault's demonstrator/novelty framing; no specific venues invented."
+    },
+    {
+      "id": "OUT-6",
+      "title": "Enhanced researcher competences and career readiness",
+      "description": "The fellow's advanced scientific, technical and transferable skills and enhanced career perspectives resulting from the fellowship's training, supervision and transfer of knowledge.",
+      "type": "training_and_career",
+      "linked_objectives": ["OBJ-5"],
+      "trl_achieved": null,
+      "exploitation_route": "UNRESOLVED - depends on the fellow, supervisor and host.",
+      "linked_wp_ids": ["WP4"],
+      "linked_deliverable_ids": [],
+      "validation_status": "Unresolved",
+      "source_vault_nodes": [],
+      "evidence_strength": "unconfirmed",
+      "note": "Spine-dependent; no vault support. Blocked pending FELLOW/SUPERVISOR/HOST confirmation."
+    }
+  ]
+}

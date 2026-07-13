@@ -1,0 +1,92 @@
+{
+  "_provenance": {
+    "record_type": "tier3_hand_lift",
+    "artifact": "architecture_inputs/workpackage_seed.json",
+    "ticket": "tickets.md ticket 14",
+    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
+    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "structure_note": "MSCA-PF is a single-fellow action: the fellow is 100% dedicated and person_months partition the fellow's effort across the 24-month EF WORKING SCAFFOLD (sum = 24; Assumed). Supervisor/host effort is in-kind and not counted here. WP1-WP3 carry vault-grounded research content; WP4 (training/transfer) and the management portion of WP5 are MSCA-PF STRUCTURAL packages whose content is Unresolved (spine-dependent). Role tokens FELLOW/HOST/SUPERVISOR are structural roles - identities Unresolved (see confirmation_checklist.json).",
+    "timeline_note": "start_month/end_month are on the 24-month EF working scaffold (Assumed; EF/GF and duration Unresolved)."
+  },
+  "work_packages": [
+    {
+      "id": "WP1",
+      "title": "Probabilistic multi-sensor diagnosis of the field state",
+      "lead": "FELLOW",
+      "participants": ["FELLOW", "SUPERVISOR"],
+      "start_month": 1,
+      "end_month": 14,
+      "person_months": 8,
+      "type": "research",
+      "description": "Build and calibrate the diagnostic branch: acquire and harmonise Sentinel-1 SAR, Sentinel-2 optical (and optional PlanetScope) with soil-sensor, weather and field-observation data; implement Route A (direct one-step probabilistic fusion via a Bayesian hierarchical model / Gaussian process) and/or Route B (homogeneous-patch proxy) to estimate the latent field state (root-zone soil moisture, crop water stress, canopy) as a posterior with honest uncertainty. Route scope (RQ2) and target field state (RQ3) are open decisions.",
+      "objectives_addressed": ["OBJ-1"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Earth Observation Layer (METH-INFRA-002)", "Ground Sensing Layer (METH-INFRA-003)", "Probabilistic Modelling Runtime (METH-INFRA-006)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "WP2",
+      "title": "Uncertainty-aware decision engine and demonstrator integration",
+      "lead": "FELLOW",
+      "participants": ["FELLOW", "SUPERVISOR"],
+      "start_month": 6,
+      "end_month": 20,
+      "person_months": 7,
+      "type": "research",
+      "description": "Build the prognostic branch and decision engine: uncertainty-aware AquaCrop calibration retaining an honest parameter posterior; counterfactual irrigation simulation over weather ensembles; profit-based decision recommendation under uncertainty. Integrate diagnosis and decision into a standalone research demonstrator (web MVP). Decision objective (RQ6) and TRL target (RQ10) are open decisions.",
+      "objectives_addressed": ["OBJ-2", "OBJ-4"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["AquaCrop Decision Interface (METH-DEC-001)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "AquaCrop Simulation Runtime (METH-INFRA-007)", "Decision Engine Layer (METH-INFRA-008)"],
+      "evidence_strength": "source_grounded"
+    },
+    {
+      "id": "WP3",
+      "title": "Field validation, ground truth and uncertainty calibration",
+      "lead": "FELLOW",
+      "participants": ["FELLOW", "HOST", "SUPERVISOR"],
+      "start_month": 8,
+      "end_month": 24,
+      "person_months": 5,
+      "type": "research",
+      "description": "Design and run the validation protocol: collect ground truth (RQ4), assess uncertainty calibration - e.g. whether 90% prediction intervals contain the truth about 90% of the time (RQ5), define pilot-success criteria (RQ7), and test Route B's patch-covariation assumption, including the control-stand variant (RQ9). Validation sites, farms and data-provider arrangements are Unresolved (spine-dependent).",
+      "objectives_addressed": ["OBJ-3"],
+      "validation_status": "Confirmed",
+      "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Control Stand Variant (METH-ROUTE-003)", "Ground Truth (METH-TERM-003)", "Ten Research Questions (METH-RQ-001)"],
+      "evidence_strength": "source_grounded",
+      "note": "Research content Confirmed; the specific validation sites and field partners are Unresolved (Unconfirmed Partner Placeholders METH-PART-006)."
+    },
+    {
+      "id": "WP4",
+      "title": "Training, supervision and two-way transfer of knowledge",
+      "lead": "SUPERVISOR",
+      "participants": ["SUPERVISOR", "HOST", "FELLOW"],
+      "start_month": 1,
+      "end_month": 24,
+      "person_months": 2,
+      "type": "training",
+      "description": "MSCA-PF structural work package for the researcher's training (scientific, management, transferable skills), supervision, and two-way transfer of knowledge between researcher and host (three-way for a Global Fellowship). CONTENT UNRESOLVED: the training programme, supervision arrangements and transfer-of-knowledge plan depend on the (unresolved) supervisor, host and fellowship type and cannot be specified without them.",
+      "objectives_addressed": ["OBJ-5"],
+      "validation_status": "Unresolved",
+      "source_vault_nodes": [],
+      "evidence_strength": "unconfirmed",
+      "note": "The WP EXISTS by MSCA-PF instrument structure (Excellence 1.3); its content is spine-dependent and blocked. No supervisor appears anywhere in the vault."
+    },
+    {
+      "id": "WP5",
+      "title": "Dissemination, exploitation, communication and management",
+      "lead": "FELLOW",
+      "participants": ["FELLOW", "HOST"],
+      "start_month": 1,
+      "end_month": 24,
+      "person_months": 2,
+      "type": "dissemination",
+      "description": "Open-science dissemination (open-access publications, open data/models, DMP by month 6), exploitation logic around the standalone research demonstrator, communication to relevant audiences, and lightweight project management, coordination and ethics oversight. Partially grounded (demonstrator + open-science posture); target groups, IP arrangements and the communication plan depend on the host and any validation partner and are refined once confirmed.",
+      "objectives_addressed": ["OBJ-1", "OBJ-2", "OBJ-3"],
+      "validation_status": "Inferred",
+      "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"],
+      "evidence_strength": "synthesis",
+      "note": "Dissemination/exploitation posture combines the MSCA-PF structural requirement (sub-section 2.2) with the vault's demonstrator framing (synthesis); audiences/IP/management detail Unresolved."
+    }
+  ]
+}
