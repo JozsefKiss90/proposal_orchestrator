@@ -1,7 +1,7 @@
 # Proposed Constitutional Changes — Milestone 1 (MSCA-PF Honest-Run)
 
-> **STATUS: DRAFT FOR RATIFICATION. NOT APPLIED.**
-> Output of the milestone-1 `/grilling` session, reconciled with the shared-understanding Stage-0 ledger. Per `CLAUDE.md` §14.5 a constitutional amendment *"requires explicit human instruction"* and *"may not be made by agents, skills, or workflows operating autonomously."* Nothing here is written into `CLAUDE.md`. To enact: instruct explicitly which items to adopt; §14.3 then requires reviewing every affected workflow/skill/agent; §14.1 makes a change enacted by editing a workflow/skill *without* amending `CLAUDE.md` invalid.
+> **STATUS: RATIFIED & APPLIED 2026-07-10.**
+> Output of the milestone-1 `/grilling` session, reconciled with the shared-understanding Stage-0 ledger. C1, C2, and C3 were ratified by explicit operator instruction (§14.5) and transcribed into `CLAUDE.md` on 2026-07-10; the §14.3 review and §14.4 consistency check were run. **The authoritative records now live in `CLAUDE.md` (§8 / §16 / §17 amendment records)**; this file is retained as the rationale/supporting draft for provenance. The §14.5 constraint continues to govern any *future* amendment: explicit human instruction only, never autonomous.
 >
 > **Three items require §14 ratification** — **C1** §8 (budget, substantive), **C2** §17.5.3 and **C3** §16.5 (both clarifications). The β operator-declared-`Assumed` guardrail (**W1**) needs **no** amendment: it enforces §12.2's existing "explicitly declared" at the workflow level by *strengthening* a gate (§13.7 permits adding, forbids only weakening).
 

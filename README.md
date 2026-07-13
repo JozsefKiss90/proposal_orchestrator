@@ -91,18 +91,20 @@ proposal_orchestator/
 +-- .claude/                           # Workflow specifications and runtime state
 |   +-- workflows/system_orchestration/
 |   |   +-- manifest.compile.yaml      #   Compiled DAG manifest (runtime entry point)
-|   |   +-- gate_rules_library.yaml    #   102 predicates across 11 gates
+|   |   +-- gate_rules_library.yaml    #   138 predicates across 14 gates
 |   |   +-- artifact_schema_specification.yaml
-|   |   +-- agent_catalog.yaml         #   18 agent definitions
-|   |   +-- skill_catalog.yaml         #   22 skill definitions
+|   |   +-- agent_catalog.yaml         #   20 agent definitions
+|   |   +-- skill_catalog.yaml         #   27 skill definitions
 |   |   +-- workflow_phases/           #   Phase YAML definitions
 |   |   +-- ...
-|   +-- agents/                        #   Agent .md specifications (18 agents)
-|   +-- skills/                        #   Skill .md specifications (22 skills)
+|   +-- agents/                        #   Agent .md specifications (20 agents)
+|   +-- skills/                        #   Skill .md specifications (27 skills)
 |   +-- runs/                          #   Per-run state (run_manifest.json, run_summary.json)
 |
 +-- tests/                             # Test suite
 ```
+
+> **Engine counts** (nodes / gates / agents / skills / predicates) are generated from the source files by `scripts/count_engine.sh` — run it rather than hand-editing these numbers.
 
 ---
 

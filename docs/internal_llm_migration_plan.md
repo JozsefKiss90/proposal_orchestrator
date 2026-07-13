@@ -1557,7 +1557,7 @@ No scheduler test should be modified as part of this migration. If a test fails,
 
 ### 9.5 Gate Equivalence Validation
 
-For each gate (11 total, 102 predicates):
+For each gate (14 total, 138 predicates):
 
 1. Run the phase with Claude CLI backend → collect gate result artifacts
 2. Run the same phase with Ollama backend → collect gate result artifacts
@@ -1660,7 +1660,7 @@ After each migration step:
 ### Phase 5: Multi-Phase Validation (Weeks 6-10)
 
 - [ ] Run Phases 1-7 with Ollama backend
-- [ ] Validate all 11 gates
+- [ ] Validate all 14 gates
 - [ ] Measure latency across all skills
 - [ ] Document semantic predicate quality
 - [ ] Decide: full local deployment vs. hybrid (local skills + Claude semantics)

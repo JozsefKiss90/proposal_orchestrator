@@ -1,7 +1,7 @@
 # Ratification Package — Insert-Ready `CLAUDE.md` §14 Amendment Records (C1–C3)
 
-> **DRAFT FOR YOUR REVIEW. NOT APPLIED TO `CLAUDE.md`.**
-> These are the literal amendment records that would be written into `CLAUDE.md`, formatted like the existing Section 17 records. Per §14.5, ratification is *your* explicit instruction; I will not transcribe any of these into `CLAUDE.md` until you say **"apply"** (naming which of C1/C2/C3).
+> **APPLIED 2026-07-10.**
+> C1, C2, and C3 were ratified by explicit operator instruction (§14.5) and transcribed into `CLAUDE.md` on 2026-07-10; the §14.3 review and §14.4 consistency check were run. **These records now live in `CLAUDE.md` (§8 / §16 / §17)**; the copies below are the insert-ready originals, retained for provenance. They are formatted like the existing Section 17 records.
 >
 > **How to ratify:** review the three records below → tell me which you adopt (all, a subset, or with edits) → I transcribe the adopted records into `CLAUDE.md` at the noted locations, run the §14.3 review (affected workflows/skills/agents) and the §14.4 consistency check, and report back. Only **C1–C3** need this; **W1** (the `assumed_claims_are_operator_declared` predicate) is workflow-level and needs building, not ratifying.
 >
