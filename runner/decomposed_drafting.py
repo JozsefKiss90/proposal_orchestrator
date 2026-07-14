@@ -78,6 +78,33 @@ _SLUG_CRITERION: dict[str, str] = {
 _DRAFTER_MODEL: str = "claude-sonnet-4-6"
 _DRAFTER_MAX_TOKENS: int = 8000
 
+#: TAPM timeout for a grounded per-sub-section drafting call.  Each call reads
+#: the declared grounding inputs from disk and drafts a full sub-section, so it
+#: is given the generous TAPM budget rather than the 300 s cli-prompt default.
+_DRAFTER_TIMEOUT_SECONDS: int = 1200
+
+#: Grounding inputs the production drafter reads (TAPM).  These are the same
+#: Tier 3 / phase-output / canonical-pack sources the monolithic drafting skills
+#: declared; the drafter is instructed to ground strictly in their retrieved
+#: content and to cite each material claim to one of them (no fabrication).  A
+#: superset is offered for every criterion; TAPM lets Claude Read only what the
+#: sub-section needs.
+_GROUNDING_INPUTS: tuple[str, ...] = (
+    "docs/tier3_project_instantiation/project_brief/",
+    "docs/tier3_project_instantiation/architecture_inputs/",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+    "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/",
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/",
+    "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/"
+    "canonical_reference_pack.json",
+)
+
 
 # ---------------------------------------------------------------------------
 # Types
@@ -198,15 +225,30 @@ def _derive_overall_status(drafts: list[dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _default_claude_drafter() -> SubSectionDrafter:
+def _default_claude_drafter(repo_root: Path) -> SubSectionDrafter:
     """Build the production per-sub-section drafter (wraps the transport).
 
-    Each call drafts a single sub-section with a bounded prompt that carries
-    the prior sub-sections' drafts as sequential context.  This is the live
-    path; the driver's control flow is validated with an injected fake drafter
-    in the tests, so this wrapper stays thin.
+    Each call drafts a single sub-section in **TAPM mode**: the drafter is told
+    which grounding inputs to Read from disk (Tier 3 project data, the Phase 1-3
+    outputs, and the canonical reference pack) and drafts strictly from their
+    retrieved content, carrying the prior sub-sections' drafts as sequential
+    context (D5).  This is the live capture path (ticket 13); the driver's
+    control flow is validated with an injected fake drafter in the tests, so the
+    live path is never exercised in CI.
+
+    Claim discipline (feeds the assumption-applier + W1, tickets 9/13):
+      * every material claim is Confirmed/Inferred with a Tier 1-4 ``source_ref``,
+        or **Unresolved**;
+      * a spine-identity fact that is not confirmed in Tier 3 (researcher, host,
+        supervisor, …) is emitted **Unresolved** with ``claim_id`` set to its
+        ``confirmation_checklist.json`` token (e.g. ``HOST``), so a matching
+        operator declaration in ``working_assumptions.json`` can flip it to
+        Assumed pre-assembly and W1 can verify the mapping.  The drafter never
+        self-declares an Assumed value.
     """
     from runner.claude_transport import invoke_claude_text
+
+    grounding_list = "\n".join(f"- {p}" for p in _GROUNDING_INPUTS)
 
     def _drafter(
         sub: dict[str, Any],
@@ -220,18 +262,33 @@ def _default_claude_drafter() -> SubSectionDrafter:
             for d in prior_drafts
         )
         system_prompt = (
-            "You are drafting one sub-section of a Horizon Europe proposal "
-            f"(criterion: {criterion}). Draft ONLY this sub-section, in full, "
-            "grounded strictly in the provided project data. Return a single "
-            "JSON object with keys: content (the full prose), claim_statuses "
-            "(array), source_refs (array of {tier, source_path}). Every "
-            "material claim must be Confirmed/Inferred/Assumed with a source "
-            "ref, or flagged Unresolved. Do not fabricate."
+            "You are drafting ONE sub-section of a Horizon Europe MSCA "
+            f"Postdoctoral Fellowship proposal (evaluation criterion: "
+            f"{criterion}). Read the declared grounding inputs from disk with "
+            "the Read/Glob tools and draft strictly from their retrieved "
+            "content — do NOT fabricate partners, capabilities, objectives, "
+            "figures, or identities not present in those files. Draft this "
+            "sub-section IN FULL at evaluator depth (do not summarise; the "
+            "monolithic length ceiling has been lifted). Return a SINGLE JSON "
+            "object (begin with '{', end with '}', no markdown fence) with "
+            "keys: content (the full evaluator-oriented prose, a string), "
+            "claim_statuses (array of {claim_id, claim_summary, status, "
+            "source_ref}), source_refs (array of {tier, source_path}). Each "
+            "material claim's status is 'confirmed' or 'inferred' with a "
+            "source_ref into Tier 1-4, or 'unresolved'. For a spine-identity "
+            "fact not confirmed in Tier 3 (researcher, host, supervisor, "
+            "fellowship type, duration), set status 'unresolved' and set "
+            "claim_id to its confirmation_checklist.json token (HOST, FELLOW, "
+            "SUPERVISOR, FELLOWSHIP_TYPE, DURATION). Never invent an identity "
+            "and never emit status 'assumed' yourself."
         )
         user_prompt = (
-            f"Sub-section {sub_id}: {sub.get('section_name', '')}\n"
+            f"Grounding inputs to Read (relative to the repository root):\n"
+            f"{grounding_list}\n\n"
+            f"Draft sub-section {sub_id}: {sub.get('section_name', '')}\n"
             f"Field requirements:\n- " + "\n- ".join(map(str, field_reqs))
-            + (f"\n\nPrior sub-sections (for coherence):\n{context_blocks}"
+            + (f"\n\nPrior sub-sections already drafted (for coherence — do "
+               f"not repeat them):\n{context_blocks}"
                if context_blocks else "")
         )
         raw = invoke_claude_text(
@@ -239,20 +296,44 @@ def _default_claude_drafter() -> SubSectionDrafter:
             user_prompt=user_prompt,
             model=_DRAFTER_MODEL,
             max_tokens=_DRAFTER_MAX_TOKENS,
+            timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
+            tools=["Read", "Glob"],
         )
-        try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise DecomposedDraftingError(
-                f"drafter response for {sub_id!r} was not valid JSON: {exc}"
-            ) from exc
-        if not isinstance(parsed, dict):
-            raise DecomposedDraftingError(
-                f"drafter response for {sub_id!r} was not a JSON object"
-            )
+        parsed = _parse_drafter_response(raw, sub_id)
         return parsed
 
     return _drafter
+
+
+def _parse_drafter_response(raw: str, sub_id: str) -> dict[str, Any]:
+    """Parse a live drafter response into a draft dict (fail-closed).
+
+    The TAPM transport returns the model's stdout, which may wrap the JSON
+    object in surrounding prose or a markdown fence.  Extract the outermost
+    ``{...}`` object and parse it; raise :class:`DecomposedDraftingError` on any
+    malformed response rather than silently repairing it (§17.5.4).
+    """
+    text = raw.strip()
+    # Tolerate a leading/trailing markdown fence or explanatory prose by
+    # extracting the outermost brace-delimited object.
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        raise DecomposedDraftingError(
+            f"drafter response for {sub_id!r} contained no JSON object"
+        )
+    candidate = text[start : end + 1]
+    try:
+        parsed = json.loads(candidate)
+    except json.JSONDecodeError as exc:
+        raise DecomposedDraftingError(
+            f"drafter response for {sub_id!r} was not valid JSON: {exc}"
+        ) from exc
+    if not isinstance(parsed, dict):
+        raise DecomposedDraftingError(
+            f"drafter response for {sub_id!r} was not a JSON object"
+        )
+    return parsed
 
 
 # ---------------------------------------------------------------------------
@@ -310,7 +391,7 @@ def draft_section_decomposed(
     subs = _resolve_drafting_sub_sections(repo_root, slug, criterion)
 
     if drafter is None:
-        drafter = _default_claude_drafter()
+        drafter = _default_claude_drafter(repo_root)
 
     drafts_dir = repo_root / SECTION_DRAFTS_ROOT_REL / slug
 

@@ -6,8 +6,10 @@
     "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
     "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
     "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "structure_note": "MSCA-PF is a single-fellow action: the fellow is 100% dedicated and person_months partition the fellow's effort across the 24-month EF WORKING SCAFFOLD (sum = 24; Assumed). Supervisor/host effort is in-kind and not counted here. WP1-WP3 carry vault-grounded research content; WP4 (training/transfer) and the management portion of WP5 are MSCA-PF STRUCTURAL packages whose content is Unresolved (spine-dependent). Role tokens FELLOW/HOST/SUPERVISOR are structural roles - identities Unresolved (see confirmation_checklist.json).",
-    "timeline_note": "start_month/end_month are on the 24-month EF working scaffold (Assumed; EF/GF and duration Unresolved)."
+    "structure_note": "MSCA-PF is a single-fellow action: the fellow is 100% dedicated and person_months partition the fellow's effort across the 24-month European Fellowship scaffold (sum = 24). Supervisor/host effort is in-kind and not counted here. WP1-WP3 carry vault-grounded research content. WP4 (training/transfer) and the management portion of WP5 are MSCA-PF STRUCTURAL packages whose content was Unresolved (spine-dependent) and is now filled against the SYNTHETIC spine SYN-SPINE-01 (§3 override, logged in decision_log/synthetic-spine-demo-override_2026-07-13.json) - NOT operator-confirmed fact. Role tokens FELLOW/HOST/SUPERVISOR now resolve to the synthetic identities in consortium/roles.json and revert with them.",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
+    "timeline_note": "start_month/end_month are on the 24-month European Fellowship scaffold, now Confirmed (synthetic): EF derives from the Bulgaria -> Hungary intra-EU move, and 24 months is the standard EF duration."
   },
   "work_packages": [
     {
@@ -65,12 +67,14 @@
       "end_month": 24,
       "person_months": 2,
       "type": "training",
-      "description": "MSCA-PF structural work package for the researcher's training (scientific, management, transferable skills), supervision, and two-way transfer of knowledge between researcher and host (three-way for a Global Fellowship). CONTENT UNRESOLVED: the training programme, supervision arrangements and transfer-of-knowledge plan depend on the (unresolved) supervisor, host and fellowship type and cannot be specified without them.",
+      "description": "MSCA-PF structural work package for the researcher's training (scientific, management, transferable skills), supervision, and two-way transfer of knowledge between researcher and host. Content: a Career Development Plan agreed with the supervisor and delivered by month 3 and reviewed at M12/M24; >=120 hours of transferable-skills training (research integrity, open science, FAIR data stewardship, entrepreneurship); supervision through regular research reviews at the host's environmental-physics / geoinformatics group; two-way transfer of knowledge - the fellow contributes the uncertainty-aware calibration method and probabilistic-fusion expertise, and takes up the host's geoinformatics and field-validation competences, evidenced by >=2 methods seminars delivered at the host; co-supervision of >=1 MSc thesis.",
       "objectives_addressed": ["OBJ-5"],
-      "validation_status": "Unresolved",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
       "source_vault_nodes": [],
       "evidence_strength": "unconfirmed",
-      "note": "The WP EXISTS by MSCA-PF instrument structure (Excellence 1.3); its content is spine-dependent and blocked. No supervisor appears anywhere in the vault."
+      "note": "The WP EXISTS by MSCA-PF instrument structure (Excellence 1.3). Its content was spine-dependent and blocked - no supervisor appears anywhere in the vault - and is now authored against the SYNTHETIC spine SYN-SPINE-01 (§3 override, logged). NOT operator-confirmed fact; reverts with the spine."
     },
     {
       "id": "WP5",

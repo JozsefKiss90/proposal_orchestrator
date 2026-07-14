@@ -285,6 +285,63 @@ class TestComponentGreen:
         assert data["derivation"]["host_country_status"] == "Assumed"
         assert data["derivation"]["host_country"] == "AT"
 
+    def test_declared_duration_flips_months_to_assumed(
+        self, tmp_path: Path
+    ) -> None:
+        """A project duration declared in working_assumptions.json greens the
+        months line as Assumed — D11/D12 symmetry with the host coefficient
+        (ticket 13): the fellowship duration is a deliberately-Unresolved spine
+        fact, so declaring it (not confirming it into the call binding) is the
+        honest β path."""
+        _seed(tmp_path, host_country="BE")  # confirmed host, NO confirmed duration
+        _write(
+            tmp_path / "docs/tier3_project_instantiation/working_assumptions.json",
+            {
+                "record_type": "working_assumptions",
+                "provenance_class": "manually_placed",
+                "declarations": [
+                    {
+                        "key": "project_duration_months",
+                        "value": 24,
+                        "declared_by": "operator@example.org",
+                        "declared_on": "2026-07-13T10:00:00Z",
+                        "checklist_ref": "DURATION",
+                    }
+                ],
+            },
+        )
+        out = derive_unit_cost_budget(RUN_ID, tmp_path)
+        data = json.loads(out.read_text("utf-8"))
+        assert data["gate_pass_declaration"] == "pass"
+        assert data["derivation"]["confirmed_months"] == 24
+        assert data["derivation"]["confirmed_months_status"] == "Assumed"
+
+    def test_declared_duration_via_duration_token(self, tmp_path: Path) -> None:
+        """The DURATION checklist token is accepted as the declaration key too
+        (matches working_assumptions.example.json)."""
+        _seed(tmp_path, host_country="BE")
+        _write(
+            tmp_path / "docs/tier3_project_instantiation/working_assumptions.json",
+            {
+                "record_type": "working_assumptions",
+                "provenance_class": "manually_placed",
+                "declarations": [
+                    {
+                        "key": "DURATION",
+                        "value": 24,
+                        "declared_by": "operator@example.org",
+                        "declared_on": "2026-07-13T10:00:00Z",
+                        "checklist_ref": "DURATION",
+                    }
+                ],
+            },
+        )
+        out = derive_unit_cost_budget(RUN_ID, tmp_path)
+        data = json.loads(out.read_text("utf-8"))
+        assert data["gate_pass_declaration"] == "pass"
+        assert data["derivation"]["confirmed_months"] == 24
+        assert data["derivation"]["confirmed_months_status"] == "Assumed"
+
 
 class TestComponentBlocked:
     def test_unresolved_host_blocks_with_lines_computed(self, tmp_path: Path) -> None:

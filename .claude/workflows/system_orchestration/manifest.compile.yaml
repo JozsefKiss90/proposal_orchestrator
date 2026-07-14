@@ -171,25 +171,30 @@ node_registry:
     name: "Excellence Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: excellence_writer
-    # Ticket 7 delivers the decomposed-drafting driver (runner/decomposed_drafting.py)
-    # and the byte-equal composition proof (Excellence drafts -> section_assembler ->
-    # full-length section).  Ticket 9 adds the excellence_assumption_applier (the β
-    # honesty flip: declared unresolved -> assumed, pre-assembly).  The governed wiring
-    # that binds these here — deterministic_components: [excellence_assumption_applier,
-    # excellence_section_assembler] (the applier MUST run before the assembler, so the
-    # flip precedes composition) — and rewrites this node's drafting skill to produce
-    # section_drafts/excellence/ lands with the E2E run (ticket 13), per
-    # section_assembler.py's "don't bind an assembler over a directory no skill yet
-    # populates" rule.
-    # Ticket 10 binds the canonical_pack_deriver here: it regenerates the
-    # canonical_reference_pack.json (Tier 3 confirmed facts + declared assumptions,
-    # per-entry provenance) the preservation gates check the prose against.  It is
-    # an INPUT to drafting, so it runs in the node body before the drafting skill
-    # (§17.5.3 components run before skill sequencing) — no ordering tension with
-    # the deferred applier/assembler, which run after drafting (ticket 13).  This
-    # replaces the former scheduler-built pack (dag_scheduler Step 2.4).
+    # Ticket 13 lands the governed decomposed-drafting wiring (capture-replay, D2/D3):
+    # the live per-sub-section drafting (runner/decomposed_drafting.py) is the
+    # NON-DETERMINISTIC capture — it writes section_drafts/excellence/ (retained,
+    # §9.5/W2, freshness-excluded).  This governed node then REPLAYS deterministically
+    # over those drafts via three pre-skill deterministic components (§17.5.3/C2), in
+    # order:
+    #   1. canonical_pack_deriver — regenerates canonical_reference_pack.json (Tier 3
+    #      confirmed facts + working_assumptions.json declared values, per-entry
+    #      provenance) that the preservation gates check the prose against (ticket 10).
+    #   2. excellence_assumption_applier — the β honesty flip: enumerated declared
+    #      Unresolved -> Assumed in the drafts, PRE-assembly (ticket 9).  MUST precede
+    #      the assembler so the flip is composed in.
+    #   3. excellence_section_assembler — array-append composes the drafts into
+    #      proposal_sections/excellence_section.json (byte-equal, no synthesis; ticket 4).
+    # All three run before skill sequencing (drafts pre-exist on disk from the capture),
+    # so no post-skill slot is needed; the monolithic excellence-section-drafting skill
+    # is SUPERSEDED and skipped by the agent runtime when its assembler is bound (the
+    # section is produced by the assembler, not the monolithic call).  The audit skills
+    # then run over the assembled section.  gate_10a re-asserts gate_09 (§8.4), so this
+    # node never reaches green until the unit-cost budget gate passes.
     deterministic_components:
       - canonical_pack_deriver
+      - excellence_assumption_applier
+      - excellence_section_assembler
     skills:
       - excellence-section-drafting
       - proposal-section-traceability-check
@@ -204,9 +209,14 @@ node_registry:
     name: "Impact Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: impact_writer
-    # Ticket 10: regenerate the canonical reference pack before drafting (see n08a).
+    # Ticket 13: governed decomposed-drafting replay (capture-replay, see n08a).
+    # canonical_pack_deriver -> impact_assumption_applier -> impact_section_assembler,
+    # composing the captured section_drafts/impact/ drafts.  The monolithic
+    # impact-section-drafting skill is superseded and skipped when the assembler is bound.
     deterministic_components:
       - canonical_pack_deriver
+      - impact_assumption_applier
+      - impact_section_assembler
     skills:
       - impact-section-drafting
       - proposal-section-traceability-check
@@ -221,9 +231,16 @@ node_registry:
     name: "Implementation Section Drafting"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: implementation_writer
-    # Ticket 10: regenerate the canonical reference pack before drafting (see n08a).
+    # Ticket 13: governed decomposed-drafting replay (capture-replay, see n08a).
+    # canonical_pack_deriver -> implementation_assumption_applier ->
+    # implementation_section_assembler, composing the captured
+    # section_drafts/implementation/ drafts.  The monolithic
+    # implementation-section-drafting skill is superseded and skipped when the
+    # assembler is bound.
     deterministic_components:
       - canonical_pack_deriver
+      - implementation_assumption_applier
+      - implementation_section_assembler
     skills:
       - implementation-section-drafting
       - proposal-section-traceability-check

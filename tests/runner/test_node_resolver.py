@@ -292,18 +292,21 @@ class TestDeterministicComponentResolution:
             "n07_budget_gate"
         ) == ["unit_cost_budget_deriver"]
 
-    @pytest.mark.parametrize("node_id", [
-        "n08a_excellence_drafting",
-        "n08b_impact_drafting",
-        "n08c_implementation_drafting",
+    @pytest.mark.parametrize("node_id,slug", [
+        ("n08a_excellence_drafting", "excellence"),
+        ("n08b_impact_drafting", "impact"),
+        ("n08c_implementation_drafting", "implementation"),
     ])
-    def test_phase8_drafting_nodes_bind_canonical_pack_deriver(
-        self, resolver: NodeResolver, node_id: str
+    def test_phase8_drafting_nodes_bind_decomposed_replay_components(
+        self, resolver: NodeResolver, node_id: str, slug: str
     ) -> None:
-        # Ticket 10: the canonical pack deriver runs in each Phase-8 drafting
-        # node body (before the drafting skill), replacing the scheduler build.
+        # Ticket 10 binds the canonical pack deriver; ticket 13 adds the
+        # decomposed-drafting replay components in order — the applier MUST
+        # precede the assembler so the Unresolved->Assumed flip is composed in.
         assert resolver.resolve_deterministic_components(node_id) == [
-            "canonical_pack_deriver"
+            "canonical_pack_deriver",
+            f"{slug}_assumption_applier",
+            f"{slug}_section_assembler",
         ]
 
     @pytest.mark.parametrize("node_id", [

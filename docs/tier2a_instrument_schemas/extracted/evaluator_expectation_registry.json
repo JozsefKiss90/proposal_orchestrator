@@ -1,106 +1,69 @@
 {
   "instruments": [
     {
-      "instrument_type": "RIA",
+      "instrument_type": "MSCA-PF",
       "criteria": [
         {
           "criterion_id": "Excellence",
           "criterion_name": "Excellence",
-          "threshold_score": 3,
+          "threshold_score": null,
+          "evaluation_form_weighting_pct": 50,
+          "scoring_scale": "0-5",
+          "grade_descriptors": {
+            "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+            "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+            "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+            "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+            "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+            "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+          },
           "evaluator_expectations": [
-            "Soundness of the concept and credibility of the proposed methodology",
-            "Extent to which the proposal demonstrates a clear understanding of the state-of-the-art in AI agent architectures, planning mechanisms, memory management, reasoning capabilities, and multi-agent frameworks",
-            "Quality and appropriateness of the research methodology and associated work plan",
-            "Clarity and pertinence of the objectives",
-            "Extent to which the proposal addresses novel and ambitious scientific and technological challenges",
-            "Quality of the interdisciplinary approach (where relevant)"
+            "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+            "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices)",
+            "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host",
+            "Quality and appropriateness of the researcher's professional experience, competences and skills"
           ]
         },
         {
           "criterion_id": "Impact",
           "criterion_name": "Impact",
-          "threshold_score": 3,
-          "evaluator_expectations": [
-            "Extent to which the outputs of the project would contribute to the Apply AI Strategy",
-            "Credibility of the plan for deployment via European Digital Innovation Hubs (EDIHs) and Testing and Experiment Facilities",
-            "Quality of the plan for sharing results via the AI-on-demand platform",
-            "Extent to which the proposal addresses at least one of the target sectors: healthcare, advanced manufacturing, or in-vehicle autonomous driving",
-            "Appropriateness of measures for the dissemination and exploitation of results",
-            "Contribution to EU competitiveness and strategic autonomy in AI",
-            "Potential societal impact and alignment with EU values"
-          ]
-        },
-        {
-          "criterion_id": "Implementation",
-          "criterion_name": "Implementation",
-          "threshold_score": 3,
-          "evaluator_expectations": [
-            "Quality and effectiveness of the work plan, including the extent to which the resources assigned to work packages are in line with their objectives and deliverables",
-            "Appropriateness of the management structures and procedures",
-            "Inclusion of KPIs, benchmarking mechanisms, and progress monitoring",
-            "Allocation of tasks for ADRA cohesion activities and GenAI4EU Hub collaboration",
-            "Evidence of building on previous funded actions and linking to AI Factories and Data Labs resources",
-            "Complementarity and balance of the consortium",
-            "Quality and relevant experience of the individual participants"
-          ]
-        },
-        {
-          "criterion_id": "PortfolioCoverage",
-          "criterion_name": "Portfolio Coverage (Sector Balance)",
           "threshold_score": null,
-          "threshold_note": "No individual per-criterion threshold for single-stage PF; only the overall 70/100 threshold applies. Weighting is used for ranking only.",
+          "evaluation_form_weighting_pct": 30,
+          "scoring_scale": "0-5",
+          "grade_descriptors": {
+            "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+            "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+            "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+            "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+            "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+            "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+          },
           "evaluator_expectations": [
-            "This is a procedural selection criterion, not a scored evaluation criterion. Grants will be awarded not only in order of ranking but also to ensure at least one funded proposal per sector: healthcare, advanced manufacturing, and in-vehicle autonomous driving — subject to all evaluation thresholds being passed."
+            "Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development",
+            "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+            "The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts"
+          ]
+        },
+        {
+          "criterion_id": "Quality_and_Efficiency_of_Implementation",
+          "criterion_name": "Quality and Efficiency of the Implementation",
+          "threshold_score": null,
+          "evaluation_form_weighting_pct": 20,
+          "scoring_scale": "0-5",
+          "grade_descriptors": {
+            "0": "The proposal fails to address the criterion or cannot be assessed due to missing or incomplete information.",
+            "1": "Poor. The criterion is inadequately addressed, or there are serious inherent weaknesses.",
+            "2": "Fair. The proposal broadly addresses the criterion, but there are significant weaknesses.",
+            "3": "Good. The proposal addresses the criterion well, but a number of shortcomings are present.",
+            "4": "Very Good. The proposal addresses the criterion very well, but a small number of shortcomings are present.",
+            "5": "Excellent. The proposal successfully addresses all relevant aspects of the criterion. Any shortcomings are minor."
+          },
+          "evaluator_expectations": [
+            "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+            "Quality and capacity of the host institutions and participating organisations, including hosting arrangements"
           ]
         }
       ]
-    },
-    {
-      "instrument_type": "MSCA-PF",
-      "evaluation_form": "ef_he-msca_en.pdf",
-      "evaluation_form_version": "V.2.2 (17.12.2025)",
-      "scoring_scale": "0-5, resolution 0.1",
-      "overall_threshold": "70/100 (weighted sum of the three criterion scores)",
-      "single_stage": true,
-      "criteria": [
-        {
-          "criterion_id": "Excellence",
-          "criterion_name": "Excellence",
-          "weight": 0.5,
-          "threshold_score": null,
-          "threshold_note": "No individual per-criterion threshold for single-stage PF; only the overall 70/100 threshold applies. Weighting is used for ranking only.",
-          "evaluator_expectations": [
-            "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art).",
-            "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant, and the quality and appropriateness of open science practices).",
-            "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host.",
-            "Quality and appropriateness of the researcher's professional experience, competences and skills."
-          ]
-        },
-        {
-          "criterion_id": "Impact",
-          "criterion_name": "Impact",
-          "weight": 0.3,
-          "threshold_score": null,
-          "threshold_note": "No individual per-criterion threshold for single-stage PF; only the overall 70/100 threshold applies. Weighting is used for ranking only.",
-          "evaluator_expectations": [
-            "Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development.",
-            "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities.",
-            "The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts."
-          ]
-        },
-        {
-          "criterion_id": "Implementation",
-          "criterion_name": "Quality and efficiency of the implementation",
-          "weight": 0.2,
-          "threshold_score": null,
-          "threshold_note": "No individual per-criterion threshold for single-stage PF; only the overall 70/100 threshold applies. Weighting is used for ranking only.",
-          "evaluator_expectations": [
-            "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages.",
-            "Quality and capacity of the host institutions and participating organisations, including hosting arrangements."
-          ]
-        }
-      ],
-      "source_note": "Criteria, weights, and thresholds read from the HE MSCA evaluation form V.2.2 (Thresholds & weighting; per-criterion 'Weighting: 50%/30%/20%'). Per-criterion expectations are the [OPTION for MSCA Postdoctoral fellowships] bullets. §10.6: read from the form, not assumed."
     }
   ]
 }

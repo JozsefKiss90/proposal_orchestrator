@@ -1,56 +1,79 @@
 {
   "_provenance": {
     "record_type": "tier3_hand_lift_spine",
-    "ticket": "tickets.md ticket 14",
+    "ticket": "tickets.md ticket 14 (hand-lift) + option-0 synthetic spine (SYN-SPINE-01)",
     "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
     "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
     "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. This file declares the STRUCTURAL roles with every IDENTITY left Unresolved (including ELTE, which is Unresolved and additionally flagged do_not_invent: true, since the sources provide no basis for it). No name is invented (CLAUDE.md §13.3). partners.json and capabilities.json are intentionally left unpopulated (the consortium/ directory retains only its .gitkeep) because zero partners are confirmed in any source. Populate these roles only from operator-confirmed facts or working_assumptions.json (ticket 15).",
-    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories (here: Unresolved). No fifth category is introduced. Where the sources provide no basis for a role (ELTE), the status stays Unresolved and the disposition is carried by descriptive fields - source_disposition: 'absent_from_sources' and do_not_invent: true. A fifth status value would bypass both honesty gates (no_unresolved_material_claims fails only on 'unresolved'; W1 governs only 'assumed') and would be a de facto change to §12.2's vocabulary without an amendment (§14.1). See decision_log/status-vocabulary-correction_2026-07-13.json."
+    "synthetic_override": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json",
+    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. The identity spine was left Unresolved by the ticket-14 hand-lift because no source vault node names any person or institution. It is now filled with SYNTHETIC demo data (SYN-SPINE-01) under an explicit CLAUDE.md §3 operator override of §13.3, scoped to this demonstration run and logged per §9.4. THESE ARE NOT REAL FACTS. Every entry carries synthetic: true. Before any real use, replace with operator-confirmed facts or revert to Unresolved - the pre-override commit is the honest state.",
+    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). No fifth category is introduced - 'synthetic' is a descriptive provenance flag, never a status value (see decision_log/status-vocabulary-correction_2026-07-13.json). Synthetic entries carry validation_status 'Confirmed' so the gates evaluate them, plus synthetic: true so their nature is unmistakable."
   },
-  "spine_status": "unresolved",
+  "spine_status": "filled_synthetic",
+  "spine_marker": "SYN-SPINE-01",
+  "synthetic": true,
+  "fellowship_type": "European Fellowship (EF)",
+  "mobility": "Bulgaria (Plovdiv) -> Hungary (ELTE): intra-EU move, therefore a European Fellowship by definition. Derived from the spine, not invented.",
   "roles": [
     {
       "role_token": "FELLOW",
       "role": "Experienced researcher / postdoctoral fellow (applicant)",
-      "identity": null,
-      "validation_status": "Unresolved",
-      "checklist_ref": "FELLOW"
+      "identity": "Dr. Mariya Petrova [SYNTHETIC]",
+      "current_affiliation": "Plovdiv University 'Paisii Hilendarski', Bulgaria",
+      "country_of_origin": "BG",
+      "field": "Agricultural and environmental modelling; probabilistic crop-water modelling",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
+      "checklist_ref": "FELLOW",
+      "note": "SYNTHETIC demo identity (§3 override, logged). Mobility basis: not resident in Hungary for more than 12 months in the 36 months before the deadline - asserted synthetically; a real run must evidence this. CV, publication record and career-stage detail remain unspecified."
     },
     {
       "role_token": "HOST",
       "role": "Beneficiary / host organisation",
-      "identity": null,
-      "country": null,
-      "validation_status": "Unresolved",
+      "identity": "Eotvos Lorand University (ELTE), Budapest",
+      "country": "Hungary",
+      "country_code": "HU",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "HOST",
-      "note": "Country drives the Phase-7 unit-cost host-country coefficient (ticket 8); Unresolved until confirmed or beta-declared."
+      "note": "SYNTHETIC hosting arrangement (§3 override, logged). ELTE is a real institution; the arrangement is not real. Country HU drives the Phase-7 unit-cost host-country coefficient (ticket 8) and resolves the host-dependent budget line at gate_09."
     },
     {
       "role_token": "SUPERVISOR",
       "role": "Supervisor at the host institution",
-      "identity": null,
-      "validation_status": "Unresolved",
+      "identity": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
+      "affiliation": "ELTE - environmental physics / geoinformatics",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "SUPERVISOR",
-      "note": "Absent from the vault entirely."
+      "note": "SYNTHETIC person attached to a real institution (§3 override, logged). Must not appear in anything submitted. Track record and supervision history are unspecified."
     },
     {
       "role_token": "VALIDATION_PARTNER",
-      "role": "Validation / farmer-access partner (AgroVIR-type)",
-      "identity": null,
-      "validation_status": "Unresolved",
+      "role": "Associated partner - farmer access, field validation, feedback (not owning or operating the tool)",
+      "identity": "AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "country": "Hungary",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "VALIDATION_PARTNER",
-      "note": "'AgroVIR-like' role-type only; not committed."
+      "note": "SYNTHETIC partnership (§3 override, logged). AgroVIR is a real company; the vault only ever said 'AgroVIR-like partners'. No real commitment exists."
     },
- {
+    {
       "role_token": "ELTE",
-      "role": "(Raised in build context only)",
-      "identity": null,
-      "validation_status": "Unresolved",
+      "role": "Superseded - ELTE is now filled as HOST (SYN-SPINE-01)",
+      "identity": "See HOST",
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
       "source_disposition": "absent_from_sources",
-      "do_not_invent": true,
+      "do_not_invent": false,
+      "do_not_invent_lifted_by": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json (§3 operator override)",
       "checklist_ref": "ELTE",
-      "note": "ELTE is absent from all sources (vault ELTE Role, METH-PART-002, evidence_strength: unconfirmed). The engine must never invent this role. Absence of evidence is not evidence against: the operator MAY still confirm ELTE, or declare it via working_assumptions.json, if it is genuinely the host."
+      "note": "The do_not_invent guard HELD for the entire build: ELTE is absent from every source and the engine never once asserted it. It is lifted here only by explicit operator instruction (§3), never by the engine, and only for this synthetic demo run. On revert this entry returns to validation_status Unresolved with do_not_invent: true."
     }
   ]
 }

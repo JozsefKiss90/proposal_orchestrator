@@ -1848,3 +1848,88 @@ class TestDeterministicComponentInvocation:
 
         assert result.status == "success"
         assert result.invoked_components == []
+
+
+class TestDecomposedDraftingSupersession:
+    """Ticket 13: when a section-assembler component is bound, the monolithic
+    drafting skill is superseded (skipped) — the section is composed from the
+    captured per-sub-section drafts, not the single-call drafting skill.  Audit
+    skills still run over the assembled section."""
+
+    def test_bound_assembler_supersedes_monolithic_drafting_skill(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+        called_skills: list[str] = []
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            # Stand in for the real assembler: write the node's expected
+            # gate-relevant artifact so can_evaluate_exit_gate passes.
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            return _success_skill()
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _assembler},
+        ), patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        # The monolithic drafting skill was superseded (never run) ...
+        assert "excellence-section-drafting" not in called_skills
+        # ... while the audit skill still ran.
+        assert "skill-audit" in called_skills
+        # It is recorded with the explicit supersession status.
+        drafting_rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "excellence-section-drafting"
+        )
+        assert drafting_rec.status == "superseded_by_decomposed_assembler"
+
+    def test_drafting_skill_runs_normally_when_no_assembler_bound(
+        self, tmp_path: Path
+    ) -> None:
+        # Without an assembler component the monolithic drafting skill is NOT
+        # superseded — the supersession is strictly conditional on the binding.
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+        called_skills: list[str] = []
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            if skill_id == "excellence-section-drafting":
+                # The monolithic skill writes its section (its Phase-8
+                # freshness guard verifies this on disk with the run_id).
+                sec = (
+                    tmp_path / "docs" / "tier5_deliverables"
+                    / "proposal_sections" / "excellence_section.json"
+                )
+                sec.parent.mkdir(parents=True, exist_ok=True)
+                sec.write_text(
+                    json.dumps({"run_id": "run-test-001"}), encoding="utf-8"
+                )
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(**kwargs)  # no deterministic_components
+
+        assert result.status == "success"
+        assert "excellence-section-drafting" in called_skills

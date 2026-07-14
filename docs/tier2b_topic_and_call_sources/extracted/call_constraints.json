@@ -2,74 +2,122 @@
   "constraints": [
     {
       "constraint_id": "CC-01",
-      "description": "Call opening date 2026-04-09; single submission deadline 2026-09-09.",
-      "constraint_type": "temporal",
-      "source_section": "Call metadata",
-      "source_document": "HORIZON-MSCA-2026-PF-01.json",
+      "description": "Applications must be made jointly by the researcher and a beneficiary in the academic or non-academic sector.",
+      "constraint_type": "partnership",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-02",
-      "description": "Single-stage proposal submission and evaluation procedure.",
-      "constraint_type": "procedural",
-      "source_section": "Part B template / evaluation form",
-      "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
+      "description": "European Postdoctoral Fellowships must have a standard duration of between 12 and 24 months.",
+      "constraint_type": "eligibility",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-03",
-      "description": "The EU contribution takes the form of unit contributions (unit costs), not actual costs or a lump sum. Rates are per person-month. See unit_cost_rates.json.",
-      "constraint_type": "budget",
-      "source_section": "WP PF section 2.1 Applicable unit contributions",
-      "source_document": "wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+      "description": "Global Postdoctoral Fellowships require an outgoing phase of minimum 12 and maximum 24 months in a non-associated Third Country.",
+      "constraint_type": "eligibility",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-04",
-      "description": "Indicative call budget EUR 59,857,539 (2026).",
-      "constraint_type": "budget",
-      "source_section": "Call metadata",
-      "source_document": "HORIZON-MSCA-2026-PF-01.json",
+      "description": "Global Postdoctoral Fellowships require a mandatory 12-month return phase to a host organisation based in an EU Member State or a Horizon Europe Associated Country.",
+      "constraint_type": "eligibility",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-05",
-      "description": "Part B-1 page limit: Sections 1-3 together must not exceed 10 pages. Part B-2 (CV, capacity of participating organisations, ethics, security, MSCA Green Charter) has no page limit.",
-      "constraint_type": "format",
-      "source_section": "Part B template (page limit)",
-      "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
+      "description": "For European Postdoctoral Fellowships, secondments cannot exceed half of the requested duration of the action (excluding any additional period for a non-academic placement) and must be in line with the project objectives.",
+      "constraint_type": "methodological",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-06",
-      "description": "European Postdoctoral Fellowships: 12-24 months. Global Postdoctoral Fellowships: outgoing 12-24 months + mandatory 12-month return (24-36 months total). Optional non-academic placement adds up to 6 months.",
-      "constraint_type": "duration",
+      "description": "For Global Postdoctoral Fellowships, optional secondments are permitted for up to half of the outgoing phase; a maximum of three months of such secondments can be spent at the start of the project at the beneficiary or associated partners linked to the beneficiary.",
+      "constraint_type": "methodological",
       "source_section": "Scope",
-      "source_document": "HORIZON-MSCA-2026-PF-01.json",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-07",
-      "description": "Award criteria and weighting: Excellence 50%, Impact 30%, Quality and efficiency of the implementation 20%; each scored 0-5 (0.1 resolution); overall threshold 70/100.",
-      "constraint_type": "evaluation",
-      "source_section": "HE MSCA evaluation form V.2.2",
-      "source_document": "ef_he-msca_en.pdf",
+      "description": "Secondments cannot take place during the mandatory twelve-month return period to the host organisation in an EU Member State or Horizon Europe Associated Country.",
+      "constraint_type": "eligibility",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-08",
-      "description": "A Career Development Plan and a Data Management Plan are mandatory deliverables (CDP at the beginning of the action; DMP by month 6).",
-      "constraint_type": "deliverable",
-      "source_section": "Scope / Part B 1.2",
-      "source_document": "wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+      "description": "Postdoctoral Fellowships may provide an additional period of up to six months to support researchers opting for a non-academic sector placement at the end of the project; the request for such a placement must be an integral part of the proposal, explaining the added-value for the project and for the career development of the researcher, and is subject to evaluation.",
+      "constraint_type": "methodological",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     },
     {
       "constraint_id": "CC-09",
-      "description": "Specific eligibility conditions apply to MSCA-PF in the research areas covered by the Euratom Research and Training Programme.",
+      "description": "Training activities must integrate key transferable skills and competences common to all fields, including digital ones (e.g. generative AI), and foster the culture of Open Science, knowledge valorisation, and when applicable innovation and entrepreneurship, as well as good scientific conduct such as research integrity.",
+      "constraint_type": "methodological",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-10",
+      "description": "A Career Development Plan must be established jointly by the supervisor(s) and the researcher; it must be submitted as a project deliverable at the beginning of the action and may be updated when needed. In addition to research objectives, it must comprise the researcher's training and career needs, transferable skills, teaching, publications, and participation in public engagement and Open Science activities.",
+      "constraint_type": "reporting",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-11",
+      "description": "Global Postdoctoral Fellowships are open only to European nationals or long-term residents.",
       "constraint_type": "eligibility",
-      "source_section": "Scope (Euratom)",
-      "source_document": "wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-12",
+      "description": "Proposal page limits and layout are described in Part B of the Application Form available in the Submission System, as referenced in Annex A and Annex E of the Horizon Europe Work Programme General Annexes.",
+      "constraint_type": "other",
+      "source_section": "Admissibility Conditions",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-13",
+      "description": "For Euratom research areas, specific eligibility conditions apply and the non-academic sector organisation must be established in an EU Member State or a country associated to the Euratom Research and Training Programme.",
+      "constraint_type": "eligibility",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-14",
+      "description": "ERA Fellowships provide specific support to researchers undertaking their fellowship in a widening country, as implemented through Work Programme Annex 11 (Widening Participation and Strengthening the European Research Area).",
+      "constraint_type": "scope",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "status": "Confirmed"
+    },
+    {
+      "constraint_id": "CC-15",
+      "description": "Fellows must be empowered to pursue a career in research and adequately prepared for increased research collaboration and information-sharing made possible by new digital technologies, including collaborative tools, Open Access to publications and research outputs, FAIR data management, societal engagement, and citizen science.",
+      "constraint_type": "methodological",
+      "source_section": "Scope",
+      "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
     }
   ]

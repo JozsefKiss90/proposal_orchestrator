@@ -1,0 +1,99 @@
+{
+  "decision_id": "scope_check_concept_refiner_2026-07-14T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "The project is an MSCA Postdoctoral Fellowship targeting a single researcher undertaking international mobility.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The research topic is uncertainty-aware multi-sensor crop water stress diagnosis and economically optimised irrigation decision support for row crops.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element confirms or excludes this research topic; scope_requirements.json (SR-01 through SR-10) defines fellowship structure and eligibility requirements only and does not impose thematic restrictions on research domains; in-scope status for this topic claim cannot be confirmed from Tier 2B data alone; scope boundary is defined by Tier 2B only"
+    },
+    {
+      "claim": "The methodology employs probabilistic machine learning (Bayesian hierarchical models, Gaussian processes), SAR and optical satellite data (Sentinel-1 SAR, Sentinel-2, PlanetScope), in-situ soil sensors and the AquaCrop crop model for counterfactual irrigation simulation.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element confirms or excludes this methodological approach; scope_requirements.json contains no thematic, disciplinary, or methodological restrictions for MSCA-PF; in-scope status for this methodology cluster cannot be confirmed from Tier 2B data alone; scope boundary is defined by Tier 2B only"
+    },
+    {
+      "claim": "Training activities will integrate Open Science culture including a Data Management Plan (DMP) by month 6, open data and open models, and key transferable skills including digital competences.",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": "CC-09",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project's open-science posture empowers the researcher for research career development, Open Access to outputs, FAIR data management, and digital collaboration.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-15",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "A Career Development Plan will be established jointly by the supervisor and the researcher and submitted as a project deliverable at the start of the action.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-10",
+      "status": "flagged",
+      "flag_reason": "SR-05 and CC-10 require the Career Development Plan to be established jointly by supervisor(s) and the researcher and submitted as a deliverable at the start of the action; the supervisor is Unresolved in all source materials — no supervisor is named anywhere — so compliance with this mandatory structural scope requirement cannot be confirmed"
+    },
+    {
+      "claim": "The host organisation (beneficiary) is Unresolved; no host is named in any source.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-01",
+      "status": "flagged",
+      "flag_reason": "CC-01 requires the application to be made jointly by the researcher and a beneficiary; SR-02 requires the European Fellowship host to be established in an EU Member State or Horizon Europe Associated Country; host identity is Unresolved, blocking confirmation of both the joint-application constraint and the host-country eligibility condition; this is a blocking unresolved item in confirmation_checklist.json (item HOST)"
+    },
+    {
+      "claim": "The fellow/researcher identity is Unresolved; no fellow is named in any source.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": "CC-01",
+      "status": "flagged",
+      "flag_reason": "SR-01 establishes excellence of the researcher as the core scope criterion for the fellowship; CC-01 requires joint application by an identified researcher; with the fellow identity Unresolved, the fellowship's primary scope criterion — demonstrable researcher excellence through international mobility — cannot be evaluated; this is a blocking unresolved item in confirmation_checklist.json (item FELLOW)"
+    },
+    {
+      "claim": "The fellowship type (European Fellowship or Global Fellowship) is Unresolved; a 24-month working scaffold is adopted as an assumed default.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-02",
+      "status": "flagged",
+      "flag_reason": "SR-02 (EF: host in EU/Associated Country, any nationality) and SR-03 (GF: outgoing phase in Third Country plus mandatory 12-month return, restricted to European nationals or long-term residents) impose distinct and non-interchangeable structural scope conditions; CC-02 bounds EF duration at 12-24 months; CC-03 and CC-04 govern GF outgoing and return phases; with EF/GF type Unresolved, compliance with the applicable structural scope requirement cannot be confirmed; GF choice would additionally require nationality confirmation under CC-11; 24-month scaffold is within CC-02 EF bounds but may not apply if GF is chosen"
+    },
+    {
+      "claim": "The project claims scientific novelty as the first end-to-end coupling of learned multimodal fusion, explicit probabilistic crop-water-state estimation, and economically optimised irrigation decision support for row crops, argued against a systematic literature review.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element defines thematic novelty requirements or domain-specific scope criteria for MSCA-PF; scope_requirements.json addresses fellowship structure and eligibility only; in-scope confirmation for this scientific novelty claim is not available from Tier 2B data alone; scope boundary is defined by Tier 2B only"
+    },
+    {
+      "claim": "The project will produce a standalone research demonstrator (Web MVP) as its primary technical output.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element defines or restricts expected technical output types for MSCA-PF beyond training and career deliverables (SR-04 through SR-06, CC-09, CC-10, CC-15); this research output type cannot be positively confirmed as in-scope from Tier 2B data alone; scope boundary is defined by Tier 2B only"
+    },
+    {
+      "claim": "The two-route diagnostic methodology (Route A: Direct Probabilistic Fusion; Route B: Homogeneous Patch Proxy) shares a single decision engine to hedge methodological risk.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element confirms or excludes this methodological design pattern; scope_requirements.json contains no methodological or disciplinary restrictions for MSCA-PF; in-scope status cannot be confirmed from Tier 2B data alone; scope boundary is defined by Tier 2B only"
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope — HORIZON-MSCA-2026-PF-01-01.slice.json (scope_requirements.json: SR-01, SR-02, SR-03, SR-04, SR-05, SR-06)",
+    "Scope — HORIZON-MSCA-2026-PF-01-01.slice.json (call_constraints.json: CC-01, CC-02, CC-03, CC-04, CC-09, CC-10, CC-11, CC-15)"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-07-14T12:00:00Z"
+}

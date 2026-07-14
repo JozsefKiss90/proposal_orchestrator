@@ -36,46 +36,59 @@
 
   "instrument_type": "MSCA-PF",
   "action_confirmation_ref": "docs/tier4_orchestration_state/decision_log/action-confirmation-msca-pf_2026-07-13.json",
-  "fellowship_type": null,
+  "fellowship_type": "European Fellowship (EF)",
   "fellowship_type_status": {
-    "validation_status": "Unresolved",
-    "note": "European Postdoctoral Fellowship (EF) vs Global Postdoctoral Fellowship (GF) is not determinable from the vault; it depends on the (unresolved) host and any Third-Country outgoing host. Project decision.",
+    "validation_status": "Confirmed",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
+    "note": "DERIVED from the synthetic spine, not separately invented: the fellow moves Bulgaria (Plovdiv) -> Hungary (ELTE), an intra-EU move, which is a European Fellowship by definition. Rests on the SYNTHETIC spine (§3 override, logged) and reverts with it.",
     "call_constraint": "EF 12-24 months; GF outgoing 12-24 months + mandatory 12-month return (24-36 total). Source: section_schema_registry.json MSCA-PF; selected_call.json."
   },
 
   "host_organisation": {
-    "validation_status": "Unresolved",
+    "validation_status": "Confirmed",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
     "role": "Beneficiary / host institution (MSCA-PF single-beneficiary model)",
-    "organisation": null,
-    "short_name": null,
-    "country": null,
-    "type": null,
-    "note": "The host/beneficiary is NOT named in any source vault node. Partner Roles Overview (METH-PART-001) records the lead institution as unconfirmed. ELTE is Unresolved with do_not_invent: true (absent from all sources; the engine must never assert it, though the operator may confirm or declare it). Confirm before submission - see confirmation_checklist.json item HOST."
+    "organisation": "Eotvos Lorand University (ELTE), Budapest",
+    "short_name": "ELTE",
+    "country": "Hungary",
+    "country_code": "HU",
+    "type": "Higher education establishment",
+    "note": "SYNTHETIC hosting arrangement (§3 operator override of §13.3; see decision_log/synthetic-spine-demo-override_2026-07-13.json). ELTE is a real institution but the arrangement is NOT real and must not be submitted. No source vault node names any host: the do_not_invent guard on ELTE held throughout the build and was lifted only by explicit operator instruction, never by the engine. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
   },
   "researcher": {
-    "validation_status": "Unresolved",
+    "validation_status": "Confirmed",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
     "role": "Experienced researcher / postdoctoral fellow (the applicant)",
-    "name": null,
-    "note": "The fellow is NOT named. The vault infers a PI Role (METH-PART-003) from first-person authorship of the design narrative and ownership of the uncertainty-aware calibration method (doi:10.1016/j.envsoft.2022.105556), but the person's name and affiliation are explicitly unconfirmed, and whether that PI is the PF fellow or the PF supervisor is itself unresolved. Confirm - see confirmation_checklist.json item FELLOW."
+    "name": "Dr. Mariya Petrova [SYNTHETIC]",
+    "current_affiliation": "Plovdiv University 'Paisii Hilendarski', Bulgaria",
+    "country_of_origin": "BG",
+    "note": "SYNTHETIC demo identity (§3 override, logged). The vault names no fellow; it only infers a PI Role (METH-PART-003) from first-person authorship of the design narrative. CV, publication record and career-stage detail remain unspecified and will surface as gaps in the person-dependent sections."
   },
   "supervisor": {
-    "validation_status": "Unresolved",
+    "validation_status": "Confirmed",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
     "role": "Supervisor at the host institution",
-    "name": null,
-    "note": "No supervisor is named in any source vault node. Confirm - see confirmation_checklist.json item SUPERVISOR."
+    "name": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
+    "affiliation": "ELTE - environmental physics / geoinformatics",
+    "note": "SYNTHETIC person attached to a real institution (§3 override, logged). No supervisor appears anywhere in the vault - notable for an MSCA-PF, which is supervisor-centric. Track record and supervision history are unspecified. Must not appear in anything submitted."
   },
 
-  "duration_months": null,
+  "duration_months": 24,
   "duration_status": {
-    "validation_status": "Unresolved",
+    "validation_status": "Confirmed",
+    "synthetic": true,
+    "spine_marker": "SYN-SPINE-01",
     "call_constraint_max_months": 36,
-    "working_scaffold_months": 24,
-    "note": "The specific project duration is a project decision tied to the (unresolved) EF/GF choice. The architecture_inputs seeds (workpackage_seed, milestones_seed) are built on a 24-month European-Fellowship WORKING SCAFFOLD, flagged Assumed throughout, not Confirmed. Confirm duration with the fellow/host before submission."
+    "note": "24 months - the standard European Fellowship duration, consistent with the EF determination above and with the 24-month working scaffold on which the architecture_inputs seeds (workpackage_seed, milestones_seed) were already built. Rests on the SYNTHETIC spine (§3 override, logged) and reverts with it."
   },
   "requested_eu_contribution_eur": null,
   "requested_eu_contribution_status": {
     "validation_status": "Unresolved",
-    "note": "MSCA-PF is a unit-cost instrument; the budget is not a Tier 3 fact. It is derived internally and deterministically in Phase 7 (months x published unit rates x host-country coefficient) per CLAUDE.md §8.1 / ticket 8. The host-country coefficient is host-dependent and therefore blocked until the host is confirmed or operator-declared."
+    "note": "MSCA-PF is a unit-cost instrument; the budget is not a Tier 3 fact. It is derived internally and deterministically in Phase 7 (months x published unit rates x host-country coefficient) per CLAUDE.md §8.1 / ticket 8. The host-country coefficient now resolves from the (synthetic) host country HU, unblocking the host-dependent budget line at gate_09. On revert to the honest state it returns to blocked."
   },
   "start_date": null,
 
@@ -107,6 +120,8 @@
     "note": "Every keyword is a source_grounded terminology node in MSCA/methodology_graph/09_terminology/ (or a source_grounded route/decision concept)."
   },
 
-  "spine_status": "unresolved",
-  "spine_note": "MSCA-PF is a single-fellow, single-beneficiary action. The research substance is lifted from the source_grounded methodology vault; the identity spine (fellow, host, supervisor, associated/validation partners, data providers) is deliberately left Unresolved because no source vault node names it. This is the honest block (D17): the run exercises the confirmed methodology and blocks-or-greens on the spine, which the operator supplies as confirmed facts or beta-declared working assumptions. See confirmation_checklist.json."
+  "spine_status": "filled_synthetic",
+  "spine_marker": "SYN-SPINE-01",
+  "synthetic": true,
+  "spine_note": "MSCA-PF is a single-fellow, single-beneficiary action. The research substance is lifted from the source_grounded methodology vault and is genuine. The identity spine (fellow, host, supervisor, associated partner, fellowship type, duration) is NOT: no source vault node names it, and it is filled here with SYNTHETIC demo data under an explicit CLAUDE.md §3 operator override of §13.3, logged in decision_log/synthetic-spine-demo-override_2026-07-13.json. THESE ARE NOT REAL FACTS and nothing built on them is submittable. On the honest (pre-override) Tier 3 the engine correctly blocks at Phase 2 on this spine (SCL-01..04) - that block is the truthful result for this project's real data, and it is preserved at the pre-override commit. Named field sites, EO data-access guarantees and meteorological providers remain genuinely Unresolved. See confirmation_checklist.json."
 }

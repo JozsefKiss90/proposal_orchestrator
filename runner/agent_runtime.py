@@ -110,6 +110,24 @@ _PHASE8_SKILL_EXPECTED_ARTIFACT: dict[str, str] = {
     ),
 }
 
+#: Maps a bound section-assembler deterministic component to the monolithic
+#: drafting skill it SUPERSEDES (ticket 13, decomposed-drafting capture-replay).
+#:
+#: When a Phase-8 drafting node binds a ``*_section_assembler`` component, the
+#: section is produced by array-append composition of the captured
+#: per-sub-section drafts (``section_drafts/<slug>/``, the non-deterministic
+#: live capture retained per §9.5/W2), NOT by the monolithic single-call
+#: drafting skill.  The two are mutually-exclusive producers of the same
+#: canonical section artifact, so when the assembler is bound the monolithic
+#: drafting skill is skipped (recorded as ``superseded_by_decomposed_assembler``).
+#: The skill stays declared in the manifest so reuse/preseed references remain
+#: valid; only its runtime execution is suppressed.
+_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL: dict[str, str] = {
+    "excellence_section_assembler": "excellence-section-drafting",
+    "impact_section_assembler": "impact-section-drafting",
+    "implementation_section_assembler": "implementation-section-drafting",
+}
+
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -1111,8 +1129,34 @@ def run_agent(
 
     _skip_set = frozenset(skip_skills) if skip_skills else frozenset()
 
+    # ── Decomposed-drafting supersession (ticket 13) ───────────────────
+    # When a section-assembler deterministic component is bound on this
+    # node, the section is composed from the captured per-sub-section drafts
+    # by the assembler — the monolithic drafting skill is superseded and
+    # must not run (it would race the assembler on the same canonical path).
+    _superseded_drafting_skills = frozenset(
+        _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL[cid]
+        for cid in (deterministic_components or [])
+        if cid in _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL
+    )
+
     for sid in ordered_skills:
-        # ── Reuse skip: skip drafting skills when artifact is reused ──
+        # ── Reuse / supersession skip ────────────────────────────────
+        if sid in _superseded_drafting_skills:
+            record = SkillInvocationRecord(
+                skill_id=sid,
+                status="superseded_by_decomposed_assembler",
+                failure_reason=(
+                    "Monolithic drafting skill superseded by the bound "
+                    "section-assembler component (decomposed capture-replay, "
+                    "ticket 13); the section is composed from section_drafts/"
+                ),
+            )
+            all_invocations.append(record)
+            logger.info(
+                "Skill %s superseded by decomposed-drafting assembler", sid
+            )
+            continue
         if sid in _skip_set:
             record = SkillInvocationRecord(
                 skill_id=sid,

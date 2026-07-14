@@ -304,26 +304,49 @@ def _read_json(path: Path, label: str) -> Any:
 
 def _resolve_confirmed_months(
     call_data: dict[str, Any],
+    working_assumptions: WorkingAssumptions,
 ) -> tuple[Optional[int], str, str]:
     """Resolve the confirmed project (fellowship / effort) months.
 
-    Returns ``(months, status, source)``.  The confirmed months is a
-    **project-specific fact** — the call-level *maximum*
-    (``max_project_duration_months``) is deliberately **not** used as the
-    figure (§13.3: no fabricated project facts).  ``project_duration_months``
-    is the confirmed project fact ticket 14 hand-lifts into the call binding;
-    when it is absent the months are ``Unresolved`` (the honest block).
+    Returns ``(months, status, source)``.  Priority mirrors the host
+    resolution (D11/D12): a **confirmed** ``project_duration_months`` in the
+    call binding; then an **operator-declared** duration in
+    ``working_assumptions.json`` (the β override — flagged ``Assumed``); else
+    ``Unresolved`` (the honest block, α).
+
+    The confirmed months is a **project-specific fact** — the call-level
+    *maximum* (``max_project_duration_months``) is deliberately **not** used as
+    the figure (§13.3: no fabricated project facts).  The project duration is a
+    deliberately-Unresolved spine fact (ticket 14; tied to EF/GF), so the
+    honest β path is to **declare** it — turning it into an ``Assumed`` budget
+    line — exactly as the host coefficient is declared, rather than confirming
+    it into the call binding (which would misrepresent an assumption as
+    confirmed).  The declaration is read through the shared substrate
+    (``runner.working_assumptions``, ticket 15) under key
+    ``project_duration_months`` or the ``DURATION`` checklist token.
     """
     value = call_data.get("project_duration_months")
     if isinstance(value, int) and not isinstance(value, bool) and value > 0:
         return value, STATUS_CONFIRMED, f"{SELECTED_CALL_REL} -> project_duration_months"
+
+    declared = working_assumptions.declared_value("project_duration_months")
+    if declared is None:
+        declared = working_assumptions.declared_value("DURATION")
+    if isinstance(declared, int) and not isinstance(declared, bool) and declared > 0:
+        return (
+            declared,
+            STATUS_ASSUMED,
+            f"{WORKING_ASSUMPTIONS_REL} -> project_duration_months "
+            f"(operator-declared)",
+        )
     return (
         None,
         STATUS_UNRESOLVED,
         (
-            "project_duration_months absent from selected_call.json "
-            "(call-level max_project_duration_months is not a project fact); "
-            "confirm the fellowship duration (ticket 14) or declare it"
+            "project_duration_months absent from selected_call.json and "
+            "working_assumptions.json (call-level max_project_duration_months "
+            "is not a project fact); confirm the fellowship duration "
+            "(ticket 14) or declare it — D11/D12"
         ),
     )
 
@@ -453,7 +476,9 @@ def derive_unit_cost_budget(run_id: str, repo_root: Path) -> Optional[Path]:
 
     working_assumptions = load_working_assumptions(repo_root)
 
-    months, months_status, months_source = _resolve_confirmed_months(call_data)
+    months, months_status, months_source = _resolve_confirmed_months(
+        call_data, working_assumptions
+    )
     host_country, host_status, host_source = _resolve_host_country(
         call_data, working_assumptions
     )

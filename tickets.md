@@ -11,7 +11,7 @@ Build tickets for an honest MSCA-PF end-to-end run via **decomposed drafting** (
 - **Wave 2:** 7, 8, 12
 - **Wave 3:** 9
 - **Wave 4:** 10
-- **Wave 5:** 11
+- **Wave 5:** 11 #done
 - **Wave 6:** 13
 
 Two orienting facts. **Ticket 1 is a prefactor** — it generalizes the one existing hardcoded deterministic pass (the n04 dependency-normalizer) into a manifest-bound mechanism, making the other four components mechanical to add. And the three drafting gates (`gate_10a/b/c`) each **re-assert the budget gate** (§8.4), so no section reaches gate-*green* until unit-cost `gate_09` (ticket 8) passes — by decision, per-section tickets deliver a verified section artifact and the whole DAG goes green at E2E (ticket 13).

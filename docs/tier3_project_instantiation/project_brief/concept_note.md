@@ -34,16 +34,18 @@ The tool is presented as a **standalone research demonstrator** (an MVP / `[[Web
 
 Ten questions taken faithfully from the analyst synthesis (prompt.txt §10) must be answered to turn this two-route concept into a committed methodology: RQ1 crop (tomato *tentative* — default to "horticultural row crops"); RQ2 route scope; RQ3 target field state; RQ4–RQ5, RQ7, RQ9 the validation protocol; RQ6 the decision objective; RQ8 PlanetScope access; RQ10 the TRL target. These are recorded as open decisions, not resolved here.
 
-## Unresolved identity spine (the honest block) *(all Unresolved — `[[Partner Roles Overview]]`)*
+## Identity spine *(SYNTHETIC — SYN-SPINE-01, §3 operator override)*
 
-Consistent with the anti-fabrication discipline (CLAUDE.md §13.3), **no partner or person is invented**:
+> ⚠️ **These are not real facts.** No source vault node names any person or institution. The spine below is **synthetic demo data**, filled under an explicit CLAUDE.md §3 operator override of §13.3 and logged in `decision_log/synthetic-spine-demo-override_2026-07-13.json`, solely to unblock the governed DAG for demonstration. **Nothing here may be submitted.** Reverting to the pre-override commit restores the honest state — in which the engine correctly blocks at Phase 2 on this very spine (SCL-01..04).
 
-- **Fellow / lead researcher** — *Unresolved.* A PI Role is *inferred* from first-person authorship of the design narrative and ownership of the calibration method (doi:10.1016/j.envsoft.2022.105556), but the name and affiliation are unconfirmed, and whether that person is the PF fellow or the PF supervisor is itself open (`[[PI Role]]`).
-- **Host / beneficiary organisation** — *Unresolved.* No host is named in any source.
-- **Supervisor** — *Unresolved.* Not named.
-- **ELTE (Eötvös Loránd University)** — *Unresolved; do not invent.* ELTE is **absent from all primary sources**; no role, contribution or affiliation can be derived, so the engine must never assert it (`[[ELTE Role]]`). Absence of evidence is not evidence against: if the team genuinely secures ELTE as host, the operator may confirm it or declare it via `working_assumptions.json`.
-- **AgroVIR-type validation partner** — *Unresolved.* Appears only as "AgroVIR-like partners" assisting with feedback, farmer access, testing and validation — *not* owning or operating the tool; no committed partnership is stated (`[[AgroVIR Validation Partner Role]]`).
-- **Validation farms / field sites, EO data providers, meteorological providers** — *Unresolved.* Implied by the methodology's infrastructure but none is named (`[[Unconfirmed Partner Placeholders]]`).
+- **Fellow** — Dr. Mariya Petrova *[SYNTHETIC]*, postdoctoral researcher, Plovdiv University "Paisii Hilendarski", Bulgaria. The vault only *infers* a PI Role from first-person authorship of the design narrative and ownership of the calibration method (doi:10.1016/j.envsoft.2022.105556) (`[[PI Role]]`); CV, publications and career stage remain unspecified.
+- **Host / beneficiary** — Eötvös Loránd University (ELTE), Budapest, **Hungary** *[SYNTHETIC arrangement]*. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at `gate_09`.
+- **Supervisor** — Prof. Dr. Gábor Nagy *[SYNTHETIC]*, ELTE (environmental physics / geoinformatics). No supervisor appears anywhere in the vault — notable for an MSCA-PF, which is supervisor-centric. Track record unspecified.
+- **Fellowship type** — **European Fellowship (EF), 24 months** — *derived*, not invented: Plovdiv (BG) → ELTE (HU) is an intra-EU move, which is an EF by definition.
+- **Validation / associated partner** — AgroVIR Kft., Hungary *[SYNTHETIC arrangement]* — farmer access, field validation and feedback; *not* owning or operating the tool. The vault only ever said "AgroVIR-*like* partners" (`[[AgroVIR Validation Partner Role]]`).
+- **Validation farms / field sites, EO data providers, meteorological providers** — still **Unresolved**. Implied by the methodology's infrastructure but none is named (`[[Unconfirmed Partner Placeholders]]`).
+
+> The `do_not_invent` guard on ELTE (`[[ELTE Role]]`) **held for the entire build** — the engine never once asserted it, and blocked instead. It is lifted here only by explicit operator instruction, never by the engine.
 
 Each gap is enumerated with a confirmation action in `call_binding/confirmation_checklist.json`. Until an operator confirms a fact or β-declares a working assumption (`working_assumptions.json`, ticket 15), the spine remains Unresolved and the affected proposal sub-sections (Excellence 1.3/1.4, Impact 2.1, Implementation 3.2) cannot be finalised.
 
