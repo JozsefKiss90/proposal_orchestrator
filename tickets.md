@@ -125,7 +125,7 @@ Two orienting facts. **Ticket 1 is a prefactor** — it generalizes the one exis
 
 - [x] A Tier 3 `working_assumptions.json` convention exists (`provenance_class: manually_placed`, user-authored); the engine reads it and never writes it. *(Convention delivered by ticket 15; the applier and W1 read it, never write it.)*
 - [x] The assumption-applier flips only enumerated `Unresolved → Assumed` from declared assumptions, pre-assembly, preserving the byte-equal assembler guarantee; bound as a component. *(`runner/assumption_applier.py`; registered as `{excellence,impact,implementation}_assumption_applier`. Node binding on n08a/b/c deferred to ticket 13, per the assembler pattern.)*
-- [x] The W1 predicate `assumed_claims_are_operator_declared` is appended to `gate_10a`: every `status: assumed` claim maps by `claim_id` to a `manually_placed` declaration with `claim_summary == declared value`. *(`g09a_p11`; `runner/predicates/criterion_predicates.py`.)*
+- [x] The W1 predicate `assumed_claims_are_operator_declared` is appended to `gate_10a`: every `status: assumed` claim maps by `claim_id` to a `manually_placed` declaration with `claim_summary == declared value`. *(`g09a_p11`; `runner/predicates/criterion_predicates.py`. The manifest `gate_registry` wiring — required for the predicate to actually run under Approach-B resolution — was completed in ticket 11 alongside `gate_10b`/`gate_10c`; the library-only definition here was inert at runtime until then.)*
 - [x] A `run_produced` artifact can never back an `Assumed`; any `Assumed` without a backing declaration fails the gate. *(The reader parses only the `manually_placed` file, so no `run_produced` value can appear as a declaration.)*
 - [x] Demonstrated both ways on Excellence: with a declaration an `Unresolved` claim greens as `Assumed`; without it, W1 blocks. *(`tests/runner/test_w1_assumed_claims.py::TestBothWaysOnExcellence`.)*
 
@@ -146,10 +146,10 @@ Two orienting facts. **Ticket 1 is a prefactor** — it generalizes the one exis
 
 **Blocked by:** 7 (Excellence decomposed drafting), 9 (β honesty layer), 10 (Canonical-pack deriver extension).
 
-- [ ] Impact and Implementation draft as bounded per-sub-section calls → assembler → section JSON, mirroring Excellence.
-- [ ] W1 is appended to `gate_10b` and `gate_10c`; the assumption-applier and canonical pack cover all three sections.
-- [ ] Impact-specific checks pass (`dec_coverage`, `impact_pathway_refs`); Implementation-specific checks pass (`wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`).
-- [ ] `gate_10d` cross-section consistency is green across the three assembled sections.
+- [x] Impact and Implementation draft as bounded per-sub-section calls → assembler → section JSON, mirroring Excellence. *(The driver `draft_section_decomposed` and `assemble_section` were already slug-generic; the tracer bullet `tests/runner/test_impact_implementation_decomposed_drafting.py` proves the decompose→compose chain for both sections — full-length, sequential context, byte-equal replay, section-specific `extra_fields` carried. Governed node binding + live skill rewrite stay with the E2E run, ticket 13, per ticket 7's scope.)*
+- [x] W1 is appended to `gate_10b` and `gate_10c`; the assumption-applier and canonical pack cover all three sections. *(`g09b_p12` / `g09c_p11` added to `gate_rules_library.yaml` **and** the manifest `gate_registry` predicate_refs — ticket 9 had defined `g09a_p11` in the library only, so W1 was inert under Approach-B resolution even on Excellence; that manifest omission is now fixed too, so W1 runs on all three drafting gates. Appliers already registered for all three slugs; the canonical pack is section-agnostic.)*
+- [x] Impact-specific checks pass (`dec_coverage`, `impact_pathway_refs`); Implementation-specific checks pass (`wp_table_refs`, `gantt_ref`, `milestone_refs`, `risk_register_ref`). *(`impact_pathways_covered` (`g09b_p06`) and `implementation_coverage_complete` (`g09c_p06`) validate these fields; the tracer bullet asserts both pass on the real assembled sections.)*
+- [x] `gate_10d` cross-section consistency is green across the three assembled sections. *(`cross_section_consistency` (`g09d_p07`) is green across the three decomposed→assembled sections in `TestGate10dGreenAcrossThreeSections`; a flagged `consistency_log` still blocks, guarding the green.)*
 
 ## 12. `.docx` exporter
 

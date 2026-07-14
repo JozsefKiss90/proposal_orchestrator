@@ -1487,6 +1487,25 @@ gate_rules:
           metric components from their measurable_target values.
         prose_condition: "All quantitative metric components from measurable_target preserved"
 
+      # W1 — β honesty layer (ticket 11 extends ticket 9 to Impact).  Every
+      # 'assumed' claim must map by claim_id to a manually_placed operator
+      # declaration in working_assumptions.json whose declared value equals the
+      # claim_summary.  The declaration reader parses only the manually_placed
+      # operator file, so a run_produced value can never back an Assumed
+      # (CLAUDE.md §13.3).  Inert unless a green was bought by declaration
+      # (no 'assumed' claim ⇒ passes).
+      - predicate_id: g09b_p12
+        type: coverage
+        function: assumed_claims_are_operator_declared
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          Impact section contains an 'assumed' claim not backed by an
+          operator declaration in working_assumptions.json (W1). Every assumed
+          claim must map by claim_id to a manually_placed declaration whose
+          declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
+        prose_condition: "Every assumed claim is operator-declared (W1)"
+
 
   # ===========================================================================
   # GATE 09c — gate_10c_implementation_completeness
@@ -1617,6 +1636,25 @@ gate_rules:
           Implementation section shortens or paraphrases canonical
           objective or WP titles from the reference pack.
         prose_condition: "Canonical objective and WP titles preserved"
+
+      # W1 — β honesty layer (ticket 11 extends ticket 9 to Implementation).
+      # Every 'assumed' claim must map by claim_id to a manually_placed operator
+      # declaration in working_assumptions.json whose declared value equals the
+      # claim_summary.  The declaration reader parses only the manually_placed
+      # operator file, so a run_produced value can never back an Assumed
+      # (CLAUDE.md §13.3).  Inert unless a green was bought by declaration
+      # (no 'assumed' claim ⇒ passes).
+      - predicate_id: g09c_p11
+        type: coverage
+        function: assumed_claims_are_operator_declared
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          Implementation section contains an 'assumed' claim not backed by an
+          operator declaration in working_assumptions.json (W1). Every assumed
+          claim must map by claim_id to a manually_placed declaration whose
+          declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
+        prose_condition: "Every assumed claim is operator-declared (W1)"
 
 
   # ===========================================================================
