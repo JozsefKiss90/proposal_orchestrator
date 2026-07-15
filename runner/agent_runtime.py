@@ -422,6 +422,40 @@ def _resolve_skill_sequence(
 # ---------------------------------------------------------------------------
 
 
+#: Artifact paths produced by the budget-gate node (n07) ONLY under the
+#: lump-sum budget regime — the external Lump Sum Budget Planner request and its
+#: validation directory.  Under a unit-cost instrument (e.g. MSCA) these are
+#: never written (C1: the budget is derived internally), so requiring them in
+#: the artifact-readiness check would wrongly fail an otherwise-resolved
+#: unit-cost budget gate.  gate_09's *predicates* already carry
+#: ``applies_when: {budget_regime: lump_sum}`` (C1); the manifest
+#: artifact_registry carries no such tag, so the same instrument-conditional is
+#: expressed here, by path.
+_LUMP_SUM_ONLY_ARTIFACT_MARKERS: tuple[str, ...] = (
+    "lump_sum_budget_planner/",
+    "integration/budget_request.json",
+)
+
+
+def _resolve_budget_regime_safe(repo_root: Path) -> Optional[str]:
+    """Return the instrument budget regime, or ``None`` if unresolvable.
+
+    Mirrors the gate evaluator's resolution (via
+    :func:`runner.instrument_profile.resolve_instrument_profile`) so the agent
+    runtime's artifact-readiness check and the exit gate agree on which
+    instrument-conditional artifacts apply.  Imported locally to preserve the
+    module's import isolation (the agent runtime imports no scheduler/gate
+    module).  Fails closed to ``None`` — the caller then keeps the artifact
+    required, so an unresolvable regime never silently drops a check.
+    """
+    try:
+        from runner.instrument_profile import resolve_instrument_profile
+
+        return resolve_instrument_profile(repo_root).budget_regime
+    except Exception:  # noqa: BLE001 — unresolvable regime → keep artifact required
+        return None
+
+
 def _get_artifacts_produced_by_node(
     node_id: str,
     repo_root: Path,
@@ -435,6 +469,9 @@ def _get_artifacts_produced_by_node(
     """
     registry = _load_artifact_registry(repo_root, manifest_path=manifest_path)
     paths: list[str] = []
+    # Resolve the budget regime once for the lump-sum-only filter below.
+    # ``None`` (unresolvable) keeps every artifact required (fail-closed).
+    _budget_regime = _resolve_budget_regime_safe(repo_root)
     for entry in registry:
         if not isinstance(entry, dict):
             continue
@@ -458,6 +495,18 @@ def _get_artifacts_produced_by_node(
 
         path = entry.get("path", "")
         tier = entry.get("tier", "")
+
+        # Instrument-conditional relevance (mirrors gate_09's applies_when, C1):
+        # skip the lump-sum-only budget artifacts unless the resolved regime is
+        # lump-sum.  For a unit-cost instrument they are never produced, so
+        # requiring them would wrongly fail the unit-cost budget gate's
+        # readiness check even when the internal derivation resolved cleanly.
+        if any(m in path for m in _LUMP_SUM_ONLY_ARTIFACT_MARKERS):
+            # Skip ONLY when the regime is resolved AND is not lump-sum.  An
+            # unresolvable regime (None) keeps the artifact required — the
+            # check is never silently dropped on uncertainty (fail-closed).
+            if _budget_regime is not None and _budget_regime != "lump_sum":
+                continue
 
         # Only check artifacts relevant to gate evaluation:
         # - tier4_phase_output artifacts (these have gate_dependency)

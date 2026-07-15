@@ -1,0 +1,24 @@
+{
+  "decision_id": "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-07-15T000000Z",
+  "decision_type": "gate_failure",
+  "gate_id": "gate_09_budget_consistency",
+  "failure_reason": "gate_09_budget_consistency failed on 4 deterministic predicates: (1) gate_pass_declaration is 'fail' not 'pass' — the budget_gate_assessment.json and unit_cost_budget.json both declare failure; (2) budget_response_reference is null — no budget artifact is referenced; (3) validation_artifact_reference is null — no validation artifact is referenced; (4) blocking_inconsistencies contains unresolved entry BLOCK-01 — docs/integrations/lump_sum_budget_planner/received/ is effectively empty (only .gitkeep) and the unit-cost derivation (unit_cost_budget.json) has two unresolved blocking components: confirmed_months_unresolved (fellowship duration not confirmed, D11/D12) and host_coefficient_unresolved (host country not confirmed, D11/D12). Per CLAUDE.md §8.4 (C1 constitutional amendment), for MSCA-PF (budget_regime: unit_cost) every budget component in the §8.1 deterministic derivation must resolve to Confirmed or operator-declared Assumed before this gate passes. An incomplete derivation constitutes the same blocking gate failure as an absent lump-sum response. Phase 8 is categorically blocked (CLAUDE.md §8.4, §13.4). Hard block is in effect.",
+  "predicates_failed": [
+    "gate_pass_declaration_equals_pass",
+    "budget_response_reference_non_empty",
+    "validation_artifact_reference_non_empty",
+    "no_unresolved_blocking_inconsistencies"
+  ],
+  "instrument_type": "MSCA-PF",
+  "budget_regime": "unit_cost",
+  "unresolved_derivation_components": [
+    "confirmed_months_unresolved",
+    "host_coefficient_unresolved"
+  ],
+  "resolution_path": "Resolve the two unresolved blocking components in unit_cost_budget.json by confirming or operator-declaring (D11/D12): (a) fellowship duration in months (confirmed_months), and (b) host country to resolve living-allowance coefficient (host_country_coefficient_percent). Once both components resolve to Confirmed or Assumed, re-run the unit-cost budget deriver (CLAUDE.md §8.1 byte-equal replay check), update budget_gate_assessment.json with populated budget_response_reference and validation_artifact_reference, and re-invoke gate_09 evaluation.",
+  "tier_authority_applied": "CLAUDE.md §6.2 (gates are mandatory; phase not complete until gate condition satisfied), §7 Phase 7 gate condition (budget gate, instrument-conditional per C1), §8.1 (unit-cost deterministic derivation; confirmed_months × published_rates × host_country_coefficient), §8.4 (categorical Phase-8 block unconditional and instrument-independent; incomplete unit-cost derivation is a blocking gate failure), §12.4 (missing mandatory inputs trigger gate failure), §13.4 (no Phase 8 activity before budget gate passes), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-07-15T00:00:00Z",
+  "canonical_artifact_evaluated": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+  "corroborating_artifact": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+}

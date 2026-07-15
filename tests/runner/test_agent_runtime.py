@@ -2108,3 +2108,76 @@ class TestDecomposedDraftingLiveWiring:
             if r.skill_id == "decomposed-drafting:impact"
         )
         assert rec.status == "failure"
+
+
+class TestBudgetGateArtifactReadinessInstrumentConditional:
+    """C1 — n07's artifact-readiness check must be instrument-conditional: the
+    lump-sum Planner artifacts (request + validation dir) are produced only for
+    lump-sum instruments and must NOT be required for a unit-cost run, whose
+    budget is derived internally.  Regression for the MSCA Phase-7 block where a
+    fully-resolved unit-cost budget still failed because the absent lump-sum
+    artifacts were treated as gate-relevant."""
+
+    _N07_REGISTRY = [
+        {
+            "path": "docs/tier4_orchestration_state/phase_outputs/"
+                    "phase7_budget_gate/",
+            "produced_by": "n07_budget_gate",
+            "tier": "tier4_phase_output",
+        },
+        {
+            "path": "docs/tier3_project_instantiation/integration/"
+                    "budget_request.json",
+            "produced_by": "n07_budget_gate",
+            "tier": "integration_validation",
+        },
+        {
+            "path": "docs/integrations/lump_sum_budget_planner/validation/",
+            "produced_by": "n07_budget_gate",
+            "tier": "integration_validation",
+        },
+    ]
+
+    def test_unit_cost_excludes_lump_sum_artifacts(self, tmp_path: Path) -> None:
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value="unit_cost"
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        # The unit-cost budget output stays required ...
+        assert any("phase7_budget_gate" in p for p in paths)
+        # ... but the lump-sum-only artifacts are dropped.
+        assert not any("lump_sum_budget_planner" in p for p in paths)
+        assert not any("budget_request.json" in p for p in paths)
+
+    def test_lump_sum_includes_lump_sum_artifacts(self, tmp_path: Path) -> None:
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value="lump_sum"
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        assert any("lump_sum_budget_planner" in p for p in paths)
+        assert any("budget_request.json" in p for p in paths)
+
+    def test_unresolvable_regime_keeps_artifacts_required(
+        self, tmp_path: Path
+    ) -> None:
+        # Fail-closed: an unresolvable regime must NOT silently drop the check.
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value=None
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        assert any("budget_request.json" in p for p in paths)

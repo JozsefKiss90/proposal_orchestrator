@@ -1,0 +1,18 @@
+{
+  "schema_id": "orch.phase7.budget_gate_assessment.v1",
+  "run_id": "msca-pf-syn-01",
+  "gate_pass_declaration": "fail",
+  "budget_response_reference": null,
+  "validation_artifact_reference": null,
+  "wp_coverage_results": [],
+  "partner_coverage_results": [],
+  "blocking_inconsistencies": [
+    {
+      "inconsistency_id": "BLOCKING-01",
+      "description": "docs/integrations/lump_sum_budget_planner/received/ directory is empty or absent. No budget response file has been received from the external Lump Sum Budget Planner system. Absent budget artifacts constitute a blocking gate failure per CLAUDE.md §8.4 and §13.4; this state is not a hold state and admits no deferral.",
+      "severity": "blocking",
+      "resolution": "unresolved",
+      "resolution_note": "Blocking gate failure detected at Step B.1.1 (Mode B: response_validation). No further validation steps were executed. The budget gate cannot pass through the lump-sum integration channel until a conforming budget response is present in docs/integrations/lump_sum_budget_planner/received/ and validated against the interface contract (contract_version: 1.0, protocol: lump_sum_budget_planner_v1). WP coverage check (WP1, WP2, WP3, WP4, WP5 per wp_structure.json), partner coverage check (FELLOW, SUPERVISOR, HOST per partner_role_matrix), and contract conformance checks were not performed because no response file was available. Resolution requires receipt of a conforming external budget response in the received/ directory before this skill is reinvoked in Mode B."
+    }
+  ]
+}

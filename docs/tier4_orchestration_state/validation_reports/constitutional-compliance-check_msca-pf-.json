@@ -1,98 +1,112 @@
 {
-  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-07-14T120000Z",
+  "report_id": "compliance_check_budget_gate_assessment_budget_gate_validator_2026-07-15T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "budget_gate_validator",
   "run_id_reference": "msca-pf-syn-01",
-  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact carries schema_id 'orch.phase7.budget_gate_assessment.v1'. No reference to a Grant Agreement Annex, AGA Template, or Model Grant Agreement Annex appears as a structural authority anywhere in the artifact content. The artifact is a Phase 7 orchestration state record, not a proposal section. Check is structurally applicable (phase outputs can reference schema sources) but no violation is present."
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact makes no claims about what the call requires, excludes, mandates, or scopes. All content is operational gate-state content describing the absence of a budget response artifact. The sole reference to normative authority is 'CLAUDE.md §8.4 and §13.4', which is a constitutional citation, not an asserted call constraint. No Tier 2B source reference is required because no call constraint is asserted."
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment — not present in Tier 3",
-      "check_status": "violation",
-      "violation_evidence": "RISK-08 mitigation states: 'Uncertainty-aware AquaCrop calibration that retains parameter uncertainty (the fellow-attributed method, doi:10.1016/j.envsoft.2022.105556).' This is a specific prior-experience and capability attribution for the FELLOW partner, identifying a particular scientific publication by DOI as belonging to the fellow. The traceability_footer.primary_sources[] does not include docs/tier3_project_instantiation/architecture_inputs/risks.json or any Tier 3 path that would contain a publication record, prior-work citation, or DOI-level capability attribution for the FELLOW. The Tier 3 paths cited in the traceability footer (consortium/partners.json, consortium/roles.json) cover role definitions and identity tokens but not specific publication DOI attributions. This omission is compounded by the fact that the FELLOW's identity is explicitly acknowledged elsewhere in the artifact as synthetic: section 1.4 notes 'FELLOW identity spine is synthetic (SYN-SPINE-01)' and section 4 notes 'FELLOW's CV (Dr. Mariya Petrova — SYNTHETIC SYN-SPINE-01); track record and competences are unspecified in current Tier 3 data.' Asserting a specific prior-experience claim (DOI method attribution) for a partner whose track record is acknowledged as unspecified in Tier 3 constitutes an invented project fact under CLAUDE.md §13.3. Additionally, docs/tier3_project_instantiation/architecture_inputs/risks.json is absent from the traceability_footer.primary_sources[], meaning the risk register entries as a whole lack a declared Tier 3 risk-seed source, though this is a secondary observation to the specific DOI attribution violation.",
-      "severity": "major"
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment — not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "The artifact's resolution_note references 'WP1, WP2, WP3, WP4, WP5 per wp_structure.json' and 'FELLOW, SUPERVISOR, HOST per partner_role_matrix'. These are cited with explicit source document references (wp_structure.json and partner_role_matrix) and are described as checks that were NOT performed ('were not performed because no response file was available'). No project-specific fact is asserted as confirmed — the references describe what would have been checked, not what was found. No project-specific budget figures, team sizes, capabilities, or partner details are asserted. The artifact does not have a traceability_footer, consistent with its operational (non-deliverable) nature."
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact under audit IS the Phase 7 budget gate assessment. Its schema_id is 'orch.phase7.budget_gate_assessment.v1' — it is not a Phase 8 artifact. The gate_pass_declaration is 'fail', correctly recording a blocking gate failure. The artifact contains no Phase 8 content, no proposal section drafts, no assembled draft content, and no budget-dependent proposal claims. The artifact correctly records that the gate has not passed, which is the necessary precondition for blocking Phase 8. No 13.4 violation is present in this artifact."
     },
     {
       "prohibition_id": "13.5",
-      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs runtime agent behaviour and decision persistence, not artifact content. Cannot be verified by reading a phase output artifact. Enforced by decision-log-update skill and runtime infrastructure. Recorded as pass per skill specification.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not directly checkable by reading an artifact. This prohibition governs agent runtime behaviour, not artifact content. Check recorded as pass per skill specification instruction: 'cannot verify from artifact content alone; this is enforced by decision-log-update skill'."
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs skill and workflow scope definitions, not phase output artifact content. Not checkable by reading the audited artifact. Recorded as pass per skill specification.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not directly checkable from an artifact. This prohibition governs skill and workflow scope creep at the system level, not artifact content. Check recorded as pass per skill specification instruction."
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact is a Phase 7 output. Its resolution_note references Phase 3 upstream artifacts (wp_structure.json, partner_role_matrix) — legitimate upstream dependencies for a Phase 7 gate check. No downstream Phase 8 or Phase 9 outputs are cited as inputs. The artifact does not weaken the gate condition: it explicitly declares gate_pass_declaration 'fail' and records blocking_inconsistencies with severity 'blocking' and resolution 'unresolved'. The resolution_note explicitly states this 'is not a hold state and admits no deferral', directly reinforcing rather than weakening the gate. No phase reordering is evident."
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable in the primary sense: the audited artifact is a Phase 6 Tier 4 phase output (schema_id: orch.phase6.implementation_architecture.v1), not a Tier 5 deliverable containing finalized proposal text. All instrument sections with incomplete source state are explicitly flagged with status 'pending_phase8' or 'partially_addressed' and carry explicit notes such as 'FELLOW identity spine is synthetic (SYN-SPINE-01); track record and competences are unspecified in current Tier 3 data. Phase 8 must populate from operator-confirmed Tier 3 data before drafting.' No finalized text is asserted for incomplete sections. Recorded as pass.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "This check is applicable to Tier 5 deliverable artifacts. The artifact under audit is a Phase 7 orchestration state output (schema_id: 'orch.phase7.budget_gate_assessment.v1'), not a Tier 5 deliverable. It contains no proposal text. Check is structurally non-applicable to this artifact type; recorded as pass."
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact makes no claims about Horizon Europe rules (participation conditions, grant agreement terms, financial regulation) that would require Tier 1 source references. The constitutional references ('CLAUDE.md §8.4 and §13.4') are constitutional document citations, not Horizon Europe regulatory claims. The reference to the 'interface contract (contract_version: 1.0, protocol: lump_sum_budget_planner_v1)' is an operational reference to the integration layer artifact. No Tier 1 regulatory claims are asserted without source references."
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable: the audited artifact is a Phase 6 output written to docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/ (Tier 4), not a Tier 5 deliverable. §13.10 applies exclusively to Tier 5 artifacts. Recorded as pass per skill specification.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "This check is applicable to all Tier 5 artifacts. The artifact under audit is a Phase 7 orchestration state output, not a Tier 5 artifact. The artifact path is within docs/tier4_orchestration_state/phase_outputs/, confirming it is a Tier 4 artifact. Check is structurally non-applicable to this artifact type; recorded as pass."
     },
     {
       "prohibition_id": "13.11",
-      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs write actions against Tier 1 and Tier 2 source documents, which cannot be evidenced or refuted by reading a Phase 6 output artifact. Not checkable from artifact content. Recorded as pass per skill specification.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not checkable from a phase output or deliverable artifact. This prohibition governs whether source documents in Tier 1 or Tier 2 were altered; it cannot be verified by reading the artifact being audited. Check recorded as pass per skill specification instruction."
     },
     {
       "prohibition_id": "13.12",
-      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent and system behaviour regarding constitutional authority, not artifact content. Not checkable by reading the audited artifact. Recorded as pass per skill specification.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not directly checkable from an artifact alone. However, the artifact itself explicitly cites 'CLAUDE.md §8.4 and §13.4' as the normative basis for the blocking gate failure declaration, demonstrating that the producing process treated CLAUDE.md as binding rather than advisory. This is a positive indicator, not a violation indicator. Check recorded as pass per skill specification instruction for structural non-applicability to artifact-level checks; positive indicator noted."
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 1
+    "violations_found": 0,
+    "overall_result": "pass",
+    "notes": "All 12 CLAUDE.md §13 prohibitions checked against docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json. No constitutional violations detected. The artifact correctly records a blocking gate failure (gate_pass_declaration: 'fail') with a single unresolved blocking inconsistency (BLOCKING-01: absent budget response in the lump-sum received/ directory). The gate failure declaration is constitutionally compliant: it does not defer, weaken, or silently bypass the budget gate condition. No Phase 8 content is present. No project facts are asserted without source references. No call constraints are invented. No Grant Agreement Annex schema is used. The artifact is constitutionally clean and may be used by the DAG scheduler as evidence of gate_09 non-pass, correctly propagating HARD_BLOCK to Phase 8 nodes per CLAUDE.md §17.3.4. No decision log entries are required (no violations found)."
   },
-  "timestamp": "2026-07-14T12:00:00Z"
+  "timestamp": "2026-07-15T00:00:00Z"
 }
