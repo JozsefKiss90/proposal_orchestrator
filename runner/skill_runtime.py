@@ -973,11 +973,27 @@ def _extract_json_response(text: str) -> dict | None:
     Uses ``json.JSONDecoder.raw_decode()`` as an early fallback when
     the response starts with ``{`` but ``json.loads()`` fails.  This
     handles the case where Claude emits a valid JSON object followed by
-    trailing characters (e.g. an extra closing brace) — ``raw_decode``
-    parses the first complete JSON value and ignores the remainder.
-    This is fail-closed: ``raw_decode`` will still reject structurally
-    malformed JSON; it only tolerates *trailing* noise after a complete
-    valid object.
+    trivial trailing noise (e.g. an extra closing brace) — ``raw_decode``
+    parses the first complete JSON value and the remainder is discarded
+    only if it is insubstantial.
+
+    Front-truncation is detected and failed closed.  When the transport
+    returns only the tail of an over-long generation, the text begins
+    mid-object; ``raw_decode`` then happily parses the first *interior*
+    fragment it finds.  Accepting that fragment would discard the real
+    payload and surface downstream as a misleading "required field
+    missing" schema error, pointing at the wrong fault.  The tell is the
+    remainder: if what follows the decoded object opens with ``,`` or
+    ``:``, the object was a member of a larger structure whose opening was
+    lost, and ``None`` is returned so the caller reports an incomplete
+    response (§17.6.5 — no silent repair).  Trailing prose or a stray
+    brace is benign and the leading object is returned as normal.
+
+    A response that opens with ``{`` but does not decode at all is broken
+    JSON and also returns ``None``.  The step-3 salvage scan is reserved
+    for prose-then-JSON replies (which do not start with ``{``); running it
+    over broken JSON would return an arbitrary *interior* object rather
+    than the artifact.
     """
     stripped = text.strip()
 
@@ -992,14 +1008,46 @@ def _extract_json_response(text: str) -> dict | None:
     # start of the string, tolerating trailing characters (e.g. an extra
     # closing brace emitted by Claude).  This is strictly more permissive
     # than json.loads() but still fail-closed for structurally invalid JSON.
+    #
+    # CRITICAL: raw_decode() cannot distinguish "a complete object followed by
+    # a stray brace" from "a complete object followed by 15KB of the real
+    # payload".  The latter occurs when the transport returns a FRONT-TRUNCATED
+    # response (the CLI emitted only the tail of an over-long generation, so the
+    # text begins mid-object).  Accepting the leading fragment there silently
+    # discards the actual payload and surfaces downstream as a misleading
+    # "required field missing" validation error, when the true fault is a
+    # truncated response.  We therefore accept the raw_decode result ONLY when
+    # what follows is trivial noise, and otherwise fail closed (§17.6.5: the
+    # runtime must not silently repair a malformed response).
     if stripped.startswith("{"):
         try:
             decoder = json.JSONDecoder()
             data, _end = decoder.raw_decode(stripped)
             if isinstance(data, dict):
+                remainder = stripped[_end:].lstrip()
+                # A remainder that opens with ',' or ':' means the parsed object
+                # was a *member* of a larger structure whose opening was lost —
+                # i.e. the response is front-truncated and what we decoded is an
+                # interior fragment, not the artifact.  Accepting it would
+                # discard the real payload and surface downstream as a
+                # misleading "required field missing" error.  Fail closed
+                # (§17.6.5: no silent repair of malformed responses).
+                if remainder[:1] in (",", ":"):
+                    return None
+                # Otherwise the remainder is trailing noise — a stray closing
+                # brace, code-fence backticks, or a closing remark in prose.
+                # That is benign: the leading object is the complete artifact.
                 return data
         except (json.JSONDecodeError, ValueError):
-            pass
+            # The response opens with '{' but does not decode as a single JSON
+            # value: it is structurally broken (e.g. '},{"key":' — an object
+            # value with no key, the malformation seen in run c4d3d0a6).  Do
+            # NOT fall through to the step-3 salvage scan: that scan would
+            # return whichever *interior* object happens to be largest, which
+            # is not the artifact and is precisely the silent repair §17.6.5
+            # forbids.  The salvage scan exists for prose-then-JSON replies,
+            # which do not start with '{'.  Fail closed.
+            return None
 
     # 2. Try markdown code fence
     code_match = re.search(
@@ -1875,6 +1923,40 @@ def run_skill(
             ),
             failure_category=model_failure_category,
         )
+
+    # ── Phase D.6: Normalize SkillResult-shaped SUCCESS envelope ──────
+    #
+    # The symmetric counterpart of Phase D.5.  The model sometimes wraps
+    # the real artifact/payload in a SkillResult-shaped success envelope
+    # instead of returning the payload directly:
+    #   {"status": "success", "outputs_written": [...],
+    #    "payload": { <the real gate_id / overall_status / ... fields> }}
+    #
+    # This is a shape ambiguity, not a data fault: every required field is
+    # present with its true value, nested one level under ``payload``.  It
+    # is provoked by skill specs that instruct the model to "return a
+    # SkillResult with the following payload" (e.g. gate-enforcement).  The
+    # model's self-asserted ``status``/``outputs_written`` are NOT trusted
+    # — they are discarded; only the nested payload is unwrapped, and it is
+    # then validated normally against the declared contract below.  No
+    # field is invented, altered, or masked, so this is normalization (the
+    # runtime's parse responsibility, §17.5.2), not the silent repair
+    # forbidden by §17.6.5.  Unwrapping is deliberately narrow: it fires
+    # only when the top level carries the SkillResult envelope signature
+    # (``status == "success"`` plus a dict ``payload``), which a flat
+    # artifact never does (artifacts use ``validation_status``, never a
+    # top-level ``status``).
+    if (
+        parsed.get("status") == "success"
+        and isinstance(parsed.get("payload"), dict)
+        and parsed["payload"]
+    ):
+        logger.info(
+            "  skill NOTE   id=%s  unwrapped SkillResult-shaped success "
+            "envelope (payload -> top level)",
+            skill_id,
+        )
+        parsed = parsed["payload"]
 
     # ── Phase E: Path-aware canonical write ────────────────────────────
     #

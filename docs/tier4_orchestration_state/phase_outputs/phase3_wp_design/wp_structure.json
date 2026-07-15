@@ -1,0 +1,426 @@
+{
+  "schema_id": "orch.phase3.wp_structure.v1",
+  "run_id": "msca-pf-syn-01",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "title": "Probabilistic multi-sensor diagnosis of the field state",
+      "objectives": [
+        "Acquire and harmonise Sentinel-1 SAR, Sentinel-2 optical, soil-sensor and weather data into a unified EO-ground fusion pipeline.",
+        "Implement and calibrate a probabilistic field-state estimator producing a posterior for root-zone soil moisture and crop water stress."
+      ],
+      "lead_partner": "FELLOW",
+      "contributing_partners": [
+        "SUPERVISOR"
+      ],
+      "tasks": [
+        {
+          "task_id": "T1-01",
+          "title": "Acquire and harmonise EO and ground sensor data",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1-02",
+          "title": "Implement probabilistic fusion model (Route A/B)",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "SUPERVISOR"
+          ]
+        },
+        {
+          "task_id": "T1-03",
+          "title": "Calibrate and evaluate diagnostic branch output",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "SUPERVISOR"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D1-01",
+          "title": "Diagnostic branch technical report",
+          "type": "report",
+          "due_month": 14,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Uncertainty-aware decision engine and demonstrator integration",
+      "objectives": [
+        "Build an uncertainty-aware AquaCrop calibration module retaining a parameter posterior for counterfactual irrigation simulation.",
+        "Integrate diagnostic and decision branches into a standalone research demonstrator web MVP."
+      ],
+      "lead_partner": "FELLOW",
+      "contributing_partners": [
+        "SUPERVISOR"
+      ],
+      "tasks": [
+        {
+          "task_id": "T2-01",
+          "title": "Implement uncertainty-aware AquaCrop calibration",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "SUPERVISOR"
+          ]
+        },
+        {
+          "task_id": "T2-02",
+          "title": "Build counterfactual irrigation simulation and decision engine",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2-03",
+          "title": "Integrate diagnosis and decision into research demonstrator",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D2-01",
+          "title": "Research demonstrator software",
+          "type": "software",
+          "due_month": 20,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Field validation, ground truth and uncertainty calibration",
+      "objectives": [
+        "Collect ground truth data and run the validation protocol against diagnostic branch outputs.",
+        "Assess uncertainty calibration quality and test Route B patch-covariation assumptions."
+      ],
+      "lead_partner": "FELLOW",
+      "contributing_partners": [
+        "HOST",
+        "SUPERVISOR"
+      ],
+      "tasks": [
+        {
+          "task_id": "T3-01",
+          "title": "Design validation protocol and ground truth collection",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "HOST",
+            "SUPERVISOR"
+          ]
+        },
+        {
+          "task_id": "T3-02",
+          "title": "Assess uncertainty calibration against field data",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "SUPERVISOR"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D3-01",
+          "title": "Validation and uncertainty calibration report",
+          "type": "report",
+          "due_month": 24,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Training, supervision and two-way transfer of knowledge",
+      "objectives": [
+        "Prepare and maintain a Career Development Plan and deliver ≥120 hours of transferable-skills training across MSCA-PF mandatory dimensions.",
+        "Facilitate two-way transfer of knowledge between fellow and host through methods seminars and co-supervision of ≥1 MSc thesis."
+      ],
+      "lead_partner": "SUPERVISOR",
+      "contributing_partners": [
+        "HOST",
+        "FELLOW"
+      ],
+      "tasks": [
+        {
+          "task_id": "T4-01",
+          "title": "Prepare and maintain Career Development Plan",
+          "responsible_partner": "SUPERVISOR",
+          "contributing_partners": [
+            "FELLOW"
+          ]
+        },
+        {
+          "task_id": "T4-02",
+          "title": "Deliver transferable skills training programme",
+          "responsible_partner": "SUPERVISOR",
+          "contributing_partners": [
+            "HOST"
+          ]
+        },
+        {
+          "task_id": "T4-03",
+          "title": "Facilitate two-way knowledge transfer activities",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "SUPERVISOR"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D4-01",
+          "title": "Career Development Plan",
+          "type": "report",
+          "due_month": 3,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Dissemination, exploitation, communication and management",
+      "objectives": [
+        "Deliver open-science outputs including a FAIR data management plan by month 6 and open-access publications.",
+        "Execute project communication, exploitation logic and lightweight management and ethics oversight."
+      ],
+      "lead_partner": "FELLOW",
+      "contributing_partners": [
+        "HOST"
+      ],
+      "tasks": [
+        {
+          "task_id": "T5-01",
+          "title": "Develop and maintain data management plan",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5-02",
+          "title": "Publish open-access research outputs",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5-03",
+          "title": "Execute communication and exploitation activities",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": [
+            "HOST"
+          ]
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D5-01",
+          "title": "Data management plan",
+          "type": "report",
+          "due_month": 6,
+          "responsible_partner": "FELLOW"
+        },
+        {
+          "deliverable_id": "D5-02",
+          "title": "Dissemination and exploitation report",
+          "type": "report",
+          "due_month": 24,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    }
+  ],
+  "dependency_map": {
+    "nodes": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5",
+      "T1-01",
+      "T1-02",
+      "T1-03",
+      "T2-01",
+      "T2-02",
+      "T2-03",
+      "T3-01",
+      "T3-02",
+      "T4-01",
+      "T4-02",
+      "T4-03",
+      "T5-01",
+      "T5-02",
+      "T5-03"
+    ],
+    "edges": [
+      {
+        "from": "WP1",
+        "to": "WP2",
+        "edge_type": "finish_to_start",
+        "derivation": "WP2 objective explicitly states integration of WP1 diagnostic branch outputs into the decision engine and demonstrator."
+      },
+      {
+        "from": "WP1",
+        "to": "WP3",
+        "edge_type": "finish_to_start",
+        "derivation": "WP3 objective explicitly states the validation protocol is run against WP1 diagnostic branch outputs."
+      },
+      {
+        "from": "T1-03",
+        "to": "T2-01",
+        "edge_type": "data_input",
+        "derivation": "T2-01 implements uncertainty-aware AquaCrop calibration; AquaCrop calibration requires the root-zone soil moisture and crop water stress posterior produced by T1-03 (calibrate and evaluate diagnostic branch output)."
+      },
+      {
+        "from": "T1-03",
+        "to": "T2-03",
+        "edge_type": "data_input",
+        "derivation": "T2-03 title explicitly states 'Integrate diagnosis and decision into research demonstrator'; the diagnosis branch output (calibrated in T1-03) is a mandatory data input to the integration task."
+      },
+      {
+        "from": "T1-03",
+        "to": "T3-01",
+        "edge_type": "data_input",
+        "derivation": "WP3 objective states the validation protocol targets diagnostic branch outputs; T3-01 designs that protocol and therefore requires the diagnostic branch output specification from T1-03 to define validation criteria."
+      },
+      {
+        "from": "T1-03",
+        "to": "T3-02",
+        "edge_type": "data_input",
+        "derivation": "T3-02 assesses uncertainty calibration quality of the WP1 probabilistic field-state estimator; this directly requires the calibrated model output from T1-03."
+      },
+      {
+        "from": "T1-03",
+        "to": "T5-02",
+        "edge_type": "data_input",
+        "derivation": "T5-02 publishes open-access research outputs; WP1 diagnostic branch findings (T1-03) constitute primary research results requiring publication."
+      },
+      {
+        "from": "T2-03",
+        "to": "T5-02",
+        "edge_type": "data_input",
+        "derivation": "T5-02 publishes open-access research outputs; the integrated research demonstrator produced by T2-03 and associated WP2 findings are primary research outputs requiring publication."
+      },
+      {
+        "from": "T3-02",
+        "to": "T5-02",
+        "edge_type": "data_input",
+        "derivation": "T5-02 publishes open-access research outputs; WP3 validation and uncertainty calibration results (T3-02, D3-01 due month 24) are the final empirical research findings and must be available before definitive open-access publication."
+      }
+    ]
+  },
+  "cycle_detected": false,
+  "cycle_flags": [],
+  "critical_path_nodes": [
+    "T1-03",
+    "T2-03",
+    "T5-02"
+  ],
+  "partner_role_matrix": [
+    {
+      "partner_id": "FELLOW",
+      "wps_as_lead": [
+        "WP1",
+        "WP2",
+        "WP3",
+        "WP5"
+      ],
+      "wps_as_contributor": [
+        "WP4"
+      ]
+    },
+    {
+      "partner_id": "SUPERVISOR",
+      "wps_as_lead": [
+        "WP4"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2",
+        "WP3"
+      ]
+    },
+    {
+      "partner_id": "HOST",
+      "wps_as_lead": [],
+      "wps_as_contributor": [
+        "WP3",
+        "WP4",
+        "WP5"
+      ]
+    }
+  ],
+  "normalization_issues": [
+    {
+      "wp_id": "WP1",
+      "field": "tasks",
+      "severity": "advisory",
+      "message": "No tasks in seed; synthesized T1-01, T1-02, T1-03 from WP objectives and title."
+    },
+    {
+      "wp_id": "WP1",
+      "field": "deliverables",
+      "severity": "advisory",
+      "message": "No deliverables in seed; synthesized D1-01 (Diagnostic branch technical report) at due_month 14 (WP end_month)."
+    },
+    {
+      "wp_id": "WP2",
+      "field": "tasks",
+      "severity": "advisory",
+      "message": "No tasks in seed; synthesized T2-01, T2-02, T2-03 from WP objectives and title."
+    },
+    {
+      "wp_id": "WP2",
+      "field": "deliverables",
+      "severity": "advisory",
+      "message": "No deliverables in seed; synthesized D2-01 (Research demonstrator software) at due_month 20 (WP end_month)."
+    },
+    {
+      "wp_id": "WP3",
+      "field": "tasks",
+      "severity": "advisory",
+      "message": "No tasks in seed; synthesized T3-01, T3-02 from WP objectives and title."
+    },
+    {
+      "wp_id": "WP3",
+      "field": "deliverables",
+      "severity": "advisory",
+      "message": "No deliverables in seed; synthesized D3-01 (Validation and uncertainty calibration report) at due_month 24 (WP end_month)."
+    },
+    {
+      "wp_id": "WP4",
+      "field": "tasks",
+      "severity": "advisory",
+      "message": "No tasks in seed; synthesized T4-01, T4-02, T4-03 from MSCA-PF structural WP description."
+    },
+    {
+      "wp_id": "WP4",
+      "field": "deliverables",
+      "severity": "advisory",
+      "message": "No deliverables in seed; synthesized D4-01 (Career Development Plan) at due_month 3, consistent with MSCA-PF CDP requirement (months 2-3)."
+    },
+    {
+      "wp_id": "WP5",
+      "field": "tasks",
+      "severity": "advisory",
+      "message": "No tasks in seed; synthesized T5-01, T5-02, T5-03 from WP objectives and description."
+    },
+    {
+      "wp_id": "WP5",
+      "field": "deliverables",
+      "severity": "advisory",
+      "message": "No deliverables in seed; synthesized D5-01 (DMP at month 6) and D5-02 (Dissemination and exploitation report at month 24)."
+    },
+    {
+      "wp_id": "ALL",
+      "field": "valid_partner_ids",
+      "severity": "advisory",
+      "message": "valid_partner_ids resolved from seed role tokens [FELLOW, HOST, SUPERVISOR]; all lead_partner and responsible_partner values are drawn from this set. Invoking agent must confirm these tokens match partners.json identities."
+    }
+  ]
+}

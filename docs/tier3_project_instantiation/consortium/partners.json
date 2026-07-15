@@ -1,0 +1,80 @@
+{
+  "_provenance": {
+    "record_type": "tier3_partner_registry",
+    "derived_from": "docs/tier3_project_instantiation/consortium/roles.json",
+    "synthetic_override": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json",
+    "override_extension": "docs/tier4_orchestration_state/decision_log/synthetic-concept-override-extension_2026-07-14.json",
+    "why_this_file_exists": "Gate g04_p07 (all_partners_in_tier3, phase_03_gate) requires every partner assigned as lead or contributor in wp_structure.json to exist in this file. The ticket-14 hand-lift populated roles.json but never created partners.json, so the predicate failed with MISSING_MANDATORY_INPUT. This registry is DERIVED from roles.json - it introduces no entity, name, country or role that is not already in the SYN-SPINE-01 spine. It is propagation of an existing logged override, not a new fabrication.",
+    "note": "MSCA-PF is a single-fellow, SINGLE-BENEFICIARY action - it is not a consortium. 'Partner' here means 'a participant identifier referenced by the work-package structure', not 'a consortium beneficiary'. Only HOST is a beneficiary legal entity. FELLOW and SUPERVISOR are natural persons who lead or contribute to work packages; VALIDATION_PARTNER is an associated partner with no beneficiary status.",
+    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories. 'synthetic' is a descriptive provenance flag, never a status value (see decision_log/status-vocabulary-correction_2026-07-13.json)."
+  },
+  "spine_status": "filled_synthetic",
+  "spine_marker": "SYN-SPINE-01",
+  "synthetic": true,
+  "partners": [
+    {
+      "partner_id": "HOST",
+      "short_name": "ELTE",
+      "legal_name": "Eotvos Lorand University (ELTE), Budapest",
+      "entity_type": "legal_entity",
+      "role_in_action": "Beneficiary / host organisation (sole beneficiary)",
+      "country": "Hungary",
+      "country_code": "HU",
+      "beneficiary": true,
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
+      "roles_ref": "roles.json role_token HOST",
+      "checklist_ref": "HOST",
+      "note": "SYNTHETIC hosting arrangement (§3 override, logged). ELTE is a real institution; the arrangement is not real. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
+    },
+    {
+      "partner_id": "FELLOW",
+      "short_name": "FELLOW",
+      "legal_name": "Dr. Mariya Petrova [SYNTHETIC]",
+      "entity_type": "natural_person",
+      "role_in_action": "Experienced researcher / postdoctoral fellow (applicant)",
+      "country_of_origin": "BG",
+      "current_affiliation": "Plovdiv University 'Paisii Hilendarski', Bulgaria",
+      "beneficiary": false,
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
+      "roles_ref": "roles.json role_token FELLOW",
+      "checklist_ref": "FELLOW",
+      "note": "SYNTHETIC demo identity (§3 override, logged). Referenced as a WP lead/participant in wp_structure.json, hence present in this registry. CV, publication record and career-stage detail remain unspecified - a genuine residue of the synthetic spine."
+    },
+    {
+      "partner_id": "SUPERVISOR",
+      "short_name": "SUPERVISOR",
+      "legal_name": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
+      "entity_type": "natural_person",
+      "role_in_action": "Supervisor at the host institution",
+      "affiliation": "ELTE - environmental physics / geoinformatics",
+      "country_code": "HU",
+      "beneficiary": false,
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
+      "roles_ref": "roles.json role_token SUPERVISOR",
+      "checklist_ref": "SUPERVISOR",
+      "note": "SYNTHETIC person attached to a real institution (§3 override, logged). Must not appear in anything submitted. Track record and supervision history are unspecified."
+    },
+    {
+      "partner_id": "VALIDATION_PARTNER",
+      "short_name": "AgroVIR",
+      "legal_name": "AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "entity_type": "legal_entity",
+      "role_in_action": "Associated partner - farmer access, field validation, feedback (not owning or operating the tool)",
+      "country": "Hungary",
+      "country_code": "HU",
+      "beneficiary": false,
+      "validation_status": "Confirmed",
+      "synthetic": true,
+      "spine_marker": "SYN-SPINE-01",
+      "roles_ref": "roles.json role_token VALIDATION_PARTNER",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "note": "SYNTHETIC partnership (§3 override, logged). AgroVIR is a real company; the vault only ever said 'AgroVIR-like partners'. No real commitment exists. Not currently referenced by wp_structure.json, but retained so the registry matches the spine in roles.json."
+    }
+  ]
+}

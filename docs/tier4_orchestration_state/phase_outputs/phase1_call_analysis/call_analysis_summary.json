@@ -1,91 +1,74 @@
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
-  "run_id": "msca-pf-e2e-alpha",
+  "run_id": "msca-pf-syn-01",
   "resolved_instrument_type": "MSCA-PF",
   "evaluation_matrix": {
     "Excellence": {
       "criterion_id": "Excellence",
       "criterion_name": "Excellence",
-      "weight": null,
-      "weight_source": "tier2b_evaluation_priority_weights.json",
-      "evaluation_form_weighting_pct": 50,
-      "source_section": "Section 1 — Excellence",
+      "weight": 0.5,
+      "weight_source": "ef_he-msca_en.pdf",
+      "source_section": "Section 1 — Excellence (Score 1, Weighting: 50%)",
       "source_document": "ef_he-msca_en.pdf"
     },
     "Impact": {
       "criterion_id": "Impact",
       "criterion_name": "Impact",
-      "weight": null,
-      "weight_source": "tier2b_evaluation_priority_weights.json",
-      "evaluation_form_weighting_pct": 30,
-      "source_section": "Section 2 — Impact",
+      "weight": 0.3,
+      "weight_source": "ef_he-msca_en.pdf",
+      "source_section": "Section 2 — Impact (Score 2, Weighting: 30%)",
       "source_document": "ef_he-msca_en.pdf"
     },
-    "Quality_and_Efficiency_of_Implementation": {
-      "criterion_id": "Quality_and_Efficiency_of_Implementation",
-      "criterion_name": "Quality and Efficiency of the Implementation",
-      "weight": null,
-      "weight_source": "tier2b_evaluation_priority_weights.json",
-      "evaluation_form_weighting_pct": 20,
-      "source_section": "Section 3 — Quality and efficiency of the implementation",
+    "Quality and efficiency of the implementation": {
+      "criterion_id": "Quality and efficiency of the implementation",
+      "criterion_name": "Quality and efficiency of the implementation",
+      "weight": 0.2,
+      "weight_source": "ef_he-msca_en.pdf",
+      "source_section": "Section 3 — Quality and efficiency of the implementation (Score 3, Weighting: 20%)",
       "source_document": "ef_he-msca_en.pdf"
     }
   },
   "compliance_checklist": [
     {
       "requirement_id": "CR-01",
-      "description": "Scope check: the application must correspond, wholly or in part, to the topic description against which it has been submitted; evaluator must declare 'in scope' or 'out of scope' with explanation",
+      "description": "Scope of the application: proposal must be 'in scope' — it must correspond, wholly or in part, to the topic description against which it has been submitted. If an application is partly out of scope, this must be reflected in the scoring and explained in the comments.",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Scope of the application",
+      "source_section": "Section 2 — Other Questions: Scope of the application",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-02",
-      "description": "Exceptional funding: any third-country participant or international organisation not listed in the General Annex to the Main Work Programme may only receive funding if their participation is essential for carrying out the project; must be assessed and listed by the evaluator",
+      "description": "Exceptional funding for third-country participants: a third country participant or international organisation not listed in the General Annex to the Main Work Programme may only exceptionally receive funding if their participation is essential for carrying out the project (e.g. outstanding expertise, access to unique know-how, research infrastructure, particular geographical environments, key partners in emerging markets, or data access).",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Exceptional funding",
+      "source_section": "Section 2 — Other Questions: Exceptional funding",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-03",
-      "description": "Use of human embryonic stem cells (hESC): evaluator must determine whether the proposal involves hESC and, if so, assess whether such use is necessary to achieve the scientific objectives",
+      "description": "Use of human embryonic stem cells (hESC): proposal must declare whether hESC are used. If YES, evaluator must state whether use is or is not necessary to achieve the scientific objectives of the proposal, or declare that necessity cannot be assessed due to lack of information.",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Use of human embryonic stem cells (hESC)",
+      "source_section": "Section 2 — Other Questions: Use of human embryonic stem cells (hESC)",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-04",
-      "description": "Use of human embryos: evaluator must determine whether the proposal involves human embryos and, if so, assess how they will be used in the project",
+      "description": "Use of human embryos: proposal must declare whether human embryos are used. If YES, evaluator must explain how the human embryos will be used in the project.",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Use of human embryos",
+      "source_section": "Section 2 — Other Questions: Use of human embryos",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-05",
-      "description": "Activities excluded from funding: proposal must not include activities aimed at human cloning for reproductive purposes, modification of heritable human genetic heritage (except cancer treatment of gonads), creation of human embryos solely for research or stem cell procurement, or destruction of human embryos; evaluator must confirm absence of excluded activities",
+      "description": "Activities excluded from funding: proposal must not include activities that (a) aim at human cloning for reproductive purposes, (b) intend to modify the heritable genetic heritage of human beings (except cancer treatment of gonads), (c) intend to create human embryos solely for research or stem cell procurement including via somatic cell nuclear transfer, or (d) lead to the destruction of human embryos (e.g. to obtain stem cells). Must declare No or Yes with explanation.",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Activities excluded from funding",
+      "source_section": "Section 2 — Other Questions: Activities excluded from funding",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-06",
-      "description": "Exclusive focus on civil applications: proposed activities must not be intended for use in military applications or aimed at serving military purposes; evaluator must confirm civil-only focus",
+      "description": "Exclusive focus on civil applications: activities proposed must have an exclusive focus on civil applications. Activities intended to be used in military applications or that aim to serve military purposes cannot be funded. Must declare Yes (civil only) or No with explanation.",
       "status": "requires_review",
-      "source_section": "Section 2 — Other Questions — Exclusive focus on civil applications",
-      "source_document": "ef_he-msca_en.pdf"
-    },
-    {
-      "requirement_id": "CR-07",
-      "description": "Overall scoring threshold: the sum of the three weighted criterion scores must reach or exceed 70 points out of 100 (each criterion scored 0-5 on a one-decimal-place scale, converted to /100 via declared weightings Excellence 50%, Impact 30%, Implementation 20%); weighting applies only for ranking and not for threshold determination",
-      "status": "requires_review",
-      "source_section": "Important Notice — Thresholds and weighting",
-      "source_document": "ef_he-msca_en.pdf"
-    },
-    {
-      "requirement_id": "CR-08",
-      "description": "Lump sum budget assessment (if applicable): for proposals using a detailed lump sum budget, evaluator comments including concrete recommendations for any needed changes are required; evaluator must declare assessment completion",
-      "status": "requires_review",
-      "source_section": "Section 1 — Evaluation (lump sum option); Section 2 — Other Questions — Assessment of lump sum cost estimations",
+      "source_section": "Section 2 — Other Questions: Exclusive focus on civil applications",
       "source_document": "ef_he-msca_en.pdf"
     }
   ]

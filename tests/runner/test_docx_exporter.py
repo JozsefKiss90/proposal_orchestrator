@@ -242,3 +242,30 @@ class TestEdgeCases:
         (tmp_path / PROPOSAL_SECTIONS_REL).mkdir(parents=True, exist_ok=True)
         rc = main(["--repo-root", str(tmp_path)])
         assert rc == 0
+
+
+class TestSyntheticMarker:
+    """Ticket 13 / SYN-SPINE-01: a demo run built on the synthetic-spine §3
+    override stamps a visible not-for-submission marker; a real run does not."""
+
+    def _write_override(self, repo_root: Path) -> None:
+        rec = (
+            repo_root
+            / "docs/tier4_orchestration_state/decision_log"
+            / "synthetic-spine-demo-override_2026-07-13.json"
+        )
+        rec.parent.mkdir(parents=True, exist_ok=True)
+        rec.write_text('{"id": "synthetic-spine-demo-override"}', encoding="utf-8")
+
+    def test_marker_present_when_override_active(self, tmp_path: Path) -> None:
+        _write_excellence(tmp_path)
+        self._write_override(tmp_path)
+        out = export_part_b_docx(tmp_path)
+        assert out is not None
+        assert any("SYNTHETIC DEMO" in t for t in _doc_texts(out))
+
+    def test_no_marker_without_override(self, tmp_path: Path) -> None:
+        _write_excellence(tmp_path)
+        out = export_part_b_docx(tmp_path)
+        assert out is not None
+        assert not any("SYNTHETIC DEMO" in t for t in _doc_texts(out))

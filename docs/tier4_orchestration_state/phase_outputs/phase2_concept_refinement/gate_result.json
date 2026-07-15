@@ -1,20 +1,20 @@
 {
   "gate_id": "phase_02_gate",
   "gate_kind": "exit",
-  "run_id": "msca-pf-e2e-alpha",
+  "run_id": "msca-pf-syn-01",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:6b75fbd293263d9cb788147395040b14deda51bc916ceb97482dcbe1de1a78b1",
+  "input_fingerprint": "sha256:47f9e98546e8567991804b22991ba800ae210191ccd7d80698446d4d1409667d",
   "input_artifact_fingerprints": {
-    "docs/tier3_project_instantiation/project_brief/concept_note.md": "sha256:2c3c5e7b309933b1334d3f70790bea778844119a6c03f5f4350f8b9d0909bfaf",
-    "docs/tier3_project_instantiation/project_brief/project_summary.json": "sha256:41cd1bea335b4a8fb256c80a668913cc2a27ed105f055aa4612c471a69b9f066",
-    "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "sha256:68d992521cb83f8c39a14155be527b1a89449ea8b82caadfac40bba0424b16b1",
-    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json": "sha256:2a3388f985601d666ce998e879ec8207c148cc1748c1be548d1e4cbd73c53bdc"
+    "docs/tier3_project_instantiation/project_brief/concept_note.md": "sha256:7d106a4eaba150ef0ce2753fa4e0e21473f2904c66c6aa9743026df913156546",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json": "sha256:6cb028f0f9fb66161bc6323e607260c9bbcc2f80c45ca1a316de08e492f7c93d",
+    "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "sha256:a1740cdc1c09c49a317a5f2868d387c95a1d7b10497f7db2dfb4dda53ae9c3f2",
+    "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json": "sha256:221a9724f21ff403d21ce6374eba29a4a1bf08e0c0d193c7987911e895e65e3a"
   },
-  "evaluated_at": "2026-07-14T12:08:09.214403+00:00",
+  "evaluated_at": "2026-07-14T17:27:54.087026+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g03_p02",
@@ -27,46 +27,10 @@
     "failed": []
   },
   "semantic_predicates": {
-    "passed": [],
-    "failed": [
-      {
-        "predicate_id": "g03_p06",
-        "function": "no_unresolved_scope_conflicts",
-        "failure_reason": "semantic_fail",
-        "constitutional_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-        "findings": [
-          {
-            "claim": "SCL-01: SR-02 (European Postdoctoral Fellowship geographic placement requirement) cannot be assessed: the fellowship type (EF vs GF) is Unresolved in project_summary.json, and the host organisation country is null. resolution_status: \"unresolved\"",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          },
-          {
-            "claim": "SCL-02: SR-05 and CC-10 (Career Development Plan mandatory deliverable) are not addressed in the concept corpus. No Career Development Plan is described, planned, or committed to in any project brief file. The supervisor is Unresolved. resolution_status: \"unresolved\"",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          },
-          {
-            "claim": "SCL-03: CC-01 (joint application by researcher and beneficiary) cannot be satisfied: neither the researcher nor the host/beneficiary organisation is identified in the concept corpus. project_summary.json records both as Unresolved. resolution_status: \"unresolved\"",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          },
-          {
-            "claim": "SCL-04: Six of eight expected outcomes (EO-01, EO-02, EO-03, EO-04, EO-05, EO-06, EO-08) have Assumed status in topic_mapping_rationale because the MSCA-PF researcher-development dimensions cannot be addressed without a confirmed fellow, supervisor, or host. This is a systemic coverage gap. resolution_status: \"unresolved\"",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate \u2014 'concept note vocabulary is aligned with call-specific expected outcomes' and 'No unresolved scope conflicts remain between the concept and Tier 2B.'",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          }
-        ],
-        "fail_message": "The concept_refinement_summary.json records four explicitly unresolved scope conflicts (SCL-01 through SCL-04) in its scope_conflict_log, including blocking gaps against mandatory Tier 2B requirements SR-02, SR-05, CC-01, and CC-10, as well as Assumed (not Confirmed or Inferred) status for six of eight expected outcomes, directly violating the CLAUDE.md \u00a77 Phase 2 gate condition that no unresolved scope conflicts remain.",
-        "artifacts_inspected": [
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\scope_requirements.json"
-        ]
-      }
-    ]
+    "passed": [
+      "g03_p06"
+    ],
+    "failed": []
   },
   "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\gate_result.json"

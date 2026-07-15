@@ -1,0 +1,206 @@
+{
+  "schema_id": "orch.phase4.gantt.v1",
+  "run_id": "msca-pf-syn-01",
+  "tasks": [
+    {
+      "task_id": "T1-01",
+      "wp_id": "WP1",
+      "title": "Acquire and harmonise EO and ground sensor data",
+      "start_month": 1,
+      "end_month": 6,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T1-02",
+      "wp_id": "WP1",
+      "title": "Implement probabilistic fusion model (Route A/B)",
+      "start_month": 4,
+      "end_month": 12,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T1-03",
+      "wp_id": "WP1",
+      "title": "Calibrate and evaluate diagnostic branch output",
+      "start_month": 10,
+      "end_month": 14,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T2-01",
+      "wp_id": "WP2",
+      "title": "Implement uncertainty-aware AquaCrop calibration",
+      "start_month": 6,
+      "end_month": 13,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T2-02",
+      "wp_id": "WP2",
+      "title": "Build counterfactual irrigation simulation and decision engine",
+      "start_month": 11,
+      "end_month": 15,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T2-03",
+      "wp_id": "WP2",
+      "title": "Integrate diagnosis and decision into research demonstrator",
+      "start_month": 15,
+      "end_month": 18,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T3-01",
+      "wp_id": "WP3",
+      "title": "Design validation protocol and ground truth collection",
+      "start_month": 8,
+      "end_month": 14,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T3-02",
+      "wp_id": "WP3",
+      "title": "Assess uncertainty calibration against field data",
+      "start_month": 15,
+      "end_month": 22,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T4-01",
+      "wp_id": "WP4",
+      "title": "Prepare and maintain Career Development Plan",
+      "start_month": 1,
+      "end_month": 3,
+      "responsible_partner": "SUPERVISOR"
+    },
+    {
+      "task_id": "T4-02",
+      "wp_id": "WP4",
+      "title": "Deliver transferable skills training programme",
+      "start_month": 1,
+      "end_month": 24,
+      "responsible_partner": "SUPERVISOR"
+    },
+    {
+      "task_id": "T4-03",
+      "wp_id": "WP4",
+      "title": "Facilitate two-way knowledge transfer activities",
+      "start_month": 6,
+      "end_month": 24,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T5-01",
+      "wp_id": "WP5",
+      "title": "Develop and maintain data management plan",
+      "start_month": 1,
+      "end_month": 6,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T5-02",
+      "wp_id": "WP5",
+      "title": "Publish open-access research outputs",
+      "start_month": 18,
+      "end_month": 24,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T5-03",
+      "wp_id": "WP5",
+      "title": "Execute communication and exploitation activities",
+      "start_month": 6,
+      "end_month": 24,
+      "responsible_partner": "FELLOW"
+    }
+  ],
+  "milestones": [
+    {
+      "milestone_id": "MS1",
+      "title": "Multi-sensor data pipeline operational; Data Management Plan delivered",
+      "due_month": 6,
+      "verifiable_criterion": "Sentinel-1, Sentinel-2, soil-sensor and weather data are ingested, quality-controlled and harmonised over the field boundaries on the geospatial/time-series platform; the Data Management Plan is delivered as an open-science deliverable by month 6.",
+      "responsible_wp": "WP1",
+      "depends_on_tasks": [
+        "T1-01"
+      ],
+      "milestone_type": "intermediate_checkpoint"
+    },
+    {
+      "milestone_id": "MS2",
+      "title": "Diagnostic method v1 producing calibrated field-state posteriors",
+      "due_month": 12,
+      "verifiable_criterion": "Route A and/or Route B produce posterior estimates of the target latent field state (e.g. root-zone soil moisture, crop water stress) with explicit uncertainty over at least one growing season's data; route scope (RQ2) and field-state definition (RQ3) recorded as decided.",
+      "responsible_wp": "WP1",
+      "depends_on_tasks": [
+        "T1-01",
+        "T1-02"
+      ],
+      "milestone_type": "intermediate_checkpoint"
+    },
+    {
+      "milestone_id": "MS3",
+      "title": "Uncertainty-aware decision engine integrated",
+      "due_month": 15,
+      "verifiable_criterion": "AquaCrop is calibrated retaining an honest parameter posterior; counterfactual irrigation simulations run over weather ensembles; the profit-based recommendation logic selects decisions by expected economic return under uncertainty, end to end from a diagnosed state.",
+      "responsible_wp": "WP2",
+      "depends_on_tasks": [
+        "T2-01",
+        "T2-02"
+      ],
+      "milestone_type": "intermediate_checkpoint"
+    },
+    {
+      "milestone_id": "MS4",
+      "title": "Standalone research demonstrator exercises the end-to-end pipeline",
+      "due_month": 18,
+      "verifiable_criterion": "The web MVP runs the full observation-to-decision pipeline and presents irrigation recommendations with their uncertainty for at least one field case; TRL target (RQ10) recorded.",
+      "responsible_wp": "WP2",
+      "depends_on_tasks": [
+        "T2-01",
+        "T2-02",
+        "T2-03"
+      ],
+      "milestone_type": "wp_completion"
+    },
+    {
+      "milestone_id": "MS5",
+      "title": "Field validation and uncertainty calibration complete",
+      "due_month": 22,
+      "verifiable_criterion": "Ground truth collected (RQ4); uncertainty-calibration metrics evaluated with prediction-interval coverage assessed against nominal (RQ5); Route B patch-covariation tested (RQ9); pilot-success criteria (RQ7) applied to the demonstrator.",
+      "responsible_wp": "WP3",
+      "depends_on_tasks": [
+        "T3-01",
+        "T3-02"
+      ],
+      "milestone_type": "wp_completion"
+    },
+    {
+      "milestone_id": "MS6",
+      "title": "Results disseminated and fellowship outcomes consolidated",
+      "due_month": 24,
+      "verifiable_criterion": "At least one open-access publication submitted covering the probabilistic fusion-to-decision framework; open data and models released under FAIR principles; dissemination, exploitation and communication actions executed per the plan.",
+      "responsible_wp": "WP5",
+      "depends_on_tasks": [
+        "T5-01",
+        "T5-02",
+        "T5-03"
+      ],
+      "milestone_type": "wp_completion"
+    }
+  ],
+  "critical_path": [
+    "T1-01",
+    "T1-02",
+    "T1-03",
+    "MS2",
+    "T2-01",
+    "T2-02",
+    "MS3",
+    "T2-03",
+    "MS4",
+    "T5-02",
+    "MS6"
+  ]
+}

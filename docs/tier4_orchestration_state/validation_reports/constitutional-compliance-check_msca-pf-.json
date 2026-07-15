@@ -1,0 +1,98 @@
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-07-14T120000Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "msca-pf-syn-01",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment — not present in Tier 3",
+      "check_status": "violation",
+      "violation_evidence": "RISK-08 mitigation states: 'Uncertainty-aware AquaCrop calibration that retains parameter uncertainty (the fellow-attributed method, doi:10.1016/j.envsoft.2022.105556).' This is a specific prior-experience and capability attribution for the FELLOW partner, identifying a particular scientific publication by DOI as belonging to the fellow. The traceability_footer.primary_sources[] does not include docs/tier3_project_instantiation/architecture_inputs/risks.json or any Tier 3 path that would contain a publication record, prior-work citation, or DOI-level capability attribution for the FELLOW. The Tier 3 paths cited in the traceability footer (consortium/partners.json, consortium/roles.json) cover role definitions and identity tokens but not specific publication DOI attributions. This omission is compounded by the fact that the FELLOW's identity is explicitly acknowledged elsewhere in the artifact as synthetic: section 1.4 notes 'FELLOW identity spine is synthetic (SYN-SPINE-01)' and section 4 notes 'FELLOW's CV (Dr. Mariya Petrova — SYNTHETIC SYN-SPINE-01); track record and competences are unspecified in current Tier 3 data.' Asserting a specific prior-experience claim (DOI method attribution) for a partner whose track record is acknowledged as unspecified in Tier 3 constitutes an invented project fact under CLAUDE.md §13.3. Additionally, docs/tier3_project_instantiation/architecture_inputs/risks.json is absent from the traceability_footer.primary_sources[], meaning the risk register entries as a whole lack a declared Tier 3 risk-seed source, though this is a secondary observation to the specific DOI attribution violation.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs runtime agent behaviour and decision persistence, not artifact content. Cannot be verified by reading a phase output artifact. Enforced by decision-log-update skill and runtime infrastructure. Recorded as pass per skill specification.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs skill and workflow scope definitions, not phase output artifact content. Not checkable by reading the audited artifact. Recorded as pass per skill specification.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable in the primary sense: the audited artifact is a Phase 6 Tier 4 phase output (schema_id: orch.phase6.implementation_architecture.v1), not a Tier 5 deliverable containing finalized proposal text. All instrument sections with incomplete source state are explicitly flagged with status 'pending_phase8' or 'partially_addressed' and carry explicit notes such as 'FELLOW identity spine is synthetic (SYN-SPINE-01); track record and competences are unspecified in current Tier 3 data. Phase 8 must populate from operator-confirmed Tier 3 data before drafting.' No finalized text is asserted for incomplete sections. Recorded as pass.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable: the audited artifact is a Phase 6 output written to docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/ (Tier 4), not a Tier 5 deliverable. §13.10 applies exclusively to Tier 5 artifacts. Recorded as pass per skill specification.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs write actions against Tier 1 and Tier 2 source documents, which cannot be evidenced or refuted by reading a Phase 6 output artifact. Not checkable from artifact content. Recorded as pass per skill specification.",
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "check_status": "pass",
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent and system behaviour regarding constitutional authority, not artifact content. Not checkable by reading the audited artifact. Recorded as pass per skill specification.",
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 1
+  },
+  "timestamp": "2026-07-14T12:00:00Z"
+}

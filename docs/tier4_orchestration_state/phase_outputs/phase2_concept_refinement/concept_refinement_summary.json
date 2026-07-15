@@ -1,370 +1,312 @@
 {
   "schema_id": "orch.phase2.concept_refinement_summary.v1",
-  "run_id": "msca-pf-e2e-alpha",
+  "run_id": "msca-pf-syn-01",
   "topic_mapping_rationale": {
     "EO-01": {
       "topic_element_id": "EO-01",
-      "mapping_to_concept": "The concept acknowledges 'Career perspectives / employability' as section 2.1 in strategic_positioning.md, and references 'transferable skills training' in section 1.2. However, section 2.1 is explicitly flagged as 'entirely spine-dependent (the fellow's career trajectory) and is blocked' — no concrete mechanism for developing transferable skills or improving career prospects is described. The terms 'transferable skills' and 'employability' appear in the concept corpus only as forward references to blocked content pending fellow, supervisor, and host confirmation. No direct coverage found; assumed to be covered by the project's general MSCA-PF framing once spine is resolved.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 2.1 ('Career perspectives / employability' — explicitly blocked as spine-dependent); section 1.2 (reference to 'transferable skills training' as a required methodology-level commitment, deferred)",
-      "status": "Assumed",
-      "vocabulary_gaps": [
-        "competences",
-        "improved employability mechanism",
-        "career development activities",
-        "postdoctoral fellows development programme"
-      ]
+      "mapping_to_concept": "The concept explicitly describes a structured Career Development Plan prepared jointly by supervisor and fellow, submitted as a project deliverable at months 2–3 and reviewed at M12 and M24. Training integrates digital and AI skills (including responsible use of generative AI), knowledge valorisation and innovation/entrepreneurship, and research integrity and open-science ethics. Strategic positioning section 2.1 ('Career perspectives / employability') quantifies career advancement targets: ≥3 peer-reviewed publications (≥2 first-author), ≥120 hours of transferable-skills training, co-supervision of ≥1 MSc thesis, and a follow-on national or ERC-track proposal submitted within six months of fellowship end. These activities directly and explicitly address expanded research and transferable skills leading to improved career prospects within academia and beyond.",
+      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '2.1 Career perspectives / employability'",
+      "status": "Confirmed",
+      "vocabulary_gaps": []
     },
     "EO-02": {
       "topic_element_id": "EO-02",
-      "mapping_to_concept": "The concept corpus does not use the terms 'international', 'inter-sectoral', 'interdisciplinary', or 'mind-sets' in the context of planned fellowship activities. The research methodology intrinsically crosses disciplinary boundaries (remote sensing, agronomy, statistical modelling, decision theory) but this is not framed as an interdisciplinary experience objective. The fellow, host, and any secondment host are all Unresolved (project_summary.json); no mechanism for forging new mind-sets through international mobility or inter-sectoral collaboration is described. No direct coverage found; assumed to be covered by the project's general MSCA-PF participation structure and the implicit cross-disciplinary research design.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md: multi-disciplinary research approach (probabilistic ML, agronomy, remote sensing, decision theory) — implicit disciplinary crossing only; strategic_positioning.md: research methodology sections — no international/inter-sectoral framing",
-      "status": "Assumed",
+      "mapping_to_concept": "The inference chain: the concept describes [international mobility from Bulgaria (Plovdiv University) to Hungary (ELTE)] + [cross-domain research spanning earth observation, probabilistic machine learning, crop physiology and decision economics] + [collaboration with non-academic sector partner AgroVIR Kft. for farmer access and field feedback], which leads to [new mindsets and approaches to R&I forged through international, inter-sectoral and interdisciplinary experience], satisfying EO-02. The international move is confirmed (BG→HU satisfies MSCA mobility rule; explicitly stated). Inter-sectoral engagement is present through AgroVIR Kft. collaboration. However, the terms 'mind-sets', 'inter-sectoral', and 'interdisciplinary' do not appear verbatim in the concept corpus, and the concept does not frame these three dimensions as explicit outcome goals.",
+      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Identity spine' section (Bulgaria→Hungary move and MSCA mobility rule); project_summary.json fellowship_type and researcher fields; strategic_positioning.md section '3.2 Host capacity and hosting arrangements' and '2.2 Dissemination, exploitation and communication' (AgroVIR Kft. as non-academic partner)",
+      "status": "Inferred",
       "vocabulary_gaps": [
-        "international",
-        "inter-sectoral",
-        "interdisciplinary",
         "mind-sets",
-        "approaches to R&I work",
-        "mobility experience"
+        "inter-sectoral",
+        "interdisciplinary"
       ]
     },
     "EO-03": {
       "topic_element_id": "EO-03",
-      "mapping_to_concept": "strategic_positioning.md section 2.2 references 'dissemination, exploitation and communication' and notes the 'demonstrator-and-open-science posture supports a dissemination/exploitation logic', but explicitly states 'the concrete plan is deferred' pending host and validation partner confirmation. The term 'networking' does not appear in the concept corpus. 'Communication' and 'dissemination' are named but no specific networking or public-communication activities are described. No direct coverage found; assumed to be covered by the project's open-science orientation and MSCA-PF structural dissemination requirement.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 2.2 ('dissemination, exploitation and communication — partially grounded' with concrete plan deferred)",
-      "status": "Assumed",
+      "mapping_to_concept": "The inference chain: the concept describes [peer-reviewed publications (≥2 first-author) as the primary scientific dissemination mechanism] + [open research software and open validation data as open-science outputs] + [societal engagement as an explicitly named training component] + [collaboration with Hungarian row-crop growers through AgroVIR Kft. as a non-scientific target group], which leads to [enhanced networking and communication capacities with scientific peers and the general public that increases R&I impact]. The dissemination and open-science posture is described in strategic_positioning.md section 2.2. However, 'networking', 'communication capacities', and 'general public' are not explicitly framed as outcome goals; the connection is logically derivable from the described dissemination activities.",
+      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "strategic_positioning.md section '2.2 Dissemination, exploitation and communication'; concept_note.md 'Training and career development' section (societal engagement as named training component)",
+      "status": "Inferred",
       "vocabulary_gaps": [
         "networking",
         "communication capacities",
-        "scientific peers",
-        "general public",
-        "research and innovation impact of fellows"
+        "general public"
       ]
     },
     "EO-04": {
       "topic_element_id": "EO-04",
-      "mapping_to_concept": "The European Charter for Researchers is not mentioned anywhere in the project brief (concept_note.md, strategic_positioning.md, project_summary.json). Working conditions are not addressed. The host organisation is Unresolved (project_summary.json: host_organisation.validation_status = 'Unresolved'), so no organisational alignment with the Charter can be described or committed to. No direct coverage found; assumed to be covered by the general MSCA-PF requirement that beneficiary organisations must adhere to the Charter — but no concept-level commitment, mechanism, or reference to the Charter is stated.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "None — European Charter for Researchers is absent from all project brief files; host organisation is Unresolved (project_summary.json host_organisation field)",
+      "mapping_to_concept": "No direct coverage found; assumed to be covered by the project's general MSCA fellowship hosting at ELTE as an established higher education establishment. Neither 'European Charter for Researchers' nor 'working conditions' appears anywhere in the concept corpus. Alignment with the Charter is an organisational commitment of the host institution and is not described as a project design mechanism. Assumption: ELTE, as a Horizon Europe-participating higher education establishment (project_summary.json host_organisation.type), is expected to comply with the Charter as a condition of MSCA participation, but this is not confirmed by any statement in the project brief. This is a genuine gap in the concept's explicit articulation of organisational compliance.",
+      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json host_organisation.type ('Higher education establishment') — institutional type only; no Charter commitment or working conditions statement present in any project brief document",
       "status": "Assumed",
       "vocabulary_gaps": [
         "European Charter for Researchers",
-        "working conditions",
-        "alignment of working conditions",
-        "participating organisations"
+        "working conditions"
       ]
     },
     "EO-05": {
       "topic_element_id": "EO-05",
-      "mapping_to_concept": "strategic_positioning.md section 1.3 identifies 'Supervision, training, two-way transfer of knowledge' as a required MSCA-PF sub-section but explicitly marks it as 'Unresolved — spine-dependent' and states 'These sub-sections are enumerated as blocked in the confirmation checklist and are the first to green once the spine is confirmed or beta-declared.' No supervisor is named (project_summary.json supervisor.validation_status = 'Unresolved'). No specific mechanism for enhancing research training quality or sustainability at any participating organisation is described. Assumed to be covered once host and supervisor are confirmed.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.3 ('Supervision, training, two-way transfer of knowledge' — explicitly blocked as spine-dependent); project_summary.json: supervisor field Unresolved",
-      "status": "Assumed",
+      "mapping_to_concept": "The inference chain: the concept describes [Career Development Plan prepared jointly by supervisor and fellow, submitted as a project deliverable at months 2–3, reviewed and updated at M12 and M24] + [regular research reviews] + [≥120 hours of structured transferable-skills training] + [two-way knowledge transfer between fellow and host (fellow brings probabilistic calibration method; host provides geoinformatics competences)], which leads to [enhanced quality and sustainability of research training and supervision at ELTE]. The mechanisms are specific and documented. 'Quality' and 'sustainability' of research training are not used verbatim as outcome goals, but the structured, documented, time-phased and jointly-owned supervision model implies both.",
+      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "status": "Inferred",
       "vocabulary_gaps": [
-        "sustainability of research training",
-        "quality of supervision",
-        "research training programme",
-        "participating organisations capacity"
+        "quality",
+        "sustainability"
       ]
     },
     "EO-06": {
       "topic_element_id": "EO-06",
-      "mapping_to_concept": "No participating organisation is named or described in the concept corpus. project_summary.json host_organisation.validation_status is 'Unresolved' and host_organisation.organisation is null. Global attractiveness, visibility, and reputation of host organisations are not addressed in any project brief file. No direct coverage found; assumed to be covered by the general MSCA-PF expectation that hosting an MSCA fellow enhances the organisation's international profile — but no concept-level claim or mechanism is stated.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "None — no participating organisation is named; project_summary.json host_organisation is entirely Unresolved",
-      "status": "Assumed",
+      "mapping_to_concept": "The inference chain: the concept describes [peer-reviewed publications (≥3 total, ≥2 first-author)] + [open research software and open validation data published under open-science principles] + [international inbound fellow (Bulgarian postdoctoral researcher at ELTE)] + [dissemination to the host's environmental-modelling community], which leads to [increased global attractiveness, visibility and reputation of ELTE as the participating organisation]. However, 'global attractiveness', 'visibility', and 'reputation' as stated organisational goals are not mentioned anywhere in the concept corpus; the connection is indirect and derives from the open-science and publication posture described in section 2.2.",
+      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "strategic_positioning.md section '2.2 Dissemination, exploitation and communication'",
+      "status": "Inferred",
       "vocabulary_gaps": [
         "global attractiveness",
         "visibility",
-        "reputation",
-        "participating organisations"
+        "reputation"
       ]
     },
     "EO-07": {
       "topic_element_id": "EO-07",
-      "mapping_to_concept": "Inference chain: The concept describes developing a novel probabilistic-fusion decision framework and an open-source research demonstrator (concept_note.md: scientific and technical approach; project_summary.json abstract), which constitutes R&I output and capacity building. strategic_positioning.md section 1.3 explicitly names 'two-way transfer of knowledge' as the third component of the supervision/training sub-section, establishing direct vocabulary alignment with the outcome's 'better transfer of knowledge' term. strategic_positioning.md section 2.3 states the project 'would establish a defensible probabilistic-fusion decision framework where the literature is thin', constituting a stronger R&I capacity outcome. The participating-organisations dimension of this outcome remains partially blocked by the unresolved host identity.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md: 'Scientific and technical approach' (novel probabilistic-fusion framework as R&I output); strategic_positioning.md: section 1.3 ('two-way transfer of knowledge' — named dimension), section 2.3 ('establish a defensible probabilistic-fusion decision framework where the literature is thin'); project_summary.json abstract (novel end-to-end decision framework)",
-      "status": "Inferred",
+      "mapping_to_concept": "The concept explicitly uses the phrase 'transfer of knowledge' verbatim in the section title '1.3 Supervision, training, two-way transfer of knowledge' and describes specific mechanisms: the fellow brings the uncertainty-aware AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556) and probabilistic-fusion expertise into ELTE's environmental-modelling group, and takes up the host's geoinformatics and field-validation competences in return, evidenced by ≥2 methods seminars delivered at the host. R&I output is addressed through planned publications (≥3 total, ≥2 first-author) and the research demonstrator (open validation software). Both transfer of knowledge and R&I output increase are directly evidenced.",
+      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge' — 'transfer of knowledge' verbatim; section '2.1 Career perspectives / employability' for R&I output targets (≥3 publications, ≥2 first-author)",
+      "status": "Confirmed",
       "vocabulary_gaps": []
     },
     "EO-08": {
       "topic_element_id": "EO-08",
-      "mapping_to_concept": "Teaching and education are not mentioned in any project brief file. The host organisation is Unresolved (project_summary.json), so no commitment to feeding research results into teaching activities at participating organisations can be described. The open-science demonstrator (research tool) could implicitly contribute to educational use, but no such mechanism is articulated. No direct coverage found; assumed to be covered by the general MSCA-PF expectation, contingent on host confirmation and spine resolution.",
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "None — teaching and education are absent from concept_note.md, strategic_positioning.md, and project_summary.json",
-      "status": "Assumed",
+      "mapping_to_concept": "The inference chain: the concept describes [co-supervision of ≥1 MSc thesis at ELTE] + [≥2 methods seminars delivered at the host's environmental-modelling group] + [a Career Development Plan that covers teaching as a competence development dimension], which leads to [regular feedback of research results into teaching and education at ELTE as the participating organisation]. The connection to teaching and education is evidenced by specific planned activities. However, 'feedback of research results into teaching' as a stated project goal is not articulated; the educational connection is a logical consequence of the described academic activities rather than an explicitly framed outcome.",
+      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "strategic_positioning.md section '2.1 Career perspectives / employability' (co-supervision of ≥1 MSc thesis at host); section '1.3 Supervision, training, two-way transfer of knowledge' (≥2 methods seminars delivered at host)",
+      "status": "Inferred",
       "vocabulary_gaps": [
-        "teaching",
-        "education",
         "feedback of research results",
-        "regular feedback"
+        "regular feedback",
+        "education"
       ]
     }
   },
   "scope_coverage": {
     "SR-01": {
       "scope_element_id": "SR-01",
-      "constraint_ref": null,
-      "coverage_status": "partially_covered",
-      "coverage_description": "The excellence of the research project is explicitly addressed in strategic_positioning.md sections 1.1 and 1.2: the concept targets the single empty cell in the literature gap matrix (Real-Time Decision Support × PlanetScope) and defends novelty through a systematic literature review. However, 'international mobility' as a core scope criterion is not addressed — the fellow's nationality, the host's country, and any cross-border arrangements are all Unresolved (project_summary.json). Excellence of the R&I project is covered; excellence-of-researcher and international-mobility dimensions are blocked by the unresolved identity spine.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.1 ('Quality and pertinence of R&I objectives; going beyond the state of the art'), section 1.2 ('Soundness of the methodology'); project_summary.json: researcher.validation_status = 'Unresolved'",
-      "notes": "International mobility cannot be assessed until the fellow and host are confirmed. The research excellence dimension is well-addressed."
+      "constraint_ref": "CC-02",
+      "coverage_status": "covered",
+      "coverage_description": "The concept positions the fellow (Dr. Mariya Petrova) as an excellent researcher who owns a prior peer-reviewed calibration method (doi:10.1016/j.envsoft.2022.105556), targets a research gap identified by systematic literature review, and undertakes international mobility from Bulgaria (Plovdiv University) to Hungary (ELTE). Excellence and international mobility are the structural basis of the fellowship as stated in both concept_note.md and strategic_positioning.md.",
+      "tier2b_source_ref": "Scope, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Identity spine' section and 'State of the art and novelty' section; project_summary.json researcher, fellowship_type, and host_organisation fields; strategic_positioning.md section '1.4 The researcher's professional experience'",
+      "notes": null
     },
     "SR-02": {
       "scope_element_id": "SR-02",
       "constraint_ref": "CC-02",
-      "coverage_status": "unresolved",
-      "coverage_description": "project_summary.json records fellowship_type.validation_status as 'Unresolved' — the choice between European Fellowship (EF) and Global Fellowship (GF) is not determined. The host_organisation.country is null. Since SR-02 applies specifically to European Postdoctoral Fellowships and requires placement in an EU Member State or Horizon Europe Associated Country, compliance cannot be confirmed without knowing the fellowship type and host country. The concept's 24-month working scaffold is flagged as 'Assumed European-Fellowship scaffold' (strategic_positioning.md section 3.1), but this is an assumption, not a confirmed scope commitment.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: fellowship_type.validation_status = 'Unresolved'; host_organisation.country = null; duration_status.working_scaffold_months = 24 (Assumed)",
-      "notes": "This is a blocking unresolved item — fellowship type (EF vs GF) must be confirmed before SR-02 can be assessed."
+      "coverage_status": "covered",
+      "coverage_description": "The fellowship is structured as a European Fellowship (EF), hosted at ELTE Budapest, Hungary (EU Member State), with a duration of 24 months, within the 12–24 month EF standard range. The fellow is a Bulgarian national (any nationality eligible for EF). project_summary.json explicitly records fellowship_type as 'European Fellowship (EF)' and duration_months as 24.",
+      "tier2b_source_ref": "Scope – European Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'), duration_months (24), host_organisation.country ('Hungary'), researcher.country_of_origin ('BG')",
+      "notes": null
     },
     "SR-03": {
       "scope_element_id": "SR-03",
       "constraint_ref": "CC-03",
       "coverage_status": "not_applicable",
-      "coverage_description": "SR-03 applies exclusively to Global Postdoctoral Fellowships. The concept's working scaffold is based on a European Fellowship (24-month EF scaffold per strategic_positioning.md section 3.1 and project_summary.json duration_status). SR-03 is not applicable under the current working scaffold. If the fellowship type is later confirmed as Global, SR-03 becomes mandatory and the outgoing phase structure, return phase, and associated partner in a non-associated Third Country would all require explicit coverage.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: duration_status.working_scaffold_months = 24 (Assumed EF scaffold); fellowship_type.validation_status = 'Unresolved'",
-      "notes": "Not applicable under EF scaffold. If fellowship_type confirmed as GF, this becomes a blocking mandatory requirement with no current coverage."
-    },
-    "SR-04": {
-      "scope_element_id": "SR-04",
-      "constraint_ref": "CC-09",
-      "coverage_status": "partially_covered",
-      "coverage_description": "strategic_positioning.md section 1.2 references Open Science practices ('open data/models, a DMP by month 6') and states these are 'addressed at the methodology level.' The concept acknowledges the need for transferable skills training. However, specific digital skills (including generative AI) are not mentioned; knowledge valorisation is absent from the corpus; innovation and entrepreneurship are not addressed; research integrity is not mentioned. Only the Open Science dimension is substantively addressed; the other required training integration components are absent.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.2 ('open data/models, a DMP by month 6'; 'open-science and EDI plan is refined once the host's practices are known')",
-      "notes": "Digital skills (e.g. generative AI), knowledge valorisation, innovation and entrepreneurship, and research integrity are vocabulary gaps requiring coverage before submission."
-    },
-    "SR-05": {
-      "scope_element_id": "SR-05",
-      "constraint_ref": "CC-10",
-      "coverage_status": "unresolved",
-      "coverage_description": "A Career Development Plan (CDP) is not mentioned in any project brief file. The supervisor is Unresolved (project_summary.json supervisor.validation_status = 'Unresolved'), making joint CDP establishment with the supervisor impossible to commit to. SR-05 requires the CDP to be jointly established and submitted as a deliverable at the start of the action. strategic_positioning.md section 1.3 acknowledges the supervision/training sub-section as blocked; no CDP structure, content, or commitment is described in the concept corpus.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: supervisor.validation_status = 'Unresolved'; strategic_positioning.md: section 1.3 (blocked/spine-dependent sub-section); no CDP mention in any project brief file",
-      "notes": "Blocking unresolved item. CDP cannot be drafted or committed to until supervisor and host are confirmed. This is also a hard CC-10 reporting constraint."
+      "coverage_description": "SR-03 defines the structure for Global Postdoctoral Fellowships (outgoing phase + mandatory 12-month return). This project is a European Fellowship (EF), not a Global Fellowship (GF). The intra-EU move from Bulgaria to Hungary determines the EF sub-type by definition. SR-03 requirements do not apply.",
+      "tier2b_source_ref": "Scope – Global Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'); concept_note.md 'Identity spine' section (BG→HU move identified as intra-EU, hence EF by definition)",
+      "notes": "GF provisions (outgoing phase structure and mandatory return period) do not apply to this European Fellowship application. SR-03 is a mandatory requirement scoped exclusively to GF applications."
     },
     "SR-06": {
       "scope_element_id": "SR-06",
-      "constraint_ref": "CC-15",
-      "coverage_status": "partially_covered",
-      "coverage_description": "strategic_positioning.md section 1.2 references Open Science practices ('open data/models, a DMP by month 6') and the concept supports an open-source research demonstrator. The FAIR data management intent is implicit in the DMP reference. However, digital collaborative tools are not mentioned; citizen science is not described as a planned activity; the concrete open-science plan is explicitly deferred ('refined once the host's practices are known'). The outcome of empowering fellows to pursue research careers is spine-dependent and blocked.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.2 ('open data/models, a DMP by month 6'; open-source research demonstrator posture); concept_note.md: 'standalone research demonstrator (an MVP)'",
-      "notes": "Collaborative digital tools, citizen science, and the career-empowerment mechanism need to be explicitly described before submission."
+      "constraint_ref": "CC-10",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly integrates all mandated training dimensions: digital and AI skills (responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation and innovation/entrepreneurship (translating the uncertainty-aware demonstrator toward user uptake), and research integrity and open-science ethics (FAIR data management, open research software, reproducible validation). These are stated as structured training activities grounded in the project's own methods.",
+      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section (all three training dimensions named explicitly); strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "notes": null
     },
     "SR-07": {
       "scope_element_id": "SR-07",
-      "constraint_ref": null,
-      "coverage_status": "not_applicable",
-      "coverage_description": "SR-07 describes an optional secondment phase. The concept does not plan or reference a secondment. This optional provision is not applicable to the current concept.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — no secondment is planned or referenced in any project brief file",
-      "notes": "Optional provision; not applicable unless the team decides to include a secondment."
-    },
-    "SR-08": {
-      "scope_element_id": "SR-08",
-      "constraint_ref": "CC-08",
-      "coverage_status": "not_applicable",
-      "coverage_description": "SR-08 describes an optional non-academic sector placement of up to six months. The concept does not reference or commit to a non-academic placement. This optional provision is not applicable to the current concept.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — no non-academic sector placement referenced in any project brief file",
-      "notes": "Optional provision; not applicable unless the team elects to include a non-academic placement."
-    },
-    "SR-09": {
-      "scope_element_id": "SR-09",
-      "constraint_ref": "CC-14",
-      "coverage_status": "not_applicable",
-      "coverage_description": "SR-09 describes ERA Fellowships for researchers in widening countries. The concept does not reference widening country provisions, and the host country is Unresolved. This provision is not targeted by the current concept.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — widening country provisions are not referenced in any project brief file; host country is Unresolved",
-      "notes": "Not applicable unless the confirmed host is in a widening country and the team elects to apply under Annex 11."
-    },
-    "SR-10": {
-      "scope_element_id": "SR-10",
-      "constraint_ref": "CC-13",
-      "coverage_status": "not_applicable",
-      "coverage_description": "SR-10 applies to proposals in Euratom research areas. The concept is in the domain of precision agriculture and crop water stress — not nuclear research. SR-10 is not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — concept research domain is crop water stress and irrigation decision support (project_summary.json research_domain); no Euratom connection",
-      "notes": "Not applicable — Euratom provisions do not apply to this research domain."
+      "constraint_ref": "CC-12",
+      "coverage_status": "covered",
+      "coverage_description": "The concept states explicitly that a Career Development Plan is prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (months 2–3), then reviewed and updated at M12 and M24. This appears verbatim in both concept_note.md and strategic_positioning.md, addressing research objectives, training needs, transferable skills, teaching (co-supervision of MSc thesis), and publications.",
+      "tier2b_source_ref": "Scope – Career Development Plan, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md sections '1.3 Supervision, training, two-way transfer of knowledge' and '2.1 Career perspectives / employability'",
+      "notes": null
     },
     "CC-01": {
       "scope_element_id": "CC-01",
-      "constraint_ref": "EC-01",
-      "coverage_status": "unresolved",
-      "coverage_description": "CC-01 requires that applications be made jointly by the researcher and a beneficiary. The concept corpus does not name any host/beneficiary organisation. project_summary.json host_organisation.organisation is null with validation_status 'Unresolved'. The researcher is also Unresolved. No joint application can be described without both parties identified. This is a fundamental structural eligibility constraint that is currently unaddressed.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: host_organisation.organisation = null (Unresolved); researcher.name = null (Unresolved)",
-      "notes": "Blocking constraint — both researcher and beneficiary must be identified before any application can proceed."
+      "constraint_ref": "SR-01",
+      "coverage_status": "covered",
+      "coverage_description": "The project is structured as a joint application by the researcher (Dr. Mariya Petrova) and the beneficiary organisation (ELTE Budapest). project_summary.json records both the researcher and host_organisation as distinct named entities in their respective roles, consistent with the MSCA-PF single-beneficiary joint-application model.",
+      "tier2b_source_ref": "Scope, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json host_organisation (ELTE, role: 'Beneficiary / host institution') and researcher (Dr. Mariya Petrova, role: 'Experienced researcher / postdoctoral fellow') fields",
+      "notes": null
     },
     "CC-02": {
       "scope_element_id": "CC-02",
       "constraint_ref": "SR-02",
-      "coverage_status": "partially_covered",
-      "coverage_description": "The concept uses a 24-month European Fellowship working scaffold (project_summary.json duration_status.working_scaffold_months = 24; strategic_positioning.md section 3.1: '24-month timeline are an Assumed European-Fellowship working scaffold'). This falls within the 12–24 month EF duration constraint. However, the duration is explicitly flagged as 'Assumed' not 'Confirmed', and the fellowship_type (EF vs GF) is Unresolved.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: duration_status.working_scaffold_months = 24, validation_status = 'Unresolved'; strategic_positioning.md: section 3.1 ('24-month timeline are an Assumed European-Fellowship working scaffold, not confirmed')",
-      "notes": "Duration is Assumed at 24 months, which satisfies the EF 12–24 month constraint, but must be confirmed once fellowship type and host are resolved."
+      "coverage_status": "covered",
+      "coverage_description": "European Fellowship, 24 months, at ELTE Hungary (EU Member State). Fellow is Bulgarian national; any nationality is eligible for EF. Duration of 24 months falls within the 12–24 month EF standard.",
+      "tier2b_source_ref": "Scope – European Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'), duration_months (24), researcher.country_of_origin ('BG'), host_organisation.country ('Hungary')",
+      "notes": null
     },
     "CC-03": {
       "scope_element_id": "CC-03",
       "constraint_ref": "SR-03",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-03 specifies outgoing phase requirements for Global Postdoctoral Fellowships. The concept's working scaffold is a European Fellowship. This constraint is not applicable under the current working assumptions.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: fellowship_type.validation_status = 'Unresolved'; duration_status working scaffold is EF",
-      "notes": "Not applicable under EF scaffold. Apply if fellowship_type is confirmed as GF."
+      "coverage_description": "CC-03 applies to Global Fellowship nationality restrictions (European nationals or long-term residents only). This is a European Fellowship; the any-nationality rule applies and CC-03 restriction does not.",
+      "tier2b_source_ref": "Scope – Global Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
+      "notes": "GF nationality restriction is inapplicable for EF applications."
     },
     "CC-04": {
       "scope_element_id": "CC-04",
-      "constraint_ref": "SR-03",
+      "constraint_ref": "SR-04",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-04 specifies the mandatory 12-month return phase for Global Postdoctoral Fellowships. The concept's working scaffold is a European Fellowship. This constraint is not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: fellowship_type.validation_status = 'Unresolved'; EF working scaffold",
-      "notes": "Not applicable under EF scaffold."
+      "coverage_description": "CC-04 defines secondment duration limits for European Fellowships (cannot exceed half of requested duration). No secondment is proposed in this concept. The 24-month fellowship is fully structured as research and training at ELTE. The constraint is optional and not invoked.",
+      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no secondment described in any project brief document",
+      "notes": "SR-04 is non-mandatory; no secondment is proposed, so this constraint does not apply. If a secondment is added in later phases, CC-04 limits must be observed."
     },
     "CC-05": {
       "scope_element_id": "CC-05",
-      "constraint_ref": null,
+      "constraint_ref": "SR-04",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-05 applies constraints on EF secondment duration. No secondment is planned in the current concept. Not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — no secondment planned in concept corpus",
-      "notes": "Not applicable; would become applicable if a secondment is added to the fellowship design."
+      "coverage_description": "CC-05 defines secondment rules for Global Fellowships (up to half the outgoing phase, max 3 months at start at beneficiary). This is a European Fellowship; CC-05 does not apply.",
+      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
+      "notes": "GF secondment rules are inapplicable for EF applications."
     },
     "CC-06": {
       "scope_element_id": "CC-06",
-      "constraint_ref": null,
+      "constraint_ref": "SR-04",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-06 applies constraints on GF secondments during the outgoing phase. The concept uses an EF scaffold. Not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — EF scaffold; no GF outgoing phase planned",
-      "notes": "Not applicable."
+      "coverage_description": "CC-06 prohibits secondments during the mandatory 12-month return period, which is a GF-only structure. This European Fellowship has no mandatory return period. Additionally, no secondment is proposed.",
+      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
+      "notes": "No mandatory return period exists in EF; this restriction is structurally inapplicable."
     },
     "CC-07": {
       "scope_element_id": "CC-07",
-      "constraint_ref": null,
+      "constraint_ref": "SR-05",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-07 prohibits secondments during the GF mandatory 12-month return period. The concept uses an EF scaffold with no return phase and no planned secondment. Not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — EF scaffold; no GF return period",
-      "notes": "Not applicable."
+      "coverage_description": "CC-07 permits an optional non-academic placement of up to 6 months at the end of the project. No such placement is proposed in this concept. The 24-month fellowship is fully structured as research and training at ELTE without a terminal non-academic placement period.",
+      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json duration_months (24); strategic_positioning.md section '3.1 Work plan' — 24-month European Fellowship timeline; no placement period described",
+      "notes": "SR-05 is non-mandatory; no non-academic placement is proposed. AgroVIR Kft. is described as an associated validation partner, not as a non-academic placement host."
     },
     "CC-08": {
       "scope_element_id": "CC-08",
-      "constraint_ref": "SR-08",
+      "constraint_ref": "SR-05",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-08 describes the optional non-academic sector placement provision. The concept does not include or reference a non-academic placement. Not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — no non-academic placement referenced in concept corpus",
-      "notes": "Optional provision; not applicable unless elected."
+      "coverage_description": "CC-08 specifies that if the fellow is recruited in the non-academic sector, the non-academic placement must be at a different non-academic host. No non-academic placement is proposed; this constraint does not apply.",
+      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no non-academic placement described",
+      "notes": "No non-academic placement proposed; constraint inapplicable."
     },
     "CC-09": {
       "scope_element_id": "CC-09",
-      "constraint_ref": "SR-04",
-      "coverage_status": "partially_covered",
-      "coverage_description": "strategic_positioning.md section 1.2 references Open Science culture ('open data/models, a DMP by month 6'). Open Science is addressed. However, digital skills (including generative AI as explicitly named in CC-09) are absent from the corpus; knowledge valorisation is not mentioned; innovation and entrepreneurship are not mentioned; research integrity is not mentioned. The training integration requirement is only partially addressed through the Open Science dimension.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.2 ('open data/models, a DMP by month 6'; open-science and EDI plan noted as to-be-refined)",
-      "notes": "Digital skills (generative AI), knowledge valorisation, innovation/entrepreneurship, and research integrity must be explicitly addressed before submission."
+      "constraint_ref": "SR-05",
+      "coverage_status": "not_applicable",
+      "coverage_description": "CC-09 addresses disqualification conditions for non-compliant placements (e.g. placement in academic organisation or Third Country). No placement is proposed; CC-09 does not apply.",
+      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no non-academic placement described",
+      "notes": "No non-academic placement proposed; constraint inapplicable."
     },
     "CC-10": {
       "scope_element_id": "CC-10",
-      "constraint_ref": "SR-05",
-      "coverage_status": "unresolved",
-      "coverage_description": "A Career Development Plan is not mentioned in any project brief file. The supervisor is Unresolved and the joint establishment process cannot be described. CC-10 requires the CDP to be submitted as a deliverable at the beginning of the action, covering research objectives, training and career needs, transferable skills, teaching, publications, and public engagement/Open Science activities. None of these CDP components are described in the concept corpus as planned deliverable content.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: supervisor.validation_status = 'Unresolved'; no CDP mentioned in concept_note.md, strategic_positioning.md, or project_summary.json",
-      "notes": "Blocking unresolved item. CDP is a mandatory deliverable and cannot be drafted until supervisor and host are confirmed."
+      "constraint_ref": "SR-06",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly names digital skills (responsible use of generative AI in environmental modelling and scientific coding), Open Science culture (FAIR data management, open research software), knowledge valorisation, and research integrity as integrated training dimensions. All elements of CC-10 are present in concept_note.md 'Training and career development' section.",
+      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "notes": null
     },
     "CC-11": {
       "scope_element_id": "CC-11",
-      "constraint_ref": "EC-03",
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-11 restricts Global Fellowships to European nationals or long-term residents. The concept uses an EF scaffold; this nationality constraint applies only to GF. Not applicable under current working scaffold.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: fellowship_type.validation_status = 'Unresolved'; EF open to researchers of any nationality (EC-02)",
-      "notes": "Not applicable under EF scaffold. Would apply if fellowship_type confirmed as GF."
+      "constraint_ref": "SR-06",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly mentions FAIR data management as a training and open-science commitment. Societal engagement is named as a training component. Open research software and a reproducible validation protocol support digital collaboration practices. 'FAIR data management' appears verbatim in concept_note.md.",
+      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section ('FAIR data management' verbatim); strategic_positioning.md section '2.2 Dissemination, exploitation and communication' ('open validation data and protocol')",
+      "notes": null
     },
     "CC-12": {
       "scope_element_id": "CC-12",
-      "constraint_ref": null,
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-12 describes admissibility conditions relating to page limits and layout as specified in Part B of the Application Form and General Annexes A/E. These are submission-format constraints, not concept-scope requirements. They are not applicable to concept-alignment assessment at Phase 2.",
-      "tier2b_source_ref": "Admissibility Conditions / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable at concept alignment stage — page limits govern the submitted application form, not the concept",
-      "notes": "To be addressed during Phase 8 drafting and assembly."
+      "constraint_ref": "SR-07",
+      "coverage_status": "covered",
+      "coverage_description": "The concept explicitly states that a Career Development Plan is established jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (months 2–3), covering research objectives, training needs, transferable skills, publications, and teaching (co-supervision of ≥1 MSc thesis). Reviewed and updated at M12 and M24. All elements of CC-12 are addressed.",
+      "tier2b_source_ref": "Scope – Career Development Plan, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md sections '1.3 Supervision, training, two-way transfer of knowledge' and '2.1 Career perspectives / employability'",
+      "notes": null
     },
     "CC-13": {
       "scope_element_id": "CC-13",
-      "constraint_ref": "SR-10",
+      "constraint_ref": "SR-08",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-13 applies Euratom-specific eligibility conditions. The concept is in precision agriculture / crop water stress — not nuclear research. Not applicable.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json: research_domain = ['crop_water_stress', 'irrigation_decision_support'] — no Euratom connection",
-      "notes": "Not applicable."
+      "coverage_description": "CC-13 defines Euratom eligibility conditions for nuclear research fellowships. This project addresses agricultural remote sensing, probabilistic machine learning, and irrigation decision support. It does not involve nuclear research. Euratom provisions do not apply.",
+      "tier2b_source_ref": "Scope – Euratom, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json research_domain (['crop_water_stress', 'irrigation_decision_support'])",
+      "notes": "Project domain (agricultural remote sensing, probabilistic ML, irrigation optimisation) is unrelated to Euratom research areas. SR-08 is non-mandatory."
     },
     "CC-14": {
       "scope_element_id": "CC-14",
       "constraint_ref": "SR-09",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-14 relates to ERA Fellowships for researchers in widening countries. The concept does not target widening country provisions and the host country is Unresolved. Not applicable to the current concept.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "Not applicable — widening country provisions not referenced; host_organisation.country = null (Unresolved)",
-      "notes": "Not applicable unless confirmed host is in a widening country."
+      "coverage_description": "CC-14 describes ERA Fellowships for researchers undertaking fellowships in widening countries under Work Programme Annex 11. This proposal is framed as a standard European Fellowship; it does not invoke Annex 11 ERA Fellowship provisions.",
+      "tier2b_source_ref": "Scope – ERA Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)') — no ERA Fellowship designation",
+      "notes": "SR-09 is non-mandatory; ERA Fellowship framing is not invoked by this concept. If Hungary qualifies as a widening country under Annex 11, this provision could optionally be explored in a future revision."
     },
     "CC-15": {
       "scope_element_id": "CC-15",
-      "constraint_ref": "SR-06",
-      "coverage_status": "partially_covered",
-      "coverage_description": "strategic_positioning.md section 1.2 references Open Access (implicit in open data/models posture) and FAIR data management (DMP by month 6). The open-source research demonstrator supports Open Access to research outputs. However, digital collaborative tools are not mentioned; citizen science is not described; societal engagement is noted only as a deferred component (section 2.2: 'concrete plan is deferred'). Empowering the fellow to pursue a research career is spine-dependent and blocked.",
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md: section 1.2 ('open data/models, a DMP by month 6'); concept_note.md ('standalone research demonstrator (an MVP)'); section 2.2 (dissemination/communication deferred)",
-      "notes": "Collaborative digital tools, citizen science, societal engagement, and the researcher-career-empowerment mechanism require explicit treatment before submission."
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "CC-15 references admissibility conditions in Annex A and E governing submission format, page limits, and layout. These are submission-time administrative requirements, not concept design decisions. They cannot be evaluated at the Phase 2 concept alignment stage.",
+      "tier2b_source_ref": "Admissibility Conditions, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": null,
+      "notes": "Admissibility conditions are verified at submission; not assessable at concept alignment stage."
+    },
+    "CC-16": {
+      "scope_element_id": "CC-16",
+      "constraint_ref": null,
+      "coverage_status": "covered",
+      "coverage_description": "Host country is Hungary (EU Member State, unambiguously eligible under Horizon Europe). Fellow is from Bulgaria (EU Member State, eligible for EF under the any-nationality rule). Both countries are fully eligible Horizon Europe participants.",
+      "tier2b_source_ref": "Eligible Countries, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": "project_summary.json host_organisation.country ('Hungary', country_code 'HU'), researcher.country_of_origin ('BG')",
+      "notes": null
+    },
+    "CC-17": {
+      "scope_element_id": "CC-17",
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "CC-17 references award criteria and scoring thresholds in Annex D. These govern the evaluation process and are not concept design decisions. Not assessable at concept alignment stage.",
+      "tier2b_source_ref": "Award Criteria / Scoring Thresholds, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": null,
+      "notes": "Award criteria are evaluator-facing and govern scoring methodology, not proposal design."
+    },
+    "CC-18": {
+      "scope_element_id": "CC-18",
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "CC-18 references submission and evaluation process described in Annex F. These are procedural requirements governing how proposals are submitted and evaluated, not concept design decisions.",
+      "tier2b_source_ref": "Submission and Evaluation Process, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": null,
+      "notes": "Procedural submission requirements; not assessable at concept alignment stage."
+    },
+    "CC-19": {
+      "scope_element_id": "CC-19",
+      "constraint_ref": null,
+      "coverage_status": "not_applicable",
+      "coverage_description": "CC-19 states the single-stage deadline (2026-09-09) and indicative call budget (EUR 59,857,539 for 2026). These are call administration parameters, not concept design requirements.",
+      "tier2b_source_ref": "Deadline / Budget Year Map, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "tier3_evidence_ref": null,
+      "notes": "Call deadline and budget are process parameters; not concept design decisions. Deadline compliance is an operational matter confirmed at submission."
     }
   },
-  "scope_conflict_log": [
-    {
-      "conflict_id": "SCL-01",
-      "description": "SR-02 (European Postdoctoral Fellowship geographic placement requirement) cannot be assessed: the fellowship type (EF vs GF) is Unresolved in project_summary.json, and the host organisation country is null. The concept does not confirm that the fellowship will take place in an EU Member State or Horizon Europe Associated Country, which is the mandatory scope criterion for European Fellowships.",
-      "resolution_status": "unresolved",
-      "resolution_note": null,
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json (SR-02)",
-      "conflict_type": "coverage_gap"
-    },
-    {
-      "conflict_id": "SCL-02",
-      "description": "SR-05 and CC-10 (Career Development Plan mandatory deliverable) are not addressed in the concept corpus. No Career Development Plan is described, planned, or committed to in any project brief file. The supervisor is Unresolved, making joint establishment impossible to represent. The CDP is a mandatory deliverable that must be submitted at the start of the action.",
-      "resolution_status": "unresolved",
-      "resolution_note": null,
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json (SR-05, CC-10)",
-      "conflict_type": "coverage_gap"
-    },
-    {
-      "conflict_id": "SCL-03",
-      "description": "CC-01 (joint application by researcher and beneficiary) cannot be satisfied: neither the researcher nor the host/beneficiary organisation is identified in the concept corpus. project_summary.json records both as Unresolved. No joint application structure can be described or committed to.",
-      "resolution_status": "unresolved",
-      "resolution_note": null,
-      "tier2b_source_ref": "Scope / HORIZON-MSCA-2026-PF-01-01.slice.json (CC-01)",
-      "conflict_type": "coverage_gap"
-    },
-    {
-      "conflict_id": "SCL-04",
-      "description": "Six of eight expected outcomes (EO-01, EO-02, EO-03, EO-04, EO-05, EO-06, EO-08) have Assumed status in topic_mapping_rationale because the MSCA-PF researcher-development dimensions (employability, international/inter-sectoral/interdisciplinary experience, networking, working conditions alignment, supervision quality, organisational visibility, teaching feedback) cannot be addressed without a confirmed fellow, supervisor, or host. The concept is exclusively research-methodology-focused; the researcher and host dimensions that constitute the majority of MSCA-PF expected outcomes are blocked by the unresolved identity spine. This is a systemic coverage gap, explicitly acknowledged in strategic_positioning.md as the 'honest block' (D17).",
-      "resolution_status": "unresolved",
-      "resolution_note": null,
-      "tier2b_source_ref": "Expected Outcomes / HORIZON-MSCA-2026-PF-01-01.slice.json (EO-01, EO-02, EO-03, EO-04, EO-05, EO-06, EO-08)",
-      "conflict_type": "coverage_gap"
-    }
-  ],
-  "strategic_differentiation": "The project's differentiation within the MSCA-PF evaluation frame operates on two levels. At the research level (Excellence 50%), the proposal targets the single empty cell in the systematic literature review's research-gap matrix — Real-Time Decision Support × PlanetScope — and claims the underdeveloped end-to-end combination of learned multimodal fusion, explicit probabilistic crop-water-state estimation, and economically optimised irrigation decision support as its novel contribution (strategic_positioning.md section 1.1, grounded in the gap matrix from concept_note.md). The methodological distinction is the 'honest uncertainty chain' carried without collapse from multi-sensor observation through probabilistic diagnosis to profit-based irrigation recommendation, combined with a risk-managed two-route architecture: a rigorous probabilistic-fusion route (Route A) and a lighter homogeneous-patch proxy route (Route B) that sidesteps the sub-pixel resolution problem, both sharing one downstream decision engine (strategic_positioning.md section 1.2; concept_note.md scientific and technical approach). The novelty claim is deliberately narrow — defensible only if the uncertainty chain is kept honest — and is anchored in a systematic literature review covering 50 papers (concept_note.md state of the art). At the MSCA structural level (researcher/host merit — Implementation 20%, Impact 30% career dimensions), the concept explicitly acknowledges that researcher, supervisor, and host positioning (sub-sections 1.3, 1.4, 2.1, 3.2) are spine-dependent and blocked pending confirmation of the fellow, supervisor, and host; these dimensions are deferred to confirmation_checklist.json resolution rather than fabricated."
+  "scope_conflict_log": [],
+  "strategic_differentiation": "This MSCA Postdoctoral Fellowship proposal differentiates on two interlocking planes within the single-researcher, single-beneficiary MSCA-PF evaluation frame. First, at the research level: the project targets the single empty cell in a systematic literature review's research-gap matrix — Real-Time Decision Support × PlanetScope — and claims a deliberately narrow, defensible novelty: no prior work couples learned multimodal fusion with explicit probabilistic crop-water-state estimation and economically optimised irrigation decision-making end-to-end for row crops. The distinguishing posture is the honest, end-to-end uncertainty chain carried from multi-sensor observation through probabilistic diagnosis to profit-maximising counterfactual decision, argued against specific precedents (Bayesian Maximum Entropy, copula-based scheduling, dynamic Bayesian networks, MF-FusionNet) that each address part of the chain but not all three stages together. The edge is not 'using satellites for irrigation' but the integrity of uncertainty propagation across the full chain. Second, at the methodological risk management level: the design is risk-managed by construction through two interchangeable diagnostic routes — a rigorous one-step probabilistic fusion route (Route A, direct probabilistic fusion via Bayesian hierarchical model or Gaussian process) and a lighter homogeneous-patch proxy route (Route B, sidesteps the sub-pixel resolution problem) — sharing one decision engine, so no single methodological failure can halt the research programme. Objectives are measurable against a defined validation protocol (uncertainty calibration: whether 90% prediction intervals contain truth ~90% of the time; decision quality) rather than asserted. At the researcher and hosting level, differentiation derives from a genuine two-way knowledge transfer: the fellow brings the peer-reviewed uncertainty-aware AquaCrop calibration method to ELTE's environmental-modelling group, and takes up the host's geoinformatics and field-validation competences in return — a knowledge exchange evidenced by specific deliverables (methods seminars, co-supervised MSc thesis) rather than asserted generically. Open-science commitments (open validation data and protocol, open research software, FAIR data management) are integral to the research design and serve the validation transparency argument, not merely compliance."
 }

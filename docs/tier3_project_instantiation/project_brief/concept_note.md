@@ -1,7 +1,7 @@
 # Uncertainty-aware multi-sensor diagnosis and economically optimised irrigation decision support for row crops
 
 > **MSCA Postdoctoral Fellowship — Concept Note (Tier 3 hand-lift, ticket 14).**
-> Lifted from the `source_grounded` methodology vault `MSCA/methodology_graph/` (pinned gitlink SHA `b4d9e57`, per `reinstantiation_provenance.json`). Provenance discipline: `source_grounded → Confirmed`, `synthesis → Inferred (framing)`, `inference → Inferred`, `unconfirmed → not lifted as fact` (Appendix B). Per-fact vault-node citations appear inline as `[[Vault Node]]` and are consolidated in `hand_lift_provenance.json`. **The identity spine (fellow / host / supervisor / partners) is Unresolved — see `call_binding/confirmation_checklist.json`.**
+> Lifted from the `source_grounded` methodology vault `MSCA/methodology_graph/` (pinned gitlink SHA `b4d9e57`, per `reinstantiation_provenance.json`). Provenance discipline: `source_grounded → Confirmed`, `synthesis → Inferred (framing)`, `inference → Inferred`, `unconfirmed → not lifted as fact` (Appendix B). Per-fact vault-node citations appear inline as `[[Vault Node]]` and are consolidated in `hand_lift_provenance.json`. **The identity spine (fellow / host / supervisor / partners) is now filled with SYNTHETIC demo data under SYN-SPINE-01 (§3 operator override, logged) — not real facts, not submittable; genuine non-spine gaps remain Unresolved (see `call_binding/confirmation_checklist.json`).**
 
 ## Research problem *(Confirmed — `[[Core Architecture]]`, `[[Methodology Graph - Meta Node]]`)*
 
@@ -47,7 +47,11 @@ Ten questions taken faithfully from the analyst synthesis (prompt.txt §10) must
 
 > The `do_not_invent` guard on ELTE (`[[ELTE Role]]`) **held for the entire build** — the engine never once asserted it, and blocked instead. It is lifted here only by explicit operator instruction, never by the engine.
 
-Each gap is enumerated with a confirmation action in `call_binding/confirmation_checklist.json`. Until an operator confirms a fact or β-declares a working assumption (`working_assumptions.json`, ticket 15), the spine remains Unresolved and the affected proposal sub-sections (Excellence 1.3/1.4, Impact 2.1, Implementation 3.2) cannot be finalised.
+Each gap is enumerated with a confirmation action in `call_binding/confirmation_checklist.json`. The spine sub-sections (Excellence 1.3/1.4, Impact 2.1, Implementation 3.2) are authored against the **synthetic** spine above and are therefore internally consistent but **not submittable**: the checklist still records each spine item as requiring real confirmation (`still_requires_real_confirmation: true`) — a synthetic fill unblocks the demo, it does not close the gap. The genuine non-spine gaps (named validation farms / field sites, EO data-access guarantees, meteorological providers, RQ1 crop, RQ10 TRL) remain **Unresolved**, and content depending on them cannot be finalised until an operator confirms the fact or β-declares a working assumption (`working_assumptions.json`, ticket 15).
+
+## Training and career development *(SYNTHETIC spine — SYN-SPINE-01; §3 operator override, demo data, not submittable)*
+
+Hosted at **ELTE** under **Prof. Dr. Gábor Nagy** *[SYNTHETIC]*, the fellowship pairs the research work plan with structured training in the MSCA-PF mandatory transferable dimensions. A **Career Development Plan** is prepared jointly by supervisor and fellow and **submitted as a project deliverable at the start of the action** (by months 2–3), then reviewed and updated at M12 and M24. Training integrates **digital and AI skills** — including the responsible use of generative AI in environmental modelling and scientific coding — together with **knowledge valorisation and innovation/entrepreneurship** (translating the uncertainty-aware crop-water decision-support demonstrator toward user uptake) and **research integrity and open-science ethics** (FAIR data management, open research software, reproducible validation). These dimensions are grounded in the project's own methods (probabilistic modelling, an open validation protocol) and the host's environmental-modelling / geoinformatics competences, and remain **synthetic demo framing — not submittable**.
 
 ## Source grounding
 

@@ -1,0 +1,53 @@
+{
+  "record_type": "decision",
+  "id": "phase7-8-deferral",
+  "date": "2026-07-14",
+  "authority": "Operator instruction (in-session, explicit). Logged per §9.4. No constitutional amendment; no gate weakened; no phase reordered.",
+  "run_id": "msca-pf-syn-01",
+
+  "summary": "Phases 1-6 of the governed DAG are released (all exit gates passed) on the SYN-SPINE-01 synthetic spine. The operator has chosen to DEFER Phases 7 (budget gate) and 8 (drafting/review) rather than run them now, because a weekly Claude Code usage limit is near and resets in ~3 days. n07 and n08 remain 'pending'. This is a deferral, NOT a bypass and NOT a gate failure: phase-scoped execution simply leaves unrun phases pending, and no downstream artifact depends on them yet.",
+
+  "node_states_at_deferral": {
+    "n01_call_analysis": "released",
+    "n02_concept_refinement": "released",
+    "n03_wp_design": "released",
+    "n04_gantt_milestones": "released",
+    "n05_impact_architecture": "released",
+    "n06_implementation_architecture": "released",
+    "n07_budget_gate": "pending (deferred)",
+    "n08a-n08f (Phase 8)": "pending (deferred)"
+  },
+
+  "phase7_disposition": {
+    "decision": "Deferred, NOT unlocked. The operator initially asked to 'unlock the Phase 7 gate by default' on the grounds that the MSCA budget is trivial (a single funding figure entered on the Funding & Tenders Portal, with no cost breakdown or WP-specific calculation).",
+    "why_no_unlock_was_made": "The premise is already satisfied by design, so no unlock is needed. selected_call.json declares budget_regime='unit_cost'. gate_09 therefore evaluates ONLY its unit-cost branch (g08_uc01/uc02/uc03): that the deterministic unit_cost_budget_deriver (Claude-free, §17.5.3/C2) wrote a resolved unit_cost_budget.json = confirmed_months x published_rates x host_country_coefficient. No Lump Sum Budget Planner response, no cost breakdown, and no WP-specific calculation are required for a unit-cost instrument. This IS the trivial budget path the operator described; C1 introduced it precisely for MSCA.",
+    "why_a_blanket_unlock_was_refused": "A default 'gate always passes' would be a §13.7 gate-weakening. gate_09 is mandatory and bypass_prohibited; its categorical, unconditional, instrument-INDEPENDENT block on Phase 8 was preserved verbatim by the C1 amendment. A blanket unlock would also strip the anti-fabrication guarantee for LUMP-SUM instruments, where a fabricated budget is exactly what the system exists to prevent. Weakening it would require an explicit §14 constitutional amendment by human instruction; it may not be done as a silent default flip by an agent (§14.1, §14.5, §13.7). The operator did not instruct such an amendment.",
+    "when_resumed": "After the quota reset, run Phase 7 with the standard command. Expected to pass cheaply: the deriver is Claude-free and only two light skills run in the node (budget-interface-validation, gate-enforcement). WATCH: g08_uc03 (unit_cost_budget_resolved) requires the published MSCA unit-rate table to be present in Tier 2B; the host-country coefficient input (HU, via the synthetic spine) is already available."
+  },
+
+  "phase8_disposition": {
+    "decision": "Deferred deliberately, and this deferral is constitutionally endorsed, not merely tolerated.",
+    "constitutional_basis": "§11.5 (final proposal text must not be produced from incomplete, contradictory, or unvalidated source state) and §13.8 (finalizing proposal text when source state is known to be incomplete without flagging the gap is prohibited). The operator states the methodology and several project facets are not finalised. On the synthetic spine, Phase 8 would draft Part B to 'completion' against fabricated + unfinalised data - exactly the state §11.5/§13.8 forbid finalizing from. Deferring is the honest position; it mirrors the alpha honest-block being the real result.",
+    "token_cost_note": "Phase 8 is the most token-intensive phase (decomposed drafting across Excellence/Impact/Implementation, assembly, evaluator review, revision). Deferral also protects the weekly quota, but the constitutional basis above is the primary and sufficient reason."
+  },
+
+  "what_this_deferral_does_NOT_change": [
+    "No gate condition was altered, softened, or bypassed. gate_09 and all Phase 8 gates remain exactly as written.",
+    "No phase was reordered or skipped in the canonical sequence; 7 and 8 are simply not yet executed.",
+    "The categorical Phase-8 block (§8.4/§13.4) remains fully in force: when Phase 8 is eventually run, it may not commence until gate_09 passes for this run_id.",
+    "The alpha honest-block result is untouched and remains the milestone's headline artifact (tag alpha-honest-block, evidence in docs/tier4_orchestration_state/alpha_honest_block/)."
+  ],
+
+  "resume_plan": {
+    "precondition": "Weekly Claude Code usage limit reset (operator estimates ~3 days from 2026-07-14).",
+    "commands": [
+      "$env:ORCHESTRATOR_TRANSPORT_PRESET = 'CLAUDE_REFERENCE'",
+      "$RID = 'msca-pf-syn-01'",
+      "python -m runner --run-id $RID --phase 7 --verbose",
+      "python scripts/run_msca_pf_e2e.py beta --run-id $RID   # Phase 7 -> canonical pack -> Phase 8 -> marked .docx"
+    ],
+    "note": "Do NOT modify Tier 3 between the already-released phases and the resume, or gates that have passed will restale. If the run context is cleared, Phases 1-6 must be re-run (their durable outputs are in Tier 4, but the run-scoped gate_pass records live in .claude/runs and are cleared with it)."
+  },
+
+  "constitutional_note": "This is the system behaving correctly: a human, who is the priority-1 authority (§3), chose to pause execution at a clean phase boundary. Pausing is not a gate failure and not a fabrication. The engine invented nothing, weakened nothing, and the deferral is explicit, scoped, and durable."
+}

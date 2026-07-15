@@ -1,0 +1,484 @@
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "msca-pf-syn-01",
+  "governance_matrix": [
+    {
+      "body_name": "Fellow-Supervisor Research Coordination",
+      "composition": [
+        "FELLOW",
+        "SUPERVISOR"
+      ],
+      "decision_scope": "Scientific progress review; methodology decisions and research route selection (including Route A/B resolution in WP1); training activity planning and execution (WP4); Career Development Plan co-authoring and updates; two-way knowledge transfer oversight; preparation and review of WP1-WP3 milestones and deliverables",
+      "meeting_frequency": "Meeting frequency not prescribed by Tier 1 extracted governance principles (governance_principles.json: no_prescribed_meeting_frequency: true) and not specified in Tier 3 consortium data. Project-operational assumption: bi-weekly during active research phases (WP1-WP3 execution), monthly at minimum throughout the action duration.",
+      "escalation_path": "Unresolved scientific disagreements or scope decisions beyond the researcher-supervisor coordination level are escalated to the Action Oversight Forum. Further unresolved issues are addressed by HOST as the sole beneficiary under grant agreement implementation provisions (wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36; programme-guide_horizon_en.pdf p.34). This escalation path is framed as a project governance route consistent with Tier 1 implementation provisions, not as a generic programme practice.",
+      "source_basis": "Body composition derived from Tier 3 roles.json (role_token: FELLOW — experienced researcher/fellow; role_token: SUPERVISOR — supervisor at host institution) and wp_structure.json (WP4 lead_partner: SUPERVISOR; WP1, WP2, WP3 lead_partner: FELLOW). No Tier 1 prescribed body names: governance_principles.json no_prescribed_governance_body_names: true. Escalation wording sourced to Tier 1: governance_principles.json escalation_path_constraint; wp-15-general-annexes_horizon-2026-2027_en.pdf p.35; programme-guide_horizon_en.pdf p.34.",
+      "assumption_note": "Body name, meeting frequency, and bi-weekly cadence are project-operational assumptions derived from the single-researcher fellowship structure of MSCA-PF. Tier 1 does not prescribe these. Not labelled 'standard RIA practice' or 'standard operational practice'."
+    },
+    {
+      "body_name": "Host Administrative Management",
+      "composition": [
+        "HOST"
+      ],
+      "decision_scope": "Grant agreement compliance and financial reporting as sole beneficiary; administrative and institutional decisions; ethics compliance monitoring; IP management and dissemination plan oversight; Gender Equality Plan maintenance; administrative authorisation for WP3 field access and validation activities; authorisation of dissemination outputs (WP5)",
+      "meeting_frequency": "Meeting frequency not prescribed by Tier 1 (governance_principles.json: no_prescribed_meeting_frequency: true) and not specified in Tier 3. Project-operational assumption: quarterly administrative review with FELLOW and SUPERVISOR.",
+      "escalation_path": "Administrative issues unresolved within HOST's internal management are escalated to the EU Project Officer under the grant agreement, as HOST is the sole beneficiary. Source: wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36 (grant agreement implementation provisions).",
+      "source_basis": "HOST is the sole beneficiary (Tier 3 partners.json: HOST entity_type: legal_entity, beneficiary: true, role_in_action: Beneficiary/host organisation). Administrative management authority is grounded in HOST's role as sole grant beneficiary under Tier 1 grant agreement implementation provisions (governance_principles.json: grant_agreement_implementation_articles; wp-15-general-annexes_horizon-2026-2027_en.pdf pp.35-36).",
+      "assumption_note": "Quarterly review cadence is a project-operational assumption. Tier 1 does not prescribe review frequency. Not labelled 'standard RIA practice'."
+    },
+    {
+      "body_name": "Action Oversight Forum",
+      "composition": [
+        "FELLOW",
+        "SUPERVISOR",
+        "HOST"
+      ],
+      "decision_scope": "Overall action steering and strategic decisions; milestone verification and go/no-go decisions for subsequent work package phases; ethics and civil-focus compliance confirmation; open science compliance review; resolution of issues escalated from the Fellow-Supervisor Research Coordination body; major scope changes",
+      "meeting_frequency": "Meeting frequency not prescribed by Tier 1 (governance_principles.json: no_prescribed_meeting_frequency: true) and not specified in Tier 3. Project-operational assumption: three fixed meetings — action start (month 1), mid-action review (month 12), and action close (month 24).",
+      "escalation_path": "Final escalation point within the action. Unresolved issues at this level are addressed by HOST as sole beneficiary with the EU Project Officer under the grant agreement (programme-guide_horizon_en.pdf p.34; wp-15-general-annexes_horizon-2026-2027_en.pdf p.35). If a consortium agreement is in place, it must complement and must not contain provisions contrary to the grant agreement (programme-guide_horizon_en.pdf p.34). This wording is tied to Tier 1 sources and does not assert unsourced programme practice.",
+      "source_basis": "Composition derived from Tier 3 partners.json (HOST: legal_entity, sole beneficiary; FELLOW: natural_person, experienced researcher; SUPERVISOR: natural_person, supervisor). All three partner_ids confirmed in valid_partner_ids from partners.json. Escalation wording sourced to Tier 1: governance_principles.json consortium_agreement_guidance (programme-guide_horizon_en.pdf p.34) and escalation_path_constraint (wp-15-general-annexes_horizon-2026-2027_en.pdf p.35).",
+      "assumption_note": "Body name and three-point meeting schedule are project-operational assumptions appropriate for an MSCA-PF single-fellow action. Tier 1 does not prescribe these. Not labelled 'standard RIA practice'."
+    }
+  ],
+  "management_roles": [
+    {
+      "role_id": "MR-01",
+      "role_name": "Principal Researcher (Fellow)",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Lead execution of WP1 (Probabilistic multi-sensor diagnosis), WP2 (Decision engine and demonstrator integration), WP3 (Field validation, ground truth and uncertainty calibration), and WP5 (Dissemination, exploitation, communication and management)",
+        "Produce all WP1, WP2, WP3, and WP5 deliverables as designated responsible partner (D1-01, D2-01, D3-01, D5-01, D5-02)",
+        "Co-author and maintain Career Development Plan with SUPERVISOR (WP4 T4-03, contributing partner)",
+        "Implement open science practices including FAIR data management: DMP deliverable D5-01 due month 6 (Tier 2B SR-06, SR-07; call_constraints.json CC-10, CC-11)",
+        "Execute dissemination, exploitation, and communication activities (WP5 T5-01, T5-02, T5-03)"
+      ],
+      "source_basis": "Derived from Tier 3 roles.json (role_token: FELLOW, role: Experienced researcher/postdoctoral fellow) and wp_structure.json partner_role_matrix (FELLOW: wps_as_lead: WP1, WP2, WP3, WP5; wps_as_contributor: WP4). FELLOW confirmed in valid_partner_ids from partners.json."
+    },
+    {
+      "role_id": "MR-02",
+      "role_name": "Supervisor",
+      "assigned_to": "SUPERVISOR",
+      "responsibilities": [
+        "Lead WP4 (Training, supervision and two-way transfer of knowledge) as designated WP4 lead partner",
+        "Co-author and maintain Career Development Plan with FELLOW (T4-01: Prepare and maintain CDP)",
+        "Deliver transferable skills training programme for the fellow (T4-02)",
+        "Facilitate two-way knowledge transfer activities including co-supervision of at least one MSc thesis (T4-03)",
+        "Provide scientific mentoring and supervision across WP1, WP2, and WP3 as contributing partner"
+      ],
+      "source_basis": "Derived from Tier 3 roles.json (role_token: SUPERVISOR, role: Supervisor at the host institution, affiliation: ELTE) and wp_structure.json (WP4 lead_partner: SUPERVISOR; SUPERVISOR wps_as_contributor: WP1, WP2, WP3). SUPERVISOR confirmed in valid_partner_ids from partners.json."
+    },
+    {
+      "role_id": "MR-03",
+      "role_name": "Host Administrative Coordinator",
+      "assigned_to": "HOST",
+      "responsibilities": [
+        "Manage grant agreement obligations as the sole legal beneficiary (HOST is the only entity with beneficiary status per partners.json)",
+        "Provide research infrastructure, administrative support, and institutional logistics for the fellowship at ELTE Budapest",
+        "Ensure Gender Equality Plan is in place as required for public bodies and research organisations in EU Member States under Tier 1 programme rules (wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19; programme-guide_horizon_en.pdf pp.16-17). The Tier 3 compliance_profile.json records gender_plan_required: true as a compliance flag derived during call binding; no Tier 2B extracted source for HORIZON-MSCA-2026-PF-01-01 cites GEP as a topic-specific mandate beyond this Tier 1 programme rule.",
+        "Contribute to WP3 field validation protocol design (T3-01 contributing partner) and WP4 training delivery (T4-02 contributing partner)",
+        "Support WP5 communication and exploitation activities (T5-03 contributing partner)"
+      ],
+      "source_basis": "Derived from Tier 3 partners.json (HOST: entity_type: legal_entity, beneficiary: true, role_in_action: Beneficiary/host organisation, country: Hungary) and wp_structure.json (HOST: wps_as_contributor: WP3, WP4, WP5). GEP requirement grounded in Tier 1: implementation_constraints.json gender_equality_plan_eligibility (wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19). The Tier 3 compliance_profile.json records gender_plan_required: true as a compliance flag derived during call binding; no Tier 2B extracted source for this topic cites GEP as a topic-specific mandate for this call. HOST confirmed in valid_partner_ids from partners.json."
+    },
+    {
+      "role_id": "WPL-WP1",
+      "role_name": "WP1 Lead",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Lead WP1: Probabilistic multi-sensor diagnosis of the field state",
+        "Accountable for tasks T1-01, T1-02, T1-03 and deliverable D1-01 (Diagnostic branch technical report, due month 14)"
+      ],
+      "source_basis": "Derived directly from wp_structure.json: work_packages[wp_id=WP1].lead_partner: FELLOW. FELLOW confirmed in valid_partner_ids from partners.json. Management structure consistent with WP lead assignment per Constraint 2."
+    },
+    {
+      "role_id": "WPL-WP2",
+      "role_name": "WP2 Lead",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Lead WP2: Uncertainty-aware decision engine and demonstrator integration",
+        "Accountable for tasks T2-01, T2-02, T2-03 and deliverable D2-01 (Research demonstrator software, due month 20)"
+      ],
+      "source_basis": "Derived directly from wp_structure.json: work_packages[wp_id=WP2].lead_partner: FELLOW. FELLOW confirmed in valid_partner_ids from partners.json. Consistent with Constraint 2."
+    },
+    {
+      "role_id": "WPL-WP3",
+      "role_name": "WP3 Lead",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Lead WP3: Field validation, ground truth and uncertainty calibration",
+        "Accountable for tasks T3-01, T3-02 and deliverable D3-01 (Validation and uncertainty calibration report, due month 24)"
+      ],
+      "source_basis": "Derived directly from wp_structure.json: work_packages[wp_id=WP3].lead_partner: FELLOW. FELLOW confirmed in valid_partner_ids from partners.json. Consistent with Constraint 2."
+    },
+    {
+      "role_id": "WPL-WP4",
+      "role_name": "WP4 Lead",
+      "assigned_to": "SUPERVISOR",
+      "responsibilities": [
+        "Lead WP4: Training, supervision and two-way transfer of knowledge",
+        "Accountable for tasks T4-01, T4-02, T4-03 and deliverable D4-01 (Career Development Plan, due month 3)"
+      ],
+      "source_basis": "Derived directly from wp_structure.json: work_packages[wp_id=WP4].lead_partner: SUPERVISOR. SUPERVISOR confirmed in valid_partner_ids from partners.json. Consistent with Constraint 2."
+    },
+    {
+      "role_id": "WPL-WP5",
+      "role_name": "WP5 Lead",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Lead WP5: Dissemination, exploitation, communication and management",
+        "Accountable for tasks T5-01, T5-02, T5-03 and deliverables D5-01 (DMP, due month 6) and D5-02 (Dissemination and exploitation report, due month 24)"
+      ],
+      "source_basis": "Derived directly from wp_structure.json: work_packages[wp_id=WP5].lead_partner: FELLOW. FELLOW confirmed in valid_partner_ids from partners.json. Consistent with Constraint 2."
+    }
+  ],
+  "risk_register": [
+    {
+      "risk_id": "RISK-01",
+      "description": "High-resolution PlanetScope imagery, valuable for small horticultural plots, may not be secured due to cost/access constraints, weakening coverage where the sub-pixel problem bites hardest.",
+      "category": "external",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Treat PlanetScope as an optional enhancement; build the core on open Copernicus Sentinel-1 + Sentinel-2 data; resolve access early (RQ8). [Affects: WP1 (Probabilistic multi-sensor diagnosis of the field state)]",
+      "responsible_partner": "HOST"
+    },
+    {
+      "risk_id": "RISK-02",
+      "description": "Reconciling the differing spatial and temporal resolutions of radar, optical, soil and weather sources may fail or degrade the fusion quality.",
+      "category": "external",
+      "likelihood": "high",
+      "impact": "medium",
+      "mitigation": "Geospatial/time-series data platform with QC; temporal compositing; explicit resolution handling. [Affects: WP1 (Probabilistic multi-sensor diagnosis of the field state)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-03",
+      "description": "Cloud cover limits Sentinel-2 optical availability, while dense vegetation reduces Sentinel-1 SAR retrieval accuracy - the two sensors' complementary weaknesses.",
+      "category": "external",
+      "likelihood": "high",
+      "impact": "medium",
+      "mitigation": "Lean on Sentinel-1 SAR through cloud; cloud masking; vegetation-aware retrieval. [Affects: WP1 (Probabilistic multi-sensor diagnosis of the field state)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-04",
+      "description": "Few large-scale efforts collect dense ground truth, so the validation may be under-powered to establish credibility.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Plan field trials with dense ground truth (RQ4); use a cost-effective sensor network. [Affects: WP3 (Field validation, ground truth and uncertainty calibration)]",
+      "responsible_partner": "HOST"
+    },
+    {
+      "risk_id": "RISK-05",
+      "description": "Route B's central assumption - that the chosen homogeneous patch genuinely covaries with the target crop - may not hold, invalidating the proxy.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Pre-register a covariation test; measure covariation (control stand) rather than assume it (RQ9). [Affects: WP3 (Field validation, ground truth and uncertainty calibration)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-06",
+      "description": "The framework's headline commitment - honest uncertainty - fails if e.g. 90% prediction intervals do not contain the truth about 90% of the time.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Build uncertainty-calibration metrics into the validation protocol (RQ5); use uncertainty-aware calibration end to end. [Affects: WP2 (Uncertainty-aware decision engine and demonstrator integration), WP3 (Field validation, ground truth and uncertainty calibration)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-07",
+      "description": "The rigorous one-step probabilistic fusion route may exceed available modelling expertise, validation data or compute within the fellowship.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Keep Route B as a credible fallback; stage the build; provision the probabilistic-modelling compute runtime. [Affects: WP1 (Probabilistic multi-sensor diagnosis of the field state)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-08",
+      "description": "Calibrating AquaCrop to a single overconfident parameter set would break the uncertainty chain and produce falsely confident decisions.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Uncertainty-aware AquaCrop calibration that retains parameter uncertainty (the fellow-attributed method, doi:10.1016/j.envsoft.2022.105556). [Affects: WP2 (Uncertainty-aware decision engine and demonstrator integration)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-09",
+      "description": "Integrating and calibrating heterogeneous sensors (radar, optical, soil, weather) adds complexity that can degrade signal quality.",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "QC pipeline; sensor comparison in the validation layer. [Affects: WP1 (Probabilistic multi-sensor diagnosis of the field state), WP3 (Field validation, ground truth and uncertainty calibration)]",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "RISK-10",
+      "description": "Operational frameworks unifying all sensors at scale are scarce, so the demonstrator may not reach a usable pilot within the fellowship.",
+      "category": "other",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Frame the MVP as a standalone research demonstrator; partners assist (feedback, farmer access, testing) rather than own or operate it; set the TRL target explicitly (RQ10). [Affects: WP2 (Uncertainty-aware decision engine and demonstrator integration), WP5 (Dissemination, exploitation, communication and management)]",
+      "responsible_partner": "HOST"
+    }
+  ],
+  "ethics_assessment": {
+    "ethics_issues_identified": true,
+    "issues": [
+      {
+        "issue_id": "ETH-01",
+        "category": "Artificial Intelligence (Section A.4 Category 8 / MSCA-PF Part B Section 1.2)",
+        "description": "WP1 implements a probabilistic field-state estimator using SAR and optical sensor fusion with a parameter posterior (T1-02, T1-03). WP2 builds an uncertainty-aware AquaCrop calibration module and a counterfactual irrigation decision engine (T2-01, T2-02), integrated into a research demonstrator web MVP (T2-03). These constitute AI-based systems under the Section A.4 Category 8 framework and require consideration of whether ethical concerns related to human rights and values arise in the agricultural decision-support context.",
+        "applicable_tier1_rule": "ethics_self_assessment_required: Applicants must complete an ethics self-assessment; projects with ethics issues may undergo ethics review and ethics requirements may become contractual obligations. Source: implementation_constraints.json; wp-15-general-annexes_horizon-2026-2027_en.pdf p.16; programme-guide_horizon_en.pdf pp.25-28.",
+        "source_basis": "Tier 1: implementation_constraints.json (ethics_self_assessment_required, wp-15-general-annexes_horizon-2026-2027_en.pdf p.16; programme-guide_horizon_en.pdf pp.25-28). Project activity evidence: wp_structure.json WP1 objectives (probabilistic field-state estimator), T1-02 (probabilistic fusion model), T1-03 (calibrate and evaluate diagnostic branch); WP2 objectives (uncertainty-aware AquaCrop calibration, counterfactual irrigation simulation, decision engine), T2-01, T2-02, T2-03. The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source in scope_requirements.json or call_constraints.json for HORIZON-MSCA-2026-PF-01-01 cites AI ethics review as a topic-specific mandate beyond the Tier 1 universal programme rule.",
+        "mitigation_note": "Phase 8 drafting must address Section A.4 Category 8 (AI) in the application form, specifying the nature of the AI systems, their application domain (agricultural irrigation support — civil-only), and how ethical concerns related to human rights and values are addressed or absent in the agricultural context."
+      },
+      {
+        "issue_id": "ETH-02",
+        "category": "Personal Data (Section A.4 Category 4)",
+        "description": "WP3 collects ground-truth data and runs a validation protocol against diagnostic branch outputs (T3-01: Design validation protocol and ground truth collection). If field-level data collection involves farm-specific or farmer-identifiable information from agricultural operators, Category 4 personal data provisions apply. This flag is conditional on the data collection methodology confirmed in Phase 8.",
+        "applicable_tier1_rule": "ethics_appraisal_summary: Ethics appraisal covers proportionality of methods and applicant awareness of ethical and social impacts. Source: implementation_constraints.json; programme-guide_horizon_en.pdf pp.25-28.",
+        "source_basis": "Tier 1: implementation_constraints.json (ethics_appraisal_summary, programme-guide_horizon_en.pdf pp.25-28). Project activity: wp_structure.json WP3 objectives (collect ground truth data, run validation protocol), T3-01 (ground truth collection, contributing partners HOST and SUPERVISOR). Flag is conditional: if data collection is limited to publicly available satellite data (Sentinel-1 SAR, Sentinel-2) and anonymous field sensors, Category 4 may not be triggered. Phase 8 must confirm.",
+        "mitigation_note": "Phase 8 drafting of Section A.4 must confirm whether personally identifiable agricultural operator data is collected. If so, GDPR compliance measures, data minimisation, and consent procedures must be specified."
+      },
+      {
+        "issue_id": "ETH-03",
+        "category": "Civil Focus (Section A.4 Declaration 7)",
+        "description": "All project activities across WP1-WP5 must have an exclusive focus on civil applications. The agricultural decision-support domain (soil moisture estimation, irrigation management) is inherently civil. No dual-use concern has been identified at Phase 6 level, but the civil-focus declaration (Declaration 7) must be completed explicitly in the application form.",
+        "applicable_tier1_rule": "civil_focus_constraint: Projects must focus exclusively on civil applications; certain human-embryo/cloning/heritable-genome-modification activities are excluded from funding. Source: implementation_constraints.json; wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17; ef_he-ria-ia_en.pdf p.7.",
+        "source_basis": "Tier 1: implementation_constraints.json (civil_focus_constraint, wp-15-general-annexes_horizon-2026-2027_en.pdf pp.14-17). Project scope: wp_structure.json WP1-WP5 all address agricultural EO sensor fusion, irrigation decision support, career development, and dissemination. No dual-use application identified at this stage.",
+        "mitigation_note": "Declaration 7 in Section A.4 of the application form must be completed affirming exclusive civil focus. Phase 8 drafting must confirm no activity crosses into dual-use or excluded categories."
+      },
+      {
+        "issue_id": "ETH-04",
+        "category": "Open Science and FAIR Data Ethics (Section A.4 Category 9 / MSCA-PF Section 1.2)",
+        "description": "The action mandates FAIR data management (DMP deliverable D5-01 due month 6, WP5 T5-01) and open-access publication of research outputs (T5-02). Responsible handling of EO and sensor data including potential data sharing obligations must be addressed in the DMP. These requirements are confirmed by Tier 2B scope requirements SR-06 and SR-07 and call constraints CC-10 and CC-11.",
+        "applicable_tier1_rule": "dissemination_and_exploitation_requirement: Applications must include a plan for exploitation and dissemination of results including communication activities unless topic conditions provide otherwise; beneficiaries must later update a complete plan. Source: implementation_constraints.json; wp-15-general-annexes_horizon-2026-2027_en.pdf p.4; programme-guide_horizon_en.pdf pp.33-39.",
+        "source_basis": "Tier 1: implementation_constraints.json (dissemination_and_exploitation_requirement). Tier 2B: scope_requirements.json SR-06 (training activities must integrate digital skills, FAIR data management; source_section: Scope – Training activities; Confirmed) and SR-07 (Career Development Plan covering publications and participation in open science events; source_section: Scope – Career Development Plan; Confirmed). Tier 2B: call_constraints.json CC-10 (training must foster Open Science culture, knowledge valorisation, research integrity; Confirmed) and CC-11 (fellows must be prepared for digital collaboration, FAIR data management, societal engagement; Confirmed). Compliance_profile.json open_science_requirements fields directly cite SR-06, SR-07, CC-10, CC-11 — these are confirmed in Tier 2B extracted files and cited here with Tier 2B traceability.",
+        "mitigation_note": "DMP (D5-01, due month 6) must address FAIR principles for EO datasets (Sentinel-1 SAR, Sentinel-2) and any ground sensor data. Phase 8 must address open science practices in MSCA-PF Part B-1 Section 1.2. Career Development Plan (D4-01, due month 3) must cover publications and open science event participation per CC-12."
+      }
+    ],
+    "self_assessment_statement": "The project activities across WP1-WP5 require completion of the ethics self-assessment as mandated by Tier 1 programme rules (implementation_constraints.json: ethics_self_assessment_required; wp-15-general-annexes_horizon-2026-2027_en.pdf p.16; programme-guide_horizon_en.pdf pp.25-28). Four ethics flags have been identified at Phase 6 level: (ETH-01) AI-based probabilistic modelling and decision engine in WP1-WP2 require consideration under Section A.4 Category 8; (ETH-02) WP3 ground-truth data collection may involve personal data if farm-operator-identifiable information is collected — Phase 8 must confirm data collection methodology and apply Category 4 if applicable; (ETH-03) civil-focus Declaration 7 must be completed for all WP1-WP5 activities; (ETH-04) open science and FAIR data obligations are confirmed by Tier 2B scope requirements SR-06 and SR-07 and call constraints CC-10 and CC-11, requiring a DMP deliverable D5-01 by month 6. The Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source in scope_requirements.json or call_constraints.json for HORIZON-MSCA-2026-PF-01-01 cites ethics review as a topic-specific mandate beyond the Tier 1 universal programme rule that projects with identified ethics issues may undergo ethics review (implementation_constraints.json). Integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance (implementation_constraints.json: gender_dimension_in_content; programme-guide_horizon_en.pdf pp.17-20; wp-15-general-annexes_horizon-2026-2027_en.pdf p.24; ef_he-ria-ia_en.pdf pp.4-5). No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. Gender management balance: beneficiaries must promote equal opportunities between men and women and aim for gender balance at all levels of personnel assigned to the action per Tier 1 (wp-15-general-annexes_horizon-2026-2027_en.pdf p.18; implementation_constraints.json: gender_management_balance_guidance). HOST (ELTE) as a higher education establishment in an EU Member State must have a Gender Equality Plan at grant signature and during the grant; the Tier 3 compliance_profile.json records gender_plan_required: true as a compliance flag derived during call binding; no Tier 2B extracted source for HORIZON-MSCA-2026-PF-01-01 cites GEP as a topic-specific mandate beyond the Tier 1 programme rule (implementation_constraints.json: gender_equality_plan_eligibility; wp-15-general-annexes_horizon-2026-2027_en.pdf pp.18-19; programme-guide_horizon_en.pdf pp.16-17). Ethics appraisal will cover compliance with ethical principles, relevant legislation, proportionality of methods, and applicant awareness of ethical and social impacts per Tier 1 (implementation_constraints.json: ethics_appraisal_summary; programme-guide_horizon_en.pdf pp.25-28)."
+  },
+  "instrument_sections_addressed": [
+    {
+      "section_id": "1",
+      "section_name": "Excellence",
+      "status": "pending_phase8",
+      "notes": "Excellence evaluation criterion (weight 50%). Parent section containing 1.1-1.4. Full narrative drafted in Phase 8 from Phase 2 refined concept, Tier 3 objectives, and Tier 2B expected outcomes. Source: section_schema_registry.json MSCA-PF instrument."
+    },
+    {
+      "section_id": "1.1",
+      "section_name": "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+      "status": "pending_phase8",
+      "notes": "Addressed in Phase 8 drafting from Phase 2 refined concept note and Tier 3 objectives.json. WP1-WP3 research objectives grounded in wp_structure.json. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "1.2",
+      "section_name": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)",
+      "status": "pending_phase8",
+      "notes": "Includes mandatory gender dimension consideration: Tier 1 default rule applies (mandatory unless topic explicitly states non-relevance; implementation_constraints.json). No Tier 2B exemption source cited in this Phase 6 artifact — Phase 8 must confirm or add Tier 2B topic reference. Open science practices confirmed by Tier 2B SR-06, SR-07, CC-10, CC-11. DMP deliverable D5-01 due month 6. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "1.3",
+      "section_name": "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host",
+      "status": "partially_addressed",
+      "notes": "Supervision structure (SUPERVISOR as WP4 lead, HOST as contributing partner) and WP4 training and knowledge-transfer objectives are grounded in Phase 3 wp_structure.json and Tier 3 roles.json. Career Development Plan requirement confirmed from Tier 2B SR-07 and CC-12. Full narrative drafted in Phase 8. For European Fellowship: two-way transfer between FELLOW and HOST/SUPERVISOR. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "1.4",
+      "section_name": "Quality and appropriateness of the researcher's professional experience, competences and skills",
+      "status": "pending_phase8",
+      "notes": "Requires FELLOW's CV, publication record, and career-stage detail. FELLOW identity spine is synthetic (SYN-SPINE-01); track record and competences are unspecified in current Tier 3 data. Phase 8 must populate from operator-confirmed Tier 3 data before drafting. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "2",
+      "section_name": "Impact",
+      "status": "pending_phase8",
+      "notes": "Impact evaluation criterion (weight 30%). Parent section containing 2.1-2.3. Addressed in Phase 5 impact architecture output and Phase 8 drafting. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "2.1",
+      "section_name": "Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development",
+      "status": "pending_phase8",
+      "notes": "Career development measures grounded in WP4 structure (Training, supervision, two-way transfer; SUPERVISOR WP4 lead; D4-01 CDP due month 3) per wp_structure.json. Full narrative in Phase 8 from Tier 3 roles data and Phase 4 milestone structure. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "2.2",
+      "section_name": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities",
+      "status": "pending_phase8",
+      "notes": "Dissemination and exploitation plan is an admissibility condition (section_schema_registry.json MSCA-PF; Tier 1 implementation_constraints.json dissemination_and_exploitation_requirement). WP5 provides structural basis (T5-01 DMP, T5-02 open-access publications, T5-03 communication and exploitation; D5-01 DMP month 6, D5-02 final report month 24). Open science requirements confirmed by Tier 2B SR-06, SR-07, CC-10, CC-11. Full plan narrative in Phase 8. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "2.3",
+      "section_name": "The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts",
+      "status": "pending_phase8",
+      "notes": "Addressed in Phase 5 impact architecture and Phase 8 drafting from Tier 2B expected_impacts.json and Tier 3 impacts.json. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "3",
+      "section_name": "Quality and Efficiency of the Implementation",
+      "status": "addressed_in_this_phase",
+      "notes": "Implementation evaluation criterion (weight 20%). Governance model, management roles, and ethics assessment produced in Phase 6 (this skill). Risk register produced in Phase 6 by risk-register-builder skill. WP structure from Phase 3 (wp_structure.json). Gantt and milestones from Phase 4. Full evaluator-oriented narrative drafted in Phase 8. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "3.1",
+      "section_name": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+      "status": "addressed_in_this_phase",
+      "notes": "WP structure (WP1-WP5, tasks, deliverables, dependencies) from Phase 3 wp_structure.json. Gantt chart (mandatory for MSCA-PF, counts against 10-page Part B-1 limit, showing months elapsed not dates) and milestones from Phase 4 output. Risk assessment produced in Phase 6 risk-register-builder invocation. Critical path identified in wp_structure.json: T1-03 → T2-03 → T5-02. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "3.2",
+      "section_name": "Quality and capacity of the host institutions and participating organisations, including hosting arrangements",
+      "status": "partially_addressed",
+      "notes": "Hosting arrangements partially addressed: HOST (ELTE Budapest) identified as sole beneficiary providing institutional infrastructure; SUPERVISOR affiliated with ELTE environmental physics/geoinformatics; VALIDATION_PARTNER (AgroVIR) noted as associated partner (not a WP lead, not a beneficiary). Detailed organisational capacity narrative and infrastructure description for Part B-2 Section 5 deferred to Phase 8. SUPERVISOR and HOST spine are synthetic (SYN-SPINE-01); Phase 8 must use confirmed Tier 3 data. Source: section_schema_registry.json MSCA-PF; Tier 3 partners.json; roles.json."
+    },
+    {
+      "section_id": "4",
+      "section_name": "CV of the researcher",
+      "status": "pending_phase8",
+      "notes": "Part B-2 section. Mandatory. Indicative length: 5 pages. Requires FELLOW's CV (Dr. Mariya Petrova — SYNTHETIC SYN-SPINE-01; track record, publication record, and career-stage detail are unspecified in current Tier 3 data). Phase 8 must use operator-confirmed Tier 3 data. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "5",
+      "section_name": "Capacity of the Participating Organisation(s)",
+      "status": "pending_phase8",
+      "notes": "Part B-2 section. Mandatory. HOST (ELTE): max 1 page; VALIDATION_PARTNER (AgroVIR, associated partner): max 0.5 page. Spine data is synthetic (SYN-SPINE-01); Phase 8 must use confirmed Tier 3 data. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "5.1",
+      "section_name": "Overview of Participating Organisations (template table)",
+      "status": "pending_phase8",
+      "notes": "Part B-2 subsection. Mandatory. Template table per participating organisation. Deferred to Phase 8 with confirmed Tier 3 data. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "5.2",
+      "section_name": "Capacity of the Participating Organisations (template table)",
+      "status": "pending_phase8",
+      "notes": "Part B-2 subsection. Mandatory. Detailed capacity table per organisation. Deferred to Phase 8 with confirmed Tier 3 data. Source: section_schema_registry.json MSCA-PF."
+    },
+    {
+      "section_id": "8",
+      "section_name": "Environmental considerations in light of the MSCA Green Charter",
+      "status": "pending_phase8",
+      "notes": "Part B-2 section. Mandatory. No specific Tier 2B or Tier 3 source for MSCA Green Charter environmental assessment is present in the declared inputs for this Phase 6 skill invocation. Phase 8 must source to the MSCA Work Programme or MSCA Green Charter document when available in Tier 2B. Source: section_schema_registry.json MSCA-PF."
+    }
+  ],
+  "traceability_footer": {
+    "primary_sources": [
+      {
+        "tier": 1,
+        "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
+        "relevant_fields": [
+          "governance_constraints.no_prescribed_governance_body_names",
+          "governance_constraints.no_prescribed_meeting_frequency",
+          "governance_constraints.consortium_agreement_guidance",
+          "governance_constraints.grant_agreement_implementation_articles",
+          "governance_constraints.escalation_path_constraint",
+          "usage_rules_for_phase6"
+        ]
+      },
+      {
+        "tier": 1,
+        "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+        "relevant_fields": [
+          "implementation_rules.ethics_self_assessment_required",
+          "implementation_rules.ethics_appraisal_summary",
+          "implementation_rules.gender_equality_plan_eligibility",
+          "implementation_rules.gender_management_balance_guidance",
+          "implementation_rules.gender_dimension_in_content",
+          "implementation_rules.civil_focus_constraint",
+          "implementation_rules.dissemination_and_exploitation_requirement"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+        "relevant_fields": [
+          "instruments[instrument_type=MSCA-PF].sections",
+          "instruments[instrument_type=MSCA-PF].criteria_weights",
+          "instruments[instrument_type=MSCA-PF].part_b_page_limit_hard",
+          "instruments[instrument_type=MSCA-PF].part_b_split"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+        "relevant_fields": [
+          "requirements[requirement_id=SR-06]",
+          "requirements[requirement_id=SR-07]"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
+        "relevant_fields": [
+          "constraints[constraint_id=CC-10]",
+          "constraints[constraint_id=CC-11]",
+          "constraints[constraint_id=CC-12]"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
+        "relevant_fields": [
+          "partners[partner_id=HOST].entity_type",
+          "partners[partner_id=HOST].beneficiary",
+          "partners[partner_id=HOST].role_in_action",
+          "partners[partner_id=HOST].country",
+          "partners[partner_id=FELLOW].entity_type",
+          "partners[partner_id=FELLOW].role_in_action",
+          "partners[partner_id=SUPERVISOR].entity_type",
+          "partners[partner_id=SUPERVISOR].role_in_action",
+          "partners[partner_id=VALIDATION_PARTNER].entity_type",
+          "partners[partner_id=VALIDATION_PARTNER].role_in_action"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/roles.json",
+        "relevant_fields": [
+          "roles[role_token=FELLOW].role",
+          "roles[role_token=FELLOW].identity",
+          "roles[role_token=HOST].role",
+          "roles[role_token=HOST].identity",
+          "roles[role_token=SUPERVISOR].role",
+          "roles[role_token=SUPERVISOR].identity",
+          "roles[role_token=VALIDATION_PARTNER].role"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+        "relevant_fields": [
+          "ethics_review_required",
+          "gender_plan_required",
+          "open_science_requirements"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+        "relevant_fields": [
+          "instrument_type",
+          "call_id",
+          "topic_code",
+          "fellowship_type_inference"
+        ]
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+        "relevant_fields": [
+          "work_packages[].wp_id",
+          "work_packages[].lead_partner",
+          "work_packages[].contributing_partners",
+          "work_packages[].tasks",
+          "work_packages[].deliverables",
+          "partner_role_matrix",
+          "critical_path_nodes"
+        ]
+      }
+    ]
+  }
+}

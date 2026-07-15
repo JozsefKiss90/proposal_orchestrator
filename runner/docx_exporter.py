@@ -60,6 +60,16 @@ _SECTION_SLUG_ORDER: tuple[str, ...] = ("excellence", "impact", "implementation"
 #: content — no claim or fact is invented by naming the document.
 _DOCUMENT_TITLE: str = "Proposal Part B"
 
+#: Decision-log glob that signals an active synthetic-data override
+#: (SYN-SPINE-01, the §3 human override that fabricated the identity spine for
+#: a demonstration run).  When present, the exported document carries a visible
+#: "not for submission" marker so no demo artifact can be mistaken for a real
+#: proposal (a synthetic person is attached to a real institution).
+_SYNTHETIC_OVERRIDE_GLOB: str = (
+    "docs/tier4_orchestration_state/decision_log/synthetic-spine*.json"
+)
+_SYNTHETIC_MARKER: str = "SYNTHETIC DEMO — NOT FOR SUBMISSION"
+
 
 # ---------------------------------------------------------------------------
 # Exception
@@ -68,6 +78,22 @@ _DOCUMENT_TITLE: str = "Proposal Part B"
 
 class DocxExportError(Exception):
     """Raised when the Part B document cannot be rendered or written."""
+
+
+def _synthetic_override_active(repo_root: Path) -> bool:
+    """Return ``True`` when a synthetic-data override record is present.
+
+    Detects SYN-SPINE-01 (the §3 operator override that fabricated the
+    identity spine for a demonstration run) by the presence of its durable
+    decision-log record.  The exporter uses this to stamp a visible
+    not-for-submission marker on demo artifacts — automatically, so the marker
+    can never be forgotten while the override is active, and absent on a real
+    (non-synthetic) run.
+    """
+    log_dir = repo_root / "docs/tier4_orchestration_state/decision_log"
+    if not log_dir.is_dir():
+        return False
+    return any(log_dir.glob("synthetic-spine*.json"))
 
 
 # ---------------------------------------------------------------------------
@@ -229,6 +255,15 @@ def export_part_b_docx(
 
     doc = Document()
     doc.add_heading(_DOCUMENT_TITLE, level=0)
+
+    # Stamp a visible not-for-submission marker when the run used the
+    # synthetic-spine override (SYN-SPINE-01): a synthetic person is attached
+    # to a real institution, so no output may be mistaken for a real proposal.
+    if _synthetic_override_active(repo_root):
+        marker = doc.add_paragraph()
+        run = marker.add_run(_SYNTHETIC_MARKER)
+        run.bold = True
+        logger.info("docx exporter: synthetic-override marker stamped")
 
     any_rendered = False
     for path in section_paths:

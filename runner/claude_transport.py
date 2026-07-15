@@ -20,6 +20,7 @@ Authoritative source:
 
 from __future__ import annotations
 
+import os
 import subprocess
 import time
 
@@ -91,6 +92,22 @@ DEFAULT_TIMEOUT_SECONDS: int = 300
 #: On Windows, CreateProcess limits the command line to ~32,767 chars.
 #: We use a conservative threshold to leave room for other arguments.
 _MAX_SYSTEM_PROMPT_CLI_LENGTH: int = 24_000
+
+#: Output-token ceiling for Claude CLI invocations.
+#:
+#: Several skills must emit large single-object artifacts — e.g.
+#: ``concept-alignment-check`` writes ``scope_coverage`` for every SR-xx and
+#: CC-xx element with a 1-3 sentence description each, plus
+#: ``topic_mapping_rationale`` for every expected outcome.  Under the CLI's
+#: default ceiling such a generation is cut off, and the CLI then returns only
+#: the tail of the response, so the captured text begins mid-object.  The
+#: artifact is unrecoverable and the schema validator reports every required
+#: field as "missing", which points at the wrong fault.
+#:
+#: Raising the ceiling is a transport-layer change only: it alters no skill
+#: semantics, no gate logic, and no artifact schema.  An operator-supplied
+#: value in the environment always wins.
+_MAX_OUTPUT_TOKENS_DEFAULT: str = "32000"
 
 
 # ---------------------------------------------------------------------------
@@ -176,6 +193,12 @@ def invoke_claude_text(
             + user_prompt
         )
 
+    # Raise the CLI's output-token ceiling so that large single-object
+    # artifacts are not cut off mid-generation (see _MAX_OUTPUT_TOKENS_DEFAULT).
+    # An operator-supplied value always takes precedence.
+    _env = os.environ.copy()
+    _env.setdefault("CLAUDE_CODE_MAX_OUTPUT_TOKENS", _MAX_OUTPUT_TOKENS_DEFAULT)
+
     _t0 = time.monotonic()
     try:
         completed = subprocess.run(
@@ -186,6 +209,7 @@ def invoke_claude_text(
             encoding="utf-8",
             timeout=timeout_seconds,
             shell=False,
+            env=_env,
         )
     except FileNotFoundError:
         raise ClaudeCLIUnavailableError(

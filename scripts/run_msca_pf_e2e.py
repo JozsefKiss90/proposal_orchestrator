@@ -17,20 +17,33 @@ The two are never conflated: this script makes live ``claude`` calls and is
 
 Modes
 -----
-α (no declarations):
-    The full DAG runs Phases 1-6 live, then the unit-cost budget gate
-    (gate_09) blocks on the Unresolved host coefficient + fellowship duration
-    — an informative blocked assessment with the host-independent lines
-    computed.  Phase 8 is HARD_BLOCK-frozen.  This honest block is a **correct
-    terminal state** (§12.4 / §15), not a failure to be "fixed" green.
+α (honest Tier 3, spine Unresolved):
+    The full governed DAG runs Phase 1 live, then **honest-blocks at Phase 2**:
+    the semantic scope-alignment gate (``no_unresolved_scope_conflicts``)
+    refuses to proceed while the researcher / host / supervisor spine is
+    Unresolved, enumerating SCL-01..04 (geographic placement, career
+    development plan, joint application, 6/8 expected outcomes Assumed).  This
+    honest block is a **correct terminal state** (§12.4 / §15), not a failure to
+    be "fixed" green.  It is preserved separately (tag ``alpha-honest-block``).
 
-β (host + duration declared):
-    ``working_assumptions.json`` declares the host country and fellowship
-    duration (and, if the drafts surface them, the spine identities).  The
-    budget gate passes (every line Confirmed or operator-declared Assumed),
-    Phase 8 drafts live via decomposed per-sub-section calls, the assembler
-    composes them, the drafting gates green (W1 satisfied), and the assembled
-    Part B is exported to ``.docx``.
+    (An MSCA-PF concept is spine-dependent at the *semantic* level — you cannot
+    scope-align a fellowship without knowing the fellow, host and supervisor —
+    so the block lands at Phase 2, earlier than the Phase-7 budget gate.  The β
+    declaration substrate (ticket 15) reaches only Phase 7 + Phase 8, so
+    declaring the spine does not unblock Phase 2; that gap is a milestone-2
+    ticket.  See ``decision_log/synthetic-spine-demo-override_2026-07-13.json``.)
+
+β (SYN-SPINE-01 — synthetic spine under the §3 operator override):
+    With the identity spine fabricated into Tier 3 as **Confirmed** (a scoped,
+    logged, reversible §3 human override — NOT engine fabrication), the scope
+    conflicts resolve, phases 2-6 pass, and the host country (HU) is Confirmed,
+    so ``gate_09`` resolves the unit-cost coefficient **without**
+    ``working_assumptions.json``.  This stage then drafts Phase 8 live via
+    decomposed per-sub-section calls, the assembler composes them, the drafting
+    gates green, and the assembled Part B is exported to ``.docx`` — carrying a
+    visible ``SYNTHETIC DEMO — NOT FOR SUBMISSION`` marker.  This stage still
+    writes a ``working_assumptions.json`` (harmless: the host is already
+    Confirmed in Tier 3, so no declaration is consulted).
 
 Transport
 ---------
