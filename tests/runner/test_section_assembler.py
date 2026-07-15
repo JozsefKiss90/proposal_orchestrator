@@ -574,3 +574,43 @@ class TestComponentRegistration:
         )
         assert record.status == "failure"
         assert record.failure_reason
+
+
+class TestSourceRefTierCoercion:
+    """The assembler coerces a descriptive string tier ('Tier 2B') to its
+    integer form.  The live drafter sometimes emits the string; re-drafting to
+    fix it would waste the whole section's drafting quota, so the assembler
+    normalises deterministically instead."""
+
+    def test_string_tier_coerced_to_int(self) -> None:
+        from runner.section_assembler import _coerce_tier
+        assert _coerce_tier("Tier 2B") == 2
+        assert _coerce_tier("2B") == 2
+        assert _coerce_tier("Tier 2") == 2
+        assert _coerce_tier("2") == 2
+
+    def test_integer_tier_unchanged(self) -> None:
+        # Byte-equal guarantee: an already-integer tier is identity.
+        from runner.section_assembler import _coerce_tier
+        for i in (1, 2, 3, 4):
+            assert _coerce_tier(i) == i
+
+    def test_uncoercible_tier_is_none(self) -> None:
+        from runner.section_assembler import _coerce_tier
+        assert _coerce_tier(None) is None
+        assert _coerce_tier(True) is None
+        assert _coerce_tier("no digits here") is None
+
+    def test_source_ref_key_accepts_string_tier(self) -> None:
+        from runner.section_assembler import _source_ref_key
+        assert _source_ref_key(
+            {"tier": "Tier 2B", "source_path": "docs/x.json"}
+        ) == (2, "docs/x.json")
+
+    def test_source_ref_key_rejects_uncoercible_tier(self) -> None:
+        from runner.section_assembler import (
+            _source_ref_key,
+            SectionAssemblerError,
+        )
+        with pytest.raises(SectionAssemblerError):
+            _source_ref_key({"tier": "none", "source_path": "docs/x.json"})

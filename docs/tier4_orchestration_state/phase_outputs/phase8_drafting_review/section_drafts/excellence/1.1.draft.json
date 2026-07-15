@@ -1,0 +1,335 @@
+{
+  "sub_section_id": "1.1",
+  "title": "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
+  "content": "## 1.1 Quality and Pertinence of the Research and Innovation Objectives; Going Beyond the State of the Art\n\n### The research problem and the case for pertinence\n\nIrrigation decisions for row-crop horticulture must be made under two simultaneous and compounding forms of uncertainty. Observational uncertainty arises because the true latent state of the field — root-zone soil moisture, crop water stress, canopy development — is never directly measured but only partially inferred from noisy, spatially heterogeneous sensor streams carrying resolution limits, temporal gaps and calibration drift. Prospective uncertainty arises because the economic consequence of any irrigation decision depends on weather that has not yet occurred and on crop responses that simulation models approximate rather than compute. Present decision-support systems manage both forms by collapsing them to point estimates at each coupling step. That collapse is the methodological source of a systematic failure mode: decisions that appear optimal under assumed certainty routinely underperform in practice because the discarded uncertainty materialises as real weather variation and real crop response variability (Core Architecture, METH-CORE-001; Uncertainty Chain, METH-CORE-004; both source_grounded, concept_note.md). This fellowship addresses that failure mode at its root by committing to honest, uninterrupted uncertainty propagation from multi-sensor observation through probabilistic field-state diagnosis through uncertainty-aware crop simulation through profit-optimised irrigation recommendation — the Uncertainty Chain (METH-CORE-004) as the project's single non-negotiable architectural invariant.\n\n### State of the art and the research-gap matrix\n\nA systematic review of multi-sensor crop water stress monitoring (METH-SOTA-001, source_grounded, concept_note.md) surveyed approximately fifty studies across two axes: depth of sensor integration and decision-support maturity (from stress detection through optimisation through real-time decision support). Study counts fall sharply as both axes deepen, and the review's central organising output — the research-gap matrix (METH-SOTA-006 / METH-SOTA-007, source_grounded, concept_note.md) — identifies one specific empty cell: real-time irrigation decision support combined with high-resolution PlanetScope imagery. That cell is the fellowship's primary positioning in the literature.\n\nGenuine probabilistic precedents are explicitly acknowledged: Bayesian Maximum Entropy drought fusion; copula-based drought-to-irrigation scheduling; dynamic Bayesian network crop-water-state modelling; and the MF-FusionNet multimodal architecture (Probabilistic Fusion Novelty Claim, METH-SOTA-006, source_grounded, concept_note.md). Each addresses part of the observation-to-decision chain. What the review documents as absent is the simultaneous three-stage coupling: learned multimodal fusion producing an explicit probabilistic crop-water-state estimate, feeding an uncertainty-aware crop simulation, feeding an economically optimised irrigation recommendation, with uncertainty propagated without collapse across all three stages. Operational frameworks unifying all required sensors at field scale for real-time decision support are separately documented as scarce (METH-SOTA-005, source_grounded, concept_note.md).\n\n### How the project goes beyond the state of the art\n\n**Departure 1 — End-to-end intact uncertainty propagation.** Prior hybrid approaches that combine a diagnostic with a prognostic stage invariably collapse the diagnostic distribution to a point estimate at the stage boundary. The fellowship refuses this collapse: the full posterior over the field state from OBJ-1 is passed intact to the AquaCrop calibration stage (OBJ-2), which retains an explicit parameter posterior rather than a single overconfident parameter set, so each counterfactual irrigation simulation produces a distribution of economic outcomes per candidate decision across the weather ensemble. No coupling point in the chain collapses a distribution without preserving its width. This is the Uncertainty Chain (METH-CORE-004, source_grounded, concept_note.md) as an architectural invariant — no reviewed precedent implements this for this problem domain.\n\n**Departure 2 — Two interchangeable diagnostic routes sharing one decision engine.** Route A (Direct Probabilistic Fusion, METH-ROUTE-001, source_grounded, concept_note.md) enters all available covariates — Sentinel-1 SAR, Sentinel-2 optical, optionally PlanetScope, in-situ soil sensors, weather data and field observations — into a single probabilistic model that goes directly to the latent field state in one step, bypassing the sub-pixel resolution problem (METH-SOTA-003; Downscaling Critique, source_grounded, concept_note.md) that afflicts disaggregation-based intermediate-product approaches. Route B (Homogeneous Patch Proxy, METH-ROUTE-002, source_grounded, concept_note.md) identifies a nearby spectrally homogeneous patch whose biology covaries with the target crop and which the coarse satellite pixel reads cleanly without sub-pixel aggregation. The Control Stand Variant (METH-ROUTE-003, source_grounded, concept_note.md) extends Route B by deliberately planting a covarying species so covariation is measured over the growing season rather than assumed. Both routes share the same decision engine, validation protocol and uncertainty-calibration framework: switching between them requires no downstream structural change. This symmetric interchangeability is itself a departure from the literature.\n\n**Departure 3 — Economically rationalised decision objective.** Existing tools beyond stress detection target yield maximisation or water-application minimisation against deterministic scenarios. The fellowship targets expected economic return — expected crop value minus full irrigation cost — across the weather ensemble (METH-DEC-005; METH-TERM-016; METH-DEC-006; all source_grounded, concept_note.md), treating underwatering and overwatering symmetrically as economic risks and producing a decision whose expected value is computable directly from the posteriors already in the framework. The exact form of the decision objective is open scientific decision RQ6 (Confirmed as open, confirmation_checklist.json).\n\n### Ambition\n\nScientifically, the project attempts the first documented end-to-end coupling of all three stages for row-crop irrigation management, argued against a systematic literature review with specific precedent citations. The coupling requires four disciplines that rarely appear together: Earth observation remote sensing, probabilistic machine learning, FAO crop physiology simulation (AquaCrop), and agricultural economics. Methodologically, the project holds itself to the demanding standard of honest uncertainty calibration as the primary verifiable scientific claim. A 90% prediction interval that empirically contains the truth only 60% of the time is not an honest uncertainty estimate. The validation protocol (OBJ-3) is designed to test whether calibration holds, not to confirm that it does. A negative calibration result, reported transparently, is a scientifically valid finding and is an outcome the design explicitly accommodates.\n\n### Research and innovation objectives: quality, pertinence, measurability, verifiability and realism\n\nThe fellowship pursues four research objectives and one training and career-development objective on a 24-month European Fellowship working scaffold [DURATION — Unresolved, confirmation_checklist.json; operator-declared 24 months under SYN-SPINE-01, working_assumptions.json; to be confirmed from the confirmed host identity and EF/GF determination]. All ten open scientific decisions (RQ1–RQ10) are maintained explicitly open (Confirmed as open, confirmation_checklist.json); no resolution is asserted in advance of the research.\n\n---\n\n**OBJ-1 — Probabilistic multi-sensor diagnosis of the latent field state**\nResearch objective. Target month: 12. WP1 (tasks T1-01, T1-02, T1-03; wp_structure.json). Deliverable D1-01: Diagnostic branch technical report, due month 14. Milestone MS2: Diagnostic method v1 producing calibrated field-state posteriors, due month 12, Confirmed, source_grounded (milestones_seed.json). Objective validation status: Confirmed, source_grounded (objectives.json; vault nodes METH-CORE-002, METH-ROUTE-001, METH-ROUTE-002, METH-TERM-010, METH-CORE-004).\n\n*Pertinence.* OBJ-1 addresses the observational half of the core gap. If the field-state estimate carries no explicit uncertainty, no downstream stage can recover one; overconfidence introduced here propagates irreversibly. OBJ-1's scientific contribution — a full posterior over the field state as the primary output of the diagnostic branch — is the foundational prerequisite for OBJ-2's decision engine and OBJ-3's calibration test.\n\n*Measurability.* The measurable target is a calibrated diagnostic model outputting explicit honest uncertainty (posteriors or calibrated prediction intervals) over the target latent field-state variables. The precise target field state is open scientific decision RQ3; whether Route A, Route B or both are implemented in primary form is open scientific decision RQ2. What is not open is the output form: it must be a distribution, not a scalar. A model returning a point estimate has not satisfied OBJ-1, regardless of its accuracy.\n\n*Verifiability.* MS2 states the verifiable criterion: Route A and/or Route B produces posterior estimates of the target latent field state with explicit uncertainty over at least one growing season; RQ2 and RQ3 recorded as decided. Verifiable by inspection of model output structure — the presence of distributions rather than scalars. Uncertainty calibration is assessed in OBJ-3, not asserted here.\n\n*Realism.* The sensor core is Sentinel-1 SAR and Sentinel-2 optical — freely available ESA Copernicus data with no access cost or contract risk (METH-INFRA-002, source_grounded, concept_note.md). Cloud cover limiting optical availability (RISK-03, Inferred, risks.json) is compensated by SAR. PlanetScope is treated as an optional enhancement subject to access confirmation (RISK-01 mitigation, Inferred, risks.json; RQ8, open). The QC pipeline is operational by month 6 (MS1, Confirmed, milestones_seed.json), providing six months of clean harmonised data before the month-12 milestone. If Route A exceeds available resources (RISK-07, Inferred, risks.json), Route B delivers OBJ-1's output independently without requiring downstream redesign.\n\n---\n\n**OBJ-2 — Uncertainty-aware decision engine for irrigation choice**\nResearch objective. Target month: 15. WP2 (tasks T2-01, T2-02, T2-03; wp_structure.json). Deliverable D2-01: Research demonstrator software, due month 20. Milestone MS3: Uncertainty-aware decision engine integrated, due month 15, Confirmed, source_grounded (milestones_seed.json). Objective validation status: Confirmed, source_grounded (objectives.json; vault nodes METH-DEC-001, METH-DEC-002, METH-DEC-003, METH-DEC-004, METH-DEC-005, METH-DEC-006).\n\n*Pertinence.* OBJ-2 addresses the prognostic half of the core gap — the conversion of a probabilistic field-state diagnosis into an economically rationalised irrigation recommendation without collapsing the uncertainty at the AquaCrop model interface. Its scientific contribution is an AquaCrop calibration module retaining an explicit parameter posterior (building on the prior uncertainty-aware calibration method, doi:10.1016/j.envsoft.2022.105556, referenced in concept_note.md; PI Role, METH-PART-003, Inferred from first-person authorship of the design narrative), combined with a counterfactual simulation layer running over weather ensembles and a profit-maximising recommendation engine operating on the resulting distribution of economic outcomes.\n\n*Measurability.* The measurable target is an integrated decision engine that (i) accepts the field-state posterior from OBJ-1 as input; (ii) calibrates AquaCrop retaining an explicit parameter posterior rather than a single overconfident parameter set (METH-DEC-002, source_grounded); (iii) runs counterfactual irrigation scenarios over a weather ensemble, one candidate decision at a time (METH-DEC-003, METH-DEC-004, source_grounded); and (iv) selects the candidate with the best expected economic return across the ensemble (METH-DEC-005, METH-DEC-006, source_grounded). The exact decision objective is open scientific decision RQ6 (Confirmed as open, confirmation_checklist.json); the engine is architected to accommodate any scalar scoring function, so specifying RQ6 early in the fellowship does not require engine redesign.\n\n*Verifiability.* MS3 provides the verifiable criterion (Confirmed, source_grounded, milestones_seed.json): AquaCrop calibrated retaining a parameter posterior; counterfactual simulations run over weather ensembles from a diagnosed field state; profit-based recommendation logic selects by expected economic return under uncertainty end to end. The verifiable test is whether the calibration module passes a posterior distribution — not a single scalar parameter set — to the simulation layer: an inspectable software property.\n\n*Realism.* OBJ-2 extends a demonstrated prior method. Uncertainty-aware AquaCrop calibration retaining a parameter posterior has been demonstrated in peer-reviewed form (doi:10.1016/j.envsoft.2022.105556; PI Role, METH-PART-003, Inferred). The primary extension — accepting an uncertain field-state input from OBJ-1 and propagating that additional uncertainty forward — is an architecturally coherent step rather than a qualitative methodological jump. The risk of collapsing to a single parameter set (RISK-08, Inferred, risks.json) is managed by an explicit architectural requirement; ensembling over plausible parameter sets is available as a contingency if a full posterior is computationally intractable. OBJ-2 is scheduled for integration by month 15, leaving seven months before validation completion (MS5, month 22) for coupled diagnostic-decision refinement.\n\n---\n\n**OBJ-3 — Field validation and honest uncertainty calibration**\nResearch objective. Target month: 20. WP3 (tasks T3-01, T3-02; wp_structure.json). Deliverable D3-01: Validation and uncertainty calibration report, due month 24. Milestone MS5: Field validation and uncertainty calibration complete, due month 22, Confirmed, source_grounded (milestones_seed.json). Objective validation status: Confirmed, source_grounded (objectives.json; vault nodes METH-INFRA-009, METH-RISK-003, METH-ROUTE-003, METH-RQ-001).\n\n*Pertinence.* OBJ-3 is the scientific test of the framework's defining commitment. The Uncertainty Chain makes a specific, empirically falsifiable claim: if correctly implemented, reported uncertainty should be calibrated — prediction intervals at a stated nominal coverage should approximately match their empirical coverage in validation data. OBJ-3 designs and executes that test. Without this test, the uncertainty chain would remain an architectural aspiration rather than a scientific contribution.\n\n*Measurability.* OBJ-3 is defined by a four-element validation protocol to be specified jointly with the confirmed field sites and data providers (Unresolved, DATA_PROVIDERS, confirmation_checklist.json): (i) ground-truth measurements — the specific observations collected to establish field truth, to be defined at RQ4 (Confirmed as open, confirmation_checklist.json); (ii) uncertainty-calibration metrics — the formal test of whether reported uncertainty is honest, of which the canonical example is prediction-interval coverage (do 90% prediction intervals contain truth approximately 90% of the time?), RQ5 (Confirmed as open, confirmation_checklist.json); (iii) pilot-success criteria — the threshold at which recommendations are judged credible for the research objective, RQ7 (Confirmed as open, confirmation_checklist.json); (iv) the Route B patch-covariation test — a pre-registered quantitative test of whether the chosen homogeneous patch genuinely covaries with the target crop, RQ9 (Confirmed as open, confirmation_checklist.json; Control Stand Variant, METH-ROUTE-003, source_grounded, concept_note.md). No specific numerical performance targets are asserted; asserting them without confirmed field data would constitute fabrication rather than science.\n\n*Verifiability.* MS5 provides the verifiable criterion (Confirmed, source_grounded, milestones_seed.json): ground truth collected per RQ4; calibration metrics evaluated with prediction-interval coverage assessed against nominal per RQ5; Route B covariation tested per RQ9; pilot-success criteria per RQ7 applied to the demonstrator output. Each element has a binary completion state — data collected, metrics computed, test executed — verifiable by inspection of deliverable D3-01.\n\n*Realism.* The principal risk is sparse ground truth leaving validation under-powered (RISK-04, Inferred, risks.json). Mitigation: design the protocol to prioritise dense ground truth at a focused pilot site, supplemented by published reference datasets if needed. A second risk is Route B's covariation failing the pre-registered test (RISK-05, Inferred, risks.json); the contingency is reverting to Route A as the primary diagnostic route, which leaves OBJ-3's protocol structurally intact because calibration is tested for the end-to-end system, not for a specific diagnostic route. A third risk is that the framework's reported uncertainty is not well calibrated (RISK-06, Inferred, risks.json); the honest contingency is recalibrating posteriors post-hoc and reporting results transparently — a negative calibration finding is a scientifically valid output. The validation sites, farms and data providers are Unresolved (DATA_PROVIDERS, confirmation_checklist.json); content depending on confirmed field sites cannot be finalised until an operator confirms the relevant facts.\n\n---\n\n**OBJ-4 — Standalone research demonstrator**\nResearch and innovation objective. Target month: 24. WPs: WP2, WP3. Deliverable D2-01: Research demonstrator software, due month 20. Milestone MS4: Demonstrator exercises the end-to-end pipeline, due month 18, Inferred, synthesis (milestones_seed.json). Objective validation status: Inferred, evidence_strength: synthesis (objectives.json; vault nodes METH-INFRA-010, METH-CORE-005, METH-INFRA-001).\n\n*Pertinence.* OBJ-4 addresses the operational decision-support gap documented in the literature (METH-SOTA-005, source_grounded, concept_note.md): the science of the uncertainty chain produces a validated decision framework, but a framework accessible only as a calibrated research model is not yet accessible to the practitioners for whom it is designed. Integrating diagnosis and decision into a standalone research demonstrator — a web MVP presenting irrigation recommendations with their uncertainty as a research artefact — bridges the gap between the scientific pipeline and user accessibility. The framing as a research artefact, not an operational product, is deliberate: a 24-month postdoctoral fellowship cannot guarantee full operational readiness, and the demonstrator's purpose is to show what uncertainty-aware decision support can achieve and to enable community inspection and reproduction.\n\n*Measurability.* The measurable target is a working end-to-end demonstrator that exercises the full observation-to-decision pipeline and presents irrigation recommendations with their uncertainty for at least one field case. The TRL level is open scientific decision RQ10 (Confirmed as open, confirmation_checklist.json) and will be determined by the outcome of validation rather than specified in advance.\n\n*Verifiability.* MS4 provides the verifiable criterion (Inferred, synthesis, milestones_seed.json): web MVP runs the full observation-to-decision pipeline and presents recommendations with uncertainty for at least one field case; TRL target recorded. Verifiable by a runnable software demonstration against deliverable D2-01.\n\n*Realism.* OBJ-4 is framed as a research demonstrator precisely to manage the operationalisation risk: operational frameworks at scale are scarce (RISK-10, Inferred, risks.json), and claiming full operational readiness within 24 months would be overclaiming. Keeping TRL open (RQ10) and framing the output as a research artefact makes OBJ-4 achievable under the constraint that the underlying scientific results emerge iteratively. OBJ-4 is noted as Inferred because the demonstrator framing derives from a vault synthesis node (METH-INFRA-010, confidence low) rather than a direct source-grounded design commitment in the way OBJ-1–3 are.\n\n---\n\n**OBJ-5 — Advancement of the fellow's competences and career**\nTraining and career objective. Target month: 24. WP4 (tasks T4-01, T4-02, T4-03; wp_structure.json). Deliverable D4-01: Career Development Plan, due month 3. Objective validation status: Confirmed in objectives.json but synthetic (spine_marker: SYN-SPINE-01), evidence_strength: unconfirmed. Spine-dependency notice: FELLOW — Unresolved (confirmation_checklist.json); SUPERVISOR — Unresolved (confirmation_checklist.json). This objective and its measurable targets were authored against the synthetic working spine (SYN-SPINE-01, working_assumptions.json) and are not submittable without confirmed fellow and supervisor identities.\n\nOBJ-5 is required by the MSCA-PF instrument structure (SR-07, Confirmed, scope_requirements.json) and addresses call expected outcomes EO-01 (Increased set of research and transferable skills and competences, Confirmed, expected_outcomes.json) and EO-05 (Enhanced quality and sustainability of research training and supervision, Confirmed, expected_outcomes.json), and call expected impact EI-01 (Improved employability and career prospects, Confirmed, expected_impacts.json). Its measurable targets — a Career Development Plan prepared jointly by [SUPERVISOR — Unresolved] and [FELLOW — Unresolved] and submitted as a project deliverable by month 3 (D4-01, wp_structure.json); at minimum 120 hours of structured transferable-skills training across the MSCA-PF mandatory dimensions (digital and AI skills including responsible use of generative AI, knowledge valorisation and innovation/entrepreneurship, and research integrity and open-science ethics; SR-06, Confirmed, scope_requirements.json); at minimum three peer-reviewed publications of which at minimum two are first-authored; co-supervision of at minimum one MSc thesis at [HOST — Unresolved]; at minimum two international conference presentations; and a follow-on national or ERC-track proposal submitted within six months of fellowship end — are scaffolded against the synthetic spine and must be confirmed with the real fellow's profile and real supervisor's mentoring commitment before finalisation.\n\n### Measurability across the objective set: the milestone chain\n\nThe four research objectives are jointly measurable through a sequential milestone chain producing inspectable artifacts at defined months within the 24-month scaffold [DURATION — Unresolved, confirmation_checklist.json]:\n\nMonth 6 — MS1: Multi-sensor data pipeline operational; Data Management Plan delivered (Confirmed, source_grounded, milestones_seed.json). Sentinel-1, Sentinel-2, soil-sensor and weather data ingested, QC'd and harmonised; DMP delivered as open-science deliverable (SR-06, CC-10/11, scope_requirements.json). Verifiable by platform demonstration and DMP document D5-01.\n\nMonth 12 — MS2: Diagnostic method v1 producing calibrated field-state posteriors (Confirmed, source_grounded, milestones_seed.json). Route A and/or Route B produces posterior estimates of the target latent field state with explicit uncertainty over at least one growing season; RQ2 and RQ3 recorded as decided. Verifiable by output structure inspection.\n\nMonth 15 — MS3: Uncertainty-aware decision engine integrated (Confirmed, source_grounded, milestones_seed.json). AquaCrop calibrated retaining parameter posterior; counterfactual simulations over weather ensembles; profit-based recommendation logic end to end from diagnosed state. Verifiable by calibration module inspection.\n\nMonth 18 — MS4: Standalone research demonstrator exercises the end-to-end pipeline (Inferred, synthesis, milestones_seed.json). Web MVP runs the full observation-to-decision pipeline and presents recommendations with uncertainty for at least one field case; TRL target recorded. Verifiable by runnable software demonstration.\n\nMonth 22 — MS5: Field validation and uncertainty calibration complete (Confirmed, source_grounded, milestones_seed.json). Ground truth collected; calibration metrics evaluated; Route B covariation tested; pilot-success criteria applied. Verifiable by D3-01 validation report.\n\nMonth 24 — MS6: Results disseminated and fellowship outcomes consolidated (Inferred, synthesis, milestones_seed.json). At least one open-access publication submitted; open data and models released under FAIR principles per SR-06. Verifiable by publication record and data repository release.\n\nNo fabricated accuracy targets or performance thresholds are asserted anywhere in the objective set or milestone chain. Uncertainty quantification is itself the primary research output; its quality is tested empirically by the validation protocol, not assumed.\n\n### Realism and achievability: the two-route safety architecture and the phased build\n\nThree structural features of the design collectively ensure no single failure mode halts the research programme.\n\n**Feature 1 — The two-route architecture as systematic risk management.** Route A (METH-ROUTE-001, source_grounded) and Route B (METH-ROUTE-002, source_grounded) are two credible scientific paths to the same diagnostic output — a field-state posterior — for the same shared decision engine. If Route A exceeds available resources (RISK-07, Inferred, risks.json), Route B delivers OBJ-1 independently. If Route B's covariation assumption fails the pre-registered test (RISK-05, Inferred), the framework reverts to Route A. In either case, OBJ-2, OBJ-3 and OBJ-4 require no structural redesign because all three depend on the type of the diagnostic output — a field-state posterior — not on the route that produced it. This symmetry is an architectural guarantee, not a post-hoc rescue plan.\n\n**Feature 2 — A sensor stack anchored to open, cost-free data.** Sentinel-1 and Sentinel-2 are freely available ESA Copernicus data with no access cost or contract risk (METH-INFRA-002, source_grounded, concept_note.md). Cloud cover limiting optical availability (RISK-03, Inferred) is compensated by SAR. PlanetScope risk (RISK-01, Inferred) is entirely contained within the optional enhancement scope; no core scientific claim depends on it. Sensor calibration complexity (RISK-09, Inferred) is managed by the QC pipeline operational at MS1.\n\n**Feature 3 — A phased build that isolates failure modes.** The milestone chain is sequenced so each phase's deliverable feeds the next without making the next's design contingent on the first's accuracy. A diagnostic method at month 12 with lower accuracy than anticipated does not invalidate the decision engine design — it constrains expected decision quality, which is exactly what the month-22 validation is designed to measure. A negative calibration result at MS5 is a scientifically valid finding the design explicitly accommodates. The refusal to assert specific accuracy numbers before data are collected is simultaneously a scientific virtue and a risk-management device: there is no unrealistic target to fail against.",
+  "claim_statuses": [
+    {
+      "claim_id": "CL-01",
+      "claim_summary": "Irrigation decisions under compounding observational and prospective uncertainty; point-estimate collapse as systematic failure mode source",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-CORE-001, METH-CORE-004, source_grounded)"
+    },
+    {
+      "claim_id": "CL-02",
+      "claim_summary": "Systematic literature review surveying approximately fifty studies on multi-sensor crop water stress monitoring",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-001, source_grounded)"
+    },
+    {
+      "claim_id": "CL-03",
+      "claim_summary": "Research-gap matrix (two axes: sensor integration depth and decision-support maturity); single empty cell at Real-Time Decision Support × PlanetScope",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-006, METH-SOTA-007, source_grounded)"
+    },
+    {
+      "claim_id": "CL-04",
+      "claim_summary": "Genuine probabilistic precedents exist and are acknowledged: Bayesian Maximum Entropy, copula-based scheduling, dynamic Bayesian networks, MF-FusionNet",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-006, source_grounded)"
+    },
+    {
+      "claim_id": "CL-05",
+      "claim_summary": "Novelty claim: three-stage coupling (learned multimodal fusion + explicit probabilistic crop-water-state + economically optimised decision) with intact uncertainty chain is absent from reviewed literature",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-006, synthesis/novelty framing); docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (strategic_differentiation)"
+    },
+    {
+      "claim_id": "CL-06",
+      "claim_summary": "Operational frameworks unifying all required sensors at field scale for real-time decision support are scarce",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-005, source_grounded)"
+    },
+    {
+      "claim_id": "CL-07",
+      "claim_summary": "Uncertainty Chain as architectural invariant: no coupling point collapses a distribution to a point estimate without preserving its width",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-CORE-004, source_grounded)"
+    },
+    {
+      "claim_id": "CL-08",
+      "claim_summary": "Route A (Direct Probabilistic Fusion): one-step probabilistic model entering all covariates, bypassing sub-pixel problem; candidate families Bayesian hierarchical model and Gaussian process",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-ROUTE-001, source_grounded)"
+    },
+    {
+      "claim_id": "CL-09",
+      "claim_summary": "Sub-pixel resolution problem and downscaling critique: disaggregation-based approaches add aggregation error that Route A bypasses",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-003, Downscaling Critique, source_grounded)"
+    },
+    {
+      "claim_id": "CL-10",
+      "claim_summary": "Route B (Homogeneous Patch Proxy): identifies nearby covarying patch the coarse pixel reads cleanly without sub-pixel aggregation",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-ROUTE-002, source_grounded)"
+    },
+    {
+      "claim_id": "CL-11",
+      "claim_summary": "Control Stand Variant: deliberately plants covarying species so covariation is measured over the growing season rather than assumed",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-ROUTE-003, source_grounded)"
+    },
+    {
+      "claim_id": "CL-12",
+      "claim_summary": "AquaCrop uncertainty-aware calibration prior method (doi:10.1016/j.envsoft.2022.105556) attributed to PI Role via first-person authorship inference; OBJ-2 builds on and extends it",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-PART-003, PI Role, inference from first-person authorship of design narrative)"
+    },
+    {
+      "claim_id": "CL-13",
+      "claim_summary": "Counterfactual irrigation simulation over weather ensembles producing distribution of economic outcomes per candidate decision",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-DEC-003, METH-DEC-004, source_grounded)"
+    },
+    {
+      "claim_id": "CL-14",
+      "claim_summary": "Profit-based decision objective: expected crop value minus full irrigation cost; economically rationalised rather than yield-maximising",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-DEC-005, METH-TERM-016, METH-DEC-006, source_grounded)"
+    },
+    {
+      "claim_id": "CL-15",
+      "claim_summary": "OBJ-1: probabilistic multi-sensor diagnosis, target month 12, WP1, tasks T1-01/T1-02/T1-03, deliverable D1-01 month 14",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (METH-CORE-002, METH-ROUTE-001, METH-ROUTE-002, source_grounded); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "CL-16",
+      "claim_summary": "OBJ-2: uncertainty-aware decision engine, target month 15, WP2, tasks T2-01/T2-02/T2-03, deliverable D2-01 month 20",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (METH-DEC-001 through METH-DEC-006, source_grounded); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "CL-17",
+      "claim_summary": "OBJ-3: field validation and honest uncertainty calibration, target month 20, WP3, tasks T3-01/T3-02, deliverable D3-01 month 24",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (METH-INFRA-009, METH-RISK-003, METH-ROUTE-003, source_grounded); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "CL-18",
+      "claim_summary": "OBJ-4: standalone research demonstrator (web MVP), target month 24, WPs WP2/WP3, deliverable D2-01",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (METH-INFRA-010, METH-CORE-005, evidence_strength: synthesis)"
+    },
+    {
+      "claim_id": "CL-19",
+      "claim_summary": "OBJ-5 measurable targets (CDP by month 3, ≥120 hours training, ≥3 publications, co-supervision ≥1 MSc thesis, follow-on proposal within 6 months of end) — authored against synthetic spine, spine-dependent, not submittable without confirmed FELLOW and SUPERVISOR",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (evidence_strength: unconfirmed, synthetic: true, SYN-SPINE-01); docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+    },
+    {
+      "claim_id": "CL-20",
+      "claim_summary": "MS1: multi-sensor data pipeline operational and DMP delivered, due month 6",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (METH-INFRA-002, METH-INFRA-003, METH-INFRA-005, source_grounded)"
+    },
+    {
+      "claim_id": "CL-21",
+      "claim_summary": "MS2: diagnostic method v1 producing calibrated field-state posteriors, due month 12",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (METH-CORE-002, METH-ROUTE-001, METH-ROUTE-002, source_grounded)"
+    },
+    {
+      "claim_id": "CL-22",
+      "claim_summary": "MS3: uncertainty-aware decision engine integrated, due month 15",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (METH-DEC-002 through METH-DEC-006, source_grounded)"
+    },
+    {
+      "claim_id": "CL-23",
+      "claim_summary": "MS4: standalone research demonstrator exercises end-to-end pipeline, due month 18",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (METH-INFRA-010, METH-CORE-005, evidence_strength: synthesis)"
+    },
+    {
+      "claim_id": "CL-24",
+      "claim_summary": "MS5: field validation and uncertainty calibration complete, due month 22",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (METH-INFRA-009, METH-RISK-003, METH-ROUTE-003, source_grounded)"
+    },
+    {
+      "claim_id": "CL-25",
+      "claim_summary": "MS6: results disseminated and fellowship outcomes consolidated, due month 24",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (evidence_strength: synthesis)"
+    },
+    {
+      "claim_id": "CL-26",
+      "claim_summary": "RISK-01 (PlanetScope cost/access) and RISK-03 (cloud limits optical; SAR compensates): hazards source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-004, source_grounded hazard; synthesis probability/impact estimate)"
+    },
+    {
+      "claim_id": "CL-27",
+      "claim_summary": "RISK-04 (sparse ground truth leaves validation under-powered): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-003, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-28",
+      "claim_summary": "RISK-05 (Route B patch covariation not proven): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-003, METH-ROUTE-002, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-29",
+      "claim_summary": "RISK-06 (reported uncertainty not well calibrated): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-CORE-004, METH-DEC-002, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-30",
+      "claim_summary": "RISK-07 (Route A too demanding for available resources): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-005, METH-ROUTE-001, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-31",
+      "claim_summary": "RISK-08 (collapsing AquaCrop to single parameter set breaks uncertainty chain): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-005, METH-DEC-002, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-32",
+      "claim_summary": "RISK-10 (prototype does not reach usable pilot within the fellowship): hazard source_grounded; probability/impact Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (METH-RISK-006, METH-SOTA-005, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CL-33",
+      "claim_summary": "Sentinel-1 SAR and Sentinel-2 optical are freely available ESA Copernicus data with no access cost or contract risk",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-INFRA-002, source_grounded)"
+    },
+    {
+      "claim_id": "CL-34",
+      "claim_summary": "All ten open scientific decisions RQ1–RQ10 maintained as explicitly open; none resolved in advance of the research",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (open_scientific_decisions, all ten status: Unresolved)"
+    },
+    {
+      "claim_id": "CL-35",
+      "claim_summary": "DMP mandatory by month 6 as MSCA-PF open-science requirement; D5-01 confirmed deliverable in WP5 task T5-01",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (MS1); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06, CC-10, CC-11, Confirmed)"
+    },
+    {
+      "claim_id": "CL-36",
+      "claim_summary": "SR-07: Career Development Plan mandatory, prepared jointly by supervisor and fellow and submitted as a project deliverable at start of action",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07, CC-12, Confirmed)"
+    },
+    {
+      "claim_id": "CL-37",
+      "claim_summary": "EO-01 (Increased research and transferable skills and competences) addressed by OBJ-5",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-01, Confirmed)"
+    },
+    {
+      "claim_id": "CL-38",
+      "claim_summary": "EO-05 (Enhanced quality and sustainability of research training and supervision) addressed by OBJ-5 and WP4 structure",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-05, Confirmed)"
+    },
+    {
+      "claim_id": "CL-39",
+      "claim_summary": "EI-01 (Improved employability and career prospects) addressed by OBJ-5",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-01, Confirmed)"
+    },
+    {
+      "claim_id": "DURATION",
+      "claim_summary": "Project duration of 24 months stated as the European Fellowship scaffold underpinning all target months and effort allocations",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (id: DURATION, still_requires_real_confirmation: true); docs/tier3_project_instantiation/working_assumptions.json (operator-declared 24 months under SYN-SPINE-01, not confirmed fact)"
+    },
+    {
+      "claim_id": "FELLOWSHIP_TYPE",
+      "claim_summary": "Fellowship type stated as European Fellowship (EF) — derived from synthetic intra-EU mobility (Bulgaria to Hungary); falls with the synthetic spine",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (id: FELLOWSHIP_TYPE, still_requires_real_confirmation: true)"
+    },
+    {
+      "claim_id": "FELLOW",
+      "claim_summary": "Fellow identity referenced in OBJ-5 measurable targets (first-authored publications, conference presentations, follow-on proposal) and PI Role inference underlying OBJ-2's prior method attribution",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (id: FELLOW, still_requires_real_confirmation: true; what_source_says: no fellow is named in any source vault node)"
+    },
+    {
+      "claim_id": "SUPERVISOR",
+      "claim_summary": "Supervisor identity referenced in OBJ-5 as joint author of the Career Development Plan and training programme lead (WP4, task T4-01, T4-02)",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (id: SUPERVISOR, still_requires_real_confirmation: true; source_vault_nodes: [])"
+    }
+  ],
+  "source_refs": [
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+    },
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+    },
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+    },
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    }
+  ]
+}

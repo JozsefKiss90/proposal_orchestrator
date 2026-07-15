@@ -1,0 +1,299 @@
+{
+  "sub_section_id": "1",
+  "title": "Excellence",
+  "content": "# Section 1 — Excellence (Evaluation Criterion Weight: 50%)\n\nThe Excellence criterion accounts for 50 per cent of the total evaluation score for MSCA Postdoctoral Fellowship proposals (Score 1, Weighting: 50%; source: ef_he-msca_en.pdf; call_analysis_summary.json). It is assessed across four sub-sections: 1.1 Quality and pertinence of the R&I objectives and going beyond the state of the art; 1.2 Soundness of the methodology, including the underlying concepts; 1.3 Supervision, training and two-way transfer of knowledge; and 1.4 The researcher's individual and professional profile. Sub-sections 1.1 and 1.2 rest on research content drawn from the source-grounded methodology vault (SHA b4d9e57) and carry Confirmed or Inferred status throughout. Sub-sections 1.3 and 1.4 address the identity spine of the fellowship — the supervisor, host, fellow, fellowship type and duration — all of which are Unresolved in the confirmation checklist (confirmation_checklist.json; all five spine items have still_requires_real_confirmation: true). The structural training and career-development content in 1.3 and 1.4 is confirmed from MSCA-PF call scope requirements (SR-06, SR-07); the identity-specific content is flagged against the checklist tokens and must be replaced with confirmed facts before any submission.\n\n---\n\n## 1.1 Quality and Pertinence of the Research and Innovation Objectives; Going Beyond the State of the Art\n\n### The research problem\n\nIrrigation decisions for row crops are made under compounding uncertainty. The true state of the field — root-zone soil moisture, crop water stress, canopy development — is only partially and imperfectly observable through heterogeneous sensor streams that each carry noise, resolution limitations and temporal gaps. The economic consequence of any given irrigation decision simultaneously depends on weather that has not yet occurred and on crop responses that simulation models approximate rather than determine. Existing decision-support approaches largely separate the diagnostic step from the prognostic step and collapse both to deterministic point estimates, discarding the uncertainty that every observation and every model parameter necessarily carries. That collapse is the methodological source of a systematic failure mode: decisions that appear optimal under assumed certainty but underperform in practice, because the uncertainty that was discarded at the modelling step materialises as real weather variation and real crop response variability.\n\nThis fellowship addresses that failure mode at its methodological root. The project's defining commitment — from which every technical design choice derives — is to carry uncertainty honestly from observation to decision without interruption. This is the uncertainty chain (Uncertainty Chain, METH-CORE-004, source_grounded): every model output must report not only the inferred state but the honest range of that state, and that range must propagate unbroken from multi-sensor diagnosis through uncertainty-aware crop-model calibration through counterfactual irrigation simulation and into the final profit-weighted recommendation. Collapsing to a point estimate at any coupling point — at the field-state diagnosis, at the AquaCrop model interface, or at the weather scenario — breaks the chain and reintroduces the overconfidence the framework is designed to eliminate.\n\n### State of the art and the research gap\n\nThe novelty argument is grounded in a systematic literature review of multi-sensor crop water stress monitoring (State of the Art — Multi Sensor Crop Water Stress Monitoring, METH-SOTA-001, source_grounded) that produced a research-gap matrix (Research Gap Matrix, METH-SOTA-006, source_grounded; Figure 6 in the review corpus). The review surveyed approximately 50 studies across two axes: depth of sensor integration (from single-sensor to heterogeneous multi-sensor fusion) and decision-support maturity (from stress detection, to optimisation, to real-time decision support). Study counts fall sharply as integration deepens and as the task advances toward real-time decision support; the two gradients converge on a single empty cell — Real-Time Decision Support combined with PlanetScope high-resolution imagery. That empty cell is the primary positioning of the fellowship in the literature.\n\nThe broader novelty claim — deliberately narrow to remain scientifically defensible — is that probabilistic, uncertainty-aware irrigation decision frameworks for row crops remain underdeveloped in the reviewed literature (Probabilistic Fusion Novelty Claim, METH-SOTA-006; novelty framing: Inferred from vault synthesis). Genuine probabilistic precedents exist and are explicitly acknowledged: Bayesian Maximum Entropy methods for drought data fusion; copula-based drought-to-irrigation scheduling frameworks; dynamic Bayesian network approaches; and the MF-FusionNet multimodal architecture (all source_grounded from the literature review). Each addresses part of the diagnostic-to-decision chain. None couples all three stages — learned multimodal fusion, explicit probabilistic crop-water-state estimation, and economically optimised irrigation recommendation — end to end, with uncertainty kept honest throughout. The proposal occupies the gap where all three are integrated and where the uncertainty of each preceding stage propagates into the next without collapse. The defensible edge is this specific coupling, not 'using satellites for irrigation management' (established) nor 'using probabilistic models in agriculture' (established).\n\n### Research and innovation objectives\n\nThe project pursues five objectives on a 24-month European Fellowship working scaffold [DURATION — Unresolved in confirmation_checklist.json; operator-declared 24 months under SYN-SPINE-01 in working_assumptions.json for the demo run; to be confirmed from the real host and fellowship type]. All ten open scientific decisions (RQ1–RQ10, confirmed as open in confirmation_checklist.json) are maintained as explicitly open; no fabricated resolution is offered.\n\n**OBJ-1 — Probabilistic multi-sensor diagnosis of the latent field state** (research; target month: 12; WP1; Confirmed, source_grounded). Develop and calibrate a probabilistic diagnostic method that fuses multi-source Earth observation — Sentinel-1 SAR, Sentinel-2 optical, and optionally high-resolution PlanetScope imagery where access is confirmed (open scientific decision RQ8) — together with in-situ soil sensors, weather data and field observations, producing full posterior estimates of the latent field state (root-zone soil moisture, crop water stress, canopy condition) rather than point estimates. Two interchangeable routes are in scope: Route A (direct one-step probabilistic fusion) and Route B (homogeneous-patch proxy). Whether both routes are implemented in parallel or one is the primary method is open scientific decision RQ2. The precise definition of the target field state is open scientific decision RQ3. The verifiable target is uncertainty-calibrated field-state estimation; no fabricated accuracy figure is asserted.\n\n**OBJ-2 — Uncertainty-aware decision engine for irrigation choice** (research; target month: 15; WP2; Confirmed, source_grounded). Build the prognostic decision engine: calibrate FAO AquaCrop retaining an explicit parameter posterior rather than a single overconfident parameter set (METH-DEC-002); run counterfactual irrigation simulations over weather ensembles (METH-DEC-003, METH-DEC-004); recommend the option with the best expected economic return (expected crop value minus irrigation costs; METH-DEC-005, METH-DEC-006). The calibration approach builds directly on the prior uncertainty-aware AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556; PI Role, METH-PART-003, Inferred). The exact decision objective is open scientific decision RQ6.\n\n**OBJ-3 — Field validation and honest uncertainty calibration** (research; target month: 20; WP3; Confirmed, source_grounded). Design and execute a validation protocol establishing credibility of diagnosis and recommendations: define ground-truth measurements (RQ4); assess uncertainty calibration, for example testing whether 90% prediction intervals contain truth approximately 90% of the time (RQ5); test Route B's patch-covariation assumption quantitatively rather than by assumption (RQ9; Control Stand Variant, METH-ROUTE-003); and apply pilot-success criteria (RQ7). Specific validation sites, farms and data arrangements are Unresolved (DATA_PROVIDERS in confirmation_checklist.json); no site names or ground-truth counts are asserted.\n\n**OBJ-4 — Standalone research demonstrator** (Inferred from vault synthesis; target month: 24; WP2, WP3; evidence_strength: synthesis). Integrate diagnosis and decision engine into a standalone research demonstrator (web MVP) presenting irrigation recommendations with their uncertainty as a research artefact rather than an operational product. TRL target is open scientific decision RQ10 and is not asserted. Operational framework scarcity is documented (Operational Decision Support Gap, METH-SOTA-005).\n\n**OBJ-5 — Advancement of the fellow's competences and career** [SYNTHETIC — SYN-SPINE-01; spine-dependent; objectives.json evidence_strength: unconfirmed; not submittable without confirmed fellow and supervisor identities]. The instrument structure requires this objective; specific targets are scaffold values authored against the synthetic working spine and must be confirmed with the real fellow's profile and real supervisor's mentoring commitment.\n\n---\n\n## 1.2 Soundness of the Methodology, Including the Underlying Concepts\n\n### Two interchangeable routes, one shared decision engine\n\nThe methodological architecture separates into a diagnostic branch and a prognostic branch, connected by the uncertainty chain (Core Architecture, METH-CORE-001). The diagnostic branch deploys two interchangeable routes sharing the same downstream decision engine — a structural risk-management choice whereby Route A (rigorous) and Route B (lighter) are scientific alternatives, not a primary and a desperation fallback. Switching between routes requires no change to the downstream validation protocol, AquaCrop calibration approach or economic objective.\n\n**Route A — Direct Probabilistic Fusion** (METH-ROUTE-001, source_grounded). All available covariates — Sentinel-1 SAR, Sentinel-2 optical, optional PlanetScope, in-situ soil sensors, weather data, field observations — enter a single probabilistic model that goes directly to the latent field state with its uncertainty in one step, bypassing any intermediate pixel-level product. This sidesteps the sub-pixel resolution problem (Sub Pixel Problem, METH-SOTA-003; Downscaling Critique, source_grounded): there is no intermediate product to disaggregate, so no disaggregation error is added on top of the model's intrinsic uncertainty. Candidate model families returning distributions over the field state are Bayesian hierarchical models and Gaussian processes (concept_note.md, Route A, source_grounded). Estimated latent state: root-zone soil moisture, crop water stress, canopy development, biomass and expected yield, each with explicit uncertainty.\n\n**Route B — Homogeneous Patch Proxy** (METH-ROUTE-002, source_grounded). A nearby spectrally homogeneous patch — matched to the target crop on high-resolution soil and climate data — whose biology covaries with the target crop is identified. The coarse satellite pixel reads it cleanly with no sub-pixel mixture to disaggregate. If covariation holds, the patch is a read-clean proxy. The control-stand variant (METH-ROUTE-003, source_grounded) extends this by deliberately planting a covarying species in the patch, enabling covariation to be measured over time rather than assumed. Route B's covariation assumption is the route's principal scientific risk (RISK-05, Inferred): a pre-registered quantitative test (RQ9) must pass before Route B's outputs feed the decision engine; failure reverts the design to Route A.\n\n### The prognostic branch\n\n**Uncertainty-aware AquaCrop calibration** (METH-DEC-002, source_grounded). AquaCrop is calibrated retaining a full parameter posterior rather than a single best-fit set. Single-point calibration would break the uncertainty chain: the simulation becomes deterministic given a weather scenario, discarding diagnostic uncertainty at the model interface. Retaining the posterior propagates uncertainty forward. The calibration approach builds on prior work (doi:10.1016/j.envsoft.2022.105556; PI Role, METH-PART-003, Inferred) and extends it by accepting an uncertain field-state input and propagating to uncertain simulation output.\n\n**Counterfactual simulation over weather ensembles** (METH-DEC-003, METH-DEC-004, source_grounded). For each candidate irrigation decision the engine runs AquaCrop over a weather-scenario ensemble. Each run produces a yield outcome and a cost. The distribution across the ensemble is the full economic consequence of that decision under joint weather and model uncertainty. This enables direct comparison of alternatives under explicit uncertainty rather than optimisation against a single assumed weather trajectory.\n\n**Profit-based recommendation** (METH-DEC-005, METH-DEC-006, source_grounded). The engine selects the option maximising expected economic return (expected crop value minus irrigation costs) across the weather ensemble. This objective treats underwatering and overwatering symmetrically as economic costs, targeting the economically rational irrigator rather than the agronomic maximum. Decision objective is open for refinement as RQ6.\n\n### The uncertainty chain as architectural invariant\n\nThe complete chain: multi-sensor observations → probabilistic fusion (Route A or B) → posterior field state with uncertainty → AquaCrop with parameter posterior → counterfactual simulations over weather ensembles → distribution of economic outcomes per candidate decision → expected-profit-maximising recommendation. No coupling point collapses a distribution to a point estimate without preserving its width. The Uncertainty Chain (METH-CORE-004, source_grounded) is an architectural invariant: a version of the framework that collapses uncertainty at any coupling is not a simplified variant of this framework — it is a structurally weaker and epistemologically different framework. The validation protocol (OBJ-3) directly tests chain integrity: the uncertainty-calibration metric (RQ5, for example 90% PI coverage approximately 90%) is the empirical test of whether the reported uncertainty is honest end to end.\n\n### Sensor stack\n\nSentinel-1 SAR and Sentinel-2 optical (ESA Copernicus; freely available open data; Earth Observation Layer, METH-INFRA-002, source_grounded); optional PlanetScope high-resolution imagery (cost/access subject to confirmation; RQ8; treated as enhancement rather than core requirement; RISK-01 mitigation); in-situ soil sensors (Ground Sensing Layer, METH-INFRA-003, source_grounded); weather data (Weather and Climate Data Layer, METH-INFRA-004, source_grounded; provider Unresolved — DATA_PROVIDERS in confirmation_checklist.json); field observations. The multi-sensor design is itself a risk-management strategy: cloud cover limiting optical data (RISK-03) is compensated by SAR; the fusion model learns adaptive source weighting rather than committing to fixed weights.\n\n### Open-science commitment and Data Management Plan\n\nOpen-science is integral to the uncertainty chain's scientific validity: a calibrated-uncertainty framework cannot be accepted or rejected by the community unless it is inspectable. The project commits to a FAIR-compliant DMP delivered by month 6 (Deliverable D5-01; Milestone MS1; milestones_seed.json, Confirmed, source_grounded; mandatory per SR-06 / CC-10, CC-11, scope_requirements.json), open research software implementing the diagnostic and decision engine, and open validation data and protocol enabling third-party reproduction. These outputs also satisfy EO-07 (stronger R&I output; Confirmed, concept_refinement_summary.json) and EO-03 (enhanced networking and communication impact through open dissemination; Inferred, concept_refinement_summary.json).\n\n### Methodological risk management\n\nTen risks registered (RISK-01 through RISK-10; risks.json; hazards: Confirmed from vault nodes METH-RISK-002 to METH-RISK-006, source_grounded; probability and impact scores: Inferred, analyst estimates): data-access risks (RISK-01 to RISK-03) managed by open-Copernicus core build, adaptive sensor weighting and QC platform; validation risks (RISK-04 to RISK-06) managed by dense-ground-truth protocol, pre-registered covariation test (Route B fallback to Route A), and uncertainty-calibration metrics embedded in validation design from inception; model-complexity risks (RISK-07 to RISK-09) managed by the two-route architecture, uncertainty-aware calibration, and sensor QC layer; operationalisation risks (RISK-10) managed by standalone-research-artefact framing and explicit open TRL target (RQ10).\n\n---\n\n## 1.3 Supervision, Training and Two-way Transfer of Knowledge\n\n**Spine-dependency notice.** Supervisor identity (token: SUPERVISOR), host identity (token: HOST), fellowship type (token: FELLOWSHIP_TYPE) and duration (token: DURATION) all carry status Unresolved (confirmation_checklist.json; still_requires_real_confirmation: true for all four). Structural training content is confirmed from scope_requirements.json (SR-06, SR-07). Supervisor track record and host capacity are absent from all source vault nodes and must be supplied by operator-confirmed data before finalisation.\n\n### Supervision structure and the Career Development Plan\n\nThe fellowship is hosted at [HOST — Unresolved; SYN-SPINE-01 synthetic working value: Eötvös Loránd University, Budapest, Hungary; not real, not submittable] under [SUPERVISOR — Unresolved; SYN-SPINE-01 synthetic working value: Prof. Dr. Gábor Nagy, ELTE environmental physics / geoinformatics; not real, not submittable; critically: no supervisor appears anywhere in the source methodology vault — this is an evaluator-critical gap explicitly noted in confirmation_checklist.json with SUPERVISOR source_vault_nodes = []]. A Career Development Plan (CDP) is jointly prepared by supervisor and fellow and submitted as a project deliverable at the start of the action, by months 2–3 (Task T4-01; Deliverable D4-01, due month 3; wp_structure.json; aligned with SR-07 / CC-12, scope_requirements.json, source_grounded). The CDP covers research objectives, training and career needs, transferable skills, teaching activities, publications planning and participation in open-science events. It is reviewed and updated at M12 and M24, creating two formal checkpoints at which training progress and research milestones are assessed against plan and the CDP updated in light of progress. Supervisory support is provided through regular research reviews within [HOST — Unresolved]'s environmental-modelling and geoinformatics research group, host computational and geospatial infrastructure, and the host's direct contributing role in WP3 field validation (Task T3-01, T3-02; wp_structure.json). [SUPERVISOR — Unresolved]'s specific track record in postdoctoral supervision and in the technical domains of this project is an evaluator-critical element that cannot be populated from existing Tier 3 data and must be confirmed before finalisation.\n\n### Training programme: three mandatory MSCA-PF dimensions\n\nAll three mandatory dimensions of SR-06 / CC-10 (scope_requirements.json, source_grounded) are addressed as integral elements of the research methodology:\n\n**Digital and AI skills.** Designing, calibrating and validating Bayesian hierarchical models and Gaussian processes for crop-water-state estimation (WP1, T1-02, T1-03) provides immersive training in probabilistic machine learning as a lived discipline. The programme additionally covers responsible use of generative AI in environmental modelling and scientific coding — named explicitly in SR-06 — through critical engagement with LLM-assisted workflows including provenance-tracking and reproducibility obligations. FAIR data platform management (T5-01; DMP D5-01 by month 6) and open-source software development embed digital-collaboration skills in routine project tasks.\n\n**Knowledge valorisation and innovation/entrepreneurship.** The standalone research demonstrator (OBJ-4; web MVP; METH-INFRA-010, synthesis) is the valorisation-training vehicle: translating the uncertainty-aware decision framework from a calibrated research model to a form accessible to farming practitioners requires engagement with non-specialist user requirements and with the research-prototype-to-operational-readiness gap. Farming-practitioner engagement, facilitated through the validation partner role (Unresolved; VALIDATION_PARTNER in confirmation_checklist.json), provides direct experience of communicating probabilistic uncertainty to domain-expert, non-statistician decision-makers.\n\n**Research integrity and open-science ethics.** Designing and maintaining the FAIR DMP (D5-01, due month 6; MS1, milestones_seed.json, source_grounded) requires active decisions about data licensing, format standards, versioning and long-term accessibility from the project's inception. Designing the validation protocol for third-party reproducibility (open models, open validation data, open protocol) embeds research integrity as a design discipline rather than a retrospective ethics declaration.\n\nAt minimum 120 hours of structured transferable-skills training across these three dimensions are planned [structural commitment confirmed from SR-06; the 120-hour figure is a scaffold target from objectives.json OBJ-5, evidence_strength: unconfirmed, spine-dependent; to be confirmed with the real fellow and supervisor].\n\n### Two-way transfer of knowledge\n\nSR-07 and EO-07 (Stronger R&I capacity and output; better transfer of knowledge; Confirmed, expected_outcomes.json; Confirmed mapping, concept_refinement_summary.json) require a documented, genuine two-way knowledge exchange operationalised through specific verifiable project activities:\n\n**Fellow to Host.** The fellow brings the uncertainty-aware AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556; PI Role, METH-PART-003, Inferred) and probabilistic machine-learning expertise in crop-water modelling to [HOST — Unresolved]'s environmental-modelling group — specific transferable technical knowledge not described as existing at the host group. Transfer is evidenced by a minimum of two methods seminars delivered at the host group on uncertainty-aware crop-water modelling and probabilistic fusion during the fellowship (OBJ-5 scaffold target; objectives.json; synthetic, spine-dependent, to be confirmed).\n\n**Host to Fellow.** The fellow acquires [HOST — Unresolved]'s geoinformatics, field-scale geospatial data collection and spatial data infrastructure competences — essential for WP3 field validation and for the fellow's subsequent research trajectory. Transfer is evidenced by active co-leadership of WP3 validation tasks jointly with the host (T3-01, T3-02; wp_structure.json) and by co-supervision of at minimum one MSc thesis at [HOST — Unresolved] (OBJ-5 scaffold target; spine-dependent, to be confirmed), embedding the fellow in the host's teaching and research supervision practice.\n\nThis structure satisfies EO-07 (Confirmed mapping, concept_refinement_summary.json), EO-05 (enhanced quality and sustainability of research training and supervision at the host; Inferred mapping, concept_refinement_summary.json) and EO-08 (regular feedback of research results into teaching; Inferred mapping, concept_refinement_summary.json). EO-04 (alignment of working conditions with the European Charter for Researchers) depends on an explicit Charter compliance statement from [HOST — Unresolved] that is not present in any current Tier 3 document and is recorded as Assumed in concept_refinement_summary.json.\n\n---\n\n## 1.4 The Researcher's Individual and Professional Profile, Skills, Competences and Motivation\n\n**Spine-dependency notice.** The fellow's identity — name, current affiliation, PhD discipline and year, full publication record, career stage and CV details — carries status Unresolved (token: FELLOW; confirmation_checklist.json; still_requires_real_confirmation: true). The source methodology vault names no fellow; a PI Role is Inferred from first-person authorship of the design narrative and ownership of the calibration method (PI Role, METH-PART-003, Inferred) but the person's name and affiliation are explicitly unconfirmed in every vault node. Identity-specific CV content must be supplied by confirmed operator data before finalisation. Synthetic working-spine value for structural illustration only: Dr. Mariya Petrova, postdoctoral researcher, Plovdiv University 'Paisii Hilendarski', Bulgaria [SYNTHETIC — SYN-SPINE-01; not real, not submittable].\n\n### Prior scientific track record and continuity with the proposed research\n\nThe fellow's most directly relevant prior contribution is the uncertainty-aware AquaCrop calibration method in a peer-reviewed publication (doi:10.1016/j.envsoft.2022.105556; referenced in concept_note.md as 'the fellow-attributed method'; PI Role inference, METH-PART-003, Inferred). This prior method established that AquaCrop can be calibrated while retaining an explicit parameter posterior — the technical prerequisite for OBJ-2 and for uncertainty-chain integrity at the AquaCrop model interface. The continuity from prior work to the proposed research is direct and specific: the prior method solves the uncertainty-collapse problem at the AquaCrop calibration step with a known input; the proposed fellowship extends the solution upstream (uncertain posterior field-state input from multi-sensor probabilistic fusion, OBJ-1, WP1) and downstream (uncertain AquaCrop simulation output driving counterfactual decision under weather uncertainty, OBJ-2, WP2). The fellowship is therefore a scientifically coherent closure of the chain around a demonstrated prior method, not a change of research direction. The fellow's broader publication record, citation history, PhD details and complete track record evidence required for evaluator assessment of this sub-section are absent from the vault (FELLOW: what_source_says: 'No fellow is named in any source vault node'; confirmation_checklist.json) and must be supplied by operator-confirmed data.\n\n### International mobility and fellowship type\n\nThe fellow moves from [FELLOW — Unresolved home institution and country] to [HOST — Unresolved host institution and country]. On the synthetic working spine this is an intra-EU move (Bulgaria to Hungary) determining the fellowship as a European Fellowship (EF) by definition (fellowship_type: project_summary.json, Confirmed-synthetic, SYN-SPINE-01; FELLOWSHIP_TYPE: Unresolved in confirmation_checklist.json — the EF determination falls with the synthetic spine and must be re-derived from the confirmed host). If the real host is in a non-associated Third Country the fellowship becomes a Global Fellowship with a mandatory 12-month return phase and three-way knowledge-transfer model (SR-03, scope_requirements.json, source_grounded). The MSCA mobility eligibility rule — no more than 12 months' residence or main activity in the host country in the 36 months preceding submission — must be verified against the confirmed fellow's actual record and cannot be assessed from current Tier 3 data.\n\n### Scientific motivation\n\nScientific motivation is grounded in two convergent observations. First, the systematic literature review's research-gap matrix (METH-SOTA-006, source_grounded) identifies real-time irrigation decision support as the least-covered combination in the reviewed literature — a specific evidenced gap rather than a claimed opportunity. Second, the fellow's prior uncertainty-aware calibration method (doi:10.1016/j.envsoft.2022.105556, Inferred attribution) demonstrates that one of the three stages required to close that gap can be handled in an uncertainty-preserving way. The conjunction generates a specific testable scientific question: does maintaining uncertainty honestly throughout the full observation-to-decision chain produce more trustworthy irrigation recommendations than collapsing to point estimates at each step? That question is scientifically motivating precisely because the answer might be negative — uncertainty might fail calibration (RISK-06), Route B covariation might not hold (RISK-05), Route A might exceed available compute (RISK-07). The design's explicit risk management and route-switching architecture reflects a scientific motivation that values honest, reproducible answers over overclaimed results.\n\n### Career development trajectory\n\nThe fellowship is positioned at the transition from postdoctoral researcher to emerging independent research leader. The CDP (OBJ-5; WP4; D4-01, due month 3; SR-07) will specify the fellow's individual targets jointly with [SUPERVISOR — Unresolved]. Structural career advancement targets [scaffold values from objectives.json OBJ-5, evidence_strength: unconfirmed, spine-dependent, to be confirmed]: at minimum three peer-reviewed publications (at minimum two first-authored); at minimum 120 hours of structured transferable-skills training; co-supervision of at minimum one MSc thesis at [HOST — Unresolved]; at minimum two international conference presentations; follow-on national or ERC-track proposal submitted within six months of fellowship end. The integration of all mandatory training dimensions into the research methodology means career-development activities and research deliverables reinforce one another throughout: open research software serves simultaneously as a scientific output and a valorisation training vehicle; the FAIR DMP serves simultaneously as a mandated deliverable and a research-integrity training exercise; methods seminars at the host serve simultaneously as knowledge-transfer deliverables and scientific communication training. This integration operationalises EO-02 (new mind-sets and approaches to R&I work through international, inter-sectoral and interdisciplinary experience; Inferred, concept_refinement_summary.json) through substantive engagement with the full scope of modern research practice across the four intersecting disciplines of this project: Earth observation remote sensing, probabilistic machine learning, crop physiology and agricultural economics.",
+  "claim_statuses": [
+    {
+      "claim_id": "CLAIM-01",
+      "claim_summary": "Excellence criterion accounts for 50% of the MSCA-PF evaluation score",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+    },
+    {
+      "claim_id": "CLAIM-02",
+      "claim_summary": "Research gap matrix (approx. 50 studies surveyed; empty cell at Real-Time Decision Support × PlanetScope) from the systematic literature review",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (METH-SOTA-006, source_grounded; METH-SOTA-001)"
+    },
+    {
+      "claim_id": "CLAIM-03",
+      "claim_summary": "Novelty framing: end-to-end coupling of learned multimodal fusion, explicit probabilistic crop-water-state estimation and economically optimised irrigation decision is underdeveloped for row crops",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Probabilistic Fusion Novelty Claim, METH-SOTA-006, evidence_strength: synthesis)"
+    },
+    {
+      "claim_id": "CLAIM-04",
+      "claim_summary": "Probabilistic precedents acknowledged: Bayesian Maximum Entropy, copula-based scheduling, dynamic Bayesian networks, MF-FusionNet — each covers part of the chain but not all three stages together",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (State of the Art, METH-SOTA-006, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-05",
+      "claim_summary": "OBJ-1: probabilistic multi-sensor field-state diagnosis (target month 12; WP1; Sentinel-1, Sentinel-2, optional PlanetScope, soil sensors, weather, field observations; full posterior over root-zone soil moisture, crop water stress, canopy)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-1, validation_status: Confirmed, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-06",
+      "claim_summary": "OBJ-2: uncertainty-aware decision engine for irrigation choice (target month 15; WP2; builds on prior method doi:10.1016/j.envsoft.2022.105556)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-2, validation_status: Confirmed, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-07",
+      "claim_summary": "OBJ-3: field validation and honest uncertainty calibration (target month 20; WP3; validation protocol with ground truth, calibration metric, pilot-success criteria, covariation test)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-3, validation_status: Confirmed, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-08",
+      "claim_summary": "OBJ-4: standalone research demonstrator / web MVP (target month 24; WP2, WP3; TRL target open — RQ10)",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-4, validation_status: Inferred, evidence_strength: synthesis)"
+    },
+    {
+      "claim_id": "CLAIM-09",
+      "claim_summary": "Ten open scientific decisions (RQ1–RQ10) confirmed as open: crop (RQ1), route scope (RQ2), target field state (RQ3), ground truth (RQ4), calibration metric (RQ5), decision objective (RQ6), pilot success (RQ7), PlanetScope access (RQ8), covariation validation (RQ9), TRL target (RQ10)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (open_scientific_decisions, all status: Unresolved)"
+    },
+    {
+      "claim_id": "CLAIM-10",
+      "claim_summary": "Uncertainty chain (METH-CORE-004) as architectural invariant: no coupling point collapses a distribution to a point estimate without preserving its width",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Uncertainty Chain, METH-CORE-004, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-11",
+      "claim_summary": "Route A — Direct Probabilistic Fusion: one-step route; all covariates feed a single probabilistic model (Bayesian hierarchical model or Gaussian process) going directly to the latent field state with uncertainty; sidesteps sub-pixel disaggregation error",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Route A — Direct Probabilistic Fusion, METH-ROUTE-001, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-12",
+      "claim_summary": "Route B — Homogeneous Patch Proxy: nearby spectrally homogeneous patch matched on soil and climate data; covariation with target crop means the patch can be read cleanly at coarse resolution without disaggregation",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Route B — Homogeneous Patch Proxy, METH-ROUTE-002, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-13",
+      "claim_summary": "Control-stand variant: deliberately planted covarying species in the patch enables covariation to be measured over time rather than assumed",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Control Stand Variant, METH-ROUTE-003, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-14",
+      "claim_summary": "Route B covariation assumption is Route B's principal scientific risk (RISK-05); if covariation test fails, design reverts to Route A",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (RISK-05, hazard source_grounded from METH-RISK-002; probability/impact scores: synthesis)"
+    },
+    {
+      "claim_id": "CLAIM-15",
+      "claim_summary": "Uncertainty-aware AquaCrop calibration retains explicit parameter posterior rather than single best-fit set; builds on prior method (doi:10.1016/j.envsoft.2022.105556)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Uncertainty Aware AquaCrop Calibration, METH-DEC-002, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-16",
+      "claim_summary": "Prior AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556) attributed to the fellow-role through first-person authorship of the design narrative",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (PI Role, METH-PART-003, evidence_strength: inference)"
+    },
+    {
+      "claim_id": "CLAIM-17",
+      "claim_summary": "Counterfactual irrigation simulation over weather ensembles: each candidate decision run through AquaCrop across weather scenarios; distribution of yield-minus-cost outcomes is the decision's economic consequence under joint uncertainty",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Counterfactual Irrigation Simulation, METH-DEC-003; Weather Ensemble Scenario Evaluation, METH-DEC-004; source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-18",
+      "claim_summary": "Profit-based recommendation: decision engine selects option maximising expected economic return (expected crop value minus irrigation costs) over weather ensemble",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Profit Based Objective Function, METH-DEC-005; Decision Recommendation Logic, METH-DEC-006; source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-19",
+      "claim_summary": "Sensor stack: Sentinel-1 SAR, Sentinel-2 optical (open Copernicus), optional PlanetScope, in-situ soil sensors, weather data, field observations",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Earth Observation Layer, METH-INFRA-002; Ground Sensing Layer, METH-INFRA-003; Weather and Climate Data Layer, METH-INFRA-004; source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-20",
+      "claim_summary": "PlanetScope treated as optional enhancement; core diagnostic build uses open Copernicus data (RISK-01 mitigation)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (RISK-01 mitigation, source_grounded hazard)"
+    },
+    {
+      "claim_id": "CLAIM-21",
+      "claim_summary": "FAIR-compliant DMP delivered by month 6 (Deliverable D5-01; Milestone MS1); mandatory MSCA-PF open-science structural requirement",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (MS1, source_grounded); docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06, CC-10, CC-11)"
+    },
+    {
+      "claim_id": "CLAIM-22",
+      "claim_summary": "Ten methodological risks (RISK-01 to RISK-10) registered across four categories: data-access, validation, model-complexity, operationalisation; hazards source_grounded; probability and impact scores Inferred",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (RISK-01 to RISK-10; hazards: source_grounded from vault METH-RISK-002 to METH-RISK-006; scores: synthesis)"
+    },
+    {
+      "claim_id": "CLAIM-23",
+      "claim_summary": "WP1–WP5 structure: WP1 (diagnosis, M1–M14, 8 PM), WP2 (decision engine, M6–M20, 7 PM), WP3 (validation, M8–M24, 5 PM), WP4 (training/transfer, M1–M24, 2 PM), WP5 (dissemination/management, M1–M24, 2 PM)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP1–WP3: Confirmed, source_grounded; WP4: Confirmed-synthetic, SYN-SPINE-01; WP5: Inferred, synthesis); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "CLAIM-24",
+      "claim_summary": "Career Development Plan jointly prepared by supervisor and fellow, submitted as project deliverable by months 2–3, reviewed at M12 and M24 — mandatory MSCA-PF requirement",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07, CC-12, source_grounded); docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (D4-01 due month 3)"
+    },
+    {
+      "claim_id": "CLAIM-25",
+      "claim_summary": "Three mandatory MSCA-PF training dimensions: digital skills including generative AI; knowledge valorisation, innovation and entrepreneurship; research integrity and open-science ethics including FAIR data",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06, CC-10, CC-11, source_grounded)"
+    },
+    {
+      "claim_id": "CLAIM-26",
+      "claim_summary": "Two-way knowledge transfer: fellow brings uncertainty-aware AquaCrop calibration method and probabilistic ML expertise to host; host provides geoinformatics and field-scale validation competences to fellow; evidenced by methods seminars and MSc co-supervision",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md (section 1.3, Inferred framing); docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (EO-07, Confirmed mapping)"
+    },
+    {
+      "claim_id": "CLAIM-27",
+      "claim_summary": "Career advancement scaffold targets: at minimum 3 peer-reviewed publications (at minimum 2 first-authored), at minimum 120 hours of structured training, at minimum 1 MSc co-supervision, at minimum 2 conference presentations, follow-on proposal within 6 months of fellowship end",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (OBJ-5, validation_status: Confirmed-synthetic, evidence_strength: unconfirmed, spine_marker: SYN-SPINE-01)"
+    },
+    {
+      "claim_id": "CLAIM-28",
+      "claim_summary": "EO-01 through EO-08 (expected outcomes for fellows and participating organisations) from MSCA-PF call, all Confirmed",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-01 to EO-08, status: Confirmed)"
+    },
+    {
+      "claim_id": "CLAIM-29",
+      "claim_summary": "EO-07 mapping (transfer of knowledge and stronger R&I output at host) confirmed directly from concept vocabulary: 'transfer of knowledge' appears verbatim in strategic_positioning.md section 1.3 heading",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (EO-07, status: Confirmed)"
+    },
+    {
+      "claim_id": "CLAIM-30",
+      "claim_summary": "EO-04 mapping (alignment with European Charter for Researchers) is Assumed: no explicit Charter compliance statement present in any Tier 3 document; depends on host institutional commitment",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (EO-04, status: Assumed)"
+    },
+    {
+      "claim_id": "CLAIM-31",
+      "claim_summary": "EO-02 mapping (new mind-sets from international, inter-sectoral and interdisciplinary experience) is Inferred: international mobility confirmed; inter-sectoral and interdisciplinary terms not verbatim in concept",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (EO-02, status: Inferred)"
+    },
+    {
+      "claim_id": "CLAIM-32",
+      "claim_summary": "European Fellowship scope: hosted at EU Member State or Horizon Europe Associated Country; 12–24 months standard duration; open to researchers of any nationality",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-02, source_grounded)"
+    },
+    {
+      "claim_id": "FELLOW",
+      "claim_summary": "Fellow identity (name, current affiliation, PhD details, publication record, career stage, CV): required for Excellence 1.4, Impact 2.1 and Part B-2 CV",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity id: FELLOW, status: Unresolved, still_requires_real_confirmation: true)"
+    },
+    {
+      "claim_id": "HOST",
+      "claim_summary": "Host organisation identity (name, country, type, infrastructure, hosting arrangements): required for Excellence 1.3, Implementation 3.2, unit-cost budget gate",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity id: HOST, status: Unresolved, still_requires_real_confirmation: true)"
+    },
+    {
+      "claim_id": "SUPERVISOR",
+      "claim_summary": "Supervisor identity (name, affiliation, track record, supervision history): required for Excellence 1.3; notably absent from all source vault nodes",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity id: SUPERVISOR, status: Unresolved, source_vault_nodes: [], still_requires_real_confirmation: true)"
+    },
+    {
+      "claim_id": "FELLOWSHIP_TYPE",
+      "claim_summary": "Fellowship type (European Fellowship vs Global Fellowship): determines duration bounds, transfer-of-knowledge model (two-way vs three-way) and whether return phase applies; currently derived from synthetic BG→HU spine and falls with it",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity id: FELLOWSHIP_TYPE, status: Unresolved, still_requires_real_confirmation: true)"
+    },
+    {
+      "claim_id": "DURATION",
+      "claim_summary": "Project duration of 24 months: operator-declared working assumption under SYN-SPINE-01 demo run; rescaling of workpackage_seed and milestones_seed required once confirmed",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity id: DURATION, status: Unresolved, still_requires_real_confirmation: true); docs/tier3_project_instantiation/working_assumptions.json (project_duration_months: 24, declared_by: operator SYN-SPINE-01)"
+    }
+  ],
+  "source_refs": [
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+    },
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+    },
+    {
+      "tier": "Tier 2B",
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+    },
+    {
+      "tier": "Tier 3",
+      "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+    },
+    {
+      "tier": "Tier 4",
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    }
+  ]
+}

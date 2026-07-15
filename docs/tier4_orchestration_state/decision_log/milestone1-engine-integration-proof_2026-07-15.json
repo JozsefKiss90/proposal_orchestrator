@@ -1,0 +1,76 @@
+{
+  "record_type": "milestone_outcome",
+  "id": "milestone1-engine-integration-proof",
+  "date": "2026-07-15",
+  "run_id": "msca-pf-syn-01",
+  "authority": "Operator instruction (in-session). Records the ticket-13A (engine-integration) outcome. Logged per §9.4.",
+
+  "headline": "The milestone-1 length fix is PROVEN end-to-end on the live governed DAG, and the honesty gates correctly block finalization of unconfirmed content. Both poles of the milestone thesis are demonstrated on one real MSCA-PF run (on the SYN-SPINE-01 synthetic spine).",
+
+  "length_fix_proven": {
+    "excellence_section_words": 20780,
+    "excellence_section_sub_sections": 5,
+    "excellence_section_size_kb": 232.7,
+    "prior_monolithic_excellence_words": "~950 (whole section 14.7 KB)",
+    "ratio": "~22x",
+    "conclusion": "The transport ceiling that capped Part B at ~3,350 words total is gone. Decomposed drafting (bounded per-sub-section Claude calls) -> deterministic array-append assembler produced a full-length, traceable section with no chunked writer, exactly as the plan of record (D2/D3/D5) predicted."
+  },
+
+  "pipeline_proven_live": "Phases 1-8 ran on the live governed DAG. Phase 7 (unit-cost budget) resolved to EUR 176,578.80 and passed gate_09. Phase 8 n08a: live decomposed drafting (5 sub-sections) -> canonical-pack deriver + assumption-applier + deterministic assembler -> gate_10a. n08b/n08c fail-fast on the extra_fields guard (no drafting quota). This is the first end-to-end live execution of the decomposed-drafting stack.",
+
+  "gate_10a_honest_block": {
+    "status": "fail (exit_gate) — a correct, honest terminal state (§12.4, §15), not an engine fault",
+    "predicates_passed": 9,
+    "predicates_passed_include": "W1 (g09a_p11, assumed_claims_are_operator_declared) — the anti-fabrication guarantee held",
+    "predicates_failed": [
+      {
+        "id": "g09a_p06",
+        "function": "no_unresolved_material_claims",
+        "cause": "21 unresolved material claims across the drafts (105 Confirmed, 49 Inferred, 21 Unresolved). These are the synthetic spine (the confirmation checklist honestly flags fellow/host/supervisor as 'still requires real confirmation' — a synthetic fill does not confirm a fact) plus the vault's genuinely open decisions (RQ1 crop, RQ10 TRL).",
+        "interpretation": "LEGITIMATE. Under the adopted D14 refinement (finalization admits only Confirmed/Inferred), a section with unresolved claims must not finalize. The gate is enforcing exactly that standard."
+      },
+      {
+        "id": "g09a_p07",
+        "function": "partner_names_preserved",
+        "cause": "The prose used 'Dr. Mariya Petrova' without the canonical '[SYNTHETIC]' suffix the reference pack carries for FELLOW.",
+        "interpretation": "Drafter-quality slip caught by the canonical contradiction-detector. Fixable only by re-drafting with stricter 'preserve verbatim' instructions."
+      },
+      {
+        "id": "g09a_p09",
+        "function": "canonical_terms_preserved",
+        "cause": "OBJ-4 and WP3 titles were paraphrased/annotated ('Standalone research demonstrator** (Inferred from vault synthesis'; 'Field validation design and uncertainty calibration assessment (T3-01, T3-02') instead of the canonical titles.",
+        "interpretation": "Drafter-quality slip; same remedy (re-draft with stricter preservation)."
+      }
+    ]
+  },
+
+  "engine_bugs_found_and_fixed_this_session": [
+    "Runtime response truncation + parser fragment-acceptance (runtime-truncation-fix_2026-07-14.json).",
+    "SkillResult success-envelope normalization, Phase D.6 (runtime-skillresult-envelope-normalization_2026-07-14.json).",
+    "Missing consortium/partners.json for the Phase-3 partner-coverage gate (derived from roles.json under SYN-SPINE-01).",
+    "Concept override extension for SR-04 training dimensions + SR-05 CDP timing (synthetic-concept-override-extension_2026-07-14.json).",
+    "Live decomposed-drafting wiring into the node body (agent_runtime Phase B0) — the length fix's missing live producer.",
+    "Drafter response parser hardened to share the fail-closed extractor.",
+    "Budget-gate artifact-readiness made instrument-conditional (C1 gap: lump-sum artifacts were required for a unit-cost run).",
+    "Assembler tier coercion ('Tier 2B' -> 2) so drafts assemble without re-drafting.",
+    "Phase B0 idempotency (reuse drafts when section_spine.json exists) so re-runs cost no drafting quota.",
+    "working_assumptions.json host_country=HU + project_duration_months=24, resolving the unit-cost budget (D11/D12)."
+  ],
+
+  "constitutional_alignment": "The outcome is the system working as its constitution intends: it produced full-length evaluator-oriented content (the length fix) and then REFUSED to finalize it because the content rests on unconfirmed (synthetic) facts and paraphrased canonical terms. W1 held throughout; the engine invented nothing. A declared failure is a correct output (§12.4, §15). This honest block is aligned with the operator's D14 refinement (finalization = Confirmed/Inferred only).",
+
+  "what_remains_for_a_real_finalization_13B": [
+    "Real project data consolidated to Confirmed/Inferred (the fellow/host/supervisor confirmed for real; RQ1-RQ10 decided) — project-side, not an engine task.",
+    "Drafter canonical-preservation tuning (preserve legal names and canonical titles verbatim) to clear g09a_p07/p09.",
+    "Soft-cap tuning: 20,780 words for Excellence overshoots the MSCA-PF ~10-page target; the per-sub-section caps should be tuned to the instrument profile's page limit.",
+    "extra_fields sourcing for Impact/Implementation (task #9) so n08b/n08c draft and assemble.",
+    "The Obsidian graph track and multi-project generalization (milestone 2)."
+  ],
+
+  "final_run_states": {
+    "n01-n07": "released",
+    "n08a_excellence_drafting": "blocked_at_exit (exit_gate: gate_10a — honest block on unresolved claims + canonical slips)",
+    "n08b_impact_drafting / n08c_implementation_drafting": "blocked_at_exit (agent_body: extra_fields fail-fast guard, no drafting quota spent)",
+    "n08d-n08f": "blocked upstream"
+  }
+}

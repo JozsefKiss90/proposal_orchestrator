@@ -49,8 +49,9 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from runner.atomic_write import atomic_write_json
 
@@ -179,13 +180,35 @@ def _build_sub_section(draft: dict[str, Any], label: str) -> dict[str, Any]:
     return entry
 
 
+def _coerce_tier(tier: Any) -> Optional[int]:
+    """Coerce a source_ref ``tier`` to its integer form (1-4), or ``None``.
+
+    The schema requires an integer tier, but the live drafter sometimes emits a
+    descriptive string ('Tier 2B', '2B', 'Tier 2', '2').  Extract the first
+    tier digit deterministically; a sub-tier letter (2A / 2B) collapses to the
+    integer tier (2), which is the schema's granularity.  This is a pure,
+    deterministic normalisation (no inference) — an already-integer tier is
+    returned unchanged, so the byte-equal assembler guarantee is preserved.
+    """
+    if isinstance(tier, bool):
+        return None
+    if isinstance(tier, int):
+        return tier
+    if isinstance(tier, str):
+        m = re.search(r"[1-4]", tier)
+        if m:
+            return int(m.group(0))
+    return None
+
+
 def _source_ref_key(ref: dict[str, Any]) -> tuple[int, str]:
     """Deterministic sort/dedup key for a traceability source ref."""
-    tier = ref.get("tier")
+    tier = _coerce_tier(ref.get("tier"))
     source_path = ref.get("source_path")
-    if not isinstance(tier, int) or isinstance(tier, bool):
+    if tier is None:
         raise SectionAssemblerError(
-            f"source_ref 'tier' must be an integer, got {tier!r}"
+            "source_ref 'tier' must be an integer 1-4 (or a tier string such "
+            f"as 'Tier 2'), got {ref.get('tier')!r}"
         )
     if not isinstance(source_path, str) or not source_path:
         raise SectionAssemblerError(

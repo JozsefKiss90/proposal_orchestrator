@@ -4,6 +4,12 @@
 
 > **Correction.** An earlier note framed milestone 1 as "closed." That was premature. Per D14 / Stage 7, milestone 1's done-condition is the **end-to-end MSCA-PF run through Phase 8, exported to `.docx`, independently re-verified** — the drafting engine actually producing length + honesty **for one real MSCA project.** That has not happened. This document is the honest status.
 
+## Engine-integration proof — ACHIEVED (2026-07-15)
+
+The live governed DAG ran **Phases 1–8** on `msca-pf-syn-01`. **The length fix is proven:** the Excellence section drafted **20,780 words** across 5 sub-sections (vs the old ~950) — the transport ceiling is gone, and decomposed drafting → deterministic assembly → gate ran end-to-end live. `gate_10a` then **honestly blocked** on 21 unresolved material claims (the synthetic spine + open vault decisions) and two canonical-preservation slips, while **W1 passed** — the anti-fabrication guarantee held. Both poles of the milestone thesis are demonstrated: full-length content *and* honest refusal to finalize unconfirmed content, exactly the D14 standard. Detail: `decision_log/milestone1-engine-integration-proof_2026-07-15.json`.
+
+Remaining for a *real* finalization (13B) is project-side + tuning: real Confirmed/Inferred data, drafter canonical-preservation tuning, soft-cap tuning to the page limit, and Impact/Implementation `extra_fields` (task #9).
+
 ## Definition of done (brief D14 / Stage 7), as refined
 
 Milestone 1 fixes **length and honesty inside the current drafting engine for one real MSCA project.** Done requires:

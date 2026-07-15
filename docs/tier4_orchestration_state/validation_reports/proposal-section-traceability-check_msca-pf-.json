@@ -1,0 +1,193 @@
+{
+  "report_id": "traceability_excellence_traceability_auditor_2026-07-15T00:00:00Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "msca-pf-syn-01",
+  "section_id_audited": "excellence",
+  "claim_audit_results": [
+    {
+      "claim_id": "C-AUDIT-01",
+      "claim_summary": "Excellence criterion accounts for 50% of MSCA-PF evaluation score (Score 1, Weighting: 50%)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json — evaluation_matrix.Excellence.weight: 0.5; source_section: 'Section 1 — Excellence (Score 1, Weighting: 50%)'; source_document: ef_he-msca_en.pdf",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-02",
+      "claim_summary": "Core methodological problem: irrigation decisions face two compounding uncertainties (observational and prospective); existing decision-support approaches collapse both to point estimates at each coupling step — the systematic failure mode this fellowship addresses at its root",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — Core Architecture (METH-CORE-001, source_grounded); Uncertainty Chain (METH-CORE-004, source_grounded)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-03",
+      "claim_summary": "Systematic literature review of approximately 50 studies across two axes (sensor integration depth x decision-support maturity); research-gap matrix identifies empty cell at Real-Time Decision Support combined with PlanetScope high-resolution imagery as the fellowship's primary positioning",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — State of the Art Multi Sensor Crop Water Stress Monitoring (METH-SOTA-001, source_grounded); Research Gap Matrix (METH-SOTA-006/METH-SOTA-007, source_grounded)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-04",
+      "claim_summary": "Novelty claim: no reviewed precedent couples all three stages — learned multimodal fusion producing explicit probabilistic crop-water-state estimate, uncertainty-aware crop simulation, and economically optimised irrigation recommendation — end-to-end with uncertainty intact throughout",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — Probabilistic Fusion Novelty Claim (METH-SOTA-006); explicitly labeled 'Inferred from vault synthesis' in section content. Derivation: review documents absence of full three-stage coupling per-stage; novelty framing synthesises from per-stage review findings rather than citing a single source sentence asserting the gap.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-05",
+      "claim_summary": "Research objectives OBJ-1 through OBJ-4 (probabilistic diagnosis, decision engine, field validation, standalone demonstrator) with stated target months, WP assignments, and deliverable linkages; OBJ-5 (training and career) as instrument-required objective",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json — OBJ-1, OBJ-2, OBJ-3 (source_grounded, Confirmed); OBJ-4 (synthesis, Inferred framing, evidence_strength: synthesis); OBJ-5 (SYN-SPINE-01, synthetic: true, evidence_strength: unconfirmed). Source exists and content directly consistent with section's objective descriptions.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-06",
+      "claim_summary": "Route A (Direct Probabilistic Fusion, METH-ROUTE-001): all covariates into single probabilistic model going directly to latent field state with uncertainty in one step; Route B (Homogeneous Patch Proxy, METH-ROUTE-002): spectrally homogeneous patch as read-clean proxy; Control Stand Variant (METH-ROUTE-003); both routes share the same decision engine",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — METH-ROUTE-001 (Route A Direct Probabilistic Fusion, source_grounded); METH-ROUTE-002 (Route B Homogeneous Patch Proxy, source_grounded); METH-ROUTE-003 (Control Stand Variant, source_grounded)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-07",
+      "claim_summary": "Uncertainty Chain (METH-CORE-004) as architectural invariant: no coupling point in the observation-to-decision pipeline collapses a distribution to a point estimate without preserving its width; validation protocol directly tests chain integrity via prediction-interval coverage metric",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — Uncertainty Chain (METH-CORE-004, source_grounded)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-08",
+      "claim_summary": "Prior peer-reviewed publication (doi:10.1016/j.envsoft.2022.105556) attributed to the fellow as principal contributor (PI Role), constituting the technical prerequisite for OBJ-2 and for Uncertainty Chain integrity at the AquaCrop model interface",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md — PI Role (METH-PART-003, explicitly labeled 'Inferred from first-person authorship of the design narrative'). Derivation: first-person narrative ownership of the calibration methodology in the source vault implies PI authorship; no named authorship record exists in any Tier 3 artifact independently of the inference.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-09",
+      "claim_summary": "Supervisor identity (name), disciplinary qualifications, publication record, and documented track record supervising researchers at postdoctoral level to career outcomes within academia and beyond",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — SUPERVISOR: source_vault_nodes: []; what_source_says: 'No supervisor appears ANYWHERE in the vault'; still_requires_real_confirmation: true. Synthetic working value Prof. Dr. Gabor Nagy [SYNTHETIC] is a demonstration placeholder only.",
+      "flag_reason": "No supervisor is named in any source vault node. SUPERVISOR identity and credentials are entirely absent from Tier 3 data. Synthetic placeholder occupies WP4 lead and contributing-partner roles without supplying any confirmed competence, publication, or supervision-history content. This is the single most consequential unresolved gap for an MSCA-PF submission (supervisor-centric instrument)."
+    },
+    {
+      "claim_id": "C-AUDIT-10",
+      "claim_summary": "Host institution identity and attributed geoinformatics, environmental-modelling, and field-scale geospatial data infrastructure competences as the substantive host-to-fellow knowledge transfer content",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — HOST: still_requires_real_confirmation: true. Competence attributions in concept_note.md and strategic_positioning.md are explicitly built on synthetic working value ELTE [SYNTHETIC ARRANGEMENT] and must be confirmed with the real host.",
+      "flag_reason": "Host identity is unconfirmed. Host competences (geoinformatics, field-scale data infrastructure) are attributed to a synthetic placeholder. No confirmed host exists to verify competence claims. Host competence assertions are Unresolved until real host is confirmed and its actual capabilities documented in Tier 3."
+    },
+    {
+      "claim_id": "C-AUDIT-11",
+      "claim_summary": "Fellow identity (name, home affiliation and country, CV, full publication record, career stage, MSCA mobility eligibility within 36-month lookback)",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — FELLOW: still_requires_real_confirmation: true. Synthetic working value Dr. Mariya Petrova [SYNTHETIC], Plovdiv University, Bulgaria (SYN-SPINE-01). No vault node names any fellow.",
+      "flag_reason": "Fellow identity is entirely unconfirmed. MSCA mobility eligibility (no more than 12 months residence or main activity in host country in preceding 36 months) cannot be assessed without confirmed identity. All CV and publication-record content in section 1.4 is spine-dependent and not submittable."
+    },
+    {
+      "claim_id": "C-AUDIT-12",
+      "claim_summary": "Project duration: 24 months; this value governs the milestone schedule, the CDP review cycle (M12, M24), and the secondment eligibility calculation throughout the section",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — DURATION: still_requires_real_confirmation: true. docs/tier3_project_instantiation/working_assumptions.json — operator-declared 24 months under SYN-SPINE-01 for demonstration run only; not a confirmed project fact.",
+      "flag_reason": "Duration is operator-declared under synthetic spine and falls with the synthetic host. If real host is in a non-associated Third Country, fellowship type changes to Global Fellowship and duration structure changes. 24-month scaffold is a working assumption, not a confirmed fact."
+    },
+    {
+      "claim_id": "C-AUDIT-13",
+      "claim_summary": "Fellowship type: European Fellowship (EF), derived from synthetic intra-EU mobility (Bulgaria to Hungary); determines applicable knowledge-transfer model (two-way, not three-way) and secondment rules",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — FELLOWSHIP_TYPE: still_requires_real_confirmation: true. EF determination rests on synthetic host (ELTE, Hungary [SYNTHETIC]); falls with the spine. docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-02 (EF) and SR-03 (GF) confirmed as structural rules.",
+      "flag_reason": "Fellowship type determination is contingent on confirmed host country. Synthetic host yields European Fellowship by definition; real host in a non-associated Third Country would require Global Fellowship structure with mandatory 12-month return phase. Fellowship type is Unresolved until host is confirmed."
+    },
+    {
+      "claim_id": "C-AUDIT-14",
+      "claim_summary": "Three mandatory MSCA-PF training dimensions under SR-06: digital skills including responsible use of generative AI, knowledge valorisation and innovation/entrepreneurship, research integrity and open-science ethics/FAIR data management",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-06: 'Training activities must integrate key transferable skills and competences including digital skills (e.g. generative AI), foster Open Science culture, knowledge valorisation, research integrity, and where applicable innovation and entrepreneurship.' Status: Confirmed, mandatory. source_document: HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-15",
+      "claim_summary": "Career Development Plan (CDP) must be established jointly by supervisor(s) and researcher, covering six content dimensions (research objectives, training/career needs, transferable skills, teaching, publications, open-science events), submitted as project deliverable at beginning of action",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-07: 'A Career Development Plan must be established jointly by the supervisor(s) and the researcher, covering research objectives, training and career needs, transferable skills, teaching, publications, and participation in open science events. The Plan must be submitted as a project deliverable at the beginning of the action.' Status: Confirmed, mandatory.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-16",
+      "claim_summary": "Work package structure (WP1–WP5), tasks (T1-01 through T5-02), deliverables (D1-01, D2-01, D3-01, D4-01, D5-01) with due months, lead partners (role tokens SUPERVISOR/HOST/FELLOW), and contributing-partner assignments",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — Phase 3 canonical output; contains WP structure with tasks, deliverables, due_month values, lead_partner and contributing_partners fields populated with role tokens.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-17",
+      "claim_summary": "Milestone verifiable criteria: MS1 (month 6, multi-sensor data pipeline operational and DMP delivered), MS2 (month 12, diagnostic method v1 producing calibrated field-state posteriors with explicit uncertainty), MS3 (month 15, decision engine integrated end-to-end), MS5 (month 22, field validation and uncertainty calibration complete)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json — MS1, MS2, MS3, MS5: evidence_strength: source_grounded; verifiable_criterion fields present and consistent with section descriptions.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-18",
+      "claim_summary": "Milestone verifiable criteria: MS4 (month 18, standalone research demonstrator exercises end-to-end pipeline and presents recommendations with uncertainty for at least one field case) and MS6 (month 24, at least one open-access publication submitted and open data/models released under FAIR principles)",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json — MS4 and MS6: evidence_strength: synthesis (labeled Inferred framing in provenance). Derivation: MS4 and MS6 verifiable criteria synthesised from vault nodes METH-INFRA-010 and METH-CORE-005 rather than derived from a single source-grounded vault statement.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-19",
+      "claim_summary": "Risk register: ten risks (RISK-01 through RISK-10) spanning data-access (RISK-01 to RISK-03), validation (RISK-04 to RISK-06), model-complexity (RISK-07 to RISK-09), and operationalisation (RISK-10) categories, with hazard identification and mitigation approaches",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json — risks lifted from Risk Register (METH-RISK-002) rows R1–R10; hazards source_grounded (traces to methodology_idea.txt/prompt.txt/litreview Report A per provenance); probability/impact scoring Inferred (analyst estimates per _provenance.status_note).",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-20",
+      "claim_summary": "Expected outcomes EO-01 through EO-08 from MSCA-PF call (EO-01: increased research and transferable skills; EO-02: new mind-sets through international/interdisciplinary experience; EO-04: Charter alignment; EO-05: enhanced training quality; EO-07: stronger R&I capacity and better transfer of knowledge; EO-08: feedback of results into teaching)",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json — EO-01 through EO-08, each with source_section 'Expected Outcome – For supported postdoctoral fellows', source_document HORIZON-MSCA-2026-PF-01-01.slice.json, status: Confirmed.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-21",
+      "claim_summary": "Expected outcome mapping statuses from Phase 2 analysis: EO-07 Confirmed mapping (only outcome with verbatim vocabulary match); EO-01 Confirmed mapping; EO-02, EO-05, EO-08 Inferred mappings; EO-04 Assumed mapping",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — EO-07 mapping: Confirmed ('concept explicitly uses the phrase transfer of knowledge verbatim in the section title'); EO-01 Confirmed; EO-02, EO-05, EO-08 Inferred; EO-04 Assumed. Derivation: mapping statuses derive from Phase 2 vocabulary-alignment analysis, not from direct source-grounded call document statements.",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "C-AUDIT-22",
+      "claim_summary": "EO-04 (European Charter for Researchers alignment) mapping — Assumed: neither 'European Charter for Researchers' nor 'working conditions' appears in the concept corpus; host Charter compliance statement (HRS4R or equivalent) absent from all Tier 3 documents",
+      "status": "assumed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — EO-04 mapping status: Assumed; note explicitly states neither Charter nor working-conditions vocabulary appears in concept corpus. Assumption declared: EO-04 alignment requires confirmed host's Charter compliance verification.",
+      "flag_reason": "Assumption explicitly declared per §12.2. Generic expectation that host institutions comply with the European Charter for Researchers is structurally plausible but cannot be elevated to Confirmed or Inferred without a specific Charter compliance statement from the confirmed host institution."
+    },
+    {
+      "claim_id": "C-AUDIT-23",
+      "claim_summary": "Data providers: named validation farms, field sites, EO data-access guarantees, and meteorological data providers required for OBJ-3 field validation and uncertainty calibration",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — DATA_PROVIDERS: Unresolved; explicitly noted as 'not touched by the SYN-SPINE-01 synthetic fill; remains genuinely open'. OBJ-3 measurability depends on confirmed validation sites.",
+      "flag_reason": "DATA_PROVIDERS are Unresolved and not addressed by the synthetic spine fill. No validation sites, farms, or data provider names are confirmed in any Tier 3 artifact. OBJ-3 content depending on confirmed field data cannot be finalised; specific ground-truth arrangements, site names, and data access cannot be verified."
+    },
+    {
+      "claim_id": "C-AUDIT-24",
+      "claim_summary": "Section's traceability_footer declares no_unsupported_claims_declaration = true",
+      "status": "unresolved",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/excellence_section.json — traceability_footer.no_unsupported_claims_declaration: true; contrasted with validation_status.overall_status: 'unresolved' and at minimum 7 distinct claim_statuses entries with status: 'unresolved' (FELLOW, HOST, SUPERVISOR, DURATION, FELLOWSHIP_TYPE, DATA_PROVIDERS, VALIDATION_PARTNER).",
+      "flag_reason": "INTERNAL CONTRADICTION: The section's traceability_footer declares no_unsupported_claims_declaration=true, but the section's own validation_status.overall_status='unresolved' and multiple claim_statuses are marked 'unresolved'. Per §12.2 and skill spec Step 2.4, no_unsupported_claims_declaration may be true only if ALL material claims have status Confirmed or Inferred (no Assumed or Unresolved claims remain). The declaration is factually incorrect and must be corrected to false before the section can pass gate_10a traceability requirements."
+    },
+    {
+      "claim_id": "C-AUDIT-25",
+      "claim_summary": "Validation partner (VALIDATION_PARTNER) inter-sectoral role in WP3 field validation and SR-06 knowledge-valorisation training dimension; synthetic value: AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "status": "unresolved",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — VALIDATION_PARTNER: Unresolved; not closed by SYN-SPINE-01 synthetic fill; explicitly noted as still genuinely open. Synthetic value is AgroVIR Kft. [SYNTHETIC ARRANGEMENT].",
+      "flag_reason": "Validation partner identity is unconfirmed. Specific inter-sectoral training content and transfer benefits attributed to the validation partner in the knowledge-valorisation dimension of SR-06 training cannot be finalised. The partner's WP3 contributing-partner role assignments in wp_structure.json rest on a synthetic placeholder."
+    }
+  ],
+  "summary": {
+    "total_claims": 25,
+    "confirmed": 12,
+    "inferred": 4,
+    "assumed": 1,
+    "unresolved": 8
+  },
+  "no_unsupported_claims_declaration": false,
+  "timestamp": "2026-07-15T00:00:00Z"
+}

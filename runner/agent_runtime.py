@@ -45,7 +45,11 @@ from runner.decomposed_drafting import (
     DecomposedDraftingError,
     draft_section_decomposed,
 )
-from runner.section_assembler import REQUIRED_EXTRA_FIELDS
+from runner.section_assembler import (
+    REQUIRED_EXTRA_FIELDS,
+    SECTION_DRAFTS_ROOT_REL,
+    SPINE_FILENAME,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -1081,6 +1085,27 @@ def run_agent(
                     failure_reason=(
                         "Decomposed drafting skipped (section reused from a "
                         "prior run)"
+                    ),
+                )
+            )
+            continue
+        # Idempotent reuse: if the section spine already exists, every
+        # sub-section draft was produced by a prior run (the spine is written
+        # LAST, after all drafts).  Skip re-drafting — the assembler composes
+        # the existing drafts — so a re-run after a downstream fix (e.g. an
+        # assembler correction) costs no drafting quota.  Delete
+        # section_drafts/<slug>/ to force a fresh draft.
+        _spine_path = (
+            repo_root / SECTION_DRAFTS_ROOT_REL / _slug / SPINE_FILENAME
+        )
+        if _spine_path.is_file():
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="reuse_skipped",
+                    failure_reason=(
+                        "Decomposed drafting reused (section_spine.json "
+                        "present; delete section_drafts/<slug>/ to re-draft)"
                     ),
                 )
             )

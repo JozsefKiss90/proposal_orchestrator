@@ -1,0 +1,268 @@
+{
+  "schema_id": "orch.phase8.canonical_reference_pack.v1",
+  "run_id": "msca-pf-syn-01",
+  "objectives": [
+    {
+      "id": "OBJ-1",
+      "title": "Probabilistic multi-sensor diagnosis of the latent field state",
+      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables with explicit, honest uncertainty (posterior/prediction intervals). The precise target field state (RQ3) and whether one or both routes are implemented (RQ2) are open project decisions; the verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": [
+        "SUPERVISOR",
+        "HOST"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OBJ-2",
+      "title": "Uncertainty-aware decision engine for irrigation choice",
+      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by expected profit (expected crop value minus costs) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The exact decision objective (profit vs weighted multi-objective) is an open decision (RQ6).",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": [
+        "SUPERVISOR"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OBJ-3",
+      "title": "Field validation and honest uncertainty calibration",
+      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4), uncertainty-calibration metrics (RQ5), pilot-success criteria (RQ7) and a patch-covariation test (RQ9). These four items define a protocol that does not yet exist and must be specified with the (unresolved) host and validation sites; no validation numbers are asserted.",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": [
+        "HOST",
+        "SUPERVISOR"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OBJ-4",
+      "title": "Standalone research demonstrator (web MVP)",
+      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target (research prototype vs validated MVP vs operational pilot) is an open project decision (RQ10) and is NOT asserted.",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": [
+        "HOST"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OBJ-5",
+      "title": "Advancement of the fellow's competences and career",
+      "measurable_target": "By month 24: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2-3), then reviewed and updated at M12 and M24; at least 3 peer-reviewed publications (>=2 as first author); >=120 hours of transferable-skills training covering the MSCA-PF mandatory dimensions - digital and AI skills (including responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation, innovation and entrepreneurship, research integrity, and open science / FAIR data stewardship; co-supervision of >=1 MSc thesis at the host; >=2 international conference presentations; and two-way transfer of knowledge evidenced by >=2 methods seminars delivered at the host on uncertainty-aware crop-water modelling.",
+      "responsible_partner": "FELLOW",
+      "contributing_partners": [
+        "SUPERVISOR",
+        "HOST"
+      ],
+      "provenance": "confirmed"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "OUT-1",
+      "title": "Probabilistic multi-sensor field-state diagnosis method",
+      "linked_objectives": [
+        "OBJ-1"
+      ],
+      "linked_wp_ids": [
+        "WP1"
+      ],
+      "linked_deliverable_ids": [
+        "D1.1",
+        "D1.2"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OUT-2",
+      "title": "Uncertainty-aware AquaCrop decision engine",
+      "linked_objectives": [
+        "OBJ-2"
+      ],
+      "linked_wp_ids": [
+        "WP2"
+      ],
+      "linked_deliverable_ids": [
+        "D2.1",
+        "D2.2"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OUT-3",
+      "title": "Field-validation dataset and uncertainty-calibration evidence",
+      "linked_objectives": [
+        "OBJ-3"
+      ],
+      "linked_wp_ids": [
+        "WP3"
+      ],
+      "linked_deliverable_ids": [
+        "D3.1",
+        "D3.2"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OUT-4",
+      "title": "Standalone research demonstrator (web MVP)",
+      "linked_objectives": [
+        "OBJ-4"
+      ],
+      "linked_wp_ids": [
+        "WP2",
+        "WP3"
+      ],
+      "linked_deliverable_ids": [
+        "D2.3"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OUT-5",
+      "title": "Peer-reviewed publications and open science outputs",
+      "linked_objectives": [
+        "OBJ-1",
+        "OBJ-2",
+        "OBJ-3"
+      ],
+      "linked_wp_ids": [
+        "WP5"
+      ],
+      "linked_deliverable_ids": [
+        "D5.1"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OUT-6",
+      "title": "Enhanced researcher competences and career readiness",
+      "linked_objectives": [
+        "OBJ-5"
+      ],
+      "linked_wp_ids": [
+        "WP4"
+      ],
+      "linked_deliverable_ids": [],
+      "provenance": "confirmed"
+    }
+  ],
+  "wps": [
+    {
+      "wp_id": "WP1",
+      "title": "Probabilistic multi-sensor diagnosis of the field state",
+      "lead_partner": "FELLOW",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Uncertainty-aware decision engine and demonstrator integration",
+      "lead_partner": "FELLOW",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Field validation, ground truth and uncertainty calibration",
+      "lead_partner": "FELLOW",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Training, supervision and two-way transfer of knowledge",
+      "lead_partner": "SUPERVISOR",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Dissemination, exploitation, communication and management",
+      "lead_partner": "FELLOW",
+      "provenance": "confirmed"
+    }
+  ],
+  "deliverables": [
+    {
+      "deliverable_id": "D1-01",
+      "title": "Diagnostic branch technical report",
+      "due_month": 14,
+      "type": "report",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2-01",
+      "title": "Research demonstrator software",
+      "due_month": 20,
+      "type": "software",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3-01",
+      "title": "Validation and uncertainty calibration report",
+      "due_month": 24,
+      "type": "report",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4-01",
+      "title": "Career Development Plan",
+      "due_month": 3,
+      "type": "report",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5-01",
+      "title": "Data management plan",
+      "due_month": 6,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5-02",
+      "title": "Dissemination and exploitation report",
+      "due_month": 24,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    }
+  ],
+  "partners": [
+    {
+      "short_name": "ELTE",
+      "legal_name": "Eotvos Lorand University (ELTE), Budapest",
+      "country": "Hungary",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "FELLOW",
+      "legal_name": "Dr. Mariya Petrova [SYNTHETIC]",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "SUPERVISOR",
+      "legal_name": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "AgroVIR",
+      "legal_name": "AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "country": "Hungary",
+      "provenance": "confirmed"
+    }
+  ],
+  "declared_assumptions": [
+    {
+      "key": "host_country",
+      "declared_value": "HU",
+      "provenance": "assumed"
+    },
+    {
+      "key": "project_duration_months",
+      "declared_value": 24,
+      "provenance": "assumed"
+    }
+  ],
+  "aliases": []
+}
