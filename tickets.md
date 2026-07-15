@@ -162,17 +162,26 @@ Two orienting facts. **Ticket 1 is a prefactor** — it generalizes the one exis
 - [ ] It renders whatever sections exist; the full B1 (all three sections) renders once Impact + Implementation (ticket 11) land.
 - [ ] The `.docx` reflects section content, headings, and structure faithfully — no content is invented at export.
 
-## 13. End-to-end MSCA-PF run (α/β) + independent re-verify
+## 13. End-to-end MSCA-PF run + independent re-verify
 
-**What to build:** A full-DAG MSCA-PF run that is either honestly blocked or all-green depending on what the operator declares — the milestone's definition of done (D14) — with the `.docx` export and an independent traceability re-verification.
+> **Done-condition refined 2026-07-14** (operator instruction; `decision_log/d14-refinement-finalization-standard_2026-07-14.json`). A **finalized** proposal admits only **Confirmed / Inferred** claims. The β / operator-declared-`Assumed` path and the SYN-SPINE-01 synthetic spine are **interim testing affordances**, not done-conditions. This splits ticket 13 into an **engine-integration** proof (any data) and a **finalization** run (consolidated Confirmed/Inferred data). The α honest block remains a valid terminal state.
+
+**What to build:** A full-DAG MSCA-PF run that proves the Stage 3–6 components integrate end-to-end, and — on consolidated real data — produces a finalized B1, with `.docx` export and independent traceability re-verification.
 
 **Blocked by:** 8 (Unit-cost budget + `gate_09`), 10 (Canonical-pack deriver extension), 11 (Impact + Implementation), 12 (`.docx` exporter).
 
-- [ ] Mode **α** (no declarations): the run fails closed with an informative block on the researcher / host / call spine — enumerated unconfirmed claims + a confirmation checklist (a correct terminal state, §13.4).
-- [ ] Mode **β** (host+ declared): every Phase-8 gate is green (every `Assumed` operator-declared, W1 satisfied), producing a full B1.
-- [ ] The `.docx` is exported for the β run.
+**13A — Engine integration (provable on scaffolding data now; establishes engine readiness).**
+
+- [ ] Mode **α** (no declarations / unconsolidated data): the run fails closed with an informative block on the researcher / host / call spine — enumerated unconfirmed claims + a confirmation checklist (a correct terminal state, §13.4). *(Captured at Phase 2; tag `alpha-honest-block`.)*
+- [ ] The full DAG runs Phases 1–8 to completion on interim data (β-declared or SYN-SPINE-01), exercising decomposed drafting, the assembler, the assumption-applier, the canonical pack, the unit-cost `gate_09`, and `.docx` export — proving the components compose. *(This green is an explicitly not-submittable engine-integration artifact, marked `SYNTHETIC/INTERIM — NOT FOR SUBMISSION`.)*
 - [ ] Both CI byte-equal checks pass (assembler; unit-cost budget).
-- [ ] An independent subagent re-verifies that every material claim traces to Tier 3 or a declared assumption.
+
+**13B — Finalization (requires real data consolidated to Confirmed/Inferred).**
+
+- [ ] The real project data is consolidated to **Confirmed / Inferred** only — no `Assumed`/`Unresolved` claims remain in the finalized set (RQ1–RQ10 closed; real researcher/host/supervisor spine confirmed). *(Project-side precondition.)*
+- [ ] The finalization run is **all-green on Confirmed/Inferred data** — no `Assumed` claim in the finalized B1.
+- [ ] The `.docx` is exported for the finalization run (no interim/synthetic marker).
+- [ ] An independent subagent re-verifies that every material claim traces to a **Confirmed or Inferred** Tier 3 fact (on real data this verifies truth, not merely mechanism).
 
 ## 14. Hand-lift MSCA Tier 3 from the vault (project instantiation)
 
