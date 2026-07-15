@@ -2073,3 +2073,38 @@ class TestDecomposedDraftingLiveWiring:
             run_agent(**kwargs)  # no deterministic_components
 
         draft_mock.assert_not_called()
+
+    def test_section_needing_extra_fields_fails_fast_without_drafting(
+        self, tmp_path: Path
+    ) -> None:
+        # Impact requires extra_fields the pre-pass does not source yet, so it
+        # must fail BEFORE any drafting call (no quota spent) and never reach
+        # the assembler.  This is the guard that keeps a live Phase-8 run from
+        # burning Impact/Implementation drafting on a section that cannot
+        # assemble.
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["impact-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock()
+        assembler = MagicMock(side_effect=self._fake_assembler)
+        with patch.dict(
+            COMPONENT_REGISTRY, {"impact_section_assembler": assembler}
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["impact_section_assembler"],
+            )
+
+        assert result.status == "failure"
+        assert result.failure_category == "MISSING_INPUT"
+        assert result.can_evaluate_exit_gate is False
+        # Fail-fast: neither the drafter nor the assembler ran.
+        draft_mock.assert_not_called()
+        assembler.assert_not_called()
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:impact"
+        )
+        assert rec.status == "failure"
