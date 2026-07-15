@@ -41,6 +41,10 @@ from runner.runtime_models import (
     SkillInvocationRecord,
 )
 from runner.skill_runtime import run_skill
+from runner.decomposed_drafting import (
+    DecomposedDraftingError,
+    draft_section_decomposed,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +130,18 @@ _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL: dict[str, str] = {
     "excellence_section_assembler": "excellence-section-drafting",
     "impact_section_assembler": "impact-section-drafting",
     "implementation_section_assembler": "implementation-section-drafting",
+}
+
+#: Maps a bound section-assembler component to the section slug whose
+#: per-sub-section drafts it composes.  Used to invoke the live decomposed
+#: drafter — the producer of ``section_drafts/<slug>/`` — BEFORE the Phase-B+
+#: component loop runs the assumption-applier and assembler that consume those
+#: drafts.  Without this producer the assembler has nothing to compose and the
+#: node yields an empty/absent section (ticket 13A: the length fix's live wire).
+_ASSEMBLER_SECTION_SLUG: dict[str, str] = {
+    "excellence_section_assembler": "excellence",
+    "impact_section_assembler": "impact",
+    "implementation_section_assembler": "implementation",
 }
 
 
@@ -982,6 +998,84 @@ def run_agent(
                 + "; ".join(input_errors)
             ),
             failure_category="MISSING_INPUT",
+        )
+
+    # ── Phase B0: Live decomposed drafting — producer of section_drafts/ ──
+    #
+    # (ticket 13A) When a ``*_section_assembler`` component is bound, the
+    # section is composed by array-append from per-sub-section drafts in
+    # ``section_drafts/<slug>/``, and the monolithic drafting skill is
+    # superseded (skipped) in the skill loop below.  Those drafts must be
+    # PRODUCED first — otherwise the Phase-B+ assumption-applier and assembler
+    # that consume them have nothing to work on and the node yields an empty
+    # section.  Decomposed drafting is Claude-invoking (bounded per-sub-section
+    # calls with sequential context), so it is a skill-class pass: recorded in
+    # ``invoked_skills`` (NOT ``invoked_components`` — those are Claude-free,
+    # §17.5.3) and fail-closed (§17.5.4).  It defaults to the live Claude
+    # drafter, which is instructed to emit only Confirmed/Inferred/Unresolved
+    # and to never self-declare ``Assumed`` — so the β/W1 honesty contract is
+    # preserved (an operator declaration applied by the Phase-B+ applier is the
+    # only path to an ``Assumed`` claim).
+    _drafting_skip_set = frozenset(skip_skills) if skip_skills else frozenset()
+    for _cid in deterministic_components or []:
+        _slug = _ASSEMBLER_SECTION_SLUG.get(_cid)
+        if _slug is None:
+            continue  # not a section-assembler; nothing to draft here
+        _monolithic_skill = _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL.get(_cid)
+        if _monolithic_skill in _drafting_skip_set:
+            # Reuse path: the section is reused from a prior run; do not redraft.
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="reuse_skipped",
+                    failure_reason=(
+                        "Decomposed drafting skipped (section reused from a "
+                        "prior run)"
+                    ),
+                )
+            )
+            continue
+        try:
+            _draft_paths = draft_section_decomposed(run_id, repo_root, _slug)
+        except Exception as exc:  # noqa: BLE001 — honor the no-raise contract
+            # draft_section_decomposed raises DecomposedDraftingError on a
+            # malformed draft; the underlying live drafter may also surface a
+            # transport error.  Either way run_agent must return an AgentResult,
+            # never propagate (§17.5.4: no silent repair, fail closed).
+            _reason = (
+                f"Decomposed drafting failed for {_slug!r}: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="failure",
+                    failure_reason=_reason,
+                    failure_category="SKILL_FAILURE",
+                )
+            )
+            return AgentResult(
+                status="failure",
+                can_evaluate_exit_gate=False,
+                failure_reason=_reason,
+                failure_category="SKILL_FAILURE",
+                outputs_written=all_outputs,
+                validation_reports=all_validation_reports,
+                decision_log_writes=all_decision_log_writes,
+                invoked_skills=all_invocations,
+                invoked_components=all_invoked_components,
+            )
+        all_invocations.append(
+            SkillInvocationRecord(
+                skill_id=f"decomposed-drafting:{_slug}",
+                status="success",
+            )
+        )
+        logger.info(
+            "Decomposed drafting produced %d artifact(s) for %s "
+            "(section_drafts/); the bound assembler will compose the section",
+            len(_draft_paths),
+            _slug,
         )
 
     # ── Phase B+: Deterministic components (manifest-bound, §17.5.3/C2) ─

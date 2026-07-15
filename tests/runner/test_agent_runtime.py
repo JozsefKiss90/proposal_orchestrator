@@ -35,6 +35,7 @@ from runner.deterministic_components import COMPONENT_REGISTRY
 # ---------------------------------------------------------------------------
 
 _RUN_SKILL_TARGET = "runner.agent_runtime.run_skill"
+_DRAFT_TARGET = "runner.agent_runtime.draft_section_decomposed"
 
 
 def _write_yaml(path: Path, data: Any) -> None:
@@ -1880,13 +1881,22 @@ class TestDecomposedDraftingSupersession:
         with patch.dict(
             COMPONENT_REGISTRY,
             {"excellence_section_assembler": _assembler},
-        ), patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+        ), patch(
+            _DRAFT_TARGET,
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ],
+        ) as _draft_mock, patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
             result = run_agent(
                 **kwargs,
                 deterministic_components=["excellence_section_assembler"],
             )
 
         assert result.status == "success"
+        # The bound assembler now first triggers live decomposed drafting
+        # (ticket 13A, Phase B0) — the producer of section_drafts/ — then
+        # supersedes the monolithic drafting skill.
+        _draft_mock.assert_called_once()
         # The monolithic drafting skill was superseded (never run) ...
         assert "excellence-section-drafting" not in called_skills
         # ... while the audit skill still ran.
@@ -1933,3 +1943,133 @@ class TestDecomposedDraftingSupersession:
 
         assert result.status == "success"
         assert "excellence-section-drafting" in called_skills
+
+
+class TestDecomposedDraftingLiveWiring:
+    """Ticket 13A — the live decomposed drafter (producer of section_drafts/)
+    is invoked in the node body when a ``*_section_assembler`` component is
+    bound, BEFORE the Phase-B+ component loop that consumes the drafts.  This
+    is the wire that makes the length fix reach the live governed DAG (the
+    driver was previously exercised only in tests)."""
+
+    @staticmethod
+    def _fake_assembler(run_id: str, repo_root: Path) -> list[Path]:
+        # Stand in for the real assembler: write the node's gate-relevant
+        # artifact so can_evaluate_exit_gate passes.
+        out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+        return [out]
+
+    def test_live_drafter_invoked_for_bound_assembler(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock(
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ]
+        )
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_called_once()
+        # Invoked positionally as (run_id, repo_root, slug).
+        assert draft_mock.call_args.args[2] == "excellence"
+        # Recorded as a skill-class invocation (Claude work), not a component.
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:excellence"
+        )
+        assert rec.status == "success"
+
+    def test_drafting_runs_before_assembler_component(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        order: list[str] = []
+
+        def _ordered_assembler(run_id: str, repo_root: Path) -> list[Path]:
+            order.append("assembler")
+            return self._fake_assembler(run_id, repo_root)
+
+        def _ordered_draft(run_id, repo_root, slug, **_kw):
+            order.append("draft")
+            return [repo_root / "section_drafts" / slug / "s.draft.json"]
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _ordered_assembler},
+        ), patch(_DRAFT_TARGET, side_effect=_ordered_draft), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        # The producer must run before the consumer.
+        assert order == ["draft", "assembler"]
+
+    def test_drafting_failure_fails_agent_body_closed(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.decomposed_drafting import DecomposedDraftingError
+
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+
+        def _boom(*_a, **_kw):
+            raise DecomposedDraftingError("malformed draft")
+
+        assembler = MagicMock(side_effect=self._fake_assembler)
+        with patch.dict(
+            COMPONENT_REGISTRY, {"excellence_section_assembler": assembler}
+        ), patch(_DRAFT_TARGET, side_effect=_boom), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "failure"
+        assert result.failure_category == "SKILL_FAILURE"
+        assert result.can_evaluate_exit_gate is False
+        # Fail-closed: drafting failed, so the assembler never ran on the
+        # missing drafts.
+        assembler.assert_not_called()
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:excellence"
+        )
+        assert rec.status == "failure"
+
+    def test_no_drafter_without_assembler(self, tmp_path: Path) -> None:
+        # A node with no section-assembler bound never invokes the drafter —
+        # the wiring is strictly conditional on the assembler binding.
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a", "skill-b"])
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json", {"ok": True}
+        )
+        draft_mock = MagicMock()
+        with patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            run_agent(**kwargs)  # no deterministic_components
+
+        draft_mock.assert_not_called()

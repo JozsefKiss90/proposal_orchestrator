@@ -308,31 +308,42 @@ def _default_claude_drafter(repo_root: Path) -> SubSectionDrafter:
 def _parse_drafter_response(raw: str, sub_id: str) -> dict[str, Any]:
     """Parse a live drafter response into a draft dict (fail-closed).
 
-    The TAPM transport returns the model's stdout, which may wrap the JSON
-    object in surrounding prose or a markdown fence.  Extract the outermost
-    ``{...}`` object and parse it; raise :class:`DecomposedDraftingError` on any
-    malformed response rather than silently repairing it (§17.5.4).
+    Delegates JSON extraction to the shared, hardened
+    :func:`runner.skill_runtime._extract_json_response`, so the decomposed
+    drafting path and the skill-runtime path treat malformed responses
+    identically:
+
+      * markdown fences and leading/trailing explanatory prose are tolerated;
+      * a **front-truncated** response (text that begins mid-object because the
+        transport returned only the tail of an over-long generation) is
+        **rejected**, not salvaged into a misleading leading fragment;
+      * structurally invalid JSON fails closed (§17.5.4 — no silent repair).
+
+    A SkillResult-shaped success envelope
+    (``{"status": "success", "payload": {...}}``) is unwrapped to its payload,
+    mirroring the skill runtime's Phase-D.6 normalisation — the model sometimes
+    wraps the draft object instead of returning it directly.  Raises
+    :class:`DecomposedDraftingError` on any unparseable response.
     """
-    text = raw.strip()
-    # Tolerate a leading/trailing markdown fence or explanatory prose by
-    # extracting the outermost brace-delimited object.
-    start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1 or end <= start:
+    # Local import: avoids any module-load import cycle and keeps a single
+    # source of truth for JSON extraction across the runtime.
+    from runner.skill_runtime import _extract_json_response
+
+    parsed = _extract_json_response(raw)
+    if parsed is None:
         raise DecomposedDraftingError(
-            f"drafter response for {sub_id!r} contained no JSON object"
+            f"drafter response for {sub_id!r} contained no parseable JSON "
+            "object (empty, truncated, or structurally malformed)"
         )
-    candidate = text[start : end + 1]
-    try:
-        parsed = json.loads(candidate)
-    except json.JSONDecodeError as exc:
-        raise DecomposedDraftingError(
-            f"drafter response for {sub_id!r} was not valid JSON: {exc}"
-        ) from exc
-    if not isinstance(parsed, dict):
-        raise DecomposedDraftingError(
-            f"drafter response for {sub_id!r} was not a JSON object"
-        )
+    # Unwrap a SkillResult-shaped success envelope if the model wrapped the
+    # draft payload instead of returning the draft object directly.  The draft
+    # schema has no top-level ``status`` key, so this signature is unambiguous.
+    if (
+        parsed.get("status") == "success"
+        and isinstance(parsed.get("payload"), dict)
+        and parsed["payload"]
+    ):
+        parsed = parsed["payload"]
     return parsed
 
 
