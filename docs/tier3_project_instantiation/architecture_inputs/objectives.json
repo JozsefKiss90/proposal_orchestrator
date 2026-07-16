@@ -1,87 +1,91 @@
 {
   "_provenance": {
-    "record_type": "tier3_hand_lift",
+    "record_type": "tier3_project_instantiation",
     "artifact": "architecture_inputs/objectives.json",
-    "ticket": "tickets.md ticket 14",
+    "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
     "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->not lifted (Unresolved, see confirmation_checklist.json)",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; operator_confirmed->Confirmed",
     "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "role_token_convention": "FELLOW = postdoctoral researcher/applicant; HOST = beneficiary/host organisation; SUPERVISOR = supervisor at host. These are STRUCTURAL roles of any MSCA-PF action, not invented identities. Every identity behind a role token is Unresolved - see confirmation_checklist.json.",
-    "timeline_scaffold": "target_month values are on a 24-month European-Fellowship WORKING SCAFFOLD (Assumed; EF/GF choice and duration are Unresolved)."
+    "role_token_convention": "FELLOW = postdoctoral researcher/applicant (Dr. Rositsa Cholakova); HOST = beneficiary/host organisation (ELTE); SUPERVISOR = supervisor at host (Dr. András Jung). Identities are operator-confirmed - see consortium/roles.json.",
+    "timeline_scaffold": "target_month values are on the operator-confirmed 24-month European-Fellowship timeline.",
+    "decisions_note": "The ten project decisions (RQ1-RQ10) are operator-confirmed and resolved (13B consolidation): RQ1 tomato; RQ2 Route B; RQ3 root-zone soil moisture + crop water status; RQ4 non-destructive physiological ground truth; RQ5 90% prediction-interval coverage; RQ6 water-use efficiency; RQ7 pilot success = RQ5 target met on validation set; RQ8 PlanetScope secured; RQ9 co-located seasonal covariation campaign; RQ10 research prototype (TRL 3-4)."
   },
   "objectives": [
     {
       "id": "OBJ-1",
       "title": "Probabilistic multi-sensor diagnosis of the latent field state",
-      "description": "Develop and calibrate a probabilistic diagnostic method that fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, optional PlanetScope), in-situ soil sensors, weather data and field observations into estimates of the latent field state (root-zone soil moisture, crop water stress, canopy condition), returning full posteriors rather than point estimates. Two interchangeable routes are in scope: Route A (direct one-step probabilistic fusion) and Route B (homogeneous-patch proxy).",
-      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables with explicit, honest uncertainty (posterior/prediction intervals). The precise target field state (RQ3) and whether one or both routes are implemented (RQ2) are open project decisions; the verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
+      "description": "Develop and calibrate a probabilistic diagnostic method that fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, secured PlanetScope), meteorological data (ERA5 reanalysis) and field observations into estimates of the latent field state (root-zone soil moisture and crop water status, RQ3), returning full posteriors rather than point estimates. The project adopts Route B, the homogeneous-patch proxy (RQ2), within a methodological architecture that also defines the rigorous one-step Route A (direct probabilistic fusion) as an alternative.",
+      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables (root-zone soil moisture and crop water status) with explicit, honest uncertainty (posterior/prediction intervals). The verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
       "target_month": 12,
       "pillar": "Diagnostic branch",
       "responsible_partner": "FELLOW",
       "contributing_partners": ["SUPERVISOR", "HOST"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Latent Field State (METH-TERM-010)", "Uncertainty Chain (METH-CORE-004)"],
-      "evidence_strength": "source_grounded",
-      "open_decisions": ["RQ2 (route scope)", "RQ3 (target field state)"]
+      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ2 route, RQ3 target state, RQ8 PlanetScope)",
+      "resolved_decisions": ["RQ2 = Route B (homogeneous patch proxy)", "RQ3 = root-zone soil moisture + crop water status", "RQ8 = PlanetScope access secured"]
     },
     {
       "id": "OBJ-2",
-      "title": "Uncertainty-aware decision engine for irrigation choice",
-      "description": "Develop the prognostic decision engine that turns the diagnosed field state into an irrigation recommendation: calibrate the FAO AquaCrop model in an uncertainty-aware way that retains an honest parameter posterior, run counterfactual irrigation simulations over weather ensembles, and select the option with the best expected economic return.",
-      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by expected profit (expected crop value minus costs) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The exact decision objective (profit vs weighted multi-objective) is an open decision (RQ6).",
+      "title": "Uncertainty-aware decision engine for water-use-efficient irrigation choice",
+      "description": "Develop the prognostic decision engine that turns the diagnosed field state into an irrigation recommendation: calibrate the FAO AquaCrop model in an uncertainty-aware way that retains an honest parameter posterior, run counterfactual irrigation simulations over weather ensembles, and select the option that best improves water-use efficiency.",
+      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by water-use efficiency (WUE) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The decision objective is water-use efficiency (RQ6, operator-confirmed).",
       "target_month": 15,
       "pillar": "Prognostic branch",
       "responsible_partner": "FELLOW",
       "contributing_partners": ["SUPERVISOR"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["AquaCrop Decision Interface (METH-DEC-001)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)"],
-      "evidence_strength": "source_grounded",
-      "open_decisions": ["RQ6 (decision objective)"]
+      "evidence_strength": "source_grounded (objective-function machinery) + operator_confirmed (RQ6 objective)",
+      "resolved_decisions": ["RQ6 = water-use efficiency (WUE)"],
+      "note": "The vault's objective-function machinery (Profit Based Objective Function METH-DEC-005) is the mechanism for scoring irrigation decisions by an expected-value criterion; RQ6 instantiates that mechanism with water-use efficiency as the chosen criterion. The uncertainty-aware AquaCrop calibration is the project's (vault-grounded) methodology; it is not attributed to the fellow."
     },
     {
       "id": "OBJ-3",
       "title": "Field validation and honest uncertainty calibration",
-      "description": "Design and execute a validation protocol establishing that the diagnosis and the decision recommendations are credible: collect ground truth, assess whether the reported uncertainty is well calibrated (e.g. whether 90% prediction intervals contain the truth about 90% of the time), and, for Route B, test that the chosen homogeneous patch genuinely covaries with the target crop.",
-      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4), uncertainty-calibration metrics (RQ5), pilot-success criteria (RQ7) and a patch-covariation test (RQ9). These four items define a protocol that does not yet exist and must be specified with the (unresolved) host and validation sites; no validation numbers are asserted.",
+      "description": "Design and execute a validation protocol on Hungarian tomato farms (accessed via AgroVIR) establishing that the diagnosis and the decision recommendations are credible: collect non-destructive physiological ground truth, assess whether the reported uncertainty is well calibrated, and test that Route B's chosen homogeneous patch genuinely covaries with the target crop.",
+      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4: chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance), an uncertainty-calibration criterion (RQ5: 90% prediction intervals contain the truth about 90% of the time), a pilot-success criterion (RQ7: the RQ5 calibration target is met on the validation set), and a patch-covariation test (RQ9: a co-located seasonal campaign measuring the target crop and the proxy patch simultaneously, demonstrating statistical covariation). No validation numbers are asserted beyond these operator-confirmed criteria.",
       "target_month": 20,
       "pillar": "Validation",
       "responsible_partner": "FELLOW",
       "contributing_partners": ["HOST", "SUPERVISOR"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Control Stand Variant (METH-ROUTE-003)", "Ten Research Questions (METH-RQ-001)"],
-      "evidence_strength": "source_grounded",
-      "open_decisions": ["RQ4 (ground truth)", "RQ5 (uncertainty calibration)", "RQ7 (pilot success)", "RQ9 (patch covariation)"]
+      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ4/RQ5/RQ7/RQ9)",
+      "resolved_decisions": ["RQ4 = non-destructive physiological ground truth", "RQ5 = 90% prediction-interval coverage", "RQ7 = pilot success = RQ5 target met on the validation set", "RQ9 = co-located seasonal covariation campaign"],
+      "coherence_note": {
+        "validation_status": "Inferred",
+        "reasoning": "RQ3 keeps root-zone soil moisture within the target field state, but the RQ4 non-destructive physiological measures (chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance) validate the crop-water-status component directly and the root-zone soil-moisture component only indirectly. This is recorded as a coherence caveat, not a gap; no soil-moisture sensor plan is fabricated here."
+      }
     },
     {
       "id": "OBJ-4",
       "title": "Standalone research demonstrator (web MVP)",
       "description": "Integrate the diagnosis and decision engine into a standalone research demonstrator (a web MVP / user interface) that presents recommendations with their uncertainty, as a research artefact rather than an operational product.",
-      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target (research prototype vs validated MVP vs operational pilot) is an open project decision (RQ10) and is NOT asserted.",
+      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target is a research prototype, TRL 3-4 (RQ10, operator-confirmed).",
       "target_month": 24,
       "pillar": "Demonstrator",
       "responsible_partner": "FELLOW",
       "contributing_partners": ["HOST"],
       "validation_status": "Inferred",
       "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Infrastructure Architecture (METH-INFRA-001)", "Observation to Decision Pipeline (METH-CORE-005)"],
-      "evidence_strength": "synthesis",
-      "note": "The demonstrator framing is vault synthesis (Web MVP node is synthesis, confidence low); the TRL target is Unresolved (RQ10).",
-      "open_decisions": ["RQ10 (TRL target)"]
+      "evidence_strength": "synthesis (demonstrator framing) + operator_confirmed (RQ10 TRL target)",
+      "note": "The demonstrator framing is vault synthesis (the Web MVP node is synthesis, confidence low), hence Inferred. The TRL target is now resolved: research prototype, TRL 3-4 (RQ10).",
+      "resolved_decisions": ["RQ10 = research prototype (TRL 3-4)"]
     },
     {
       "id": "OBJ-5",
       "title": "Advancement of the fellow's competences and career",
-      "description": "Enhance the researcher's scientific, technical and transferable competences and career perspectives through the fellowship's training, supervision and two-way transfer of knowledge (MSCA-PF Impact criterion 2.1 / Excellence criterion 1.3).",
-      "measurable_target": "By month 24: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2-3), then reviewed and updated at M12 and M24; at least 3 peer-reviewed publications (>=2 as first author); >=120 hours of transferable-skills training covering the MSCA-PF mandatory dimensions - digital and AI skills (including responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation, innovation and entrepreneurship, research integrity, and open science / FAIR data stewardship; co-supervision of >=1 MSc thesis at the host; >=2 international conference presentations; and two-way transfer of knowledge evidenced by >=2 methods seminars delivered at the host on uncertainty-aware crop-water modelling.",
+      "description": "Enhance the researcher's scientific, technical and transferable competences and career perspectives through the fellowship's training, supervision and two-way transfer of knowledge (MSCA-PF Impact criterion 2.1 / Excellence criterion 1.3). The two-way transfer is bidirectional: the fellow brings plant-physiology and non-destructive stress-phenotyping expertise (biological ground truth) to the host's geoinformatics and remote-sensing group; the host provides geoinformatics, remote sensing, and hyperspectral/multisensor-fusion methods and infrastructure to the fellow.",
+      "measurable_target": "By month 24: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action, then reviewed and updated during the fellowship; structured transferable-skills training covering the MSCA-PF mandatory dimensions (digital and AI skills, including responsible use of generative AI in remote-sensing and crop-water modelling and scientific coding; knowledge valorisation; innovation and entrepreneurship; research integrity; and open science / FAIR data stewardship); peer-reviewed publication and conference dissemination of the project's results; and two-way transfer of knowledge evidenced by methods exchange between the fellow and the host group. Specific quantitative targets (publication counts, training hours, thesis co-supervision, seminar counts) are deliberately NOT asserted - none were operator-provided - and are to be fixed in the Career Development Plan with the supervisor.",
       "target_month": 24,
       "pillar": "Researcher career development",
       "responsible_partner": "FELLOW",
       "contributing_partners": ["SUPERVISOR", "HOST"],
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "source_vault_nodes": [],
-      "evidence_strength": "unconfirmed",
-      "note": "SPINE-DEPENDENT and SYNTHETIC (§3 override, logged in decision_log/synthetic-spine-demo-override_2026-07-13.json). No source vault node supports a training/career plan and the supervisor is absent from the vault entirely - this target was authored against the synthetic spine (SYN-SPINE-01) purely to unblock the demo run. It is NOT operator-confirmed fact and reverts with the spine."
+      "evidence_strength": "operator_confirmed (two-way transfer content; real fellow/supervisor/host) + instrument_requirement (Career Development Plan as a start-of-action deliverable; training across the MSCA-PF mandatory transferable dimensions)",
+      "note": "Grounded in the operator-confirmed identity spine and two-way transfer plus the MSCA-PF structural requirements (Excellence 1.3, SR-04/SR-05). No fellow-specific quantitative career figures are invented."
     }
   ]
 }

@@ -1,55 +1,56 @@
 {
   "_provenance": {
-    "record_type": "tier3_hand_lift",
+    "record_type": "tier3_project_instantiation",
     "artifact": "architecture_inputs/outcomes.json",
-    "ticket": "tickets.md ticket 14",
+    "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
     "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; operator_confirmed->Confirmed",
     "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "trl_note": "trl_achieved is null throughout: the TRL target is an open project decision (RQ10) and is not asserted."
+    "trl_note": "trl_achieved is null throughout: this is a proposal, so no TRL is yet achieved. The TRL TARGET is resolved (RQ10): research prototype, TRL 3-4."
   },
   "outcomes": [
     {
       "id": "OUT-1",
       "title": "Probabilistic multi-sensor field-state diagnosis method",
-      "description": "A calibrated probabilistic method (and its software implementation) that fuses radar, optical, soil-sensor, weather and field-observation data into posterior estimates of the latent field state, via Route A (direct probabilistic fusion) and/or Route B (homogeneous-patch proxy).",
+      "description": "A calibrated probabilistic method (and its software implementation) that fuses radar, optical (Sentinel-1/Sentinel-2), secured PlanetScope, meteorological (ERA5) and field-observation data into posterior estimates of the latent field state (root-zone soil moisture and crop water status), via Route B (the homogeneous-patch proxy, RQ2), within an architecture that also defines Route A (direct probabilistic fusion) as an alternative.",
       "type": "scientific_and_technical",
       "linked_objectives": ["OBJ-1"],
       "trl_achieved": null,
-      "exploitation_route": "Open research software and methods; peer-reviewed publication; contribution to the standalone research demonstrator. Specific exploitation partners are spine-dependent and Unresolved.",
+      "exploitation_route": "Open research software and methods; peer-reviewed publication; contribution to the standalone research demonstrator. Field validation is provided through the host (ELTE) and the associated partner AgroVIR (Hungarian tomato farms).",
       "linked_wp_ids": ["WP1"],
       "linked_deliverable_ids": ["D1.1", "D1.2"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Diagnostic Branch (METH-CORE-002)", "Probabilistic Machine Learning (METH-TERM-009)"],
-      "evidence_strength": "source_grounded"
+      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ2/RQ3/RQ8)"
     },
     {
       "id": "OUT-2",
       "title": "Uncertainty-aware AquaCrop decision engine",
-      "description": "An integrated decision engine that calibrates AquaCrop while retaining an honest parameter posterior, runs counterfactual irrigation simulations over weather ensembles, and recommends the option with the best expected economic return.",
+      "description": "An integrated decision engine that calibrates AquaCrop while retaining an honest parameter posterior, runs counterfactual irrigation simulations over weather ensembles, and recommends the option that best improves water-use efficiency (WUE, RQ6).",
       "type": "scientific_and_technical",
       "linked_objectives": ["OBJ-2"],
       "trl_achieved": null,
-      "exploitation_route": "Open research software; publication; integration into the demonstrator. Downstream operational exploitation depends on the (unresolved) host and validation partners.",
+      "exploitation_route": "Open research software; publication; integration into the demonstrator. Downstream operational exploitation is supported by the host (ELTE) and the associated partner AgroVIR.",
       "linked_wp_ids": ["WP2"],
       "linked_deliverable_ids": ["D2.1", "D2.2"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "Decision Recommendation Logic (METH-DEC-006)"],
-      "evidence_strength": "source_grounded"
+      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ6 = WUE)",
+      "note": "The uncertainty-aware AquaCrop calibration is the project's vault-grounded methodology; it is not attributed to the fellow."
     },
     {
       "id": "OUT-3",
       "title": "Field-validation dataset and uncertainty-calibration evidence",
-      "description": "A validation dataset (ground truth, sensor comparison) and calibration evidence establishing whether the diagnosis and decision recommendations are credible and whether reported uncertainty is well calibrated, including a test of Route B's patch-covariation assumption.",
+      "description": "A validation dataset (non-destructive physiological ground truth - chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance - and sensor comparison) and calibration evidence establishing whether the diagnosis and decision recommendations are credible and whether reported uncertainty is well calibrated (90% prediction-interval coverage, RQ5), including a test of Route B's patch-covariation assumption (RQ9).",
       "type": "scientific_and_technical",
       "linked_objectives": ["OBJ-3"],
       "trl_achieved": null,
-      "exploitation_route": "Open validation data and protocol; publication. The validation sites, farms and ground-truth arrangements are spine-dependent and Unresolved (RQ4).",
+      "exploitation_route": "Open validation data and protocol; publication. Validation sites are Hungarian tomato farms accessed via the associated partner AgroVIR; ground truth is non-destructive physiological measurement (RQ4).",
       "linked_wp_ids": ["WP3"],
       "linked_deliverable_ids": ["D3.1", "D3.2"],
       "validation_status": "Confirmed",
       "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Ground Truth (METH-TERM-003)", "Control Stand Variant (METH-ROUTE-003)"],
-      "evidence_strength": "source_grounded"
+      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ4/RQ5/RQ9; field sites)"
     },
     {
       "id": "OUT-4",
@@ -58,45 +59,43 @@
       "type": "demonstrator",
       "linked_objectives": ["OBJ-4"],
       "trl_achieved": null,
-      "exploitation_route": "Standalone research demonstrator with partners assisting (feedback, farmer access, testing) rather than owning or operating it. TRL target Unresolved (RQ10).",
+      "exploitation_route": "Standalone research demonstrator with the associated partner AgroVIR assisting (feedback, farmer access, testing) rather than owning or operating it. TRL target: research prototype, TRL 3-4 (RQ10).",
       "linked_wp_ids": ["WP2", "WP3"],
       "linked_deliverable_ids": ["D2.3"],
       "validation_status": "Inferred",
       "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Infrastructure Architecture (METH-INFRA-001)"],
-      "evidence_strength": "synthesis",
-      "note": "Demonstrator framing is vault synthesis (Web MVP node confidence low); partners assist not own (prompt.txt §8)."
+      "evidence_strength": "synthesis (demonstrator framing) + operator_confirmed (RQ10 TRL target)",
+      "note": "Demonstrator framing is vault synthesis (Web MVP node confidence low), hence Inferred; partners assist rather than own (prompt.txt §8). TRL target resolved to research prototype, TRL 3-4 (RQ10)."
     },
     {
       "id": "OUT-5",
       "title": "Peer-reviewed publications and open science outputs",
-      "description": "Open-access publications, open research data and open models covering the probabilistic fusion diagnosis, the uncertainty-aware decision engine and the validation, with a Data Management Plan delivered by month 6 (MSCA open-science requirement, sub-section 1.2).",
+      "description": "Open-access publications, open research data and open models covering the probabilistic-fusion diagnosis, the uncertainty-aware decision engine and the validation, with a Data Management Plan delivered by month 6 (MSCA open-science requirement, sub-section 1.2).",
       "type": "scientific_and_technical",
       "linked_objectives": ["OBJ-1", "OBJ-2", "OBJ-3"],
       "trl_achieved": null,
-      "exploitation_route": "Open-access dissemination; open data/models under FAIR principles. Specific venues and target audiences are not asserted and are refined with the host.",
+      "exploitation_route": "Open-access dissemination; open data/models under FAIR principles. Specific venues are not asserted and are refined with the host.",
       "linked_wp_ids": ["WP5"],
       "linked_deliverable_ids": ["D5.1"],
       "validation_status": "Inferred",
       "source_vault_nodes": ["State of the Art - Multi Sensor Crop Water Stress Monitoring (METH-SOTA-001)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"],
-      "evidence_strength": "synthesis",
-      "note": "Open-science posture is an MSCA-PF structural requirement (sub-section 1.2) combined with the vault's demonstrator/novelty framing; no specific venues invented."
+      "evidence_strength": "synthesis (novelty/demonstrator framing) + instrument_requirement (open-science, sub-section 1.2)",
+      "note": "Open-science posture is an MSCA-PF structural requirement (sub-section 1.2) combined with the vault's demonstrator/novelty framing; no specific venues or publication counts are invented."
     },
     {
       "id": "OUT-6",
       "title": "Enhanced researcher competences and career readiness",
-      "description": "The fellow's advanced scientific, technical and transferable skills and enhanced career perspectives resulting from the fellowship's training, supervision and transfer of knowledge.",
+      "description": "The fellow's advanced scientific, technical and transferable skills and enhanced career perspectives resulting from the fellowship's training, supervision and two-way transfer of knowledge - the fellow's plant-physiology and non-destructive stress-phenotyping expertise exchanged for the host's geoinformatics, remote-sensing and hyperspectral/multisensor-fusion competence.",
       "type": "training_and_career",
       "linked_objectives": ["OBJ-5"],
       "trl_achieved": null,
-      "exploitation_route": "The fellow's enhanced competences are exploited through: (i) research leadership on uncertainty-aware crop-water decision support at the host and, on return, in the fellow's home research ecosystem; (ii) peer-reviewed publications and the open release of the decision-support demonstrator; (iii) teaching and co-supervision at the host, embedding the methodology in its curriculum; and (iv) preparation of a follow-on national or ERC-track proposal in the final six months of the fellowship.",
+      "exploitation_route": "The fellow's enhanced competences are exploited through: (i) research leadership on uncertainty-aware crop-water decision support at the host and, on return, in the fellow's home research ecosystem; (ii) peer-reviewed publication and the open release of the decision-support demonstrator; and (iii) two-way transfer between the fellow's plant-physiology / non-destructive-phenotyping expertise and the host's geoinformatics and remote-sensing methods. Specific quantitative targets are not asserted (none operator-provided) and are to be set in the Career Development Plan with the supervisor.",
       "linked_wp_ids": ["WP4"],
       "linked_deliverable_ids": [],
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "source_vault_nodes": [],
-      "evidence_strength": "unconfirmed",
-      "note": "SPINE-DEPENDENT and SYNTHETIC (§3 override, logged). No vault node supports a career/exploitation route; authored against the synthetic spine (SYN-SPINE-01) to unblock the demo run. NOT operator-confirmed fact; reverts with the spine."
+      "evidence_strength": "operator_confirmed (two-way transfer; real fellow/supervisor/host) + instrument_requirement (MSCA-PF training and supervision)",
+      "note": "Grounded in the operator-confirmed identity spine and two-way transfer plus MSCA-PF structural requirements. No fellow-specific quantitative career figures are invented."
     }
   ]
 }

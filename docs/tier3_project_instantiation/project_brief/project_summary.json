@@ -1,37 +1,31 @@
 {
   "_provenance": {
-    "record_type": "tier3_hand_lift",
-    "ticket": "tickets.md ticket 14 (Hand-lift MSCA Tier 3 from the vault)",
+    "record_type": "tier3_project_instantiation",
+    "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
     "authority": [
-      "CLAUDE.md §5 Tier 3 (project instantiation), §9.5 (reproducibility), §12.2 (validation-status categories), §13.3 (no fabricated project facts)",
-      "MILESTONE1_DECISION_RECORD.md D17 (honest block on the researcher / host / call spine), D11 (block-default)",
-      "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md Appendix B (evidence_strength -> constitution mapping)"
+      "CLAUDE.md §5 Tier 3 (project instantiation), §9.5 (reproducibility), §12.2 (validation-status categories), §13.3 (no fabricated project facts)"
     ],
-    "source_vault": {
-      "path": "MSCA/methodology_graph/",
-      "recorded_gitlink_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-      "sha_source": "docs/tier4_orchestration_state/reinstantiation_provenance.json (ticket 3, §9.5)"
-    },
+    "source": "Research substance grounded in the source_grounded methodology vault (MSCA/methodology_graph/, gitlink b4d9e570a0861fb49590015b2ff68afc3bb7181b). Identity spine and the ten project decisions (RQ1-RQ10) are operator-confirmed real facts (13B consolidation, 2026-07-16).",
     "appendix_b_mapping": {
       "source_grounded": "Confirmed",
       "synthesis": "Inferred (framing)",
       "inference": "Inferred",
-      "unconfirmed": "Unresolved (not lifted as fact; enumerated in the confirmation checklist)"
+      "operator_confirmed": "Confirmed (operator-provided fact or operator-chosen decision)"
     },
     "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
     "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
   },
 
-  "title": "Uncertainty-aware multi-sensor diagnosis and economically optimised irrigation decision support for row crops",
+  "title": "Uncertainty-aware multi-sensor diagnosis and water-use-efficient irrigation decision support for tomato",
   "title_status": {
     "validation_status": "Inferred",
-    "note": "Working descriptive title synthesised from the novelty short-form ('From multi-sensor observation to probabilistic diagnosis to economically optimised irrigation decision'). The official project title and acronym are a project decision, not stated in any source vault node.",
+    "note": "Working descriptive title, synthesised from the project's novelty short-form and updated to reflect the confirmed crop (tomato, RQ1) and decision objective (water-use efficiency, RQ6). The official project title is a project-naming decision not yet finalised.",
     "source_vault_node": "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"
   },
   "acronym": null,
   "acronym_status": {
-    "validation_status": "Unresolved",
-    "note": "No acronym is given in any source vault node; do not invent one."
+    "validation_status": "Inferred",
+    "note": "No acronym was supplied by the operator and none is invented. Under the no-fabrication rule, the field is left null pending an explicit project-naming decision at submission preparation; this null disposition is the derived (not asserted) state."
   },
 
   "instrument_type": "MSCA-PF",
@@ -39,56 +33,52 @@
   "fellowship_type": "European Fellowship (EF)",
   "fellowship_type_status": {
     "validation_status": "Confirmed",
-    "synthetic": true,
-    "spine_marker": "SYN-SPINE-01",
-    "note": "DERIVED from the synthetic spine, not separately invented: the fellow moves Bulgaria (Plovdiv) -> Hungary (ELTE), an intra-EU move, which is a European Fellowship by definition. Rests on the SYNTHETIC spine (§3 override, logged) and reverts with it.",
+    "note": "Operator-confirmed. The fellow moves Bulgaria (Plovdiv) -> Hungary (Budapest, ELTE), an intra-EU move, which is a European Fellowship by definition.",
     "call_constraint": "EF 12-24 months; GF outgoing 12-24 months + mandatory 12-month return (24-36 total). Source: section_schema_registry.json MSCA-PF; selected_call.json."
   },
 
   "host_organisation": {
     "validation_status": "Confirmed",
-    "synthetic": true,
-    "spine_marker": "SYN-SPINE-01",
     "role": "Beneficiary / host institution (MSCA-PF single-beneficiary model)",
-    "organisation": "Eotvos Lorand University (ELTE), Budapest",
+    "organisation": "Eötvös Loránd University (ELTE), Budapest",
     "short_name": "ELTE",
+    "organisational_unit": "Faculty of Informatics, Institute of Cartography and Geoinformatics",
+    "group_focus": "Geoinformatics and remote sensing",
     "country": "Hungary",
     "country_code": "HU",
     "type": "Higher education establishment",
-    "note": "SYNTHETIC hosting arrangement (§3 operator override of §13.3; see decision_log/synthetic-spine-demo-override_2026-07-13.json). ELTE is a real institution but the arrangement is NOT real and must not be submitted. No source vault node names any host: the do_not_invent guard on ELTE held throughout the build and was lifted only by explicit operator instruction, never by the engine. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
+    "note": "Operator-confirmed host; hosting confirmed. The host group's geoinformatics and remote-sensing competence and infrastructure are the host-to-fellow side of the two-way transfer. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
   },
   "researcher": {
     "validation_status": "Confirmed",
-    "synthetic": true,
-    "spine_marker": "SYN-SPINE-01",
     "role": "Experienced researcher / postdoctoral fellow (the applicant)",
-    "name": "Dr. Mariya Petrova [SYNTHETIC]",
-    "current_affiliation": "Plovdiv University 'Paisii Hilendarski', Bulgaria",
+    "name": "Dr. Rositsa Cholakova",
+    "current_affiliation": "Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy, Plovdiv, Bulgaria (prior: Agricultural University - Plovdiv)",
     "country_of_origin": "BG",
-    "note": "SYNTHETIC demo identity (§3 override, logged). The vault names no fellow; it only infers a PI Role (METH-PART-003) from first-person authorship of the design narrative. CV, publication record and career-stage detail remain unspecified and will surface as gaps in the person-dependent sections."
+    "career_stage": "Approximately 4 years post-PhD. PhD 2020 (summa cum laude); thesis 'Non-destructive evaluation of physiological status of drought-stressed tomato plants' (doi:10.2139/ssrn.5492527).",
+    "expertise": "Plant physiology; non-destructive techniques for evaluating abiotic and biotic plant stress and crop monitoring; photosynthesis under stress; biostimulants.",
+    "eligibility": "Mobility rule satisfied (Y); PhD held (Y, 2020).",
+    "note": "Operator-confirmed real fellow. Her non-destructive plant-stress-physiology expertise supplies the project's biological ground truth and is the fellow-to-host side of the two-way transfer (RQ4)."
   },
   "supervisor": {
     "validation_status": "Confirmed",
-    "synthetic": true,
-    "spine_marker": "SYN-SPINE-01",
     "role": "Supervisor at the host institution",
-    "name": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
-    "affiliation": "ELTE - environmental physics / geoinformatics",
-    "note": "SYNTHETIC person attached to a real institution (§3 override, logged). No supervisor appears anywhere in the vault - notable for an MSCA-PF, which is supervisor-centric. Track record and supervision history are unspecified. Must not appear in anything submitted."
+    "name": "Dr. András Jung",
+    "affiliation": "ELTE Faculty of Informatics; Deputy Head, Institute of Cartography and Geoinformatics",
+    "expertise": "Remote sensing, hyperspectral imaging and field spectroscopy, multisensor-drone fusion (Head of the Multisensor-Drone-Fusion Working Group, project ELTE TKP2021-NVA-29); co-founder of Cubert GmbH (hyperspectral cameras) and Brightic Research; habilitations in Computer Science and Crop Sciences.",
+    "note": "Operator-confirmed real supervisor. Anchors the host-to-fellow transfer of remote-sensing, hyperspectral and multisensor-fusion methods and infrastructure."
   },
 
   "duration_months": 24,
   "duration_status": {
     "validation_status": "Confirmed",
-    "synthetic": true,
-    "spine_marker": "SYN-SPINE-01",
     "call_constraint_max_months": 36,
-    "note": "24 months - the standard European Fellowship duration, consistent with the EF determination above and with the 24-month working scaffold on which the architecture_inputs seeds (workpackage_seed, milestones_seed) were already built. Rests on the SYNTHETIC spine (§3 override, logged) and reverts with it."
+    "note": "Operator-confirmed 24 months - the standard European Fellowship duration, consistent with the EF determination and with the 24-month scaffold on which the architecture_inputs seeds were built."
   },
   "requested_eu_contribution_eur": null,
   "requested_eu_contribution_status": {
-    "validation_status": "Unresolved",
-    "note": "MSCA-PF is a unit-cost instrument; the budget is not a Tier 3 fact. It is derived internally and deterministically in Phase 7 (months x published unit rates x host-country coefficient) per CLAUDE.md §8.1 / ticket 8. The host-country coefficient now resolves from the (synthetic) host country HU, unblocking the host-dependent budget line at gate_09. On revert to the honest state it returns to blocked."
+    "validation_status": "Inferred",
+    "note": "MSCA-PF is a unit-cost instrument; the EU contribution is not a Tier 3 fact. It is derived internally and deterministically in Phase 7 (confirmed months (24) x published unit rates x HU host-country coefficient) per CLAUDE.md §8.1. Null here by design. The derivation is unblocked because host country (HU) and duration (24 months) are Confirmed facts in selected_call.json."
   },
   "start_date": null,
 
@@ -96,32 +86,32 @@
     "crop_water_stress",
     "irrigation_decision_support"
   ],
-  "abstract": "This postdoctoral research project develops and validates an uncertainty-aware, end-to-end decision framework for crop water-stress monitoring and irrigation decision support in row crops. It fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, and, where available, high-resolution PlanetScope imagery), in-situ soil sensors, weather data and field observations into probabilistic estimates of the latent field state - root-zone soil moisture, crop water stress and canopy condition - carrying uncertainty honestly from observation to decision. Two interchangeable diagnostic routes share a single decision engine: a rigorous one-step probabilistic-fusion route (Route A), which feeds the satellite as one more covariate into a probabilistic machine-learning model (e.g. a Bayesian hierarchical model or Gaussian process) and goes straight to the field state with its uncertainty; and a lighter homogeneous-patch proxy route (Route B) that sidesteps the sub-pixel resolution problem by reading a nearby covarying patch the coarse pixel can resolve cleanly. From the diagnosed state onward the path is the same for both routes: the state drives uncertainty-aware AquaCrop calibration and counterfactual irrigation simulation over weather ensembles, recommending the option with the best expected economic return. The scientific novelty, argued against a systematic literature review, is the end-to-end coupling of learned multimodal fusion, explicit probabilistic crop-water-state estimation and economically optimised irrigation, which the literature reports as underdeveloped for row crops.",
+  "abstract": "This postdoctoral research project develops and validates an uncertainty-aware, end-to-end decision framework for crop water-stress monitoring and irrigation decision support, applied to tomato (RQ1) on Hungarian farms accessed through the associated partner AgroVIR. It fuses multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, and secured high-resolution PlanetScope imagery), meteorological data (ERA5 reanalysis) and field observations into probabilistic estimates of the latent field state - root-zone soil moisture and crop water status (RQ3) - carrying uncertainty honestly from observation to decision. The project adopts Route B, the homogeneous-patch proxy (RQ2): it sidesteps the sub-pixel resolution problem by reading a nearby covarying patch that the coarse pixel can resolve cleanly, within a methodological architecture that also defines a rigorous one-step probabilistic-fusion alternative (Route A). From the diagnosed state onward, the state drives uncertainty-aware AquaCrop calibration and counterfactual irrigation simulation over weather ensembles, recommending the option that best improves water-use efficiency (WUE, RQ6). Diagnosis and decisions are validated against non-destructive physiological ground truth - chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature and spectral reflectance (RQ4) - with uncertainty calibration judged by prediction-interval coverage (90% intervals containing the truth about 90% of the time, RQ5) and Route B's patch covariation established by a co-located seasonal campaign measuring the target crop and the proxy patch simultaneously (RQ9). The scientific novelty, argued against a systematic literature review, is the end-to-end coupling of learned multimodal fusion, explicit probabilistic crop-water-state estimation and water-use-efficiency-oriented irrigation, delivered as a research prototype (TRL 3-4, RQ10), which the literature reports as underdeveloped.",
   "abstract_status": {
     "validation_status": "Inferred",
-    "note": "Synthesis summary. The framing (two routes, one shared decision engine, red-thread uncertainty) is vault synthesis (Core Architecture METH-CORE-001, Methodology Graph Meta Node METH-META-001); the individual claims it summarises are source_grounded (Route A/B METH-ROUTE-001/002, prompt.txt sections). No crop, site, partner, or number is asserted beyond the sources - 'row crops' is used because the specific crop (tomato) is unconfirmed (RQ1)."
+    "note": "Synthesis summary. The two-route architecture and end-to-end honest-uncertainty framing are vault synthesis (Core Architecture METH-CORE-001, Methodology Graph Meta Node METH-META-001); the individual methodology claims are source_grounded (Route A/B METH-ROUTE-001/002; decision framework METH-DEC-001..006). The crop (tomato), route choice (Route B), target field state, ground truth, decision objective (WUE), data access (PlanetScope secured, ERA5), field sites and TRL target are operator-confirmed project decisions (RQ1-RQ10, 13B consolidation)."
   },
   "keywords": [
     "crop water stress",
     "irrigation decision support",
+    "tomato",
     "multi-sensor data fusion",
     "probabilistic machine learning",
     "uncertainty propagation",
     "Sentinel-1 SAR",
     "Sentinel-2",
+    "PlanetScope",
     "AquaCrop",
     "root-zone soil moisture",
     "counterfactual simulation",
-    "expected profit",
-    "Bayesian hierarchical model"
+    "water-use efficiency",
+    "non-destructive plant phenotyping"
   ],
   "keywords_status": {
     "validation_status": "Confirmed",
-    "note": "Every keyword is a source_grounded terminology node in MSCA/methodology_graph/09_terminology/ (or a source_grounded route/decision concept)."
+    "note": "Most keywords are source_grounded terminology nodes in MSCA/methodology_graph/09_terminology/ (or source_grounded route/decision concepts). 'tomato' (RQ1), 'water-use efficiency' (RQ6) and 'non-destructive plant phenotyping' (RQ4) reflect operator-confirmed project decisions; 'water-use efficiency' replaces the earlier 'expected profit' now that RQ6 is decided."
   },
 
-  "spine_status": "filled_synthetic",
-  "spine_marker": "SYN-SPINE-01",
-  "synthetic": true,
-  "spine_note": "MSCA-PF is a single-fellow, single-beneficiary action. The research substance is lifted from the source_grounded methodology vault and is genuine. The identity spine (fellow, host, supervisor, associated partner, fellowship type, duration) is NOT: no source vault node names it, and it is filled here with SYNTHETIC demo data under an explicit CLAUDE.md §3 operator override of §13.3, logged in decision_log/synthetic-spine-demo-override_2026-07-13.json. THESE ARE NOT REAL FACTS and nothing built on them is submittable. On the honest (pre-override) Tier 3 the engine correctly blocks at Phase 2 on this spine (SCL-01..04) - that block is the truthful result for this project's real data, and it is preserved at the pre-override commit. Named field sites, EO data-access guarantees and meteorological providers remain genuinely Unresolved. See confirmation_checklist.json."
+  "spine_status": "confirmed_real",
+  "spine_note": "MSCA-PF is a single-fellow, single-beneficiary action. The research substance is grounded in the source_grounded methodology vault and is genuine. The identity spine (fellow Dr. Rositsa Cholakova; host ELTE Faculty of Informatics / Institute of Cartography and Geoinformatics; supervisor Dr. András Jung; associated partner AgroVIR; European Fellowship; 24 months) and the ten project decisions (RQ1-RQ10) are operator-confirmed real project data (13B consolidation, 2026-07-16). Data and infrastructure are confirmed: PlanetScope access secured (Planet platform and API); Sentinel-1 (SAR) and Sentinel-2 (optical) open data; ERA5 reanalysis (ECMWF) for meteorology; Hungarian tomato field sites via AgroVIR."
 }

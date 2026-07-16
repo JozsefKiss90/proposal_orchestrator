@@ -1,155 +1,109 @@
 {
   "record_type": "spine_confirmation_checklist",
-  "ticket": "tickets.md ticket 14 (Hand-lift MSCA Tier 3 from the vault); annotated for the SYN-SPINE-01 synthetic override",
-  "date": "2026-07-13",
+  "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
+  "date": "2026-07-16",
   "authority": [
-    "CLAUDE.md §13.3 (no fabricated project facts), §12.2 (validation-status categories), §12.4 (gate failure is a valid output), §3 (explicit human instruction is priority 1 and may scope-override a named rule), §9.4 (durable decisions logged)",
-    "MILESTONE1_DECISION_RECORD.md D11 (block-default), D17 (honest block on the researcher/host/call spine)",
-    "MSCA vault: Partner Roles Overview (METH-PART-001), ELTE Role (METH-PART-002), Unconfirmed Partner Placeholders (METH-PART-006), Ten Research Questions (METH-RQ-001)"
+    "CLAUDE.md §5 (Tier 3), §12.2 (validation-status categories), §13.3 (no fabricated project facts), §9.4 (durable decisions logged)",
+    "MSCA-PF instrument structure (Excellence 1.3/1.4, Impact 2.1, Implementation 3.2)"
   ],
-  "purpose": "Enumerates every identity-spine gap and open project decision, so an honest block is legible and each gap has a named confirmation action. The ENGINE never invents these (D11/§13.3) - it blocked, correctly, at Phase 2. The OPERATOR may supply them as confirmed facts, beta-declare them (working_assumptions.json, ticket 15), or - as here - scope-override §13.3 with SYNTHETIC data for a demonstration run (§3, logged). This checklist remains the register of what is genuinely OPEN, regardless of what the data files now assert.",
-  "role_token_convention": "FELLOW = postdoctoral researcher/applicant; HOST = beneficiary/host organisation; SUPERVISOR = supervisor at host. These are STRUCTURAL roles of any MSCA-PF action. The identities behind them are NOT confirmed; they are currently filled with SYNTHETIC values (SYN-SPINE-01) in the Tier 3 data files so the governed DAG can run. Role tokens still appear in architecture_inputs/*.json.",
-  "status_vocabulary": "status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). No fifth category exists. A fifth status value would bypass both honesty gates (no_unresolved_material_claims fails only on 'unresolved'; W1 governs only 'assumed') and would be a de facto change to §12.2 without an amendment (§14.1). Dispositions ride on descriptive fields - source_disposition, do_not_invent, synthetic_fill - never on new status values. See decision_log/status-vocabulary-correction_2026-07-13.json.",
-
-  "synthetic_override": {
-    "marker": "SYN-SPINE-01",
-    "record": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json",
-    "what_happened": "Under an explicit CLAUDE.md §3 operator override of §13.3 - scoped to a demonstration run and logged per §9.4 - the identity spine below was FILLED WITH SYNTHETIC DATA in the Tier 3 data files (consortium/roles.json, project_brief/*, architecture_inputs/*) so the governed DAG could pass the Phase-2 scope-alignment gate, which had correctly blocked on SCL-01..04 while the spine was Unresolved.",
-    "critical": "A SYNTHETIC FILL DOES NOT CLOSE A GAP. Every item marked synthetic_fill below remains genuinely UNRESOLVED - no real fellow, host or supervisor has been confirmed by anyone. The Tier 3 data files carry validation_status 'Confirmed' PLUS synthetic: true so the gates will evaluate them; THIS CHECKLIST keeps the truth, and the confirmation actions below are still outstanding.",
-    "synthetic_values": "FELLOW = Dr. Mariya Petrova [SYNTHETIC], Plovdiv University 'Paisii Hilendarski' (BG); HOST = Eotvos Lorand University (ELTE), Budapest (HU); SUPERVISOR = Prof. Dr. Gabor Nagy [SYNTHETIC], ELTE; VALIDATION_PARTNER = AgroVIR Kft. [SYNTHETIC ARRANGEMENT], HU; FELLOWSHIP_TYPE = European Fellowship (EF); DURATION = 24 months. EF and 24 months are DERIVED from the BG -> HU intra-EU move, not separately invented - but they rest on a synthetic host and fall with it.",
-    "not_closed_by_the_fill": "DATA_PROVIDERS (named validation farms / field sites, EO data-access guarantees, meteorological providers) and all ten open scientific decisions (RQ1-RQ10, incl. crop and TRL target) remain Unresolved - the synthetic spine does not touch them.",
-    "revert": "The pre-override commit is the honest state, in which the engine blocks at Phase 2 on this spine. Before any real use, replace every SYN-SPINE-01 value with operator-confirmed facts or revert."
-  },
+  "purpose": "Register of the project's identity spine and the ten project decisions, all now operator-confirmed real data (13B consolidation, 2026-07-16). This supersedes the earlier state in which the spine was open and enumerated for an honest block. Every item below is Confirmed with its real value/decision.",
+  "role_token_convention": "FELLOW = postdoctoral researcher/applicant (Dr. Rositsa Cholakova); HOST = beneficiary/host organisation (ELTE); SUPERVISOR = supervisor at host (Dr. András Jung); VALIDATION_PARTNER = associated partner (AgroVIR). Role tokens appear in architecture_inputs/*.json and consortium/*.json.",
+  "status_vocabulary": "status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). All spine items and project decisions here are Confirmed; the sole Inferred item is the RQ3/RQ4 coherence caveat.",
 
   "spine_identity": [
     {
       "id": "FELLOW",
       "role": "Experienced researcher / postdoctoral fellow (the applicant)",
-      "status": "Unresolved",
-      "synthetic_fill": "Dr. Mariya Petrova [SYNTHETIC], postdoctoral researcher, Plovdiv University 'Paisii Hilendarski', Bulgaria (SYN-SPINE-01)",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "No fellow is named in any source vault node. A PI Role is INFERRED from first-person authorship of the design narrative and ownership of the calibration method (doi:10.1016/j.envsoft.2022.105556); the person's name and affiliation are explicitly unconfirmed, and whether that person is the PF fellow or the PF supervisor is itself open.",
-      "source_vault_nodes": ["PI Role (METH-PART-003, inference)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
-      "confirmation_action": "Confirm the fellow's identity, CV and eligibility (mobility rule, PhD/4-yr FTE experience). Required for Excellence 1.4, Impact 2.1 and the Part B-2 CV.",
-      "blocks": ["Excellence 1.4", "Impact 2.1", "OBJ-5", "OUT-6", "IMP-4", "WP4"]
+      "status": "Confirmed",
+      "confirmed_value": "Dr. Rositsa Cholakova, plant physiologist. Current affiliation: Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy, Plovdiv, Bulgaria (prior: Agricultural University - Plovdiv). Approximately 4 years post-PhD (PhD 2020, summa cum laude; thesis 'Non-destructive evaluation of physiological status of drought-stressed tomato plants', doi:10.2139/ssrn.5492527). Expertise: non-destructive techniques for abiotic/biotic plant-stress evaluation and crop monitoring, plant physiology, photosynthesis under stress, biostimulants. Eligibility: mobility rule satisfied (Y); PhD held (Y).",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)",
+      "note": "Her non-destructive plant-stress-physiology expertise is the project's biological ground-truth strength (RQ4)."
     },
     {
       "id": "HOST",
       "role": "Beneficiary / host organisation",
-      "status": "Unresolved",
-      "synthetic_fill": "Eotvos Lorand University (ELTE), Budapest, Hungary [SYNTHETIC ARRANGEMENT] (SYN-SPINE-01). Country HU drives the unit-cost coefficient and unblocks the gate_09 host-dependent line.",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "No host/beneficiary is named in any source. The lead institution is an explicit unconfirmed placeholder.",
-      "source_vault_nodes": ["Unconfirmed Partner Placeholders (METH-PART-006, unconfirmed)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
-      "confirmation_action": "Confirm the host organisation, its country (drives the unit-cost country coefficient in Phase 7), infrastructure and hosting arrangements. Required for Implementation 3.2 and the unit-cost budget (ticket 8).",
-      "blocks": ["Implementation 3.2", "unit-cost budget gate_09 host coefficient", "WP3/WP4/WP5 host elements"]
+      "status": "Confirmed",
+      "confirmed_value": "Eötvös Loránd University (ELTE), Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest, Hungary (country code HU). Group focus: geoinformatics + remote sensing. Hosting confirmed.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)",
+      "note": "Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
     },
     {
       "id": "SUPERVISOR",
       "role": "Supervisor at the host institution",
-      "status": "Unresolved",
-      "synthetic_fill": "Prof. Dr. Gabor Nagy [SYNTHETIC], ELTE - environmental physics / geoinformatics (SYN-SPINE-01). A synthetic person attached to a real institution; must not appear in anything submitted.",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "No supervisor appears ANYWHERE in the vault (notable for an MSCA-PF, which is supervisor-centric).",
-      "source_vault_nodes": [],
-      "confirmation_action": "Confirm the supervisor's identity, track record and supervision/training plan. Required for Excellence 1.3.",
-      "blocks": ["Excellence 1.3", "WP4"]
+      "status": "Confirmed",
+      "confirmed_value": "Dr. András Jung, ELTE Faculty of Informatics; Deputy Head, Institute of Cartography and Geoinformatics. Expertise: remote sensing, hyperspectral imaging and field spectroscopy, multisensor-drone fusion (Head of the Multisensor-Drone-Fusion Working Group, project ELTE TKP2021-NVA-29); co-founder of Cubert GmbH and Brightic Research; habilitations in Computer Science and Crop Sciences.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)",
+      "note": "Anchors the host-to-fellow transfer of remote-sensing, hyperspectral and multisensor-fusion methods."
     },
     {
       "id": "ELTE",
-      "role": "(Raised in build context only - now filled as HOST)",
-      "status": "Unresolved",
-      "source_disposition": "absent_from_sources",
-      "do_not_invent": false,
-      "do_not_invent_lifted_by": "decision_log/synthetic-spine-demo-override_2026-07-13.json (§3 operator override)",
-      "synthetic_fill": "Filled as the HOST (SYN-SPINE-01).",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "ELTE (Eotvos Lorand University) is ABSENT from all primary sources. No role, contribution or affiliation can be derived. The vault node exists only to hold the open question and PREVENT fabrication: 'do not invent a role.'",
-      "source_vault_nodes": ["ELTE Role (METH-PART-002, unconfirmed)"],
-      "confirmation_action": "The do_not_invent guard HELD for the entire build - the engine never asserted ELTE, and blocked instead. It is lifted here only by explicit operator instruction, never by the engine, and only for this synthetic demo. Only real, independently confirmed ELTE involvement may be carried into a submission.",
-      "blocks": []
+      "role": "Host institution (confirmed as HOST)",
+      "status": "Confirmed",
+      "confirmed_value": "ELTE is the confirmed host organisation (see HOST). The former vault do-not-invent placeholder is resolved by operator confirmation.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)"
     },
     {
       "id": "VALIDATION_PARTNER",
-      "role": "Validation / farmer-access partner (AgroVIR-type)",
-      "status": "Unresolved",
-      "synthetic_fill": "AgroVIR Kft., Hungary [SYNTHETIC ARRANGEMENT] (SYN-SPINE-01). A real company; the partnership is not real.",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "Appears only as the role-type phrase 'AgroVIR-like partners' assisting with feedback, farmer access, testing and validation - NOT owning or operating the tool. No committed partnership, contract or farm is stated.",
-      "source_vault_nodes": ["AgroVIR Validation Partner Role (METH-PART-005, unconfirmed)", "Partner Roles Overview (METH-PART-001, unconfirmed)"],
-      "confirmation_action": "Confirm (or not) a named validation partner and the scope of its assistance. Do not present AgroVIR as a secured partner.",
-      "blocks": ["WP3 validation sites", "Implementation 3.2 associated partners"]
+      "role": "Associated partner - farmer access, field validation, feedback",
+      "status": "Confirmed",
+      "confirmed_value": "AgroVIR (Hungary): real, confirmed associated partner. Scope: farmer access, field validation and feedback (not owning or operating the tool). Provides access to Hungarian tomato farms.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)"
     },
     {
       "id": "DATA_PROVIDERS",
       "role": "EO and meteorological data providers; validation farms/field sites",
-      "status": "Unresolved",
-      "synthetic_fill": null,
-      "still_requires_real_confirmation": true,
-      "not_closed_by_synthetic_fill": true,
-      "what_source_says": "Implied by the methodology's infrastructure but none is named. Sentinel-1/2 are open Copernicus data; PlanetScope access is itself open (RQ8); no meteo provider or field site is named.",
-      "source_vault_nodes": ["Unconfirmed Partner Placeholders (METH-PART-006, unconfirmed)", "Earth Observation Layer (METH-INFRA-002)", "Weather and Climate Data Layer (METH-INFRA-004)"],
-      "confirmation_action": "Confirm PlanetScope access (RQ8), the meteorological data source, and validation farms/field sites. THIS GAP IS NOT TOUCHED by the synthetic spine and remains genuinely open even in the demo run.",
-      "blocks": ["WP1 PlanetScope", "WP3 field sites", "RISK-01", "RISK-04"]
+      "status": "Confirmed",
+      "confirmed_value": "PlanetScope access secured (Planet platform and API, RQ8). Sentinel-1 (SAR) and Sentinel-2 (optical) open Copernicus data used. Meteorological source: ERA5 reanalysis (ECMWF). Field sites: Hungarian tomato farms accessed via AgroVIR.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)"
     },
     {
       "id": "FELLOWSHIP_TYPE",
       "role": "European Fellowship (EF) vs Global Fellowship (GF)",
-      "status": "Unresolved",
-      "synthetic_fill": "European Fellowship (EF) - DERIVED from the synthetic spine: Plovdiv (BG) -> ELTE (HU) is an intra-EU move, which is an EF by definition. The derivation is sound; the host it derives from is not real, so it falls with the spine.",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "Not determinable from the vault; depends on the (unresolved) host and any Third-Country outgoing host.",
-      "source_vault_nodes": [],
-      "confirmation_action": "Confirm EF vs GF once the real host is known. Determines duration bounds, the transfer-of-knowledge model (two-way vs three-way) and whether a return phase applies.",
-      "blocks": ["Excellence 1.3 transfer model", "duration", "Implementation 3.2 outgoing host"]
+      "status": "Confirmed",
+      "confirmed_value": "European Fellowship (EF). Derived from and consistent with the Bulgaria (Plovdiv) -> Hungary (ELTE) intra-EU move; two-way transfer model (fellow <-> host).",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)"
     },
     {
       "id": "DURATION",
       "role": "Project duration in months",
-      "status": "Unresolved",
-      "synthetic_fill": "24 months - the standard EF duration, consistent with the derived EF above and with the 24-month scaffold the architecture_inputs seeds were already built on (SYN-SPINE-01).",
-      "still_requires_real_confirmation": true,
-      "what_source_says": "No duration figure appears anywhere in the vault. Call constraint: EF 12-24 months; GF 24-36 (incl. 12-month return).",
-      "source_vault_nodes": [],
-      "confirmation_action": "Confirm the project duration (tied to EF/GF). Re-scale workpackage_seed / milestones_seed once confirmed.",
-      "blocks": ["workpackage_seed timeline", "milestones_seed due_month", "unit-cost budget months"]
+      "status": "Confirmed",
+      "confirmed_value": "24 months (standard EF duration). Carried in selected_call.json as project_duration_months = 24.",
+      "confirmation_source": "Operator-confirmed (13B consolidation, 2026-07-16)"
     },
     {
       "id": "CALL_BINDING",
       "role": "Selected MSCA-PF call",
       "status": "Confirmed",
-      "synthetic_fill": null,
-      "still_requires_real_confirmation": false,
-      "what_source_says": "The vault is silent on the specific call (only 'MSCA-style proposal'). The call binding is GENUINELY OPERATOR-CONFIRMED - not derived from the vault and not synthetic: HORIZON-MSCA-2026-PF-01, instrument MSCA-PF, deadline 2026-09-09, recorded in selected_call.json with action_confirmation_ref to the ticket-5 decision log.",
-      "source_vault_nodes": [],
-      "confirmation_action": "None - already operator-confirmed. This is the ONLY genuinely confirmed spine item.",
-      "blocks": []
+      "confirmed_value": "HORIZON-MSCA-2026-PF-01, instrument MSCA-PF, deadline 2026-09-09. Recorded in selected_call.json with action_confirmation_ref to the ticket-5 decision log.",
+      "confirmation_source": "Operator-confirmed"
     }
   ],
 
-  "open_scientific_decisions": [
-    {"id": "RQ1", "question": "First crop: tomato (tentative) or horticultural row crops?", "status": "Unresolved", "default": "horticultural row crops", "source_vault_node": "Ten Research Questions (METH-RQ-001)"},
-    {"id": "RQ2", "question": "Route A and Route B both, or one main + one fallback/comparison?", "status": "Unresolved", "source_vault_node": "Route Comparison (METH-ROUTE-006)"},
-    {"id": "RQ3", "question": "Target field state: soil moisture, crop water stress, yield risk, irrigation priority, or all?", "status": "Unresolved", "source_vault_node": "Latent Field State (METH-TERM-010)"},
-    {"id": "RQ4", "question": "What ground-truth measurements will be collected?", "status": "Unresolved", "source_vault_node": "Validation and Field Trial Layer (METH-INFRA-009)"},
-    {"id": "RQ5", "question": "How will uncertainty be evaluated (e.g. 90% PI coverage ~90%)?", "status": "Unresolved", "source_vault_node": "Uncertainty Chain (METH-CORE-004)"},
-    {"id": "RQ6", "question": "Decision objective: profit, water-use efficiency, yield stability, drought-risk, or weighted?", "status": "Unresolved", "default": "profit (expected crop value - costs)", "source_vault_node": "Profit Based Objective Function (METH-DEC-005)"},
-    {"id": "RQ7", "question": "What counts as pilot success?", "status": "Unresolved", "source_vault_node": "Decision Recommendation Logic (METH-DEC-006)"},
-    {"id": "RQ8", "question": "Is PlanetScope access secured or only optional?", "status": "Unresolved", "source_vault_node": "PlanetScope Usage Gap (METH-SOTA-003)"},
-    {"id": "RQ9", "question": "How will homogeneous-patch/control-stand covariation be validated?", "status": "Unresolved", "source_vault_node": "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)"},
-    {"id": "RQ10", "question": "TRL target: research prototype, validated MVP, or operational pilot?", "status": "Unresolved", "source_vault_node": "Web MVP and User Interface Layer (METH-INFRA-010)"}
+  "project_decisions": [
+    {"id": "RQ1", "question": "First crop", "status": "Confirmed", "decision": "Tomato", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ2", "question": "Route scope", "status": "Confirmed", "decision": "Route B (homogeneous patch proxy)", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ3", "question": "Target field state", "status": "Confirmed", "decision": "Root-zone soil moisture + crop water status", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ4", "question": "Ground-truth measurements", "status": "Confirmed", "decision": "Non-destructive physiological measurements: chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ5", "question": "Uncertainty-calibration criterion", "status": "Confirmed", "decision": "Prediction-interval coverage (90% PIs contain the truth about 90% of the time)", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ6", "question": "Decision objective", "status": "Confirmed", "decision": "Water-use efficiency (WUE)", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ7", "question": "Pilot success", "status": "Confirmed", "decision": "The RQ5 calibration target is met on the validation set", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ8", "question": "PlanetScope access", "status": "Confirmed", "decision": "Secured (Planet platform and API)", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ9", "question": "Homogeneous-patch/control-stand covariation proof", "status": "Confirmed", "decision": "A co-located seasonal campaign measuring the target crop and the proxy patch simultaneously and showing statistical covariation", "confirmation_source": "Operator-confirmed (13B consolidation)"},
+    {"id": "RQ10", "question": "TRL target", "status": "Confirmed", "decision": "Research prototype (TRL 3-4)", "confirmation_source": "Operator-confirmed (13B consolidation)"}
   ],
+
+  "coherence_note": {
+    "id": "RQ3_RQ4_coherence",
+    "status": "Inferred",
+    "reasoning": "RQ3 keeps root-zone soil moisture within the target field state, but the RQ4 non-destructive physiological measures validate the crop-water-status component directly and the root-zone soil-moisture component only indirectly. Recorded as a coherence caveat, not a gap; no soil-moisture sensor plan is fabricated."
+  },
 
   "summary": {
     "spine_items_total": 9,
-    "spine_unresolved_count": 8,
-    "spine_genuinely_confirmed_count": 1,
-    "spine_synthetically_filled_count": 7,
-    "spine_open_even_after_fill_count": 1,
-    "open_scientific_decisions_count": 10,
-    "counting_note": "9 spine items: 8 Unresolved + 1 genuinely Confirmed (CALL_BINDING). Of the 8 Unresolved, 7 are SYNTHETICALLY FILLED (FELLOW, HOST, SUPERVISOR, ELTE, VALIDATION_PARTNER, FELLOWSHIP_TYPE, DURATION) and 1 (DATA_PROVIDERS) is not filled at all. A synthetic fill is NOT a confirmation, so all 8 remain counted as Unresolved. There is no 'Refuted' status - the vocabulary is closed at the four §12.2 categories.",
-    "terminal_state": "full_dag_green (SYNTHETIC spine, SYN-SPINE-01)",
-    "terminal_state_note": "The honest_block (alpha) terminal state - the engine blocking at Phase 2 on the unresolved spine (SCL-01..04) - is preserved at the pre-override commit and remains the TRUTHFUL result for this project's real data. The full-DAG green is a demonstration on synthetic data, not a real proposal.",
-    "architectural_finding": "The beta declaration substrate (working_assumptions.json) reaches ONLY Phase 7 (budget host coefficient) and Phase 8 (assumption-applier + W1). No Phase 2-6 skill or semantic predicate reads it, so declaring the spine cannot unblock the Phase-2 scope gate - which is why a synthetic fill, rather than a beta declaration, was required. Extending the substrate to Phases 2-6 with W1-equivalent provenance guards is the honest fix and is carried as a milestone-2 ticket."
+    "spine_confirmed_count": 9,
+    "project_decisions_count": 10,
+    "project_decisions_confirmed_count": 10,
+    "state": "spine and decisions operator-confirmed (real data)",
+    "note": "All nine spine items and all ten project decisions are operator-confirmed. The only non-Confirmed record is the RQ3/RQ4 coherence caveat (Inferred). No item remains Assumed or Unresolved."
   }
 }

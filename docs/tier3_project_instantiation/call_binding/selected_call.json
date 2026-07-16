@@ -11,9 +11,15 @@
   "submission_deadline": "2026-09-09",
   "call_opening": "2026-04-09",
   "max_project_duration_months": 36,
-  "project_duration_note": "Call-level maximum (Global Fellowships: 24-36 months incl. 12-month return). European Fellowships: 12-24 months. The project's specific duration is a Tier 3 project fact set in ticket 14; recorded here is the call constraint.",
+  "project_duration_note": "Call-level maximum (Global Fellowships: 24-36 months incl. 12-month return). European Fellowships: 12-24 months. The project's specific duration is the operator-confirmed project fact below (project_duration_months = 24).",
+  "host_country": "HU",
+  "host_country_status": "Confirmed",
+  "host_country_note": "Operator-confirmed (13B consolidation, 2026-07-16). Host beneficiary is Eötvös Loránd University (ELTE), Budapest, Hungary. Drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09.",
+  "project_duration_months": 24,
+  "project_duration_status": "Confirmed",
+  "project_duration_months_note": "Operator-confirmed (13B consolidation). Standard European Fellowship duration (24 months), consistent with the Bulgaria -> Hungary intra-EU move (EF). Read by the deterministic unit-cost budget deriver together with host_country.",
   "indicative_call_budget_eur": 59857539,
   "budget_regime": "unit_cost",
   "action_confirmation_ref": "docs/tier4_orchestration_state/decision_log/action-confirmation-msca-pf_2026-07-13.json",
-  "notes": "Operator-confirmed call binding for the MSCA-PF honest run (milestone 1, D1). This file is the minimal Tier 3 call spine needed for Phase 1; the full project instantiation (concept note, objectives, consortium/researcher-host spine) is the ticket-14 hand-lift. The researcher / host / supervisor spine is deliberately left unresolved here (honest block, D11/D17)."
+  "notes": "Operator-confirmed call binding for the MSCA-PF run. The researcher / host / supervisor / associated-partner spine and the ten project decisions (RQ1-RQ10) are now operator-confirmed real data (13B consolidation, 2026-07-16; see decision_log/13b-real-data-consolidation_2026-07-16.json). host_country (HU) and project_duration_months (24) are carried here as Confirmed facts so the deterministic unit-cost budget deriver reads them directly."
 }

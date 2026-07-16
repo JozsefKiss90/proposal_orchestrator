@@ -1,79 +1,66 @@
 {
   "_provenance": {
-    "record_type": "tier3_hand_lift_spine",
-    "ticket": "tickets.md ticket 14 (hand-lift) + option-0 synthetic spine (SYN-SPINE-01)",
-    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "confirmation_checklist": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-    "synthetic_override": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json",
-    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. The identity spine was left Unresolved by the ticket-14 hand-lift because no source vault node names any person or institution. It is now filled with SYNTHETIC demo data (SYN-SPINE-01) under an explicit CLAUDE.md §3 operator override of §13.3, scoped to this demonstration run and logged per §9.4. THESE ARE NOT REAL FACTS. Every entry carries synthetic: true. Before any real use, replace with operator-confirmed facts or revert to Unresolved - the pre-override commit is the honest state.",
-    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). No fifth category is introduced - 'synthetic' is a descriptive provenance flag, never a status value (see decision_log/status-vocabulary-correction_2026-07-13.json). Synthetic entries carry validation_status 'Confirmed' so the gates evaluate them, plus synthetic: true so their nature is unmistakable."
+    "record_type": "tier3_real_project_spine",
+    "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
+    "source": "Operator-confirmed real project data (13B consolidation, 2026-07-16). This replaces the former synthetic demo spine, which is superseded and no longer in effect.",
+    "research_substance_source": "The research/methodology substance remains grounded in the source_grounded methodology vault (MSCA/methodology_graph/, gitlink b4d9e570a0861fb49590015b2ff68afc3bb7181b). The identity spine (fellow, host, supervisor, associated partner, fellowship type, duration) and the ten project decisions (RQ1-RQ10) are operator-confirmed real facts, not vault-derived.",
+    "note": "MSCA-PF is a single-fellow, single-beneficiary action - not a consortium. Only HOST is a beneficiary legal entity; FELLOW and SUPERVISOR are natural persons; VALIDATION_PARTNER is an associated partner with no beneficiary status.",
+    "status_vocabulary": "validation_status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). Operator-confirmed facts and operator-chosen decisions carry 'Confirmed'."
   },
-  "spine_status": "filled_synthetic",
-  "spine_marker": "SYN-SPINE-01",
-  "synthetic": true,
+  "spine_status": "confirmed_real",
   "fellowship_type": "European Fellowship (EF)",
-  "mobility": "Bulgaria (Plovdiv) -> Hungary (ELTE): intra-EU move, therefore a European Fellowship by definition. Derived from the spine, not invented.",
+  "mobility": "Bulgaria (Plovdiv) -> Hungary (Budapest, ELTE): intra-EU move, therefore a European Fellowship by definition. Mobility rule satisfied (operator-confirmed).",
   "roles": [
     {
       "role_token": "FELLOW",
       "role": "Experienced researcher / postdoctoral fellow (applicant)",
-      "identity": "Dr. Mariya Petrova [SYNTHETIC]",
-      "current_affiliation": "Plovdiv University 'Paisii Hilendarski', Bulgaria",
+      "identity": "Dr. Rositsa Cholakova",
+      "current_affiliation": "Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy, Plovdiv, Bulgaria (prior: Agricultural University - Plovdiv)",
       "country_of_origin": "BG",
-      "field": "Agricultural and environmental modelling; probabilistic crop-water modelling",
+      "field": "Plant physiology; non-destructive techniques for evaluating abiotic and biotic plant stress and crop monitoring; photosynthesis under stress; biostimulants",
+      "career_stage": "Approximately 4 years post-PhD. PhD 2020 (summa cum laude); thesis 'Non-destructive evaluation of physiological status of drought-stressed tomato plants' (doi:10.2139/ssrn.5492527).",
+      "eligibility": "Mobility rule satisfied (Y); PhD held (Y, 2020)",
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "FELLOW",
-      "note": "SYNTHETIC demo identity (§3 override, logged). Mobility basis: not resident in Hungary for more than 12 months in the 36 months before the deadline - asserted synthetically; a real run must evidence this. CV, publication record and career-stage detail remain unspecified."
+      "note": "Operator-confirmed real fellow. Her non-destructive plant-stress-physiology expertise supplies the project's biological ground truth (RQ4 validation strength)."
     },
     {
       "role_token": "HOST",
-      "role": "Beneficiary / host organisation",
-      "identity": "Eotvos Lorand University (ELTE), Budapest",
+      "role": "Beneficiary / host organisation (sole beneficiary)",
+      "identity": "Eötvös Loránd University (ELTE), Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest",
       "country": "Hungary",
       "country_code": "HU",
+      "group_focus": "Geoinformatics and remote sensing",
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "HOST",
-      "note": "SYNTHETIC hosting arrangement (§3 override, logged). ELTE is a real institution; the arrangement is not real. Country HU drives the Phase-7 unit-cost host-country coefficient (ticket 8) and resolves the host-dependent budget line at gate_09."
+      "note": "Operator-confirmed host; hosting confirmed. Country HU drives the Phase-7 unit-cost host-country coefficient and resolves the host-dependent budget line at gate_09."
     },
     {
       "role_token": "SUPERVISOR",
       "role": "Supervisor at the host institution",
-      "identity": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
-      "affiliation": "ELTE - environmental physics / geoinformatics",
+      "identity": "Dr. András Jung",
+      "affiliation": "ELTE Faculty of Informatics; Deputy Head, Institute of Cartography and Geoinformatics",
+      "field": "Remote sensing, hyperspectral imaging and field spectroscopy, multisensor-drone fusion (Head of the Multisensor-Drone-Fusion Working Group, project ELTE TKP2021-NVA-29); co-founder of Cubert GmbH (hyperspectral cameras) and Brightic Research; habilitations in Computer Science and Crop Sciences",
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "SUPERVISOR",
-      "note": "SYNTHETIC person attached to a real institution (§3 override, logged). Must not appear in anything submitted. Track record and supervision history are unspecified."
+      "note": "Operator-confirmed real supervisor at the host. Supervisory expertise in remote sensing and multisensor fusion anchors the host-to-fellow transfer of knowledge."
     },
     {
       "role_token": "VALIDATION_PARTNER",
       "role": "Associated partner - farmer access, field validation, feedback (not owning or operating the tool)",
-      "identity": "AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "identity": "AgroVIR",
       "country": "Hungary",
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
       "checklist_ref": "VALIDATION_PARTNER",
-      "note": "SYNTHETIC partnership (§3 override, logged). AgroVIR is a real company; the vault only ever said 'AgroVIR-like partners'. No real commitment exists."
+      "note": "Operator-confirmed real associated partner. Provides access to Hungarian tomato farms for field validation and farmer feedback."
     },
     {
       "role_token": "ELTE",
-      "role": "Superseded - ELTE is now filled as HOST (SYN-SPINE-01)",
+      "role": "ELTE is the confirmed host organisation (see HOST role_token)",
       "identity": "See HOST",
       "validation_status": "Confirmed",
-      "synthetic": true,
-      "spine_marker": "SYN-SPINE-01",
-      "source_disposition": "absent_from_sources",
-      "do_not_invent": false,
-      "do_not_invent_lifted_by": "docs/tier4_orchestration_state/decision_log/synthetic-spine-demo-override_2026-07-13.json (§3 operator override)",
       "checklist_ref": "ELTE",
-      "note": "The do_not_invent guard HELD for the entire build: ELTE is absent from every source and the engine never once asserted it. It is lifted here only by explicit operator instruction (§3), never by the engine, and only for this synthetic demo run. On revert this entry returns to validation_status Unresolved with do_not_invent: true."
+      "note": "ELTE is operator-confirmed as the real host organisation. The former vault do-not-invent placeholder (ELTE was unnamed in the sources) is resolved by explicit operator confirmation."
     }
   ]
 }
