@@ -1,0 +1,66 @@
+{
+  "record_type": "decision",
+  "id": "13b-real-data-consolidation",
+  "date": "2026-07-16",
+  "supersedes": [
+    "synthetic-spine-demo-override_2026-07-13.json",
+    "synthetic-concept-override-extension_2026-07-14.json"
+  ],
+  "authority": "Explicit operator instruction. The operator supplied real, held project facts and decisions via the 13B consolidation checklist. The engine transcribed them; it invented nothing (§13.3 upheld — an operator providing held facts is not fabrication).",
+
+  "summary": "The SYN-SPINE-01 synthetic identity spine and its concept-content extension are RETIRED and replaced with operator-confirmed real project data. The two §3 override records above are therefore no longer in effect: the engine no longer relies on any synthetic data. Every project-specific claim in Tier 3 now carries validation_status Confirmed or Inferred; working_assumptions.json is emptied (no Assumed declarations); no Unresolved claim remains. This moves the run from the 13A engine-integration demo basis (synthetic) to the 13B finalization basis (real Confirmed/Inferred data).",
+
+  "real_identity_spine": {
+    "FELLOW": "Dr. Rositsa Cholakova - plant physiologist, Maritsa Vegetable Crops Research Institute / Bulgarian Agricultural Academy, Plovdiv, Bulgaria; ~4 years post-PhD (PhD 2020, summa cum laude). Expertise: non-destructive evaluation of abiotic/biotic plant stress and crop monitoring. Eligibility (mobility rule; PhD) operator-confirmed. Prior work: PhD on non-destructive evaluation of drought-stressed tomato plants (doi:10.2139/ssrn.5492527); publications on maize chilling-stress photosynthesis and biostimulants.",
+    "HOST": "Eotvos Lorand University (ELTE), Budapest, Hungary (HU) - Faculty of Informatics, Institute of Cartography and Geoinformatics (geoinformatics + remote sensing). Sole beneficiary. Hosting confirmed.",
+    "SUPERVISOR": "Dr. Andras Jung - ELTE Faculty of Informatics; Deputy Head, Institute of Cartography and Geoinformatics. Expertise: remote sensing, hyperspectral imaging, field spectroscopy, multisensor-drone fusion.",
+    "ASSOCIATED_PARTNER": "AgroVIR (Hungary) - real associated partner; farmer access, field validation, feedback at Hungarian tomato sites; not owning/operating the tool.",
+    "FELLOWSHIP_TYPE": "European Fellowship (EF); Bulgaria -> Hungary intra-EU.",
+    "DURATION": "24 months."
+  },
+
+  "research_decisions_confirmed": {
+    "RQ1_crop": "tomato",
+    "RQ2_route": "Route B (homogeneous patch proxy)",
+    "RQ3_target_state": "root-zone soil moisture + crop water status",
+    "RQ4_ground_truth": "non-destructive physiological measurement (chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance) - the fellow's expertise",
+    "RQ5_calibration": "90% prediction-interval coverage (~90% of truths within 90% PIs)",
+    "RQ6_objective": "water-use efficiency",
+    "RQ7_pilot_success": "the RQ5 calibration target met on the validation set",
+    "RQ8_planetscope": "secured (Planet platform / API)",
+    "RQ9_covariation_proof": "co-located seasonal measurement campaign",
+    "RQ10_TRL": "research prototype (TRL 3-4)"
+  },
+
+  "data_providers": {
+    "earth_observation": "PlanetScope (secured, Planet platform/API); Sentinel-1 (SAR) and Sentinel-2 (optical) open data",
+    "meteorological": "ERA5 reanalysis (ECMWF)",
+    "field_sites": "Hungarian tomato field sites via AgroVIR"
+  },
+
+  "corrections_from_the_synthetic_draft": [
+    "HOST DEPARTMENT: the synthetic concept placed the host in 'environmental physics / geoinformatics'. The real host is the Faculty of Informatics, Institute of Cartography and Geoinformatics (geoinformatics + remote sensing). All host / two-way-transfer framing was reframed accordingly (a better fit for the multi-sensor EO methodology).",
+    "PRIOR-METHOD ATTRIBUTION: the synthetic concept attributed an 'uncertainty-aware AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556)' to the fellow. This attribution is REMOVED - that is not Dr. Cholakova's work. The AquaCrop / probabilistic-fusion methodology is retained as a project/literature method (operator-confirmed to keep); the fellow's real contribution is grounded in her non-destructive stress-physiology expertise (doi:10.2139/ssrn.5492527), which is the project's ground-truth/validation strength (RQ4)."
+  ],
+
+  "coherence_note": "RQ3 retains root-zone soil moisture in the target state while RQ4 grounds validation in plant-level non-destructive measures - which directly validate the crop-water-status component. The soil-moisture component is diagnosed but validated indirectly; adding in-situ soil-moisture probes, or narrowing RQ3 to crop water status, would fully close it. Recorded as an Inferred note; not a blocker.",
+
+  "status_effect": "SYN-SPINE-01 fully retired. No 'synthetic: true' flag, no 'spine_marker', no Unresolved/Assumed status remains in docs/tier3_project_instantiation/ (hand_lift_provenance.json retains a historical reference to the superseded spine). The two §3 overrides are closed by this record.",
+
+  "affected_files": [
+    "consortium/roles.json",
+    "consortium/partners.json",
+    "project_brief/project_summary.json",
+    "project_brief/concept_note.md",
+    "project_brief/strategic_positioning.md",
+    "architecture_inputs/objectives.json",
+    "architecture_inputs/outcomes.json",
+    "architecture_inputs/impacts.json",
+    "architecture_inputs/workpackage_seed.json",
+    "call_binding/confirmation_checklist.json",
+    "call_binding/selected_call.json (host_country=HU, project_duration_months=24, Confirmed)",
+    "working_assumptions.json (emptied)"
+  ],
+
+  "constitutional_note": "This is the difference between the SYN-SPINE-01 demonstration (synthetic, explicitly not submittable) and a real proposal: the identity spine, research decisions and data providers are now the operator's actual project facts and decisions. §13.3 held throughout - the engine transcribed operator-supplied held facts and did not invent any project fact. A fresh full-DAG run (Phases 1-8) on this Tier 3 is a real-data (13B) run."
+}
