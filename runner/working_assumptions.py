@@ -223,6 +223,34 @@ class WorkingAssumptions:
             for d in self.declarations
         ]
 
+    def as_canonical_pack_entries(self) -> list[dict[str, Any]]:
+        """Render the declarations as canonical-reference-pack machine entries.
+
+        The lean machine entry — ``key`` / ``declared_value`` / ``checklist_ref``
+        (when present) / ``provenance: "assumed"`` — that **both** canonical-pack
+        derivers quarantine operator declarations into: the Tier-3-sourced
+        :func:`runner.phase8_canonical_pack.build_phase8_canonical_reference_pack`
+        and the graph-sourced
+        :func:`runner.graph_canonical_pack.build_canonical_pack_from_graph`.
+        Owning the rendering here means the two derivers **cannot drift** (the
+        prior "keep in sync" duplication is removed) and a declared value can
+        never masquerade as a confirmed canonical fact.
+
+        Distinct from :meth:`as_surface`, which produces the human-legible
+        *declared surface* (``status``/``provenance_class``/``declared_by``/
+        ``declared_on``); this is the machine surface pack consumers read.
+        """
+        entries: list[dict[str, Any]] = []
+        for d in self.declarations:
+            entry: dict[str, Any] = {"key": d.key, "declared_value": d.value}
+            if d.checklist_ref is not None:
+                entry["checklist_ref"] = d.checklist_ref
+            # Lowercase §12.2 machine tag — an operator declaration is 'assumed',
+            # quarantined out of every confirmed array.
+            entry["provenance"] = DECLARED_STATUS.lower()
+            entries.append(entry)
+        return entries
+
 
 # ---------------------------------------------------------------------------
 # Loader

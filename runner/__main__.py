@@ -230,12 +230,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         from runner.graph_compiler import (
             GraphCompileError,
             compile_and_diff,
+            compile_part_b_and_report,
         )
         from runner.graph_config import GraphConfigError
         from runner.vault_reader import VaultReadError
 
         try:
             result, report = compile_and_diff(Path(args.from_graph), repo_root)
+            part_b_result, part_b = compile_part_b_and_report(
+                Path(args.from_graph), repo_root
+            )
         except (GraphConfigError, VaultReadError, GraphCompileError) as exc:
             _err(f"graph compile fail-closed: {exc}")
             return 1
@@ -245,12 +249,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         _out(
             f"[FROM-GRAPH] project={result.project_id} "
             f"artifacts={len(result.artifacts)} "
-            f"converged={report['converged']} residual={report['residual_total']}",
+            f"converged={report['converged']} residual={report['residual_total']} "
+            f"part_b_sections={part_b['section_count']}",
             "from_graph",
             project_id=result.project_id,
             artifacts=len(result.artifacts),
             converged=report["converged"],
             residual_total=report["residual_total"],
+            part_b_sections=part_b["section_count"],
         )
         return 0
 

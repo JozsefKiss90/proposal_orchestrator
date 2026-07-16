@@ -63,8 +63,10 @@ SCHEMA_ID = "orch.phase8.canonical_reference_pack.v1"
 #: directly evidenced by a Tier 1–3 source (§12.2 "Confirmed") and an assumed
 #: entry is an operator declaration adopted in the absence of direct evidence
 #: (§12.2 "Assumed") — the tag is the machine encoding of that distinction.
+#: The ``"assumed"`` tag itself is now owned by
+#: :meth:`runner.working_assumptions.WorkingAssumptions.as_canonical_pack_entries`
+#: (the shared declared-assumptions renderer), so only the confirmed tag lives here.
 PROVENANCE_CONFIRMED = "confirmed"
-PROVENANCE_ASSUMED = "assumed"
 
 #: Confirmed arrays that must be non-empty for the pack to back Phase-8
 #: drafting.  A Phase-8 drafting node runs only after the upstream Phase-3/4
@@ -183,42 +185,24 @@ def _extract_partners(data: dict) -> list[dict[str, Any]]:
 
 
 def _extract_declared_assumptions(repo_root: Path) -> list[dict[str, Any]]:
-    """Pass operator declarations through verbatim, tagged provenance=assumed.
+    """Pass operator declarations through verbatim, tagged ``provenance: "assumed"``.
 
     Reads the Tier 3 ``working_assumptions.json`` substrate (ticket 15) via the
-    shared reader and renders each declaration as a canonical-reference entry.
-    No inference: the deriver does **not** decide which typed entity a
-    declaration backs — it copies the stable ``key``, the operator-declared
-    ``value``, and (when present) the ``checklist_ref`` spine link, and tags the
-    entry ``provenance: "assumed"``.  So a declared value is quarantined here and
-    can never be emitted inside a confirmed array.
+    shared reader and delegates the machine-entry rendering to
+    :meth:`runner.working_assumptions.WorkingAssumptions.as_canonical_pack_entries`
+    — the **single** renderer both this Tier-3-sourced deriver and the
+    graph-sourced deriver (:mod:`runner.graph_canonical_pack`) share, so a
+    declared value is quarantined identically in both and can never masquerade as
+    a confirmed canonical fact.  No inference: the value/key/checklist_ref are
+    copied verbatim.
 
     Fail-closed: a present-but-malformed file raises
     :class:`runner.working_assumptions.WorkingAssumptionsError`, which the
     component wrapper surfaces as an ``AGENT_EXECUTION_ERROR`` node block rather
     than silently dropping the operator's declaration.  An absent or empty file
     yields ``[]`` (the honest block, mode α).
-
-    This is a **deliberately distinct** rendering from
-    ``WorkingAssumptions.as_surface()``: that method produces the human-legible
-    *declared surface* (``status`` / ``provenance_class`` / ``declared_by`` /
-    ``declared_on``) for confirmation checklists and traceability footers, while
-    this produces the lean *machine* canonical-reference entry (``key`` /
-    ``declared_value`` / ``checklist_ref`` / ``provenance``) the pack consumers
-    read.  Keep the two in mind together when the declaration shape changes.
     """
-    wa = load_working_assumptions(repo_root)
-    result: list[dict[str, Any]] = []
-    for decl in wa.declarations:
-        entry: dict[str, Any] = {
-            "key": decl.key,
-            "declared_value": decl.value,
-        }
-        if decl.checklist_ref is not None:
-            entry["checklist_ref"] = decl.checklist_ref
-        entry["provenance"] = PROVENANCE_ASSUMED
-        result.append(entry)
-    return result
+    return load_working_assumptions(repo_root).as_canonical_pack_entries()
 
 
 def build_phase8_canonical_reference_pack(

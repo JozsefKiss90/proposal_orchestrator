@@ -120,6 +120,18 @@ EVIDENCE_TO_STATUS: dict[str, str] = {
     "unconfirmed": "Unresolved",
 }
 
+#: The same Appendix-B lookup, **lowercased** to the machine vocabulary shared by
+#: the Tier-5 section claim status
+#: (``validation_status.claim_statuses[].status`` ∈
+#: ``{confirmed, inferred, assumed, unresolved}``) and the canonical reference
+#: pack's per-entry ``provenance`` tag.  Derived from :data:`EVIDENCE_TO_STATUS`
+#: so it can never drift from the §12.2 mapping.  ``unconfirmed`` → ``unresolved``
+#: (never ``confirmed``): the compiler (ticket 6) and the pack deriver (ticket 7)
+#: both rely on an ``unconfirmed`` node never landing as a confirmed fact.
+EVIDENCE_TO_MACHINE_STATUS: dict[str, str] = {
+    k: v.lower() for k, v in EVIDENCE_TO_STATUS.items()
+}
+
 
 # ---------------------------------------------------------------------------
 # Front-matter field contract

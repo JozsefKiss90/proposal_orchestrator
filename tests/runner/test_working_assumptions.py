@@ -234,6 +234,35 @@ class TestDeclaredSurface:
         assert load_working_assumptions(tmp_path).as_surface() == []
 
 
+class TestCanonicalPackEntries:
+    """The shared machine-entry renderer both canonical-pack derivers use."""
+
+    def test_entries_are_quarantined_assumed(self, tmp_path: Path) -> None:
+        _seed(tmp_path, _file(_host_declaration("BE")))
+        entries = load_working_assumptions(tmp_path).as_canonical_pack_entries()
+        assert entries == [
+            {
+                "key": "host_country",
+                "declared_value": "BE",
+                "checklist_ref": "HOST",
+                # Lowercase machine tag — quarantined out of every confirmed array.
+                "provenance": "assumed",
+            }
+        ]
+        # Never a confirmed canonical fact.
+        assert entries[0]["provenance"] != "confirmed"
+
+    def test_checklist_ref_omitted_when_absent(self, tmp_path: Path) -> None:
+        decl = _host_declaration("BE")
+        del decl["checklist_ref"]
+        _seed(tmp_path, _file(decl))
+        entry = load_working_assumptions(tmp_path).as_canonical_pack_entries()[0]
+        assert "checklist_ref" not in entry
+
+    def test_entries_empty_when_no_declarations(self, tmp_path: Path) -> None:
+        assert load_working_assumptions(tmp_path).as_canonical_pack_entries() == []
+
+
 # ---------------------------------------------------------------------------
 # Fail-closed on a present-but-malformed file
 # ---------------------------------------------------------------------------
