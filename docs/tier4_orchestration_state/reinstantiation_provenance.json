@@ -25,7 +25,20 @@
     "recorded_gitlink_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
     "working_tree_state_at_record": "dirty (uncommitted ADR churn + untracked .scratch/ and .smart-env/)",
     "handling": "Operator decision: record the current gitlink SHA as re-instantiation provenance; do NOT commit the vault's uncommitted changes. A byte-exact clean pin-and-record is deferred (D8/D10).",
-    "provenance_note": "This SHA pins the source vault used for re-instantiation. Because the working tree was left dirty and uncommitted, the recorded SHA reflects the last committed gitlink, not the current working tree."
+    "provenance_note": "This SHA pins the source vault used for re-instantiation. Because the working tree was left dirty and uncommitted, the recorded SHA reflects the last committed gitlink, not the current working tree.",
+    "topology_resolution_d8": {
+      "resolved": "absorbed",
+      "date": "2026-07-16",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/graph-topology-d8-absorb_2026-07-16.json",
+      "authority": ["tickets_milestone2.md ticket 2", "MILESTONE2_SCOPE.md D8", "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md §3 (D8)", "CLAUDE.md §9.4/§9.5"],
+      "what_happened": "The embedded MSCA/ git repo (gitlink mode 160000 at b4d9e57, no .gitmodules) was ABSORBED into the parent repo: the gitlink was removed from the parent index (git rm --cached MSCA), the standalone MSCA/.git was removed, and MSCA/** is now tracked as ordinary files under the parent repo. Submodule was rejected because the standalone repo is local-only (no remote/origin), so a .gitmodules URL could not point anywhere clonable, and because the vault is the tightly-coupled milestone-2 authoring surface of THIS repo (ticket 5 template home + Dataview enable, --from-graph stable path).",
+      "pin_sha_traceability": "b4d9e57 (recorded_gitlink_sha above) remains traceable and REPRODUCIBLE: the standalone repo's complete history (refs/heads/master @ b4d9e57, HEAD @ b4d9e57, refs/stash) was archived to MSCA-preabsorb-b4d9e57.bundle (git bundle --all, verified 'complete history') at the repo root before MSCA/.git was removed. `git clone MSCA-preabsorb-b4d9e57.bundle` restores the pre-absorb vault. The provenance record is UPDATED, not silently broken (ticket 2 acceptance).",
+      "history_archive": "MSCA-preabsorb-b4d9e57.bundle",
+      "gitignored_after_absorb": ["MSCA/.smart-env/ (Smart Connections embeddings cache)", "MSCA/.serena/ (Serena cache)", "MSCA/.scratch/ (scratch)", "MSCA/.obsidian/workspace.json + graph.json (per-user UI state)"],
+      "tracked_after_absorb": ["MSCA/methodology_graph/** (87 graph nodes — the reader/--from-graph target)", "MSCA/.obsidian/plugins/** + community-plugins.json (self-contained vault; Dataview present for ticket 5)", "MSCA/sources/**, MSCA/docs/**, MSCA/CLAUDE.md, MSCA/CONTEXT.md, MSCA/llm_wiki.md"],
+      "stable_vault_path": "MSCA/methodology_graph/ is the stable, in-tree node root the deterministic vault reader (runner/vault_reader.py, ticket 1) and the ticket-3 --from-graph compiler read. It is unchanged by the absorb; it is now a plain in-tree path requiring no submodule init.",
+      "generic_template_home": "templates/obsidian_graph_vault/ (repo root) is fixed as the generic (no-project-nouns) template home for ticket 5's obsidian-graph scaffolding skill. MSCA/methodology_graph/ is reference instance #1; the generic template is authored into templates/obsidian_graph_vault/ in ticket 5."
+    }
   },
   "purge_manifest_source": "PHASE8_FULLSCALE_AND_OBSIDIAN_GRILL_BRIEF.md §5",
   "reset_to_skeleton": [

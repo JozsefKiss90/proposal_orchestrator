@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@bitbonsai/mcpvault@latest",
+        "C:\\MSCA\\MSCA"
+      ],
+      "env": {}
+    },
+    "smart-connections": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\jozse\\mcp-servers\\smart-connections-mcp\\dist\\index.js"
+      ],
+      "env": {
+        "SMART_VAULT_PATH": "C:\\MSCA\\MSCA"
+      }
+    }
+  }
+}

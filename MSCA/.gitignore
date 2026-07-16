@@ -1,0 +1,25 @@
+# MSCA vault — absorbed from the standalone embedded repo into the parent
+# orchestrator repo (D8 / ticket 2, 2026-07-16). Pre-absorb history is archived
+# in ../MSCA-preabsorb-b4d9e57.bundle and recorded in
+# docs/tier4_orchestration_state/reinstantiation_provenance.json.
+#
+# The graph nodes (methodology_graph/**) and vault config (.obsidian/plugins,
+# .obsidian/community-plugins.json, CLAUDE.md, CONTEXT.md, sources/, docs/) are
+# tracked. Only runtime/tooling caches and per-user UI state are ignored below —
+# they are regenerated on demand and are not graph content.
+
+# Smart Connections embeddings cache (regenerated on demand)
+.smart-env/
+
+# Serena language-server cache
+.serena/
+
+# Scratch / working notes
+.scratch/
+
+# Obsidian per-user UI state (window layout, graph view position). The plugin
+# set (.obsidian/plugins/) and community-plugins.json ARE tracked so the vault
+# is self-contained and Dataview can be enabled in ticket 5.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/graph.json
