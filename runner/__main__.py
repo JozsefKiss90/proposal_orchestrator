@@ -112,6 +112,19 @@ def main(argv: Optional[list[str]] = None) -> int:
         ),
     )
     parser.add_argument(
+        "--from-graph",
+        dest="from_graph",
+        default=None,
+        metavar="CONFIG",
+        help=(
+            "Compile Tier 3 architecture_inputs from a per-project vault "
+            "(graph.config.yaml at CONFIG) to a non-destructive staging location "
+            "and print a diff against the hand-lift, then exit.  A Step-0-style "
+            "pre-dispatch pass (milestone 2, ticket 3): it does not construct or "
+            "run the scheduler, evaluate gates, or overwrite any Tier 3 source."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print ready nodes from the initial graph state and exit without evaluating gates.",
@@ -201,6 +214,47 @@ def main(argv: Optional[list[str]] = None) -> int:
             if args.repo_root
             else find_repo_root()
         )
+    except Exception as exc:
+        _err(str(exc))
+        return 3
+
+    # ------------------------------------------------------------------
+    # --from-graph: deterministic Tier-3 compile-and-diff (Step-0-style).
+    #
+    # Runs BEFORE any scheduler construction or node dispatch and returns —
+    # it never touches the DAG scheduler, gate evaluation, or §17 contracts,
+    # and it is non-destructive (writes only staging under Tier 4).  Absent
+    # this flag, the scheduler path below is entirely unchanged.
+    # ------------------------------------------------------------------
+    if args.from_graph:
+        from runner.graph_compiler import (
+            GraphCompileError,
+            compile_and_diff,
+        )
+        from runner.graph_config import GraphConfigError
+        from runner.vault_reader import VaultReadError
+
+        try:
+            result, report = compile_and_diff(Path(args.from_graph), repo_root)
+        except (GraphConfigError, VaultReadError, GraphCompileError) as exc:
+            _err(f"graph compile fail-closed: {exc}")
+            return 1
+        except Exception as exc:  # noqa: BLE001 — CLI boundary
+            _err(str(exc))
+            return 3
+        _out(
+            f"[FROM-GRAPH] project={result.project_id} "
+            f"artifacts={len(result.artifacts)} "
+            f"converged={report['converged']} residual={report['residual_total']}",
+            "from_graph",
+            project_id=result.project_id,
+            artifacts=len(result.artifacts),
+            converged=report["converged"],
+            residual_total=report["residual_total"],
+        )
+        return 0
+
+    try:
         library_path: Path = (
             Path(args.library_path)
             if args.library_path

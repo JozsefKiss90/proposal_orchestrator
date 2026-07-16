@@ -132,6 +132,55 @@ def test_resolve_returns_none_when_no_binding_matches(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# Optional collection_key (additive — ticket 3 compiler)
+# ---------------------------------------------------------------------------
+
+
+def test_collection_key_parsed_when_present(tmp_path):
+    text = (
+        "project_id: x\n"
+        "bindings:\n"
+        "  - match: {node_type: work_package}\n"
+        "    tier: tier3\n"
+        "    artifact_path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json\n"
+        "    collection_key: work_packages\n"
+    )
+    cfg = load_graph_config(_write(tmp_path / "graph.config.yaml", text))
+    assert cfg.bindings[0].collection_key == "work_packages"
+
+
+def test_collection_key_defaults_to_none_when_absent(tmp_path):
+    cfg = load_graph_config(_write(tmp_path / "graph.config.yaml", _VALID))
+    # none of the _VALID bindings declare a collection_key
+    assert all(b.collection_key is None for b in cfg.bindings)
+
+
+def test_collection_key_blank_fails_closed(tmp_path):
+    text = (
+        "project_id: x\n"
+        "bindings:\n"
+        "  - match: {node_type: objective}\n"
+        "    tier: tier3\n"
+        "    collection_key: '   '\n"
+    )
+    with pytest.raises(GraphConfigError, match=r"bindings\[0\]\.collection_key"):
+        load_graph_config(_write(tmp_path / "graph.config.yaml", text))
+
+
+def test_collection_key_without_artifact_path_fails_closed(tmp_path):
+    # collection_key on a source-only binding is a likely authoring error.
+    text = (
+        "project_id: x\n"
+        "bindings:\n"
+        "  - match: {folder: '04_routes'}\n"
+        "    tier: tier3\n"
+        "    collection_key: routes\n"
+    )
+    with pytest.raises(GraphConfigError, match=r"collection_key.*artifact_path"):
+        load_graph_config(_write(tmp_path / "graph.config.yaml", text))
+
+
+# ---------------------------------------------------------------------------
 # Fail closed — file / root
 # ---------------------------------------------------------------------------
 

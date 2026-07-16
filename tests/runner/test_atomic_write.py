@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from runner.atomic_write import atomic_write_json, atomic_write_via
+from runner.atomic_write import atomic_write_json, atomic_write_text, atomic_write_via
 
 
 class TestAtomicWriteJson:
@@ -40,6 +40,26 @@ class TestAtomicWriteJson:
         with pytest.raises(TypeError):
             atomic_write_json({"bad": object()}, out)
         assert not out.exists()
+        assert list(tmp_path.glob("*.tmp")) == []
+
+
+class TestAtomicWriteText:
+    def test_writes_utf8_text_creating_parents(self, tmp_path: Path) -> None:
+        out = tmp_path / "a" / "b" / "note.md"
+        atomic_write_text("# Title\n\nbody with ünïcode\n", out)
+        assert out.read_text("utf-8") == "# Title\n\nbody with ünïcode\n"
+
+    def test_newlines_written_verbatim(self, tmp_path: Path) -> None:
+        # \n is not translated (byte-identical across platforms).
+        out = tmp_path / "x.md"
+        atomic_write_text("a\nb\nc", out)
+        assert out.read_bytes() == b"a\nb\nc"
+
+    def test_overwrites_without_temp_leftover(self, tmp_path: Path) -> None:
+        out = tmp_path / "x.md"
+        atomic_write_text("one", out, prefix="t_")
+        atomic_write_text("two", out, prefix="t_")
+        assert out.read_text("utf-8") == "two"
         assert list(tmp_path.glob("*.tmp")) == []
 
 

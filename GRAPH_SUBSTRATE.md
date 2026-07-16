@@ -139,6 +139,33 @@ and the pack-from-graph deriver (ticket 7), are built on top of this reader.
 
 ---
 
+## 4a. Built on the substrate (Wave 1 — tickets 3, 4, 5)
+
+| Module | Ticket | Role | Exception |
+|---|---|---|---|
+| `runner/graph_compiler.py` | 3 | **graph→docs** Tier-3 extraction (config-driven, non-destructive staging + diff vs the hand-lift). Entry: `python -m runner --from-graph <config>` (Step-0-style, before dispatch; no §17/DAG/gate change) or `python -m runner.graph_compiler`. | `GraphCompileError` |
+| `runner/graph_projector.py` | 4 | **docs→graph** phase/gate mirror (Tier-4 → `phase_gate_state` nodes) + the D6 `sync_direction` no-overlap invariant (`check_no_overlap`). Entry: `python -m runner.graph_projector`. | `GraphProjectionError` / `SyncOverlapError` |
+| `runner/vault_scaffold.py` + `.claude/skills/obsidian-graph/` | 5 | Scaffold a fresh per-project vault from the generic template (below), swapping in `project_id`. | `VaultScaffoldError` |
+
+The two sync directions are **non-overlapping** (D6): `graph_to_docs` (compiler) owns
+Tier 3 + Part B prose (writes `docs/**`); `docs_to_graph` (projector) owns Tier 4 state +
+the gate mirror (writes only the vault's `18_phase_gate_state/` folder, no `docs/**`).
+`runner/graph_projector.py::check_no_overlap` enforces this against any `graph.config.yaml`.
+Both directions are deterministic, Claude-free, and fail-closed. Both write via the shared
+`runner/atomic_write.py` house-style writer (§17.5.3). Staging output and projected mirror
+nodes are regenerable, gitignored, and are **not** source truth.
+
+The `collection_key` field on a `graph.config.yaml` binding (added in ticket 3) names the
+top-level JSON key extracted records collect under (e.g. `work_packages` for
+`workpackage_seed.json` — not always the filename stem).
+
+Walking-skeleton note: against the current methodology-only MSCA vault the Tier-3 binding
+nodes (folders `11…18`) are **not yet authored** (ticket 8), so the compile is empty and
+the diff report enumerates the whole hand-lift as an **explained residual**. The extraction
+mechanism is proven on a controlled fixture vault (`tests/runner/test_graph_compiler.py`).
+
+---
+
 ## 5. Topology + stable paths (D8 / ticket 2 — resolved)
 
 The embedded `MSCA/` git repo (gitlink, no `.gitmodules`) was **absorbed** into the
@@ -153,7 +180,9 @@ provenance: `docs/tier4_orchestration_state/reinstantiation_provenance.json`
 | Concern | Stable path (documented, in-tree) |
 |---|---|
 | Reference instance #1 vault (reader / `--from-graph` node root) | `MSCA/methodology_graph/` |
+| Reference instance #1 config (ticket 3) | `MSCA/graph.config.yaml` |
 | Generic template home (ticket 5) | `templates/obsidian_graph_vault/` |
+| Generic template config (ticket 5) | `templates/obsidian_graph_vault/graph.config.yaml` |
 
 The reader takes the vault directory as an argument (path-agnostic by design), so the
 paths above are documentation + defaults, not literals baked into the reader — the

@@ -21,7 +21,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable
 
-__all__ = ["atomic_write_json", "atomic_write_via"]
+__all__ = ["atomic_write_json", "atomic_write_text", "atomic_write_via"]
 
 
 def _finalize(tmp_path: str, output_path: Path) -> None:
@@ -45,6 +45,39 @@ def atomic_write_json(
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     data = json.dumps(obj, indent=2, ensure_ascii=False).encode("utf-8")
+
+    fd, tmp_path = tempfile.mkstemp(
+        dir=str(output_path.parent), suffix=".tmp", prefix=prefix
+    )
+    try:
+        os.write(fd, data)
+        os.close(fd)
+        fd = -1
+        _finalize(tmp_path, output_path)
+    except Exception:
+        if fd >= 0:
+            os.close(fd)
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
+
+
+def atomic_write_text(
+    text: str,
+    output_path: Path,
+    *,
+    prefix: str = "atomic_",
+) -> None:
+    """Write *text* as UTF-8 to *output_path*, atomically.
+
+    The text sibling of :func:`atomic_write_json`, for producers that emit
+    markdown or other text artifacts (e.g. the docs→graph projector's mirror
+    nodes).  Newlines are written verbatim (``\\n`` is not translated), so output
+    is byte-identical across platforms.  Creates parent directories as needed.
+    Raises on any failure, leaving no partial output.
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    data = text.encode("utf-8")
 
     fd, tmp_path = tempfile.mkstemp(
         dir=str(output_path.parent), suffix=".tmp", prefix=prefix

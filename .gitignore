@@ -6,6 +6,13 @@
 # NOTE: .claude/agents/, .claude/skills/, .claude/workflows/ are constitutional
 #       configuration and are intentionally tracked. Only runtime-generated
 #       directories are excluded here.
+# graph_compiler.py --from-graph staging + diff report: regenerable, deterministic
+# preview/compile output (milestone 2, ticket 3). Non-destructive; not source truth.
+docs/tier4_orchestration_state/graph_compile/
+# graph_projector.py phase-gate mirror nodes (milestone 2, ticket 4): derived,
+# regenerable Tier-4 state projected into any vault. The owned folder skeleton is
+# tracked; the generated PGS-*.md mirror nodes are not.
+**/18_phase_gate_state/PGS-*.md
 .claude/skill_diag/
 .claude/semantic_diag/
 .claude/runs/

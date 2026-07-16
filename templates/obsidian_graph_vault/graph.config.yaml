@@ -1,0 +1,79 @@
+# graph.config.yaml — GENERIC per-project template (milestone 2, ticket 5)
+#
+# This is the starter binding contract the `obsidian-graph` scaffolding skill
+# copies into a fresh per-project vault. It carries ZERO project nouns — only the
+# generic Horizon-Europe proposal structure the compiler/projector understand.
+# To instantiate an instance, change `project_id` (the scaffolder does this) and,
+# if a project's folders differ, adjust the bindings. No code changes are needed:
+# the schema, reader, compiler, and projector are all project-agnostic (D15).
+#
+# Consumed by runner/graph_config.py → runner/graph_compiler.py (graph→docs) and,
+# read-only, runner/graph_projector.py (docs→graph). The no-overlap invariant
+# (runner/graph_projector.py::check_no_overlap) holds for this config.
+
+project_id: template-instance
+vault_path: vault
+
+bindings:
+  # ── Part B prose (Tier 5): one proposal_section node per sub-section ─────────
+  - match:
+      node_type: proposal_section
+    tier: tier5
+    artifact_path: docs/tier5_deliverables/proposal_sections
+
+  # ── Tier 3 architecture_inputs (binding folders 11–17) ──────────────────────
+  - match:
+      folder: "11_objectives"
+      node_type: objective
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/objectives.json
+    collection_key: objectives
+
+  - match:
+      folder: "12_outcomes"
+      node_type: outcome
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/outcomes.json
+    collection_key: outcomes
+
+  - match:
+      folder: "13_impacts"
+      node_type: impact
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/impacts.json
+    collection_key: impacts
+
+  - match:
+      folder: "14_work_packages"
+      node_type: work_package
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
+    collection_key: work_packages
+
+  - match:
+      folder: "15_timeline"
+      node_type: timeline
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json
+    collection_key: milestones
+
+  - match:
+      folder: "16_risks"
+      node_type: risk
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/risks.json
+    collection_key: risks
+
+  # ── Budget binding nodes (Tier 3 source; no architecture_inputs artifact) ────
+  - match:
+      folder: "17_budget"
+      node_type: budget
+    tier: tier3
+
+  # ── Tier-4 phase/gate mirror — WRITTEN by the docs→graph projector, never
+  #    extracted by the compiler. Source-only (no artifact_path) keeps the
+  #    no-overlap invariant (D6) satisfied.
+  - match:
+      folder: "18_phase_gate_state"
+      node_type: phase_gate_state
+    tier: tier4

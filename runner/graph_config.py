@@ -88,6 +88,15 @@ class Binding:
     """Canonical ``docs/**`` target this binding extracts to.  ``None`` marks a
     *source-only* binding (read, never written)."""
 
+    collection_key: Optional[str] = None
+    """Top-level JSON key under which extracted records are collected in the
+    ``artifact_path`` file (e.g. ``objectives``, ``work_packages``).  Optional and
+    additive: the compiler (ticket 3) falls back to the ``artifact_path`` filename
+    stem when it is absent.  Carried here — not derived — because the canonical key
+    is not always the filename stem (``workpackage_seed.json`` → ``work_packages``),
+    and deriving it would bake a project-specific naming rule into the generic
+    layer.  Ignored for source-only bindings."""
+
     def matches(self, folder: str, node_type: str) -> bool:
         """True if a node in *folder* with *node_type* is selected by this binding.
 
@@ -195,12 +204,22 @@ def _parse_binding(raw: Any, index: int) -> Binding:
     artifact_path = _optional_stripped_str(
         entry.get("artifact_path"), f"{label}.artifact_path"
     )
+    collection_key = _optional_stripped_str(
+        entry.get("collection_key"), f"{label}.collection_key"
+    )
+    if collection_key is not None and artifact_path is None:
+        raise GraphConfigError(
+            f"{label}: 'collection_key' is set but 'artifact_path' is not; "
+            f"collection_key names the JSON key of an extracted artifact and is "
+            f"meaningless on a source-only binding — remove one or the other"
+        )
 
     return Binding(
         tier=tier,
         match_folder=match_folder,
         match_node_type=match_node_type,
         artifact_path=artifact_path,
+        collection_key=collection_key,
     )
 
 
