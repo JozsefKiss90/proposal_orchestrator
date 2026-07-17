@@ -1,17 +1,17 @@
 {
   "schema_id": "orch.phase7.unit_cost_budget.v1",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "instrument_type": "MSCA-PF",
   "budget_regime": "unit_cost",
   "gate_pass_declaration": "pass",
   "derivation": {
     "formula": "confirmed_months x published_rates x host_country_coefficient",
     "confirmed_months": 24,
-    "confirmed_months_status": "Assumed",
-    "confirmed_months_source": "docs/tier3_project_instantiation/working_assumptions.json -> project_duration_months (operator-declared)",
+    "confirmed_months_status": "Confirmed",
+    "confirmed_months_source": "docs/tier3_project_instantiation/call_binding/selected_call.json -> project_duration_months",
     "host_country": "HU",
-    "host_country_status": "Assumed",
-    "host_country_source": "docs/tier3_project_instantiation/working_assumptions.json -> host_country (operator-declared)",
+    "host_country_status": "Confirmed",
+    "host_country_source": "docs/tier3_project_instantiation/call_binding/selected_call.json -> host_country",
     "host_country_coefficient_percent": 78.7
   },
   "line_items": [

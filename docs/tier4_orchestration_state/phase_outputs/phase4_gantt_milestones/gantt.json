@@ -1,11 +1,11 @@
 {
   "schema_id": "orch.phase4.gantt.v1",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "tasks": [
     {
       "task_id": "T1-01",
       "wp_id": "WP1",
-      "title": "Acquire and harmonise EO and ground sensor data",
+      "title": "Acquire and harmonise multi-sensor EO and meteorological data",
       "start_month": 1,
       "end_month": 6,
       "responsible_partner": "FELLOW"
@@ -13,63 +13,71 @@
     {
       "task_id": "T1-02",
       "wp_id": "WP1",
-      "title": "Implement probabilistic fusion model (Route A/B)",
+      "title": "Implement Route A direct probabilistic fusion and Route B homogeneous-patch proxy",
       "start_month": 4,
-      "end_month": 12,
+      "end_month": 10,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T1-03",
       "wp_id": "WP1",
-      "title": "Calibrate and evaluate diagnostic branch output",
-      "start_month": 10,
-      "end_month": 14,
+      "title": "Calibrate diagnostic branch and produce field state posterior estimates",
+      "start_month": 8,
+      "end_month": 12,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T2-01",
       "wp_id": "WP2",
-      "title": "Implement uncertainty-aware AquaCrop calibration",
-      "start_month": 6,
-      "end_month": 13,
+      "title": "Implement uncertainty-aware AquaCrop calibration and parameter posterior",
+      "start_month": 10,
+      "end_month": 14,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T2-02",
       "wp_id": "WP2",
-      "title": "Build counterfactual irrigation simulation and decision engine",
-      "start_month": 11,
+      "title": "Develop counterfactual irrigation simulation and WUE-based decision engine",
+      "start_month": 12,
       "end_month": 15,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T2-03",
       "wp_id": "WP2",
-      "title": "Integrate diagnosis and decision into research demonstrator",
-      "start_month": 15,
+      "title": "Build and integrate research demonstrator web MVP",
+      "start_month": 14,
       "end_month": 18,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T3-01",
       "wp_id": "WP3",
-      "title": "Design validation protocol and ground truth collection",
+      "title": "Design and run field validation protocol on Hungarian tomato farms",
       "start_month": 8,
-      "end_month": 14,
+      "end_month": 18,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T3-02",
       "wp_id": "WP3",
-      "title": "Assess uncertainty calibration against field data",
-      "start_month": 15,
+      "title": "Assess uncertainty calibration quality against RQ5 target",
+      "start_month": 13,
+      "end_month": 20,
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "task_id": "T3-03",
+      "wp_id": "WP3",
+      "title": "Run co-located patch-covariation campaign for Route B validation",
+      "start_month": 10,
       "end_month": 22,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T4-01",
       "wp_id": "WP4",
-      "title": "Prepare and maintain Career Development Plan",
+      "title": "Prepare, submit and periodically review Career Development Plan",
       "start_month": 1,
       "end_month": 3,
       "responsible_partner": "SUPERVISOR"
@@ -77,40 +85,24 @@
     {
       "task_id": "T4-02",
       "wp_id": "WP4",
-      "title": "Deliver transferable skills training programme",
+      "title": "Deliver structured transferable-skills training and supervision sessions",
       "start_month": 1,
       "end_month": 24,
       "responsible_partner": "SUPERVISOR"
     },
     {
-      "task_id": "T4-03",
-      "wp_id": "WP4",
-      "title": "Facilitate two-way knowledge transfer activities",
-      "start_month": 6,
-      "end_month": 24,
-      "responsible_partner": "FELLOW"
-    },
-    {
       "task_id": "T5-01",
       "wp_id": "WP5",
-      "title": "Develop and maintain data management plan",
+      "title": "Develop and implement open-science dissemination and communication strategy",
       "start_month": 1,
-      "end_month": 6,
+      "end_month": 24,
       "responsible_partner": "FELLOW"
     },
     {
       "task_id": "T5-02",
       "wp_id": "WP5",
-      "title": "Publish open-access research outputs",
-      "start_month": 18,
-      "end_month": 24,
-      "responsible_partner": "FELLOW"
-    },
-    {
-      "task_id": "T5-03",
-      "wp_id": "WP5",
-      "title": "Execute communication and exploitation activities",
-      "start_month": 6,
+      "title": "Manage project coordination, reporting and ethics oversight",
+      "start_month": 1,
       "end_month": 24,
       "responsible_partner": "FELLOW"
     }
@@ -135,9 +127,10 @@
       "responsible_wp": "WP1",
       "depends_on_tasks": [
         "T1-01",
-        "T1-02"
+        "T1-02",
+        "T1-03"
       ],
-      "milestone_type": "intermediate_checkpoint"
+      "milestone_type": "wp_completion"
     },
     {
       "milestone_id": "MS3",
@@ -168,11 +161,12 @@
       "milestone_id": "MS5",
       "title": "Field validation and uncertainty calibration complete",
       "due_month": 22,
-      "verifiable_criterion": "Ground truth collected (RQ4); uncertainty-calibration metrics evaluated with prediction-interval coverage assessed against nominal (RQ5); Route B patch-covariation tested (RQ9); pilot-success criteria (RQ7) applied to the demonstrator.",
+      "verifiable_criterion": "Ground truth collected (RQ4); uncertainty-calibration metrics evaluated - e.g. prediction-interval coverage assessed against nominal (RQ5); Route B patch-covariation tested (RQ9); pilot-success criteria (RQ7) applied to the demonstrator.",
       "responsible_wp": "WP3",
       "depends_on_tasks": [
         "T3-01",
-        "T3-02"
+        "T3-02",
+        "T3-03"
       ],
       "milestone_type": "wp_completion"
     },
@@ -180,12 +174,11 @@
       "milestone_id": "MS6",
       "title": "Results disseminated and fellowship outcomes consolidated",
       "due_month": 24,
-      "verifiable_criterion": "At least one open-access publication submitted covering the probabilistic fusion-to-decision framework; open data and models released under FAIR principles; dissemination, exploitation and communication actions executed per the plan.",
+      "verifiable_criterion": "At least one open-access publication submitted covering the probabilistic fusion-to-decision framework; open data/models released under FAIR principles; dissemination/exploitation and communication actions executed per the plan.",
       "responsible_wp": "WP5",
       "depends_on_tasks": [
         "T5-01",
-        "T5-02",
-        "T5-03"
+        "T5-02"
       ],
       "milestone_type": "wp_completion"
     }
@@ -194,13 +187,8 @@
     "T1-01",
     "T1-02",
     "T1-03",
-    "MS2",
-    "T2-01",
-    "T2-02",
-    "MS3",
-    "T2-03",
-    "MS4",
-    "T5-02",
+    "T3-03",
+    "MS5",
     "MS6"
   ]
 }

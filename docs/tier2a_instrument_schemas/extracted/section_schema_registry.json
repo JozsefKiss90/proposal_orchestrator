@@ -356,7 +356,9 @@
       "max_work_packages_note": "No maximum work package count stated in the PF Part B template. MSCA-PF uses a work plan structure rather than numbered work packages; the Gantt chart covers tasks/deliverables/milestones within the fellowship duration. Source: Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0.",
       "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
       "source_document_secondary": "af_he-msca-pf_en.pdf",
-      "extracted_at": "2026-07-14T00:00:00Z",
+      "extracted_at": "2026-07-16T12:00:00Z",
+      "extraction_reconfirmed_at": "2026-07-16T12:00:00Z",
+      "extraction_reconfirmation_note": "Re-confirmed in this invocation by direct reading of RTF file. Key verifications: 10-page limit confirmed at RTF lines 15951-15952 ('Start of page count (max 10 pages)'); Part B-1 heading at line 15954; Section 1 'Excellence' at line 15958; Section 1.1 title at lines 15962-15963; Section 1.1 field requirement preamble at line 15966; field requirements at lines 15969-15974; Section 1.2 at lines 15980-15982; Section 1.2 field requirements (Overall methodology, Integration of methods, Gender dimension) at lines 16014-16029. Grant Agreement Annex guard: file header is 'Part B-1', filename is 'Tpl_Application Form (Part B) (HE MSCA PF).rtf' — no annex/grant-agreement markers present. Constitutional constraints satisfied.",
       "part_b_page_limit_hard": 10,
       "part_b_page_limit_hard_note": "Read from the PF Part B template (§10.6), NOT assumed. Template text confirmed at RTF lines 15951-15952: 'Start of page count (max 10 pages)'. Full page-limit instruction: 'Sections 1, 2 and 3 together should not be longer than 10 pages. All tables, figures, references and any other element pertaining to these sections must be included as an integral part of these sections and are thus counted towards this page limit.' Applies to Part B-1 (Excellence + Impact + Implementation). Source: Tpl_Application Form (Part B) (HE MSCA PF).rtf, version 5.0 (27 March 2026), Part B-1 page-count marker. Verified in this invocation at RTF lines 15951-15952.",
       "part_b_split": "Part B-1 (page-limited: sections 1-3) and Part B-2 (no page limit: sections 4-8 = CV, capacity of participating organisations, additional ethics, security screening, MSCA Green Charter). Source: PF Part B template v5.0.",
@@ -371,7 +373,7 @@
       },
       "criteria_weights_note": "Source: HE MSCA evaluation form V.2.2. Excellence 50%, Impact 30%, Implementation 20%; scores 0-5 (0.1 resolution); overall threshold 70/100. Single-stage.",
       "form_version_part_b": "5.0 (27 March 2026)",
-      "section_type_correction_note": "section_type values comply with artifact_schema_specification.yaml enum [proposal_section, implementation_section, cover_page, annexe]. Criterion sections 1, 2, 3 (Part B-1) mapped to 'proposal_section' (3.1 and 3.2 to 'implementation_section'); Part B-2 sections 4-8 mapped to 'annexe'. Source document traceability confirmed against RTF file. Re-extraction verified 2026-07-14 against Tpl_Application Form (Part B) (HE MSCA PF).rtf.",
+      "section_type_correction_note": "section_type values comply with artifact_schema_specification.yaml enum [proposal_section, implementation_section, cover_page, annexe]. Criterion sections 1, 2, 3 (Part B-1) mapped to 'proposal_section' (3.1 and 3.2 to 'implementation_section'); Part B-2 sections 4-8 mapped to 'annexe'. Source document traceability confirmed against RTF file. Re-extraction verified 2026-07-16 against Tpl_Application Form (Part B) (HE MSCA PF).rtf.",
       "sections": [
         {
           "section_id": "1",
@@ -387,7 +389,8 @@
             "Parent section for the Excellence evaluation criterion (weight 50%).",
             "Contains sub-sections 1.1-1.4."
           ],
-          "source_note": "Section 1 heading '1. Excellence' confirmed at RTF line 15958. Corresponds to the Excellence criterion. Source: PF Part B template v5.0, Part B-1. Verified in this invocation."
+          "source_note": "Section 1 heading '1. Excellence' confirmed at RTF line 15958. Corresponds to the Excellence criterion. Source: PF Part B template v5.0, Part B-1. Verified in this invocation.",
+          "assumption_note": "mandatory: true — form structure requires all Part B-1 sections; Excellence is the primary criterion at 50% weight. No explicit 'optional' marking in template."
         },
         {
           "section_id": "1.1",
@@ -404,7 +407,8 @@
             "Describe the quality and pertinence of the R&I objectives; are the objectives measurable and verifiable? Are they realistically achievable?",
             "Describe how your project goes beyond the state-of-the-art, and the extent to which the proposed work is ambitious."
           ],
-          "source_note": "Section 1.1 title confirmed at RTF lines 15962-15963: 'Quality and pertinence of the project’s research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)'. Field requirements confirmed at lines 15966-15974. Verified in this invocation."
+          "source_note": "Section 1.1 title confirmed at RTF lines 15962-15963: 'Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)'. Field requirement preamble at line 15966: 'At a minimum, address the following aspects:'. Field requirements confirmed at lines 15969-15974: 'Describe the quality and pertinence of the R&I objectives; are the objectives measurable and verifiable? Are they realistically achievable?' and 'Describe how your project goes beyond the state-of-the-art, and the extent to which the proposed work is ambitious.' Verified in this invocation.",
+          "assumption_note": "mandatory: true — mandatory field per template structure; form states 'At a minimum, address the following aspects:' indicating required content elements."
         },
         {
           "section_id": "1.2",
@@ -423,7 +427,8 @@
             "Gender dimension and other diversity aspects: Describe how the gender dimension and other diversity aspects are taken into account in the project's research and innovation content. If you do not consider such a gender dimension to be relevant in your project, please provide a justification. Note: this question relates to the content of the planned research and innovation activities, not gender balance in teams. Source: RTF lines 16027-16029, 16063-16065.",
             "Open science practices implemented as an integral part of the methodology; DMP as a deliverable by month 6. Source: RTF lines 16107-16118."
           ],
-          "source_note": "Section 1.2 title confirmed at RTF lines 15980-15982. Field requirements confirmed at RTF lines 16011-16118. Verified in this invocation."
+          "source_note": "Section 1.2 title confirmed at RTF lines 15980-15982: '1.2' identifier at line 15980, 'Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)' at lines 15981-15982. Field requirements confirmed at RTF lines 16014-16029. Verified in this invocation.",
+          "assumption_note": "mandatory: true — mandatory field per template structure; form states 'At a minimum, address the following aspects:' and lists required content elements."
         },
         {
           "section_id": "1.3",
@@ -442,7 +447,8 @@
             "For European Fellowships: two-way transfer of knowledge between researcher and host. For Global Fellowships: three-way transfer between researcher, host, and associated partner for the outgoing phase.",
             "Rationale and added-value of the non-academic placement and secondment (if applicable)."
           ],
-          "source_note": "Section 1.3 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 1.3 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF; supervision and training are core Excellence sub-criteria."
         },
         {
           "section_id": "1.4",
@@ -458,7 +464,8 @@
           "field_requirements": [
             "Discuss the quality and appropriateness of the researcher's existing professional experience in relation to the proposed research project."
           ],
-          "source_note": "Section 1.4 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 1.4 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF; researcher competence is a core Excellence sub-criterion."
         },
         {
           "section_id": "2",
@@ -474,7 +481,8 @@
             "Parent section for the Impact evaluation criterion (weight 30%).",
             "Contains sub-sections 2.1-2.3."
           ],
-          "source_note": "Section 2 corresponds to the Impact criterion. Source: PF Part B template v5.0, Part B-1."
+          "source_note": "Section 2 corresponds to the Impact criterion. Source: PF Part B template v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — Impact criterion section is required; no optional marking in template."
         },
         {
           "section_id": "2.1",
@@ -491,7 +499,8 @@
             "Specific measures to enhance career perspectives and employability of the researcher inside and/or outside academia.",
             "Expected contribution of proposed skills development to the future career of the researcher."
           ],
-          "source_note": "Section 2.1 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 2.1 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF Impact criterion."
         },
         {
           "section_id": "2.2",
@@ -509,7 +518,8 @@
             "Strategy for the management of intellectual property and foreseen protection measures (if relevant).",
             "Measures proportionate to the scale of the project, with concrete actions during and after the project."
           ],
-          "source_note": "Section 2.2 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 2.2 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF Impact criterion."
         },
         {
           "section_id": "2.3",
@@ -526,7 +536,8 @@
             "Narrative on how the project's results make a difference in terms of impact (scientific, economic/technological, societal), beyond the immediate scope.",
             "Indication of the magnitude and importance of the contribution, with credible quantified estimates where possible and meaningful."
           ],
-          "source_note": "Section 2.3 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 2.3 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF Impact criterion."
         },
         {
           "section_id": "3",
@@ -542,7 +553,8 @@
             "Parent section for the Quality and efficiency of the implementation criterion (weight 20%).",
             "Contains sub-sections 3.1-3.2."
           ],
-          "source_note": "Section 3 corresponds to the Implementation criterion. Source: PF Part B template v5.0, Part B-1."
+          "source_note": "Section 3 corresponds to the Implementation criterion. Source: PF Part B template v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — Implementation criterion section is required; no optional marking in template."
         },
         {
           "section_id": "3.1",
@@ -561,7 +573,8 @@
             "Mechanisms in place to assess and mitigate risks (research and/or administrative).",
             "A Gantt chart must be included (WPs, major deliverables, milestones, secondments, placements); it counts towards the 10-page limit and shows months elapsed, not dates."
           ],
-          "source_note": "Section 3.1 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 3.1 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF Implementation criterion."
         },
         {
           "section_id": "3.2",
@@ -580,7 +593,8 @@
             "For GF, both the outgoing Third Country host and the return host must be outlined.",
             "Involvement of any associated partners linked to a beneficiary (if applicable)."
           ],
-          "source_note": "Section 3.2 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1."
+          "source_note": "Section 3.2 sourced from Tpl_Application Form (Part B) (HE MSCA PF).rtf, v5.0, Part B-1.",
+          "assumption_note": "mandatory: true — mandatory field per template structure for MSCA-PF Implementation criterion."
         },
         {
           "section_id": "4",
@@ -594,7 +608,8 @@
           "field_requirements": [
             "Indicative length: 5 pages. Standard academic and research record; career gaps or unconventional paths explained; dates consistent with Part A."
           ],
-          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14: B1-only). section_type set to 'annexe' as Part B-2 sections are supplementary to the 10-page Part B-1 evaluated content."
+          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14: B1-only). section_type set to 'annexe' as Part B-2 sections are supplementary to the 10-page Part B-1 evaluated content.",
+          "assumption_note": "mandatory: true — CV is a required Part B-2 element for all MSCA-PF submissions."
         },
         {
           "section_id": "5",
@@ -608,7 +623,8 @@
           "field_requirements": [
             "One table per participating organisation. Beneficiary: max 1 page; each associated partner: max 1/2 page."
           ],
-          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: true — capacity tables are required for all participating organisations in MSCA-PF."
         },
         {
           "section_id": "5.1",
@@ -620,7 +636,8 @@
           "parent_section_id": "5",
           "page_limit": null,
           "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
-          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: true — sub-section of required Section 5."
         },
         {
           "section_id": "5.2",
@@ -632,7 +649,8 @@
           "parent_section_id": "5",
           "page_limit": null,
           "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
-          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: true — sub-section of required Section 5."
         },
         {
           "section_id": "6",
@@ -643,7 +661,8 @@
           "in_scope_milestone_1": false,
           "page_limit": null,
           "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
-          "source_note": "Part B-2, conditional ('if applicable'). Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2, conditional ('if applicable'). Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: false — conditional on ethics triggers; template marks as 'if applicable'."
         },
         {
           "section_id": "7",
@@ -654,7 +673,8 @@
           "in_scope_milestone_1": false,
           "page_limit": null,
           "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
-          "source_note": "Part B-2, conditional. Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2, conditional. Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: false — conditional on security screening triggers; template marks as conditional."
         },
         {
           "section_id": "8",
@@ -665,7 +685,8 @@
           "in_scope_milestone_1": false,
           "page_limit": null,
           "source_document": "Tpl_Application Form (Part B) (HE MSCA PF).rtf",
-          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14)."
+          "source_note": "Part B-2. Deferred by scope in milestone 1 (D14).",
+          "assumption_note": "mandatory: true — MSCA Green Charter section is required for all MSCA-PF submissions per programme requirements."
         }
       ]
     }

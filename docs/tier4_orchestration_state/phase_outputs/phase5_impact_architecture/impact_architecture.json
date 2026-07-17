@@ -1,488 +1,531 @@
 {
   "schema_id": "orch.phase5.impact_architecture.v1",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "impact_pathways": [
     {
-      "pathway_id": "P-EI-01",
+      "pathway_id": "PWY-EI-01",
       "expected_impact_id": "EI-01",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For supported postdoctoral fellows",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
+      "expected_impact_description": "Improved employability and career prospects of MSCA postdoctoral fellows within academia and beyond, contributing to a more mobile and highly skilled European research workforce.",
+      "matched_project_impact_ids": [
         "IMP-4"
       ],
       "project_outputs": [
-        "D4-01"
-      ],
-      "linkage_derivation": "IMP-4.linked_wp_ids=[WP4]; WP4 sole deliverable is D4-01 (Career Development Plan). Tier 3 linked_deliverable_ids for IMP-4 is empty; WP-level linkage used to resolve canonical deliverable. IMP-4 and OUT-6 are flagged SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01) in impacts.json and outcomes.json; pathway is Unresolved pending operator confirmation.",
-      "outcomes": [
         {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "Enhanced researcher competences and career readiness via fellowship training, supervision, and transfer-of-knowledge activities in WP4.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); not operator-confirmed. Reverts with the synthetic spine."
-        },
-        {
-          "outcome_id": "EO-01",
-          "type": "call",
-          "description": "Increased set of research and transferable skills and competences, leading to improved employability and career prospects of MSCA postdoctoral fellows within academia and beyond."
+          "wp_id": "WP4",
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Career Development Plan",
+          "linkage_basis": "IMP-4.linked_wp_ids=[WP4]; OUT-6.linked_wp_ids=[WP4]; D4-01 is the canonical deliverable of WP4 in wp_structure.json"
         }
       ],
-      "impact_narrative": "WP4 delivers the structured career development framework through which the fellow acquires and documents expanded scientific and transferable competences. The Career Development Plan (D4-01), co-prepared by supervisor and fellow by M3 and reviewed at M12 and M24, is the primary vehicle. WP4 tasks include a transferable-skills training programme (T4-02, ≥120 hours covering MSCA-PF mandatory dimensions) and preparation of a follow-on proposal submitted within 6 months of fellowship end. These WP4-grounded mechanisms connect directly to improved employability and career prospects within academia and beyond. NOTE: IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); this pathway is Unresolved pending operator confirmation of the synthetic spine.",
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-6",
+          "project_outcome_title": "Enhanced researcher competences and career readiness",
+          "call_expected_outcome_ids": [
+            "EO-01",
+            "EO-02"
+          ],
+          "description": "The fellow develops advanced competences in probabilistic sensing, uncertainty-aware decision support, and geoinformatics through structured training and two-way knowledge transfer at ELTE, improving career prospects within and beyond academia."
+        }
+      ],
+      "impact_narrative": "IMP-4 (Tier 3 impacts.json) maps directly to EI-01. The fellowship delivers a jointly prepared Career Development Plan (D4-01, WP4) structured around the MSCA-PF mandatory training dimensions — digital and AI skills, open science, research integrity, knowledge valorisation, and innovation. The two-way transfer that is the defining mechanism of this project — the fellow's plant-physiology and non-destructive stress-phenotyping expertise into ELTE's geoinformatics group, and ELTE's remote-sensing and hyperspectral-fusion methods back to the fellow — creates a distinctive cross-disciplinary profile that broadens the fellow's career options in both precision agriculture and Earth observation. This project-specific exchange, documented in the CDP and enacted through WP4 supervision, directly realises EI-01.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway validity contingent on operator confirmation."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-01"
     },
     {
-      "pathway_id": "P-EI-02",
+      "pathway_id": "PWY-EI-02",
       "expected_impact_id": "EI-02",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For supported postdoctoral fellows",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
+      "expected_impact_description": "Increased and broadened research and innovation impact through enhanced networking and communication capacities with scientific peers and the general public.",
+      "matched_project_impact_ids": [
+        "IMP-1",
+        "IMP-2",
         "IMP-4"
       ],
       "project_outputs": [
-        "D4-01"
-      ],
-      "linkage_derivation": "IMP-4.linked_wp_ids=[WP4]; WP4 deliverable D4-01. The fellowship provides international mobility and integrates three disciplinary domains (Earth observation, probabilistic Bayesian inference, AquaCrop agronomic modelling), constituting inter-sectoral and interdisciplinary exposure. WP4 T4-02 and T4-03 structure knowledge-exchange activities. IMP-4/OUT-6 SYNTHETIC/SPINE-DEPENDENT.",
-      "outcomes": [
         {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "Enhanced researcher competences including exposure to interdisciplinary methods (remote sensing, probabilistic ML, agronomic modelling) through WP4 training and knowledge-transfer seminars.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01)."
+          "wp_id": "WP1",
+          "deliverable_id": "D1-01",
+          "deliverable_title": "Diagnostic model specification and calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D1-01 is canonical deliverable of WP1"
         },
         {
-          "outcome_id": "EO-02",
-          "type": "call",
-          "description": "New mind-sets and approaches to R&I work forged through international, inter-sectoral and interdisciplinary experience."
+          "wp_id": "WP2",
+          "deliverable_id": "D2-01",
+          "deliverable_title": "Decision engine and demonstrator software",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; IMP-2.linked_wp_ids=[WP2,WP3]; D2-01 is canonical deliverable of WP2"
+        },
+        {
+          "wp_id": "WP3",
+          "deliverable_id": "D3-01",
+          "deliverable_title": "Field validation dataset and uncertainty calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; IMP-2.linked_wp_ids=[WP2,WP3]; D3-01 is canonical deliverable of WP3"
+        },
+        {
+          "wp_id": "WP4",
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Career Development Plan",
+          "linkage_basis": "IMP-4.linked_wp_ids=[WP4]; D4-01 is canonical deliverable of WP4"
+        },
+        {
+          "wp_id": "WP5",
+          "deliverable_id": "D5-01",
+          "deliverable_title": "Data Management Plan",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP5]; OUT-5.linked_wp_ids=[WP5]; D5-01 is canonical deliverable of WP5"
+        },
+        {
+          "wp_id": "WP5",
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Dissemination and exploitation plan",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP5]; OUT-5.linked_wp_ids=[WP5]; D5-02 is canonical deliverable of WP5"
         }
       ],
-      "impact_narrative": "The fellowship is an international mobility action that integrates three previously siloed methodological traditions: satellite Earth observation (Sentinel-1/2, PlanetScope), probabilistic Bayesian/machine-learning inference, and AquaCrop agronomic simulation. Working across these domains under the supervision of the host develops new interdisciplinary R&I mindsets. WP4 T4-02 delivers structured transferable-skills training; T4-03 facilitates ≥2 methods seminars at the host and ≥1 bidirectional knowledge adoption. The CDP (D4-01) plans, records, and evidences this interdisciplinary and international exposure. NOTE: IMP-4/OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); Unresolved pending operator confirmation.",
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-5",
+          "project_outcome_title": "Peer-reviewed publications and open science outputs",
+          "call_expected_outcome_ids": [
+            "EO-03"
+          ],
+          "description": "Open-access publications, open data and open models produced under WP5 serve as the primary communication channel through which the fellow's probabilistic fusion-to-decision results reach scientific peers and the general public, broadening R&I impact beyond the project team."
+        },
+        {
+          "project_outcome_id": "OUT-6",
+          "project_outcome_title": "Enhanced researcher competences and career readiness",
+          "call_expected_outcome_ids": [
+            "EO-03"
+          ],
+          "description": "Transferable-skills training in communication and networking (WP4, D4-01) equips the fellow to disseminate the project's substantive results — WUE-optimised irrigation recommendations, uncertainty-calibrated sensing, landscape-compatible Route B — effectively to scientific and non-specialist audiences."
+        }
+      ],
+      "impact_narrative": "EI-02 requires that the fellow's communication and networking capacities are developed and deployed to broaden R&I impact. The project generates novel scientific and economic outputs across WP1–WP3 (diagnostic model D1-01, decision engine D2-01, validation dataset D3-01) that constitute substantive R&I content — specifically the end-to-end probabilistic fusion-to-WUE-decision pipeline — worth disseminating. WP5 (D5-01 Data Management Plan, D5-02 Dissemination and exploitation plan) formalises the open-science dissemination pathway under FAIR principles. WP4 (D4-01 CDP) develops the fellow's communication competences as a mandatory training dimension. Together these deliverables — grounded in IMP-1 (scientific advance), IMP-2 (economic/WUE impact) and IMP-4 (career/networking) from Tier 3 — constitute the project-specific mechanism through which EI-02 is realised.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway validity contingent on operator confirmation."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-02"
     },
     {
-      "pathway_id": "P-EI-03",
+      "pathway_id": "PWY-EI-03",
       "expected_impact_id": "EI-03",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For supported postdoctoral fellows",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
+      "expected_impact_description": "Stronger R&I capacity and output among participating organisations and better transfer of knowledge between participating organisations.",
+      "matched_project_impact_ids": [
+        "IMP-1",
+        "IMP-4"
+      ],
+      "project_outputs": [
+        {
+          "wp_id": "WP1",
+          "deliverable_id": "D1-01",
+          "deliverable_title": "Diagnostic model specification and calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D1-01 is canonical deliverable of WP1"
+        },
+        {
+          "wp_id": "WP2",
+          "deliverable_id": "D2-01",
+          "deliverable_title": "Decision engine and demonstrator software",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D2-01 is canonical deliverable of WP2"
+        },
+        {
+          "wp_id": "WP3",
+          "deliverable_id": "D3-01",
+          "deliverable_title": "Field validation dataset and uncertainty calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D3-01 is canonical deliverable of WP3"
+        },
+        {
+          "wp_id": "WP4",
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Career Development Plan",
+          "linkage_basis": "IMP-4.linked_wp_ids=[WP4]; D4-01 is canonical deliverable of WP4"
+        },
+        {
+          "wp_id": "WP5",
+          "deliverable_id": "D5-01",
+          "deliverable_title": "Data Management Plan",
+          "linkage_basis": "OUT-5.linked_wp_ids=[WP5]; D5-01 is canonical deliverable of WP5"
+        }
+      ],
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-1",
+          "project_outcome_title": "Probabilistic multi-sensor field-state diagnosis method",
+          "call_expected_outcome_ids": [
+            "EO-07"
+          ],
+          "description": "The probabilistic fusion methodology (WP1, D1-01) strengthens ELTE's research capacity in multi-sensor EO analysis, Bayesian calibration and uncertainty quantification — areas where the method addresses an identified literature gap."
+        },
+        {
+          "project_outcome_id": "OUT-2",
+          "project_outcome_title": "Uncertainty-aware AquaCrop decision engine",
+          "call_expected_outcome_ids": [
+            "EO-07"
+          ],
+          "description": "The decision engine (WP2, D2-01) adds new computational crop-modelling and WUE-optimisation capacity to ELTE's research output, representing a concrete advance in precision agriculture decision support."
+        },
+        {
+          "project_outcome_id": "OUT-6",
+          "project_outcome_title": "Enhanced researcher competences and career readiness",
+          "call_expected_outcome_ids": [
+            "EO-05",
+            "EO-07"
+          ],
+          "description": "Two-way knowledge transfer (WP4, D4-01) — the fellow's plant-physiology expertise into ELTE's geoinformatics group, and ELTE's remote-sensing methods into the fellow's practice — directly strengthens both parties' R&I capacity in complementary disciplines."
+        }
+      ],
+      "impact_narrative": "EI-03 targets the participating organisations' R&I capacity and knowledge transfer. The project contributes through two parallel mechanisms grounded in Tier 3. First, IMP-1 (scientific advance): WP1, WP2 and WP3 produce novel probabilistic sensing and decision-support outputs (D1-01, D2-01, D3-01) that directly increase ELTE's research output in remote sensing and precision agriculture, addressing the real-time decision-support gap identified in the vault (METH-SOTA-007). Second, IMP-4 (knowledge transfer): the CDP (D4-01, WP4) formally structures the bi-directional transfer between the fellow's plant-physiology and non-destructive stress-phenotyping expertise and ELTE's geoinformatics and hyperspectral-fusion competence. Both mechanisms are project-specific, traceable to named WP deliverables, and directly realise EI-03.",
+      "coverage_status": "Covered",
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-03"
+    },
+    {
+      "pathway_id": "PWY-EI-04",
+      "expected_impact_id": "EI-04",
+      "expected_impact_description": "Increased global attractiveness, visibility and reputation of the participating organisation(s) and, by extension, of the European Research Area.",
+      "matched_project_impact_ids": [
         "IMP-1"
       ],
       "project_outputs": [
-        "D5-01",
-        "D5-02"
-      ],
-      "linkage_derivation": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; OUT-5.linked_wp_ids=[WP5]. WP5 delivers D5-01 (DMP, M6) and D5-02 (Dissemination and exploitation report, M24). Networking and communication capacity flows through WP5 T5-02 (open-access publications) and T5-03 (communication and exploitation activities). IMP-4 indicators include ≥2 international conference presentations, contributing through OUT-6 (SYNTHETIC/SPINE-DEPENDENT) but the primary mechanism is IMP-1/WP5, which is non-synthetic.",
-      "outcomes": [
         {
-          "outcome_id": "OUT-5",
-          "type": "project",
-          "description": "Open-access peer-reviewed publications and FAIR data/model releases from WP1–WP3 results, disseminated via WP5.",
-          "validation_status": "Inferred"
+          "wp_id": "WP1",
+          "deliverable_id": "D1-01",
+          "deliverable_title": "Diagnostic model specification and calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D1-01 is canonical deliverable of WP1"
         },
         {
-          "outcome_id": "EO-03",
-          "type": "call",
-          "description": "Enhanced networking and communication capacities with scientific peers, as well as with the general public, that will increase and broaden the research and innovation impact."
-        }
-      ],
-      "impact_narrative": "WP5 is the dedicated dissemination, exploitation, communication, and management work package. T5-01 delivers a FAIR data management plan (D5-01, M6) establishing open-data conditions for fellowship outputs. T5-02 produces open-access publications documenting the probabilistic fusion method (from WP1) and the uncertainty-aware decision engine (from WP2), peer-reviewed by the scientific community. T5-03 executes targeted communication activities including conference presentations. The dissemination and exploitation report (D5-02, M24) records the full communication portfolio. These activities directly build the fellow's networking and communication capacities with scientific peers and the general public, broadening the R&I impact of the fellowship.",
-      "coverage_status": "Covered",
-      "unresolved_flags": []
-    },
-    {
-      "pathway_id": "P-EI-04",
-      "expected_impact_id": "EI-04",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For participating organisations",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
-        "IMP-4"
-      ],
-      "project_outputs": [
-        "D4-01"
-      ],
-      "linkage_derivation": "IMP-4.linked_wp_ids=[WP4]; WP4→D4-01. The CDP co-prepared by supervisor and fellow is the primary mechanism for aligning the fellowship working conditions with the European Charter for Researchers (supervisory obligations, researcher rights, training entitlement). WP4 T4-01 structures this preparation. IMP-4/OUT-6 SYNTHETIC/SPINE-DEPENDENT.",
-      "outcomes": [
-        {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "Structured career development and supervision arrangements under WP4, aligned with European Charter for Researchers principles.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01)."
+          "wp_id": "WP2",
+          "deliverable_id": "D2-01",
+          "deliverable_title": "Decision engine and demonstrator software",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D2-01 is canonical deliverable of WP2"
         },
         {
-          "outcome_id": "EO-04",
-          "type": "call",
-          "description": "Increased alignment of working conditions for researchers in accordance with the principles set out in the European Charter for Researchers."
+          "wp_id": "WP3",
+          "deliverable_id": "D3-01",
+          "deliverable_title": "Field validation dataset and uncertainty calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D3-01 is canonical deliverable of WP3"
+        },
+        {
+          "wp_id": "WP5",
+          "deliverable_id": "D5-02",
+          "deliverable_title": "Dissemination and exploitation plan",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP5]; OUT-5.linked_wp_ids=[WP5]; D5-02 is canonical deliverable of WP5"
         }
       ],
-      "impact_narrative": "The CDP (D4-01), jointly prepared by supervisor and fellow by M3 and reviewed at M12 and M24, is the formal instrument for aligning the fellowship with European Charter for Researchers principles governing supervisory obligations, researcher rights, and training entitlements. WP4 T4-01 structures this joint preparation; T4-02 structures training delivery against the agreed dimensions. The CDP review cycle creates a documented, durable record of charter-aligned practice at the host institution, contributing to institutional norm alignment beyond the duration of the individual fellowship. NOTE: IMP-4/OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); Unresolved pending operator confirmation.",
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-1",
+          "project_outcome_title": "Probabilistic multi-sensor field-state diagnosis method",
+          "call_expected_outcome_ids": [
+            "EO-06"
+          ],
+          "description": "Open publication of the Route A/B probabilistic fusion methodology addresses a literature gap (real-time decision support x PlanetScope, Research Gap Matrix METH-SOTA-007) and elevates ELTE's visibility in the multi-sensor EO and uncertainty-quantification community."
+        },
+        {
+          "project_outcome_id": "OUT-2",
+          "project_outcome_title": "Uncertainty-aware AquaCrop decision engine",
+          "call_expected_outcome_ids": [
+            "EO-06"
+          ],
+          "description": "The open-source end-to-end decision engine (WP2, D2-01) demonstrating honest uncertainty propagation from EO sensing to irrigation recommendation positions ELTE as a research leader in precision agriculture decision support."
+        },
+        {
+          "project_outcome_id": "OUT-5",
+          "project_outcome_title": "Peer-reviewed publications and open science outputs",
+          "call_expected_outcome_ids": [
+            "EO-06"
+          ],
+          "description": "Open-access publications and open code/data released under FAIR principles (operationalised via D5-02) increase ELTE's international citation footprint and scientific reputation."
+        }
+      ],
+      "impact_narrative": "EI-04 requires a visible contribution to the reputation and attractiveness of ELTE and the ERA. This project achieves it through the global scientific novelty of IMP-1: the end-to-end probabilistic fusion-to-decision framework addresses an identified gap in the literature (the empty real-time decision-support × PlanetScope cell of the reviewed gap matrix, METH-SOTA-007) and its open release under FAIR principles (D5-02, WP5) ensures international visibility. The field validation study on Hungarian tomato farms (D3-01, WP3) provides an internationally reproducible benchmark dataset. These project-specific outputs, linked to IMP-1 in Tier 3, directly realise EI-04 for ELTE as host institution and contribute to the ERA.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway validity contingent on operator confirmation."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-04"
     },
     {
-      "pathway_id": "P-EI-05",
+      "pathway_id": "PWY-EI-05",
       "expected_impact_id": "EI-05",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For participating organisations",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
+      "expected_impact_description": "Increased alignment of working conditions for researchers in accordance with the principles set out in the European Charter for Researchers, contributing to more equitable and attractive research careers across Europe.",
+      "matched_project_impact_ids": [
         "IMP-4"
       ],
       "project_outputs": [
-        "D4-01"
-      ],
-      "linkage_derivation": "IMP-4.linked_wp_ids=[WP4]; WP4 objective states '≥120 hours of transferable-skills training across MSCA-PF mandatory dimensions'; T4-02 delivers the training programme; T4-03 includes co-supervision of ≥1 MSc thesis. These WP4 activities enhance training quality and sustainability at the host. WP4→D4-01. IMP-4/OUT-6 SYNTHETIC/SPINE-DEPENDENT.",
-      "outcomes": [
         {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "Enhanced researcher competences via structured WP4 training programme (≥120 hours) and MSc co-supervision, both improving training quality and long-term supervisory practices at the host.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01)."
-        },
-        {
-          "outcome_id": "EO-05",
-          "type": "call",
-          "description": "Enhanced quality and sustainability of research training and supervision."
+          "wp_id": "WP4",
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Career Development Plan",
+          "linkage_basis": "IMP-4.linked_wp_ids=[WP4]; OUT-6.linked_wp_ids=[WP4]; D4-01 is canonical deliverable of WP4"
         }
       ],
-      "impact_narrative": "WP4 structures a minimum 120-hour transferable-skills training programme (T4-02) covering all MSCA-PF mandatory dimensions: digital and AI skills (including responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation, innovation and entrepreneurship, research integrity, and open science/FAIR data stewardship. The CDP (D4-01), jointly reviewed at M3, M12, and M24, embeds a structured supervision cycle at the host. Co-supervision of ≥1 MSc thesis (T4-03) creates a direct mechanism for improving graduate-level supervision practices and extending the quality of training beyond the fellow. These activities collectively enhance training quality and sustainability at the participating organisation. NOTE: IMP-4/OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); Unresolved pending operator confirmation.",
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-6",
+          "project_outcome_title": "Enhanced researcher competences and career readiness",
+          "call_expected_outcome_ids": [
+            "EO-04"
+          ],
+          "description": "The jointly prepared CDP (D4-01) and structured supervision by ELTE implement charter-aligned working conditions: transparent supervision, regular career reviews, equitable training access across all mandatory MSCA-PF dimensions, and explicit research integrity grounding."
+        }
+      ],
+      "impact_narrative": "EI-05 targets alignment with the European Charter for Researchers. The project's mechanism is project-specific and grounded in IMP-4 (Tier 3 impacts.json): WP4 (D4-01, Career Development Plan) is the operative instrument. The CDP is jointly prepared by the supervisor and fellow at the action's start, then reviewed periodically — implementing Charter principles of transparent supervision, clear rights and responsibilities, and structured career development. The mandatory training programme covering research integrity, open science and FAIR data stewardship, digital and AI skills, and knowledge valorisation directly enacts Charter-aligned norms in a concrete curriculum attached to this particular fellowship. The pathway from D4-01 through OUT-6 to EI-05 is traceable to the MSCA-PF instrument requirement for a CDP.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway validity contingent on operator confirmation."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-05"
     },
     {
-      "pathway_id": "P-EI-06",
+      "pathway_id": "PWY-EI-06",
       "expected_impact_id": "EI-06",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For participating organisations",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
-        "IMP-1",
-        "IMP-2"
+      "expected_impact_description": "Regular feedback of research results into teaching and education at participating organisations, sustaining knowledge circulation between research and education.",
+      "matched_project_impact_ids": [
+        "IMP-1"
       ],
       "project_outputs": [
-        "D1-01",
-        "D2-01",
-        "D3-01",
-        "D5-01",
-        "D5-02"
-      ],
-      "linkage_derivation": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; WP1→D1-01, WP2→D2-01, WP3→D3-01, WP5→D5-01,D5-02. IMP-2.linked_wp_ids=[WP2,WP3]; WP2→D2-01, WP3→D3-01. Open-access publications and open software releases under host affiliation increase host visibility and reputation. Tier 3 linked_deliverable_ids for IMP-1 use dot-notation (D1.2, D2.2, D5.1) not present in the valid deliverable reference set from wp_structure.json; WP-level linkage used to resolve canonical IDs. IMP-1 validation_status is Inferred (novelty claim is vault synthesis).",
-      "outcomes": [
         {
-          "outcome_id": "OUT-1",
-          "type": "project",
-          "description": "Probabilistic multi-sensor field-state diagnosis method and open software (WP1, D1-01): novel scientific output increasing host research profile in EO-based crop-water estimation.",
-          "validation_status": "Confirmed"
+          "wp_id": "WP1",
+          "deliverable_id": "D1-01",
+          "deliverable_title": "Diagnostic model specification and calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D1-01 is canonical deliverable of WP1"
         },
         {
-          "outcome_id": "OUT-2",
-          "type": "project",
-          "description": "Uncertainty-aware AquaCrop decision engine integrated into standalone research demonstrator (WP2, D2-01): tangible research artefact associated with the host institution.",
-          "validation_status": "Confirmed"
+          "wp_id": "WP2",
+          "deliverable_id": "D2-01",
+          "deliverable_title": "Decision engine and demonstrator software",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1,WP2,WP3,WP5]; D2-01 is canonical deliverable of WP2"
         },
         {
-          "outcome_id": "OUT-5",
-          "type": "project",
-          "description": "Open-access publications from the fellowship under host affiliation (WP5, D5-02), raising host publication visibility.",
-          "validation_status": "Inferred"
-        },
-        {
-          "outcome_id": "EO-06",
-          "type": "call",
-          "description": "Increased global attractiveness, visibility and reputation of the participating organisation(s)."
+          "wp_id": "WP5",
+          "deliverable_id": "D5-01",
+          "deliverable_title": "Data Management Plan",
+          "linkage_basis": "OUT-5.linked_wp_ids=[WP5]; IMP-1.linked_wp_ids=[WP5]; D5-01 is canonical deliverable of WP5"
         }
       ],
-      "impact_narrative": "The fellowship produces a portfolio of open research outputs directly attributed to the host: the diagnostic branch technical report and open software (D1-01, WP1), the research demonstrator software integrating probabilistic diagnosis and decision support (D2-01, WP2), the validation and uncertainty calibration report (D3-01, WP3), a FAIR data management plan (D5-01, WP5), and a dissemination and exploitation report (D5-02, WP5). Open-access publication of these results under host affiliation positions the host institution as a contributor to an underserved methodological niche (probabilistic multi-sensor crop-water decision support). IMP-2's demonstrator-based economic and societal framing also broadens the host's societal engagement reputation. NOTE: IMP-1 validation_status is Inferred; novelty claim is vault synthesis, not directly source_grounded.",
+      "intermediate_outcomes": [
+        {
+          "project_outcome_id": "OUT-1",
+          "project_outcome_title": "Probabilistic multi-sensor field-state diagnosis method",
+          "call_expected_outcome_ids": [
+            "EO-08"
+          ],
+          "description": "The probabilistic fusion methodology (WP1, D1-01) produces concrete, teachable advances in Bayesian multi-sensor fusion and crop-water state estimation — topics amenable to integration into ELTE's geoinformatics and remote-sensing curricula."
+        },
+        {
+          "project_outcome_id": "OUT-5",
+          "project_outcome_title": "Peer-reviewed publications and open science outputs",
+          "call_expected_outcome_ids": [
+            "EO-08"
+          ],
+          "description": "Open-access publications and open code/data released under the FAIR-principles DMP (D5-01, WP5) enable integration of the project's specific probabilistic fusion and decision-engine results into academic teaching at ELTE."
+        }
+      ],
+      "impact_narrative": "EI-06 targets feedback of research results into teaching and education at ELTE. The mechanism is project-specific: ELTE is a university host with active geoinformatics, remote sensing and precision-agriculture curricula. The project's outputs from WP1 (D1-01: probabilistic diagnosis model) and WP2 (D2-01: uncertainty-aware decision engine) represent concrete, teachable advances in Bayesian multi-sensor fusion where few open end-to-end implementations currently exist. The DMP (D5-01, WP5) commits to FAIR data and open code release, enabling these materials to be incorporated directly into ELTE's teaching. The pathway from D1-01 and D2-01 through OUT-1 and OUT-5 to EI-06 is grounded in IMP-1 in Tier 3.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-1 validation_status is Inferred; novelty framing is vault synthesis (METH-SOTA-006), not independently source_grounded."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-06"
     },
     {
-      "pathway_id": "P-EI-07",
+      "pathway_id": "PWY-EI-07",
       "expected_impact_id": "EI-07",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For participating organisations",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
-        "IMP-1",
-        "IMP-4"
+      "expected_impact_description": "New mind-sets and approaches to R&I work fostered through international, inter-sectoral and interdisciplinary experience, enriching the broader European research culture.",
+      "matched_project_impact_ids": [
+        "IMP-4",
+        "IMP-1"
       ],
       "project_outputs": [
-        "D1-01",
-        "D4-01"
-      ],
-      "linkage_derivation": "IMP-1.linked_wp_ids=[WP1,...]; WP1→D1-01 (primary R&I output strengthening host capacity in probabilistic EO-based estimation). IMP-4.linked_wp_ids=[WP4]; WP4→D4-01; IMP-4 indicators explicitly include '≥2 methods seminars at host' and '≥1 host competence adopted into fellow's own practice' (two-way ToK, T4-03). IMP-4/OUT-6 SYNTHETIC/SPINE-DEPENDENT.",
-      "outcomes": [
         {
-          "outcome_id": "OUT-1",
-          "type": "project",
-          "description": "Probabilistic fusion method and open software (WP1, D1-01) strengthening host R&I capacity in EO-based crop-water-state estimation.",
-          "validation_status": "Confirmed"
+          "wp_id": "WP4",
+          "deliverable_id": "D4-01",
+          "deliverable_title": "Career Development Plan",
+          "linkage_basis": "IMP-4.linked_wp_ids=[WP4]; OUT-6.linked_wp_ids=[WP4]; D4-01 is canonical deliverable of WP4"
         },
         {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "Two-way transfer of knowledge via WP4 methods seminars and co-supervision, transferring probabilistic decision-support competences to the host and adopting host competences into the fellow's practice.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01)."
-        },
-        {
-          "outcome_id": "EO-07",
-          "type": "call",
-          "description": "Stronger R&I capacity and output among participating organisations; better transfer of knowledge."
+          "wp_id": "WP1",
+          "deliverable_id": "D1-01",
+          "deliverable_title": "Diagnostic model specification and calibration report",
+          "linkage_basis": "IMP-1.linked_wp_ids=[WP1]; OUT-1.linked_wp_ids=[WP1]; D1-01 is canonical deliverable of WP1"
         }
       ],
-      "impact_narrative": "WP1 builds the host's R&I capacity in probabilistic multi-sensor field-state estimation, materialised in D1-01 (diagnostic branch technical report) delivered by M14 and released as an open research output. This represents new scientific capacity at the host in an area the literature identifies as underdeveloped (Research Gap Matrix METH-SOTA-007; Operational Decision Support Gap METH-SOTA-005). WP4 T4-03 delivers ≥2 methods seminars at the host on probabilistic fusion and uncertainty-aware decision support, with ≥1 host competence explicitly adopted into the fellow's own practice — constituting documented, bidirectional knowledge exchange. D4-01 (CDP) plans and records the transfer-of-knowledge arrangements. NOTE: IMP-4/OUT-6 pathway contributions are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); Unresolved pending operator confirmation.",
-      "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway partially Unresolved pending operator confirmation."
-      ]
-    },
-    {
-      "pathway_id": "P-EI-08",
-      "expected_impact_id": "EI-08",
-      "tier2b_source_ref": {
-        "source_section": "Expected Outcome – For participating organisations",
-        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
-      },
-      "project_impacts_ref": [
-        "IMP-4"
-      ],
-      "project_outputs": [
-        "D4-01",
-        "D5-01"
-      ],
-      "linkage_derivation": "IMP-4.linked_wp_ids=[WP4]; IMP-4 indicators explicitly include 'Co-supervision of ≥1 MSc thesis at the host' (T4-03) and teaching activities. WP4→D4-01. OUT-5.linked_wp_ids=[WP5]; WP5→D5-01 (DMP establishing FAIR reuse conditions for open data and models that feed curricula). IMP-4/OUT-6 SYNTHETIC/SPINE-DEPENDENT.",
-      "outcomes": [
+      "intermediate_outcomes": [
         {
-          "outcome_id": "OUT-6",
-          "type": "project",
-          "description": "WP4 co-supervision and methods-seminar activities embedding fellowship findings into host curricula and graduate education.",
-          "validation_status": "Unresolved",
-          "note": "SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01)."
+          "project_outcome_id": "OUT-6",
+          "project_outcome_title": "Enhanced researcher competences and career readiness",
+          "call_expected_outcome_ids": [
+            "EO-02"
+          ],
+          "description": "The interdisciplinary two-way transfer between plant physiology / non-destructive phenotyping (fellow's expertise) and geoinformatics / hyperspectral fusion (ELTE's expertise) enacted through WP4 (D4-01) exemplifies the new mind-sets fostered by MSCA international and interdisciplinary mobility."
         },
         {
-          "outcome_id": "OUT-5",
-          "type": "project",
-          "description": "Open-access publications and FAIR data artefacts (WP5, D5-01 DMP) providing citable, reusable research outputs for integration into teaching.",
-          "validation_status": "Inferred"
-        },
-        {
-          "outcome_id": "EO-08",
-          "type": "call",
-          "description": "Regular feedback of research results into teaching and education at participating organisations."
+          "project_outcome_id": "OUT-1",
+          "project_outcome_title": "Probabilistic multi-sensor field-state diagnosis method",
+          "call_expected_outcome_ids": [
+            "EO-02"
+          ],
+          "description": "The methodological synthesis of plant physiology, crop modelling and probabilistic remote sensing in D1-01 is itself the concrete scientific product of the new interdisciplinary approach that the fellowship enables — a product neither discipline could have produced independently."
         }
       ],
-      "impact_narrative": "IMP-4 explicitly requires co-supervision of ≥1 MSc thesis at the host (WP4, T4-03), creating a direct and documented channel from fellowship research results — specifically from WP1–WP3 probabilistic estimation and decision-support findings — into graduate education. Methods seminars (T4-03: ≥2 at the host) embed the probabilistic crop-water estimation methodology into the host's research-facing curriculum. Open data and models released under WP5 (D5-01: FAIR DMP completed by M6) establish reuse conditions that enable integration of fellowship data products into teaching contexts beyond the fellowship period. NOTE: IMP-4/OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); Unresolved pending operator confirmation.",
+      "impact_narrative": "EI-07 captures the ERA-level enrichment arising when fellows bring genuinely new disciplinary perspectives into host organisations. This project's mechanism is project-specific and grounded in IMP-4 (Tier 3 impacts.json): the fellow brings plant-physiology and non-destructive stress-phenotyping expertise into ELTE's geoinformatics and remote-sensing group — a combination not previously present. The CDP (D4-01, WP4) structures this exchange formally as a named and reviewable element of the fellowship; the probabilistic fusion methodology (D1-01, WP1) is the concrete scientific product of the interdisciplinary approach, synthesising physiological ground truth design with Bayesian multi-sensor estimation. Both deliverables are project-specific mechanisms through which new mind-sets are introduced and documented, realising EI-07.",
       "coverage_status": "Covered",
-      "unresolved_flags": [
-        "IMP-4 and OUT-6 are SYNTHETIC/SPINE-DEPENDENT (SYN-SPINE-01); pathway validity contingent on operator confirmation."
-      ]
+      "tier2b_source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json#EI-07"
     }
   ],
   "kpis": [
     {
       "kpi_id": "KPI-01",
-      "pathway_ref": "P-EI-01",
-      "description": "Career Development Plan co-prepared by supervisor and fellow, delivered by M3, reviewed and updated at M12 and M24",
-      "target": "CDP delivered by M3; two documented review updates completed at M12 and M24",
-      "measurement_method": "CDP delivery date, review records, and joint sign-off confirmed in project management records",
+      "pathway_id": "PWY-EI-01",
+      "description": "Career Development Plan prepared and submitted at action start, covering all MSCA-PF mandatory transferable-skills dimensions including digital and AI skills, open science, research integrity, knowledge valorisation and innovation",
+      "target": "D4-01 submitted by month 3; CDP explicitly covers all mandatory MSCA-PF training dimensions",
+      "measurement_method": "Delivery of D4-01 by due_month 3; content checklist against mandatory MSCA-PF training dimensions",
       "traceable_to_deliverable": "D4-01"
     },
     {
       "kpi_id": "KPI-02",
-      "pathway_ref": "P-EI-01",
-      "description": "Follow-on proposal (national or ERC-track) submitted within 6 months of fellowship end",
-      "target": "≥1 follow-on proposal submitted by M30 (within 6 months post-M24 end)",
-      "measurement_method": "Submission confirmation (institutional reference number or agency acknowledgement)",
+      "pathway_id": "PWY-EI-01",
+      "description": "Evidence of two-way knowledge transfer documented in CDP reviews: fellow's plant-physiology and non-destructive stress-phenotyping expertise adopted into ELTE's geoinformatics group; ELTE's remote-sensing and hyperspectral-fusion methods adopted into the fellow's practice",
+      "target": "Both transfer directions documented and reviewed at each periodic CDP review point",
+      "measurement_method": "CDP review records (within D4-01 lifecycle) identifying specific transfer events in each direction",
       "traceable_to_deliverable": "D4-01"
     },
     {
       "kpi_id": "KPI-03",
-      "pathway_ref": "P-EI-02",
-      "description": "Transferable-skills training hours completed across all MSCA-PF mandatory dimensions during WP4",
-      "target": "≥120 hours by M24, covering digital/AI skills, knowledge valorisation, research integrity, and open science/FAIR data stewardship",
-      "measurement_method": "Training log maintained within CDP review records at M12 and M24",
-      "traceable_to_deliverable": "D4-01"
+      "pathway_id": "PWY-EI-02",
+      "description": "Data Management Plan delivered by month 6 covering all primary project data assets (WP1–WP3) under FAIR principles, enabling open dissemination of the probabilistic fusion and decision-engine outputs",
+      "target": "D5-01 submitted by month 6; DMP covers WP1, WP2 and WP3 data assets",
+      "measurement_method": "Submission of D5-01 by due_month 6; FAIR compliance assessed against all primary data assets",
+      "traceable_to_deliverable": "D5-01"
     },
     {
       "kpi_id": "KPI-04",
-      "pathway_ref": "P-EI-03",
-      "description": "Open-access peer-reviewed publications resulting from WP1–WP3 fellowship research",
-      "target": "≥3 open-access publications by M24, of which ≥2 first-authored by the fellow",
-      "measurement_method": "DOI list and open-access licence confirmation recorded in the dissemination and exploitation report",
+      "pathway_id": "PWY-EI-02",
+      "description": "Dissemination and exploitation plan delivered by month 6 with open-access routes identified for all primary research outputs (diagnostic model, decision engine, validation dataset)",
+      "target": "D5-02 submitted by month 6; open-access routes confirmed for WP1, WP2 and WP3 primary outputs",
+      "measurement_method": "Submission of D5-02 by due_month 6; completeness check against primary outputs of WP1–WP3",
       "traceable_to_deliverable": "D5-02"
     },
     {
       "kpi_id": "KPI-05",
-      "pathway_ref": "P-EI-03",
-      "description": "International conference presentations delivered by the fellow on fellowship research",
-      "target": "≥2 international conference presentations by M24",
-      "measurement_method": "Conference programme references (title, venue, date) recorded in the dissemination and exploitation report",
-      "traceable_to_deliverable": "D5-02"
-    },
-    {
-      "kpi_id": "KPI-06",
-      "pathway_ref": "P-EI-04",
-      "description": "CDP review cycle completed with joint supervisor-fellow sign-off at each review point, evidencing charter-aligned supervisory practice",
-      "target": "Three documented joint sign-offs (M3 initial delivery, M12 review, M24 review)",
-      "measurement_method": "Signed CDP review records referenced in updated CDP at each review milestone",
-      "traceable_to_deliverable": "D4-01"
-    },
-    {
-      "kpi_id": "KPI-07",
-      "pathway_ref": "P-EI-05",
-      "description": "MSc thesis co-supervised at the host institution with research topic traceable to WP1–WP3 methodology",
-      "target": "≥1 MSc thesis co-supervised and submitted during the fellowship period",
-      "measurement_method": "Thesis title, co-supervisor credit, and topic alignment statement confirmed in CDP review at M24",
-      "traceable_to_deliverable": "D4-01"
-    },
-    {
-      "kpi_id": "KPI-08",
-      "pathway_ref": "P-EI-06",
-      "description": "Open research outputs (technical report, demonstrator software, validation report, DMP, dissemination report) completed and attributed to the host organisation",
-      "target": "D1-01 by M14, D2-01 by M20, D3-01 by M24, D5-01 by M6, D5-02 by M24 — all with host affiliation declared",
-      "measurement_method": "Delivery dates and host-affiliation attribution confirmed in final D5-02 portfolio record",
-      "traceable_to_deliverable": "D5-02"
-    },
-    {
-      "kpi_id": "KPI-09",
-      "pathway_ref": "P-EI-07",
-      "description": "Diagnostic branch technical report (WP1) completed and released as open research output, demonstrating new R&I capacity at the host",
-      "target": "D1-01 delivered by M14, open-access or openly licensed",
-      "measurement_method": "Delivery date and licence/access status confirmed in project management records",
+      "pathway_id": "PWY-EI-03",
+      "description": "Probabilistic diagnosis model specification and calibration report produced (WP1), demonstrating ELTE's increased research output in uncertainty-aware multi-sensor EO and Bayesian calibration",
+      "target": "D1-01 delivered by month 14; report includes Route A and Route B specifications with calibration evidence",
+      "measurement_method": "Delivery of D1-01 by due_month 14; report assessed for Route A/B specification completeness and calibration evidence",
       "traceable_to_deliverable": "D1-01"
     },
     {
-      "kpi_id": "KPI-10",
-      "pathway_ref": "P-EI-07",
-      "description": "Methods seminars on probabilistic crop-water estimation delivered at the host, and ≥1 host competence adopted into the fellow's own practice",
-      "target": "≥2 methods seminars at the host by M24; ≥1 documented host-competence adoption by the fellow",
-      "measurement_method": "Seminar records (title, date, attendees) and host-competence adoption statement in CDP review at M12 and M24",
+      "kpi_id": "KPI-06",
+      "pathway_id": "PWY-EI-03",
+      "description": "Decision engine and demonstrator software delivered as open research artefact (WP2), representing new uncertainty-aware crop-modelling and WUE-optimisation capacity at ELTE",
+      "target": "D2-01 delivered by month 20 as open-source software with documented WUE-based decision logic",
+      "measurement_method": "Delivery of D2-01 by due_month 20; open code repository established; WUE-based objective function documented",
+      "traceable_to_deliverable": "D2-01"
+    },
+    {
+      "kpi_id": "KPI-07",
+      "pathway_id": "PWY-EI-04",
+      "description": "Open dissemination plan executed covering international scientific venues for the probabilistic fusion-to-decision outputs, positioning ELTE in the global remote-sensing and precision-agriculture community",
+      "target": "D5-02 delivered by month 6 with identified international open-access venues covering at least WP1 and WP2 primary results",
+      "measurement_method": "Submission of D5-02 by due_month 6; international venue identification confirmed for WP1 and WP2 outputs",
+      "traceable_to_deliverable": "D5-02"
+    },
+    {
+      "kpi_id": "KPI-08",
+      "pathway_id": "PWY-EI-04",
+      "description": "Field validation dataset from Hungarian tomato farms released as open benchmark dataset (WP3), increasing ELTE's international reputation in precision agriculture sensing and crop-water diagnostics",
+      "target": "D3-01 released under FAIR principles by month 24 with dataset DOI or open repository reference",
+      "measurement_method": "Delivery and open release of D3-01 by due_month 24; documented DOI or repository link; FAIR compliance confirmed",
+      "traceable_to_deliverable": "D3-01"
+    },
+    {
+      "kpi_id": "KPI-09",
+      "pathway_id": "PWY-EI-05",
+      "description": "CDP structured explicitly around European Charter for Researchers principles: transparent supervision, regular career review, equitable training access, and research integrity module",
+      "target": "D4-01 submitted at month 3 and explicitly covers Charter-aligned dimensions; periodic reviews documented",
+      "measurement_method": "D4-01 content assessment against Charter dimensions: supervision transparency, career-review schedule, training plan, research integrity module coverage",
       "traceable_to_deliverable": "D4-01"
+    },
+    {
+      "kpi_id": "KPI-10",
+      "pathway_id": "PWY-EI-06",
+      "description": "Open-source diagnostic model and code accompanying D1-01 released under FAIR principles, enabling integration of the probabilistic fusion methodology into ELTE's geoinformatics and remote-sensing teaching curricula",
+      "target": "Open code repository established alongside D1-01 delivery; FAIR compliance confirmed by DMP",
+      "measurement_method": "Open repository URL documented at D1-01 delivery; DMP (D5-01) confirms FAIR compliance for WP1 code and data assets",
+      "traceable_to_deliverable": "D1-01"
     },
     {
       "kpi_id": "KPI-11",
-      "pathway_ref": "P-EI-08",
-      "description": "MSc thesis co-supervised at the host with research topic directly traceable to WP1–WP3 results, providing feedback from fellowship research into graduate education",
-      "target": "≥1 MSc thesis co-supervised and submitted with explicit topic linkage to fellowship research",
-      "measurement_method": "Thesis record and written topic-alignment statement confirmed in D4-01 at M24 review",
-      "traceable_to_deliverable": "D4-01"
+      "pathway_id": "PWY-EI-06",
+      "description": "DMP confirming FAIR data stewardship for all primary research outputs (WP1–WP3), enabling uptake of project results in academic teaching at ELTE",
+      "target": "D5-01 submitted by month 6 covering all WP1, WP2 and WP3 data assets under FAIR principles",
+      "measurement_method": "D5-01 delivery by due_month 6; data assets for WP1, WP2 and WP3 confirmed covered with FAIR compliance",
+      "traceable_to_deliverable": "D5-01"
     },
     {
       "kpi_id": "KPI-12",
-      "pathway_ref": "P-EI-08",
-      "description": "FAIR data management plan delivered by M6, establishing reuse conditions that enable integration of fellowship data products into teaching and educational contexts",
-      "target": "D5-01 (DMP) completed by M6, covering open-data and open-model licensing, FAIR principle compliance, and reuse permissions",
-      "measurement_method": "DMP delivery date and FAIR compliance statement confirmed by M6 project review",
-      "traceable_to_deliverable": "D5-01"
+      "pathway_id": "PWY-EI-07",
+      "description": "Two-way interdisciplinary knowledge transfer between plant-physiology/non-destructive phenotyping and geoinformatics/remote-sensing documented and reviewed in the CDP lifecycle",
+      "target": "Both transfer directions explicitly identified in D4-01 CDP and evidenced at each review point",
+      "measurement_method": "CDP (D4-01) content review confirming identification of both transfer directions; review records evidencing progress",
+      "traceable_to_deliverable": "D4-01"
+    },
+    {
+      "kpi_id": "KPI-13",
+      "pathway_id": "PWY-EI-07",
+      "description": "Diagnostic model specification (D1-01) demonstrates methodological cross-fertilisation between plant physiology and probabilistic remote sensing, evidencing the interdisciplinary approach enabled by the fellowship",
+      "target": "D1-01 report evidences plant-physiology-grounded design choices (e.g., non-destructive physiological ground truth integration, Route B patch-covariation assumption) within the probabilistic fusion architecture",
+      "measurement_method": "D1-01 content assessment for explicit integration of plant-physiological concepts into the Route A/B diagnostic architecture",
+      "traceable_to_deliverable": "D1-01"
     }
   ],
   "dissemination_plan": {
     "activities": [
       {
-        "activity_type": "peer-reviewed open-access publication of probabilistic multi-sensor crop-water-state estimation methodology",
-        "target_audience": "Remote sensing and crop-water modelling researchers active in Earth observation, precision agriculture, and Bayesian machine learning journals (e.g., Remote Sensing of Environment, Agricultural Water Management, IEEE TGRS)",
-        "responsible_partner": "FELLOW",
-        "timing": "M12–M24: first manuscript submitted by M12; full publication portfolio by M24, traceable to D5-02"
+        "activity_type": "Peer-reviewed open-access publication",
+        "target_audience": "Remote sensing and precision agriculture researchers studying multi-sensor fusion, probabilistic crop-water-state estimation, and uncertainty-aware decision support",
+        "responsible_partner": "ELTE",
+        "timing": "M12–M24 (aligned with IMP-1 timeline; contingent on WP1–WP3 validation protocol completion per impacts.json)"
       },
       {
-        "activity_type": "peer-reviewed open-access publication of uncertainty-aware AquaCrop decision engine",
-        "target_audience": "Agricultural water management engineers, operations research and irrigation-scheduling communities working at the intersection of crop simulation and decision support",
-        "responsible_partner": "FELLOW",
-        "timing": "M16–M24: manuscript submitted by M16; published or accepted by M24 and recorded in D5-02"
+        "activity_type": "International conference presentation",
+        "target_audience": "Geoinformatics, Earth observation, and crop-modelling scientists at ISPRS, IEEE IGARSS, and precision agriculture conference venues addressing the real-time decision-support × PlanetScope gap (METH-SOTA-007)",
+        "responsible_partner": "ELTE",
+        "timing": "M14–M24 (following D1-01 delivery at M14 and progressing through WP2–WP3 completion)"
       },
       {
-        "activity_type": "international conference presentations on probabilistic crop-water estimation and decision-support results",
-        "target_audience": "Earth observation and remote sensing researchers, agronomic modellers, and precision irrigation practitioners attending international venues (e.g., IGARSS, EGU, AgriSense, ESA Living Planet Symposium)",
-        "responsible_partner": "FELLOW",
-        "timing": "M12 (mid-project results) and M20 (decision-engine results); minimum 2 presentations recorded in D5-02"
+        "activity_type": "Open data and open-source code repository release (FAIR)",
+        "target_audience": "Agricultural technology developers, geoinformatics researchers, and data scientists seeking reproducible benchmark datasets and open end-to-end probabilistic fusion implementations for precision agriculture sensing",
+        "responsible_partner": "ELTE",
+        "timing": "M14 (WP1 code accompanying D1-01), M20 (WP2 code and demonstrator with D2-01), M24 (WP3 field validation dataset with D3-01)"
       },
       {
-        "activity_type": "methods seminars at host institution on probabilistic fusion and uncertainty-aware decision support",
-        "target_audience": "Host institution research group members, MSc and PhD students in environmental remote sensing and applied agronomy",
-        "responsible_partner": "FELLOW",
-        "timing": "M8 and M18 (≥2 seminars per WP4 T4-03); attendance and topics recorded in CDP D4-01 review at M12 and M24"
+        "activity_type": "Curriculum integration of research outputs into ELTE teaching",
+        "target_audience": "MSc and PhD students enrolled in ELTE geoinformatics, remote sensing, and precision agriculture programmes who will benefit from the project's Bayesian multi-sensor fusion and crop-water decision-support outputs (EI-06 pathway)",
+        "responsible_partner": "ELTE",
+        "timing": "M18–M24 (following D1-01 and D2-01 delivery; FAIR compliance confirmed by DMP D5-01)"
       },
       {
-        "activity_type": "FAIR open-source software and data release for diagnostic field-state estimation tool",
-        "target_audience": "Research groups using PlanetScope, Sentinel-1, and Sentinel-2 imagery for agricultural field-state estimation who require reproducible, openly licensed codebases",
-        "responsible_partner": "FELLOW",
-        "timing": "Open-source code release aligned with D1-01 (M14); FAIR data management plan D5-01 delivered by M6 to establish reuse conditions"
-      },
-      {
-        "activity_type": "FAIR open-source release of uncertainty-aware AquaCrop decision-support demonstrator",
-        "target_audience": "Crop modellers, irrigation decision-support practitioners, and precision agriculture software developers seeking uncertainty-propagating simulation pipelines",
-        "responsible_partner": "FELLOW",
-        "timing": "M20, aligned with D2-01 (demonstrator delivery)"
-      },
-      {
-        "activity_type": "Dissemination and exploitation report (D5-02)",
-        "target_audience": "European Commission MSCA programme stakeholders, host institution, and the broader scientific community",
-        "responsible_partner": "BENEFICIARY-HOST",
-        "timing": "M24 (project end); serves as the consolidated record of all dissemination and communication activities"
+        "activity_type": "Dissemination and exploitation plan (D5-02) delivery and periodic update",
+        "target_audience": "MSCA-PF programme scientific officer; scientific and non-specialist public via plan-documented channels",
+        "responsible_partner": "ELTE",
+        "timing": "M6 (initial D5-02 submission); periodic updates through M24 as WP1–WP3 outputs materialise"
       }
     ],
-    "open_access_policy": "All peer-reviewed publications produced by the fellowship will be made immediately open-access upon publication, in full compliance with the Horizon Europe open-access mandate and Plan S. Preprints will be deposited on domain-appropriate open repositories (ESSOAr, arXiv, or EarthArXiv) at the point of submission to peer review. Research datasets underpinning publications will be released under CC BY 4.0 or equivalent open data licences. All fellowship software outputs will be released under an OSI-approved open-source licence. Findability, Accessibility, Interoperability, and Reusability (FAIR) conditions for all data and model artefacts are established in the Data Management Plan (D5-01) delivered by M6 and are maintained throughout and after the fellowship."
+    "open_access_policy": "All peer-reviewed publications arising from the project will be made available under open-access routes in compliance with the Horizon Europe open-access mandate and the project's Data Management Plan (D5-01, WP5). Primary research data (WP1–WP3 datasets) and all project software (WP1 probabilistic fusion code, WP2 decision engine and demonstrator) will be released in open repositories under FAIR principles — findable, accessible, interoperable, and reusable. Open-access routes for all primary outputs of WP1, WP2, and WP3 are to be confirmed by D5-02 at month 6, consistent with KPI-04."
   },
   "exploitation_plan": {
     "activities": [
       {
-        "activity_type": "Open-source software release of probabilistic multi-sensor field-state diagnosis tool (WP1 output)",
-        "expected_result": "A reusable, documented open-source codebase enabling any research group with access to PlanetScope and Sentinel-1/2 imagery to replicate and extend probabilistic crop-water-state diagnosis without licensing barriers; citable via a software DOI registered in the DMP (D5-01)",
-        "responsible_partner": "FELLOW",
-        "timing": "M14, aligned with D1-01 delivery"
+        "activity_type": "Open-source release of the uncertainty-aware AquaCrop decision engine and demonstrator (D2-01)",
+        "expected_result": "A replicable, openly licensed end-to-end decision-support prototype (TRL 3–4) demonstrating honest uncertainty propagation from multi-sensor EO observation to WUE-optimised irrigation recommendation, available to the global precision agriculture and crop-modelling research community for further development and adaptation (IMP-2, RQ10)",
+        "responsible_partner": "ELTE",
+        "timing": "M20 (D2-01 delivery with open code repository established)"
       },
       {
-        "activity_type": "Open research demonstrator release of uncertainty-aware AquaCrop decision engine integrated with diagnostic branch (WP2 output)",
-        "expected_result": "A standalone, openly licensed demonstrator implementing the full observation-to-decision pipeline with explicit uncertainty propagation; serves as proof-of-concept basis for future non-academic uptake or commercialisation in a subsequent funded stage (TRL 3–4 at project end)",
-        "responsible_partner": "FELLOW",
-        "timing": "M20, aligned with D2-01 delivery"
+        "activity_type": "Open benchmark dataset release from Hungarian tomato farm field validation (D3-01)",
+        "expected_result": "An internationally reproducible field-validation dataset with uncertainty calibration evidence, assigned a DOI or open repository reference under FAIR principles, enabling external replication of the Route A / Route B probabilistic diagnosis framework and supporting ELTE's reputation in precision agriculture sensing (IMP-1, IMP-2, EI-04 pathway, KPI-08)",
+        "responsible_partner": "ELTE",
+        "timing": "M24 (D3-01 delivery; FAIR release confirmed by DMP D5-01)"
       },
       {
-        "activity_type": "MSc thesis co-supervision translating WP1–WP3 methodology into graduate research",
-        "expected_result": "A trained graduate researcher competent in probabilistic EO-based agronomic modelling, with thesis results extending fellowship methods; embeds fellowship knowledge into the host institution's graduate programme and creates a documented knowledge-transfer output",
-        "responsible_partner": "BENEFICIARY-HOST",
-        "timing": "Co-supervision initiated by M12; thesis submitted by M24 and recorded in CDP D4-01 review"
-      },
-      {
-        "activity_type": "Follow-on research proposal preparation and submission",
-        "expected_result": "Submission of ≥1 national or ERC-track follow-on proposal continuing the probabilistic crop-water decision-support research line at higher TRL or broader scope, building directly on fellowship outputs",
-        "responsible_partner": "FELLOW",
-        "timing": "M24–M30 (within 6 months of fellowship end, per IMP-4 indicator)"
+        "activity_type": "Integration of probabilistic fusion methodology into ELTE's ongoing remote sensing and geoinformatics research programme",
+        "expected_result": "Strengthened R&I capacity at ELTE in Bayesian multi-sensor analysis and uncertainty-aware crop-water-state estimation, enabling follow-on research projects building on the project's open-source code and validated methodology beyond the fellowship period (EI-03 pathway, IMP-1)",
+        "responsible_partner": "ELTE",
+        "timing": "M18–M24 and post-project"
       }
     ],
-    "ipr_strategy": "The fellowship operates at TRL 3–4 and generates primarily open scientific knowledge — peer-reviewed publications, open-source software, and FAIR data artefacts — for which open licensing is the appropriate and intended exploitation mechanism. No patent applications are anticipated for this phase of research. All software will be released under an OSI-approved open-source licence; all data under CC BY 4.0 or an equivalent permissive open data licence; all publications under immediate open-access conditions. The fellow and the host institution jointly hold publication and data rights; no third-party IP encumbrances on core fellowship outputs are foreseen. Should commercially exploitable applications emerge from the uncertainty-aware decision-support demonstrator in future funded stages, IPR management will be addressed in the follow-on proposal in accordance with the host institution's technology-transfer and knowledge-valorisation policies."
+    "ipr_strategy": "The project's primary outputs — scientific publications, the probabilistic fusion diagnostic model (D1-01), the decision engine and demonstrator software (D2-01), and the field validation dataset (D3-01) — are research artefacts intended for open dissemination under FAIR principles and permissive open-source licences. No patent protection is sought: the project operates at TRL 3–4 (RQ10 per impacts.json) and its impact is realised through open scientific dissemination and ELTE's research capacity rather than commercial exclusivity. This approach is consistent with the MSCA-PF instrument's emphasis on knowledge transfer and ERA capacity building (EI-03, EI-04)."
   },
   "sustainability_mechanism": {
-    "description": "Fellowship outputs are designed for durability well beyond the M24 end date. Peer-reviewed open-access publications permanently establish the probabilistic multi-sensor crop-water estimation methodology and the uncertainty-aware decision engine in the scientific record, providing citable, independently verifiable references that persist without institutional dependency. Open-source software releases (D1-01 aligned, M14; D2-01 aligned, M20) and FAIR data artefacts governed by the DMP (D5-01, M6) ensure that the diagnostic and decision-support tools remain accessible, replicable, and extensible by the global remote sensing and precision agriculture research community under open licences. MSc co-supervision (WP4 T4-03, ≥1 thesis submitted by M24) embeds the probabilistic crop-water estimation methodology directly into the host institution's graduate curriculum, creating a durable educational pathway from fellowship research to teaching. The follow-on proposal (≥1 submitted within 6 months of M24) is the primary mechanism for continuation of the scientific programme in a subsequent funded phase at higher TRL or broader scope. The host institution, as long-term custodian of the open software repositories, FAIR data archives, and publication portfolio, sustains institutional access to and stewardship of fellowship outputs after the grant period.",
+    "description": "Post-fellowship sustainability is secured through three complementary mechanisms grounded in the project's Tier 3 impact data. First, ELTE retains the probabilistic fusion methodology, validated code (D1-01, D2-01), and benchmark dataset (D3-01) as open research infrastructure within its geoinformatics and remote sensing group, enabling continued use and extension by ELTE researchers and students beyond the fellowship period (IMP-1, EI-03, EI-06). Second, open FAIR release of all primary code and data assets under the DMP (D5-01) ensures that the global precision agriculture and Earth observation research community can build on and extend the results independently, sustaining the scientific impact (IMP-1, IMP-2) without dependence on the project's continued funding. Third, the fellow's cross-disciplinary profile — coupling plant physiology and non-destructive stress phenotyping with geoinformatics and remote sensing, documented in the CDP (D4-01) — enables continued collaboration and career development in precision agriculture and Earth observation beyond the fellowship, sustaining the two-way knowledge transfer relationship between the fellow and ELTE (IMP-4, EI-01, EI-07).",
     "responsible_partners": [
-      "FELLOW",
-      "BENEFICIARY-HOST"
+      "ELTE"
     ]
   }
 }

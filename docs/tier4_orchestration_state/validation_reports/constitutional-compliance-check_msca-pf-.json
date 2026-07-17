@@ -1,122 +1,112 @@
 {
-  "report_id": "compliance_check_excellence_section_compliance_validator_2026-07-15T000000Z",
+  "report_id": "compliance_check_phase7_budget_gate_assessment_compliance_validator_20260717T000000Z",
   "skill_id": "constitutional-compliance-check",
   "invoking_agent": "compliance_validator",
-  "run_id_reference": "msca-pf-syn-01",
-  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "run_id_reference": "msca-pf-real-01",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing; Annex templates govern post-award implementation reporting, not proposal writing",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing. Annex templates govern post-award implementation reporting. Application form templates (Tier 2A) govern proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3.",
+      "check_status": "violation",
+      "violation_evidence": "The artifact's partner_coverage_results entry for HOST states: 'HOST (ELTE) is the sole beneficiary receiving the grant disbursement; all unit-cost disbursement flows to HOST as grant agreement signatory; management_and_indirect line_item structurally present with status Confirmed; HOST administrative, institutional support, and WP3/WP4/WP5 contributing-partner activities covered under this line'. The institutional name 'ELTE' is a specific project-fact claim identifying a named partner by institutional identity. The artifact contains no traceability_footer field and provides no primary_sources[] reference pointing to any path within docs/tier3_project_instantiation/ for this claim. Per CLAUDE.md §13.3 and check 13.3 of this skill specification, a project-fact claim naming a specific partner (by name or identifier) without a Tier 3 source reference in the artifact's traceability footer constitutes a violation. This skill does not read docs/tier3_project_instantiation/ directly; it checks only whether the artifact provides a Tier 3 source reference. No such reference exists in the artifact.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
-      "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed; absent budget artifacts are a blocking gate failure",
-      "check_status": "violation",
-      "violation_evidence": "The artifact schema_id is 'orch.tier5.excellence_section.v1', which begins with 'orch.tier5.' and therefore identifies this as a Phase 8 Tier 5 deliverable subject to the categorical pre-condition of §8.4 and §13.4. The budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json records gate_pass_declaration: 'fail'. The blocking_inconsistencies entry states: 'docs/integrations/lump_sum_budget_planner/received/ directory is empty or absent. No budget response file has been received from the external Lump Sum Budget Planner system. Absent budget artifacts constitute a blocking gate failure per CLAUDE.md §8.4 and §13.4; this state is not a hold state and admits no deferral.' The excellence_section.json artifact — a full Phase 8 proposal section draft including sub-sections 1.1 through 1.4, full validation_status, and a populated traceability_footer — was produced without a passing budget gate. This constitutes a categorical constitutional violation: CLAUDE.md §13.4 prohibits all Phase 8 activity, including preparatory drafting, until gate_09 is satisfied, and §8.4 makes this block unconditional and instrument-independent. No Phase 8 substep may have commenced before the gate passed.",
-      "severity": "critical"
-    },
-    {
       "prohibition_id": "13.5",
-      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4 decision log or phase outputs",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent runtime behaviour during execution, not the content of a written phase output artifact. The artifact at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json is itself a durable Tier 4 record, which evidences that at least the gate_pass_declaration decision was written to Tier 4. Enforcement of whether all durable decisions were written is outside the scope of post-hoc artifact inspection by this skill.",
       "severity": null
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by redefining phase meanings, tier meanings, gate logic, or the authority hierarchy",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs workflow and skill scope at design time. The artifact is a Phase 7 budget gate assessment output, not a workflow or skill definition. Inspection of the artifact's instrument_type_note finds the statement 'for unit-cost instruments the constitution (CLAUDE.md §10.2: skills are not authorities) supersedes that step', which is a correct application of the CLAUDE.md authority hierarchy (CLAUDE.md §3, Priority 2 above skills at Priority 9) and does not constitute a skill expanding its own scope to redefine gate logic.",
       "severity": null
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to this artifact type: the artifact is a Phase 7 budget gate assessment (schema_id: orch.phase7.budget_gate_assessment.v1), not a Tier 5 proposal section or assembled draft. §13.8 governs finalized proposal text. No proposal text is present in this artifact.",
       "severity": null
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
-      "check_status": "violation",
-      "violation_evidence": "The artifact contains MSCA participation condition claims that constitute Horizon Europe regulatory-level requirements asserted without any Tier 1 normative framework path in the traceability_footer.primary_sources[]. Specific instances: (1) Claim C15 asserts the MSCA mobility eligibility rule — 'no more than 12 months residence or main activity in the host country in the 36 months immediately preceding the submission deadline' — sourced exclusively to docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json SR-02 (Tier 2B only); (2) sub-section 1.4 content states 'SR-01 (scope_requirements.json, Confirmed, mandatory) positions the fellowship instrument as requiring excellent researchers undertaking international mobility — excellence of the researcher is not peripheral context but the instrument's central individual-level selection criterion', sourced to Tier 2B only; (3) the content asserts 'If the real host is in a non-associated Third Country the fellowship becomes a Global Fellowship with a mandatory 12-month return phase and three-way knowledge-transfer model (SR-03, scope_requirements.json, source_grounded)'; (4) MSCA doctoral-degree eligibility criteria are stated as regulatory requirements without Tier 1 backing in the footer. The traceability_footer.primary_sources[] lists no path within docs/tier1_normative_framework/extracted/ — all Tier-2 references are Tier 2B sources (scope_requirements.json, expected_outcomes.json, expected_impacts.json). MSCA participation conditions derive from the Framework Programme Regulation and MSCA-specific primary legislation; their use in the deliverable without a Tier 1 traceability anchor in the footer is a §13.9 violation.",
-      "severity": "major"
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to this artifact type: the artifact is a Phase 7 Tier 4 orchestration state artifact (docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json), not a Tier 5 deliverable. §13.10 governs Tier 5 outputs only.",
       "severity": null
     },
     {
       "prohibition_id": "13.11",
-      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs write operations against Tier 1 and Tier 2 source documents. Reading the Phase 7 budget gate assessment artifact cannot confirm or deny whether a separate write to Tier 1 or Tier 2 occurred. No such modification evidence is present in or derivable from the audited artifact. Enforcement requires filesystem-level inspection outside the declared input boundary of this skill invocation.",
       "severity": null
     },
     {
       "prohibition_id": "13.12",
-      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
       "check_status": "pass",
-      "violation_evidence": null,
+      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent and skill behaviour during execution. The audited artifact explicitly cites CLAUDE.md §8.1 constitutional amendment C1, §8.3, §8.4, and §10.2 as binding authorities governing its content, indicating that the producing agent treated CLAUDE.md as the governing constitution rather than as advisory. No evidence of CLAUDE.md being treated as optional is present in the artifact.",
       "severity": null
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 2
+    "violations_found": 1
   },
-  "decision_log_entries": [
+  "timestamp": "2026-07-17T00:00:00Z",
+  "decision_log_entries_written": [
     {
-      "decision_id": "constitutional_violation_compliance_validator_2026-07-15T000000Z",
+      "decision_id": "constitutional_violation_compliance_validator_20260717T000000Z",
       "decision_type": "constitutional_violation",
-      "violation_id": "13.4_excellence_section_2026-07-15T000000Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.4",
-      "artifact_affected": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "violation_id": "13.3_phase7_budget_gate_assessment_20260717T000000Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.3",
+      "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
       "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected; requires human operator resolution. A Phase 8 Tier 5 proposal section (schema_id: orch.tier5.excellence_section.v1, run_id: msca-pf-syn-01) was produced without a passing budget gate. The budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json records gate_pass_declaration: 'fail' with a blocking inconsistency: no budget response has been received from the external Lump Sum Budget Planner system in docs/integrations/lump_sum_budget_planner/received/. CLAUDE.md §13.4 and §8.4 impose a categorical and unconditional block on all Phase 8 activity — including preparatory drafting — until gate_09 is satisfied. The excellence_section.json artifact must not be used as the basis for proposal submission, further drafting, assembly, or evaluator review until a conforming budget response is received, validated against the interface contract, and the budget gate assessment is rerun with gate_pass_declaration: 'pass'. No Phase 8 substep may commence before that condition is met.",
+      "resolution_note": "Constitutional violation detected: the artifact names 'ELTE' as a specific partner institution in partner_coverage_results without providing a Tier 3 source reference in a traceability_footer. Requires human operator resolution: either (a) the artifact is amended to include a traceability_footer with primary_sources[] pointing to the relevant docs/tier3_project_instantiation/consortium/ file that establishes ELTE as the HOST institution, or (b) the human operator confirms that the institutional reference is derivable from Tier 4 state (wp_structure.json or unit_cost_budget.json) and provides a documented resolution ruling. This skill does not resolve constitutional violations; it flags them.",
       "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-15T00:00:00Z"
-    },
-    {
-      "decision_id": "constitutional_violation_compliance_validator_2026-07-15T000001Z",
-      "decision_type": "constitutional_violation",
-      "violation_id": "13.9_excellence_section_2026-07-15T000001Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.9",
-      "artifact_affected": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected; requires human operator resolution. The excellence_section.json artifact contains MSCA participation condition claims and Horizon Europe programme-level regulatory requirements (MSCA mobility rule SR-02, researcher excellence requirement SR-01, Global Fellowship return-phase requirement SR-03, MSCA doctoral-degree eligibility conditions) without any Tier 1 normative framework path in the artifact's traceability_footer.primary_sources[]. All regulatory-level references trace only to Tier 2B scope_requirements.json. Resolution options: (1) revise the artifact to include explicit Tier 1 extracted source references for all participation condition claims — for example, paths within docs/tier1_normative_framework/extracted/ for the Framework Programme Regulation and MSCA provisions that are the legislative source of these conditions; or (2) confirm through a Tier 4 decision log entry that the Tier 2B scope_requirements.json extraction has been directly and fully grounded in Tier 1 normative documents and that Tier 2B references constitute sufficient traceability for these claims in this repository's tier model, recording that determination with the relevant Tier 1 authority citations. Severity is major, not critical; it does not independently block downstream use but must be resolved before finalisation per §11.5.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-15T00:00:01Z"
+      "written_to": "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_20260717T000000Z.json",
+      "timestamp": "2026-07-17T00:00:00Z"
     }
-  ],
-  "timestamp": "2026-07-15T00:00:00Z"
+  ]
 }

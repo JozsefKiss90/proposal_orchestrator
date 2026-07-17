@@ -1,66 +1,83 @@
 {
   "schema_id": "orch.phase2.concept_refinement_summary.v1",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "topic_mapping_rationale": {
     "EO-01": {
       "topic_element_id": "EO-01",
-      "mapping_to_concept": "The concept explicitly describes a structured Career Development Plan prepared jointly by supervisor and fellow, submitted as a project deliverable at months 2–3 and reviewed at M12 and M24. Training integrates digital and AI skills (including responsible use of generative AI), knowledge valorisation and innovation/entrepreneurship, and research integrity and open-science ethics. Strategic positioning section 2.1 ('Career perspectives / employability') quantifies career advancement targets: ≥3 peer-reviewed publications (≥2 first-author), ≥120 hours of transferable-skills training, co-supervision of ≥1 MSc thesis, and a follow-on national or ERC-track proposal submitted within six months of fellowship end. These activities directly and explicitly address expanded research and transferable skills leading to improved career prospects within academia and beyond.",
-      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '2.1 Career perspectives / employability'",
+      "mapping_to_concept": "The concept explicitly describes structured training in the MSCA-PF mandatory transferable dimensions: digital and AI skills including the responsible use of generative AI in environmental modelling and scientific coding, knowledge valorisation and innovation/entrepreneurship for translating the uncertainty-aware demonstrator toward user uptake, and research integrity/open-science ethics (FAIR data management, open research software, reproducible validation). The Career Development Plan commits to ≥120 hours of transferable-skills training, ≥3 peer-reviewed publications (≥2 first-author), co-supervision of ≥1 MSc thesis at the host, and a follow-on national or ERC-track proposal submitted within six months of the fellowship end — all activities directly addressing improved employability and career prospects within academia and beyond.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For supported postdoctoral fellows",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development section — 'fellowship pairs the research work plan with structured training in the MSCA-PF mandatory transferable dimensions'); strategic_positioning.md (§2.1 Career perspectives / employability — CDP milestones, publications, MSc co-supervision, follow-on proposal)",
       "status": "Confirmed",
       "vocabulary_gaps": []
     },
     "EO-02": {
       "topic_element_id": "EO-02",
-      "mapping_to_concept": "The inference chain: the concept describes [international mobility from Bulgaria (Plovdiv University) to Hungary (ELTE)] + [cross-domain research spanning earth observation, probabilistic machine learning, crop physiology and decision economics] + [collaboration with non-academic sector partner AgroVIR Kft. for farmer access and field feedback], which leads to [new mindsets and approaches to R&I forged through international, inter-sectoral and interdisciplinary experience], satisfying EO-02. The international move is confirmed (BG→HU satisfies MSCA mobility rule; explicitly stated). Inter-sectoral engagement is present through AgroVIR Kft. collaboration. However, the terms 'mind-sets', 'inter-sectoral', and 'interdisciplinary' do not appear verbatim in the concept corpus, and the concept does not frame these three dimensions as explicit outcome goals.",
-      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Identity spine' section (Bulgaria→Hungary move and MSCA mobility rule); project_summary.json fellowship_type and researcher fields; strategic_positioning.md section '3.2 Host capacity and hosting arrangements' and '2.2 Dissemination, exploitation and communication' (AgroVIR Kft. as non-academic partner)",
+      "mapping_to_concept": "Inference chain: The concept describes international mobility (Dr. Cholakova, Bulgaria → ELTE, Hungary — intra-EU European Fellowship), a genuinely interdisciplinary pairing (plant physiology fellow × geoinformatics/remote sensing host and supervisor), and engagement with the non-academic associated partner AgroVIR for field validation and farmer access. These three mechanisms constitute the international, inter-sectoral and interdisciplinary experience through which new mind-sets and approaches to R&I work are forged per EO-02. The two-way knowledge transfer (plant physiology into geoinformatics; geoinformatics methods back to the fellow) is the explicit mechanism of new approach acquisition. The term 'inter-sectoral' is not used verbatim but AgroVIR's non-academic sector role provides the inter-sectoral dimension. 'New mind-sets' is not stated explicitly but is the logical outcome of the described cross-disciplinary and cross-country mobility.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For supported postdoctoral fellows",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — Fellowship type: 'European Fellowship (EF), 24 months (Plovdiv, Bulgaria → ELTE, Hungary; intra-EU)'; Two-way transfer of knowledge section); strategic_positioning.md (§1.3 Supervision, training, two-way transfer of knowledge; §1.4 The researcher's professional experience — 'The Bulgaria → Hungary move satisfies the MSCA mobility rule')",
       "status": "Inferred",
       "vocabulary_gaps": [
-        "mind-sets",
-        "inter-sectoral",
-        "interdisciplinary"
+        "new mind-sets",
+        "inter-sectoral"
       ]
     },
     "EO-03": {
       "topic_element_id": "EO-03",
-      "mapping_to_concept": "The inference chain: the concept describes [peer-reviewed publications (≥2 first-author) as the primary scientific dissemination mechanism] + [open research software and open validation data as open-science outputs] + [societal engagement as an explicitly named training component] + [collaboration with Hungarian row-crop growers through AgroVIR Kft. as a non-scientific target group], which leads to [enhanced networking and communication capacities with scientific peers and the general public that increases R&I impact]. The dissemination and open-science posture is described in strategic_positioning.md section 2.2. However, 'networking', 'communication capacities', and 'general public' are not explicitly framed as outcome goals; the connection is logically derivable from the described dissemination activities.",
-      "tier2b_source_ref": "Expected Outcome – For supported postdoctoral fellows, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md section '2.2 Dissemination, exploitation and communication'; concept_note.md 'Training and career development' section (societal engagement as named training component)",
+      "mapping_to_concept": "Inference chain: The concept describes ≥3 peer-reviewed publications (≥2 first-author), open research software, open validation data and protocol, dissemination to the geoinformatics/remote-sensing community, and outreach to Hungarian tomato growers via associated partner AgroVIR. These activities constitute the mechanisms for enhanced networking and communication capacities with scientific peers (geoinformatics/remote-sensing community, conference participation implied by publication targets) and with a non-scientific public (farmers via AgroVIR). The framing of increased R&I impact is present through the open demonstrator (TRL 3–4) and open data strategy. Neither 'networking' nor 'general public' nor 'communication capacities' appear verbatim; the inference is that the described dissemination and outreach activities produce those capacities.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For supported postdoctoral fellows",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "strategic_positioning.md (§2.2 Dissemination, exploitation and communication — 'open research software, open validation data and protocol, peer-reviewed publication. Target groups are the host's geoinformatics / remote-sensing community and Hungarian tomato growers reached through AgroVIR'; §2.1 — ≥3 peer-reviewed publications)",
       "status": "Inferred",
       "vocabulary_gaps": [
         "networking",
-        "communication capacities",
-        "general public"
+        "general public",
+        "communication capacities"
       ]
     },
     "EO-04": {
       "topic_element_id": "EO-04",
-      "mapping_to_concept": "No direct coverage found; assumed to be covered by the project's general MSCA fellowship hosting at ELTE as an established higher education establishment. Neither 'European Charter for Researchers' nor 'working conditions' appears anywhere in the concept corpus. Alignment with the Charter is an organisational commitment of the host institution and is not described as a project design mechanism. Assumption: ELTE, as a Horizon Europe-participating higher education establishment (project_summary.json host_organisation.type), is expected to comply with the Charter as a condition of MSCA participation, but this is not confirmed by any statement in the project brief. This is a genuine gap in the concept's explicit articulation of organisational compliance.",
-      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json host_organisation.type ('Higher education establishment') — institutional type only; no Charter commitment or working conditions statement present in any project brief document",
+      "mapping_to_concept": "No direct coverage found; assumed to be covered by ELTE's status as a major European higher education establishment in Hungary with institutional obligations under the European Charter for Researchers. The concept does not mention the European Charter for Researchers, working conditions alignment, or specific Charter-related commitments. The structured Career Development Plan and supervision arrangements imply standard academic research working conditions, but this is an assumption grounded only in ELTE's institutional type, not in any explicit statement in the concept corpus.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For participating organisations",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (host_organisation.type: 'Higher education establishment'; host_organisation.organisation: 'Eötvös Loránd University (ELTE), Budapest'; host_organisation.country: 'Hungary')",
       "status": "Assumed",
       "vocabulary_gaps": [
         "European Charter for Researchers",
-        "working conditions"
+        "working conditions",
+        "alignment"
       ]
     },
     "EO-05": {
       "topic_element_id": "EO-05",
-      "mapping_to_concept": "The inference chain: the concept describes [Career Development Plan prepared jointly by supervisor and fellow, submitted as a project deliverable at months 2–3, reviewed and updated at M12 and M24] + [regular research reviews] + [≥120 hours of structured transferable-skills training] + [two-way knowledge transfer between fellow and host (fellow brings probabilistic calibration method; host provides geoinformatics competences)], which leads to [enhanced quality and sustainability of research training and supervision at ELTE]. The mechanisms are specific and documented. 'Quality' and 'sustainability' of research training are not used verbatim as outcome goals, but the structured, documented, time-phased and jointly-owned supervision model implies both.",
-      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "mapping_to_concept": "Inference chain: The concept describes a Career Development Plan jointly prepared by supervisor (Dr. András Jung) and fellow (Dr. Rositsa Cholakova), submitted as a project deliverable at project start (months 2–3), then reviewed and updated at M12 and M24, supported by regular research reviews and a genuine two-way knowledge transfer (plant physiology expertise into the host group; geoinformatics/remote sensing methods back to the fellow, evidenced by ≥2 methods seminars delivered at the host). This structured, milestone-tracked supervisory arrangement constitutes enhanced quality and sustainability of research training and supervision (EO-05). 'Sustainability' in the training context is not used verbatim; the M12/M24 review cycle provides the inference basis for longitudinal sustained quality.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For participating organisations",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development — 'A Career Development Plan is prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2–3), then reviewed and updated at M12 and M24'); strategic_positioning.md (§1.3 — 'Supervision is structured around a Career Development Plan... regular research reviews, and a genuine two-way transfer... ≥2 methods seminars delivered at the host')",
       "status": "Inferred",
       "vocabulary_gaps": [
-        "quality",
-        "sustainability"
+        "sustainability (in research training context)"
       ]
     },
     "EO-06": {
       "topic_element_id": "EO-06",
-      "mapping_to_concept": "The inference chain: the concept describes [peer-reviewed publications (≥3 total, ≥2 first-author)] + [open research software and open validation data published under open-science principles] + [international inbound fellow (Bulgarian postdoctoral researcher at ELTE)] + [dissemination to the host's environmental-modelling community], which leads to [increased global attractiveness, visibility and reputation of ELTE as the participating organisation]. However, 'global attractiveness', 'visibility', and 'reputation' as stated organisational goals are not mentioned anywhere in the concept corpus; the connection is indirect and derives from the open-science and publication posture described in section 2.2.",
-      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md section '2.2 Dissemination, exploitation and communication'",
+      "mapping_to_concept": "Inference chain: The concept describes ≥3 peer-reviewed publications (≥2 first-author), an open TRL 3–4 research demonstrator (uncertainty-aware crop water stress decision support tool), open research software, open validation data and protocol, and a follow-on ERC-track proposal — all hosted at and attributed to ELTE Budapest. These outputs logically increase ELTE's global attractiveness, visibility and reputation as a research host with emerging capability at the intersection of geoinformatics, probabilistic machine learning and crop science. The terms 'global attractiveness', 'visibility' and 'reputation' do not appear verbatim; the inference is from the described output portfolio.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For participating organisations",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "strategic_positioning.md (§2.1 — '≥3 peer-reviewed publications (≥2 first-author)... follow-on national or ERC-track proposal submitted within six months of the fellowship end'; §2.2 — 'open research software, open validation data and protocol')",
       "status": "Inferred",
       "vocabulary_gaps": [
         "global attractiveness",
@@ -70,243 +87,308 @@
     },
     "EO-07": {
       "topic_element_id": "EO-07",
-      "mapping_to_concept": "The concept explicitly uses the phrase 'transfer of knowledge' verbatim in the section title '1.3 Supervision, training, two-way transfer of knowledge' and describes specific mechanisms: the fellow brings the uncertainty-aware AquaCrop calibration method (doi:10.1016/j.envsoft.2022.105556) and probabilistic-fusion expertise into ELTE's environmental-modelling group, and takes up the host's geoinformatics and field-validation competences in return, evidenced by ≥2 methods seminars delivered at the host. R&I output is addressed through planned publications (≥3 total, ≥2 first-author) and the research demonstrator (open validation software). Both transfer of knowledge and R&I output increase are directly evidenced.",
-      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge' — 'transfer of knowledge' verbatim; section '2.1 Career perspectives / employability' for R&I output targets (≥3 publications, ≥2 first-author)",
+      "mapping_to_concept": "The concept explicitly uses the phrase 'two-way transfer of knowledge': the fellow brings plant-physiology and non-destructive stress-phenotyping expertise into the host's geoinformatics group; the host provides geoinformatics, remote-sensing and hyperspectral/multisensor-fusion methods and infrastructure in return, evidenced by ≥2 methods seminars delivered at the host. R&I output is explicitly evidenced by ≥3 peer-reviewed publications, a TRL 3–4 research demonstrator, and open research software. R&I capacity is explicitly built through the combination of plant physiology (fellow) and geoinformatics/remote sensing (host) competences — a capacity neither organisation held independently before the fellowship.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For participating organisations",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Two-way transfer of knowledge section — 'Two-way transfer of knowledge. The fellow brings plant-physiology and non-destructive stress-phenotyping expertise... into the host's geoinformatics group; the host provides geoinformatics, remote-sensing and hyperspectral/multisensor-fusion methods and infrastructure in return'); strategic_positioning.md (§1.3 — '≥2 methods seminars delivered at the host'; §2.1 — ≥3 publications)",
       "status": "Confirmed",
       "vocabulary_gaps": []
     },
     "EO-08": {
       "topic_element_id": "EO-08",
-      "mapping_to_concept": "The inference chain: the concept describes [co-supervision of ≥1 MSc thesis at ELTE] + [≥2 methods seminars delivered at the host's environmental-modelling group] + [a Career Development Plan that covers teaching as a competence development dimension], which leads to [regular feedback of research results into teaching and education at ELTE as the participating organisation]. The connection to teaching and education is evidenced by specific planned activities. However, 'feedback of research results into teaching' as a stated project goal is not articulated; the educational connection is a logical consequence of the described academic activities rather than an explicitly framed outcome.",
-      "tier2b_source_ref": "Expected Outcome – For participating organisations, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "strategic_positioning.md section '2.1 Career perspectives / employability' (co-supervision of ≥1 MSc thesis at host); section '1.3 Supervision, training, two-way transfer of knowledge' (≥2 methods seminars delivered at host)",
+      "mapping_to_concept": "Inference chain: The concept describes co-supervision of ≥1 MSc thesis at ELTE and ≥2 methods seminars delivered at the host institution. These are the specific mechanisms by which research results from the uncertainty-aware crop water stress and irrigation decision-support project feed into teaching and education at ELTE. Co-supervision of an MSc thesis directly embeds project methodology into graduate education. Methods seminars deliver research insights into the host department's educational programme. The term 'regular feedback' is not used verbatim; 'teaching' does not appear explicitly, but co-supervision of MSc theses and departmental seminars are the standard academic mechanisms for research-to-teaching feedback.",
+      "tier2b_source_ref": {
+        "source_section": "Expected Outcome — For participating organisations",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "strategic_positioning.md (§1.3 — '≥2 methods seminars delivered at the host'; §2.1 — 'co-supervision of ≥1 MSc thesis at the host')",
       "status": "Inferred",
       "vocabulary_gaps": [
-        "feedback of research results",
         "regular feedback",
-        "education"
+        "teaching"
       ]
     }
   },
   "scope_coverage": {
     "SR-01": {
       "scope_element_id": "SR-01",
-      "constraint_ref": "CC-02",
+      "constraint_ref": "CC-01",
       "coverage_status": "covered",
-      "coverage_description": "The concept positions the fellow (Dr. Mariya Petrova) as an excellent researcher who owns a prior peer-reviewed calibration method (doi:10.1016/j.envsoft.2022.105556), targets a research gap identified by systematic literature review, and undertakes international mobility from Bulgaria (Plovdiv University) to Hungary (ELTE). Excellence and international mobility are the structural basis of the fellowship as stated in both concept_note.md and strategic_positioning.md.",
-      "tier2b_source_ref": "Scope, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Identity spine' section and 'State of the art and novelty' section; project_summary.json researcher, fellowship_type, and host_organisation fields; strategic_positioning.md section '1.4 The researcher's professional experience'",
+      "coverage_description": "The concept explicitly identifies Dr. Rositsa Cholakova (PhD summa cum laude 2020, plant physiology — non-destructive evaluation of drought-stressed tomato plants, doi:10.2139/ssrn.5492527) as the excellent researcher and confirms a European Fellowship with international mobility from Plovdiv, Bulgaria to ELTE Budapest, Hungary (intra-EU). Both defining features — researcher excellence and centrality of international mobility — are explicitly stated and operator-confirmed.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — Fellow: 'Dr. Rositsa Cholakova, plant physiologist... PhD (summa cum laude, 2020)'; Fellowship type: 'European Fellowship (EF), 24 months (Plovdiv, Bulgaria → ELTE, Hungary; intra-EU)'); project_summary.json (researcher.eligibility: 'Mobility rule satisfied (Y); PhD held (Y, 2020)')",
       "notes": null
     },
     "SR-02": {
       "scope_element_id": "SR-02",
-      "constraint_ref": "CC-02",
+      "constraint_ref": "CC-03",
       "coverage_status": "covered",
-      "coverage_description": "The fellowship is structured as a European Fellowship (EF), hosted at ELTE Budapest, Hungary (EU Member State), with a duration of 24 months, within the 12–24 month EF standard range. The fellow is a Bulgarian national (any nationality eligible for EF). project_summary.json explicitly records fellowship_type as 'European Fellowship (EF)' and duration_months as 24.",
-      "tier2b_source_ref": "Scope – European Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'), duration_months (24), host_organisation.country ('Hungary'), researcher.country_of_origin ('BG')",
+      "coverage_description": "The concept confirms European Postdoctoral Fellowship (EF) as the fellowship form, with 24-month duration within the mandatory 12–24 month EF range. Dr. Cholakova (Bulgarian national, any nationality permitted for EF) moves from Plovdiv, Bulgaria to ELTE Budapest, Hungary, satisfying the EF definition (researcher hosted in Europe moving within Europe). The fellowship type and duration are operator-confirmed.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — European Postdoctoral Fellowships / Global Postdoctoral Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (fellowship_type: 'European Fellowship (EF)', duration_months: 24, duration_status.validation_status: 'Confirmed'); concept_note.md (Consortium and identity — Fellowship type)",
       "notes": null
     },
     "SR-03": {
       "scope_element_id": "SR-03",
-      "constraint_ref": "CC-03",
-      "coverage_status": "not_applicable",
-      "coverage_description": "SR-03 defines the structure for Global Postdoctoral Fellowships (outgoing phase + mandatory 12-month return). This project is a European Fellowship (EF), not a Global Fellowship (GF). The intra-EU move from Bulgaria to Hungary determines the EF sub-type by definition. SR-03 requirements do not apply.",
-      "tier2b_source_ref": "Scope – Global Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'); concept_note.md 'Identity spine' section (BG→HU move identified as intra-EU, hence EF by definition)",
-      "notes": "GF provisions (outgoing phase structure and mandatory return period) do not apply to this European Fellowship application. SR-03 is a mandatory requirement scoped exclusively to GF applications."
-    },
-    "SR-06": {
-      "scope_element_id": "SR-06",
-      "constraint_ref": "CC-10",
+      "constraint_ref": "CC-11",
       "coverage_status": "covered",
-      "coverage_description": "The concept explicitly integrates all mandated training dimensions: digital and AI skills (responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation and innovation/entrepreneurship (translating the uncertainty-aware demonstrator toward user uptake), and research integrity and open-science ethics (FAIR data management, open research software, reproducible validation). These are stated as structured training activities grounded in the project's own methods.",
-      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section (all three training dimensions named explicitly); strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "coverage_description": "The concept explicitly states that training integrates: digital and AI skills including the responsible use of generative AI in environmental modelling and scientific coding; knowledge valorisation and innovation/entrepreneurship for translating the uncertainty-aware decision-support demonstrator toward user uptake; and research integrity and open-science ethics (FAIR data management, open research software, reproducible validation). Open Science is addressed through the open data and software commitment. All mandatory elements of SR-03 are explicitly present.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Training activities",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development — 'Training integrates digital and AI skills — including the responsible use of generative AI in environmental modelling and scientific coding — together with knowledge valorisation and innovation/entrepreneurship... and research integrity and open-science ethics (FAIR data management, open research software, reproducible validation)'); strategic_positioning.md (§1.3)",
       "notes": null
     },
-    "SR-07": {
-      "scope_element_id": "SR-07",
-      "constraint_ref": "CC-12",
+    "SR-04": {
+      "scope_element_id": "SR-04",
+      "constraint_ref": "CC-13",
       "coverage_status": "covered",
-      "coverage_description": "The concept states explicitly that a Career Development Plan is prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (months 2–3), then reviewed and updated at M12 and M24. This appears verbatim in both concept_note.md and strategic_positioning.md, addressing research objectives, training needs, transferable skills, teaching (co-supervision of MSc thesis), and publications.",
-      "tier2b_source_ref": "Scope – Career Development Plan, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md sections '1.3 Supervision, training, two-way transfer of knowledge' and '2.1 Career perspectives / employability'",
+      "coverage_description": "The concept explicitly states that a Career Development Plan is prepared jointly by supervisor (Dr. András Jung) and fellow (Dr. Rositsa Cholakova) and submitted as a project deliverable at the start of the action (by months 2–3), then reviewed and updated at M12 and M24. The plan covers research objectives, transferable skills training (≥120 hours), publications (≥3 peer-reviewed), open science activities, and MSc co-supervision. Submission as a project deliverable at project start is explicitly confirmed.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Career Development Plan",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development — 'A Career Development Plan is prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2–3), then reviewed and updated at M12 and M24'); strategic_positioning.md (§1.3 — same language; §2.1 — milestones: publications, MSc co-supervision, follow-on proposal)",
       "notes": null
     },
     "CC-01": {
       "scope_element_id": "CC-01",
       "constraint_ref": "SR-01",
       "coverage_status": "covered",
-      "coverage_description": "The project is structured as a joint application by the researcher (Dr. Mariya Petrova) and the beneficiary organisation (ELTE Budapest). project_summary.json records both the researcher and host_organisation as distinct named entities in their respective roles, consistent with the MSCA-PF single-beneficiary joint-application model.",
-      "tier2b_source_ref": "Scope, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json host_organisation (ELTE, role: 'Beneficiary / host institution') and researcher (Dr. Mariya Petrova, role: 'Experienced researcher / postdoctoral fellow') fields",
+      "coverage_description": "Confirmed international mobility (Bulgaria → Hungary, intra-EU European Fellowship) and researcher excellence (PhD summa cum laude, established plant physiology and non-destructive stress phenotyping expertise with peer-reviewed publications). Cross-reference SR-01.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — Fellow section; Fellowship type); project_summary.json (researcher, fellowship_type)",
       "notes": null
     },
     "CC-02": {
       "scope_element_id": "CC-02",
-      "constraint_ref": "SR-02",
+      "constraint_ref": null,
       "coverage_status": "covered",
-      "coverage_description": "European Fellowship, 24 months, at ELTE Hungary (EU Member State). Fellow is Bulgarian national; any nationality is eligible for EF. Duration of 24 months falls within the 12–24 month EF standard.",
-      "tier2b_source_ref": "Scope – European Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)'), duration_months (24), researcher.country_of_origin ('BG'), host_organisation.country ('Hungary')",
+      "coverage_description": "The concept confirms ELTE (Eötvös Loránd University, Budapest, Hungary) as the single host beneficiary in the MSCA-PF single-beneficiary model. ELTE is an academic sector institution (higher education establishment). The MSCA-PF is a joint application by the researcher (Dr. Cholakova) and the beneficiary (ELTE), satisfying the joint application requirement. The project_summary.json confirms the single-fellow, single-beneficiary model.",
+      "tier2b_source_ref": {
+        "source_section": "Scope",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (host_organisation.role: 'Beneficiary / host institution (MSCA-PF single-beneficiary model)'; spine_note: 'MSCA-PF is a single-fellow, single-beneficiary action')",
       "notes": null
     },
     "CC-03": {
       "scope_element_id": "CC-03",
-      "constraint_ref": "SR-03",
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-03 applies to Global Fellowship nationality restrictions (European nationals or long-term residents only). This is a European Fellowship; the any-nationality rule applies and CC-03 restriction does not.",
-      "tier2b_source_ref": "Scope – Global Postdoctoral Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
-      "notes": "GF nationality restriction is inapplicable for EF applications."
+      "constraint_ref": "SR-02",
+      "coverage_status": "covered",
+      "coverage_description": "European Fellowship confirmed as the fellowship type. The EF is open to researchers of any nationality; Dr. Cholakova is a Bulgarian national (EU Member State). The eligibility condition is satisfied. The fellowship is hosted in Europe (ELTE Budapest, Hungary).",
+      "tier2b_source_ref": {
+        "source_section": "Scope — European Postdoctoral Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (fellowship_type: 'European Fellowship (EF)'; researcher.country_of_origin: 'BG'; host_organisation.country: 'Hungary')",
+      "notes": "Eligibility condition met; no nationality restriction applies for EF."
     },
     "CC-04": {
       "scope_element_id": "CC-04",
-      "constraint_ref": "SR-04",
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-04 defines secondment duration limits for European Fellowships (cannot exceed half of requested duration). No secondment is proposed in this concept. The 24-month fellowship is fully structured as research and training at ELTE. The constraint is optional and not invoked.",
-      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no secondment described in any project brief document",
-      "notes": "SR-04 is non-mandatory; no secondment is proposed, so this constraint does not apply. If a secondment is added in later phases, CC-04 limits must be observed."
+      "constraint_ref": "SR-02",
+      "coverage_status": "covered",
+      "coverage_description": "EF duration confirmed at 24 months, which is within the mandatory 12–24 month range for European Postdoctoral Fellowships. Duration is operator-confirmed.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — European Postdoctoral Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (duration_months: 24, duration_status.validation_status: 'Confirmed', duration_status.note: 'Operator-confirmed 24 months - the standard European Fellowship duration, consistent with the EF determination')",
+      "notes": null
     },
     "CC-05": {
       "scope_element_id": "CC-05",
-      "constraint_ref": "SR-04",
+      "constraint_ref": null,
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-05 defines secondment rules for Global Fellowships (up to half the outgoing phase, max 3 months at start at beneficiary). This is a European Fellowship; CC-05 does not apply.",
-      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
-      "notes": "GF secondment rules are inapplicable for EF applications."
+      "coverage_description": "Global Fellowship eligibility conditions (open to European nationals or long-term residents) do not apply; the proposal is a European Fellowship. GF eligibility is not relevant to this submission.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Global Postdoctoral Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (fellowship_type: 'European Fellowship (EF)')",
+      "notes": "European Fellowship chosen; GF eligibility conditions (CC-05, CC-06) are not applicable to this proposal."
     },
     "CC-06": {
       "scope_element_id": "CC-06",
-      "constraint_ref": "SR-04",
+      "constraint_ref": null,
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-06 prohibits secondments during the mandatory 12-month return period, which is a GF-only structure. This European Fellowship has no mandatory return period. Additionally, no secondment is proposed.",
-      "tier2b_source_ref": "Scope – Secondments, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)')",
-      "notes": "No mandatory return period exists in EF; this restriction is structurally inapplicable."
+      "coverage_description": "Global Fellowship outgoing phase (12–24 months in non-associated Third Country) and mandatory 12-month return phase requirements do not apply; the proposal is a European Fellowship with a single 24-month period at ELTE Budapest.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Global Postdoctoral Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (fellowship_type: 'European Fellowship (EF)', duration_months: 24)",
+      "notes": "European Fellowship chosen; GF structural duration requirements are not applicable."
     },
     "CC-07": {
       "scope_element_id": "CC-07",
       "constraint_ref": "SR-05",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-07 permits an optional non-academic placement of up to 6 months at the end of the project. No such placement is proposed in this concept. The 24-month fellowship is fully structured as research and training at ELTE without a terminal non-academic placement period.",
-      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json duration_months (24); strategic_positioning.md section '3.1 Work plan' — 24-month European Fellowship timeline; no placement period described",
-      "notes": "SR-05 is non-mandatory; no non-academic placement is proposed. AgroVIR Kft. is described as an associated validation partner, not as a non-academic placement host."
+      "coverage_description": "The concept does not include a secondment phase. EF secondment constraints (cannot exceed half of requested duration) apply only when a secondment is included. AgroVIR is described as an associated partner providing farmer access and field validation, not as a secondment host organisation.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Secondments",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — 'AgroVIR (Hungary): farmer access, field validation and feedback at Hungarian tomato sites; not owning or operating the tool')",
+      "notes": "No secondment planned; constraint is not activated."
     },
     "CC-08": {
       "scope_element_id": "CC-08",
       "constraint_ref": "SR-05",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-08 specifies that if the fellow is recruited in the non-academic sector, the non-academic placement must be at a different non-academic host. No non-academic placement is proposed; this constraint does not apply.",
-      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no non-academic placement described",
-      "notes": "No non-academic placement proposed; constraint inapplicable."
+      "coverage_description": "GF secondment constraints do not apply; the proposal is a European Fellowship. No secondments are planned for this proposal.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Secondments",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (fellowship_type: 'European Fellowship (EF)')",
+      "notes": "European Fellowship; GF-specific secondment constraints not applicable."
     },
     "CC-09": {
       "scope_element_id": "CC-09",
-      "constraint_ref": "SR-05",
+      "constraint_ref": "SR-06",
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-09 addresses disqualification conditions for non-compliant placements (e.g. placement in academic organisation or Third Country). No placement is proposed; CC-09 does not apply.",
-      "tier2b_source_ref": "Scope – Placements in the non-academic sector, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md and strategic_positioning.md — no non-academic placement described",
-      "notes": "No non-academic placement proposed; constraint inapplicable."
+      "coverage_description": "The concept does not include a non-academic sector placement. The optional additional period of up to 6 months for a non-academic placement has not been invoked. AgroVIR provides associated partner field access; it is explicitly described as not owning or operating the tool and is not a formal non-academic placement host.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Placements in the non-academic sector",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — 'AgroVIR (Hungary): farmer access, field validation and feedback at Hungarian tomato sites; not owning or operating the tool')",
+      "notes": "Non-academic placement option not invoked in this proposal."
     },
     "CC-10": {
       "scope_element_id": "CC-10",
       "constraint_ref": "SR-06",
-      "coverage_status": "covered",
-      "coverage_description": "The concept explicitly names digital skills (responsible use of generative AI in environmental modelling and scientific coding), Open Science culture (FAIR data management, open research software), knowledge valorisation, and research integrity as integrated training dimensions. All elements of CC-10 are present in concept_note.md 'Training and career development' section.",
-      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md section '1.3 Supervision, training, two-way transfer of knowledge'",
+      "coverage_status": "not_applicable",
+      "coverage_description": "The constraint that a non-academic placement request must be an integral part of the proposal with added-value justification does not apply; no non-academic placement is included.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Placements in the non-academic sector",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Consortium and identity — AgroVIR described as associated partner, not formal placement host)",
       "notes": null
     },
     "CC-11": {
       "scope_element_id": "CC-11",
-      "constraint_ref": "SR-06",
+      "constraint_ref": "SR-03",
       "coverage_status": "covered",
-      "coverage_description": "The concept explicitly mentions FAIR data management as a training and open-science commitment. Societal engagement is named as a training component. Open research software and a reproducible validation protocol support digital collaboration practices. 'FAIR data management' appears verbatim in concept_note.md.",
-      "tier2b_source_ref": "Scope – Training activities, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section ('FAIR data management' verbatim); strategic_positioning.md section '2.2 Dissemination, exploitation and communication' ('open validation data and protocol')",
+      "coverage_description": "Training activities explicitly integrate key transferable skills including digital skills (generative AI in environmental modelling and scientific coding), Open Science culture (FAIR data, open research software, reproducible validation), knowledge valorisation and innovation/entrepreneurship, and good scientific conduct including research integrity. Cross-reference SR-03.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Training activities",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development section); strategic_positioning.md (§1.3)",
       "notes": null
     },
     "CC-12": {
       "scope_element_id": "CC-12",
-      "constraint_ref": "SR-07",
-      "coverage_status": "covered",
-      "coverage_description": "The concept explicitly states that a Career Development Plan is established jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (months 2–3), covering research objectives, training needs, transferable skills, publications, and teaching (co-supervision of ≥1 MSc thesis). Reviewed and updated at M12 and M24. All elements of CC-12 are addressed.",
-      "tier2b_source_ref": "Scope – Career Development Plan, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "concept_note.md 'Training and career development' section; strategic_positioning.md sections '1.3 Supervision, training, two-way transfer of knowledge' and '2.1 Career perspectives / employability'",
-      "notes": null
+      "constraint_ref": null,
+      "coverage_status": "partially_covered",
+      "coverage_description": "The concept addresses career empowerment (CDP with structured milestones, follow-on ERC-track proposal), FAIR data management, open research software, opening access to publications and research outputs, and societal engagement via AgroVIR outreach to Hungarian tomato growers. However, the concept does not explicitly address collaborative digital tools for information sharing, citizen science, or the specific framing of empowering the fellow for increased research collaboration enabled by new digital technologies.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Training activities",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development — FAIR data management, open research software, reproducible validation); strategic_positioning.md (§2.1 — career milestones; §2.2 — 'open research software, open validation data and protocol'; AgroVIR outreach)",
+      "notes": "Citizen science and collaborative digital tools for information-sharing are not explicitly addressed. FAIR data, open research software, and societal engagement via AgroVIR partially satisfy the requirement; the framing around 'new digital technologies enabling research collaboration' should be strengthened."
     },
     "CC-13": {
       "scope_element_id": "CC-13",
-      "constraint_ref": "SR-08",
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-13 defines Euratom eligibility conditions for nuclear research fellowships. This project addresses agricultural remote sensing, probabilistic machine learning, and irrigation decision support. It does not involve nuclear research. Euratom provisions do not apply.",
-      "tier2b_source_ref": "Scope – Euratom, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json research_domain (['crop_water_stress', 'irrigation_decision_support'])",
-      "notes": "Project domain (agricultural remote sensing, probabilistic ML, irrigation optimisation) is unrelated to Euratom research areas. SR-08 is non-mandatory."
+      "constraint_ref": "SR-04",
+      "coverage_status": "covered",
+      "coverage_description": "Career Development Plan confirmed as jointly established by supervisor and fellow, comprising research objectives, training and career needs (transferable skills, ≥3 peer-reviewed publications, MSc co-supervision, open science activities). CDP is explicitly committed for submission as a project deliverable at the start of the action (months 2–3) with reviews at M12 and M24. Cross-reference SR-04.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Career Development Plan",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "concept_note.md (Training and career development section); strategic_positioning.md (§1.3 — 'Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2–3), then reviewed and updated at M12 and M24'; §2.1 — publication and training milestones)",
+      "notes": null
     },
     "CC-14": {
       "scope_element_id": "CC-14",
-      "constraint_ref": "SR-09",
+      "constraint_ref": null,
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-14 describes ERA Fellowships for researchers undertaking fellowships in widening countries under Work Programme Annex 11. This proposal is framed as a standard European Fellowship; it does not invoke Annex 11 ERA Fellowship provisions.",
-      "tier2b_source_ref": "Scope – ERA Fellowships, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json fellowship_type ('European Fellowship (EF)') — no ERA Fellowship designation",
-      "notes": "SR-09 is non-mandatory; ERA Fellowship framing is not invoked by this concept. If Hungary qualifies as a widening country under Annex 11, this provision could optionally be explored in a future revision."
+      "coverage_description": "The project research domain is crop water stress monitoring and irrigation decision support for tomato, using geoinformatics, remote sensing, probabilistic machine learning, and plant physiology. It does not involve nuclear research or any Euratom-covered research area.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — Euratom",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (research_domain: ['crop_water_stress', 'irrigation_decision_support']; keywords do not include nuclear or Euratom-relevant terms)",
+      "notes": "Euratom-specific eligibility conditions not applicable to this project's research domain."
     },
     "CC-15": {
       "scope_element_id": "CC-15",
-      "constraint_ref": null,
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-15 references admissibility conditions in Annex A and E governing submission format, page limits, and layout. These are submission-time administrative requirements, not concept design decisions. They cannot be evaluated at the Phase 2 concept alignment stage.",
-      "tier2b_source_ref": "Admissibility Conditions, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": null,
-      "notes": "Admissibility conditions are verified at submission; not assessable at concept alignment stage."
+      "constraint_ref": "SR-07",
+      "coverage_status": "partially_covered",
+      "coverage_description": "ELTE is located in Budapest, Hungary, which qualifies as a widening country under Horizon Europe. The ERA Fellowship designation providing specific support for fellowships in widening countries is therefore structurally available to this proposal. However, the concept does not explicitly invoke widening participation, ERA Fellowship designation, or address the widening-country framing of spreading excellence and fostering balanced brain circulation. The host country condition is met but the optional ERA Fellowship strategic dimension is absent from the concept text.",
+      "tier2b_source_ref": {
+        "source_section": "Scope — ERA Fellowships",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (host_organisation.country: 'Hungary', host_organisation.country_code: 'HU')",
+      "notes": "ERA Fellowship is an optional mechanism (SR-07 mandatory:false). Hungary qualifies as a widening country, making ERA Fellowship designation available, but the concept does not invoke this framing. Flagged as partially_covered to alert that widening-country positioning could be incorporated to strengthen the proposal's ERA eligibility claim."
     },
     "CC-16": {
       "scope_element_id": "CC-16",
       "constraint_ref": null,
-      "coverage_status": "covered",
-      "coverage_description": "Host country is Hungary (EU Member State, unambiguously eligible under Horizon Europe). Fellow is from Bulgaria (EU Member State, eligible for EF under the any-nationality rule). Both countries are fully eligible Horizon Europe participants.",
-      "tier2b_source_ref": "Eligible Countries, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": "project_summary.json host_organisation.country ('Hungary', country_code 'HU'), researcher.country_of_origin ('BG')",
-      "notes": null
+      "coverage_status": "not_applicable",
+      "coverage_description": "Admissibility conditions in Annexes A and E are procedural submission requirements governing page limits, layout, and formal admissibility. These are not substantive concept content alignment targets.",
+      "tier2b_source_ref": {
+        "source_section": "Admissibility Conditions",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": null,
+      "notes": "Procedural admissibility constraint; not a substantive concept coverage target."
     },
     "CC-17": {
       "scope_element_id": "CC-17",
       "constraint_ref": null,
-      "coverage_status": "not_applicable",
-      "coverage_description": "CC-17 references award criteria and scoring thresholds in Annex D. These govern the evaluation process and are not concept design decisions. Not assessable at concept alignment stage.",
-      "tier2b_source_ref": "Award Criteria / Scoring Thresholds, HORIZON-MSCA-2026-PF-01-01.slice.json",
-      "tier3_evidence_ref": null,
-      "notes": "Award criteria are evaluator-facing and govern scoring methodology, not proposal design."
+      "coverage_status": "covered",
+      "coverage_description": "Both Hungary (host country, ELTE) and Bulgaria (fellow's country of origin, Dr. Cholakova) are EU Member States, automatically eligible for Horizon Europe participation under Annex B. No special national provisions are required.",
+      "tier2b_source_ref": {
+        "source_section": "Eligible Countries",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
+      "tier3_evidence_ref": "project_summary.json (host_organisation.country: 'Hungary', host_organisation.country_code: 'HU'; researcher.country_of_origin: 'BG')",
+      "notes": null
     },
     "CC-18": {
       "scope_element_id": "CC-18",
       "constraint_ref": null,
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-18 references submission and evaluation process described in Annex F. These are procedural requirements governing how proposals are submitted and evaluated, not concept design decisions.",
-      "tier2b_source_ref": "Submission and Evaluation Process, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "coverage_description": "The single-stage submission model and the deadline of 2026-09-09 are procedural submission constraints. They are not substantive concept content requirements for concept alignment.",
+      "tier2b_source_ref": {
+        "source_section": "deadline_model / deadlines",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
       "tier3_evidence_ref": null,
-      "notes": "Procedural submission requirements; not assessable at concept alignment stage."
+      "notes": "Procedural submission deadline; not a concept alignment target."
     },
     "CC-19": {
       "scope_element_id": "CC-19",
       "constraint_ref": null,
       "coverage_status": "not_applicable",
-      "coverage_description": "CC-19 states the single-stage deadline (2026-09-09) and indicative call budget (EUR 59,857,539 for 2026). These are call administration parameters, not concept design requirements.",
-      "tier2b_source_ref": "Deadline / Budget Year Map, HORIZON-MSCA-2026-PF-01-01.slice.json",
+      "coverage_description": "Submission and evaluation process (Annex F) and award criteria, scoring and thresholds (Annex D) are procedural cross-references to General Annexes. They are not substantive concept content requirements.",
+      "tier2b_source_ref": {
+        "source_section": "Submission and Evaluation Process / Award Criteria, Scoring and Thresholds",
+        "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json"
+      },
       "tier3_evidence_ref": null,
-      "notes": "Call deadline and budget are process parameters; not concept design decisions. Deadline compliance is an operational matter confirmed at submission."
+      "notes": "Procedural cross-references; not substantive concept alignment targets."
     }
   },
   "scope_conflict_log": [],
-  "strategic_differentiation": "This MSCA Postdoctoral Fellowship proposal differentiates on two interlocking planes within the single-researcher, single-beneficiary MSCA-PF evaluation frame. First, at the research level: the project targets the single empty cell in a systematic literature review's research-gap matrix — Real-Time Decision Support × PlanetScope — and claims a deliberately narrow, defensible novelty: no prior work couples learned multimodal fusion with explicit probabilistic crop-water-state estimation and economically optimised irrigation decision-making end-to-end for row crops. The distinguishing posture is the honest, end-to-end uncertainty chain carried from multi-sensor observation through probabilistic diagnosis to profit-maximising counterfactual decision, argued against specific precedents (Bayesian Maximum Entropy, copula-based scheduling, dynamic Bayesian networks, MF-FusionNet) that each address part of the chain but not all three stages together. The edge is not 'using satellites for irrigation' but the integrity of uncertainty propagation across the full chain. Second, at the methodological risk management level: the design is risk-managed by construction through two interchangeable diagnostic routes — a rigorous one-step probabilistic fusion route (Route A, direct probabilistic fusion via Bayesian hierarchical model or Gaussian process) and a lighter homogeneous-patch proxy route (Route B, sidesteps the sub-pixel resolution problem) — sharing one decision engine, so no single methodological failure can halt the research programme. Objectives are measurable against a defined validation protocol (uncertainty calibration: whether 90% prediction intervals contain truth ~90% of the time; decision quality) rather than asserted. At the researcher and hosting level, differentiation derives from a genuine two-way knowledge transfer: the fellow brings the peer-reviewed uncertainty-aware AquaCrop calibration method to ELTE's environmental-modelling group, and takes up the host's geoinformatics and field-validation competences in return — a knowledge exchange evidenced by specific deliverables (methods seminars, co-supervised MSc thesis) rather than asserted generically. Open-science commitments (open validation data and protocol, open research software, FAIR data management) are integral to the research design and serve the validation transparency argument, not merely compliance."
+  "strategic_differentiation": "The proposal's research differentiation is the defensible end-to-end coupling of three capabilities the reviewed literature reports as underdeveloped in combination: (1) learned multimodal fusion of multi-source Earth observation (Sentinel-1 SAR, Sentinel-2 optical, PlanetScope high-resolution imagery, ERA5 meteorological reanalysis) and field sensors, (2) explicit probabilistic crop-water-state estimation (root-zone soil moisture and crop water status for tomato, with uncertainty carried honestly from observation through the model), and (3) water-use-efficiency-oriented irrigation decision optimisation via uncertainty-aware AquaCrop calibration and counterfactual simulation over weather ensembles. The targeted novelty occupies the single empty cell in the systematic literature review's research-gap matrix — Real-Time Decision Support × PlanetScope — argued narrowly and defended against 50 reviewed studies rather than asserted. The methodological commitment distinguishing this proposal from related work is the honest uncertainty chain from multi-sensor observation to irrigation decision: every model output reports not only what the field state is but how certain that estimate is, and that uncertainty propagates all the way into the decision. Objectives are measurable against a defined validation protocol (90% prediction-interval coverage on the validation set as the calibration criterion; Route B patch covariation proven by co-located seasonal campaign), not merely asserted. The researcher-and-host differentiation rests on a unique disciplinary pairing unavailable in a single-discipline fellowship: Dr. Rositsa Cholakova (plant physiologist, non-destructive evaluation of drought-stressed tomato plants — PhD summa cum laude 2020 — provides the biological ground truth engine, RQ4) is hosted in the geoinformatics and remote sensing group at ELTE Budapest under Dr. András Jung (remote sensing, hyperspectral imaging, field spectroscopy, multisensor-drone fusion), creating a genuine two-way knowledge transfer in which neither partner's disciplinary capability alone is sufficient for the end-to-end framework. The proposal is framed as a European Fellowship at ELTE Budapest, Hungary (intra-EU, Bulgaria → Hungary, 24 months), with Earth-observation data access confirmed (PlanetScope via Planet platform/API; Sentinel-1/2 open data; ERA5 reanalysis) and Hungarian tomato field access secured via associated partner AgroVIR. Research output is a TRL 3–4 research prototype, proportionate to a 24-month fellowship and appropriate to the novelty claim."
 }

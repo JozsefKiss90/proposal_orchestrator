@@ -1,10 +1,10 @@
 {
   "schema_id": "orch.phase4.scheduling_constraints.v1",
-  "run_id": "msca-pf-syn-01",
-  "source_wp_structure_run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
+  "source_wp_structure_run_id": "msca-pf-real-01",
   "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-  "normalization_timestamp": "2026-07-14T19:24:19.594587+00:00",
-  "project_duration_months": 36,
+  "normalization_timestamp": "2026-07-16T20:46:12.582515+00:00",
+  "project_duration_months": 24,
   "wp_bounds": {
     "WP1": {
       "start_month": 1,
@@ -30,36 +30,8 @@
   "strict_constraints": [],
   "non_strict_constraints": [
     {
-      "from": "WP1",
-      "to": "WP2",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M14, WP2 starts M6"
-    },
-    {
-      "from": "WP1",
-      "to": "WP3",
-      "original_edge_type": "finish_to_start",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M14, WP3 starts M8"
-    },
-    {
       "from": "T1-03",
       "to": "T2-01",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "T1-03",
-      "to": "T2-03",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "T1-03",
-      "to": "T3-01",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
@@ -72,22 +44,8 @@
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
-      "from": "T1-03",
-      "to": "T5-02",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "T2-03",
-      "to": "T5-02",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "T3-02",
-      "to": "T5-02",
+      "from": "T1-02",
+      "to": "T3-03",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
@@ -96,48 +54,8 @@
   "normalization_log": [
     {
       "edge": {
-        "from": "WP1",
-        "to": "WP2"
-      },
-      "original_type": "finish_to_start",
-      "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M14, WP2 starts M6"
-    },
-    {
-      "edge": {
-        "from": "WP1",
-        "to": "WP3"
-      },
-      "original_type": "finish_to_start",
-      "normalized_type": "non_strict",
-      "action": "reclassified",
-      "reason": "WP-level finish_to_start infeasible: WP1 ends M14, WP3 starts M8"
-    },
-    {
-      "edge": {
         "from": "T1-03",
         "to": "T2-01"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "T1-03",
-        "to": "T2-03"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "T1-03",
-        "to": "T3-01"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",
@@ -156,28 +74,8 @@
     },
     {
       "edge": {
-        "from": "T1-03",
-        "to": "T5-02"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "T2-03",
-        "to": "T5-02"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "T3-02",
-        "to": "T5-02"
+        "from": "T1-02",
+        "to": "T3-03"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",
