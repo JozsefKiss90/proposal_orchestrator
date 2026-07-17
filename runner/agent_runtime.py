@@ -1097,13 +1097,25 @@ def run_agent(
         _spine_path = (
             repo_root / SECTION_DRAFTS_ROOT_REL / _slug / SPINE_FILENAME
         )
+        # Reuse the existing drafts ONLY if they belong to the CURRENT run.  A
+        # spine from a different run_id is stale (e.g. left over from a prior
+        # run on other data); reusing it makes the assembler reject it as stale.
+        # Stale or unreadable → fall through and re-draft (overwriting it).
+        _spine_fresh = False
         if _spine_path.is_file():
+            try:
+                _spine_fresh = json.loads(
+                    _spine_path.read_text(encoding="utf-8-sig")
+                ).get("run_id") == run_id
+            except (OSError, json.JSONDecodeError, ValueError):
+                _spine_fresh = False
+        if _spine_fresh:
             all_invocations.append(
                 SkillInvocationRecord(
                     skill_id=f"decomposed-drafting:{_slug}",
                     status="reuse_skipped",
                     failure_reason=(
-                        "Decomposed drafting reused (section_spine.json "
+                        "Decomposed drafting reused (current-run section_spine "
                         "present; delete section_drafts/<slug>/ to re-draft)"
                     ),
                 )

@@ -2120,7 +2120,10 @@ class TestDecomposedDraftingLiveWiring:
             tmp_path / SECTION_DRAFTS_ROOT_REL / "excellence" / SPINE_FILENAME
         )
         spine.parent.mkdir(parents=True, exist_ok=True)
-        spine.write_text("{}", encoding="utf-8")
+        # Reuse requires the spine to belong to the CURRENT run.
+        spine.write_text(
+            json.dumps({"run_id": "run-test-001"}), encoding="utf-8"
+        )
 
         kwargs = _make_agent_env(
             tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
@@ -2144,6 +2147,44 @@ class TestDecomposedDraftingLiveWiring:
             if r.skill_id == "decomposed-drafting:excellence"
         )
         assert rec.status == "reuse_skipped"
+
+    def test_stale_run_spine_forces_redraft(self, tmp_path: Path) -> None:
+        # A spine from a DIFFERENT run_id is stale — it must NOT be reused
+        # (reusing it makes the assembler reject stale drafts).  Regression for
+        # the msca-pf-syn-01 → msca-pf-real-01 stale-draft failure.
+        from runner.section_assembler import (
+            SECTION_DRAFTS_ROOT_REL,
+            SPINE_FILENAME,
+        )
+        spine = (
+            tmp_path / SECTION_DRAFTS_ROOT_REL / "excellence" / SPINE_FILENAME
+        )
+        spine.parent.mkdir(parents=True, exist_ok=True)
+        spine.write_text(
+            json.dumps({"run_id": "some-prior-run"}), encoding="utf-8"
+        )
+
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock(
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ]
+        )
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_called_once()  # stale spine → re-drafted, not reused
 
 
 class TestBudgetGateArtifactReadinessInstrumentConditional:

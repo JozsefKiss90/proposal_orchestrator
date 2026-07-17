@@ -273,7 +273,10 @@ def _default_claude_drafter(repo_root: Path) -> SubSectionDrafter:
             "in the canonical reference pack (docs/tier4_orchestration_state/"
             "phase_outputs/phase8_drafting_review/canonical_reference_pack.json)"
             " — never paraphrase, shorten, or append parenthetical annotations "
-            "or provenance tags to it. Draft this "
+            "or provenance tags to it. Do not state a deliverable's due month, "
+            "or a work-package or milestone month, unless it matches the "
+            "canonical reference pack exactly — omit the month rather than "
+            "guess. Draft this "
             "sub-section IN FULL at evaluator depth (do not summarise; the "
             "monolithic length ceiling has been lifted). Return a SINGLE JSON "
             "object (begin with '{', end with '}', no markdown fence) with "
@@ -432,7 +435,7 @@ def source_section_extra_fields(repo_root: Path, slug: str) -> dict[str, Any]:
         ]
         dp = arch.get("dissemination_plan") or {}
         ep = arch.get("exploitation_plan") or {}
-        dp_txt = json.dumps(dp, ensure_ascii=False).lower()
+        arch_txt = json.dumps(arch, ensure_ascii=False).lower()
         return {
             "impact_pathway_refs": refs,
             "dec_coverage": {
@@ -442,8 +445,11 @@ def source_section_extra_fields(repo_root: Path, slug: str) -> dict[str, Any]:
                 "exploitation_addressed": bool(
                     ep.get("activities") if isinstance(ep, dict) else ep
                 ),
+                # Communication is part of the Phase-5 DEC check (its skill is
+                # dissemination-exploitation-COMMUNICATION-check); look across
+                # the whole impact architecture, not just dissemination_plan.
                 "communication_addressed": (
-                    "communication" in dp_txt
+                    "communication" in arch_txt
                     or bool(arch.get("communication_plan"))
                 ),
             },
