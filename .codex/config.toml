@@ -1,0 +1,25 @@
+[mcp_servers.filesystem]
+command = "npx.cmd"
+args = [
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    'C:\Code\proposal_demo\proposal_orchestrator',
+]
+
+[mcp_servers.mcpvault]
+command = "npx.cmd"
+args = [
+    "-y",
+    "@bitbonsai/mcpvault@latest",
+    'C:\Code\proposal_demo\proposal_orchestrator',
+]
+
+[mcp_servers.smart-connections]
+command = "npx.cmd"
+args = [
+    "-y",
+    "@yejianye/smart-connections-mcp",
+]
+
+[mcp_servers.smart-connections.env]
+OBSIDIAN_VAULT = 'C:\Code\proposal_demo\proposal_orchestrator'

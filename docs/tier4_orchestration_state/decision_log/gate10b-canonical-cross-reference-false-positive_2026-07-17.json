@@ -1,0 +1,34 @@
+{
+  "record_type": "decision",
+  "id": "gate10b-canonical-cross-reference-false-positive",
+  "date": "2026-07-17",
+  "authority": "Diagnostic finding during the 13B real-data Phase 8 run (run_id msca-pf-real-01). Predicate bug-fix, not a constitutional amendment and not a gate relaxation.",
+
+  "trigger": "Phase 8 run: n08a_excellence_drafting drafted and passed gate_10a (released); n08b_impact_drafting drafted successfully (agent status=success) but its exit gate gate_10b_impact_completeness FAILED on a single predicate, g09b_p10 = canonical_terms_preserved, reporting '2 term(s) with wrong titles' for WP2 and WP3.",
+
+  "finding": "FALSE POSITIVE in the canonical_terms_preserved predicate — not a drafter error and not a real canonical violation.",
+
+  "evidence": {
+    "flagged_prose": "The impact section drafted one enumerating sentence: '... WP2 (D2-01: Decision engine and demonstrator software), and WP3 (D3-01: Field validation dataset and uncertainty calibration report) produce genuine original scientific and technical additions ...'. Elsewhere in the same section WP2 and WP3 are cited with their correct canonical titles ('WP2 (Uncertainty-aware decision engine and demonstrator integration)', 'WP3 (Field validation, ground truth and uncertainty calibration)') multiple times.",
+    "canonical_pack": "canonical_reference_pack.json: WP2.title='Uncertainty-aware decision engine and demonstrator integration'; D2-01.title='Decision engine and demonstrator software' (parent_wp WP2). WP3.title='Field validation, ground truth and uncertainty calibration'; D3-01.title='Field validation dataset and uncertainty calibration report' (parent_wp WP3).",
+    "conclusion": "The flagged appositives are each the EXACT deliverable id + EXACT canonical deliverable title of the WP's own deliverable. The drafter reproduced canonical titles verbatim and cross-referenced a deliverable — the precise behaviour the canonical-preservation requirement demands. Nothing was shortened, paraphrased, or fabricated."
+  },
+
+  "root_cause": "canonical_terms_preserved uses _find_appositives(wp_id, content) + a bidirectional 50%-shared-word heuristic (_is_title_attempt). A deliverable appositive 'D2-01: Decision engine and demonstrator software' shares 'decision engine'/'demonstrator' with WP2's canonical title, so the heuristic mistook a legitimate deliverable cross-reference for a botched attempt to state WP2's own title. The predicate had no notion of 'this appositive is a reference to a DIFFERENT canonical entity'.",
+
+  "fix": {
+    "file": "runner/predicates/phase8_section_predicates.py",
+    "change": "Added helper _appositive_is_other_entity(appos, pack_data, exclude_id) and guarded all three title loops (objective, outcome, WP). An appositive is treated as a legitimate cross-reference (and NOT flagged as the checked entity's title) when it either (a) begins with another canonical entity's id (e.g. 'D2-01: ...'), or (b) verbatim-contains another entity's full canonical title. A wrong title INSIDE an explicit deliverable reference remains the deliverable-title predicate's concern.",
+    "why_not_gate_weakening": "Per §13.7, gates may not be weakened to admit incomplete/incorrect work. Here the work is CORRECT and the gate was WRONG: the drafter preserved canonical titles exactly. The guard is deliberately tight — it excludes only verbatim cross-references (id-prefixed, or full-title-containing). A genuine shortening/paraphrase of the checked entity's own title (e.g. 'WP2 (decision engine)') carries no other entity's id and contains no other entity's full title, so it is STILL flagged. This makes the predicate correct, not lax.",
+    "why_not_content_edit": "Hand-editing the impact section to satisfy a buggy check would patch correct output and would be reintroduced by any re-draft; and per §11.4/§13.10 deliverables are engine output, not hand-authored. The defect was in the check, so the check was fixed."
+  },
+
+  "verification": {
+    "real_artifact": "canonical_terms_preserved(impact_section.json, canonical_reference_pack.json) now returns passed=True (previously failed with 2 wp_title issues).",
+    "unit_tests": "tests/runner/predicates/test_phase8_section_predicates.py — 34 passed. Added test_wp_id_deliverable_cross_reference_passes (branch a) and test_wp_id_unlabelled_other_full_title_passes (branch b); the pre-existing test_wp_id_wrong_title_fails still fails as designed (real shortening still caught)."
+  },
+
+  "operational_effect": "n08b_impact_drafting reset to pending in .claude/runs/msca-pf-real-01/run_manifest.json (runtime state, §9.2). On re-run its fresh impact drafts (section_spine run_id=msca-pf-real-01) are reused (no re-draft); audits re-run; gate_10b re-evaluates and now passes. Excellence (n08a) stays released; implementation (n08c) stays released. Downstream n08d assembly then becomes eligible.",
+
+  "constitutional_note": "§13.3 upheld (no project fact invented). §13.7 upheld (gate not weakened; false positive corrected). §12.4 upheld (the gate failure was a valid, honest output that surfaced a predicate defect rather than being papered over)."
+}

@@ -1,18 +1,18 @@
 {
   "gate_id": "gate_10a_excellence_completeness",
   "gate_kind": "exit",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:7a841bb36fd0b1d6400c7b9ddcc4f1db0cb6e2c6e915c92aee0fb9c63a8d2daa",
+  "input_fingerprint": "sha256:c230d6543167922ea43e158aea0944b96f3dbd7f9f44299590b036eedb3352fc",
   "input_artifact_fingerprints": {
-    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:365fc0999cdc819fc258af84e07deacf6601e94ef92c036b9b543b44fb8d9e02",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:5c7c602aaec4e129f47bacb16715d7fd41550736979a0c48fc84300c4f7d36a5"
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:7c0138610c92af2b2aab1f03731760fc232f2ef2069c3740fa251d12ee42d88c",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:24523d73db959de3b576a10d55125927bd224060b5b67e77eef75538e697ef12"
   },
-  "evaluated_at": "2026-07-15T17:16:31.365733+00:00",
+  "evaluated_at": "2026-07-17T15:46:47.344450+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g09a_p02",
@@ -21,92 +21,19 @@
       "g09a_p04",
       "g09a_p05",
       "g09a_p05b",
+      "g09a_p06",
+      "g09a_p07",
       "g09a_p08",
+      "g09a_p09",
       "g09a_p10",
       "g09a_p11"
     ],
-    "failed": [
-      {
-        "predicate_id": "g09a_p06",
-        "type": "coverage",
-        "function": "no_unresolved_material_claims",
-        "args": {
-          "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json"
-        },
-        "failure_category": "POLICY_VIOLATION",
-        "reason": "Unresolved material claims in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: validation_status.overall_status is 'unresolved'",
-        "details": {
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "overall_status": "unresolved"
-        },
-        "fail_message": "Excellence section contains unresolved material claims (validation_status.overall_status is \"unresolved\").\n",
-        "prose_condition": "No unresolved material claims in Excellence section"
-      },
-      {
-        "predicate_id": "g09a_p07",
-        "type": "coverage",
-        "function": "partner_names_preserved",
-        "args": {
-          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-        },
-        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Partner name issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 1 issue(s)",
-        "details": {
-          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
-          "issues": [
-            {
-              "partner": "FELLOW",
-              "expected_legal_name": "Dr. Mariya Petrova [SYNTHETIC]",
-              "found_truncated": "Dr. Mariya Petrova",
-              "issue": "Legal name for FELLOW appears truncated: found 'Dr. Mariya Petrova' instead of 'Dr. Mariya Petrova [SYNTHETIC]'"
-            }
-          ]
-        },
-        "fail_message": "Excellence section uses partner short names without their canonical legal names from the reference pack.\n",
-        "prose_condition": "Partner names preserved from canonical reference pack"
-      },
-      {
-        "predicate_id": "g09a_p09",
-        "type": "coverage",
-        "function": "canonical_terms_preserved",
-        "args": {
-          "section_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-        },
-        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
-        "reason": "Canonical term issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: 2 term(s) with wrong titles",
-        "details": {
-          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
-          "issues": [
-            {
-              "term_type": "objective_title",
-              "id": "OBJ-4",
-              "canonical_title": "Standalone research demonstrator (web MVP)",
-              "found_title": "Standalone research demonstrator** (Inferred from vault synthesis",
-              "issue": "Objective OBJ-4 has wrong title attached: found 'Standalone research demonstrator** (Inferred from vault synthesis', expected 'Standalone research demonstrator (web MVP)'"
-            },
-            {
-              "term_type": "wp_title",
-              "id": "WP3",
-              "canonical_title": "Field validation, ground truth and uncertainty calibration",
-              "found_title": "Field validation design and uncertainty calibration assessment (T3-01, T3-02",
-              "issue": "WP WP3 has wrong title attached: found 'Field validation design and uncertainty calibration assessment (T3-01, T3-02', expected 'Field validation, ground truth and uncertainty calibration'"
-            }
-          ]
-        },
-        "fail_message": "Excellence section shortens or paraphrases canonical objective or WP titles from the reference pack.\n",
-        "prose_condition": "Canonical objective and WP titles preserved"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
 }
