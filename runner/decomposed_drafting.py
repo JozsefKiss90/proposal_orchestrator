@@ -180,7 +180,9 @@ def _build_draft(
     content = produced.get("content")
     if not isinstance(content, str) or not content.strip():
         raise DecomposedDraftingError(
-            f"drafter for sub-section {sub_id!r} produced no 'content' prose"
+            f"drafter for sub-section {sub_id!r} produced no 'content' prose "
+            f"(returned keys: {sorted(map(str, produced.keys()))}; "
+            f"content type: {type(content).__name__})"
         )
 
     claim_statuses = produced.get("claim_statuses", [])

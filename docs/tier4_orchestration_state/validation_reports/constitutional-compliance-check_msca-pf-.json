@@ -1,112 +1,122 @@
 {
-  "report_id": "compliance_check_phase7_budget_gate_assessment_compliance_validator_20260717T000000Z",
+  "report_id": "compliance_check_implementation_section_implementation_writer_2026-07-17T120000Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "implementation_writer",
   "run_id_reference": "msca-pf-real-01",
-  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing. Annex templates govern post-award implementation reporting. Application form templates (Tier 2A) govern proposal writing.",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact uses schema_id 'orch.tier5.implementation_section.v1', which is the canonical application form schema. No reference to 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' appears as a structural authority anywhere in the content or traceability_footer. The structural organisation (WP1–WP5, milestones, risk register, management structure) reflects application form section 3 structure, not a Grant Agreement annex."
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "Call requirement claims in the artifact (SR-01, SR-02 mobility requirement; SR-03 mandatory transferable-skills dimensions; SR-04 Career Development Plan at start of action; SR-05/SR-06 optionality of secondment and placement; MSCA-PF structural WP4/WP5 requirement) each carry claim_statuses source_refs pointing to 'docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json'. The traceability_footer.primary_sources[] includes 'docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json', 'docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json', and 'docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json'. The artifact provides Tier 2B source references for all call requirement claims within the artifact's traceability infrastructure. No call constraint claim was identified as lacking a Tier 2B traceability reference in either the claim_statuses or the traceability_footer."
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3.",
-      "check_status": "violation",
-      "violation_evidence": "The artifact's partner_coverage_results entry for HOST states: 'HOST (ELTE) is the sole beneficiary receiving the grant disbursement; all unit-cost disbursement flows to HOST as grant agreement signatory; management_and_indirect line_item structurally present with status Confirmed; HOST administrative, institutional support, and WP3/WP4/WP5 contributing-partner activities covered under this line'. The institutional name 'ELTE' is a specific project-fact claim identifying a named partner by institutional identity. The artifact contains no traceability_footer field and provides no primary_sources[] reference pointing to any path within docs/tier3_project_instantiation/ for this claim. Per CLAUDE.md §13.3 and check 13.3 of this skill specification, a project-fact claim naming a specific partner (by name or identifier) without a Tier 3 source reference in the artifact's traceability footer constitutes a violation. This skill does not read docs/tier3_project_instantiation/ directly; it checks only whether the artifact provides a Tier 3 source reference. No such reference exists in the artifact.",
-      "severity": "critical"
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, or equipment — not present in Tier 3",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "All named project-specific facts — Dr. Rositsa Cholakova (fellow), Dr. András Jung (supervisor), AgroVIR (associated partner), Eötvös Loránd University (ELTE) (host/sole beneficiary), RQ1–RQ10 operator decisions, WP structure, task assignments, deliverables, milestones, and risk register — are traced in claim_statuses to Tier 3 documents: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json, docs/tier3_project_instantiation/project_brief/project_summary.json, docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json, docs/tier3_project_instantiation/architecture_inputs/risks.json, docs/tier3_project_instantiation/architecture_inputs/objectives.json, docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json, docs/tier3_project_instantiation/call_binding/selected_call.json, docs/tier3_project_instantiation/project_brief/concept_note.md, and docs/tier3_project_instantiation/project_brief/strategic_positioning.md. The traceability_footer.primary_sources[] contains all of the above Tier 3 paths. No project-fact claim was identified as lacking a Tier 3 source reference."
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed.",
-      "check_status": "pass",
-      "violation_evidence": null,
-      "severity": null
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
+      "check_status": "violation",
+      "violation_evidence": "The artifact schema_id 'orch.tier5.implementation_section.v1' identifies this as a Phase 8 Tier 5 deliverable. The artifact contains person-month budget-figure references used as confirmed values, matching the '[0-9]+ person-months' scan pattern specified for check 13.4: 'The fellow's 24 person-months are distributed across the five work packages and sum to exactly 24'; '8 PM to WP1, the largest block'; '7 PM to WP2'; '5 PM to WP3'; '2 PM each to WP4 and WP5'; 'The fellow's 24 person-months are allocated as follows: 8 PM to WP1 ... 7 PM to WP2 ... 5 PM to WP3 ... 2 PM each to WP4 and WP5'. The budget gate assessment file at 'docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json' could not be read due to TAPM input boundary constraints ('Read ONLY CLAUDE.md and the file at artifact_path. Do not recursively read docs/tier4_orchestration_state/phase_outputs/ or any other phase output directory'). Per CLAUDE.md §15, the system must prefer explicit gate failure over fabricated completion: inability to confirm the budget gate passed is equivalent to inability to confirm the gate condition is satisfied. Note: for MSCA-PF as a unit-cost instrument, person-month figures are also Tier 3 structural project design facts (sourced from docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json), and no monetary euro-denominated budget figures (€[0-9]+, [0-9]+ EUR) were found in the artifact. The severity is assessed as major rather than critical because the person-month figures match the scan pattern but are dually traceable to Tier 3 structural outputs (Phase 3/4), and the budget gate file's pass/fail status could not be positively confirmed either way due to TAPM boundary constraints. Human operator verification of budget_gate_assessment.json gate_pass_declaration is required before this check can be definitively resolved.",
+      "severity": "major"
     },
     {
       "prohibition_id": "13.5",
-      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent runtime behaviour during execution, not the content of a written phase output artifact. The artifact at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json is itself a durable Tier 4 record, which evidences that at least the gate_pass_declaration decision was written to Tier 4. Enforcement of whether all durable decisions were written is outside the scope of post-hoc artifact inspection by this skill.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not directly verifiable from artifact content alone. This prohibition is enforced by the decision-log-update skill and the orchestration runtime, not by reading a Tier 5 output artifact. Check recorded as pass per skill specification: check is structurally non-applicable to artifact-level audit."
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by redefining phase meanings, tier meanings, or gate logic",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs workflow and skill scope at design time. The artifact is a Phase 7 budget gate assessment output, not a workflow or skill definition. Inspection of the artifact's instrument_type_note finds the statement 'for unit-cost instruments the constitution (CLAUDE.md §10.2: skills are not authorities) supersedes that step', which is a correct application of the CLAUDE.md authority hierarchy (CLAUDE.md §3, Priority 2 above skills at Priority 9) and does not constitute a skill expanding its own scope to redefine gate logic.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not directly verifiable from artifact content alone. This prohibition applies to workflow and skill definitions, not to the content of a Tier 5 deliverable artifact. Check recorded as pass per skill specification: check is structurally non-applicable to artifact-level audit."
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null
+      "severity": null,
+      "check_notes": "The artifact's traceability_footer.primary_sources[] references upstream phase outputs in proper sequential order: phase3_wp_design/wp_structure.json (Phase 3), phase4_gantt_milestones/gantt.json (Phase 4), phase6_implementation_architecture/implementation_architecture.json (Phase 6), and phase8_drafting_review/canonical_reference_pack.json (Phase 8). No reference to a phase output higher in number than Phase 8 was found, and no claim suggests that a downstream phase output was used as an input to produce this artifact. The dependency chain is consistent with the canonical phase sequence (Phases 3 → 4 → 6 → 8)."
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to this artifact type: the artifact is a Phase 7 budget gate assessment (schema_id: orch.phase7.budget_gate_assessment.v1), not a Tier 5 proposal section or assembled draft. §13.8 governs finalized proposal text. No proposal text is present in this artifact.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "The artifact's validation_status.overall_status is 'inferred', not 'unresolved'. All 60+ entries in claim_statuses are either 'confirmed' or 'inferred'; none are 'unresolved'. The 'inferred' overall_status is consistent with the presence of inferred claims (C06, C11, C16, C19, C27, C32, C33, C35, C36, C-13, C-20, C-29) whose inference chains are traceable. The artifact does not present finalized text with unresolved claims that lack explicit flagging. Notable acknowledged gaps: specific CDP targets (publication counts, training hours) are explicitly deferred to the CDP deliverable at month 3 and flagged in C17 as intentionally not pre-asserted. The artifact handles this correctly by stating 'that are intentionally not pre-asserted in this proposal; none were operator-provided at proposal stage.'"
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
-      "check_status": "pass",
-      "violation_evidence": null,
-      "severity": null
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible",
+      "check_status": "violation",
+      "violation_evidence": "The artifact makes two regulatory claims referencing EU/Horizon Europe rules that lack Tier 1 normative framework source references in traceability_footer.primary_sources[]: (1) 'Eötvös Loránd University (ELTE), Budapest, as a higher education establishment in an EU Member State, is required to have a gender equality plan in place at grant signature and throughout the fellowship' — this is a mandatory legal requirement under Art. 17 of Regulation (EU) 2021/695 (Horizon Europe Framework Programme Regulation), a Tier 1 normative document. The corresponding claim_statuses (C-04 references 'docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json'; C36 references 'docs/tier3_project_instantiation/call_binding/confirmation_checklist.json') trace this to Tier 4 and Tier 3 respectively, not to Tier 1. (2) 'ELTE, as sole beneficiary and the legal entity that signs the grant agreement' and 'institutional compliance with grant agreement obligations, including financial management, reporting to the European Commission' reference grant agreement structural obligations without a Tier 1 source reference. The traceability_footer.primary_sources[] contains NO entry with a path within 'docs/tier1_normative_framework/extracted/'. Per CLAUDE.md §13.9 and §10.6, regulatory claims about Horizon Europe participation conditions and grant agreement obligations require Tier 1 source references; absent those references, the claims rest on agent-local programme knowledge rather than on documented Tier 1 sources.",
+      "severity": "major"
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4.",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1–4",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to this artifact type: the artifact is a Phase 7 Tier 4 orchestration state artifact (docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json), not a Tier 5 deliverable. §13.10 governs Tier 5 outputs only.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "The artifact's traceability_footer.no_unsupported_claims_declaration is true. All 60+ entries in claim_statuses carry source_refs to Tier 2B, Tier 3, or Tier 4 phase output documents. No claim_status entry has status 'unresolved' with an absent source_ref. The traceability_footer.primary_sources[] contains a comprehensive set of source paths spanning Tier 2 (three Tier 2B extracted files), Tier 3 (six project instantiation documents), and Tier 4 (four phase output files). The artifact satisfies the traceability requirement for Tier 5 content derivability from Tier 1–4 state at the claim level. Note: the absence of Tier 1 source references (flagged under 13.9 for regulatory claims) is a §13.9 concern rather than a §13.10 concern, as §13.10 requires traceability to Tier 1–4 collectively, and the Tier 2–4 traceability is demonstrated."
     },
     {
       "prohibition_id": "13.11",
-      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs write operations against Tier 1 and Tier 2 source documents. Reading the Phase 7 budget gate assessment artifact cannot confirm or deny whether a separate write to Tier 1 or Tier 2 occurred. No such modification evidence is present in or derivable from the audited artifact. Enforcement requires filesystem-level inspection outside the declared input boundary of this skill invocation.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not verifiable from a Tier 5 deliverable artifact. This prohibition applies to actions performed on Tier 1 and Tier 2 source documents themselves; it cannot be confirmed or disconfirmed by reading a Tier 5 output. Check recorded as pass per skill specification: check is structurally non-applicable to artifact-level audit."
     },
     {
       "prohibition_id": "13.12",
-      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional",
       "check_status": "pass",
-      "violation_evidence": "Non-applicable to artifact-level check: this prohibition governs agent and skill behaviour during execution. The audited artifact explicitly cites CLAUDE.md §8.1 constitutional amendment C1, §8.3, §8.4, and §10.2 as binding authorities governing its content, indicating that the producing agent treated CLAUDE.md as the governing constitution rather than as advisory. No evidence of CLAUDE.md being treated as optional is present in the artifact.",
-      "severity": null
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "Not verifiable from artifact content alone. This prohibition governs agent behaviour and interpretive authority, not the content of a Tier 5 deliverable. Check recorded as pass per skill specification: check is structurally non-applicable to artifact-level audit."
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 1
+    "violations_found": 2,
+    "violations_summary": [
+      {
+        "prohibition_id": "13.4",
+        "severity": "major",
+        "short_description": "Phase 8 Tier 5 artifact contains person-month budget-figure references used as confirmed values; budget gate assessment file (phase7_budget_gate/budget_gate_assessment.json) could not be verified as passing due to TAPM input boundary constraints. Human operator verification required."
+      },
+      {
+        "prohibition_id": "13.9",
+        "severity": "major",
+        "short_description": "Regulatory claims about the gender equality plan obligation and grant agreement structural obligations lack Tier 1 normative framework source references in traceability_footer.primary_sources[]; traced only to Tier 3 and Tier 4 sources in claim_statuses."
+      }
+    ],
+    "decision_log_entries_written": 0,
+    "decision_log_note": "No decision log entries written: both violations are severity 'major' (not 'critical'), and no invoking-agent flag for durable recording was provided. Both violations are recorded in this compliance report and require human operator review before the artifact may advance downstream."
   },
-  "timestamp": "2026-07-17T00:00:00Z",
-  "decision_log_entries_written": [
-    {
-      "decision_id": "constitutional_violation_compliance_validator_20260717T000000Z",
-      "decision_type": "constitutional_violation",
-      "violation_id": "13.3_phase7_budget_gate_assessment_20260717T000000Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.3",
-      "artifact_affected": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
-      "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: the artifact names 'ELTE' as a specific partner institution in partner_coverage_results without providing a Tier 3 source reference in a traceability_footer. Requires human operator resolution: either (a) the artifact is amended to include a traceability_footer with primary_sources[] pointing to the relevant docs/tier3_project_instantiation/consortium/ file that establishes ELTE as the HOST institution, or (b) the human operator confirms that the institutional reference is derivable from Tier 4 state (wp_structure.json or unit_cost_budget.json) and provides a documented resolution ruling. This skill does not resolve constitutional violations; it flags them.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "written_to": "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_20260717T000000Z.json",
-      "timestamp": "2026-07-17T00:00:00Z"
-    }
-  ]
+  "timestamp": "2026-07-17T12:00:00Z"
 }

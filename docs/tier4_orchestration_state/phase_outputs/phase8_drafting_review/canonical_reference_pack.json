@@ -1,11 +1,11 @@
 {
   "schema_id": "orch.phase8.canonical_reference_pack.v1",
-  "run_id": "msca-pf-syn-01",
+  "run_id": "msca-pf-real-01",
   "objectives": [
     {
       "id": "OBJ-1",
       "title": "Probabilistic multi-sensor diagnosis of the latent field state",
-      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables with explicit, honest uncertainty (posterior/prediction intervals). The precise target field state (RQ3) and whether one or both routes are implemented (RQ2) are open project decisions; the verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
+      "measurable_target": "A calibrated diagnostic model that outputs the target field-state variables (root-zone soil moisture and crop water status) with explicit, honest uncertainty (posterior/prediction intervals). The verifiable target is uncertainty-calibrated field-state estimation, not a fabricated accuracy percentage.",
       "responsible_partner": "FELLOW",
       "contributing_partners": [
         "SUPERVISOR",
@@ -15,8 +15,8 @@
     },
     {
       "id": "OBJ-2",
-      "title": "Uncertainty-aware decision engine for irrigation choice",
-      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by expected profit (expected crop value minus costs) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The exact decision objective (profit vs weighted multi-objective) is an open decision (RQ6).",
+      "title": "Uncertainty-aware decision engine for water-use-efficient irrigation choice",
+      "measurable_target": "An integrated decision engine that scores candidate irrigation decisions by water-use efficiency (WUE) under weather and model uncertainty, propagating uncertainty from diagnosis into the recommendation. The decision objective is water-use efficiency (RQ6, operator-confirmed).",
       "responsible_partner": "FELLOW",
       "contributing_partners": [
         "SUPERVISOR"
@@ -26,7 +26,7 @@
     {
       "id": "OBJ-3",
       "title": "Field validation and honest uncertainty calibration",
-      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4), uncertainty-calibration metrics (RQ5), pilot-success criteria (RQ7) and a patch-covariation test (RQ9). These four items define a protocol that does not yet exist and must be specified with the (unresolved) host and validation sites; no validation numbers are asserted.",
+      "measurable_target": "A validation protocol with defined ground-truth measurements (RQ4: chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance), an uncertainty-calibration criterion (RQ5: 90% prediction intervals contain the truth about 90% of the time), a pilot-success criterion (RQ7: the RQ5 calibration target is met on the validation set), and a patch-covariation test (RQ9: a co-located seasonal campaign measuring the target crop and the proxy patch simultaneously, demonstrating statistical covariation). No validation numbers are asserted beyond these operator-confirmed criteria.",
       "responsible_partner": "FELLOW",
       "contributing_partners": [
         "HOST",
@@ -37,7 +37,7 @@
     {
       "id": "OBJ-4",
       "title": "Standalone research demonstrator (web MVP)",
-      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target (research prototype vs validated MVP vs operational pilot) is an open project decision (RQ10) and is NOT asserted.",
+      "measurable_target": "A working end-to-end demonstrator that exercises the full observation-to-decision pipeline. The TRL target is a research prototype, TRL 3-4 (RQ10, operator-confirmed).",
       "responsible_partner": "FELLOW",
       "contributing_partners": [
         "HOST"
@@ -47,7 +47,7 @@
     {
       "id": "OBJ-5",
       "title": "Advancement of the fellow's competences and career",
-      "measurable_target": "By month 24: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action (by months 2-3), then reviewed and updated at M12 and M24; at least 3 peer-reviewed publications (>=2 as first author); >=120 hours of transferable-skills training covering the MSCA-PF mandatory dimensions - digital and AI skills (including responsible use of generative AI in environmental modelling and scientific coding), knowledge valorisation, innovation and entrepreneurship, research integrity, and open science / FAIR data stewardship; co-supervision of >=1 MSc thesis at the host; >=2 international conference presentations; and two-way transfer of knowledge evidenced by >=2 methods seminars delivered at the host on uncertainty-aware crop-water modelling.",
+      "measurable_target": "By month 24: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action, then reviewed and updated during the fellowship; structured transferable-skills training covering the MSCA-PF mandatory dimensions (digital and AI skills, including responsible use of generative AI in remote-sensing and crop-water modelling and scientific coding; knowledge valorisation; innovation and entrepreneurship; research integrity; and open science / FAIR data stewardship); peer-reviewed publication and conference dissemination of the project's results; and two-way transfer of knowledge evidenced by methods exchange between the fellow and the host group. Specific quantitative targets (publication counts, training hours, thesis co-supervision, seminar counts) are deliberately NOT asserted - none were operator-provided - and are to be fixed in the Career Development Plan with the supervisor.",
       "responsible_partner": "FELLOW",
       "contributing_partners": [
         "SUPERVISOR",
@@ -181,7 +181,7 @@
   "deliverables": [
     {
       "deliverable_id": "D1-01",
-      "title": "Diagnostic branch technical report",
+      "title": "Diagnostic model specification and calibration report",
       "due_month": 14,
       "type": "report",
       "parent_wp": "WP1",
@@ -189,7 +189,7 @@
     },
     {
       "deliverable_id": "D2-01",
-      "title": "Research demonstrator software",
+      "title": "Decision engine and demonstrator software",
       "due_month": 20,
       "type": "software",
       "parent_wp": "WP2",
@@ -197,9 +197,9 @@
     },
     {
       "deliverable_id": "D3-01",
-      "title": "Validation and uncertainty calibration report",
+      "title": "Field validation dataset and uncertainty calibration report",
       "due_month": 24,
-      "type": "report",
+      "type": "dataset",
       "parent_wp": "WP3",
       "provenance": "confirmed"
     },
@@ -213,7 +213,7 @@
     },
     {
       "deliverable_id": "D5-01",
-      "title": "Data management plan",
+      "title": "Data Management Plan",
       "due_month": 6,
       "type": "report",
       "parent_wp": "WP5",
@@ -221,8 +221,8 @@
     },
     {
       "deliverable_id": "D5-02",
-      "title": "Dissemination and exploitation report",
-      "due_month": 24,
+      "title": "Dissemination and exploitation plan",
+      "due_month": 6,
       "type": "report",
       "parent_wp": "WP5",
       "provenance": "confirmed"
@@ -231,38 +231,27 @@
   "partners": [
     {
       "short_name": "ELTE",
-      "legal_name": "Eotvos Lorand University (ELTE), Budapest",
+      "legal_name": "Eötvös Loránd University (ELTE), Budapest",
       "country": "Hungary",
       "provenance": "confirmed"
     },
     {
       "short_name": "FELLOW",
-      "legal_name": "Dr. Mariya Petrova [SYNTHETIC]",
+      "legal_name": "Dr. Rositsa Cholakova",
       "provenance": "confirmed"
     },
     {
       "short_name": "SUPERVISOR",
-      "legal_name": "Prof. Dr. Gabor Nagy [SYNTHETIC]",
+      "legal_name": "Dr. András Jung",
       "provenance": "confirmed"
     },
     {
       "short_name": "AgroVIR",
-      "legal_name": "AgroVIR Kft. [SYNTHETIC ARRANGEMENT]",
+      "legal_name": "AgroVIR",
       "country": "Hungary",
       "provenance": "confirmed"
     }
   ],
-  "declared_assumptions": [
-    {
-      "key": "host_country",
-      "declared_value": "HU",
-      "provenance": "assumed"
-    },
-    {
-      "key": "project_duration_months",
-      "declared_value": 24,
-      "provenance": "assumed"
-    }
-  ],
+  "declared_assumptions": [],
   "aliases": []
 }

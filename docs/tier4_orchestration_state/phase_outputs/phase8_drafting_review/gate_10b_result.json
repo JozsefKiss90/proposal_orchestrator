@@ -1,0 +1,117 @@
+{
+  "gate_id": "gate_10b_impact_completeness",
+  "gate_kind": "exit",
+  "run_id": "msca-pf-real-01",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:4753b4000131e27bfae4f6b016f4c56407ff9e27c5574714000d1721be870b10",
+  "input_artifact_fingerprints": {
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:7c0138610c92af2b2aab1f03731760fc232f2ef2069c3740fa251d12ee42d88c",
+    "docs/tier5_deliverables/proposal_sections/impact_section.json": "sha256:10038ade9fb0891a6b876e8b4046ac6c9ce85d7f0890876e6cf9b5ae066477a6"
+  },
+  "evaluated_at": "2026-07-17T10:50:58.308211+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g09b_p02",
+      "g09b_p03",
+      "g09b_p01",
+      "g09b_p04",
+      "g09b_p05",
+      "g09b_p05b",
+      "g09b_p07",
+      "g09b_p08",
+      "g09b_p11",
+      "g09b_p12"
+    ],
+    "failed": [
+      {
+        "predicate_id": "g09b_p06",
+        "type": "coverage",
+        "function": "impact_pathways_covered",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "impact_arch_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "DEC coverage incomplete in impact section: missing ['communication_addressed']",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "dec_gaps": [
+            "communication_addressed"
+          ]
+        },
+        "fail_message": "Impact section does not cover all pathways from the impact architecture or DEC coverage is incomplete.\n",
+        "prose_condition": "Impact pathways and DEC measures are covered"
+      },
+      {
+        "predicate_id": "g09b_p09",
+        "type": "coverage",
+        "function": "deliverable_identity_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Deliverable identity issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 2 issue(s)",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "deliverable_id": "D5-01",
+              "check": "wrong_due_month",
+              "canonical_due_month": 6,
+              "found_due_month": 24,
+              "issue": "Deliverable D5-01 states due month 24, but canonical due month is 6"
+            },
+            {
+              "deliverable_id": "D5-02",
+              "check": "wrong_title",
+              "canonical_title": "Dissemination and exploitation plan",
+              "found_title": "are active instruments of the dissemination, exploitation and communication strategy at different scales and for different audiences",
+              "issue": "Deliverable D5-02 has wrong title attached: found 'are active instruments of the dissemination, exploitation and communication strategy at different scales and for different audiences', expected 'Dissemination and exploitation plan'"
+            }
+          ]
+        },
+        "fail_message": "Impact section references deliverable IDs with wrong title, parent WP, or due month.\n",
+        "prose_condition": "Deliverable identities match canonical reference pack"
+      },
+      {
+        "predicate_id": "g09b_p10",
+        "type": "coverage",
+        "function": "canonical_terms_preserved",
+        "args": {
+          "section_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+          "canonical_pack_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        },
+        "failure_category": "CROSS_ARTIFACT_INCONSISTENCY",
+        "reason": "Canonical term issues in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json: 1 term(s) with wrong titles",
+        "details": {
+          "section_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
+          "canonical_pack_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\canonical_reference_pack.json",
+          "issues": [
+            {
+              "term_type": "wp_title",
+              "id": "WP2",
+              "canonical_title": "Uncertainty-aware decision engine and demonstrator integration",
+              "found_title": "the probabilistic fusion diagnostic model and the uncertainty-aware decision engine \u2014 represent concrete, teachable advances in Bayesian multi-sensor fusion and crop-water state estimation",
+              "issue": "WP WP2 has wrong title attached: found 'the probabilistic fusion diagnostic model and the uncertainty-aware decision engine \u2014 represent concrete, teachable advances in Bayesian multi-sensor fusion and crop-water state estimation', expected 'Uncertainty-aware decision engine and demonstrator integration'"
+            }
+          ]
+        },
+        "fail_message": "Impact section shortens or paraphrases canonical objective or WP titles from the reference pack.\n",
+        "prose_condition": "Canonical objective and WP titles preserved"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10b_result.json"
+}
