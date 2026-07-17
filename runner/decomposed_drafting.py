@@ -356,6 +356,134 @@ def _parse_drafter_response(raw: str, sub_id: str) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Section-specific extra_fields sourcing (deterministic; ticket 9)
+# ---------------------------------------------------------------------------
+
+#: Canonical phase-output artifacts the per-section ``extra_fields`` derive from.
+_IMPACT_ARCH_REL: str = (
+    "docs/tier4_orchestration_state/phase_outputs/"
+    "phase5_impact_architecture/impact_architecture.json"
+)
+_WP_STRUCTURE_REL: str = (
+    "docs/tier4_orchestration_state/phase_outputs/"
+    "phase3_wp_design/wp_structure.json"
+)
+_GANTT_ARTIFACT_REL: str = (
+    "docs/tier4_orchestration_state/phase_outputs/"
+    "phase4_gantt_milestones/gantt.json"
+)
+_IMPL_ARCH_REL: str = (
+    "docs/tier4_orchestration_state/phase_outputs/"
+    "phase6_implementation_architecture/implementation_architecture.json"
+)
+
+
+def _read_upstream_json(repo_root: Path, rel: str, what: str) -> dict[str, Any]:
+    """Read a required upstream phase-output artifact, failing closed."""
+    path = repo_root / rel
+    if not path.is_file():
+        raise DecomposedDraftingError(
+            f"cannot source extra_fields: {what} missing at {rel}"
+        )
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DecomposedDraftingError(
+            f"cannot source extra_fields: {what} unreadable ({rel}): {exc}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise DecomposedDraftingError(
+            f"cannot source extra_fields: {what} is not a JSON object ({rel})"
+        )
+    return data
+
+
+def source_section_extra_fields(repo_root: Path, slug: str) -> dict[str, Any]:
+    """Deterministically derive the section-specific ``extra_fields`` the
+    assembler requires (``section_assembler.REQUIRED_EXTRA_FIELDS``) from the
+    upstream phase outputs.  Ticket 9.
+
+    * ``excellence`` needs none → ``{}``.
+    * ``impact`` → ``impact_pathway_refs`` (every pathway id in the Phase-5
+      impact architecture, so ``impact_pathways_covered`` passes) and
+      ``dec_coverage`` (dissemination / exploitation / communication addressed,
+      derived from the Phase-5 plans).
+    * ``implementation`` → ``wp_table_refs`` (every WP id from Phase 3),
+      ``gantt_ref`` (the Phase-4 gantt artifact), ``milestone_refs`` (every
+      milestone id from Phase 4), ``risk_register_ref`` (the Phase-6
+      implementation architecture holding the populated risk register).
+
+    Pure lookup/derivation — no inference, no Claude.  Fails closed
+    (``DecomposedDraftingError``) if a required upstream artifact is missing or
+    malformed, so a live run fails BEFORE spending drafting quota.
+    """
+    if slug == "excellence":
+        return {}
+
+    if slug == "impact":
+        arch = _read_upstream_json(
+            repo_root, _IMPACT_ARCH_REL, "Phase-5 impact_architecture.json"
+        )
+        pathways = arch.get("impact_pathways") or arch.get("pathways") or []
+        refs = [
+            str(p.get("pathway_id") or p.get("id"))
+            for p in pathways
+            if isinstance(p, dict) and (p.get("pathway_id") or p.get("id"))
+        ]
+        dp = arch.get("dissemination_plan") or {}
+        ep = arch.get("exploitation_plan") or {}
+        dp_txt = json.dumps(dp, ensure_ascii=False).lower()
+        return {
+            "impact_pathway_refs": refs,
+            "dec_coverage": {
+                "dissemination_addressed": bool(
+                    dp.get("activities") if isinstance(dp, dict) else dp
+                ),
+                "exploitation_addressed": bool(
+                    ep.get("activities") if isinstance(ep, dict) else ep
+                ),
+                "communication_addressed": (
+                    "communication" in dp_txt
+                    or bool(arch.get("communication_plan"))
+                ),
+            },
+        }
+
+    if slug == "implementation":
+        wp = _read_upstream_json(
+            repo_root, _WP_STRUCTURE_REL, "Phase-3 wp_structure.json"
+        )
+        gantt = _read_upstream_json(
+            repo_root, _GANTT_ARTIFACT_REL, "Phase-4 gantt.json"
+        )
+        # Presence-check the Phase-6 architecture that holds the risk register.
+        _read_upstream_json(
+            repo_root, _IMPL_ARCH_REL,
+            "Phase-6 implementation_architecture.json",
+        )
+        wp_refs = [
+            str(w.get("wp_id") or w.get("id"))
+            for w in wp.get("work_packages", [])
+            if isinstance(w, dict) and (w.get("wp_id") or w.get("id"))
+        ]
+        ms_refs = [
+            str(m.get("milestone_id") or m.get("id"))
+            for m in gantt.get("milestones", [])
+            if isinstance(m, dict) and (m.get("milestone_id") or m.get("id"))
+        ]
+        return {
+            "wp_table_refs": wp_refs,
+            "gantt_ref": _GANTT_ARTIFACT_REL,
+            "milestone_refs": ms_refs,
+            "risk_register_ref": _IMPL_ARCH_REL,
+        }
+
+    raise DecomposedDraftingError(
+        f"cannot source extra_fields for unknown slug {slug!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -407,6 +535,14 @@ def draft_section_decomposed(
             f"Unknown section slug {slug!r}; expected one of {sorted(VALID_SLUGS)}"
         )
     criterion = _SLUG_CRITERION[slug]
+
+    # Source the section-specific extra_fields the assembler requires unless the
+    # caller supplied them (tests inject fixtures).  Done BEFORE drafting so a
+    # missing upstream artifact fails closed without spending drafting quota
+    # (ticket 9).
+    if extra_fields is None:
+        extra_fields = source_section_extra_fields(repo_root, slug)
+
     subs = _resolve_drafting_sub_sections(repo_root, slug, criterion)
 
     if drafter is None:

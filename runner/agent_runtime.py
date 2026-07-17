@@ -46,7 +46,6 @@ from runner.decomposed_drafting import (
     draft_section_decomposed,
 )
 from runner.section_assembler import (
-    REQUIRED_EXTRA_FIELDS,
     SECTION_DRAFTS_ROOT_REL,
     SPINE_FILENAME,
 )
@@ -1110,44 +1109,12 @@ def run_agent(
                 )
             )
             continue
-        # Fail-fast guard: this pre-pass does not yet source the section-specific
-        # ``extra_fields`` the assembler requires (Impact: dec_coverage,
-        # impact_pathway_refs; Implementation: wp_table_refs, gantt_ref,
-        # milestone_refs, risk_register_ref).  Drafting such a section would
-        # spend a bounded Claude call per sub-section and only then fail at the
-        # assembler on the missing fields.  Fail BEFORE any drafting call so no
-        # quota is wasted, until extra_fields sourcing lands (follow-on ticket
-        # "Source extra_fields for Impact/Implementation drafting").  Excellence
-        # requires none (``REQUIRED_EXTRA_FIELDS['excellence'] == frozenset()``)
-        # and proceeds normally.
-        _required_extra = REQUIRED_EXTRA_FIELDS.get(_slug, frozenset())
-        if _required_extra:
-            _reason = (
-                f"Decomposed drafting for {_slug!r} requires section "
-                f"extra_fields {sorted(_required_extra)}, which this node-body "
-                "pass does not yet source; failing fast before any drafting "
-                "call (no quota spent).  Excellence drafts today; "
-                "Impact/Implementation await extra_fields sourcing."
-            )
-            all_invocations.append(
-                SkillInvocationRecord(
-                    skill_id=f"decomposed-drafting:{_slug}",
-                    status="failure",
-                    failure_reason=_reason,
-                    failure_category="MISSING_INPUT",
-                )
-            )
-            return AgentResult(
-                status="failure",
-                can_evaluate_exit_gate=False,
-                failure_reason=_reason,
-                failure_category="MISSING_INPUT",
-                outputs_written=all_outputs,
-                validation_reports=all_validation_reports,
-                decision_log_writes=all_decision_log_writes,
-                invoked_skills=all_invocations,
-                invoked_components=all_invoked_components,
-            )
+        # ticket 9: draft_section_decomposed sources the section-specific
+        # extra_fields the assembler requires (Impact: impact_pathway_refs,
+        # dec_coverage; Implementation: wp_table_refs, gantt_ref, milestone_refs,
+        # risk_register_ref) from the upstream phase outputs, failing closed
+        # BEFORE any drafting call if a required upstream artifact is missing.
+        # No separate node-body guard is needed.
         try:
             _draft_paths = draft_section_decomposed(run_id, repo_root, _slug)
         except Exception as exc:  # noqa: BLE001 — honor the no-raise contract

@@ -2074,21 +2074,22 @@ class TestDecomposedDraftingLiveWiring:
 
         draft_mock.assert_not_called()
 
-    def test_section_needing_extra_fields_fails_fast_without_drafting(
+    def test_impact_now_drafts_extra_fields_sourced_internally(
         self, tmp_path: Path
     ) -> None:
-        # Impact requires extra_fields the pre-pass does not source yet, so it
-        # must fail BEFORE any drafting call (no quota spent) and never reach
-        # the assembler.  This is the guard that keeps a live Phase-8 run from
-        # burning Impact/Implementation drafting on a section that cannot
-        # assemble.
+        # Ticket 9: the fail-fast guard is removed.  Impact now DRAFTS —
+        # draft_section_decomposed sources the section-specific extra_fields
+        # from the upstream phase outputs itself, so Phase B0 simply invokes it,
+        # exactly as it does for Excellence.
         kwargs = _make_agent_env(
             tmp_path, skill_ids=["impact-section-drafting", "skill-audit"]
         )
-        draft_mock = MagicMock()
-        assembler = MagicMock(side_effect=self._fake_assembler)
+        draft_mock = MagicMock(
+            return_value=[tmp_path / "section_drafts" / "impact" / "s.draft.json"]
+        )
         with patch.dict(
-            COMPONENT_REGISTRY, {"impact_section_assembler": assembler}
+            COMPONENT_REGISTRY,
+            {"impact_section_assembler": self._fake_assembler},
         ), patch(_DRAFT_TARGET, draft_mock), patch(
             _RUN_SKILL_TARGET, return_value=_success_skill()
         ):
@@ -2097,17 +2098,14 @@ class TestDecomposedDraftingLiveWiring:
                 deterministic_components=["impact_section_assembler"],
             )
 
-        assert result.status == "failure"
-        assert result.failure_category == "MISSING_INPUT"
-        assert result.can_evaluate_exit_gate is False
-        # Fail-fast: neither the drafter nor the assembler ran.
-        draft_mock.assert_not_called()
-        assembler.assert_not_called()
+        assert result.status == "success"
+        draft_mock.assert_called_once()
+        assert draft_mock.call_args.args[2] == "impact"
         rec = next(
             r for r in result.invoked_skills
             if r.skill_id == "decomposed-drafting:impact"
         )
-        assert rec.status == "failure"
+        assert rec.status == "success"
 
     def test_drafting_reused_when_spine_exists(self, tmp_path: Path) -> None:
         # Idempotent reuse: an existing section_spine.json means the drafts were
