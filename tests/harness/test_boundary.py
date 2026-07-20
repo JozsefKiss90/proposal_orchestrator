@@ -75,6 +75,17 @@ class TestPackageSurface:
             "HarnessReport",
             "build_report",
             "EVIDENCE_TYPE_INFERRED",
+            # E1.5 calibration
+            "GoldPair",
+            "GoldSet",
+            "load_gold_set",
+            "seed_pairs_from_claim_statuses",
+            "build_faithfulness_prompt",
+            "calibrate",
+            "calibrate_with_judge",
+            "graduation_for",
+            "CalibrationLog",
+            "GraduationThreshold",
         ):
             assert hasattr(harness, name), name
 

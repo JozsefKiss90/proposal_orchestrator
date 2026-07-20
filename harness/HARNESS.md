@@ -103,11 +103,49 @@ five (`judge_model, judge_version, prompt_hash, score, rationale`) plus
 supplementary context (metric, property_key, passed, sample_index, evidence_type,
 timestamp).
 
-## What E1 does *not* do
+## E1.5 — Judge-reliability calibration (the advisory → gating mechanism)
 
-- It does not compute any metric (E2–E9).
-- It does not adopt Ragas / DeepEval / PromptFoo. Their exact metric/API names
+The guardrail says the harness stays advisory "until judge reliability is
+characterized." E1.5 is that characterization — without it the clause has no
+mechanism and the harness is advisory forever.
+
+- **Human-labeled gold set** (`gold_set.py`) — `(claim, source_ref, supported?)`
+  triples where `supported?` is a **human** ground truth, not the engine's
+  `status` (the engine can stamp `confirmed` over an unsupported claim; that is
+  the very error we calibrate against). The loader is **fail-closed**: an
+  unlabeled pair cannot be used for calibration. `seed_pairs_from_claim_statuses`
+  draws real candidates deterministically from a section's `claim_statuses` but
+  never fabricates the label. A real seeded template lives in
+  `harness/gold_sets/` (labels pending — see its README).
+- **The atomic faithfulness question** (`faithfulness.py`) — asks the pinned
+  judge "does this source support this claim?" (`passed=True` = supported). E2
+  will extend this same question with status partitioning; E1.5 owns only the
+  atomic unit the gold set is labeled against.
+- **Precision/recall meta-eval** (`calibration.py`) — runs the judge over the
+  labeled set, computes a confusion matrix (positive = `supported`, so a false
+  positive = the judge blessed a gap — the integrity-critical error), and records
+  `{judge_model, judge_version, precision, recall}` in a `CalibrationReport`.
+- **Graduation** — `graduation_for(judge_config, report)` returns `advisory` or
+  `gating_permitted` via a fail-safe cascade: no calibration → advisory; a
+  **repinned** judge (model/version changed) → advisory; below the threshold →
+  advisory; only a fresh, applicable, above-threshold calibration → gating
+  permitted. Even then it clears a *human* to gate a merge — nothing blocks a
+  run. The threshold (`GraduationThreshold`) is operator policy; the default is a
+  conservative starting bar, not an endorsement.
+- **Repin re-opens advisory-only** — a calibration is keyed to the exact judge it
+  measured; change the model or version and the graduation it supported no longer
+  applies. `CalibrationLog` keeps the history so the current judge's status is a
+  lookup by model+version.
+
+## What E1 / E1.5 do *not* do
+
+- They do not compute any production metric (E2–E9). E1.5's `faithfulness.py` is
+  the atomic calibration question, not E2's status-partitioned metric.
+- They do not adopt Ragas / DeepEval / PromptFoo. Their exact metric/API names
   predate the knowledge cutoff and must be confirmed against current docs at
-  build time (guardrail: API currency). E1 depends on none of them.
-- It does not wire anything into CI as a merge gate — that graduation is gated on
-  E1.5 judge-reliability calibration.
+  build time (guardrail: API currency). Nothing here depends on them.
+- They do not auto-gate a merge. E1.5 supplies the *mechanism* to graduate
+  advisory → human-gating (`graduation_for`), but graduation still requires a
+  human-labeled gold set and a judge that clears the operator's threshold; the
+  seeded gold set ships **unlabeled**, so the harness remains advisory until a
+  human labels it and re-runs calibration.

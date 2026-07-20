@@ -38,6 +38,7 @@ from harness.verdict import (  # noqa: F401
     Verdict,
     majority_vote,
 )
+from harness.jsonl_log import JsonlLog  # noqa: F401
 from harness.provenance import (  # noqa: F401
     REQUIRED_PROVENANCE_FIELDS,
     ProvenanceLog,
@@ -72,6 +73,41 @@ from harness.report import (  # noqa: F401
     build_report,
 )
 
+# -- E1.5 judge-reliability calibration ------------------------------------- #
+from harness.gold_set import (  # noqa: F401
+    RECOMMENDED_MAX_PAIRS,
+    RECOMMENDED_MIN_PAIRS,
+    TO_BE_LABELED,
+    GoldPair,
+    GoldSet,
+    GoldSetError,
+    gold_set_hash,
+    load_gold_set,
+    seed_pairs_from_claim_statuses,
+    write_gold_set_template,
+)
+from harness.faithfulness import (  # noqa: F401
+    FAITHFULNESS_METRIC,
+    build_faithfulness_prompt,
+    judge_pair_supported,
+    resolve_source_text,
+)
+from harness.calibration import (  # noqa: F401
+    DEFAULT_GRADUATION_THRESHOLD,
+    GRADUATION_ADVISORY,
+    GRADUATION_GATING_PERMITTED,
+    CalibrationError,
+    CalibrationLog,
+    CalibrationReport,
+    ConfusionMatrix,
+    GraduationDecision,
+    GraduationThreshold,
+    calibrate,
+    calibrate_with_judge,
+    confusion_from_labels,
+    graduation_for,
+)
+
 __all__ = [
     # verdict
     "EVIDENCE_TYPE_INFERRED",
@@ -84,6 +120,7 @@ __all__ = [
     "prompt_hash",
     "ProvenanceRecord",
     "ProvenanceLog",
+    "JsonlLog",
     # routing
     "DeterministicCoverageError",
     "RoutingAuthority",
@@ -108,4 +145,34 @@ __all__ = [
     "Finding",
     "HarnessReport",
     "build_report",
+    # E1.5 gold set
+    "RECOMMENDED_MIN_PAIRS",
+    "RECOMMENDED_MAX_PAIRS",
+    "TO_BE_LABELED",
+    "GoldPair",
+    "GoldSet",
+    "GoldSetError",
+    "load_gold_set",
+    "gold_set_hash",
+    "seed_pairs_from_claim_statuses",
+    "write_gold_set_template",
+    # E1.5 faithfulness primitive
+    "FAITHFULNESS_METRIC",
+    "build_faithfulness_prompt",
+    "resolve_source_text",
+    "judge_pair_supported",
+    # E1.5 calibration
+    "GRADUATION_ADVISORY",
+    "GRADUATION_GATING_PERMITTED",
+    "DEFAULT_GRADUATION_THRESHOLD",
+    "CalibrationError",
+    "ConfusionMatrix",
+    "GraduationThreshold",
+    "CalibrationReport",
+    "GraduationDecision",
+    "confusion_from_labels",
+    "calibrate",
+    "calibrate_with_judge",
+    "graduation_for",
+    "CalibrationLog",
 ]

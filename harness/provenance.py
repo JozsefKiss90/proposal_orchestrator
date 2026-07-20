@@ -32,12 +32,10 @@ Constitutional authority:
 from __future__ import annotations
 
 import hashlib
-import json
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
-from runner.atomic_write import atomic_write_text
+from harness.jsonl_log import JsonlLog
 from harness.verdict import EVIDENCE_TYPE_INFERRED, Verdict
 
 __all__ = [
@@ -183,59 +181,16 @@ class ProvenanceRecord:
         }
 
 
-class ProvenanceLog:
+class ProvenanceLog(JsonlLog):
     """Append-only JSONL log of :class:`ProvenanceRecord` — one record per line.
 
-    Writes are atomic (temp file + rename via :func:`runner.atomic_write`): the
-    whole log is re-serialized and swapped over on every append, so a reader
-    never observes a torn line.  Volume is low (verdicts per QA run), so the
-    read-all/rewrite cost is immaterial and buys torn-write safety plus trivial
-    testability.  The log is an out-of-band artifact — it is *not* a Tier 4 gate
-    result and nothing in :mod:`runner` reads it.
-
-    Parameters
-    ----------
-    path:
-        Destination ``.jsonl`` file.  Parent directories are created on first
-        append.
+    A :class:`~harness.jsonl_log.JsonlLog` (atomic rewrite per append; nothing in
+    :mod:`runner` reads it) that serializes :class:`ProvenanceRecord`.
     """
 
-    def __init__(self, path: Path) -> None:
-        self._path = Path(path)
-        # In-memory mirror seeded from any pre-existing log so appends are
-        # order-preserving across process restarts without re-reading per call.
-        self._records: list[dict[str, Any]] = self._load_existing()
-
-    @property
-    def path(self) -> Path:
-        return self._path
-
-    def _load_existing(self) -> list[dict[str, Any]]:
-        if not self._path.is_file():
-            return []
-        out: list[dict[str, Any]] = []
-        text = self._path.read_text(encoding="utf-8")
-        for line in text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            out.append(json.loads(line))
-        return out
+    def __init__(self, path) -> None:
+        super().__init__(path, prefix="provenance_")
 
     def append(self, record: ProvenanceRecord) -> None:
-        """Append one record and atomically rewrite the log."""
-        self._records.append(record.to_dict())
-        self._flush()
-
-    def _flush(self) -> None:
-        body = "".join(
-            json.dumps(rec, ensure_ascii=False) + "\n" for rec in self._records
-        )
-        atomic_write_text(body, self._path, prefix="provenance_")
-
-    def records(self) -> list[dict[str, Any]]:
-        """Return a copy of every logged record, in append order."""
-        return list(self._records)
-
-    def __len__(self) -> int:
-        return len(self._records)
+        """Append one provenance record and atomically rewrite the log."""
+        self.append_dict(record.to_dict())
