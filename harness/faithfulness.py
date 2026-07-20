@@ -33,6 +33,8 @@ from harness.judge import Judge, JudgeResult
 
 __all__ = [
     "FAITHFULNESS_METRIC",
+    "INDEPENDENCE_PREAMBLE",
+    "build_claim_user_prompt",
     "build_faithfulness_prompt",
     "resolve_source_text",
     "judge_pair_supported",
@@ -41,15 +43,24 @@ __all__ = [
 #: The metric name stamped on faithfulness verdicts and their provenance.
 FAITHFULNESS_METRIC: str = "faithfulness_atomic"
 
-_SYSTEM_PROMPT: str = (
+#: The shared opening of every harness faithfulness system prompt — the
+#: grader/generator-independence framing (strategy §1).  Exposed so E2's
+#: status-specific prompts (:mod:`harness.status_faithfulness`) open with the
+#: *same* words rather than a near-duplicate, keeping "the judge is a different
+#: model, judging only from the material" a single source of truth.
+INDEPENDENCE_PREAMBLE: str = (
     "You are an independent faithfulness judge for a research-proposal "
     "integrity harness. You are deliberately a different model from the one "
-    "that drafted the text, and you judge ONLY from the source passage "
-    "provided — never from prior knowledge or plausibility.\n\n"
-    "Your single task: decide whether the SOURCE passage genuinely SUPPORTS the "
-    "CLAIM. The source supports the claim only if it states the claim or clearly "
-    "entails it. If the source is silent on the claim, contradicts it, or only "
-    "loosely relates to it, the claim is NOT supported.\n\n"
+    "that drafted the text, and you judge ONLY from the material provided "
+    "— never from prior knowledge or plausibility.\n\n"
+)
+
+_SYSTEM_PROMPT: str = (
+    INDEPENDENCE_PREAMBLE
+    + "Your single task: decide whether the SOURCE passage genuinely SUPPORTS "
+    "the CLAIM. The source supports the claim only if it states the claim or "
+    "clearly entails it. If the source is silent on the claim, contradicts it, "
+    "or only loosely relates to it, the claim is NOT supported.\n\n"
     "Return ONLY a JSON object, no prose before or after:\n"
     '{"passed": <true if the source supports the claim, false otherwise>, '
     '"score": <optional 0.0–1.0 confidence the claim is supported>, '
@@ -57,6 +68,30 @@ _SYSTEM_PROMPT: str = (
     "Do not infer support the source does not actually provide. When in doubt, "
     'answer "passed": false.'
 )
+
+
+def build_claim_user_prompt(
+    claim: str,
+    material: str,
+    *,
+    question: str,
+    material_label: str = "SOURCE PASSAGE",
+    source_ref: str | None = None,
+) -> str:
+    """Return the user-turn text for a claim-vs-material faithfulness question.
+
+    The shared user-prompt shape both the atomic question and E2's status-aware
+    metric build: the ``CLAIM``, an optional ``SOURCE REF`` provenance label, the
+    material under a caller-chosen *material_label* (``SOURCE PASSAGE`` for a
+    source, ``DECLARED VALUE`` for an assumed claim), and the closing *question*.
+    """
+    ref_line = f"SOURCE REF (label only): {source_ref}\n" if source_ref else ""
+    return (
+        f"CLAIM:\n{claim}\n\n"
+        f"{ref_line}"
+        f"{material_label}:\n{material}\n\n"
+        f"{question}"
+    )
 
 
 def build_faithfulness_prompt(
@@ -71,12 +106,12 @@ def build_faithfulness_prompt(
     means supported.  *source_ref* is included only as a provenance label in the
     user turn — the judgment is made against the excerpt text.
     """
-    ref_line = f"SOURCE REF (label only): {source_ref}\n" if source_ref else ""
-    user_prompt = (
-        f"CLAIM:\n{claim}\n\n"
-        f"{ref_line}"
-        f"SOURCE PASSAGE:\n{source_excerpt}\n\n"
-        "Does the SOURCE PASSAGE support the CLAIM? Return the JSON verdict."
+    user_prompt = build_claim_user_prompt(
+        claim,
+        source_excerpt,
+        question="Does the SOURCE PASSAGE support the CLAIM? Return the JSON verdict.",
+        material_label="SOURCE PASSAGE",
+        source_ref=source_ref,
     )
     return _SYSTEM_PROMPT, user_prompt
 

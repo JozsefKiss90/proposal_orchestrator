@@ -1,17 +1,18 @@
-# Evaluation & Integrity Harness — substrate (E1)
+# Evaluation & Integrity Harness — substrate (E1/E1.5) + status-aware faithfulness (E2)
 
 > Out-of-band QA/CI track. **Never a fail-closed runtime gate.** Advisory to a
 > human. Subordinate to `CLAUDE.md`.
 >
 > Source: `harness_plan/EVALUATION_HARNESS_STRATEGY.md` (v1),
-> `harness_plan/tickets_eval_harness.md` (E1). Reviewed in
+> `harness_plan/tickets_eval_harness.md` (E1, E1.5, E2). Reviewed in
 > `harness_plan/EVAL_HARNESS_TICKETS_REVIEW.md`.
 
 This package (`harness/`) is the scaffolding every harness metric (E2–E9) stands
-on. E1 builds **only the substrate** — the judge, provenance, routing, verdict
-types, and reporting boundary. The metrics that use it (status-aware
-faithfulness, claim-ledger completeness, the evaluator G-Evals, the α-block
-assertion, graph-retrieval precision/recall) are later tickets.
+on. E1 builds the **substrate** — the judge, provenance, routing, verdict types,
+and reporting boundary; E1.5 the judge-reliability calibration; **E2 the first
+production metric (status-aware faithfulness, below).** The remaining metrics
+(claim-ledger completeness, the evaluator G-Evals, the α-block assertion,
+graph-retrieval precision/recall) are later tickets.
 
 ## The one load-bearing invariant
 
@@ -137,15 +138,71 @@ mechanism and the harness is advisory forever.
   applies. `CalibrationLog` keeps the history so the current judge's status is a
   lookup by model+version.
 
-## What E1 / E1.5 do *not* do
+## E2 — Status-aware faithfulness (headline signal #1)
 
-- They do not compute any production metric (E2–E9). E1.5's `faithfulness.py` is
-  the atomic calibration question, not E2's status-partitioned metric.
-- They do not adopt Ragas / DeepEval / PromptFoo. Their exact metric/API names
-  predate the knowledge cutoff and must be confirmed against current docs at
-  build time (guardrail: API currency). Nothing here depends on them.
-- They do not auto-gate a merge. E1.5 supplies the *mechanism* to graduate
-  advisory → human-gating (`graduation_for`), but graduation still requires a
-  human-labeled gold set and a judge that clears the operator's threshold; the
-  seeded gold set ships **unlabeled**, so the harness remains advisory until a
-  human labels it and re-runs calibration.
+The first production metric, and the independent net M3's composition pass calls
+for. It partitions every Tier-5 claim by the engine's own `status` and judges
+each against the target that status *promises*, because a predicate can only see
+that a `source_ref` field is non-blank — never whether the source actually
+supports the sentence:
+
+- **`confirmed` → judged strictly against its `source_ref`.** A confirmed claim
+  must be directly evidenced (faithfulness ≈ 1.0); one its own source does not
+  support is a **hard integrity finding** (`SEVERITY_INTEGRITY`) — the "gap
+  masked as confirmed" no predicate can catch.
+- **`assumed` → judged against the operator-declared value** in
+  `working_assumptions.json` (via the shared `runner.working_assumptions` reader,
+  by `key` then `checklist_ref`), **not** the source. This complements the W1
+  predicate — W1 checks the declaration *exists*, E2 checks the claim faithfully
+  represents its *content*. A mismatch is `SEVERITY_CONTENT_DRIFT`.
+- **`inferred` → judged as framing/synthesis** against its source under a
+  **softer** bar (`passed` *or* a score clearing a low `min_score`): a faithful
+  inference need not be verbatim, but must not contradict or over-reach its
+  source. A failure is a soft concern (`SEVERITY_SOFT`), not a hard finding.
+
+It is a **custom metric on the E1 substrate — no framework dependency.** It
+reuses `harness.judge.Judge` (pinned, non-drafter, provenance-logged),
+`assert_judgeable` (a claim id colliding with a predicate name is refused),
+`Verdict` (typed `Inferred`), and `build_report` (`advisory=True,
+blocking=False`). The framework pick is recorded in the decision log
+(`e2-status-aware-faithfulness-framework_2026-07-20.json`): **DeepEval/Ragas
+adoption is deferred to E5 (G-Eval) / E8 (DeepTeam) / E9 (Ragas retrieval)** —
+the lanes where a framework *primitive* is irreplaceable — because E2's claims
+arrive pre-decomposed (`claim_statuses`), the substrate is deliberately
+framework-independent and offline-testable, and the API-currency guardrail blocks
+a real binding until the current API is confirmed. This is earn-its-lane:
+*defer cost, demand proof.*
+
+Un-verifiable claims are **surfaced, never dropped**: an unresolvable
+`source_ref`, or an `assumed` claim with no backing declaration, becomes a
+`SEVERITY_UNRESOLVED` finding with the judge *not* invoked; an unpartitioned
+status becomes `SEVERITY_UNKNOWN_STATUS`. Reporting-only; zero DAG runs; built
+against the current `*_section.json` and re-points at M2-T10's graph-sourced
+artifacts unchanged (identical claim schema).
+
+**M3 reuse — grounding invariance.** `freeze_baseline` snapshots the per-claim
+grounding verdict on the pre-composition ledger; `compare_to_baseline` re-runs on
+the composed output and flags any claim whose grounding **weakened** — a
+`bar_regression` (met the bar, no longer does), a `status_changed`, or a
+`dropped` claim all *break* invariance; a `score_drop` that still meets the bar is
+a soft, non-breaking flag. *Form may change, grounding may not.* A baseline is
+keyed to the judge pin it was frozen under (`applies_to`), so a comparison
+spanning a repin is flagged (`judge_repinned`), mirroring the E1.5 discipline.
+
+## What the harness does *not* do (through E2)
+
+- It computes only the metrics built so far (E1.5 calibration, E2 status-aware
+  faithfulness). E3–E9 (ledger completeness, evaluator G-Evals, the α-block
+  assertion, graph-retrieval precision/recall) are later tickets.
+- It adopts **no** Ragas / DeepEval / PromptFoo dependency. Their exact metric/API
+  names predate the knowledge cutoff and must be confirmed against current docs at
+  build time (guardrail: API currency); E2 is a custom metric on the substrate,
+  and framework adoption is deferred to the lanes where a primitive is
+  irreplaceable (E5/E8/E9). Nothing here imports them.
+- It does not auto-gate a merge. E1.5 supplies the *mechanism* to graduate
+  advisory → human-gating (`graduation_for`), and E2's report is `blocking=False`
+  by construction; graduation still requires a human-labeled gold set and a judge
+  that clears the operator's threshold; the seeded gold set ships **unlabeled**,
+  so the harness remains advisory until a human labels it and re-runs calibration.
+- It does not run the DAG. Every metric through E2 reads frozen artifacts; zero
+  DAG runs.
