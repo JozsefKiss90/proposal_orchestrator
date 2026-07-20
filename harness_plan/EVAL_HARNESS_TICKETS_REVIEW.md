@@ -1,6 +1,18 @@
 # Review — Eval & Integrity Harness tickets (`tickets_eval_harness.md`)
 
 > **Reviewed 2026-07-20** against `EVALUATION_HARNESS_STRATEGY.md` (v1), the strategy's source code base (`runner/predicates/**`, `evaluator_expectation_registry.json`, `excellence_section.json`), and the surrounding roadmap (`MILESTONE3_SCOPE.md`, `tickets_milestone2.md`). Confidence **Confirmed** unless marked.
+>
+> **Rev-note (2026-07-20, post-verification):** the operator flagged two items; both were checked against the code and **corrected** — see **Corrections** immediately below. They supersede R-4's dry-run mechanism and MF-2's E9 run-classification; the rest of the review stands.
+
+## Corrections (post-verification, 2026-07-20)
+
+Two items were verified against source and **corrected** — folded into `tickets_eval_harness.md` Rev 3.
+
+1. **E7a mechanism — supersedes R-4's "`--dry-run` / single-phase" suggestion.** `--dry-run` does **not** evaluate gates (`runner/__main__.py:345` — *"Dry-run does NOT evaluate any gates"*; it prints ready nodes and exits), so it cannot observe the α block. The α Phase-7 block is the **deterministic** `gate_09_budget_consistency` exit gate (node `n07`, `gate_rules_library.yaml`) on the MSCA **unit-cost derivation**: with no host declared, the host-country-coefficient line can't be derived, so `gate_09` blocks (host-independent lines still computed = the informative assessment, D12/C1). Assert it by calling the **gate evaluator directly on `gate_09` against α fixtures** — still zero-run, and *deterministic* (no judge). R-4's intent (E7a is offline, no full run) held; its mechanism was wrong.
+
+2. **E9 is neither blocked nor run-dependent — supersedes MF-2's E9 dependency note.** The "folders 11–18 unauthored / walking-skeleton" premise (from `GRAPH_SUBSTRATE.md`) is **stale**: the M2 section-node authoring is **done** — vault folders `11_objectives … 19_proposal_sections` are authored, incl. the **12 `proposal_section` nodes** (verified 2026-07-20). Graph retrieval runs through the compiler `--from-graph` **Step-0 pass** (`__main__.py` — "does not construct or run the scheduler, evaluate gates, or overwrite any Tier 3 source"), **not a DAG run**. So E9's data is ready today and it gates only on adopting Ragas + the E1 judge — it moves **out of the run-dependent Wave 4 into the offline track**. MF-2's separate-the-dependencies instinct held (M2-T10 ≠ section-node authoring); the correction is that the authoring is complete and the retrieval path is Step-0.
+
+Read the E7 and E9 rows of the alignment table (§5) through these corrections.
 
 ## Verdict
 

@@ -1,6 +1,9 @@
 # Tickets: Evaluation & Integrity Harness — out-of-band QA track
 
-Source strategy: `EVALUATION_HARNESS_STRATEGY.md` (v1, 2026-07-20). Reviewed in `EVAL_HARNESS_TICKETS_REVIEW.md` (2026-07-20). **Rev 2 (2026-07-20)** applies that review: E1–E3 lead now as **M3's independent verifier**; judge-reliability calibration added (**E1.5**); `ticket 10 → M2-T10` pinned and the section-node-authoring dependency separated; **E7 split** into an offline half (E7a) and a run-dependent half (E7b); **E3 given a materiality threshold**.
+Source strategy: `EVALUATION_HARNESS_STRATEGY.md` (v1, 2026-07-20). Reviewed in `EVAL_HARNESS_TICKETS_REVIEW.md` (2026-07-20). **Rev 2** applied that review (E1–E3 lead as M3's verifier; **E1.5** judge-reliability; `ticket 10 → M2-T10`; E7 split; E3 materiality). **Rev 3 (2026-07-20)** corrects two items on code verification:
+
+- **E7a mechanism.** `--dry-run` does **not** evaluate gates (`runner/__main__.py:345` — *"Dry-run does NOT evaluate any gates"*); it prints ready nodes and exits. The α Phase-7 block is the deterministic **`gate_09_budget_consistency`** exit gate (node `n07`) on the MSCA unit-cost derivation — assert it by calling the gate evaluator directly on α fixtures (zero run, no judge). E7a rewritten.
+- **E9 unblocked + offline.** The M2 **section-node authoring is done** — vault folders `11…19` are authored incl. the **12 `proposal_section` nodes** (verified 2026-07-20). Graph retrieval runs through the compiler `--from-graph` **Step-0 pass, not a DAG run**. E9 moves out of the run-dependent bucket into the offline track.
 
 This is a **separate, out-of-band QA/CI track** — architecturally distinct from the runtime DAG and the milestone-2 authoring track. It sits alongside M3, not inside M2.
 
@@ -8,17 +11,17 @@ This is a **separate, out-of-band QA/CI track** — architecturally distinct fro
 
 ## Referenced dependencies (pinned)
 
-The run-dependent gating leans on three names; pin them so no ticket is gated on an undefined artifact (same fail-closed-on-dangling-links discipline `vault_reader.dangling_links()` applies to wikilinks).
+Pin every gating name so no ticket is gated on an undefined artifact (same fail-closed-on-dangling-links discipline `vault_reader.dangling_links()` applies to wikilinks).
 
-- **`M2-T10`** = milestone-2 ticket 10 — the *graph-becomes-authoritative-Tier-3-source* cutover (open-Q #4, `tickets_milestone2.md`). Before it, section artifacts are the current hand-lifted `msca-pf-syn-01` outputs; after it, they are graph-sourced. The offline harness re-points at the graph-sourced artifacts unchanged when this lands.
-- **M2 section-node authoring** = the milestone-2 ticket that authors `proposal_section` nodes in vault folders `11…18` (the walking-skeleton residual in `GRAPH_SUBSTRATE.md`). **Distinct from M2-T10.** E9 depends on *this*, not on M2-T10. ⟐ **pin the exact M2 ticket ID.**
-- **"the showcase"** = the planned flagship end-to-end run (M2 graph-sourced Tier 3 + M3 composition + Opus-for-impact Impact authoring) that produces an evaluator-ready Part B, whose runs E7b/E8/E9 batch behind. ⟐ **not yet pinned to a canonical ticket — pin before Wave 3 starts** (grep-confirmed it appears in no repo doc as of 2026-07-20; do not treat as defined until pinned).
+- **`M2-T10`** = milestone-2 ticket 10 — the *graph-becomes-authoritative-Tier-3-source* cutover (open-Q #4, `tickets_milestone2.md`). Gates only the run-dependent **E7b/E8** (they reuse the showcase's runs). The offline tickets do **not** wait on it.
+- **M2 section-node authoring — ✅ DONE (verified 2026-07-20).** The milestone-2 ticket that authors `proposal_section` nodes has authored vault folders `11_objectives … 19_proposal_sections`, including the **12 `proposal_section` nodes** (PS-excellence-1/1.1–1.4, PS-impact-2/2.1–2.3, PS-implementation-3/3.1–3.2). E9's authoring blocker is **cleared**. (The `GRAPH_SUBSTRATE.md` "walking-skeleton / folders 11–18 unauthored" note is stale — supersede it.)
+- **"the showcase"** = the planned flagship end-to-end run (M2 graph-sourced Tier 3 + M3 composition + Opus-for-impact Impact authoring) that produces an evaluator-ready Part B, whose runs **E7b/E8** batch behind. ⟐ **not yet pinned to a canonical ticket — pin before Wave 4 starts** (grep-confirmed it appears in no repo doc as of 2026-07-20; do not treat as defined until pinned).
 - **"Opus-for-impact"** = authoring/composing the Impact section with the Opus model (the model choice E6's cost matrix is meant to evidence). ⟐ **pin to its scope line / ticket.**
 
 ## Non-negotiable guardrails (span every ticket)
 
 - **Never a fail-closed runtime gate.** No eval metric wires into the runtime DAG. The 138 predicates + byte-equal CI checks remain the only blocking runtime gates (§17 byte-equal replay + fail-closed preserved). The harness gates *decisions about the pipeline* — merges, prompt changes, model swaps, release cuts — in CI, and even there it is **advisory to a human**, not auto-blocking, until judge reliability is characterized (**E1.5**).
-- **Deterministic-first routing.** Where a predicate can check a property, the predicate is authoritative; a judge runs only where no deterministic check exists; a green judge never overrides a red predicate.
+- **Deterministic-first routing.** Where a predicate/gate can check a property, it is authoritative; a judge runs only where no deterministic check exists; a green judge never overrides a red predicate. *(E7a is a case in point — the α-block is a deterministic gate, so it is asserted deterministically, no judge.)*
 - **Grader–generator independence.** Judge with a non-drafter model over the OpenAI-compatible transport.
 - **Judge output is `Inferred`, never `Confirmed`.** Pin judge model+version, temp 0, N≥3 majority where a score informs a decision; log `{judge_model, judge_version, prompt_hash, score, rationale}` as provenance (same discipline as the decision log).
 - **Earn-its-lane.** Each framework must prove its distinct lane before the next is adopted. If a lane is better served by a framework already in use, do not add the second tool. (Expect convergence on ~three tools in *distinct* lanes — see the Wave-0 decision gate.)
@@ -26,10 +29,10 @@ The run-dependent gating leans on three names; pin them so no ticket is gated on
 
 ## Sequencing — the "avoid extra runs" split
 
-The harness judges **artifacts, not runs** — most of it never triggers a DAG run.
+The harness judges **artifacts, not runs** — almost all of it never triggers a DAG run.
 
-- **Offline tickets (E1–E6, E7a)** read frozen `*_section.json` + `claim_statuses` + `source_ref`. Zero DAG runs. **E1–E3 lead now**, built against the current `msca-pf-syn-01` artifacts, and are **reused as M3's independent semantic verifier** (see below). They re-point at M2-T10's graph-sourced artifacts unchanged when those land, and catch any regression the M3 composition / Opus-for-impact authoring introduces.
-- **Run-dependent tickets (E7b, E8, E9)** observe block behaviour / retrieval on varied or hostile inputs, so they need pipeline runs. **Gated behind M2-T10 / the showcase:** batch their runs behind the showcase and reuse its artifacts — never ad-hoc. This is where "avoid running phases more than necessary" is enforced.
+- **Offline tickets (E1–E6, E7a, E9)** read frozen artifacts, exercise the deterministic gate evaluator, or run the Step-0 graph compiler. **Zero DAG runs.** E1–E3 lead now (M3's verifier); E7a is a deterministic `gate_09` assertion; **E9's graph data is authored and reached via the `--from-graph` compiler pass, not a run.**
+- **Run-dependent tickets (E7b, E8)** observe β→B1 / hostile-input behaviour that needs full pipeline runs. **Gated behind M2-T10 / the showcase:** batch their runs behind the showcase and reuse its artifacts — never ad-hoc. This is where "avoid running phases more than necessary" is enforced.
 
 **Why E1–E3 lead (review MF-1 — the M3 collision).** M3 introduces a **Claude-driven composition pass** that rewrites each section's `content` (de-identify + weave to evaluator-ready prose) while carrying `claim_statuses`/`source_ref` forward **verbatim**. Its anti-fabrication guarantee is *not* determinism (the composer is synthesis — `MILESTONE3_SCOPE.md` §7 calls it a sanctioned "shadow author") but the structural contradiction-detector gates + `no_unsupported_tier5_claims` — the latter itself a **semantic/in-run** gate (absent from the deterministic predicate registry), i.e. the same-model-family judge the strategy §2 says must not be trusted alone. Those gates catch a *wrong* token, not a composer that keeps every canonical token but subtly **weakens the grounding** of a `confirmed` claim. **E2 status-aware faithfulness is exactly that missing check.** So E1–E3 are built **before** M3 composition and reused as the exit check on **M3-T3 / M3-T7** — the independent, out-of-band net M3's §7 risk calls for. *Baseline nuance:* baseline Excellence + Implementation immediately; baseline Impact **after** the Opus-for-impact authoring (the one section that genuinely changes), so you are not diffing against a to-be-discarded version.
 
@@ -37,9 +40,11 @@ The harness judges **artifacts, not runs** — most of it never triggers a DAG r
 
 - **Wave 0 (offline, now — M3's verifier; prove the core in one framework):** E1, E1.5, E2, E3 → decision gate
 - **Wave 1 (offline, add pytest/CI lane if it earns):** E4, E5
-- **Wave 2 (offline, add prompt-boundary lane if it earns):** E6, E7a
-- **Wave 3 (run-dependent, ⚠ behind M2-T10 / the showcase):** E7b, E8
-- **Wave 4 (run-dependent + graph, ⚠ behind M2 section-node authoring):** E9
+- **Wave 2 (offline, add prompt-boundary lane if it earns; + the deterministic α-block check):** E6, E7a
+- **Wave 3 (offline, graph-retrieval lane — where Ragas earns in; data ready today):** E9
+- **Wave 4 (run-dependent, ⚠ behind M2-T10 / the showcase):** E7b, E8
+
+Only Wave 4 needs a pipeline run.
 
 ---
 
@@ -48,7 +53,7 @@ The harness judges **artifacts, not runs** — most of it never triggers a DAG r
 **Blocked by:** none (offline).
 - [ ] A pinned non-drafter judge over the OpenAI-compatible transport (temp 0; model+version pinned).
 - [ ] Provenance logging `{judge_model, judge_version, prompt_hash, score, rationale}` for every verdict.
-- [ ] A deterministic-first routing helper: a property with a predicate is never judged; the judge runs only in the semantic gap.
+- [ ] A deterministic-first routing helper: a property with a predicate/gate is never judged; the judge runs only in the semantic gap.
 - [ ] Reporting-only output (no CI gate yet); a documented "never a runtime gate / advisory-to-human" boundary.
 - [ ] Judge output typed `Inferred`; N≥3 majority scaffold where a score will inform a decision.
 
@@ -102,16 +107,18 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 - [ ] Old vs new drafting prompts across fixture Tier 3; per row: `is-json`, `<20KB`, **`type: python` calls to `canonical_terms_preserved`/`partner_names_preserved`**, plus a rubric — one row proving the length lift didn't regress integrity.
 - [ ] Model/provider/cost matrix feeding the `unit_cost_budget`/`benchmark` cost discipline (evidence for "which model per sub-section", incl. the Opus-for-impact choice).
 
-## E7a. α-block state assertions — offline half ✅ no run
-**What to build:** the α (no-declaration) honest-block outcome, checked offline via the single-phase / `--dry-run` path rather than a full E2E run.
-**Blocked by:** E1 (offline; no full pipeline run).
-- [ ] α (no declarations) drives Phase 7 to a **fail-closed block** that names the right unconfirmed spine facts — asserted on the gate state / block-message contents from a single-phase / `--dry-run` invocation (the brief's §5.3 dry-run precedent).
-- [ ] Deterministic outcome assertions; regression-tracks that the block still fires after prompt/model changes. Offline; pullable in Wave 2.
+## E7a. α-block assertion — deterministic, zero-run
+**What to build:** assert the α (no-declaration) honest-block **without a DAG run**, by evaluating the gate directly on α fixtures.
+**Blocked by:** E1 substrate (fixtures + harness). **No run, no judge.**
+- [ ] **Mechanism (Rev-3 correction).** The α Phase-7 block is the deterministic **`gate_09_budget_consistency`** exit gate (node `n07`, `gate_rules_library.yaml`) on the MSCA **unit-cost derivation**: with no host declared, the host-dependent line (living allowance = base × host-country coefficient) can't be derived, so `gate_09` blocks while host-independent lines are computed (the "informative assessment", D12/C1). Assert it by **calling the gate evaluator on `gate_09` against α fixtures** — the same zero-run pattern as calling a predicate in a test.
+- [ ] ⚠ **Not `--dry-run`.** `runner/__main__.py:345` — *"Dry-run does NOT evaluate any gates"* — prints ready nodes and exits, so it cannot observe the block it is meant to assert. (A `--phase 7` run would evaluate the gate but still spins the scheduler; the direct gate-evaluator call is the clean zero-run path.)
+- [ ] Deterministic outcome assertion: gate state = blocked, and `budget_gate_assessment` names the unconfirmed spine facts; regression-tracks that the block still fires after prompt/model changes.
+- [ ] Being deterministic, E7a could equally live in the standard `tests/` suite — it needs neither the judge nor a run; it sits in the harness only to complete the α/β behavioural story.
 
 ## E7b. β→B1 behavioural run — run-dependent half ⚠ behind M2-T10 / the showcase
-**What to build:** the full β (operator-declared) path reaching evaluator-ready B1 — the Stage-7 β acceptance turned into a standing, adversarially-driven harness.
+**What to build:** the full β (operator-declared) path reaching evaluator-ready B1 — the Stage-7 β acceptance turned into a standing harness.
 **Blocked by:** M2-T10 / the showcase (needs a full pipeline run; batch behind the showcase, reuse artifacts).
-- [ ] `(input fixture × declaration state) → expected outcome`: β (host+ declared) reaches full B1 with every `assumed` claim operator-declared; the α rows are covered offline by E7a.
+- [ ] β (host+ declared) reaches full B1 with every `assumed` claim operator-declared; the α rows are already covered offline by E7a.
 - [ ] Outcome assertions deterministic (gate state, block-message contents); the harness drives the input space + regression-tracks that the block still fires after any prompt/model change.
 - [ ] Runs batched behind the showcase; no ad-hoc DAG runs.
 
@@ -122,12 +129,13 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 - [ ] Property under test = "no fabrication / correct fail-closed block"; adversarial surface generated + regression-tracked.
 - [ ] Systematic red-team is the CI source-of-record; keep any PromptFoo red-team for quick prompt-dev probes only.
 
-## E9. Ragas context precision/recall — graph-retrieval integrity ⚠ behind M2 section-node authoring
-**What to build:** the milestone-2 retrieval-integrity metric — the graph's dedicated eval.
-**Blocked by:** the **M2 section-node authoring** ticket (authors `proposal_section` nodes in folders `11…18`) — **distinct from M2-T10**; ⟐ pin its ID. Run first on the fixture vault, then `MSCA/methodology_graph/`.
-- [ ] Context precision (retrieved nodes are relevant — `vault_reader`/`graph.config` aren't pulling noise) + context recall (no evidence silently dropped).
+## E9. Ragas context precision/recall — graph-retrieval integrity (offline; Ragas lane)
+**What to build:** the graph's dedicated retrieval-integrity metric — context precision/recall over the vault.
+**Status (Rev-3 correction):** **data ready today.** M2 section-node authoring is **done** — folders `11_objectives … 19_proposal_sections` authored, incl. the **12 `proposal_section` nodes** (verified 2026-07-20). **Not run-dependent:** graph retrieval is exercised through the compiler **`--from-graph` Step-0 pass** (`runner/__main__.py` — "does not construct or run the scheduler, evaluate gates, or overwrite any Tier 3 source"; the pass reports `part_b_sections` via `compile_part_b_and_report`), not a DAG run.
+**Blocked by:** E1 (judge) + adopting Ragas — this is the ticket where Ragas earns its irreplaceable lane. Run on the fixture vault, then `MSCA/methodology_graph/`.
+- [ ] Context precision (retrieved nodes are relevant — `vault_reader`/`graph.config` aren't pulling noise) + context recall (no evidence silently dropped), computed over the compiler's Part B retrieval.
 - [ ] Gold "relevant nodes per sub-section" set from the vault's `upstream_nodes`/`downstream_nodes`/`source_refs` front-matter.
 
 ---
 
-*Separate out-of-band QA track. Never a fail-closed runtime gate. Earn-its-lane framework adoption (converges on ~three distinct lanes). **E1–E3 lead now as M3's independent verifier;** offline tickets (E1–E6, E7a) cost zero DAG runs; run-dependent tickets (E7b–E9) batched behind M2-T10 / the showcase. Rev 2 (2026-07-20) applies `EVAL_HARNESS_TICKETS_REVIEW.md`.*
+*Separate out-of-band QA track. Never a fail-closed runtime gate. Earn-its-lane framework adoption (converges on ~three distinct lanes). **E1–E3 lead now as M3's independent verifier;** offline tickets (E1–E6, E7a, E9) cost zero DAG runs; only E7b–E8 are run-dependent (behind M2-T10 / the showcase). Rev 2 applied `EVAL_HARNESS_TICKETS_REVIEW.md`; **Rev 3 (2026-07-20)** corrected E7a → deterministic `gate_09` assertion (not `--dry-run`), and E9 → offline & data-ready (M2 section-node authoring done, retrieval via the Step-0 compiler).*
