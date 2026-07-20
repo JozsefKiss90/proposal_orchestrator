@@ -1,0 +1,83 @@
+"""
+Architectural boundary tests for the harness package.
+
+The harness is out-of-band: it may import ``runner`` (to reuse the transport and
+read the deterministic predicate registry), but ``runner`` must NEVER import
+``harness`` — that one-way dependency is what makes "the harness is never a
+runtime gate" a structural fact. If this test ever fails, an eval concern has
+leaked into the runtime and the load-bearing invariant is broken.
+
+Also asserts the package imports cleanly and re-exports its public API.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+import pytest
+
+from runner.paths import find_repo_root
+
+_IMPORT_HARNESS = re.compile(r"^\s*(?:from|import)\s+harness\b", re.MULTILINE)
+
+
+class TestOneWayDependency:
+    def test_runner_never_imports_harness(self):
+        repo = find_repo_root()
+        offenders: list[str] = []
+        for py in (repo / "runner").rglob("*.py"):
+            text = py.read_text(encoding="utf-8")
+            if _IMPORT_HARNESS.search(text):
+                offenders.append(str(py.relative_to(repo)))
+        assert not offenders, (
+            "runner must not import harness (out-of-band boundary); offenders: "
+            + ", ".join(offenders)
+        )
+
+    def test_tools_and_scripts_do_not_import_harness_into_runtime(self):
+        # The auxiliary runtime surfaces (tools/, scripts/) must stay harness-free
+        # too — nothing that runs as part of producing the pipeline may depend on
+        # the out-of-band eval layer.
+        repo = find_repo_root()
+        offenders: list[str] = []
+        for sub in ("tools", "scripts"):
+            base = repo / sub
+            if not base.is_dir():
+                continue
+            for py in base.rglob("*.py"):
+                if _IMPORT_HARNESS.search(py.read_text(encoding="utf-8")):
+                    offenders.append(str(py.relative_to(repo)))
+        assert not offenders, (
+            "tools/ and scripts/ must not import harness (out-of-band boundary); "
+            "offenders: " + ", ".join(offenders)
+        )
+
+
+class TestPackageSurface:
+    def test_imports_clean(self):
+        import harness  # noqa: F401
+
+    def test_public_api_exported(self):
+        import harness
+
+        for name in (
+            "Judge",
+            "JudgeConfig",
+            "Verdict",
+            "MajorityVerdict",
+            "majority_vote",
+            "ProvenanceRecord",
+            "ProvenanceLog",
+            "prompt_hash",
+            "route",
+            "assert_judgeable",
+            "HarnessReport",
+            "build_report",
+            "EVIDENCE_TYPE_INFERRED",
+        ):
+            assert hasattr(harness, name), name
+
+    def test_harness_md_exists(self):
+        repo = find_repo_root()
+        assert (repo / "harness" / "HARNESS.md").is_file()

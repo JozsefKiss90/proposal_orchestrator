@@ -48,7 +48,6 @@ with an empty ``findings`` list.  The gate evaluator detects the
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
@@ -58,6 +57,7 @@ from runner.claude_transport import (
     ClaudeCLITimeoutError,
     ClaudeTransportError,
 )
+from runner.json_extract import extract_first_json_object
 from runner.paths import resolve_repo_path
 from runner.transport.config import resolve_provider_config, ProviderConfig
 
@@ -553,44 +553,12 @@ def _extract_json(text: str) -> Optional[dict]:
     """
     Extract the first JSON object from *text*.
 
-    Handles bare JSON, JSON inside a markdown code block, and JSON
-    preceded or followed by prose.  Returns ``None`` if no valid JSON
-    object can be found.
+    Thin wrapper over :func:`runner.json_extract.extract_first_json_object` (the
+    shared house helper) — see it for the extraction order.  Retained as a
+    module-local name because :func:`invoke_agent` and the dispatch tests
+    reference it.
     """
-    stripped = text.strip()
-
-    # 1. Try parsing the whole response as JSON.
-    # If it parses but is not a dict (e.g. a list), stop — don't extract
-    # a nested dict from inside a top-level array.
-    try:
-        data = json.loads(stripped)
-        return data if isinstance(data, dict) else None
-    except json.JSONDecodeError:
-        pass
-
-    # 2. Try extracting from a markdown code fence
-    code_match = re.search(
-        r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL
-    )
-    if code_match:
-        try:
-            data = json.loads(code_match.group(1))
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-
-    # 3. Try finding any JSON object anywhere in the text
-    obj_match = re.search(r"\{.*\}", stripped, re.DOTALL)
-    if obj_match:
-        try:
-            data = json.loads(obj_match.group())
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-
-    return None
+    return extract_first_json_object(text)
 
 
 # ---------------------------------------------------------------------------
