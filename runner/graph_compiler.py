@@ -50,12 +50,14 @@ binding, extract declared fields verbatim, compute status from
   ``unconfirmed`` node yields an ``unresolved`` claim the drafting gates catch
   (:func:`compile_part_b`).
 
-Against the *current* MSCA vault — methodology-only, with the Tier-3/Part-B
-binding nodes (folders 11–18) not yet authored (ticket 8) — **both** slices
-compile empty: the Tier-3 diff enumerates the whole hand-lift as an **explained
-residual**, and no ``proposal_section`` nodes exist so no section is written.
-Each extraction contract is proven on a controlled fixture vault
-(``tests/runner/test_graph_compiler.py``, ``test_graph_compiler_part_b.py``).
+Against a *pre-authoring* vault — one whose Tier-3/Part-B binding folders are not
+yet populated — **both** slices legitimately compile empty: the Tier-3 diff
+enumerates the whole hand-lift as an **explained residual**, and with no
+``proposal_section`` nodes present no section is written.  Against a fully
+authored instance vault they converge to the Tier-3 ``architecture_inputs`` and
+the Part B sections.  Either way each extraction contract is proven independently
+on a controlled fixture vault (``tests/runner/test_graph_compiler.py``,
+``test_graph_compiler_part_b.py``).
 
 Constitutional authority
 -------------------------
@@ -561,10 +563,11 @@ def _diff_one(
     else:
         status = "residual"
         explanation = (
-            "Residual diff: the Tier-3 binding nodes for this artifact are not yet "
-            "authored in the vault (ticket 8). The compile mechanism is verified; "
-            "convergence lands when ticket 8 authors the binding nodes carrying "
-            "these records. The hand-lift is not overwritten (ticket 10 cutover)."
+            "Residual diff: the compiled record id-set differs from the hand-lift's. "
+            "Against a pre-authoring vault the Tier-3 binding nodes are not yet "
+            "populated, so the compile is empty and the whole hand-lift is residual; "
+            "against a fully authored instance vault the id-sets converge. The "
+            "hand-lift is not overwritten (ticket 10 cutover)."
         )
     return {
         "artifact": artifact.artifact_path,
@@ -615,16 +618,16 @@ def diff_against_hand_lift(
         "convergence_basis": (
             "record identity (id/milestone_id) — 'converged' means the id-sets "
             "match, not that every field value matches. Field-level convergence "
-            "is verified when ticket 8 authors the binding nodes carrying the "
-            "record fields (and reconciled at the ticket-10 cutover)."
+            "is verified once the binding nodes carrying the record fields are "
+            "authored (and reconciled at the ticket-10 cutover)."
         ),
         "residual_total": residual_total,
         "artifacts": per_artifact,
         "note": (
             "compile(vault) ≈ hand_lift. Any residual is explained per-artifact: "
-            "against the current methodology-only vault the Tier-3 binding nodes "
-            "(folders 11–18) are not yet authored (ticket 8), so the compiled "
-            "architecture_inputs are empty and the whole hand-lift is residual. "
+            "against a pre-authoring vault the Tier-3 binding folders are not yet "
+            "populated, so the compiled architecture_inputs are empty and the "
+            "whole hand-lift is residual; a fully authored instance converges. "
             "The extraction mechanism is verified on a controlled fixture vault."
         ),
     }

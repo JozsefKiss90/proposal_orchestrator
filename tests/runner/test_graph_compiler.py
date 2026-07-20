@@ -393,7 +393,7 @@ def test_diff_converged_when_ids_match(fixture_repo, tmp_path):
     assert report["converged"] is True
 
 
-def test_diff_residual_explains_ticket_8(fixture_repo, tmp_path):
+def test_diff_residual_is_explained(fixture_repo, tmp_path):
     _write_hand_lift(
         fixture_repo,
         "docs/tier3_project_instantiation/architecture_inputs/risks.json",
@@ -405,7 +405,10 @@ def test_diff_residual_explains_ticket_8(fixture_repo, tmp_path):
     risks = next(a for a in report["artifacts"] if a["artifact"].endswith("risks.json"))
     assert risks["status"] == "residual"
     assert sorted(risks["only_in_hand_lift"]) == ["RISK-01", "RISK-02"]
-    assert "ticket 8" in risks["explanation"]
+    # The residual is explained in authoring-state-agnostic terms (a pre-authoring
+    # vault yields an empty compile → residual), and the hand-lift is not overwritten.
+    assert "pre-authoring" in risks["explanation"]
+    assert "ticket 10 cutover" in risks["explanation"]
     assert report["converged"] is False
 
 
