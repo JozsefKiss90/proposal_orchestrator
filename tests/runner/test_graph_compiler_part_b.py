@@ -9,9 +9,11 @@ Two layers, mirroring ``test_graph_compiler.py``:
   status (never read), overall-status derivation, section-specific required-field
   enforcement (schema-driven, fail-closed), determinism/byte-stability, non-
   destructiveness, and the fail-closed cases.
-* **MSCA oracle** — compiling the real methodology-only vault yields **zero**
-  Part B sections (the ``proposal_section`` nodes await ticket 8); the real
-  ``docs/tier5_.../proposal_sections`` is never touched.
+* **MSCA oracle** — compiling the real vault.  Ticket 8 authored the
+  ``proposal_section`` nodes, so Part B now compiles to the three Tier-5
+  sections (excellence / impact / implementation), each honestly
+  ``overall_status=inferred``; the real ``docs/tier5_.../proposal_sections``
+  is never touched (non-destructive staging).
 """
 
 from __future__ import annotations
@@ -597,7 +599,7 @@ def test_compile_part_b_and_report_writes_report(excellence_repo, tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# MSCA oracle — the real vault has no proposal_section nodes (ticket 8)
+# MSCA oracle — the real vault (ticket 8 authored the proposal_section nodes)
 # ---------------------------------------------------------------------------
 
 
@@ -609,10 +611,27 @@ def msca_config(repo_root) -> Path:
     return cfg
 
 
-def test_msca_compiles_zero_sections_today(msca_config, repo_root, tmp_path):
+def test_msca_compiles_part_b_from_authored_nodes(msca_config, repo_root, tmp_path):
+    # Ticket 8 authored the proposal_section nodes (folder 19_proposal_sections),
+    # so Part B now compiles to the three Tier-5 sections, each honestly
+    # overall_status=inferred (drafted narrative is synthesis over confirmed facts).
     result = compile_part_b(msca_config, repo_root, staging_root=tmp_path / "s", now=_FIXED_NOW)
     assert result.project_id == "msca-pf-reference"
-    assert result.sections == ()  # no proposal_section nodes until ticket 8
+    by_slug = {s.slug: s for s in result.sections}
+    assert set(by_slug) == {"excellence", "impact", "implementation"}
+    assert len(by_slug["excellence"].section["sub_sections"]) == 5
+    assert len(by_slug["impact"].section["sub_sections"]) == 4
+    assert len(by_slug["implementation"].section["sub_sections"]) == 3
+    for sec in result.sections:
+        assert sec.section["validation_status"]["overall_status"] == "inferred"
+        # every section carries a non-empty traceability footer
+        assert sec.section["traceability_footer"]["primary_sources"]
+    # section-specific required extras are emitted from the authored nodes
+    assert "impact_pathway_refs" in by_slug["impact"].section
+    assert "dec_coverage" in by_slug["impact"].section
+    impl = by_slug["implementation"].section
+    for f in ("wp_table_refs", "gantt_ref", "milestone_refs", "risk_register_ref"):
+        assert f in impl
 
 
 def test_msca_part_b_does_not_mutate_real_tier5(msca_config, repo_root, tmp_path):

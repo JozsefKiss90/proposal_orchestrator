@@ -10,9 +10,10 @@ Two layers, mirroring the other graph tests:
   determinism/byte-stability, and the **no-drift** property: a pack and a Part B
   section derived from the *same* vault nodes pass the canonical-preservation
   gate.
-* **MSCA oracle** — the real methodology-only vault yields an empty pack (the
-  binding nodes await ticket 8); the real ``canonical_reference_pack.json`` is
-  never touched.
+* **MSCA oracle** — the real vault.  Ticket 8 authored the binding nodes, so
+  the pack's confirmed arrays (objectives / outcomes / work packages) are now
+  populated with carried, never-upgraded provenance; the real
+  ``canonical_reference_pack.json`` is never touched.
 """
 
 from __future__ import annotations
@@ -335,7 +336,7 @@ def test_missing_config_fails_closed(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# MSCA oracle — the real methodology-only vault yields an empty pack
+# MSCA oracle — the real vault (ticket 8 authored the binding nodes)
 # ---------------------------------------------------------------------------
 
 
@@ -347,17 +348,28 @@ def msca_config(repo_root) -> Path:
     return cfg
 
 
-def test_msca_pack_empty_today(msca_config, tmp_path):
+def test_msca_pack_from_authored_nodes(msca_config, tmp_path):
     # repo_root=tmp_path isolates working_assumptions (absent → empty); the vault
-    # resolves from the real config.  The 6 methodology partner nodes in the
-    # unbound 08_partners folder must be excluded → all confirmed arrays empty.
+    # resolves from the real config.  Ticket 8 authored the objective/outcome/
+    # work_package binding nodes, so those confirmed arrays are now populated.
     target, pack = build_canonical_pack_from_graph(
         msca_config, tmp_path, out_path=tmp_path / "pack.json"
     )
     assert pack["run_id"] == "msca-pf-reference"
-    for key in ("objectives", "outcomes", "wps", "deliverables", "partners"):
-        assert pack[key] == [], f"{key} should be empty pre-ticket-8"
+    assert len(pack["objectives"]) == 5
+    assert len(pack["outcomes"]) == 6
+    assert len(pack["wps"]) == 5
+    # Deliverables are Phase-3 seed forward-refs (not authored as WP-node lists),
+    # and the operator-confirmed spine lives in Tier-3 roles.json — no *bound*
+    # partner nodes exist (the 6 methodology partner nodes are in the unbound
+    # 08_partners folder), so both arrays stay honestly empty.
+    assert pack["deliverables"] == []
+    assert pack["partners"] == []
     assert pack["declared_assumptions"] == []
+    # Provenance is carried and never upgraded: OBJ-4 (Inferred) stays 'inferred'.
+    prov = {o["id"]: o["provenance"] for o in pack["objectives"]}
+    assert prov["OBJ-4"] == "inferred"
+    assert prov["OBJ-1"] == "confirmed"
 
 
 def test_msca_pack_does_not_touch_real_canonical_pack(msca_config, repo_root, tmp_path):

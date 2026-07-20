@@ -7,9 +7,10 @@ Two layers:
   the Appendix-B computed status (never read), determinism/byte-stability,
   non-destructiveness, fail-closed on inconsistent bindings, and the diff report
   (converged vs residual).  This is the walking skeleton's substantive proof.
-* **MSCA oracle** — compiling the *real* methodology-only vault yields empty
-  Tier-3 collections and an explained residual diff against the ticket-14
-  hand-lift (the binding nodes await ticket 8).  The hand-lift is never touched.
+* **MSCA oracle** — compiling the *real* vault.  Ticket 8 authored the Tier-3
+  binding nodes (folders 11-16), so the compile now **converges** against the
+  ticket-14 hand-lift (record id-sets match, residual 0).  The hand-lift is
+  never touched (non-destructive; the ticket-10 cutover chooses the source).
 
 All fixture vaults are written to tmp_path; the MSCA oracle reads the real vault
 and hand-lift but stages to tmp_path so the repo is never mutated.
@@ -438,26 +439,34 @@ def test_msca_config_loads_and_resolves_vault(msca_config, repo_root):
     assert cfg.resolve_vault_dir() == repo_root / "MSCA" / "methodology_graph"
 
 
-def test_msca_compiles_empty_tier3_today(msca_config, repo_root, tmp_path):
-    # The methodology-only vault has no Tier-3 binding nodes yet (ticket 8), so
-    # every Tier-3 architecture_input compiles to an empty collection.
+def test_msca_compiles_tier3_from_authored_nodes(msca_config, repo_root, tmp_path):
+    # Ticket 8 authored the Tier-3 binding nodes (folders 11-16), so every
+    # architecture_input now compiles to its populated collection.
     result = compile_tier3(msca_config, repo_root, staging_root=tmp_path / "s", now=_FIXED_NOW)
     assert result.project_id == "msca-pf-reference"
     assert len(result.artifacts) == 6  # objectives, outcomes, impacts, wp, milestones, risks
-    for a in result.artifacts:
-        assert a.records == (), f"{a.artifact_path} should be empty pre-ticket-8"
+    counts = {a.collection_key: len(a.records) for a in result.artifacts}
+    assert counts == {
+        "objectives": 5,
+        "outcomes": 6,
+        "impacts": 4,
+        "work_packages": 5,
+        "milestones": 6,
+        "risks": 10,
+    }
 
 
-def test_msca_oracle_residual_explained(msca_config, repo_root, tmp_path):
+def test_msca_oracle_converged_after_ticket_8(msca_config, repo_root, tmp_path):
+    # Ticket 8 authored the binding nodes, so the compile now CONVERGES against
+    # the ticket-14 hand-lift: the record id-sets match exactly, residual 0.
     result = compile_tier3(msca_config, repo_root, staging_root=tmp_path / "s", now=_FIXED_NOW)
     report = diff_against_hand_lift(result, repo_root)
-    # Not converged: the hand-lift has records the empty compile does not.
-    assert report["converged"] is False
-    assert report["residual_total"] > 0
+    assert report["converged"] is True
+    assert report["residual_total"] == 0
     for entry in report["artifacts"]:
-        if entry["hand_lift_count"] > 0:
-            assert entry["status"] == "residual"
-            assert "ticket 8" in entry["explanation"]
+        assert entry["status"] == "converged"
+        assert entry["only_in_hand_lift"] == []
+        assert entry["only_in_compiled"] == []
 
 
 def test_msca_compile_does_not_mutate_hand_lift(msca_config, repo_root, tmp_path):

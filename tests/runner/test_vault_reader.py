@@ -366,14 +366,27 @@ def msca_methodology_vault(repo_root) -> Path:
     return vault
 
 
+#: Ticket-8 authoring added the Tier-3/4/5 binding folders (11-19); the ticket-1
+#: invariant is scoped to the *methodology* folders (00-10, 90, 99) so it keeps
+#: asserting exactly what it always meant: the 87 methodology nodes unchanged.
+_BINDING_FOLDER_PREFIXES = ("11_", "12_", "13_", "14_", "15_", "16_", "17_", "18_", "19_")
+
+
+def _methodology_nodes(vault):
+    return [n for n in vault.nodes if not n.rel_path.startswith(_BINDING_FOLDER_PREFIXES)]
+
+
 def test_all_87_methodology_nodes_validate_unchanged(msca_methodology_vault):
+    # The whole vault reads cleanly (no VaultReadError, incl. the ticket-8 binding
+    # nodes); the 87 methodology nodes (folders 00-10, 90, 99) are unchanged.
     vault = read_vault(msca_methodology_vault)
-    assert len(vault.nodes) == 87
+    assert len(_methodology_nodes(vault)) == 87
 
 
 def test_msca_evidence_distribution(msca_methodology_vault):
+    # Distribution over the 87 methodology nodes is unchanged by ticket 8.
     vault = read_vault(msca_methodology_vault)
-    dist = Counter(n.evidence_strength for n in vault.nodes)
+    dist = Counter(n.evidence_strength for n in _methodology_nodes(vault))
     assert dist == {
         "source_grounded": 67,
         "synthesis": 14,
@@ -395,6 +408,28 @@ def test_msca_elte_node_is_unresolved(msca_methodology_vault):
     elte = vault.by_basename["ELTE Role"]
     assert elte.evidence_strength == "unconfirmed"
     assert elte.status == "Unresolved"
+
+
+def test_msca_ticket8_binding_nodes_authored(msca_methodology_vault):
+    # Ticket 8 authored the Tier-3/5 binding + budget nodes in folders 11-19; this
+    # pins their node_type distribution (incl. the source-only budget nodes, which
+    # have no other oracle).
+    vault = read_vault(msca_methodology_vault)
+    binding = [n for n in vault.nodes if n.rel_path.startswith(_BINDING_FOLDER_PREFIXES)]
+    assert Counter(n.node_type for n in binding) == {
+        "objective": 5,
+        "outcome": 6,
+        "impact": 4,
+        "work_package": 5,
+        "timeline": 6,
+        "risk": 10,
+        "budget": 5,
+        "proposal_section": 12,
+    }
+    # Budget lines are the §8.1 unit-cost derivation — all Confirmed today, so
+    # source_grounded; the deriver degrades a missing status to unconfirmed, never up.
+    budget = [n for n in binding if n.node_type == "budget"]
+    assert all(n.evidence_strength == "source_grounded" for n in budget)
 
 
 def test_msca_schema_node_only_parses_leading_front_matter(msca_methodology_vault):
