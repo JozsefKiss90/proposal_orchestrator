@@ -2,3 +2,6 @@
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-v"
+markers = [
+    "harness_regression: standing E4 golden-set comparison of the live Tier-5 sections against harness/regression_baselines (merge-advisory, human-decided; never run-blocking)",
+]

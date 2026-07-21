@@ -1,19 +1,20 @@
-# Evaluation & Integrity Harness — substrate (E1/E1.5) + the two headline signals (E2, E3)
+# Evaluation & Integrity Harness — substrate (E1/E1.5), the two headline signals (E2, E3) + the regression golden-set (E4)
 
 > Out-of-band QA/CI track. **Never a fail-closed runtime gate.** Advisory to a
 > human. Subordinate to `CLAUDE.md`.
 >
 > Source: `harness_plan/EVALUATION_HARNESS_STRATEGY.md` (v1),
-> `harness_plan/tickets_eval_harness.md` (E1, E1.5, E2, E3). Reviewed in
+> `harness_plan/tickets_eval_harness.md` (E1, E1.5, E2, E3, E4). Reviewed in
 > `harness_plan/EVAL_HARNESS_TICKETS_REVIEW.md`.
 
 This package (`harness/`) is the scaffolding every harness metric (E2–E9) stands
 on. E1 builds the **substrate** — the judge, provenance, routing, verdict types,
 and reporting boundary; E1.5 the judge-reliability calibration; **E2 and E3 the
 two headline integrity signals** (status-aware faithfulness and claim-ledger
-completeness + status calibration, below). The remaining metrics (the evaluator
-G-Evals, the α-block assertion, graph-retrieval precision/recall) are later
-tickets.
+completeness + status calibration, below); **E4 the regression golden-set** that
+freezes the current sections so a prompt/model change cannot silently regress
+them. The remaining metrics (the evaluator G-Evals, the α-block assertion,
+graph-retrieval precision/recall) are later tickets.
 
 ## The one load-bearing invariant
 
@@ -247,12 +248,51 @@ E3 per the ticket and closed native again — decision log
   Zero-assertion density anomalies and ledger records matched by no assertion
   are also surfaced in the notes.
 
-## What the harness does *not* do (through E3)
+## E4 — Regression golden-set (`regression.py` + `regression_baselines/`)
+
+The safety net the length-lift work lacked: the current section JSONs are
+frozen as golden baselines, and any future artifact — after a drafting
+soft-cap lift (D2/D3), a prompt change, or a model swap — is diffed against
+them so an integrity/quality regression is surfaced instead of sliding
+through. Native on the substrate (no framework — DeepEval's pytest lane earns
+in at E5, per the Wave-0 decision gate); two lanes, deterministic-first:
+
+- **Deterministic fingerprint lane (zero judge, offline, committed).**
+  `freeze_section_fingerprint` snapshots the claim ledger (matched by
+  *meaning* — `(claim_summary, status, source_ref)`, never bare `claim_id`),
+  per-sub-section prose hashes + char counts, and a canonical
+  formatting-invariant artifact hash. `compare_section` /
+  `compare_to_golden_set` classify every drift: a **removed claim, a status
+  change, a source_ref swap, a dropped sub-section, a missing section** are
+  *breaking* findings; an added claim/section, prose growth,
+  prose-changed-while-ledger-unchanged (the escaped-claim risk zone — re-run
+  E2/E3 there), and a confirmed-share drop (grounding-density quality signal)
+  are advisory context. The frozen goldens live in
+  `harness/regression_baselines/` (191 + 119 + 96 claims = the full
+  406-entry ledger); loading an empty golden dir **fails closed** (a check
+  against no baselines would vacuously pass).
+- **Judge lane (E2 reuse, runs when the pinned judge is live).**
+  `freeze_section_grounding` / `compare_section_grounding` wrap E2's
+  `freeze_baseline` / `compare_to_baseline` — per-claim grounding invariance
+  (*form may change, grounding may not*) as the regression assertion after a
+  redraft.
+
+**CI wiring — merge-advisory, human-decided, never run-blocking.** The
+standing suite (`tests/harness/test_regression_golden.py`, marker
+`harness_regression`) diffs the live sections against the committed goldens on
+every full pytest run; `python -m harness.regression check` does the same from
+the command line (exit 1 = drift, exit 2 = fail-closed). A breaking finding is
+*advice to a human*: refreeze (`… freeze`) and commit the golden diff in the
+same PR if the change is intentional, investigate if not. `RegressionReport`
+enforces `advisory=True, blocking=False` structurally, and nothing in `runner`
+reads any of it.
+
+## What the harness does *not* do (through E4)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware
-  faithfulness, E3 ledger completeness + status calibration). E4–E9 (regression
-  golden-set, evaluator G-Evals, the α-block assertion, graph-retrieval
-  precision/recall) are later tickets.
+  faithfulness, E3 ledger completeness + status calibration, E4 regression
+  golden-set). E5–E9 (evaluator G-Evals, the α-block assertion, graph-retrieval
+  precision/recall, the run-dependent behavioural suites) are later tickets.
 - It adopts **no** Ragas / DeepEval / PromptFoo dependency. Their exact metric/API
   names predate the knowledge cutoff and must be confirmed against current docs at
   build time (guardrail: API currency); E2 **and E3** are custom metrics on the
@@ -267,5 +307,5 @@ E3 per the ticket and closed native again — decision log
   gold set and a judge that clears the operator's threshold; the seeded gold set
   ships **unlabeled** (as do E3's materiality negatives), so the harness remains
   advisory until a human labels them and re-runs calibration.
-- It does not run the DAG. Every metric through E3 reads frozen artifacts; zero
+- It does not run the DAG. Every metric through E4 reads frozen artifacts; zero
   DAG runs.
