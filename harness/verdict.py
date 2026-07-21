@@ -36,6 +36,7 @@ __all__ = [
     "Verdict",
     "MajorityVerdict",
     "majority_vote",
+    "validate_sample_count",
 ]
 
 #: The only admissible evidence type for a judge verdict (CLAUDE.md §12.2).
@@ -49,6 +50,23 @@ EVIDENCE_TYPE_INFERRED: str = "Inferred"
 #: nor absorb residual judge non-determinism, so :func:`majority_vote` rejects
 #: fewer than this many samples.
 MIN_MAJORITY_SAMPLES: int = 3
+
+
+def validate_sample_count(n: int) -> None:
+    """Reject any panel size other than 1 (single verdict) or ≥3 (majority).
+
+    The shared entry-point guard every metric applies to its ``n`` parameter
+    (E2's status faithfulness, E3's materiality/ledger/status-calibration):
+    a single sample is the cheap default, an N≥3 panel is the guardrails'
+    rule where a score will inform a decision, and n=2 is rejected because it
+    can neither break a tie nor absorb residual non-determinism.
+    """
+    if n != 1 and n < MIN_MAJORITY_SAMPLES:
+        raise ValueError(
+            f"n must be 1 (single verdict) or ≥{MIN_MAJORITY_SAMPLES} (majority, "
+            f"the guardrails' N≥3 rule where a score informs a decision); got {n}. "
+            f"n=2 cannot break a tie."
+        )
 
 
 def _validate_inferred(evidence_type: str, what: str) -> None:

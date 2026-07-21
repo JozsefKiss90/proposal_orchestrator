@@ -37,6 +37,7 @@ from harness.verdict import (  # noqa: F401
     MajorityVerdict,
     Verdict,
     majority_vote,
+    validate_sample_count,
 )
 from harness.jsonl_log import JsonlLog  # noqa: F401
 from harness.provenance import (  # noqa: F401
@@ -115,6 +116,7 @@ __all__ = [
     "Verdict",
     "MajorityVerdict",
     "majority_vote",
+    "validate_sample_count",
     # provenance
     "REQUIRED_PROVENANCE_FIELDS",
     "prompt_hash",

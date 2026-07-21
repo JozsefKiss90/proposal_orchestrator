@@ -73,7 +73,12 @@ from harness.faithfulness import INDEPENDENCE_PREAMBLE, build_claim_user_prompt
 from harness.judge import Judge, MajorityJudgeResult
 from harness.report import HarnessReport, build_report
 from harness.routing import RoutingDecision, assert_judgeable
-from harness.verdict import MIN_MAJORITY_SAMPLES, MajorityVerdict, Verdict
+from harness.verdict import (
+    MIN_MAJORITY_SAMPLES,
+    MajorityVerdict,
+    Verdict,
+    validate_sample_count,
+)
 
 __all__ = [
     "STATUS_AWARE_FAITHFULNESS_METRIC",
@@ -91,6 +96,7 @@ __all__ = [
     "DEFAULT_MAX_SOURCE_CHARS",
     "StatusFaithfulnessError",
     "SourceResolutionError",
+    "entry_key_for",
     "SectionClaim",
     "StatusPolicy",
     "DEFAULT_POLICIES",
@@ -186,6 +192,22 @@ class SourceResolutionError(StatusFaithfulnessError):
 # --------------------------------------------------------------------------- #
 
 
+def entry_key_for(claim_id: str, entry_index: int | None) -> str:
+    """The one rendering of a claim's disambiguated identity (``C01#171``).
+
+    Real ledgers repeat ``claim_id`` across independently-numbered drafting
+    blocks, so the bare id is a display label, not a key; the entry index is
+    what makes a claim addressable.  ``None`` (a claim built outside a ledger)
+    falls back to the bare id.  Every ``entry_key`` property across the
+    harness (:class:`SectionClaim`, :class:`ClaimFaithfulness`,
+    :class:`ClaimGroundingSnapshot`, E3's drift rows) delegates here so the
+    format cannot drift.
+    """
+    if entry_index is None:
+        return claim_id
+    return f"{claim_id}#{entry_index}"
+
+
 @dataclass(frozen=True)
 class SectionClaim:
     """One entry of a section's ``validation_status.claim_statuses`` array.
@@ -203,12 +225,19 @@ class SectionClaim:
     source_ref:
         The path (optionally ``…#fragment``, optionally with a trailing
         parenthetical annotation) the engine cited as the claim's provenance.
+    entry_index:
+        Position of this entry within the section's ``claim_statuses`` array.
+        Real ledgers concatenate independently-numbered drafting blocks, so
+        ``claim_id`` is **not unique** (excellence: 191 entries / 128 unique
+        ids; three unrelated ``C01``\\ s) — the entry index is what makes a
+        claim addressable.  ``None`` for a claim constructed outside a ledger.
     """
 
     claim_id: str
     claim_summary: str
     status: str
     source_ref: str
+    entry_index: int | None = None
 
     def __post_init__(self) -> None:
         if not str(self.claim_id).strip():
@@ -218,8 +247,20 @@ class SectionClaim:
                 f"SectionClaim {self.claim_id!r}: claim_summary must be non-empty."
             )
 
+    @property
+    def entry_key(self) -> str:
+        """The disambiguated identity: ``claim_id`` alone, or ``C01#7`` with an index.
+
+        Used as the judge ``property_key``, in ``hard_finding_ids``, and as the
+        baseline key — so a finding on one of several same-id claims names
+        exactly which entry it concerns.
+        """
+        return entry_key_for(self.claim_id, self.entry_index)
+
     @classmethod
-    def from_dict(cls, d: Mapping[str, Any]) -> "SectionClaim":
+    def from_dict(
+        cls, d: Mapping[str, Any], *, entry_index: int | None = None
+    ) -> "SectionClaim":
         if not isinstance(d, Mapping):
             raise StatusFaithfulnessError(
                 f"claim entry must be an object; got {type(d).__name__}"
@@ -229,6 +270,7 @@ class SectionClaim:
             claim_summary=str(d.get("claim_summary", "")),
             status=str(d.get("status", "")).strip().lower(),
             source_ref=str(d.get("source_ref", "")),
+            entry_index=entry_index,
         )
 
 
@@ -253,7 +295,9 @@ def load_section_claims(path: Path | str) -> tuple[SectionClaim, ...]:
         raise StatusFaithfulnessError(
             f"section {p} has no validation_status.claim_statuses array to judge."
         )
-    return tuple(SectionClaim.from_dict(c) for c in claim_statuses)
+    return tuple(
+        SectionClaim.from_dict(c, entry_index=i) for i, c in enumerate(claim_statuses)
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -811,6 +855,9 @@ class ClaimFaithfulness:
         *not* judged (comparison target unresolved, or an unknown status).
     reason:
         Human-readable explanation, especially for the un-judged cases.
+    entry_index:
+        The judged claim's position in ``claim_statuses`` (see
+        :attr:`SectionClaim.entry_index`); ``None`` when unknown.
     """
 
     claim_id: str
@@ -820,6 +867,12 @@ class ClaimFaithfulness:
     severity: str
     verdict: Verdict | MajorityVerdict | None = None
     reason: str = ""
+    entry_index: int | None = None
+
+    @property
+    def entry_key(self) -> str:
+        """Disambiguated identity (``C01#171``); bare ``claim_id`` without an index."""
+        return entry_key_for(self.claim_id, self.entry_index)
 
     @property
     def flagged(self) -> bool:
@@ -849,6 +902,8 @@ class ClaimFaithfulness:
     def to_dict(self) -> dict[str, Any]:
         return {
             "claim_id": self.claim_id,
+            "entry_index": self.entry_index,
+            "entry_key": self.entry_key,
             "status": self.status,
             "comparison": self.comparison,
             "comparison_ref": self.comparison_ref,
@@ -906,13 +961,6 @@ def _judge_claim(
     return result.majority
 
 
-def _validate_n(n: int) -> None:
-    if n != 1 and n < MIN_MAJORITY_SAMPLES:
-        raise ValueError(
-            f"n must be 1 (single verdict) or ≥{MIN_MAJORITY_SAMPLES} (majority, "
-            f"the guardrails' N≥3 rule where a score informs a decision); got {n}. "
-            f"n=2 cannot break a tie."
-        )
 
 
 def evaluate_claim(
@@ -927,17 +975,17 @@ def evaluate_claim(
 ) -> ClaimFaithfulness:
     """Judge one claim's faithfulness under its status policy.
 
-    Routes on the claim id (a green judge never overrides a red predicate),
-    resolves the status-appropriate comparison target, invokes the judge (single
-    or N≥3 majority), and classifies the severity.  A claim with an unknown
-    status, an unresolvable source, or an ``assumed`` claim with no backing
-    declaration is *surfaced un-judged* with the matching severity — never
-    silently dropped.
+    Routes on the claim's ``entry_key`` (a green judge never overrides a red
+    predicate), resolves the status-appropriate comparison target, invokes the
+    judge (single or N≥3 majority), and classifies the severity.  A claim with
+    an unknown status, an unresolvable source, or an ``assumed`` claim with no
+    backing declaration is *surfaced un-judged* with the matching severity —
+    never silently dropped.
     """
     # Routing enforcement is the public entry point's job; the section runner
     # (:func:`evaluate_status_aware_faithfulness`) routes once itself and calls
     # the already-routed body directly, so the check is not duplicated per claim.
-    assert_judgeable(claim.claim_id)
+    assert_judgeable(claim.entry_key)
     return _evaluate_claim_routed(
         judge,
         claim,
@@ -960,7 +1008,7 @@ def _evaluate_claim_routed(
     source_text_resolver: SourceTextResolver | None = None,
 ) -> ClaimFaithfulness:
     """Body of :func:`evaluate_claim`, assuming the claim id is already routed."""
-    _validate_n(n)
+    validate_sample_count(n)
     resolved_policies = policies if policies is not None else DEFAULT_POLICIES
     resolver = source_text_resolver or resolve_claim_source_text
     # A single sample's score never drives a hard decision; the ≈1.0 / soft-score
@@ -983,6 +1031,7 @@ def _evaluate_claim_routed(
             severity=severity,
             verdict=verdict,
             reason=reason,
+            entry_index=claim.entry_index,
         )
 
     policy = resolved_policies.get(claim.status)
@@ -1034,7 +1083,7 @@ def _evaluate_claim_routed(
         claim_text=claim.claim_summary,
         comparison_text=material,
         comparison=policy.comparison,
-        property_key=claim.claim_id,
+        property_key=claim.entry_key,
         source_ref=source_ref,
         n=n,
     )
@@ -1144,7 +1193,7 @@ class StatusFaithfulnessResult:
             "judge_model": self.judge_model,
             "judge_version": self.judge_version,
             "severity_counts": self.severity_counts,
-            "hard_finding_ids": [f.claim_id for f in self.integrity_findings()],
+            "hard_finding_ids": [f.entry_key for f in self.integrity_findings()],
             "findings": [f.to_dict() for f in self.findings],
         }
 
@@ -1170,14 +1219,14 @@ def evaluate_status_aware_faithfulness(
     the run to a subset (e.g. only ``confirmed`` claims); *n* selects a single
     verdict (1) or an N≥3 majority.  Reporting-only; performs zero DAG runs.
     """
-    _validate_n(n)
+    validate_sample_count(n)
     selected = [c for c in claims if (claim_filter is None or claim_filter(c))]
     findings: list[ClaimFaithfulness] = []
     routing: list[RoutingDecision] = []
     for claim in selected:
         # Route once here (collecting the decision for the report) and call the
         # already-routed body, so routing is not re-evaluated per claim.
-        routing.append(assert_judgeable(claim.claim_id))
+        routing.append(assert_judgeable(claim.entry_key))
         findings.append(
             _evaluate_claim_routed(
                 judge,
@@ -1245,6 +1294,14 @@ class ClaimGroundingSnapshot:
     met_bar: bool
     passed: bool | None
     score: float | None
+    #: Position in ``claim_statuses`` — real ledgers repeat ``claim_id`` across
+    #: drafting blocks, so without this a baseline of same-id claims collapses.
+    entry_index: int | None = None
+
+    @property
+    def entry_key(self) -> str:
+        """Disambiguated identity (``C01#171``); bare ``claim_id`` without an index."""
+        return entry_key_for(self.claim_id, self.entry_index)
 
     @classmethod
     def from_finding(cls, finding: ClaimFaithfulness) -> "ClaimGroundingSnapshot":
@@ -1256,11 +1313,13 @@ class ClaimGroundingSnapshot:
             met_bar=finding.severity == SEVERITY_NONE,
             passed=finding.passed,
             score=finding.score,
+            entry_index=finding.entry_index,
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "claim_id": self.claim_id,
+            "entry_index": self.entry_index,
             "status": self.status,
             "comparison": self.comparison,
             "severity": self.severity,
@@ -1279,6 +1338,9 @@ class ClaimGroundingSnapshot:
             met_bar=bool(d.get("met_bar", False)),
             passed=d.get("passed"),
             score=d.get("score"),
+            # Absent in baselines frozen before entry_index existed — the key
+            # then falls back to the bare claim_id, keeping old files loadable.
+            entry_index=d.get("entry_index"),
         )
 
 
@@ -1298,7 +1360,14 @@ class FaithfulnessBaseline:
     snapshots: tuple[ClaimGroundingSnapshot, ...]
 
     def by_id(self) -> dict[str, ClaimGroundingSnapshot]:
-        return {s.claim_id: s for s in self.snapshots}
+        """Snapshots keyed by ``entry_key`` (claim ids repeat across blocks).
+
+        Keying on the bare ``claim_id`` would silently collapse a real ledger
+        (excellence: 191 entries / 128 unique ids) and mis-compare the M3
+        invariance check.  Baselines frozen before ``entry_index`` existed fall
+        back to ``claim_id`` keys.
+        """
+        return {s.entry_key: s for s in self.snapshots}
 
     def applies_to(self, judge_model: str | None, judge_version: str | None) -> bool:
         """Whether this baseline was frozen under the given judge pin."""
@@ -1368,7 +1437,10 @@ def load_baseline(path: Path | str) -> FaithfulnessBaseline:
 class InvarianceViolation:
     """One per-claim grounding change between a baseline and a re-run.
 
-    ``kind`` is one of the ``VIOLATION_*`` constants.  A ``breaking`` violation
+    ``claim_id`` carries the *entry key* (``C01#171``) where the ledger
+    supplied an entry index, so a violation names exactly which of several
+    same-id claims changed.  ``kind`` is one of the ``VIOLATION_*`` constants.
+    A ``breaking`` violation
     (:data:`VIOLATION_DROPPED` / :data:`VIOLATION_STATUS_CHANGED` /
     :data:`VIOLATION_BAR_REGRESSION`) means grounding weakened or the ledger
     mutated; :data:`VIOLATION_SCORE_DROP` is a soft, informational flag.
@@ -1459,7 +1531,9 @@ def compare_to_baseline(
     (breaking) kinds occurred.  Reporting-only; advisory to a human.
     """
     base_by_id = baseline.by_id()
-    cur_by_id = {f.claim_id: f for f in result.findings}
+    # Keyed by entry_key throughout — claim ids repeat across drafting blocks,
+    # and a violation must name exactly which entry weakened.
+    cur_by_id = {f.entry_key: f for f in result.findings}
     violations: list[InvarianceViolation] = []
 
     for claim_id, snap in base_by_id.items():

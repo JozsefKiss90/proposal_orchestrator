@@ -1,18 +1,19 @@
-# Evaluation & Integrity Harness — substrate (E1/E1.5) + status-aware faithfulness (E2)
+# Evaluation & Integrity Harness — substrate (E1/E1.5) + the two headline signals (E2, E3)
 
 > Out-of-band QA/CI track. **Never a fail-closed runtime gate.** Advisory to a
 > human. Subordinate to `CLAUDE.md`.
 >
 > Source: `harness_plan/EVALUATION_HARNESS_STRATEGY.md` (v1),
-> `harness_plan/tickets_eval_harness.md` (E1, E1.5, E2). Reviewed in
+> `harness_plan/tickets_eval_harness.md` (E1, E1.5, E2, E3). Reviewed in
 > `harness_plan/EVAL_HARNESS_TICKETS_REVIEW.md`.
 
 This package (`harness/`) is the scaffolding every harness metric (E2–E9) stands
 on. E1 builds the **substrate** — the judge, provenance, routing, verdict types,
-and reporting boundary; E1.5 the judge-reliability calibration; **E2 the first
-production metric (status-aware faithfulness, below).** The remaining metrics
-(claim-ledger completeness, the evaluator G-Evals, the α-block assertion,
-graph-retrieval precision/recall) are later tickets.
+and reporting boundary; E1.5 the judge-reliability calibration; **E2 and E3 the
+two headline integrity signals** (status-aware faithfulness and claim-ledger
+completeness + status calibration, below). The remaining metrics (the evaluator
+G-Evals, the α-block assertion, graph-retrieval precision/recall) are later
+tickets.
 
 ## The one load-bearing invariant
 
@@ -189,20 +190,82 @@ a soft, non-breaking flag. *Form may change, grounding may not.* A baseline is
 keyed to the judge pin it was frozen under (`applies_to`), so a comparison
 spanning a repin is flagged (`judge_repinned`), mirroring the E1.5 discipline.
 
-## What the harness does *not* do (through E2)
+## Claim identity — `entry_key`, because `claim_id` is not a key
+
+Real ledgers concatenate independently-numbered drafting blocks, so
+`claim_id` repeats across **unrelated** claims (excellence: 191 entries / 128
+unique ids; three different `C01`s) and nothing tags a claim to its
+sub-section. Every harness surface therefore keys claims by
+**`entry_key`** — `claim_id` disambiguated by its position in
+`claim_statuses` (`C01#171`): the judge `property_key`/provenance, E2's
+`hard_finding_ids`, the M3 baseline (`by_id()` would otherwise silently
+collapse 191 snapshots to 128 and mis-compare), and every E3 record. E3's
+matching goes further: it never matches by id at all — the ledger is treated
+as a set of `(claim_summary, status, source_ref)` records matched by meaning,
+and ids are display labels only.
+
+## E3 — Claim-ledger completeness + status calibration (headline signal #2)
+
+The "escaped claim" detector (`claim_ledger.py`) plus label-drift
+(`status_calibration.py`), with the §10.5 materiality bar (`materiality.py`)
+in between. All native on the substrate (the framework question re-opened at
+E3 per the ticket and closed native again — decision log
+`e3-claim-ledger-completeness_2026-07-21.json`).
+
+- **The escaped claim (hard finding).** Prose is chunked deterministically
+  (whole paragraphs), decomposed by the judge into atomic assertions
+  (*exhaustively* — materiality is deliberately a separate classifier), and
+  every **material** assertion is matched against the ledger by meaning:
+  a deterministic lexical shortlist, then one **batched** judge call over
+  numbered candidates (the judge answers with a candidate *number*, never an
+  ambiguous claim id), escalating to the stricter per-candidate boolean
+  question when coverage is asserted but unattributable. A material assertion
+  no record covers is **`escaped`** — an unattributed claim per CLAUDE.md
+  §10.5 ("*Unattributed claims must be flagged, not asserted*"), the
+  fabricates-without-emitting-a-claim threat no predicate can see. The escape
+  *basis* is always recorded (`no_lexical_candidates` vs `judged_uncovered` vs
+  `escalation_unconfirmed`) so a paraphrase false-escape is legible.
+- **Materiality (the bar that keeps the diff usable).** `classify_materiality`
+  quotes §10.5 verbatim; the *same* classifier path is calibrated against the
+  engine's own 406-entry ledger (`harness/materiality_sets/` — 393 deduped
+  auto-labeled positives; 30 **unlabeled** negative candidates a human must
+  label, the E1.5 rule). Recall is measurable now; **precision is forced to
+  `None` until labeled negatives exist** (positives-only precision would be a
+  spurious 1.0). Every completeness report stamps the calibration state in its
+  notes.
+- **Status calibration (label drift).** `confirmed`-not-grounded =
+  **overclaimed** (hard; reuses E2's integrity finding — a supplied E2 result
+  costs zero extra confirmed-direction judge calls). `inferred` that clears
+  the confirmed bar (E2's own `meets_bar` under the `confirmed` policy) =
+  **underclaimed** (soft, advisory — integrity-safe but calibration-wrong).
+  Unverifiable claims are surfaced as `unverifiable`, never conflated with
+  overclaiming.
+- **Batch-failure posture.** Unlike E2 (hundreds of calls), an E3 run makes
+  thousands; a per-assertion/per-chunk judge failure is **surfaced as an
+  `unjudgeable` finding / `ChunkFailure`** rather than aborting the batch —
+  a report with the failure visible serves integrity better than no report.
+  Zero-assertion density anomalies and ledger records matched by no assertion
+  are also surfaced in the notes.
+
+## What the harness does *not* do (through E3)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware
-  faithfulness). E3–E9 (ledger completeness, evaluator G-Evals, the α-block
-  assertion, graph-retrieval precision/recall) are later tickets.
+  faithfulness, E3 ledger completeness + status calibration). E4–E9 (regression
+  golden-set, evaluator G-Evals, the α-block assertion, graph-retrieval
+  precision/recall) are later tickets.
 - It adopts **no** Ragas / DeepEval / PromptFoo dependency. Their exact metric/API
   names predate the knowledge cutoff and must be confirmed against current docs at
-  build time (guardrail: API currency); E2 is a custom metric on the substrate,
-  and framework adoption is deferred to the lanes where a primitive is
-  irreplaceable (E5/E8/E9). Nothing here imports them.
+  build time (guardrail: API currency); E2 **and E3** are custom metrics on the
+  substrate (the framework question re-opened at E3 — prose decomposition being
+  Ragas's headline primitive — and closed native again: the decomposition judge
+  is a bounded prompt on the existing substrate and the ledger-diff is custom
+  either way), and framework adoption is deferred to the lanes where a primitive
+  is irreplaceable (E5/E8/E9). Nothing here imports them.
 - It does not auto-gate a merge. E1.5 supplies the *mechanism* to graduate
-  advisory → human-gating (`graduation_for`), and E2's report is `blocking=False`
-  by construction; graduation still requires a human-labeled gold set and a judge
-  that clears the operator's threshold; the seeded gold set ships **unlabeled**,
-  so the harness remains advisory until a human labels it and re-runs calibration.
-- It does not run the DAG. Every metric through E2 reads frozen artifacts; zero
+  advisory → human-gating (`graduation_for`), and every report is
+  `blocking=False` by construction; graduation still requires a human-labeled
+  gold set and a judge that clears the operator's threshold; the seeded gold set
+  ships **unlabeled** (as do E3's materiality negatives), so the harness remains
+  advisory until a human labels them and re-runs calibration.
+- It does not run the DAG. Every metric through E3 reads frozen artifacts; zero
   DAG runs.

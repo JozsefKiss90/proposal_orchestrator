@@ -300,6 +300,17 @@ class Judge:
         self._provenance_log = provenance_log
         self._clock = clock or _default_clock
 
+    @property
+    def provenance_log(self) -> ProvenanceLog | None:
+        """The attached provenance log, if any (read-only).
+
+        ``evaluate()`` appends to it automatically.  Exposed so callers that
+        drive :meth:`raw_invoke` for a *generative* judge task (e.g. E3's
+        decomposition) can hand-build their provenance into the **same** trail
+        instead of silently producing none.
+        """
+        return self._provenance_log
+
     # -- transport -------------------------------------------------------- #
 
     def _get_backend(self) -> Backend:

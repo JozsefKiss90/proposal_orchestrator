@@ -699,6 +699,124 @@ class TestM3Baseline:
 
 
 # --------------------------------------------------------------------------- #
+# Claim identity — duplicate claim_ids disambiguated by entry_index/entry_key
+# --------------------------------------------------------------------------- #
+
+
+class TestClaimIdentityDisambiguation:
+    """Real ledgers repeat claim_ids across independently-numbered drafting
+    blocks (excellence: 191 entries / 128 unique ids; three unrelated C01s), so
+    claim_id alone is not a key.  entry_index (position in claim_statuses) and
+    the derived entry_key ("C01#7") disambiguate every downstream surface."""
+
+    def test_load_section_claims_populates_entry_index(self, tmp_path):
+        section = {
+            "validation_status": {
+                "claim_statuses": [
+                    {"claim_id": "C1", "claim_summary": "a", "status": "confirmed", "source_ref": "d1"},
+                    {"claim_id": "C1", "claim_summary": "b", "status": "inferred", "source_ref": "d2"},
+                ]
+            }
+        }
+        p = tmp_path / "sec.json"
+        p.write_text(json.dumps(section), encoding="utf-8")
+        claims = sf.load_section_claims(p)
+        assert [c.entry_index for c in claims] == [0, 1]
+        assert [c.entry_key for c in claims] == ["C1#0", "C1#1"]
+
+    def test_entry_key_falls_back_to_claim_id_without_index(self):
+        c = claim(cid="C7")
+        assert c.entry_index is None
+        assert c.entry_key == "C7"
+
+    def test_duplicate_ids_get_distinct_property_keys_and_hard_finding_ids(self):
+        # Two unrelated claims sharing the id "C01" (the real C01 collision):
+        # the unsupported one must be reportable without ambiguity.
+        claims = [
+            sf.SectionClaim(
+                claim_id="C01", claim_summary="crop is tomato", status="confirmed",
+                source_ref="docs/a.json", entry_index=0,
+            ),
+            sf.SectionClaim(
+                claim_id="C01", claim_summary="the fellow is Dr. X", status="confirmed",
+                source_ref="docs/b.json", entry_index=171,
+            ),
+        ]
+
+        def rule(system, user):
+            return {"passed": "tomato" in user, "score": 0.9, "rationale": "r"}
+
+        judge, _ = make_judge(rule)
+        result = sf.evaluate_status_aware_faithfulness(
+            claims, judge, repo_root=Path("."), working_assumptions=EMPTY_WA,
+            source_text_resolver=fixed_source("SRC"),
+        )
+        keys = [f.verdict.property_key for f in result.findings]
+        assert keys == ["C01#0", "C01#171"]
+        assert result.to_dict()["hard_finding_ids"] == ["C01#171"]
+        assert [f.entry_key for f in result.integrity_findings()] == ["C01#171"]
+
+    def test_baseline_does_not_collapse_duplicate_ids(self):
+        findings = [
+            _finding("C01", "confirmed", sf.SEVERITY_NONE, passed=True, score=0.95),
+            _finding("C01", "confirmed", sf.SEVERITY_NONE, passed=True, score=0.9),
+        ]
+        findings = [
+            sf.ClaimFaithfulness(
+                claim_id=f.claim_id, status=f.status, comparison=f.comparison,
+                comparison_ref=f.comparison_ref, severity=f.severity,
+                verdict=f.verdict, entry_index=i,
+            )
+            for i, f in enumerate(findings)
+        ]
+        base = sf.freeze_baseline(_result(findings))
+        assert len(base.by_id()) == 2  # not collapsed to one "C01"
+        rep = sf.compare_to_baseline(base, _result(findings))
+        assert rep.invariant is True
+        assert rep.compared == 2
+
+    def test_baseline_regression_names_the_exact_entry(self):
+        def with_index(f, i):
+            return sf.ClaimFaithfulness(
+                claim_id=f.claim_id, status=f.status, comparison=f.comparison,
+                comparison_ref=f.comparison_ref, severity=f.severity,
+                verdict=f.verdict, entry_index=i,
+            )
+
+        base_findings = [
+            with_index(_finding("C01", "confirmed", sf.SEVERITY_NONE, passed=True), 0),
+            with_index(_finding("C01", "confirmed", sf.SEVERITY_NONE, passed=True), 171),
+        ]
+        weakened = [
+            with_index(_finding("C01", "confirmed", sf.SEVERITY_NONE, passed=True), 0),
+            with_index(_finding("C01", "confirmed", sf.SEVERITY_INTEGRITY, passed=False), 171),
+        ]
+        base = sf.freeze_baseline(_result(base_findings))
+        rep = sf.compare_to_baseline(base, _result(weakened))
+        assert rep.invariant is False
+        assert [v.claim_id for v in rep.breaking_violations] == ["C01#171"]
+
+    def test_old_baseline_without_entry_index_still_loads(self, tmp_path):
+        # A baseline written before entry_index existed keys by bare claim_id.
+        old = {
+            "record_type": "status_faithfulness_baseline",
+            "baseline_id": "b-old",
+            "section_id": "s",
+            "judge_model": "acme-judge-1",
+            "judge_version": "v1",
+            "snapshots": [
+                {"claim_id": "C1", "status": "confirmed", "comparison": "source",
+                 "severity": "none", "met_bar": True, "passed": True, "score": 0.9},
+            ],
+        }
+        p = tmp_path / "old.json"
+        p.write_text(json.dumps(old), encoding="utf-8")
+        loaded = sf.load_baseline(p)
+        assert set(loaded.by_id()) == {"C1"}
+        assert loaded.snapshots[0].entry_index is None
+
+
+# --------------------------------------------------------------------------- #
 # Integration on the real excellence section (offline, injected judge)
 # --------------------------------------------------------------------------- #
 
