@@ -99,6 +99,24 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 - **Ragas → E9** — graph context precision/recall (retrieval-eval machinery).
 - **PromptFoo → E6/E7** — provider matrix + the `type: python` predicate bridge.
 
+## E3.1  Materiality calibration completeness — advisory→gating for E3 (offline; native)
+**What to build:** the measurement that graduates E3 from advisory, mirroring E1.5 for the judge.
+Without it, E3 flags escapes but its own leak rate is unmeasured, so it can never move to merge-gating.
+**Blocked by:** E3 (built on it). Does **not** block E4.
+- [ ] Label `harness/materiality_sets/materiality_negatives_TEMPLATE.jsonl` (non-material spans)
+      → compute + record precision `{judge_model, judge_version, precision}`
+      (positives-only precision stays `None` by design until this lands).
+- [ ] Seed a small human-labeled set of **out-of-ledger material claims** (material assertions
+      deliberately absent from the ledger) → compute + record recall / miss-rate on the real
+      failure mode. (Overlaps E8 adversarial fixtures — minimal set here, full suite at E8;
+      these are also the first fixtures that exercise the `assumed` path, still 0 in real data.)
+- [ ] Apply the E1.5 `graduation_for` threshold → record the graduation decision
+      (advisory-stays / promote-to-gating) in `docs/tier4_orchestration_state/decision_log/`.
+- [ ] Reporting-only; zero DAG runs. Human ground truth only (an AI labeling gold for an AI
+      classifier reintroduces the correlation the harness avoids).
+**Done =** E3's precision + miss-rate are characterized and a graduation decision is recorded —
+not necessarily promotion (same honest bar as E1.5's "advisory until characterized").
+
 ## E4. Regression golden-set (offline; native — reuses E2's baseline machinery)
 **What to build:** frozen baselines so a prompt/model change can't silently regress integrity/quality.
 **Blocked by:** Wave-0 decision gate. **Native** on the substrate — the harness already runs under pytest (238 tests) and E2 ships `freeze_baseline`/`compare_to_baseline`; E4 formalizes that into a standing golden-set suite. (No framework: DeepEval's pytest-integration isn't needed here — it earns in at E5.)
