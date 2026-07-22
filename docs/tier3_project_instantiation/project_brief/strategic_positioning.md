@@ -6,7 +6,13 @@
 
 MSCA-PF is a **single-researcher, single-beneficiary** action assessed on the researcher's development through an excellent, well-hosted research project — not a consortium research programme. This positioning note therefore separates the **research merit** (grounded in the methodology vault) from the **researcher-and-host merit** (1.3, 1.4, 2.1, 3.2), which rests on the confirmed pairing of a plant-physiology fellow (Cholakova) with a remote-sensing / geoinformatics host and supervisor (ELTE; Jung).
 
+<<<<<<< Updated upstream
 ## Excellence (50%) — research and methodology *(vault-grounded)*
+=======
+MAESTRO is explicitly aligned with the call’s required maturity range (TRL 2–TRL 5). The project begins at TRL 2, focusing on the formulation and early experimental grounding of its core AI agent architectures and coordination mechanisms, and advances these to TRL 5 through integrated validation in operational environments across the selected Apply AI sector demonstrators.
+
+### Positioning Against the Expected Outcomes
+>>>>>>> Stashed changes
 
 **1.1 Quality and pertinence of the R&I objectives; going beyond the state of the art.** The project targets the single empty cell of the reviewed literature's research-gap matrix — *Real-Time Decision Support × PlanetScope* (`[[Research Gap Matrix]]`, `source_grounded`) — and the underdeveloped combination of *learned multimodal fusion + explicit probabilistic crop-water-state + irrigation optimisation* (`[[Probabilistic Fusion Novelty Claim]]`). The defensible edge is the end-to-end coupling, argued narrowly and honestly, not "using satellites for irrigation." Objectives are measurable against a validation protocol (uncertainty calibration, decision quality) rather than asserted.
 

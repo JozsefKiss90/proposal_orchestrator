@@ -15,6 +15,7 @@
 | Phase | Status | Notes |
 |-------|--------|-------|
 | Phase 1 | COMPLETE | Call slicer + TAPM stable |
+<<<<<<< Updated upstream:plans/reports/backend_migration_plan.md
 | Phase 2 | OPERATIONAL | scope_coverage fix → semantic gate stable. Output quality depends on Tier 3 concept content; gate pass does not guarantee evaluator-grade alignment. |
 | Phase 3 | OPERATIONAL | CLI mode; structural output stable. Dependency semantics now handled by Phase 4-side normalization layer (not by mutating Phase 3 output). |
 | Phase 4 | OPERATIONAL — VALIDATED | Remediation validated: normalizer + gantt-schedule-builder + gate hardening + FULL milestone validation. Gate passed on runtime rerun. All deterministic predicates passing. |
@@ -22,6 +23,11 @@
 | Phase 6 | COMPLETE — VALIDATED | Gate passed (run `b2d4f829`, 2026-04-24). All 10 deterministic predicates pass (`g07_p01`–`g07_p09` + `g07_p04b`). Governance model, risk register, ethics assessment, instrument sections all validated. See §24 for full implementation details. |
 | Phase 7 | COMPLETE — VALIDATED | Gate passed (run `3c0b880c`, 2026-04-24). All 9 deterministic predicates pass (`g08_p01`–`g08_p09`). Budget response conforms to `interface_contract.json` v1.0. External integration structurally complete via placeholder response. Phase 8 unblocked. |
 | Phase 8 | PARTIALLY OPERATIONAL | Drafting & Review. Conditionally executable after Phase 7 passes. `proposal-section-drafting` skill added to n08a. Runtime artifact_path injection for `constitutional-compliance-check` implemented but not yet validated end-to-end. |
+=======
+| Phase 2 | COMPLETE | scope_coverage fix → semantic gate stable |
+| Phase 3 | FUNCTIONAL (STRUCTURAL ONLY) | Passes gates; dependency semantics require correction before Phase 4 |
+| Phase 4 | NOT READY | Blocking issues in dependency semantics and gate coverage | Root cause: Phase 3 dependency graph violates temporal feasibility assumptions required by Phase 4 scheduling.
+>>>>>>> Stashed changes:backend_migration_plan.md
 
 ---
 
@@ -1265,6 +1271,7 @@ Phase 3 is operationally complete but not fully optimized.
 
 ---
 
+<<<<<<< Updated upstream:plans/reports/backend_migration_plan.md
 ## 19. Phase 4 — Migration Readiness (OPERATIONAL — VALIDATED)
 
 Phase 4 is operationally complete. Remediation was implemented and validated by a successful Phase 4 gate pass at runtime.
@@ -1308,6 +1315,31 @@ Phase 4 is operationally complete. Remediation was implemented and validated by 
 2. ~~Gate incompleteness~~ → `g05_p08` predicate added
 3. ~~No gantt-producing skill~~ → `gantt-schedule-builder` added to n04
 4. ~~Milestone validation in DEGRADED mode~~ → gantt.json now present before milestone-consistency-check runs
+=======
+## 19. Phase 4 — Migration Readiness (BLOCKED)
+
+Phase 4 is NOT ready for implementation due to structural inconsistencies between Phase 3 outputs and Phase 4 requirements.
+
+### Blocking issues
+
+1. **Dependency semantics mismatch:**
+   - WP-level `finish_to_start` edges are temporally infeasible
+   - Must be reclassified to `data_input`
+
+2. **Gate incompleteness:**
+   - No predicate enforcing dependency → schedule consistency
+
+3. **Skill sequencing error:**
+   - `milestone-consistency-check` executes before `gantt.json` exists
+
+### Required fixes before implementation
+
+- Reclassify WP-level dependency edges (Phase 3 artifact correction)
+- Add `dependency_schedule_consistency` predicate to Phase 4 gate
+- Reorder or dual-mode `milestone-consistency-check`
+
+**Phase 4 must NOT be implemented before these corrections.**
+>>>>>>> Stashed changes:backend_migration_plan.md
 
 ### Phase 4 TAPM Suitability
 

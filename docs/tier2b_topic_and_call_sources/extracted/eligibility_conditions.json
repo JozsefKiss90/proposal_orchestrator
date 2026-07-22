@@ -2,15 +2,26 @@
   "conditions": [
     {
       "condition_id": "EC-01",
+<<<<<<< Updated upstream
       "description": "Applications must be made jointly by the researcher and a beneficiary in the academic or non-academic sector; a sole researcher application without an institutional beneficiary is not eligible.",
       "condition_type": "consortium_composition",
       "source_section": "Scope",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+=======
+      "description": "Participation is restricted to legal entities established in EU Member States, Iceland, Norway, and the following associated countries: Canada, Israel, Republic of Korea, New Zealand, Switzerland, and the United Kingdom.",
+      "condition_type": "geographic",
+      "source_section": "eligibility_restrictions.eligible_entities",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+>>>>>>> Stashed changes
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-02",
+<<<<<<< Updated upstream
       "description": "European Postdoctoral Fellowships are open to researchers of any nationality; no nationality restriction applies for EF applicants.",
+=======
+      "description": "Entities controlled by non-eligible countries may be excluded from participation unless appropriate guarantees are provided to the contracting authority.",
+>>>>>>> Stashed changes
       "condition_type": "geographic",
       "source_section": "Scope — European Postdoctoral Fellowships",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
@@ -18,30 +29,52 @@
     },
     {
       "condition_id": "EC-03",
+<<<<<<< Updated upstream
       "description": "Global Postdoctoral Fellowships are open to European nationals or long-term residents only; third-country nationals who are not long-term residents in an EU Member State or Horizon Europe Associated Country are not eligible for GF.",
       "condition_type": "geographic",
       "source_section": "Scope — Global Postdoctoral Fellowships",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+=======
+      "description": "Project activities are expected to start at TRL 2 and achieve TRL 5 by the end of the project.",
+      "condition_type": "trl_level",
+      "source_section": "technology_readiness_level",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+>>>>>>> Stashed changes
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-04",
+<<<<<<< Updated upstream
       "description": "European Postdoctoral Fellowship standard duration must be between 12 and 24 months.",
       "condition_type": "other",
       "source_section": "Scope — European Postdoctoral Fellowships",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+=======
+      "description": "Maximum EU contribution per project is €19,000,000. The indicative total topic budget is €38,000,000 for approximately 2 funded projects.",
+      "condition_type": "budget_limit",
+      "source_section": "call_entry.min__contribution / call_entry.max_contribution / call_entry.indicative_budget",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+>>>>>>> Stashed changes
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-05",
+<<<<<<< Updated upstream
       "description": "Global Postdoctoral Fellowship outgoing phase must be a minimum of 12 months and a maximum of 24 months, spent at a host organisation in a non-associated Third Country.",
       "condition_type": "other",
       "source_section": "Scope — Global Postdoctoral Fellowships",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
+=======
+      "description": "Financial support to third parties (FSTP) provisions: maximum €300,000 per third party in grant stage 2; maximum €2,250,000 per third party in grant stage 3; maximum €2,550,000 per third party overall across all stages.",
+      "condition_type": "budget_limit",
+      "source_section": "fstp_provisions",
+      "source_document": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json",
+>>>>>>> Stashed changes
       "status": "Confirmed"
     },
     {
       "condition_id": "EC-06",
+<<<<<<< Updated upstream
       "description": "Global Postdoctoral Fellowships require a mandatory 12-month return phase at a host organisation based in an EU Member State or a Horizon Europe Associated Country.",
       "condition_type": "other",
       "source_section": "Scope — Global Postdoctoral Fellowships",
@@ -95,6 +128,14 @@
       "source_section": "Scope — Placements in the non-academic sector",
       "source_document": "HORIZON-MSCA-2026-PF-01-01.slice.json",
       "status": "Confirmed"
+=======
+      "description": "Standard Horizon Europe RIA minimum consortium composition: at least 3 legal entities from at least 3 different EU Member States or associated countries.",
+      "condition_type": "consortium_composition",
+      "source_section": null,
+      "source_document": null,
+      "status": "Assumed",
+      "assumption_note": "Minimum consortium size and composition are not stated in any of the topic-specific source documents (HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json, HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.json, or selected_call.json). This reflects the standard Horizon Europe General Annex B participation condition for Research and Innovation Actions. Verification against General Annex B (Tier 1) is required before treating this as a binding project eligibility constraint."
+>>>>>>> Stashed changes
     }
   ]
 }
