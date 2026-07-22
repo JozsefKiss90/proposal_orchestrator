@@ -7,6 +7,10 @@ Source strategy: `EVALUATION_HARNESS_STRATEGY.md` (v1, 2026-07-20). Reviewed in 
 
 **Rev 4 (2026-07-21) — build status + framework resolution.** **E1, E1.5, E2 are implemented, reviewed, and committed** on branch `harness` (E1 `4d0a73e`, E1.5 `1f9df59`, E2 `f75d9e0`). The Wave-0 framework question is **resolved: E2 is native** on the E1/E1.5 substrate, no framework dependency — this **supersedes the earlier "DeepEval as Wave-0 spine" default** (rationale in the decision-gate cascade below; recorded in the decision log). Plan docs now live in `harness_plan/`. One open item carries forward: E1.5's gold set **ships unlabeled** — human labeling + the first calibration run is the pending deliverable that graduates the judge (and E2) from advisory.
 
+**Rev 5 (2026-07-21) — build reality + cost policy + coordination.** **E3 (`b2b69b0`) and E4 (`1f85fe6`) are implemented, reviewed, and committed** on branch `harness`; Wave 0 is complete and Wave 1's E4 is done (native). This Rev folds in decisions that until now lived only in the `harness_plan/` companion docs — invisible to build sessions, the coordination gap it closes: **E3.1** (materiality calibration → advisory→gating for E3), **E10** (the single deferred paid/online-framework ticket), the **subscription cost policy**, and E4's grounding-baseline open item. **LLM calls run on the Claude Code subscription plan (flat-rate — no per-call bill); the harness judge is a non-drafter local model. Runs incur no metered cost; the only added-cost item is E10's external frameworks.** Waves refreshed to reality.
+
+> **Companion docs — read these; they carry the rationale, and this ticket folds in their decisions:** `harness_plan/EVAL_HARNESS_TICKETS_REVIEW.md` (strategy review), `EVAL_HARNESS_E3_PREAPPROVAL.md` (E3 grounded review + D1–D3 resolution), `HARNESS_COST_POLICY.md` ($0 policy + free/paid taxonomy + E10). If a companion doc and this ticket disagree, update both.
+
 This is a **separate, out-of-band QA/CI track** — architecturally distinct from the runtime DAG and the milestone-2 authoring track. It sits alongside M3, not inside M2.
 
 **Scope decision (operator steer): earn-its-lane phasing.** Prove the two headline integrity signals in one framework first; adopt a second/third framework only when its *distinct* lane demonstrates ROI; keep the right to consolidate. Integrity-weighted over quality.
@@ -15,10 +19,10 @@ This is a **separate, out-of-band QA/CI track** — architecturally distinct fro
 
 Pin every gating name so no ticket is gated on an undefined artifact (same fail-closed-on-dangling-links discipline `vault_reader.dangling_links()` applies to wikilinks).
 
-- **`M2-T10`** = milestone-2 ticket 10 — the *graph-becomes-authoritative-Tier-3-source* cutover (open-Q #4, `tickets_milestone2.md`). Gates only the run-dependent **E7b/E8** (they reuse the showcase's runs). The offline tickets do **not** wait on it.
+- **`M2-T10`** = milestone-2 ticket 10 — the *graph-becomes-authoritative-Tier-3-source* cutover (open-Q #4, `tickets_milestone2.md`). Gates only the run-dependent **E7b/E8** (they reuse the showcase's runs). The offline tickets do **not** wait on it. **(M2 tickets 1–9 are ✅ complete; only T10 — E2E graph-sourced run + open-Q #4 — and T11 — B2 extension — remain.)**
 - **M2 section-node authoring — ✅ DONE (verified 2026-07-20).** The milestone-2 ticket that authors `proposal_section` nodes has authored vault folders `11_objectives … 19_proposal_sections`, including the **12 `proposal_section` nodes** (PS-excellence-1/1.1–1.4, PS-impact-2/2.1–2.3, PS-implementation-3/3.1–3.2). E9's authoring blocker is **cleared**. (The `GRAPH_SUBSTRATE.md` "walking-skeleton / folders 11–18 unauthored" note is stale — supersede it.)
-- **"the showcase"** = the planned flagship end-to-end run (M2 graph-sourced Tier 3 + M3 composition + Opus-for-impact Impact authoring) that produces an evaluator-ready Part B, whose runs **E7b/E8** batch behind. ⟐ **not yet pinned to a canonical ticket — pin before Wave 4 starts** (grep-confirmed it appears in no repo doc as of 2026-07-20; do not treat as defined until pinned).
-- **"Opus-for-impact"** = authoring/composing the Impact section with the Opus model (the model choice E6's cost matrix is meant to evidence). ⟐ **pin to its scope line / ticket.**
+- **"the showcase"** = the planned flagship end-to-end run (M2 graph-sourced Tier 3 + M3 composition + Opus-for-impact Impact authoring) that produces an evaluator-ready Part B, whose runs **E7b/E8** batch behind. ⟐ now **pinned = the Phase-8 finalization re-run** (M2 graph-sourced + refreshed Tier 3 + Opus-for-impact) that clears `gate_10b_impact_completeness` and produces an evaluator-ready Part B. The run is on the Claude Code subscription (flat-rate) — no metered bill.
+- **"Opus-for-impact"** = authoring/composing the Impact section with the Opus model (the model choice E6's cost matrix is meant to evidence). Now **activated to clear `gate_10b_impact_completeness`** — Opus 4.8 runs on the Claude Code subscription (flat-rate), so no cost tension. The anti-fabrication guard still applies: every impact claim must trace to the refreshed Tier 3 (exactly what E2/E3 verify).
 
 ## Non-negotiable guardrails (span every ticket)
 
@@ -28,6 +32,7 @@ Pin every gating name so no ticket is gated on an undefined artifact (same fail-
 - **Judge output is `Inferred`, never `Confirmed`.** Pin judge model+version, temp 0, N≥3 majority where a score informs a decision; log `{judge_model, judge_version, prompt_hash, score, rationale}` as provenance (same discipline as the decision log).
 - **Earn-its-lane.** Each framework must prove its distinct lane before the next is adopted. If a lane is better served by a framework already in use, do not add the second tool. (Expect convergence on ~three tools in *distinct* lanes — see the Wave-0 decision gate.)
 - **API currency.** Exact Ragas/DeepEval/PromptFoo metric/API names predate the May-2025 cutoff — confirm against current docs at build time before writing any binding (Inferred until then). *(This is a live constraint: the frameworks are absent from the offline build env, so a real binding can't be verified here — a reason E2 went native.)*
+- **Cost policy (Rev 5) — subscription + local judge.** Claude LLM calls run on the Claude Code subscription (flat-rate, no per-call bill); every harness feature unit-tests with a fake backend and runs against a non-drafter local judge — no feature may require a *separately-metered* provider. Only external frameworks that call their own metered endpoints (DeepEval, Ragas LLM-graded, PromptFoo provider matrix, DeepTeam) defer to **E10**. Full taxonomy: `harness_plan/HARNESS_COST_POLICY.md`.
 
 ## Sequencing — the "avoid extra runs" split
 
@@ -40,13 +45,15 @@ The harness judges **artifacts, not runs** — almost all of it never triggers a
 
 ## Waves
 
-- **Wave 0 (offline, now — M3's verifier; prove the core in one framework):** ✅ E1, ✅ E1.5, ✅ E2, ✅ E3 *(all done, native)* → decision gate
-- **Wave 1 (offline, add pytest/CI lane if it earns):** ✅ E4 *(done, native)*, E5
-- **Wave 2 (offline, add prompt-boundary lane if it earns; + the deterministic α-block check):** E6, E7a
-- **Wave 3 (offline, graph-retrieval lane — where Ragas earns in; data ready today):** E9
-- **Wave 4 (run-dependent, ⚠ behind M2-T10 / the showcase):** E7b, E8
+- **Wave 0 (offline — M3's verifier; core proven native):** ✅ E1 · ✅ E1.5 *(mechanism; ⏳ gold-set labeling)* · ✅ E2 · ✅ E3 *(`b2b69b0`)* — all **native**. Decision gate passed: no second framework adopted.
+- **Wave 1 (offline):** ✅ E4 *(`1f85fe6`, native; ⏳ grounding baselines unfrozen)* · ⏸ E5 → **native rubric grader = $0; DeepEval form → E10**.
+- **Graduation track (advisory → gating; $0 on local judge):** ☐ **E1.5 gold-set labeling** · ☐ **E3.1 materiality calibration**. Until these land, the E2/E3/E4 judge lanes stay advisory.
+- **Wave 2 (offline):** ☐ E6 *(native predicate bridge = $0; provider matrix → E10)* · ☐ E7a *(deterministic; no judge, no run)*.
+- **Wave 3 (offline, graph-retrieval):** ☐ E9 → **native set-math core = $0; Ragas LLM-form → E10**.
+- **Wave 4 (run-dependent — behind M2-T10 / the showcase; runs on the subscription, no metered bill):** ☐ E7b · ☐ E8 *(DeepTeam generation → E10)*.
+- **E10 (deferred):** paid/online framework integration — gated on budget + an online session.
 
-Only Wave 4 needs a pipeline run.
+Runs are covered by the Claude Code subscription (no metered bill); the only remaining cost line is E10's external tooling.
 
 ---
 
@@ -79,15 +86,16 @@ Only Wave 4 needs a pipeline run.
 - [x] Built against the current `excellence/impact/implementation_section.json` (real-data probe: all 406 claim refs resolve, 0 unresolved / 0 truncated); re-points at M2-T10's graph-sourced artifacts unchanged. Reporting-only; zero DAG runs.
 - [x] **M3 reuse:** `freeze_baseline` / `compare_to_baseline` — per-claim grounding-invariance for the M3-T3/T7 exit check.
 
-## E3. Claim-ledger completeness + status calibration — headline signal #2 — ✅ DONE (branch harness) · **native**
+## E3. Claim-ledger completeness + status calibration — headline signal #2 — ✅ DONE (`b2b69b0`, branch harness) · **native**
 **What to build:** the "escaped claim" detector + calibration drift.
-**Blocked by:** E1 (built on the same **native** substrate as E2). ⟐ **Framework re-opens here on its own merits:** prose→atomic-assertion decomposition is the one place a framework's differentiator (Ragas) *or* a native decomposition-judge applies — decide when E3 is built; the ledger-diff is custom either way, so native is the likely answer. **→ Resolved: native** (`harness/claim_ledger.py` + `materiality.py` + `status_calibration.py`; decision log `e3-claim-ledger-completeness_2026-07-21.json`) — the decomposition judge is a bounded prompt on the existing substrate; Ragas remains unverifiable offline (API-currency); the ledger-diff is custom regardless. **Build finding (operator steer applied): claim identity settled beside materiality** — real `claim_id`s repeat across independently-numbered drafting blocks (excellence 191 entries / 128 unique ids; three unrelated `C01`s), so the diff matches the ledger **by meaning** (`(summary, status, source_ref)` records; batched coverage answers by candidate *number*) and every surface keys on the disambiguated `entry_key` (`C01#171`); the same pass fixed shipped E2's ambiguous `hard_finding_ids`/`property_key` and a real M3-baseline collapse bug (`by_id()` lost 63 duplicate-id snapshots).
-- [x] Prose decomposed into atomic assertions, diffed against logged `claim_id`s; a non-empty "unledgered assertion" set is a hard finding ("fabricates without emitting a claim" — the threat W1 cannot reach). → `OUTCOME_ESCAPED` with the basis always recorded (`no_lexical_candidates` / `judged_uncovered` / `escalation_unconfirmed`); decomposition is exhaustive by prompt (materiality deliberately a separate classifier); chunk/assertion failures surfaced as findings, never aborting the batch.
-- [x] **Materiality threshold (else self-defeating; the design task to settle first).** Only assertions meeting the *material claim* bar must map to a `claim_id`; non-material prose (transitions, framing, definitional/method description) is excluded — else the "escaped claim" set floods with false positives and the check gets ignored. **Two anchors, spelled out:**
+**Status: ✅ DONE** — native (`harness/claim_ledger.py`, `materiality.py`, `status_calibration.py`); matches by *meaning*, never bare `claim_id` (D1); materiality precision `None` until negatives labeled (→ **E3.1**). Boxes below are the as-built spec; full D1–D3 resolution in `harness_plan/EVAL_HARNESS_E3_PREAPPROVAL.md`.
+**Blocked by:** E1 (built on the same **native** substrate as E2). ⟐ **Framework re-opens here on its own merits:** prose→atomic-assertion decomposition is the one place a framework's differentiator (Ragas) *or* a native decomposition-judge applies — decide when E3 is built; the ledger-diff is custom either way, so native is the likely answer.
+- [ ] Prose decomposed into atomic assertions, diffed against logged `claim_id`s; a non-empty "unledgered assertion" set is a hard finding ("fabricates without emitting a claim" — the threat W1 cannot reach).
+- [ ] **Materiality threshold (else self-defeating; the design task to settle first).** Only assertions meeting the *material claim* bar must map to a `claim_id`; non-material prose (transitions, framing, definitional/method description) is excluded — else the "escaped claim" set floods with false positives and the check gets ignored. **Two anchors, spelled out:**
     - *Constitutional (the mandate) — `CLAUDE.md` §10.5, verbatim:* "All major outputs produced by agents must be traceable to their tiered inputs. An agent must be able to identify, for each material claim in its output, the Tier 1–4 source from which the claim derives. **Unattributed claims must be flagged, not asserted.**" → **E3 is the output-side checker for that final sentence** — an "escaped claim" *is* an unattributed material claim, and no predicate currently enforces it on the prose (the source-ref predicates check the *field* exists, not that every material assertion has one). Strong charter — but §10.5 is the term's *only* occurrence in the constitution and never defines *which sentences count*; `claim_statuses` carries no `material` flag.
-    - *Empirical (the operational bar).* Derive materiality from the **406-claim ledger** — the engine's own enumeration of what it treats as material-and-attributable. Calibrate the classifier against it (positives = real `claim_summary` values; negatives = framing/transition/definitional spans); flag prose assertions that clear that bar yet match no `claim_id`. In one line: **§10.5 says *what* (material claims must be attributed or flagged); the ledger says *which*.** → `harness/materiality.py` (prompt quotes §10.5 verbatim; same classifier path in pipeline and calibration). `harness/materiality_sets/`: 393 deduped auto-labeled positives from the real ledger + 30 **unlabeled** negative candidates (human labels — the E1.5 rule). Recall measurable now; **precision forced `None` until labeled negatives exist** (positives-only precision is a spurious 1.0); every completeness report stamps the calibration state.
-- [x] Claim-status calibration: a `confirmed` that isn't grounded, or an `inferred` fully source-backed (mislabelled down), flagged as drift. → `status_calibration.py`: overclaimed (hard; reuses a supplied E2 result at zero extra confirmed-direction calls) / underclaimed (soft; the inferred claim judged under E2's own confirmed `meets_bar`) / unverifiable (surfaced, never conflated).
-- [x] Runs on the real section as a ready-made calibration set; reporting-only; zero runs. → real-data probe: 12 sub-sections load/chunk bounded, 406-entry ledger deduped with the C01 collision preserved, shortlist + end-to-end slice offline (stub judge, zero network).
+    - *Empirical (the operational bar).* Derive materiality from the **406-claim ledger** — the engine's own enumeration of what it treats as material-and-attributable. Calibrate the classifier against it (positives = real `claim_summary` values; negatives = framing/transition/definitional spans); flag prose assertions that clear that bar yet match no `claim_id`. In one line: **§10.5 says *what* (material claims must be attributed or flagged); the ledger says *which*.**
+- [ ] Claim-status calibration: a `confirmed` that isn't grounded, or an `inferred` fully source-backed (mislabelled down), flagged as drift.
+- [ ] Runs on the real section as a ready-made calibration set; reporting-only; zero runs.
 
 ### ⟐ Earn-its-lane decision gate (after Wave 0)
 Did status-aware faithfulness + ledger completeness surface real issues (or give real confidence) on the current artifacts? Record the finding in the decision log. Only if yes — and only for a *distinct* capability — adopt a second framework in Wave 1. If the chosen framework underdelivered, reconsider it before adding tools.
@@ -99,32 +107,24 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 - **Ragas → E9** — graph context precision/recall (retrieval-eval machinery).
 - **PromptFoo → E6/E7** — provider matrix + the `type: python` predicate bridge.
 
-## E3.1  Materiality calibration completeness — advisory→gating for E3 (offline; native)
-**What to build:** the measurement that graduates E3 from advisory, mirroring E1.5 for the judge.
-Without it, E3 flags escapes but its own leak rate is unmeasured, so it can never move to merge-gating.
+## E3.1 Materiality calibration completeness — advisory→gating for E3 (offline; native; $0 on local judge)
+**What to build:** the measurement that graduates E3's materiality signal from advisory — mirrors E1.5 for the judge. Folded in from `harness_plan/EVAL_HARNESS_E3_PREAPPROVAL.md` (D2).
 **Blocked by:** E3 (built on it). Does **not** block E4.
-- [ ] Label `harness/materiality_sets/materiality_negatives_TEMPLATE.jsonl` (non-material spans)
-      → compute + record precision `{judge_model, judge_version, precision}`
-      (positives-only precision stays `None` by design until this lands).
-- [ ] Seed a small human-labeled set of **out-of-ledger material claims** (material assertions
-      deliberately absent from the ledger) → compute + record recall / miss-rate on the real
-      failure mode. (Overlaps E8 adversarial fixtures — minimal set here, full suite at E8;
-      these are also the first fixtures that exercise the `assumed` path, still 0 in real data.)
-- [ ] Apply the E1.5 `graduation_for` threshold → record the graduation decision
-      (advisory-stays / promote-to-gating) in `docs/tier4_orchestration_state/decision_log/`.
-- [ ] Reporting-only; zero DAG runs. Human ground truth only (an AI labeling gold for an AI
-      classifier reintroduces the correlation the harness avoids).
-**Done =** E3's precision + miss-rate are characterized and a graduation decision is recorded —
-not necessarily promotion (same honest bar as E1.5's "advisory until characterized").
+- [ ] Label `harness/materiality_sets/materiality_negatives_TEMPLATE.jsonl` (non-material spans) → compute + record **precision** `{judge_model, judge_version, precision}`. (Positives-only precision stays `None` by design — a spurious 1.0 otherwise.)
+- [ ] Seed a small human-labeled set of **out-of-ledger material claims** (material assertions deliberately absent from the ledger) → compute + record **recall / miss-rate** on the real failure mode. (Overlaps E8 fixtures — minimal set here; also the first fixtures exercising the `assumed` path, still 0 in real data.)
+- [ ] Apply the E1.5 `graduation_for` threshold → record the graduation decision (advisory-stays / promote-to-gating) in the decision log.
+- [ ] Human ground truth only; reporting-only; zero runs. **$0** on the local judge.
+**Done =** E3's precision + miss-rate are characterized and a graduation decision is recorded — not necessarily promotion.
 
-## E4. Regression golden-set (offline; native — reuses E2's baseline machinery) — ✅ DONE (branch harness) · **native**
+## E4. Regression golden-set — ✅ DONE (`1f85fe6`, branch harness; offline; native)
 **What to build:** frozen baselines so a prompt/model change can't silently regress integrity/quality.
-**Blocked by:** Wave-0 decision gate *(cleared — recorded in the E3 decision-log entry)*. **Native** on the substrate — the harness already runs under pytest (238 tests) and E2 ships `freeze_baseline`/`compare_to_baseline`; E4 formalizes that into a standing golden-set suite. (No framework: DeepEval's pytest-integration isn't needed here — it earns in at E5.) → `harness/regression.py` + `harness/regression_baselines/`; decision log `e4-regression-golden-set_2026-07-21.json`.
-- [x] Current section JSONs frozen as baselines. → deterministic fingerprints (meaning-keyed claim ledger `(summary, status, source_ref)` — the E3 `entry_key` lesson; per-sub-section prose hashes; canonical formatting-invariant artifact hash) committed in `harness/regression_baselines/*.golden.json` (191+119+96 = the full 406-entry ledger); `load_golden_set` fails closed on an empty golden dir.
-- [x] Assert no faithfulness/quality regression vs baseline on a soft-cap lift (D2/D3) or model swap — the safety net the length-lift work currently lacks. → deterministic lane: breaking findings for claim-removed / status-changed / source_ref-swapped / sub-section-dropped, advisory for added claims, prose deltas, prose-changed-ledger-unchanged (escaped-claim risk zone → re-run E2/E3) and confirmed-share drop (grounding-density quality signal); judge lane: `freeze_section_grounding`/`compare_section_grounding` reuse E2's grounding-invariance verbatim. ⏳ **Honest scope note:** the faithfulness half is machinery-only today — grounding baselines are deliberately *not* frozen (they require the live pinned judge); the first live-judge session freezes them, until then the deterministic lane is the standing safety net.
-- [x] Wired advisory into CI (merge-advisory, human-decided), never run-blocking. → standing suite `tests/harness/test_regression_golden.py` (marker `harness_regression`, registered in `pyproject.toml`) + `python -m harness.regression freeze|check` CLI (check: exit 1 = drift advisory, exit 2 = fail-closed); `RegressionReport` enforces `advisory=True, blocking=False` structurally; refreeze policy documented in `harness/regression_baselines/README.md`. **"CI" here = the full pytest suite** (the repo has no hosted CI config; the ticket's own framing — "the harness already runs under pytest" — makes the suite the CI lane); if hosted CI is ever added, wire `-m harness_regression` as a non-required check.
+**Blocked by:** Wave-0 decision gate. **Native** on the substrate — the harness already runs under pytest (238 tests) and E2 ships `freeze_baseline`/`compare_to_baseline`; E4 formalizes that into a standing golden-set suite. (No framework: DeepEval's pytest-integration isn't needed here — it earns in at E5.)
+- [x] Current section JSONs frozen → `harness/regression_baselines/*.golden.json` (full 406-entry ledger). Diff matches claims by **meaning** — `(claim_summary, status, source_ref)`, never bare `claim_id` (the E3 lesson). Empty golden dir fails closed (a check against no baselines can't vacuously pass).
+- [x] No-regression assertion, **two lanes:** deterministic fingerprint lane (zero judge, offline) classifying breaking vs advisory drift; **judge lane** = thin wrappers over E2's `freeze_baseline`/`compare_to_baseline` (grounding invariance).
+- [x] Wired advisory into CI — **"CI" = the pytest suite** (`tests/harness/test_regression_golden.py`, marker `harness_regression`; repo has no hosted CI config). `RegressionReport` enforces `advisory=True, blocking=False`; nothing in `runner` reads it. CLI: `py -3.10 -m harness.regression freeze|check`.
+- [ ] ⏳ **Open item:** grounding baselines are **not frozen yet** — the judge lane is machinery-only until the live pinned **local** judge freezes them. Now unblocked ($0, local judge).
 
-## E5. Evaluator G-Eval ×9 — integrity-framed independent grader
+## E5. Evaluator G-Eval ×9 — integrity-framed independent grader — ⏸ DEFERRED shape: **native rubric grader = $0; DeepEval framework form → E10**
 **What to build:** the MSCA-PF evaluator expectations as rubric metrics, as an independent 2nd grader.
 **Blocked by:** E4. **First DeepEval adoption** (G-Eval is a DeepEval primitive) — do it in an online build session so the API-currency guardrail can be satisfied; else fall back to a native rubric judge on the substrate.
 - [ ] Each expectation in `evaluator_expectation_registry.json` (Excellence 4 / Impact 3 / Implementation 2) → a rubric metric, framed for integrity ("does the section address *and ground* the expectation").
@@ -159,13 +159,20 @@ not necessarily promotion (same honest bar as E1.5's "advisory until characteriz
 - [ ] Property under test = "no fabrication / correct fail-closed block"; adversarial surface generated + regression-tracked.
 - [ ] Systematic red-team is the CI source-of-record; keep any PromptFoo red-team for quick prompt-dev probes only.
 
-## E9. Ragas context precision/recall — graph-retrieval integrity (offline; Ragas lane)
+## E9. Ragas context precision/recall — graph-retrieval integrity (offline) — **native set-math core = $0; Ragas LLM-graded form → E10**
 **What to build:** the graph's dedicated retrieval-integrity metric — context precision/recall over the vault.
 **Status (Rev-3 correction):** **data ready today.** M2 section-node authoring is **done** — folders `11_objectives … 19_proposal_sections` authored, incl. the **12 `proposal_section` nodes** (verified 2026-07-20). **Not run-dependent:** graph retrieval is exercised through the compiler **`--from-graph` Step-0 pass** (`runner/__main__.py` — "does not construct or run the scheduler, evaluate gates, or overwrite any Tier 3 source"; the pass reports `part_b_sections` via `compile_part_b_and_report`), not a DAG run.
 **Blocked by:** E1 (judge) + adopting Ragas (online build session for API currency) — this is the ticket where Ragas earns its irreplaceable lane. Run on the fixture vault, then `MSCA/methodology_graph/`.
 - [ ] Context precision (retrieved nodes are relevant — `vault_reader`/`graph.config` aren't pulling noise) + context recall (no evidence silently dropped), computed over the compiler's Part B retrieval.
 - [ ] Gold "relevant nodes per sub-section" set from the vault's `upstream_nodes`/`downstream_nodes`/`source_refs` front-matter.
+- [ ] **Native $0 path:** with that gold set, context precision/recall is **set arithmetic on node IDs** — no judge, no embeddings. Ragas's LLM-graded form (if ever wanted) → E10.
+
+## E10. Paid / online framework integration — ⏸ DEFERRED (single ticket)
+**What:** adopt the external frameworks whose value is inseparable from billed calls — DeepEval (G-Eval / DeepTeam), Ragas (LLM-graded context metrics), PromptFoo (provider/cost matrix). Folded in from `harness_plan/HARNESS_COST_POLICY.md`.
+**Gated by:** (a) available budget, and (b) an online build session (satisfies the API-currency guardrail). Never a runtime gate.
+**Free cores already in the native track (do NOT wait on E10):** E5 → native rubric grader; E9 → set-math context precision/recall; E6 → native predicate bridge; E7a → deterministic α-block; E8 honesty invariants → hand-authored fixtures + deterministic block assertions.
+**Scope when funded:** framework bindings + provider/cost matrix + DeepTeam generation + any remaining adversarial runs. One ticket, one budget line.
 
 ---
 
-*Separate out-of-band QA track. Never a fail-closed runtime gate. Earn-its-lane framework adoption (converges on ~three distinct lanes). **E1–E3 lead as M3's independent verifier;** offline tickets (E1–E6, E7a, E9) cost zero DAG runs; only E7b–E8 are run-dependent (behind M2-T10 / the showcase). Rev 2 applied `EVAL_HARNESS_TICKETS_REVIEW.md`; Rev 3 (2026-07-20) corrected E7a → deterministic `gate_09` assertion and E9 → offline & data-ready; **Rev 4 (2026-07-21): E1/E1.5/E2 done & committed (branch `harness`); framework resolved — E2 native, superseding the DeepEval-spine default (DeepEval → E5/E8, Ragas → E9, PromptFoo → E6/E7); E4 native. Rev 5 (2026-07-21): E3 done & committed (native — Wave 0 complete; claim identity settled by `entry_key`, E2 disambiguated in the same pass; decision log `e3-claim-ledger-completeness_2026-07-21.json`). Rev 6 (2026-07-21): E4 done & committed (native — deterministic fingerprint lane frozen + committed for all three sections, judge lane reuses E2 grounding-invariance, standing `harness_regression` pytest lane + `python -m harness.regression` CLI; decision log `e4-regression-golden-set_2026-07-21.json`). Open: label E1.5's gold set (graduates E2/E3 from advisory) + E3's materiality negatives (unlocks classifier precision, → E3.1) + freeze E4's judge-lane grounding baselines at the first live-judge session (the deterministic fingerprint lane stands until then).***
+*Separate out-of-band QA track. Never a fail-closed runtime gate. Earn-its-lane framework adoption (converges on ~three distinct lanes). **E1–E3 lead as M3's independent verifier;** offline tickets (E1–E6, E7a, E9) cost zero DAG runs; only E7b–E8 are run-dependent (behind M2-T10 / the showcase). Rev 2 applied `EVAL_HARNESS_TICKETS_REVIEW.md`; Rev 3 (2026-07-20) corrected E7a → deterministic `gate_09` assertion and E9 → offline & data-ready; **Rev 4 (2026-07-21): E1/E1.5/E2 done & committed (branch `harness`); framework resolved — E2 native, superseding the DeepEval-spine default (DeepEval → E5/E8, Ragas → E9, PromptFoo → E6/E7); E4 native. Open: label E1.5's gold set to graduate E2 from advisory. **Rev 5 (2026-07-21): E3 (`b2b69b0`) + E4 (`1f85fe6`) done & Waves refreshed; folded in E3.1, E10, the subscription cost policy, E4's grounding-baseline open item, and the companion-doc pointer — closing the gap where these lived only in `harness_plan/`. pipeline on the Claude Code subscription; harness judge local; only E10 adds metered cost.***
