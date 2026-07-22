@@ -1,93 +1,161 @@
 {
   "_provenance": {
-    "record_type": "tier3_project_instantiation",
-    "artifact": "architecture_inputs/workpackage_seed.json",
-    "consolidation_record": "docs/tier4_orchestration_state/decision_log/13b-real-data-consolidation_2026-07-16.json",
-    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; operator_confirmed->Confirmed",
-    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "structure_note": "MSCA-PF is a single-fellow action: the fellow (Dr. Rositsa Cholakova) is 100% dedicated and person_months partition the fellow's effort across the 24-month European Fellowship (sum = 24). Supervisor/host effort is in-kind and not counted here. WP1-WP3 carry vault-grounded research content, resolved by the operator-confirmed project decisions (RQ1-RQ10). WP4 (training/transfer) and the management portion of WP5 are MSCA-PF structural packages now grounded in the operator-confirmed identity spine and two-way transfer. Role tokens FELLOW/HOST/SUPERVISOR resolve to the confirmed identities in consortium/roles.json.",
-    "timeline_note": "start_month/end_month are on the operator-confirmed 24-month European Fellowship timeline (EF derives from the Bulgaria -> Hungary intra-EU move; 24 months is the standard EF duration)."
+    "record_type": "tier3_graph_compile",
+    "generated_by": "runner/graph_compiler.py",
+    "artifact": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "collection_key": "work_packages",
+    "source_config_project_id": "msca-pf-reference",
+    "source_vault": "MSCA/methodology_graph",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred; inference->Inferred; unconfirmed->Unresolved",
+    "node_count": 5,
+    "source_node_ids": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5"
+    ],
+    "non_destructive": "Compile-and-diff staging output (milestone 2, ticket 3). This does NOT overwrite the Tier 3 hand-lift; the graph-as-authoritative cutover (open-Q #4) is deferred to ticket 10.",
+    "compiled_at": "2026-07-22T08:21:16.187367+00:00"
   },
   "work_packages": [
     {
       "id": "WP1",
       "title": "Probabilistic multi-sensor diagnosis of the field state",
       "lead": "FELLOW",
-      "participants": ["FELLOW", "SUPERVISOR"],
+      "participants": [
+        "FELLOW",
+        "SUPERVISOR"
+      ],
       "start_month": 1,
       "end_month": 14,
       "person_months": 8,
       "type": "research",
       "description": "Build and calibrate the diagnostic branch for tomato (RQ1): acquire and harmonise Sentinel-1 SAR, Sentinel-2 optical and secured PlanetScope (RQ8) with meteorological (ERA5 reanalysis) and field-observation data; implement Route B, the homogeneous-patch proxy (RQ2), within an architecture that also defines Route A (direct one-step probabilistic fusion via a Bayesian hierarchical model / Gaussian process), to estimate the latent field state (root-zone soil moisture and crop water status, RQ3) as a posterior with honest uncertainty.",
-      "objectives_addressed": ["OBJ-1"],
+      "objectives_addressed": [
+        "OBJ-1"
+      ],
+      "source_vault_nodes": [
+        "Diagnostic Branch (METH-CORE-002)",
+        "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)",
+        "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)",
+        "Earth Observation Layer (METH-INFRA-002)",
+        "Ground Sensing Layer (METH-INFRA-003)",
+        "Probabilistic Modelling Runtime (METH-INFRA-006)"
+      ],
+      "provenance_detail": "source_grounded (methodology) + operator_confirmed (RQ1/RQ2/RQ3/RQ8)",
       "validation_status": "Confirmed",
-      "source_vault_nodes": ["Diagnostic Branch (METH-CORE-002)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Earth Observation Layer (METH-INFRA-002)", "Ground Sensing Layer (METH-INFRA-003)", "Probabilistic Modelling Runtime (METH-INFRA-006)"],
-      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ1/RQ2/RQ3/RQ8)"
+      "evidence_strength": "source_grounded"
     },
     {
       "id": "WP2",
       "title": "Uncertainty-aware decision engine and demonstrator integration",
       "lead": "FELLOW",
-      "participants": ["FELLOW", "SUPERVISOR"],
+      "participants": [
+        "FELLOW",
+        "SUPERVISOR"
+      ],
       "start_month": 6,
       "end_month": 20,
       "person_months": 7,
       "type": "research",
       "description": "Build the prognostic branch and decision engine: uncertainty-aware AquaCrop calibration retaining an honest parameter posterior; counterfactual irrigation simulation over weather ensembles; water-use-efficiency-based decision recommendation under uncertainty (RQ6). Integrate diagnosis and decision into a standalone research demonstrator (web MVP) targeting a research prototype, TRL 3-4 (RQ10).",
-      "objectives_addressed": ["OBJ-2", "OBJ-4"],
+      "objectives_addressed": [
+        "OBJ-2",
+        "OBJ-4"
+      ],
+      "source_vault_nodes": [
+        "AquaCrop Decision Interface (METH-DEC-001)",
+        "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)",
+        "Counterfactual Irrigation Simulation (METH-DEC-003)",
+        "Weather Ensemble Scenario Evaluation (METH-DEC-004)",
+        "Profit Based Objective Function (METH-DEC-005)",
+        "AquaCrop Simulation Runtime (METH-INFRA-007)",
+        "Decision Engine Layer (METH-INFRA-008)"
+      ],
+      "note": "The decision objective is water-use efficiency (RQ6); the vault's objective-function machinery is instantiated with WUE. The uncertainty-aware AquaCrop calibration is the project's vault-grounded methodology, not attributed to the fellow.",
+      "provenance_detail": "source_grounded (methodology) + operator_confirmed (RQ6 = WUE; RQ10 TRL)",
       "validation_status": "Confirmed",
-      "source_vault_nodes": ["AquaCrop Decision Interface (METH-DEC-001)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)", "Counterfactual Irrigation Simulation (METH-DEC-003)", "Weather Ensemble Scenario Evaluation (METH-DEC-004)", "Profit Based Objective Function (METH-DEC-005)", "AquaCrop Simulation Runtime (METH-INFRA-007)", "Decision Engine Layer (METH-INFRA-008)"],
-      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ6 = WUE; RQ10 TRL)",
-      "note": "The decision objective is water-use efficiency (RQ6); the vault's objective-function machinery is instantiated with WUE. The uncertainty-aware AquaCrop calibration is the project's vault-grounded methodology, not attributed to the fellow."
+      "evidence_strength": "source_grounded"
     },
     {
       "id": "WP3",
       "title": "Field validation, ground truth and uncertainty calibration",
       "lead": "FELLOW",
-      "participants": ["FELLOW", "HOST", "SUPERVISOR"],
+      "participants": [
+        "FELLOW",
+        "HOST",
+        "SUPERVISOR"
+      ],
       "start_month": 8,
       "end_month": 24,
       "person_months": 5,
       "type": "research",
       "description": "Design and run the validation protocol on Hungarian tomato farms accessed via the associated partner AgroVIR: collect non-destructive physiological ground truth (RQ4: chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance), assess uncertainty calibration (RQ5: 90% prediction intervals contain the truth about 90% of the time), define pilot success as the RQ5 target met on the validation set (RQ7), and test Route B's patch-covariation assumption via a co-located seasonal campaign measuring the target crop and the proxy patch simultaneously (RQ9), including the control-stand variant.",
-      "objectives_addressed": ["OBJ-3"],
+      "objectives_addressed": [
+        "OBJ-3"
+      ],
+      "source_vault_nodes": [
+        "Validation and Field Trial Layer (METH-INFRA-009)",
+        "Validation Risks (METH-RISK-003)",
+        "Control Stand Variant (METH-ROUTE-003)",
+        "Ground Truth (METH-TERM-003)",
+        "Ten Research Questions (METH-RQ-001)"
+      ],
+      "note": "The fellow's non-destructive plant-stress-physiology expertise is the ground-truth strength. Coherence caveat (Inferred): the RQ4 non-destructive measures validate the crop-water-status component of the target state directly and root-zone soil moisture only indirectly; no soil-moisture sensor plan is fabricated.",
+      "provenance_detail": "source_grounded (methodology) + operator_confirmed (RQ4/RQ5/RQ7/RQ9; field sites via AgroVIR)",
       "validation_status": "Confirmed",
-      "source_vault_nodes": ["Validation and Field Trial Layer (METH-INFRA-009)", "Validation Risks (METH-RISK-003)", "Control Stand Variant (METH-ROUTE-003)", "Ground Truth (METH-TERM-003)", "Ten Research Questions (METH-RQ-001)"],
-      "evidence_strength": "source_grounded (methodology) + operator_confirmed (RQ4/RQ5/RQ7/RQ9; field sites via AgroVIR)",
-      "note": "The fellow's non-destructive plant-stress-physiology expertise is the ground-truth strength. Coherence caveat (Inferred): the RQ4 non-destructive measures validate the crop-water-status component of the target state directly and root-zone soil moisture only indirectly; no soil-moisture sensor plan is fabricated."
+      "evidence_strength": "source_grounded"
     },
     {
       "id": "WP4",
       "title": "Training, supervision and two-way transfer of knowledge",
       "lead": "SUPERVISOR",
-      "participants": ["SUPERVISOR", "HOST", "FELLOW"],
+      "participants": [
+        "SUPERVISOR",
+        "HOST",
+        "FELLOW"
+      ],
       "start_month": 1,
       "end_month": 24,
       "person_months": 2,
       "type": "training",
       "description": "MSCA-PF structural work package for the researcher's training (scientific, management, transferable skills), supervision, and two-way transfer of knowledge between researcher and host. Content: a Career Development Plan prepared jointly by supervisor and fellow and submitted as a project deliverable at the start of the action, then reviewed and updated during the fellowship; structured transferable-skills training covering the MSCA-PF mandatory dimensions - digital and AI skills (including responsible use of generative AI in remote-sensing and crop-water modelling and scientific coding), knowledge valorisation, innovation and entrepreneurship, research integrity, and open science / FAIR data stewardship; supervision by Dr. András Jung through regular research reviews in the host's geoinformatics and remote-sensing group; and two-way transfer of knowledge - the fellow contributes plant-physiology and non-destructive stress-phenotyping expertise (biological ground truth), and takes up the host's geoinformatics, remote-sensing and hyperspectral/multisensor-fusion methods and infrastructure. Specific quantitative training/career targets are not asserted (none operator-provided) and are to be set in the Career Development Plan.",
-      "objectives_addressed": ["OBJ-5"],
-      "validation_status": "Confirmed",
+      "objectives_addressed": [
+        "OBJ-5"
+      ],
       "source_vault_nodes": [],
-      "evidence_strength": "operator_confirmed (two-way transfer; real fellow/supervisor/host) + instrument_requirement (Excellence 1.3; CDP as a start-of-action deliverable; mandatory training dimensions)",
-      "note": "The WP exists by MSCA-PF instrument structure (Excellence 1.3); its content is now grounded in the operator-confirmed identity spine and the real two-way transfer. No fellow-specific quantitative figures are invented."
+      "note": "The WP exists by MSCA-PF instrument structure (Excellence 1.3); its content is now grounded in the operator-confirmed identity spine and the real two-way transfer. No fellow-specific quantitative figures are invented.",
+      "provenance_detail": "operator_confirmed (two-way transfer; real fellow/supervisor/host) + instrument_requirement (Excellence 1.3; CDP as a start-of-action deliverable; mandatory training dimensions)",
+      "validation_status": "Confirmed",
+      "evidence_strength": "source_grounded"
     },
     {
       "id": "WP5",
       "title": "Dissemination, exploitation, communication and management",
       "lead": "FELLOW",
-      "participants": ["FELLOW", "HOST"],
+      "participants": [
+        "FELLOW",
+        "HOST"
+      ],
       "start_month": 1,
       "end_month": 24,
       "person_months": 2,
       "type": "dissemination",
       "description": "Open-science dissemination (open-access publications, open data/models, DMP by month 6), exploitation logic around the standalone research demonstrator, communication to relevant audiences (the host's geoinformatics and remote-sensing community, and Hungarian tomato growers reached via the associated partner AgroVIR), and lightweight project management, coordination and ethics oversight.",
-      "objectives_addressed": ["OBJ-1", "OBJ-2", "OBJ-3"],
+      "objectives_addressed": [
+        "OBJ-1",
+        "OBJ-2",
+        "OBJ-3"
+      ],
+      "source_vault_nodes": [
+        "Web MVP and User Interface Layer (METH-INFRA-010)",
+        "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"
+      ],
+      "note": "Dissemination/exploitation posture combines the MSCA-PF structural requirement (sub-section 2.2) with the vault's demonstrator framing (synthesis), hence Inferred; IP arrangements and the detailed communication plan are refined with the host. No publication counts are invented.",
+      "provenance_detail": "synthesis (demonstrator framing) + instrument_requirement (dissemination sub-section 2.2)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Web MVP and User Interface Layer (METH-INFRA-010)", "Probabilistic Fusion Novelty Claim (METH-SOTA-006)"],
-      "evidence_strength": "synthesis (demonstrator framing) + instrument_requirement (dissemination sub-section 2.2)",
-      "note": "Dissemination/exploitation posture combines the MSCA-PF structural requirement (sub-section 2.2) with the vault's demonstrator framing (synthesis), hence Inferred; IP arrangements and the detailed communication plan are refined with the host. No publication counts are invented."
+      "evidence_strength": "synthesis"
     }
   ]
 }

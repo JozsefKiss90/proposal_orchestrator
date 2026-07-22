@@ -1,13 +1,27 @@
 {
   "_provenance": {
-    "record_type": "tier3_hand_lift",
-    "artifact": "architecture_inputs/risks.json",
-    "ticket": "tickets.md ticket 14",
-    "source_vault_sha": "b4d9e570a0861fb49590015b2ff68afc3bb7181b",
-    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred(framing); inference->Inferred; unconfirmed->Unresolved",
-    "manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "lifted_from": "Risk Register (METH-RISK-002) rows R1-R10, with theme detail from Data Access / Validation / Model Complexity / Operationalisation Risks nodes.",
-    "status_note": "Each hazard is source_grounded (traces to methodology_idea.txt / prompt.txt / litreview Report A), but the likelihood/impact judgements are qualitative analyst ESTIMATES (the Risk Register node is synthesis, confidence medium). validation_status is therefore Inferred: the hazard is Confirmed, the probability/impact scoring is Inferred and to be re-scored once data-access, partner and TRL decisions firm up. risk_owner uses structural role tokens (FELLOW research risks; HOST data-access/operational) - identities Unresolved."
+    "record_type": "tier3_graph_compile",
+    "generated_by": "runner/graph_compiler.py",
+    "artifact": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+    "collection_key": "risks",
+    "source_config_project_id": "msca-pf-reference",
+    "source_vault": "MSCA/methodology_graph",
+    "appendix_b_mapping": "source_grounded->Confirmed; synthesis->Inferred; inference->Inferred; unconfirmed->Unresolved",
+    "node_count": 10,
+    "source_node_ids": [
+      "RISK-01",
+      "RISK-02",
+      "RISK-03",
+      "RISK-04",
+      "RISK-05",
+      "RISK-06",
+      "RISK-07",
+      "RISK-08",
+      "RISK-09",
+      "RISK-10"
+    ],
+    "non_destructive": "Compile-and-diff staging output (milestone 2, ticket 3). This does NOT overwrite the Tier 3 hand-lift; the graph-as-authoritative cutover (open-Q #4) is deferred to ticket 10.",
+    "compiled_at": "2026-07-22T08:21:16.187367+00:00"
   },
   "risks": [
     {
@@ -17,14 +31,23 @@
       "category": "data_access",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-1"],
-      "affected_work_packages": ["WP1"],
+      "affected_objectives": [
+        "OBJ-1"
+      ],
+      "affected_work_packages": [
+        "WP1"
+      ],
       "mitigation": "Treat PlanetScope as an optional enhancement; build the core on open Copernicus Sentinel-1 + Sentinel-2 data; resolve access early (RQ8).",
       "contingency": "Deliver the diagnosis on Sentinel-1 + Sentinel-2 only, documenting the resolution trade-off for small plots.",
       "risk_owner": "HOST",
+      "source_vault_nodes": [
+        "Risk Register R1 (METH-RISK-002)",
+        "Data Access Risks (METH-RISK-004)",
+        "PlanetScope Usage Gap (METH-SOTA-003)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R1 (METH-RISK-002)", "Data Access Risks (METH-RISK-004)", "PlanetScope Usage Gap (METH-SOTA-003)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-02",
@@ -33,14 +56,23 @@
       "category": "data_access",
       "probability": "high",
       "impact": "medium",
-      "affected_objectives": ["OBJ-1"],
-      "affected_work_packages": ["WP1"],
+      "affected_objectives": [
+        "OBJ-1"
+      ],
+      "affected_work_packages": [
+        "WP1"
+      ],
       "mitigation": "Geospatial/time-series data platform with QC; temporal compositing; explicit resolution handling.",
       "contingency": "Restrict fusion to the sources that harmonise reliably; treat problematic sources as covariates at their native resolution.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R2 (METH-RISK-002)",
+        "Data Access Risks (METH-RISK-004)",
+        "Geospatial and Time Series Data Platform (METH-INFRA-005)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R2 (METH-RISK-002)", "Data Access Risks (METH-RISK-004)", "Geospatial and Time Series Data Platform (METH-INFRA-005)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-03",
@@ -49,14 +81,24 @@
       "category": "data_access",
       "probability": "high",
       "impact": "medium",
-      "affected_objectives": ["OBJ-1"],
-      "affected_work_packages": ["WP1"],
+      "affected_objectives": [
+        "OBJ-1"
+      ],
+      "affected_work_packages": [
+        "WP1"
+      ],
       "mitigation": "Lean on Sentinel-1 SAR through cloud; cloud masking; vegetation-aware retrieval.",
       "contingency": "Weight the fusion toward the more reliable sensor per condition; gap-fill optical with radar-informed estimates.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R3 (METH-RISK-002)",
+        "Data Access Risks (METH-RISK-004)",
+        "Earth Observation Layer (METH-INFRA-002)",
+        "SAR (METH-TERM-026)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R3 (METH-RISK-002)", "Data Access Risks (METH-RISK-004)", "Earth Observation Layer (METH-INFRA-002)", "SAR (METH-TERM-026)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-04",
@@ -65,15 +107,24 @@
       "category": "validation",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-3"],
-      "affected_work_packages": ["WP3"],
+      "affected_objectives": [
+        "OBJ-3"
+      ],
+      "affected_work_packages": [
+        "WP3"
+      ],
       "mitigation": "Plan field trials with dense ground truth (RQ4); use a cost-effective sensor network.",
       "contingency": "Prioritise ground truth at a focused pilot site; supplement with published reference datasets.",
       "risk_owner": "HOST",
+      "source_vault_nodes": [
+        "Risk Register R4 (METH-RISK-002)",
+        "Validation Risks (METH-RISK-003)",
+        "Validation and Field Trial Layer (METH-INFRA-009)"
+      ],
+      "note": "The field sites and farms that would supply ground truth are Unresolved (spine-dependent).",
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R4 (METH-RISK-002)", "Validation Risks (METH-RISK-003)", "Validation and Field Trial Layer (METH-INFRA-009)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
-      "note": "The field sites and farms that would supply ground truth are Unresolved (spine-dependent)."
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-05",
@@ -82,14 +133,25 @@
       "category": "validation",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-1", "OBJ-3"],
-      "affected_work_packages": ["WP3"],
+      "affected_objectives": [
+        "OBJ-1",
+        "OBJ-3"
+      ],
+      "affected_work_packages": [
+        "WP3"
+      ],
       "mitigation": "Pre-register a covariation test; measure covariation (control stand) rather than assume it (RQ9).",
       "contingency": "Fall back to Route A (direct probabilistic fusion) as the main diagnostic route if covariation cannot be demonstrated.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R5 (METH-RISK-002)",
+        "Validation Risks (METH-RISK-003)",
+        "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)",
+        "Control Stand Variant (METH-ROUTE-003)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R5 (METH-RISK-002)", "Validation Risks (METH-RISK-003)", "Route B - Homogeneous Patch Proxy (METH-ROUTE-002)", "Control Stand Variant (METH-ROUTE-003)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-06",
@@ -98,14 +160,27 @@
       "category": "validation",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-1", "OBJ-2", "OBJ-3"],
-      "affected_work_packages": ["WP2", "WP3"],
+      "affected_objectives": [
+        "OBJ-1",
+        "OBJ-2",
+        "OBJ-3"
+      ],
+      "affected_work_packages": [
+        "WP2",
+        "WP3"
+      ],
       "mitigation": "Build uncertainty-calibration metrics into the validation protocol (RQ5); use uncertainty-aware calibration end to end.",
       "contingency": "Recalibrate posteriors post-hoc; report calibration honestly and narrow claims to the calibrated regime.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R6 (METH-RISK-002)",
+        "Validation Risks (METH-RISK-003)",
+        "Uncertainty Chain (METH-CORE-004)",
+        "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R6 (METH-RISK-002)", "Validation Risks (METH-RISK-003)", "Uncertainty Chain (METH-CORE-004)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-07",
@@ -114,14 +189,24 @@
       "category": "model_complexity",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-1"],
-      "affected_work_packages": ["WP1"],
+      "affected_objectives": [
+        "OBJ-1"
+      ],
+      "affected_work_packages": [
+        "WP1"
+      ],
       "mitigation": "Keep Route B as a credible fallback; stage the build; provision the probabilistic-modelling compute runtime.",
       "contingency": "Adopt Route B as the primary diagnostic route, with Route A as a comparison where resources allow (RQ2).",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R7 (METH-RISK-002)",
+        "Model Complexity Risks (METH-RISK-005)",
+        "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)",
+        "Probabilistic Modelling Runtime (METH-INFRA-006)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R7 (METH-RISK-002)", "Model Complexity Risks (METH-RISK-005)", "Route A - Direct Probabilistic Fusion (METH-ROUTE-001)", "Probabilistic Modelling Runtime (METH-INFRA-006)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-08",
@@ -130,14 +215,23 @@
       "category": "model_complexity",
       "probability": "medium",
       "impact": "high",
-      "affected_objectives": ["OBJ-2"],
-      "affected_work_packages": ["WP2"],
+      "affected_objectives": [
+        "OBJ-2"
+      ],
+      "affected_work_packages": [
+        "WP2"
+      ],
       "mitigation": "Uncertainty-aware AquaCrop calibration that retains parameter uncertainty (the fellow-attributed method, doi:10.1016/j.envsoft.2022.105556).",
       "contingency": "Ensemble over plausible parameter sets and propagate their spread into the decision if a full posterior is intractable.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R8 (METH-RISK-002)",
+        "Model Complexity Risks (METH-RISK-005)",
+        "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R8 (METH-RISK-002)", "Model Complexity Risks (METH-RISK-005)", "Uncertainty Aware AquaCrop Calibration (METH-DEC-002)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-09",
@@ -146,14 +240,25 @@
       "category": "model_complexity",
       "probability": "medium",
       "impact": "medium",
-      "affected_objectives": ["OBJ-1", "OBJ-3"],
-      "affected_work_packages": ["WP1", "WP3"],
+      "affected_objectives": [
+        "OBJ-1",
+        "OBJ-3"
+      ],
+      "affected_work_packages": [
+        "WP1",
+        "WP3"
+      ],
       "mitigation": "QC pipeline; sensor comparison in the validation layer.",
       "contingency": "Reduce the sensor set to the reliably calibrated core; document excluded sensors as extension points.",
       "risk_owner": "FELLOW",
+      "source_vault_nodes": [
+        "Risk Register R9 (METH-RISK-002)",
+        "Model Complexity Risks (METH-RISK-005)",
+        "Ground Sensing Layer (METH-INFRA-003)"
+      ],
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R9 (METH-RISK-002)", "Model Complexity Risks (METH-RISK-005)", "Ground Sensing Layer (METH-INFRA-003)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)"
+      "evidence_strength": "synthesis"
     },
     {
       "id": "RISK-10",
@@ -162,15 +267,26 @@
       "category": "operationalisation",
       "probability": "medium",
       "impact": "medium",
-      "affected_objectives": ["OBJ-4"],
-      "affected_work_packages": ["WP2", "WP5"],
+      "affected_objectives": [
+        "OBJ-4"
+      ],
+      "affected_work_packages": [
+        "WP2",
+        "WP5"
+      ],
       "mitigation": "Frame the MVP as a standalone research demonstrator; partners assist (feedback, farmer access, testing) rather than own or operate it; set the TRL target explicitly (RQ10).",
       "contingency": "Deliver a research-prototype TRL demonstrator with a documented path to pilot, rather than claiming operational readiness.",
       "risk_owner": "HOST",
+      "source_vault_nodes": [
+        "Risk Register R10 (METH-RISK-002)",
+        "Operationalisation Risks (METH-RISK-006)",
+        "Operational Decision Support Gap (METH-SOTA-005)",
+        "Web MVP and User Interface Layer (METH-INFRA-010)"
+      ],
+      "note": "The partners who would assist with testing/farmer access are Unresolved (AgroVIR-like only; not committed).",
+      "provenance_detail": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
       "validation_status": "Inferred",
-      "source_vault_nodes": ["Risk Register R10 (METH-RISK-002)", "Operationalisation Risks (METH-RISK-006)", "Operational Decision Support Gap (METH-SOTA-005)", "Web MVP and User Interface Layer (METH-INFRA-010)"],
-      "evidence_strength": "source_grounded (hazard) / synthesis (likelihood-impact estimate)",
-      "note": "The partners who would assist with testing/farmer access are Unresolved (AgroVIR-like only; not committed)."
+      "evidence_strength": "synthesis"
     }
   ]
 }

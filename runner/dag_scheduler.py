@@ -1736,6 +1736,23 @@ class DAGScheduler:
             node_id
         )
 
+        # Preseed supersedes decomposed assembly.  A preseeded section is the
+        # authoritative, externally-produced canonical artifact, so the
+        # draft-consuming composition components — the assumption-applier and
+        # the section-assembler — must NOT run: they would recompose the
+        # (foreign-run) section_drafts over the preseed and fail the node on a
+        # spine run_id mismatch (this mirrors the drafting-skill supersession).
+        # The canonical_pack_deriver is retained: it derives the reference pack
+        # the preservation gates check against, from Tier 3 (not from drafts).
+        if _preseed_skip_skills is not None and deterministic_components:
+            deterministic_components = [
+                _c for _c in deterministic_components
+                if not (
+                    _c.endswith("_section_assembler")
+                    or _c.endswith("_assumption_applier")
+                )
+            ]
+
         log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
         agent_result = run_agent(
             agent_id,

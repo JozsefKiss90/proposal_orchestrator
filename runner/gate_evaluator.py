@@ -831,6 +831,12 @@ def evaluate_gate(
     # 10. Build GateResult dict (§6.2)
     # ------------------------------------------------------------------
     gate_result: dict[str, Any] = {
+        # Required by artifact_schema_specification.yaml (gate_result_schema):
+        # every gate result file MUST carry this schema_id, and a consumer that
+        # finds a different/absent value fails with MALFORMED_ARTIFACT (e.g.
+        # checkpoint-publish at n08f).  Historically omitted; added here so the
+        # evaluator's output conforms to its own declared schema.
+        "schema_id": "orch.gate_result.v1",
         "gate_id": gate_id,
         "gate_kind": gate_kind,
         "run_id": run_id,

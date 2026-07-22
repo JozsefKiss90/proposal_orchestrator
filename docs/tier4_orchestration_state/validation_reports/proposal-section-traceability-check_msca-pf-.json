@@ -1,194 +1,75 @@
 {
-  "report_id": "traceability_impact_impact_writer_2026-07-17T000000Z",
+  "report_id": "traceability_part_b_assembled_draft_traceability_auditor_2026-07-22T00:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "impact_writer",
-  "run_id_reference": "msca-pf-real-01",
-  "section_id_audited": "impact",
-  "audit_mode": "section",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "msca-pf-graph-01",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
   "claim_audit_results": [
     {
-      "claim_id": "C1",
-      "claim_summary": "Dr. Rositsa Cholakova is the postdoctoral fellow: plant physiologist, PhD summa cum laude 2020 on non-destructive evaluation of drought-stressed tomato plants (doi:10.2139/ssrn.5492527), approximately 4 years post-PhD, at Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy, Plovdiv, Bulgaria",
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft has correct schema_id and non-empty sections array",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.FELLOW: confirmed_value matches all stated particulars; confirmation_source: Operator-confirmed 13B consolidation 2026-07-16)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: schema_id='orch.tier5.part_b_assembled_draft.v1'; sections[] contains 3 entries",
       "flag_reason": null
     },
     {
-      "claim_id": "C2",
-      "claim_summary": "Dr. András Jung is supervisor at ELTE: Deputy Head of the Institute of Cartography and Geoinformatics, Head of the Multisensor-Drone-Fusion Working Group (ELTE TKP2021-NVA-29), co-founder of Cubert GmbH and Brightic Research, habilitations in Computer Science and Crop Sciences",
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "All three section artifacts (excellence, impact, implementation) are referenced and exist on disk",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.SUPERVISOR: confirmed_value lists all stated credentials verbatim; confirmation_source: Operator-confirmed 13B consolidation 2026-07-16)",
+      "source_ref": "sections[].artifact_path verified on disk: excellence_section.json, impact_section.json, implementation_section.json all present at docs/tier5_deliverables/proposal_sections/",
       "flag_reason": null
     },
     {
-      "claim_id": "C3",
-      "claim_summary": "Eötvös Loránd University (ELTE), Budapest, Faculty of Informatics, Institute of Cartography and Geoinformatics is the host beneficiary with geoinformatics and remote-sensing group focus",
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section ordering is excellence(order=1), impact(order=2), implementation(order=3)",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.HOST: confirmed_value states ELTE Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest, Hungary, group focus geoinformatics + remote sensing)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json sections[].order fields: excellence=1, impact=2, implementation=3",
       "flag_reason": null
     },
     {
-      "claim_id": "C4",
-      "claim_summary": "AgroVIR (Hungary) is the confirmed associated partner providing farmer access and field-validation site logistics; it does not own or operate any project output",
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced sections expose non-empty traceability_footer.primary_sources",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.VALIDATION_PARTNER: confirmed_value states AgroVIR Hungary, scope bounded to farmer access and field validation, not owning or operating the tool)",
+      "source_ref": "excellence_section.json: 12 primary_sources entries (Tier 2-4); impact_section.json: 12 entries (Tier 2-4); implementation_section.json: 16 entries (Tier 2-4); all non-empty",
       "flag_reason": null
     },
     {
-      "claim_id": "C5",
-      "claim_summary": "Fellowship type is European Fellowship (EF), duration 24 months, intra-EU mobility from Plovdiv, Bulgaria to ELTE, Budapest, Hungary, satisfying the MSCA mobility requirement",
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare no_unsupported_claims_declaration=true",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.FELLOWSHIP_TYPE: EF, derived from Bulgaria→Hungary intra-EU move; spine_identity.DURATION: 24 months; both Operator-confirmed 13B consolidation 2026-07-16)",
+      "source_ref": "excellence_section.json traceability_footer.no_unsupported_claims_declaration=true; impact_section.json=true; implementation_section.json=true",
       "flag_reason": null
     },
     {
-      "claim_id": "C6",
-      "claim_summary": "Career Development Plan (D4-01, WP4) is jointly prepared by supervisor and fellow, submitted as a project deliverable at the beginning of the action (month 3), reviewed and updated during the fellowship, per scope requirement SR-04",
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All referenced sections have overall_status not 'unresolved' and non-empty claim_statuses",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-04: mandatory, requires CDP jointly by supervisor and researcher, submitted as a project deliverable at the beginning of the action; source_document HORIZON-MSCA-2026-PF-01-01.slice.json)",
+      "source_ref": "excellence_section.json: overall_status='inferred', 5 claim_statuses (PS-excellence-1 through 1.4); impact_section.json: overall_status='inferred', 4 claim_statuses (PS-impact-2 through 2.3); implementation_section.json: overall_status='inferred', 3 claim_statuses (PS-implementation-3 through 3.2)",
       "flag_reason": null
     },
     {
-      "claim_id": "C7",
-      "claim_summary": "SR-03 requires training activities to integrate key transferable skills including digital and AI skills (e.g. generative AI), Open Science, knowledge valorisation, innovation and entrepreneurship, and research integrity — all of which are addressed in the fellowship's training programme",
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "Consistency log present, non-empty, and contains no unresolved or inconsistency_flagged entries",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-03: mandatory, description enumerates digital skills including generative AI, Open Science, knowledge valorisation, innovation and entrepreneurship, good scientific conduct and research integrity; source_document HORIZON-MSCA-2026-PF-01-01.slice.json)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json consistency_log[]: 12 entries CC-01 through CC-12; all entries carry status='consistent'; zero entries with status='unresolved' or 'inconsistency_flagged'",
       "flag_reason": null
     },
     {
-      "claim_id": "C8",
-      "claim_summary": "EI-01 through EI-07 are the seven expected impacts of HORIZON-MSCA-2026-PF-01-01, each with the descriptions used in the section (EI-01: improved employability; EI-02: networking/communication; EI-03: R&I capacity; EI-04: visibility/reputation; EI-05: Charter alignment; EI-06: feedback into teaching; EI-07: new mind-sets)",
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability_footer present with non-empty primary_sources and no_unsupported_claims_declaration=true",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (all seven EI-01 through EI-07 present with descriptions matching section usage; source_document HORIZON-MSCA-2026-PF-01-01.slice.json)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C9",
-      "claim_summary": "RQ5: 90% prediction-interval coverage criterion (90% prediction intervals contain the truth approximately 90% of the time) is the confirmed uncertainty-calibration standard and pilot-success criterion (RQ7: RQ5 met on the validation set)",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decisions.RQ5: 'Prediction-interval coverage (90% PIs contain the truth about 90% of the time)'; RQ7: 'The RQ5 calibration target is met on the validation set'; both Operator-confirmed 13B consolidation)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C10",
-      "claim_summary": "RQ6: water-use efficiency (WUE) is the confirmed decision objective; the framework scores candidate irrigation decisions by WUE under propagated uncertainty",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decisions.RQ6: 'Water-use efficiency (WUE)'; Operator-confirmed 13B consolidation)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C11",
-      "claim_summary": "Earth observation data sources are Sentinel-1 SAR, Sentinel-2 optical (open Copernicus), PlanetScope imagery secured via Planet platform and API (RQ8), and ERA5 meteorological reanalysis (ECMWF); field sites at Hungarian tomato farms via AgroVIR",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.DATA_PROVIDERS: PlanetScope secured, Sentinel-1 SAR, Sentinel-2 optical open Copernicus, ERA5 ECMWF, field sites via AgroVIR — all Operator-confirmed; project_decisions.RQ8: 'Secured (Planet platform and API)')",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C12",
-      "claim_summary": "D5-01 (Data Management Plan) and D5-02 (Dissemination and exploitation plan) are both due at month 6 under WP5, establishing FAIR compliance and open-access dissemination routes before any primary research deliverable",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables: D5-01 and D5-02 both due month 6 under WP5; file exists on disk)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C13",
-      "claim_summary": "D1-01 (Diagnostic model specification and calibration report) due month 14 under WP1; D2-01 (Decision engine and demonstrator software) due month 20 under WP2; D3-01 (Field validation dataset and uncertainty calibration report) due month 24 under WP3",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables table: D1-01 M14 WP1, D2-01 M20 WP2, D3-01 M24 WP3; file exists on disk)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C14",
-      "claim_summary": "TRL target is a research prototype at TRL 3-4 (RQ10, operator-confirmed); the project does not assert operational deployment, commercial uptake, or scaled economic benefits",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decisions.RQ10: 'Research prototype (TRL 3-4)'; Operator-confirmed 13B consolidation)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C15",
-      "claim_summary": "Route B (homogeneous-patch proxy, RQ2) is the confirmed primary diagnostic pathway; RQ9 requires a co-located seasonal campaign measuring the proxy patch and target tomato crop simultaneously and demonstrating statistical covariation",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decisions.RQ2: 'Route B (homogeneous patch proxy)'; project_decisions.RQ9: 'A co-located seasonal campaign measuring the target crop and the proxy patch simultaneously and showing statistical covariation'; both Operator-confirmed)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C16",
-      "claim_summary": "No patent protection is sought for any primary research output; all primary outputs (D1-01 code, D2-01 software, D3-01 dataset) are intended for open dissemination under permissive open-source licences and FAIR principles",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json (exploitation_plan.ipr_strategy: open dissemination, no patent protection; file exists on disk)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C17",
-      "claim_summary": "IMP-2: economic and societal impact through WUE-optimised irrigation decision recommendation under propagated uncertainty; framework targets tomato horticulture at Hungarian field sites via AgroVIR",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-2: 'Economic and societal impact: water-use efficiency and farm resilience'; validation_status: Confirmed per IMP-1 note; grounded in operator-confirmed RQ6 and AgroVIR partner)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C18",
-      "claim_summary": "IMP-3: environmental co-benefit through landscape-compatible sensing — Route B's reliance on semi-natural covarying patches aligns sensing performance with landscape diversity retention; stated as structural property, not post-hoc framing",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-3: 'Environmental co-benefit through landscape-compatible sensing via Route B'; validation_status: Confirmed per note; grounded in operator-confirmed RQ2 and RQ9)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C19",
-      "claim_summary": "Dr. Cholakova's doctoral thesis doi:10.2139/ssrn.5492527 on non-destructive evaluation of physiological status of drought-stressed tomato plants; further peer-reviewed contributions on maize chilling-stress photosynthesis and biostimulants",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.FELLOW confirmed_value: 'thesis Non-destructive evaluation of physiological status of drought-stressed tomato plants, doi:10.2139/ssrn.5492527'; expertise includes 'photosynthesis under stress, biostimulants')",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C20",
-      "claim_summary": "IMP-1 scientific advance: gap matrix derived from a systematic review of 50 studies identifies an empty cell at real-time decision support combined with PlanetScope high-resolution imagery; specific novelty is end-to-end probabilistic coupling of multi-sensor EO with WUE-oriented decision support across all three of learned multimodal fusion, probabilistic crop-water-state estimation, and WUE-oriented recommendation",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-1 validation_status: Inferred; gap facts source_grounded from vault nodes METH-SOTA-007/005/006; novelty framing is vault synthesis). Source: docs/tier3_project_instantiation/project_brief/concept_note.md (50-study systematic review and gap matrix; file exists). Derivation: gap facts are source-grounded in the concept note's literature review; the novelty claim that the specific three-component combination is absent from the 50-study literature is derived from the gap matrix evidence combined with the precedent treatment (Bayesian Maximum Entropy, copula-based, dynamic Bayesian networks, MF-FusionNet, each documented in concept_note.md as lacking the full three-component integration).",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C21",
-      "claim_summary": "The fellowship opens three career trajectory directions: academic research groups in geoinformatics, crop science, or precision agriculture; non-academic and agri-tech sector; research management and policy — each addressable by the cross-disciplinary competence profile produced",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-4: Advancement of the researcher's career and ERA). Derivation: the three trajectory directions are logically derivable from the confirmed cross-disciplinary competence profile (plant physiology + probabilistic geoinformatics, evidenced in FAIR-released deliverables D1-01, D2-01, D3-01) and the inter-sectoral exposure via AgroVIR. No Tier 3 file enumerates these specific trajectories verbatim; they are structured inferences from confirmed competence and project characteristics.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C22",
-      "claim_summary": "Hungary is a Horizon Europe widening country, making the ERA Fellowship designation (SR-07) structurally available to this proposal and situating the ERA capacity contribution within the ERA's objective of balanced scientific excellence across Member States",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (CC-15 coverage_status: partially_covered; widening-country status inferred from host_country HU). Derivation: Confirmed host country is Hungary (HU) per confirmation_checklist.json spine_identity.HOST; Hungary's status as a Horizon Europe widening country is a documented programme fact; the ERA Fellowship designation under SR-07 is derived from SR-07 in scope_requirements.json (confirmed) applied to the confirmed host country. Derivation chain stated; no Tier 2B file explicitly confirms Hungary as widening country by name.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C23",
-      "claim_summary": "EI-05 alignment with the European Charter for Researchers is realised through D4-01 (CDP jointly prepared, periodically reviewed, transparent supervision arrangements) and ELTE's status as a European higher education establishment",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-05: Confirmed, 'Increased alignment of working conditions for researchers in accordance with the principles set out in the European Charter for Researchers'). Source: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json (EO-04 status: Assumed in Phase 2; here elevated to Inferred). Derivation: ELTE is confirmed as an EU higher education establishment (HU, Faculty of Informatics); D4-01 requirements are confirmed in SR-04; Charter alignment is a logical derivation from these confirmed institutional type and deliverable obligations. No Tier 3 file explicitly states 'ELTE holds HR Excellence in Research award' or equivalent Charter certification.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C24",
-      "claim_summary": "ELTE hosts active MSc and PhD programmes in geoinformatics, remote sensing, and precision agriculture within its Faculty of Informatics, Institute of Cartography and Geoinformatics, enabling curriculum integration of project outputs",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity.HOST: ELTE Faculty of Informatics, Institute of Cartography and Geoinformatics, group focus geoinformatics + remote sensing). Derivation: The confirmed existence of a named institute within a Faculty of Informatics at a major European research university (ELTE) specialised in geoinformatics and remote sensing logically entails the presence of MSc and PhD programs in those domains. No Tier 3 file explicitly lists specific degree programs; the derivation rests on the confirmed institutional identity and its research group focus.",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "C25",
-      "claim_summary": "Open-access publication commitment and FAIR data and software release for all primary research outputs (D1-01, D2-01, D3-01) under the Horizon Europe open-access mandate, with routes confirmed by D5-01 and D5-02 at month 6",
-      "status": "inferred",
-      "source_ref": "Source: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-03: mandatory, 'foster Open Science'). Source: docs/tier3_project_instantiation/project_brief/concept_note.md (open-access and FAIR commitment stated as project design choice). Derivation: The Horizon Europe open-access mandate is a programme-level requirement derivable from SR-03; specific FAIR governance via D5-01 and D5-02 is derived from the confirmed WP5 deliverable structure in canonical_reference_pack.json. The mandate itself is stated as an inference from the MSCA-PF open science scope requirement rather than being cited from a specific Tier 1 programme guidance article.",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json traceability_footer.primary_sources: 9 entries (3 section file paths + Tier 3/4 references including objectives.json, partners.json, outcomes.json, wp_structure.json, impact_architecture.json, budget_gate_assessment.json); no_unsupported_claims_declaration=true; derivation_note confirms section-level traceability inheritance",
       "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 25,
-    "confirmed": 19,
-    "inferred": 6,
+    "total_claims": 8,
+    "confirmed": 8,
+    "inferred": 0,
     "assumed": 0,
     "unresolved": 0
   },
   "no_unsupported_claims_declaration": true,
-  "timestamp": "2026-07-17T00:00:00Z"
+  "timestamp": "2026-07-22T00:00:00Z"
 }
