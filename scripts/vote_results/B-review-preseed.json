@@ -9,9 +9,9 @@
     {
       "lens": "correctness-and-missed-code-paths",
       "verdict": {
-        "holds_up": false,
+        "holds_up": true,
         "confidence": "medium",
-        "top_defect": "Stripping the assembler empties `_superseded_drafting_skills` in agent_runtime, so the manifest-derived suppressor of the monolithic drafting skill is gone and only a hardcoded skill-id string match prevents Claude from redrafting over the authoritative preseeded/reused section \u2014 and the new seam hardcodes `resolve_skill_ids`, so it cannot catch that drift.",
+        "top_defect": "Suppression is gated on REUSE_SKIP_SKILLS.get(node_id) being truthy while the 'drafting_skipped_audit_executed' reuse decision is persisted to Tier 4 before that lookup \u2014 a node in REUSE_ELIGIBLE_NODES but absent from REUSE_SKIP_SKILLS would record drafting-skipped, pass the reuse run_id escape hatch on that record, and still recompose over stale drafts; latent only, since the two tables currently share keys.",
         "lens": "correctness-and-missed-code-paths"
       }
     },
@@ -19,17 +19,17 @@
       "lens": "canonical_pack-vs-unapplied-assumptions",
       "verdict": {
         "holds_up": false,
-        "confidence": "medium",
-        "top_defect": "Suppression now covers reuse mode but the compensating worst-wins roll-up guard is wired only into preseed, so a reused section with overall_status 'confirmed' over an unresolved declared claim goes green while the retained canonical_pack_deriver republishes that declaration under the current run_id",
+        "confidence": "high",
+        "top_defect": "rollup_inconsistency lowercases overall_status (claim_status.py:84,104) but no_unresolved_material_claims compares exactly (criterion_predicates.py:218), so a preseeded section with 'Unresolved' passes gate_10a while the retained canonical_pack_deriver publishes the never-applied declaration as in force",
         "lens": "canonical_pack-vs-unapplied-assumptions"
       }
     },
     {
       "lens": "brittle-name-suffix-match",
       "verdict": {
-        "holds_up": true,
+        "holds_up": false,
         "confidence": "medium",
-        "top_defect": "Comment claims the import guard catches a new undeclared draft-consumer, but `DRAFT_CONSUMING_COMPONENTS - set(COMPONENT_REGISTRY)` only catches the rename direction; the addition direction rests on a test detector that greps adapter source for the substrings 'section_assembler'/'assumption_applier' and asserts len()==6, so a consumer reaching section_drafts/ via any other module escapes both silently.",
+        "top_defect": "Component suppression is properly enumerated, but the carried-forward drafting-skill skip is still hardcoded name-string matching across three tables never checked against the manifest's resolved skill_ids \u2014 an unmatched skip id is a silent no-op, so a skill rename lets the monolithic drafter overwrite the preseeded section while the new audit record falsely claims it was skipped.",
         "lens": "brittle-name-suffix-match"
       }
     }
