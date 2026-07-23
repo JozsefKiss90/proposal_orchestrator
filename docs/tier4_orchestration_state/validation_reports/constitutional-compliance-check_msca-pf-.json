@@ -1,7 +1,7 @@
 {
-  "report_id": "compliance_check_review_packet_evaluator_reviewer_2026-07-22T000000Z",
+  "report_id": "compliance_check_review_packet_compliance_validator_2026-07-22T000000Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "evaluator_reviewer",
+  "invoking_agent": "compliance_validator",
   "run_id_reference": "msca-pf-graph-01",
   "artifact_audited": "docs/tier5_deliverables/review_packets/review_packet.json",
   "section13_checks": [
@@ -11,28 +11,29 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "The artifact carries schema_id 'orch.tier5.review_packet.v1'. No structural reference to 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural schema authority appears anywhere in the artifact's fields, content, or schema_id. The single reference to grant-related compliance — ELTE's obligation to maintain a gender equality plan at grant signature — appears only within a quoted finding's evidence field as a quotation from a proposal section, not as a schema source."
+      "check_notes": "No references to Grant Agreement Annex, Model Grant Agreement Annex, AGA Template, or Annex [digit] used as a structural schema source appear in the artifact. Evaluation criteria references identify the MSCA-PF evaluation form, which is Tier 2A instrument schema content, not a grant agreement annex. No annex-pattern strings matching the prohibited forms were detected."
     },
     {
       "prohibition_id": "13.2",
       "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents",
       "check_status": "violation",
-      "violation_evidence": "The artifact asserts multiple MSCA-PF evaluation sub-criterion requirements as binding call constraints across six findings, with no traceability_footer field in the artifact and therefore no primary_sources[] reference pointing to docs/tier2b_topic_and_call_sources/extracted/. Specific assertions: (1) F-EX-01 states 'The MSCA-PF evaluation form requires consideration of the gender dimension and other diversity aspects if relevant for the research project under the soundness of methodology sub-criterion'; (2) F-IMP-01 states 'The MSCA-PF Impact sub-criterion requires credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development'; (3) F-EX-02 states 'The MSCA-PF Excellence sub-criterion Quality and appropriateness of the researcher's professional experience, competences and skills requires evidence of research independence and competitiveness'; (4) F-IMP-02 states the Impact sub-criterion requires 'the magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts'; (5) F-IMP-03 references the Impact sub-criterion on 'suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan'; (6) F-IMPL-02 references the Implementation sub-criterion on 'quality and capacity of the host institutions and participating organisations, including hosting arrangements'. Each of these is a positive assertion about what the call/evaluation instrument requires. The artifact contains no traceability_footer key at any level; not one of these call-constraint claims carries a source_ref to docs/tier2b_topic_and_call_sources/extracted/ or docs/tier2a_instrument_schemas/extracted/. Note: the evidence fields cite proposal section labels informally (e.g., 'Implementation section 3.2') but these are references to other Tier 5 artifacts, not to Tier 2A or Tier 2B extracted source files.",
+      "violation_evidence": "F-001: 'The MSCA-PF evaluation form requires consideration of the gender dimension...if relevant for the research project as a component of the soundness of methodology sub-criterion (weight 50%).' F-002: 'MSCA-PF evaluators assess the quality of supervision and training — including inter-sectoral exposure — under the Excellence criterion’s supervision and two-way transfer sub-criterion.' F-003: 'MSCA evaluators assessing credibility of the measures to enhance the career perspectives and employability of the researcher (Impact criterion, weight 30%).' F-004: 'suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan (Impact sub-criterion 2, weight 30%).' The artifact asserts specific evaluation criterion weights, sub-criterion names, and MSCA-PF programme-level requirements. No traceability_footer field is present in the artifact; consequently no traceability_footer.primary_sources[] references to docs/tier2b_topic_and_call_sources/extracted/ exist for any of these call-constraint claims.",
       "severity": "critical"
     },
     {
       "prohibition_id": "13.3",
       "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3",
       "check_status": "violation",
-      "violation_evidence": "The artifact names specific project facts without a traceability_footer referencing docs/tier3_project_instantiation/. The artifact contains no traceability_footer key at any level. Specific project-fact claims: (1) F-EX-02 names 'Dr. Rositsa Cholakova' as the fellow by name and characterises her research output as 'doi:10.2139/ssrn.5492527, summa cum laude, 2020' being 'the sole publication cited'; (2) F-EX-02 states 'No peer-reviewed journal publications, conference contributions, independently secured grants, or other indicators of research track record beyond the doctorate appear in any available artifact' — an assertion about the fellow's research record; (3) F-IMP-02 identifies 'Hungarian tomato growers' and 'AgroVIR' as the primary user group; (4) F-IMPL-02 names AgroVIR as 'the sole participating organisation' and asserts 'AgroVIR is the confirmed associated partner, based in Hungary'; (5) F-EX-01 evidence field quotes ELTE's institutional identity and legal obligation. The evidence fields within findings reference source material by informal label only (e.g., 'Implementation section 3.2: AgroVIR is the confirmed associated partner'), which are references to other Tier 5 artifacts rather than to docs/tier3_project_instantiation/ source paths. No conformant traceability_footer.primary_sources[] entry pointing to a Tier 3 path is present.",
+      "violation_evidence": "F-001 evidence: 'Eötvös Loránd University (ELTE), Budapest.' F-002: 'AgroVIR’s role is explicitly scoped to field access, validation logistics, and farmer feedback at Hungarian tomato sites'; 'Dr. András Jung’s co-founding experience at Cubert GmbH and Brightic Research'; F-002 evidence: 'No secondment and no non-academic placement are included in the fellowship plan.' F-003 evidence: 'D4-01', 'T4-01'. F-004 evidence: 'MS6 verifiable criterion: at least one open-access publication submitted covering the probabilistic fusion-to-decision framework'; 'D5-02'. F-005: 'WP4 (Training, supervision and two-way transfer of knowledge) is allocated 2 person-months'; 'T4-02'; 'SR-03'. The artifact names specific consortium partners, external companies, named project personnel, work packages, tasks, milestones, and deliverables. No traceability_footer field is present in the artifact; consequently no traceability_footer.primary_sources[] references to docs/tier3_project_instantiation/ exist for any of these project-fact claims.",
       "severity": "critical"
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed",
-      "check_status": "violation",
-      "violation_evidence": "The artifact carries schema_id 'orch.tier5.review_packet.v1', which begins with 'orch.tier5.' and therefore qualifies as a Phase 8 artifact under the skill's check-13.4 applicability rule. The budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json cannot be read within the TAPM input boundary for this skill invocation ('Read ONLY CLAUDE.md and the file at artifact_path'); this file is not among the declared inputs. Because the budget gate status cannot be confirmed as gate_pass_declaration: 'pass', and because CLAUDE.md §15 requires preferring explicit gate failure over fabricated completion, this check must record a violation. Note: a scan of the artifact's content reveals no budget figures in the forms €[0-9]+, [0-9]+ EUR, or [0-9]+ person-months used as confirmed budget values — the '24-month fellowship' reference is a duration statement, not a budget figure. The absence of budget-dependent content in the review packet itself is a partial mitigating factor, but cannot substitute for a confirmed budget gate pass as required by CLAUDE.md §8.4 and §13.4. Resolution requires a human operator to confirm the budget gate assessment file exists with gate_pass_declaration: 'pass'.",
-      "severity": "critical"
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null,
+      "check_notes": "The artifact carries schema_id 'orch.tier5.review_packet.v1', classifying it as a Phase 8 Tier 5 artifact. The budget gate assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json cannot be read under TAPM input boundary constraints (declared inputs are CLAUDE.md and the artifact_path only; the phase_outputs directory is explicitly excluded from reading). No EUR-denominated or €-denominated budget figures appear anywhere in the artifact. Person-month references in F-005 ('WP4 is allocated 2 person-months') and revision action A-5 ('redistribute 0.5 PM from WP5 to WP4', '0.5 PM for CDP preparation', '1.5 PM for supervision sessions') are observational reporting on the reviewed draft's existing WP effort allocations, not new budget assertions introduced by this artifact. No conclusive evidence of a budget-gate bypass is detectable from artifact content alone. Check recorded as pass with acknowledged limitation: budget gate file state cannot be verified from within TAPM input boundary."
     },
     {
       "prohibition_id": "13.5",
@@ -40,7 +41,7 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "Not directly checkable from artifact content. This prohibition governs agent runtime behaviour during execution, not the content of a produced artifact. Enforcement is the responsibility of the decision-log-update skill and the agent runtime. Recorded as pass per skill specification Check 13.5."
+      "check_notes": "Not directly checkable by reading an artifact. This prohibition governs agent execution behaviour and is enforced by the decision-log-update skill and DAG execution semantics, not by artifact content inspection. Recorded as pass per skill specification; the check cannot be evidenced or refuted from a Tier 5 review packet artifact."
     },
     {
       "prohibition_id": "13.6",
@@ -48,7 +49,7 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "Not directly checkable from artifact content. This prohibition governs the behavioural scope of skills and workflows, not the content of a produced artifact. No evidence within the review_packet.json artifact suggests it was produced by a skill that redefined phase meanings, tier meanings, or gate logic. Recorded as pass per skill specification Check 13.6."
+      "check_notes": "Not directly checkable from artifact content. A review packet is an evaluative output artifact; it does not define workflow logic, gate semantics, phase meanings, or tier definitions. No language in the artifact attempts to redefine constitutional constructs. Recorded as pass per skill specification."
     },
     {
       "prohibition_id": "13.7",
@@ -56,15 +57,15 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "The artifact is a Phase 8 review packet. Its content references only Phase 8 artifacts (proposal sections, consistency checks CC-07, CC-09, the assembled draft, implementation section 3.1, implementation section 3.2) as sources for its findings. No reference is made to Phase 9 or later outputs as inputs, nor is there any indication that Phase 8 outputs were used to satisfy an earlier phase's gate condition. No phase reordering is evidenced from the artifact content."
+      "check_notes": "The artifact is a Phase 8 Tier 5 output. All backward references — to WP structure (Phase 3), Gantt/milestones (Phase 4), impact architecture (Phase 5), implementation architecture (Phase 6) — are appropriate downstream references from a final-phase output to earlier completed phases. No forward references to outputs of phases later than Phase 8 appear. No evidence of phase reordering, gate-weakening language, or skip-ahead assumptions is present in the artifact content."
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalising proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "This check is applicable to Tier 5 deliverable artifacts. The review_packet.json is itself the mechanism for flagging gaps and incomplete content in the proposal. It contains seven findings (F-EX-01, F-EX-02, F-IMP-01 through F-IMP-03, F-IMPL-01, F-IMPL-02) that explicitly identify gaps in the proposal sections (missing gender dimension analysis, missing career development specificity, thin researcher track record evidence, missing scale evidence, missing dissemination specificity, missing statistical design rationale, missing AgroVIR organisational profile) and seven corresponding revision actions. The artifact does not present finalized proposal text as complete while concealing known incompleteness; it IS the flagging instrument. The artifact lacks a validation_status.overall_status field, which would be expected per the skill's check description, but the findings structure provides equivalent flagging function. No violation is present."
+      "check_notes": "The artifact is a review packet (schema_id: orch.tier5.review_packet.v1), not finalized proposal section text. Its entire content consists of structured findings (F-001 through F-005) and revision actions (A-1 through A-5) that explicitly identify gaps, deficiencies, and required changes in the underlying section drafts. The artifact contains no proposal text presented as complete and final. The findings themselves are the gap-flagging mechanism (e.g., F-001 flags inadequate gender dimension treatment, F-003 flags deferred career targets, F-004 flags insufficient dissemination ambition). Check 13.8 is structurally non-applicable to a review packet artifact; recorded as pass."
     },
     {
       "prohibition_id": "13.9",
@@ -72,13 +73,13 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "Check 13.9 specifically targets claims referencing 'Horizon Europe rules (participation conditions, grant agreement terms, financial regulation)' without a Tier 1 source reference in traceability_footer.primary_sources[]. The artifact's claims about MSCA-PF evaluation sub-criteria are Tier 2A (evaluation form schema) matters, not Tier 1 legal/regulatory matters (participation conditions, financial regulation, grant agreement terms). No explicit claim about participation conditions, financial regulation articles, or grant agreement terms appears in the artifact without a Tier 1 source reference. The evaluation criteria claims, which lack Tier 2A/2B source traceability, are addressed under Check 13.2. No §13.9 violation is independently present."
+      "check_notes": "The review packet's programme-level assertions concern MSCA-PF evaluation criterion weights and sub-criterion names (Tier 2A instrument schema content) and MSCA-PF mandatory training framework SR-03 (Tier 2A/2B content). These do not constitute Tier 1 regulatory claims (primary legislation, Framework Programme Regulation, EU Financial Regulation, or participation conditions) within the scope of §13.9. The GEP compliance statement in F-001 evidence ('Eötvös Loránd University (ELTE)...is required to have a gender equality plan in place at grant signature') is quoted from the implementation section of the proposal being reviewed, not asserted as a new regulatory claim by the review packet itself. No Tier 1 regulatory claims (participation conditions, grant agreement terms, financial regulation) are identified in the artifact content that would require Tier 1 source references. Recorded as pass."
     },
     {
       "prohibition_id": "13.10",
       "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4",
       "check_status": "violation",
-      "violation_evidence": "The artifact is a Tier 5 output (schema_id 'orch.tier5.review_packet.v1'). It contains no traceability_footer field at any level. Consequently: (1) traceability_footer.no_unsupported_claims_declaration is absent and cannot be confirmed; (2) no validation_status.claim_statuses[] array is present; (3) the artifact's factual claims — including MSCA-PF sub-criterion requirements (Tier 2A sources not cited), researcher name and publication record (Tier 3 sources not cited), partner identities and roles (Tier 3 sources not cited), and project scope characterisations (Tier 2B sources not cited) — are referenced only by informal labels such as 'CC-09 terminology consistency check', 'CC-07', 'Implementation section 3.1', 'Implementation section 3.2', 'the assembled draft, consistency log, and implementation section'. These informal labels refer to other Tier 5 artifacts, not to Tier 1–4 source paths. CLAUDE.md §11.4 states: 'Tier 5 deliverables are the output layer; they must be derived from Tier 1–4 state. They must not introduce new facts, constraints, or framings that are not grounded in a higher tier.' Without a traceability_footer providing Tier 1–4 path references, this derivation chain cannot be verified.",
+      "violation_evidence": "The artifact (schema_id: orch.tier5.review_packet.v1) contains no traceability_footer field and no no_unsupported_claims_declaration field. The following claims appear without any source_refs linking to Tier 1–4 source paths: evaluation criterion weights ('weight 50%', 'weight 30%' in F-001, F-003, F-004); sub-criterion names ('soundness of methodology', 'supervision and two-way transfer', Impact sub-criterion 2 in F-001, F-002, F-004); SR-03 mandatory transferable-skills dimensions (F-005, revision action A-5); partner identity claims (AgroVIR in F-002, F-005; ELTE in F-001 evidence); personnel claims (Dr. András Jung, Cubert GmbH, Brightic Research in F-002); WP effort allocations ('2 person-months' for WP4 in F-005); milestone verifiable criteria (MS6 in F-004); and deliverable references (D4-01 in F-003, D5-02 in F-004 and A-3). The complete absence of a traceability_footer means no source_refs for any claim are present in the artifact structure.",
       "severity": "critical"
     },
     {
@@ -87,7 +88,7 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "Not checkable from a phase output or deliverable artifact. This prohibition governs write operations against Tier 1 and Tier 2 source documents. The review_packet.json artifact does not reference any modification of Tier 1 or Tier 2 documents. Recorded as pass per skill specification Check 13.11."
+      "check_notes": "Not checkable from a phase output or deliverable artifact. This prohibition governs write operations to source documents and cannot be evidenced or refuted by inspecting a Tier 5 artifact. Recorded as pass per skill specification."
     },
     {
       "prohibition_id": "13.12",
@@ -95,58 +96,54 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "applicability_note": "Not directly checkable from artifact content. No statement within the review_packet.json artifact characterises CLAUDE.md as advisory or optional, nor does any content suggest it was produced by a process that ignored constitutional constraints. Recorded as pass per skill specification Check 13.12."
+      "check_notes": "Not directly checkable from artifact content. This prohibition governs agent and skill execution disposition, not artifact structure. A review packet artifact cannot itself treat CLAUDE.md as advisory. Recorded as pass per skill specification."
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 4
+    "violations_found": 3,
+    "violations_by_prohibition": [
+      "13.2",
+      "13.3",
+      "13.10"
+    ],
+    "critical_violations": 3,
+    "major_violations": 0
   },
+  "timestamp": "2026-07-22T00:00:00Z",
   "decision_log_entries": [
     {
-      "decision_id": "constitutional_violation_evaluator_reviewer_2026-07-22T000001Z",
+      "decision_id": "constitutional_violation_compliance_validator_2026-07-22T000000Z_13-2",
       "decision_type": "constitutional_violation",
-      "violation_id": "13.2_review_packet_2026-07-22T000001Z",
+      "violation_id": "13.2_review_packet_2026-07-22T000000Z",
       "constitutional_rule_ref": "CLAUDE.md §13.2",
       "artifact_affected": "docs/tier5_deliverables/review_packets/review_packet.json",
       "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: the review packet asserts MSCA-PF evaluation sub-criterion requirements as call constraints across six findings (F-EX-01, F-IMP-01, F-EX-02, F-IMP-02, F-IMP-03, F-IMPL-02) without any traceability_footer.primary_sources[] entry pointing to docs/tier2b_topic_and_call_sources/extracted/ or docs/tier2a_instrument_schemas/extracted/. The artifact contains no traceability_footer field. Resolution requires: (a) adding a traceability_footer to the review packet with primary_sources[] entries pointing to the relevant Tier 2A extracted evaluation form schema and Tier 2B extracted call constraint files for each finding that asserts an evaluation requirement, or (b) human operator acknowledgement that informal inline evidence field references to proposal sections constitute sufficient traceability for this artifact type. Requires human operator resolution.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-22T00:00:01Z"
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The review packet asserts MSCA-PF evaluation criterion weights (50%, 30%) and named sub-criterion requirements without traceability_footer.primary_sources[] references to docs/tier2b_topic_and_call_sources/extracted/. Human operator must determine whether: (a) these evaluation criteria claims are grounded in the active Tier 2B extracted files and the review packet schema should be amended to include a traceability_footer with source_refs; or (b) a formal schema-level exception applies to review packet artifacts that audit rather than assert call constraints, which must be recorded as a constitutional decision log entry and reflected in the artifact schema specification.",
+      "tier_authority_applied": "CLAUDE.md §13.2",
+      "timestamp": "2026-07-22T00:00:00Z"
     },
     {
-      "decision_id": "constitutional_violation_evaluator_reviewer_2026-07-22T000002Z",
+      "decision_id": "constitutional_violation_compliance_validator_2026-07-22T000000Z_13-3",
       "decision_type": "constitutional_violation",
-      "violation_id": "13.3_review_packet_2026-07-22T000002Z",
+      "violation_id": "13.3_review_packet_2026-07-22T000000Z",
       "constitutional_rule_ref": "CLAUDE.md §13.3",
       "artifact_affected": "docs/tier5_deliverables/review_packets/review_packet.json",
       "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: the review packet names project-specific facts — Dr. Rositsa Cholakova (fellow, by name), doi:10.2139/ssrn.5492527 (publication), ELTE (partner), AgroVIR (associated partner, characterised as 'the sole participating organisation') — without any traceability_footer.primary_sources[] entry pointing to docs/tier3_project_instantiation/. The artifact contains no traceability_footer field. Note: evidence fields within findings reference proposal sections by informal label (e.g., 'Implementation section 3.2'), providing partial inline attribution to Tier 5 artifacts but not to Tier 3 source paths. Resolution requires: (a) adding a traceability_footer with Tier 3 source path references for each project-fact claim, or (b) human operator determination that this review packet artifact type is exempt from the traceability_footer requirement by its operational role as a meta-audit document. Requires human operator resolution.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-22T00:00:02Z"
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The review packet names specific consortium partners (AgroVIR, ELTE), external companies (Cubert GmbH, Brightic Research), project personnel (Dr. András Jung), work packages (WP3, WP4, WP5), tasks (T4-01, T4-02), milestones (MS4, MS6), and deliverables (D4-01, D5-02) without traceability_footer.primary_sources[] references to docs/tier3_project_instantiation/. Human operator must determine whether: (a) all named project facts are present in Tier 3 data and the review packet schema should be amended to carry traceability evidence; or (b) review packet artifacts — which audit proposal sections derived from Tier 3, rather than making primary assertions — are exempt from §13.3 traceability requirements by schema-level exception, which must be formally recorded.",
+      "tier_authority_applied": "CLAUDE.md §13.3",
+      "timestamp": "2026-07-22T00:00:00Z"
     },
     {
-      "decision_id": "constitutional_violation_evaluator_reviewer_2026-07-22T000003Z",
+      "decision_id": "constitutional_violation_compliance_validator_2026-07-22T000000Z_13-10",
       "decision_type": "constitutional_violation",
-      "violation_id": "13.4_review_packet_2026-07-22T000003Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.4",
-      "artifact_affected": "docs/tier5_deliverables/review_packets/review_packet.json",
-      "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: the review_packet.json is a Phase 8 Tier 5 artifact (schema_id 'orch.tier5.review_packet.v1'). The budget gate assessment file docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json cannot be confirmed to exist with gate_pass_declaration: 'pass' within the TAPM input boundary of this skill invocation. Per CLAUDE.md §8.4 and §13.4, no Phase 8 activity may commence before gate_09 passes; the categorical block is unconditional and instrument-independent. Resolution requires: a human operator to confirm that budget_gate_assessment.json exists at the canonical path with gate_pass_declaration: 'pass', and that this gate was confirmed before the review packet was produced. If the budget gate was not passed when this artifact was produced, the artifact must be voided and reproduced after gate passage. The absence of budget figures in the review packet's content is noted but does not satisfy the gate-passage requirement.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-22T00:00:03Z"
-    },
-    {
-      "decision_id": "constitutional_violation_evaluator_reviewer_2026-07-22T000004Z",
-      "decision_type": "constitutional_violation",
-      "violation_id": "13.10_review_packet_2026-07-22T000004Z",
+      "violation_id": "13.10_review_packet_2026-07-22T000000Z",
       "constitutional_rule_ref": "CLAUDE.md §13.10",
       "artifact_affected": "docs/tier5_deliverables/review_packets/review_packet.json",
       "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: the review_packet.json is a Tier 5 artifact that lacks a traceability_footer field entirely. CLAUDE.md §11.4 requires that all Tier 5 content be derivable from Tier 1–4 state and traceable to specific Tier 1–4 inputs. The artifact's claims about evaluation requirements, researcher identity and track record, partner identity and role, and project scope are referenced only via informal evidence-field labels pointing to other Tier 5 artifacts, not to Tier 1–4 source paths. Resolution requires: adding a traceability_footer to the review packet that includes (a) no_unsupported_claims_declaration with a boolean value, (b) primary_sources[] entries with Tier 1–4 paths for each material claim category, and (c) a claim_statuses[] array or equivalent per §12.2 vocabulary. This is a structural gap in the artifact schema as produced. Requires human operator resolution and potential artifact revision.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-07-22T00:00:04Z"
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The review packet (orch.tier5.review_packet.v1) is a Tier 5 artifact with no traceability_footer field, no no_unsupported_claims_declaration, and no source_refs for any claim across its findings and revision actions. All claims about evaluation criteria, partner identities, project structure, effort allocations, and milestone criteria are unlinked to Tier 1–4 source paths. Human operator must resolve whether: (a) the review packet schema (orch.tier5.review_packet.v1) must be amended in the artifact_schema_specification.yaml to require a traceability_footer with source_refs aligned to the Tier 1–4 inputs that grounded each finding; or (b) operational review/audit artifacts are formally exempt from the §13.10 per-claim traceability requirement by a schema-level exception registered in the artifact schema specification and decision log, on the grounds that their claims are second-order (auditing first-order artifacts that carry their own traceability).",
+      "tier_authority_applied": "CLAUDE.md §13.10",
+      "timestamp": "2026-07-22T00:00:00Z"
     }
-  ],
-  "timestamp": "2026-07-22T00:00:00Z"
+  ]
 }
