@@ -1,0 +1,37 @@
+{
+  "lane": "B-review-preseed",
+  "decision": "REFUTED \u2014 majority found blocking defects",
+  "holds": 1,
+  "refute": 2,
+  "unparsed": 0,
+  "errored": 0,
+  "verdicts": [
+    {
+      "lens": "correctness-and-missed-code-paths",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "Stripping the assembler empties `_superseded_drafting_skills` in agent_runtime, so the manifest-derived suppressor of the monolithic drafting skill is gone and only a hardcoded skill-id string match prevents Claude from redrafting over the authoritative preseeded/reused section \u2014 and the new seam hardcodes `resolve_skill_ids`, so it cannot catch that drift.",
+        "lens": "correctness-and-missed-code-paths"
+      }
+    },
+    {
+      "lens": "canonical_pack-vs-unapplied-assumptions",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "Suppression now covers reuse mode but the compensating worst-wins roll-up guard is wired only into preseed, so a reused section with overall_status 'confirmed' over an unresolved declared claim goes green while the retained canonical_pack_deriver republishes that declaration under the current run_id",
+        "lens": "canonical_pack-vs-unapplied-assumptions"
+      }
+    },
+    {
+      "lens": "brittle-name-suffix-match",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "medium",
+        "top_defect": "Comment claims the import guard catches a new undeclared draft-consumer, but `DRAFT_CONSUMING_COMPONENTS - set(COMPONENT_REGISTRY)` only catches the rename direction; the addition direction rests on a test detector that greps adapter source for the substrings 'section_assembler'/'assumption_applier' and asserts len()==6, so a consumer reaching section_drafts/ via any other module escapes both silently.",
+        "lens": "brittle-name-suffix-match"
+      }
+    }
+  ]
+}

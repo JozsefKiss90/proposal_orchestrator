@@ -1,0 +1,37 @@
+{
+  "lane": "B-review-schemaid",
+  "decision": "REFUTED \u2014 majority found blocking defects",
+  "holds": 0,
+  "refute": 3,
+  "unparsed": 0,
+  "errored": 0,
+  "verdicts": [
+    {
+      "lens": "every-write-path-covered",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "Backfill silently overwrites a present-but-different schema_id (contradicting its own 'adds only' docstring and \u00a717.6.5), and the canonical test fixture gate_result_writers.py still emits no schema_id \u2014 so the required regression seam would certify the pre-fix shape.",
+        "lens": "every-write-path-covered"
+      }
+    },
+    {
+      "lens": "backfill-idempotency-and-safety",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "Backfill silently overwrites a present-but-different schema_id (the `if k != \"schema_id\"` filter drops the old value) instead of failing, violating \u00a717.6.5's no-silent-repair rule and its own \"adds only\" docstring; the emit is also unenforced by any predicate or test.",
+        "lens": "backfill-idempotency-and-safety"
+      }
+    },
+    {
+      "lens": "schema-contract-match",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "high",
+        "top_defect": "backfill silently overwrites a present-but-different schema_id (the auto-repair \u00a717.6.5 forbids, contradicting its own 'adds only' docstring), and no runtime consumer validates schema_id \u2014 gate_pass_predicates._MANDATORY_FIELDS omits it \u2014 so a wrong value is caught only at n08f",
+        "lens": "schema-contract-match"
+      }
+    }
+  ]
+}
