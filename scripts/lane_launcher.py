@@ -25,7 +25,9 @@ import inspect
 import json
 import os
 import re
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage  # verify surface vs your version
@@ -133,9 +135,56 @@ def _render(message) -> None:
     # SystemMessage / Task*Message / UserMessage(tool results) / StreamEvent -> skipped as noise
 
 
-async def _drive(opener: str, options: ClaudeAgentOptions, label: str) -> str | None:
+def _git_changed() -> set:
+    """Working-tree paths git currently sees as changed/untracked. Runs native git locally; returns an
+    empty set if git isn't available. Diffed before/after an apply to record exactly what it touched —
+    which is what would have caught apply-preseed relocating that brief."""
+    try:
+        out = subprocess.run(["git", "status", "--porcelain"], cwd=str(REPO),
+                             capture_output=True, text=True, timeout=30).stdout
+    except Exception:
+        return set()
+    paths = set()
+    for line in out.splitlines():
+        p = line[3:] if len(line) > 3 else ""
+        if " -> " in p:  # rename: "old -> new"
+            p = p.split(" -> ", 1)[1]
+        p = p.strip().strip('"')
+        if p:
+            paths.add(p)
+    return paths
+
+
+def _append_apply_log(action: str, item: str, result: str, changed: set) -> None:
+    entry = {"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+             "action": action, "item": item, "result": result, "changed_paths": sorted(changed)}
+    VOTE_DIR.mkdir(parents=True, exist_ok=True)
+    with (VOTE_DIR / "apply_log.jsonl").open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(entry) + "\n")
+    print(f"  · logged: {action} {item} -> {result}; {len(changed)} file(s) changed")
+    for p in sorted(changed):
+        print(f"      ~ {p}")
+
+
+def show_log() -> None:
+    fp = VOTE_DIR / "apply_log.jsonl"
+    if not fp.exists():
+        print(f"no apply log yet ({fp})")
+        return
+    for line in fp.read_text(encoding="utf-8").splitlines():
+        try:
+            e = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        print(f"{e.get('ts','?')}  {e.get('action',''):5} {e.get('item',''):10} -> "
+              f"{e.get('result',''):16} ({len(e.get('changed_paths', []))} files)")
+        for p in e.get("changed_paths", []):
+            print(f"    ~ {p}")
+
+
+async def _drive(opener: str, options: ClaudeAgentOptions, label: str) -> tuple:
     """Run one session with concise output (LANE_VERBOSE=1 for the raw stream). Never crashes on a
-    turn-ceiling/error result — reports and returns."""
+    turn-ceiling/error result — reports and returns (result_text, stopped_reason_or_None)."""
     print(f"\n▶ {label} — running (Ctrl-C to abort)…")
     result, stopped = None, None
     try:
@@ -153,7 +202,7 @@ async def _drive(opener: str, options: ClaudeAgentOptions, label: str) -> str | 
         print("    If it ran out of turns, raise this lane's max_turns or split the task smaller.")
     else:
         print(f"✓ {label} — done.")
-    return result
+    return result, stopped
 
 
 # ============================ SINGLE-SESSION LANES ================================================
@@ -192,7 +241,8 @@ async def run_lane(name: str) -> str | None:
     lane = LANES[name]
     options = _make_options(allowed_tools=lane["allowed_tools"], model=lane["model"], effort=lane["effort"],
                             system_append=_always_on_context(lane["lane_note"]), max_turns=lane["max_turns"])
-    return await _drive(lane["opener"], options, f"lane {name}")
+    result, _ = await _drive(lane["opener"], options, f"lane {name}")
+    return result
 
 
 # ============================ OPTION (b): DETERMINISTIC N-VOTE ====================================
@@ -348,7 +398,10 @@ async def run_apply(item: str) -> str | None:
         system_append=_always_on_context(f"Apply lane for '{item}'. Verify findings, then fix. No commit."),
         max_turns=80,
     )
-    return await _drive(opener, options, f"apply {item}")
+    before = _git_changed()
+    result, stopped = await _drive(opener, options, f"apply {item}")
+    _append_apply_log("apply", item, "done" if not stopped else f"stopped:{stopped}", _git_changed() - before)
+    return result
 
 
 async def run_seams(item: str | None = None) -> None:
@@ -375,7 +428,9 @@ async def run_seams(item: str | None = None) -> None:
             system_append=_always_on_context(f"Seam-lock lane for '{it}'. Test only; no logic change; no commit."),
             max_turns=50,
         )
-        await _drive(opener, options, f"seams {it}")
+        before = _git_changed()
+        _, stopped = await _drive(opener, options, f"seams {it}")
+        _append_apply_log("seams", it, "done" if not stopped else f"stopped:{stopped}", _git_changed() - before)
 
 
 # ============================ CLI ================================================================
@@ -385,6 +440,7 @@ def _usage() -> None:
     print("  python lane_launcher.py vote <lane> [n]   vote lanes: " + ", ".join(VOTE_LANES) + "  (n default 3)")
     print("  python lane_launcher.py apply <item>      items: " + ", ".join(APPLY_ITEMS) + "  (reads the persisted verdict)")
     print("  python lane_launcher.py seams [item]      write the seam for items that HELD UP (verdict-gated)")
+    print("  python lane_launcher.py log               show the apply-log (what ran, when, files changed)")
 
 
 def main() -> None:
@@ -401,6 +457,9 @@ def main() -> None:
             _usage()
             raise SystemExit(2)
         asyncio.run(run_seams(it))
+        return
+    if args[:1] == ["log"]:
+        show_log()
         return
     if len(args) == 1 and args[0] in LANES:
         if args[0] == "A-transport":
