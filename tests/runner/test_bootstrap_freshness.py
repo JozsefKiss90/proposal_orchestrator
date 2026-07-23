@@ -38,7 +38,10 @@ from runner.dag_scheduler import (
     RunAbortedError,
     bootstrap_phase_prerequisites,
 )
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import (
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+)
 from runner.predicates.gate_pass_predicates import is_gate_fresh
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult
@@ -82,6 +85,7 @@ def _write_gate_result(
     abs_path = repo_root / _TIER4_ROOT_REL / rel_path
     abs_path.parent.mkdir(parents=True, exist_ok=True)
     result = {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "status": status,
         "run_id": "prior-run-id",

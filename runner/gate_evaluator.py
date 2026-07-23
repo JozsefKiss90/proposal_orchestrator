@@ -55,7 +55,7 @@ from runner.gate_library import (
     LIBRARY_REL_PATH,
 )
 from runner.manifest_reader import ManifestReader, ManifestReaderError
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.coverage_predicates import (
@@ -835,8 +835,9 @@ def evaluate_gate(
         # every gate result file MUST carry this schema_id, and a consumer that
         # finds a different/absent value fails with MALFORMED_ARTIFACT (e.g.
         # checkpoint-publish at n08f).  Historically omitted; added here so the
-        # evaluator's output conforms to its own declared schema.
-        "schema_id": "orch.gate_result.v1",
+        # evaluator's output conforms to its own declared schema.  This is the
+        # sole gate-result write path in the runtime (§17.6.3).
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "gate_kind": gate_kind,
         "run_id": run_id,

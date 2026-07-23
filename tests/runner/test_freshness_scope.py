@@ -30,7 +30,10 @@ from runner.dag_scheduler import (
     RunAbortedError,
     bootstrap_phase_prerequisites,
 )
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import (
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+)
 from runner.predicates.gate_pass_predicates import is_gate_fresh
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult
@@ -67,6 +70,7 @@ def _write_gate_result(
     if evaluated_at is None:
         evaluated_at = datetime.now(timezone.utc).isoformat()
     result = {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "status": status,
         "run_id": "prior-run-id",

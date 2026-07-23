@@ -1,35 +1,35 @@
 {
   "lane": "B-review-schemaid",
-  "decision": "REFUTED \u2014 majority found blocking defects",
-  "holds": 0,
-  "refute": 3,
+  "decision": "HOLDS UP \u2014 majority",
+  "holds": 3,
+  "refute": 0,
   "unparsed": 0,
   "errored": 0,
   "verdicts": [
     {
       "lens": "every-write-path-covered",
       "verdict": {
-        "holds_up": false,
-        "confidence": "medium",
-        "top_defect": "Backfill silently overwrites a present-but-different schema_id (contradicting its own 'adds only' docstring and \u00a717.6.5), and the canonical test fixture gate_result_writers.py still emits no schema_id \u2014 so the required regression seam would certify the pre-fix shape.",
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "Backfill globs only phase_outputs/**/*result*.json, missing the evaluator's own fallback dir docs/tier4_orchestration_state/gate_results/ (gate_evaluator.py:337) and the gate-result-shaped alpha_honest_block/phase2_gate_result_HONEST_BLOCK.json \u2014 latent scope gap, no live miss",
         "lens": "every-write-path-covered"
       }
     },
     {
       "lens": "backfill-idempotency-and-safety",
       "verdict": {
-        "holds_up": false,
-        "confidence": "medium",
-        "top_defect": "Backfill silently overwrites a present-but-different schema_id (the `if k != \"schema_id\"` filter drops the old value) instead of failing, violating \u00a717.6.5's no-silent-repair rule and its own \"adds only\" docstring; the emit is also unenforced by any predicate or test.",
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "backfill silently reports APPLIED/exit-0 when --repo-root is wrong (rglob on a missing dir yields nothing, root never validated), making 'scanned nothing' indistinguishable from 'all conforming'",
         "lens": "backfill-idempotency-and-safety"
       }
     },
     {
       "lens": "schema-contract-match",
       "verdict": {
-        "holds_up": false,
-        "confidence": "high",
-        "top_defect": "backfill silently overwrites a present-but-different schema_id (the auto-repair \u00a717.6.5 forbids, contradicting its own 'adds only' docstring), and no runtime consumer validates schema_id \u2014 gate_pass_predicates._MANDATORY_FIELDS omits it \u2014 so a wrong value is caught only at n08f",
+        "holds_up": true,
+        "confidence": "medium",
+        "top_defect": "Backfill discovers files by glob+duck-type rather than GATE_RESULT_PATHS, so a gate result at the evaluator's fallback path is skipped while the tool exits 0 \u2014 silent under-coverage, unreachable today",
         "lens": "schema-contract-match"
       }
     }

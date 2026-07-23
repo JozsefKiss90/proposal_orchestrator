@@ -14,7 +14,17 @@ The full repo-relative equivalents (for documentation) are:
 This table is the authoritative runtime source for gate result path resolution.
 It must remain consistent with §6.3 of artifact_schema_specification.yaml.
 Any amendment to that section requires a corresponding update here.
+
+``GATE_RESULT_SCHEMA_ID`` is the single runtime source of truth for the
+``schema_id`` every gate result must carry (``gate_result_schema.schema_id_value``
+in artifact_schema_specification.yaml).  The gate evaluator stamps it, the
+``gate_pass_recorded`` predicate enforces it, and the backfill tool compares
+against it — none of them may hard-code the literal independently.
 """
+
+#: Required value of the ``schema_id`` field in every gate result artifact.
+#: artifact_schema_specification.yaml §gate_result_schema.schema_id_value.
+GATE_RESULT_SCHEMA_ID: str = "orch.gate_result.v1"
 
 GATE_RESULT_PATHS: dict[str, str] = {
     # entry gate for n01 — evaluated before Phase 1 begins

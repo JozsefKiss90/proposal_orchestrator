@@ -2,10 +2,10 @@
 Gate-pass predicate: gate_pass_recorded.
 
 Confirms that a gate result artifact exists at its canonical path (§6.3 of
-artifact_schema_specification.yaml), records status: pass, carries a run_id
-that matches the current run, has an input_fingerprint field, and has an
-evaluated_at timestamp that is not older than the mtime of any upstream
-required input artifact.
+artifact_schema_specification.yaml), declares the required gate-result
+schema_id, records status: pass, carries a run_id that matches the current run,
+has an input_fingerprint field, and has an evaluated_at timestamp that is not
+older than the mtime of any upstream required input artifact.
 
 See gate_rules_library_plan.md §3 and §6.3 for the full specification.
 """
@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.paths import resolve_repo_path
 from runner.predicates.types import (
     MALFORMED_ARTIFACT,
@@ -33,7 +33,12 @@ from runner.versions import MANIFEST_VERSION
 PathLike = Union[str, os.PathLike[str]]
 
 # Every GateResult artifact must carry all of these fields with non-null values.
+# ``schema_id`` is mandatory per artifact_schema_specification.yaml
+# §gate_result_schema.fields.schema_id; its *value* is additionally checked
+# below, because that section requires this predicate to fail with
+# MALFORMED_ARTIFACT when it finds a different schema_id.
 _MANDATORY_FIELDS: frozenset[str] = frozenset({
+    "schema_id",
     "gate_id",
     "run_id",
     "status",
@@ -336,6 +341,29 @@ def gate_pass_recorded(
                 "gate_id": gate_id,
                 "path": str(result_path),
                 "missing_fields": missing,
+            },
+        )
+
+    # 4b — schema_id must equal the declared gate-result schema.
+    # artifact_schema_specification.yaml §gate_result_schema: "A
+    # gate_pass_recorded predicate that reads a gate result file and finds a
+    # different schema_id must fail with failure_category: MALFORMED_ARTIFACT."
+    # This is a validation failure, never an auto-correctable condition
+    # (CLAUDE.md §17.6.5) — the predicate reports it, it does not repair it.
+    recorded_schema_id: str = data["schema_id"]
+    if recorded_schema_id != GATE_RESULT_SCHEMA_ID:
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"Gate result for '{gate_id}' declares schema_id "
+                f"'{recorded_schema_id}'; expected '{GATE_RESULT_SCHEMA_ID}'."
+            ),
+            details={
+                "gate_id": gate_id,
+                "path": str(result_path),
+                "expected_schema_id": GATE_RESULT_SCHEMA_ID,
+                "recorded_schema_id": recorded_schema_id,
             },
         )
 

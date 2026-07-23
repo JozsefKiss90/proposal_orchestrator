@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
 from tests.runner.fixtures.repo_builders import write_json
 
@@ -43,6 +43,8 @@ def write_passed_gate(
     ``gate_pass_recorded``:
 
     * canonical path derived from GATE_RESULT_PATHS
+    * ``schema_id == GATE_RESULT_SCHEMA_ID`` (overridable via ``extra`` for
+      schema-mismatch tests)
     * all mandatory fields present and non-null
     * ``run_id`` matches
     * ``manifest_version`` matches MANIFEST_VERSION (overridable for version-
@@ -63,6 +65,7 @@ def write_passed_gate(
     result_path = tier4_root / GATE_RESULT_PATHS[gate_id]
 
     data: dict[str, Any] = {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "gate_kind": "exit",
         "run_id": run_id,
@@ -98,6 +101,7 @@ def write_failed_gate(
     result_path = tier4_root / GATE_RESULT_PATHS[gate_id]
 
     data: dict[str, Any] = {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "gate_kind": "exit",
         "run_id": run_id,
