@@ -35,6 +35,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from runner.claim_status import STATUS_SEVERITY, worst_status
+
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -80,6 +82,71 @@ PRESEED_NODE_CONFIG: dict[str, dict[str, str]] = {
         "skipped_skill": "implementation-section-drafting",
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# Validation-status consistency
+# ---------------------------------------------------------------------------
+
+
+def _validation_status_inconsistency(data: dict[str, Any]) -> str | None:
+    """Return a failure reason iff the roll-up over-states the claims (§12.2).
+
+    A drafted section gets its ``validation_status.overall_status`` derived from
+    the per-claim statuses by the drafter and, after any declared flips, by the
+    assumption-applier — the worst-wins rule of §12.2.  A **preseeded** section
+    bypasses that whole pipeline: the operator hands in a finished artifact, and
+    nothing downstream re-derives the roll-up.  ``gate_10a`` reads only the
+    roll-up (``no_unresolved_material_claims``) and W1
+    (``assumed_claims_are_operator_declared``) inspects only ``assumed`` claims,
+    so an ``unresolved`` claim sitting under a ``confirmed`` roll-up is invisible
+    to both — a fail-closed honest block silently becomes a green.  Presence
+    validation alone cannot catch that; this check does.
+
+    The rule is one-sided by design: the roll-up may be **more** conservative
+    than its claims (an operator may declare a section ``assumed`` over
+    ``confirmed`` claims — honest under-claiming, §15), but it may never be more
+    resolved than its least-resolved claim.
+
+    Returns ``None`` when the artifact is consistent (including when it carries
+    no claims), otherwise a ``preseed_*`` reason string.
+    """
+    validation_status = data.get("validation_status")
+    if not isinstance(validation_status, dict):
+        return (
+            "preseed_validation_status_not_object: 'validation_status' must be "
+            f"an object, got {type(validation_status).__name__}"
+        )
+
+    overall = validation_status.get("overall_status")
+    if not isinstance(overall, str) or overall.lower() not in STATUS_SEVERITY:
+        return (
+            "preseed_overall_status_invalid: 'validation_status."
+            f"overall_status' must be one of {sorted(STATUS_SEVERITY)}, got "
+            f"{overall!r}"
+        )
+
+    claim_statuses = validation_status.get("claim_statuses", [])
+    if not isinstance(claim_statuses, list):
+        return (
+            "preseed_claim_statuses_not_array: 'validation_status."
+            "claim_statuses' must be an array, got "
+            f"{type(claim_statuses).__name__}"
+        )
+
+    worst = worst_status(
+        claim.get("status", "")
+        for claim in claim_statuses
+        if isinstance(claim, dict)
+    )
+    if STATUS_SEVERITY[overall.lower()] < STATUS_SEVERITY[worst]:
+        return (
+            f"preseed_overall_status_overstated: 'validation_status."
+            f"overall_status' is {overall!r} but the worst claim status is "
+            f"{worst!r} (CLAUDE.md §12.2 worst-wins); the roll-up may be more "
+            "conservative than its claims, never more resolved"
+        )
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -192,6 +259,16 @@ def maybe_apply_phase8_preseed(
         return Phase8PreseedResult(
             applied=False,
             reason=f"preseed_missing_fields: {missing}",
+            error=True,
+            failure_category="MALFORMED_ARTIFACT",
+        )
+
+    # -- Verify the validation_status roll-up is internally consistent --
+    consistency_error = _validation_status_inconsistency(data)
+    if consistency_error is not None:
+        return Phase8PreseedResult(
+            applied=False,
+            reason=consistency_error,
             error=True,
             failure_category="MALFORMED_ARTIFACT",
         )

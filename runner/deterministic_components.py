@@ -182,6 +182,72 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
 
 
 # ---------------------------------------------------------------------------
+# Draft-consuming components
+# ---------------------------------------------------------------------------
+#
+# The components below read ``section_drafts/<slug>/`` — the per-sub-section
+# drafts the drafting skill writes — and compose them into (or over) the
+# canonical Tier 5 section artifact.  They are therefore only sound when the
+# drafting skill actually ran in the current run.
+#
+# When the drafting skill is skipped and an authoritative section artifact
+# already exists on disk (manual preseed, or Phase-8 reuse of a prior run's
+# section), the drafts on disk are *not* this run's product: composing them
+# would either clobber the authoritative prose or fail the node on the
+# assembler's stale-spine ``run_id`` guard.  The scheduler suppresses this set
+# in exactly that case (``runner/dag_scheduler.py``, Step 3).
+#
+# This is an explicit, enumerated declaration rather than a name-suffix
+# heuristic: an unlisted draft-consuming component would silently escape
+# suppression, and a name-inferred set would break on any rename.  The
+# membership check below fails closed at import on drift from the registry.
+
+#: Component ids that read ``section_drafts/`` and must not run when the
+#: drafting skill was skipped.  Every member must exist in
+#: :data:`COMPONENT_REGISTRY`.
+DRAFT_CONSUMING_COMPONENTS: frozenset[str] = frozenset(
+    {
+        "excellence_section_assembler",
+        "impact_section_assembler",
+        "implementation_section_assembler",
+        "excellence_assumption_applier",
+        "impact_assumption_applier",
+        "implementation_assumption_applier",
+    }
+)
+
+_unknown_draft_consumers = sorted(
+    DRAFT_CONSUMING_COMPONENTS - set(COMPONENT_REGISTRY)
+)
+if _unknown_draft_consumers:  # pragma: no cover — import-time invariant
+    raise RuntimeError(
+        "DRAFT_CONSUMING_COMPONENTS names components absent from "
+        f"COMPONENT_REGISTRY: {_unknown_draft_consumers}"
+    )
+
+
+def partition_draft_consuming(
+    component_ids: Iterable[str],
+) -> tuple[list[str], list[str]]:
+    """Split *component_ids* into (kept, suppressed) by draft consumption.
+
+    *suppressed* are the members of :data:`DRAFT_CONSUMING_COMPONENTS`; *kept*
+    is everything else, in the original order.  Ids that are not draft-consuming
+    are kept verbatim — including ids absent from :data:`COMPONENT_REGISTRY`, so
+    an unknown id still reaches :func:`invoke_component` and fails closed there
+    rather than being silently dropped here.
+    """
+    kept: list[str] = []
+    suppressed: list[str] = []
+    for component_id in component_ids:
+        if component_id in DRAFT_CONSUMING_COMPONENTS:
+            suppressed.append(component_id)
+        else:
+            kept.append(component_id)
+    return kept, suppressed
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 

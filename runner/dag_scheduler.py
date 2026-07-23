@@ -87,12 +87,14 @@ log = logging.getLogger("runner.scheduler")
 
 from runner.agent_runtime import run_agent
 from runner.call_slicer import CallSlicerError, generate_call_slice
+from runner.deterministic_components import partition_draft_consuming
 from runner.gate_evaluator import evaluate_gate
 from runner.gate_result_registry import GATE_RESULT_PATHS
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
 from runner.phase8_preseed import (
+    PRESEED_AUDIT_DIR,
     PRESEED_NODE_CONFIG,
     Phase8PreseedResult,
     maybe_apply_phase8_preseed,
@@ -1736,22 +1738,58 @@ class DAGScheduler:
             node_id
         )
 
-        # Preseed supersedes decomposed assembly.  A preseeded section is the
-        # authoritative, externally-produced canonical artifact, so the
-        # draft-consuming composition components — the assumption-applier and
-        # the section-assembler — must NOT run: they would recompose the
-        # (foreign-run) section_drafts over the preseed and fail the node on a
-        # spine run_id mismatch (this mirrors the drafting-skill supersession).
+        # ── Draft-consuming component suppression ────────────────────
+        #
+        # The invariant is *not* "a preseed was applied" — it is "an
+        # authoritative section artifact already exists and the drafting skill
+        # is not running this run".  Both supersession modes satisfy it:
+        #
+        #   * preseed — the operator's artifact was just copied to the canonical
+        #     Tier 5 path, and
+        #   * reuse   — a validated prior-run artifact is being carried forward.
+        #
+        # In both cases the ``section_drafts/`` on disk are not this run's
+        # product, so the draft-consuming components (assumption-applier,
+        # section-assembler) must NOT run: they would either recompose stale
+        # drafts over the authoritative prose or fail the node on the
+        # assembler's stale-spine run_id guard.  This mirrors the drafting-skill
+        # supersession that both modes already perform.
+        #
         # The canonical_pack_deriver is retained: it derives the reference pack
         # the preservation gates check against, from Tier 3 (not from drafts).
-        if _preseed_skip_skills is not None and deterministic_components:
-            deterministic_components = [
-                _c for _c in deterministic_components
-                if not (
-                    _c.endswith("_section_assembler")
-                    or _c.endswith("_assumption_applier")
+        #
+        # The suppressed set is the explicit DRAFT_CONSUMING_COMPONENTS
+        # declaration, not a name-suffix match — a rename or a new
+        # draft-consuming component must not silently escape suppression.
+        _suppressed_components: list[str] = []
+        _supersession_mode = (
+            "preseed" if _preseed_skip_skills is not None
+            else "reuse" if _reuse_skip_skills is not None
+            else None
+        )
+        if _supersession_mode is not None and deterministic_components:
+            deterministic_components, _suppressed_components = (
+                partition_draft_consuming(deterministic_components)
+            )
+            if _suppressed_components:
+                log.info(
+                    "  [%s] %s: draft-consuming components suppressed: %s "
+                    "(retained: %s)",
+                    node_id,
+                    _supersession_mode.upper(),
+                    ", ".join(_suppressed_components),
+                    ", ".join(deterministic_components) or "none",
                 )
-            ]
+
+        # Durable audit of the suppression (§9.4): a component that did not run
+        # must be recoverable from Tier 4, not only from the log stream.
+        if _suppressed_components:
+            self._record_component_suppression(
+                node_id=node_id,
+                mode=_supersession_mode or "unknown",
+                suppressed=_suppressed_components,
+                retained=list(deterministic_components or []),
+            )
 
         log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
         agent_result = run_agent(
@@ -1915,6 +1953,51 @@ class DAGScheduler:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _record_component_suppression(
+        self,
+        *,
+        node_id: str,
+        mode: str,
+        suppressed: list[str],
+        retained: list[str],
+    ) -> Path:
+        """Write a Tier 4 audit record for suppressed deterministic components.
+
+        A manifest-bound component that did not run is a durable orchestration
+        decision (§9.4): it must be recoverable from Tier 4, not only from the
+        log stream.  Best-effort — an audit-write fault must not fail a node
+        that is otherwise sound, so it is logged and swallowed.
+        """
+        audit = {
+            "mode": mode,
+            "node_id": node_id,
+            "run_id": self.ctx.run_id,
+            "reason": (
+                "drafting skill superseded; section_drafts/ are not this "
+                "run's product, so draft-consuming components were not invoked"
+            ),
+            "suppressed_components": suppressed,
+            "retained_components": retained,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        audit_path = (
+            self.repo_root
+            / PRESEED_AUDIT_DIR
+            / f"component_suppression_{node_id}.json"
+        )
+        try:
+            audit_path.parent.mkdir(parents=True, exist_ok=True)
+            audit_path.write_text(
+                json.dumps(audit, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+        except OSError as exc:
+            log.warning(
+                "  [%s] could not write component-suppression audit: %s",
+                node_id, exc,
+            )
+        return audit_path
 
     def _reload_ctx(self) -> None:
         """
