@@ -153,6 +153,24 @@ def _run_canonical_pack_deriver(run_id: str, repo_root: Path) -> list[Path]:
     return [build_phase8_canonical_reference_pack(repo_root, run_id)]
 
 
+def _run_checkpoint_publisher(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the Phase-8 checkpoint publisher (CHK-1).
+
+    Writes ``phase8_checkpoint.json``, confirming the six Phase-8 gate results
+    and recording a provenance quad for any cross-run (bootstrapped) gate whose
+    ``run_id`` is authorized by the run's ``accepted_upstream_gates`` record.
+    Replaces the retired ``checkpoint-publish`` skill (found 100% mechanical).
+    Closed by pure lookup + verbatim copy over durable gate results; the single
+    non-deterministic field is ``published_at`` (a publication stamp, excluded
+    from the replay invariant, mirroring ``gate_result.evaluated_at``).  Fails
+    closed (raises) on the write-once guard, any invalid gate result, or an
+    unauthorized cross-run gate.
+    """
+    from runner.checkpoint_publisher import publish_checkpoint
+
+    return [publish_checkpoint(run_id, repo_root)]
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -166,7 +184,11 @@ def _run_canonical_pack_deriver(run_id: str, repo_root: Path) -> list[Path]:
 #: idempotent byte-equal replay.  The canonical-pack deriver (ticket 10)
 #: regenerates the reference pack the preservation gates check prose against,
 #: from the same source as the prose (Tier 3 confirmed facts + declared
-#: assumptions) with per-entry provenance, closed by pure lookup.  With this the
+#: assumptions) with per-entry provenance, closed by pure lookup.  The
+#: checkpoint publisher (CHK-1, ``n08f_revision``) writes ``phase8_checkpoint``
+#: — confirming the six Phase-8 gates and recording an authorized cross-run
+#: provenance quad — replacing the retired ``checkpoint-publish`` skill, closed
+#: by pure lookup + verbatim copy over durable gate results.  With this the
 #: full milestone-1 roster binds and logs uniformly through the C2/C3 substrate.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
@@ -178,6 +200,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "implementation_assumption_applier": _run_implementation_assumption_applier,
     "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
     "canonical_pack_deriver": _run_canonical_pack_deriver,
+    "checkpoint_publisher": _run_checkpoint_publisher,
 }
 
 

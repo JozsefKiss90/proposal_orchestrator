@@ -292,6 +292,23 @@ class TestDeterministicComponentResolution:
             "n07_budget_gate"
         ) == ["unit_cost_budget_deriver"]
 
+    def test_n08f_binds_checkpoint_publisher(
+        self, resolver: NodeResolver
+    ) -> None:
+        # CHK-1: the checkpoint publisher replaces the retired checkpoint-publish
+        # skill and runs in the n08f node body.
+        assert resolver.resolve_deterministic_components(
+            "n08f_revision"
+        ) == ["checkpoint_publisher"]
+
+    def test_n08f_no_longer_binds_checkpoint_publish_skill(
+        self, resolver: NodeResolver
+    ) -> None:
+        # The retired skill must not linger in the node's resolved skill ids.
+        assert "checkpoint-publish" not in resolver.resolve_skill_ids(
+            "n08f_revision"
+        )
+
     @pytest.mark.parametrize("node_id,slug", [
         ("n08a_excellence_drafting", "excellence"),
         ("n08b_impact_drafting", "impact"),

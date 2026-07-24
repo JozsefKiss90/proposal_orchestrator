@@ -645,20 +645,9 @@ skill_catalog:
       - "Every resolved tier conflict must produce a decision log entry"
       - "Decision log entries must identify the tier authority applied"
 
-  - id: checkpoint-publish
-    execution_mode: "tapm"
-    purpose: >
-      Write a formal checkpoint artifact to Tier 4 checkpoints/ confirming that a
-      phase or phase group has completed with a known validated state. Preserves a
-      reproducible snapshot of the state at the checkpoint.
-    used_by_agents:
-      - revision_integrator
-      - state_recorder
-    reads_from:
-      - docs/tier4_orchestration_state/phase_outputs/
-      - docs/tier3_project_instantiation/
-    writes_to:
-      - docs/tier4_orchestration_state/checkpoints/
-    constitutional_constraints:
-      - "Validated checkpoints must not be overwritten by subsequent reruns"
-      - "A checkpoint must not be published before all gate conditions for the phase are met"
+  # checkpoint-publish — RETIRED (CHK-1, 2026-07-24). Checkpoint publication was
+  # found to be 100% mechanical and moved to the `checkpoint_publisher`
+  # deterministic component (runner/checkpoint_publisher.py), bound in
+  # manifest.compile.yaml n08f_revision under `deterministic_components`
+  # (§17.5.3/C2, §16.5/C3). See decision_log/chk-1-checkpoint-provenance-quad_2026-07-24.json.
+  # It is no longer a skill: not Claude-invoked, not in this catalog.

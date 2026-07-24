@@ -17,9 +17,9 @@ Before taking any action in any invocation context, read the following sources i
 
 1. `CLAUDE.md` — Constitutional authority; §9.4 (durable decisions mandate), §9.4 checkpoint immutability rule, §13.5 (decisions in memory prohibited)
 2. The invocation context provided by the calling agent: artifact to be recorded, decision details, or validation summary
-3. For checkpoint-publish context only: `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` — if it exists with `status: "published"`, halt immediately (immutable)
-4. For checkpoint-publish context only: `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json` — verify `gate_12_constitutional_compliance` has passed before writing checkpoint
-5. `.claude/agents/state_recorder.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
+3. `.claude/agents/state_recorder.md` — This agent's contract; must-not constraints, schema contracts, gate awareness, failure protocol
+
+> Note (CHK-1): Phase-8 checkpoint publishing is **retired** from this agent. The checkpoint is now written by the `checkpoint_publisher` deterministic component in the `n08f_revision` node body, not by a `checkpoint-publish` skill this agent invokes.
 
 Inputs for decision logging are determined at invocation time by the calling agent. The calling agent passes the context to be recorded.
 
@@ -74,18 +74,8 @@ Only `revision_integrator` may invoke this context. If the caller is any other a
 **Step 2 — Verify gate_12_constitutional_compliance has passed.**
 Read `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/gate_12_result.json`. If absent or not `pass`, halt immediately. Write decision log: `decision_type: constitutional_halt`; gate not yet passed; cite CLAUDE.md §9.4 checkpoint constraint. Must not write checkpoint before all Phase 8 gate conditions are met.
 
-**Step 3 — Check for existing published checkpoint.**
-Read `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` if it exists. If `status: "published"` is found, halt. Write decision log: `decision_type: constitutional_halt`; prior checkpoint is immutable; cite CLAUDE.md §9.4. Must not overwrite a validated checkpoint.
-
-**Step 4 — Invoke checkpoint-publish skill.**
-Write `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`:
-- `schema_id: "orch.checkpoints.phase8_checkpoint.v1"` (exact string)
-- `run_id`: from invoking run context
-- `status: "published"`
-- `published_at`: ISO 8601 timestamp
-- `gate_results_confirmed`: must include all four gate IDs: `gate_09_budget_consistency`, `gate_10_part_b_completeness`, `gate_11_review_closure`, `gate_12_constitutional_compliance`
-
-`artifact_status` must be absent at write time (runner-managed).
+**Steps 3–4 — Checkpoint publishing: RETIRED (CHK-1).**
+This agent no longer publishes `phase8_checkpoint.json`. Publication moved to the `checkpoint_publisher` deterministic component (`runner/checkpoint_publisher.py`, §17.5.3/C2) in the `n08f_revision` node body, which also enforces the immutability guard (it raises rather than overwriting a `status: "published"` checkpoint) and confirms the six Phase-8 gates (`gate_09_budget_consistency`, `gate_10a/10b/10c/10d`, `gate_11_review_closure` — not `gate_12`, which is the exit gate). No checkpoint-publishing step is invoked here.
 
 **Step 5 — Write decision log entry for checkpoint publication.**
 Write `decision_type: gate_pass`; `agent_id: state_recorder`; gate IDs confirmed; run_id; `published_at`.

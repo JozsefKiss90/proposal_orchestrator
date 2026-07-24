@@ -238,3 +238,93 @@ class TestCanonicalPackDeriverComponent:
         record = invoke_component("canonical_pack_deriver", "run-1", tmp_path)
         assert record.status == "failure"
         assert "provenance_class" in (record.failure_reason or "")
+
+
+# ---------------------------------------------------------------------------
+# checkpoint_publisher registration (CHK-1)
+# ---------------------------------------------------------------------------
+
+
+def _write_checkpoint_gate_fixtures(tmp_path: Path, run_id: str) -> None:
+    """Write the six confirmed gate results with a uniform run_id."""
+    from runner.checkpoint_publisher import CONFIRMED_GATE_IDS
+    from runner.gate_result_registry import (
+        GATE_RESULT_PATHS,
+        GATE_RESULT_SCHEMA_ID,
+    )
+
+    for gate_id in CONFIRMED_GATE_IDS:
+        path = (
+            tmp_path / "docs" / "tier4_orchestration_state"
+            / GATE_RESULT_PATHS[gate_id]
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({
+            "schema_id": GATE_RESULT_SCHEMA_ID,
+            "gate_id": gate_id,
+            "run_id": run_id,
+            "status": "pass",
+            "manifest_version": "1.1",
+            "library_version": "1.0",
+            "constitution_version": "21430b0",
+            "input_fingerprint": "sha256:abc",
+            "evaluated_at": "2026-07-16T00:00:00+00:00",
+        }), encoding="utf-8")
+
+
+class TestCheckpointPublisherComponent:
+    def test_checkpoint_publisher_registered(self) -> None:
+        assert "checkpoint_publisher" in COMPONENT_REGISTRY
+
+    def test_not_a_draft_consuming_component(self) -> None:
+        """checkpoint_publisher does not read section_drafts/ — must not be
+        suppressed when the drafting skill is skipped."""
+        from runner.deterministic_components import DRAFT_CONSUMING_COMPONENTS
+
+        assert "checkpoint_publisher" not in DRAFT_CONSUMING_COMPONENTS
+
+    def test_component_writes_checkpoint_via_generic_path(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.checkpoint_publisher import CHECKPOINT_REL
+
+        _write_checkpoint_gate_fixtures(tmp_path, "run-1")
+        record = invoke_component("checkpoint_publisher", "run-1", tmp_path)
+        assert record.status == "success"
+        assert record.outputs_written == [CHECKPOINT_REL]
+        assert (tmp_path / CHECKPOINT_REL).is_file()
+
+    def test_component_fails_closed_on_unauthorized_cross_run(
+        self, tmp_path: Path
+    ) -> None:
+        """A cross-run gate with no acceptance record → the publisher raises →
+        failure record (never propagates)."""
+        from runner.checkpoint_publisher import CHECKPOINT_REL
+
+        _write_checkpoint_gate_fixtures(tmp_path, "run-1")
+        # Rewrite gate_09 to carry a prior run_id with no acceptance record.
+        from runner.gate_result_registry import (
+            GATE_RESULT_PATHS,
+            GATE_RESULT_SCHEMA_ID,
+        )
+
+        g09 = (
+            tmp_path / "docs" / "tier4_orchestration_state"
+            / GATE_RESULT_PATHS["gate_09_budget_consistency"]
+        )
+        g09.write_text(json.dumps({
+            "schema_id": GATE_RESULT_SCHEMA_ID,
+            "gate_id": "gate_09_budget_consistency",
+            "run_id": "prior-run",
+            "status": "pass",
+            "manifest_version": "1.1",
+            "library_version": "1.0",
+            "constitution_version": "21430b0",
+            "input_fingerprint": "sha256:abc",
+            "evaluated_at": "2026-07-16T00:00:00+00:00",
+        }), encoding="utf-8")
+
+        record = invoke_component("checkpoint_publisher", "run-1", tmp_path)
+        assert record.status == "failure"
+        assert record.failure_reason
+        assert not (tmp_path / CHECKPOINT_REL).is_file()

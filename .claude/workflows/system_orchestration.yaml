@@ -951,12 +951,14 @@ workflow:
           Resolve critical and major weaknesses while preserving structural
           consistency. Produce the final revised draft for export.
         agent: revision_integrator
+        # The Phase-8 checkpoint is written by the checkpoint_publisher
+        # deterministic component (CHK-1), not a skill — see
+        # manifest.compile.yaml n08f_revision deterministic_components.
         skills:
           - proposal-section-traceability-check
           - evaluator-criteria-review
           - constitutional-compliance-check
           - decision-log-update
-          - checkpoint-publish
         depends_on_substep: phase_08c_evaluator_review
         required_inputs:
           - path: docs/tier5_deliverables/assembled_drafts/
@@ -1863,7 +1865,7 @@ state_rules:
       gate has been formally validated must not be overwritten. If a phase is rerun
       after a checkpoint has been published, the rerun must produce a new checkpoint
       artifact; it must not modify the prior validated artifact.
-    enforcement: checkpoint-publish skill
+    enforcement: checkpoint_publisher deterministic component (CHK-1; raises rather than overwriting a published checkpoint)
 
   decision_logging:
     rule: >

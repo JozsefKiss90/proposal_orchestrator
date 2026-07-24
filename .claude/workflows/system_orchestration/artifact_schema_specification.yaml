@@ -1401,8 +1401,12 @@ tier4_phase_output_schemas:
   # ---------------------------------------------------------------------------
   # 1.9 phase8_checkpoint.json
   # Path: docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json
-  # Produced by: runner after gate_12_constitutional_compliance passes
-  # Consumed by: gate_12 checkpoint_published predicate
+  # Produced by: the checkpoint_publisher deterministic component (CHK-1) in the
+  #   n08f_revision node body, BEFORE gate_12 is evaluated. (Replaces the retired
+  #   checkpoint-publish skill.)
+  # Consumed by: gate_12's checkpoint_published predicate, which verifies
+  #   status: published and re-validates the inherited_gate_provenance quad
+  #   against durable Tier-4 gate results.
   # ---------------------------------------------------------------------------
   phase8_checkpoint:
     schema_id_value: "orch.checkpoints.phase8_checkpoint.v1"
@@ -1438,9 +1442,65 @@ tier4_phase_output_schemas:
         required: true
         description: >
           List of gate_ids whose results were confirmed at checkpoint time.
-          Must include gate_09_budget_consistency, gate_10_part_b_completeness,
-          gate_11_review_closure, gate_12_constitutional_compliance.
+          The six Phase-8 gates the checkpoint asserts (post gate-decomposition):
+          gate_09_budget_consistency, gate_10a_excellence_completeness,
+          gate_10b_impact_completeness, gate_10c_implementation_completeness,
+          gate_10d_cross_section_consistency, gate_11_review_closure.
+          gate_12_constitutional_compliance is NOT included — it is n08f's exit
+          gate, evaluated by the runner AFTER this checkpoint is written.
         item_type: string
+
+      tier3_snapshot:
+        type: object
+        required: true
+        description: >
+          Reproducible snapshot of Tier-3 identity at checkpoint time: call_id
+          and topic_id (from selected_call.json; topic_code is accepted as the
+          topic_id source) and partner_ids (from partners.json). Absent sources
+          yield null / empty. Not gate-relevant — the checkpoint_published
+          predicate checks only gate_results_confirmed and the provenance quad.
+
+      inherited_gate_provenance:
+        type: array
+        required: false
+        description: >
+          Additive / optional (CHK-1, decision D3): present only when one or more
+          of the six confirmed gate results was inherited from a prior run via
+          phase-scoped continuation bootstrap — i.e. carries a run_id different
+          from this checkpoint's run_id. One entry per authorized inherited gate,
+          recording the provenance quad so the checkpoint is self-consistent and
+          auditable against durable Tier-4 gate results without re-validating
+          clearable .claude/runs/ state. OMITTED entirely for an all-current-run
+          checkpoint (byte-identical to the pre-CHK-1 output — mirrors how
+          inherited_artifacts was added to gate_result with no schema bump).
+          Authorized by deterministic set-membership against
+          accepted_upstream_gates; every field is copied verbatim from the
+          durable gate result.
+        item_schema:
+          gate_id:
+            type: string
+            required: true
+            description: The confirmed gate whose durable result was inherited.
+          original_run_id:
+            type: string
+            required: true
+            description: The prior run_id the durable gate result carries.
+          evidence_path:
+            type: string
+            required: true
+            description: >
+              Repo-relative path to the durable gate result that evidences the
+              inheritance (from the run's accepted_upstream_gates record).
+          input_fingerprint:
+            type: string
+            required: true
+            description: input_fingerprint copied verbatim from the durable gate result.
+          versions:
+            type: object
+            required: true
+            description: >
+              manifest_version / library_version / constitution_version copied
+              verbatim from the durable gate result.
 
 
 # =============================================================================

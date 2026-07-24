@@ -253,12 +253,18 @@ substeps:
       Resolve critical and major weaknesses while preserving structural
       consistency. Produce the final revised draft for export.
     agent: revision_integrator
+    # Deterministic component (CLAUDE.md §16.5/C3, CHK-1): the checkpoint publisher
+    # writes phase8_checkpoint.json in the node body before skill sequencing
+    # (§17.5.3/C2), replacing the retired checkpoint-publish skill. It records an
+    # authorized cross-run provenance quad for bootstrapped gates; gate_12's
+    # checkpoint_published predicate re-validates it.
+    deterministic_components:
+      - checkpoint_publisher
     skills:
       - proposal-section-traceability-check
       - evaluator-criteria-review
       - constitutional-compliance-check
       - decision-log-update
-      - checkpoint-publish
     depends_on_substep: phase_08e_evaluator_review
     required_inputs:
       - path: docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json

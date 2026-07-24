@@ -23,7 +23,10 @@ invoked_skills:
   - evaluator-criteria-review
   - constitutional-compliance-check
   - decision-log-update
-  - checkpoint-publish
+# The Phase-8 checkpoint is published by the `checkpoint_publisher` deterministic
+# component (§17.5.3/C2), bound in manifest.compile.yaml under n08f_revision's
+# `deterministic_components`, running in the node body before these skills. The
+# former `checkpoint-publish` skill was retired (CHK-1); it is no longer invoked.
 entry_gate: null
 exit_gate: gate_12_constitutional_compliance
 ---
@@ -87,13 +90,13 @@ In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for 
 - Every resolved tier conflict must produce a decision log entry.
 - Decision log entries must identify the tier authority applied.
 
-### `checkpoint-publish`
-**Purpose:** Write a formal checkpoint artifact to Tier 4 confirming Phase 8 has completed with a known validated state.
-**Trigger:** After `gate_12_constitutional_compliance` passes; publishes `phase8_checkpoint.json` as the terminal DAG checkpoint.
-**Output / side-effect:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` written.
+### `checkpoint_publisher` (deterministic component — not a skill)
+**Purpose:** Write the Phase-8 checkpoint artifact to Tier 4 confirming Phase 8 has completed with a known validated state. Replaces the retired `checkpoint-publish` skill (CHK-1); it is a Claude-free deterministic component (`runner/checkpoint_publisher.py`, §17.5.3/C2), bound in the manifest under n08f_revision's `deterministic_components`.
+**Trigger:** Runs in the n08f node body **before** the skills above and before `gate_12_constitutional_compliance` is evaluated. It confirms the six Phase-8 gate results and records an authorized cross-run provenance quad for any bootstrapped (prior-run_id) gate; `gate_12`'s `checkpoint_published` predicate then re-validates that quad.
+**Output / side-effect:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` written (atomically).
 **Constitutional constraints:**
-- Validated checkpoints must not be overwritten by subsequent reruns.
-- A checkpoint must not be published before all gate conditions for the phase are met.
+- Validated checkpoints must not be overwritten by subsequent reruns (the component raises rather than overwriting a `status: published` checkpoint).
+- A checkpoint must not be published before all gate conditions for the phase are met; a component fault fails closed (`AGENT_EXECUTION_ERROR`, exit gate skipped) before anything is written.
 
 ## Canonical Inputs
 
@@ -275,7 +278,7 @@ Write to `docs/tier4_orchestration_state/decision_log/`. Every entry: `agent_id:
 
 Node binding is `n08f_revision` (`terminal: true`). Exit gate is `gate_12_constitutional_compliance` — matches manifest. This is the only agent with authority to write `final_exports/` and `checkpoints/`. The Terminal Node section correctly notes that `overall_status: pass` in `run_summary.json` is set by the scheduler (not by this agent). No confusion about runner-owned artifacts (`run_summary.json`, `gate_result.json`, `artifact_status`) exists.
 
-**Checkpoint authority:** The `checkpoint-publish` skill is listed in both the manifest skill list for `n08f_revision` and in this agent's `invoked_skills`. This agent is the only Phase 8 agent with write authority to `checkpoints/`. The must_not constraint "Must not overwrite a validated checkpoint" is in place. The Output Schema Contracts section states the checkpoint is immutable once published.
+**Checkpoint authority:** The Phase-8 checkpoint is written by the `checkpoint_publisher` deterministic component bound under `n08f_revision`'s `deterministic_components` (CHK-1; the former `checkpoint-publish` skill was retired). The component runs in this node's body, so `n08f_revision` remains the only Phase 8 node with write authority to `checkpoints/`. The must_not constraint "Must not overwrite a validated checkpoint" is enforced by the component (it raises rather than overwriting a `status: published` checkpoint). The Output Schema Contracts section states the checkpoint is immutable once published.
 
 **Budget gate prerequisite:** The Budget Gate Prerequisite section describes transitive verification (via gate_11 → gate_10d → gates 10a/10b/10c → gate_09) and also the direct check via `gate_12` conditions `g11_p07` and `g11_p10`. Any revision action that would introduce budget-dependent content not confirmed by the budget gate must be flagged as unresolvable. No softening of the budget gate exists.
 

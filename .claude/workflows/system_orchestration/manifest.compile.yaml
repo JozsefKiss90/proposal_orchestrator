@@ -283,12 +283,23 @@ node_registry:
     name: "Revision Cycle"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: revision_integrator
+    # Deterministic component (§16.5/C3, CHK-1): the checkpoint publisher writes
+    # phase8_checkpoint.json in the node body BEFORE skill sequencing (§17.5.3/C2),
+    # replacing the retired checkpoint-publish skill (found 100% mechanical). It
+    # confirms the six Phase-8 gates and records an authorized cross-run
+    # provenance quad {gate_id, original_run_id, evidence_path, input_fingerprint,
+    # versions} for any bootstrapped (prior-run_id) gate — authorized by
+    # deterministic set-membership against the run's accepted_upstream_gates. A
+    # component fault fails closed (AGENT_EXECUTION_ERROR, exit gate skipped)
+    # before anything is written; gate_12's checkpoint_published predicate then
+    # re-validates the quad against durable Tier-4 gate results.
+    deterministic_components:
+      - checkpoint_publisher
     skills:
       - proposal-section-traceability-check
       - evaluator-criteria-review
       - constitutional-compliance-check
       - decision-log-update
-      - checkpoint-publish
     exit_gate: gate_12_constitutional_compliance
     terminal: true
 

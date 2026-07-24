@@ -980,3 +980,225 @@ class TestCheckpointPublished:
         result = checkpoint_published(p)
         assert not result.passed
         assert result.failure_category == MALFORMED_ARTIFACT
+
+
+# ---------------------------------------------------------------------------
+# §checkpoint_published — CHK-1 cross-run provenance quad (decision D4)
+# ---------------------------------------------------------------------------
+
+
+_TIER4_REL = "docs/tier4_orchestration_state"
+_CHECKPOINT_REL = f"{_TIER4_REL}/checkpoints/phase8_checkpoint.json"
+
+
+def _gate_result_dict(gate_id, run_id, *, status="pass", fingerprint="sha256:fp"):
+    from runner.gate_result_registry import GATE_RESULT_SCHEMA_ID
+
+    return {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
+        "gate_id": gate_id,
+        "run_id": run_id,
+        "status": status,
+        "manifest_version": "1.1",
+        "library_version": "1.0",
+        "constitution_version": "21430b0",
+        "input_fingerprint": fingerprint,
+        "evaluated_at": "2026-07-16T00:00:00+00:00",
+    }
+
+
+def _stage_checkpoint_layout(tmp_path, *, checkpoint, gate_run_ids):
+    """Write a canonical checkpoint + its confirmed gate results under tmp_path.
+
+    ``gate_run_ids`` maps gate_id -> run_id (and drives what durable results are
+    written). Returns the resolved checkpoint path.
+    """
+    from runner.gate_result_registry import GATE_RESULT_PATHS
+
+    for gate_id, run_id in gate_run_ids.items():
+        gp = tmp_path / _TIER4_REL / GATE_RESULT_PATHS[gate_id]
+        gp.parent.mkdir(parents=True, exist_ok=True)
+        gp.write_text(
+            json.dumps(_gate_result_dict(gate_id, run_id)), encoding="utf-8"
+        )
+    cp = tmp_path / _CHECKPOINT_REL
+    cp.parent.mkdir(parents=True, exist_ok=True)
+    cp.write_text(json.dumps(checkpoint), encoding="utf-8")
+    return cp
+
+
+def _quad_entry(gate_id, original_run_id, *, fingerprint="sha256:fp",
+                evidence_rel=None, versions=None):
+    from runner.gate_result_registry import GATE_RESULT_PATHS
+
+    if evidence_rel is None:
+        evidence_rel = f"{_TIER4_REL}/{GATE_RESULT_PATHS[gate_id]}"
+    return {
+        "gate_id": gate_id,
+        "original_run_id": original_run_id,
+        "evidence_path": evidence_rel,
+        "input_fingerprint": fingerprint,
+        "versions": versions or {
+            "manifest_version": "1.1",
+            "library_version": "1.0",
+            "constitution_version": "21430b0",
+        },
+    }
+
+
+class TestCheckpointPublishedProvenanceQuad:
+    def test_all_current_run_passes(self, tmp_path):
+        """Durable gates all carry the checkpoint's run_id → no quad → pass."""
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": [
+                    "gate_09_budget_consistency",
+                    "gate_11_review_closure",
+                ],
+            },
+            gate_run_ids={
+                "gate_09_budget_consistency": "R",
+                "gate_11_review_closure": "R",
+            },
+        )
+        assert checkpoint_published(cp).passed
+
+    def test_valid_quad_passes(self, tmp_path):
+        """A cross-run gate_09 with a faithful quad entry passes."""
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": [
+                    "gate_09_budget_consistency",
+                    "gate_11_review_closure",
+                ],
+                "inherited_gate_provenance": [
+                    _quad_entry("gate_09_budget_consistency", "PRIOR"),
+                ],
+            },
+            gate_run_ids={
+                "gate_09_budget_consistency": "PRIOR",
+                "gate_11_review_closure": "R",
+            },
+        )
+        result = checkpoint_published(cp)
+        assert result.passed
+        # Fingerprint recorded durably for ST-1.
+        assert (
+            "gate_09_budget_consistency"
+            in result.details["input_fingerprints"]
+        )
+
+    def test_cross_run_gate_without_quad_fails(self, tmp_path):
+        """gate_09 durable run_id != checkpoint run_id, no quad → hidden
+        inheritance → fail."""
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": ["gate_09_budget_consistency"],
+                # No inherited_gate_provenance.
+            },
+            gate_run_ids={"gate_09_budget_consistency": "PRIOR"},
+        )
+        result = checkpoint_published(cp)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+        assert "hidden inheritance" in result.reason
+
+    def test_quad_wrong_original_run_id_fails(self, tmp_path):
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": ["gate_09_budget_consistency"],
+                "inherited_gate_provenance": [
+                    _quad_entry("gate_09_budget_consistency", "WRONG-PRIOR"),
+                ],
+            },
+            gate_run_ids={"gate_09_budget_consistency": "PRIOR"},
+        )
+        result = checkpoint_published(cp)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
+    def test_quad_wrong_fingerprint_fails(self, tmp_path):
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": ["gate_09_budget_consistency"],
+                "inherited_gate_provenance": [
+                    _quad_entry(
+                        "gate_09_budget_consistency", "PRIOR",
+                        fingerprint="sha256:TAMPERED",
+                    ),
+                ],
+            },
+            gate_run_ids={"gate_09_budget_consistency": "PRIOR"},
+        )
+        result = checkpoint_published(cp)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
+    def test_quad_wrong_versions_fails(self, tmp_path):
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": ["gate_09_budget_consistency"],
+                "inherited_gate_provenance": [
+                    _quad_entry(
+                        "gate_09_budget_consistency", "PRIOR",
+                        versions={
+                            "manifest_version": "9.9",
+                            "library_version": "1.0",
+                            "constitution_version": "21430b0",
+                        },
+                    ),
+                ],
+            },
+            gate_run_ids={"gate_09_budget_consistency": "PRIOR"},
+        )
+        result = checkpoint_published(cp)
+        assert not result.passed
+        assert result.failure_category == POLICY_VIOLATION
+
+    def test_quad_missing_evidence_file_fails(self, tmp_path):
+        """A quad whose evidence_path points at a missing file → malformed."""
+        from runner.gate_result_registry import GATE_RESULT_PATHS
+
+        cp = _stage_checkpoint_layout(
+            tmp_path,
+            checkpoint={
+                "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+                "run_id": "R",
+                "status": "published",
+                "gate_results_confirmed": ["gate_09_budget_consistency"],
+                "inherited_gate_provenance": [
+                    _quad_entry(
+                        "gate_09_budget_consistency", "PRIOR",
+                        evidence_rel=f"{_TIER4_REL}/phase_outputs/nope.json",
+                    ),
+                ],
+            },
+            gate_run_ids={"gate_09_budget_consistency": "PRIOR"},
+        )
+        result = checkpoint_published(cp)
+        assert not result.passed
+        assert result.failure_category == MALFORMED_ARTIFACT

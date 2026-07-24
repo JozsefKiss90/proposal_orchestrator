@@ -26,6 +26,17 @@ against it — none of them may hard-code the literal independently.
 #: artifact_schema_specification.yaml §gate_result_schema.schema_id_value.
 GATE_RESULT_SCHEMA_ID: str = "orch.gate_result.v1"
 
+#: The version fields every gate result carries (``versions.py`` constants).
+#: The single shared source both the checkpoint publisher (which copies them
+#: verbatim into the provenance quad) and the ``checkpoint_published`` predicate
+#: (which re-validates the quad) read, so adding a version field is a one-line
+#: change here rather than a lockstep edit in two modules (CHK-1).
+GATE_RESULT_VERSION_FIELDS: tuple[str, ...] = (
+    "manifest_version",
+    "library_version",
+    "constitution_version",
+)
+
 GATE_RESULT_PATHS: dict[str, str] = {
     # entry gate for n01 — evaluated before Phase 1 begins
     "gate_01_source_integrity": (
