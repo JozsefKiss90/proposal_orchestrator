@@ -31,11 +31,11 @@ declaration as in force. This is a fail-closed bypass — the one blocking bug l
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Re-verify the mismatch (roll-up lowercases; the criterion predicate compares exactly) against current code.
-- [ ] The status comparison is case-normalised consistently; audit the sibling criterion predicates for the same exact-match pattern and fix any others.
-- [ ] A red-capable regression test proves a section with `'Unresolved'` fails `gate_10a` (test fails on the pre-fix code, passes after).
-- [ ] `python scripts/lane_launcher.py vote B-review-preseed` re-run: PRE-1 no longer refutes.
-- [ ] Zero new test failures against the pre-existing-failure baseline; committed from the repo root.
+- [x] Re-verify the mismatch (roll-up lowercases; the criterion predicate compares exactly) against current code. — confirmed live at `criterion_predicates.py:218` vs `claim_status.py`.
+- [x] The status comparison is case-normalised consistently; audit the sibling criterion predicates for the same exact-match pattern and fix any others. — added single normalisation point `runner.claim_status.normalize_status`; routed the gate predicate + 3 reuse-admission siblings (`phase8_reuse.py`) through it. W1 already lowercased; coverage/resolution/revision-action compares are different vocabularies (whitelist-guarded), not the preseed surface.
+- [x] A red-capable regression test proves a section with `'Unresolved'` fails `gate_10a` (test fails on the pre-fix code, passes after). — parametrized `Unresolved`/`UNRESOLVED`/`UnReSoLvEd` at the gate_10a criterion predicate (red pre-fix, green post-fix) + reuse-path + `normalize_status` unit coverage.
+- [ ] `python scripts/lane_launcher.py vote B-review-preseed` re-run: PRE-1 no longer refutes. — **DEFERRED** (operator decision 2026-07-24): billed Opus vote; SDK not installed; lane stays REFUTED overall on the separate PRE-2/PRE-3 lenses. Fold into ticket 3's re-vote.
+- [x] Zero new test failures against the pre-existing-failure baseline; committed from the repo root. — full-suite failing set byte-identical to pristine HEAD (28 failed + 6 errors, all pre-existing); committed `bcd5d60` from repo root.
 
 ## 2. CHK-1 — Checkpoint provenance quad: grill the design, then implement
 
