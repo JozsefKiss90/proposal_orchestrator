@@ -85,7 +85,7 @@ import yaml
 
 log = logging.getLogger("runner.scheduler")
 
-from runner.agent_runtime import run_agent
+from runner.agent_runtime import drafting_skills_superseded_by, run_agent
 from runner.call_slicer import CallSlicerError, generate_call_slice
 from runner.deterministic_components import partition_draft_consuming
 from runner.gate_evaluator import evaluate_gate
@@ -1761,6 +1761,19 @@ class DAGScheduler:
         # The suppressed set is the explicit DRAFT_CONSUMING_COMPONENTS
         # declaration, not a name-suffix match — a rename or a new
         # draft-consuming component must not silently escape suppression.
+        #
+        # Suppressing the assemblers also strips the manifest-derived
+        # supersession of the monolithic drafting skill (the agent runtime
+        # derives it from the components it is handed, ticket 13).  That
+        # supersession is the reason the drafting skill does not redraft over the
+        # canonical section, so it must be carried forward explicitly here — from
+        # the *pre-suppression* binding — instead of being left to the hardcoded
+        # skill id in PRESEED_NODE_CONFIG / REUSE_SKIP_SKILLS.  Where the two
+        # agree (the normal case) this is a no-op; where they drift, the manifest
+        # binding wins and the authoritative prose survives.
+        _skip_skills: list[str] = list(
+            _preseed_skip_skills or _reuse_skip_skills or []
+        )
         _suppressed_components: list[str] = []
         _supersession_mode = (
             "preseed" if _preseed_skip_skills is not None
@@ -1768,6 +1781,16 @@ class DAGScheduler:
             else None
         )
         if _supersession_mode is not None and deterministic_components:
+            for _skill_id in sorted(
+                drafting_skills_superseded_by(deterministic_components)
+            ):
+                if _skill_id not in _skip_skills:
+                    log.info(
+                        "  [%s] %s: drafting skill %s carried into the skip set "
+                        "from the suppressed assembler binding",
+                        node_id, _supersession_mode.upper(), _skill_id,
+                    )
+                    _skip_skills.append(_skill_id)
             deterministic_components, _suppressed_components = (
                 partition_draft_consuming(deterministic_components)
             )
@@ -1789,6 +1812,7 @@ class DAGScheduler:
                 mode=_supersession_mode or "unknown",
                 suppressed=_suppressed_components,
                 retained=list(deterministic_components or []),
+                skipped_skills=list(_skip_skills),
             )
 
         log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
@@ -1802,7 +1826,7 @@ class DAGScheduler:
             phase_id=phase_id,
             sub_agent_id=sub_agent_id,
             pre_gate_agent_id=pre_gate_agent_id,
-            skip_skills=_preseed_skip_skills or _reuse_skip_skills,
+            skip_skills=_skip_skills or None,
             deterministic_components=deterministic_components,
         )
         log.info(
@@ -1961,6 +1985,7 @@ class DAGScheduler:
         mode: str,
         suppressed: list[str],
         retained: list[str],
+        skipped_skills: list[str],
     ) -> Path:
         """Write a Tier 4 audit record for suppressed deterministic components.
 
@@ -1979,6 +2004,10 @@ class DAGScheduler:
             ),
             "suppressed_components": suppressed,
             "retained_components": retained,
+            # The skills that did not run alongside them — including any drafting
+            # skill carried in from the suppressed assembler binding, so the
+            # audit shows the whole supersession, not half of it.
+            "skipped_skills": skipped_skills,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         audit_path = (

@@ -29,7 +29,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 import yaml
 
@@ -147,6 +147,31 @@ _ASSEMBLER_SECTION_SLUG: dict[str, str] = {
     "impact_section_assembler": "impact",
     "implementation_section_assembler": "implementation",
 }
+
+
+def drafting_skills_superseded_by(
+    component_ids: Iterable[str] | None,
+) -> frozenset[str]:
+    """Return the monolithic drafting skills that *component_ids* supersede.
+
+    The supersession is derived from the node's **manifest binding** — bind the
+    assembler and the drafting skill it replaces is suppressed — which is the
+    only reason a Phase-8 node does not redraft over its own canonical section.
+
+    The scheduler needs this on the *pre-suppression* binding: when preseed or
+    reuse drops the draft-consuming components (``dag_scheduler._dispatch_node``,
+    Step 3), the assemblers never reach :func:`run_agent`, so the supersession
+    they carry would evaporate exactly when an authoritative artifact is on disk
+    and must not be redrafted over.  Without carrying it forward, the only thing
+    standing between Claude and the operator's prose is the hardcoded skill id in
+    ``PRESEED_NODE_CONFIG`` / ``REUSE_SKIP_SKILLS`` — a second, unchecked source
+    of truth for "which skill drafts this node".
+    """
+    return frozenset(
+        _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL[cid]
+        for cid in (component_ids or [])
+        if cid in _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1320,10 +1345,8 @@ def run_agent(
     # node, the section is composed from the captured per-sub-section drafts
     # by the assembler — the monolithic drafting skill is superseded and
     # must not run (it would race the assembler on the same canonical path).
-    _superseded_drafting_skills = frozenset(
-        _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL[cid]
-        for cid in (deterministic_components or [])
-        if cid in _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL
+    _superseded_drafting_skills = drafting_skills_superseded_by(
+        deterministic_components
     )
 
     for sid in ordered_skills:

@@ -19,7 +19,7 @@ vocabulary — so it is safe for a Claude-free deterministic component to use.
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Any, Iterable
 
 #: §12.2 validation vocabulary ordered worst-last.  ``confirmed`` is the most
 #: resolved (severity 0); ``unresolved`` is the honest block (severity 3).
@@ -48,3 +48,64 @@ def worst_status(statuses: Iterable[str]) -> str:
         if severity is not None and severity > worst:
             worst = severity
     return _SEVERITY_STATUS[worst]
+
+
+def rollup_inconsistency(data: dict[str, Any], *, prefix: str) -> str | None:
+    """Return a failure reason iff *data*'s roll-up over-states its claims.
+
+    Both **supersession** paths for a Phase-8 section — manual preseed
+    (:mod:`runner.phase8_preseed`) and reuse (:mod:`runner.phase8_reuse`) —
+    admit a finished section artifact without running the derivation pipeline
+    that would have produced its ``validation_status.overall_status`` (the
+    drafter, then the assumption-applier, §12.2 worst-wins).  Neither can rely
+    on the gates to catch a bad roll-up: ``no_unresolved_material_claims`` reads
+    only the roll-up and W1 (``assumed_claims_are_operator_declared``) inspects
+    only ``assumed`` claims, so an ``unresolved`` claim under a ``confirmed``
+    roll-up is invisible to both — a fail-closed honest block silently becomes a
+    green.  The check lives here, once, so the two paths cannot drift.
+
+    The rule is one-sided by design: the roll-up may be **more** conservative
+    than its claims (declaring a section ``assumed`` over ``confirmed`` claims
+    is honest under-claiming, §15), but it may never be more resolved than its
+    least-resolved claim.
+
+    *prefix* namespaces the returned reason to the calling path (``"preseed"`` /
+    ``"reuse"``).  Returns ``None`` when the artifact is consistent — including
+    when it carries no claims.
+    """
+    validation_status = data.get("validation_status")
+    if not isinstance(validation_status, dict):
+        return (
+            f"{prefix}_validation_status_not_object: 'validation_status' must "
+            f"be an object, got {type(validation_status).__name__}"
+        )
+
+    overall = validation_status.get("overall_status")
+    if not isinstance(overall, str) or overall.lower() not in STATUS_SEVERITY:
+        return (
+            f"{prefix}_overall_status_invalid: 'validation_status."
+            f"overall_status' must be one of {sorted(STATUS_SEVERITY)}, got "
+            f"{overall!r}"
+        )
+
+    claim_statuses = validation_status.get("claim_statuses", [])
+    if not isinstance(claim_statuses, list):
+        return (
+            f"{prefix}_claim_statuses_not_array: 'validation_status."
+            "claim_statuses' must be an array, got "
+            f"{type(claim_statuses).__name__}"
+        )
+
+    worst = worst_status(
+        claim.get("status", "")
+        for claim in claim_statuses
+        if isinstance(claim, dict)
+    )
+    if STATUS_SEVERITY[overall.lower()] < STATUS_SEVERITY[worst]:
+        return (
+            f"{prefix}_overall_status_overstated: 'validation_status."
+            f"overall_status' is {overall!r} but the worst claim status is "
+            f"{worst!r} (CLAUDE.md §12.2 worst-wins); the roll-up may be more "
+            "conservative than its claims, never more resolved"
+        )
+    return None

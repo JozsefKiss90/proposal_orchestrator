@@ -45,8 +45,10 @@ live repository artifacts are read or mutated.
 
 from __future__ import annotations
 
+import importlib
 import inspect
 import json
+import re
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -54,7 +56,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
+from runner import dag_scheduler
 from runner import deterministic_components as dc
+from runner.agent_runtime import drafting_skills_superseded_by
+from runner.claim_status import rollup_inconsistency
 from runner.dag_scheduler import DAGScheduler, ManifestGraph
 from runner.deterministic_components import (
     COMPONENT_REGISTRY,
@@ -66,9 +71,14 @@ from runner.phase8_preseed import (
     PRESEED_AUDIT_DIR,
     PRESEED_DIR,
     PRESEED_NODE_CONFIG,
+    _validation_status_inconsistency,
     maybe_apply_phase8_preseed,
 )
-from runner.phase8_reuse import REUSE_ELIGIBLE_NODES, ReuseDecision
+from runner.phase8_reuse import (
+    REUSE_ELIGIBLE_NODES,
+    ReuseDecision,
+    validate_reuse_candidate,
+)
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult
 from runner.section_assembler import (
@@ -98,6 +108,10 @@ _DRAFT_PROSE = "STALE DRAFT PROSE - must not be recomposed over the preseed."
 #: ``TestDeclaredSetIsNotSuffixInferred`` can prove the behaviour no longer
 #: depends on them.
 _LEGACY_SUFFIXES = ("_section_assembler", "_assumption_applier")
+
+#: The directory whose contents make a component draft-consuming.  The drift
+#: detector looks for *this*, not for module names.
+_DRAFTS_DIR_NAME = "section_drafts"
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +260,53 @@ def _real_n08a_components() -> list[str]:
         if node["node_id"] == _NODE_ID:
             return list(node.get("deterministic_components") or [])
     raise AssertionError(f"{_NODE_ID} not found in the live manifest")
+
+
+#: Matches ``from runner.x import …`` / ``import runner.x`` in module source —
+#: including the lazy in-function imports the component adapters use.
+_RUNNER_IMPORT_RE = re.compile(
+    r"(?:from\s+(runner\.[\w.]+)\s+import|import\s+(runner\.[\w.]+))"
+)
+
+
+def _imported_runner_modules(source: str) -> set[str]:
+    return {a or b for a, b in _RUNNER_IMPORT_RE.findall(source)}
+
+
+def _reaches_section_drafts(entry_source: str) -> bool:
+    """True iff ``section_drafts`` is reachable from *entry_source*'s imports.
+
+    Walks the transitive closure of ``runner.*`` modules reachable from the
+    source and reports whether any of them names the drafts directory.  This is
+    a *reachability* test, not a name test: a component that reads
+    ``section_drafts/`` through some third module — never mentioning the
+    assembler or the applier — is still detected, which a grep of the adapter
+    for ``"section_assembler"`` / ``"assumption_applier"`` could not do.
+    """
+    pending = list(_imported_runner_modules(entry_source))
+    seen: set[str] = set()
+    while pending:
+        name = pending.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        try:
+            module_source = inspect.getsource(importlib.import_module(name))
+        except (ImportError, OSError, TypeError):  # pragma: no cover — defensive
+            continue
+        if _DRAFTS_DIR_NAME in module_source:
+            return True
+        pending.extend(_imported_runner_modules(module_source))
+    return False
+
+
+def _draft_consuming_component_ids() -> set[str]:
+    """Registry ids whose implementation can reach ``section_drafts/``."""
+    return {
+        component_id
+        for component_id, fn in COMPONENT_REGISTRY.items()
+        if _reaches_section_drafts(inspect.getsource(fn))
+    }
 
 
 def _section_path(repo: Path) -> Path:
@@ -594,21 +655,24 @@ class TestDeclaredSetInvariant:
     to it, in both directions.
     """
 
-    #: Modules whose entry points read ``section_drafts/``.
-    _DRAFT_CONSUMING_MODULES = ("section_assembler", "assumption_applier")
+    def test_the_detector_finds_the_known_consumers(self) -> None:
+        """Detector self-check: it must find today's six, or it detects nothing.
 
-    def _draft_consuming_component_ids(self) -> set[str]:
-        found: set[str] = set()
-        for component_id, fn in COMPONENT_REGISTRY.items():
-            source = inspect.getsource(fn)
-            if any(m in source for m in self._DRAFT_CONSUMING_MODULES):
-                found.add(component_id)
-        return found
+        A subset assertion, not an equality on the count — a legitimately added
+        seventh consumer must fail the *drift* test below with its own name in
+        the message, not this one with an arithmetic mismatch.
+        """
+        assert _draft_consuming_component_ids() >= {
+            "excellence_section_assembler",
+            "impact_section_assembler",
+            "implementation_section_assembler",
+            "excellence_assumption_applier",
+            "impact_assumption_applier",
+            "implementation_assumption_applier",
+        }
 
     def test_every_draft_consuming_component_is_declared(self) -> None:
-        draft_consumers = self._draft_consuming_component_ids()
-        # Sanity: the detector must find the known six, or it is not detecting.
-        assert len(draft_consumers) == 6, sorted(draft_consumers)
+        draft_consumers = _draft_consuming_component_ids()
         undeclared = sorted(draft_consumers - DRAFT_CONSUMING_COMPONENTS)
         assert undeclared == [], (
             "these components read section_drafts/ but are absent from "
@@ -618,7 +682,7 @@ class TestDeclaredSetInvariant:
 
     def test_no_non_draft_component_is_declared(self) -> None:
         """The declaration must not drop components that never touch drafts."""
-        draft_consumers = self._draft_consuming_component_ids()
+        draft_consumers = _draft_consuming_component_ids()
         over_declared = sorted(DRAFT_CONSUMING_COMPONENTS - draft_consumers)
         assert over_declared == []
 
@@ -630,6 +694,43 @@ class TestDeclaredSetInvariant:
         """Pin the directory the suppression exists to protect against."""
         assert SECTION_DRAFTS_ROOT_REL.endswith("section_drafts")
         assert dc.COMPONENT_REGISTRY  # registry is populated
+
+    def test_a_consumer_reaching_drafts_indirectly_is_detected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The addition direction: a new consumer via some *other* module.
+
+        The import-time guard in ``deterministic_components`` only catches the
+        rename direction (a declared id that left the registry).  The addition
+        direction — a newly registered component that reads ``section_drafts/``
+        and was never added to ``DRAFT_CONSUMING_COMPONENTS`` — rests entirely on
+        this detector, so it must not be satisfiable by naming: a component that
+        reaches the drafts through a module that is neither the assembler nor the
+        applier has to be caught too.
+        """
+
+        def _run_sneaky_composer(run_id: str, repo_root: Path) -> list[Path]:
+            from runner.decomposed_drafting import SECTION_DRAFTS_ROOT_REL as _r
+
+            return [Path(_r)]
+
+        # Reaches the drafts, but names neither draft-consuming module — the
+        # old substring detector would have waved it through.
+        source = inspect.getsource(_run_sneaky_composer)
+        assert not any(m in source for m in _LEGACY_SUFFIXES)
+        assert _DRAFTS_DIR_NAME not in source
+
+        monkeypatch.setitem(
+            COMPONENT_REGISTRY, "sneaky_composer", _run_sneaky_composer
+        )
+
+        detected = _draft_consuming_component_ids()
+
+        assert "sneaky_composer" in detected
+        # …and that is exactly what makes the declaration test go red for it.
+        assert "sneaky_composer" not in DRAFT_CONSUMING_COMPONENTS
+        with pytest.raises(AssertionError):
+            self.test_every_draft_consuming_component_is_declared()
 
 
 class TestDeclaredSetIsNotSuffixInferred:
@@ -996,3 +1097,237 @@ class TestPreseedRollUpConsistency:
 
         assert result.applied is True
         assert result.error is False
+
+
+# ---------------------------------------------------------------------------
+# I. Reuse must enforce the same roll-up invariant as preseed
+# ---------------------------------------------------------------------------
+
+
+class TestReuseRollUpConsistency:
+    """Reuse admits a finished artifact too, so it needs the same §12.2 check.
+
+    Regression for the "canonical_pack-vs-unapplied-assumptions" defect.  The
+    roll-up guard was wired into preseed only, while suppression was extended to
+    cover reuse — so the reuse path carried forward a section whose roll-up says
+    ``confirmed`` over an ``unresolved`` claim, suppressed the components that
+    would have re-derived it, and let the retained ``canonical_pack_deriver``
+    republish the declaration under the current run_id.  ``gate_10a`` reads only
+    the roll-up, so the node goes green on an unresolved claim.
+
+    ``validate_reuse_candidate`` step 4 does not catch it: it rejects only an
+    *overall* ``unresolved``.
+    """
+
+    def _artifact(
+        self, repo: Path, *, overall: str, claims: list[dict[str, Any]]
+    ) -> None:
+        _write_json(
+            _section_path(repo),
+            {
+                "schema_id": REUSE_ELIGIBLE_NODES[_NODE_ID]["schema_id"],
+                "run_id": "msca-pf-real-01",
+                "criterion": "Excellence",
+                "sub_sections": [
+                    {
+                        "sub_section_id": "1.1",
+                        "title": "Objectives",
+                        "content": _PRESEED_PROSE,
+                        "word_count": 5,
+                    }
+                ],
+                "validation_status": {
+                    "overall_status": overall,
+                    "claim_statuses": claims,
+                },
+                "traceability_footer": {
+                    "primary_sources": [
+                        {"tier": 3, "source_path": "docs/tier3/objectives.json"}
+                    ],
+                    "no_unsupported_claims_declaration": True,
+                },
+            },
+        )
+
+    def test_unresolved_claim_under_confirmed_rollup_is_not_reusable(
+        self, tmp_path: Path
+    ) -> None:
+        self._artifact(
+            tmp_path,
+            overall="confirmed",
+            claims=[{"claim_id": "C1", "status": "unresolved"}],
+        )
+
+        decision = validate_reuse_candidate(
+            _NODE_ID, tmp_path, current_fingerprint="f" * 64
+        )
+
+        assert decision.reusable is False
+        assert "overstated" in decision.reason
+
+    def test_assumed_claim_under_confirmed_rollup_is_not_reusable(
+        self, tmp_path: Path
+    ) -> None:
+        self._artifact(
+            tmp_path,
+            overall="confirmed",
+            claims=[{"claim_id": "C1", "status": "assumed"}],
+        )
+
+        decision = validate_reuse_candidate(
+            _NODE_ID, tmp_path, current_fingerprint="f" * 64
+        )
+
+        assert decision.reusable is False
+        assert "overstated" in decision.reason
+
+    def test_a_conservative_rollup_is_not_rejected_for_the_rollup(
+        self, tmp_path: Path
+    ) -> None:
+        """Over-suppression guard: under-claiming must fail later, if at all."""
+        self._artifact(
+            tmp_path,
+            overall="assumed",
+            claims=[{"claim_id": "C1", "status": "confirmed"}],
+        )
+
+        decision = validate_reuse_candidate(
+            _NODE_ID, tmp_path, current_fingerprint="f" * 64
+        )
+
+        # Still not reusable in this bare fixture (no gate result / metadata),
+        # but never for the roll-up.
+        assert "overstated" not in decision.reason
+
+    def test_preseed_and_reuse_share_one_implementation(self) -> None:
+        """The two paths must not be able to drift apart again."""
+        overstated = {
+            "validation_status": {
+                "overall_status": "confirmed",
+                "claim_statuses": [{"claim_id": "C1", "status": "unresolved"}],
+            }
+        }
+
+        assert rollup_inconsistency(overstated, prefix="preseed") is not None
+        assert rollup_inconsistency(overstated, prefix="reuse") is not None
+        assert _validation_status_inconsistency(overstated) == (
+            rollup_inconsistency(overstated, prefix="preseed")
+        )
+
+
+# ---------------------------------------------------------------------------
+# J. Suppressing the assembler must not lose the drafting-skill supersession
+# ---------------------------------------------------------------------------
+
+
+class TestSupersessionSurvivesSuppression:
+    """Dropping the assembler must not re-arm the monolithic drafting skill.
+
+    Regression for the "correctness-and-missed-code-paths" defect.  The agent
+    runtime derives "this drafting skill is superseded" from the *bound
+    assembler component* (``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL``, ticket 13).
+    Suppression strips those components before ``run_agent`` sees them, so that
+    manifest-derived suppressor evaporates and the only thing left standing
+    between Claude and the authoritative prose is a hardcoded skill-id string in
+    ``PRESEED_NODE_CONFIG`` / ``REUSE_SKIP_SKILLS`` — a second source of truth
+    for "which skill drafts this node", checked by nothing.
+
+    These tests force the two sources apart and assert the manifest-derived one
+    still lands in the skip set.
+    """
+
+    #: The drafting skill the *manifest binding* supersedes for n08a.
+    _BOUND_DRAFTING_SKILL = "excellence-section-drafting"
+    #: A drifted hardcoded id — what preseed/reuse would skip instead.
+    _DRIFTED_SKILL = "excellence-section-drafting-v2"
+
+    def test_the_bound_assembler_names_the_drafting_skill(self) -> None:
+        """Pin the derivation the scheduler now depends on."""
+        assert drafting_skills_superseded_by(_real_n08a_components()) == {
+            self._BOUND_DRAFTING_SKILL
+        }
+        assert drafting_skills_superseded_by([]) == frozenset()
+        assert drafting_skills_superseded_by(None) == frozenset()
+
+    def test_preseed_drift_still_suppresses_the_bound_drafting_skill(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+        # Drift: the preseed config no longer names the skill the manifest binds.
+        monkeypatch.setitem(
+            PRESEED_NODE_CONFIG[_NODE_ID], "skipped_skill", self._DRIFTED_SKILL
+        )
+
+        agent = _ComponentExecutingAgent()
+        sched = _make_scheduler(
+            tmp_path, run_id, preseed=True, components=_real_n08a_components()
+        )
+        with patch(_RA_TARGET, new=agent), patch(
+            _EG_TARGET, return_value=_GATE_PASS
+        ):
+            sched._dispatch_node(_NODE_ID)
+
+        assert self._BOUND_DRAFTING_SKILL in (agent.skip_skills or [])
+        # The hardcoded one is still honoured — this adds, never replaces.
+        assert self._DRIFTED_SKILL in (agent.skip_skills or [])
+
+    def test_reuse_drift_still_suppresses_the_bound_drafting_skill(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+        monkeypatch.setitem(
+            dag_scheduler.REUSE_SKIP_SKILLS, _NODE_ID, self._DRIFTED_SKILL
+        )
+
+        agent = _ComponentExecutingAgent()
+        TestReuseModeSuppression()._dispatch_in_reuse_mode(
+            tmp_path, run_id, agent
+        )
+
+        assert self._BOUND_DRAFTING_SKILL in (agent.skip_skills or [])
+        assert self._DRIFTED_SKILL in (agent.skip_skills or [])
+
+    def test_no_supersession_is_invented_without_a_binding(
+        self, tmp_path: Path
+    ) -> None:
+        """Only the bound assembler may add a skip — not the node id."""
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+
+        agent = _ComponentExecutingAgent()
+        sched = _make_scheduler(
+            tmp_path, run_id, preseed=True, components=["canonical_pack_deriver"]
+        )
+        with patch(_RA_TARGET, new=agent), patch(
+            _EG_TARGET, return_value=_GATE_PASS
+        ):
+            sched._dispatch_node(_NODE_ID)
+
+        assert agent.skip_skills == [
+            PRESEED_NODE_CONFIG[_NODE_ID]["skipped_skill"]
+        ]
+
+    def test_the_skip_set_is_audited(self, tmp_path: Path) -> None:
+        """§9.4: the skills that did not run are part of the durable record."""
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+
+        agent = _ComponentExecutingAgent()
+        sched = _make_scheduler(
+            tmp_path, run_id, preseed=True, components=_real_n08a_components()
+        )
+        with patch(_RA_TARGET, new=agent), patch(
+            _EG_TARGET, return_value=_GATE_PASS
+        ):
+            sched._dispatch_node(_NODE_ID)
+
+        audit = json.loads(
+            (
+                tmp_path
+                / PRESEED_AUDIT_DIR
+                / f"component_suppression_{_NODE_ID}.json"
+            ).read_text(encoding="utf-8")
+        )
+        assert audit["skipped_skills"] == [self._BOUND_DRAFTING_SKILL]

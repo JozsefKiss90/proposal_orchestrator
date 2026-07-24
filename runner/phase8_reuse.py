@@ -28,6 +28,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from runner.claim_status import rollup_inconsistency
+
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -437,6 +439,23 @@ def validate_reuse_candidate(
     if vs.get("overall_status") == "unresolved":
         return ReuseDecision(
             reusable=False, reason="unresolved_validation_status",
+            input_fingerprint=current_fingerprint,
+        )
+
+    # 4b. The roll-up must not over-state its claims (§12.2 worst-wins).
+    #
+    # Reuse carries a finished section artifact forward *and* — like preseed —
+    # suppresses the draft-consuming components, so nothing in the current run
+    # re-derives ``overall_status`` from ``claim_statuses``.  Step 4 only rejects
+    # an overall ``unresolved``: an ``unresolved`` claim sitting under a
+    # ``confirmed`` roll-up passes it, and the retained ``canonical_pack_deriver``
+    # then republishes that declaration under the current run_id while
+    # ``gate_10a`` (which reads only the roll-up) goes green.  Same defect,
+    # same check as preseed — shared so the two paths cannot drift.
+    _rollup_reason = rollup_inconsistency(artifact_data, prefix="reuse")
+    if _rollup_reason is not None:
+        return ReuseDecision(
+            reusable=False, reason=_rollup_reason,
             input_fingerprint=current_fingerprint,
         )
 
