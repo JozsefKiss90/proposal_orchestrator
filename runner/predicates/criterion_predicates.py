@@ -36,6 +36,7 @@ import re
 from pathlib import Path
 from typing import Optional, Union
 
+from runner.claim_status import normalize_status
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.types import (
     CROSS_ARTIFACT_INCONSISTENCY,
@@ -215,7 +216,10 @@ def no_unresolved_material_claims(
         return PredicateResult(passed=True)
 
     overall = validation_status.get("overall_status", "")
-    if overall == "unresolved":
+    # §12.2 names the vocabulary in title case; the roll-up derivation
+    # (runner.claim_status) normalises case, so this comparison must too, or an
+    # operator-authored ``'Unresolved'`` preseed sails through gate_10a (PRE-1).
+    if normalize_status(overall) == "unresolved":
         return PredicateResult(
             passed=False,
             failure_category=POLICY_VIOLATION,

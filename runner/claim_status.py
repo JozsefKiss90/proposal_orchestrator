@@ -34,6 +34,28 @@ STATUS_SEVERITY: dict[str, int] = {
 _SEVERITY_STATUS: dict[int, str] = {v: k for k, v in STATUS_SEVERITY.items()}
 
 
+def normalize_status(status: Any) -> str | None:
+    """Return *status* as its canonical (lowercase) §12.2 form, or ``None``.
+
+    CLAUDE.md §12.2 names the vocabulary in title case (``Confirmed`` /
+    ``Inferred`` / ``Assumed`` / ``Unresolved``); the runtime's canonical form
+    is lowercase.  Artifacts — especially operator-authored preseed sections and
+    reused carry-forwards, neither of which passes through the drafter that would
+    lowercase the value — may carry either casing.  This maps any casing of a
+    known status to its canonical lowercase spelling and returns ``None`` for a
+    value outside the vocabulary.
+
+    Callers comparing a section's status against a canonical value must route
+    through this function so a title-case ``Unresolved`` matches ``unresolved``
+    (the PRE-1 fail-closed bypass), while an unknown value never spuriously
+    matches a canonical status.  This is the single case-normalisation point for
+    the §12.2 vocabulary, mirroring how :func:`worst_status` /
+    :func:`rollup_inconsistency` own the ordering.
+    """
+    normalized = str(status).lower()
+    return normalized if normalized in STATUS_SEVERITY else None
+
+
 def worst_status(statuses: Iterable[str]) -> str:
     """Return the worst (least-resolved) status among *statuses*.
 

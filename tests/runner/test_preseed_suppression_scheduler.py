@@ -59,7 +59,7 @@ import yaml
 from runner import dag_scheduler
 from runner import deterministic_components as dc
 from runner.agent_runtime import drafting_skills_superseded_by
-from runner.claim_status import rollup_inconsistency
+from runner.claim_status import normalize_status, rollup_inconsistency
 from runner.dag_scheduler import DAGScheduler, ManifestGraph
 from runner.deterministic_components import (
     COMPONENT_REGISTRY,
@@ -1213,6 +1213,41 @@ class TestReuseRollUpConsistency:
         assert _validation_status_inconsistency(overstated) == (
             rollup_inconsistency(overstated, prefix="preseed")
         )
+
+
+# ---------------------------------------------------------------------------
+# I2. normalize_status — the single §12.2 case-normalisation point (PRE-1)
+# ---------------------------------------------------------------------------
+
+
+class TestNormalizeStatus:
+    """``normalize_status`` maps any casing of a §12.2 status to lowercase.
+
+    The status-case gate bypass (PRE-1) existed because the roll-up derivation
+    lowercased while the gate/reuse admission checks compared exactly.  Both
+    sides now route through this one helper, so it is the contract that closes
+    the bypass: title-case matches, unknown values never do.
+    """
+
+    @pytest.mark.parametrize(
+        "raw,expected",
+        [
+            ("unresolved", "unresolved"),
+            ("Unresolved", "unresolved"),
+            ("UNRESOLVED", "unresolved"),
+            ("Assumed", "assumed"),
+            ("Confirmed", "confirmed"),
+            ("Inferred", "inferred"),
+        ],
+    )
+    def test_known_statuses_normalise_to_lowercase(
+        self, raw: str, expected: str
+    ) -> None:
+        assert normalize_status(raw) == expected
+
+    @pytest.mark.parametrize("raw", ["", "garbage", "passed", None, 3, [], {}])
+    def test_unknown_values_return_none(self, raw: object) -> None:
+        assert normalize_status(raw) is None
 
 
 # ---------------------------------------------------------------------------

@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from runner.claim_status import rollup_inconsistency
+from runner.claim_status import normalize_status, rollup_inconsistency
 
 log = logging.getLogger(__name__)
 
@@ -429,14 +429,15 @@ def validate_reuse_candidate(
             input_fingerprint=current_fingerprint,
         )
 
-    # 4. validation_status.overall_status must not be "unresolved"
+    # 4. validation_status.overall_status must not be "unresolved" (any casing —
+    #    §12.2 title-case, so normalise before comparing, as gate_10a does; PRE-1)
     vs = artifact_data.get("validation_status")
     if not isinstance(vs, dict):
         return ReuseDecision(
             reusable=False, reason="missing_validation_status",
             input_fingerprint=current_fingerprint,
         )
-    if vs.get("overall_status") == "unresolved":
+    if normalize_status(vs.get("overall_status")) == "unresolved":
         return ReuseDecision(
             reusable=False, reason="unresolved_validation_status",
             input_fingerprint=current_fingerprint,
@@ -711,14 +712,20 @@ def is_reuse_owned_artifact_valid(
     vs = artifact.get("validation_status")
     if not isinstance(vs, dict):
         return False, "missing_validation_status"
-    if vs.get("overall_status") == "unresolved":
+    # Normalise casing before comparing: §12.2 title-case must not slip a reused
+    # section past this ownership check that gate_10a would block (PRE-1).
+    if normalize_status(vs.get("overall_status")) == "unresolved":
         return False, "validation_status_unresolved"
 
     # Check for assumed/unresolved claims
     claim_statuses = vs.get("claim_statuses", [])
     for cs in claim_statuses:
-        if isinstance(cs, dict) and cs.get("status") in ("assumed", "unresolved"):
-            return False, f"claim_status_{cs.get('status')}"
+        if not isinstance(cs, dict):
+            continue
+        claim_status = normalize_status(cs.get("status"))
+        if claim_status in ("assumed", "unresolved"):
+            # Report the normalised status so the reason is casing-independent.
+            return False, f"claim_status_{claim_status}"
 
     tf = artifact.get("traceability_footer")
     if not isinstance(tf, dict):

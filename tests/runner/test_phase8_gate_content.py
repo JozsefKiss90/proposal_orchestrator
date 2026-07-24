@@ -259,6 +259,28 @@ class TestGatePredicateWithFixtures:
         assert not result.passed
         assert result.failure_category == "POLICY_VIOLATION"
 
+    @pytest.mark.parametrize("overall", ["Unresolved", "UNRESOLVED", "UnReSoLvEd"])
+    def test_capitalized_unresolved_fails_predicate(
+        self, tmp_path: Path, overall: str
+    ) -> None:
+        """A section carrying §12.2's title-case ``Unresolved`` must still fail.
+
+        PRE-1 regression: the roll-up derivation normalises case but this
+        criterion predicate used to compare the raw string exactly, so a
+        preseeded section spelling the status as the constitution does
+        (§12.2 title-case) sailed through ``gate_10a`` while the canonical pack
+        republished a never-applied declaration as in force.  Any casing of
+        ``unresolved`` is a fail-closed honest block.
+        """
+        _write_json(tmp_path / "section.json", {
+            "validation_status": {"overall_status": overall},
+        })
+        result = no_unresolved_material_claims(
+            "section.json", repo_root=tmp_path
+        )
+        assert not result.passed
+        assert result.failure_category == "POLICY_VIOLATION"
+
     def test_confirmed_overall_status_passes(self, tmp_path: Path) -> None:
         _write_json(tmp_path / "section.json", {
             "validation_status": {"overall_status": "confirmed"},
