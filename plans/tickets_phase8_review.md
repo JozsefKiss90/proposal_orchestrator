@@ -76,7 +76,7 @@ failing closed on any drift. Note: the manifest-derived supersession carry-forwa
 - [x] Eligibility and skip-binding come from a single source (or the tables are asserted in agreement at load time), so "audit says skipped" and "drafting actually suppressed" can never diverge. — `PHASE8_DRAFTING_SKILL_BY_NODE` is the single source; `PRESEED_NODE_CONFIG.skipped_skill` and `REUSE_SKIP_SKILLS` derive from it; `REUSE_ELIGIBLE_NODES` node-set and `_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL` values asserted in agreement at import (`SkipBindingError` on drift).
 - [x] The Tier-4 reuse/preseed decision record is written only when the suppression it describes is actually in force. — preseed skip binding validated before `maybe_apply_phase8_preseed` (no artifact/audit on failure); reuse decision `record_reuse_decision` moved *after* the binding check (blocks + records `not_reused` on failure, never a false `drafting_skipped_audit_executed`).
 - [x] Regression tests cover: renamed/unmatched skip id (hard failure, not overwrite), eligible-but-unbound node (no false audit record), and the normal agree case (unchanged behaviour). — `TestSkipBindingFailsClosedOnDrift` (rewrote the two b5eb816 drift tests to assert fail-closed + added eligible-but-unbound + normal-agree) + new `tests/runner/test_phase8_skip_binding.py` (`validate_skip_binding`, single-source agreement, load-time helpers). Targeted files green; full suite: zero new failures vs baseline (the sole non-run is the pre-existing TR-1 hang in `test_skill_runtime.py`, untouched by this ticket).
-- [ ] `python scripts/lane_launcher.py vote B-review-preseed` re-run: verdict HOLDS UP. — **DEFERRED** (same operator basis as PRE-1 item #4): billed Opus vote, Claude Agent SDK not installed locally. Left for the operator to run; not blocking the code changes.
+- [x] `python scripts/lane_launcher.py vote B-review-preseed` re-run: verdict HOLDS UP. — operator ran the lane; `scripts/vote_results/B-review-preseed.json` = **HOLDS UP — majority (2 holds, 1 refute)**. Both PRE-3 (tier4-audit-only-when-in-force) and the PRE-1-regression (canonical_pack, high confidence "inert, not exploitable") hold. The one refutation (PRE-2 lens, medium) is a *sibling-path* gap the refuter itself marks "out of ticket-3 scope": the **default decomposed-drafting** supersession in `run_agent` (`drafting_skills_superseded_by` → bare `ordered_skills` membership) is not manifest-cross-checked. Ticket 3's criteria (the preseed/reuse skip) are all met; the sibling-path gap is filed as ticket 9.
 
 ## 4. SCH-1 + SCH-2 — schema_id backfill tool: registry-driven discovery + root validation
 
@@ -159,3 +159,27 @@ LG-1's numbers feed the coarse-ledger decision-log entry if available, but do no
 - [ ] `--from-graph` re-run produces byte-identical staging output (determinism re-check).
 - [ ] Decision-log entries exist for open-Q #4 and the coarse-ledger property.
 - [ ] The previously blocked n08f completes: checkpoint published under the CHK-1 contract, closing M2-T10.
+
+## 9. PRE-4 — Default decomposed-drafting supersession not fail-closed on manifest drift (surfaced by ticket 3's re-vote)
+
+**What to build:** Ticket 3 made the **preseed/reuse** drafting-skill skip fail closed against the manifest
+(`validate_skip_binding` vs `resolve_skill_ids`). The **default decomposed-drafting** path — no preseed,
+no reuse — still supersedes the monolithic drafting skill in `runner/agent_runtime.py:run_agent` by bare
+`ordered_skills` membership on `drafting_skills_superseded_by(deterministic_components)`
+(`_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL`), with **no** manifest cross-check. A manifest rename of the
+drafting skill that is not mirrored into the map would silently no-op the supersession, letting the
+monolithic drafter run alongside the assembler and race/overwrite the assembler-composed section — the
+same PRE-2 defect class ticket 3 closed, on a sibling path. This was raised by the `B-review-preseed`
+re-vote's one refuting lens (`skip-id-resolves-against-manifest-or-fails-closed`, medium confidence),
+which the refuter itself scoped **out of ticket 3**. Two mitigations already bound it: the import-time
+assert ties `_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL.values()` ⊆ `PHASE8_DRAFTING_SKILL_BY_NODE.values()`
+(so map↔single-source drift is caught), and any preseed/reuse run on the node trips the ticket-3
+guard (so only default-*only* runs miss it). Currently inert — no live manifest drift exists — hence
+latent, not blocking.
+
+**Blocked by:** None. Coordinate with ticket 3's `phase8_skip_binding` substrate (reuse `validate_skip_binding`).
+
+- [ ] Re-verify the gap against current code: confirm `run_agent`'s decomposed-drafting supersession has no `resolve_skill_ids` cross-check and that the two named mitigations are the only guards.
+- [ ] The default-path supersession resolves its superseded skill id against the node's manifest `skill_ids`; a map id that matches no resolved skill is a hard failure (fail-closed), consistent with the preseed/reuse guard — not a silent no-op.
+- [ ] Regression test: a manifest whose drafting skill name diverges from `_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL` hard-blocks the node on the default (no preseed/reuse) path, rather than running both producers.
+- [ ] Zero new test failures against the pre-existing-failure baseline.
