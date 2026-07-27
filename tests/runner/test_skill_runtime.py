@@ -1330,16 +1330,33 @@ class TestOptionalReadsFrom:
         assert mock_claude.called
 
     def test_no_optional_field_means_empty_list(self, tmp_path: Path) -> None:
-        """Skills without optional_reads_from behave exactly as before."""
+        """Skills without optional_reads_from behave exactly as before.
+
+        ``test-skill`` declares no ``optional_reads_from`` field; with its
+        required input present, the absent-optional handling must default to an
+        empty list (no spurious validation failure) and the skill must run to
+        success.  The transport is mocked so the test is hermetic — the previous
+        version left ``invoke_claude_text`` unmocked and called the real
+        ``claude`` CLI, which hangs indefinitely on Windows when the CLI stalls
+        (the TR-1 process-tree-timeout defect) and asserted nothing.
+        """
         repo_root = _make_skill_env(tmp_path)
 
-        # test-skill has no optional_reads_from — missing required input fails
-        result = run_skill("test-skill", "run-opt-004", repo_root, {
-            "docs/tier3/input.json": {"topic": "test"},
-        })
-        # Should succeed since input is provided
-        # (Claude is not mocked here, so we'd get a transport error,
-        #  but the point is: no validation failure from optional paths)
+        response = {
+            "schema_id": "test_output_v1",
+            "run_id": "run-opt-004",
+            "result": "ok",
+        }
+        # test-skill has no optional_reads_from; the required input is present.
+        with _claude_returns(response):
+            result = run_skill("test-skill", "run-opt-004", repo_root, {
+                "docs/tier3/input.json": {"topic": "test"},
+            })
+
+        # No optional_reads_from field must not cause a validation failure, and
+        # with the required input provided the skill runs to success.
+        assert result.failure_category != "MISSING_INPUT"
+        assert result.status == "success"
 
     def test_tapm_prompt_includes_optional_paths(self, tmp_path: Path) -> None:
         """TAPM prompt assembly includes optional paths annotated as OPTIONAL."""

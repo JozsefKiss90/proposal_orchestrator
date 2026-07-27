@@ -85,7 +85,7 @@ import yaml
 
 log = logging.getLogger("runner.scheduler")
 
-from runner.agent_runtime import drafting_skills_superseded_by, run_agent
+from runner.agent_runtime import run_agent
 from runner.call_slicer import CallSlicerError, generate_call_slice
 from runner.deterministic_components import partition_draft_consuming
 from runner.gate_evaluator import evaluate_gate
@@ -109,6 +109,7 @@ from runner.phase8_reuse import (
     validate_reuse_candidate,
     write_reuse_metadata,
 )
+from runner.phase8_skip_binding import validate_skip_binding
 from runner.predicates.gate_pass_predicates import is_gate_fresh
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult, NodeExecutionResult
@@ -1620,6 +1621,25 @@ class DAGScheduler:
         # from it because MSCA-PF is single-researcher (no consortium
         # partners.json), so requiring it was a RIA-shaped assumption.
 
+        # ── Skip-binding resolution (PRE-2/PRE-3, ticket 3) ───────────
+        #
+        # When preseed or reuse supersedes a Phase-8 drafting skill, the id it
+        # skips must be a real manifest-resolved skill for the node — otherwise
+        # a rename is a silent no-op that lets the drafter overwrite the
+        # authoritative section while the audit falsely records a skip.  Resolve
+        # the node's manifest skills once, up front, so both the preseed and the
+        # reuse branch can fail closed against them (via ``validate_skip_binding``)
+        # before they write anything.  Only Phase-8 supersession-eligible nodes
+        # need it; every other node skips the resolver call.
+        _supersession_eligible = (
+            self._preseed_phase8_sections and node_id in PRESEED_NODE_CONFIG
+        ) or node_id in REUSE_ELIGIBLE_NODES
+        _resolved_skill_ids: frozenset[str] = (
+            frozenset(self._node_resolver.resolve_skill_ids(node_id))
+            if _supersession_eligible
+            else frozenset()
+        )
+
         # ── Step 2.45: Phase 8 manual preseed (n08a/n08b/n08c only) ──
         #
         # When --preseed-phase8-sections is active, check for manually
@@ -1628,6 +1648,25 @@ class DAGScheduler:
         # If the preseed file exists but is invalid, block the node.
         _preseed_skip_skills: list[str] | None = None
         if self._preseed_phase8_sections and node_id in PRESEED_NODE_CONFIG:
+            # Fail-closed skip binding (PRE-2): validate BEFORE applying, so an
+            # invalid binding writes neither the section artifact nor its skip
+            # audit (PRE-3 — no audit unless the suppression is in force).
+            _binding_err = validate_skip_binding(
+                node_id,
+                [PRESEED_NODE_CONFIG[node_id]["skipped_skill"]],
+                _resolved_skill_ids,
+            )
+            if _binding_err is not None:
+                _fail_reason = (
+                    f"Preseed skip binding invalid for {node_id!r}: {_binding_err}"
+                )
+                log.error("  [%s] %s", node_id, _fail_reason)
+                return self._block_before_dispatch(
+                    node_id,
+                    failure_origin="preseed",
+                    failure_reason=_fail_reason,
+                    failure_category="CONSTRAINT_VIOLATION",
+                )
             preseed_result = maybe_apply_phase8_preseed(
                 self.repo_root, self.ctx.run_id, node_id,
             )
@@ -1638,24 +1677,12 @@ class DAGScheduler:
                     f"{preseed_result.reason}"
                 )
                 log.error("  [%s] %s", node_id, _fail_reason)
-                self.ctx.set_node_state(
+                return self._block_before_dispatch(
                     node_id,
-                    "blocked_at_exit",
                     failure_origin="preseed",
-                    exit_gate_evaluated=False,
                     failure_reason=_fail_reason,
-                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
-                )
-                self.ctx.save()
-                return NodeExecutionResult(
-                    node_id=node_id,
-                    final_state="blocked_at_exit",
-                    exit_gate_evaluated=False,
-                    failure_origin="preseed",
-                    gate_result=None,
-                    agent_result=None,
-                    failure_reason=_fail_reason,
-                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
+                    failure_category=preseed_result.failure_category
+                    or "MALFORMED_ARTIFACT",
                 )
             if preseed_result.applied:
                 log.info(
@@ -1678,6 +1705,40 @@ class DAGScheduler:
                 node_id, self.repo_root, current_fingerprint=fp,
             )
             if decision.reusable:
+                # Fail-closed skip binding (PRE-2/PRE-3): the drafting skill
+                # reuse will skip must be a real manifest skill for this node,
+                # and must be validated BEFORE the reuse decision is persisted —
+                # so the Tier-4 record that claims "drafting_skipped_audit_
+                # executed" is written only when the suppression it describes is
+                # actually in force.  An eligible node with no bound skip skill
+                # (eligibility/skip drift) yields an empty skip set and blocks
+                # here instead of recording a false skip over an unsuppressed
+                # drafter.
+                drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
+                _binding_err = validate_skip_binding(
+                    node_id,
+                    [drafting_skill] if drafting_skill is not None else [],
+                    _resolved_skill_ids,
+                )
+                if _binding_err is not None:
+                    _fail_reason = (
+                        f"Reuse skip binding invalid for {node_id!r}: "
+                        f"{_binding_err}"
+                    )
+                    log.error("  [%s] %s", node_id, _fail_reason)
+                    # Record the refusal, not a skip — the audit must not claim a
+                    # suppression that never happened.
+                    self._reuse_decisions[node_id] = {
+                        "status": "not_reused",
+                        "reason": _fail_reason,
+                    }
+                    return self._block_before_dispatch(
+                        node_id,
+                        failure_origin="reuse",
+                        failure_reason=_fail_reason,
+                        failure_category="CONSTRAINT_VIOLATION",
+                    )
+
                 # Read the actual artifact run_id from disk (authoritative).
                 # The metadata's source_run_id may be stale from v1 format;
                 # always prefer the artifact file's own run_id field.
@@ -1709,14 +1770,14 @@ class DAGScheduler:
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,
                 }
+                # Persist the decision and set the skip together, now that the
+                # binding is confirmed in force (PRE-3).
                 self._reuse_decisions[node_id] = reuse_dec
                 # Persist to RunContext so gate predicates can verify
                 self.ctx.record_reuse_decision(node_id, reuse_dec)
                 self.ctx.save()
                 # Skip only the drafting skill; audit skills still run.
-                drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
-                if drafting_skill:
-                    _reuse_skip_skills = [drafting_skill]
+                _reuse_skip_skills = [drafting_skill]
             else:
                 log.info(
                     "  [%s] REUSE: not reusable (%s)",
@@ -1762,15 +1823,15 @@ class DAGScheduler:
         # declaration, not a name-suffix match — a rename or a new
         # draft-consuming component must not silently escape suppression.
         #
-        # Suppressing the assemblers also strips the manifest-derived
-        # supersession of the monolithic drafting skill (the agent runtime
-        # derives it from the components it is handed, ticket 13).  That
-        # supersession is the reason the drafting skill does not redraft over the
-        # canonical section, so it must be carried forward explicitly here — from
-        # the *pre-suppression* binding — instead of being left to the hardcoded
-        # skill id in PRESEED_NODE_CONFIG / REUSE_SKIP_SKILLS.  Where the two
-        # agree (the normal case) this is a no-op; where they drift, the manifest
-        # binding wins and the authoritative prose survives.
+        # The drafting skill itself is suppressed by the ``_skip_skills`` set
+        # below, whose sole member (the preseed/reuse skip id) was already
+        # validated against the node's manifest ``skill_ids`` before this point
+        # (PRE-2/PRE-3): if it drifted from the manifest the node has already
+        # hard-blocked, so no unvalidated skip id reaches ``run_agent``.  A
+        # matching id is guaranteed to be in the node's ``ordered_skills`` there
+        # and is therefore skipped — the b5eb816 "carry the manifest-derived
+        # supersession into the skip set" workaround is subsumed by the
+        # fail-closed guard and no longer needed.
         _skip_skills: list[str] = list(
             _preseed_skip_skills or _reuse_skip_skills or []
         )
@@ -1781,16 +1842,6 @@ class DAGScheduler:
             else None
         )
         if _supersession_mode is not None and deterministic_components:
-            for _skill_id in sorted(
-                drafting_skills_superseded_by(deterministic_components)
-            ):
-                if _skill_id not in _skip_skills:
-                    log.info(
-                        "  [%s] %s: drafting skill %s carried into the skip set "
-                        "from the suppressed assembler binding",
-                        node_id, _supersession_mode.upper(), _skill_id,
-                    )
-                    _skip_skills.append(_skill_id)
             deterministic_components, _suppressed_components = (
                 partition_draft_consuming(deterministic_components)
             )
@@ -1977,6 +2028,42 @@ class DAGScheduler:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _block_before_dispatch(
+        self,
+        node_id: str,
+        *,
+        failure_origin: str,
+        failure_reason: str,
+        failure_category: str,
+    ) -> NodeExecutionResult:
+        """Persist and return a block that happens before the agent body runs.
+
+        Shared by the preseed and reuse pre-dispatch guards (invalid preseed
+        artifact, drifted skip binding): the node is blocked before any agent
+        dispatch, so there is no gate result or agent result and the exit gate
+        is never evaluated.  Persists the block state to ``RunContext`` and
+        returns the matching :class:`NodeExecutionResult`.
+        """
+        self.ctx.set_node_state(
+            node_id,
+            "blocked_at_exit",
+            failure_origin=failure_origin,
+            exit_gate_evaluated=False,
+            failure_reason=failure_reason,
+            failure_category=failure_category,
+        )
+        self.ctx.save()
+        return NodeExecutionResult(
+            node_id=node_id,
+            final_state="blocked_at_exit",
+            exit_gate_evaluated=False,
+            failure_origin=failure_origin,
+            gate_result=None,
+            agent_result=None,
+            failure_reason=failure_reason,
+            failure_category=failure_category,
+        )
 
     def _record_component_suppression(
         self,

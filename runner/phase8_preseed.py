@@ -36,6 +36,10 @@ from pathlib import Path
 from typing import Any
 
 from runner.claim_status import rollup_inconsistency
+from runner.phase8_skip_binding import (
+    PHASE8_DRAFTING_SKILL_BY_NODE,
+    assert_agrees_with_source,
+)
 
 log = logging.getLogger(__name__)
 
@@ -61,27 +65,37 @@ REQUIRED_FIELDS: tuple[str, ...] = (
     "traceability_footer",
 )
 
-#: Node-to-preseed mapping.
+#: Node-to-preseed mapping.  ``skipped_skill`` is *not* hardcoded here — it is
+#: taken from :data:`PHASE8_DRAFTING_SKILL_BY_NODE`, the single authoritative
+#: source, so the preseed skip binding can never drift from the reuse skip
+#: binding or the manifest supersession (PRE-2/PRE-3, ticket 3).
 PRESEED_NODE_CONFIG: dict[str, dict[str, str]] = {
     "n08a_excellence_drafting": {
         "source_file": "excellence_section.json",
         "target_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
         "schema_id": "orch.tier5.excellence_section.v1",
-        "skipped_skill": "excellence-section-drafting",
+        "skipped_skill": PHASE8_DRAFTING_SKILL_BY_NODE["n08a_excellence_drafting"],
     },
     "n08b_impact_drafting": {
         "source_file": "impact_section.json",
         "target_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
         "schema_id": "orch.tier5.impact_section.v1",
-        "skipped_skill": "impact-section-drafting",
+        "skipped_skill": PHASE8_DRAFTING_SKILL_BY_NODE["n08b_impact_drafting"],
     },
     "n08c_implementation_drafting": {
         "source_file": "implementation_section.json",
         "target_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
         "schema_id": "orch.tier5.implementation_section.v1",
-        "skipped_skill": "implementation-section-drafting",
+        "skipped_skill": PHASE8_DRAFTING_SKILL_BY_NODE["n08c_implementation_drafting"],
     },
 }
+
+#: Load-time invariant: the preseed skip binding must equal the single source.
+#: Guards against a future hand-edit that reintroduces a divergent literal.
+assert_agrees_with_source(
+    "PRESEED_NODE_CONFIG",
+    {node: cfg["skipped_skill"] for node, cfg in PRESEED_NODE_CONFIG.items()},
+)
 
 
 # ---------------------------------------------------------------------------

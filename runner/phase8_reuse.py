@@ -29,6 +29,10 @@ from pathlib import Path
 from typing import Any
 
 from runner.claim_status import normalize_status, rollup_inconsistency
+from runner.phase8_skip_binding import (
+    PHASE8_DRAFTING_SKILL_BY_NODE,
+    assert_nodes_match_source,
+)
 
 log = logging.getLogger(__name__)
 
@@ -45,11 +49,10 @@ REUSE_METADATA_DIR: str = "docs/tier4_orchestration_state/reuse/phase8"
 #: Node-specific drafting skills to skip during reuse.
 #: Only the expensive drafting skill is skipped; audit skills
 #: (traceability-check, compliance-check) always execute.
-REUSE_SKIP_SKILLS: dict[str, str] = {
-    "n08a_excellence_drafting": "excellence-section-drafting",
-    "n08b_impact_drafting": "impact-section-drafting",
-    "n08c_implementation_drafting": "implementation-section-drafting",
-}
+#: This *is* the single authoritative skip binding — not a second copy of it —
+#: so the reuse skip and the preseed skip can never name different skills for
+#: the same node (PRE-2/PRE-3, ticket 3).
+REUSE_SKIP_SKILLS: dict[str, str] = dict(PHASE8_DRAFTING_SKILL_BY_NODE)
 
 #: Nodes eligible for reuse, mapped to their canonical artifact and gate.
 REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
@@ -69,6 +72,12 @@ REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
         "gate_id": "gate_10c_implementation_completeness",
     },
 }
+
+#: Load-time invariant: eligibility and the skip binding cover exactly the same
+#: nodes.  A node eligible for reuse but absent from the skip binding (or vice
+#: versa) is the PRE-3 latent defect — a false "drafting skipped" audit over an
+#: unsuppressed drafter — so the divergence is caught at import, not at runtime.
+assert_nodes_match_source("REUSE_ELIGIBLE_NODES", REUSE_ELIGIBLE_NODES.keys())
 
 #: Node-specific minimum fingerprint input paths.
 #: All files under directory paths are included in the hash.

@@ -35,6 +35,7 @@ import yaml
 
 from runner.deterministic_components import invoke_component
 from runner.node_resolver import NodeResolver, NodeResolverError
+from runner.phase8_skip_binding import PHASE8_DRAFTING_SKILL_BY_NODE, SkipBindingError
 from runner.runtime_models import (
     AgentResult,
     ComponentInvocationRecord,
@@ -135,6 +136,21 @@ _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL: dict[str, str] = {
     "impact_section_assembler": "impact-section-drafting",
     "implementation_section_assembler": "implementation-section-drafting",
 }
+
+#: Load-time invariant: every drafting skill an assembler supersedes must be one
+#: the single authoritative skip binding recognises.  Keeps this fourth naming
+#: of "the drafting skill" from drifting away from the preseed/reuse binding
+#: (PRE-2/PRE-3, ticket 3); the assembler→node mapping stays local because the
+#: supersession is keyed by component, not node.
+_unbound_supersessions = sorted(
+    set(_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL.values())
+    - set(PHASE8_DRAFTING_SKILL_BY_NODE.values())
+)
+if _unbound_supersessions:  # pragma: no cover — import-time invariant
+    raise SkipBindingError(
+        "_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL names drafting skills absent from "
+        f"the authoritative Phase-8 skip binding: {_unbound_supersessions}"
+    )
 
 #: Maps a bound section-assembler component to the section slug whose
 #: per-sub-section drafts it composes.  Used to invoke the live decomposed

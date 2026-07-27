@@ -368,6 +368,44 @@ def _make_scheduler(
     return sched
 
 
+def _dispatch_reuse_forced(
+    repo: Path,
+    run_id: str,
+    agent: "_ComponentExecutingAgent",
+    *,
+    components: list[str] | None = None,
+) -> tuple[DAGScheduler, Any]:
+    """Dispatch n08a with preseed off and reuse forced reusable=True.
+
+    Returns ``(scheduler, result)`` so callers can inspect the persisted reuse
+    decision on ``scheduler.ctx`` — needed to prove that a fail-closed skip
+    binding writes no false "drafting skipped" audit (PRE-3).
+    """
+    sched = _make_scheduler(
+        repo, run_id, preseed=False,
+        components=components if components is not None else _real_n08a_components(),
+    )
+    decision = ReuseDecision(
+        reusable=True,
+        reason="reusable",
+        artifact_path=REUSE_ELIGIBLE_NODES[_NODE_ID]["artifact_path"],
+        source_run_id="msca-pf-real-01",
+        input_fingerprint="f" * 64,
+        gate_id=_EXIT_GATE,
+    )
+    with patch(_RA_TARGET, new=agent), patch(
+        _EG_TARGET, return_value=_GATE_PASS
+    ), patch(
+        "runner.dag_scheduler.validate_reuse_candidate", return_value=decision,
+    ), patch(
+        "runner.dag_scheduler.compute_input_fingerprint", return_value="f" * 64,
+    ), patch(
+        "runner.dag_scheduler.write_reuse_metadata"
+    ):
+        result = sched._dispatch_node(_NODE_ID)
+    return sched, result
+
+
 class _ComponentExecutingAgent:
     """A ``run_agent`` stand-in that really runs the components it is handed.
 
@@ -1251,45 +1289,48 @@ class TestNormalizeStatus:
 
 
 # ---------------------------------------------------------------------------
-# J. Suppressing the assembler must not lose the drafting-skill supersession
+# J. Skip binding is resolved against the manifest and fails closed on drift
 # ---------------------------------------------------------------------------
 
 
-class TestSupersessionSurvivesSuppression:
-    """Dropping the assembler must not re-arm the monolithic drafting skill.
+class TestSkipBindingFailsClosedOnDrift:
+    """A skip id that matches no manifest skill hard-blocks the node (PRE-2/PRE-3).
 
-    Regression for the "correctness-and-missed-code-paths" defect.  The agent
-    runtime derives "this drafting skill is superseded" from the *bound
-    assembler component* (``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL``, ticket 13).
-    Suppression strips those components before ``run_agent`` sees them, so that
-    manifest-derived suppressor evaporates and the only thing left standing
-    between Claude and the authoritative prose is a hardcoded skill-id string in
-    ``PRESEED_NODE_CONFIG`` / ``REUSE_SKIP_SKILLS`` — a second source of truth
-    for "which skill drafts this node", checked by nothing.
+    The preseed/reuse drafting-skill skip used to be a hardcoded name-string
+    (``PRESEED_NODE_CONFIG`` / ``REUSE_SKIP_SKILLS``) checked against nothing.
+    An unmatched id was a silent no-op: the drafter ran and overwrote the
+    authoritative section while the audit falsely claimed a skip.  ``b5eb816``
+    mitigated it by *carrying the manifest-derived supersession into the skip
+    set* — an "add, never replace" workaround.  Ticket 3 replaces that with the
+    real fix: the skip id is resolved against the node's manifest ``skill_ids``
+    and a drift is a hard failure, so the drafter never gets the chance to run.
 
-    These tests force the two sources apart and assert the manifest-derived one
-    still lands in the skip set.
+    These tests force the hardcoded skip id apart from the manifest binding and
+    assert the node blocks fail-closed, writing neither an overwrite nor a false
+    audit.
     """
 
-    #: The drafting skill the *manifest binding* supersedes for n08a.
+    #: The drafting skill the *manifest binding* supersedes for n08a — the value
+    #: the injected resolver returns as the node's only ``skill_id``.
     _BOUND_DRAFTING_SKILL = "excellence-section-drafting"
-    #: A drifted hardcoded id — what preseed/reuse would skip instead.
+    #: A drifted hardcoded id — matches no manifest-resolved skill.
     _DRIFTED_SKILL = "excellence-section-drafting-v2"
 
     def test_the_bound_assembler_names_the_drafting_skill(self) -> None:
-        """Pin the derivation the scheduler now depends on."""
+        """Pin the manifest-derived supersession helper (still used in-runtime)."""
         assert drafting_skills_superseded_by(_real_n08a_components()) == {
             self._BOUND_DRAFTING_SKILL
         }
         assert drafting_skills_superseded_by([]) == frozenset()
         assert drafting_skills_superseded_by(None) == frozenset()
 
-    def test_preseed_drift_still_suppresses_the_bound_drafting_skill(
+    def test_preseed_drift_hard_blocks_before_applying(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        """A drifted preseed skip id blocks the node — no artifact, no drafter."""
         run_id = "msca-pf-graph-01"
         _build_fixture(tmp_path, spine_run_id=run_id)
-        # Drift: the preseed config no longer names the skill the manifest binds.
+        # Drift: the preseed config no longer names a skill the manifest binds.
         monkeypatch.setitem(
             PRESEED_NODE_CONFIG[_NODE_ID], "skipped_skill", self._DRIFTED_SKILL
         )
@@ -1301,15 +1342,22 @@ class TestSupersessionSurvivesSuppression:
         with patch(_RA_TARGET, new=agent), patch(
             _EG_TARGET, return_value=_GATE_PASS
         ):
-            sched._dispatch_node(_NODE_ID)
+            result = sched._dispatch_node(_NODE_ID)
 
-        assert self._BOUND_DRAFTING_SKILL in (agent.skip_skills or [])
-        # The hardcoded one is still honoured — this adds, never replaces.
-        assert self._DRIFTED_SKILL in (agent.skip_skills or [])
+        assert result.final_state == "blocked_at_exit"
+        assert result.failure_origin == "preseed"
+        assert result.exit_gate_evaluated is False
+        assert result.failure_category == "CONSTRAINT_VIOLATION"
+        assert self._DRIFTED_SKILL in (result.failure_reason or "")
+        # Validated before apply: no artifact reached the canonical path and the
+        # agent body (the drafter) was never dispatched.
+        assert not _section_path(tmp_path).exists()
+        assert agent.components_received is None
 
-    def test_reuse_drift_still_suppresses_the_bound_drafting_skill(
+    def test_reuse_drift_hard_blocks_and_records_no_false_skip(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        """A drifted reuse skip id blocks; no ``drafting_skipped`` decision persists."""
         run_id = "msca-pf-graph-01"
         _build_fixture(tmp_path, spine_run_id=run_id)
         monkeypatch.setitem(
@@ -1317,17 +1365,66 @@ class TestSupersessionSurvivesSuppression:
         )
 
         agent = _ComponentExecutingAgent()
-        TestReuseModeSuppression()._dispatch_in_reuse_mode(
-            tmp_path, run_id, agent
-        )
+        sched, result = _dispatch_reuse_forced(tmp_path, run_id, agent)
 
-        assert self._BOUND_DRAFTING_SKILL in (agent.skip_skills or [])
-        assert self._DRIFTED_SKILL in (agent.skip_skills or [])
+        assert result.final_state == "blocked_at_exit"
+        assert result.failure_origin == "reuse"
+        assert result.failure_category == "CONSTRAINT_VIOLATION"
+        assert agent.components_received is None
+        # PRE-3: the Tier-4 reuse decision must not claim a skip that never
+        # happened — nothing "reused" is persisted, only the refusal.
+        assert sched.ctx.get_reuse_decision(_NODE_ID) is None
+        assert sched._reuse_decisions[_NODE_ID]["status"] == "not_reused"
+
+    def test_eligible_but_unbound_node_records_no_false_skip(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """PRE-3 core: eligible but absent from the skip binding → no false audit.
+
+        The empty-skip branch of ``validate_skip_binding`` fires: the node is
+        reuse-eligible but has no drafting skill to suppress, so it blocks
+        instead of recording ``drafting_skipped_audit_executed`` over an
+        unsuppressed drafter.
+        """
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+        # Eligibility/skip drift: the node is reuse-eligible but bound to no skip.
+        monkeypatch.delitem(dag_scheduler.REUSE_SKIP_SKILLS, _NODE_ID)
+
+        agent = _ComponentExecutingAgent()
+        sched, result = _dispatch_reuse_forced(tmp_path, run_id, agent)
+
+        assert result.final_state == "blocked_at_exit"
+        assert result.failure_origin == "reuse"
+        assert "empty" in (result.failure_reason or "")
+        assert agent.components_received is None
+        assert sched.ctx.get_reuse_decision(_NODE_ID) is None
+        assert sched._reuse_decisions[_NODE_ID]["status"] == "not_reused"
+
+    def test_normal_agree_case_dispatches_unchanged(
+        self, tmp_path: Path
+    ) -> None:
+        """The in-agreement case is untouched: skip binding matches, node runs."""
+        run_id = "msca-pf-graph-01"
+        _build_fixture(tmp_path, spine_run_id=run_id)
+
+        agent = _ComponentExecutingAgent()
+        sched = _make_scheduler(
+            tmp_path, run_id, preseed=True, components=_real_n08a_components()
+        )
+        with patch(_RA_TARGET, new=agent), patch(
+            _EG_TARGET, return_value=_GATE_PASS
+        ):
+            result = sched._dispatch_node(_NODE_ID)
+
+        assert result.final_state == "released"
+        assert agent.skip_skills == [self._BOUND_DRAFTING_SKILL]
+        assert _PRESEED_PROSE in _section_prose(tmp_path)
 
     def test_no_supersession_is_invented_without_a_binding(
         self, tmp_path: Path
     ) -> None:
-        """Only the bound assembler may add a skip — not the node id."""
+        """The single-source skip id is the only skip — nothing is invented."""
         run_id = "msca-pf-graph-01"
         _build_fixture(tmp_path, spine_run_id=run_id)
 
