@@ -55,7 +55,12 @@ from runner.gate_library import (
     LIBRARY_REL_PATH,
 )
 from runner.manifest_reader import ManifestReader, ManifestReaderError
-from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
+from runner.gate_result_registry import (
+    GATE_RESULT_FALLBACK_SUBDIR,
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+    TIER4_ROOT_REL,
+)
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.coverage_predicates import (
@@ -152,11 +157,14 @@ DETERMINISTIC_TYPES: frozenset[str] = frozenset(
 #: Gate that triggers HARD_BLOCK on budget-received-dir failure.
 HARD_BLOCK_GATE: str = "gate_09_budget_consistency"
 
-#: Tier-4 root relative to repo root.
-TIER4_ROOT_REL: str = "docs/tier4_orchestration_state"
-
-#: Fallback gate result sub-path for gate_ids not in GATE_RESULT_PATHS.
-_FALLBACK_RESULT_SUB: str = "gate_results"
+#: Tier-4 root and fallback gate-result subdir are sourced from
+#: ``gate_result_registry`` (the authoritative path module, imported above) so
+#: this write-path resolver and the schema_id backfill discovery tool read one
+#: source instead of re-hardcoding the literals.  (Other path-computers —
+#: ``dag_scheduler`` etc. — still keep local mirrors; converging them is out of
+#: scope here.)  ``TIER4_ROOT_REL`` is re-exported via the import;
+#: ``_FALLBACK_RESULT_SUB`` keeps its historical local name.
+_FALLBACK_RESULT_SUB: str = GATE_RESULT_FALLBACK_SUBDIR
 
 # ---------------------------------------------------------------------------
 # Predicate dispatch registry

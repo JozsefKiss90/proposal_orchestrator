@@ -35,7 +35,11 @@ import pytest
 import yaml
 
 from runner.gate_evaluator import evaluate_gate
-from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
+from runner.gate_result_registry import (
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+    TIER4_ROOT_REL,
+)
 from runner.predicates.gate_pass_predicates import gate_pass_recorded
 from runner.predicates.types import MALFORMED_ARTIFACT
 from runner.versions import MANIFEST_VERSION
@@ -372,3 +376,155 @@ class TestBackfill:
         assert report["changed"] == []
         assert report["skipped_non_gate"] == 1
         assert path.read_bytes() == before
+
+
+# ===========================================================================
+# 4. Discovery is registry-driven, not a narrow phase_outputs glob (SCH-1)
+# ===========================================================================
+
+
+def _write_gate_result_at(
+    repo_root: Path, rel_under_tier4: str, **overrides
+) -> Path:
+    """Write a gate-result-shaped JSON at an arbitrary path under tier4."""
+    data = {
+        "gate_id": "phase_02_gate",
+        "gate_kind": "exit",
+        "status": "fail",
+        "run_id": "legacy-run",
+    }
+    data.update({k: v for k, v in overrides.items() if v is not _OMIT})
+    path = repo_root / TIER4_ROOT_REL / rel_under_tier4
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    return path
+
+
+class TestBackfillRegistryDrivenDiscovery:
+    """SCH-1: discovery is driven by the runtime's own knowledge of where gate
+    results live — the registry (``GATE_RESULT_PATHS``) plus the evaluator's
+    fallback subdir — with a labelled safety-net sweep for preserved artifacts.
+    The old ``phase_outputs/**/*result*.json`` glob missed both sibling
+    locations named in the finding.
+    """
+
+    def test_finds_preserved_non_canonical_result(self, tmp_path: Path) -> None:
+        """``alpha_honest_block/phase2_gate_result_HONEST_BLOCK.json`` lives
+        *outside* ``phase_outputs/`` and was silently missed.  It must now be
+        discovered, backfilled, and reported under ``non_canonical`` so a file
+        caught outside the canonical path model is always visible."""
+        rel_under = "alpha_honest_block/phase2_gate_result_HONEST_BLOCK.json"
+        path = _write_gate_result_at(tmp_path, rel_under, schema_id=_OMIT)
+
+        report = backfill(tmp_path, apply=True)
+
+        rel = f"{TIER4_ROOT_REL}/{rel_under}"
+        assert rel in report["changed"]
+        assert rel in report["non_canonical"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert data["schema_id"] == GATE_RESULT_SCHEMA_ID
+
+    def test_finds_non_canonical_result_without_result_token(
+        self, tmp_path: Path
+    ) -> None:
+        """A preserved gate result at a non-canonical location whose filename
+        lacks the ``result`` token must still be found: discovery keys on the
+        gate-result *shape* (gate_id + gate_kind + status), not on a filename
+        heuristic, so the sweep cannot be evaded by a name like
+        ``phase2_gate_HONEST_BLOCK.json``."""
+        rel_under = "alpha_honest_block/phase2_gate_HONEST_BLOCK.json"
+        path = _write_gate_result_at(tmp_path, rel_under, schema_id=_OMIT)
+
+        report = backfill(tmp_path, apply=True)
+
+        rel = f"{TIER4_ROOT_REL}/{rel_under}"
+        assert rel in report["changed"]
+        assert rel in report["non_canonical"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert data["schema_id"] == GATE_RESULT_SCHEMA_ID
+
+    def test_finds_fallback_dir_result_without_result_token(
+        self, tmp_path: Path
+    ) -> None:
+        """The evaluator writes unregistered gate_ids to
+        ``gate_results/<gate_id>.json`` — a name with **no** ``result`` token,
+        which the old ``*result*.json`` glob could never match.  Discovery via
+        the fallback subdir must find and backfill it, and it is *not* flagged
+        non-canonical (the fallback dir is a known runtime location)."""
+        rel_under = "gate_results/gate_09_budget_consistency.json"
+        path = _write_gate_result_at(
+            tmp_path,
+            rel_under,
+            gate_id="gate_09_budget_consistency",
+            schema_id=_OMIT,
+        )
+
+        report = backfill(tmp_path, apply=True)
+
+        rel = f"{TIER4_ROOT_REL}/{rel_under}"
+        assert rel in report["changed"]
+        assert rel not in report["non_canonical"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        assert data["schema_id"] == GATE_RESULT_SCHEMA_ID
+
+    def test_non_canonical_conflict_still_fails_closed(
+        self, tmp_path: Path
+    ) -> None:
+        """A wrong schema_id at a non-canonical location is a conflict and must
+        never be rewritten (§17.6.5) — fail-closed is not limited to
+        ``phase_outputs/``."""
+        path = _write_gate_result_at(
+            tmp_path,
+            "alpha_honest_block/phase2_gate_result_HONEST_BLOCK.json",
+            schema_id="orch.gate_result.v0",
+        )
+        before = path.read_bytes()
+
+        report = backfill(tmp_path, apply=True)
+
+        assert report["changed"] == []
+        assert len(report["conflicts"]) == 1
+        assert report["conflicts"][0]["found_schema_id"] == "orch.gate_result.v0"
+        assert path.read_bytes() == before
+
+
+# ===========================================================================
+# 5. Root validation + zero-scan is never a silent success (SCH-2)
+# ===========================================================================
+
+
+class TestBackfillRootValidation:
+    """SCH-2: a wrong ``--repo-root`` and a zero-scan are each surfaced with a
+    distinct non-zero exit, never as a silent clean run.  The old tool
+    ``rglob``-ed a missing directory, found nothing, and exited 0 —
+    indistinguishable from "all conforming"."""
+
+    def test_wrong_root_is_rejected_distinctly(self, tmp_path: Path) -> None:
+        """A ``--repo-root`` without the tier4 tree is a distinct failure (2),
+        not 0 (clean) and not 1 (conflict)."""
+        from tools.backfill_gate_result_schema_id import main
+
+        # tmp_path has no docs/tier4_orchestration_state/ — a misdirected root.
+        assert main(["--repo-root", str(tmp_path), "--apply"]) == 2
+
+    def test_zero_scan_is_not_a_silent_success(self, tmp_path: Path) -> None:
+        """A valid root with no gate results at all exits with a distinct code
+        (3), never the exit-0 'all conforming' path."""
+        from tools.backfill_gate_result_schema_id import main
+
+        (tmp_path / TIER4_ROOT_REL).mkdir(parents=True)
+
+        assert main(["--repo-root", str(tmp_path), "--apply"]) == 3
+
+    def test_all_conforming_exits_zero(self, tmp_path: Path) -> None:
+        """One already-conforming gate result is a genuine clean success (0),
+        distinct from the zero-scan code."""
+        from tools.backfill_gate_result_schema_id import main
+
+        _write_gate_result_at(
+            tmp_path,
+            "phase_outputs/phase2_concept_refinement/gate_result.json",
+            schema_id=GATE_RESULT_SCHEMA_ID,
+        )
+
+        assert main(["--repo-root", str(tmp_path), "--apply"]) == 0

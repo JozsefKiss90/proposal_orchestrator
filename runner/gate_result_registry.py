@@ -26,6 +26,24 @@ against it — none of them may hard-code the literal independently.
 #: artifact_schema_specification.yaml §gate_result_schema.schema_id_value.
 GATE_RESULT_SCHEMA_ID: str = "orch.gate_result.v1"
 
+#: Tier-4 orchestration-state root, relative to the repository root.  The
+#: ``GATE_RESULT_PATHS`` values below are relative to *this* directory, so the
+#: absolute path of a gate result is
+#: ``repo_root / TIER4_ROOT_REL / GATE_RESULT_PATHS[gate_id]``.  Kept here — the
+#: authoritative gate-result path module — so the evaluator's write-path
+#: resolver and the schema_id backfill discovery tool read one source instead of
+#: re-hardcoding the literal.  (Other modules — ``dag_scheduler``,
+#: ``checkpoint_publisher``, ``phase8_reuse`` — still keep local mirrors of this
+#: string; converging them onto this constant is a separate cleanup.)
+TIER4_ROOT_REL: str = "docs/tier4_orchestration_state"
+
+#: Sub-directory (under ``TIER4_ROOT_REL``) where the gate evaluator writes
+#: results for gate_ids **not** present in ``GATE_RESULT_PATHS``
+#: (``gate_evaluator._gate_result_path`` fallback → ``<gate_id>.json``).  It is
+#: part of the runtime's own knowledge of where gate results live, so discovery
+#: enumerates it directly rather than pattern-guessing filenames.
+GATE_RESULT_FALLBACK_SUBDIR: str = "gate_results"
+
 #: The version fields every gate result carries (``versions.py`` constants).
 #: The single shared source both the checkpoint publisher (which copies them
 #: verbatim into the provenance quad) and the ``checkpoint_published`` predicate
