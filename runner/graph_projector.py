@@ -52,6 +52,7 @@ import yaml
 
 from runner.atomic_write import atomic_write_text
 from runner.graph_config import GraphConfig, GraphConfigError, load_graph_config
+from runner.graph_schema import GraphSchemaError, validate_front_matter
 
 # ---------------------------------------------------------------------------
 # Constants — the docs_to_graph ownership boundary
@@ -144,39 +145,63 @@ def _predicate_counts(block: Any) -> tuple[int, int]:
     )
 
 
-def read_tier4_gate_states(repo_root: Path) -> tuple[GateState, ...]:
+@dataclass(frozen=True)
+class Tier4Scan:
+    """The result of scanning Tier-4 phase outputs for gate-result artifacts.
+
+    ``gate_states`` are the successfully-read gate results (ordered by
+    ``(phase, gate_id)``).  ``unreadable`` names every ``*.json`` under
+    ``phase_outputs`` that could **not** be parsed as a JSON object (repo-relative,
+    sorted) — corrupt/malformed Tier-4 state that would otherwise vanish from the
+    mirror silently.  Surfacing it is the honest signal that the mirror is
+    incomplete (§12.4): the projector reflects what it can read and names what it
+    cannot, rather than papering over a gap.
+    """
+
+    gate_states: tuple[GateState, ...]
+    unreadable: tuple[str, ...]
+
+
+def scan_tier4_gate_states(repo_root: Path) -> Tier4Scan:
     """Scan Tier-4 phase outputs for gate-result artifacts, deterministically.
 
     A gate-result file is any ``*.json`` under
     ``docs/tier4_orchestration_state/phase_outputs`` carrying both a ``gate_id``
-    and a ``status`` (phase summaries and other artifacts lack these and are
-    skipped).  Files are scanned in sorted path order; a duplicate ``gate_id``
-    keeps the first (sorted) occurrence.  Returns states ordered by
-    ``(phase, gate_id)``.
+    and a ``status`` (phase summaries and other artifacts parse but lack these and
+    are skipped as legitimately non-gate).  Files are scanned in sorted path
+    order; a duplicate ``gate_id`` keeps the first (sorted) occurrence.
+
+    A ``*.json`` that cannot be parsed as a JSON object at all (e.g. one carrying
+    committed git conflict markers) is **not** silently dropped: its repo-relative
+    path is recorded in :attr:`Tier4Scan.unreadable` so callers can surface the
+    corruption instead of mirroring an incomplete state as if it were complete.
     """
     outputs_dir = repo_root / PHASE_OUTPUTS_REL
     if not outputs_dir.is_dir():
-        return ()
+        return Tier4Scan(gate_states=(), unreadable=())
 
     by_gate_id: dict[str, GateState] = {}
+    unreadable: list[str] = []
     json_files = sorted(
         (p for p in outputs_dir.rglob("*.json") if p.is_file()),
         key=lambda p: p.relative_to(repo_root).as_posix(),
     )
     for path in json_files:
+        rel = path.relative_to(repo_root).as_posix()
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
+            unreadable.append(rel)  # corrupt Tier-4 JSON — surface, never drop
             continue
         if not isinstance(data, dict):
+            unreadable.append(rel)
             continue
         gate_id = data.get("gate_id")
         status = data.get("status")
         if not isinstance(gate_id, str) or not isinstance(status, str):
-            continue  # not a gate-result artifact
+            continue  # parses fine but not a gate-result artifact (e.g. a summary)
         if gate_id in by_gate_id:
             continue  # first sorted occurrence wins (deterministic)
-        rel = path.relative_to(repo_root).as_posix()
         det_p, det_f = _predicate_counts(data.get("deterministic_predicates"))
         sem_p, sem_f = _predicate_counts(data.get("semantic_predicates"))
         by_gate_id[gate_id] = GateState(
@@ -192,9 +217,17 @@ def read_tier4_gate_states(repo_root: Path) -> tuple[GateState, ...]:
             semantic_passed=sem_p,
             semantic_failed=sem_f,
         )
-    return tuple(
-        sorted(by_gate_id.values(), key=lambda g: (g.phase if g.phase is not None else 0, g.gate_id))
+    return Tier4Scan(
+        gate_states=tuple(
+            sorted(by_gate_id.values(), key=lambda g: (g.phase if g.phase is not None else 0, g.gate_id))
+        ),
+        unreadable=tuple(unreadable),
     )
+
+
+def read_tier4_gate_states(repo_root: Path) -> tuple[GateState, ...]:
+    """Return only the readable gate states (back-compat over :func:`scan_tier4_gate_states`)."""
+    return scan_tier4_gate_states(repo_root).gate_states
 
 
 # ---------------------------------------------------------------------------
@@ -234,6 +267,17 @@ def _render_mirror_node(gs: GateState) -> str:
         "read_only": True,
         "tags": ["phase-gate-mirror", "docs-to-graph"],
     }
+    # Fail closed if a mirror node would violate the generic graph schema.  The
+    # projector constructs schema-valid nodes by construction (source_grounded
+    # evidence, all required core fields present), so this can only fire on a
+    # future regression — making schema-validity an enforced invariant, not an
+    # implicit property (DOD-1: "validates against the graph schema").
+    try:
+        validate_front_matter(front_matter, gs.mirror_id)
+    except GraphSchemaError as exc:
+        raise GraphProjectionError(
+            f"Projector produced a schema-invalid mirror node: {exc}"
+        ) from exc
     fm_text = yaml.safe_dump(front_matter, sort_keys=False, allow_unicode=True)
     phase_label = f"phase {gs.phase}" if gs.phase is not None else "unphased"
     body = (
@@ -262,12 +306,19 @@ def _render_mirror_node(gs: GateState) -> str:
 
 @dataclass(frozen=True)
 class ProjectionResult:
-    """The outcome of a projection run."""
+    """The outcome of a projection run.
+
+    ``unreadable`` carries the repo-relative paths of any ``*.json`` under
+    ``phase_outputs`` that could not be parsed as a gate result (corrupt Tier-4
+    state).  It is **surfaced**, not swallowed: a non-empty ``unreadable`` means
+    the mirror is honestly incomplete and the CLI reports it (§12.4).
+    """
 
     target_dir: Path
     written: tuple[Path, ...]
     removed: tuple[Path, ...]
     gate_states: tuple[GateState, ...]
+    unreadable: tuple[str, ...] = ()
 
 
 def project(
@@ -277,11 +328,13 @@ def project(
 ) -> ProjectionResult:
     """Mirror durable Tier-4 gate state into the vault's owned folder.
 
-    Reads gate results via :func:`read_tier4_gate_states`, renders one
-    ``phase_gate_state`` node per gate into ``vault_dir/target_folder``, and
-    prunes any stale ``PGS-*.md`` there that no longer corresponds to a gate.
+    Reads gate results via :func:`scan_tier4_gate_states`, renders one
+    ``phase_gate_state`` node per readable gate into ``vault_dir/target_folder``,
+    and prunes any stale ``PGS-*.md`` there that no longer corresponds to a gate.
     Writes/prunes **only** ``PGS-*.md`` files in ``target_folder`` — never any
-    other folder and never any ``docs/**`` path.
+    other folder and never any ``docs/**`` path.  Any unparseable gate-result
+    JSON is carried through to :attr:`ProjectionResult.unreadable` (surfaced by
+    the CLI), never silently dropped.
 
     Idempotent: re-running on unchanged Tier-4 rewrites byte-identical content
     and removes nothing.
@@ -289,13 +342,15 @@ def project(
     Raises
     ------
     GraphProjectionError
-        If *vault_dir* does not exist.
+        If *vault_dir* does not exist, or a rendered mirror node would violate
+        the generic graph schema (fail-closed invariant).
     """
     vault_dir = Path(vault_dir)
     if not vault_dir.is_dir():
         raise GraphProjectionError(f"Vault directory not found: {vault_dir}")
 
-    gate_states = read_tier4_gate_states(repo_root)
+    scan = scan_tier4_gate_states(repo_root)
+    gate_states = scan.gate_states
     target_dir = vault_dir / target_folder
     target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -324,6 +379,7 @@ def project(
         written=tuple(written),
         removed=tuple(removed),
         gate_states=gate_states,
+        unreadable=scan.unreadable,
     )
 
 
@@ -448,9 +504,22 @@ def main(argv: Optional[list[str]] = None) -> int:
     print(
         f"[graph-project] project={config.project_id} "
         f"mirrored={len(result.written)} pruned={len(result.removed)} "
+        f"unreadable={len(result.unreadable)} "
         f"target={result.target_dir}",
         flush=True,
     )
+    # Surface corrupt Tier-4 gate JSON on stderr — an incomplete mirror must be
+    # visible, never silently narrower than the durable state (§12.4).
+    if result.unreadable:
+        print(
+            "[graph-project] WARNING: skipped "
+            f"{len(result.unreadable)} unreadable gate-result file(s); the "
+            "mirror is incomplete:",
+            file=sys.stderr,
+            flush=True,
+        )
+        for rel in result.unreadable:
+            print(f"[graph-project]   - {rel}", file=sys.stderr, flush=True)
     return 0
 
 

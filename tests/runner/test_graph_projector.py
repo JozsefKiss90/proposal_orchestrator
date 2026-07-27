@@ -26,6 +26,7 @@ from runner.graph_projector import (
     compute_sync_partition,
     project,
     read_tier4_gate_states,
+    scan_tier4_gate_states,
 )
 from runner.vault_reader import read_vault
 
@@ -33,6 +34,13 @@ from runner.vault_reader import read_vault
 # ---------------------------------------------------------------------------
 # Helpers — synthetic Tier-4 gate results
 # ---------------------------------------------------------------------------
+
+
+def _phase_output_path(repo_root: Path, phase_folder: str, filename: str) -> Path:
+    """Resolve (and mkdir the parent of) a Tier-4 phase-output artifact path."""
+    p = repo_root / "docs/tier4_orchestration_state/phase_outputs" / phase_folder / filename
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
 
 
 def _write_gate_result(
@@ -43,8 +51,7 @@ def _write_gate_result(
     status: str,
     **extra,
 ) -> Path:
-    p = repo_root / "docs/tier4_orchestration_state/phase_outputs" / phase_folder / filename
-    p.parent.mkdir(parents=True, exist_ok=True)
+    p = _phase_output_path(repo_root, phase_folder, filename)
     obj = {
         "gate_id": gate_id,
         "gate_kind": "exit",
@@ -60,9 +67,29 @@ def _write_gate_result(
 
 
 def _write_non_gate(repo_root: Path, phase_folder: str, filename: str) -> Path:
-    p = repo_root / "docs/tier4_orchestration_state/phase_outputs" / phase_folder / filename
-    p.parent.mkdir(parents=True, exist_ok=True)
+    p = _phase_output_path(repo_root, phase_folder, filename)
     p.write_text(json.dumps({"schema_id": "some.summary.v1", "data": 1}), encoding="utf-8")
+    return p
+
+
+#: A gate-result file corrupted by committed git conflict markers (the real
+#: bffe89d corruption class) — parses as neither a JSON object nor anything else.
+_CONFLICTED_GATE_JSON = (
+    "{\n"
+    '  "gate_id": "phase_02_gate",\n'
+    "<<<<<<< Updated upstream\n"
+    '  "run_id": "run-a",\n'
+    "=======\n"
+    '  "run_id": "run-b",\n'
+    ">>>>>>> Stashed changes\n"
+    '  "status": "pass"\n'
+    "}\n"
+)
+
+
+def _write_corrupt_gate(repo_root: Path, phase_folder: str, filename: str) -> Path:
+    p = _phase_output_path(repo_root, phase_folder, filename)
+    p.write_text(_CONFLICTED_GATE_JSON, encoding="utf-8")
     return p
 
 
@@ -113,6 +140,72 @@ def test_real_tier4_gate_states(repo_root):
     states = read_tier4_gate_states(repo_root)
     assert len(states) >= 1
     assert all(s.gate_id and s.status for s in states)
+
+
+def test_real_tier4_has_no_unreadable_gate_json(repo_root):
+    # Regression guard for the DOD-1 data repair: the committed phase-output corpus
+    # must carry NO unparseable gate-result JSON.  A future conflict-marker commit
+    # (the bffe89d failure mode) would repopulate `unreadable` and fail here — the
+    # only place that pins the real mirror is complete, not silently narrowed.
+    scan = scan_tier4_gate_states(repo_root)
+    assert scan.unreadable == (), (
+        "Corrupt gate-result JSON reappeared under phase_outputs/: "
+        f"{scan.unreadable}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# scan_tier4_gate_states — surfaces corrupt gate JSON instead of dropping it
+# ---------------------------------------------------------------------------
+
+
+def test_scan_surfaces_unreadable_gate_json(tier4_repo):
+    # A gate-result file corrupted by committed conflict markers must be reported
+    # in `unreadable`, NOT silently dropped — while readable gates still parse.
+    _write_corrupt_gate(tier4_repo, "phase2_concept_refinement", "gate_result.json")
+    scan = scan_tier4_gate_states(tier4_repo)
+    assert scan.unreadable == (
+        "docs/tier4_orchestration_state/phase_outputs/"
+        "phase2_concept_refinement/gate_result.json",
+    )
+    # the four readable gate results from the fixture are still present
+    assert {s.gate_id for s in scan.gate_states} == {
+        "gate_01_source_integrity",
+        "phase_01_gate",
+        "phase_03_gate",
+        "gate_10a_excellence_completeness",
+    }
+
+
+def test_scan_unreadable_empty_when_all_readable(tier4_repo):
+    scan = scan_tier4_gate_states(tier4_repo)
+    assert scan.unreadable == ()
+    assert len(scan.gate_states) == 4
+
+
+def test_read_tier4_gate_states_is_readable_subset(tier4_repo):
+    # The back-compat wrapper returns exactly the readable states, even with a
+    # corrupt file present (which it silently omits — callers wanting the gap use
+    # scan_tier4_gate_states).
+    _write_corrupt_gate(tier4_repo, "phase2_concept_refinement", "gate_result.json")
+    states = read_tier4_gate_states(tier4_repo)
+    scan = scan_tier4_gate_states(tier4_repo)
+    assert states == scan.gate_states
+
+
+def test_scan_non_object_json_is_unreadable(tmp_path):
+    # A *.json that parses but is not an object (e.g. a bare list) is corrupt for
+    # gate-mirror purposes and surfaced, not confused with a non-gate summary.
+    root = tmp_path / "repo"
+    p = root / "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/gate_result.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("[1, 2, 3]", encoding="utf-8")
+    scan = scan_tier4_gate_states(root)
+    assert scan.gate_states == ()
+    assert scan.unreadable == (
+        "docs/tier4_orchestration_state/phase_outputs/"
+        "phase1_call_analysis/gate_result.json",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -221,7 +314,41 @@ def test_real_tier4_projects_into_tmp_vault(repo_root, tmp_path):
     vault.mkdir()
     result = project(repo_root, vault)
     assert len(result.written) == len(result.gate_states) >= 1
+    assert result.unreadable == ()  # real corpus is clean → complete mirror
     read_vault(vault)  # parses without error
+
+
+def test_project_surfaces_unreadable_and_mirrors_the_rest(tier4_repo, tmp_path):
+    # A corrupt gate-result present alongside good ones: the readable four still
+    # mirror, and the corruption is surfaced on the result (never silently lost).
+    _write_corrupt_gate(tier4_repo, "phase2_concept_refinement", "gate_result.json")
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    result = project(tier4_repo, vault)
+    assert len(result.written) == 4
+    assert result.unreadable == (
+        "docs/tier4_orchestration_state/phase_outputs/"
+        "phase2_concept_refinement/gate_result.json",
+    )
+
+
+def test_project_all_readable_reports_no_unreadable(tier4_repo, tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    result = project(tier4_repo, vault)
+    assert result.unreadable == ()
+
+
+def test_project_fails_closed_on_schema_invalid_node(tier4_repo, tmp_path, monkeypatch):
+    # The projector guarantees schema-valid mirror nodes; if a regression made it
+    # emit an invalid node_type, project() must fail closed, not write garbage.
+    import runner.graph_projector as gp
+
+    monkeypatch.setattr(gp, "PROJECTOR_NODE_TYPE", "not_a_real_node_type")
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    with pytest.raises(GraphProjectionError, match="schema-invalid mirror node"):
+        project(tier4_repo, vault)
 
 
 # ---------------------------------------------------------------------------
@@ -306,6 +433,27 @@ def test_cli_projects_into_config_vault(tier4_repo, tmp_path, capsys):
     assert code == 0
     assert "project=cli-test" in capsys.readouterr().out
     assert (tier4_repo / "vault" / PROJECTOR_OWNED_FOLDER).is_dir()
+
+
+def test_cli_reports_unreadable_gate_files(tier4_repo, tmp_path, capsys):
+    from runner.graph_projector import main as projector_main
+
+    _write_corrupt_gate(tier4_repo, "phase2_concept_refinement", "gate_result.json")
+    cfg = tier4_repo / "graph.config.yaml"
+    cfg.write_text(
+        "project_id: cli-corrupt\n"
+        "vault_path: vault\n"
+        "bindings:\n"
+        f"  - match: {{folder: \"{PROJECTOR_OWNED_FOLDER}\", node_type: {PROJECTOR_NODE_TYPE}}}\n"
+        "    tier: tier4\n",
+        encoding="utf-8",
+    )
+    (tier4_repo / "vault").mkdir()
+    code = projector_main(["--config", str(cfg), "--repo-root", str(tier4_repo)])
+    out = capsys.readouterr()
+    assert code == 0  # best-effort mirror still succeeds…
+    assert "unreadable=1" in out.out  # …but the gap is surfaced on stdout…
+    assert "phase2_concept_refinement/gate_result.json" in out.err  # …and named on stderr
 
 
 def test_cli_fail_closed_on_overlap_config(tmp_path, capsys):
