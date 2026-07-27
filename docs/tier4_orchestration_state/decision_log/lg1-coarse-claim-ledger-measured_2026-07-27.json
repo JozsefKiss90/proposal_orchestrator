@@ -1,0 +1,64 @@
+{
+  "decision_id": "lg1_coarse_claim_ledger_measured_2026-07-27T00-00-00Z",
+  "decision_type": "eval_measurement_and_ledger_granularity_acceptance",
+  "invoking_agent": "phase8-review ticket 7 (LG-1) implementation",
+  "phase_context": "Carried backlog from HANDOFF_phase8_m2t10_2026-07-22.md §4.4. The milestone-2 graph compiler emits one node-level proposal_section claim per Part B sub-section (a 'table of contents' ledger); the monolithic drafter emitted a granular per-assertion ledger. The operator accepted the coarse ledger provisionally; this ticket measures the gap offline (eval harness E2/E3/E4, zero DAG runs) and converts the provisional acceptance into a recorded, evidenced decision.",
+  "run_id_reference": "No DAG run. Offline deterministic measurement over frozen Tier-5 artifacts (harness track; graph branch). Sections carry run_id=msca-pf-graph-01.",
+  "authority": [
+    "plans/tickets_phase8_review.md ticket 7 (LG-1 — Coarse claim ledger, measured)",
+    "HANDOFF_phase8_m2t10_2026-07-22.md §4.4 (coarse-ledger provisional acceptance to be measured)",
+    "CLAUDE.md §9.4 (durable decisions to Tier 4), §9.5 (reproducible from documented inputs), §10.5 (material claims traceable; unattributed claims flagged not asserted), §12.2 (status vocabulary Confirmed/Inferred/Assumed/Unresolved), §17.5.3 (deterministic byte-equal replay as the anti-fabrication guarantee)",
+    "harness/HARNESS.md (E2 status-aware faithfulness, E3 claim-ledger completeness, E4 regression golden-set), decision_log/e2-status-aware-faithfulness-framework_2026-07-20.json, e3-claim-ledger-completeness_2026-07-21.json (open item: a live E2/E3 run awaits a configured non-Claude judge endpoint), e4-regression-golden-set_2026-07-21.json",
+    "decision_log/ms2-ticket8-author-proposal-graph_2026-07-20.json (the compiler's status-preserving 'proposal_section = synthesis -> inferred, claims section-level not sub-section-attributed' rule)"
+  ],
+  "prerequisite_gate_status": "N/A — measurement + decision ticket, not a gated phase. Blocked by nothing (frontier). The harness is one-way isolated from runner/ and is never a runtime gate.",
+  "measurement": {
+    "method": "Deterministic, offline, zero judge, zero DAG. harness/ledger_granularity.py (in the out-of-band harness package, not scripts/ which must stay harness-free per the one-way import boundary) composes existing harness primitives: E4 golden-set comparison (harness.regression.compare_to_golden_set), E2 claim loader (harness.status_faithfulness.load_section_claims), and E3/materiality prose surface (harness.claim_ledger.chunk_prose, harness.materiality._sentences). Drafter-era ledgers are the E4 golden baselines (harness/regression_baselines/*.golden.json, frozen 2026-07-21, preserved byte-for-byte); graph-sourced sections are the current docs/tier5_deliverables/proposal_sections/*.json.",
+    "full_report": "docs/tier4_orchestration_state/decision_log/lg1_ledger_granularity_measurement_2026-07-27.json",
+    "prose_byte_identity": "12/12 sub-sections byte-identical (per-sub-section content SHA-256 matches the golden). The ledger is the ONLY variable; the cardinality deficit is exact, not confounded by content drift.",
+    "per_section": {
+      "excellence": {"sub_sections": 5, "drafter_claims": 191, "drafter_confirmed": 167, "graph_claims": 5, "graph_status": "all inferred", "ratio": 38.2, "e4_claim_removed": 182},
+      "impact": {"sub_sections": 4, "drafter_claims": 119, "drafter_confirmed": 107, "graph_claims": 4, "graph_status": "all inferred", "ratio": 29.75, "e4_claim_removed": 119},
+      "implementation": {"sub_sections": 3, "drafter_claims": 96, "drafter_confirmed": 85, "graph_claims": 3, "graph_status": "all inferred", "ratio": 32.0, "e4_claim_removed": 93}
+    },
+    "totals": {
+      "sub_sections": 12,
+      "drafter_era_claims": 406,
+      "drafter_era_confirmed": 359,
+      "graph_sourced_claims": 12,
+      "graph_sourced_status": "all inferred (0 confirmed)",
+      "cardinality_ratio_drafter_over_graph": 33.83,
+      "drafter_claims_per_sub_section": 33.83,
+      "graph_claims_per_sub_section": 1.0,
+      "e4_breaking_findings": 394,
+      "e4_confirmed_share_drop": "~0.88 -> 0.00 in every section",
+      "assertion_surface_sentences_proxy": 1788
+    },
+    "coarse_ledger_shape": "Graph claims carry only {claim_id, claim_summary, status}; no per-claim source_ref. The 5/4/3 summaries are the evaluation criterion + its sub-criterion titles. Grounding is declared once at section level in traceability_footer.primary_sources (16 sources for excellence) plus no_unsupported_claims_declaration, with overall_status=inferred. It is a section-level synthesis posture, not a per-assertion attribution."
+  },
+  "judge_layer_limitation": {
+    "not_run": "E2 (per-claim faithfulness scoring) and E3 (semantic prose decomposition + coverage matching) — the judge-scored layers — were NOT executed.",
+    "reason": "Both require an independent, non-Claude judge endpoint (OpenAI-compatible transport). None is configured under this repo's subscription-only claude_cli transport, and harness/judge.py structurally refuses the drafter's own model for grader-generator independence. Fabricating judge verdicts would violate CLAUDE.md §13 and the harness's own guardrails. This matches the harness's recorded state (e3 decision-log open item: 'A live (non-stub) E3 run over the three sections awaits a configured OpenAI-compatible judge endpoint').",
+    "why_deterministic_evidence_is_sufficient": "The prose is byte-identical, so E3's decomposition would yield the SAME material-assertion set for both variants — the completeness denominator is held constant. Only the ledger (numerator of attribution) differs. A single node-level record per multi-paragraph sub-section cannot atomically attribute the dozens of assertions the ~34-record drafter ledger attributes; the measured 33.8x cardinality deficit over identical prose is therefore a firm lower bound on the judge-scored escaped-material-assertion gap. The status axis is fully deterministic and judge-independent: graph = 0 confirmed claims, drafter = 359 confirmed claims."
+  },
+  "decision": "ACCEPT COARSE (measured). The provisional acceptance of the graph compiler's ~1-per-sub-section node-level claim ledger is confirmed as a recorded decision. The compiler's ledger derivation is NOT enriched; no enrichment follow-up ticket is filed. A re-open trigger is recorded (below).",
+  "decision_rationale": [
+    "Zero evaluator-facing regression: the prose is byte-identical across all 12 sub-sections (verified by content SHA-256 vs the E4 goldens). The document an evaluator reads is unchanged; only the machine-readable claim ledger differs.",
+    "Status honesty favors the coarse ledger: the graph ledger makes 0 'confirmed' claims — every claim is 'inferred' (synthesis over confirmed facts, per the compiler's status-preserving rule) with section-level provenance. The drafter ledger stamped 359 claims 'confirmed'. E2 exists precisely because a deterministic predicate can see only that a source_ref field is non-blank, never whether the source supports the sentence — so the drafter's 359 confirmed stamps are 359 unverifiable 'gap-masked-as-confirmed' integrity risks, while the coarse ledger asserts none it cannot back. Coarse-but-honest > granular-but-overclaimed.",
+    "Determinism / replayability: the graph ledger is deterministically derived from the vault (byte-equal replayable), aligning with the repo's core anti-fabrication guarantee (§17.5.3). The 406-entry drafter ledger is a non-replayable stochastic LLM artifact.",
+    "The §10.5 escaped-claim risk is bounded here: §10.5 targets unattributed *confirmed* assertions. A section that declares itself overall_status=inferred synthesis with a section-level traceability_footer is not asserting unattributed confirmed facts. Enriching would either keep every derived sub-claim 'inferred' (finer audit trail but same evidential status — modest gain for real derivation complexity) or re-introduce per-claim 'confirmed' stamps the deterministic compiler cannot justify without a judge — re-opening the exact integrity hole the graph design closed."
+  ],
+  "re_open_trigger": "Revisit this acceptance if, once an independent (non-Claude) judge endpoint is configured (e.g. after harness E5), a full judge-scored E2/E3 run over these three sections shows an escaped-material-assertion rate above an operator-set bar, OR if a downstream evaluator/audit requirement demands per-assertion (not section-level) claim traceability. Until such evidence exists, the coarse ledger stands as accepted, not provisional.",
+  "verification": {
+    "reproducibility": "py -3.10 -m harness.ledger_granularity (deterministic; re-derives every number above and rewrites the full report). Inputs are committed: the graph-sourced sections and the E4 golden baselines.",
+    "tests": "tests/harness/test_measure_ledger_granularity.py asserts the load-bearing measured facts (prose byte-identity 12/12, all-inferred graph ledger vs confirmed-heavy drafter ledger, the 406-vs-12 cardinality gap, E4 breaking-finding presence) so a future change to the compiler or the goldens that would invalidate this decision surfaces as a red test.",
+    "no_fabrication": "No judge verdict is fabricated; the judge layer is explicitly recorded as not-run with its reason. No project fact authored. Reads Tier-5 + harness goldens read-only; writes only this decision log, the measurement report, the script, and its test."
+  },
+  "constitutional_check": "No §17 runtime-contract, scheduler, node-state, or gate-evaluation change. No gate evaluated (the harness is out-of-band and never a runtime gate, §17.6.2). No CLAUDE.md amendment required. Decision + evidence written durably to Tier 4 (§9.4) and reproducible from documented inputs (§9.5). The measurement uses the §12.2 status vocabulary as reported by the artifacts (confirmed/inferred). No higher tier modified.",
+  "open_items": [
+    "Judge-scored E2/E3 over the three sections remains pending a configured non-Claude judge endpoint (carries the harness's standing open item; not blocking this decision).",
+    "If the re-open trigger fires, file the compiler-enrichment ticket then with the measured target (~34 claim_status per sub-section) — out of scope here."
+  ],
+  "resolution_status": "resolved",
+  "timestamp": "2026-07-27T00:00:00Z"
+}
