@@ -104,10 +104,10 @@ entry point) is the intended vehicle.
 
 **Blocked by:** None — can start immediately. Must run locally (not in a cloud sandbox).
 
-- [ ] On timeout the transport kills the full child process tree on both platforms and raises the existing timeout exception — no orphaned Node processes.
-- [ ] A unit test with a dummy long-running child (spawning its own child) proves the tree dies at timeout; mocked-transport tests are unaffected.
-- [ ] Live validation on the local CLI (the `A-transport` lane or a manual stalled-call reproduction): the call fails at the configured timeout instead of hanging.
-- [ ] No change to transport semantics on the success path (same result contract, same exceptions).
+- [x] On timeout the transport kills the full child process tree on both platforms and raises the existing timeout exception — no orphaned Node processes. — `invoke_claude_text` moved from `subprocess.run` to `Popen` + `communicate(timeout=...)` so the child handle survives the timeout; `_kill_process_tree` does `taskkill /F /T /PID` on Windows and `killpg` on POSIX (child spawned with `start_new_session=True` via `_tree_killable_popen_kwargs`, so the group kill can never reach the caller), then drains/reaps and raises the existing `ClaudeCLITimeoutError` with elapsed/command diagnostics. Non-timeout communicate failures tree-kill before raising too.
+- [x] A unit test with a dummy long-running child (spawning its own child) proves the tree dies at timeout; mocked-transport tests are unaffected. — new `tests/runner/test_claude_transport_treekill.py` spawns a real parent→grandchild Python tree via the transport's own popen-kwargs helper and asserts both PIDs die; red-capable (the old direct-child-only kill leaves the grandchild alive). Mocked suite adapted to the Popen boundary (+ tree-kill-on-timeout, drained-output-fallback, communicate-failure tests); 40/40 green.
+- [x] Live validation on the local CLI (the `A-transport` lane or a manual stalled-call reproduction): the call fails at the configured timeout instead of hanging. — manual stalled-call repro, 2026-07-27 (A-transport lane skipped: its opener re-diagnoses the already-fixed bug from scratch and `claude_agent_sdk` isn't installed): real `claude -p` (sonnet-4-6, count-to-20000 workload, `timeout_seconds=20`) raised `ClaudeCLITimeoutError` at 21.7s elapsed (26.0s incl. kill+drain) vs the pre-fix ~2h hang; zero new `claude.exe`/`node.exe` survivors after the kill.
+- [x] No change to transport semantics on the success path (same result contract, same exceptions). — same contract preserved (system-prompt embed fallback, `--tools`, output-token env ceiling, empty-stdout and non-zero-exit errors); the success-path assertions in the rewritten mocked suite are unchanged and pass.
 
 ## 6. ST-1 — Phase 3–6 staleness: content, not mtime (carried from m2t10 §4.3)
 

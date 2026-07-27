@@ -21,6 +21,7 @@ Authoritative source:
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import time
 
@@ -108,6 +109,100 @@ _MAX_SYSTEM_PROMPT_CLI_LENGTH: int = 24_000
 #: semantics, no gate logic, and no artifact schema.  An operator-supplied
 #: value in the environment always wins.
 _MAX_OUTPUT_TOKENS_DEFAULT: str = "32000"
+
+#: True on Windows (``os.name == "nt"``), False on POSIX.
+_IS_WINDOWS: bool = os.name == "nt"
+
+#: Bound on how long we wait for the process-tree kill (and the post-kill
+#: pipe drain) to complete.  A forceful kill of an already-known PID returns
+#: near-instantly; this is a safety ceiling, not a tuning knob.
+_TREE_KILL_TIMEOUT_SECONDS: int = 10
+
+
+# ---------------------------------------------------------------------------
+# Process-tree termination (TR-1)
+# ---------------------------------------------------------------------------
+
+
+def _tree_killable_popen_kwargs() -> dict:
+    """Platform-specific ``Popen`` kwargs that make the child tree killable.
+
+    On POSIX, ``start_new_session=True`` runs the child in its own session and
+    process group (``setsid``), so :func:`_kill_process_tree` can signal the
+    whole group — including grandchildren such as the ``claude`` CLI's Node
+    child — without ever reaching this process's own group (the test runner).
+
+    On Windows this returns no extra kwargs: ``taskkill /T`` walks the
+    parent/child PID tree from the direct child's PID, so no process-group
+    creation flag is required, and adding one would needlessly alter the
+    child's console-signal behavior.
+
+    The transport and its regression tests must spawn children through the
+    *same* helper so the kill semantics they exercise match production.
+    """
+    if _IS_WINDOWS:
+        return {}
+    return {"start_new_session": True}
+
+
+def _kill_process_tree(proc: subprocess.Popen) -> None:
+    """Forcibly terminate *proc* and its entire descendant process tree.
+
+    Python's own timeout handling (``subprocess.run(timeout=...)`` internally,
+    or a bare ``proc.kill()``) terminates only the *direct* child.  On both
+    platforms that leaves the ``claude`` CLI's Node child tree orphaned and
+    running — the ~2h "stalled" hang this fix (TR-1) closes.
+
+    This is a best-effort, exception-swallowing teardown: a failure to kill
+    must never mask the timeout error that motivated the kill.  It is a no-op
+    if *proc* has already exited (guarding the PID-reuse window: we only kill
+    a PID we still hold and have not reaped).
+    """
+    if proc.poll() is not None:
+        return  # already exited — nothing to kill, and its PID may be reused
+
+    if _IS_WINDOWS:
+        # /T terminates the process and every descendant; /F forces it.
+        try:
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                capture_output=True,
+                timeout=_TREE_KILL_TIMEOUT_SECONDS,
+                shell=False,
+            )
+            return
+        except Exception:
+            # Fall through to a direct-child kill as a last resort.
+            pass
+    else:
+        # The child leads its own process group (start_new_session=True);
+        # signal the whole group so grandchildren die with it.
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            return
+        except (ProcessLookupError, PermissionError, OSError):
+            # Process/group already gone, or not permitted — fall through.
+            pass
+
+    try:
+        proc.kill()
+    except Exception:
+        pass
+
+
+def _drain_after_kill(
+    proc: subprocess.Popen,
+) -> tuple[str | None, str | None]:
+    """Drain and reap *proc* after a tree kill; return any buffered output.
+
+    Once the tree is dead the pipes hit EOF, so this returns promptly.  It is
+    called only from failure paths and must never raise: a drain failure must
+    not mask the timeout/transport error being surfaced.
+    """
+    try:
+        return proc.communicate(timeout=_TREE_KILL_TIMEOUT_SECONDS)
+    except Exception:
+        return None, None
 
 
 # ---------------------------------------------------------------------------
@@ -199,58 +294,87 @@ def invoke_claude_text(
     _env = os.environ.copy()
     _env.setdefault("CLAUDE_CODE_MAX_OUTPUT_TOKENS", _MAX_OUTPUT_TOKENS_DEFAULT)
 
+    # Use Popen (not subprocess.run) so that on timeout we still hold a handle
+    # to the child and can kill its *entire* process tree.  subprocess.run's
+    # internal timeout path kills only the direct child, orphaning the claude
+    # CLI's Node grandchild (TR-1).  Popen.communicate(timeout=...) does not
+    # auto-kill on timeout, which is exactly what lets us tree-kill ourselves.
     _t0 = time.monotonic()
     try:
-        completed = subprocess.run(
+        proc = subprocess.Popen(
             cmd,
-            input=effective_user_prompt,
-            capture_output=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
             encoding="utf-8",
-            timeout=timeout_seconds,
             shell=False,
             env=_env,
+            **_tree_killable_popen_kwargs(),
         )
     except FileNotFoundError:
         raise ClaudeCLIUnavailableError(
             "The 'claude' CLI executable was not found on PATH. "
             "Ensure Claude Code is installed and available."
         )
+    except Exception as exc:
+        # Spawn failed for some other reason (e.g. OSError); preserve the
+        # original contract of wrapping unexpected failures.
+        raise ClaudeTransportError(
+            f"Claude CLI invocation failed: {type(exc).__name__}: {exc}"
+        ) from exc
+
+    try:
+        stdout, stderr = proc.communicate(
+            input=effective_user_prompt,
+            timeout=timeout_seconds,
+        )
     except subprocess.TimeoutExpired as exc:
         _elapsed = time.monotonic() - _t0
+        # Kill the whole tree (the direct child *and* its Node descendants),
+        # then drain any buffered output so the child is reaped and no pipe
+        # readers are left dangling.
+        _kill_process_tree(proc)
+        _drained_out, _drained_err = _drain_after_kill(proc)
+        _to_out = exc.stdout if isinstance(exc.stdout, str) else _drained_out
+        _to_err = exc.stderr if isinstance(exc.stderr, str) else _drained_err
         raise ClaudeCLITimeoutError(
             f"Claude CLI invocation timed out after {timeout_seconds}s",
-            stdout=exc.stdout if isinstance(exc.stdout, str) else None,
-            stderr=exc.stderr if isinstance(exc.stderr, str) else None,
+            stdout=_to_out if isinstance(_to_out, str) else None,
+            stderr=_to_err if isinstance(_to_err, str) else None,
             command=cmd,
             timeout_seconds=timeout_seconds,
             elapsed_seconds=round(_elapsed, 3),
         )
     except Exception as exc:
+        # Any other communication failure: make sure we don't leak the child
+        # (or its tree) before surfacing the error.
+        _kill_process_tree(proc)
+        _drain_after_kill(proc)
         raise ClaudeTransportError(
             f"Claude CLI invocation failed: {type(exc).__name__}: {exc}"
         ) from exc
 
-    if completed.returncode != 0:
-        stderr_snippet = (completed.stderr or "").strip()[:500]
+    returncode = proc.returncode
+    if returncode != 0:
+        stderr_snippet = (stderr or "").strip()[:500]
         raise ClaudeTransportError(
-            f"Claude CLI exited with code {completed.returncode}"
+            f"Claude CLI exited with code {returncode}"
             + (f": {stderr_snippet}" if stderr_snippet else ""),
-            stderr=completed.stderr,
-            stdout=completed.stdout,
+            stderr=stderr,
+            stdout=stdout,
         )
 
-    stdout = completed.stdout
     if not stdout or not stdout.strip():
         raise ClaudeTransportError(
             "Claude CLI returned empty output"
             + (
-                f" (stderr: {(completed.stderr or '').strip()[:300]})"
-                if completed.stderr
+                f" (stderr: {(stderr or '').strip()[:300]})"
+                if stderr
                 else ""
             ),
-            stderr=completed.stderr,
-            stdout=completed.stdout,
+            stderr=stderr,
+            stdout=stdout,
         )
 
     return stdout
