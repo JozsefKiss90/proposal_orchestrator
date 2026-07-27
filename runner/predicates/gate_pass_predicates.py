@@ -4,8 +4,10 @@ Gate-pass predicate: gate_pass_recorded.
 Confirms that a gate result artifact exists at its canonical path (§6.3 of
 artifact_schema_specification.yaml), declares the required gate-result
 schema_id, records status: pass, carries a run_id that matches the current run,
-has an input_fingerprint field, and has an evaluated_at timestamp that is not
-older than the mtime of any upstream required input artifact.
+has an input_fingerprint field, and is fresh with respect to its upstream
+required inputs — where freshness is judged by *content* (per-artifact
+fingerprint comparison), not wall-clock mtime, per ST-1.  See
+:func:`is_gate_fresh`.
 
 See gate_rules_library_plan.md §3 and §6.3 for the full specification.
 """
@@ -18,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Union
 
+from runner.fingerprints import fingerprint_path
 from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.paths import resolve_repo_path
 from runner.predicates.types import (
@@ -71,26 +74,36 @@ def _parse_iso8601(ts: Any) -> Optional[datetime]:
         return None
 
 
-def _max_upstream_mtime(
+def _mtime_suspect_inputs(
     gate_id: str,
+    evaluated_at_posix: float,
     repo_root: Optional[Path],
-) -> Optional[float]:
-    """Return the maximum mtime (POSIX float) of upstream required inputs.
+) -> list[tuple[str, Path]]:
+    """Return upstream inputs whose mtime postdates *evaluated_at_posix*.
+
+    mtime is a cheap, conservative *trigger* for content re-checking (ST-1):
+    an input whose mtime does not postdate the evaluation was not touched since
+    the gate ran and is definitely unchanged, so no content hashing is needed
+    for it.  An input whose mtime *does* postdate the evaluation is a "suspect"
+    whose content must be confirmed against the fingerprint recorded at
+    evaluation time before the gate can be judged fresh or stale.
 
     Only paths that currently exist are considered; non-existent paths are
     silently skipped (their absence is checked by file predicates elsewhere).
     Directories use their own mtime (not a recursive child scan).
-    Returns None if no upstream path exists.
+
+    Returns
+    -------
+    list[tuple[str, Path]]
+        ``(repo_relative_path, resolved_path)`` for each mtime-suspect input,
+        in ``UPSTREAM_REQUIRED_INPUTS`` order.
     """
-    paths = UPSTREAM_REQUIRED_INPUTS.get(gate_id, [])
-    max_ts: Optional[float] = None
-    for raw in paths:
+    suspects: list[tuple[str, Path]] = []
+    for raw in UPSTREAM_REQUIRED_INPUTS.get(gate_id, []):
         resolved = resolve_repo_path(raw, repo_root)
-        if resolved.exists():
-            mtime = resolved.stat().st_mtime
-            if max_ts is None or mtime > max_ts:
-                max_ts = mtime
-    return max_ts
+        if resolved.exists() and resolved.stat().st_mtime > evaluated_at_posix:
+            suspects.append((raw, resolved))
+    return suspects
 
 
 def _check_continuation_acceptance(
@@ -141,17 +154,35 @@ def is_gate_fresh(
 ) -> tuple[bool, Optional[str], list[str]]:
     """Check whether a gate result is fresh relative to its upstream inputs.
 
-    Reuses the same freshness logic as step 9 of :func:`gate_pass_recorded`:
-    compares the ``evaluated_at`` timestamp from *gate_result_data* against the
-    modification timestamps of upstream required inputs declared in
-    :data:`runner.upstream_inputs.UPSTREAM_REQUIRED_INPUTS`.
+    Reuses the same freshness logic as step 9 of :func:`gate_pass_recorded`.
+    Staleness is judged by **content**, not wall-clock mtime (ST-1): mtime is
+    a cheap, conservative *trigger* only.  An upstream input whose mtime does
+    not postdate ``evaluated_at`` was not touched since the gate ran and is
+    definitely unchanged (fast path — no hashing).  For an input whose mtime
+    *does* postdate ``evaluated_at`` ("mtime-suspect"), freshness is confirmed
+    by comparing the input's *current* content fingerprint against the
+    fingerprint recorded for that path in the gate result's
+    ``input_artifact_fingerprints`` at evaluation time:
+
+    * current fingerprint == recorded  → the mtime bump was spurious (e.g. a
+      Tier-3 re-promote that rewrote the file with identical or provenance-only
+      content); the input is unchanged and does not make the gate stale.
+    * current fingerprint != recorded  → the input genuinely changed → stale.
+    * no recorded fingerprint to confirm against (field absent, or this path
+      missing from the map) → cannot prove the input is unchanged → **fail
+      closed** as stale (the pre-ST-1 mtime behaviour for that input).
+
+    This is a strict relaxation of the prior mtime-only rule: nothing the old
+    check accepted is now rejected; only demonstrably-spurious mtime positives
+    are removed.
 
     Parameters
     ----------
     gate_id:
         Gate identifier (must be a key in ``UPSTREAM_REQUIRED_INPUTS``).
     gate_result_data:
-        Parsed gate result dict (must contain ``evaluated_at``).
+        Parsed gate result dict (must contain ``evaluated_at``; consults
+        ``input_artifact_fingerprints`` for the content confirmation).
     repo_root:
         Repository root for resolving upstream input paths.
 
@@ -162,8 +193,9 @@ def is_gate_fresh(
 
         * ``is_fresh``: ``True`` when the gate result is not stale.
         * ``reason``: Human-readable explanation when stale; ``None`` when fresh.
-        * ``stale_inputs``: List of upstream input paths whose mtime exceeds
-          ``evaluated_at``; empty when fresh.
+        * ``stale_inputs``: Upstream input paths that are mtime-suspect **and**
+          whose content could not be confirmed identical to what the gate
+          evaluated; empty when fresh.
     """
     evaluated_at_raw = gate_result_data.get("evaluated_at")
     if evaluated_at_raw is None:
@@ -179,21 +211,44 @@ def is_gate_fresh(
         )
 
     evaluated_at_posix = evaluated_at_dt.timestamp()
-    max_mtime = _max_upstream_mtime(gate_id, repo_root)
 
-    if max_mtime is not None and evaluated_at_posix < max_mtime:
-        stale_inputs: list[str] = []
-        for raw_path in UPSTREAM_REQUIRED_INPUTS.get(gate_id, []):
-            resolved = resolve_repo_path(raw_path, repo_root)
-            if resolved.exists() and resolved.stat().st_mtime > evaluated_at_posix:
-                stale_inputs.append(raw_path)
+    # mtime is only a trigger: inputs not touched since evaluation are unchanged
+    # and need no content check (fast path, identical to pre-ST-1 for the
+    # common case).
+    suspects = _mtime_suspect_inputs(gate_id, evaluated_at_posix, repo_root)
+    if not suspects:
+        return True, None, []
+
+    # One or more inputs were modified after evaluation (by mtime).  Confirm by
+    # CONTENT against the per-artifact fingerprints the gate evaluator recorded
+    # at evaluation time.  Only inputs whose content actually differs — or that
+    # lack recorded fingerprint evidence to confirm against (fail closed) —
+    # make the gate stale.
+    recorded_fps = gate_result_data.get("input_artifact_fingerprints")
+    if not isinstance(recorded_fps, dict):
+        recorded_fps = {}
+
+    changed_inputs: list[str] = []
+    for raw_path, resolved in suspects:
+        recorded = recorded_fps.get(raw_path)
+        if not isinstance(recorded, str) or not recorded:
+            # No recorded fingerprint to prove this input is unchanged.
+            changed_inputs.append(raw_path)
+            continue
+        if fingerprint_path(resolved) != recorded:
+            changed_inputs.append(raw_path)
+
+    if changed_inputs:
         return (
             False,
-            f"Gate result for '{gate_id}' is stale: evaluated_at "
-            f"{evaluated_at_raw} predates upstream input modifications",
-            stale_inputs,
+            f"Gate result for '{gate_id}' is stale: upstream inputs changed "
+            f"since evaluation (content differs from recorded fingerprint): "
+            f"{changed_inputs}",
+            changed_inputs,
         )
 
+    # Every mtime-suspect input is content-identical to what the gate
+    # evaluated — the gate is fresh despite the newer mtimes.
     return True, None, []
 
 
@@ -216,7 +271,9 @@ def gate_pass_recorded(
     6. Recorded manifest_version matches the current MANIFEST_VERSION.
     7. Recorded status equals "pass".
     8. input_fingerprint is a non-empty string.
-    9. evaluated_at is not older than the mtime of any upstream required input.
+    9. Every upstream required input is fresh by content: an input modified
+       after evaluated_at (by mtime) must match its recorded per-artifact
+       fingerprint (see is_gate_fresh — ST-1, content over mtime).
 
     Args:
         gate_id:    ID of the gate whose result is being checked (must be a
@@ -444,7 +501,8 @@ def gate_pass_recorded(
             },
         )
 
-    # 9 — freshness: evaluated_at must not predate any upstream input's mtime
+    # 9 — freshness: mtime-suspect upstream inputs must match their recorded
+    # content fingerprints (ST-1 — staleness judged by content, not mtime).
     fresh, fresh_reason, stale_inputs = is_gate_fresh(gate_id, data, repo_root)
     if not fresh:
         # Determine failure category: unparseable timestamp → MALFORMED_ARTIFACT;

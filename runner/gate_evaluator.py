@@ -43,7 +43,6 @@ See gate_rules_library_plan.md §6 for the full specification.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,6 +60,7 @@ from runner.gate_result_registry import (
     GATE_RESULT_SCHEMA_ID,
     TIER4_ROOT_REL,
 )
+from runner.fingerprints import compute_fingerprints
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.coverage_predicates import (
@@ -275,59 +275,6 @@ def _extract_node_id(evaluated_at: str) -> str:
     """
     parts = (evaluated_at or "").strip().split()
     return parts[0] if parts else "unknown"
-
-
-def _fingerprint_path(path: Path) -> str:
-    """
-    Compute a deterministic SHA-256 fingerprint of *path*.
-
-    * **File**: SHA-256 of raw file bytes.
-    * **Directory**: SHA-256 of a JSON-encoded sorted list of direct-child
-      names (non-recursive).  This detects additions and removals of direct
-      children but not changes inside subdirectories.
-    * **Missing**: returns the sentinel string ``"sha256:MISSING"`` rather
-      than raising, so fingerprinting never blocks gate evaluation.
-    """
-    if not path.exists():
-        return "sha256:MISSING"
-    if path.is_dir():
-        entries = sorted(p.name for p in path.iterdir())
-        content = json.dumps(entries).encode("utf-8")
-    else:
-        content = path.read_bytes()
-    return "sha256:" + hashlib.sha256(content).hexdigest()
-
-
-def _compute_fingerprints(
-    artifact_paths: list[str],
-    repo_root: Path,
-) -> tuple[dict[str, str], str]:
-    """
-    Compute per-artifact fingerprints and a combined fingerprint.
-
-    Parameters
-    ----------
-    artifact_paths:
-        List of repo-relative (or absolute) path strings.
-    repo_root:
-        Repository root for resolving relative paths.
-
-    Returns
-    -------
-    per_artifact:
-        ``{path_string: "sha256:<hex>"}`` mapping, stable-sorted by path.
-    combined:
-        A single SHA-256 fingerprint derived from the stable JSON encoding
-        of *per_artifact*.  Used for the ``input_fingerprint`` field.
-    """
-    per_artifact: dict[str, str] = {}
-    for p in sorted(artifact_paths):  # sort for stability
-        resolved = resolve_repo_path(p, repo_root)
-        per_artifact[p] = _fingerprint_path(resolved)
-
-    combined_bytes = json.dumps(per_artifact, sort_keys=True).encode("utf-8")
-    combined = "sha256:" + hashlib.sha256(combined_bytes).hexdigest()
-    return per_artifact, combined
 
 
 def _gate_result_path(gate_id: str, repo_root: Path) -> Path:
@@ -666,7 +613,7 @@ def evaluate_gate(
     # 5. Compute input fingerprints
     # ------------------------------------------------------------------
     upstream_paths: list[str] = UPSTREAM_REQUIRED_INPUTS.get(gate_id, [])
-    per_artifact_fps, combined_fp = _compute_fingerprints(
+    per_artifact_fps, combined_fp = compute_fingerprints(
         upstream_paths, repo_root
     )
 

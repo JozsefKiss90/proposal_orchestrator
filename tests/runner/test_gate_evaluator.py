@@ -28,10 +28,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
+from runner.fingerprints import compute_fingerprints, fingerprint_path
 from runner.gate_evaluator import (
     PREDICATE_REGISTRY,
-    _compute_fingerprints,
-    _fingerprint_path,
     _substitute_runtime_args,
     evaluate_gate,
 )
@@ -248,7 +247,7 @@ class TestFingerprinting:
     def test_fingerprint_path_missing_file_returns_sentinel(
         self, tmp_path: Path
     ) -> None:
-        fp = _fingerprint_path(tmp_path / "nonexistent.json")
+        fp = fingerprint_path(tmp_path / "nonexistent.json")
         assert fp == "sha256:MISSING"
 
     def test_fingerprint_path_existing_file_returns_sha256(
@@ -256,7 +255,7 @@ class TestFingerprinting:
     ) -> None:
         f = tmp_path / "artifact.json"
         f.write_text('{"key": "value"}', encoding="utf-8")
-        fp = _fingerprint_path(f)
+        fp = fingerprint_path(f)
         expected = "sha256:" + hashlib.sha256(f.read_bytes()).hexdigest()
         assert fp == expected
 
@@ -267,7 +266,7 @@ class TestFingerprinting:
         d.mkdir()
         (d / "a.txt").write_text("hello", encoding="utf-8")
         (d / "b.txt").write_text("world", encoding="utf-8")
-        fp = _fingerprint_path(d)
+        fp = fingerprint_path(d)
         assert fp.startswith("sha256:")
         assert fp != "sha256:MISSING"
 
@@ -276,8 +275,8 @@ class TestFingerprinting:
     ) -> None:
         f = tmp_path / "art.json"
         f.write_text('{"x": 1}', encoding="utf-8")
-        per1, combined1 = _compute_fingerprints(["art.json"], tmp_path)
-        per2, combined2 = _compute_fingerprints(["art.json"], tmp_path)
+        per1, combined1 = compute_fingerprints(["art.json"], tmp_path)
+        per2, combined2 = compute_fingerprints(["art.json"], tmp_path)
         assert combined1 == combined2
         assert per1 == per2
 
@@ -286,9 +285,9 @@ class TestFingerprinting:
     ) -> None:
         f = tmp_path / "art.json"
         f.write_text('{"x": 1}', encoding="utf-8")
-        _, combined1 = _compute_fingerprints(["art.json"], tmp_path)
+        _, combined1 = compute_fingerprints(["art.json"], tmp_path)
         f.write_text('{"x": 2}', encoding="utf-8")
-        _, combined2 = _compute_fingerprints(["art.json"], tmp_path)
+        _, combined2 = compute_fingerprints(["art.json"], tmp_path)
         assert combined1 != combined2
 
     def test_per_artifact_fingerprints_in_gate_result(
