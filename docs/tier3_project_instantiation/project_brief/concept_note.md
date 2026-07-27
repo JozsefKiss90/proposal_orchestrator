@@ -9,13 +9,7 @@ Irrigation decisions for row crops must be made under compounding uncertainty: t
 
 ## Scientific and technical approach
 
-<<<<<<< Updated upstream
 ### The diagnostic branch — two routes, one shared decision engine *(framing: Inferred `[[Core Architecture]]`; routes: Confirmed)*
-=======
-MAESTRO is positioned within the call’s required maturity range, explicitly starting from TRL 2 at project outset — where core AI agent architectures, reasoning mechanisms, and coordination protocols are formulated and experimentally grounded — and advancing these through integration and validation in operational environments to TRL 5 by project end.
-
-### Scientific and Technical Approach
->>>>>>> Stashed changes
 
 A single thread runs under **two interchangeable routes** to the diagnosed field state, both feeding the same downstream decision engine:
 
@@ -55,12 +49,6 @@ The ten decisions from the analyst synthesis (prompt.txt §10) that turn this tw
 
 Hosted at **ELTE** under **Dr. András Jung**, the fellowship pairs the research work plan with structured training in the MSCA-PF mandatory transferable dimensions. A **Career Development Plan** is prepared jointly by supervisor and fellow and **submitted as a project deliverable at the start of the action** (by months 2–3), then reviewed and updated at M12 and M24. Training integrates **digital and AI skills** — including the responsible use of generative AI in environmental modelling and scientific coding — together with **knowledge valorisation and innovation/entrepreneurship** (translating the uncertainty-aware crop-water decision-support demonstrator toward user uptake) and **research integrity and open-science ethics** (FAIR data management, open research software, reproducible validation). These dimensions are grounded in the project's own methods (probabilistic modelling, an open validation protocol) and the host's **geoinformatics and remote-sensing** competences.
 
-<<<<<<< Updated upstream
 ## Source grounding
-=======
-The project follows a clearly defined maturity trajectory aligned with the call requirements: it starts from TRL 2, where foundational agent architectures and methods are developed and experimentally validated in controlled settings, and progresses to TRL 5 through integrated system validation in real-world operational environments across the demonstrator domains.
-
-**Call-Aligned Apply AI Sector Demonstrators**
->>>>>>> Stashed changes
 
 All research claims above trace to the pinned methodology vault (`MSCA/methodology_graph/`, SHA `b4d9e57`). Primary sources cited by the vault: `[[Source - Methodology Idea]]` (PI first-person design narrative), `[[Source - Methodology Synthesis Prompt]]` (analyst synthesis, prompt.txt), `[[Source - Literature Review]]` (Report A gap matrix; Report B probabilistic-novelty precedents). Consolidated per-fact provenance: `docs/tier3_project_instantiation/hand_lift_provenance.json`.

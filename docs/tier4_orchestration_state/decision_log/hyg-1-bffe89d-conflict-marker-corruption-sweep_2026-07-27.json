@@ -1,0 +1,65 @@
+{
+  "record_type": "decision",
+  "id": "hyg-1-bffe89d-conflict-marker-corruption-sweep",
+  "date": "2026-07-27",
+  "authority": "Explicit in-session operator instruction (2026-07-27): 'Fix the issue of the 14 remaining corrupt files related to ticket 10, HYG-1'. Git-hygiene repair of committed merge-conflict corruption plus a CLAUDE.md §12.3 contradiction-resolution record. NOT a constitutional amendment.",
+  "ticket": "HYG-1 (plans/tickets_phase8_review.md ticket 10) — the bffe89d conflict-marker corruption sweep for the 14 files remaining after DOD-1 8.1 resolved the 7 Tier-4 phase-output files.",
+  "cross_reference": "docs/tier4_orchestration_state/decision_log/dod-1-phase1-3-gate-result-conflict-resolution_2026-07-27.json — the DOD-1 8.1 sibling entry that resolved the FIRST 7 (Tier-4 gate-result) files of the same bffe89d corruption event ('resolve to upstream + log'). HYG-1 applies the identical direction (keep 'Updated upstream') to the remaining 14, extended per the auto-merge finding below.",
+
+  "trigger": "Commit bffe89d ('fixed branch drift', 2026-07-22) was a `git stash pop` committed with its conflicts UNRESOLVED, writing raw git conflict markers into 21 tracked source files across constitutional tiers. The two sides are a cross-era merge: 'Updated upstream' = the branch's own committed MSCA-PF / July-2026 state (bffe89d^ = 5801c4b); 'Stashed changes' = stale orphaned April-2026 RIA / MAESTRO work (topic HORIZON-CL4-2026-05-DIGITAL-EMERGING-02, 2026-04-21 timestamps, UUID runs ec190493/c084e3dd/cb3ad20d). DOD-1 8.1 fixed 7; this entry covers the remaining 14 (Tier 2A instrument schema, Tier 2B call sources, Tier 3 project instantiation, plans, README). 36 conflict regions total.",
+
+  "affected_files": [
+    "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+    "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json",
+    "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
+    "docs/tier2b_topic_and_call_sources/extracted/eligibility_conditions.json",
+    "docs/tier2b_topic_and_call_sources/extracted/evaluation_priority_weights.json",
+    "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
+    "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+    "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+    "docs/tier3_project_instantiation/call_binding/topic_mapping.json",
+    "docs/tier3_project_instantiation/project_brief/concept_note.md",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json",
+    "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
+    "plans/reports/backend_migration_plan.md",
+    "README.md"
+  ],
+
+  "method_finding_auto_merge": "The ticket prescribed the DOD-1 8.1 textual resolver (strip markers, keep upstream, drop stashed). Verification revealed that pure textual marker-resolution is INSUFFICIENT for 2 of the 14 files: the bad `git stash pop` also AUTO-MERGED non-conflicting insertions from the stashed (RIA) side OUTSIDE any conflict marker. In call_constraints.json a second CC-09/CC-10/CC-11 (three pure-RIA constraint objects, duplicate ids, source_document HORIZON-CL4-...-DIGITAL-EMERGING) sit in a shared region between two conflict blocks; scope_requirements.json has the analogous insertion. A textual keep-ours leaves these orphaned RIA objects in the MSCA-PF file (call_constraints +33 lines, scope_requirements +16 lines vs the true upstream), VIOLATING criterion 3 (no residual orphaned-RIA reference). The faithful realization of 'keep Updated upstream' is therefore to restore each file to its exact git 'Updated upstream' blob = bffe89d^ (5801c4b), which is byte-identical to textual keep-ours for the 12 marker-only files AND additionally removes the auto-merged insertions in the 2 contaminated files. Git only emits conflict markers where the two sides diverge, so restoring the 5801c4b blob reconstructs the pristine pre-corruption MSCA-PF file exactly.",
+
+  "safety_checks_before_apply": [
+    "No commit AFTER bffe89d touched any of the 14 files (`git log bffe89d..HEAD -- <14>` empty) — restoring to 5801c4b loses no legitimate post-corruption edit.",
+    "All 14 current working-tree files were byte-identical to their bffe89d-committed (corrupt) content — the corruption is the ONLY delta since 5801c4b.",
+    "All 14 5801c4b blobs verified clean: zero conflict markers; every .json parses; RIA tokens gone except the two legitimately-historical files (see per_file_direction_confirmation).",
+    "Marker structure audited across all 14 before touching: balanced start/sep/end counts, exact '=======' separator (no stray), no diff3 base markers (|||||||), well-formed SME nesting, all files LF-only.",
+    "Applied by writing raw `git show 5801c4b:<path>` blob bytes directly (unsmudged, LF-preserving) rather than `git checkout` (core.autocrlf=true would smudge LF->CRLF)."
+  ],
+
+  "per_file_direction_confirmation": {
+    "uniform_msca_vs_ria_split_11_files_keep_upstream_msca_pf": "upstream cites HORIZON-MSCA-2026-PF-01-01.slice.json / ef_he-msca; stashed cites HORIZON-CL4-...-DIGITAL-EMERGING-02 / call_entry.* — a clean MSCA-vs-RIA split. Files: the 5 Tier-2B extracted (call_constraints, eligibility_conditions, evaluation_priority_weights, expected_impacts, scope_requirements), Tier-3 call_binding (compliance_profile, topic_mapping), Tier-3 project_brief (concept_note.md, project_summary.json [upstream side empty -> drops a MAESTRO block that duplicated the real 'abstract' key], strategic_positioning.md), and the slice timestamp file.",
+    "section_schema_registry_json_non_uniform_keep_upstream": "region 1 = extracted_at date only (upstream 2026-07-14 newer vs stashed 2026-04-21); region 2 = wording of the SAME af_he-ria-ia_en.pdf Part-B page-limit note ('Applied automatically / hidden' upstream vs 'Enforced automatically / made invisible' stashed). af_he-ria-ia_en.pdf is the SHARED RIA/IA application form; its citation is legitimately historical (41 af_he-ria tokens retained; zero DIGITAL-EMERGING/MAESTRO).",
+    "backend_migration_plan_md_non_uniform_keep_upstream": "upstream = current VALIDATED phase-state table + §19 Phase-4 OPERATIONAL narrative that legitimately documents the historical RIA phase runs; stashed = older BLOCKED phase states. Conflict markers carried a rename suffix (:plans/reports/backend_migration_plan.md vs :backend_migration_plan.md) — the current path is the upstream one. 24 RIA tokens retained as legitimate migration history.",
+    "readme_md_non_uniform_keep_upstream": "upstream = current architecture description (deterministic dependency normalization, impact-pathway-core-builder TAPM); stashed = older Gantt/DAG description. Formatting/content diff, no MSCA-vs-RIA token split; keep upstream (current)."
+  },
+
+  "contradiction_analysis_12_3": "In every conflict region the two sides are the coherent MSCA-PF payload (upstream, on the 5801c4b lineage that is the branch's committed pre-stash-pop state and the current selected_call HORIZON-MSCA-2026-PF-01-01 identity) versus orphaned April-2026 RIA/MAESTRO state (stashed, topic HORIZON-CL4-...-DIGITAL-EMERGING-02). The contradiction is resolved uniformly toward upstream because it is the branch's own committed state and matches the active instrument (MSCA-PF); the stashed side is a dead April branch with no live run lineage. For the 2 auto-merge-contaminated files the contradiction additionally manifested as duplicate-id RIA objects co-existing (unmarked) with the MSCA objects — resolved by restoring the pristine upstream blob, which never contained them.",
+
+  "decision": {
+    "D1_restore_upstream_blob": "Restore all 14 files to their bffe89d^ (5801c4b) 'Updated upstream' blob. This IS 'keep Updated upstream, discard Stashed changes' realized exactly at the git-object level; for 12 files it equals textual keep-ours byte-for-byte, for 2 it additionally clears auto-merged RIA insertions.",
+    "D2_no_fabrication": "Pure restoration of the pristine committed upstream content — no field invented, edited, recomputed, or re-ordered. Each restored .json re-validated as parseable; the restored artifacts are byte-identical to the last legitimate committed version. §12.4 / §13.3 preserved: no gate outcome, constraint, or figure was manufactured.",
+    "D3_slice_existence_kept_flagged": "HORIZON-CL4-2026-05-DIGITAL-EMERGING-02.slice.json is an orphaned RIA-topic artifact in an MSCA-PF instance (active selected_call = HORIZON-MSCA-2026-PF-01-01; the slice is referenced only by a historical decision-log entry, the CL4 work-programme grouped source, and its sibling non-slice extract; absent from docs/index/). Per ticket criterion 5 and CLAUDE.md 'do not silently delete a Tier-2B source', it is KEPT (now clean JSON) and a removal-review follow-up (HYG-2, plans/tickets_phase8_review.md ticket 11) is filed. Removal must be considered for the whole orphaned-RIA set (slice + sibling HORIZON-CL4-...-DIGITAL-EMERGING-02.json + CL4 grouped source), not this one file in isolation.",
+    "D4_residual_pre_existing_test_out_of_scope": "test_instrument_profile.py::TestFailClosed::test_real_registries_resolve_msca_pf remains RED after the fix, but was one of the 3 pre-existing FAILURES before it (corrupt HEAD: 3 failed + 6 errors on this test file). It fails on a section-TAXONOMY expectation (the pristine registry marks MSCA-PF parent sections '1'/'2'/'3' as proposal_section, so drafting_sub_sections includes them; the test wants the 9 leaf sub-sections only). This is a property of the pristine committed registry, present in the 5801c4b blob, unrelated to the conflict markers and outside HYG-1's scope (a conflict-marker sweep). HYG-1 cleared 8 of the 9 instrument-profile reds (the 6 TestRealRIAProfile fixture errors + 2 of the 3 failures); the 9th is a data/test mismatch left for a separate MSCA-PF-taxonomy ticket. Zero NEW failures were introduced (whole-suite diff confirms it appears in neither the cleared nor the new set)."
+  },
+
+  "verification": {
+    "markers": "Full-repo `git grep -E '^(<<<<<<< |={7}$|>>>>>>> )'` returns ZERO matches. The tests/runner/test_graph_projector.py fixture uses indented quoted string literals ('    \"<<<<<<< Updated upstream\\n\"') that do not match the column-0 pattern and is untouched.",
+    "json": "All 10 restored .json parse as valid JSON.",
+    "tokens": "Orphaned-RIA tokens (DIGITAL-EMERGING/MAESTRO/HORIZON-CL4) are gone from all 10 substantive MSCA-PF files; retained only in the slice file (its own identity, 4 DIGITAL-EMERGING tokens) and backend_migration_plan.md (historical migration record, 24 tokens); section_schema_registry retains only af_he-ria (shared application form, 41) with zero DIGITAL-EMERGING/MAESTRO.",
+    "downstream_instrument_profile": "test_instrument_profile.py went 3 failed + 6 errors (corrupt) -> 1 failed + 20 passed (clean): TestRealRIAProfile fully green, the section_schema_registry.json 'not valid JSON' parse failure cleared.",
+    "full_suite_before_after_diff": "BEFORE (corrupt HEAD): 28 failed, 4149 passed, 40 skipped, 6 errors (34 reds). AFTER (clean 5801c4b restore): 26 failed, 4157 passed, 40 skipped, 0 errors (26 reds). DIFF: cleared_count=8 (6 TestRealRIAProfile fixture errors + TestFailClosed::test_real_registries_still_resolve_ria + TestRealRIAProfile::test_real_registries_have_ria_not_msca), new_count=0. Zero new failures; the pre-existing baseline minus the 8 now-cleared instrument-profile reds."
+  },
+
+  "no_constitutional_amendment_rationale": "Repairing committed merge-conflict corruption by restoring the pristine committed upstream content changes no phase meaning, tier meaning, gate condition, or authority-hierarchy rule. §12.3 (explicit contradiction resolution recording the prevailing side and reasoning) is satisfied here. §13.11 (no modifying Tier 1/2 source to reflect project assumptions) is not implicated — the edit REMOVES accidental cross-era corruption and restores the tiers' own committed MSCA-PF state; no assumption is injected. §13.2 (no inventing call constraints) is upheld — the restored Tier-2B content is the branch's own extracted MSCA-PF data, and the orphaned RIA constraints are removed, not added. Recorded per §9.4 / §12.3.",
+
+  "effect": "The 14 Tier-2A/2B/3 + plans + README files are valid, marker-free, and restored to their pristine committed MSCA-PF state; the bffe89d conflict-marker corruption event is fully swept (7 Tier-4 files by DOD-1 8.1 + these 14 = all 21). Phase-1 re-analysis is unblocked and the pre-existing instrument_profile JSON-parse reds (6 errors + 2 failures) are cleared. One residual pre-existing MSCA-PF section-taxonomy test failure and the orphaned RIA-topic slice existence question are handed to follow-ups, not silently resolved."
+}

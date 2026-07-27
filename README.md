@@ -539,7 +539,6 @@ Phase 3: WP Design & Dependencies
     |                           |
 Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
   n04_gantt_milestones          n05_impact_architecture
-<<<<<<< Updated upstream
     - Deterministic dependency         - impact-pathway-core-builder (TAPM):
       normalization (Phase B+,             * Maps call expected impacts to
       pure Python, pre-agent):               project outputs and WP deliverables
@@ -570,22 +569,6 @@ Phase 4: Gantt & Milestones   Phase 5: Impact Architecture
           (g05_p05)
         * Dep-to-schedule
           consistency (g05_p08)
-=======
-    - Transforms dependency DAG into temporal schedule:
-        * Assigns start_month / end_month to all tasks
-        * Produces milestone events with verification criteria
-    - Introduces temporal constraints:
-        * Project duration bound (from selected_call.json)
-        * Task coverage (all tasks must have time assignments)
-    - IMPORTANT:
-      Current gate predicates validate timeline completeness and bounds,
-      but do NOT fully enforce dependency_map temporal consistency.
-
-      + This means Phase 4 outputs may pass gates while still violating
-      + dependency semantics inherited from Phase 3.
-      + Phase 4 should not be considered semantically valid until the
-      + dependency_schedule_consistency predicate is implemented.
->>>>>>> Stashed changes
   Exit: phase_04_gate           Exit: phase_05_gate
     |                           |
     +---------------------------+
@@ -680,7 +663,6 @@ The orchestration pipeline transitions through three structural regimes:
   - Construct dependency DAG
 
 - **Phase 4: Temporal realization**
-<<<<<<< Updated upstream
   - Deterministic dependency normalization (pure Python, pre-agent):
     reads Phase 3 `wp_structure.json` immutably (does not modify Phase 3 output),
     converts dependency_map into `scheduling_constraints.json` (canonical
@@ -697,10 +679,6 @@ The orchestration pipeline transitions through three structural regimes:
     normalized constraints from `scheduling_constraints.json`
   - Dependency cycle validation remains Phase 3's responsibility;
     temporal consistency is Phase 4's
-=======
-  - Convert DAG into executable timeline (Gantt)
-  - Introduce scheduling constraints and milestone alignment
->>>>>>> Stashed changes
 
 - **Phase 5: Impact architecture**
   - Split architecture (not monolithic):
