@@ -1,36 +1,36 @@
 {
   "lane": "B-review-preseed",
-  "decision": "REFUTED \u2014 majority found blocking defects",
-  "holds": 1,
-  "refute": 2,
+  "decision": "HOLDS UP \u2014 majority",
+  "holds": 2,
+  "refute": 1,
   "unparsed": 0,
   "errored": 0,
   "verdicts": [
     {
-      "lens": "correctness-and-missed-code-paths",
+      "lens": "skip-id-resolves-against-manifest-or-fails-closed",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "drafting_skills_superseded_by() skip in run_agent is applied by bare ordered_skills membership with no validate_skip_binding/resolve_skill_ids cross-check, so a manifest\u2194PHASE8_DRAFTING_SKILL_BY_NODE drift silently no-ops on the default decomposed-drafting path and lets the monolithic drafter overwrite the assembler-composed section",
+        "lens": "skip-id-resolves-against-manifest-or-fails-closed"
+      }
+    },
+    {
+      "lens": "tier4-audit-only-when-suppression-in-force",
       "verdict": {
         "holds_up": true,
         "confidence": "medium",
-        "top_defect": "Suppression is gated on REUSE_SKIP_SKILLS.get(node_id) being truthy while the 'drafting_skipped_audit_executed' reuse decision is persisted to Tier 4 before that lookup \u2014 a node in REUSE_ELIGIBLE_NODES but absent from REUSE_SKIP_SKILLS would record drafting-skipped, pass the reuse run_id escape hatch on that record, and still recompose over stale drafts; latent only, since the two tables currently share keys.",
-        "lens": "correctness-and-missed-code-paths"
+        "top_defect": "single source is manifest-validated only lazily on preseed/reuse paths; the plain decomposed path still supersedes off a hardcoded map (no audit, out of ticket-3 scope)",
+        "lens": "tier4-audit-only-when-suppression-in-force"
       }
     },
     {
       "lens": "canonical_pack-vs-unapplied-assumptions",
       "verdict": {
-        "holds_up": false,
+        "holds_up": true,
         "confidence": "high",
-        "top_defect": "rollup_inconsistency lowercases overall_status (claim_status.py:84,104) but no_unresolved_material_claims compares exactly (criterion_predicates.py:218), so a preseeded section with 'Unresolved' passes gate_10a while the retained canonical_pack_deriver publishes the never-applied declaration as in force",
+        "top_defect": "retained canonical_pack_deriver re-emits declared_assumptions unapplied to the suppressed section, but that field is read by no gate, is provenance=assumed, and reuse is fingerprint-guarded on working_assumptions.json \u2014 inert, not exploitable",
         "lens": "canonical_pack-vs-unapplied-assumptions"
-      }
-    },
-    {
-      "lens": "brittle-name-suffix-match",
-      "verdict": {
-        "holds_up": false,
-        "confidence": "medium",
-        "top_defect": "Component suppression is properly enumerated, but the carried-forward drafting-skill skip is still hardcoded name-string matching across three tables never checked against the manifest's resolved skill_ids \u2014 an unmatched skip id is a silent no-op, so a skill rename lets the monolithic drafter overwrite the preseeded section while the new audit record falsely claims it was skipped.",
-        "lens": "brittle-name-suffix-match"
       }
     }
   ]

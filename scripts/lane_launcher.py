@@ -265,15 +265,28 @@ VOTE_LANES = {
         ),
     ),
     "B-review-preseed": dict(
-        model=OPUS_MODEL, effort="high", block="committing the preseed-suppression fix as-is",
-        lane_note="Lane B review. Read-only; refute the fix. Do not modify files.",
-        lenses=["correctness-and-missed-code-paths", "canonical_pack-vs-unapplied-assumptions", "brittle-name-suffix-match"],
-        opener=(
-            "Refute the preseed-suppression fix in runner/dag_scheduler.py (drops *_section_assembler + "
-            "*_assumption_applier, keeps canonical_pack_deriver in preseed mode). Find a scenario where "
-            "it is wrong or inconsistent; quote the code."
+            model=OPUS_MODEL, effort="high",
+            block="committing the single-source skip-binding fix (PRE-2/PRE-3) as-is",
+            lane_note="Lane B review. Read-only; refute the fix. Do not modify files.",
+            lenses=[
+                "skip-id-resolves-against-manifest-or-fails-closed",     # PRE-2
+                "tier4-audit-only-when-suppression-in-force",            # PRE-3
+                "canonical_pack-vs-unapplied-assumptions",               # PRE-1 regression
+            ],
+            opener=(
+                "Refute the ticket-3 preseed/reuse skip-binding fix. The drafting-skill skip is now meant to "
+                "come from a single authoritative source resolved against the manifest — the node's bound "
+                "assembler component via drafting_skills_superseded_by() cross-checked against "
+                "resolver.resolve_skill_ids(node_id) — and to FAIL CLOSED on drift, replacing the hardcoded "
+                "REUSE_SKIP_SKILLS / PRESEED_NODE_CONFIG[...].skipped_skill / REUSE_ELIGIBLE_NODES tables. "
+                "Read runner/dag_scheduler.py (Step 2.45 preseed, Step 2.5 reuse) and the skip-application "
+                "loop in runner/agent_runtime.py run_agent(). Find a scenario where a skip id that matches no "
+                "resolved skill still silently no-ops and lets the monolithic drafter overwrite the "
+                "preseeded/reused section; where the Tier-4 'drafting_skipped_audit_executed' record (or the "
+                "preseed audit) is written when drafting was NOT actually suppressed; or where the retained "
+                "canonical_pack_deriver republishes a never-applied declaration. Quote the code."
+            ),
         ),
-    ),
     "B-review-schemaid": dict(
         model=OPUS_MODEL, effort="high", block="committing the schema_id emit/backfill as-is",
         lane_note="Lane B review. Read-only; refute the fix. Do not modify files.",
