@@ -1944,6 +1944,105 @@ class TestDecomposedDraftingSupersession:
         assert result.status == "success"
         assert "excellence-section-drafting" in called_skills
 
+    def test_manifest_drift_hard_blocks_default_path_fail_closed(
+        self, tmp_path: Path
+    ) -> None:
+        # PRE-4 (ticket 9): on the default decomposed-drafting path (no preseed,
+        # no reuse) the monolithic drafting skill the assembler supersedes is
+        # skipped purely by name-membership against the hardcoded
+        # ``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL`` map.  If the manifest renames
+        # the drafting skill so it no longer matches that map, the supersession
+        # silently no-ops and the renamed monolithic drafter would run alongside
+        # the assembler and race/overwrite the assembler-composed section (the
+        # PRE-2 defect class ticket 3 closed for preseed/reuse, on this sibling
+        # path).  The node must fail closed (CONSTRAINT_VIOLATION) BEFORE either
+        # producer runs — not run both.
+        kwargs = _make_agent_env(
+            tmp_path,
+            # The manifest drafting skill is renamed; the map still supersedes
+            # "excellence-section-drafting", which is now absent from skill_ids.
+            skill_ids=["excellence-section-drafting-v2", "skill-audit"],
+        )
+        called_skills: list[str] = []
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            return _success_skill()
+
+        assembler = MagicMock(side_effect=_assembler)
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": assembler},
+        ), patch(_DRAFT_TARGET) as _draft_mock, patch(
+            _RUN_SKILL_TARGET, side_effect=_track_skill
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        # Fail closed — the same category the preseed/reuse guard uses.
+        assert result.status == "failure"
+        assert result.failure_category == "CONSTRAINT_VIOLATION"
+        assert result.can_evaluate_exit_gate is False
+        # The reason is the unmatched-branch failure (not the empty-skip
+        # branch) and names the map's superseded id — asserted on the stable
+        # human-readable phrase and a quote-delimited id token, not the exact
+        # list formatting emitted by validate_skip_binding.
+        _reason = result.failure_reason or ""
+        assert "match no manifest-resolved skill" in _reason
+        assert "excellence-section-drafting'" in _reason  # map id, not '…-v2'
+        # Neither producer ran: not the live drafter, not the assembler, and
+        # not the renamed monolithic drafting skill.  Both were suppressed by
+        # the fail-closed block, so the section is never double-written.
+        _draft_mock.assert_not_called()
+        assembler.assert_not_called()
+        assert "excellence-section-drafting-v2" not in called_skills
+
+    def test_matching_binding_supersedes_without_false_positive(
+        self, tmp_path: Path
+    ) -> None:
+        # The fail-closed guard must not false-positive on the normal binding:
+        # when the manifest drafting skill matches the map, the supersession
+        # proceeds (skill skipped, assembler composes) — no CONSTRAINT_VIOLATION.
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _assembler},
+        ), patch(
+            _DRAFT_TARGET,
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ],
+        ), patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        drafting_rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "excellence-section-drafting"
+        )
+        assert drafting_rec.status == "superseded_by_decomposed_assembler"
+
 
 class TestDecomposedDraftingLiveWiring:
     """Ticket 13A — the live decomposed drafter (producer of section_drafts/)

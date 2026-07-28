@@ -35,7 +35,11 @@ import yaml
 
 from runner.deterministic_components import invoke_component
 from runner.node_resolver import NodeResolver, NodeResolverError
-from runner.phase8_skip_binding import PHASE8_DRAFTING_SKILL_BY_NODE, SkipBindingError
+from runner.phase8_skip_binding import (
+    PHASE8_DRAFTING_SKILL_BY_NODE,
+    SkipBindingError,
+    validate_skip_binding,
+)
 from runner.runtime_models import (
     AgentResult,
     ComponentInvocationRecord,
@@ -1094,6 +1098,49 @@ def run_agent(
             failure_category="MISSING_INPUT",
         )
 
+    # ── Phase B0-guard: decomposed-drafting supersession fail-closed ─────
+    #
+    # (PRE-4, ticket 9) When a ``*_section_assembler`` component is bound, the
+    # monolithic drafting skill it SUPERSEDES is skipped purely by name
+    # membership against the hardcoded ``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL``
+    # map (Phase B0 below and the skill loop's ``drafting_skills_superseded_by``
+    # in Phase D).  Neither cross-checks that name against the node's
+    # manifest-resolved ``skill_ids``.  A manifest rename of the drafting skill
+    # that is not mirrored into the map would silently no-op the supersession —
+    # the renamed monolithic drafter would then run in the skill loop alongside
+    # the assembler and race/overwrite the assembler-composed section (the same
+    # PRE-2 defect class ticket 3 closed for the preseed/reuse skip, on this
+    # sibling default path).  Resolve the superseded skill id against the node's
+    # manifest ``skill_ids`` and fail closed on any drift — reusing ticket 3's
+    # ``validate_skip_binding`` so the default and preseed/reuse paths share one
+    # authoritative check.  Computed once here and reused in Phase D.
+    #
+    # On the preseed/reuse path the scheduler has already partitioned the
+    # assembler out of ``deterministic_components`` (``partition_draft_consuming``)
+    # and validated its own skip binding, so this set is empty and the guard is
+    # inert there — it fires only on the default (no preseed/reuse) path.
+    _superseded_drafting_skills = drafting_skills_superseded_by(
+        deterministic_components
+    )
+    if _superseded_drafting_skills:
+        _supersession_binding_err = validate_skip_binding(
+            node_id, _superseded_drafting_skills, skill_ids
+        )
+        if _supersession_binding_err is not None:
+            # Pre-invocation failure: nothing has been drafted, no component or
+            # skill has run, so every accumulator is still empty — omit them,
+            # matching the sibling pre-invocation returns (spec load, input
+            # validation) rather than the post-invocation idiom below.
+            return AgentResult(
+                status="failure",
+                can_evaluate_exit_gate=False,
+                failure_reason=(
+                    f"Decomposed-drafting supersession binding invalid for "
+                    f"{node_id!r}: {_supersession_binding_err}"
+                ),
+                failure_category="CONSTRAINT_VIOLATION",
+            )
+
     # ── Phase B0: Live decomposed drafting — producer of section_drafts/ ──
     #
     # (ticket 13A) When a ``*_section_assembler`` component is bound, the
@@ -1361,10 +1408,10 @@ def run_agent(
     # node, the section is composed from the captured per-sub-section drafts
     # by the assembler — the monolithic drafting skill is superseded and
     # must not run (it would race the assembler on the same canonical path).
-    _superseded_drafting_skills = drafting_skills_superseded_by(
-        deterministic_components
-    )
-
+    # ``_superseded_drafting_skills`` was computed and validated fail-closed
+    # against the manifest ``skill_ids`` at the Phase B0-guard above (PRE-4,
+    # ticket 9): every id in it is guaranteed to be a real manifest skill for
+    # this node, so a match here can never be a silent no-op over a rename.
     for sid in ordered_skills:
         # ── Reuse / supersession skip ────────────────────────────────
         if sid in _superseded_drafting_skills:
