@@ -1,0 +1,37 @@
+{
+  "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+  "run_id": "msca-pf-graph-01",
+  "status": "published",
+  "published_at": "2026-07-28T10:51:12.552143+00:00",
+  "gate_results_confirmed": [
+    "gate_09_budget_consistency",
+    "gate_10a_excellence_completeness",
+    "gate_10b_impact_completeness",
+    "gate_10c_implementation_completeness",
+    "gate_10d_cross_section_consistency",
+    "gate_11_review_closure"
+  ],
+  "tier3_snapshot": {
+    "call_id": "HORIZON-MSCA-2026-PF-01",
+    "topic_id": "HORIZON-MSCA-2026-PF-01-01",
+    "partner_ids": [
+      "HOST",
+      "FELLOW",
+      "SUPERVISOR",
+      "VALIDATION_PARTNER"
+    ]
+  },
+  "inherited_gate_provenance": [
+    {
+      "gate_id": "gate_09_budget_consistency",
+      "original_run_id": "msca-pf-real-01",
+      "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+      "input_fingerprint": "sha256:4f7577e2df789cedeca79904e6c6d647892429150c223605ddccb27e050e2038",
+      "versions": {
+        "manifest_version": "1.1",
+        "library_version": "1.0",
+        "constitution_version": "21430b0"
+      }
+    }
+  ]
+}

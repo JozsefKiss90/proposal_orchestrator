@@ -1,0 +1,64 @@
+{
+  "record_type": "decision",
+  "id": "dod-1e-n08f-checkpoint-published",
+  "date": "2026-07-28",
+  "authority": "Operator-directed ticket (plans/tickets_phase8_review.md ticket 8.5 / DOD-1e), the fifth and final M2-T10 definition-of-done subticket. Durable recording, per CLAUDE.md §9.4, of a milestone-close event: the publication of the run msca-pf-graph-01 Phase-8 checkpoint via the CHK-1 deterministic component, and confirmation that gate_12's checkpoint_published predicate accepts it. Application of already-ratified rules (§9.1 docs/ authoritative; §9.5 reproducibility; §12.4 fail-closed; §17.5.3 deterministic Claude-free component; CHK-1's C2/C3 binding). NOT a constitutional amendment.",
+
+  "ticket": "DOD-1e (plans/tickets_phase8_review.md ticket 8.5): 'n08f checkpoint published under CHK-1, closing M2-T10.' Deliverable: drive publish_checkpoint for msca-pf-graph-01, confirm the durable checkpoint records the inherited_gate_provenance quad, and confirm gate_12's checkpoint_published predicate passes against it — the literal M2-T10 close.",
+
+  "background": "n08f_revision on run msca-pf-graph-01 was blocked_at_exit BEFORE CHK-1: the retired checkpoint-publish SKILL hard-failed at its Step-2 run_id check because a --phase-8 run bootstraps phases 1-7 from a prior run's durable gate evidence, so gate_09_budget_consistency legitimately carries the PRIOR run_id msca-pf-real-01 (the run manifest's node_failure_details.n08f_revision still records this stale skill error: 'run_id mismatch: found msca-pf-real-01, expected msca-pf-graph-01'). CHK-1 (commit 2cafe8b) retired that skill and replaced it with the deterministic checkpoint_publisher component, which AUTHORIZES a cross-run gate by set-membership against the run's accepted_upstream_gates record and records a provenance quad rather than hard-failing. DOD-1 8.1 (commit 9e2442b) then cleared the last corruption (committed bffe89d conflict markers) from the phase 1-3 gate results the publisher/predicate read. With both landed, DOD-1e is the operational close.",
+
+  "drive": {
+    "method": "runner.deterministic_components.invoke_component('checkpoint_publisher', 'msca-pf-graph-01', repo_root) — the canonical runtime path the agent runtime uses for the n08f node-body deterministic component (manifest.compile.yaml n08f_revision.deterministic_components: [checkpoint_publisher]). Equivalent to runner.checkpoint_publisher.publish_checkpoint('msca-pf-graph-01', repo_root). Reproducible: the same durable gate inputs + accepted_upstream_gates produce the same checkpoint modulo the published_at stamp.",
+    "result": "status=success; outputs_written=['docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json']. Before the drive the checkpoints/ dir held only .gitkeep; the write-once guard therefore did not fire.",
+    "pre_drive_verification": "A byte-for-byte scratch dry-run (copying ONLY the run manifest + the six real gate results + Tier-3 identity into a throwaway repo root) reproduced the identical checkpoint and a passing predicate before the real durable write was performed — verify-before-mutate, since the publish is write-once/irreversible-in-one-step."
+  },
+
+  "published_checkpoint": {
+    "path": "docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json",
+    "schema_id": "orch.checkpoints.phase8_checkpoint.v1",
+    "run_id": "msca-pf-graph-01",
+    "status": "published",
+    "gate_results_confirmed": [
+      "gate_09_budget_consistency",
+      "gate_10a_excellence_completeness",
+      "gate_10b_impact_completeness",
+      "gate_10c_implementation_completeness",
+      "gate_10d_cross_section_consistency",
+      "gate_11_review_closure"
+    ],
+    "tier3_snapshot": "call_id HORIZON-MSCA-2026-PF-01, topic_id HORIZON-MSCA-2026-PF-01-01, partner_ids [HOST, FELLOW, SUPERVISOR, VALIDATION_PARTNER] — non-blocking identity snapshot.",
+    "committed": "Git-committed alongside this entry, not gitignored — a durable Tier-4 artifact (§9.1) and the immutable-after-creation record (artifact_registry a_t4_checkpoint_phase8) of the six confirmed Phase-8 gate results. It does NOT by itself assert a full gate_12 pass — the checkpoint lists only the six upstream gates it confirms (gate_12 reads it, so cannot appear in its own confirmed list); see scope_and_honesty."
+  },
+
+  "inherited_gate_provenance_quad": {
+    "entries": 1,
+    "gate_id": "gate_09_budget_consistency",
+    "original_run_id": "msca-pf-real-01",
+    "evidence_path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/gate_result.json",
+    "input_fingerprint": "sha256:4f7577e2df789cedeca79904e6c6d647892429150c223605ddccb27e050e2038",
+    "versions": {"manifest_version": "1.1", "library_version": "1.0", "constitution_version": "21430b0"},
+    "authorization": "The quad is authorized — not merely asserted — by the run's continuation record: .claude/runs/msca-pf-graph-01/run_manifest.json accepted_upstream_gates.gate_09_budget_consistency = {original_run_id: msca-pf-real-01, status: pass, evidence_path: …/phase7_budget_gate/gate_result.json}, written by bootstrap_phase_prerequisites. Every quad field is copied VERBATIM from the durable gate result; no re-stamping. The five Phase-8 gates (10a/10b/10c/10d/11) carry the current run_id msca-pf-graph-01, so they take no quad entry (additive array holds only the one genuinely cross-run gate).",
+    "why_only_gate_09": "gate_09 is the sole gate bootstrapped from the prior msca-pf-real-01 run (phases 1-7 evidence); the Phase-8 gates were evaluated in-run. A degenerate all-current-run checkpoint would omit inherited_gate_provenance entirely and be byte-identical to the pre-CHK-1 output — this run is the genuine cross-run case the quad exists for."
+  },
+
+  "predicate_confirmation": {
+    "direct": "runner.predicates.schema_predicates.checkpoint_published(<path>, repo_root=<repo>) → passed=True, details.inherited_gate_provenance_checked=['gate_09_budget_consistency'], input_fingerprints={gate_09: sha256:4f7577e2…}. The predicate is consistency-only (CHK-1 D4): it re-validates the quad against durable Tier-4 gate evidence (quad-faithfulness + no-hidden-inheritance), fail-closed on any drift; it does NOT recompute input_fingerprint from current inputs (that content-freshness step is ST-1's, kept separate).",
+    "via_gate_evaluator": "runner.gate_evaluator._call_predicate('checkpoint_published', {path: docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json}, 'msca-pf-graph-01', repo_root, None) → passed=True. This exercises the exact wiring gate_12 uses to evaluate g11_p06 (PREDICATE_REGISTRY lookup + arg injection + call), with the canonical path arg from gate_rules_library.yaml g11_p06. So 'gate_12's checkpoint_published predicate passes' is confirmed at the wired-predicate level, not only the bare function."
+  },
+
+  "scope_and_honesty": "This closes the SPECIFIC blocker that stalled n08f — the checkpoint-publish step — which is exactly where the node failed under the retired skill. It does NOT assert that gate_12 as a whole passed: gate_12 additionally requires final_exports/ presence (g11_p05/p05b), review closure, budget-confirmation, higher-tier-contradiction and Section-13 predicates that depend on a full n08f revision-agent run (a live Claude node body) and are outside DOD-1e's scope. Per §13.8 this is stated, not glossed: DOD-1e delivers the durable checkpoint + a passing checkpoint_published predicate; it does not flip the run's n08f node state to released. The run manifest's stale node_failure_details.n08f_revision (the retired-skill run_id-mismatch error) is pre-CHK-1 runtime state (§9.2, rebuildable) and is intentionally left as the historical record of the pre-fix failure; it is not evidence of a current fault.",
+
+  "constitutional_legitimacy": "Publishing the checkpoint via a direct component drive (rather than inside a full DAGScheduler run of n08f) is faithful: checkpoint_publisher is a deterministic, Claude-free §17.5.3 component whose output is a pure lookup + verbatim copy over durable gate results (single non-deterministic field: the published_at stamp, excluded from the replay invariant, mirroring gate_result.evaluated_at). The direct drive produces the byte-identical artifact the node body would. No gate was declared passed without confirming its condition (§10.4): the checkpoint_published predicate was independently evaluated and passed. No fabricated completion (§12.4/§15): the checkpoint asserts only the six gate results that exist and are status:pass on disk, and the quad is authorized by the durable continuation record.",
+
+  "consistency_with_prior_entries": "CHK-1 (decision_log/chk-1-checkpoint-provenance-quad_2026-07-24.json) established the component, the additive schema field, the quad, and the consistency-only predicate; this entry is its first production drive on the real msca-pf-graph-01 run. DOD-1 8.1 (dod-1-phase1-3-gate-result-conflict-resolution_2026-07-27.json) removed the committed-conflict-marker corruption from the phase 1-3 gate results, which — together with the phase 7/8 gate results being clean — is what lets the publisher and predicate read the full gate set without fault. ST-1 (st-1-content-based-staleness_2026-07-27.json) owns the input-fingerprint content-freshness recompute the predicate deliberately does not do (D4 boundary preserved). DOD-1c/1d are unaffected. This is the checkpoint-publication leg of the same M2-T10 DoD back-half.",
+
+  "change_surface": [
+    "docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json (NEW durable artifact — the primary DOD-1e deliverable; the run msca-pf-graph-01 Phase-8 checkpoint with the authorized cross-run provenance quad).",
+    "docs/tier4_orchestration_state/decision_log/dod-1e-n08f-checkpoint-published_2026-07-28.json (this entry).",
+    "tests/runner/test_dod1e_checkpoint_close.py (NEW real-run oracle: a read-only regression seam pinning the three DOD-1e criteria against the committed artifact — published-for-graph-run, gate_09 quad copied verbatim from the durable gate result, and checkpoint_published passing both directly and via the gate-evaluator's g11_p06 dispatch; plus the cross-run precondition that the durable gate_09 carries the prior run_id).",
+    "NO change to runner/ (checkpoint_publisher, the predicate, and the deterministic-component registry all landed in CHK-1), the DAG scheduler, the gate evaluator, the node-state machine, the manifest, or any tier source document."
+  ],
+
+  "effect": "DOD-1e is closed. The durable msca-pf-graph-01 Phase-8 checkpoint is published under CHK-1 with the authorized gate_09 provenance quad, and gate_12's checkpoint_published (g11_p06) predicate accepts it — the exact step that blocked n08f under the retired skill now passes. With 8.1 (projector mirror), 8.2 (claim→node re-verification), 8.3 (--from-graph determinism re-check), 8.4 (open-Q #4 + coarse-ledger decision entries), and 8.5 (this) all done, the milestone-2 T10 definition-of-done back-half is fully closed. M2-T10 is complete."
+}
