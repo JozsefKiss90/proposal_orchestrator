@@ -21,6 +21,7 @@ import pytest
 
 from runner.decomposed_drafting import (
     DecomposedDraftingError,
+    _parse_drafter_response,
     draft_section_decomposed,
 )
 from runner.section_assembler import (
@@ -227,6 +228,32 @@ class TestDecomposeThenCompose:
             )
             assert sub["content"] == draft["content"]
 
+    def test_stale_drafts_from_prior_run_are_removed(self, tmp_path: Path) -> None:
+        """A draft left behind by a prior run for a sub-section that is no
+        longer in the drafting set (observed live: the criterion heading '1'
+        drafted while the registry misclassified it as proposal_section) must
+        be removed before drafting — otherwise the assembler fails closed on
+        a draft the new spine does not declare."""
+        _seed_msca_excellence_profile(tmp_path)
+        drafts_dir = tmp_path / SECTION_DRAFTS_ROOT_REL / "excellence"
+        _write(
+            drafts_dir / "1.draft.json",
+            {
+                "sub_section_id": "1",
+                "title": "Excellence",
+                "content": "stale whole-criterion draft from a prior run",
+                "claim_statuses": [],
+                "source_refs": [],
+            },
+        )
+        draft_section_decomposed(
+            RUN_ID, tmp_path, "excellence", drafter=_RecordingDrafter()
+        )
+        assert not (drafts_dir / "1.draft.json").exists()
+        # The stale draft no longer blocks assembly.
+        out = assemble_section(RUN_ID, tmp_path, "excellence")
+        assert out.is_file()
+
     def test_byte_equal_replay_on_real_drafts(self, tmp_path: Path) -> None:
         """assemble(drafts) is byte-identical on replay — the anti-synthesis
         guarantee, on the real Excellence drafts (ticket 7 acceptance)."""
@@ -295,3 +322,29 @@ class TestFailClosed:
 
         with pytest.raises(DecomposedDraftingError, match="no 'content'"):
             draft_section_decomposed(RUN_ID, tmp_path, "excellence", drafter=_empty)
+
+
+class TestParseDrafterResponse:
+    def test_unparseable_error_carries_excerpt_and_length(self) -> None:
+        """A live-run parse failure must be diagnosable from the manifest
+        alone: the error names the response length and a bounded excerpt
+        (run c622b352's '2.3' failure carried neither, leaving no evidence)."""
+        raw = "I could not produce the draft because of reasons."
+        with pytest.raises(DecomposedDraftingError) as exc_info:
+            _parse_drafter_response(raw, "2.3")
+        msg = str(exc_info.value)
+        assert f"response length {len(raw)} chars" in msg
+        assert "because of reasons" in msg
+
+    def test_unparseable_error_names_capture_path(self, tmp_path: Path) -> None:
+        cap = tmp_path / "2.3.response.txt"
+        with pytest.raises(DecomposedDraftingError) as exc_info:
+            _parse_drafter_response("not json", "2.3", capture_path=cap)
+        assert str(cap) in str(exc_info.value)
+
+    def test_long_response_excerpt_is_bounded(self) -> None:
+        raw = "x" * 100_000
+        with pytest.raises(DecomposedDraftingError) as exc_info:
+            _parse_drafter_response(raw, "2.3")
+        # head + tail excerpt, never the full 100k payload
+        assert len(str(exc_info.value)) < 1200

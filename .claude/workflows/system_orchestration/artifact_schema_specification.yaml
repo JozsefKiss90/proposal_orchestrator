@@ -3083,7 +3083,18 @@ tier2a_extracted_schemas:
               section_type:
                 type: string
                 required: true
-                enum: [proposal_section, implementation_section, cover_page, annexe]
+                enum: [proposal_section, implementation_section, criterion_section, cover_page, annexe]
+                description: >
+                  criterion_section marks a criterion-level parent heading
+                  (e.g. MSCA-PF Part B sections 1/2/3) that groups drafted
+                  leaf sub-sections but carries no draftable prose of its
+                  own. The Phase 8 decomposed-drafting granularity
+                  (InstrumentProfile.drafting_sub_sections) includes only
+                  proposal_section / implementation_section entries;
+                  criterion_section headings are excluded. Classifying a
+                  parent heading as proposal_section reintroduces the
+                  monolithic whole-criterion drafting call the decomposition
+                  exists to eliminate.
               page_limit:
                 type: integer
                 required: false

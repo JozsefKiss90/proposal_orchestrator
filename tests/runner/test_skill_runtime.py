@@ -29,7 +29,11 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from runner.claude_transport import ClaudeCLITimeoutError, ClaudeTransportError
+from runner.claude_transport import (
+    ClaudeCLIRateLimitError,
+    ClaudeCLITimeoutError,
+    ClaudeTransportError,
+)
 from runner.runtime_models import SkillResult
 from runner.skill_runtime import (
     _assemble_skill_prompt,
@@ -474,6 +478,27 @@ class TestTransportFailureDiagnostics:
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         assert meta["failure_class"] == "EMPTY_OUTPUT"
 
+    def test_rate_limit_classified_correctly(self, skill_env: Path) -> None:
+        """A ClaudeCLIRateLimitError is classified as RATE_LIMITED, not NONZERO_EXIT."""
+        with patch(
+            _TRANSPORT_TARGET,
+            side_effect=ClaudeCLIRateLimitError(
+                "Claude CLI refused the call: Claude Code subscription usage "
+                "limit reached (You've hit your limit · resets 9:20pm).",
+                stdout="You've hit your limit · resets 9:20pm (Europe/Budapest)",
+                reset_notice="You've hit your limit · resets 9:20pm (Europe/Budapest)",
+            ),
+        ):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["failure_class"] == "RATE_LIMITED"
+        assert meta["had_partial_stdout"] is True
+
     # -- C. Skill failure semantics unchanged --
 
     def test_failure_semantics_preserved(self, skill_env: Path) -> None:
@@ -787,6 +812,41 @@ class TestExtractJsonResponse:
         assert result["overall_status"] == "pass"
         assert result["gate_id"] == "phase_06_gate"
         assert result["decision_log_entry_written"] is False
+
+    def test_front_truncated_tail_fails_closed(self) -> None:
+        """Front-truncated response whose tail holds only interior member
+        objects must return None, not a salvaged fragment.
+
+        The exact failure mode observed in run 511325a3 (n08a): the transport
+        returned only the tail of an over-long drafter generation, the text
+        did not begin with '{' (so the step-1b guard never ran), and the
+        salvage scan returned a lone source_refs entry — surfacing downstream
+        as a misleading "produced no 'content' prose (returned keys:
+        ['source_path', 'tier'])" error."""
+        truncated_tail = (
+            'evaluation criteria and beyond the state of the art."},\n'
+            '    {"claim_id": "C-17", "claim_summary": "Host lab", '
+            '"status": "unresolved", "source_ref": null}\n  ],\n'
+            '  "source_refs": [\n'
+            '    {"tier": 3, "source_path": "docs/tier3_project_instantiation/'
+            'project_brief/concept_note.md"},\n'
+            '    {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/'
+            'extracted/expected_outcomes.json"}\n  ]\n}'
+        )
+        assert _extract_json_response(truncated_tail) is None
+
+    def test_prose_wrapped_json_object_still_salvaged(self) -> None:
+        """The interior-fragment guard must not reject a genuine root object
+        that is preceded AND followed by prose (remainder opens with prose,
+        not with a structural continuation character)."""
+        text = (
+            "Here is the artifact you requested:\n"
+            '{"content": "full prose", "claim_statuses": [], "source_refs": []}\n'
+            "Let me know if anything else is needed."
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert result["content"] == "full prose"
 
 
 class TestAtomicWrite:

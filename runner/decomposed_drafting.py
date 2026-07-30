@@ -81,7 +81,12 @@ _DRAFTER_MAX_TOKENS: int = 8000
 #: TAPM timeout for a grounded per-sub-section drafting call.  Each call reads
 #: the declared grounding inputs from disk and drafts a full sub-section, so it
 #: is given the generous TAPM budget rather than the 300 s cli-prompt default.
-_DRAFTER_TIMEOUT_SECONDS: int = 1200
+#: Live-run evidence (runs a79ed11e / 511325a3, 2026-07-29): leaf sub-section
+#: calls measured 6-17 min wall clock, so the prior 1200 s ceiling sat inside
+#: normal latency variance and produced intermittent ClaudeCLITimeoutError
+#: node failures.  30 min gives headroom above the observed worst case while
+#: still bounding a genuinely hung invocation.
+_DRAFTER_TIMEOUT_SECONDS: int = 1800
 
 #: Grounding inputs the production drafter reads (TAPM).  These are the same
 #: Tier 3 / phase-output / canonical-pack sources the monolithic drafting skills
@@ -226,8 +231,50 @@ def _derive_overall_status(drafts: list[dict[str, Any]]) -> str:
 # Production drafter (wraps the Claude runtime transport)
 # ---------------------------------------------------------------------------
 
+#: Root of the per-run raw-response capture (runtime execution memory, §9.2 —
+#: rebuildable, never constitutional source truth).  Every live drafter call
+#: persists its raw transport response here BEFORE parsing, so a malformed or
+#: truncated response is diagnosable after the fact; run 511325a3/c622b352
+#: failures were undiagnosable because the drafter path (unlike the skill
+#: runtime) kept no diagnostic bundle.
+_RESPONSE_CAPTURE_ROOT_REL: str = ".claude/logs/decomposed_drafting"
 
-def _default_claude_drafter(repo_root: Path) -> SubSectionDrafter:
+
+def _capture_raw_response(
+    repo_root: Path,
+    run_id: str,
+    slug: str,
+    filename: str,
+    text: str,
+) -> Optional[Path]:
+    """Persist a raw transport response/diagnostic; never raise.
+
+    A capture failure must not mask the drafting outcome — returns the path
+    on success, ``None`` on any OS error.
+    """
+    try:
+        cap_dir = repo_root / _RESPONSE_CAPTURE_ROOT_REL / run_id / slug
+        cap_dir.mkdir(parents=True, exist_ok=True)
+        path = cap_dir / filename
+        path.write_text(text, encoding="utf-8")
+        return path
+    except OSError:  # pragma: no cover — depends on host FS state
+        return None
+
+
+def _snippet(text: str, limit: int = 240) -> str:
+    """Whitespace-collapsed head+tail excerpt of *text* for error messages."""
+    collapsed = " ".join(text.split())
+    if len(collapsed) <= 2 * limit:
+        return collapsed
+    return f"{collapsed[:limit]} …[{len(collapsed) - 2 * limit} chars]… {collapsed[-limit:]}"
+
+
+def _default_claude_drafter(
+    repo_root: Path,
+    run_id: str = "",
+    slug: str = "",
+) -> SubSectionDrafter:
     """Build the production per-sub-section drafter (wraps the transport).
 
     Each call drafts a single sub-section in **TAPM mode**: the drafter is told
@@ -303,22 +350,52 @@ def _default_claude_drafter(repo_root: Path) -> SubSectionDrafter:
             + (f"\n\nPrior sub-sections already drafted (for coherence — do "
                f"not repeat them):\n{context_blocks}"
                if context_blocks else "")
+            # Restated last: after a long Read/Glob session the output
+            # contract is the instruction most at risk of being dropped, and
+            # a non-JSON final reply fails the whole node (observed live:
+            # run c622b352, sub-section '2.3').
+            + "\n\nFINAL OUTPUT CONTRACT REMINDER: after your reading is "
+              "done, your final reply must be ONLY the single JSON object "
+              "described in the system instructions — beginning with '{' and "
+              "ending with '}', with no preamble, commentary, or markdown "
+              "fence around it."
         )
-        raw = invoke_claude_text(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            model=_DRAFTER_MODEL,
-            max_tokens=_DRAFTER_MAX_TOKENS,
-            timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
-            tools=["Read", "Glob"],
+        try:
+            raw = invoke_claude_text(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model=_DRAFTER_MODEL,
+                max_tokens=_DRAFTER_MAX_TOKENS,
+                timeout_seconds=_DRAFTER_TIMEOUT_SECONDS,
+                tools=["Read", "Glob"],
+            )
+        except Exception as exc:
+            # Persist whatever the transport buffered (a timeout / non-zero
+            # exit still often carries partial stdout+stderr) so the failure
+            # is diagnosable, then re-raise unchanged (§17.5.4 — no retry).
+            _stdout = getattr(exc, "stdout", None)
+            _stderr = getattr(exc, "stderr", None)
+            _capture_raw_response(
+                repo_root, run_id, slug, f"{sub_id}.transport_failure.txt",
+                f"exception: {type(exc).__name__}: {exc}\n"
+                f"--- stdout ---\n{_stdout or ''}\n"
+                f"--- stderr ---\n{_stderr or ''}\n",
+            )
+            raise
+        capture_path = _capture_raw_response(
+            repo_root, run_id, slug, f"{sub_id}.response.txt", raw
         )
-        parsed = _parse_drafter_response(raw, sub_id)
+        parsed = _parse_drafter_response(raw, sub_id, capture_path=capture_path)
         return parsed
 
     return _drafter
 
 
-def _parse_drafter_response(raw: str, sub_id: str) -> dict[str, Any]:
+def _parse_drafter_response(
+    raw: str,
+    sub_id: str,
+    capture_path: Optional[Path] = None,
+) -> dict[str, Any]:
     """Parse a live drafter response into a draft dict (fail-closed).
 
     Delegates JSON extraction to the shared, hardened
@@ -346,7 +423,11 @@ def _parse_drafter_response(raw: str, sub_id: str) -> dict[str, Any]:
     if parsed is None:
         raise DecomposedDraftingError(
             f"drafter response for {sub_id!r} contained no parseable JSON "
-            "object (empty, truncated, or structurally malformed)"
+            "object (empty, truncated, or structurally malformed); "
+            f"response length {len(raw)} chars"
+            + (f", raw response captured at {capture_path}" if capture_path
+               else "")
+            + f"; excerpt: {_snippet(raw)!r}"
         )
     # Unwrap a SkillResult-shaped success envelope if the model wrapped the
     # draft payload instead of returning the draft object directly.  The draft
@@ -554,9 +635,22 @@ def draft_section_decomposed(
     subs = _resolve_drafting_sub_sections(repo_root, slug, criterion)
 
     if drafter is None:
-        drafter = _default_claude_drafter(repo_root)
+        drafter = _default_claude_drafter(repo_root, run_id=run_id, slug=slug)
 
     drafts_dir = repo_root / SECTION_DRAFTS_ROOT_REL / slug
+
+    # ── Rerun hygiene: drop drafts/spine left by a prior run ──────────────
+    # The assembler treats the spine's sub_section_order as the sole authority
+    # on membership and fails closed on any draft file it does not declare.  A
+    # profile change between runs (e.g. a sub-section leaving the drafting set)
+    # would otherwise strand a stale <id>.draft.json on disk and block assembly
+    # (§6.4 — reruns must update state deterministically from current inputs).
+    if drafts_dir.is_dir():
+        for stale in drafts_dir.glob(f"*{DRAFT_SUFFIX}"):
+            stale.unlink()
+        stale_spine = drafts_dir / SPINE_FILENAME
+        if stale_spine.is_file():
+            stale_spine.unlink()
 
     # ── Draft each sub-section, passing prior drafts as sequential context ─
     drafts: list[dict[str, Any]] = []

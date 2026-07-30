@@ -19,12 +19,14 @@ Test groups:
 
 from __future__ import annotations
 
+import json
 import subprocess
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from runner.claude_transport import (
+    ClaudeCLIRateLimitError,
     ClaudeCLITimeoutError,
     ClaudeCLIUnavailableError,
     ClaudeTransportError,
@@ -215,6 +217,111 @@ class TestToolsParameter:
 
 
 # ---------------------------------------------------------------------------
+# stream-json reassembly (front-truncation fix)
+# ---------------------------------------------------------------------------
+
+
+def _assistant_event(*blocks: dict, parent_tool_use_id: str | None = None) -> dict:
+    """Build a stream-json assistant event with the given content blocks."""
+    return {
+        "type": "assistant",
+        "parent_tool_use_id": parent_tool_use_id,
+        "message": {"role": "assistant", "content": list(blocks)},
+    }
+
+
+def _text(text: str) -> dict:
+    return {"type": "text", "text": text}
+
+
+def _stream(*events: dict) -> str:
+    """Serialize events to the JSONL shape claude -p --output-format stream-json emits."""
+    return "\n".join(json.dumps(e) for e in events)
+
+
+class TestStreamJsonReassembly:
+    _INIT = {"type": "system", "subtype": "init", "session_id": "s1"}
+    _RESULT = {"type": "result", "subtype": "success", "result": "tail"}
+
+    def test_command_requests_stream_json_with_verbose(self) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs())
+        cmd = mock_popen.call_args.args[0]
+        idx = cmd.index("--output-format")
+        assert cmd[idx + 1] == "stream-json"
+        assert "--verbose" in cmd
+
+    def test_single_assistant_message_text_returned(self) -> None:
+        out = _stream(self._INIT, _assistant_event(_text("OK")), self._RESULT)
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == "OK"
+
+    def test_multi_turn_split_rejoins_seamlessly(self) -> None:
+        """A generation cut mid-token across two assistant turns (the run
+        e93b54c6 '3.1' failure: the CLI's text mode returned only the tail,
+        front-truncating the JSON object) must be reassembled whole, with no
+        separator injected inside the split JSON string."""
+        front = '{"content": "WP'
+        tail = '5 covers communication."}'
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text(front)),
+            _assistant_event(_text(tail)),
+            {"type": "result", "subtype": "success", "result": tail},
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+        assert result == front + tail
+        assert json.loads(result) == {"content": "WP5 covers communication."}
+
+    def test_result_event_text_is_not_duplicated(self) -> None:
+        out = _stream(self._INIT, _assistant_event(_text("OK")),
+                      {"type": "result", "subtype": "success", "result": "OK"})
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == "OK"
+
+    def test_tool_use_and_thinking_blocks_skipped(self) -> None:
+        out = _stream(
+            self._INIT,
+            _assistant_event(
+                {"type": "thinking", "thinking": "planning..."},
+                _text("prose "),
+                {"type": "tool_use", "id": "t1", "name": "Read", "input": {}},
+            ),
+            _assistant_event(_text("answer")),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == "prose answer"
+
+    def test_subagent_assistant_messages_skipped(self) -> None:
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text("sub"), parent_tool_use_id="tu_1"),
+            _assistant_event(_text("top")),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == "top"
+
+    def test_plain_text_stdout_falls_back_verbatim(self) -> None:
+        """A CLI (or test double) that ignored the output-format flag still
+        works: non-stream stdout is the response, exactly as before."""
+        out = "Just a plain\nmulti-line answer with {\"k\": 1} inside."
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == out
+
+    def test_stream_events_without_assistant_text_fail_closed(self) -> None:
+        out = _stream(self._INIT, {"type": "result", "subtype": "error_during_execution"})
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            with pytest.raises(ClaudeTransportError, match="no assistant text"):
+                invoke_claude_text(**_call_kwargs())
+
+    def test_malformed_jsonl_lines_are_ignored(self) -> None:
+        out = "{not json\n" + _stream(_assistant_event(_text("OK"))) + "\n{also not json"
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            assert invoke_claude_text(**_call_kwargs()) == "OK"
+
+
+# ---------------------------------------------------------------------------
 # System prompt length fallback
 # ---------------------------------------------------------------------------
 
@@ -273,6 +380,67 @@ class TestNonZeroExitCode:
         with patch(_POPEN_TARGET, return_value=_mock_proc("", "", 2)):
             with pytest.raises(ClaudeTransportError, match="exited with code 2"):
                 invoke_claude_text(**_call_kwargs())
+
+    def test_stdout_detail_surfaced_when_stderr_empty(self) -> None:
+        # A non-zero exit whose diagnostic lands on stdout (stderr empty) must
+        # still be visible in the exception message, not a blind exit code.
+        with patch(
+            _POPEN_TARGET,
+            return_value=_mock_proc("Something went wrong on stdout", "", 1),
+        ):
+            with pytest.raises(
+                ClaudeTransportError, match="Something went wrong on stdout"
+            ):
+                invoke_claude_text(**_call_kwargs())
+
+
+# ---------------------------------------------------------------------------
+# Subscription usage-limit refusal (stdout notice, non-zero exit)
+# ---------------------------------------------------------------------------
+
+
+class TestRateLimitRefusal:
+    #: The exact notice observed in run 0d041dae's skill_diag stdout.
+    _NOTICE = "You've hit your limit · resets 9:20pm (Europe/Budapest)"
+
+    def test_is_subclass_of_transport_error(self) -> None:
+        assert issubclass(ClaudeCLIRateLimitError, ClaudeTransportError)
+
+    def test_stdout_limit_notice_raises_rate_limit_error(self) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc(self._NOTICE, "", 1)):
+            with pytest.raises(ClaudeCLIRateLimitError, match="usage limit reached"):
+                invoke_claude_text(**_call_kwargs())
+
+    def test_reset_notice_captured_verbatim(self) -> None:
+        with patch(_POPEN_TARGET, return_value=_mock_proc(self._NOTICE, "", 1)):
+            try:
+                invoke_claude_text(**_call_kwargs())
+            except ClaudeCLIRateLimitError as exc:
+                assert exc.reset_notice == self._NOTICE
+                assert "resets 9:20pm" in str(exc)
+            else:
+                pytest.fail("expected ClaudeCLIRateLimitError")
+
+    def test_notice_on_stderr_also_detected(self) -> None:
+        # Defensive: if a future CLI version routes the notice to stderr, the
+        # detection must still fire.
+        with patch(
+            _POPEN_TARGET,
+            return_value=_mock_proc("", "Claude usage limit reached", 1),
+        ):
+            with pytest.raises(ClaudeCLIRateLimitError):
+                invoke_claude_text(**_call_kwargs())
+
+    def test_ordinary_error_is_not_misclassified_as_rate_limit(self) -> None:
+        # A generic failure that merely mentions "limit" in an unrelated way
+        # must remain a plain ClaudeTransportError, not a rate-limit error.
+        with patch(
+            _POPEN_TARGET,
+            return_value=_mock_proc("", "config value exceeds limit", 1),
+        ):
+            with pytest.raises(ClaudeTransportError) as ei:
+                invoke_claude_text(**_call_kwargs())
+        assert not isinstance(ei.value, ClaudeCLIRateLimitError)
 
 
 # ---------------------------------------------------------------------------

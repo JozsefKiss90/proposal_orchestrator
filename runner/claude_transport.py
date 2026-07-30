@@ -20,6 +20,7 @@ Authoritative source:
 
 from __future__ import annotations
 
+import json
 import os
 import signal
 import subprocess
@@ -56,6 +57,34 @@ class ClaudeTransportError(Exception):
 
 class ClaudeCLIUnavailableError(ClaudeTransportError):
     """Raised when the ``claude`` executable cannot be found."""
+
+
+class ClaudeCLIRateLimitError(ClaudeTransportError):
+    """Raised when the ``claude`` CLI refuses a call due to a usage limit.
+
+    The Claude Code Max subscription enforces a rolling usage cap.  When it is
+    reached, ``claude -p`` prints a notice such as
+    ``"You've hit your limit · resets 9:20pm (Europe/Budapest)"`` **to stdout**
+    (not stderr) and exits non-zero.  Without special handling this surfaces as
+    a bare ``"Claude CLI exited with code 1"`` — indistinguishable from a real
+    transport fault, and misleading during debugging.
+
+    This is an environmental / account condition, not a defect in the prompt,
+    the skill, or the orchestration engine.  The correct recovery is to wait
+    for the quota to reset and re-run; the runtime must not retry (§17.5.4).
+    Carries the notice line in ``reset_notice`` for surfacing to the operator.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        stderr: str | None = None,
+        stdout: str | None = None,
+        reset_notice: str | None = None,
+    ) -> None:
+        super().__init__(message, stderr=stderr, stdout=stdout)
+        self.reset_notice = reset_notice
 
 
 class ClaudeCLITimeoutError(ClaudeTransportError):
@@ -113,10 +142,111 @@ _MAX_OUTPUT_TOKENS_DEFAULT: str = "32000"
 #: True on Windows (``os.name == "nt"``), False on POSIX.
 _IS_WINDOWS: bool = os.name == "nt"
 
+#: Case-insensitive substrings that identify a Claude Code subscription
+#: usage-limit refusal in the CLI's output.  The CLI writes this notice to
+#: *stdout* and exits non-zero, so a plain "exited with code N" message hides
+#: the real cause.  Matching any of these promotes the failure to a distinct,
+#: self-identifying ``ClaudeCLIRateLimitError``.  Kept deliberately narrow to
+#: avoid misclassifying a model that merely *discusses* rate limits in prose;
+#: these phrases are CLI-emitted control notices, not response content.
+_RATE_LIMIT_SIGNALS: tuple[str, ...] = (
+    "hit your limit",
+    "usage limit reached",
+    "you've reached your limit",
+    "claude usage limit",
+)
+
+
+def _rate_limit_notice(*texts: str | None) -> str | None:
+    """Return the first line matching a usage-limit signal, else ``None``.
+
+    Scans each supplied text (stdout, stderr) line by line and returns the
+    first line containing any :data:`_RATE_LIMIT_SIGNALS` substring
+    (case-insensitively), trimmed.  Used to detect subscription quota
+    exhaustion and surface the human-readable reset notice verbatim.
+    """
+    for text in texts:
+        if not text:
+            continue
+        for line in text.splitlines():
+            low = line.lower()
+            if any(sig in low for sig in _RATE_LIMIT_SIGNALS):
+                return line.strip()
+    return None
+
 #: Bound on how long we wait for the process-tree kill (and the post-kill
 #: pipe drain) to complete.  A forceful kill of an already-known PID returns
 #: near-instantly; this is a safety ceiling, not a tuning knob.
 _TREE_KILL_TIMEOUT_SECONDS: int = 10
+
+
+# ---------------------------------------------------------------------------
+# stream-json response reassembly
+# ---------------------------------------------------------------------------
+
+
+def _reassemble_stream_json(stdout: str) -> str | None:
+    """Reassemble the complete assistant-visible text from stream-json output.
+
+    ``claude -p`` in its default text output mode prints only the **final**
+    assistant message of the session.  When a generation spans more than one
+    assistant turn — an output-token cut that the CLI auto-continues, or a
+    tool call issued after the model has begun its answer — the text of every
+    earlier turn is silently dropped and the caller receives a
+    **front-truncated** response (observed live three times: run 2026-07-14
+    concept-alignment-check, run a79ed11e n08a, run e93b54c6 n08c
+    sub-section '3.1', whose capture began mid-word at a token boundary).
+
+    With ``--output-format stream-json`` the CLI emits every message as a
+    JSONL event.  This helper concatenates the text blocks of all *top-level*
+    assistant events in emission order, restoring the complete visible
+    response regardless of how many turns it spanned.  It is a faithful
+    capture of what the model actually emitted — no repair, no synthesis, no
+    reordering (§17.6.5 is untouched: a genuinely malformed response still
+    fails downstream parsing and is reported honestly).
+
+    Returns ``None`` when *stdout* contains no recognizable stream-json
+    events — the caller then falls back to treating stdout as the response
+    verbatim (defensive: also keeps the transport usable against a CLI or
+    test double that ignores the output-format flag).  Otherwise returns the
+    concatenated text, possibly empty; the caller fails closed on an empty
+    reassembly.
+    """
+    texts: list[str] = []
+    saw_stream_event = False
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(event, dict) or "type" not in event:
+            continue
+        saw_stream_event = True
+        if event.get("type") != "assistant":
+            continue
+        # Only top-level assistant traffic is the response; a sub-agent's
+        # messages (parent_tool_use_id set) belong to its parent tool call.
+        if event.get("parent_tool_use_id"):
+            continue
+        message = event.get("message")
+        if not isinstance(message, dict):
+            continue
+        content = message.get("content")
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                texts.append(block.get("text") or "")
+    if not saw_stream_event:
+        return None
+    # Join with NO separator: a turn split mid-token by an output-token cut
+    # must rejoin seamlessly — inserting a newline would corrupt a JSON
+    # string that continues across the split (the exact defect this helper
+    # exists to close).
+    return "".join(texts)
 
 
 # ---------------------------------------------------------------------------
@@ -251,7 +381,12 @@ def invoke_claude_text(
     Returns
     -------
     str
-        The raw response text from Claude (stdout).
+        The complete assistant response text, reassembled from the CLI's
+        stream-json events across ALL assistant turns of the session (a
+        generation split across turns — output-token cut with auto-continue,
+        or a mid-answer tool call — is captured whole, not tail-only).  When
+        stdout carries no stream-json events, the raw stdout is returned
+        verbatim.
 
     Raises
     ------
@@ -262,11 +397,17 @@ def invoke_claude_text(
     ClaudeTransportError
         Non-zero exit code, empty stdout, or other transport failure.
     """
-    # Build the command
+    # Build the command.  stream-json output (which requires --verbose in
+    # print mode) lets the transport reassemble the FULL assistant response
+    # from every turn of the session; the default text mode prints only the
+    # final assistant message, which front-truncates any generation that
+    # spans turns (see _reassemble_stream_json).
     cmd: list[str] = [
         "claude",
         "-p",
-        "--model", model
+        "--model", model,
+        "--output-format", "stream-json",
+        "--verbose",
     ]
 
     # Append --tools flag when tools are specified.
@@ -357,10 +498,29 @@ def invoke_claude_text(
 
     returncode = proc.returncode
     if returncode != 0:
+        # A subscription usage-limit refusal is written to *stdout* and exits
+        # non-zero.  Detect it first so it surfaces as a distinct, actionable
+        # error instead of a bare "exited with code N" (the notice is not on
+        # stderr, so the generic path below would hide it).
+        _notice = _rate_limit_notice(stdout, stderr)
+        if _notice is not None:
+            raise ClaudeCLIRateLimitError(
+                "Claude CLI refused the call: Claude Code subscription usage "
+                f"limit reached ({_notice}). This is an account/quota condition, "
+                "not a prompt or engine defect; wait for the reset and re-run.",
+                stderr=stderr,
+                stdout=stdout,
+                reset_notice=_notice,
+            )
+        # Generic non-zero exit.  stderr is preferred for the message, but when
+        # it is empty the CLI often writes its diagnostic to stdout — include a
+        # stdout snippet so the failure is not blind in the run manifest.
         stderr_snippet = (stderr or "").strip()[:500]
+        stdout_snippet = (stdout or "").strip()[:500]
+        detail = stderr_snippet or stdout_snippet
         raise ClaudeTransportError(
             f"Claude CLI exited with code {returncode}"
-            + (f": {stderr_snippet}" if stderr_snippet else ""),
+            + (f": {detail}" if detail else ""),
             stderr=stderr,
             stdout=stdout,
         )
@@ -377,4 +537,20 @@ def invoke_claude_text(
             stdout=stdout,
         )
 
-    return stdout
+    reassembled = _reassemble_stream_json(stdout)
+    if reassembled is None:
+        # Not stream-json output (a CLI or test double that ignored the
+        # flag): the raw stdout IS the response, exactly as before.
+        return stdout
+    if not reassembled.strip():
+        raise ClaudeTransportError(
+            "Claude CLI stream-json output contained no assistant text"
+            + (
+                f" (stderr: {(stderr or '').strip()[:300]})"
+                if stderr
+                else ""
+            ),
+            stderr=stderr,
+            stdout=stdout,
+        )
+    return reassembled

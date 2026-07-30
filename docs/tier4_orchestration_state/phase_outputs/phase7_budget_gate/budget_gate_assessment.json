@@ -1,39 +1,38 @@
 {
   "schema_id": "orch.phase7.budget_gate_assessment.v1",
-  "run_id": "msca-pf-real-01",
+  "run_id": "4acdc86e-4a04-4d55-b9f9-a04c9cd9e28e",
   "gate_pass_declaration": "pass",
   "budget_response_reference": "unit_cost_budget.json",
-  "validation_artifact_reference": "budget_validation_response_20260717T000000Z.json",
-  "instrument_type_note": "MSCA-PF is a unit-cost instrument per CLAUDE.md §8.1 constitutional amendment C1. Budget authority is the internal deterministic derivation at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json (schema_id: orch.phase7.unit_cost_budget.v1). The lump_sum_budget_planner received/ directory is inapplicable for unit-cost instruments; its absence is not a blocking gate failure for this instrument type — CLAUDE.md §8.4 C1 amendment governs. The skill specification's Step B.1.1 received/ blocking-failure rule applies to lump-sum instruments only; for unit-cost instruments the constitution (CLAUDE.md §10.2: skills are not authorities) supersedes that step. All four line_items in unit_cost_budget.json carry status: Confirmed. unresolved_components is empty. gate_pass_declaration set to pass per CLAUDE.md §8.4 unit-cost path: every budget component resolved to Confirmed; no blocking inconsistencies. Structural validation of unit_cost_budget.json confirmed: required fields (schema_id, run_id, instrument_type, budget_regime, gate_pass_declaration, derivation, line_items, unresolved_components, blocking_inconsistencies) are all structurally present and of correct type. No numeric budget values have been materialized, stored, quoted, or written to this artifact per CLAUDE.md §8.1, §8.3, and constitutional constraint 1 of this skill.",
+  "validation_artifact_reference": "budget_validation_response_2026-07-29T00:00:00.000Z.json",
   "wp_coverage_results": [
     {
       "wp_id": "WP1",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — project-level unit-cost derivation; MSCA-PF unit-cost budget is not decomposed per work package; WP1 activities (probabilistic multi-sensor diagnosis of the field state) covered by the project-level fellow stipend lines structurally confirmed present with status Confirmed",
+      "budget_line_reference": "unit_cost_budget.json (docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/) — instrument_type MSCA-PF, budget_regime unit_cost; WP1 activities are structurally covered within the 24-month fellowship unit-cost derivation; unit-cost instruments do not carry WP-level budget line entries; all four cost-category line items are status Confirmed",
       "inconsistencies": []
     },
     {
       "wp_id": "WP2",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — project-level unit-cost derivation; MSCA-PF unit-cost budget is not decomposed per work package; WP2 activities (uncertainty-aware decision engine and demonstrator integration) covered by the project-level fellow stipend lines structurally confirmed present with status Confirmed",
+      "budget_line_reference": "unit_cost_budget.json — WP2 activities structurally covered within the 24-month fellowship unit-cost derivation; no WP-level line separation exists under the MSCA-PF unit-cost instrument model",
       "inconsistencies": []
     },
     {
       "wp_id": "WP3",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — project-level unit-cost derivation; MSCA-PF unit-cost budget is not decomposed per work package; WP3 activities (field validation, ground truth and uncertainty calibration) covered by the project-level fellow stipend lines structurally confirmed present with status Confirmed",
+      "budget_line_reference": "unit_cost_budget.json — WP3 activities structurally covered within the 24-month fellowship unit-cost derivation",
       "inconsistencies": []
     },
     {
       "wp_id": "WP4",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — project-level unit-cost derivation; MSCA-PF unit-cost budget is not decomposed per work package; WP4 training, supervision and two-way transfer of knowledge activities covered under research_training_networking and management_and_indirect line_items structurally confirmed present with status Confirmed",
+      "budget_line_reference": "unit_cost_budget.json — WP4 activities structurally covered within the 24-month fellowship unit-cost derivation",
       "inconsistencies": []
     },
     {
       "wp_id": "WP5",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — project-level unit-cost derivation; MSCA-PF unit-cost budget is not decomposed per work package; WP5 dissemination, exploitation, communication and management activities covered under research_training_networking and management_and_indirect line_items structurally confirmed present with status Confirmed",
+      "budget_line_reference": "unit_cost_budget.json — WP5 activities structurally covered within the 24-month fellowship unit-cost derivation",
       "inconsistencies": []
     }
   ],
@@ -41,21 +40,22 @@
     {
       "partner_id": "FELLOW",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — FELLOW is the MSCA-PF researcher; living_allowance and mobility_allowance line_items structurally present with status Confirmed; FELLOW is the direct beneficiary of unit-cost fellow stipend lines; leads WP1, WP2, WP3, WP5 and contributes to WP4 per wp_structure.json partner_role_matrix",
+      "budget_line_reference": "unit_cost_budget.json — FELLOW is the cost-bearing researcher under the MSCA-PF instrument; all four unit-cost line items (living_allowance, mobility_allowance, research_training_networking, management_and_indirect) are present and status Confirmed; no numeric values materialized per Constraint 1",
       "inconsistencies": []
     },
     {
       "partner_id": "SUPERVISOR",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — SUPERVISOR provides supervision and leads WP4 under MSCA-PF institutional hosting arrangements; supervision and training activities structurally covered under research_training_networking and management_and_indirect line_items confirmed present with status Confirmed; MSCA-PF unit-cost model does not carry discrete supervisor budget lines separate from these project-level lines",
+      "budget_line_reference": "unit_cost_budget.json — SUPERVISOR (Dr. András Jung, affiliated to HOST/ELTE) participates under the MSCA-PF fellowship without a separate named budget line; supervisory activities are structurally subsumed within the management_and_indirect unit-cost line item, status Confirmed",
       "inconsistencies": []
     },
     {
       "partner_id": "HOST",
       "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json — HOST (ELTE) is the sole beneficiary receiving the grant disbursement; all unit-cost disbursement flows to HOST as grant agreement signatory; management_and_indirect line_item structurally present with status Confirmed; HOST administrative, institutional support, and WP3/WP4/WP5 contributing-partner activities covered under this line",
+      "budget_line_reference": "unit_cost_budget.json — HOST (Eötvös Loránd University, ELTE) is the sole beneficiary; institutional administration and indirect costs are structurally covered by the management_and_indirect unit-cost line item, status Confirmed; no separate host-organisation named entry exists under MSCA-PF unit-cost instrument structure",
       "inconsistencies": []
     }
   ],
-  "blocking_inconsistencies": []
+  "blocking_inconsistencies": [],
+  "assessment_note": "Budget gate assessed against the internal deterministic unit-cost derivation per CLAUDE.md §8.1 / Constitutional Amendment C1, instrument_type MSCA-PF, budget_regime unit_cost. The lump_sum_budget_planner/received/ directory is correctly absent for this instrument type; for unit-cost instruments the external lump-sum response channel is not applicable (§8.1 / §5 integration constraints scoped to lump-sum only). gate_pass_declaration set to pass on the basis that: (1) unit_cost_budget.json is present in phase7_budget_gate/ with its own gate_pass_declaration pass and all four cost-category line items at status Confirmed, including the host-dependent living_allowance line (host_country HU, Confirmed); (2) all five WPs from wp_structure.json (schema_id orch.phase3.wp_structure.v1, run_id 50ec7164-9a7e-419f-9db2-7b540e077f36) are structurally covered by the 24-month fellowship unit-cost derivation — unit-cost budgets cover the fellowship as a whole, not per-WP; (3) all three partner_ids from the wp_structure.json partner_role_matrix (FELLOW, SUPERVISOR, HOST) are accounted for within the MSCA-PF unit-cost cost-category model; (4) no blocking inconsistencies are present or unresolved. Response conformance check: unit_cost_budget.json carries schema_id orch.phase7.unit_cost_budget.v1 and gate_pass_declaration pass — all required structural fields present and correctly typed per interface_contract.json contract_version 1.0 response_schema (response_id equivalent: schema_id + run_id; work_packages coverage: instrument-level, all five WPs structurally confirmed; partners coverage: FELLOW, SUPERVISOR, HOST confirmed). No numeric budget values have been materialized, stored, quoted, or written in this artifact in compliance with Constraint 1 (CLAUDE.md §8.1, §8.3, §17.6.7). Validation artifact written to docs/integrations/lump_sum_budget_planner/validation/budget_validation_response_2026-07-29T00:00:00.000Z.json. Sources: interface_contract.json contract_version 1.0; wp_structure.json run_id 50ec7164-9a7e-419f-9db2-7b540e077f36; unit_cost_budget.json run_id 4acdc86e-4a04-4d55-b9f9-a04c9cd9e28e."
 }

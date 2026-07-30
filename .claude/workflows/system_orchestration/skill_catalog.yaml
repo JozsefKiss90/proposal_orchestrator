@@ -412,6 +412,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/excellence_section.json
     constitutional_constraints:
@@ -435,6 +437,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/impact_section.json
     constitutional_constraints:
@@ -459,6 +463,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/implementation_section.json
     constitutional_constraints:
@@ -480,6 +486,11 @@ skill_catalog:
       - docs/tier5_deliverables/proposal_sections/
       - docs/tier3_project_instantiation/
       - docs/tier2a_instrument_schemas/application_forms/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
     writes_to:
       - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
     constitutional_constraints:
@@ -504,6 +515,11 @@ skill_catalog:
       - docs/tier5_deliverables/proposal_sections/
     optional_reads_from:
       - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
     notes: >

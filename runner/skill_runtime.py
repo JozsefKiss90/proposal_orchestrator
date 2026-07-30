@@ -816,15 +816,21 @@ _FAILURE_CLASS_TIMEOUT = "TIMEOUT"
 _FAILURE_CLASS_NONZERO_EXIT = "NONZERO_EXIT"
 _FAILURE_CLASS_EMPTY_OUTPUT = "EMPTY_OUTPUT"
 _FAILURE_CLASS_CLI_UNAVAILABLE = "CLI_UNAVAILABLE"
+_FAILURE_CLASS_RATE_LIMITED = "RATE_LIMITED"
 _FAILURE_CLASS_OTHER = "OTHER"
 
 
 def _classify_transport_failure(exc: ClaudeTransportError) -> str:
     """Classify a transport exception into a diagnostic failure class."""
-    from runner.claude_transport import ClaudeCLIUnavailableError
+    from runner.claude_transport import (
+        ClaudeCLIRateLimitError,
+        ClaudeCLIUnavailableError,
+    )
 
     if isinstance(exc, ClaudeCLITimeoutError):
         return _FAILURE_CLASS_TIMEOUT
+    if isinstance(exc, ClaudeCLIRateLimitError):
+        return _FAILURE_CLASS_RATE_LIMITED
     if isinstance(exc, ClaudeCLIUnavailableError):
         return _FAILURE_CLASS_CLI_UNAVAILABLE
     msg = str(exc).lower()
@@ -1080,6 +1086,23 @@ def _extract_json_response(text: str) -> dict | None:
             data, end = decoder.raw_decode(stripped, i)
             span = end - i
             if isinstance(data, dict) and span > best_span:
+                # Interior-fragment guard (front-truncation, salvage path).
+                # The step-1b guard only covers responses that BEGIN with '{'.
+                # A front-truncated response that begins mid-string or
+                # mid-array does not, so it lands here — and its surviving
+                # tail is full of small *complete* member objects (e.g. the
+                # trailing source_refs entries of a cut-off draft).  A
+                # genuine root object embedded in prose is followed by
+                # prose, whitespace, or EOF — never by ',' ':' ']' or '}',
+                # which mark membership in an enclosing structure whose
+                # opening was lost.  Skip such candidates so a truncated
+                # response fails closed as unparseable instead of being
+                # silently repaired into a misleading fragment (§17.6.5;
+                # observed in run 511325a3 as a drafter "no 'content'
+                # prose" error whose parsed keys were a single source_refs
+                # entry).
+                if stripped[end:].lstrip()[:1] in (",", ":", "]", "}"):
+                    continue
                 best = data
                 best_span = span
         except (json.JSONDecodeError, ValueError):

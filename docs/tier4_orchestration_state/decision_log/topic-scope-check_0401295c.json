@@ -1,0 +1,117 @@
+{
+  "decision_id": "scope_check_concept_refiner_2026-07-28T120000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "Dr. Rositsa Cholakova undertakes international mobility from Bulgaria (Plovdiv) to Hungary (Budapest, ELTE) for an MSCA Postdoctoral Fellowship, satisfying the international mobility and researcher excellence criteria that are the defining scope criteria of the instrument.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The application is submitted jointly by the researcher (Dr. Rositsa Cholakova) and a beneficiary (ELTE) in the academic sector.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The European Fellowship takes place at ELTE, Budapest, Hungary — an EU Member State — satisfying the requirement that EF fellowships must take place in an EU Member State or Horizon Europe Associated Country.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The fellowship duration is confirmed at 24 months, within the 12–24 month range required for European Postdoctoral Fellowships.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "A Career Development Plan is prepared jointly by supervisor (Dr. András Jung) and fellow (Dr. Rositsa Cholakova), submitted as a project deliverable at the start of the action (by months 2–3), then reviewed and updated at M12 and M24.",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-13",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Training integrates digital and AI skills including the responsible use of generative AI in environmental modelling and scientific coding, addressing the MSCA-PF mandatory requirement for key transferable skills including digital ones.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": "CC-11",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Training integrates knowledge valorisation and innovation/entrepreneurship — specifically translating the uncertainty-aware crop-water decision-support demonstrator toward user uptake — addressing the MSCA-PF requirement for fostering a culture of knowledge valorisation and innovation.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Training integrates research integrity and open-science ethics: FAIR data management, open research software, and reproducible validation; preparing the fellow for increased research collaboration and information-sharing via digital technologies including open access.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-12",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "A two-way transfer of knowledge is structured: the fellow brings plant-physiology and non-destructive stress-phenotyping expertise into the host's geoinformatics group; the host provides remote-sensing, hyperspectral and multisensor-fusion competences in return, evidenced by at least two methods seminars delivered at the host.",
+      "scope_element_ref": "SR-05",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project develops an uncertainty-aware multi-sensor diagnostic and irrigation decision support framework for tomato crops (Route B: homogeneous patch proxy), fusing Sentinel-1 SAR, Sentinel-2 optical, PlanetScope high-resolution imagery, ERA5 meteorological reanalysis and field sensor data via probabilistic machine learning to estimate root-zone soil moisture and crop water status.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this research domain and methodology claim is in-scope; scope boundary is defined by Tier 2B only. The scope_requirements.json defines MSCA-PF scope in terms of researcher excellence and international mobility (SR-01), fellowship structure, training activities (SR-05, SR-06), and the Career Development Plan (SR-07) — not thematic research domains. MSCA-PF is discipline-agnostic; no required_focus or excluded_topic entry exists in scope_requirements.json for crop water stress, precision irrigation, probabilistic machine learning, or Earth observation research. The claim is not contradicted by any Tier 2B constraint or excluded_topic entry but cannot be affirmatively confirmed as in_scope against a specific Tier 2B scope boundary entry."
+    },
+    {
+      "claim": "The project uses uncertainty-aware AquaCrop calibration and counterfactual irrigation simulation over weather ensembles to recommend the irrigation option with the best expected water-use efficiency, carrying uncertainty end-to-end from observation to decision — with the framework kept open to profit or drought-risk objective formulations.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this research methodology claim is in-scope; scope boundary is defined by Tier 2B only. AquaCrop-based counterfactual decision simulation and water-use-efficiency optimisation are research methodology choices not addressed by any scope boundary entry in scope_requirements.json. The claim is not contradicted by any Tier 2B constraint but cannot be affirmatively confirmed as in_scope against a specific scope element."
+    },
+    {
+      "claim": "Validation is performed against non-destructive physiological ground truth (chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, spectral reflectance); uncertainty calibration is judged by 90% prediction-interval coverage (90% prediction intervals containing the truth approximately 90% of the time); Route B patch covariation is established by a co-located seasonal measurement campaign.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this validation methodology claim is in-scope; scope boundary is defined by Tier 2B only. Non-destructive physiological measurement protocols and prediction-interval calibration targets are research methodology choices not addressed by any entry in scope_requirements.json or call_constraints.json. The claim is not contradicted by any Tier 2B constraint but cannot be affirmatively confirmed as in_scope against a specific scope boundary entry."
+    },
+    {
+      "claim": "The research targets TRL 3–4 (research prototype), presented as a standalone demonstrator rather than a product, deemed appropriate for a 24-month research fellowship.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm or evaluate a TRL 3–4 target claim as in-scope; scope boundary is defined by Tier 2B only. The scope_requirements.json and call_constraints.json contain no TRL requirements, restrictions, or expected maturity levels for MSCA-PF research projects. The claim is not contradicted by any Tier 2B constraint but cannot be affirmatively confirmed as in_scope against a specific scope element."
+    },
+    {
+      "claim": "AgroVIR (Hungary, non-academic associated partner) provides farmer access and field validation sites for Hungarian tomato growers; AgroVIR is explicitly stated as not owning or operating the tool and is not acting as a formal non-academic sector placement host.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm associated-partner field-access roles as in-scope; scope boundary is defined by Tier 2B only. SR-09 and CC-07–CC-10 address formal non-academic sector placements; AgroVIR is explicitly described as an associated partner providing field access, not as a placement host, and therefore does not violate these constraints. However, no scope boundary entry in scope_requirements.json affirms or excludes the use of associated partners for farmer access and field validation engagement. The claim is not a constraint violation but cannot be mapped to a specific Tier 2B scope element to confirm in_scope status."
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope",
+    "Scope - European Postdoctoral Fellowships",
+    "Scope - Training activities",
+    "Scope - Career Development Plan",
+    "Scope - Secondments",
+    "Scope - Placements in the non-academic sector"
+  ],
+  "tier_authority_applied": "Tier 2B docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (11 requirements SR-01 to SR-11, sourced from HORIZON-MSCA-2026-PF-01-01.slice.json); Tier 2B docs/tier2b_topic_and_call_sources/extracted/call_constraints.json (18 constraints CC-01 to CC-18, sourced from HORIZON-MSCA-2026-PF-01-01.slice.json). No other sources consulted; scope boundary defined exclusively by these two Tier 2B extracted files per constitutional constraint.",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-07-28T12:00:00Z"
+}

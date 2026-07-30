@@ -148,6 +148,21 @@ Forbidden patterns:
 
 General rule: after any `WP*` reference followed by punctuation that introduces descriptive text, first write the exact canonical title from `canonical_reference_pack.wps[].title`, then separate capability descriptions with a semicolon or a new sentence. Do not let a capability phrase become the apparent title attached to the WP ID.
 
+**Task-citation sub-rule (same gate, same appositive mechanism).** The gate treats *any* appositive attached to a `WP*` ID as a claimed WP title — including a task reference. Never place a task ID or task description in the parenthetical/colon/dash slot directly after a `WP*` ID; that reads as if the task were the WP's title and fails `gate_10c` canonical term preservation. This is especially dangerous when the task description shares words with the WP title (e.g. a "communication and dissemination" task under a "Dissemination, ... communication ..." WP).
+
+When you need to cite a specific task while mentioning its parent WP, lead with the **task** ID (not the WP ID) in the appositive slot, or name the WP with its canonical title and put the task in a separate clause:
+
+- `... contributes to the communication materials in task T5-02 (Develop communication and dissemination materials for target audiences), which sits within WP5 ...`
+- `... in WP5 (Dissemination, exploitation, communication and management), specifically task T5-02, the host ...`
+
+Forbidden patterns (task descriptor attached to the WP ID slot):
+
+- `... the communication materials in WP5 (T5-02: Develop communication and dissemination materials for target audiences) ...`
+- `... contributes to WP5 — Develop communication and dissemination materials ...`
+- `... to T5-02 delivered under WP5: communication and dissemination materials ...`
+
+Rule of thumb: the only text that may appear in a `WP<n> (...)`, `WP<n>: ...`, or `WP<n> — ...` appositive is the exact canonical WP title from `canonical_reference_pack.wps[].title`. Tasks, deliverables, and capability phrases go in a separate clause or attach to their own ID.
+
 ### 4. Output Schema
 
 Return JSON conforming to `orch.tier5.implementation_section.v1`:

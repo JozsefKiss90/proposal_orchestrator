@@ -1,41 +1,40 @@
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
-  "run_id": "msca-pf-graph-01",
+  "run_id": "5952b165-d2ee-403f-9dec-27382645d7f3",
   "sections": [
     {
       "section_id": "excellence",
       "criterion": "Excellence",
       "order": 1,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "word_count": 24670
+      "word_count": 16248
     },
     {
       "section_id": "impact",
       "criterion": "Impact",
       "order": 2,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
-      "word_count": 19025
+      "word_count": 11058
     },
     {
       "section_id": "implementation",
       "criterion": "Quality and efficiency of the implementation",
       "order": 3,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
-      "word_count": 12557
+      "word_count": 7273
     }
   ],
   "consistency_log": [
     {
       "check_id": "CC-01",
-      "description": "Objective consistency across Excellence and Implementation sections, verified against Tier 3 authoritative objectives",
+      "description": "Objective consistency across Excellence and Implementation sections",
       "sections_checked": [
         "excellence",
-        "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (5 objectives: OBJ-1 through OBJ-5); excellence_section.json sub_section 1.1 (enumerates all 5 objectives with canonical titles and IDs); implementation_section.json sub_section 3.1 (references OBJ-1, OBJ-2, OBJ-3, OBJ-4); impact_section.json (references OBJ-5 via IMP-4). All objective IDs and canonical titles match Tier 3 exactly across all three sections. Objective count in Excellence (5) matches Tier 3 node_count (5). No objective ID appears in any section that is absent from Tier 3."
+      "source_basis": "Tier 3 objectives.json (OBJ-1 through OBJ-5 canonical IDs and titles); excellence_section.json sub-section 1.1 (OBJ-1 through OBJ-5 enumerated with titles and WP attribution); implementation_section.json sub-section 3.1 WP objectives"
     },
     {
       "check_id": "CC-02",
@@ -47,11 +46,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "implementation_section.json wp_table_refs [WP1, WP2, WP3, WP4, WP5]; excellence_section.json sub_sections 1.1–1.4 (references WP1–WP5 with canonical titles); impact_section.json sub_sections 2.1–2.3 (references WP1–WP5). WP IDs and titles are used consistently across all three sections: WP1 (Probabilistic multi-sensor diagnosis of the field state), WP2 (Uncertainty-aware decision engine and demonstrator integration), WP3 (Field validation, ground truth and uncertainty calibration), WP4 (Training, supervision and two-way transfer of knowledge), WP5 (Dissemination, exploitation, communication and management). No WP ID appears in Excellence or Impact that is absent from the canonical WP list in Implementation."
+      "source_basis": "phase3_wp_design/wp_structure.json (canonical WP IDs and titles WP1-WP5); implementation_section.json wp_table_refs [WP1-WP5]; excellence_section.json sub-sections 1.1-1.4; impact_section.json sub-sections 2.1-2.3"
     },
     {
       "check_id": "CC-03",
-      "description": "Partner name consistency across all three sections, verified against Tier 3 authoritative partner registry",
+      "description": "Partner name consistency across all three sections",
       "sections_checked": [
         "excellence",
         "impact",
@@ -59,11 +58,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "docs/tier3_project_instantiation/consortium/partners.json (4 partners: HOST legal_name 'Eötvös Loránd University (ELTE), Budapest' / short_name 'ELTE'; FELLOW legal_name 'Dr. Rositsa Cholakova'; SUPERVISOR legal_name 'Dr. András Jung'; VALIDATION_PARTNER legal_name 'AgroVIR' / short_name 'AgroVIR'); all three section artifacts. All partner names used across sections match either legal_name or short_name from Tier 3. 'Eötvös Loránd University (ELTE), Budapest' and abbreviated 'ELTE' are both present in Tier 3 (legal_name and short_name respectively); both forms are used appropriately in sections. No partner appears in any section whose identity is absent from Tier 3. No variant or misspelling detected."
+      "source_basis": "Tier 3 consortium/partners.json (legal_name and short_name for HOST, FELLOW, SUPERVISOR, VALIDATION_PARTNER); all three section artifacts"
     },
     {
       "check_id": "CC-04",
-      "description": "Deliverable ID and naming consistency across all three sections",
+      "description": "Deliverable ID consistency across all three sections",
       "sections_checked": [
         "excellence",
         "impact",
@@ -71,7 +70,7 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json sub_section 1.1 (deliverable titles and months); impact_section.json sub_sections 2.2–2.3 (deliverable titles and months); implementation_section.json sub_section 3.1 (deliverable table). Six deliverables referenced consistently across sections: D1-01 (Diagnostic model specification and calibration report, month 14, WP1), D2-01 (Decision engine and demonstrator software, month 20, WP2), D3-01 (Field validation dataset and uncertainty calibration report, month 24, WP3), D4-01 (Career Development Plan, month 3, WP4), D5-01 (Data Management Plan, month 6, WP5), D5-02 (Dissemination and exploitation plan, month 6, WP5). Names, WP attributions, and due months are consistent across all three sections. No deliverable is described as a KPI; KPI-tracked outcomes (e.g., 90% PI coverage per RQ5) are consistently framed as validation criteria, not as deliverables."
+      "source_basis": "phase3_wp_design/wp_structure.json (canonical deliverable IDs D1-01 through D5-02 with titles and due months); all three section artifacts"
     },
     {
       "check_id": "CC-05",
@@ -82,30 +81,29 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "implementation_section.json milestone_refs [MS1, MS2, MS3, MS4, MS5, MS6] and sub_section 3.1 milestone definitions; impact_section.json sub_sections 2.3.3–2.3.4. The Implementation section defines six milestones (MS1 month 6, MS2 month 12, MS3 month 15, MS4 month 18, MS5 month 22, MS6 month 24), each with verifiable criteria. The Impact and Excellence sections organise content by outcomes, impact pathways, and deliverables rather than by explicit milestone IDs; this is a structural difference in presentation, not a contradiction. No milestone ID appears in the Impact or Excellence sections that conflicts with or is absent from the Implementation milestone registry. MS4 (research demonstrator, month 18) is referenced contextually in the Impact section in relation to farmer feedback; the description is consistent with the Implementation section definition."
+      "source_basis": "implementation_section.json milestone_refs [MS1-MS6] and verifiable criteria in sub-section 3.1; excellence_section.json sub-section 1.3 milestone references; phase3_wp_design/wp_structure.json"
     },
     {
       "check_id": "CC-06",
-      "description": "KPI consistency across sections",
+      "description": "KPI consistency across Impact and Implementation sections",
       "sections_checked": [
-        "excellence",
         "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json sub_section 1.1 (RQ5 criterion: '90% prediction intervals must contain the measured ground-truth value approximately 90% of the time'; RQ6: water-use efficiency); impact_section.json sub_section 2.3.2 (same RQ5 criterion verbatim); implementation_section.json sub_section 3.1 MS5 verifiable criterion (same RQ5 criterion). The two core KPIs — uncertainty-calibration coverage criterion (RQ5: 90% PI coverage approximately 90% of the time) and decision objective (RQ6: water-use efficiency) — are defined identically across all three sections. No section asserts a different numerical target or a different decision objective. OBJ-3 measurable_target components (RQ4, RQ5, RQ7, RQ9) are all present in all three sections with no partial metric loss: all four RQ4 measurement types (chlorophyll fluorescence, stomatal conductance, canopy and leaf temperature, spectral reflectance) appear in each section that references OBJ-3."
+      "source_basis": "impact_section.json sub-section 2.3 (KPI-01 through KPI-07 defined); phase5_impact_architecture/impact_architecture.json (KPI definitions and targets); implementation_section.json (underlying measurable criteria RQ5, RQ7, RQ9 consistent with KPI targets in impact section)"
     },
     {
       "check_id": "CC-07",
-      "description": "Impact claim grounding: each impact claim in the Impact section is traceable to a project mechanism in the Implementation section",
+      "description": "Impact claim grounding — each Impact section impact claim must cite a project mechanism present in Implementation",
       "sections_checked": [
         "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "impact_section.json sub_sections 2.3.2–2.3.5 and impact_pathway_refs [PWY-EI-01 through PWY-EI-07]; implementation_section.json wp_table_refs and sub_section 3.1. All impact pathways and outcome references in the Impact section cite project mechanisms (WPs, deliverables, tasks) that are defined in the Implementation section. OUT-1 → WP1/D1-01 (confirmed in Implementation). OUT-2 → WP2/D2-01 (confirmed). OUT-3 → WP3/D3-01 (confirmed). OUT-4 → WP2/T2-03/D2-01 (confirmed). OUT-5 → WP5 (confirmed). No impact claim references a WP or deliverable absent from the Implementation section wp_table_refs or deliverable list."
+      "source_basis": "impact_section.json sub-section 2.3 (IMP-1 through IMP-4, PW-01 through PW-06, OUT-1 through OUT-6 citing WP1-WP5 and D1-01 through D5-02); implementation_section.json wp_table_refs and deliverable table confirming all cited WPs and deliverables present; Tier 3 architecture_inputs/impacts.json"
     },
     {
       "check_id": "CC-08",
@@ -117,11 +115,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "implementation_section.json sub_section 3.1 effort allocation (24 PM total: WP1 8 PM, WP2 7 PM, WP3 5 PM, WP4 2 PM, WP5 2 PM); excellence_section.json sub_sections (references 24-month fellowship duration, WP person-months matching Implementation); impact_section.json (does not assert independent budget or person-month figures). Resource allocations are stated exclusively in the Implementation section as the authoritative source. The Excellence section references the same WP person-month figures in structural context without contradiction. The Impact section does not independently assert any budget or effort figures. No conflicting person-month, cost, or resource allocation values detected across sections."
+      "source_basis": "implementation_section.json sub-section 3.1 (total effort 24 person-months; WP1=8PM, WP2=7PM, WP3=5PM, WP4=2PM, WP5=2PM); phase7_budget_gate/budget_gate_assessment.json (gate_pass_declaration: pass; all WPs covered; no blocking inconsistencies); excellence_section.json and impact_section.json contain no contradicting resource or budget figures"
     },
     {
       "check_id": "CC-09",
-      "description": "Terminology consistency: technical terms, methodology names, and component names across all three sections",
+      "description": "Terminology consistency — canonical technical terms, methodology names, and acronyms across all three sections",
       "sections_checked": [
         "excellence",
         "impact",
@@ -129,11 +127,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "docs/tier3_project_instantiation/architecture_inputs/objectives.json (canonical component/system names from objective titles); all three section artifacts. Key technical terms are used consistently: 'Route A' (direct probabilistic fusion), 'Route B' (homogeneous-patch proxy), 'AquaCrop', 'water-use efficiency (WUE)', 'honest uncertainty chain', 'TRL 3-4'. The canonical component name 'decision engine' (from OBJ-2 title: 'Uncertainty-aware decision engine for water-use-efficient irrigation choice') appears with its full stem in all three sections; no section uses 'decision' without 'engine' in a way that omits the component keyword. Minor stylistic variations (e.g., 'canopy/leaf temperature' vs 'canopy and leaf temperature'; 'TRL 3-4' vs 'TRL 3–4' en-dash variant) are present but do not introduce contradictions or ambiguity in meaning."
+      "source_basis": "Tier 3 objectives.json (canonical component/system names in objective titles); all three section artifacts. Key terms verified: Route B / homogeneous-patch proxy, Route A / direct probabilistic fusion, AquaCrop, water-use efficiency (WUE), ERA5, PlanetScope, Sentinel-1 SAR, Sentinel-2, TRL 3-4, RQ1-RQ10. OBJ-1 title uses 'latent field state' while WP1 title uses 'field state' — this is a canonical intentional distinction applied consistently across all three sections, not a terminology drift."
     },
     {
       "check_id": "CC-10",
-      "description": "Section ordering and completeness: all three sections present in correct Part B order",
+      "description": "Section ordering and completeness — all three Part B sections present in correct order",
       "sections_checked": [
         "excellence",
         "impact",
@@ -141,11 +139,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "excellence_section.json (schema_id: orch.tier5.excellence_section.v1, criterion: Excellence); impact_section.json (schema_id: orch.tier5.impact_section.v1, criterion: Impact); implementation_section.json (schema_id: orch.tier5.implementation_section.v1, criterion: Implementation). All three criterion-aligned sections are present. Ordering Excellence (1) → Impact (2) → Implementation (3) matches the MSCA-PF Part B application form structure for HORIZON-MSCA-2026-PF-01 as evidenced by section criteria names, sub_section IDs (1.x, 2.x, 3.x), and MSCA-PF instrument type. No application form template files were found in the declared Tier 2A directory (docs/tier2a_instrument_schemas/application_forms/); ordering verification is therefore based on section metadata and instrument type rather than explicit template file cross-reference."
+      "source_basis": "All three criterion-aligned section artifacts present with confirmed schema IDs; section order Excellence(1) → Impact(2) → Implementation(3) matches MSCA-PF application form template structure"
     },
     {
       "check_id": "CC-11",
-      "description": "Traceability footer consistency: primary_sources non-empty; no_unsupported_claims_declaration consistent with validation_status.overall_status",
+      "description": "Traceability footer consistency — non-empty primary_sources and no_unsupported_claims_declaration consistent with validation_status",
       "sections_checked": [
         "excellence",
         "impact",
@@ -153,11 +151,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "traceability_footer.primary_sources arrays and validation_status.overall_status from all three section artifacts. All three sections have non-empty primary_sources arrays (Excellence: 12 source entries spanning Tier 2 and Tier 3; Impact: 12 source entries; Implementation: 16 source entries). All three sections have no_unsupported_claims_declaration: true with validation_status.overall_status: 'inferred'. The check criterion (flag if true + 'unresolved') is not triggered: none of the three sections has overall_status: 'unresolved'. The 'inferred' status is consistent with no_unsupported_claims_declaration: true, as 'inferred' denotes claims derived by logical reasoning from confirmed evidence rather than unsupported assertions."
+      "source_basis": "excellence_section.json traceability_footer (no_unsupported_claims_declaration: true; overall_status: inferred — no conflict); impact_section.json traceability_footer (no_unsupported_claims_declaration: true; overall_status: inferred — no conflict); implementation_section.json traceability_footer (no_unsupported_claims_declaration: true; overall_status: inferred — no conflict). No section has no_unsupported_claims_declaration: true combined with overall_status: unresolved. All primary_sources arrays non-empty."
     },
     {
       "check_id": "CC-12",
-      "description": "Validation status aggregation across all three sections (informational)",
+      "description": "Validation status aggregation — record overall_status from each section; note any unresolved status as cross-section concern",
       "sections_checked": [
         "excellence",
         "impact",
@@ -165,7 +163,7 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "validation_status.overall_status from all three section artifacts: excellence_section.json (overall_status: 'inferred'); impact_section.json (overall_status: 'inferred'); implementation_section.json (overall_status: 'inferred'). All three sections carry 'inferred' validation status — claims are derived by logical reasoning from confirmed evidence (inference chain consistent with CLAUDE.md §12.2 'Inferred' category). No section has overall_status: 'unresolved'. Downstream reviewers should note that none of the three sections has reached 'confirmed' overall status; review should focus on verifying that inference chains stated in section traceability footers are traceable to Tier 1–3 sources before final submission."
+      "source_basis": "excellence_section.json validation_status.overall_status: inferred; impact_section.json validation_status.overall_status: inferred; implementation_section.json validation_status.overall_status: inferred. No section has overall_status: unresolved. All three sections carry inferred status driven by synthesis-provenance claims (not unverified or contradicted), consistent with CLAUDE.md §12.2 vocabulary."
     }
   ],
   "traceability_footer": {
@@ -174,8 +172,8 @@
       "docs/tier5_deliverables/proposal_sections/impact_section.json",
       "docs/tier5_deliverables/proposal_sections/implementation_section.json",
       "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
-      "docs/tier3_project_instantiation/consortium/partners.json",
       "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
       "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
       "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
       "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"

@@ -1,91 +1,159 @@
 {
   "schema_id": "orch.tier5.review_packet.v1",
-  "run_id": "msca-pf-graph-01",
+  "run_id": "5952b165-d2ee-403f-9dec-27382645d7f3",
   "findings": [
     {
-      "finding_id": "F-001",
+      "finding_id": "F-01",
       "section_id": "excellence",
       "criterion": "Excellence",
-      "description": "The gender dimension in the research methodology is addressed solely as an institutional GEP compliance obligation, not as a research-methodology consideration. The MSCA-PF evaluation form requires 'consideration of the gender dimension...if relevant for the research project' as a component of the soundness of methodology sub-criterion (weight 50%). The observable proposal content — the implementation section and assembled draft consistency log — frames gender exclusively as a host-institution legal requirement. Precision agriculture research involving irrigation decision-support has documented gender-differentiated dimensions (smallholder farmworker demographics, differential technology adoption, access to irrigation decision authority) that are neither acknowledged as relevant nor dismissed with a principled argument. No evidence of research-methodology-level gender dimension analysis appears in any readable section artifact.",
+      "description": "Section 1.1 (OBJ-3) and 1.2 (validation protocol) explicitly acknowledge that the non-destructive physiological ground-truth measurements (RQ4) validate the crop-water-status component of RQ3 directly but the root-zone soil moisture component only indirectly, via plant-physiology stress responses. The mitigation is stated as 'to be addressed in the detailed validation protocol as part of WP3' — a future-tense deferral with no specifics provided. Since RQ3 (root-zone soil moisture and crop water status) is the defined target of OBJ-1, and RQ5 (90% PI coverage) is calibrated against RQ3, a validation protocol that lacks a direct soil-moisture measurement instrument creates a material gap between the stated calibration criterion and what the available ground truth can actually verify. This directly weakens the 'honest uncertainty chain' commitment that is the project's methodological centrepiece.",
       "severity": "major",
-      "evidence": "Implementation section 3.1 ethics self-assessment: 'Eötvös Loránd University (ELTE), Budapest, as a higher education establishment in an EU Member State, is required to have a gender equality plan in place at grant signature and throughout the fellowship.' This is an institutional compliance statement, not a research-methodology gender dimension analysis.",
-      "recommendation": "Add a dedicated paragraph in the Excellence section's methodology sub-section explicitly assessing whether and how gender dimension is relevant to the research project. If relevant (e.g., gendered agricultural labour patterns, differential farmer technology adoption in Hungarian horticulture), articulate how it is considered in study design, validation cohort selection, or stakeholder engagement. If assessed as not relevant to this specific research context, provide a principled one-paragraph justification. Do not substitute the GEP institutional compliance statement for this analysis."
+      "evidence": "A coherence caveat is recorded transparently: the RQ4 non-destructive physiological measures validate the crop-water-status component...directly, but validate the root-zone soil moisture component only indirectly...No soil-moisture sensor plan beyond the confirmed ground-truth protocol is fabricated; this design constraint is acknowledged and to be addressed in the detailed validation protocol as part of WP3.",
+      "recommendation": "Specify in Section 1.1/1.2 a concrete plan for direct root-zone soil moisture measurement (e.g., soil moisture sensors, TDR probes at field sites via AgroVIR), or explicitly narrow RQ3 to exclude root-zone soil moisture from the calibration target and adjust the RQ5 criterion accordingly. If a direct instrument is not feasible, provide a quantified argument for why the indirect physiological proxy is sufficient for the RQ5 coverage test, and document this as an explicit project-design decision with its limitation acknowledged in the novelty claim."
     },
     {
-      "finding_id": "F-002",
+      "finding_id": "F-02",
       "section_id": "excellence",
       "criterion": "Excellence",
-      "description": "Inter-sectoral training exposure within WP4 is limited. AgroVIR's role is explicitly scoped to field access, validation logistics, and farmer feedback at Hungarian tomato sites — it has no formal training or mentoring contribution to the fellow. No non-academic sector secondment or structured placement is included. The supervisor's entrepreneurial track record (co-founder of Cubert GmbH and Brightic Research) is mentioned in the implementation section's hosting narrative but is not structured into any formal inter-sectoral training activity within WP4. MSCA-PF evaluators assess the quality of supervision and training — including inter-sectoral exposure — under the Excellence criterion's supervision and two-way transfer sub-criterion.",
+      "description": "The MSCA-PF evaluation criterion for Excellence (Soundness of methodology) explicitly requires consideration of the gender dimension and other diversity aspects if relevant for the research project. Section 1.2 provides a brief treatment that concludes with: 'A more detailed equality, diversity and inclusion plan is to be developed within WP4 in collaboration with the host institution, drawing on ELTE's institutional equality framework, and will be documented in the Career Development Plan (D4-01, due month 3).' This defers the concrete equality, diversity and inclusion plan to a post-award deliverable. At proposal evaluation stage, evaluators must assess methodology against this sub-criterion from the submitted text alone; the deferral means the proposal does not provide a methodology-stage equality and diversity plan for assessment.",
       "severity": "minor",
-      "evidence": "Implementation section 3.2: 'AgroVIR does not own or operate the decision-support tool; its contribution is to make real tomato farms accessible for the WP3 validation campaigns...to facilitate farmer feedback on the research demonstrator (MS4), and to provide domain grounding.' Implementation section 3.2 confirms 'No secondment and no non-academic placement are included in the fellowship plan.'",
-      "recommendation": "Structure at least one explicit inter-sectoral training element into WP4's T4-02 activities. Options include: (a) formal knowledge-valorisation mentoring sessions drawing on Dr. András Jung's co-founding experience at Cubert GmbH and Brightic Research, explicitly scheduled and described in the Excellence section; (b) structured farmer co-design workshops with AgroVIR framed as translation exercises for the demonstrator's uncertainty representations, counted as part of knowledge valorisation training; or (c) participation in a named agri-tech or precision agriculture stakeholder forum. Ensure at least one concrete non-academic sector training touchpoint is named and scheduled in WP4."
+      "evidence": "A more detailed equality, diversity and inclusion plan is to be developed within WP4 in collaboration with the host institution, drawing on Eötvös Loránd University (ELTE), Budapest's institutional equality framework, and will be documented in the Career Development Plan (D4-01, due month 3).",
+      "recommendation": "Include at least a substantive outline of the gender dimension and diversity considerations for the research methodology within Section 1.2. This could include: the gender composition of the project team; how the agricultural application domain's documented gender-differentiated access to irrigation infrastructure is addressed in the demonstrator design; and concrete steps ELTE will take to ensure inclusive working conditions. Do not defer the entire content to D4-01."
     },
     {
-      "finding_id": "F-003",
+      "finding_id": "F-03",
+      "section_id": "excellence",
+      "criterion": "Excellence",
+      "description": "The state-of-the-art review and novelty claim in Section 1.1 and 1.2 relies on a Research Gap Matrix (METH-SOTA-007) without providing the underlying peer-reviewed literature citations within the proposal text. The section names methodological precedents (Bayesian Maximum Entropy drought fusion, copula-based approaches, dynamic Bayesian networks, MF-FusionNet) but provides only one doi citation (doi:10.1016/j.envsoft.2022.105556 for AquaCrop uncertainty calibration). Evaluators cannot independently verify the novelty claim — that no work combines all three elements end-to-end — without access to the underlying literature review, which is only referenced by internal name (METH-SOTA-007). The validation status of the novelty claim is also explicitly marked as Inferred/synthesis in the project's own provenance record.",
+      "severity": "minor",
+      "evidence": "Genuine probabilistic precedents exist in the literature (including Bayesian Maximum Entropy drought fusion, copula-based drought–irrigation scheduling, dynamic Bayesian networks, and MF-FusionNet approaches) and are respected in the project's review; but none combines all three elements — learned multimodal fusion, explicit probabilistic crop-water-state outputs, and optimised irrigation decision under that uncertainty — end-to-end.",
+      "recommendation": "Cite the specific peer-reviewed references that establish the four methodological precedents (Bayesian ME drought fusion, copula-based irrigation scheduling, dynamic Bayesian networks, MF-FusionNet) and the evidence basis for the gap claim. Including 4–6 representative literature citations directly in the body of Sections 1.1 and 1.2 will allow evaluators to verify the novelty claim against the documented literature without access to METH-SOTA-007."
+    },
+    {
+      "finding_id": "F-04",
       "section_id": "impact",
       "criterion": "Impact",
-      "description": "Specific, measurable career development targets — publication planning, training hour commitments, co-supervision activities, and career-progression milestones — are explicitly deferred to the Career Development Plan deliverable (D4-01) at month 3. While the CDP framework is sound, MSCA evaluators assessing 'credibility of the measures to enhance the career perspectives and employability of the researcher' (Impact criterion, weight 30%) cannot assess the specificity or ambition of career development commitments at proposal stage. The proposal provides a structural framework for career development but no pre-specified indicators against which evaluators can judge credibility or measure the concrete post-fellowship career prospects addressed by this sub-criterion.",
+      "description": "The MSCA-PF evaluation criterion for Impact requires assessment of the 'credibility of the measures to enhance the career perspectives and employability of the researcher.' Section 2.1 explicitly defers all specific quantitative career-development targets to the Career Development Plan: 'Specific quantitative targets for the fellowship — including publication targets, structured training hours, thesis co-supervision commitments, and post-fellowship career milestones — are to be agreed and recorded in the Career Development Plan.' This leaves the impact section without measurable commitments against which the credibility of career enhancement measures can be assessed by an evaluator. The absence of any minimum quantitative anchors (e.g., at least N open-access publications; at least N hours of structured training per MSCA dimension; one conference presentation per year) significantly reduces the evaluator's ability to score this sub-criterion.",
       "severity": "major",
-      "evidence": "Implementation section 3.1, T4-01: 'It will set the specific, measurable training and career targets for the fellowship — publication planning, training hour targets, co-supervision, and career-progression milestones — that are intentionally not pre-asserted in this proposal; none were operator-provided at proposal stage, and the appropriate moment to fix them is at the start of the action, jointly with the supervisor, so they reflect the actual state of the fellow's career at the time of commencement.'",
-      "recommendation": "Include indicative (non-binding) career development targets in the Impact section's career perspectives sub-section: a publication target range (e.g., 2–3 peer-reviewed articles over the fellowship); named conference or forum dissemination activities; a stated post-fellowship career aspiration (e.g., tenure-track academic position, senior research scientist in agri-tech or EO); and at least one concrete network development activity (e.g., joining a named European remote sensing or precision agriculture research network). Frame these as indicative goals to be formalised in the CDP, not as immutable commitments."
+      "evidence": "No such targets are asserted in advance of that joint agreement: OBJ-5...explicitly records that specific quantitative targets are to be fixed in the Career Development Plan with the supervisor, reflecting the principle that concrete commitments must arise from the actual supervision relationship rather than being pre-determined independently of it.",
+      "recommendation": "Provide minimum quantitative anchors in Section 2.1 for the key career-development measures: at minimum, a minimum publication target (e.g., at least one open-access manuscript submitted per 24-month fellowship), a structured training hours commitment per MSCA mandatory dimension, and at least one milestone-type commitment for post-fellowship career development. These can be framed as floors, with specific targets to be refined in D4-01, rather than pre-committing to fixed figures. Some measurable anchor is necessary for evaluators to assess credibility."
     },
     {
-      "finding_id": "F-004",
+      "finding_id": "F-05",
       "section_id": "impact",
       "criterion": "Impact",
-      "description": "The terminal dissemination milestone (MS6, month 24) commits to 'at least one open-access publication submitted' as the verifiable achievement criterion for scientific dissemination. For a 24-month fellowship addressing ten research questions across five work packages and generating novel probabilistic multi-sensor fusion and uncertainty-aware decision methodology, a single publication represents a low dissemination floor. The 'at least one' formulation sets a minimum that may undermine evaluator confidence in the 'suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan' (Impact sub-criterion 2, weight 30%).",
-      "severity": "major",
-      "evidence": "Implementation section 3.1, MS6 verifiable criterion: 'at least one open-access publication submitted covering the probabilistic fusion-to-decision framework; open data/models released under FAIR principles; dissemination/exploitation and communication actions executed per the plan.'",
-      "recommendation": "Revise the MS6 verifiable criterion to specify a more ambitious and credible publication commitment (e.g., 'at least two open-access publications submitted, with at least one targeting a top-quartile journal in remote sensing or precision agriculture'). Ensure that the dissemination plan (D5-02) to be delivered at month 6 specifies target journals, provisional submission timelines for each anticipated article, and named conference or stakeholder dissemination targets. Reflect the revised publication target in both the Impact section's dissemination sub-section and the MS6 milestone definition in the Implementation section."
+      "description": "Section 2.2 commits to 'at least one open-access publication covering the probabilistic fusion-to-decision framework submitted by month 20' (MS6). The fellowship produces three distinct methodological contributions — the probabilistic multi-sensor field-state diagnosis method (OUT-1, WP1, D1-01 at month 14), the uncertainty-aware AquaCrop decision engine (OUT-2, WP2, D2-01 at month 20), and the field-validation dataset and uncertainty-calibration evidence (OUT-3, WP3, D3-01 at month 24) — each of which the Impact section itself describes as a 'distinct publishable contribution in peer-reviewed journals.' The commitment to only one submitted manuscript appears inconsistent with the stated richness of the publication contribution, and may not adequately demonstrate the 'suitability and quality of measures to maximise expected outcomes.'",
+      "severity": "minor",
+      "evidence": "The project's scientific outputs span three distinct methodological contributions...each of which constitutes a distinct publishable contribution in peer-reviewed journals at the intersection of remote sensing, precision agriculture, and probabilistic modelling.",
+      "recommendation": "Revise Section 2.2 to specify a minimum of two submitted manuscripts (e.g., one covering the diagnostic method and one covering the validation results), consistent with the three-WP scientific output structure already described in the dissemination plan. Alternatively, justify explicitly why one manuscript at month 20 is proportionate to a 24-month fellowship producing three publishable contributions."
     },
     {
-      "finding_id": "F-005",
+      "finding_id": "F-06",
+      "section_id": "impact",
+      "criterion": "Impact",
+      "description": "Section 2.3 explicitly states: 'No specific water-saving percentages, yield improvement figures, or economic return estimates are asserted in any Tier 1–4 source for this project, and no such figures are invented here.' While scientifically honest, the evaluation criterion for the Impact section requires 'the magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts.' For a fellowship explicitly targeting water-use efficiency (RQ6) as its decision objective, and operating at Hungarian tomato farm sites where WUE improvements have a measurable agronomic context, the total absence of any indicative quantification of potential economic or water-saving magnitude — even as a system-level context from the broader precision-agriculture literature — reduces the evaluator's ability to assess the importance of the contribution to societal and economic impacts.",
+      "severity": "minor",
+      "evidence": "No specific water-saving percentages, yield improvement figures, or economic return estimates are asserted in any Tier 1–4 source for this project, and no such figures are invented here.",
+      "recommendation": "Include in Section 2.3 at least one reference to published literature estimates of the potential water-saving magnitude in analogous precision-irrigation or decision-support systems for tomato or horticultural crops, framed as the context within which this project's TRL 3-4 research prototype is relevant. This provides the evaluator with evidence of the importance of the applied domain without requiring the proposal itself to assert unverified economic figures."
+    },
+    {
+      "finding_id": "F-07",
       "section_id": "implementation",
       "criterion": "Implementation",
-      "description": "WP4 (Training, supervision and two-way transfer of knowledge) is allocated 2 person-months across a 24-month fellowship. This envelope covers: Career Development Plan preparation and review cycles (T4-01, month 1–3 and periodic reviews), structured training delivery across four mandatory transferable-skills dimensions under SR-03 (digital/AI skills, knowledge valorisation, research integrity, open science/FAIR data stewardship), and regular supervision sessions running the full 24 months. Evaluators assessing 'quality and effectiveness of the work plan and appropriateness of the effort assigned to work packages' may question whether 2 PM is proportionate to the scope of MSCA-PF mandatory training activities described.",
+      "description": "Section 3.1 describes the WP3 field validation protocol in detail but does not provide a statistical power assessment or minimum sample size specification for either of the two key statistical tests: (a) the RQ5 90% prediction-interval coverage test (requires sufficient number of independent field observations to achieve stable empirical coverage estimates), and (b) the RQ9 Route B patch-covariation test (requires sufficient temporal density of co-located crop/patch measurement pairs to establish statistical covariation). The measurement window for T3-02 is described as 10 months spanning 'at least two partial growing seasons', but without a stated sample size target, evaluators cannot assess whether the validation data will be adequately powered to give definitive results on either test. This is a material gap in the work plan quality assessment for a proposal whose central scientific claim depends on demonstrating RQ5 and RQ9.",
+      "severity": "major",
+      "evidence": "The 10-month span of T3-02 (months 10–20) is required to cover at least two partial growing seasons, providing seasonal replication in the prediction-interval coverage assessment.",
+      "recommendation": "Add a paragraph in Section 3.1.6 (or Section 1.2) providing a sample size justification for both the RQ5 coverage test and the RQ9 covariation test. For RQ5, specify: the expected number of independent field observations, the minimum coverage fraction needed to reject the null of 'systematically miscalibrated', and the statistical test (e.g., binomial test for coverage rate). For RQ9, specify the minimum number of co-located seasonal measurement pairs and the covariation threshold. Even approximate power estimates drawn from the published validation literature would be sufficient."
+    },
+    {
+      "finding_id": "F-08",
+      "section_id": "implementation",
+      "criterion": "Implementation",
+      "description": "Section 3.2 of the Implementation section evaluates host quality including European Charter for Researchers alignment. The MSCA-PF evaluation form specifically notes that institutions holding the HRS4R (Human Resources Strategy for Researchers) label are 'exempted from providing further justification' for the Charter alignment criterion. Section 3.2 does not state whether Eötvös Loránd University (ELTE) holds the HRS4R label or is in the process of obtaining it. This omission means the proposal neither benefits from the exemption (if ELTE holds HRS4R) nor provides the required justification for Charter alignment (if it does not), leaving the host's compliance status ambiguous for the evaluator.",
       "severity": "minor",
-      "evidence": "Implementation section 3.1, WP4: 'T4-02 (Deliver structured transferable-skills training and supervision sessions, months 1–24) runs throughout the full fellowship, providing structured training that integrates the MSCA-PF mandatory transferable-skills dimensions (SR-03): digital and AI skills...knowledge valorisation and innovation and entrepreneurship...research integrity...and open science and FAIR data stewardship. Dr. András Jung supervises through regular research reviews within the host's geoinformatics and remote-sensing group.'",
-      "recommendation": "Provide a brief sub-allocation of the 2 PM WP4 effort across its component activities (e.g., 0.5 PM for CDP preparation, review and updates; 1.5 PM for supervision sessions and structured training delivery). If the aggregate scope strains the 2 PM allocation, consider redistributing 0.5 PM from WP5 to WP4, given that the single-researcher, single-beneficiary structure minimises management coordination overhead in WP5."
+      "evidence": "Section 3.2.2 describes ELTE's administrative support services and gender equality plan obligations but contains no reference to HRS4R label status or European Charter for Researchers certification.",
+      "recommendation": "Add a sentence in Section 3.2.2 stating ELTE's HRS4R status. If ELTE holds the label, cite it and note the exemption from further justification. If ELTE does not hold the label, provide a brief statement confirming ELTE's alignment with the European Charter for Researchers and the Code of Conduct for the Recruitment of Researchers, referencing the host's relevant institutional policies."
+    },
+    {
+      "finding_id": "F-09",
+      "section_id": "implementation",
+      "criterion": "Implementation",
+      "description": "WP4 (Training, supervision and two-way transfer of knowledge) is allocated 2 person-months (8% of total effort, lead Dr. András Jung). Section 2.1 identifies five mandatory MSCA-PF transferable-skills training dimensions to be structured within WP4: digital and AI skills, knowledge valorisation and innovation/entrepreneurship, research integrity, open science and FAIR data stewardship, and communication/networking/public engagement. The section argues that training is 'woven into' the research work packages, which is a valid architectural choice, but the formal WP4 allocation of 2 PM in the work plan does not reflect the full training effort described. An evaluator may question whether 2 PM (effectively Dr. Jung's supervisory time) is adequate to deliver five structured mandatory training dimensions over 24 months, even if much of the practical training occurs within WP1-WP3. This creates a potential inconsistency between the ambition described in Section 2.1 and the resource allocation in Section 3.1.",
+      "severity": "minor",
+      "evidence": "WP4 (2 PM, 8%) is lean but sufficient because the training programme is delivered by Dr. András Jung and the host institution's infrastructure rather than requiring intensive additional effort from the fellow's research time.",
+      "recommendation": "Clarify in Section 3.1.7 (Appropriateness of Effort) how the 2 PM allocation maps to the five mandatory MSCA-PF training dimensions. If the argument is that each WP contributes to training, quantify the embedded training effort across WP1-WP5 and explain how this totals to the training hours required. Alternatively, confirm that 2 PM covers all supervisory and structured training interactions as supervisor-side effort, and separately describe the fellow's reciprocal time within her own WP allocations."
     }
   ],
   "revision_actions": [
     {
       "action_id": "A-1",
-      "finding_id": "F-001",
+      "finding_id": "F-07",
       "priority": 1,
-      "action_description": "Insert a research-methodology gender dimension analysis paragraph in the Excellence section's methodology sub-section. The paragraph must: (a) explicitly assess whether gender dimension is relevant to the precision agriculture and irrigation decision-support research context in this proposal; (b) if relevant, state concretely how gender is considered in study design, validation site selection, farmer stakeholder engagement, or technology uptake analysis; (c) if assessed as not relevant, provide a principled one-paragraph scientific argument for non-relevance. Remove or supplement any language that conflates the host institution's GEP compliance obligation with research-methodology gender dimension consideration.",
-      "target_section": "excellence",
+      "action_description": "Add a statistical power and sample size justification section within Section 3.1 (or Section 1.2). Specify: (a) the minimum number of independent field observations required for the RQ5 90% PI coverage test, the statistical test to be used, and the expected power at that sample size; (b) the minimum number of co-located seasonal measurement pairs for the RQ9 covariation test and the covariation threshold criterion. Reference published validation protocols from analogous precision-agriculture studies.",
+      "target_section": "implementation",
       "severity": "major"
     },
     {
       "action_id": "A-2",
-      "finding_id": "F-003",
+      "finding_id": "F-01",
       "priority": 2,
-      "action_description": "Add indicative career development targets to the Impact section's career perspectives sub-section. Include: (1) a publication target range (e.g., 2–3 peer-reviewed open-access articles over the 24-month fellowship); (2) at least one named conference or scientific forum for dissemination; (3) a stated post-fellowship career direction with specific reference to the types of positions or sectors targeted; (4) at least one named network development activity (e.g., a European EO or precision agriculture research network). Frame all targets explicitly as indicative goals to be formalised and made binding in the CDP (D4-01) at month 3, while providing evaluators with enough specificity to assess the credibility of career development measures at proposal stage.",
-      "target_section": "impact",
+      "action_description": "Resolve the coherence caveat on root-zone soil moisture validation by either: (a) adding a direct soil moisture measurement instrument to the WP3 ground-truth protocol and updating RQ4 accordingly, or (b) explicitly narrowing RQ3 to exclude root-zone soil moisture from the primary calibration target and adjusting RQ5 scope to reflect what can actually be tested by the available ground-truth modalities. Either path must be specified in the proposal text, not deferred to WP3 post-award.",
+      "target_section": "excellence",
       "severity": "major"
     },
     {
       "action_id": "A-3",
-      "finding_id": "F-004",
+      "finding_id": "F-04",
       "priority": 3,
-      "action_description": "Revise the dissemination ambition in both the Impact section and the Implementation section's MS6 milestone. Specifically: (1) set a minimum publication commitment of at least 2 peer-reviewed open-access articles, naming provisional target journals or journal categories; (2) add at least one named conference or symposium target with provisional timing; (3) ensure D5-02 (Dissemination and exploitation plan, month 6) specifies all publication and dissemination targets with provisional submission timelines; (4) amend the MS6 verifiable criterion to reflect the revised publication target and specific conference or forum dissemination activity, replacing 'at least one open-access publication submitted' with a more ambitious and verifiable commitment.",
+      "action_description": "Add minimum quantitative anchors to Section 2.1 for the career development measures: at minimum a minimum publication target (at least one open-access manuscript per fellowship, with the specific target to be refined in D4-01), a structured training hours floor per mandatory MSCA dimension, and at least one measurable post-fellowship career milestone. Frame these as floors, not rigid commitments, to preserve the principle that exact targets are fixed in the Career Development Plan jointly.",
       "target_section": "impact",
       "severity": "major"
     },
     {
       "action_id": "A-4",
-      "finding_id": "F-002",
+      "finding_id": "F-02",
       "priority": 4,
-      "action_description": "Add one structured inter-sectoral training element to WP4's T4-02 activities in the Excellence section's supervision and training sub-section. Preferred option: describe formal knowledge-valorisation mentoring sessions in which Dr. András Jung's co-founding experience at Cubert GmbH and Brightic Research provides structured mentoring on the research-to-product pathway, scheduled explicitly (e.g., four sessions at months 6, 12, 18, 24). Alternative: describe planned stakeholder co-design workshops with AgroVIR that provide the fellow with structured exposure to agricultural technology procurement and user requirements in a non-academic business context. Name the inter-sectoral element, its schedule, and its learning objective.",
+      "action_description": "Expand the gender dimension and diversity treatment in Section 1.2 to include substantive methodology-stage content: the gender composition of the project team (fellow and supervisor); concrete steps for inclusive working conditions at ELTE; how the demonstrator design addresses gender-differentiated access to irrigation decision tools in the target farming context; and any relevant ELTE institutional policies on gender equality. This content must appear in the proposal text, not solely in D4-01.",
       "target_section": "excellence",
       "severity": "minor"
     },
     {
       "action_id": "A-5",
-      "finding_id": "F-005",
+      "finding_id": "F-05",
       "priority": 5,
-      "action_description": "Add a WP4 effort breakdown table or paragraph in the Implementation section's work plan narrative showing how the 2 PM is allocated across: (a) CDP preparation, submission and review cycles (T4-01); (b) structured supervision sessions (T4-02); (c) training delivery across each SR-03 dimension. If the breakdown reveals that 2 PM is insufficient for the training scope described, redistribute 0.5 PM from WP5 to WP4, citing the single-researcher single-beneficiary structure as justification for lower management overhead in WP5, and update the effort table accordingly.",
+      "action_description": "Revise Section 2.2 dissemination commitments to specify a minimum of two submitted open-access manuscripts by month 24, consistent with the three distinct publishable contributions described (OUT-1/D1-01, OUT-2/D2-01, OUT-3/D3-01). If only one manuscript is planned, provide an explicit justification for why three methodological outputs can be consolidated into one publication within the fellowship timeline.",
+      "target_section": "impact",
+      "severity": "minor"
+    },
+    {
+      "action_id": "A-6",
+      "finding_id": "F-08",
+      "priority": 6,
+      "action_description": "Add a statement in Section 3.2.2 on ELTE's HRS4R label status. If ELTE holds the label, cite it explicitly and invoke the exemption from further Charter alignment justification. If not, provide a brief Charter and Code alignment statement referencing ELTE's relevant institutional research policies.",
+      "target_section": "implementation",
+      "severity": "minor"
+    },
+    {
+      "action_id": "A-7",
+      "finding_id": "F-03",
+      "priority": 7,
+      "action_description": "Add 4–6 specific peer-reviewed literature citations in Sections 1.1 and 1.2 to support the four named methodological precedents (Bayesian ME drought fusion, copula-based irrigation scheduling, dynamic Bayesian networks, MF-FusionNet), and provide references for the gap claim regarding the absence of combined end-to-end probabilistic fusion-to-decision frameworks. This allows evaluators to verify the novelty claim without requiring access to the internal Research Gap Matrix (METH-SOTA-007).",
+      "target_section": "excellence",
+      "severity": "minor"
+    },
+    {
+      "action_id": "A-8",
+      "finding_id": "F-06",
+      "priority": 8,
+      "action_description": "Include in Section 2.3 at least one reference to published literature estimates of water-saving or WUE improvement magnitude from analogous precision-irrigation or EO-based decision-support systems for tomato or horticultural crops. Frame this as external context establishing the importance of the applied domain, not as a claim of this project's own economic impact. This provides evaluators with a basis for assessing the societal importance of the contribution without requiring the proposal to assert unverified economic figures.",
+      "target_section": "impact",
+      "severity": "minor"
+    },
+    {
+      "action_id": "A-9",
+      "finding_id": "F-09",
+      "priority": 9,
+      "action_description": "Add a paragraph in Section 3.1.7 clarifying how the 2 PM WP4 allocation maps across the five MSCA mandatory training dimensions. Quantify the embedded supervisory and training interaction time carried within the fellow's WP1–WP5 effort, and explain how Dr. Jung's 2 PM covers the formal structured training component. This will close the apparent gap between the ambition of the training programme described in Section 2.1 and the WP4 resource shown in the work plan.",
       "target_section": "implementation",
       "severity": "minor"
     }

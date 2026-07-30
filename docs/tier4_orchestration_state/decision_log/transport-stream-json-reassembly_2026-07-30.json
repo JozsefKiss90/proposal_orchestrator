@@ -1,0 +1,34 @@
+{
+  "record_type": "decision",
+  "id": "transport-stream-json-reassembly",
+  "date": "2026-07-30",
+  "authority": "Operator instruction (in-session): debug the n08c_implementation_drafting failure of run e93b54c6-173a-4fe1-84cf-ab18741a92f2. Logged per §9.4. Transport-layer change only (§17.5.2 / §17.1.3); no workflow logic, gate logic, artifact schema, or skill semantics altered.",
+
+  "problem": {
+    "symptom": "Run e93b54c6 n08c_implementation_drafting failed with failure_origin='agent_body', failure_category='SKILL_FAILURE': decomposed drafter response for sub-section '3.1' contained no parseable JSON object (41,380 chars, captured at .claude/logs/decomposed_drafting/e93b54c6-.../implementation/3.1.response.txt).",
+    "diagnosis": "The captured response is FRONT-TRUNCATED: it begins mid-word inside the JSON string ('...WP' | '5 covers...' — a token-boundary cut signature) and ends with a structurally valid JSON tail. The fail-closed rejection by _extract_json_response / _parse_drafter_response was CORRECT behaviour (§17.6.5, §12.4); the defect is upstream in the transport.",
+    "root_cause": "claude -p in its default text output mode prints only the FINAL assistant message of the session. The '3.1' generation spanned more than one assistant turn (an output-token cut at the CLAUDE_CODE_MAX_OUTPUT_TOKENS=32000 per-turn ceiling that the CLI auto-continued; a mid-answer tool call produces the same shape). Every earlier turn's text was dropped, so the transport delivered only the tail of the JSON object.",
+    "class_history": "Third recurrence of the front-truncation class: (1) 2026-07-14 concept-alignment-check (mitigated by raising the output-token ceiling to 32000, decision runtime-truncation-fix); (2) 2026-07-29 run a79ed11e n08a (mitigated by rejecting interior fragments in _extract_json_response and by restoring leaf-granularity drafting); (3) 2026-07-30 run e93b54c6 n08c '3.1'. Each prior fix treated a symptom (ceiling height, parser fail-open, draft size); the structural defect — the transport discarding all non-final assistant turns — remained.",
+    "trigger_context": "The '3.1' redraft ran fresh (not reused) because the 2026-07-29 §3b task-citation edit to implementation-section-drafting.md correctly invalidated n08c's reuse fingerprint. The redraft's cut/continue turn split is model-run variance; the prior run d20b6c0c produced a 48.7K-char '3.1' in a single turn that parsed fine."
+  },
+
+  "fix_applied": {
+    "component": "runner/claude_transport.py",
+    "change": "invoke_claude_text now invokes claude -p with '--output-format stream-json --verbose' and reassembles the response with a new pure helper _reassemble_stream_json: the text blocks of ALL top-level assistant events (parent_tool_use_id null; thinking/tool_use blocks and sub-agent traffic excluded) are concatenated in emission order with NO separator, so a turn split mid-token rejoins seamlessly. Fallback: stdout with no recognizable stream-json events is returned verbatim (keeps the transport usable against a CLI/test double that ignores the flag). Fail-closed: stream-json output with no assistant text raises ClaudeTransportError. Rate-limit detection (ClaudeCLIRateLimitError) still scans raw stdout/stderr and is unaffected.",
+    "constitutional_class": "Transport layer only (§17.5.2). Reassembly is faithful capture of what the model actually emitted across the CLI's message stream — no repair, no synthesis, no reordering — so §17.6.5 (no silent repair) is untouched: a genuinely malformed response still fails downstream parsing and is reported honestly. All runtime contracts (§17.4), gate logic, and failure semantics unchanged.",
+    "regression_guard": "tests/runner/test_claude_transport.py::TestStreamJsonReassembly (9 tests): multi-turn mid-token rejoin round-trips through json.loads; result-event text not duplicated; thinking/tool_use/sub-agent blocks excluded; plain-text fallback preserved; no-assistant-text fails closed; malformed JSONL lines ignored. Full transport + semantic-dispatch + skill-runtime TAPM/tool-loop + benchmark-hook + decomposed-drafting suites pass (55 + 152). Live smoke through the real claude CLI 2.1.200 confirmed stream-json event shape and clean reassembly."
+  },
+
+  "explicitly_not_changed": [
+    "_MAX_OUTPUT_TOKENS_DEFAULT stays 32000: with reassembly, a per-turn output cut that the CLI auto-continues is now harmlessly recovered, so the ceiling no longer needs to outrun worst-case generation length.",
+    "runner/decomposed_drafting.py and runner/skill_runtime.py::_extract_json_response: their fail-closed rejection of front-truncated input was correct and remains the last line of defence.",
+    "No retry was added (§17.5.4)."
+  ],
+
+  "verification": [
+    "py -3.10 -m pytest tests/runner/test_claude_transport.py tests/runner/test_claude_transport_treekill.py -q → 55 passed",
+    "py -3.10 -m pytest tests/runner/test_semantic_dispatch.py tests/runner/test_skill_runtime_tapm.py tests/runner/test_skill_runtime_tool_loop.py tests/runner/benchmark/test_transport_hook.py tests/runner/test_excellence_decomposed_drafting.py -q → 152 passed",
+    "Live invoke_claude_text smoke (claude CLI 2.1.200, stream-json): returns clean reassembled assistant text; _extract_json_response parses it.",
+    "End-to-end: re-run python -m runner --phase 8 (n08a/n08b reuse; n08c redrafts '3.1'/'3.2' through the fixed transport)."
+  ]
+}

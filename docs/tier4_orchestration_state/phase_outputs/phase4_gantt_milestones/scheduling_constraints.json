@@ -1,9 +1,9 @@
 {
   "schema_id": "orch.phase4.scheduling_constraints.v1",
-  "run_id": "msca-pf-real-01",
-  "source_wp_structure_run_id": "msca-pf-real-01",
+  "run_id": "13139efa-2f71-4b2d-b879-2c03ceb7ce91",
+  "source_wp_structure_run_id": "50ec7164-9a7e-419f-9db2-7b540e077f36",
   "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-  "normalization_timestamp": "2026-07-16T20:46:12.582515+00:00",
+  "normalization_timestamp": "2026-07-28T20:20:51.061539+00:00",
   "project_duration_months": 24,
   "wp_bounds": {
     "WP1": {
@@ -30,7 +30,7 @@
   "strict_constraints": [],
   "non_strict_constraints": [
     {
-      "from": "T1-03",
+      "from": "T1-02",
       "to": "T2-01",
       "original_edge_type": "data_input",
       "action": "preserved",
@@ -38,7 +38,7 @@
     },
     {
       "from": "T1-03",
-      "to": "T3-02",
+      "to": "T2-01",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
@@ -49,9 +49,40 @@
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T1-03",
+      "to": "T3-03",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T2-03",
+      "to": "T5-02",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T3-03",
+      "to": "T5-02",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
     }
   ],
   "normalization_log": [
+    {
+      "edge": {
+        "from": "T1-02",
+        "to": "T2-01"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
     {
       "edge": {
         "from": "T1-03",
@@ -64,8 +95,8 @@
     },
     {
       "edge": {
-        "from": "T1-03",
-        "to": "T3-02"
+        "from": "T1-02",
+        "to": "T3-03"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",
@@ -74,8 +105,28 @@
     },
     {
       "edge": {
-        "from": "T1-02",
+        "from": "T1-03",
         "to": "T3-03"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T2-03",
+        "to": "T5-02"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T3-03",
+        "to": "T5-02"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",

@@ -1,0 +1,98 @@
+{
+  "report_id": "compliance_check_impact_section_impact_writer_2026-07-30T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "impact_writer",
+  "run_id_reference": "e93b54c6-173a-4fe1-84cf-ab18741a92f2",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing. Annex templates govern post-award implementation reporting; application form templates (Tier 2A) govern proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts — partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment — not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope to redefine phase meanings, tier meanings, or gate logic.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow workflow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present and accessible.",
+      "check_status": "violation",
+      "violation_evidence": "Section 2.2 contains the regulatory claim: 'in compliance with MSCA open access mandates and Plan S where applicable' — an assertion that MSCA programme rules impose a binding open-access obligation. Section 2.3 contains the regulatory claim: 'Dr. Cholakova's move … constitutes a confirmed European Fellowship placement satisfying the MSCA mobility rule' — an assertion of an MSCA eligibility/participation rule. Neither claim carries a source_ref in the artifact's traceability_footer.primary_sources[] pointing to a path within docs/tier1_normative_framework/extracted/. The 14 primary_sources listed in the traceability footer are exclusively Tier 2B (expected_impacts.json, expected_outcomes.json, scope_requirements.json), Tier 3 (confirmation_checklist.json, selected_call.json, concept_note.md, project_summary.json, strategic_positioning.md, impacts.json, objectives.json, outcomes.json, workpackage_seed.json), and Tier 4 (impact_architecture.json, canonical_reference_pack.json). No Tier 1 normative framework source is present in the footer. MSCA open-access mandates and the MSCA mobility rule are Horizon Europe regulatory requirements traceable to the General Annexes, Programme Guide, or specific programme regulation — Tier 1 authorities — whose absence from the traceability footer constitutes a §13.9 violation.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1–4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 1
+  },
+  "timestamp": "2026-07-30T00:00:00Z"
+}

@@ -1,0 +1,202 @@
+{
+  "report_id": "traceability_excellence_traceability_auditor_2026-07-29T120000Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "traceability_auditor",
+  "run_id_reference": "c622b352-47c5-4ab7-b508-a511ffc2b736",
+  "section_id_audited": "excellence",
+  "audit_mode": "section",
+  "claim_audit_results": [
+    {
+      "claim_id": "AUDIT-001",
+      "claim_summary": "Fellow identity: Dr. Rositsa Cholakova, plant physiologist; current affiliation Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy, Plovdiv; prior Agricultural University - Plovdiv; approximately 4 years post-PhD",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOW spine item, confirmed_value: 'Maritsa Vegetable Crops Research Institute... Approximately 4 years post-PhD')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-002",
+      "claim_summary": "PhD summa cum laude 2020 on non-destructive evaluation of physiological status of drought-stressed tomato plants; doi:10.2139/ssrn.5492527",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOW confirmed_value: 'PhD 2020, summa cum laude; thesis Non-destructive evaluation... doi:10.2139/ssrn.5492527')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-003",
+      "claim_summary": "Host institution: Eötvös Loránd University (ELTE), Budapest, Faculty of Informatics, Institute of Cartography and Geoinformatics, Hungary",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST spine item, confirmed_value: 'Eötvös Loránd University (ELTE), Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest, Hungary')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-004",
+      "claim_summary": "Supervisor: Dr. András Jung, Deputy Head of Institute of Cartography and Geoinformatics, ELTE; expertise in remote sensing, hyperspectral imaging, field spectroscopy, multisensor-drone fusion; leads Multisensor-Drone-Fusion Working Group (ELTE TKP2021-NVA-29); co-founder of Cubert GmbH and Brightic Research; habilitations in Computer Science and Crop Sciences",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR spine item, confirmed_value matches all listed attributes exactly)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-005",
+      "claim_summary": "AgroVIR (Hungary) is confirmed associated partner providing farmer access, field validation logistics, and grower feedback at Hungarian tomato farms; does not own or operate the research demonstrator",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (VALIDATION_PARTNER confirmed_value: 'AgroVIR (Hungary): real, confirmed associated partner. Scope: farmer access, field validation and feedback (not owning or operating the tool)')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-006",
+      "claim_summary": "PlanetScope access confirmed via Planet platform and API (RQ8); Sentinel-1 SAR and Sentinel-2 optical are open Copernicus data; meteorological source is ERA5 reanalysis from ECMWF; field sites are Hungarian tomato farms via AgroVIR",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DATA_PROVIDERS confirmed_value; RQ8 project_decision)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-007",
+      "claim_summary": "Fellowship type: European Fellowship (EF), 24 months, intra-EU move from Plovdiv, Bulgaria to Budapest, Hungary; mobility rule satisfied; doctoral degree held",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE; FELLOW eligibility fields: 'Mobility rule satisfied (Y); PhD held (Y)')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-008",
+      "claim_summary": "Project submits MSCA Postdoctoral Fellowships 2026 call (HORIZON-MSCA-2026-PF-01); five objectives OBJ-1 through OBJ-5 with OBJ-1 Probabilistic multi-sensor diagnosis, OBJ-2 Uncertainty-aware decision engine, OBJ-3 Field validation, OBJ-4 Research demonstrator (web MVP, TRL 3-4), OBJ-5 Advancement of fellow competences",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (objectives: OBJ-1 through OBJ-5 with measurable targets)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-009",
+      "claim_summary": "Research-gap matrix from systematic literature review shows published work falls sharply as sensor integration deepens and task complexity increases toward real-time decision support; single empty cell is Real-Time Decision Support combined with PlanetScope high-resolution imagery",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (research gap matrix section establishing the gap the project targets)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-010",
+      "claim_summary": "Novelty claim: no prior work in the reviewed literature simultaneously combines (i) learned multimodal EO fusion into (ii) explicit calibrated probabilistic crop-water-state estimation with (iii) optimised irrigation decision support under that uncertainty end-to-end; genuine probabilistic precedents (Bayesian maximum entropy, copula-based drought-to-irrigation, dynamic Bayesian networks, MF-FusionNet) each lack at least one of the three elements",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (systematic literature review and research-gap matrix); inference chain: concept_note.md establishes the gap matrix by reviewing prior work across two gradients; the novelty claim derives from the finding that the combination-cell is empty in the reviewed corpus — a synthesis, not a direct quotation from a single source",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-011",
+      "claim_summary": "Route B (homogeneous-patch proxy) is the confirmed primary diagnostic route (RQ2); Route A (direct probabilistic fusion; candidate families: Bayesian hierarchical model, Gaussian process) is the rigorous alternative defined within the same architectural framework; both routes produce the same output currency (posterior over field state) and feed the same decision engine",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decision RQ2: Route B as primary); docs/tier3_project_instantiation/project_brief/concept_note.md (Route A and Route B architectural descriptions)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-012",
+      "claim_summary": "Target field state comprises root-zone soil moisture and crop water status (RQ3); ground-truth measurements are chlorophyll fluorescence, stomatal conductance, canopy/leaf temperature, and spectral reflectance (RQ4); uncertainty-calibration criterion is 90% prediction-interval coverage (RQ5); decision objective is water-use efficiency WUE (RQ6); pilot success criterion is RQ5 met on validation set (RQ7); co-located seasonal campaign to prove patch covariation (RQ9); TRL target is research prototype TRL 3-4 (RQ10)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (project_decisions RQ3, RQ4, RQ5, RQ6, RQ7, RQ9, RQ10 — all listed as Confirmed with explicit confirmed_values)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-013",
+      "claim_summary": "AquaCrop (FAO crop model) is the crop-model interface for the decision engine; uncertainty-aware calibration retains posterior distribution over model parameters rather than collapsing to single best-fit set; builds on established methods documented at doi:10.1016/j.envsoft.2022.105556",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (prognostic branch section naming AquaCrop and doi:10.1016/j.envsoft.2022.105556 explicitly)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-014",
+      "claim_summary": "Control-stand variant of Route B deliberately plants a covarying species as a designed proxy sensor, making covariation measurable by construction rather than reliant on naturally occurring patch selection",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (Route B experimental extension — Control Stand Variant section)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-015",
+      "claim_summary": "WP structure: WP1 Probabilistic multi-sensor diagnosis (months 1-14), WP2 Uncertainty-aware decision engine and demonstrator integration (months 6-20), WP3 Field validation, ground truth and uncertainty calibration (months 8-24), WP4 Training, supervision and two-way transfer of knowledge (months 1-24, led by supervisor), WP5 Dissemination, exploitation, communication and management (months 1-24, 2 person-months)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP1-WP5 entries with stated timings and person-month allocations)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-016",
+      "claim_summary": "Deliverables: D1-01 Multi-sensor data harmonisation and diagnostic model report (WP1, month 14), D2-01 Decision engine and research demonstrator report (WP2, month 20), D3-01 Field validation and uncertainty calibration report (WP3, month 24), D4-01 Career Development Plan (WP4, month 3), D5-01 Data management plan (WP5, month 6), D5-02 Dissemination and communication activity report (WP5, month 24)",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables registry: D1-01 through D5-02 with due months and WP links)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-017",
+      "claim_summary": "Milestones MS1-MS6: MS1 (month 6) Multi-sensor data pipeline operational; DMP delivered — directly verified: due_month=6, title confirmed in source. MS2 (month 12), MS3 (month 15), MS4 (month 18), MS5 (month 22), MS6 (month 24) — in same artifact, all 6 nodes confirmed by provenance",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (MS1 directly read: due_month=6, title='Multi-sensor data pipeline operational; Data Management Plan delivered'; MS2-MS6 present per provenance node_count=6 listing all IDs)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-018",
+      "claim_summary": "Risk register entries: RISK-02 (spatial/temporal harmonisation fails, probability high, impact medium), RISK-05 (Route B patch covariation not proven, probability medium, impact high; contingency Route A), RISK-06 (uncertainty not well calibrated, probability medium, impact high), RISK-08 (AquaCrop overconfident parameter collapse, probability medium, impact high; mitigation: uncertainty-aware calibration per doi:10.1016/j.envsoft.2022.105556)",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json (RISK-02, RISK-05, RISK-06, RISK-08 all directly read: probability and impact values verified to match section assertions exactly)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-019",
+      "claim_summary": "MSCA-PF training requirement SR-05: training activities must integrate digital skills (including generative AI), open science culture, knowledge valorisation, innovation, entrepreneurship, and good scientific conduct",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-05: 'Training activities must integrate key transferable skills... digital ones (e.g. generative AI)... Open Science, knowledge valorisation, innovation, entrepreneurship, and good scientific conduct')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-020",
+      "claim_summary": "SR-06: training activities must empower fellows to pursue a research career and prepare them for information-sharing via digital technologies (open access, FAIR data); SR-07: Career Development Plan must be established jointly by supervisor(s) and the researcher",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06 and SR-07 directly verified: SR-06 'empower fellows to pursue a research career and prepare them for increased research collaboration and information-sharing via digital technologies'; SR-07 'must be established jointly by supervisor(s) and the researcher')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-021",
+      "claim_summary": "SR-08: secondments optional for European Fellowships; SR-09: non-academic sector placements optional; neither is included in this fellowship, with rationale that 24 months is fully occupied and Dr. Jung's co-foundership provides entrepreneurship mentorship",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-08: 'Secondments are optional'; SR-09: 'Non-academic sector placements are optional')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-022",
+      "claim_summary": "D4-01 Career Development Plan due month 3; prepared jointly by Dr. András Jung and Dr. Rositsa Cholakova; encompasses research objectives, training and career needs, transferable skills, teaching, publications, and open science; quantitative targets deliberately not pre-asserted but to be set in D4-01",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D4-01 due_month=3; objectives OBJ-5 confirming deliberate deferral of quantitative targets)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-023",
+      "claim_summary": "Two-way transfer of knowledge: fellow brings plant-physiology and non-destructive stress-phenotyping expertise into the host's geoinformatics group; host provides remote sensing, hyperspectral imaging, and multisensor-drone fusion methods and infrastructure to the fellow; both directions are structurally necessary for the project's scientific validity",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (consortium section and two-way transfer section describing bidirectional exchange)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-024",
+      "claim_summary": "Post-doctoral work on maize chilling-stress photosynthesis demonstrates that the fellow's measurement competences generalise across species and stress types; biostimulant research deepens mechanistic understanding of physiological stress response modulation",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (consortium section: 'further work on maize chilling-stress photosynthesis and biostimulants')",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-025",
+      "claim_summary": "Gender dimension: core EO/ML methodology is not intrinsically gendered; application domain (smallholder tomato irrigation decision support) connects to contexts where gender-differentiated access to irrigation and extension services is documented in agricultural literature; accessible web MVP output format and AgroVIR grower-feedback loop reflect design choices bearing on equitable use; more detailed EDI plan to be developed in WP4 with ELTE's institutional equality framework and documented in D4-01",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md (section 1.2 open-science and EDI note); docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP5 accessible output format design); inference chain: strategic_positioning.md frames the gender dimension; the specific accessible output and grower-feedback design choices are derived from WP descriptions; claim that these choices bear on equity is a logical derivation not a direct quotation",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "AUDIT-META-01",
+      "claim_summary": "Structural integrity flag: the section's validation_status.claim_statuses[] array contains non-globally-unique claim_ids. Claim_ids C01 through C25 each appear twice — once in claims from sub_sections 1.1/1.2 and once in claims from sub_sections 1.3/1.4. Each duplicate claim carries distinct content and a distinct source_ref, so content traceability is preserved at the individual entry level. However, claim-level reference by ID is ambiguous. This is a bookkeeping defect in the claim tracking mechanism, not an unattributed project-fact claim.",
+      "status": "assumed",
+      "source_ref": "Structural observation from reading validation_status.claim_statuses[]; no Tier 1-4 source required to validate this structural finding",
+      "flag_reason": "Non-globally-unique claim_ids in validation_status.claim_statuses[]: duplicate entries for C01-C25 across sub-section boundaries. Each duplicated entry has a source_ref, so no constitutional halt is warranted (§10.5, §12.2 are not violated). Recommend globally unique claim_id scheme in future drafts."
+    }
+  ],
+  "summary": {
+    "total_claims": 26,
+    "confirmed": 22,
+    "inferred": 2,
+    "assumed": 1,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": false,
+  "audit_notes": "no_unsupported_claims_declaration is false due to the AUDIT-META-01 assumed entry flagging a bookkeeping defect in claim_statuses[]. All 25 material content claims (AUDIT-001 through AUDIT-025) are either confirmed (22) or inferred (2) with named specific Tier 1-4 source artifacts. No project-fact claim lacks a source reference. Constitutional constraints §10.5 and §12.2 are satisfied for all material content claims. The structural tracking defect (AUDIT-META-01) should be resolved before final proposal assembly.",
+  "timestamp": "2026-07-29T12:00:00Z"
+}
