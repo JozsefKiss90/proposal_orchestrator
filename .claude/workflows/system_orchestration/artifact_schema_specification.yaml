@@ -2013,7 +2013,12 @@ tier5_deliverable_schemas:
   # ---------------------------------------------------------------------------
   # 2.3 final_export.json
   # Path: docs/tier5_deliverables/final_exports/final_export.json
-  # Produced by: proposal_writer agent (Phase 8d on completion)
+  # Produced by: the final_export_writer deterministic component in the
+  #   n08f_revision node body (§17.5.3/C2, bound per §16.5/C3;
+  #   runner/final_export_writer.py). Derived from the n08d assembled draft by
+  #   pure lookup + verbatim copy; export_path names the self-contained
+  #   part_b_json_bundle.json written alongside it. Rewritten each run —
+  #   g11_p05b requires current-run ownership.
   # Consumed by: gate_12_constitutional_compliance predicates
   # ---------------------------------------------------------------------------
   final_export:

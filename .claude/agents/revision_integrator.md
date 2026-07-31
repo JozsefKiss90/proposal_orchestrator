@@ -20,7 +20,7 @@ writes_to:
   - docs/tier4_orchestration_state/decision_log/
 invoked_skills:
   - proposal-section-traceability-check
-  - evaluator-criteria-review
+  - drafting-review-status
   - constitutional-compliance-check
   - decision-log-update
 # The Phase-8 checkpoint is published by the `checkpoint_publisher` deterministic
@@ -63,14 +63,15 @@ In a prior reconciliation pass, `agent_catalog.yaml` `constitutional_scope` for 
 - Unattributed claims must be flagged, not silently accepted as Confirmed.
 - Confirmed status requires naming the specific source artifact.
 
-### `evaluator-criteria-review`
-**Purpose:** Assess proposal content against the scoring logic of the applicable evaluation criterion; identify residual weaknesses.
-**Trigger:** After applying revision actions; verifies that critical and major weaknesses from the review packet have been resolved.
-**Output / side-effect:** Residual weakness assessment; confirms resolution of review packet findings before gate evaluation.
+### `drafting-review-status`
+**Purpose:** Disposition every revision action from the Phase-8e review packet against the current assembled draft, without modifying any prose or the review packet; produce `drafting_review_status.json` — the artifact gate_12's `all_critical_revisions_resolved` predicate (`g11_p04`) evaluates.
+**Trigger:** After traceability verification; records per-action `resolved`/`unresolved` dispositions, section completion log, and the disposition revision log.
+**Output / side-effect:** `docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json` (schema `orch.phase8.drafting_review_status.v1`). Replaces the former n08f re-run of `evaluator-criteria-review`, which rewrote `review_packet.json` and thereby invalidated gate_11's recorded input fingerprint (ST-1 content-based staleness — gate_12 `g11_p01` STALE_UPSTREAM_MISMATCH, run 531ec9f0).
 **Constitutional constraints:**
-- Evaluation must apply the active instrument evaluation criteria only.
-- Must not evaluate against grant agreement annex requirements.
-- Weakness severity (critical/major/minor) must be assigned to each finding.
+- Must not modify, rewrite, or overwrite any proposal prose or the review packet.
+- Must not mark an action resolved unless the current draft substantively addresses it.
+- Critical unresolved actions require a specific, non-empty reason (§12.4).
+- Must not fabricate resolutions or content to satisfy gate predicates (§13.8).
 
 ### `constitutional-compliance-check`
 **Purpose:** Verify that the revised draft does not violate any prohibition in CLAUDE.md.

@@ -283,21 +283,42 @@ node_registry:
     name: "Revision Cycle"
     source_file: workflow_phases/phase_08_drafting_review.yaml
     agent: revision_integrator
-    # Deterministic component (§16.5/C3, CHK-1): the checkpoint publisher writes
-    # phase8_checkpoint.json in the node body BEFORE skill sequencing (§17.5.3/C2),
-    # replacing the retired checkpoint-publish skill (found 100% mechanical). It
-    # confirms the six Phase-8 gates and records an authorized cross-run
-    # provenance quad {gate_id, original_run_id, evidence_path, input_fingerprint,
-    # versions} for any bootstrapped (prior-run_id) gate — authorized by
-    # deterministic set-membership against the run's accepted_upstream_gates. A
-    # component fault fails closed (AGENT_EXECUTION_ERROR, exit gate skipped)
-    # before anything is written; gate_12's checkpoint_published predicate then
-    # re-validates the quad against durable Tier-4 gate results.
+    # Deterministic components (§16.5/C3), node-body passes that run BEFORE
+    # skill sequencing (§17.5.3/C2); a component fault fails closed
+    # (AGENT_EXECUTION_ERROR, exit gate skipped) before anything is written.
+    #
+    # final_export_writer: derives the terminal Tier-5 export from the n08d
+    # assembled draft — part_b_json_bundle.json (assembled draft + section
+    # artifacts, verbatim, self-contained) and the schema-bound
+    # final_export.json (orch.tier5.final_export.v1) that gate_12's
+    # g11_p05/g11_p05b predicates check. Pure lookup + verbatim copy; rewritten
+    # each run (g11_p05b requires current-run ownership). Bound FIRST because
+    # it is idempotent-overwrite while the checkpoint publisher is write-once:
+    # publishing the checkpoint last ensures a failed export can never strand
+    # a freshly published checkpoint that would block re-publication on rerun.
+    #
+    # checkpoint_publisher (CHK-1): writes phase8_checkpoint.json, replacing
+    # the retired checkpoint-publish skill (found 100% mechanical). It confirms
+    # the six Phase-8 gates and records an authorized cross-run provenance quad
+    # {gate_id, original_run_id, evidence_path, input_fingerprint, versions}
+    # for any bootstrapped (prior-run_id) gate — authorized by deterministic
+    # set-membership against the run's accepted_upstream_gates. gate_12's
+    # checkpoint_published predicate then re-validates the quad against durable
+    # Tier-4 gate results.
     deterministic_components:
+      - final_export_writer
       - checkpoint_publisher
+    # Skill roster note: evaluator-criteria-review was REMOVED from this node
+    # (run 531ec9f0 root cause). Its n08f re-run rewrote review_packet.json —
+    # the artifact gate_11 was evaluated on — so ST-1 content-based staleness
+    # correctly failed gate_12's g11_p01 (STALE_UPSTREAM_MISMATCH) on every run
+    # reaching the gate. drafting-review-status replaces it: it dispositions the
+    # packet's revision actions against the current draft without touching the
+    # packet, and produces drafting_review_status.json — the g11_p04 artifact,
+    # which previously had no producer.
     skills:
       - proposal-section-traceability-check
-      - evaluator-criteria-review
+      - drafting-review-status
       - constitutional-compliance-check
       - decision-log-update
     exit_gate: gate_12_constitutional_compliance

@@ -77,8 +77,8 @@ c. After applying all possible revisions, invoke the `proposal-section-traceabil
 
 d. Record each revision in `revision_log`: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` (ISO 8601).
 
-**Step 6 — Invoke evaluator-criteria-review skill.**
-Apply the `evaluator-criteria-review` skill to verify that critical and major weaknesses from the review packet have been resolved (or are documented as unresolvable). Confirm residual weakness assessment is acceptable for gate evaluation.
+**Step 6 — Invoke drafting-review-status skill.**
+Apply the `drafting-review-status` skill to disposition every revision action from the review packet against the current draft: `resolved` only when the draft already substantively addresses the action; otherwise `unresolved` with a specific non-empty `reason` for critical severity. This skill writes `drafting_review_status.json` (Step 8's artifact) and must NOT rewrite `review_packet.json` — the former re-run of `evaluator-criteria-review` here overwrote the packet gate_11 was evaluated on, which the ST-1 content-based staleness check correctly failed (`g11_p01` STALE_UPSTREAM_MISMATCH).
 
 **Step 7 — Invoke constitutional-compliance-check skill.**
 Apply the `constitutional-compliance-check` skill to the complete revised draft before declaring `gate_12_constitutional_compliance` pass. This is the final constitutional check. Any violation found must be flagged — not silently resolved. Write results to `docs/tier4_orchestration_state/validation_reports/`. Constitutional violations block `gate_12`.

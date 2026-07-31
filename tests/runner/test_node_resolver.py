@@ -292,14 +292,18 @@ class TestDeterministicComponentResolution:
             "n07_budget_gate"
         ) == ["unit_cost_budget_deriver"]
 
-    def test_n08f_binds_checkpoint_publisher(
+    def test_n08f_binds_export_writer_then_checkpoint_publisher(
         self, resolver: NodeResolver
     ) -> None:
-        # CHK-1: the checkpoint publisher replaces the retired checkpoint-publish
-        # skill and runs in the n08f node body.
+        # CHK-1 bound the checkpoint publisher (replacing the retired
+        # checkpoint-publish skill); the final-export writer joins it to close
+        # the g11_p05 gap. Order matters: the export writer is
+        # idempotent-overwrite and MUST precede the write-once checkpoint
+        # publisher, so a failed export can never strand a freshly published
+        # checkpoint that would block re-publication on rerun.
         assert resolver.resolve_deterministic_components(
             "n08f_revision"
-        ) == ["checkpoint_publisher"]
+        ) == ["final_export_writer", "checkpoint_publisher"]
 
     def test_n08f_no_longer_binds_checkpoint_publish_skill(
         self, resolver: NodeResolver
@@ -308,6 +312,19 @@ class TestDeterministicComponentResolution:
         assert "checkpoint-publish" not in resolver.resolve_skill_ids(
             "n08f_revision"
         )
+
+    def test_n08f_binds_drafting_review_status_not_review_rerun(
+        self, resolver: NodeResolver
+    ) -> None:
+        # Run 531ec9f0 root cause: n08f's re-run of evaluator-criteria-review
+        # rewrote review_packet.json — gate_11's fingerprinted input — so ST-1
+        # staleness correctly failed gate_12's g11_p01 on every run reaching
+        # it. drafting-review-status replaces it: same disposition purpose,
+        # but writes drafting_review_status.json (the g11_p04 artifact, which
+        # previously had NO producer) and never touches the packet.
+        skills = resolver.resolve_skill_ids("n08f_revision")
+        assert "drafting-review-status" in skills
+        assert "evaluator-criteria-review" not in skills
 
     @pytest.mark.parametrize("node_id,slug", [
         ("n08a_excellence_drafting", "excellence"),

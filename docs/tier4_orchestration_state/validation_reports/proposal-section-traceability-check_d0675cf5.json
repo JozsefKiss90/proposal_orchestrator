@@ -1,0 +1,75 @@
+{
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-07-31T000000Z",
+  "skill_id": "proposal-section-traceability-check",
+  "invoking_agent": "proposal_integrator",
+  "run_id_reference": "d0675cf5-4c10-4bb9-a949-643c96bcec2a",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
+  "claim_audit_results": [
+    {
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft has schema_id=orch.tier5.part_b_assembled_draft.v1 and non-empty sections[] array (3 entries)",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json: schema_id field and sections[] array directly read",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "sections[] references exactly three section_ids (excellence, impact, implementation) each with an artifact_path that exists on disk",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json sections[]; files verified present: excellence_section.json, impact_section.json, implementation_section.json under docs/tier5_deliverables/proposal_sections/",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order is excellence(order=1), impact(order=2), implementation(order=3)",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json sections[].order values read directly: 1, 2, 3",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced section artifacts expose non-empty traceability_footer.primary_sources[]",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json traceability_footer.primary_sources: 17 entries; impact_section.json traceability_footer.primary_sources: 12 entries; implementation_section.json traceability_footer.primary_sources: 16 entries — all non-empty, read directly from disk",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced section artifacts declare no_unsupported_claims_declaration=true",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json traceability_footer.no_unsupported_claims_declaration=true (line 983); impact_section.json traceability_footer.no_unsupported_claims_declaration=true (line 845); implementation_section.json traceability_footer.no_unsupported_claims_declaration=true (line 385) — all read directly",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All three referenced section artifacts have validation_status.overall_status != unresolved and non-empty claim_statuses[]",
+      "status": "confirmed",
+      "source_ref": "excellence_section.json overall_status=inferred (line 32), claim_statuses non-empty; impact_section.json overall_status=inferred (line 26), claim_statuses non-empty; implementation_section.json overall_status=inferred (line 20), claim_statuses non-empty — all read directly",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "consistency_log[] present (12 entries CC-01 to CC-12), no entry has status unresolved or inconsistency_flagged — all have status=consistent",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json consistency_log array read directly; all 12 entries carry status=consistent; no inconsistency_note populated in any entry",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft contains traceability_footer with non-empty primary_sources (8 entries) and no_unsupported_claims_declaration=true, consistent with section-level declarations",
+      "status": "confirmed",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json traceability_footer read directly: primary_sources contains 8 entries (3 section artifacts + 5 Tier 3-4 sources); no_unsupported_claims_declaration=true; consistent with all three section-level declarations confirmed in ASSEMBLY-05",
+      "flag_reason": null
+    }
+  ],
+  "summary": {
+    "total_claims": 8,
+    "confirmed": 8,
+    "inferred": 0,
+    "assumed": 0,
+    "unresolved": 0
+  },
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-07-31T00:00:00Z"
+}

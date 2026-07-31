@@ -542,7 +542,6 @@ skill_catalog:
       criterion section artifact).
     used_by_agents:
       - evaluator_reviewer
-      - revision_integrator
     reads_from:
       - docs/tier2a_instrument_schemas/evaluation_forms/
       - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
@@ -554,6 +553,39 @@ skill_catalog:
       - "Evaluation must apply the active instrument evaluation criteria only"
       - "Must not evaluate against grant agreement annex requirements"
       - "Weakness severity (critical/major/minor) must be assigned to each finding"
+
+  # drafting-review-status — replaces the former n08f re-run of
+  # evaluator-criteria-review. That re-run rewrote review_packet.json — the very
+  # artifact gate_11 was evaluated on — so the ST-1 content-based staleness check
+  # correctly failed gate_12's g11_p01 (STALE_UPSTREAM_MISMATCH) on every run
+  # that reached it (first observed: run 531ec9f0). This skill dispositions the
+  # packet's revision actions against the current draft WITHOUT touching the
+  # packet or any prose, and produces the drafting_review_status.json artifact
+  # that g11_p04 (all_critical_revisions_resolved) evaluates — which previously
+  # had no producer at all.
+  - id: drafting-review-status
+    execution_mode: "tapm"
+    purpose: >
+      Disposition every revision action from the Phase-8e review packet against
+      the current assembled draft, without modifying any prose or the review
+      packet. Mark actions resolved only when the current draft already
+      substantively addresses them; otherwise unresolved, with a specific
+      non-empty reason required for critical severity. Produce
+      drafting_review_status.json (orch.phase8.drafting_review_status.v1) with
+      the section completion log and the disposition revision log.
+    used_by_agents:
+      - revision_integrator
+    reads_from:
+      - docs/tier5_deliverables/review_packets/review_packet.json
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+      - docs/tier5_deliverables/proposal_sections/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json
+    constitutional_constraints:
+      - "Must not modify, rewrite, or overwrite any proposal prose or the review packet"
+      - "Must not mark an action resolved unless the current draft substantively addresses it"
+      - "Critical unresolved actions require a specific, non-empty reason (§12.4)"
+      - "Must not fabricate resolutions or content to satisfy gate predicates (§13.8)"
 
   - id: constitutional-compliance-check
     execution_mode: "tapm"

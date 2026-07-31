@@ -153,6 +153,26 @@ def _run_canonical_pack_deriver(run_id: str, repo_root: Path) -> list[Path]:
     return [build_phase8_canonical_reference_pack(repo_root, run_id)]
 
 
+def _run_final_export_writer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the Phase-8 final-export writer (``n08f_revision``).
+
+    Writes the terminal Tier-5 export: ``part_b_json_bundle.json`` (the
+    assembled draft + every referenced section artifact, verbatim and
+    self-contained) and the schema-bound ``final_export.json`` manifest
+    (``orch.tier5.final_export.v1``) that gate_12's ``g11_p05``/``g11_p05b``
+    predicates check.  Closed by pure lookup + verbatim copy over the n08d
+    assembled draft; the single non-deterministic field is ``exported_at`` (a
+    production stamp, excluded from the replay invariant).  Not write-once —
+    ``g11_p05b`` requires current-run ownership, so each run that reaches n08f
+    rewrites the export from its own assembly.  Fails closed (raises) on a
+    missing/malformed/foreign-run assembled draft or a missing section
+    artifact.
+    """
+    from runner.final_export_writer import write_final_export
+
+    return write_final_export(run_id, repo_root)
+
+
 def _run_checkpoint_publisher(run_id: str, repo_root: Path) -> list[Path]:
     """Adapter for the Phase-8 checkpoint publisher (CHK-1).
 
@@ -188,8 +208,11 @@ def _run_checkpoint_publisher(run_id: str, repo_root: Path) -> list[Path]:
 #: checkpoint publisher (CHK-1, ``n08f_revision``) writes ``phase8_checkpoint``
 #: — confirming the six Phase-8 gates and recording an authorized cross-run
 #: provenance quad — replacing the retired ``checkpoint-publish`` skill, closed
-#: by pure lookup + verbatim copy over durable gate results.  With this the
-#: full milestone-1 roster binds and logs uniformly through the C2/C3 substrate.
+#: by pure lookup + verbatim copy over durable gate results.  The final-export
+#: writer (``n08f_revision``) derives the terminal Tier-5 export bundle and
+#: ``final_export.json`` manifest from the n08d assembled draft, closed by pure
+#: lookup + verbatim copy.  With this the full milestone-1 roster binds and
+#: logs uniformly through the C2/C3 substrate.
 COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dependency_normalizer": _run_dependency_normalizer,
     "excellence_section_assembler": _run_excellence_section_assembler,
@@ -201,6 +224,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "unit_cost_budget_deriver": _run_unit_cost_budget_deriver,
     "canonical_pack_deriver": _run_canonical_pack_deriver,
     "checkpoint_publisher": _run_checkpoint_publisher,
+    "final_export_writer": _run_final_export_writer,
 }
 
 
