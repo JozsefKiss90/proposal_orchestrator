@@ -55,7 +55,7 @@ Approve. Before the modules: **(D1)** match on claim *meaning*, because `claim_i
 
 ## Resolution status (2026-07-21) — post-build (commit `b2b69b0`, Wave 0 complete)
 
-Applied after E3 shipped; supersedes the "Before the modules" framing above where noted.
+Applied after E3 shipped; supersedes the "Before the modules" framing above where noted. *(2026-07-31: E3 has since been divided into subtickets **E3a–E3e** in `tickets_eval_harness.md` — D1 → E3a, D3 → E3b, D2 → E3c (+ residual → E3.1), status calibration → E3d, real-section run → E3e. Content unchanged; structure only.)*
 
 - **D1 — claim-identity — ✅ resolved.** Nothing keys on bare `claim_id`; every surface uses `entry_key` (e.g. `C01#171`) and E3 never matches by id. The forced E2 disambiguation pass also caught a **real baseline bug** — a snapshot keyer silently collapsing 191→128 on duplicate ids in the grounding-invariance comparison (`compare_to_baseline`), which would have mis-paired claims; fixed backward-compatibly.
 - **D3 — decomposition — ✅ addressed.** Exhaustive judge decomposition (filtering split out of the decomposer), paragraph chunking ≤4 KB, escalation to a stricter per-candidate question when coverage is claimed but unattributable, and the match basis recorded so a paraphrase false-escape stays legible.

@@ -88,14 +88,42 @@ Runs are covered by the Claude Code subscription (no metered bill); the only rem
 
 ## E3. Claim-ledger completeness + status calibration — headline signal #2 — ✅ DONE (`b2b69b0`, branch harness) · **native**
 **What to build:** the "escaped claim" detector + calibration drift.
-**Status: ✅ DONE** — native (`harness/claim_ledger.py`, `materiality.py`, `status_calibration.py`); matches by *meaning*, never bare `claim_id` (D1); materiality precision `None` until negatives labeled (→ **E3.1**). Boxes below are the as-built spec; full D1–D3 resolution in `harness_plan/EVAL_HARNESS_E3_PREAPPROVAL.md`.
-**Blocked by:** E1 (built on the same **native** substrate as E2). ⟐ **Framework re-opens here on its own merits:** prose→atomic-assertion decomposition is the one place a framework's differentiator (Ragas) *or* a native decomposition-judge applies — decide when E3 is built; the ledger-diff is custom either way, so native is the likely answer.
-- [ ] Prose decomposed into atomic assertions, diffed against logged `claim_id`s; a non-empty "unledgered assertion" set is a hard finding ("fabricates without emitting a claim" — the threat W1 cannot reach).
-- [ ] **Materiality threshold (else self-defeating; the design task to settle first).** Only assertions meeting the *material claim* bar must map to a `claim_id`; non-material prose (transitions, framing, definitional/method description) is excluded — else the "escaped claim" set floods with false positives and the check gets ignored. **Two anchors, spelled out:**
-    - *Constitutional (the mandate) — `CLAUDE.md` §10.5, verbatim:* "All major outputs produced by agents must be traceable to their tiered inputs. An agent must be able to identify, for each material claim in its output, the Tier 1–4 source from which the claim derives. **Unattributed claims must be flagged, not asserted.**" → **E3 is the output-side checker for that final sentence** — an "escaped claim" *is* an unattributed material claim, and no predicate currently enforces it on the prose (the source-ref predicates check the *field* exists, not that every material assertion has one). Strong charter — but §10.5 is the term's *only* occurrence in the constitution and never defines *which sentences count*; `claim_statuses` carries no `material` flag.
-    - *Empirical (the operational bar).* Derive materiality from the **406-claim ledger** — the engine's own enumeration of what it treats as material-and-attributable. Calibrate the classifier against it (positives = real `claim_summary` values; negatives = framing/transition/definitional spans); flag prose assertions that clear that bar yet match no `claim_id`. In one line: **§10.5 says *what* (material claims must be attributed or flagged); the ledger says *which*.**
-- [ ] Claim-status calibration: a `confirmed` that isn't grounded, or an `inferred` fully source-backed (mislabelled down), flagged as drift.
-- [ ] Runs on the real section as a ready-made calibration set; reporting-only; zero runs.
+**Status: ✅ DONE** — native (`harness/claim_ledger.py`, `materiality.py`, `status_calibration.py`); matches by *meaning*, never bare `claim_id` (D1); materiality precision `None` until negatives labeled (→ **E3.1**). Divided into subtickets **E3a–E3e** below (the as-built spec, cut along the shipped modules + the D1–D3 design resolutions); full D1–D3 record in `harness_plan/EVAL_HARNESS_E3_PREAPPROVAL.md`. *(The follow-on graduation ticket **E3.1** is deliberately **not** one of these subtickets — it is E3's advisory→gating measurement and stays a separate ticket.)*
+**Blocked by:** E1 (built on the same **native** substrate as E2). ⟐ **Framework re-opens here on its own merits:** prose→atomic-assertion decomposition is the one place a framework's differentiator (Ragas) *or* a native decomposition-judge applies — decide when E3 is built; the ledger-diff is custom either way, so native is the likely answer. **Resolved native at build (per D3: "revisit if noisy"; Ragas's LLM-graded form → E10).**
+
+### E3a. Claim-identity substrate — match by meaning, not `claim_id` (D1) — ✅ DONE
+**What:** the identity model everything else in E3 stands on. `claim_id` is **not a usable key**: excellence's 191 entries span ~34 independently-numbered blocks (`C01..C43`, `C01..C56`, `C01..C20`) plus mixed schemes — `C01` alone maps to three unrelated claims (191 entries / 128 unique ids).
+**Blocked by:** E1.
+- [x] Ledger treated as a set of `(claim_summary, status, source_ref)` records; prose→claim matching is by **meaning**, never bare id.
+- [x] Ids demoted to disambiguated *labels* — every surface uses `entry_key` (e.g. `C01#171`); nothing keys on bare `claim_id`.
+- [x] **E2 disambiguation pass** (the D1 retrofit): shipped E2 keyed `property_key`/`hard_finding_ids` on `claim_id` — relabeled, and the pass caught + fixed a **real baseline bug** (snapshot keyer silently collapsing 191→128 on duplicate ids in `compare_to_baseline`, which would have mis-paired claims; fixed backward-compatibly).
+
+### E3b. Escaped-claim detector — prose decomposition + ledger diff (D3) — ✅ DONE (`harness/claim_ledger.py`)
+**What:** headline signal #2 proper — "fabricates without emitting a claim," the threat W1 cannot reach.
+**Blocked by:** E3a (its matching basis).
+- [x] Prose decomposed into atomic assertions, diffed against the ledger (by meaning, per E3a); a non-empty "unledgered assertion" set is a hard finding.
+- [x] Decomposition hardened per D3 (long-paragraph risk: max 2,208/4,556 chars): exhaustive judge decomposition with filtering split out of the decomposer; paragraph chunking ≤4 KB; escalation to a stricter per-candidate question when coverage is claimed but unattributable; match basis recorded so a paraphrase false-escape stays legible.
+- [x] D3 spot-check stance recorded: native decomposition is right for now (API-currency guardrail); revisit if noisy — the one place Ragas could earn in later (→ E10).
+
+### E3c. Materiality threshold (D2) — ✅ DONE as machinery (`harness/materiality.py`) · graduation → E3.1
+**What:** the bar deciding *which* assertions must map to a claim (else self-defeating — the design task the ticket said to settle first). Only assertions meeting the *material claim* bar must map; non-material prose (transitions, framing, definitional/method description) is excluded — else the "escaped claim" set floods with false positives and the check gets ignored. **Two anchors, spelled out:**
+- *Constitutional (the mandate) — `CLAUDE.md` §10.5, verbatim:* "All major outputs produced by agents must be traceable to their tiered inputs. An agent must be able to identify, for each material claim in its output, the Tier 1–4 source from which the claim derives. **Unattributed claims must be flagged, not asserted.**" → **E3 is the output-side checker for that final sentence** — an "escaped claim" *is* an unattributed material claim, and no predicate currently enforces it on the prose (the source-ref predicates check the *field* exists, not that every material assertion has one). Strong charter — but §10.5 is the term's *only* occurrence in the constitution and never defines *which sentences count*; `claim_statuses` carries no `material` flag.
+- *Empirical (the operational bar).* Derive materiality from the **406-claim ledger** — the engine's own enumeration of what it treats as material-and-attributable. Calibrate the classifier against it (positives = real `claim_summary` values; negatives = framing/transition/definitional spans); flag prose assertions that clear that bar yet match no `claim_id`. In one line: **§10.5 says *what* (material claims must be attributed or flagged); the ledger says *which*.**
+**Blocked by:** E3a.
+- [x] Classifier built with the D2 anti-circularity discipline: §10.5's *concept* governs; human ground truth, fail-closed on unlabeled (E1.5 discipline) — "material = looks like a logged claim" must not define away the escaped claims E3 exists to catch.
+- [x] Precision honestly `None` until non-material negatives are labeled (positives-only would report a spurious 1.0).
+- [ ] ⏳ **Residual (not closed here):** recall on the real failure mode — material assertions *absent* from the ledger — unmeasured; negatives unlabeled. **Tracked as → E3.1** (does not block E4).
+
+### E3d. Claim-status calibration drift — ✅ DONE (`harness/status_calibration.py`)
+**What:** the ledger's *labels* audited, complementing E3b's audit of its *coverage*.
+**Blocked by:** E3a.
+- [x] A `confirmed` that isn't grounded, or an `inferred` fully source-backed (mislabelled down), flagged as drift.
+- [x] ⚠ Known coverage gap recorded: real data is 359 `confirmed` / 47 `inferred` / **0 `assumed`** — the `assumed` path is unexercised until the E8 / E3.1 fixtures exist ("runs clean on the real sections" does not validate it).
+
+### E3e. Real-section calibration run — ✅ DONE
+**What:** the whole E3 stack exercised on the three committed Part B sections (406 claim entries) as a ready-made calibration set.
+**Blocked by:** E3b + E3c + E3d.
+- [x] Reporting-only; zero DAG runs; advisory by construction (blocking=False) until E3.1 + E1.5 graduation.
 
 ### ⟐ Earn-its-lane decision gate (after Wave 0)
 Did status-aware faithfulness + ledger completeness surface real issues (or give real confidence) on the current artifacts? Record the finding in the decision log. Only if yes — and only for a *distinct* capability — adopt a second framework in Wave 1. If the chosen framework underdelivered, reconsider it before adding tools.
