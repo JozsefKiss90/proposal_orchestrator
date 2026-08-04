@@ -41,12 +41,20 @@ Workflow
        visible).  Full rubric: ``harness/labeling/LABELLING_GUIDE.md``.
     2. Attest the review (required before this may ever gate):
            export HARNESS_LABELS_REVIEWED_BY="Your Name"
-    3. Run (local judge over the OpenAI-compatible transport; cost $0):
+    3. Run — the judge must be a NON-DRAFTER model over a NON-`claude_cli` transport
+       (JudgeConfig + the backend enforce both). Free hosted judge, no local compute,
+       e.g. Groq (non-Claude Llama/Qwen over an OpenAI-compatible endpoint):
            HARNESS_LABELS_REVIEWED_BY="Your Name" \
-           HARNESS_JUDGE_MODEL=<local-model> HARNESS_JUDGE_VERSION=<tag> \
-           ORCHESTRATOR_TRANSPORT_PRESET=openai_compatible \
-           ORCHESTRATOR_TRANSPORT_ENDPOINT=http://localhost:11434/v1 \
+           ORCHESTRATOR_TRANSPORT_PRESET=GENERIC_OPENAI_COMPATIBLE \
+           ORCHESTRATOR_TRANSPORT_ENDPOINT=https://api.groq.com/openai/v1 \
+           ORCHESTRATOR_TRANSPORT_API_KEY=<groq-key> \
+           ORCHESTRATOR_TRANSPORT_MODEL=llama-3.3-70b-versatile \
+           HARNESS_JUDGE_MODEL=llama-3.3-70b-versatile HARNESS_JUDGE_VERSION=<pin> \
+           HARNESS_JUDGE_SLEEP=10 \        # pace calls under a free tier's tokens/min cap
            python -m harness.materiality_calibration
+       (Local $0 alternative: ORCHESTRATOR_TRANSPORT_PRESET=OLLAMA_LOCAL +
+        ORCHESTRATOR_TRANSPORT_MODEL — bakes in localhost:11434/v1, no key. See
+        docs/backend/transport_presets.md for all presets.)
 
 Point at a specific sheet with ``HARNESS_MATERIALITY_GOLD=/abs/path/to/sheet``.
 
@@ -63,6 +71,7 @@ import datetime
 import json
 import os
 import pathlib
+import time
 from dataclasses import dataclass
 
 # NOTE: every ``harness.*`` import lives INSIDE a function, so this module imports
@@ -307,13 +316,20 @@ def main() -> None:
     # calibrate_materiality's classifier + confusion inline, so we also keep the
     # per-row predictions the escape-recall slice and the disagreement view need.)
     n = int(os.environ.get("HARNESS_MATERIALITY_N", "1"))
-    for row, ex in zip(rows, examples):
+    # Pace calls under a free tier's tokens/min cap (e.g. Groq free ≈ 6k TPM). The
+    # backend does no 429 backoff, so ~10s/row keeps a 32-row run from tripping it.
+    sleep_s = float(os.environ.get("HARNESS_JUDGE_SLEEP", "0"))
+    if sleep_s:
+        print(f"pacing: {sleep_s:g}s between judge calls (~{len(rows) * n * sleep_s / 60:.1f} min total)")
+    for i, (row, ex) in enumerate(zip(rows, examples)):
         verdict = classify_materiality(judge, ex.text, property_key=ex.example_id, n=n)
         if verdict.passed is None:
             raise SystemExit(
                 f"example {ex.example_id!r}: classifier returned no boolean verdict; cannot calibrate."
             )
         row.pred = bool(verdict.passed)
+        if sleep_s and i < len(rows) - 1:
+            time.sleep(sleep_s)
 
     truth = [r.material for r in rows]
     pred = [bool(r.pred) for r in rows]
