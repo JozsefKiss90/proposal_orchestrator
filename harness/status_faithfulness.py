@@ -858,6 +858,11 @@ class ClaimFaithfulness:
     entry_index:
         The judged claim's position in ``claim_statuses`` (see
         :attr:`SectionClaim.entry_index`); ``None`` when unknown.
+    claim_summary:
+        The judged claim's text, carried so a *reuser* of this finding (E5d's
+        grounding aggregation) can detect that the ledger's wording drifted
+        since the claim was judged — id/status/ref alone cannot see a reworded
+        claim.  Empty on findings built before the field existed.
     """
 
     claim_id: str
@@ -868,6 +873,7 @@ class ClaimFaithfulness:
     verdict: Verdict | MajorityVerdict | None = None
     reason: str = ""
     entry_index: int | None = None
+    claim_summary: str = ""
 
     @property
     def entry_key(self) -> str:
@@ -904,6 +910,7 @@ class ClaimFaithfulness:
             "claim_id": self.claim_id,
             "entry_index": self.entry_index,
             "entry_key": self.entry_key,
+            "claim_summary": self.claim_summary,
             "status": self.status,
             "comparison": self.comparison,
             "comparison_ref": self.comparison_ref,
@@ -1032,6 +1039,7 @@ def _evaluate_claim_routed(
             verdict=verdict,
             reason=reason,
             entry_index=claim.entry_index,
+            claim_summary=claim.claim_summary,
         )
 
     policy = resolved_policies.get(claim.status)
