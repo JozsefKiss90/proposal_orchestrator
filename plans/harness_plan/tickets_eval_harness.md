@@ -46,8 +46,8 @@ The harness judges **artifacts, not runs** — almost all of it never triggers a
 ## Waves
 
 - **Wave 0 (offline — M3's verifier; core proven native):** ✅ E1 · ✅ E1.5 *(mechanism; ⏳ gold-set labeling)* · ✅ E2 · ✅ E3 *(`b2b69b0`)* — all **native**. Decision gate passed: no second framework adopted.
-- **Wave 1 (offline):** ✅ E4 *(`1f85fe6`, native; ⏳ grounding baselines unfrozen)* · ⏸ E5 → **native rubric grader = $0; DeepEval form → E10**.
-- **Graduation track (advisory → gating; $0):** ☐ **E1.5 gold-set labeling** · ✅ **E3.1 materiality calibration** *(2026-08-03; gating permitted by metrics, operating advisory)*. Until E1.5 lands, the E2/E3/E4 judge lanes stay advisory.
+- **Wave 1 (offline):** ✅ E4 *(`1f85fe6`, native; ⏳ grounding baselines unfrozen)* · ☐ **E5 → built native, $0** (DeepEval form → E10), split into ☐ E5a substrate · ☐ E5b rubrics + evidence packs · ☐ E5c coverage axis · ☐ E5d grounding axis *(reuses E2)* · ☐ E5e contradiction detector + wiring · ☐ E5f first real run. E5a/E5b are judge-free and can start immediately; only E5c/E5d/E5f spend judge budget.
+- **Graduation track (advisory → gating; $0):** ✅ **E1.5 gold-set labeling + first calibration** *(2026-08-07; precision 1.0, recall 0.567 → decision **advisory**)* · ✅ **E3.1 materiality calibration** *(2026-08-03; gating permitted by metrics, operating advisory)* · ☐ **E5.1 rubric-grader calibration**. The E2/E3/E4 judge lanes stay advisory (E1.5 recall below the bar); E5 ships advisory until E5.1.
 - **Wave 2 (offline):** ☐ E6 *(native predicate bridge = $0; provider matrix → E10)* · ☐ E7a *(deterministic; no judge, no run)*.
 - **Wave 3 (offline, graph-retrieval):** ☐ E9 → **native set-math core = $0; Ragas LLM-form → E10**.
 - **Wave 4 (run-dependent — behind M2-T10 / the showcase; runs on the subscription, no metered bill):** ☐ E7b · ☐ E8 *(DeepTeam generation → E10)*.
@@ -152,12 +152,63 @@ Did status-aware faithfulness + ledger completeness surface real issues (or give
 - [x] Wired advisory into CI — **"CI" = the pytest suite** (`tests/harness/test_regression_golden.py`, marker `harness_regression`; repo has no hosted CI config). `RegressionReport` enforces `advisory=True, blocking=False`; nothing in `runner` reads it. CLI: `py -3.10 -m harness.regression freeze|check`.
 - [ ] ⏳ **Open item:** grounding baselines are **not frozen yet** — the judge lane is machinery-only until the live pinned **local** judge freezes them. Now unblocked ($0, local judge).
 
-## E5. Evaluator G-Eval ×9 — integrity-framed independent grader — ⏸ DEFERRED shape: **native rubric grader = $0; DeepEval framework form → E10**
+## E5. Evaluator rubric grader ×9 — integrity-framed independent grader — **native rubric grader = $0; DeepEval framework form → E10**
 **What to build:** the MSCA-PF evaluator expectations as rubric metrics, as an independent 2nd grader.
-**Blocked by:** E4. **First DeepEval adoption** (G-Eval is a DeepEval primitive) — do it in an online build session so the API-currency guardrail can be satisfied; else fall back to a native rubric judge on the substrate.
-- [ ] Each expectation in `evaluator_expectation_registry.json` (Excellence 4 / Impact 3 / Implementation 2) → a rubric metric, framed for integrity ("does the section address *and ground* the expectation").
-- [ ] Independent of the in-run `evaluator-criteria-review` skill: different context, ideally different model, to catch what the in-run reviewer misses.
-- [ ] Surfaces the integrity-contradiction case (high host-capacity score while the host is an unconfirmed-spine item).
+**Blocked by:** E4. Framework question **closed native** (same cascade as E2/E3): G-Eval is a DeepEval primitive, but the substance — a pinned rubric prompt over frozen artifacts, N≥3 majority, provenance — is already substrate; the DeepEval *form* would add a metered dependency for packaging only → **E10**. Build native, on the non-drafter judge, $0.
+**Two axes per expectation (design decision, 2026-08-07):** **coverage** ("does the section actually address this expectation?") × **grounding** ("is what it says traceable to `confirmed` claims with a real `source_ref`?"). The headline output is the *contradiction* cell — high coverage + weak grounding — e.g. host capacity scored well while the host is an unconfirmed-spine item. A single blended score would hide exactly that cell, which is why the axes stay separate all the way to the report.
+**Judge-capacity constraint (drives E5b/E5f):** Groq free tier is **6k tokens/minute** and **100k tokens/day**. A whole section (Excellence ≈ 191 claims) does not fit in one call, so the grader is fed a **deterministically assembled evidence pack per expectation**, never a whole section JSON. Any design that ships whole sections to the judge is out of budget by construction.
+**Count correction:** the registry holds **10** raw expectations (Excellence 4 / Impact 3 / Implementation 3); Implementation's *recruiting-institutions* entry is the non-PF variant, so the PF-applicable set is **9** (Excellence 4 / Impact 3 / Implementation 2). The 10→9 filter is E5a's job, not a hand-copied constant.
+
+**Source of truth — verified scorecard (2026-08-07).** The 9 PF expectations E5 grades against are frozen, verbatim, in `harness/evaluator_scorecard_msca_pf.json` (human mirror `…_pf.md`) — extracted from the official *HE MSCA Evaluation Form V2.2 (2025-12-17, WP2026/7)*, pp.4-6, and human-verified (József Kiss). It carries provenance (form / version / pages), the 0-5 scale, the criterion weights **Excellence 50 / Impact 30 / Implementation 20**, the **70/100** threshold, and the `excluded_for_pf` COFUND *recruiting-institutions* item. The registry stays the raw upstream extraction; the **scorecard is the binding, verified subset**. E5a's 10→9 filter must *reproduce* the scorecard (fail closed on divergence); E5b's rubric text traces to its verbatim aspect text. E5 stays integrity-framed — it does **not** compute the weighted /100 evaluator score (that would hide the contradiction cell); the weights/threshold are recorded for auditability only.
+
+### E5a. Expectation substrate — registry loader + PF filter + criterion↔section map (deterministic, no judge)
+- [ ] Load `docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json`; filter the `[OPTION for …]` tags to the **MSCA-PF-applicable 9**; expose a stable `expectation_key` per row (criterion + slug), because the verbatim text is long and will be re-worded upstream — the E3 `claim_id`-is-not-a-key lesson applied to expectations.
+- [ ] **Fail closed on drift:** count change (≠10 raw / ≠9 filtered), an unrecognised `[OPTION …]` tag, or an unmapped criterion raises rather than silently grading a subset. Pin the expected raw/filtered counts in the test.
+- [ ] **Cross-check against the verified scorecard.** Assert the filtered 9 (by `expectation_key`) match the aspects in `harness/evaluator_scorecard_msca_pf.json` — the human-verified verbatim freeze of the official form — and that the `excluded_for_pf` COFUND item is absent; **fail closed on any divergence** (registry drift *or* a stale scorecard against a newer form version). The scorecard is the anchor the deterministic filter reproduces, not a second hand-maintained copy.
+- [ ] Map each criterion → the frozen section artifact(s) it is graded against (Excellence / Impact / Implementation), so the grader never guesses which prose answers which expectation.
+- [ ] Zero judge, zero DAG runs; unit-tested against a fixture registry incl. a drifted copy.
+**Done =** the 9 PF expectations are addressable by key, and a registry edit breaks a test instead of quietly changing the metric.
+
+### E5b. Rubric set + evidence-pack contract (offline; fake backend only)
+- [ ] One **integrity-framed** rubric per expectation (9), authored as *versioned data* (not inline strings): rubric text + evaluation steps + threshold, `prompt_hash`-pinned like every other judge prompt. Framing is "does the section address **and ground** this expectation", never "is this good prose".
+- [ ] **Rubric wording traces to the scorecard.** Each rubric's expectation text is the verbatim `text` of the matching scorecard aspect (auditable to the official form V2.2, pp.4-6), never paraphrased; the `expectation_key` equals the scorecard aspect `id` (`exc-*` / `imp-*` / `impl-*`), so any rubric traces to a page of the form.
+- [ ] **Evidence-pack builder (deterministic):** per expectation, select the candidate prose spans + the `claim_statuses` subset (with `status` and `source_ref`) that bear on it, capped to fit the **6k TPM** ceiling with headroom for N≥3. Selection is deterministic and logged — what was *excluded* is part of the record (no silent caps).
+- [ ] Truncation/overflow is an explicit outcome (`insufficient_context`), not a silent short pack — a rubric graded on a truncated pack must not read as a clean pass.
+- [ ] Unit-tested end-to-end with the injectable fake backend; **no network in tests**.
+**Done =** 9 pinned rubrics + a reproducible, budget-bounded evidence pack per (expectation, section), exercised offline.
+
+### E5c. Coverage axis grader (judge; N≥3; routing-checked)
+- [ ] Judge metric answering "does this section substantively address expectation X?" over the E5b pack → `{score, passed, rationale}`, N≥3 `majority_vote`, verdict `Inferred`, full `ProvenanceLog` record.
+- [ ] **Routing:** register under a property key *distinct* from the deterministic `instrument_sections_addressed` predicate — the predicate proves a section exists/is non-empty; the judge answers the semantic residue. `routing.py` must permit the judge key and refuse any key the predicate registry already covers.
+- [ ] **Independence assertion** (structural test, not prose): different context (frozen artifact + evidence pack, not the in-run drafting context) and a **non-drafter model** vs the in-run `evaluator-criteria-review` skill; assert the two never share a transport or model pin. Same shape as `tests/harness/test_boundary.py`.
+**Done =** a coverage score per (expectation, section) that is reproducible, provenance-logged, and provably not the in-run reviewer wearing a second hat.
+
+### E5d. Grounding axis grader — reuse E2, do not re-implement faithfulness
+- [ ] Per expectation, derive grounding from the claims in its evidence pack via **E2 status-aware faithfulness** — E2 stays the single system-of-record for "does the source entail the claim". E5 contributes the *aggregation* (per-expectation grounding rate + weakest-link claim), not a second faithfulness judge.
+- [ ] Status-aware aggregation: `confirmed` claims that fail entailment dominate the score (the integrity-critical case); `assumed`/`inferred` are reported separately, not averaged away.
+- [ ] Reuses the existing E2 verdicts where a section has already been judged — no duplicate judge calls for the same `(claim, source_ref)` pair (budget + one-SoR discipline).
+**Done =** a grounding score per (expectation, section) traceable to individual E2 verdicts, with zero new faithfulness prompts.
+
+### E5e. Contradiction detector + report/CLI/pytest wiring (advisory)
+- [ ] Deterministic combination rule over E5c × E5d → the 2×2; the **high-coverage / weak-grounding** cell is the flagged output, with the offending claims named.
+- [ ] **Spine-awareness:** cross-reference the unconfirmed-spine facts (host, hosting arrangements) so "Implementation scored well on host capacity while the host is undeclared" surfaces as a named contradiction, not a low number in a table.
+- [ ] `RubricReport` enforces `advisory=True, blocking=False`; nothing in `runner` imports it. CLI `py -3.10 -m harness.rubric grade|report`, pytest marker alongside `harness_regression`.
+- [ ] Report renders both axes side by side; a single blended score is explicitly **not** produced.
+**Done =** running the grader on a frozen section prints the 9×2 grid plus any contradictions, advisory-only, with the boundary test green.
+
+### E5f. First real grading run under the judge budget (produces the artifact)
+- [ ] Paced/checkpointed runner reusing the `freeze_grounding_baselines` / `faithfulness_calibration` backend pattern (retry, per-item checkpoint, resumable across a daily-cap stop, auto-loads `.env.harness`).
+- [ ] **Budget math recorded before the run:** 9 expectations × the mapped sections × N≥3 vs 6k TPM / 100k TPD; if it does not fit one day, either the local Ollama judge ($0, no cap) or an explicit multi-day resume — never a silently reduced N or a truncated pack.
+- [ ] Grade the three real sections (Impact **after** the Opus-for-impact authoring, per the baseline nuance) → freeze the result and hand it to **E4** as a rubric-lane baseline so a prompt/model change can't silently regress coverage or grounding.
+**Done =** a real 9×2 grid on the current sections, frozen as a comparable baseline, with the budget accounting written down.
+
+## E5.1 Rubric-grader calibration → graduation decision (advisory→gating for E5; offline; native; $0)
+**What to build:** the measurement that graduates E5 from advisory — mirrors E1.5 (judge) and E3.1 (materiality). **Blocked by:** E5c/E5d. Does not block anything downstream.
+- [ ] Human-labeled gold set on **both** axes: per (expectation, section), a human verdict on coverage (addressed / not) and on grounding (grounded / weak). Fail-closed loader — an unlabeled row cannot be used for calibration. Reuse the `harness/labeling/*.xlsx` workflow that worked for E3.1.
+- [ ] Compute + record precision/recall per axis, positive class chosen so the **integrity-critical error is a false positive** (grader blesses an ungrounded-but-covered expectation). Port the `precision = None if (tn+fp)==0` guard — the same gap still open in `harness/calibration.py`.
+- [ ] Apply the E1.5 `graduation_for` cascade → record advisory-stays / gating-permitted in `docs/tier4_orchestration_state/decision_log/`. A repin re-opens advisory.
+- [ ] Human ground truth only; reporting-only; zero DAG runs; $0.
+**Done =** E5's precision/recall are characterized per axis and a graduation decision is recorded — not necessarily promotion.
 
 ## E6. Prompt/transport boundary + predicate bridge (offline; add lane if it earns)
 **What to build:** drafting-prompt regression with a deterministic+semantic bridge, and a model/cost matrix.
