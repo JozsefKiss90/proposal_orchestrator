@@ -251,13 +251,22 @@ class PackClaim:
 
 @dataclass(frozen=True)
 class ExcludedItem:
-    """One candidate that is **not** in the pack — the no-silent-caps record."""
+    """One candidate that is **not** in the pack — the no-silent-caps record.
+
+    For an excluded **claim**, ``status`` and ``source_ref`` carry the ledger
+    entry's identity (additive fields, empty for prose spans) — so a
+    downstream consumer (E5e's spine cross-reference) can still see *what* was
+    excluded, not merely that something was.  An exclusion record that hid the
+    claim's identity would itself be a silent cap.
+    """
 
     kind: str  # "prose_span" | "claim"
     key: str
     reason: str  # EXCLUDED_NOT_RELEVANT | EXCLUDED_OVER_BUDGET
     matched_terms: tuple[str, ...]
     token_estimate: int
+    status: str = ""
+    source_ref: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -266,6 +275,8 @@ class ExcludedItem:
             "reason": self.reason,
             "matched_terms": list(self.matched_terms),
             "token_estimate": self.token_estimate,
+            "status": self.status,
+            "source_ref": self.source_ref,
         }
 
 
@@ -458,6 +469,7 @@ def _fill_budget(
             used += item.token_estimate
         else:
             truncated = True
+            claim = getattr(item, "claim", None)  # PackClaim carries identity
             excluded.append(
                 ExcludedItem(
                     kind=kind,
@@ -465,6 +477,8 @@ def _fill_budget(
                     reason=EXCLUDED_OVER_BUDGET,
                     matched_terms=item.matched_terms,
                     token_estimate=item.token_estimate,
+                    status=claim.status if claim is not None else "",
+                    source_ref=claim.source_ref if claim is not None else "",
                 )
             )
     return included, used, truncated
@@ -575,6 +589,8 @@ def build_evidence_pack(
                     reason=EXCLUDED_NOT_RELEVANT,
                     matched_terms=(),
                     token_estimate=pc.token_estimate,
+                    status=claim.status,
+                    source_ref=claim.source_ref,
                 )
             )
 
