@@ -75,3 +75,21 @@ class TestGoldenSetStanding:
         summary = report.to_dict()["summary"]
         assert "sections_changed" in summary
         assert summary["sections_compared"] == len(golden)
+
+
+class TestRubricLaneStanding:
+    """The E5f rubric-grid baseline, once frozen, must stay loadable and
+    self-consistent. Until E5f freezes it, the lane records the gap by
+    skipping, never by pretending."""
+
+    def test_frozen_rubric_baseline_is_self_consistent(self):
+        path = REPO_ROOT / reg.DEFAULT_RUBRIC_BASELINE_PATH
+        if not path.is_file():
+            pytest.skip("no frozen rubric baseline yet (E5f pending)")
+        baseline = reg.load_rubric_baseline(path)
+        comparison = reg.compare_rubric_baseline(baseline, baseline["report"])
+        assert comparison.blocking is False
+        assert comparison.regressed is False
+        assert baseline.get("budget_record"), (
+            "the E5f baseline must carry its budget accounting"
+        )

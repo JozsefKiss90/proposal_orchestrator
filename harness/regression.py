@@ -28,6 +28,14 @@ Two lanes, mirroring the harness's deterministic-first routing:
   :func:`~harness.status_faithfulness.compare_to_baseline` — the per-claim
   grounding-invariance check (*form may change, grounding may not*), run under
   the pinned, non-drafter judge.
+* **Rubric lane (E5f handoff).**  :func:`freeze_rubric_baseline` /
+  :func:`compare_rubric_baseline` freeze the graded E5 coverage×grounding
+  grid (``harness.rubric``) and diff a future re-grade against it — so a
+  prompt or model change cannot silently regress an expectation's coverage or
+  grounding outcome.  The comparison itself is deterministic dict arithmetic
+  (the judge spend happened when the reports were graded); it fail-closes on
+  a judge repin or a rubric-set fingerprint change, where grades stop being
+  comparable and the baseline must be refrozen instead.
 
 **Merge-advisory, never run-blocking.**  The comparison output is a
 :class:`RegressionReport` with ``advisory=True, blocking=False`` enforced
@@ -110,6 +118,17 @@ __all__ = [
     # judge lane (E2 reuse)
     "freeze_section_grounding",
     "compare_section_grounding",
+    # rubric lane (E5f handoff)
+    "RUBRIC_BASELINE_RECORD_TYPE",
+    "DEFAULT_RUBRIC_BASELINE_PATH",
+    "REGRESSION_RUBRIC_CELL_MISSING",
+    "REGRESSION_RUBRIC_CELL_ADDED",
+    "REGRESSION_RUBRIC_CELL_REGRESSED",
+    "REGRESSION_RUBRIC_CONTRADICTION_APPEARED",
+    "REGRESSION_RUBRIC_CELL_IMPROVED",
+    "freeze_rubric_baseline",
+    "load_rubric_baseline",
+    "compare_rubric_baseline",
     # CLI
     "main",
 ]
@@ -158,6 +177,23 @@ REGRESSION_SECTION_MISSING: str = "section_missing"
 #: A current section has no baseline yet (advisory: freeze it).
 REGRESSION_SECTION_ADDED: str = "section_added"
 
+# Rubric-lane kinds (the E5f grid vs its frozen baseline; see the rubric-lane
+# section below for the freeze/compare machinery).
+
+#: A baseline cell has no counterpart in the current report (breaking: an
+#: expectation silently fell out of the grid).
+REGRESSION_RUBRIC_CELL_MISSING: str = "rubric_cell_missing"
+#: A current cell has no baseline yet (advisory: refreeze to cover it).
+REGRESSION_RUBRIC_CELL_ADDED: str = "rubric_cell_added"
+#: A cell's coverage or grounding outcome degraded (breaking: the axis the
+#: baseline vouched for no longer holds).
+REGRESSION_RUBRIC_CELL_REGRESSED: str = "rubric_cell_regressed"
+#: A contradiction kind absent from the baseline cell appeared (breaking).
+REGRESSION_RUBRIC_CONTRADICTION_APPEARED: str = "rubric_contradiction_appeared"
+#: A cell improved or a contradiction disappeared (advisory: refreeze to keep
+#: the tighter baseline).
+REGRESSION_RUBRIC_CELL_IMPROVED: str = "rubric_cell_improved"
+
 #: Kinds that constitute a regression a human must decide on (refreeze or fix).
 _BREAKING_KINDS: frozenset[str] = frozenset(
     {
@@ -166,6 +202,9 @@ _BREAKING_KINDS: frozenset[str] = frozenset(
         REGRESSION_SOURCE_REF_CHANGED,
         REGRESSION_SUBSECTION_REMOVED,
         REGRESSION_SECTION_MISSING,
+        REGRESSION_RUBRIC_CELL_MISSING,
+        REGRESSION_RUBRIC_CELL_REGRESSED,
+        REGRESSION_RUBRIC_CONTRADICTION_APPEARED,
     }
 )
 
@@ -939,6 +978,265 @@ def compare_section_grounding(
 
 
 # --------------------------------------------------------------------------- #
+# Rubric lane — the frozen E5f grid as a regression baseline (E5 handoff)
+# --------------------------------------------------------------------------- #
+
+#: The ``record_type`` of a frozen rubric-grid baseline file.
+RUBRIC_BASELINE_RECORD_TYPE: str = "rubric_grid_baseline"
+
+#: Where the frozen rubric-grid baseline lives (harness-owned; the suffix is
+#: distinct from ``.golden.json`` so ``load_golden_set`` never reads it).
+DEFAULT_RUBRIC_BASELINE_PATH: Path = DEFAULT_GOLDEN_DIR / "rubric_grid.rubric.json"
+
+#: The ``record_type`` a rubric report must carry (mirrored from
+#: ``harness.rubric`` without importing it — the rubric module already imports
+#: nothing from here, and the string is a stable data contract).
+_RUBRIC_REPORT_RECORD_TYPE: str = "rubric_grade_report"
+
+
+def _require_report(report: Mapping[str, Any], label: str) -> None:
+    """Fail closed unless *report* is a well-formed advisory rubric report."""
+    if not isinstance(report, Mapping):
+        raise RegressionError(f"{label} is not a JSON object.")
+    if report.get("record_type") != _RUBRIC_REPORT_RECORD_TYPE:
+        raise RegressionError(
+            f"{label} is not a {_RUBRIC_REPORT_RECORD_TYPE!r} record "
+            f"(got {report.get('record_type')!r})."
+        )
+    if report.get("advisory") is not True or report.get("blocking") is not False:
+        raise RegressionError(
+            f"{label} does not carry advisory=True/blocking=False — refusing "
+            "a report that claims authority over a run."
+        )
+    cells = report.get("cells")
+    if not isinstance(cells, list) or not cells:
+        raise RegressionError(
+            f"{label} has no cells — an empty grid cannot serve as a baseline."
+        )
+    if not report.get("judge_model") or not report.get("judge_version"):
+        raise RegressionError(
+            f"{label} carries no judge pin — a baseline without a pin cannot "
+            "enforce the repin discipline."
+        )
+
+
+def freeze_rubric_baseline(
+    report: Mapping[str, Any],
+    *,
+    baseline_id: str = "rubric_grid",
+    frozen_at: str | None = None,
+    budget_record: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Freeze a graded rubric report as the E4 rubric-lane baseline.
+
+    The full report travels inside the baseline (the audit trail), pinned to
+    the judge and rubric set it was graded under.  *budget_record* is the E5f
+    budget accounting — recorded with the freeze so the baseline documents
+    what the run cost and what it planned.
+    """
+    _require_report(report, "rubric report")
+    return {
+        "record_type": RUBRIC_BASELINE_RECORD_TYPE,
+        "metric": str(report.get("metric", "")),
+        "baseline_id": baseline_id,
+        "frozen_at": frozen_at if frozen_at is not None else _default_clock(),
+        "judge_model": report["judge_model"],
+        "judge_version": report["judge_version"],
+        "rubric_set_id": str(report.get("rubric_set_id", "")),
+        "rubric_set_version": str(report.get("rubric_set_version", "")),
+        "rubric_set_fingerprint": str(report.get("rubric_set_fingerprint", "")),
+        "budget_record": dict(budget_record) if budget_record is not None else None,
+        "report": dict(report),
+    }
+
+
+def _read_json(path: Path, label: str) -> Any:
+    """Read one JSON file fail-closed (missing/invalid raise, never default)."""
+    if not path.is_file():
+        raise RegressionError(f"{label} not found: {path}")
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except json.JSONDecodeError as exc:
+        raise RegressionError(f"{label} {path} is not valid JSON: {exc}") from exc
+
+
+def load_rubric_baseline(path: Path | str) -> dict[str, Any]:
+    """Load a frozen rubric-grid baseline, fail-closed."""
+    p = Path(path)
+    data = _read_json(p, "rubric baseline")
+    if not isinstance(data, Mapping) or data.get("record_type") != RUBRIC_BASELINE_RECORD_TYPE:
+        raise RegressionError(f"{p} is not a {RUBRIC_BASELINE_RECORD_TYPE!r} record.")
+    _require_report(data.get("report", {}), f"rubric baseline {p} report")
+    return dict(data)
+
+
+def _cell_index(report: Mapping[str, Any]) -> dict[tuple[str, str], Mapping[str, Any]]:
+    out: dict[tuple[str, str], Mapping[str, Any]] = {}
+    for cell in report.get("cells", []):
+        out[(str(cell.get("expectation_key", "")), str(cell.get("section_id", "")))] = cell
+    return out
+
+
+#: The boolean axes a baseline cell vouches for, with the record path each
+#: reads: the cell-level covered/grounded outcomes plus coverage's clean pass
+#: (the truncation-override bit E5b makes visible).
+_RUBRIC_AXES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("covered", ("covered",)),
+    ("grounded", ("grounded",)),
+    ("coverage clean pass", ("coverage", "passed")),
+)
+
+
+def _axis_value(cell: Mapping[str, Any], path: tuple[str, ...]) -> Any:
+    node: Any = cell
+    for key in path:
+        if not isinstance(node, Mapping):
+            return None
+        node = node.get(key)
+    return node
+
+
+def _contradiction_kinds(cell: Mapping[str, Any]) -> set[str]:
+    return {
+        str(c.get("kind", ""))
+        for c in cell.get("contradictions", [])
+        if isinstance(c, Mapping)
+    }
+
+
+def compare_rubric_baseline(
+    baseline: Mapping[str, Any],
+    current_report: Mapping[str, Any],
+) -> RegressionReport:
+    """Diff a fresh rubric report against the frozen baseline, deterministically.
+
+    Fail-closed on a judge repin or a rubric-set fingerprint change — grades
+    under a different judge or different rubric text are not comparable; the
+    E1.5 discipline says refreeze under the new pin instead.  Otherwise every
+    baseline cell's boolean axes (covered, grounded, coverage clean pass) must
+    hold and no new contradiction kind may appear; degradations are breaking
+    findings, improvements are advisory context for a refreeze decision.
+    """
+    _require_report(current_report, "current rubric report")
+    base_report = baseline.get("report")
+    _require_report(base_report if isinstance(base_report, Mapping) else {}, "baseline report")
+
+    base_pin = (baseline.get("judge_model"), baseline.get("judge_version"))
+    cur_pin = (current_report.get("judge_model"), current_report.get("judge_version"))
+    if base_pin != cur_pin:
+        raise RegressionError(
+            f"judge repin: baseline was frozen under {base_pin[0]}@{base_pin[1]}, "
+            f"the current report is graded under {cur_pin[0]}@{cur_pin[1]} — "
+            "not comparable; refreeze the rubric baseline under the new pin."
+        )
+    base_fp = str(baseline.get("rubric_set_fingerprint", ""))
+    cur_fp = str(current_report.get("rubric_set_fingerprint", ""))
+    if base_fp != cur_fp:
+        raise RegressionError(
+            "rubric-set fingerprint changed since the baseline was frozen — "
+            "the rubric text is different, so the grades are not comparable; "
+            "refreeze the rubric baseline for the new rubric set."
+        )
+
+    base_cells = _cell_index(base_report)  # type: ignore[arg-type]
+    cur_cells = _cell_index(current_report)
+
+    findings: list[RegressionFinding] = []
+    for key in sorted(base_cells):
+        expectation_key, section_id = key
+        base_cell = base_cells[key]
+        cur_cell = cur_cells.get(key)
+        if cur_cell is None:
+            findings.append(
+                RegressionFinding(
+                    kind=REGRESSION_RUBRIC_CELL_MISSING,
+                    section_id=section_id,
+                    detail=(
+                        f"{expectation_key} / {section_id}: baseline cell has "
+                        "no counterpart in the current report."
+                    ),
+                    baseline={"cell": base_cell.get("cell")},
+                )
+            )
+            continue
+        for axis, path in _RUBRIC_AXES:
+            was, now = _axis_value(base_cell, path), _axis_value(cur_cell, path)
+            if was is True and now is not True:
+                findings.append(
+                    RegressionFinding(
+                        kind=REGRESSION_RUBRIC_CELL_REGRESSED,
+                        section_id=section_id,
+                        detail=(
+                            f"{expectation_key} / {section_id}: {axis} "
+                            f"degraded {was!r} -> {now!r}."
+                        ),
+                        baseline={axis: was},
+                        current={axis: now},
+                    )
+                )
+            elif was is not True and now is True:
+                findings.append(
+                    RegressionFinding(
+                        kind=REGRESSION_RUBRIC_CELL_IMPROVED,
+                        section_id=section_id,
+                        detail=(
+                            f"{expectation_key} / {section_id}: {axis} "
+                            f"improved {was!r} -> {now!r} (refreeze to keep it)."
+                        ),
+                        baseline={axis: was},
+                        current={axis: now},
+                    )
+                )
+        base_kinds = _contradiction_kinds(base_cell)
+        cur_kinds = _contradiction_kinds(cur_cell)
+        for kind in sorted(cur_kinds - base_kinds):
+            findings.append(
+                RegressionFinding(
+                    kind=REGRESSION_RUBRIC_CONTRADICTION_APPEARED,
+                    section_id=section_id,
+                    detail=(
+                        f"{expectation_key} / {section_id}: contradiction "
+                        f"{kind!r} appeared (absent from the baseline)."
+                    ),
+                    current={"contradiction_kind": kind},
+                )
+            )
+        for kind in sorted(base_kinds - cur_kinds):
+            findings.append(
+                RegressionFinding(
+                    kind=REGRESSION_RUBRIC_CELL_IMPROVED,
+                    section_id=section_id,
+                    detail=(
+                        f"{expectation_key} / {section_id}: baseline "
+                        f"contradiction {kind!r} is gone (refreeze to keep it)."
+                    ),
+                    baseline={"contradiction_kind": kind},
+                )
+            )
+    for key in sorted(set(cur_cells) - set(base_cells)):
+        expectation_key, section_id = key
+        findings.append(
+            RegressionFinding(
+                kind=REGRESSION_RUBRIC_CELL_ADDED,
+                section_id=section_id,
+                detail=(
+                    f"{expectation_key} / {section_id}: cell has no rubric "
+                    "baseline yet — refreeze to bring it under cover."
+                ),
+                current={"cell": cur_cells[key].get("cell")},
+            )
+        )
+    return RegressionReport(
+        results=(),
+        golden_set_findings=tuple(findings),
+        notes=(
+            "Rubric-lane comparison (coverage x grounding grid vs the frozen "
+            "baseline). " + _ADVISORY_NOTE
+        ),
+    )
+
+
+# --------------------------------------------------------------------------- #
 # CLI — freeze / check (merge-advisory)
 # --------------------------------------------------------------------------- #
 
@@ -977,6 +1275,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     p_check.add_argument("--golden", default=str(DEFAULT_GOLDEN_DIR))
     p_check.add_argument("--report", default=None, help="also write the report JSON here")
 
+    p_rfreeze = sub.add_parser(
+        "rubric-freeze", help="freeze a graded rubric report as the rubric-lane baseline"
+    )
+    p_rfreeze.add_argument("--report", required=True, help="graded rubric report JSON")
+    p_rfreeze.add_argument("--out", default=str(DEFAULT_RUBRIC_BASELINE_PATH))
+    p_rfreeze.add_argument("--frozen-at", default=None, help="freeze label (default: UTC now)")
+
+    p_rcheck = sub.add_parser(
+        "rubric-check", help="compare a graded rubric report to the frozen baseline"
+    )
+    p_rcheck.add_argument("--report", required=True, help="graded rubric report JSON")
+    p_rcheck.add_argument("--baseline", default=str(DEFAULT_RUBRIC_BASELINE_PATH))
+    p_rcheck.add_argument("--out", default=None, help="also write the comparison JSON here")
+
     args = parser.parse_args(argv)
     try:
         if args.command == "freeze":
@@ -993,6 +1305,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                     f"{Path(args.out) / (fp.section_id + GOLDEN_SUFFIX)}"
                 )
             return 0
+
+        if args.command in ("rubric-freeze", "rubric-check"):
+            graded = _read_json(Path(args.report), "rubric report")
+
+            if args.command == "rubric-freeze":
+                baseline = freeze_rubric_baseline(graded, frozen_at=args.frozen_at)
+                atomic_write_json(baseline, Path(args.out), prefix="rubric_baseline_")
+                print(
+                    f"frozen rubric baseline: {len(baseline['report']['cells'])} cells "
+                    f"under {baseline['judge_model']}@{baseline['judge_version']} "
+                    f"-> {args.out}"
+                )
+                return 0
+
+            comparison = compare_rubric_baseline(
+                load_rubric_baseline(Path(args.baseline)), graded
+            )
+            print(json.dumps(comparison.to_dict(), indent=2, ensure_ascii=True))
+            if args.out:
+                atomic_write_json(
+                    comparison.to_dict(), Path(args.out), prefix="rubric_regression_"
+                )
+            return 1 if comparison.regressed else 0
 
         golden = load_golden_set(Path(args.golden))
         report = compare_to_golden_set(golden, _section_files(Path(args.sections)))

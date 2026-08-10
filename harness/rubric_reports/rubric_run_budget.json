@@ -1,0 +1,178 @@
+{
+  "record_type": "rubric_run_budget",
+  "computed_at": "2026-08-10T14:59:11.993431+00:00",
+  "judge_model": "llama-3.3-70b-versatile",
+  "judge_version": "groq-llama-3.3-70b@2026-08-03",
+  "rubric_set_id": "msca_pf_rubrics",
+  "rubric_set_version": "1.0.0",
+  "rubric_set_fingerprint": "sha256:28193a04c359eb40b8c681959b06d5f80aa2d7bc19a8b7e19b12c282d00912cd",
+  "n": 3,
+  "token_budget": 3000,
+  "span_budget_fraction": 0.6,
+  "caps": {
+    "tpm": 5500,
+    "rpm": 28,
+    "tpd": 100000,
+    "rpd": 1000
+  },
+  "impact_baseline_nuance": {
+    "note": "impact is graded against the post-showcase artifact; gate_10b_impact_completeness certifies the Opus-for-impact authoring landed",
+    "gate_10b": {
+      "gate_id": "gate_10b_impact_completeness",
+      "status": "pass",
+      "run_id": "d0675cf5-4c10-4bb9-a949-643c96bcec2a",
+      "evaluated_at": "2026-07-30T21:27:10.172707+00:00"
+    }
+  },
+  "cells": [
+    {
+      "expectation_key": "exc-obj",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2160,
+      "claims_in_pack": 5,
+      "claims_excluded_over_budget": 69,
+      "new_unique_claims": 5,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 3460,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 15
+    },
+    {
+      "expectation_key": "exc-method",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2981,
+      "claims_in_pack": 14,
+      "claims_excluded_over_budget": 97,
+      "new_unique_claims": 14,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4281,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 42
+    },
+    {
+      "expectation_key": "exc-supervision",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2985,
+      "claims_in_pack": 15,
+      "claims_excluded_over_budget": 79,
+      "new_unique_claims": 11,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4285,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 33
+    },
+    {
+      "expectation_key": "exc-researcher",
+      "criterion_id": "excellence",
+      "section_id": "excellence_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2985,
+      "claims_in_pack": 13,
+      "claims_excluded_over_budget": 103,
+      "new_unique_claims": 4,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4285,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 12
+    },
+    {
+      "expectation_key": "imp-career",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2936,
+      "claims_in_pack": 16,
+      "claims_excluded_over_budget": 38,
+      "new_unique_claims": 16,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4236,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 48
+    },
+    {
+      "expectation_key": "imp-dissemination",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2936,
+      "claims_in_pack": 17,
+      "claims_excluded_over_budget": 47,
+      "new_unique_claims": 13,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4236,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 39
+    },
+    {
+      "expectation_key": "imp-magnitude",
+      "criterion_id": "impact",
+      "section_id": "impact_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2953,
+      "claims_in_pack": 17,
+      "claims_excluded_over_budget": 71,
+      "new_unique_claims": 10,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4253,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 30
+    },
+    {
+      "expectation_key": "impl-workplan",
+      "criterion_id": "implementation",
+      "section_id": "implementation_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2926,
+      "claims_in_pack": 12,
+      "claims_excluded_over_budget": 72,
+      "new_unique_claims": 12,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 4226,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 36
+    },
+    {
+      "expectation_key": "impl-host",
+      "criterion_id": "implementation",
+      "section_id": "implementation_section",
+      "pack_status": "insufficient_context",
+      "pack_token_estimate": 2366,
+      "claims_in_pack": 6,
+      "claims_excluded_over_budget": 27,
+      "new_unique_claims": 5,
+      "coverage_calls": 3,
+      "coverage_tokens_per_call_est": 3666,
+      "coverage_tokens_per_call_ceiling": 5948,
+      "grounding_calls_est": 15
+    }
+  ],
+  "totals": {
+    "cells": 9,
+    "unique_claims": 90,
+    "coverage_calls": 27,
+    "coverage_tokens_est": 110784,
+    "grounding_calls_est": 270,
+    "grounding_tokens_est": 567000,
+    "calls_est": 297,
+    "tokens_est": 677784
+  },
+  "assessment": {
+    "max_call_ceiling_fits_tpm": false,
+    "max_call_ceiling": 5948,
+    "fits_one_day": false,
+    "estimated_days": 7,
+    "plan": "multi_day_resume",
+    "notes": [
+      "N and the pack budget are never reduced to fit the caps; if the plan exceeds one day, the recorded approach is an explicit multi-day resume from the per-cell checkpoint.",
+      "grounding tokens/call is the measured mean of the E1.5 calibration run under this judge (~2100); coverage tokens/call is the pack estimate plus the pinned prompt allowance plus ~400 completion tokens.",
+      "grounding calls are an upper bound: the shared verdict cache judges each unique (claim_summary, status, source_ref) once across the whole grid.",
+      "the local Ollama judge path ($0, uncapped) is not available on this machine (no ollama install); the run uses the pinned Groq free-tier judge with pacing."
+    ]
+  }
+}

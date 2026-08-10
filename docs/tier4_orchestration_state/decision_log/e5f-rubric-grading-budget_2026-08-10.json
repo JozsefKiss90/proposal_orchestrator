@@ -1,0 +1,38 @@
+{
+  "decision_id": "e5f_rubric_grading_budget_2026-08-10",
+  "decision_type": "eval_harness_e5f_grading_run_budget_posture",
+  "invoking_agent": "scripts/rubric_grading_run.py (E5f) via Claude Code implement session",
+  "phase_context": "Out-of-band QA/CI track (harness/). First real E5 rubric-grid grading run: 9 PF evaluator expectations x coverage/grounding axes over the three committed Part B sections, under the pinned non-drafter Groq judge. Never a runtime gate.",
+  "run_id_reference": "eval_mock branch; judge llama-3.3-70b-versatile@groq-llama-3.3-70b@2026-08-03; budget math in harness/rubric_reports/rubric_run_budget.json",
+  "authority": [
+    "plans/harness_plan/tickets_eval_harness.md E5f (budget math recorded before the run; local judge OR explicit multi-day resume; never a silently reduced N or a truncated pack)",
+    "plans/harness_plan/tickets_eval_harness.md E5b (measured reality: 5-18k tokens of material per expectation vs the ~3k TPM-derived pack ceiling; insufficient_context is the honest common outcome)",
+    "harness/evidence_pack.py (MAX_PACK_TOKEN_BUDGET is derived from the 6k TPM cap; pack_forbids_clean_pass / clean_pass enforce the truncation contract)",
+    "harness/HARNESS.md (advisory-only; provenance discipline)"
+  ],
+  "judge": {
+    "model": "llama-3.3-70b-versatile",
+    "version": "groq-llama-3.3-70b@2026-08-03"
+  },
+  "recorded_plan": {
+    "cells": 9,
+    "unique_claims": 90,
+    "estimated_calls": 297,
+    "estimated_tokens": 677784,
+    "n": 3,
+    "pack_token_budget": 3000,
+    "provider_caps": {"tpm": 6000, "rpm": 30, "tpd": 100000, "rpd": 1000},
+    "assessment": "multi_day_resume (~7 days at 100k TPD)"
+  },
+  "decision": "groq_multi_day_resume_with_explicit_truncation",
+  "rationale": "The E5f options were the local Ollama judge or an explicit multi-day resume. No local judge exists on this machine, and installing one is a system change outside an autonomous session's scope. An uncapped judge would not lift the pack ceiling anyway: MAX_PACK_TOKEN_BUDGET is TPM-derived in E5b, so raising it is an E5b change out of E5f scope. The run therefore proceeds on the pinned Groq judge at the designed default pack budget, paced under the caps, resumable day by day from the per-cell checkpoint. N=3 is preserved everywhere (E5c/E5d structurally refuse less). Pack truncation on the real sections is EXPLICIT, never silent: pack_status=insufficient_context travels on every grade, clean_pass is structurally forbidden over a truncated pack, and every exclusion is itemized with its reason. This satisfies the anti-silence prohibition; the known cost is that the coverage clean-pass axis of the frozen baseline is expected uniformly False, so regression signal on that axis rests on the raw-majority covered bit and the grounding axis.",
+  "constitutional_check": "Advisory by construction (RubricReport enforces advisory=True/blocking=False); no runtime gate consumes any of this. Declared partial states preferred over fabricated completion (S15): a paused run exits with a distinct code and a checkpoint, never a fabricated grid.",
+  "open_items": [
+    "Multi-day resume: re-run scripts/rubric_grading_run.py on each fresh Groq daily quota until the grid completes; the checkpoint skips completed cells and cached verdicts.",
+    "If the operator installs a local judge later, a bigger effective pack budget still requires an E5b MAX_PACK_TOKEN_BUDGET change plus a judge repin, which re-opens the baseline (refreeze under the new pin).",
+    "E5.1 calibration is the graduation path for the grader itself; this run stays advisory regardless of outcome."
+  ],
+  "resolution_status": "recorded",
+  "operating_posture": "advisory",
+  "timestamp": "2026-08-10T15:10:00+00:00"
+}
