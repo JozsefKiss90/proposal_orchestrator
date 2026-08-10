@@ -1,0 +1,21 @@
+{
+  "rulesets": [
+    {
+      "name": "tier5-deliverables",
+      "governs": ["docs/tier5_deliverables/**/*.json"],
+      "sentenceLimit": 25,
+      "sentenceCeiling": 35,
+      "paragraphLimit": 6,
+      "emDashPerFile": 2,
+      "bannedPhrases": ["state of the art"]
+    },
+    {
+      "name": "internal-docs",
+      "governs": ["README.md", "AGENTS.md", "plans/**/*.md"],
+      "sentenceLimit": 35,
+      "sentenceCeiling": 35,
+      "paragraphLimit": 6,
+      "emDashPerFile": null
+    }
+  ]
+}
