@@ -78,20 +78,52 @@ One engine gap surfaced by item 9. `derive_unit_cost_budget` never sets `include
 
 ## 3. Seed call binding and project brief
 
-**What to build:** The first Tier 3 seeding slice. `selected_call.json` is carried forward
-unchanged, and `project_summary.json`, `concept_note.md`, and `strategic_positioning.md` are lifted
-from the draft under the plan's §5 provenance envelope. This ticket also creates
-`hand_lift_provenance.json` and the lift record in the decision log, which tickets 4 and 5 extend.
-Narrative files carry YAML front matter and per-section source references; prose is lifted without
-rewriting.
+**What to build:** The first Tier 3 seeding slice. `selected_call.json` is carried forward with its
+call-scoped fields unchanged and its residual demo-run project facts corrected, and
+`project_summary.json`, `concept_note.md`, and `strategic_positioning.md` are lifted from the draft
+under the plan's §5 provenance envelope. This ticket also creates `hand_lift_provenance.json` and
+the lift record in the decision log, which tickets 4 and 5 extend. Narrative files carry YAML front
+matter and per-section source references; prose is lifted without rewriting.
 
 **Blocked by:** Complete the purge and the decision-log split.
 
-- [ ] `selected_call.json` matches its pre-purge content and targets HORIZON-MSCA-2026-PF-01.
+- [ ] `selected_call.json` targets HORIZON-MSCA-2026-PF-01 and its call-scoped fields match its pre-purge content.
+- [ ] The six project-scoped fields named below are corrected, and no field still cites the 13B consolidation or a decision-log path that ticket 1 archived.
 - [ ] The three project-brief files exist, use the §5 envelope, and cite draft paragraph ranges.
 - [ ] Every record carries exactly one §12.2 status, and nothing not present in the draft is marked Confirmed.
 - [ ] `hand_lift_provenance.json` and the lift decision-log entry exist and cover these files.
 - [ ] `topic_mapping.json` and `compliance_profile.json` are not seeded (Phase 2 writes them).
+
+One deviation, recorded in the lift decision-log entry.
+
+`selected_call.json` is not carried forward byte-for-byte. The original criterion said it was, and
+that criterion could not be met: the pre-purge file (recoverable at commit `6d96a60`) mixes genuine
+call facts with the superseded demo run's project facts, and two of its internal references now
+dangle because ticket 1 moved their targets to `decision_log/archive/demo-run/`. Carrying it forward
+unchanged would reintroduce purged project data into Tier 3 and produce a file with broken
+references, which is what §13.11 exists to prevent.
+
+The file is a call binding. Call-scoped fields stay. Project-scoped fields are re-derived from the
+operator input pack, which is the authority for them. Six fields change:
+
+| Field | Pre-purge | Corrected | Why |
+|-------|-----------|-----------|-----|
+| `project_duration_months` | `24` | `30` | Operator decision of 2026-08-11, input pack item 2: 24-month European Fellowship plus a 6-month non-academic placement at AgroVIR under CC-07 |
+| `project_duration_months_note` | cites "13B consolidation, 2026-07-16" | cites input pack items 2 and 7 | The 13B consolidation belongs to the superseded run |
+| `project_duration_note` | asserts "project_duration_months = 24" | states 30, and that 24 + 6 is the composition | Stale the moment the field above changes |
+| `host_country_note` | cites "13B consolidation, 2026-07-16" | cites input pack item 7 | Value `HU` is unchanged and still correct; only its provenance was superseded |
+| `action_confirmation_ref` | `decision_log/action-confirmation-msca-pf_2026-07-13.json` | the FIELDWISE authorisation record from ticket 7 | **Dangling.** Ticket 1 archived that file to `decision_log/archive/demo-run/` |
+| `notes` | claims the spine and RQ1–RQ10 are "operator-confirmed real data (13B consolidation)"; cites an archived decision-log path | restates the spine from input pack item 7 | Item 7 confirms RQ1–RQ10 are **superseded** by the draft, so this field asserts the opposite of the confirmed position |
+
+`max_project_duration_months` stays at `36`. It is a genuine call fact — the call-level maximum
+across both fellowship types — and it is not the project's duration. `runner/unit_cost_budget.py`
+documents the distinction explicitly and refuses to substitute one for the other.
+
+`project_duration_status` stays `Confirmed`. That is now accurate: the operator decided the duration
+on 2026-08-11. Setting the value here rather than declaring it in `working_assumptions.json` is
+deliberate — `gate_09` accepts either, but `phase_04_gate`'s `timeline_within_duration` reads
+`project_duration_months` from this file by name, and the gate-enforcement rules record an
+unavailable predicate value as a special case rather than a pass. Setting it satisfies both gates.
 
 ## 4. Seed architecture inputs
 

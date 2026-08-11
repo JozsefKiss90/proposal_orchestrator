@@ -90,42 +90,167 @@ Seven fields per organisation. None appears anywhere in the draft.
 ```
 ITEM 1 — LEGAL IDENTITY
 
+Completed 2026-08-11 from public registers and CORDIS. Operator-supplied values are kept and
+marked. [V] verified against a source named below. [O] operator-supplied, not independently
+verified. [!] needs your action. [!!] blocks something.
+
 MATE
-  legal_name_national:
-  legal_name_english:
-  pic: 891269563
-  entity_type:
-  address_city:
-  address_country_code:
-  contact_person: Dr. Sándor Takács
-  contact_email: tak5533@uni-mate.hu
-  already_registered_in_participant_register: yes / no
-  letter_of_commitment: planned 
+  legal_name_national:  Magyar Agrár- és Élettudományi Egyetem                              [V]
+  legal_name_english:   Hungarian University of Agriculture and Life Sciences                [V]
+    EU grant spelling as recorded in CORDIS: MAGYAR AGRAR- ES ELETTUDOMANYI EGYETEM
+  pic: 891269563                                                                             [V]
+    Confirmed: MATE coordinates AGRIGEP, grant 101094158, recorded under this PIC.
+  entity_type:  Higher education institution. Public-benefit (közhasznú) private non-profit
+    since the 2021 model change, maintained by Magyar Agrár- és Élettudományi Egyetemért
+    Alapítvány. Legal successor of Szent István Egyetem from 2021-02-01. In Horizon terms:
+    Higher or Secondary Education Establishment, non-profit.                                 [V]
+    [!] The public/private flag is the one field to check with MATE's grants office. The
+        foundation model makes Hungarian universities private in form and public in function;
+        the Part A entry must match how MATE already self-declares in the Register.
+  address_street:   Páter Károly utca 1                                                      [V]
+  address_city:     Gödöllő                                                                  [V]
+  address_postcode: 2100                                                                     [V]
+  address_country_code: HU                                                                   [V]
+  contact_person: Dr. Sándor Takács                                                          [O]
+  contact_email:  tak5533@uni-mate.hu                                                        [O]
+    [!] Role and institute not verified. Item 12 places him in the Institute of Horticultural
+        Sciences. Supply his exact title: Part B-2 §5 needs it and g07_p08 reads the name.
+  already_registered_in_participant_register: yes — the PIC proves it                        [V]
+  letter_of_commitment: planned                                                              [O]
 
 MVCRI
-  legal_name_national:
-  legal_name_english:
-  pic: 999533009
-  entity_type:
-  address_city:
-  address_country_code:
-  contact_person: Dr. Rositsa Cholakova
-  contact_email: rositsa.cho@abv.bg
-  already_registered_in_participant_register: yes 
-  letter_of_commitment: planned 
+  legal_name_national:  Институт по зеленчукови култури „Марица“ – Пловдив                   [V]
+  legal_name_english:   Maritsa Vegetable Crops Research Institute                           [V]
+    EU grant spelling as recorded in CORDIS: MARITSA VEGETABLE CROPS RESEARCH INSTITUTE
+  pic: 999533009                                                                             [V]
+    Confirmed, and it belongs to the institute itself rather than to the Agricultural Academy.
+    MVCRI coordinated FP7 project 205941 under this PIC, in its own name.
+  entity_type:  Public research organisation, non-profit, not a higher education institution.
+    A scientific institute of Селскостопанска академия, the Agricultural Academy, which sits
+    under the Minister of Agriculture.                                                       [V]
+    [!] Holding its own PIC and having coordinated an EU project in its own name settles this
+        for Register purposes. It does not settle who signs. Ask MVCRI whether the institute
+        director signs a partnership agreement or whether the Academy must. Institutes of the
+        Academy are structural units, so this can go either way, and it is far cheaper to ask
+        now than at grant preparation.
+  address_street:   32 Brezovsko shose St. (ул. „Брезовско шосе“ 32)                         [V]
+  address_city:     Plovdiv                                                                  [V]
+  address_postcode: 4003                                                                     [V]
+  address_country_code: BG                                                                   [V]
+  contact_person: Prof. Vinelina Yankova, PhD                                                    [!!]
+  contact_email:  vinelina@abv.bg                                              [!!]
+    C1 RESOLVED IN STRUCTURE, 2026-08-11 — operator chose "name another MVCRI colleague".
+    Dr. Rositsa Cholakova is REMOVED from this field. She is the FELLOW, and naming her as
+    the transfer partner's contact made the independent cross-country test answerable to the
+    person whose model it tests.
+    ONE NAME STILL NEEDED. Supply it once and it fills both this field and item 4's
+    TRANSFER_PARTNER seat — the same token `<<MVCRI_COLLEAGUE>>` marks both.
+    Candidates visible from her co-authorships, roles unconfirmed: Stanislava Grozeva,
+    Ivanka Tringovska, Daniela Ganeva, Elena Topalova. The institute director would be the
+    conventional choice for a partner contact; a head of department is equally acceptable.
+    [!] Use an institutional address if one exists. Worth knowing: MVCRI appears to have no
+        institutional mail domain — its own published addresses are izk_maritsa@abv.bg and
+        seme_izk@abv.bg, both on the free provider abv.bg. So a free-provider address is
+        normal here and is not a problem in itself. The problem was only whose it was.
+  already_registered_in_participant_register: yes — the PIC proves it                        [V]
+  letter_of_commitment: planned                                                              [O]
 
 AgroVIR
-  legal_name_national:
-  legal_name_english:
-  pic: none
-  entity_type:
-  address_city: Budapest
-  address_country_code:
-  contact_person: Balázs Zsuzsanna
-  contact_email:  balazs.zsuzsanna@agrovir.hu
-  already_registered_in_participant_register:  no
-  letter_of_commitment: none
+  legal_name_national:  AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság         [V]
+    short form: AGROVIR Kft.
+  legal_name_english:   AgroVIR Business Consulting Ltd.                                     [V]
+  pic: none                                                                                  [!!]
+    MUST BE CREATED BEFORE SUBMISSION. See "What item 1 still blocks" below.
+  entity_type:  Private for-profit company, limited liability (Kft.). SME. Founded 2007.
+    Main activity NACE 7020, business and management consulting.                             [V]
+    [!] SME status is inferred from the published revenue band, not from a self-assessment.
+        Run the official SME self-assessment before Part A.
+  address_street:   Kinizsi utca 30                                                          [V]
+  address_city:     Budaörs                                                                  [V]
+  address_postcode: 2040                                                                     [V]
+  address_country_code: HU                                                                   [V]
+    [!!] CORRECTION. The form said Budapest. The registered seat is 2040 Budaörs, Kinizsi utca
+         30 — a separate town in Pest county, not a Budapest district. The tax number ends in
+         the Pest county code, which corroborates it. Budaörs is about 15 km from central
+         Budapest, so nothing in the work plan changes; only the address in Part A and
+         Part B-2 §5 does.
+  tax_number (adószám): 14000838-2-13                                                        [V]
+  company_registration_number (cégjegyzékszám):  NOT VERIFIED                                [!]
+    One source implies 01-09-884056, but the tax number's county code points to Pest, which
+    would give a 13- prefix. Do not use either until the company confirms it.
+  contact_person: Balázs Zsuzsanna                                                           [O]
+  contact_email:  balazs.zsuzsanna@agrovir.hu                                                [O]
+    [!] Role not verified — the company website names no staff. Supply her title.
+  already_registered_in_participant_register: no                                             [O]
+  letter_of_commitment: none                                                                 [!!]
+    "None" is a problem here, not a neutral answer. See below.
 ```
+
+### Sources for the verified fields
+
+- MATE legal name, address and PIC 891269563 — CORDIS grant 101094158 (AGRIGEP), MATE as
+  coordinator: https://cordis.europa.eu/project/id/101094158
+- MATE seat, foundation maintenance, successor status — the university's own published economic
+  information: https://uni-mate.hu/gazd%C3%A1lkod%C3%A1si-inform%C3%A1ci%C3%B3k
+- MVCRI legal name, address and PIC 999533009 — CORDIS FP7 grant 205941, MVCRI as coordinator:
+  https://cordis.europa.eu/project/id/205941 and http://izk-maritsa.org/en/contact-us/
+- AgroVIR legal name, seat, tax number, activity code, founding year — Hungarian company register
+  extract via OPTEN: https://webshop.opten.hu/agrovir-kft-c0109884056.html ; scale and product:
+  https://www.agrovir.com/HU/rolunk.html
+
+### What item 1 still blocks
+
+`phase_03_gate` predicate `g04_p07` requires every work-package-assigned partner to exist in
+`consortium/partners.json`. MATE and MVCRI now resolve completely — verified legal name, verified
+PIC, verified address. They will pass.
+
+**AgroVIR will not.** It has no PIC and no letter of commitment, and the draft makes it WP5 co-lead.
+Three consequences, in the order they bite.
+
+The PIC is the easy one. Registering in the Participant Register is free, takes minutes, and needs
+only the legal name, address and tax number — all three of which are now filled in above. Nothing
+blocks doing it today. Until it exists, `partners.json` carries an Unresolved record for a partner
+the work plan assigns a work package to, and `g04_p07` fails on it.
+
+The letter is harder, and it interacts with item 2. If AgroVIR becomes a **non-academic placement
+host**, constraint CC-09 requires the placement to be integral to the proposal, and it is
+*evaluated*. A placement host that has given no letter of commitment is the weakest possible version
+of that, and evaluators read it as an arrangement that may not exist. As an **associated partner**
+or **secondment host** a letter is still expected, but the exposure is smaller. Decide item 2 and
+you will know how hard to push.
+
+The third is quieter, and it is contradiction C9.
+
+**C9 RESOLVED 2026-08-11 — by narrative, since the fact itself is not wrong.** AgroVIR's registered
+activity code is 7020, business and management consulting, and its registered name is AGROVIR
+Üzletviteli Tanácsadó Kft. — literally "business consulting Ltd". The company plainly does build and
+operate a farm management information system. Both things are true: Hungarian companies commonly
+keep a founding NACE code that no longer describes what they do, and nothing needs correcting at the
+registry. The contradiction is only in what an evaluator infers.
+
+The exposure grew when the placement was approved. An evaluator now reads Part A, sees a business
+consultancy, and turns to a Part B-1 that asks them to accept it as both the operational technology
+partner and a six-month non-academic placement host. Left unaddressed, the registered activity is
+the first thing that contradicts the narrative.
+
+Adopted approach — state it, do not let the code speak first. Wherever AgroVIR is introduced, in
+§3.2 and Part B-2 §5, lead with what it operates rather than how it is registered:
+
+  "AgroVIR (AGROVIR Üzletviteli Tanácsadó Kft., founded 2007, Budaörs, Hungary) develops and
+  operates a cloud-based farm management information system in production use across more than
+  745,000 hectares in eight countries — Hungary (500,000+ ha), Romania (120,000+), Azerbaijan
+  (50,000+), Slovakia (40,000+), Bulgaria (15,000+), Serbia (10,000+), Ukraine (7,000+) and
+  Argentina (3,000+). Its Hungarian and Bulgarian footprints correspond to the two countries in
+  which FIELDWISE operates. The company is registered under NACE 7020 (business and management
+  consulting), reflecting its founding activity; its current business is agricultural software."
+
+That last sentence is the whole fix: name the discrepancy in one clause instead of leaving the
+evaluator to find it. The hectare figures come from the company's own published material.
+
+[!] Two things this wording depends on, both still open: a letter of commitment (which the
+    placement decision made load-bearing), and a named on-site supervisor for M25–M30. The
+    narrative above describes a substantial company; it does not yet evidence a hosting
+    arrangement.
 
 ---
 
@@ -168,11 +293,79 @@ ITEM 2 — PARTICIPATION MODE
 
 MATE:     associated_partner 
 MVCRI:    associated_partner 
-AgroVIR:  secondment_host / non_academic_placement 
+AgroVIR:  non_academic_placement          <-- DECIDED by the operator, 2026-08-11
   if non_academic_placement, months added at the end: 6
 
-Total action duration after this decision (months):
+Total action duration after this decision (months):  30
+
 Statement on MVCRI independence given the fellow's current affiliation:
+
+--- DECISION RECORDED 2026-08-11 -------------------------------------------------
+RESOLVED. AgroVIR is the non-academic placement host. Six months are added at the end
+of the action. The action runs 30 months: M1–M24 at ELTE, M25–M30 on placement at
+AgroVIR. My earlier recommendation of a 24-month secondment is superseded; it is struck
+through below and kept only so the reasoning is on the record.
+
+This is now the settled duration everywhere in the pack. Items 7, 8, 9, 12 and 14 have
+been consolidated to 30 months. The contradiction with item 9 is closed.
+
+WHAT THE DECISION BUYS. The placement is the operational-transfer half of the proposal
+made structural rather than asserted. G5 and H5 both claim that research-to-farm transfer
+is where models break; a six-month period embedded in the company that runs the farms is
+the strongest available evidence that the proposal takes its own gap seriously. It also
+answers the previous evaluation's criticism, recorded in §2.2, that the economic and
+technological route to users was insufficiently substantiated. A resubmission that moved
+from 70.40% needs exactly this kind of structural answer.
+
+WHAT IT COSTS, and all of it is now live work.
+
+  1. The placement is EVALUATED. Confirmed against the 2026 Guide for Applicants: the
+     non-academic placement "should be described in part B-1 and the evaluators will
+     assess their relevance and quality in the respective criterion". It is no longer
+     enough for AgroVIR to appear in the work plan — Part B-1 must argue the placement:
+     what the fellow does in M25–M30, why it needs six months, why it needs to be inside
+     the company, and what the fellow gains that ELTE cannot give her. Nothing in the
+     current draft does this. It is new §1.2/§1.3/§3.1 content for Phase 8.
+  2. Part A needs a separate budget line. The Guide is explicit: add the number of months
+     requested for the non-academic placement as a separate line in Part A Section 3.
+  3. AgroVIR's letter of commitment moves from "nice to have" to load-bearing. An
+     evaluated placement resting on a host that has provided no letter is the weakest
+     version of this decision. See item 1 — this is now the most urgent open action in
+     the pack after the mobility flag.
+  4. Location is fine. The placement organisation must be in an EU Member State or
+     Associated Country; the Guide does not prohibit the same country as the beneficiary.
+     AgroVIR in Budaörs, Hungary, is eligible. Confirmed, no action needed.
+  5. CC-07's six-month ceiling is used in full. There is no headroom left if the plan
+     later needs a seventh month.
+
+  ~~Recommendation: secondment_host, 24 months total.~~ SUPERSEDED 2026-08-11.
+  ~~Reasons were: CC-09 makes a placement evaluated while AgroVIR has no letter; the +6
+  months churns every downstream number; the draft did not argue for the extra months;
+  CC-04 already allows up to 12 secondment months.~~ The operator has weighed these and
+  accepted the placement. Reasons 1 and 3 above are the residual work those objections
+  point at, and they are now tracked rather than avoided.
+----------------------------------------------------------------------------------
+
+Statement on MVCRI independence — DRAFTED, accept or replace:
+  "MVCRI is the fellow's employer of record at the time of application. The Bulgarian
+  evaluation is nonetheless independent of model development in the sense that matters
+  scientifically: the Hungary-to-Bulgaria transfer test in WP4 is a zero-shot evaluation
+  against data MVCRI holds and the fellow does not use in training, executed against a
+  frozen model and a pre-registered evaluation protocol agreed before the Bulgarian data
+  are opened. Model development occurs entirely at ELTE on MATE source-domain data. To
+  keep the separation visible rather than asserted, MVCRI's project contact and steering
+  group seat are held by a named MVCRI colleague other than the fellow, and the WP4
+  evaluation split manifest is published under the open-science commitments of §1.2."
+  [✓] C1 RESOLVED 2026-08-11. That last sentence is now true in structure: the fellow has
+      been removed from item 1's MVCRI contact field and item 4's TRANSFER_PARTNER seat,
+      both of which now carry `<<MVCRI_COLLEAGUE>>`. It becomes true in fact when you supply
+      the name. The statement above can be adopted as drafted.
+  [!] One addition the placement decision forces: WP4's Bulgarian transfer test must
+      complete before the placement begins at M25, or the fellow is evaluating the
+      Hungary-to-Bulgaria transfer from inside a Hungarian commercial software company.
+      WP4 currently runs M12–M21, so this holds — but state it, because the sequencing
+      is now part of the independence argument rather than an accident of the Gantt.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -217,8 +410,36 @@ human_participants:      ACCEPT
 animal_subjects:         ACCEPT 
 dual_use:                ACCEPT 
 non_eu_data_transfer:    no
-ethics_committee_approval_required: no
-ELTE data protection officer consulted: no
+ethics_committee_approval_required: not_yet_determined     <-- C2, amended 2026-08-11
+ELTE data protection officer consulted: planned            <-- C2, amended 2026-08-11
+
+--- C2 RESOLVED 2026-08-11 -------------------------------------------------------
+Operator chose "soften both answers". `g07_p06` passes and the internal contradiction is
+gone. The two amended lines carry the following reasons, which Phase 6 should write into
+`ethics_assessment.self_assessment_statement` rather than leaving as bare tokens.
+
+  ethics_committee_approval_required: not_yet_determined
+    "ELTE's research ethics committee will be consulted on task T5.6 before any fieldwork
+    begins. The expectation is that structured usability feedback from AgroVIR staff and
+    participating farmers, collected under informed consent with a right of withdrawal and
+    with no health, biometric or special-category data, falls below the committee's review
+    threshold. This will be confirmed in writing by M12."
+
+  ELTE data protection officer consulted: planned
+    "ELTE's Data Protection Officer will be consulted before the first DrR Web MVP user
+    account is created, covering the lawful basis for holding farm contact details and
+    field boundaries, the retention period, and data minimisation across the MVP."
+
+What this fixed. You had accepted `personal_data_gdpr: yes, limited` and
+`human_participants: yes, low risk`, and the GDPR candidate's own text says "ELTE's Data
+Protection Officer reviews the processing" — so answering "no DPO consulted" made the form
+contradict the text it had adopted. An evaluator reads that as an ethics section written
+without reference to its own commitments. Both amendments cost nothing at gate.
+
+[!] One consequence to carry: `ethics_issues_identified` remains true, so Part A's ethics
+    self-assessment table and Part B-2 §6 must both be completed. Unchanged by this edit,
+    but it follows from the candidates you accepted rather than from these two lines.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -273,8 +494,47 @@ decision_rights_table:      ACCEPT
 conflict_resolution:        ACCEPT 
 named contacts per partner (needed for g07_p08):
   DATA_PARTNER (MATE): Dr. Sándor Takács
-  TRANSFER_PARTNER (MVCRI): Dr. Rositsa Cholakova
+  TRANSFER_PARTNER (MVCRI): Vinelina Yankova         
   VALIDATION_PARTNER (AgroVIR): Zsuzsanna Balázs
+
+--- sweep 2026-08-11 -------------------------------------------------------------
+Complete. `g07_p07` passes on the accepted Steering Group. `g07_p08` will pass once the
+three names resolve to partners in `partners.json`, which item 1 now makes possible for
+MATE and MVCRI and not yet for AgroVIR.
+
+[✓] C1 RESOLVED IN STRUCTURE, 2026-08-11. The fellow is removed from the TRANSFER_PARTNER
+    seat. She previously sat on the Steering Group twice — once as FELLOW and once as the
+    transfer partner's representative — on a body that issues go/no-go verdicts on MS1–MS5.
+    The same `<<MVCRI_COLLEAGUE>>` name fills item 1's contact field; supply it once.
+
+[✓] The knock-on is fixed by the same change. The accepted decision-rights table routes
+    "access to partner data and field sites" to "the owning partner", escalating to the
+    Steering Group. With the fellow holding MVCRI's seat she owned, escalated and voted.
+    With a colleague in the seat, the escalation is genuine.
+
+[✓] C6 RESOLVED 2026-08-11. The accepted conflict-resolution route escalates past the
+    SUPERVISOR to "the ELTE Institute of Cartography and Geoinformatics head" — but the
+    supervisor IS the deputy head of that institute, so the route partly looped back on the
+    person being escalated past. The head is a different person and the route is sound once
+    named.
+
+      Head of Institute: Dr. Mátyás Gede, habil. associate professor, Director of the
+      Institute of Cartography and Geoinformatics, ELTE Faculty of Informatics,
+      H-1117 Budapest, Pázmány Péter sétány 1/C.
+      Verified: https://www.inf.elte.hu/en/units/institute-of-cartography-science-and-geoinformatics
+
+    Corrected escalation, replacing the accepted text's second step:
+      "FELLOW and SUPERVISOR resolve disagreements directly and record the outcome in the
+      monthly progress record. Anything unresolved after one cycle goes to the Director of
+      the Institute of Cartography and Geoinformatics (Dr. Mátyás Gede), and then to the
+      ELTE research integrity route. Data access disputes follow the dispute clause of the
+      relevant data-sharing agreement."
+
+    [!] One caveat worth carrying. ELTE lists Dr. Jung's deputy directorship as *temporary*.
+        If he ceases to be deputy director during a 30-month action the escalation route is
+        unaffected — it names the Director by office — but item 12's §3.2 text should
+        describe him by his professorship rather than by a temporary administrative post.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -335,9 +595,85 @@ K1 to K10 as drafted:  ACCEPT / edit below
 edits:
 
 EI-03 public engagement measure:  ACCEPT candidate 
-EI-04 Charter alignment measure:  ACCEPT candidate 
-  does ELTE hold HR Excellence in Research? unknown
-EI-06 teaching measure:           ACCEPT candidate 
+EI-04 Charter alignment measure:  ACCEPT, WITH THE HRS4R CLAIM REMOVED  <-- C8, 2026-08-11
+  does ELTE hold HR Excellence in Research? unknown — claim dropped, see C8 below
+EI-06 teaching measure:           RAISED, see C7 below                  <-- C7, 2026-08-11
+
+--- sweep 2026-08-11 -------------------------------------------------------------
+Complete enough for `g06_p04` — all six expected impacts now map to an output. `g06_p05`
+passes on the ten KPIs, each of which names a deliverable.
+
+[✓] C8 RESOLVED 2026-08-11 by removing the claim rather than by verifying it. Two rounds of
+    checking failed: the EURAXESS acknowledged-institutions list is robots-blocked to
+    automated access, targeted searches of elte.hu and euraxess.ec.europa.eu returned
+    nothing either way, and https://www.elte.hu/en/hrs4r returns 404. That last point is
+    weak evidence rather than proof — institutions holding the award usually publish a page
+    — but it is not evidence of absence and I am not asserting ELTE lacks it.
+
+    The contradiction was internal: the accepted EI-04 candidate asserts "ELTE's HR
+    Excellence in Research status ... stated in §3.2" while the answer line to its immediate
+    right says "unknown". A proposal cannot both claim the status and record not knowing it.
+
+    ADOPTED EI-04 WORDING, which does not depend on the answer:
+      "Charter alignment is evidenced at instrument level by the Career Development Plan
+      (D1.3), by ELTE's open recruitment and researcher-development policies, and by the
+      supervision and training arrangements set out in §1.3."
+
+    The asymmetry decides it: if ELTE does hold the award, adding one sentence later costs
+    nothing; if it does not, the original wording puts a false institutional claim into a
+    submitted proposal. One email to ELTE's HR or research office settles it — restore the
+    stronger claim the moment they confirm, and not before.
+
+[✓] C1 knock-on RESOLVED 2026-08-11. K5 "cross-country gap quantified" and K6 "adaptation
+    cost stated" both trace to D4.2/D4.3 in WP4, whose target domain is MVCRI. While the
+    fellow held MVCRI's contact and steering seat, these two KPIs were measured by her
+    against her own employer's data with no third party in the loop. With
+    `<<MVCRI_COLLEAGUE>>` in both seats, K5 and K6 are reported to someone at MVCRI who is
+    not their author. No change to the KPI wording is needed — only to who receives it.
+
+[!] Item 6's D1.3 Career Development Plan carries no KPI. Item 6 accepted it as a
+    deliverable, so the KPI list is now one short of covering every deliverable it claims
+    traceability to. Consider K11: "Career Development Plan agreed by M3 and reviewed at all
+    four steering points" → D1.3.
+
+--- C7 RESOLVED 2026-08-11: teaching ambition raised -------------------------------
+Operator chose "raise the ambition". The contradiction was that items 5 and 6 treated
+teaching as a competence the fellowship would build, while the CV shows five years of it at
+Agricultural University Plovdiv, 2015–2020: syllabus design, lecturing and examining in
+Bulgarian and English including for Erasmus students, and Bachelor's thesis supervision.
+
+REPLACES the EI-06 candidate ("one guest module in an ELTE MSc course, and co-supervision
+of one MSc thesis"):
+
+  EI-06 teaching measure — raised:
+    • Co-design and deliver a full module unit within an ELTE MSc course on Earth
+      observation for agriculture, rather than a single guest lecture.
+    • PRIMARY-supervise one ELTE MSc thesis to completion.
+    • Co-supervise the field-experiment component of one PhD student's work.
+
+  Corresponding change to item 6's Career Development Plan, "Teaching" component: it is
+  reframed from a competence to acquire into an existing strength transferred into a new
+  discipline, a new institution and a new language of instruction. The developmental content
+  is real but different — moving from plant protection teaching in Bulgarian at a Bulgarian
+  agricultural university to Earth-observation teaching in English at a Hungarian
+  informatics faculty, and stepping up from Bachelor's to Master's and doctoral supervision.
+
+Why this is worth the extra commitment. §1.4 states the intended progression ending at
+"independent researcher". Primary supervision and module ownership are the standard
+evidence of that step; guest lecturing is not. The raised version turns EI-06 from the
+weakest of the three added impact measures into support for the career argument §2.1 is
+scored on.
+
+[!] Two consequences to carry.
+    • The workload lands in a 30-month plan whose cross-cutting allocation is 3.0
+      person-months. Supervising a thesis to completion and co-designing a module unit will
+      not fit inside that comfortably. Either raise cross-cutting, or state in §3.1 that
+      teaching sits within the training allocation rather than the research WPs.
+    • Primary supervision of an ELTE MSc thesis may require a formal ELTE affiliation or
+      status the fellow will not automatically hold. Confirm with the Faculty of Informatics
+      that an MSCA fellow can act as primary supervisor; if not, the measure drops back to
+      co-supervision and the module unit carries the ambition instead.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -432,15 +768,146 @@ RQ1 to RQ7 and H1 to H6, which ticket 3 lifts from §1.1.6 and §1.1.7.
 ITEM 7 — IDENTITY SPINE
 
 FELLOW:               CONFIRM 
-HOST:                 CONFIRM 
-SUPERVISOR:           CONFIRM 
+HOST:                 CONFIRM — CONDITIONAL on C5        <-- amended 2026-08-11
+SUPERVISOR:           CONFIRM — corroborated, see below  <-- amended 2026-08-11
 VALIDATION_PARTNER:   CONFIRM 
-FELLOWSHIP_TYPE:      CONFIRM 
-DURATION:             CONFIRM 
+FELLOWSHIP_TYPE:      CONFIRM — CONDITIONAL on C5        <-- amended 2026-08-11
+DURATION:             CONFIRM   <-- AMENDED, see below
 CALL_BINDING:         CONFIRM 
 
 DATA_PROVIDERS record is superseded by the draft:  CONFIRM 
 RQ1 to RQ10 decisions are superseded by the draft: CONFIRM 
+
+--- consolidated 2026-08-11 ------------------------------------------------------
+[!!] DURATION IS NO LONGER 24 MONTHS. The pre-purge record you confirmed reads
+     "24 months, carried in `selected_call.json` as `project_duration_months`". Item 2's
+     placement decision makes the action 30 months. The confirmation stands on the
+     principle — the duration record does carry forward and does live in
+     `selected_call.json` — but the value is now wrong.
+
+     Corrected record:
+       DURATION: 30 months. 24 months of European Fellowship at ELTE (M1–M24) plus a
+       6-month non-academic placement at AgroVIR (M25–M30) under CC-07.
+       `selected_call.json` `project_duration_months` = 30.
+
+[✓] TICKET 3 RESOLVED, 2026-08-11. An earlier version of this note called this a collision
+    with ticket 3's "matches its pre-purge content" criterion and asked you to choose
+    between amending the criterion and moving the field. That framing was wrong, and it is
+    withdrawn. Reading `runner/unit_cost_budget.py` and the pre-purge file settled it.
+
+    What the runner actually does. `_resolve_confirmed_months` (line 305) resolves the
+    duration in priority order: a positive `project_duration_months` in the call binding
+    (→ Confirmed); then an operator declaration in `working_assumptions.json` or the
+    `DURATION` checklist token (→ Assumed); else Unresolved. Its docstring is explicit that
+    `max_project_duration_months` is a call-level maximum and is "deliberately not used as
+    the figure (§13.3: no fabricated project facts)". The two fields are different things
+    and the engine already knows it.
+
+    What the pre-purge file actually contains, at commit `6d96a60`:
+      "max_project_duration_months": 36            <- genuine call fact
+      "project_duration_months": 24                <- Confirmed
+      "project_duration_months_note": "Operator-confirmed (13B consolidation, 2026-07-16)..."
+    The 13B consolidation is the SUPERSEDED demo run's. So the 24 was never a call fact —
+    it is the purged project's decision, sitting inside a call-binding artifact and stamped
+    Confirmed. `host_country` is in the same position; it survives only because FIELDWISE
+    also hosts in Hungary.
+
+    Worse, two of the file's internal references now dangle. `action_confirmation_ref`
+    points at `decision_log/action-confirmation-msca-pf_2026-07-13.json`, and `notes` cites
+    `decision_log/13b-real-data-consolidation_2026-07-16.json`. Ticket 1 moved both to
+    `decision_log/archive/demo-run/`. Verified: neither path resolves. And `notes` asserts
+    RQ1–RQ10 are "operator-confirmed real data" — the opposite of what you confirmed three
+    lines above in this very item.
+
+    So this is not a criterion collision. It is a purge miss. Ticket 3's criterion is right
+    in intent; the pre-purge file is what is wrong. Ticket 3 has been given a deviation
+    block in `plans/fieldwise_tickets.md` listing the six fields to correct, in the same
+    form as ticket 1's three deviations. No amendment to the runner is needed and none is
+    proposed.
+
+[!] Why the value is SET here rather than declared in `working_assumptions.json`. Both
+    routes satisfy `gate_09` — `g08_uc03` accepts Confirmed or operator-declared Assumed.
+    But `phase_04_gate`'s `timeline_within_duration` reads `project_duration_months` from
+    `selected_call.json` by name, and the gate-enforcement rules record a predicate whose
+    value is unavailable as a special case rather than passing it. Removing the field would
+    serve one gate and risk stalling the other. Setting it to 30 satisfies both, and
+    "Confirmed" is honest now that you have decided it — the runner's caution about
+    confirming into the call binding was aimed at a duration nobody had chosen.
+
+[!] FELLOWSHIP_TYPE is unchanged in kind — it remains a European Fellowship. The
+    placement is an extension of it, not a different instrument. No amendment needed
+    beyond the duration.
+
+--- C5 DEFERRED BY THE OPERATOR, 2026-08-11 --------------------------------------
+Status: DEFER — "I will consult with the fellow." Under this pack's own rules a deferred
+item stays Unresolved and goes into the authorisation packet. No runner gate reads it, so
+the run can proceed; ticket 7 must not issue authorisation while it is open.
+
+HOST and FELLOWSHIP_TYPE are therefore marked CONFIRM — CONDITIONAL rather than plain
+CONFIRM. The records themselves are right: ELTE is the intended host and a European
+Fellowship is the intended instrument. What is unresolved is whether that combination is
+*available* to this fellow at this deadline.
+
+THE RULE IS NOT AMBIGUOUS. I checked the 2026 Guide for Applicants directly. The mobility
+rule reads: "The researcher cannot have resided or carried out their main activity (work,
+studies, etc.) in the country of the beneficiary for more than 12 months in the 36 months
+immediately before the call deadline." The exception list is closed and exhaustive:
+
+  a) compulsory national service;
+  b) time spent in a procedure for obtaining refugee status under the Geneva Convention,
+     and time spent obtaining EU temporary protection;
+  c) short stays (such as holidays), "i.e. the researcher did not reside or did not have
+     their main activity (work, studies, etc.) in the country during that period".
+
+Career breaks, parental leave and time outside research are NOT on that list. They extend
+the *research experience* window, which is a different criterion. And exception (c) is
+defined by not having resided — so a career break spent living in Budapest is expressly not
+a short stay.
+
+THE ARITHMETIC, against a deadline of 2026-09-09, so a window opening 2023-09-09:
+
+| Period | Basis | Months in window |
+|--------|-------|------------------|
+| 2023-09-09 to 2024-05-31 | Career break, residing in Budapest | ≈ 8.7 |
+| 2024-06-01 to 2024-10-01 | Data Analyst, KPMG Global Hungary | 4.0 |
+| 2026, 3 months, dates not given | Erasmus master's mobility at ELTE | ≈ 3.0 |
+| | **Total** | **≈ 15.7** |
+
+Even discounting the ELTE internship entirely, the first two rows come to ≈ 12.7 months
+against a 12-month cap. The Erasmus is a three-month study mobility, which is main activity
+rather than a holiday, so discounting it is generous rather than correct.
+
+WHAT WOULD ACTUALLY CHANGE THE ANSWER. Only one thing: the CV's location lines are not
+residence records. It says "BUDAPEST, HUNGARY" against the career break, but if her
+registered residence remained in Bulgaria and the Budapest time was intermittent, the count
+falls. That is the question to put to the fellow. Ask for documented residence — registration,
+tax residence, lease or address history — across 2023-09-09 to 2026-09-09, not a recollection.
+
+THE FOUR OPTIONS, preserved for when you have the answer.
+
+  1. Verify residence and submit in 2026 as planned. Only viable if the documented record
+     is materially different from the CV.
+  2. Defer to the 2027 call. The arithmetic clears on its own: a ~September 2027 deadline
+     puts the window at 2024-09 to 2027-09, containing roughly 0.8 months of KPMG plus the
+     3-month Erasmus — about 3.8 months against a 12-month cap, with eight months of
+     headroom. It also buys time for the AgroVIR letter, the PIC, and the placement
+     narrative, all of which are currently thin. This was my recommendation.
+  3. Restructure as a Global Fellowship. The mobility rule then applies to the outgoing
+     third-country host rather than the return host, so ELTE could remain. FIELDWISE has no
+     third-country partner — Bulgaria is a Member State — so this means finding one and
+     redesigning the work plan.
+  4. Change the host country. Clean on eligibility, but it removes ELTE, the supervisor
+     relationship, the MATE archive and the PLANTDIGISENSE continuity. A different proposal.
+
+[✓] SUPERVISOR record independently corroborated, 2026-08-11. ELTE's Faculty of Informatics
+    lists Dr. András Jung as Professor and Deputy Director of the Institute of Cartography
+    and Geoinformatics, H-1117 Budapest, Pázmány Péter sétány 1/C. The pre-purge record said
+    "Deputy Head" and is accurate. The listing marks the deputy role as temporary, which is
+    worth knowing for a 30-month action but does not affect the confirmation.
+
+[!] The placement decision does not touch C5. The placement runs after the deadline and has
+    no bearing on the 36-month look-back.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -488,10 +955,83 @@ fellow allocation as drafted:  ACCEPT / replace with:
   WP1:   WP2:   WP3:   WP4:   WP5:   cross-cutting:    (must total the action duration)
 
 person-months, optional:
-  MATE: 0.24 
+  MATE: 2.4                <-- C4, corrected from 0.24 by the operator, 2026-08-11
   MVCRI: -
   AgroVIR: -
   ELTE supervisor: -
+
+--- consolidated 2026-08-11 ------------------------------------------------------
+You answered `fellow allocation as drafted: ACCEPT`. Taken as accepting the drafted
+*shape*, extended to the approved 30 months — WP1 to WP4 are exactly as drafted and
+untouched, and the six placement months are added where the placement actually happens.
+
+  fellow allocation:  ACCEPT as drafted for WP1–WP4, extended for WP5 and cross-cutting
+    WP1: 3.0   WP2: 5.5   WP3: 5.5   WP4: 4.0   WP5: 9.0   cross-cutting: 3.0   = 30.0
+
+  [!] If you meant "accept" literally — the drafted table as written, totalling 24.0 —
+      say so, because it would leave six months of the action unallocated and the line
+      itself requires the total to equal the action duration. I have read it the other way
+      because a 24-month allocation against a 30-month action cannot be what you intended.
+
+| Work package | Month range | Person-months | Share | Change from the 24-month draft |
+|--------------|-------------|---------------|-------|--------------------------------|
+| WP1 Historical data and target design | M1–M6 | 3.0 | 10.0% | unchanged |
+| WP2 Physiological early warning and sensor transfer | M3–M14 | 5.5 | 18.3% | unchanged |
+| WP3 Prospective and uncertainty-aware prediction | M6–M18 | 5.5 | 18.3% | unchanged |
+| WP4 Temporal and cross-country transferability | M12–M21 | 4.0 | 13.3% | unchanged |
+| WP5 Operational transfer, decision value and web MVP | M16–**M30** | **9.0** | 30.0% | **+5.0**, range extended |
+| Cross-cutting: management, training, dissemination | M1–**M30** | **3.0** | 10.0% | **+1.0**, range extended |
+| Total | | **30.0** | 100% | +6.0 |
+
+Why the six months land where they do. The placement is at AgroVIR, and AgroVIR is the
+WP5 partner — so the added effort belongs to WP5 by construction, not by allocation
+choice. Five of the six go there and one goes to cross-cutting, because management,
+training and dissemination are continuous rows in the draft's Gantt and have to cover the
+longer action. WP1–WP4 are untouched: none of them runs past M21 and the placement adds
+nothing to them.
+
+WP5 becoming the largest work package at 30% is the intended, visible consequence of the
+decision. It is also the honest one — an evaluated placement that did not show up as the
+largest effort block would look like a budget device rather than a research plan.
+
+[!!] MONTH RANGES ARE NOT JUST THIS TABLE. `phase_04_gate` checks task months and the
+     critical path, and ticket 4 seeds `workpackage_seed.json` and `milestones_seed.json`
+     with Inferred task months derived from the WP month ranges. Those seeds must now be
+     derived against M1–M30, not M1–M24. In particular:
+       - WP5's range extends from M16–M24 to M16–M30, and its internal tasks need
+         re-spreading. T5.6, the AgroVIR MVP assessment, is the natural occupant of the
+         M25–M30 placement window.
+       - MS5, if it sat at M24, has to move or be joined by a placement-completion
+         milestone. The draft's four corrective decision points at M6, M12, M16 and M20
+         now leave a ten-month unmonitored tail. Item 4's Steering Group meets at those
+         four points; consider adding M27.
+     None of this can be inferred safely from the draft. Ticket 4 should seed it Inferred
+     with the derivation stated, and the authorisation packet should surface it.
+
+[!] `phase_04_gate` also checks that concurrent work packages never demand more than one
+    FTE in any month. M16–M21 now carries WP4 and a heavier WP5 concurrently. The totals
+    still fit inside 30 person-months over 30 months, but the monthly profile is tighter
+    than it was. Phase 4 will tell you if it breaks.
+
+[✓] C4 RESOLVED 2026-08-11. MATE corrected from 0.24 to 2.4 person-months — the misplaced
+    decimal. 2.4 PM across 30 months is roughly ten working days a year: plausible for
+    supervision, data preparation and experiment access, and no longer at odds with item
+    12's capacity claim for the same partner. It is in-kind and not costed by the unit-cost
+    derivation, so it changes no budget figure. It is recorded as Assumed, not Confirmed —
+    the number is the operator's estimate, not MATE's own statement, and it needs a matching
+    declaration in `working_assumptions.json`.
+
+[!] STILL OPEN, and it is the residue of C4 rather than a new problem. MVCRI, AgroVIR and
+    the ELTE supervisor are all "-". A literal zero for the supervisor contradicts item 4's
+    accepted weekly one-to-ones and quarterly reviews, and a literal zero for AgroVIR is now
+    plainly wrong — it hosts the fellow for six months. Two ways to close it:
+      (a) Give each a nominal indicative figure, declared Assumed like MATE's 2.4.
+      (b) State in §3.1 that partner contributions are in kind and deliberately not
+          quantified, and drop the per-partner lines entirely — including MATE's.
+    (b) is the more honest option if none of these figures comes from the partners
+    themselves. What is not defensible is a table where one partner carries a number and
+    three carry dashes, because the dashes then read as zero.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -545,11 +1085,103 @@ ITEM 9 — OPTIONAL UNIT-COST LINES
 
 none of the three applies:  ACCEPT / correct below
 
-family_allowance:            applies unknown at proposal stage
-long_term_leave_allowance:   unknown at proposal stage
+family_allowance:            does not apply — DECLARED ASSUMED   <-- C3, resolved 2026-08-11
+long_term_leave_allowance:   does not apply — DECLARED ASSUMED   <-- C3, resolved 2026-08-11
 special_needs_allowance:     does not apply 
 
-duration used for the derivation:  24 months 
+duration used for the derivation:  30 months     <-- RESOLVED by the operator, 2026-08-11
+
+--- consolidated 2026-08-11 ------------------------------------------------------
+DURATION RESOLVED. 30 months, consistent with item 2's placement decision and item 7's
+amended DURATION record. The contradiction that stood here is closed.
+
+The derivation at 30 months, replacing the 24-month table above:
+
+| Line | Rate | Basis | Amount |
+|------|------|-------|--------|
+| Living allowance | €6,350/month × 78.7% Hungary coefficient = €4,997.45 | 30 months | €149,923.50 |
+| Mobility allowance | €710/month | 30 months | €21,300.00 |
+| Research, training and networking | €1,000/month | 30 months | €30,000.00 |
+| Management and indirect costs | €650/month | 30 months | €19,500.00 |
+| **Total** | | | **€220,723.50** |
+
+That is €44,144.70 more than the 24-month figure, and it matches the €220,723.50 the
+candidate text already predicted for this scenario. Arithmetic checks out on all four
+lines.
+
+[!] Part A needs the placement months as a SEPARATE budget line — the 2026 Guide for
+    Applicants is explicit about this. The derived total above is the whole 30 months in
+    one block; Part A wants 24 + 6 shown separately. That is a Part A presentation matter,
+    not a change to the total, but it has to happen.
+
+[✓] C3 RESOLVED 2026-08-11 — THE ITEM IS NOW CLOSED. Operator chose to declare both
+    remaining lines "does not apply" as Assumed. All three components of `g08_uc03` now
+    resolve: duration Confirmed at 30, family allowance and long-term leave
+    operator-declared Assumed, special needs does not apply. **`gate_09` passes.**
+
+    The two declarations to write into `working_assumptions.json`, verbatim:
+
+      project_duration_months: 30 — Confirmed. Operator decision 2026-08-11, input pack
+        item 2: 24-month European Fellowship plus a 6-month non-academic placement at
+        AgroVIR under CC-07. Also carried in selected_call.json per ticket 3's deviation.
+
+      family_allowance: does not apply — ASSUMED, operator-declared 2026-08-11. Family
+        status is established at recruitment, not at proposal stage. The unit-cost
+        derivation is built without the family rate. If the fellow's circumstances at
+        recruitment trigger the allowance, it is added at grant preparation, which is the
+        normal route and does not affect the proposal budget.
+
+      long_term_leave_allowance: does not apply — ASSUMED, operator-declared 2026-08-11.
+        Not foreseeable at proposal stage. The deriver has no representation for this line,
+        so it would be handled by amendment if it arose.
+
+    This is the §13.3 pattern working as intended: a stated assumption, owned and dated,
+    rather than a guess or a blank. Ticket 6 folds these; ticket 7 lists them as Assumed
+    facts in the authorisation packet.
+
+[!] The engine gap recorded in ticket 2 is now dormant rather than blocking.
+    `derive_unit_cost_budget` still never sets `include_family`
+    (`runner/unit_cost_budget.py:159`, call at line 507). With family allowance declared
+    "does not apply", nothing needs the flag and the derived total is correct. Keep the
+    engine ticket open — the bug is real and would bite on any future run that answers
+    "applies" — but it no longer blocks this one.
+
+[!!] family_allowance reads "applies unknown at proposal stage" — two answers at once. It
+     has to be one. This one also carries the engine gap already recorded in ticket 2:
+     `derive_unit_cost_budget` never sets `include_family`, so even a clean "applies" cannot
+     reach the derived artifact without a code change (`runner/unit_cost_budget.py:159`, call
+     at line 507).
+
+     How to make the gate pass without pretending to know the answer. The predicate accepts
+     an operator-declared Assumed value — it does not require certainty, it requires a
+     declaration. So:
+       family_allowance: does not apply — DECLARED ASSUMED. Family status is established at
+         recruitment, not at proposal stage. The derivation is built without the family rate.
+         If the fellow's circumstances at recruitment trigger it, the allowance is added at
+         grant preparation, which is the normal route and does not affect the proposal budget.
+       long_term_leave_allowance: does not apply — DECLARED ASSUMED. Not foreseeable at
+         proposal stage; the deriver has no representation for it, and it would be handled by
+         amendment if it arose.
+     Both declarations go into `working_assumptions.json`. That is exactly what §13.3 wants:
+     a stated assumption rather than a guess or a blank.
+
+     If you would rather keep "unknown", that is a legitimate answer — but then accept that
+     `gate_09` fails honestly and say so in the authorisation packet. Do not leave it
+     ambiguous.
+
+[✓] special_needs_allowance: does not apply. Clean.
+
+[!] `selected_call.json` `project_duration_months` must now read 30. `gate_09` reads it
+    from there, not from this form. Item 7's note records the collision this creates with
+    ticket 3's acceptance criterion — settle that before ticket 3 runs.
+
+[!] One knock-on the placement creates for the family allowance question specifically. A
+    30-month action makes a change in family circumstances during the fellowship more
+    likely than a 24-month one, simply by being longer. That does not change the answer at
+    proposal stage — family status is still established at recruitment — but it slightly
+    strengthens the case for declaring the assumption explicitly rather than leaving it
+    open, since an amendment mid-action is the fallback either way.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -1140,6 +1772,82 @@ AgroVIR
   infrastructure_and_farm_access: network access, MCP validaation via the agrovir software
   key_people: 
   relevant_track_record:
+
+--- sweep 2026-08-11: what I could fill from sources already in hand ---------------
+Blocks no gate. Feeds Part B-1 §3.2, which IS in scope for this run, so the blanks below
+will show up in the drafted proposal.
+
+AgroVIR — organisation_profile, DRAFTED from the company's own published figures:
+  "AgroVIR Kft., founded 2007 and seated in Budaörs, Hungary, develops and operates a
+  cloud-based farm management information system built on twenty years of practice in
+  Hungarian commercial agriculture. The platform is in production use across more than
+  745,000 hectares in eight countries: Hungary (500,000+ ha), Romania (120,000+),
+  Azerbaijan (50,000+), Slovakia (40,000+), Bulgaria (15,000+), Serbia (10,000+), Ukraine
+  (7,000+) and Argentina (3,000+). This is the commercial-scale operating environment
+  against which WP5 tests research-to-farm transferability, and the Bulgarian and Hungarian
+  footprints match the two countries FIELDWISE works in."
+  Source: https://www.agrovir.com/HU/rolunk.html   [V]
+  [!!] THE PLACEMENT DECISION RAISES THE BAR HERE. AgroVIR is no longer just a validation
+       partner — it hosts the fellow for M25–M30, and the placement is evaluated. Part B-1
+       must now show AgroVIR can *host a researcher*, not merely provide data access. That
+       means, on top of the profile above: who supervises her on site and with what
+       seniority, what workspace and system access she gets, what she works on for six
+       months, and what she learns there that ELTE cannot teach. None of this exists yet in
+       any source. It is the largest single content gap the placement decision opens.
+  [!] relevant_track_record: no EU-funded research participation found for AgroVIR. If
+      there is none, say so plainly and lean on the commercial footprint instead — an
+      unevidenced claim of research experience is worse than an honest absence. With the
+      placement now evaluated, the 745,000-hectare figure is doing more work than before:
+      it is the main evidence that the host is substantial enough to place someone in.
+  [!] key_people: only Zsuzsanna Balázs is named, role unknown. §3.2 needs a role — and
+      the placement needs a named on-site supervisor, who may or may not be her.
+  [!] "MCP validation via the agrovir software" — I could not tell what MCP stands for
+      here. If it means the model/prediction pipeline validating through the AgroVIR API,
+      write it out; the acronym will not survive an evaluator.
+
+MVCRI — DRAFTED from the item 11 CV and the institute's own pages:
+  department_and_team: Maritsa Vegetable Crops Research Institute, Plovdiv — a vegetable
+    breeding and crop science institute of the Agricultural Academy, with tomato breeding
+    and abiotic-stress physiology groups relevant to FIELDWISE.   [partly V]
+  key_people: Dr. Rositsa Cholakova (Chief Assistant Professor) is MVCRI staff — but she is
+    the fellow, so §3.2 needs OTHER MVCRI people to demonstrate capacity. Candidates visible
+    from her co-authorships: Stanislava Grozeva, Ivanka Tringovska, Daniela Ganeva,
+    Elena Topalova.   [!] confirm roles with MVCRI.
+  recent_projects_and_publications: two funded projects run there now and both are strong
+    §3.2 material —
+      • ZEMDKT 17, Agricultural Academy, 2024–2026, Task 7: "Resistance to abiotic stress —
+        drought and salinity in Solanum lycopersicum." Same crop and same stress as FIELDWISE.
+      • KP-06-COST/2, National Science Fund, 2025–ongoing: "Monitoring of vegetable crops in
+        support of precision agriculture using satellite and unmanned aerial systems", with
+        the Space Research and Technology Institute, Bulgarian Academy of Sciences.
+    Both come from the CV supplied for item 11, so they are as reliable as that document.
+  [!] infrastructure: "secondary access to field trials" understates it and reads as an
+      afterthought. WP4 depends on MVCRI having real experimental capacity. Ask for the trial
+      area, the tomato germplasm held, and what measurement instruments are available.
+
+MATE — key_people is Dr. Sándor Takács with no role, and recent_projects_and_publications is
+  blank. MATE is a verified Horizon coordinator (AGRIGEP, grant 101094158), which is
+  citable §3.2 evidence of EU project capability. Its PIC and legal identity are now
+  confirmed in item 1.
+  [!] The five-year hyperspectral archive is the single most important asset in the whole
+      proposal and §3.2 currently describes it in one clause. Ask MATE for: years covered,
+      instrument make and model, number of measurement campaigns and plots, and what soil and
+      meteorological station data accompany it. Without this, G2 and H2 rest on an asset the
+      proposal has not described.
+
+ELTE — recent_projects_and_publications, previous_msca_hosting and
+  hosting_arrangements_and_support_services are all blank, and §3.2 is scored.
+  previous_msca_hosting: PARTIAL ANSWER AVAILABLE. Item 11 establishes that ELTE hosted the
+    PLANTDIGISENSE MSCA-PF application (HORIZON-MSCA-2025-PF, proposal 101284764) with the
+    same fellow and supervisor, scoring 70.40% against a 70.00 threshold. That evidences MSCA
+    application experience, not MSCA *hosting*. [!] Ask ELTE's research office whether it has
+    hosted funded MSCA fellows before, and how many.
+  [!] hosting_arrangements_and_support_services is the field §3.2 is most explicitly scored
+      on — integration into the team, office and lab access, administrative and career support,
+      mentoring structure. None of it can be invented. This needs one email to ELTE.
+  [!] "claude storage" in the infrastructure line is presumably "cloud storage". Fix before
+      it reaches a drafted section.
+------------------------------------------------------------------------------------
 ```
 
 ---
@@ -1179,6 +1887,14 @@ ITEM 13 — SECURITY SCREENING AND GREEN CHARTER
 security_screening statement:  ACCEPT 
 green_charter commitments:     ACCEPT 
 edits:
+
+--- sweep 2026-08-11 -------------------------------------------------------------
+[✓] Complete. Both statements accepted, no gate involved, nothing outstanding.
+[!] One consistency note only: the accepted security statement says the project "involves no
+    entity established outside the EU". True of the consortium as it stands — ELTE and MATE
+    in Hungary, MVCRI in Bulgaria, AgroVIR in Hungary. It stays true regardless of how item 2
+    is decided. No action needed; recorded so ticket 6 does not re-derive it.
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -1230,6 +1946,75 @@ page budget as drafted:  ACCEPT / replace with:
 edits:
 
 if you disagree that the draft is under the cap, state what you measured:
+
+--- sweep 2026-08-11 -------------------------------------------------------------
+[!] Unanswered. Blocks no gate, but the Phase 8 drafting skills read this, so leaving it
+    blank means Phase 8 drafts to no budget at all.
+
+Recommended answer, which is simply the drafted table:
+  page budget as drafted:  ACCEPT
+
+Three things that have changed since the candidate table was written, none of which
+require altering it:
+
+  • Item 10 landed at 35 references, the top of the 25–35 range the table assumed. They must
+    fit inside the 1.1 + 1.2 allocation of 4.50 pages. At MSCA formatting a 35-entry list runs
+    roughly 0.8–1.0 of a page, so §1.1 and §1.2 have about 3.5 pages of prose between them.
+    That is tight but workable. If it proves not to be, drop R20 first (noted in item 10).
+  • Item 6 added deliverable D1.3, and item 5 may add a K11 KPI for it. Both land in §3.1's
+    1.50 pages alongside the 13-row risk table and the Gantt. §3.1 is the section most likely
+    to overflow; the risk table compressing to a grouped form is the intended release valve.
+  • Item 12's §3.2 allocation is 0.50 pages and four organisations must fit in it, one of
+    which (ELTE) needs hosting arrangements as well as capacity. If the item 12 blanks get
+    filled generously, 0.50 will not hold. Consider moving 0.25 from §1.3 to §3.2.
+
+--- consolidated 2026-08-11 -------------------------------------------------------
+The placement is approved, so the fourth pressure is now real rather than conditional.
+§3.1's Gantt gains six months of columns, WP5 and the cross-cutting rows extend to M30,
+and a placement-completion milestone probably joins MS1–MS5. All of that lands inside
+§3.1's 1.50 pages, which was already the tightest allocation in the table.
+
+More importantly, the placement is **evaluated**, and the Guide says it is described in
+Part B-1. That is new prose with nowhere currently budgeted to go. It belongs across §1.2
+(what happens in M25–M30 methodologically), §1.3 (what the fellow gains from a
+non-academic environment — this is the training argument) and §3.1 (the work plan). None
+of those three has slack.
+
+Revised page budget, replacing the drafted table. The total still comes to 10.00:
+
+| Section | Drafted | **Revised** | Why |
+|---------|---------|-------------|-----|
+| 1.1 Objectives, gaps, questions, ambition, references | 2.25 | 2.25 | unchanged; holds the 35-reference list |
+| 1.2 Methodology, incl. the method figure | 2.25 | 2.25 | unchanged; absorbs the placement method text by compressing layer descriptions |
+| 1.3 Supervision, training, two-way transfer | 0.75 | **1.00** | +0.25 — the placement's training argument lives here and is scored |
+| 1.4 Researcher experience | 0.50 | 0.50 | unchanged |
+| 2.1 Career perspectives | 0.75 | 0.75 | unchanged |
+| 2.2 Dissemination, exploitation, communication | 0.75 | **0.50** | −0.25; the exploitation pathway overlaps the placement text in 1.3 and 3.1 |
+| 2.3 Expected impacts | 0.75 | 0.75 | unchanged |
+| 3.1 Work plan, Gantt, risks, effort | 1.50 | **1.75** | +0.25 — 30-month Gantt, extended WP5, placement in the work plan |
+| 3.2 Capacity and hosting arrangements | 0.50 | **0.25** | −0.25, under protest; see the warning below |
+| **Total** | 10.00 | **10.00** | |
+
+  page budget as drafted:  REPLACE with the revised column above
+
+[!!] §3.2 at 0.25 pages is the weakest part of this proposal. Four organisations, plus
+     ELTE's hosting arrangements, plus — now — AgroVIR's ability to host a six-month
+     placement, in a quarter page. It does not fit. I have taken the quarter page from it
+     because §3.1 and §1.3 are scored harder and the placement content has to go
+     somewhere, but this is a real loss, not a tidy reallocation.
+     Two ways out, both yours to pick:
+       (a) Compress the 13-row risk table to a grouped form in §3.1 and give the recovered
+           space back to §3.2. The draft's risk table is the most compressible object in
+           Part B-1.
+       (b) Accept a thin §3.2 and carry the capacity detail in Part B-2 §5, which is not
+           page-capped the same way. Legitimate, but §3.2 is scored under Implementation
+           and Part B-2 is not, so this trades a scored section for an unscored one.
+     (a) is better if the risk table survives compression legibly.
+
+[!] The 35-reference list is unchanged by this decision and still fits §1.1 + §1.2 at
+    roughly 0.8–1.0 page. If §1.2 turns out to need more room for the placement method
+    text, dropping R20 remains the first release valve (item 10 records this).
+----------------------------------------------------------------------------------
 ```
 
 ---
@@ -1247,3 +2032,194 @@ Ticket 12 decides when the Obsidian vault is re-authored. Both are recorded as o
 
 The `graph_claim_verifier` audit stays red until ticket 12 completes. That is a known and logged
 §12.3 contradiction, not a new gap.
+
+---
+
+# Completion sweep — 2026-08-11
+
+All fourteen items were reviewed in one pass after item 1 was completed. This section is the
+register: what is done, what still blocks a runner gate, and what has no source. Ticket 6 folds
+answers; ticket 7 carries whatever is still open into the authorisation packet.
+
+## Status of the fourteen items
+
+> **Consolidated 2026-08-11 (second pass).** The operator approved the six-month non-academic
+> placement at AgroVIR and set the duration to 30 months. Items 2, 7, 8, 9, 12 and 14 have been
+> updated to match. The table below reflects the post-decision state.
+
+| # | Item | State | Gate | Verdict |
+|---|------|-------|------|---------|
+| 1 | Legal identity | **Complete** | `g04_p07` | MATE and MVCRI pass. AgroVIR fails: no PIC |
+| 2 | Participation mode | **DECIDED** | `g04_p07` | Non-academic placement, 30 months. New Part B-1 content owed |
+| 3 | Ethics | **Complete** | `g07_p06` | **C2 resolved.** Passes, contradiction gone |
+| 4 | Governance | Complete | `g07_p07`, `g07_p08` | **C1 resolved in structure.** Needs one MVCRI name |
+| 5 | KPIs | Complete | `g06_p04`, `g06_p05` | Passes. **C7 and C8 resolved** — EI-06 raised, HRS4R claim removed |
+| 6 | Career Development Plan | Complete | `g07_p09` | Passes. **C7 resolved** — teaching component reframed |
+| 7 | Identity spine | **Amended** | none | DURATION now 30; ticket 3 deviation written. **C5 DEFERRED** — HOST and FELLOWSHIP_TYPE conditional |
+| 8 | Person-months | **Proposed** | none | 30-month split drafted; accept or replace. **C4 resolved** (MATE 2.4) |
+| 9 | Unit-cost lines | **CLOSED** | `gate_09` `g08_uc03` | **C3 resolved.** All components resolve → **gate passes** |
+| 10 | References | Complete | none | 35 refs. DrR alone uncited |
+| 11 | Researcher CV | Complete | none | **Carries an eligibility risk that outranks everything** |
+| 12 | Capacity | **Partial** | none | ELTE hosting blank; AgroVIR must now show it can host a placement |
+| 13 | Security / Green Charter | Complete | none | Nothing outstanding |
+| 14 | Page budget | **Proposed** | none | Revised 30-month budget drafted; §3.2 squeezed to 0.25 |
+
+## Blocking a runner gate
+
+Two remain. Item 2 is off this list.
+
+**AgroVIR has no PIC — `phase_03_gate` `g04_p07`.** The draft assigns it WP5 co-lead, and the
+placement decision now also makes it the host for M25–M30, so `partners.json` must contain it.
+Registration is free and takes minutes, and item 1 supplies every field it needs: AGROVIR
+Üzletviteli Tanácsadó Kft., 2040 Budaörs, Kinizsi utca 30, tax number 14000838-2-13. This is the
+cheapest blocker on the list, and the placement decision made it more urgent, not less.
+
+**~~Item 9's two "unknown" answers~~ — CLOSED 2026-08-11 (C3).** Both lines are now declared
+"does not apply" as operator-declared Assumed. With duration Confirmed at 30, all three components
+of `g08_uc03` resolve and **`gate_09` passes**. The declaration text for
+`working_assumptions.json` is in item 9.
+
+### Contradiction register
+
+Nine contradictions were flagged in the sweep. Four are resolved.
+
+| # | Contradiction | State |
+|---|---------------|-------|
+| C1 | Fellow held every MVCRI seat | **Resolved in structure** — needs one name |
+| C2 | Ethics answers contradicted the accepted candidates | **Resolved** |
+| C3 | Family allowance held two answers; both unknowns failed the gate | **Resolved — gate now passes** |
+| C4 | MATE at 0.24 PM against its own capacity claim | **Resolved** — 2.4. Residue: three dashes still read as zero |
+| C5 | Item 7 confirms HOST/FELLOWSHIP_TYPE; item 11 says they may be unavailable | **DEFERRED** — operator consulting the fellow. Rule text confirmed; records marked conditional |
+| C6 | Escalation routes past the supervisor to a post the supervisor deputises | **Resolved** — Director is Dr. Mátyás Gede, a different person |
+| C7 | Teaching treated as a competence to build; the CV shows five years of it | **Resolved** — EI-06 raised, CDP component reframed |
+| C8 | EI-04 asserts ELTE holds HRS4R while the same item answers "unknown" | **Resolved** — claim removed; restore only if ELTE confirms |
+| C9 | AgroVIR registered as a consultancy, named as technology partner and placement host | **Resolved** — named explicitly in the §3.2 / Part B-2 §5 wording |
+
+Eight of nine resolved. C5 is deferred, not closed: no runner gate reads it, so the run proceeds,
+but **ticket 7 must not issue authorisation while it is open** — it is the one item that can
+invalidate the identity spine rather than merely weaken a score.
+
+Open actions carried out of the contradiction pass, none of which I can close:
+
+| Action | For | Blocks |
+|--------|-----|--------|
+| The fellow's documented residence across 2023-09-09 to 2026-09-09 | C5 | Authorisation |
+| One MVCRI colleague's name and email | C1 | `g07_p08` resolution, item 1, item 4 |
+| Confirm whether ELTE holds HRS4R | C8 | Nothing — restores a stronger EI-04 claim |
+| Confirm an MSCA fellow may primary-supervise an ELTE MSc thesis | C7 | Nothing — else EI-06 drops to co-supervision |
+| AgroVIR letter of commitment and named on-site placement supervisor | C9, item 12 | Nothing at gate; scored |
+| Decide the three dashes in item 8's partner effort table | C4 residue | Nothing at gate; scored |
+
+**~~Item 2's undecided mode~~ — CLOSED 2026-08-11.** The placement is approved. `roles.json` and
+`partners.json` can now record `non_academic_placement` for AgroVIR, the duration is 30 months,
+item 8's allocation totals 30, item 9's derivation runs at 30, and `selected_call.json`
+`project_duration_months` is set to 30 — subject to the ticket 3 collision recorded in item 7.
+
+## What the placement decision opened
+
+Closing item 2 settled four items and opened five pieces of work. None blocks a gate; all of them
+are scored.
+
+| Owed | Where it lands | Why it is new |
+|------|----------------|---------------|
+| Part B-1 must argue the placement | §1.2, §1.3, §3.1 | The Guide says the placement is described in Part B-1 and evaluators assess its relevance and quality. The draft says nothing about M25–M30 |
+| AgroVIR letter of commitment | Item 1 | An *evaluated* placement resting on a host with no letter is the weakest form of this decision. Now the most urgent open action after the mobility flag |
+| AgroVIR must show it can host a researcher | Item 12, §3.2 and Part B-2 §5 | On-site supervisor, workspace, system access, six months of work. Nothing on this exists in any source yet |
+| Part A separate budget line | Part A §3 | The Guide requires the placement months as their own line, even though the derived total is one block |
+| 30-month WP and milestone ranges | Ticket 4 seeds | WP5 extends to M30, MS5 moves or gains a companion, and the M6/M12/M16/M20 decision points leave a ten-month unmonitored tail |
+
+## A purge miss found on the way, 2026-08-11
+
+Chasing the duration through the runner turned up something that has nothing to do with the
+placement and would have surfaced at ticket 3 regardless.
+
+The pre-purge `selected_call.json` carries the superseded demo run's project facts inside a
+call-binding artifact — `project_duration_months: 24` stamped Confirmed and provenanced to the 13B
+consolidation of 2026-07-16, `host_country` provenanced the same way, and a `notes` field asserting
+that RQ1–RQ10 are "operator-confirmed real data" when item 7 confirms they are superseded. Two of
+its internal references also dangle: `action_confirmation_ref` and the `notes` citation both point
+at decision-log files that ticket 1 moved to `archive/demo-run/`. Verified — neither path resolves.
+
+Ticket 1's purge was scoped to directories and to the decision log. It did not re-read the contents
+of files that survived, and this one survived with purged data inside it.
+
+`plans/fieldwise_tickets.md` now carries a deviation block on ticket 3 listing the six fields to
+correct. Two consequences worth carrying further.
+
+Ticket 3's acceptance criterion has been reworded from "matches its pre-purge content" to
+"targets HORIZON-MSCA-2026-PF-01 and its call-scoped fields match its pre-purge content", with a
+second criterion covering the corrections. The old wording could not be met honestly.
+
+**I checked whether anything else survived with demo-run content in it.** `selected_call.json` was
+found because `gate_09` reads it, so it was worth asking what else had not been re-read. A
+`git grep` for `13b-real-data`, `13B consolidation`, `synthetic-spine`, `synthetic-concept` and
+`demo-run` across `docs/`, `plans/` and `runner/`, excluding `archive/demo-run/`, returns seven
+files. **None is a Tier 3 data file, and none needs action.**
+
+| File | Verdict |
+|------|---------|
+| `decision_log/fieldwise-purge-and-decision-log-split_2026-08-11.json` | The purge record itself, describing what it moved. Correct |
+| `plans/fieldwise_reinstantiation_plan.md`, `plans/fieldwise_tickets.md` | Plans describing the purge. Correct |
+| `plans/milestones/WAVE6_STATE_HANDOFF.md`, `plans/reports/HANDOFF_phase8_m2t10_2026-07-22.md` | Historical planning documents, not project data. Correct |
+| `runner/docx_exporter.py` | The `synthetic-spine*.json` glob at line 69 — exactly the mechanism ticket 1 relies on, and it now matches nothing. Correct |
+| `decision_log/milestone1-engine-integration-proof_2026-07-15.json` | Borderline but defensible — see below |
+
+The last one is the only judgement call. It was classified as an engine ruling and left in
+`decision_log/`, which is right on content — it records engine bugs found and fixed, the length fix,
+the live pipeline proof and a `gate_10a` honest block, all of which are reusable findings about the
+engine rather than facts about the superseded project. But it also carries `run_id` and
+`final_run_states` fields tied to the demo run, and a `what_remains_for_a_real_finalization_13B` key.
+Nothing reads those fields, so it is inert. Flagging it only so the classification is on the record
+rather than rediscovered later.
+
+Conclusion: `selected_call.json` was the only real survivor with purged data inside it. Ticket 1's
+purge was sound; it was scoped to directories and to the decision log, and this one file slipped
+through because it survives by design and nobody re-read its contents.
+
+## No source — flagged, not guessed
+
+| What | Where | Status |
+|------|-------|--------|
+| DrR - Digital Agronomist | Item 10, area 8 | No publication, preprint, release or repository. Deposit on Zenodo or accept §1.1.3 uncited |
+| ELTE HR Excellence in Research (HRS4R) | Item 5, EI-04 | Could not confirm either way. EURAXESS list robots-blocked; elte.hu search found nothing. One email to ELTE settles it. Fallback wording supplied in item 5 |
+| ELTE hosting arrangements and support services | Item 12 | Cannot be invented and §3.2 is scored on it |
+| ELTE previous MSCA hosting | Item 12 | PLANTDIGISENSE evidences application, not hosting |
+| AgroVIR EU-project track record | Item 12 | None found. May genuinely be none — say so rather than imply otherwise |
+| AgroVIR company registration number | Item 1 | Two conflicting readings. Ask the company |
+| Roles of Takács, Balázs; MVCRI senior contact | Items 1, 4, 12 | Names known, roles not |
+| MATE archive specification | Item 12 | Years, instrument, campaigns, plots. The proposal's most important asset is described in one clause |
+| Invited talks | Item 11 | Not in the CV. Supply or confirm none |
+| PhD thesis exact title | Item 11, R34 | Read truncated; English rendering is mine |
+| AgroVIR on-site placement supervisor | Item 12 | Added 2026-08-11. The placement is evaluated and currently has no named supervisor |
+| What the fellow does at AgroVIR in M25–M30 | Item 2, §1.2/§1.3 | Added 2026-08-11. Cannot be inferred from the draft; only AgroVIR and the fellow can supply it |
+
+## The one that is not a gate problem
+
+Item 11 raises a **mobility-rule risk** that no gate checks and no seeding can work around. On the
+CV's face the fellow spent roughly 12.7 months in Hungary inside the 36-month window before the
+deadline, against a 12-month cap — and about 15.7 months if the 2026 Erasmus internship at ELTE
+counts. If that holds, the European Fellowship with ELTE as host is not available and item 7's
+`FELLOWSHIP_TYPE` and `HOST` confirmations are wrong.
+
+Everything else in this pack is downstream of that being true. Settle it first.
+
+**Updated 2026-08-11.** The rule text has since been checked directly against the 2026 Guide for
+Applicants and it is not ambiguous: the exception list is closed at compulsory national service,
+refugee and temporary-protection procedures, and short stays defined as periods where the researcher
+*did not reside* in the country. Career breaks and parental leave are excluded from the
+research-experience criterion, not from this one. So the arithmetic above stands unless the fellow's
+documented residence differs from what her CV states.
+
+The operator has deferred pending consultation with the fellow. Item 7 now carries HOST and
+FELLOWSHIP_TYPE as CONFIRM — CONDITIONAL, and the four available routes, including deferring to the
+2027 call where the window clears to about 3.8 months, are recorded in item 7.
+
+## One thread running through four items
+
+The fellow is named as MVCRI's contact (item 1), as MVCRI's steering-group representative (item 4),
+and is the person whose model WP4 tests against MVCRI data (item 2). She is also the author of the
+KPIs that measure that test (item 5, K5 and K6). Item 2 already asks for a statement on MVCRI
+independence; a statement will not carry it while the same person holds every seat.
+
+Naming one MVCRI colleague other than the fellow fixes all four at once. It is a single edit in two
+places and it is the highest-leverage small change available in this pack.
