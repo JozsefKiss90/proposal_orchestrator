@@ -19,7 +19,8 @@
         "docs/tier4_orchestration_state/reuse/phase8/**",
         "docs/tier4_orchestration_state/graph_compile/** (untracked; .gitignore declares it derived and regenerable)"
       ],
-      "scope_note": "The ticket's acceptance list names four directories. preseed/phase8/ and reuse/phase8/ are deleted as well, because they hold the superseded run's excellence, impact and implementation sections. Both paths are opt-in (--preseed-phase8-sections, the reuse policy), so neither blocks a run, but leaving them would let ticket 10's Phase 8 supersede a FIELDWISE draft with the previous project's prose. graph_compile/pre_promote_backup/ held a restorable copy of the purged Tier 3 and is removed for the same reason.",
+      "scope_note": "The ticket's acceptance list names four directories. preseed/phase8/ and reuse/phase8/ are deleted as well, because they hold the superseded run's excellence, impact and implementation sections. Both paths are opt-in (--preseed-phase8-sections, the reuse policy), so neither blocks a run, but leaving them would let ticket 10's Phase 8 supersede a FIELDWISE draft with the previous project's prose.",
+      "graph_compile_deletion": "docs/tier4_orchestration_state/graph_compile/ is deleted as a third, separately declared deviation. Its pre_promote_backup/ held a restorable copy of the purged Tier 3, which the promote tool could have written back over a FIELDWISE seed. The directory is gitignored, so this deletion appears in no diff and git cannot restore it. That loses nothing: the purged Tier 3 itself is recoverable from commit 6d96a60, and the staging tree is regenerable by re-running the compiler.",
       "retained": [
         "docs/tier4_orchestration_state/reinstantiation_provenance.json — records the milestone-1 purge and the D8 vault absorb. Engine and branch provenance, not demo-run output.",
         ".gitkeep placeholders in phase_outputs/, checkpoints/, validation_reports/, reuse/ so the skeleton stays tracked."
@@ -38,12 +39,13 @@
     },
     "runtime_memory": {
       "cleared": [".claude/runs/", ".claude/benchmark/", ".claude/skill_diag/", ".claude/semantic_diag/", ".claude/cache/", ".claude/logs/", ".claude/agent-memory/"],
-      "authority": "CLAUDE.md §9.2 — runtime execution state may be cleared without affecting the constitutional validity of docs/. All of these are gitignored, so the clearing is a working-tree operation and does not appear in this commit."
+      "authority": "CLAUDE.md §9.2 — runtime execution state may be cleared without affecting the constitutional validity of docs/. All of these are gitignored, so the clearing is a working-tree operation and does not appear in this commit.",
+      "what_cleared_means": ".claude/runs/ refills with a test-00000000-0000-0000-0000-000000000000 fixture directory whenever the test suite runs, because tests/test_production_mode.py writes one. Cleared therefore means no demo-run contexts remain, not that the directory stays absent. reinstantiation_provenance.json recorded the same carve-out at the milestone-1 purge ('test-* fixture run dirs preserved')."
     }
   },
 
   "decision_log_split": {
-    "rationale": "The decision log held 52 files with three different dispositions. A blanket archive would have removed rulings the next run depends on, and a blanket delete would have removed more. Two modules cite entries directly: runner/graph_determinism_check.py:95 cites dod-1c, and runner/checkpoint_publisher.py:9 cites chk-1.",
+    "rationale": "The decision log held 52 files with three different dispositions. A blanket archive would have removed rulings the next run depends on, and a blanket delete would have removed more. Two modules cite entries directly: runner/graph_determinism_check.py cites dod-1c for retaining compiled_at, and runner/checkpoint_publisher.py cites chk-1 for the provenance quad.",
     "deleted": {
       "count": 18,
       "what": "Runner-written run state: decision-log-update_*, topic-scope-check_*, gate_failure_*. Each references artifacts this purge deleted, and each is regenerable by the next run.",
@@ -79,7 +81,7 @@
         "synthetic-spine-demo-override_2026-07-13.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/synthetic-spine-demo-override_2026-07-13.json",
         "tier3-hand-lift-msca-pf_2026-07-13.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/tier3-hand-lift-msca-pf_2026-07-13.json"
       },
-      "load_bearing_move": "runner/docx_exporter.py:96 globs decision_log/synthetic-spine*.json and stamps a visible 'SYNTHETIC DEMO — NOT FOR SUBMISSION' marker on the exported Part B when the file matches. The glob is non-recursive, so moving synthetic-spine-demo-override_2026-07-13.json into archive/demo-run/ clears the stamp from the FIELDWISE export while preserving the record. Leaving it in place would have marked a real submission as a demo.",
+      "load_bearing_move": "runner.docx_exporter._synthetic_override_active globs _SYNTHETIC_OVERRIDE_GLOB (decision_log/synthetic-spine*.json) and the exporter stamps a visible 'SYNTHETIC DEMO — NOT FOR SUBMISSION' marker on the exported Part B when the file matches. The glob is non-recursive, so moving synthetic-spine-demo-override_2026-07-13.json into archive/demo-run/ clears the stamp from the FIELDWISE export while preserving the record. Leaving it in place would have marked a real submission as a demo.",
       "dangling_reference": "status-vocabulary-correction_2026-07-13.json (retained) carries supersedes_aspect_of pointing at the pre-move path of tier3-hand-lift-msca-pf_2026-07-13.json. The moved-path map above is the resolution; the retained entry is left byte-unchanged because rewriting an engine ruling to chase a path move would edit a record of what was decided."
     },
     "retained": {

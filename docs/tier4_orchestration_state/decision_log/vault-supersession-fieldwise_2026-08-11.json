@@ -3,7 +3,8 @@
   "id": "vault-supersession-fieldwise",
   "date": "2026-08-11",
   "branch": "fieldwise-run-01",
-  "status": "open",
+  "contradiction_status": "Unresolved",
+  "status_vocabulary_note": "The §12.2 word is used in the §12.2 sense: conflicting evidence exists and resolution is required before downstream use. status-vocabulary-correction_2026-07-13.json closes that vocabulary at the four categories, so this record does not coin a fifth. The field is named contradiction_status rather than status because it describes the tier conflict, not the lifecycle of this record; no gate predicate reads it.",
 
   "authority": "CLAUDE.md §12.3 (contradictions between tiers are resolved explicitly and recorded, never silently resolved by picking the convenient source), §9.4 (durable decisions are written down), §13.7 (no silent weakening of a check). Operator-directed ticket plans/fieldwise_tickets.md ticket 1, executing plans/fieldwise_reinstantiation_plan.md §6. NOT a constitutional amendment.",
 
@@ -25,7 +26,7 @@
 
   "how_it_is_re_authored": "tools/author_msca_proposal_graph.py is the deterministic authoring path. Ticket 12 rewrites that tool for FIELDWISE rather than hand-editing nodes, so the vault stays reproducible from a script under §9.5.",
 
-  "closed_by": "plans/fieldwise_tickets.md ticket 12 ('Re-author the vault for FIELDWISE'). Closing requires graph_claim_verifier to pass against the committed FIELDWISE Tier 5 sections, at which point this record is updated to status 'closed' with the closing commit named.",
+  "closed_by": "plans/fieldwise_tickets.md ticket 12 ('Re-author the vault for FIELDWISE'). Closing requires graph_claim_verifier to pass against the committed FIELDWISE Tier 5 sections, at which point contradiction_status becomes 'Confirmed' — the vault and Tier 3 then agree — with the closing commit named here.",
 
   "companion_records": [
     "fieldwise-purge-and-decision-log-split_2026-08-11.json",

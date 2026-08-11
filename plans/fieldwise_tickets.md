@@ -30,12 +30,18 @@ quarantine/supersession record per plan §6.
 - [x] The §13.11 correction and the vault supersession are logged in the decision log.
 - [x] The purge is committed on `fieldwise-run-01`.
 
-Two deviations, both recorded in the purge decision-log entry.
+Three deviations, all recorded in the purge decision-log entry.
 
 - `preseed/phase8/` and `reuse/phase8/` are deleted alongside the four named directories. They hold the
   superseded run's Part B sections, which would otherwise supersede a FIELDWISE draft at ticket 10.
+- `graph_compile/` is deleted. Its `pre_promote_backup/` held a restorable copy of the purged Tier 3.
+  The directory is gitignored, so this deletion appears in no diff and is not recoverable from git.
+  The purged Tier 3 itself remains recoverable from commit `6d96a60`.
 - `working_assumptions.example.json` is kept. It is a project-neutral template the operator manual tells
   you to copy, and it carries no superseded project data.
+
+`.claude/runs/` refills with a `test-00000000-...` fixture directory whenever the test suite runs.
+"Cleared" means no demo-run contexts remain, not that the directory stays absent.
 
 ## 2. Operator input pack
 

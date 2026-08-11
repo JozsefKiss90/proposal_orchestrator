@@ -11,9 +11,9 @@ for every later ticket:
 
 * the three-way split itself (18 deleted, 5 archived, 29 retained by id),
 * the load-bearing archive move that clears the exporter's `SYNTHETIC DEMO` stamp
-  (`runner/docx_exporter.py:96` globs `decision_log/synthetic-spine*.json`
-  non-recursively, so the record survives in `archive/demo-run/` without stamping the
-  FIELDWISE export),
+  (`runner.docx_exporter._synthetic_override_active` globs
+  `_SYNTHETIC_OVERRIDE_GLOB` non-recursively, so the record survives in
+  `archive/demo-run/` without stamping the FIELDWISE export),
 * the §13.11 correction that moved the project draft out of Tier 2A, and
 * the §12.3 vault supersession record that ticket 12 closes out.
 """
@@ -23,10 +23,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
-from runner.docx_exporter import _synthetic_override_active
-from runner.paths import find_repo_root
+from runner.docx_exporter import _SYNTHETIC_OVERRIDE_GLOB, _synthetic_override_active
 
 
 DECISION_LOG = "docs/tier4_orchestration_state/decision_log"
@@ -113,11 +110,6 @@ RETAINED_ENGINE_RULINGS = (
 )
 
 
-@pytest.fixture(scope="module")
-def root() -> Path:
-    return find_repo_root()
-
-
 def _load(root: Path, relpath: str) -> dict:
     path = root / relpath
     assert path.is_file(), f"missing decision-log record: {relpath}"
@@ -127,64 +119,68 @@ def _load(root: Path, relpath: str) -> dict:
 class TestSplitPartition:
     """The 52 files land in exactly three places, by id."""
 
-    def test_auto_generated_run_records_are_deleted(self, root: Path) -> None:
-        log_dir = root / DECISION_LOG
+    def test_auto_generated_run_records_are_deleted(self, repo_root: Path) -> None:
+        log_dir = repo_root / DECISION_LOG
         present = [n for n in DELETED_RUN_RECORDS if (log_dir / n).exists()]
         assert present == [], f"demo-run state survived the purge: {present}"
 
     def test_auto_generated_run_records_were_not_archived_instead(
-        self, root: Path
+        self, repo_root: Path
     ) -> None:
-        archive = root / ARCHIVE
+        archive = repo_root / ARCHIVE
         leaked = [n for n in DELETED_RUN_RECORDS if (archive / n).exists()]
         assert leaked == [], f"regenerable run state archived, not deleted: {leaked}"
 
-    def test_project_scoped_decisions_are_archived(self, root: Path) -> None:
-        archive = root / ARCHIVE
+    def test_project_scoped_decisions_are_archived(self, repo_root: Path) -> None:
+        archive = repo_root / ARCHIVE
         missing = [n for n in ARCHIVED_PROJECT_RECORDS if not (archive / n).is_file()]
         assert missing == [], f"missing from {ARCHIVE}: {missing}"
 
-    def test_project_scoped_decisions_left_the_log_root(self, root: Path) -> None:
-        log_dir = root / DECISION_LOG
+    def test_project_scoped_decisions_left_the_log_root(self, repo_root: Path) -> None:
+        log_dir = repo_root / DECISION_LOG
         remaining = [n for n in ARCHIVED_PROJECT_RECORDS if (log_dir / n).exists()]
-        assert remaining == [], f"superseded records still at log root: {remaining}"
+        assert remaining == [], f"superseded records still at the log root: {remaining}"
 
-    def test_engine_rulings_stay_in_place(self, root: Path) -> None:
-        log_dir = root / DECISION_LOG
+    def test_engine_rulings_stay_in_place(self, repo_root: Path) -> None:
+        log_dir = repo_root / DECISION_LOG
         missing = [n for n in RETAINED_ENGINE_RULINGS if not (log_dir / n).is_file()]
         assert missing == [], f"engine rulings lost to the purge: {missing}"
 
-    def test_retained_engine_rulings_are_readable_json(self, root: Path) -> None:
+    def test_retained_engine_rulings_are_readable_json(self, repo_root: Path) -> None:
         for name in RETAINED_ENGINE_RULINGS:
-            _load(root, f"{DECISION_LOG}/{name}")
+            _load(repo_root, f"{DECISION_LOG}/{name}")
 
-    def test_split_covers_every_file_of_the_original_log(self) -> None:
-        total = (
-            len(DELETED_RUN_RECORDS)
-            + len(ARCHIVED_PROJECT_RECORDS)
-            + len(RETAINED_ENGINE_RULINGS)
-        )
-        assert (18, 5, 29) == (
-            len(DELETED_RUN_RECORDS),
-            len(ARCHIVED_PROJECT_RECORDS),
-            len(RETAINED_ENGINE_RULINGS),
-        )
-        assert total == 52
+    def test_the_archive_holds_exactly_the_five_superseded_records(
+        self, repo_root: Path
+    ) -> None:
+        """Nothing else may be filed under archive/demo-run/.
+
+        The archive is the disposition for superseded *project* decisions. A
+        later ticket that parks an engine ruling or a fresh run record here
+        would hide it from readers of the live log, so the directory is pinned
+        to its five members by on-disk contents rather than by count.
+        """
+        found = sorted(p.name for p in (repo_root / ARCHIVE).glob("*.json"))
+        assert found == sorted(ARCHIVED_PROJECT_RECORDS)
 
 
 class TestSyntheticStampCleared:
     """The archive move is load-bearing, not tidy."""
 
-    def test_exporter_reports_no_synthetic_override(self, root: Path) -> None:
-        assert _synthetic_override_active(root) is False
+    def test_exporter_reports_no_synthetic_override(self, repo_root: Path) -> None:
+        assert _synthetic_override_active(repo_root) is False
 
-    def test_stamp_glob_matches_nothing_at_the_log_root(self, root: Path) -> None:
-        matches = sorted((root / DECISION_LOG).glob("synthetic-spine*.json"))
-        assert matches == []
+    def test_the_exporters_own_glob_matches_nothing(self, repo_root: Path) -> None:
+        """Asserts the ticket criterion against the pattern the exporter owns.
 
-    def test_the_override_record_still_exists_in_the_archive(self, root: Path) -> None:
+        The pattern is imported rather than retyped, so changing it in
+        `runner.docx_exporter` cannot leave this test pinning a stale literal.
+        """
+        assert sorted(repo_root.glob(_SYNTHETIC_OVERRIDE_GLOB)) == []
+
+    def test_the_override_record_still_exists_in_the_archive(self, repo_root: Path) -> None:
         record = _load(
-            root, f"{ARCHIVE}/synthetic-spine-demo-override_2026-07-13.json"
+            repo_root, f"{ARCHIVE}/synthetic-spine-demo-override_2026-07-13.json"
         )
         assert record["id"] == "synthetic-spine-demo-override"
 
@@ -192,59 +188,59 @@ class TestSyntheticStampCleared:
 class TestPurgeRecord:
     """§9.4: the split is a durable decision, so it is written down."""
 
-    def test_purge_record_states_the_three_dispositions(self, root: Path) -> None:
-        record = _load(root, f"{DECISION_LOG}/{PURGE_RECORD}")
+    def test_purge_record_states_the_three_dispositions(self, repo_root: Path) -> None:
+        record = _load(repo_root, f"{DECISION_LOG}/{PURGE_RECORD}")
         split = record["decision_log_split"]
         assert split["deleted"]["count"] == 18
         assert split["archived"]["count"] == 5
         assert split["retained"]["count"] == 29
 
     def test_purge_record_maps_every_archived_file_to_its_new_path(
-        self, root: Path
+        self, repo_root: Path
     ) -> None:
-        record = _load(root, f"{DECISION_LOG}/{PURGE_RECORD}")
+        record = _load(repo_root, f"{DECISION_LOG}/{PURGE_RECORD}")
         moved = record["decision_log_split"]["archived"]["moved"]
         assert sorted(moved) == sorted(ARCHIVED_PROJECT_RECORDS)
         for name, destination in moved.items():
             assert destination == f"{ARCHIVE}/{name}"
-            assert (root / destination).is_file()
+            assert (repo_root / destination).is_file()
 
 
 class TestTier2ADraftCorrection:
     """§13.11: a project draft may not sit in instrument-schema space."""
 
-    def test_tier2a_holds_no_project_draft(self, root: Path) -> None:
-        tier2a = root / "docs/tier2a_instrument_schemas"
+    def test_tier2a_holds_no_project_draft(self, repo_root: Path) -> None:
+        tier2a = repo_root / "docs/tier2a_instrument_schemas"
         strays = sorted(p.name for p in tier2a.rglob("part_b_draft_v0"))
         assert strays == []
 
-    def test_the_draft_lives_in_tier3_source_materials(self, root: Path) -> None:
-        assert (root / DRAFT_RELPATH).is_file()
+    def test_the_draft_lives_in_tier3_source_materials(self, repo_root: Path) -> None:
+        assert (repo_root / DRAFT_RELPATH).is_file()
 
-    def test_correction_record_cites_13_11_and_both_paths(self, root: Path) -> None:
-        record = _load(root, f"{DECISION_LOG}/{TIER2A_CORRECTION_RECORD}")
+    def test_correction_record_cites_13_11_and_both_paths(self, repo_root: Path) -> None:
+        record = _load(repo_root, f"{DECISION_LOG}/{TIER2A_CORRECTION_RECORD}")
         assert "§13.11" in record["authority"]
         assert record["moved_from"].startswith("docs/tier2a_instrument_schemas/")
         assert record["moved_to"] == DRAFT_RELPATH
-        assert not (root / record["moved_from"]).exists()
-        assert (root / record["moved_to"]).is_file()
+        assert not (repo_root / record["moved_from"]).exists()
+        assert (repo_root / record["moved_to"]).is_file()
 
 
 class TestVaultSupersession:
     """§12.3: the vault contradicts the incoming Tier 3, so the conflict is logged."""
 
     def test_supersession_record_names_the_vault_and_the_contradiction(
-        self, root: Path
+        self, repo_root: Path
     ) -> None:
-        record = _load(root, f"{DECISION_LOG}/{VAULT_SUPERSESSION_RECORD}")
+        record = _load(repo_root, f"{DECISION_LOG}/{VAULT_SUPERSESSION_RECORD}")
         assert "§12.3" in record["authority"]
         assert record["vault_path"] == "MSCA/methodology_graph"
-        assert (root / record["vault_path"]).is_dir()
+        assert (repo_root / record["vault_path"]).is_dir()
 
     def test_supersession_is_open_and_names_its_closing_ticket(
-        self, root: Path
+        self, repo_root: Path
     ) -> None:
-        record = _load(root, f"{DECISION_LOG}/{VAULT_SUPERSESSION_RECORD}")
-        assert record["status"] == "open"
+        record = _load(repo_root, f"{DECISION_LOG}/{VAULT_SUPERSESSION_RECORD}")
+        assert record["contradiction_status"] == "Unresolved"
         assert "graph_claim_verifier" in json.dumps(record)
         assert record["closed_by"]
