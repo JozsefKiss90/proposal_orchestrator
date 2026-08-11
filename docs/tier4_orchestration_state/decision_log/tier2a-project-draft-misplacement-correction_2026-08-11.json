@@ -1,0 +1,29 @@
+{
+  "record_type": "decision",
+  "id": "tier2a-project-draft-misplacement-correction",
+  "date": "2026-08-11",
+  "branch": "fieldwise-run-01",
+
+  "authority": "CLAUDE.md §13.11 (no project-specific content in Tier 1 or Tier 2 sources), §5 Tier 2A (instrument schemas are structural authorities for the selected instrument), §5 Tier 3 (project instantiation), §9.4 (durable decisions are written down). Operator-directed ticket plans/fieldwise_tickets.md ticket 1, executing plans/fieldwise_reinstantiation_plan.md step B2. NOT a constitutional amendment.",
+
+  "violation": "docs/tier2a_instrument_schemas/ holds application-form and evaluation-form templates for the active Horizon Europe instruments. It is instrument-schema space, and §13.11 forbids placing project-specific material there. The FIELDWISE Part B master draft is project instantiation data: it names the fellow, the host, the work packages, the partners and the risks of one specific proposal. It was placed at docs/tier2a_instrument_schemas/part_b_draft_v0/, which made a project artifact readable as an instrument schema.",
+
+  "moved_from": "docs/tier2a_instrument_schemas/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+  "moved_to": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+  "moved_in_commit": "6d96a60",
+
+  "why_tier3_source_materials": "§5 Tier 3 names source materials — concept documents, partner inputs, prior proposals, reference materials — as the canonical home for project input documents. The draft is exactly that: the document tickets 3, 4 and 5 lift Tier 3 records from. Every seeded record cites it as its source under the plan's §5 provenance envelope.",
+
+  "risk_had_it_stayed": "A skill resolving Tier 2A inputs could have read the draft as instrument structure and treated one project's section layout as the MSCA-PF application form. That would have made a project fact into a structural constraint, inverting the authority hierarchy of §3 and breaching §13.1 in the same way an annex template does.",
+
+  "verification": "docs/tier2a_instrument_schemas/ now contains only application_forms/, evaluation_forms/ and extracted/. No part_b_draft_v0 path remains anywhere beneath it. The draft resolves at its Tier 3 path. tests/runner/test_fieldwise_purge.py::TestTier2ADraftCorrection pins both halves and checks that this record's moved_from and moved_to still describe the tree.",
+
+  "scope": "This correction concerns the location of one document. It does not amend §13.11, does not license any other project artifact in Tier 1 or Tier 2, and does not change the content of the draft, which is byte-identical at its new path.",
+
+  "companion_records": [
+    "fieldwise-purge-and-decision-log-split_2026-08-11.json — the purge this correction was recorded alongside.",
+    "vault-supersession-fieldwise_2026-08-11.json"
+  ],
+
+  "effect": "The §13.11 breach is closed. The draft sits in the tier that owns it, and the seeding tickets cite a Tier 3 path rather than a Tier 2A one."
+}

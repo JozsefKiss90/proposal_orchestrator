@@ -1,0 +1,125 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-purge-and-decision-log-split",
+  "date": "2026-08-11",
+  "branch": "fieldwise-run-01",
+
+  "authority": "Operator-directed ticket (plans/fieldwise_tickets.md ticket 1), executing plans/fieldwise_reinstantiation_plan.md steps B3-B7. The operator approved the §2.1 three-way decision-log split on 2026-08-10. Durable recording per CLAUDE.md §9.4 of a state transition that later readers cannot reconstruct from the tree alone. Applies already-ratified rules (§9.1 docs/ is authoritative, §9.2 runtime memory is not constitutional truth, §12.3 contradictions are logged). NOT a constitutional amendment; no §14.5 question is raised here.",
+
+  "why": "The FIELDWISE master draft and the superseded Tier 3 describe two different projects. The identity spine matches — fellow, host ELTE Budapest, supervisor, 24-month European Fellowship, Hungary — but the research content does not. Tier 3 had to be replaced, not edited, so every artifact derived from it (Tier 4 run state, all of Tier 5) had to go with it. Leaving derived state behind would let a later phase read the superseded project through a gate that believes it is fresh.",
+
+  "purge": {
+    "tier4_run_scoped_state": {
+      "deleted": [
+        "docs/tier4_orchestration_state/phase_outputs/**",
+        "docs/tier4_orchestration_state/checkpoints/**",
+        "docs/tier4_orchestration_state/validation_reports/**",
+        "docs/tier4_orchestration_state/alpha_honest_block/**",
+        "docs/tier4_orchestration_state/preseed/phase8/**",
+        "docs/tier4_orchestration_state/reuse/phase8/**",
+        "docs/tier4_orchestration_state/graph_compile/** (untracked; .gitignore declares it derived and regenerable)"
+      ],
+      "scope_note": "The ticket's acceptance list names four directories. preseed/phase8/ and reuse/phase8/ are deleted as well, because they hold the superseded run's excellence, impact and implementation sections. Both paths are opt-in (--preseed-phase8-sections, the reuse policy), so neither blocks a run, but leaving them would let ticket 10's Phase 8 supersede a FIELDWISE draft with the previous project's prose. graph_compile/pre_promote_backup/ held a restorable copy of the purged Tier 3 and is removed for the same reason.",
+      "retained": [
+        "docs/tier4_orchestration_state/reinstantiation_provenance.json — records the milestone-1 purge and the D8 vault absorb. Engine and branch provenance, not demo-run output.",
+        ".gitkeep placeholders in phase_outputs/, checkpoints/, validation_reports/, reuse/ so the skeleton stays tracked."
+      ]
+    },
+    "tier5": {
+      "deleted": "All files under proposal_sections/, assembled_drafts/, final_exports/, review_packets/. Only the four .gitkeep placeholders remain.",
+      "consequence": "The E4 harness golden-set regression lane pins the deleted Tier 5 content and is now red. Ticket 11 decides between re-freezing the baselines against the FIELDWISE Tier 5 and marking the lane expected-red on this branch."
+    },
+    "tier3": {
+      "deleted": "project_brief/, consortium/, call_binding/, architecture_inputs/, integration/ contents; hand_lift_provenance.json; working_assumptions.json.",
+      "retained": [
+        "source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx — the source of truth for the reseed.",
+        "working_assumptions.example.json — an inert, project-neutral template carrying no superseded project data. Proposal_Engine_Operator_Manual.md §168 instructs the operator to copy it to working_assumptions.json, and ticket 6 needs it. Plan step B5 reads 'delete all of Tier 3 except source_materials', which would have removed it; the deviation is deliberate and recorded here."
+      ]
+    },
+    "runtime_memory": {
+      "cleared": [".claude/runs/", ".claude/benchmark/", ".claude/skill_diag/", ".claude/semantic_diag/", ".claude/cache/", ".claude/logs/", ".claude/agent-memory/"],
+      "authority": "CLAUDE.md §9.2 — runtime execution state may be cleared without affecting the constitutional validity of docs/. All of these are gitignored, so the clearing is a working-tree operation and does not appear in this commit."
+    }
+  },
+
+  "decision_log_split": {
+    "rationale": "The decision log held 52 files with three different dispositions. A blanket archive would have removed rulings the next run depends on, and a blanket delete would have removed more. Two modules cite entries directly: runner/graph_determinism_check.py:95 cites dod-1c, and runner/checkpoint_publisher.py:9 cites chk-1.",
+    "deleted": {
+      "count": 18,
+      "what": "Runner-written run state: decision-log-update_*, topic-scope-check_*, gate_failure_*. Each references artifacts this purge deleted, and each is regenerable by the next run.",
+      "files": [
+        "decision-log-update_0401295c.json",
+        "decision-log-update_13139efa.json",
+        "decision-log-update_4acdc86e.json",
+        "decision-log-update_531ec9f0.json",
+        "decision-log-update_5952b165.json",
+        "decision-log-update_854fd6e8.json",
+        "decision-log-update_c084e3dd.json",
+        "decision-log-update_d0675cf5.json",
+        "decision-log-update_msca-pf-.json",
+        "topic-scope-check_0401295c.json",
+        "topic-scope-check_80f2c313.json",
+        "topic-scope-check_854fd6e8.json",
+        "topic-scope-check_c084e3dd.json",
+        "topic-scope-check_ec190493.json",
+        "topic-scope-check_msca-pf-.json",
+        "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-07-15T00_00_00Z.json",
+        "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-07-15T000000Z.json",
+        "gate_failure_gate_09_budget_consistency_budget_gate_validator_2026-07-15T12_00_00Z.json"
+      ]
+    },
+    "archived": {
+      "count": 5,
+      "what": "Human decisions about the superseded project. FIELDWISE replaces all five, but each records why an operator chose what they chose, so none is deleted.",
+      "destination": "docs/tier4_orchestration_state/decision_log/archive/demo-run/",
+      "moved": {
+        "13b-real-data-consolidation_2026-07-16.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/13b-real-data-consolidation_2026-07-16.json",
+        "action-confirmation-msca-pf_2026-07-13.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/action-confirmation-msca-pf_2026-07-13.json",
+        "synthetic-concept-override-extension_2026-07-14.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/synthetic-concept-override-extension_2026-07-14.json",
+        "synthetic-spine-demo-override_2026-07-13.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/synthetic-spine-demo-override_2026-07-13.json",
+        "tier3-hand-lift-msca-pf_2026-07-13.json": "docs/tier4_orchestration_state/decision_log/archive/demo-run/tier3-hand-lift-msca-pf_2026-07-13.json"
+      },
+      "load_bearing_move": "runner/docx_exporter.py:96 globs decision_log/synthetic-spine*.json and stamps a visible 'SYNTHETIC DEMO — NOT FOR SUBMISSION' marker on the exported Part B when the file matches. The glob is non-recursive, so moving synthetic-spine-demo-override_2026-07-13.json into archive/demo-run/ clears the stamp from the FIELDWISE export while preserving the record. Leaving it in place would have marked a real submission as a demo.",
+      "dangling_reference": "status-vocabulary-correction_2026-07-13.json (retained) carries supersedes_aspect_of pointing at the pre-move path of tier3-hand-lift-msca-pf_2026-07-13.json. The moved-path map above is the resolution; the retained entry is left byte-unchanged because rewriting an engine ruling to chase a path move would edit a record of what was decided."
+    },
+    "retained": {
+      "count": 29,
+      "what": "Rulings that govern the engine regardless of which call is written: DOD-1 x4, CHK-1, ST-1, the transport and truncation fixes, the taxonomy-drift correction, the gate-result schema backfill, the agnosticism proof, the E2-E5 and LG-1 harness frameworks, and the rest.",
+      "location": "docs/tier4_orchestration_state/decision_log/ (unchanged)"
+    },
+    "known_category_tension": "The 29 are project-agnostic in rule and project-scoped only in evidence. dod-1e proves checkpoint publication by driving run msca-pf-graph-01, yet the rule binds any run. §5 defines Tier 4 as run-scoped orchestration state, which an engine ruling is not, while §9.4 mandates this location. Moving them to a register outside Tier 4 would need a §14.5 amendment. The operator declined to raise that question on 2026-08-10, so the 29 stay where they are and the tension is recorded, not resolved."
+  },
+
+  "companion_records": [
+    "tier2a-project-draft-misplacement-correction_2026-08-11.json — the §13.11 correction for the draft's move out of Tier 2A.",
+    "vault-supersession-fieldwise_2026-08-11.json — the §12.3 record that MSCA/methodology_graph/ now contradicts Tier 3."
+  ],
+
+  "change_surface": [
+    "docs/tier4_orchestration_state/** — run-scoped state deleted, decision log split three ways, three new records written.",
+    "docs/tier5_deliverables/** — emptied to the four .gitkeep placeholders.",
+    "docs/tier3_project_instantiation/** — emptied except source_materials/ and working_assumptions.example.json.",
+    "tests/runner/test_fieldwise_purge.py (NEW) — pins the durable half of this transition: the three-way partition by id, the cleared synthetic stamp, and the two companion records. It deliberately does not assert that Tier 3, Tier 4 and Tier 5 stay empty, because tickets 3-5 and 8-10 refill them.",
+    "NO change to runner/, .claude/, the DAG scheduler, the gate evaluator, or any Tier 1 / Tier 2A / Tier 2B source."
+  ],
+
+  "verification": {
+    "baseline_before_purge": "34 failed, 4500 passed, 42 skipped (4576 collected).",
+    "after_purge": "39 failed, 4490 passed, 59 skipped, 5 errors (4593 collected; +17 from tests/runner/test_fieldwise_purge.py, all passing).",
+    "red_set_delta": "34 red before, 44 red after. 28 unchanged, 6 turned into honest skips, 16 newly red.",
+    "turned_into_skips": "Each of these carries an 'artifact not present' skip guard, so none of them passes falsely on missing data: test_dod1e_checkpoint_close.py x3 (phase8_checkpoint.json, durable gate_09 result), test_claim_ledger.py::TestRealDataProbe x2 and test_phase8_gate_content.py::TestCurrentArtifactState x1 (excellence_section.json).",
+    "newly_red": [
+      "tests/harness/test_evidence_pack.py::TestRealSections x3 — read the deleted Tier 5 sections.",
+      "tests/harness/test_expectations.py::TestCriterionSectionMap::test_live_section_paths_resolve — resolves excellence_section.json.",
+      "tests/harness/test_regression_golden.py::TestGoldenSetStanding x2 — the E4 lane reports section_missing for all three golden sections.",
+      "tests/harness/test_rubric_report.py::TestStandingLane::test_real_spine_register_loads_and_is_fully_confirmed — reads the deleted Tier 5 spine register.",
+      "tests/harness/test_measure_ledger_granularity.py x2 (module now errors on all 5) — reads the deleted Tier 5 sections.",
+      "tests/runner/test_graph_compiler.py::test_msca_oracle_converged_after_ticket_8 — compiles the vault against the deleted Tier 3 hand-lift oracle.",
+      "tests/runner/test_graph_projector.py x2 — project run-scoped Tier 4 gate state, of which none remains.",
+      "tests/runner/test_phase6_field_production.py x4 — read the deleted phase6_implementation_architecture/implementation_architecture.json."
+    ],
+    "attribution": "Every newly-red test names a specific purged artifact in its failure message. None indicates a code defect. Ticket 11 owns the E4 golden lane; tickets 8-10 re-populate Tier 4 and Tier 5; ticket 12 re-authors the vault. The harness lanes beyond E4 — evidence_pack, expectations, rubric_report, measure_ledger_granularity — are pinned to Tier 5 content in the same way the E4 lane is, so ticket 11's decision needs to cover them as well as the golden set."
+  },
+
+  "effect": "fieldwise-run-01 carries a clean skeleton. Tickets 3, 4 and 5 can now seed Tier 3 from the draft, and the FIELDWISE export at ticket 10 will carry no synthetic-demo stamp."
+}
