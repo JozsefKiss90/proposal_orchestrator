@@ -1,0 +1,231 @@
+{
+  "_provenance": {
+    "record_type": "tier3_outcomes",
+    "collection_key": "outcomes",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "separation_note": "The draft names deliverables and six ambition transitions but never separates a project output from the outcome it produces (plan §3). outputs below are the draft's deliverables, Confirmed. outcomes below are an Inferred first pass at that separation, derived from the deliverables and the §1.1.9 transitions; each note states the derivation. Phase 5 refines this separation against the Tier 2B expected outcomes."
+  },
+  "spine_status": "confirmed_real",
+  "outputs": [
+    {
+      "deliverable_id": "D1.1",
+      "title": "Harmonised historical database",
+      "work_package": "WP1",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶260"
+    },
+    {
+      "deliverable_id": "D1.2",
+      "title": "Data/target/validation protocol",
+      "work_package": "WP1",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶261"
+    },
+    {
+      "deliverable_id": "D1.3",
+      "title": "Career Development Plan",
+      "work_package": "WP1",
+      "due_month": 3,
+      "validation_status": "Confirmed",
+      "checklist_ref": "CDP_DELIVERABLE",
+      "source_ref": "Operator input pack item 6, accepted 2026-08-11 (CC-13 instrument mandate)",
+      "note": "Not in the draft's deliverable list. Operator-added deliverable: agreed by M3, owned by FELLOW and SUPERVISOR, reviewed at M6/M12/M16/M20. Seeded here per the ticket 2 correction ('Ticket 4 must seed D1.3 if the operator accepts item 6'). Confirmed on the same footing as the 30-month duration in selected_call.json (operator decision of 2026-08-11; status reasoning in the lift decision-log extension); checklist_ref resolves when ticket 6 re-authors confirmation_checklist.json."
+    },
+    {
+      "deliverable_id": "D2.1",
+      "title": "Physiological validation dataset",
+      "work_package": "WP2",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶272"
+    },
+    {
+      "deliverable_id": "D2.2",
+      "title": "Hyperspectral-to-Sentinel transfer library",
+      "work_package": "WP2",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶273"
+    },
+    {
+      "deliverable_id": "D3.1",
+      "title": "Comparative modelling benchmark",
+      "work_package": "WP3",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶285"
+    },
+    {
+      "deliverable_id": "D3.2",
+      "title": "FIELDWISE predictive engine/model card",
+      "work_package": "WP3",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶286"
+    },
+    {
+      "deliverable_id": "D4.1",
+      "title": "Temporal transferability benchmark",
+      "work_package": "WP4",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶298"
+    },
+    {
+      "deliverable_id": "D4.2",
+      "title": "Hungary->Bulgaria transferability report",
+      "work_package": "WP4",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶299"
+    },
+    {
+      "deliverable_id": "D4.3",
+      "title": "Adaptation protocol",
+      "work_package": "WP4",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶300"
+    },
+    {
+      "deliverable_id": "D5.1",
+      "title": "DrR web MVP",
+      "work_package": "WP5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶312"
+    },
+    {
+      "deliverable_id": "D5.2",
+      "title": "Commercial-field transferability assessment",
+      "work_package": "WP5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶313"
+    },
+    {
+      "deliverable_id": "D5.3",
+      "title": "Field Decision Value report",
+      "work_package": "WP5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶314"
+    },
+    {
+      "deliverable_id": "D5.4",
+      "title": "AgroVIR functional/technical evaluation",
+      "work_package": "WP5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶315"
+    },
+    {
+      "deliverable_id": "D5.5",
+      "title": "FMIS integration roadmap",
+      "work_package": "WP5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶316"
+    }
+  ],
+  "transitions": [
+    {
+      "transition_id": "TR1",
+      "statement": "Spectral proxy -> Physiological target",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶104"
+    },
+    {
+      "transition_id": "TR2",
+      "statement": "Hyperspectral discovery -> Satellite scaling",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶105"
+    },
+    {
+      "transition_id": "TR3",
+      "statement": "Static detection -> Prospective prediction",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶106"
+    },
+    {
+      "transition_id": "TR4",
+      "statement": "Internal validation -> Temporal transferability",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶107"
+    },
+    {
+      "transition_id": "TR5",
+      "statement": "Single-country modelling -> Geographic transferability",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶108"
+    },
+    {
+      "transition_id": "TR6",
+      "statement": "Research accuracy -> Commercial-field decision value",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶109"
+    },
+    {
+      "transition_id": "VL",
+      "statement": "Validation ladder: MATE - scientific development and validation -> MVCRI - cross-country transferability -> AgroVIR farmer field - operational transferability -> DrR Web MVP - research-to-operation delivery.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.9 ¶110"
+    }
+  ],
+  "outcomes": [
+    {
+      "outcome_id": "OC1",
+      "statement": "A physiologically defined water-stress target and a Sentinel-2-transferable early-warning feature basis, replacing spectral-proxy stress definitions.",
+      "produced_by_outputs": ["D1.1", "D1.2", "D2.1", "D2.2"],
+      "linked_transitions": ["TR1", "TR2"],
+      "linked_objectives": ["O1", "O2"],
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶104-105; §3.1 ¶260-261, ¶272-273",
+      "note": "Derived: transitions TR1/TR2 state the intended change of state, and D1.1/D1.2/D2.1/D2.2 are the outputs whose content (harmonised data, physiological target, transfer library) brings that state about. The draft states both ends but not the output->outcome link."
+    },
+    {
+      "outcome_id": "OC2",
+      "statement": "A prospective, uncertainty-aware stress-forecasting capability at actionable horizons, in place of static detection.",
+      "produced_by_outputs": ["D3.1", "D3.2"],
+      "linked_transitions": ["TR3"],
+      "linked_objectives": ["O3"],
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶106; §3.1 ¶285-286",
+      "note": "Derived: TR3 names the static-to-prospective transition; D3.1/D3.2 (modelling benchmark, predictive engine with model card) are the outputs that realise it. Link inferred, not stated."
+    },
+    {
+      "outcome_id": "OC3",
+      "statement": "Quantified temporal and Hungary-to-Bulgaria transferability of the predictive model, with a stated local-calibration cost for adapting it to a new agro-environment.",
+      "produced_by_outputs": ["D4.1", "D4.2", "D4.3"],
+      "linked_transitions": ["TR4", "TR5"],
+      "linked_objectives": ["O4"],
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶107-108; §3.1 ¶298-300",
+      "note": "Derived: TR4/TR5 name the transferability transitions; D4.1-D4.3 are the benchmark, report and protocol that quantify them. Link inferred, not stated."
+    },
+    {
+      "outcome_id": "OC4",
+      "statement": "Evidence of field-level decision value under commercial farming conditions, enabling model selection by usefulness rather than retrospective accuracy.",
+      "produced_by_outputs": ["D5.2", "D5.3", "D5.4"],
+      "linked_transitions": ["TR6"],
+      "linked_objectives": ["O5", "O6"],
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶109; §3.1 ¶313-315",
+      "note": "Derived: TR6 names the accuracy-to-decision-value transition; D5.2-D5.4 (commercial-field assessment, FDV report, AgroVIR evaluation) are the outputs that evidence it. Link inferred, not stated."
+    },
+    {
+      "outcome_id": "OC5",
+      "statement": "A research-to-operation delivery path: an externally evaluated web MVP and a named post-MSCA FMIS integration route.",
+      "produced_by_outputs": ["D5.1", "D5.5"],
+      "linked_transitions": ["VL"],
+      "linked_objectives": ["O6"],
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶110; §3.1 ¶312, ¶316; §1.2 ¶156-158, ¶170",
+      "note": "Derived from the validation ladder's final rung and D5.1/D5.5. The draft itself bounds this outcome: the MVP is the research-to-operation demonstrator, not the primary scientific objective (¶158), and full commercial integration is not promised within the fellowship (¶170)."
+    },
+    {
+      "outcome_id": "OC6",
+      "statement": "A researcher profile combining biological understanding, scalable geospatial prediction and operational decision support, carried by an agreed and reviewed Career Development Plan.",
+      "produced_by_outputs": ["D1.3"],
+      "linked_transitions": [],
+      "linked_objectives": [],
+      "validation_status": "Inferred",
+      "source_ref": "§2.1 ¶219-222; §1.4 ¶216; operator input pack item 6",
+      "note": "Derived: §2.1 states the career outcome and §1.4 the intended progression; D1.3 (operator-added, item 6) is the output that carries them. The draft states the career claims but assembles no plan and names no deliverable for them."
+    }
+  ]
+}

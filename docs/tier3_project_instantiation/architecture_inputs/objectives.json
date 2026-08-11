@@ -1,0 +1,90 @@
+{
+  "_provenance": {
+    "record_type": "tier3_objectives",
+    "collection_key": "objectives",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "field_mapping": "The draft table's header cells are Objective | Purpose | Verification (¶81-83). title is the Purpose column; measurable_output is the Verification column, named after the section heading 'Objectives and measurable outputs' (¶80). The plan §5 worked example calls this column's content measurable_target and additionally shows a 'verification' value ('Feature library documented with per-feature Sentinel-2 transferability verdict') that appears nowhere in the draft; this seed carries only the two draft columns and no elaborated verification text, per §13.3. addressed_by_work_packages, linked_research_questions, linked_hypotheses and target_month come from the cited §3.1 work-package block, the RQ/H lists and the milestone line, per the worked example.",
+    "partner_tokens": "involved_partners uses the role tokens the plan defines (DATA_PARTNER = MATE, HOST = ELTE, TRANSFER_PARTNER = MVCRI, VALIDATION_PARTNER = AgroVIR; cover block ¶9-18, §1.3 ¶206-211). Tokens list the organisations the cited WP month-line names; the FELLOW executes all work packages in this single-researcher action and is not repeated per objective."
+  },
+  "spine_status": "confirmed_real",
+  "objectives": [
+    {
+      "objective_id": "O1",
+      "title": "Construct a harmonised five-year MATE soil-plant-atmosphere dataset",
+      "measurable_output": "QC-controlled historical database and documented metadata",
+      "addressed_by_work_packages": ["WP1"],
+      "linked_research_questions": [],
+      "linked_hypotheses": [],
+      "target_month": 6,
+      "involved_partners": ["DATA_PARTNER", "HOST"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶84-86; WP1 §3.1 ¶252-262; MS1 ¶262"
+    },
+    {
+      "objective_id": "O2",
+      "title": "Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability",
+      "measurable_output": "Validated hyperspectral/Sentinel-compatible feature library",
+      "addressed_by_work_packages": ["WP2"],
+      "linked_research_questions": ["RQ1", "RQ2"],
+      "linked_hypotheses": ["H1", "H2"],
+      "target_month": 12,
+      "involved_partners": ["DATA_PARTNER", "HOST"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶87-89; WP2 §3.1 ¶263-274; MS2 ¶274"
+    },
+    {
+      "objective_id": "O3",
+      "title": "Develop prospective uncertainty-aware crop water-stress forecasts",
+      "measurable_output": "Calibrated forecasts at actionable horizons",
+      "addressed_by_work_packages": ["WP3"],
+      "linked_research_questions": ["RQ3"],
+      "linked_hypotheses": [],
+      "target_month": 16,
+      "involved_partners": ["HOST", "DATA_PARTNER"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶90-92; WP3 §3.1 ¶275-287; MS3 ¶287"
+    },
+    {
+      "objective_id": "O4",
+      "title": "Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation",
+      "measurable_output": "Independent transferability benchmark",
+      "addressed_by_work_packages": ["WP4"],
+      "linked_research_questions": ["RQ4", "RQ5"],
+      "linked_hypotheses": ["H3", "H4"],
+      "target_month": 20,
+      "involved_partners": ["DATA_PARTNER", "TRANSFER_PARTNER"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶93-95; WP4 §3.1 ¶288-301; MS4 ¶301"
+    },
+    {
+      "objective_id": "O5",
+      "title": "Quantify research->commercial-field operational transferability",
+      "measurable_output": "AgroVIR farmer-field evaluation",
+      "addressed_by_work_packages": ["WP5"],
+      "linked_research_questions": ["RQ6"],
+      "linked_hypotheses": ["H5"],
+      "target_month": 23,
+      "involved_partners": ["HOST", "VALIDATION_PARTNER"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶96-98; WP5 §3.1 ¶302-317; MS5 ¶317"
+    },
+    {
+      "objective_id": "O6",
+      "title": "Translate validated predictions into irrigation priority and a functional web MVP",
+      "measurable_output": "DrR web MVP + Field Decision Value + AgroVIR requirements assessment",
+      "addressed_by_work_packages": ["WP5"],
+      "linked_research_questions": ["RQ7"],
+      "linked_hypotheses": ["H6"],
+      "target_month": 23,
+      "involved_partners": ["HOST", "VALIDATION_PARTNER"],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.1.8 ¶99-101; WP5 §3.1 ¶302-317; MS5 ¶317"
+    }
+  ]
+}

@@ -135,11 +135,11 @@ person-months absent. Impact KPIs are Unresolved pending operator input.
 
 **Blocked by:** Seed call binding and project brief.
 
-- [ ] All six files exist with the §5 envelope and draft source references.
-- [ ] Objectives O1–O6, milestones MS1–MS5, and the 13 risks are Confirmed against the draft.
-- [ ] Derived content (outcome separation, task months, dependencies) is Inferred with the derivation stated in `note`.
-- [ ] Person-months and KPIs appear as Unresolved records, not as invented values.
-- [ ] `hand_lift_provenance.json` covers these files.
+- [x] All six files exist with the §5 envelope and draft source references.
+- [x] Objectives O1–O6, milestones MS1–MS5, and the 13 risks are Confirmed against the draft.
+- [x] Derived content (outcome separation, task months, dependencies) is Inferred with the derivation stated in `note`.
+- [x] Person-months and KPIs appear as Unresolved records, not as invented values.
+- [x] `hand_lift_provenance.json` covers these files.
 
 ## 5. Seed consortium files
 

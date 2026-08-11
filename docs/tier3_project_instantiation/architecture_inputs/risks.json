@@ -1,0 +1,139 @@
+{
+  "_provenance": {
+    "record_type": "tier3_risks",
+    "collection_key": "risks",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "field_mapping": "title and mitigation are the draft risk table's Risk and Mitigation columns, verbatim. The draft's single L/I column is split into likelihood and impact (L = low, M = medium, H = high). The draft assigns no risk categories, owners or affected work packages; Phase 6 populates the full risk register."
+  },
+  "spine_status": "confirmed_real",
+  "risks": [
+    {
+      "risk_id": "R01",
+      "title": "Historical MATE information incomplete",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Common-data subset; quality flags; prospective augmentation",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶384-386"
+    },
+    {
+      "risk_id": "R02",
+      "title": "Hyperspectral index has no Sentinel equivalent",
+      "likelihood": "M",
+      "impact": "M",
+      "mitigation": "Retain for physiological discovery; exclude from operational Sentinel model",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶387-389"
+    },
+    {
+      "risk_id": "R03",
+      "title": "Spectral domain mismatch",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "SRF resampling + concurrent sensor comparison",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶390-392"
+    },
+    {
+      "risk_id": "R04",
+      "title": "Proximal/satellite spatial mismatch",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Representative plot/zone aggregation",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶393-395"
+    },
+    {
+      "risk_id": "R05",
+      "title": "Insufficient physiological stress events",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Targeted temporal sampling across stress gradients",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶396-398"
+    },
+    {
+      "risk_id": "R06",
+      "title": "Cloud gaps",
+      "likelihood": "M",
+      "impact": "M",
+      "mitigation": "Temporal windows and Sentinel-1 where scientifically useful",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶399-401"
+    },
+    {
+      "risk_id": "R07",
+      "title": "Unseen-year performance drops",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Expected scientific outcome; quantify and adapt",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶402-404"
+    },
+    {
+      "risk_id": "R08",
+      "title": "Hungary->Bulgaria performance drops",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Limited local/Bayesian adaptation",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶405-407"
+    },
+    {
+      "risk_id": "R09",
+      "title": "Farmer-field performance drops",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Quantify operational gap; simplify inputs/model where necessary",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶408-410"
+    },
+    {
+      "risk_id": "R10",
+      "title": "Bayesian approach does not outperform ML",
+      "likelihood": "M",
+      "impact": "L",
+      "mitigation": "Retain simpler model if superior in calibration/FDV",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶411-413"
+    },
+    {
+      "risk_id": "R11",
+      "title": "Prediction is accurate but too late",
+      "likelihood": "M",
+      "impact": "H",
+      "mitigation": "Lead time included as primary model-selection criterion",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶414-416"
+    },
+    {
+      "risk_id": "R12",
+      "title": "Web development delayed",
+      "likelihood": "L",
+      "impact": "M",
+      "mitigation": "Modular development building on existing DrR prototype",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶417-419"
+    },
+    {
+      "risk_id": "R13",
+      "title": "Full AgroVIR integration not feasible",
+      "likelihood": "M",
+      "impact": "M",
+      "mitigation": "MVP assessment + integration roadmap remain successful endpoint",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶420-422"
+    }
+  ],
+  "risk_philosophy": {
+    "statement": "Failure of zero-shot transfer is not project failure. If FIELDWISE establishes that a model trained at MATE cannot reliably transfer to Bulgaria without a defined amount of local calibration, that is itself a significant scientific finding.",
+    "validation_status": "Confirmed",
+    "source_ref": "§3.1 ¶423"
+  }
+}

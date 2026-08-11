@@ -49,5 +49,27 @@
 
   "extended_by": [
     "Ticket 4 (architecture inputs) and ticket 5 (consortium) extend hand_lift_provenance.json and this lift record's scope as their slices land."
+  ],
+
+  "extensions": [
+    {
+      "ticket": 4,
+      "date": "2026-08-12",
+      "what": "Second seeding slice: the six architecture_inputs files, lifted from the draft under the same §5 envelope and status rule.",
+      "artifacts_written": [
+        "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
+        "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+        "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+        "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+        "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+      ],
+      "confirmed_content": "O1-O6 (§1.1.8 table), WP1-WP5 with month ranges, leads, 32 tasks and 14 deliverables (§3.1), MS1-MS5 (months 6/12/16/20/23), 13 risks with split L/I and mitigations (§3.1 risk table), five §2.3 impact claims, six §1.1.9 transitions and the validation ladder.",
+      "inferred_content": "The output/outcome separation the draft lacks (OC1-OC6, derivations in note); task-level months (each task inherits its WP month range — no sub-range is guessed); six inter-WP dependency edges derived from WP content, milestone statements and the validation ladder.",
+      "unresolved_content": "Person-months (workpackage_seed.json) and KPIs plus the EI-03/EI-04/EI-06 expected-impact mappings (impacts.json). The operator answered input pack items 5 and 8 on 2026-08-11, but folding answers into Tier 3 is ticket 6's scope; seeding them here would blur the lift/fold boundary the ticket structure draws. Nothing is invented (§13.3).",
+      "operator_added_deliverable": "D1.3 Career Development Plan (due M3, FELLOW + SUPERVISOR, reviewed M6/M12/M16/M20) is seeded into WP1 and outcomes.json outputs per the ticket 2 correction: CC-13 requires the plan as a deliverable and the draft's D1.1-D5.5 list has none. Source: operator input pack item 6, accepted 2026-08-11 — an operator decision, not draft content, and cited as such.",
+      "d13_status_reasoning": "D1.3 is marked Confirmed, not Assumed, as a deliberate narrowing of the plan §5 rule ('no draft basis -> Assumed'). That rule guards against content nobody decided; D1.3 is an explicit operator decision (input pack item 6, accepted 2026-08-11), the same footing on which ticket 3 marked the 30-month duration Confirmed in selected_call.json with the tickets file's sanction ('Confirmed is honest now that you have decided it'). §12.2's 'named source in Tier 1-3' is satisfied prospectively: ticket 6 copies the completed input pack into Tier 3 source_materials, at which point the citation is in-tier. Both D1.3 records carry checklist_ref CDP_DELIVERABLE, which ticket 6's re-authored confirmation_checklist.json must resolve. Declaring it Assumed instead would require a working_assumptions.json declaration that ticket 6 owns, and would misstate the epistemic state: the fact is decided, not adopted for want of evidence.",
+      "tests": "tests/runner/test_fieldwise_ticket4_seed.py pins the acceptance criteria (envelope, statuses, Confirmed sets, Inferred derivations, Unresolved person-months/KPIs, provenance coverage, dependency_normalizer compatibility)."
+    }
   ]
 }

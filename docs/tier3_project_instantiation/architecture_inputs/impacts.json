@@ -1,0 +1,61 @@
+{
+  "_provenance": {
+    "record_type": "tier3_impacts",
+    "collection_key": "impacts",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included)."
+  },
+  "spine_status": "confirmed_real",
+  "impacts": [
+    {
+      "impact_id": "IMP-SCI",
+      "title": "Scientific impact",
+      "claim": "FIELDWISE provides a framework for agricultural AI evaluated according to temporal + geographic + operational transferability rather than only retrospective accuracy. It additionally establishes a methodological bridge between high-information proximal hyperspectral observations and scalable Sentinel-based prediction.",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.3 ¶240-241"
+    },
+    {
+      "impact_id": "IMP-ENV",
+      "title": "Environmental impact",
+      "claim": "FIELDWISE contributes to the EU-level opportunity for water savings in irrigated agriculture by improving the timing and spatial prioritisation of irrigation decisions. The project does not claim in advance that it will achieve a particular percentage reduction; impact will be quantified from project evidence.",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.3 ¶242-243"
+    },
+    {
+      "impact_id": "IMP-AGRI",
+      "title": "Agricultural and food-production impact",
+      "claim": "Water scarcity already produces agricultural yield losses and higher water costs in Europe, while irrigation demand is expected to increase under climate change. Processing tomato provides a high-value horticultural test case in which improved timing can therefore have substantial agronomic and economic relevance.",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.3 ¶244-245"
+    },
+    {
+      "impact_id": "IMP-TECH",
+      "title": "Technological impact",
+      "claim": "FIELDWISE advances the project from a desktop research prototype to a scientifically validated web MVP. External AgroVIR evaluation provides evidence about whether the resulting technology meets actual agricultural software requirements.",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.3 ¶246-247"
+    },
+    {
+      "impact_id": "IMP-EU",
+      "title": "European impact",
+      "claim": "The MATE-MVCRI architecture directly investigates whether agricultural AI developed in one European environment can be transferred to another. FIELDWISE therefore contributes to a wider European question: how can locally developed agricultural intelligence become reliably transferable rather than remaining confined to the field in which it was trained?",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.3 ¶248-249"
+    }
+  ],
+  "kpis": {
+    "validation_status": "Unresolved",
+    "note": "No KPI is lifted, because the draft carries none: it explicitly declines advance numeric targets and commits to quantifying impact from project evidence (¶243). The operator answered input pack item 5 on 2026-08-11 (K1-K10 accepted, EI-03/EI-04/EI-06 measures decided, K11 candidate raised); ticket 6 folds those answers into this file. Until that fold, KPIs stay Unresolved rather than invented (§13.3). phase_05_gate g06_p05 reads KPI-to-deliverable traceability from the Phase 5 output, so this Unresolved record blocks nothing before ticket 6.",
+    "source_ref": "§2.3 ¶243 (the draft's refusal); plans/fieldwise_operator_input_pack.md item 5 (answered, not yet folded)"
+  },
+  "expected_impact_coverage": {
+    "validation_status": "Unresolved",
+    "note": "phase_05_gate g06_p04 requires all six Tier 2B expected impacts to map to a project output. The draft's §2.3 covers EI-02 and EI-05, and §2.1/§2.2 cover EI-01. Nothing in the draft addresses EI-03 (public engagement), EI-04 (Charter alignment) or EI-06 (teaching). The operator decided all three in input pack item 5 (EI-03 candidate accepted; EI-04 accepted with the HRS4R claim removed per C8; EI-06 raised per C7); ticket 6 folds them. Until then the three mappings are Unresolved here, and Phase 5 would fail g06_p04 honestly if run first.",
+    "source_ref": "plans/fieldwise_operator_input_pack.md item 5; input pack table note on g06_p04/g06_p05"
+  }
+}

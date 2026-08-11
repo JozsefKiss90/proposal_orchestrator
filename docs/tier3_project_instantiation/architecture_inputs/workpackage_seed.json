@@ -1,0 +1,228 @@
+{
+  "_provenance": {
+    "record_type": "tier3_workpackage_seed",
+    "collection_key": "work_packages",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "partner_tokens": "lead is the draft's month-line string, verbatim. lead_role_tokens maps its organisations to the plan's role tokens (DATA_PARTNER = MATE, HOST = ELTE, TRANSFER_PARTNER = MVCRI, VALIDATION_PARTNER = AgroVIR; cover block ¶9-18, §1.3 ¶206-211). The FELLOW executes all work packages in this single-researcher action.",
+    "scope_note": "Work packages, month ranges, leads, tasks and deliverables are draft-Confirmed. Task-level months and inter-WP dependency edges are Inferred (separate collections below, derivations stated). Person-months have no source in the draft and are Unresolved until ticket 6 folds input pack item 8."
+  },
+  "spine_status": "confirmed_real",
+  "work_packages": [
+    {
+      "id": "WP1",
+      "title": "Historical Data and Target Design",
+      "start_month": 1,
+      "end_month": 6,
+      "lead": "MATE + ELTE",
+      "lead_role_tokens": ["DATA_PARTNER", "HOST"],
+      "milestone": "MS1",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶252-262",
+      "tasks": [
+        {"task_id": "T1.1", "title": "Harmonise five-year MATE hyperspectral archive", "validation_status": "Confirmed", "source_ref": "§3.1 ¶254"},
+        {"task_id": "T1.2", "title": "Integrate soil/weather/management information", "validation_status": "Confirmed", "source_ref": "§3.1 ¶255"},
+        {"task_id": "T1.3", "title": "Audit missingness and data quality", "validation_status": "Confirmed", "source_ref": "§3.1 ¶256"},
+        {"task_id": "T1.4", "title": "Establish physiological stress definition", "validation_status": "Confirmed", "source_ref": "§3.1 ¶257"},
+        {"task_id": "T1.5", "title": "Establish leakage-safe validation design", "validation_status": "Confirmed", "source_ref": "§3.1 ¶258"}
+      ],
+      "deliverables": [
+        {"deliverable_id": "D1.1", "title": "Harmonised historical database", "validation_status": "Confirmed", "source_ref": "§3.1 ¶260"},
+        {"deliverable_id": "D1.2", "title": "Data/target/validation protocol", "validation_status": "Confirmed", "source_ref": "§3.1 ¶261"},
+        {"deliverable_id": "D1.3", "title": "Career Development Plan", "due_month": 3, "validation_status": "Confirmed", "checklist_ref": "CDP_DELIVERABLE", "source_ref": "Operator input pack item 6, accepted 2026-08-11 (CC-13 instrument mandate)", "note": "Not in the draft's deliverable list. Operator-added: agreed by M3, owned by FELLOW and SUPERVISOR, reviewed at M6/M12/M16/M20. Seeded per the ticket 2 correction ('Ticket 4 must seed D1.3 if the operator accepts item 6'). Confirmed on the same footing as the 30-month duration in selected_call.json: an operator decision of 2026-08-11, recorded in the input pack, which ticket 6 copies into Tier 3 source materials; the status reasoning is in the lift decision-log extension. checklist_ref resolves when ticket 6 re-authors confirmation_checklist.json. Placed in WP1 because its due month falls inside WP1's M1-M6 range; Phase 3 may relocate it to a management/training strand."}
+      ]
+    },
+    {
+      "id": "WP2",
+      "title": "Physiological Early Warning and Hyperspectral-to-Sentinel Transfer",
+      "start_month": 3,
+      "end_month": 14,
+      "lead": "MATE + ELTE",
+      "lead_role_tokens": ["DATA_PARTNER", "HOST"],
+      "milestone": "MS2",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶263-274",
+      "tasks": [
+        {"task_id": "T2.1", "title": "Prospective physiological monitoring", "validation_status": "Confirmed", "source_ref": "§3.1 ¶265"},
+        {"task_id": "T2.2", "title": "Hyperspectral stress-signature discovery", "validation_status": "Confirmed", "source_ref": "§3.1 ¶266"},
+        {"task_id": "T2.3", "title": "Sentinel spectral-response resampling", "validation_status": "Confirmed", "source_ref": "§3.1 ¶267"},
+        {"task_id": "T2.4", "title": "Concurrent hyperspectral/Sentinel observations", "validation_status": "Confirmed", "source_ref": "§3.1 ¶268"},
+        {"task_id": "T2.5", "title": "Spatial-scale calibration", "validation_status": "Confirmed", "source_ref": "§3.1 ¶269"},
+        {"task_id": "T2.6", "title": "Sentinel-compatible feature identification", "validation_status": "Confirmed", "source_ref": "§3.1 ¶270"}
+      ],
+      "deliverables": [
+        {"deliverable_id": "D2.1", "title": "Physiological validation dataset", "validation_status": "Confirmed", "source_ref": "§3.1 ¶272"},
+        {"deliverable_id": "D2.2", "title": "Hyperspectral-to-Sentinel transfer library", "validation_status": "Confirmed", "source_ref": "§3.1 ¶273"}
+      ]
+    },
+    {
+      "id": "WP3",
+      "title": "Prospective and Uncertainty-Aware Prediction",
+      "start_month": 6,
+      "end_month": 18,
+      "lead": "ELTE + MATE",
+      "lead_role_tokens": ["HOST", "DATA_PARTNER"],
+      "milestone": "MS3",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶275-287",
+      "tasks": [
+        {"task_id": "T3.1", "title": "Temporal feature engineering", "validation_status": "Confirmed", "source_ref": "§3.1 ¶277"},
+        {"task_id": "T3.2", "title": "Transparent baseline models", "validation_status": "Confirmed", "source_ref": "§3.1 ¶278"},
+        {"task_id": "T3.3", "title": "RF/XGBoost models", "validation_status": "Confirmed", "source_ref": "§3.1 ¶279"},
+        {"task_id": "T3.4", "title": "Bayesian/hierarchical modelling", "validation_status": "Confirmed", "source_ref": "§3.1 ¶280"},
+        {"task_id": "T3.5", "title": "Multi-horizon forecasting", "validation_status": "Confirmed", "source_ref": "§3.1 ¶281"},
+        {"task_id": "T3.6", "title": "Probability calibration/uncertainty", "validation_status": "Confirmed", "source_ref": "§3.1 ¶282"},
+        {"task_id": "T3.7", "title": "Feature ablation and error analysis", "validation_status": "Confirmed", "source_ref": "§3.1 ¶283"}
+      ],
+      "deliverables": [
+        {"deliverable_id": "D3.1", "title": "Comparative modelling benchmark", "validation_status": "Confirmed", "source_ref": "§3.1 ¶285"},
+        {"deliverable_id": "D3.2", "title": "FIELDWISE predictive engine/model card", "validation_status": "Confirmed", "source_ref": "§3.1 ¶286"}
+      ]
+    },
+    {
+      "id": "WP4",
+      "title": "Temporal and Cross-Country Transferability",
+      "start_month": 12,
+      "end_month": 21,
+      "lead": "MATE -> MVCRI",
+      "lead_role_tokens": ["DATA_PARTNER", "TRANSFER_PARTNER"],
+      "milestone": "MS4",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶288-301",
+      "tasks": [
+        {"task_id": "T4.1", "title": "Leave-one-year-out MATE validation", "validation_status": "Confirmed", "source_ref": "§3.1 ¶290"},
+        {"task_id": "T4.2", "title": "Independent MATE field/plot validation where possible", "validation_status": "Confirmed", "source_ref": "§3.1 ¶291"},
+        {"task_id": "T4.3", "title": "Zero-shot MATE->MVCRI transfer", "validation_status": "Confirmed", "source_ref": "§3.1 ¶292"},
+        {"task_id": "T4.4", "title": "Geographic transferability-gap assessment", "validation_status": "Confirmed", "source_ref": "§3.1 ¶293"},
+        {"task_id": "T4.5", "title": "Limited Bulgarian calibration", "validation_status": "Confirmed", "source_ref": "§3.1 ¶294"},
+        {"task_id": "T4.6", "title": "Hierarchical/Bayesian adaptation", "validation_status": "Confirmed", "source_ref": "§3.1 ¶295"},
+        {"task_id": "T4.7", "title": "Identification of universal versus site-specific predictors", "validation_status": "Confirmed", "source_ref": "§3.1 ¶296"}
+      ],
+      "deliverables": [
+        {"deliverable_id": "D4.1", "title": "Temporal transferability benchmark", "validation_status": "Confirmed", "source_ref": "§3.1 ¶298"},
+        {"deliverable_id": "D4.2", "title": "Hungary->Bulgaria transferability report", "validation_status": "Confirmed", "source_ref": "§3.1 ¶299"},
+        {"deliverable_id": "D4.3", "title": "Adaptation protocol", "validation_status": "Confirmed", "source_ref": "§3.1 ¶300"}
+      ]
+    },
+    {
+      "id": "WP5",
+      "title": "Operational Transfer, Decision Value and Web MVP",
+      "start_month": 16,
+      "end_month": 24,
+      "lead": "ELTE + AgroVIR",
+      "lead_role_tokens": ["HOST", "VALIDATION_PARTNER"],
+      "milestone": "MS5",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.1 ¶302-317",
+      "tasks": [
+        {"task_id": "T5.1", "title": "Develop irrigation-priority logic", "validation_status": "Confirmed", "source_ref": "§3.1 ¶304"},
+        {"task_id": "T5.2", "title": "Establish Field Decision Value framework", "validation_status": "Confirmed", "source_ref": "§3.1 ¶305"},
+        {"task_id": "T5.3", "title": "Implement DrR - Digital Agronomist web MVP", "validation_status": "Confirmed", "source_ref": "§3.1 ¶306"},
+        {"task_id": "T5.4", "title": "Transfer model to AgroVIR farmer field(s)", "validation_status": "Confirmed", "source_ref": "§3.1 ¶307"},
+        {"task_id": "T5.5", "title": "Quantify research->commercial transferability", "validation_status": "Confirmed", "source_ref": "§3.1 ¶308"},
+        {"task_id": "T5.6", "title": "Conduct AgroVIR functional/interoperability assessment", "validation_status": "Confirmed", "source_ref": "§3.1 ¶309"},
+        {"task_id": "T5.7", "title": "Establish post-MSCA FMIS integration and exploitation roadmap", "validation_status": "Confirmed", "source_ref": "§3.1 ¶310"}
+      ],
+      "deliverables": [
+        {"deliverable_id": "D5.1", "title": "DrR web MVP", "validation_status": "Confirmed", "source_ref": "§3.1 ¶312"},
+        {"deliverable_id": "D5.2", "title": "Commercial-field transferability assessment", "validation_status": "Confirmed", "source_ref": "§3.1 ¶313"},
+        {"deliverable_id": "D5.3", "title": "Field Decision Value report", "validation_status": "Confirmed", "source_ref": "§3.1 ¶314"},
+        {"deliverable_id": "D5.4", "title": "AgroVIR functional/technical evaluation", "validation_status": "Confirmed", "source_ref": "§3.1 ¶315"},
+        {"deliverable_id": "D5.5", "title": "FMIS integration roadmap", "validation_status": "Confirmed", "source_ref": "§3.1 ¶316"}
+      ]
+    }
+  ],
+  "task_month_allocation": {
+    "validation_status": "Inferred",
+    "note": "The draft gives month ranges per work package (¶253, ¶264, ¶276, ¶289, ¶303) but no task-level months. Derivation: each task inherits its work package's full month range, which adds no information the draft does not state. Phase 4 narrows tasks to months; this seed deliberately does not pre-empt that by guessing sub-ranges. Exception: none — every task uses the inherited range.",
+    "source_ref": "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303",
+    "allocations": [
+      {"task_id": "T1.1", "start_month": 1, "end_month": 6},
+      {"task_id": "T1.2", "start_month": 1, "end_month": 6},
+      {"task_id": "T1.3", "start_month": 1, "end_month": 6},
+      {"task_id": "T1.4", "start_month": 1, "end_month": 6},
+      {"task_id": "T1.5", "start_month": 1, "end_month": 6},
+      {"task_id": "T2.1", "start_month": 3, "end_month": 14},
+      {"task_id": "T2.2", "start_month": 3, "end_month": 14},
+      {"task_id": "T2.3", "start_month": 3, "end_month": 14},
+      {"task_id": "T2.4", "start_month": 3, "end_month": 14},
+      {"task_id": "T2.5", "start_month": 3, "end_month": 14},
+      {"task_id": "T2.6", "start_month": 3, "end_month": 14},
+      {"task_id": "T3.1", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.2", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.3", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.4", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.5", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.6", "start_month": 6, "end_month": 18},
+      {"task_id": "T3.7", "start_month": 6, "end_month": 18},
+      {"task_id": "T4.1", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.2", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.3", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.4", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.5", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.6", "start_month": 12, "end_month": 21},
+      {"task_id": "T4.7", "start_month": 12, "end_month": 21},
+      {"task_id": "T5.1", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.2", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.3", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.4", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.5", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.6", "start_month": 16, "end_month": 24},
+      {"task_id": "T5.7", "start_month": 16, "end_month": 24}
+    ]
+  },
+  "dependencies": [
+    {
+      "from_wp": "WP1",
+      "to_wp": "WP2",
+      "validation_status": "Inferred",
+      "source_ref": "§3.1 ¶254, ¶262, ¶266; §1.2 ¶116-120",
+      "note": "Derived: WP2's signature discovery (T2.2) operates on the archive WP1 harmonises (T1.1), and MS1 'Data and target readiness' (M6) is the gate statement for that readiness. Month ranges overlap (WP2 starts M3), so this is a data dependency, not strict sequencing."
+    },
+    {
+      "from_wp": "WP1",
+      "to_wp": "WP3",
+      "validation_status": "Inferred",
+      "source_ref": "§3.1 ¶258, ¶276-277",
+      "note": "Derived: T1.5 establishes the leakage-safe validation design WP3's modelling must follow, and WP3 starts at M6, the month WP1 ends."
+    },
+    {
+      "from_wp": "WP2",
+      "to_wp": "WP3",
+      "validation_status": "Inferred",
+      "source_ref": "§3.1 ¶270, ¶273, ¶277; §1.2 ¶128",
+      "note": "Derived: Sentinel-compatible features (T2.6, D2.2) are the candidate predictors WP3's feature engineering (T3.1) and models consume; ¶128 states Sentinel-compatible features become candidates for operational prediction."
+    },
+    {
+      "from_wp": "WP3",
+      "to_wp": "WP4",
+      "validation_status": "Inferred",
+      "source_ref": "§3.1 ¶287, ¶292",
+      "note": "Derived: MS3 (M16) states the predictor must be 'ready for independent transferability testing', which is WP4's purpose, and T4.3's zero-shot transfer requires the WP3 engine. WP4 starts M12, before MS3: its early tasks (T4.1 leave-one-year-out validation) can run on interim models, so the hard dependency binds T4.3 onward, not the whole WP."
+    },
+    {
+      "from_wp": "WP4",
+      "to_wp": "WP5",
+      "validation_status": "Inferred",
+      "source_ref": "§1.1.9 ¶110; §3.1 ¶301, ¶307-308",
+      "note": "Derived: the validation ladder (¶110) orders MVCRI cross-country transferability before AgroVIR operational transferability, and MS4 (M20, cross-country transferability quantified) precedes MS5 (M23). Month ranges overlap (WP5 starts M16), so the edge binds the operational-transfer conclusions (T5.5), not WP5's start."
+    },
+    {
+      "from_wp": "WP3",
+      "to_wp": "WP5",
+      "validation_status": "Inferred",
+      "source_ref": "§3.1 ¶286, ¶306-307; §1.2 ¶156",
+      "note": "Derived: T5.3 implements and T5.4 transfers the predictive engine that WP3 delivers (D3.2), and ¶156 states the prediction pipeline is transferred into the MVP following successful scientific validation."
+    }
+  ],
+  "person_months": {
+    "validation_status": "Unresolved",
+    "note": "No person-month figures appear anywhere in the draft (plan §3: 'Person-months have no source'). The operator answered input pack item 8 on 2026-08-11 with a 30-month consolidated allocation; ticket 6 folds it into this file. Until that fold, person-months stay Unresolved rather than invented (§13.3). Item 8 blocks no gate: phase_04_gate checks task months and the critical path, and the unit-cost gate_09 reads project_duration_months, not per-WP effort (ticket 2 correction).",
+    "source_ref": "plans/fieldwise_reinstantiation_plan.md §3; plans/fieldwise_operator_input_pack.md item 8 (answered, not yet folded)"
+  }
+}
