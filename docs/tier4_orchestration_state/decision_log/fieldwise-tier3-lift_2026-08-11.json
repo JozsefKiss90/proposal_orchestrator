@@ -1,0 +1,53 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-tier3-lift",
+  "date": "2026-08-11",
+  "branch": "fieldwise-run-01",
+
+  "authority": "Operator-directed ticket (plans/fieldwise_tickets.md ticket 3), executing plans/fieldwise_reinstantiation_plan.md §5 (seed template) and step S4 (first slice). Durable recording per CLAUDE.md §9.4. Status assignment per §12.2; no fabricated project facts per §13.3; prose lifted without rewriting per §10.5. Tickets 4 and 5 extend this record as their seeding slices land.",
+
+  "why": "First Tier 3 seeding slice after the ticket 1 purge. The call binding is restored with the demo run's residual project facts corrected, and the project brief is lifted from the FIELDWISE master draft so Phases 1-2 have a project to analyse. The operator input pack (items 2 and 7, decided/confirmed 2026-08-11) is the authority for the project-scoped corrections.",
+
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json",
+    "docs/tier3_project_instantiation/project_brief/concept_note.md",
+    "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
+    "docs/tier3_project_instantiation/hand_lift_provenance.json"
+  ],
+
+  "not_seeded": [
+    "call_binding/topic_mapping.json and call_binding/compliance_profile.json — Phase 2 writes them (plan §3); seeding them here would pre-empt a phase output.",
+    "call_binding/confirmation_checklist.json and working_assumptions.json — ticket 6 authors them from the returned operator input pack."
+  ],
+
+  "selected_call_deviation": {
+    "what": "selected_call.json is not carried forward byte-for-byte, deviating from the original ticket criterion ('carried forward unchanged'). Call-scoped fields are carried forward unchanged from the pre-purge file (recoverable at commit 6d96a60). Six project-scoped fields are corrected, because the pre-purge file mixed genuine call facts with the superseded demo run's project facts, and two of its internal references dangle after ticket 1 archived their targets to decision_log/archive/demo-run/. Carrying it forward unchanged would reintroduce purged project data into Tier 3 and produce a file with broken references — what §13.11 exists to prevent. The operator input pack item 7 sweep verified both points against the pre-purge file and called this a purge miss, not a criterion collision.",
+    "corrected_fields": {
+      "project_duration_months": "24 -> 30. Operator decision of 2026-08-11 (input pack item 2): 24-month European Fellowship plus a 6-month non-academic placement at AgroVIR under CC-07.",
+      "project_duration_months_note": "Cited '13B consolidation, 2026-07-16' (the superseded run) -> cites input pack items 2 and 7.",
+      "project_duration_note": "Asserted 'project_duration_months = 24' -> states 30 and that 24 + 6 is the composition. Stale the moment the field above changed.",
+      "host_country_note": "Cited '13B consolidation, 2026-07-16' -> cites input pack item 7. Value HU is unchanged and still correct; only its provenance was superseded.",
+      "action_confirmation_ref": "decision_log/action-confirmation-msca-pf_2026-07-13.json (dangling; ticket 1 archived it to archive/demo-run/) -> null, with action_confirmation_status Unresolved and a note naming ticket 7. The ticket table's corrected value is 'the FIELDWISE authorisation record from ticket 7'; that record does not exist yet, and naming a not-yet-written path would replace one dangling reference with another. Null-pending-ticket-7 is the honest realisation: ticket 7 writes the FIELDWISE authorisation record and fills this field. No runner predicate reads it, so the pending state blocks no gate.",
+      "notes": "Claimed the spine and RQ1-RQ10 are 'operator-confirmed real data (13B consolidation)' and cited an archived decision-log path -> restates the spine from input pack item 7, records that RQ1-RQ10 and the DATA_PROVIDERS record are superseded by the draft (which carries RQ1-RQ7 and H1-H6), and carries the C5 conditionality on HOST and FELLOWSHIP_TYPE."
+    },
+    "unchanged_on_purpose": {
+      "max_project_duration_months": "Stays 36. A genuine call fact — the call-level maximum across both fellowship types — not the project's duration. runner/unit_cost_budget.py documents the distinction and refuses to substitute one for the other.",
+      "project_duration_status": "Stays Confirmed, now accurately: the operator decided the duration on 2026-08-11. Set here rather than declared in working_assumptions.json because gate_09 accepts either route but phase_04_gate's timeline_within_duration reads project_duration_months from this file by name, and an unavailable predicate value is recorded as a special case rather than a pass. Setting it satisfies both gates.",
+      "host_country": "Stays HU. FIELDWISE also hosts at ELTE, Hungary."
+    }
+  },
+
+  "project_brief_lift": {
+    "status_rule": "plan §5: draft text -> Confirmed; derivation -> Inferred; no draft basis -> Assumed (declared); missing/contradicted -> Unresolved. Everything in this slice is Confirmed against cited draft paragraph ranges; nothing not present in the draft is marked Confirmed.",
+    "paragraph_numbering": "Defined and anchor-checked in hand_lift_provenance.json (436 non-empty paragraphs including table cells; §1.1.8 at ¶80, §3.2 at ¶424 — matching the plan's citations).",
+    "duration_not_duplicated": "project_summary.json deliberately carries no duration record. The 30-month duration is an operator decision, not a draft fact; its single authoritative home is selected_call.json.",
+    "no_person_named": "The brief files name organisations the draft names (ELTE, MATE, MVCRI, AgroVIR) but no person. The fellow and supervisor identities enter Tier 3 at tickets 5 and 6 from the confirmed spine, not from the draft, which never names them."
+  },
+
+  "spine_conditionality": "Input pack item 7 confirms the identity spine, with HOST and FELLOWSHIP_TYPE conditional on the deferred C5 mobility-eligibility question. selected_call.json notes carry that conditionality; ticket 7 must resolve C5 or list it as Unresolved in the authorisation packet before authorising any phase run.",
+
+  "extended_by": [
+    "Ticket 4 (architecture inputs) and ticket 5 (consortium) extend hand_lift_provenance.json and this lift record's scope as their slices land."
+  ]
+}

@@ -56,7 +56,7 @@ the operator can accept or replace.
 
 - [x] The form lists all 14 items with severity and the gate each one blocks.
 - [x] Items 3, 4, 5, 6, 8, 9, 13, and 14 each carry a drafted candidate answer.
-- [ ] The operator has returned answers for every item, or explicitly deferred named items.
+- [x] The operator has returned answers for every item, or explicitly deferred named items.
 
 The form is `plans/fieldwise_operator_input_pack.md`. Fill it in place and return it. Ticket 6 copies
 the completed pack to `docs/tier3_project_instantiation/source_materials/operator_input_pack/` as the
@@ -78,27 +78,27 @@ One engine gap surfaced by item 9. `derive_unit_cost_budget` never sets `include
 
 ## 3. Seed call binding and project brief
 
-**What to build:** The first Tier 3 seeding slice. `selected_call.json` is carried forward with its
-call-scoped fields unchanged and its residual demo-run project facts corrected, and
-`project_summary.json`, `concept_note.md`, and `strategic_positioning.md` are lifted from the draft
-under the plan's §5 provenance envelope. This ticket also creates `hand_lift_provenance.json` and
+**What to build:** The first Tier 3 seeding slice. The call binding `selected_call.json` is carried
+forward with its call-scoped fields unchanged and its residual demo-run project facts corrected.
+The three brief files `project_summary.json`, `concept_note.md`, and `strategic_positioning.md` are
+lifted from the draft under the plan's §5 provenance envelope. This ticket also creates `hand_lift_provenance.json` and
 the lift record in the decision log, which tickets 4 and 5 extend. Narrative files carry YAML front
 matter and per-section source references; prose is lifted without rewriting.
 
 **Blocked by:** Complete the purge and the decision-log split.
 
-- [ ] `selected_call.json` targets HORIZON-MSCA-2026-PF-01 and its call-scoped fields match its pre-purge content.
-- [ ] The six project-scoped fields named below are corrected, and no field still cites the 13B consolidation or a decision-log path that ticket 1 archived.
-- [ ] The three project-brief files exist, use the §5 envelope, and cite draft paragraph ranges.
-- [ ] Every record carries exactly one §12.2 status, and nothing not present in the draft is marked Confirmed.
-- [ ] `hand_lift_provenance.json` and the lift decision-log entry exist and cover these files.
-- [ ] `topic_mapping.json` and `compliance_profile.json` are not seeded (Phase 2 writes them).
+- [x] `selected_call.json` targets HORIZON-MSCA-2026-PF-01 and its call-scoped fields match its pre-purge content.
+- [x] The six project-scoped fields named below are corrected, and no field still cites the 13B consolidation or a decision-log path that ticket 1 archived.
+- [x] The three project-brief files exist, use the §5 envelope, and cite draft paragraph ranges.
+- [x] Every record carries exactly one §12.2 status, and nothing not present in the draft is marked Confirmed.
+- [x] `hand_lift_provenance.json` and the lift decision-log entry exist and cover these files.
+- [x] `topic_mapping.json` and `compliance_profile.json` are not seeded (Phase 2 writes them).
 
 One deviation, recorded in the lift decision-log entry.
 
 `selected_call.json` is not carried forward byte-for-byte. The original criterion said it was, and
-that criterion could not be met: the pre-purge file (recoverable at commit `6d96a60`) mixes genuine
-call facts with the superseded demo run's project facts, and two of its internal references now
+that criterion could not be met. The pre-purge file (recoverable at commit `6d96a60`) mixes genuine
+call facts with the superseded demo run's project facts. Two of its internal references now
 dangle because ticket 1 moved their targets to `decision_log/archive/demo-run/`. Carrying it forward
 unchanged would reintroduce purged project data into Tier 3 and produce a file with broken
 references, which is what §13.11 exists to prevent.
@@ -121,7 +121,7 @@ documents the distinction explicitly and refuses to substitute one for the other
 
 `project_duration_status` stays `Confirmed`. That is now accurate: the operator decided the duration
 on 2026-08-11. Setting the value here rather than declaring it in `working_assumptions.json` is
-deliberate — `gate_09` accepts either, but `phase_04_gate`'s `timeline_within_duration` reads
+deliberate. Both routes satisfy `gate_09`. But `phase_04_gate`'s `timeline_within_duration` reads
 `project_duration_months` from this file by name, and the gate-enforcement rules record an
 unavailable predicate value as a special case rather than a pass. Setting it satisfies both gates.
 
