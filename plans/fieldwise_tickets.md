@@ -54,9 +54,27 @@ the operator can accept or replace.
 
 **Blocked by:** None — can start immediately.
 
-- [ ] The form lists all 14 items with severity and the gate each one blocks.
-- [ ] Items 3, 4, 5, 6, 8, 9, 13, and 14 each carry a drafted candidate answer.
+- [x] The form lists all 14 items with severity and the gate each one blocks.
+- [x] Items 3, 4, 5, 6, 8, 9, 13, and 14 each carry a drafted candidate answer.
 - [ ] The operator has returned answers for every item, or explicitly deferred named items.
+
+The form is `plans/fieldwise_operator_input_pack.md`. Fill it in place and return it. Ticket 6 copies
+the completed pack to `docs/tier3_project_instantiation/source_materials/operator_input_pack/` as the
+lift source.
+
+Four corrections to plan §4 are recorded in the form itself.
+
+- Item 8 blocks no gate. `phase_04_gate` checks task months and the critical path, not effort, and
+  the unit-cost `gate_09` reads `project_duration_months`, not per-WP person-months.
+- Item 5's `g06_p05` passes vacuously on an empty KPI list. The hard predicate is `g06_p04`, which
+  needs all six Tier 2B expected impacts mapped. The draft covers only EI-01, EI-02 and EI-05.
+- Item 14's premise is wrong. Sections 1–3 of the draft measure about 3,800 words, roughly five to
+  six pages against a 10-page cap. The form asks for a page budget instead of a cut list.
+- CC-13 requires the Career Development Plan as a deliverable, and the draft's D1.1–D5.5 list has
+  none. Ticket 4 must seed D1.3 if the operator accepts item 6.
+
+One engine gap surfaced by item 9. `derive_unit_cost_budget` never sets `include_family`, so a
+"family allowance applies" answer cannot reach the derived artifact without a code change.
 
 ## 3. Seed call binding and project brief
 
