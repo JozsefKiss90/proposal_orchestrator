@@ -174,42 +174,58 @@ class TestPartners:
 
 
 class TestNothingGuessed:
+    """What the lift may not do, whether or not the fold has run.
+
+    Ticket 5 left MATE, MVCRI and AgroVIR Unresolved with their missing fields
+    named. Ticket 6 folds operator input pack items 1 and 2 and resolves them,
+    so the Unresolved state is no longer what these tests can assert; the
+    resolved state is pinned by test_fieldwise_ticket6_fold.py. What stays
+    true of the lift is that every value on those records is sourced: the
+    draft's own facts still stand, and anything the draft cannot supply cites
+    the operator pack rather than appearing unattributed.
+    """
+
     @pytest.mark.parametrize("token,short_name", sorted(UNRESOLVED_PARTICIPANTS.items()))
-    def test_three_participants_are_unresolved_in_both_files(self, token, short_name):
+    def test_three_participants_keep_their_draft_short_names(self, token, short_name):
         roles = {r["role_token"]: r for r in _load("roles.json")["roles"]}
         partners = {p["partner_id"]: p for p in _load("partners.json")["partners"]}
         for record in (roles[token], partners[token]):
-            assert record["validation_status"] == "Unresolved", token
             assert record["short_name"] == short_name, token
+            assert record["validation_status"] in VALID_STATUSES, token
 
     @pytest.mark.parametrize("token", sorted(UNRESOLVED_PARTICIPANTS))
-    def test_missing_fields_are_named_and_null(self, token):
+    def test_missing_fields_are_named_and_never_unattributed(self, token):
         partner = next(
             p for p in _load("partners.json")["partners"] if p["partner_id"] == token
         )
         for field in MUST_BE_NULL:
-            assert field in partner, f"{token}: {field} is not named as missing"
-            assert partner[field] is None, f"{token}: {field} carries a guessed value"
+            assert field in partner, f"{token}: {field} is not named"
+            if partner[field] is None:
+                continue
+            # A filled field is the ticket 6 fold and must cite the operator
+            # pack, which is the only authority for anything the draft lacks.
+            assert "input pack" in partner["source_ref"].lower(), (
+                f"{token}: {field} carries a value with no operator source"
+            )
 
     @pytest.mark.parametrize("token", sorted(UNRESOLVED_PARTICIPANTS))
-    def test_notes_tie_the_gap_to_the_blocking_input_pack_items(self, token):
+    def test_notes_tie_the_record_to_the_input_pack_items(self, token):
         partner = next(
             p for p in _load("partners.json")["partners"] if p["partner_id"] == token
         )
-        note = partner["note"]
-        assert "item 1" in note, token
-        assert "item 2" in note, token
+        blob = partner["note"] + partner["source_ref"]
+        assert "item 1" in blob or "items 1 and 2" in blob, token
+        assert "item 2" in blob or "items 1 and 2" in blob, token
 
     @pytest.mark.parametrize("token", sorted(UNRESOLVED_PARTICIPANTS))
     def test_draft_confirmed_facts_are_still_stated(self, token):
-        """An Unresolved record states what the draft confirms (plan §5)."""
+        """The draft's own facts survive the fold (plan §5)."""
         role = next(
             r for r in _load("roles.json")["roles"] if r["role_token"] == token
         )
         assert role["country_code"] in {"HU", "BG"}, token
         assert role["function"].strip(), token
         assert role["work_plan_role"].strip(), token
-        assert role["participation_mode"] is None, token
 
 
 class TestCapabilities:

@@ -1,0 +1,369 @@
+{
+  "record_type": "spine_confirmation_checklist",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+  "project": "FIELDWISE",
+  "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
+  "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json",
+  "source": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md — the completed operator input pack, answered and consolidated 2026-08-11, copied into Tier 3 by ticket 6.",
+  "authority": [
+    "CLAUDE.md §5 (Tier 3), §12.2 (validation-status categories), §13.3 (no fabricated project facts), §9.4 (durable decisions logged)",
+    "MSCA-PF instrument structure (Excellence 1.3/1.4, Impact 2.1/2.3, Implementation 3.1/3.2)"
+  ],
+  "purpose": "Register of the FIELDWISE identity spine and of every operator decision returned in the input pack, with the Tier 3 artifact each one lands in. This file replaces the superseded demo run's checklist, which ticket 1 purged: none of its content carries forward, and the ten RQ1-RQ10 project decisions it recorded are superseded by the master draft.",
+  "status_vocabulary": "status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). Assumed items carry a matching declaration in docs/tier3_project_instantiation/working_assumptions.json, named per record.",
+  "role_token_convention": "FELLOW = the applicant researcher; HOST = beneficiary and host organisation; SUPERVISOR and CO_SUPERVISOR = supervision at the beneficiary; DATA_PARTNER = MATE; TRANSFER_PARTNER = MVCRI; VALIDATION_PARTNER = AgroVIR. The tokens appear in consortium/*.json and architecture_inputs/*.json; this file is where each one is confirmed.",
+
+  "spine_identity": [
+    {
+      "id": "FELLOW",
+      "role": "Experienced researcher / postdoctoral fellow (the applicant)",
+      "status": "Confirmed",
+      "confirmed_value": "Dr. Rositsa Cholakova, plant physiologist, publishing before 2020 as Rositsa Cholakova-Bimbalova. Chief Assistant Professor at Maritsa Vegetable Crops Research Institute, Agricultural Academy, Plovdiv, Bulgaria, from 2024-10-15. PhD 2020 (Agricultural University - Plovdiv, Plant Physiology). ORCID 0009-0008-3761-3106 is Assumed, not Confirmed.",
+      "confirmation_source": "Operator input pack item 7 (identity spine, confirmed 2026-08-11) and item 11 (CV, supplied 2026-08-11). The draft describes her profile in §1.4 and names no person.",
+      "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json researcher_profile"],
+      "assumed_declarations": ["researcher_orcid"],
+      "note": "Both name forms must appear in Part A and in §1.4, or the pre-2020 record does not attach to the applicant."
+    },
+    {
+      "id": "HOST",
+      "role": "Beneficiary and host organisation (sole beneficiary)",
+      "status": "Confirmed",
+      "confirmed_value": "Eötvös Loránd University (ELTE), Faculty of Informatics, Institute of Cartography and Geoinformatics, H-1117 Budapest, Pázmány Péter sétány 1/C, Hungary (country code HU).",
+      "confirmation_source": "Draft cover block ¶7-8 and §3.2 ¶425-426; operator input pack item 7, confirmed 2026-08-11.",
+      "lands_in": ["consortium/roles.json", "consortium/partners.json", "call_binding/selected_call.json host_country"],
+      "conditionality": "Item 7 records HOST as CONFIRM - CONDITIONAL on the C5 mobility question. See the MOBILITY_ELIGIBILITY record: the operator overrode C5 as a declared position, and the record itself (ELTE is the intended host) is not in doubt.",
+      "note": "Country HU drives the Phase 7 unit-cost living-allowance coefficient through selected_call.json."
+    },
+    {
+      "id": "SUPERVISOR",
+      "role": "Supervisor at the host institution",
+      "status": "Confirmed",
+      "confirmed_value": "Prof. András Jung, ELTE Faculty of Informatics; Professor and Deputy Director, Institute of Cartography and Geoinformatics. Remote sensing, hyperspectral imaging and field spectroscopy, geoinformatics.",
+      "confirmation_source": "Operator input pack item 7, confirmed 2026-08-11 and independently corroborated against the ELTE Faculty of Informatics staff listing.",
+      "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json participant_capacity"],
+      "assumed_declarations": ["person_months_ELTE_supervisor"],
+      "note": "The listing marks the deputy directorship as temporary, so §3.2 should describe him by his professorship. He chairs the Steering Group and remains the escalation point."
+    },
+    {
+      "id": "CO_SUPERVISOR",
+      "role": "Co-supervisor at the host institution; methodological lead and quality assurance for model development and testing",
+      "status": "Confirmed",
+      "confirmed_value": "Dr. Roland Hollós, ELTE Department of Meteorology, Budapest. ORCID 0000-0001-5137-7471. Machine learning and meta-modelling of crop and grassland multi-model outputs; agro-meteorology.",
+      "confirmation_source": "Operator input pack item 7, new record added 2026-08-11; ELTE Department of Meteorology affiliation verified on Hollós et al. 2026, Geoscientific Model Development 19, 4385-4438.",
+      "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json participant_capacity"],
+      "assumed_declarations": ["person_months_ELTE_co_supervisor"],
+      "open_check": "His primary employment must be ELTE rather than HUN-REN, because MSCA requires supervision at the beneficiary. The check blocks no gate and decides whether CO_SUPERVISOR is the right token.",
+      "note": "phase_06_gate predicate g07_p08 reads management roles against partners.json; he resolves to ELTE, which is present as HOST. Part B must present his responsibility as supervisory — he provides the methodological lead and quality-assures the modelling, the fellow designs, builds and runs it."
+    },
+    {
+      "id": "DATA_PARTNER",
+      "role": "Primary experimental and data environment (MATE)",
+      "status": "Confirmed",
+      "confirmed_value": "Magyar Agrár- és Élettudományi Egyetem (Hungarian University of Agriculture and Life Sciences), PIC 891269563, Páter Károly utca 1, 2100 Gödöllő, Hungary. Higher education institution, public-benefit private non-profit. Participation mode: associated partner. Contact: Dr. Sándor Takács (Assumed).",
+      "confirmation_source": "Operator input pack items 1 and 2, answered 2026-08-11; legal identity verified against CORDIS grant 101094158 (AGRIGEP, MATE as coordinator).",
+      "lands_in": ["consortium/partners.json", "consortium/roles.json"],
+      "assumed_declarations": ["contact_person_MATE", "person_months_MATE"],
+      "open_check": "The public/private flag must match how MATE self-declares in the EU Participant Register."
+    },
+    {
+      "id": "TRANSFER_PARTNER",
+      "role": "Cross-country transferability environment (MVCRI)",
+      "status": "Confirmed",
+      "confirmed_value": "Институт по зеленчукови култури „Марица“ – Пловдив (Maritsa Vegetable Crops Research Institute), PIC 999533009, 32 Brezovsko shose St., 4003 Plovdiv, Bulgaria. Public research organisation of the Agricultural Academy, non-profit. Participation mode: associated partner. Contact: Prof. Vinelina Yankova, Head of Department, Technologies in Vegetable Crops Production.",
+      "confirmation_source": "Operator input pack items 1 and 2, answered 2026-08-11; legal identity verified against CORDIS FP7 grant 205941, which MVCRI coordinated in its own name, and the institute's own pages.",
+      "lands_in": ["consortium/partners.json", "consortium/roles.json"],
+      "assumed_declarations": ["contact_email_MVCRI", "person_months_MVCRI"],
+      "open_check": "Whether the institute director or the Agricultural Academy signs a partnership agreement is open (Unresolved in partners.json).",
+      "note": "MVCRI is the fellow's employer of record. The independence statement adopted in item 2 governs how §1.2 and WP4 describe the separation, and the C1 resolution put a department head rather than the fellow in MVCRI's contact and steering seat."
+    },
+    {
+      "id": "VALIDATION_PARTNER",
+      "role": "Operational and farmer-field evaluator; non-academic placement host (AgroVIR)",
+      "status": "Confirmed",
+      "confirmed_value": "AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (AGROVIR Kft.), Kinizsi utca 30, 2040 Budaörs, Hungary, tax number 14000838-2-13. Private for-profit SME, founded 2007, NACE 7020. Participation mode: non-academic placement host, six months, M25-M30. PIC: confirmed absent.",
+      "confirmation_source": "Operator input pack items 1 and 2, answered 2026-08-11; legal identity verified against the Hungarian company register extract.",
+      "lands_in": ["consortium/partners.json", "consortium/roles.json", "architecture_inputs/workpackage_seed.json (WP5 to M30)"],
+      "assumed_declarations": ["contact_person_AgroVIR", "person_months_AgroVIR"],
+      "open_check": "The absent PIC blocks submission, not phase_03_gate: AgroVIR hosts the placement, so it appears in Part A Section 2, where every participant needs one. Registration is free and needs only the legal name, address and tax number, all three recorded. The company registration number is Unresolved (two conflicting readings), and no letter of commitment is submitted — the Guide for Applicants instructs that none be included for a non-academic placement host."
+    },
+    {
+      "id": "FELLOWSHIP_TYPE",
+      "role": "European Fellowship or Global Fellowship",
+      "status": "Confirmed",
+      "confirmed_value": "European Fellowship, from the Bulgaria to Hungary intra-EU move. The six-month non-academic placement is an extension of it under CC-07, not a different instrument.",
+      "confirmation_source": "Operator input pack item 7, confirmed 2026-08-11; draft cover block.",
+      "lands_in": ["call_binding/selected_call.json"],
+      "conditionality": "CONFIRM - CONDITIONAL on C5, as for HOST. See MOBILITY_ELIGIBILITY."
+    },
+    {
+      "id": "DURATION",
+      "role": "Project duration in months",
+      "status": "Confirmed",
+      "confirmed_value": "30 months: 24 months of European Fellowship at ELTE (M1-M24) plus a 6-month non-academic placement at AgroVIR (M25-M30) under CC-07. Carried in selected_call.json as project_duration_months = 30.",
+      "confirmation_source": "Operator decision of 2026-08-11, input pack items 2, 7 and 9. It supersedes the pre-purge record of 24 months, which belonged to the demo run.",
+      "lands_in": ["call_binding/selected_call.json", "architecture_inputs/workpackage_seed.json"],
+      "note": "Set in the call binding rather than declared as a working assumption, deliberately: gate_09 accepts either route, but phase_04_gate's timeline_within_duration reads project_duration_months from selected_call.json by name. max_project_duration_months stays 36 — a call-level maximum, not this project's duration."
+    },
+    {
+      "id": "CALL_BINDING",
+      "role": "Selected MSCA-PF call",
+      "status": "Confirmed",
+      "confirmed_value": "HORIZON-MSCA-2026-PF-01, instrument MSCA-PF, deadline 2026-09-09.",
+      "confirmation_source": "Operator input pack item 7, confirmed 2026-08-11; carried forward in selected_call.json.",
+      "lands_in": ["call_binding/selected_call.json"],
+      "note": "action_confirmation_ref is null pending the ticket 7 authorisation record. No runner predicate reads it."
+    },
+    {
+      "id": "MOBILITY_ELIGIBILITY",
+      "role": "European Fellowship mobility rule (36-month look-back before the call deadline)",
+      "status": "Assumed",
+      "declared_value": "Mobility rule satisfied on the rectified CV: 7.05 months in Hungary within the window, against a 12-month cap.",
+      "confirmation_source": "Operator override of contradiction C5, 2026-08-11 (input pack items 7 and 11). Declared under §13.3 as an operator position, not promoted to Confirmed — the underlying facts have not changed and no new evidence was supplied.",
+      "declaration_key": "mobility_eligibility",
+      "lands_in": ["working_assumptions.json", "consortium/capabilities.json researcher_profile.mobility_eligibility"],
+      "note": "On the CV's face the count is about 15.81 months, or 12.7 discounting the ELTE Erasmus entirely. The override rests on rectifying the CV's residence lines for the 2021-2024 career break. Two periods survive any revision and are fixed points: KPMG Global Hungary (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months). Registration is evidence of residence, not a substitute for it. Ticket 7 must record the override, its basis and its date, and must not drop it: an override that disappears from the record is indistinguishable from a fact."
+    }
+  ],
+
+  "superseded_records": [
+    {
+      "id": "DATA_PROVIDERS",
+      "status": "Confirmed",
+      "confirmed_value": "The pre-purge DATA_PROVIDERS record (PlanetScope, Sentinel-1 SAR, ERA5 reanalysis) is superseded by the draft. FIELDWISE uses the five-year MATE hyperspectral archive, MATE soil and meteorological stations, and Sentinel-2.",
+      "confirmation_source": "Operator input pack item 7, confirmed 2026-08-11.",
+      "note": "Recorded so the superseded values cannot re-enter Tier 3 by reference to the demo run."
+    },
+    {
+      "id": "RQ1_TO_RQ10",
+      "status": "Confirmed",
+      "confirmed_value": "The demo run's ten project decisions RQ1-RQ10 (Route B latent-field-state fusion) are superseded by the draft, which carries its own RQ1-RQ7 and H1-H6 in §1.1.6 and §1.1.7.",
+      "confirmation_source": "Operator input pack item 7, confirmed 2026-08-11.",
+      "note": "Ticket 3 lifted the draft's RQ1-RQ7 and H1-H6 into project_brief/concept_note.md."
+    }
+  ],
+
+  "operator_decisions": [
+    {
+      "item": 3,
+      "title": "Ethics self-assessment",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "phase_06_gate predicate g07_p06 requires a non-empty ethics_assessment.self_assessment_statement in the Phase 6 output.",
+      "decision": {
+        "personal_data_gdpr": "Yes, limited. The DrR web MVP holds user accounts and farm contact details; field boundaries tied to a named holding are personal data for a natural-person farmer. ELTE's Data Protection Officer reviews the processing and data minimisation applies.",
+        "farmer_commercial_data": "Yes. Yields, irrigation records and field geometries from AgroVIR farms are commercially sensitive. A data-sharing agreement governs them, and results are published only in aggregated or anonymised form.",
+        "human_participants": "Yes, low risk. Task T5.6 requires structured feedback from AgroVIR staff and participating farmers. Informed consent and a right of withdrawal apply. No health, biometric or special-category data is collected.",
+        "animal_subjects": "No. The project studies processing tomato.",
+        "dual_use_and_misuse": "No. Civil agricultural decision support on open Copernicus data. No export-controlled goods or technology.",
+        "non_eu_data_transfer": "No. All data stays within the EU (Hungary and Bulgaria).",
+        "ethics_committee_approval_required": "Not yet determined. ELTE's research ethics committee will be consulted on task T5.6 before any fieldwork begins. The expectation is that structured usability feedback collected under informed consent, with no special-category data, falls below the committee's review threshold. To be confirmed in writing by M12.",
+        "data_protection_officer_consulted": "Planned. ELTE's Data Protection Officer will be consulted before the first DrR Web MVP user account is created, covering the lawful basis for holding farm contact details and field boundaries, the retention period, and data minimisation across the MVP.",
+        "ethics_issues_identified": true
+      },
+      "consequence": "ethics_issues_identified is true, so Part A's ethics self-assessment table and Part B-2 §6 must both be completed. Phase 6 writes the two amended lines above into the self-assessment statement rather than leaving them as bare tokens.",
+      "source_ref": "Operator input pack item 3, candidates accepted with the C2 amendment of 2026-08-11.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item3-ethics_2026-08-12.json"
+    },
+    {
+      "item": 4,
+      "title": "Governance and supervision arrangements",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "phase_06_gate predicates g07_p07 (a governance body with composition and decision scope) and g07_p08 (every management role names a partner that exists in partners.json).",
+      "decision": {
+        "supervision_cadence": "Weekly one-to-one meeting between FELLOW and SUPERVISOR. Weekly technical session with the CO_SUPERVISOR through WP3 and WP4 (M6-M21), tapering to monthly outside that window. Monthly written progress record held by the fellow. Quarterly review against the Career Development Plan, attended by both supervisors.",
+        "governance_body": "Project Steering Group, chaired by SUPERVISOR, with FELLOW, CO_SUPERVISOR and one named contact each from DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER. It meets at M6, M12, M16 and M20 — the four corrective decision points the draft already names — and issues a go or no-go verdict on milestones MS1 to MS5.",
+        "decision_rights": [
+          {"decision": "Scientific method, day-to-day research choices", "owner": "FELLOW", "escalation": "SUPERVISOR"},
+          {"decision": "Model development and testing: methodological lead and quality assurance", "owner": "CO_SUPERVISOR", "escalation": "SUPERVISOR"},
+          {"decision": "Training plan, resources, milestone go/no-go recommendation", "owner": "SUPERVISOR", "escalation": "Steering Group"},
+          {"decision": "Contract, finance, IP, open-access policy", "owner": "HOST", "escalation": "ELTE research office"},
+          {"decision": "Access to partner data and field sites", "owner": "The owning partner", "escalation": "Steering Group"},
+          {"decision": "Milestone go/no-go", "owner": "Steering Group", "escalation": "HOST"}
+        ],
+        "conflict_resolution": "FELLOW and SUPERVISOR resolve disagreements directly and record the outcome in the monthly progress record. Anything unresolved after one cycle goes to the Director of the Institute of Cartography and Geoinformatics as an office, and then to the ELTE research integrity route. Data access disputes follow the dispute clause of the relevant data-sharing agreement.",
+        "named_partner_contacts": {
+          "DATA_PARTNER": "Dr. Sándor Takács (MATE)",
+          "TRANSFER_PARTNER": "Prof. Vinelina Yankova (MVCRI), Head of Department, Technologies in Vegetable Crops Production",
+          "VALIDATION_PARTNER": "Zsuzsanna Balázs (AgroVIR)"
+        }
+      },
+      "consequence": "All management roles resolve to organisations present in partners.json, so g07_p08 can pass. The escalation route names an office rather than an individual, which fixes C6: the supervisor is himself deputy director of that institute, so an individual-named route partly looped back on the person being escalated past, and an office-based route also survives a change of incumbent across a 30-month action. The incumbent Director is not associated with the call and is named nowhere.",
+      "source_ref": "Operator input pack item 4, candidates accepted 2026-08-11 with the co-supervisor amendments and the C6 correction of the same day.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item4-governance_2026-08-12.json"
+    },
+    {
+      "item": 5,
+      "title": "KPI set per impact claim and expected-impact coverage",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "phase_05_gate predicates g06_p04 (every Tier 2B expected impact carries a mapped project output) and g06_p05 (every KPI names a deliverable in the Phase 3 structure).",
+      "decision": "Ten KPIs K1-K10, each tied to one draft deliverable, and mappings for all six Tier 2B expected impacts. EI-04 is accepted with the HRS4R claim removed permanently: the operator confirmed ELTE does not hold the HR Excellence in Research award. EI-06 is raised beyond the original candidate, because the CV shows five years of university teaching. K11 for the Career Development Plan was raised and not decided.",
+      "lands_in": ["architecture_inputs/impacts.json"],
+      "source_ref": "Operator input pack item 5, accepted 2026-08-11 with the C7 and C8 resolutions.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item5-kpis_2026-08-12.json"
+    },
+    {
+      "item": 6,
+      "title": "Career Development Plan",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "phase_06_gate predicate g07_p09 (every instrument-mandated implementation section addressed). Constraint CC-13 makes the plan mandatory.",
+      "decision": {
+        "components": "Research objectives (O1-O6); training and career needs (the eleven ELTE-to-fellow competences, delivered as supervised practice plus named ELTE courses); transferable skills (research integrity, open science and FAIR practice, generative-AI literacy, grant writing, IP and exploitation, project management, science communication); teaching; publications planning (outputs P1-P4, at least two peer-reviewed submissions during or shortly after the fellowship); open-science engagement (open-access publication, code and model cards where IP permits, FAIR metadata, validation split manifests).",
+        "agreed_by_month": 3,
+        "review_points": [6, 12, 16, 20],
+        "deliverable": "D1.3 Career Development Plan, due M3, owned by FELLOW and SUPERVISOR.",
+        "teaching_component": "Reframed by C7 from a competence to acquire into an existing strength transferred to a new discipline, a new institution and a new language of instruction, and stepping up from Bachelor's to Master's and doctoral supervision.",
+        "signature": "CC-13 requires the plan to be established jointly by supervisor and researcher. With a co-supervisor in place it should be signed by both supervisors and the fellow."
+      },
+      "checklist_ref_resolved": "CDP_DELIVERABLE",
+      "checklist_ref_note": "The token is carried by the D1.3 records in architecture_inputs/workpackage_seed.json and architecture_inputs/outcomes.json, seeded at ticket 4, and resolves here.",
+      "lands_in": ["architecture_inputs/workpackage_seed.json D1.3", "architecture_inputs/outcomes.json"],
+      "source_ref": "Operator input pack item 6, accepted 2026-08-11.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item6-career-development-plan_2026-08-12.json"
+    },
+    {
+      "item": 8,
+      "title": "Person-months per work package",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "None. phase_04_gate checks task months, milestone criteria and the critical path; the unit-cost gate_09 reads project_duration_months. Part B-1 §3.1 is scored on the appropriateness of effort.",
+      "decision": "Fellow: WP1 3.0, WP2 5.5, WP3 5.5, WP4 4.0, WP5 9.0, cross-cutting 3.0, total 30.0. Partner in-kind, all Assumed: MATE 2.4, MVCRI 1.5, AgroVIR 3.0, ELTE supervisor 2.5, ELTE co-supervisor 2.0, total 11.4. WP5 and the cross-cutting strand extend to M30.",
+      "lands_in": ["architecture_inputs/workpackage_seed.json", "working_assumptions.json"],
+      "assumed_declarations": ["person_months_MATE", "person_months_MVCRI", "person_months_AgroVIR", "person_months_ELTE_supervisor", "person_months_ELTE_co_supervisor"],
+      "source_ref": "Operator input pack item 8, consolidated 2026-08-11 with the C4 correction.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json"
+    },
+    {
+      "item": 9,
+      "title": "Optional unit-cost lines",
+      "status": "Assumed",
+      "decided_on": "2026-08-11",
+      "gate": "gate_09_budget_consistency predicate g08_uc03 requires every budget component to resolve to Confirmed or to an operator-declared Assumed value.",
+      "decision": "None of the three optional lines applies. Family allowance and long-term leave allowance are operator-declared Assumed; special-needs allowance likewise. The derivation runs on 30 months at the Hungary coefficient.",
+      "checklist_ref_resolved": "BUDGET_OPTIONAL_LINES",
+      "lands_in": ["working_assumptions.json"],
+      "assumed_declarations": ["family_allowance", "long_term_leave_allowance", "special_needs_allowance"],
+      "note": "The engine gap recorded in ticket 2 is dormant rather than closed: derive_unit_cost_budget never sets include_family (runner/unit_cost_budget.py:159, call at line 507). With the family allowance declared not to apply, nothing needs the flag. Part A still needs the placement months as a separate budget line, which is a presentation matter, not a change to the derived total.",
+      "source_ref": "Operator input pack item 9, C3 resolved 2026-08-11.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item9-unit-cost-lines_2026-08-12.json"
+    },
+    {
+      "item": 13,
+      "title": "Security screening and Green Charter statements",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "None. Part B-2 §7 and §8, which this run does not draft.",
+      "decision": {
+        "security_screening": "No concerns arise. The project handles no classified or EU-restricted information. It uses open Copernicus data and institutional field measurements. It involves no dual-use goods or technology and no entity established outside the EU.",
+        "green_charter": [
+          "Reuse before regeneration: the five-year MATE archive is the primary data source rather than a new campaign.",
+          "Prefer the simplest adequate model, introducing deep architectures only where sample size and temporal density justify them.",
+          "Run computation on shared ELTE infrastructure rather than provisioning dedicated hardware.",
+          "Travel: default to remote collaboration, with at most one physical visit to MVCRI per growing season and shared transport for field campaigns.",
+          "Conferences: hybrid attendance by default, at most one in-person conference per year.",
+          "Purpose: the project targets better irrigation timing, which serves the Charter's environmental aim directly."
+        ]
+      },
+      "note": "The security statement's claim that no entity is established outside the EU is true of the consortium as it stands — ELTE and MATE in Hungary, MVCRI in Bulgaria, AgroVIR in Hungary — and is unaffected by the placement decision.",
+      "source_ref": "Operator input pack item 13, candidates accepted 2026-08-11.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item13-security-green-charter_2026-08-12.json"
+    },
+    {
+      "item": 14,
+      "title": "Page-limit decision",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "None. Part B-1 sections 1 to 3 are capped at 10 pages including tables, figures and references. The Phase 8 drafting skills read this budget.",
+      "decision": {
+        "unit": "pages",
+        "total": 10.0,
+        "budget": {
+          "1.1": 2.25,
+          "1.2": 2.25,
+          "1.3": 1.0,
+          "1.4": 0.5,
+          "2.1": 0.75,
+          "2.2": 0.5,
+          "2.3": 0.75,
+          "3.1": 1.75,
+          "3.2": 0.25
+        }
+      },
+      "note": "The revised 30-month budget, not the original candidate: §1.3 rises to 1.00 because the placement's training argument lives there and is scored, §3.1 rises to 1.75 for the 30-month Gantt and the extended WP5, and §2.2 and §3.2 each give up 0.25. §3.2 at 0.25 pages is the acknowledged weak point, and the operator left the preferred remedy open — compressing the 13-row risk table in §3.1 to a grouped form and returning the space to §3.2 — to be decided before Phase 8 drafts §3.1. The 35-reference list must fit inside the §1.1 and §1.2 allocation, at roughly 0.8 to 1.0 page.",
+      "source_ref": "Operator input pack item 14, revised table accepted 2026-08-11.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item14-page-budget_2026-08-12.json"
+    },
+    {
+      "item": 10,
+      "title": "References and citations",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "None. Part B-1 §1.1 is scored on going beyond the state of the art.",
+      "decision": "A 35-entry reference list covering eight areas, held at docs/tier3_project_instantiation/source_materials/references/fieldwise_references.bib. The '30% of EU territory' figure in §1.1.1 is supported by R01, European Environment Agency (2025), indicator WAT001.",
+      "note": "Two entries carry a weaker check and are marked [dc] in the pack: R24 (Tarraf et al.) and R31 (Wilks 2001). One strand is uncitable — the DrR - Digital Agronomist prototype has no publication, preprint, release or repository, so §1.1.3 is either uncited or the prototype is deposited on Zenodo. Phase 8 drafting inserts the citations; ticket 6 does not rewrite the verbatim concept-note lift.",
+      "lands_in": ["source_materials/references/fieldwise_references.bib"],
+      "source_ref": "Operator input pack item 10, supplied 2026-08-11 and amended on receipt of the CV."
+    },
+    {
+      "item": 11,
+      "title": "Researcher CV",
+      "status": "Confirmed",
+      "decided_on": "2026-08-11",
+      "gate": "None. Part B-2 §4, out of scope for this run; it strengthens the in-scope §1.4.",
+      "decision": "The CV is folded into consortium/capabilities.json as researcher_profile: positions, doctorate, teaching, publications, projects, mobilities and the previous PLANTDIGISENSE submission. Two fields are not Confirmed: the ORCID (Assumed, declared) and invited_talks (Unresolved, not supplied).",
+      "lands_in": ["consortium/capabilities.json researcher_profile"],
+      "source_ref": "Operator input pack item 11, supplied 2026-08-11."
+    },
+    {
+      "item": 12,
+      "title": "Host and participant capacity descriptions",
+      "status": "Unresolved",
+      "decided_on": "2026-08-11",
+      "gate": "None directly. phase_06_gate g07_p09 requires §3.2 to be addressed, and it will be thin rather than empty.",
+      "decision": "Answered in part and deferred in part. Answered: ELTE hosting arrangements (from PLANTDIGISENSE §3.2), the ELTE equipment inventory, all department and team lines, ELTE and MATE key people, MVCRI key people and recent projects, and the AgroVIR organisation profile and farm access. Deferred: five named fields, listed below.",
+      "deferred_fields": [
+        "ELTE recent_projects_and_publications",
+        "ELTE previous_msca_hosting",
+        "MATE recent_projects_and_publications",
+        "AgroVIR key_people",
+        "AgroVIR relevant_track_record"
+      ],
+      "lands_in": ["consortium/capabilities.json participant_capacity"],
+      "source_ref": "Operator input pack item 12, partial deferral 2026-08-11."
+    }
+  ],
+
+  "open_for_authorisation": {
+    "note": "What ticket 7 must carry into the authorisation packet. None of these blocks a runner gate; the packet is where they are visible to the operator before any phase runs.",
+    "items": [
+      {"what": "The C5 mobility override", "status": "Assumed", "why_open": "An operator-declared position pending a rectified CV that is consistent with Part A and with ELTE's Erasmus records. It must be listed with its basis and date, and never promoted to Confirmed."},
+      {"what": "Item 12's five deferred capacity fields", "status": "Unresolved", "why_open": "Only the organisations themselves can supply them. §3.2 drafts thin."},
+      {"what": "AgroVIR's hosting capacity for the M25-M30 placement", "status": "Unresolved", "why_open": "The placement is evaluated and has no named on-site supervisor, no described workspace and no stated six-month work content. The largest single content gap the placement decision opens."},
+      {"what": "Item 11's invited_talks", "status": "Unresolved", "why_open": "Not in the CV. The operator has neither supplied any nor confirmed there are none."},
+      {"what": "AgroVIR's PIC", "status": "Confirmed absent", "why_open": "Blocks submission rather than a gate. AgroVIR hosts the placement, so it goes in Part A, where every participant needs a PIC. Only the EU Participant Register can supply one."},
+      {"what": "AgroVIR's company registration number", "status": "Unresolved", "why_open": "Two conflicting readings; the company must confirm."},
+      {"what": "MVCRI's signatory authority", "status": "Unresolved", "why_open": "Whether the institute director or the Agricultural Academy signs a partnership agreement."},
+      {"what": "The M23-M30 monitoring gap", "status": "Unresolved", "why_open": "Five milestones all fall at or before M23 in a 30-month action. A placement-completion milestone and an M27 steering point were raised and not decided."},
+      {"what": "K11 for the Career Development Plan", "status": "Unresolved", "why_open": "Raised in item 5 and not answered. D1.3 is the one deliverable with no KPI."},
+      {"what": "The co-supervisor's ELTE contract status", "status": "Unresolved", "why_open": "MSCA requires supervision at the beneficiary. It decides whether CO_SUPERVISOR is the right token; it blocks no gate."},
+      {"what": "The co-supervisor's person-month figure", "status": "Assumed", "why_open": "Item 8 carries both 2.0 and 1.5. The fold resolved it to 2.0 on the arithmetic of the operator's own stated total; the operator can overturn it in one line."},
+      {"what": "Roles and titles for Takács (MATE) and Balázs (AgroVIR)", "status": "Assumed", "why_open": "Names are known, roles are not. g07_p08 reads the name; Part B-2 §5 needs the role."}
+    ]
+  },
+
+  "summary": {
+    "spine_items_total": 11,
+    "spine_confirmed_count": 10,
+    "spine_assumed_count": 1,
+    "operator_decision_items_total": 11,
+    "operator_decision_items_confirmed": 9,
+    "operator_decision_items_assumed": 1,
+    "operator_decision_items_unresolved": 1,
+    "working_assumption_declarations": 13,
+    "state": "Spine confirmed with one operator-declared assumption (mobility eligibility). Every input pack item is folded; item 12 is partly deferred by the operator and stays Unresolved.",
+    "note": "The counts cover this file only. Residual Unresolved fields inside Tier 3 artifacts are enumerated in open_for_authorisation above."
+  }
+}

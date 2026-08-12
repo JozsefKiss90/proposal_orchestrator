@@ -8,7 +8,15 @@
     "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
     "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
     "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included)."
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "ticket6_fold": {
+      "date": "2026-08-12",
+      "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
+      "operator_input_pack": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+      "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item5-kpis_2026-08-12.json",
+      "what": "Input pack item 5, decided 2026-08-11: ten KPIs each tied to a draft deliverable, and the six expected-impact mappings. The five §2.3 impact claims above are draft lifts and are unchanged.",
+      "scope_note": "The KPI and mapping records are operator decisions, not draft content. Their source_ref cites the input pack, whose in-tier copy ticket 6 placed in source_materials."
+    }
   },
   "spine_status": "confirmed_real",
   "impacts": [
@@ -49,13 +57,79 @@
     }
   ],
   "kpis": {
-    "validation_status": "Unresolved",
-    "note": "No KPI is lifted, because the draft carries none: it explicitly declines advance numeric targets and commits to quantifying impact from project evidence (¶243). The operator answered input pack item 5 on 2026-08-11 (K1-K10 accepted, EI-03/EI-04/EI-06 measures decided, K11 candidate raised); ticket 6 folds those answers into this file. Until that fold, KPIs stay Unresolved rather than invented (§13.3). phase_05_gate g06_p05 reads KPI-to-deliverable traceability from the Phase 5 output, so this Unresolved record blocks nothing before ticket 6.",
-    "source_ref": "§2.3 ¶243 (the draft's refusal); plans/fieldwise_operator_input_pack.md item 5 (answered, not yet folded)"
+    "validation_status": "Confirmed",
+    "note": "Folded at ticket 6 from operator input pack item 5, accepted 2026-08-11. Every KPI measures something the project controls and delivers, which respects the draft's own refusal (¶243) to set advance numeric targets for water saving. Each names one deliverable that exists in workpackage_seed.json, so phase_05_gate predicate g06_p05 can resolve traceable_to_deliverable from the Phase 5 output. The KPIs are an operator decision, not draft content, and are cited as such.",
+    "source_ref": "plans/fieldwise_operator_input_pack.md item 5 (accepted 2026-08-11); in-tier copy at docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+    "items": [
+      {"kpi_id": "K1", "title": "Harmonised archive coverage", "target": "Five seasons integrated with documented QC flags and metadata", "traceable_to_deliverable": "D1.1", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K2", "title": "Sentinel-2 transferability verdicts", "target": "Every candidate hyperspectral feature carries an explicit transferable or hyperspectral-only verdict", "traceable_to_deliverable": "D2.2", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K3", "title": "Forecast horizons evaluated", "target": "Horizons t+1, t+3 and t+5 each reported with calibration and prediction-interval coverage", "traceable_to_deliverable": "D3.1", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K4", "title": "Released model documented", "target": "One model card published for the released predictive engine", "traceable_to_deliverable": "D3.2", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K5", "title": "Cross-country gap quantified", "target": "Zero-shot and locally calibrated Hungary to Bulgaria performance both reported", "traceable_to_deliverable": "D4.2", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11", "note": "Reported to Prof. Vinelina Yankova at MVCRI, who is not their author. The C1 resolution of 2026-08-11 removed the fellow from MVCRI's contact and steering seat, so K5 and K6 are no longer measured by the fellow against her own employer's data with no third party in the loop. The KPI wording is unchanged; only who receives it changed."},
+      {"kpi_id": "K6", "title": "Adaptation cost stated", "target": "The adaptation protocol states the minimum local calibration volume needed", "traceable_to_deliverable": "D4.3", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K7", "title": "MVP delivered", "target": "Web MVP reachable and serving stress probability, uncertainty, spatial risk, irrigation priority and temporal evolution", "traceable_to_deliverable": "D5.1", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K8", "title": "Decision value measured", "target": "Field Decision Value computed for at least two competing models, with lead time, false action rate and missed stress rate reported", "traceable_to_deliverable": "D5.3", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K9", "title": "External evaluation completed", "target": "The AgroVIR report covers all nine assessment dimensions listed in §1.2", "traceable_to_deliverable": "D5.4", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K10", "title": "Integration path defined", "target": "The FMIS roadmap names the required interfaces and the post-fellowship steps", "traceable_to_deliverable": "D5.5", "validation_status": "Confirmed", "source_ref": "Operator input pack item 5, accepted 2026-08-11"},
+      {"kpi_id": "K11", "title": "Career Development Plan agreed and reviewed", "target": "Proposed: agreed by M3 and reviewed at all four steering points", "traceable_to_deliverable": "D1.3", "validation_status": "Unresolved", "source_ref": "plans/fieldwise_operator_input_pack.md item 5 (raised 2026-08-11, not answered)", "note": "Raised in item 5 as a candidate, because D1.3 is the one deliverable with no KPI, and left undecided: the operator's answer line accepts K1-K10 and its edits block is empty. It is recorded here as a named candidate rather than folded as accepted (§13.3), and it blocks nothing — g06_p05 checks that each KPI names a deliverable, not that each deliverable carries a KPI. Ticket 7 should put it to the operator."}
+    ]
   },
   "expected_impact_coverage": {
-    "validation_status": "Unresolved",
-    "note": "phase_05_gate g06_p04 requires all six Tier 2B expected impacts to map to a project output. The draft's §2.3 covers EI-02 and EI-05, and §2.1/§2.2 cover EI-01. Nothing in the draft addresses EI-03 (public engagement), EI-04 (Charter alignment) or EI-06 (teaching). The operator decided all three in input pack item 5 (EI-03 candidate accepted; EI-04 accepted with the HRS4R claim removed per C8; EI-06 raised per C7); ticket 6 folds them. Until then the three mappings are Unresolved here, and Phase 5 would fail g06_p04 honestly if run first.",
-    "source_ref": "plans/fieldwise_operator_input_pack.md item 5; input pack table note on g06_p04/g06_p05"
+    "validation_status": "Confirmed",
+    "note": "Folded at ticket 6 from operator input pack item 5, decided 2026-08-11. phase_05_gate predicate g06_p04 requires every Tier 2B expected impact to carry at least one mapped project output. All six now map. EI-01, EI-02 and EI-05 map to draft content; EI-03, EI-04 and EI-06 map to measures the operator decided, because the draft addresses none of them. The mapped outputs are deliverables that exist in workpackage_seed.json, except where the measure is an activity rather than a deliverable, which is stated per record.",
+    "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-01 to EI-06); plans/fieldwise_operator_input_pack.md item 5",
+    "mappings": [
+      {
+        "expected_impact_id": "EI-01",
+        "expected_impact": "Improved employability and career prospects of researchers within academia and beyond.",
+        "mapped_project_outputs": ["D1.3"],
+        "mapped_measure": "The career progression the draft states in §1.4 and the competences §2.1 lists, made operational by the Career Development Plan (D1.3) and by the non-academic placement at AgroVIR, which adds an inter-sectoral period to the profile.",
+        "validation_status": "Confirmed",
+        "source_ref": "§2.1 ¶218-222; §1.4 ¶212-216; operator input pack items 2 and 6"
+      },
+      {
+        "expected_impact_id": "EI-02",
+        "expected_impact": "Strengthened international, inter-sectoral and interdisciplinary research collaboration.",
+        "mapped_project_outputs": ["D4.2", "D5.4"],
+        "mapped_measure": "The Hungary-to-Bulgaria transfer test with MVCRI (international), the AgroVIR evaluation and placement (inter-sectoral), and the two-way transfer between plant physiology and geoinformatics the draft §1.3 describes (interdisciplinary).",
+        "validation_status": "Confirmed",
+        "source_ref": "§2.3 ¶248-249; §1.3 ¶182-211; §3.1 ¶289, ¶303"
+      },
+      {
+        "expected_impact_id": "EI-03",
+        "expected_impact": "Broadened public engagement with research and innovation.",
+        "mapped_project_outputs": [],
+        "mapped_measure": "One public field demonstration with AgroVIR farmers, and one public-facing article per year.",
+        "validation_status": "Confirmed",
+        "source_ref": "Operator input pack item 5, candidate accepted 2026-08-11",
+        "note": "Nothing in the draft addresses EI-03. The measure is an operator decision and carries no deliverable id: no deliverable in workpackage_seed.json covers it, and inventing one here would fabricate a project fact. Phase 5 may propose a dissemination deliverable; Phase 3 owns the deliverable list."
+      },
+      {
+        "expected_impact_id": "EI-04",
+        "expected_impact": "Enhanced convergence of researcher working conditions with the European Charter for Researchers.",
+        "mapped_project_outputs": ["D1.3"],
+        "mapped_measure": "Charter alignment is evidenced at instrument level by the Career Development Plan (D1.3), by ELTE's open recruitment and researcher-development policies, and by the supervision and training arrangements set out in §1.3.",
+        "validation_status": "Confirmed",
+        "source_ref": "Operator input pack item 5, accepted 2026-08-11 with the HRS4R claim removed (C8)",
+        "note": "The operator confirmed on 2026-08-11 that ELTE does NOT hold the HR Excellence in Research (HRS4R) award, and the claim is removed permanently rather than provisionally. The wording above is final and must not be restored to include HRS4R unless ELTE actually obtains the award. This is the thinnest of the six mappings — it rests on D1.3, institutional policy and §1.3, with no external accreditation — and g06_p04 still passes, because the predicate requires a mapped output and D1.3 is one."
+      },
+      {
+        "expected_impact_id": "EI-05",
+        "expected_impact": "Increased R&I capacity, output and knowledge transfer among European research organisations.",
+        "mapped_project_outputs": ["D2.2", "D3.2", "D4.3"],
+        "mapped_measure": "The transfer library, the released predictive engine with its model card, and the adaptation protocol, together with the §1.3 two-way transfer between the fellow and ELTE and the partner contributions of MATE, MVCRI and AgroVIR.",
+        "validation_status": "Confirmed",
+        "source_ref": "§2.3 ¶240-241, ¶246-247; §1.3 ¶183-211; §3.1 ¶273, ¶286, ¶300"
+      },
+      {
+        "expected_impact_id": "EI-06",
+        "expected_impact": "Enhanced integration of research results into higher education and teaching at host organisations.",
+        "mapped_project_outputs": [],
+        "mapped_measure": "Co-design and delivery of a full module unit within an ELTE MSc course on Earth observation for agriculture; primary supervision of one ELTE MSc thesis to completion; co-supervision of the field-experiment component of one PhD student's work.",
+        "validation_status": "Confirmed",
+        "source_ref": "Operator input pack item 5, raised measure adopted 2026-08-11 (C7)",
+        "note": "This replaces the original candidate of one guest module and one co-supervised thesis. The operator raised it once the CV showed five years of university teaching, so the measure is a transfer of an existing strength into a new discipline, institution and language of instruction rather than a competence to acquire. Two consequences carried from item 5, neither of which blocks a gate: the workload lands in a 3.0 person-month cross-cutting allocation and may need to be stated as sitting inside the training allocation, and primary supervision of an ELTE MSc thesis may require a formal ELTE status the fellow will not automatically hold. If it does, the measure drops to co-supervision and the module unit carries the ambition. Like EI-03, the measure carries no deliverable id."
+      }
+    ]
   }
 }

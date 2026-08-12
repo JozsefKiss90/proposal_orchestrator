@@ -48,7 +48,8 @@
   "spine_conditionality": "Input pack item 7 confirms the identity spine, with HOST and FELLOWSHIP_TYPE conditional on the deferred C5 mobility-eligibility question. selected_call.json notes carry that conditionality; ticket 7 must resolve C5 or list it as Unresolved in the authorisation packet before authorising any phase run.",
 
   "extended_by": [
-    "Ticket 4 (architecture inputs) and ticket 5 (consortium) extend hand_lift_provenance.json and this lift record's scope as their slices land."
+    "Ticket 4 (architecture inputs) and ticket 5 (consortium) extend hand_lift_provenance.json and this lift record's scope as their slices land.",
+    "Ticket 6 (fold of the operator input pack) closes the lift/fold boundary this record draws. Its own record is decision_log/fieldwise-ticket6-fold_2026-08-12.json, with one record per decision item."
   ],
 
   "extensions": [
@@ -96,6 +97,21 @@
       },
       "not_seeded_here": "Legal identities and participation modes (items 1 and 2), the Part B-2 §5 capacity fields (item 12), confirmation_checklist.json and working_assumptions.json. All are ticket 6. The checklist_ref tokens FELLOW, HOST, SUPERVISOR, CO_SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER must all resolve in ticket 6's re-authored confirmation_checklist.json.",
       "tests": "tests/runner/test_fieldwise_ticket5_seed.py pins the acceptance criteria (envelope, statuses, the seven role tokens, work-plan token coverage, Unresolved participants with named missing fields and no guessed values, verbatim capabilities lift against the draft, provenance coverage, and g04_p07 resolvability of the seeded partner ids)."
+    },
+    {
+      "ticket": 6,
+      "date": "2026-08-12",
+      "what": "The fold. Every operator answer returned in the input pack becomes Tier 3 data, and the pack itself is copied into source_materials so operator-decided records cite an in-tier source.",
+      "own_record": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json, plus one record per decision item (items 3, 4, 5, 6, 8, 9, 13 and 14).",
+      "closes_from_this_record": {
+        "not_seeded_confirmation_checklist": "call_binding/confirmation_checklist.json is re-authored for FIELDWISE. The demo run's checklist carries forward in no part, and its ten RQ1-RQ10 decisions are registered as superseded by the draft.",
+        "not_seeded_working_assumptions": "working_assumptions.json now carries thirteen declarations, one for every Assumed fact in Tier 3.",
+        "ticket_4_unresolved_content": "Person-months and KPIs are folded. The fellow's allocation is Confirmed, the five partner figures Assumed and declared, K1-K10 Confirmed with a deliverable each, and all six expected-impact mappings Confirmed.",
+        "ticket_5_unresolved_content": "MATE, MVCRI and AgroVIR carry their legal identity and participation mode and are Confirmed. The Part B-2 §5 capacity detail is folded in part, with five operator-deferred fields still Unresolved.",
+        "checklist_ref_tokens": "FELLOW, HOST, SUPERVISOR, CO_SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER, VALIDATION_PARTNER and CDP_DELIVERABLE all resolve in the re-authored checklist, as ticket 5's record required. BUDGET_OPTIONAL_LINES and MOBILITY_ELIGIBILITY are added by the fold."
+      },
+      "corrections_to_earlier_slices": "Four, all recorded in the ticket 6 record: selected_call.json describes C5 as overridden rather than deferred and names the supervisor consistently; the AgroVIR capacity line is rendered readable; and WP5 extends to M30, with the draft's M24 preserved as draft_end_month, so the 9.0 person-month allocation and the work-package range agree.",
+      "tests": "tests/runner/test_fieldwise_ticket6_fold.py pins the five acceptance criteria."
     }
   ]
 }

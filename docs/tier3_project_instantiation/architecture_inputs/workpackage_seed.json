@@ -10,7 +10,15 @@
     "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
     "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
     "partner_tokens": "lead is the draft's month-line string, verbatim. lead_role_tokens maps its organisations to the plan's role tokens (DATA_PARTNER = MATE, HOST = ELTE, TRANSFER_PARTNER = MVCRI, VALIDATION_PARTNER = AgroVIR; cover block ¶9-18, §1.3 ¶206-211). The FELLOW executes all work packages in this single-researcher action.",
-    "scope_note": "Work packages, month ranges, leads, tasks and deliverables are draft-Confirmed. Task-level months and inter-WP dependency edges are Inferred (separate collections below, derivations stated). Person-months have no source in the draft and are Unresolved until ticket 6 folds input pack item 8."
+    "scope_note": "Work packages, month ranges, leads, tasks and deliverables are draft-Confirmed, except WP5's end month, which the ticket 6 fold extended from the draft's M24 to M30 on the operator's placement decision. Task-level months and inter-WP dependency edges are Inferred (separate collections below, derivations stated). Person-months are the ticket 6 fold of input pack item 8: the fellow's allocation Confirmed, the five partner in-kind figures Assumed and declared.",
+    "ticket6_fold": {
+      "date": "2026-08-12",
+      "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
+      "operator_input_pack": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+      "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json",
+      "what": "Input pack item 8, consolidated 2026-08-11: the fellow's 30-month allocation, five partner in-kind estimates, and the WP5 and cross-cutting extension to M30 that the item 2 placement decision forces. T5.1 to T5.7 inherit the extended WP5 range.",
+      "unchanged": "WP1 to WP4, all 32 task titles, all 14 draft deliverables and the operator-added D1.3, the six dependency edges, and every draft source reference."
+    }
   },
   "spine_status": "confirmed_real",
   "work_packages": [
@@ -113,12 +121,15 @@
       "id": "WP5",
       "title": "Operational Transfer, Decision Value and Web MVP",
       "start_month": 16,
-      "end_month": 24,
+      "end_month": 30,
+      "draft_end_month": 24,
+      "end_month_status": "Confirmed",
+      "end_month_note": "Extended from the draft's M24 to M30 at the ticket 6 fold. The operator decided the six-month non-academic placement at AgroVIR on 2026-08-11 (input pack items 2 and 8), AgroVIR is the WP5 partner, and the placement therefore extends this work package by construction rather than by allocation choice. selected_call.json carries the same decision as project_duration_months 30. WP1 to WP4 are untouched: none runs past M21 and the placement adds nothing to them.",
       "lead": "ELTE + AgroVIR",
       "lead_role_tokens": ["HOST", "VALIDATION_PARTNER"],
       "milestone": "MS5",
       "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶302-317",
+      "source_ref": "§3.1 ¶302-317 (title, lead, tasks, deliverables, draft month range); operator input pack items 2 and 8, 2026-08-11 (extension to M30)",
       "tasks": [
         {"task_id": "T5.1", "title": "Develop irrigation-priority logic", "validation_status": "Confirmed", "source_ref": "§3.1 ¶304"},
         {"task_id": "T5.2", "title": "Establish Field Decision Value framework", "validation_status": "Confirmed", "source_ref": "§3.1 ¶305"},
@@ -139,8 +150,9 @@
   ],
   "task_month_allocation": {
     "validation_status": "Inferred",
-    "note": "The draft gives month ranges per work package (¶253, ¶264, ¶276, ¶289, ¶303) but no task-level months. Derivation: each task inherits its work package's full month range, which adds no information the draft does not state. Phase 4 narrows tasks to months; this seed deliberately does not pre-empt that by guessing sub-ranges. Exception: none — every task uses the inherited range.",
-    "source_ref": "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303",
+    "note": "The draft gives month ranges per work package (¶253, ¶264, ¶276, ¶289, ¶303) but no task-level months. Derivation: each task inherits its work package's full month range, which adds no information the draft does not state. Phase 4 narrows tasks to months; this seed deliberately does not pre-empt that by guessing sub-ranges. Exception: none — every task uses the inherited range. Re-derived at the ticket 6 fold for WP5, whose range now ends at M30, so T5.1 to T5.7 inherit M16-M30.",
+    "placement_window_indication": "Input pack item 8 names T5.6, the AgroVIR functional and interoperability assessment, as the natural occupant of the M25-M30 placement window. It is recorded here rather than written into the allocation below, because narrowing one task to a sub-range while its six siblings keep the inherited range would pre-empt Phase 4 on the strength of a single word ('natural') in the pack. Phase 4 owns the narrowing and should start from this indication.",
+    "source_ref": "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303; operator input pack items 2 and 8 (WP5 extension to M30)",
     "allocations": [
       {"task_id": "T1.1", "start_month": 1, "end_month": 6},
       {"task_id": "T1.2", "start_month": 1, "end_month": 6},
@@ -167,13 +179,13 @@
       {"task_id": "T4.5", "start_month": 12, "end_month": 21},
       {"task_id": "T4.6", "start_month": 12, "end_month": 21},
       {"task_id": "T4.7", "start_month": 12, "end_month": 21},
-      {"task_id": "T5.1", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.2", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.3", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.4", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.5", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.6", "start_month": 16, "end_month": 24},
-      {"task_id": "T5.7", "start_month": 16, "end_month": 24}
+      {"task_id": "T5.1", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.2", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.3", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.4", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.5", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.6", "start_month": 16, "end_month": 30},
+      {"task_id": "T5.7", "start_month": 16, "end_month": 30}
     ]
   },
   "dependencies": [
@@ -221,8 +233,48 @@
     }
   ],
   "person_months": {
-    "validation_status": "Unresolved",
-    "note": "No person-month figures appear anywhere in the draft (plan §3: 'Person-months have no source'). The operator answered input pack item 8 on 2026-08-11 with a 30-month consolidated allocation; ticket 6 folds it into this file. Until that fold, person-months stay Unresolved rather than invented (§13.3). Item 8 blocks no gate: phase_04_gate checks task months and the critical path, and the unit-cost gate_09 reads project_duration_months, not per-WP effort (ticket 2 correction).",
-    "source_ref": "plans/fieldwise_reinstantiation_plan.md §3; plans/fieldwise_operator_input_pack.md item 8 (answered, not yet folded)"
+    "validation_status": "Confirmed",
+    "note": "Folded at ticket 6 from operator input pack item 8, consolidated 2026-08-11. The fellow's allocation is the operator's decision and totals the action duration. Partner effort is in kind, is not funded by MSCA-PF and is not costed by the unit-cost derivation; all five partner figures are the operator's estimates and are Assumed with matching declarations in working_assumptions.json. No figure appears anywhere in the draft. Item 8 blocks no gate: phase_04_gate checks task months, milestone criteria and the critical path, and the unit-cost gate_09 reads project_duration_months from selected_call.json, not per-WP effort.",
+    "source_ref": "plans/fieldwise_operator_input_pack.md item 8 (consolidated 2026-08-11); in-tier copy at docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+    "fellow_allocation": {
+      "validation_status": "Confirmed",
+      "unit": "person_months",
+      "total": 30.0,
+      "total_check": "Equals project_duration_months in call_binding/selected_call.json. The fellow is the only MSCA-funded effort in this single-researcher action.",
+      "allocations": [
+        {"work_package": "WP1", "month_range": "M1-M6", "person_months": 3.0, "share_percent": 10.0, "change_from_draft_shape": "unchanged"},
+        {"work_package": "WP2", "month_range": "M3-M14", "person_months": 5.5, "share_percent": 18.3, "change_from_draft_shape": "unchanged"},
+        {"work_package": "WP3", "month_range": "M6-M18", "person_months": 5.5, "share_percent": 18.3, "change_from_draft_shape": "unchanged"},
+        {"work_package": "WP4", "month_range": "M12-M21", "person_months": 4.0, "share_percent": 13.3, "change_from_draft_shape": "unchanged"},
+        {"work_package": "WP5", "month_range": "M16-M30", "person_months": 9.0, "share_percent": 30.0, "change_from_draft_shape": "+5.0, range extended by the placement"},
+        {"work_package": null, "strand": "cross-cutting: management, training, dissemination", "month_range": "M1-M30", "person_months": 3.0, "share_percent": 10.0, "change_from_draft_shape": "+1.0, range extended"}
+      ],
+      "cross_cutting_note": "The cross-cutting row is not a work package and has no id in work_packages above. It corresponds to the three continuous rows of the draft's Gantt table (management, training, dissemination) and covers the whole action.",
+      "why_the_six_months_land_in_wp5": "The placement is hosted by AgroVIR, which is the WP5 partner, so five of the six added months belong to WP5 by construction. The sixth goes to cross-cutting, because management, training and dissemination run continuously and must cover the longer action. WP5 becoming the largest work package at 30% is the intended and visible consequence of an evaluated placement.",
+      "source_ref": "Operator input pack item 8, consolidated table of 2026-08-11"
+    },
+    "partner_in_kind_effort": {
+      "validation_status": "Assumed",
+      "unit": "person_months",
+      "total": 11.4,
+      "note": "All five figures are the operator's estimates of 2026-08-11, to be checked with the partners. Each is derived in input pack item 8 from a commitment accepted elsewhere in the pack, so a partner can argue with the assumption rather than with an unexplained number. None is costed: MSCA-PF funds only the fellow's months, so these affect the §3.1 Implementation narrative and nothing in the budget. Each carries a declaration in working_assumptions.json under the key named per entry.",
+      "entries": [
+        {"organisation": "MATE", "role_token": "DATA_PARTNER", "person_months": 2.4, "declaration_key": "person_months_MATE", "validation_status": "Assumed", "source_ref": "Operator input pack item 8, C4 correction 2026-08-11", "note": "Corrected from 0.24 to 2.4 — a misplaced decimal. About ten working days a year across 30 months, for supervision, data preparation and experiment access."},
+        {"organisation": "MVCRI", "role_token": "TRANSFER_PARTNER", "person_months": 1.5, "declaration_key": "person_months_MVCRI", "validation_status": "Assumed", "source_ref": "Operator input pack item 8, estimate 2026-08-11", "note": "WP4 target domain, M12-M21: trial hosting, ground and physiological measurement, data preparation under the pre-registered protocol, the contact and steering-group role, and co-authorship of the transfer-test outputs."},
+        {"organisation": "AgroVIR", "role_token": "VALIDATION_PARTNER", "person_months": 3.0, "declaration_key": "person_months_AgroVIR", "validation_status": "Assumed", "source_ref": "Operator input pack item 8, estimate 2026-08-11", "note": "WP5 co-lead from M16 plus placement host M25-M30: on-site supervision, the nine-dimension MVP assessment producing D5.4, farmer-field access and liaison, FMIS roadmap input for D5.5, and the steering-group seat. Deliberately the largest partner figure, because it is the only partner hosting the fellow."},
+        {"organisation": "ELTE", "role_token": "SUPERVISOR", "person_months": 2.5, "declaration_key": "person_months_ELTE_supervisor", "validation_status": "Assumed", "source_ref": "Operator input pack item 8, estimate 2026-08-11", "note": "Built bottom-up from item 4's accepted governance over 30 months: weekly one-to-ones with preparation, monthly progress-record reviews, quarterly Career Development Plan reviews, chairing the Steering Group, reading the P1-P4 drafts and deliverables, and delivering the eleven §1.3 competences. About 8% FTE."},
+        {"organisation": "ELTE", "role_token": "CO_SUPERVISOR", "person_months": 2.0, "declaration_key": "person_months_ELTE_co_supervisor", "validation_status": "Assumed", "source_ref": "Operator input pack item 8, estimate 2026-08-11", "note": "Weekly technical sessions through the modelling-intensive window WP3-WP4 (M6-M21), tapering to monthly outside it, plus the quarterly Career Development Plan reviews, Steering Group membership, and review of the modelling and validation-design outputs D3.1, D3.2, D4.2 and D4.3 with the model card."}
+      ],
+      "co_supervisor_figure_contradiction": {
+        "what": "Input pack item 8 carries two figures for the co-supervisor. Its answer block reads 2.0 and states a partner in-kind total of 11.4, which 2.4 + 1.5 + 3.0 + 2.5 + 2.0 satisfies exactly. Its derivation paragraph reads 1.5, which would make the total 10.9 and contradict the stated total.",
+        "resolved_as": "2.0, the answer-block figure.",
+        "why": "The 1.5 derivation is built on 'fortnightly technical sessions ... through M6-M21', and item 4 supersedes that cadence: it raises the co-supervisor's sessions to weekly through WP3 and WP4 once the operator confirmed he is responsible for model development and testing. Weekly sessions across that window roughly double the session hours in the derivation, which lands the figure at about 2.0. So the answer block is the post-amendment value and the derivation paragraph is stale, not the other way round. The stated total corroborates it.",
+        "status": "Resolved at the fold rather than referred back, because both readings are the operator's own and one of them is arithmetically inconsistent with the total the operator also stated. The figure is Assumed either way, it is in kind and uncosted, and it changes no gate. Ticket 7 should note the correction in the authorisation packet so the operator can overturn it in one line."
+      }
+    },
+    "open_consequences_for_phase_4": [
+      "The monthly profile is tighter than it was. M16-M21 now carries WP4 and a heavier WP5 concurrently. The totals fit inside 30 person-months over 30 months, but phase_04_gate's check that concurrent work packages never demand more than one FTE in any month is the one that will tell. Partner in-kind effort is outside that check.",
+      "The draft's four corrective decision points at M6, M12, M16 and M20 leave a ten-month unmonitored tail in a 30-month action. Input pack item 8 suggests a fifth point at M27 and a placement-completion milestone, and the operator decided neither. Recorded as Unresolved in milestones_seed.json rather than invented here."
+    ]
   }
 }

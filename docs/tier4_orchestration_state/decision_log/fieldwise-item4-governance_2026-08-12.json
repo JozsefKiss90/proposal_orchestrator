@@ -1,0 +1,38 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-item4-governance",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+  "decided_on": "2026-08-11",
+  "decided_by": "operator, FIELDWISE input pack item 4",
+  "authority": "Operator decision returned in plans/fieldwise_operator_input_pack.md item 4, folded into Tier 3 by plans/fieldwise_tickets.md ticket 6. Recorded per CLAUDE.md §9.4; status per §12.2.",
+
+  "decision": "Supervision cadence, a Project Steering Group, a decision-rights table, a conflict-resolution route and one named contact per partner organisation are adopted as drafted, with three amendments the co-supervisor's appointment forced and one correction to the escalation route.",
+
+  "why": "The draft names four corrective decision points at M6, M12, M16 and M20 and describes the two-way transfer, but defines no bodies, no cadence and no decision rights. phase_06_gate predicate g07_p07 requires at least one governance body with composition and decision scope, and g07_p08 requires every management role to name a partner that exists in partners.json.",
+
+  "amendments_for_the_co_supervisor": [
+    "Supervision cadence gains a weekly technical session with the CO_SUPERVISOR through WP3 and WP4 (M6-M21), tapering to monthly outside that window. It was raised from fortnightly once the operator confirmed he is responsible for model development and testing.",
+    "The decision-rights table gains one row: model development and testing, methodological lead and quality assurance, owned by CO_SUPERVISOR and escalating to SUPERVISOR. The wording is deliberate — it matches authority to responsibility while keeping the fellow as the person who designs, builds and runs the models.",
+    "The CO_SUPERVISOR attends the Steering Group as a member. He does not chair and adds no partner seat: he is ELTE staff, and ELTE is already represented by the chair."
+  ],
+
+  "contradictions_resolved": [
+    {
+      "id": "C1",
+      "what": "The fellow held the MVCRI contact seat and the TRANSFER_PARTNER seat on a body that issues go/no-go verdicts on the milestones her own model is tested against, and the decision-rights table routed data-access disputes to the owning partner, escalating to that same body.",
+      "resolution": "Prof. Vinelina Yankova, Head of the Department of Technologies in Vegetable Crops Production, takes both seats. The fellow sits once, as FELLOW, and the escalation is genuine."
+    },
+    {
+      "id": "C6",
+      "what": "The accepted conflict-resolution route escalated past the SUPERVISOR to the head of the ELTE Institute of Cartography and Geoinformatics, of which the supervisor is himself deputy — so the route partly looped back on the person being escalated past.",
+      "resolution": "The route names the Director of the Institute as an OFFICE, not a person. The Director and the Deputy Director are different posts, so the loop is broken, and an office-based route survives a change of incumbent across a 30-month action. The incumbent Director is not associated with the call and is named nowhere in Tier 3. The alternative the operator left open — escalating straight to the ELTE research integrity route — removes the local step that usually resolves things fastest and was not taken."
+    }
+  ],
+
+  "lands_in": ["docs/tier3_project_instantiation/call_binding/confirmation_checklist.json operator_decisions item 4"],
+  "consumed_by": "The Phase 6 governance builder.",
+  "gate_effect": "phase_06_gate g07_p07 passes on the Steering Group. g07_p08 resolves: MATE, MVCRI and AgroVIR all exist in consortium/partners.json, and the CO_SUPERVISOR resolves to ELTE, present as HOST.",
+  "open": "Only one of the three partner contacts carries a verified title (Yankova). Takács at MATE and Balázs at AgroVIR are names without roles, and both are Assumed with declarations in working_assumptions.json. Item 6's Career Development Plan should be signed by both supervisors and the fellow, which CC-13's 'established jointly' requires and item 6's accepted answer does not say.",
+  "status": "Confirmed"
+}

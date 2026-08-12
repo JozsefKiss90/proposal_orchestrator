@@ -1,0 +1,105 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-ticket6-fold",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+
+  "authority": "Operator-directed ticket (plans/fieldwise_tickets.md ticket 6, Fold operator answers into Tier 3), executing plans/fieldwise_reinstantiation_plan.md §4. Durable recording per CLAUDE.md §9.4; status assignment per §12.2; no fabricated project facts per §13.3; declarations per the working_assumptions convention (§9, ticket 15).",
+
+  "why": "Tickets 3, 4 and 5 lifted the FIELDWISE master draft into Tier 3 and deliberately left every operator answer unfolded, so the lift and the fold stayed separable. This record is the fold: the completed input pack becomes Tier 3 data, the Unresolved consortium records resolve, the confirmation checklist is re-authored for FIELDWISE, and every residual Assumed fact gets a declaration.",
+
+  "input_pack_copied_into_tier3": {
+    "from": "plans/fieldwise_operator_input_pack.md",
+    "to": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+    "why": "Ticket 2 instructs ticket 6 to copy the completed pack as the lift source. It also settles a §12.2 question the earlier tickets deferred: records marked Confirmed on the strength of an operator decision now cite a source that is inside Tier 3, not a planning file outside it.",
+    "note": "A copy, not a move. plans/fieldwise_operator_input_pack.md remains the form the operator filled in."
+  },
+
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/consortium/capabilities.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/hand_lift_provenance.json"
+  ],
+
+  "per_item_records": {
+    "note": "Each of the eight decision items — those the input pack offered a drafted candidate for — has its own decision-log record, per the ticket's fifth acceptance criterion.",
+    "item_3_ethics": "decision_log/fieldwise-item3-ethics_2026-08-12.json",
+    "item_4_governance": "decision_log/fieldwise-item4-governance_2026-08-12.json",
+    "item_5_kpis": "decision_log/fieldwise-item5-kpis_2026-08-12.json",
+    "item_6_career_development_plan": "decision_log/fieldwise-item6-career-development-plan_2026-08-12.json",
+    "item_8_person_months": "decision_log/fieldwise-item8-person-months_2026-08-12.json",
+    "item_9_unit_cost_lines": "decision_log/fieldwise-item9-unit-cost-lines_2026-08-12.json",
+    "item_13_security_green_charter": "decision_log/fieldwise-item13-security-green-charter_2026-08-12.json",
+    "item_14_page_budget": "decision_log/fieldwise-item14-page-budget_2026-08-12.json"
+  },
+
+  "items_folded_in_this_record": {
+    "item_1_legal_identity": "MATE, MVCRI and AgroVIR gain their registered legal name, entity type, address and contact person in partners.json, and their legal name in roles.json. MATE (PIC 891269563) and MVCRI (PIC 999533009) are verified against CORDIS; AgroVIR is verified against the Hungarian company register, and its seat is corrected from Budapest to Budaörs. All three records move from Unresolved to Confirmed.",
+    "item_2_participation_mode": "MATE and MVCRI are associated partners. AgroVIR is the non-academic placement host, six months, M25-M30, which is why the action runs 30 months. The modes land in both consortium files.",
+    "item_10_references": "The 35-entry list is already in Tier 3 at source_materials/references/fieldwise_references.bib and is registered in the confirmation checklist. The concept note is not rewritten to insert citations: it is a verbatim draft lift, and citation insertion is Phase 8 drafting.",
+    "item_11_researcher_cv": "Folded into capabilities.json as researcher_profile. Two fields are not Confirmed: the ORCID (Assumed, declared) and invited_talks (Unresolved, not supplied). strategic_positioning.md is left untouched for the same verbatim-lift reason.",
+    "item_12_capacity": "The answered fields land in capabilities.json participant_capacity. Five operator-deferred fields stay Unresolved on their own records, and the AgroVIR placement-hosting gap is recorded as a sixth open field, opened by the item 2 decision rather than deferred."
+  },
+
+  "assumed_facts_declared": {
+    "file": "docs/tier3_project_instantiation/working_assumptions.json",
+    "count": 13,
+    "keys": ["family_allowance", "long_term_leave_allowance", "special_needs_allowance", "person_months_MATE", "person_months_MVCRI", "person_months_AgroVIR", "person_months_ELTE_supervisor", "person_months_ELTE_co_supervisor", "contact_person_MATE", "contact_person_AgroVIR", "contact_email_MVCRI", "researcher_orcid", "mobility_eligibility"],
+    "rule": "Every record in Tier 3 carrying an Assumed status names its declaration key here, and every key backs at least one such record. A declaration makes an assumption conscious, owned and dated; it never makes a fact Confirmed."
+  },
+
+  "deliberate_omissions_from_working_assumptions": {
+    "project_duration_months_and_host_country": "Input pack item 9 asked for a duration declaration. It is omitted, and host_country with it. Both are Confirmed in call_binding/selected_call.json, which is where runner/unit_cost_budget.py resolves them first and where phase_04_gate's timeline_within_duration reads the duration by name. The shared reader stamps every declaration Assumed, so declaring either would render an operator-Confirmed fact as Assumed in the declared surface and the canonical reference pack, contradicting the call binding inside one tier (§12.3), while adding nothing: the call binding wins the precedence order. The substance is kept in the call binding, in the confirmation checklist under DURATION, and in fieldwise-item9-unit-cost-lines_2026-08-12.json."
+  },
+
+  "corrections_made_at_the_fold": [
+    {
+      "what": "selected_call.json described the C5 mobility question as deferred.",
+      "correction": "It records the operator's override of 2026-08-11 instead, as a declared position pending a rectified CV, and points at the MOBILITY_ELIGIBILITY checklist record and the mobility_eligibility declaration.",
+      "why": "The deferral is what the pack held when ticket 3 ran; the override superseded it the same day. Leaving both readings in Tier 3 would be a §12.3 contradiction inside one tier."
+    },
+    {
+      "what": "selected_call.json named the supervisor as 'Dr. András Jung' and did not name the co-supervisor.",
+      "correction": "'Prof. András Jung', consistent with roles.json, partners.json and the item 7 corroboration, and the CO_SUPERVISOR record is named.",
+      "why": "One person, one title, across one tier."
+    },
+    {
+      "what": "The AgroVIR capacity line read 'network access, MCP validaation via the agrovir software'.",
+      "correction": "Rendered as validation of the prediction pipeline through the AgroVIR software, with the operator's own wording preserved in the note.",
+      "why": "Input pack item 12 flags the typo and states that the unexpanded acronym will not survive an evaluator. If MCP means something else, the operator's correction is needed before Phase 8 drafts §3.2."
+    },
+    {
+      "what": "WP5 ended at M24 in workpackage_seed.json while the action runs 30 months.",
+      "correction": "WP5 and the cross-cutting strand extend to M30, and T5.1 to T5.7 inherit the extended range. The draft's M24 is preserved as draft_end_month.",
+      "why": "Ticket 4 lifted the draft's range faithfully and left the extension to the fold of item 8, which is where the operator's 30-month allocation lives. A 9.0 person-month WP5 running to M24 would contradict the allocation inside one file."
+    }
+  ],
+
+  "not_folded_deliberately": [
+    "K11, a KPI for the Career Development Plan. Raised in item 5 and not answered; recorded in impacts.json as Unresolved with the candidate wording.",
+    "A placement-completion milestone and an M27 steering point. Raised in item 8 and not decided; recorded in milestones_seed.json as an Unresolved placement_period_monitoring record rather than invented.",
+    "A task-month narrowing for T5.6. Item 8 calls it the natural occupant of the M25-M30 window; the indication is recorded for Phase 4 rather than written into the allocation.",
+    "Deliverable ids for the EI-03 and EI-06 measures. No deliverable covers them and Phase 3 owns the deliverable list; the mapped-output arrays are empty with the reason stated."
+  ],
+
+  "gate_position_after_the_fold": {
+    "phase_03_gate_g04_p07": "Passes on token membership. All seven partner ids resolve, and the predicate reads no PIC, no legal name and no participation mode.",
+    "phase_04_gate": "project_duration_months is 30 in selected_call.json and every task month falls inside M1-M30. The concurrency check is the one to watch: M16-M21 now carries WP4 and a heavier WP5.",
+    "phase_05_gate_g06_p04_g06_p05": "All six expected impacts map, and each of the ten KPIs names a deliverable that exists in the work-package seed.",
+    "phase_06_gate_g07_p06_p07_p08_p09": "Ethics statement, governance body, named management roles and the CC-13 Career Development Plan are all recorded in the confirmation checklist. §3.2 will draft thin, not empty.",
+    "gate_09_g08_uc03": "Duration Confirmed at 30, host country Confirmed as HU, all three optional lines operator-declared Assumed.",
+    "caveat": "These are readings of the predicates, not gate results. Gates are evaluated by the scheduler (§17.6.2), and nothing here asserts a phase has run."
+  },
+
+  "open_for_ticket_7": "confirmation_checklist.json carries the full list under open_for_authorisation: the C5 mobility override, item 12's five deferred fields, AgroVIR's placement-hosting gap, invited_talks, AgroVIR's absent PIC and company registration number, MVCRI's signatory authority, the M23-M30 monitoring gap, K11, the co-supervisor's ELTE contract status and person-month figure, and the two unknown partner-contact roles.",
+
+  "tests": "tests/runner/test_fieldwise_ticket6_fold.py pins the five acceptance criteria: no consortium record Unresolved for a reason the pack answered, every Assumed fact declared, checklist coverage of the spine and every operator decision, deferred items still Unresolved and listed, and one decision-log record per decision item."
+}

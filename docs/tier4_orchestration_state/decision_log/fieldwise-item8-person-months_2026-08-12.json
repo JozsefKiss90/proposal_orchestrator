@@ -1,0 +1,48 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-item8-person-months",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+  "decided_on": "2026-08-11",
+  "decided_by": "operator, FIELDWISE input pack item 8",
+  "authority": "Operator decision returned in plans/fieldwise_operator_input_pack.md item 8, folded into Tier 3 by plans/fieldwise_tickets.md ticket 6. Recorded per CLAUDE.md §9.4; status per §12.2; partner estimates declared per §13.3.",
+
+  "decision": {
+    "fellow_allocation_person_months": {"WP1": 3.0, "WP2": 5.5, "WP3": 5.5, "WP4": 4.0, "WP5": 9.0, "cross_cutting": 3.0, "total": 30.0},
+    "partner_in_kind_person_months": {"MATE": 2.4, "MVCRI": 1.5, "AgroVIR": 3.0, "ELTE_supervisor": 2.5, "ELTE_co_supervisor": 2.0, "total": 11.4},
+    "range_extension": "WP5 extends from M16-M24 to M16-M30 and the cross-cutting strand from M1-M24 to M1-M30. WP1 to WP4 are untouched."
+  },
+
+  "why": "The draft gives a month range per work package and nothing else: no task months, no effort figures, no cross-cutting allocation. Part B-1 §3.1 is scored on the appropriateness of the effort assigned to work packages, so the figures affect the Implementation score. The fellow's months are the only MSCA-funded effort; partner effort is in kind and is not costed by the unit-cost derivation.",
+
+  "why_the_six_months_land_in_wp5": "The placement is hosted by AgroVIR, and AgroVIR is the WP5 partner, so the added effort belongs to WP5 by construction rather than by allocation choice. Five months go there and one to cross-cutting, because management, training and dissemination are continuous rows in the draft's Gantt and must cover the longer action. WP5 becoming the largest work package at 30% is the intended, visible consequence of an evaluated placement.",
+
+  "reading_of_the_operator_answer": "The answer line 'fellow allocation as drafted: ACCEPT' is read as accepting the drafted shape extended to the approved 30 months, which is how the pack itself consolidated it on 2026-08-11. Read literally it would leave six months of the action unallocated, and the line requires the total to equal the action duration.",
+
+  "contradictions_resolved": [
+    {
+      "id": "C4",
+      "what": "MATE was recorded at 0.24 person-months, at odds with its own capacity claim.",
+      "resolution": "Corrected by the operator to 2.4 — a misplaced decimal. About ten working days a year across 30 months. In kind and uncosted, so no budget figure changes.",
+      "residual": "Anchored on MATE's 2.4 the scale is modest: MATE supplies the five-year archive, runs the experiments and co-leads two work packages for 2.4 person-months, while AgroVIR gets 3.0 for hosting the placement. Both cannot obviously be right; the pack keeps MATE at the operator's figure and flags this as the first thing a partner will query."
+    },
+    {
+      "id": "co_supervisor_figure",
+      "what": "Item 8 carries two figures for the co-supervisor: 2.0 in its answer block, corroborated by the stated partner total of 11.4, and 1.5 in a derivation paragraph.",
+      "resolution": "Folded as 2.0. The 1.5 derivation is built on 'fortnightly technical sessions ... through M6-M21', a cadence item 4 supersedes by raising his sessions to weekly through WP3 and WP4. Weekly sessions roughly double the session hours in that derivation, which lands the figure near 2.0. So the answer block is the post-amendment value and the derivation is stale, and the operator's own stated total is arithmetically consistent only with 2.0.",
+      "residual": "Resolved at the fold rather than referred back, because both readings are the operator's and one is inconsistent with the total the operator also stated. The figure is Assumed either way, in kind, uncosted and gate-neutral. Ticket 7 should put the correction to the operator, who can overturn it in one line."
+    }
+  ],
+
+  "status_split": "The fellow's allocation is Confirmed as an operator decision. All five partner figures are Assumed, each with a declaration in working_assumptions.json (person_months_MATE, person_months_MVCRI, person_months_AgroVIR, person_months_ELTE_supervisor, person_months_ELTE_co_supervisor). If the partners decline to commit numbers, the pack's fallback is to state in §3.1 that partner contributions are in kind and deliberately not quantified, and drop all five lines together.",
+
+  "consequences_recorded_not_resolved": [
+    "The monthly profile is tighter: M16-M21 now carries WP4 and a heavier WP5 concurrently. phase_04_gate checks that concurrent work packages never demand more than one FTE in any month, and partner in-kind effort is outside that check.",
+    "Five milestones all fall at or before M23 in a 30-month action, leaving the placement period unmonitored. Item 8 raised a placement-completion milestone and an M27 steering point; the operator decided neither, so milestones_seed.json carries an Unresolved placement_period_monitoring record rather than an invented milestone.",
+    "Task months for T5.1 to T5.7 inherit the extended WP5 range, M16-M30. Item 8 names T5.6 as the natural occupant of the M25-M30 placement window; that indication is recorded for Phase 4 rather than written into the allocation, because narrowing one task while six siblings keep the inherited range would pre-empt Phase 4."
+  ],
+
+  "lands_in": ["docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json", "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json", "docs/tier3_project_instantiation/working_assumptions.json", "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json operator_decisions item 8"],
+  "gate_effect": "None directly. phase_04_gate reads task months and the critical path; gate_09 reads project_duration_months from selected_call.json, not per-work-package effort.",
+  "status": "Confirmed for the fellow allocation; Assumed for the five partner figures"
+}

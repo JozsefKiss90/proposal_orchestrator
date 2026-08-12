@@ -11,7 +11,15 @@
     "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
     "lift_mode": "Verbatim. Every competence item and every capacity statement below is the draft's own string, including the draft's trailing punctuation, so each entry can be checked character-for-character against the cited paragraph. Role tokens are attached alongside the draft's own names, never in place of them.",
     "consumer_note": "Optional Phase 6 input, recommended by plans/fieldwise_reinstantiation_plan.md §3. No runner predicate reads this file. It feeds Part B-1 §3.2 (quality and capacity of participating organisations) and the §1.3 supervision and knowledge-transfer narrative.",
-    "unresolved_scope": "Part B-2 §5 capacity fields — department and team, infrastructure, key people, recent projects and publications, previous MSCA hosting, and the ELTE hosting arrangements — are absent from the draft. They are input pack item 12, which the operator answered in part and deferred in part on 2026-08-11. Ticket 6 folds them."
+    "unresolved_scope": "Folded at ticket 6. The answered item 12 capacity fields and the item 11 researcher CV are recorded in participant_capacity and researcher_profile below; five operator-deferred fields and the placement-hosting gap stay Unresolved on their own records and are enumerated in part_b2_capacity_detail for the ticket 7 authorisation packet.",
+    "ticket6_fold": {
+      "date": "2026-08-12",
+      "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
+      "operator_input_pack": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
+      "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json",
+      "what": "Input pack items 11 (researcher CV) and 12 (host and participant capacity) folded. The draft-lifted records above are untouched and remain verbatim; the folded content is additive and cites the pack, never the draft.",
+      "lift_mode_note": "lift_mode 'Verbatim' governs the draft-lifted collections only — knowledge_transfer, partner_contributions, capacity_statements and training_and_career. participant_capacity and researcher_profile are operator-pack folds, not draft lifts."
+    }
   },
   "spine_status": "confirmed_real",
   "knowledge_transfer": [
@@ -145,9 +153,179 @@
       "source_ref": "§1.4 ¶216"
     }
   ],
+  "participant_capacity": [
+    {
+      "organisation_id": "HOST",
+      "short_name": "ELTE",
+      "department_and_team": "Faculty of Informatics, Institute of Cartography and Geoinformatics, H-1117 Budapest, Pázmány Péter sétány 1/C. The hosting team is the institute's remote-sensing group. Supervision is interdisciplinary within the beneficiary: the co-supervisor sits in the ELTE Department of Meteorology, a different department from the hosting institute.",
+      "department_and_team_status": "Confirmed",
+      "infrastructure": "GIS and Remote Sensing Laboratory: DJI Matrice 350 RTK industrial drone with RTK GPS; DJI Zenmuse L1 (LiDAR and RGB); DJI Zenmuse P1 (45 MP photogrammetry); DJI Zenmuse H20T (thermal, zoom, wide); Ultris S5 hyperspectral camera (VIS-NIR narrow bands); Cubert CUVIS Lab Lite package (hyperspectral imaging with calibration tools). Software: licensed ArcGIS, ENVI and MATLAB; Google Earth Engine, QGIS, SNAP, Python, R. High-performance computing clusters for AI and large-scale geospatial analysis; secure storage and backup for large remote-sensing datasets. ELTE library, IT services and open-science repositories.",
+      "infrastructure_status": "Confirmed",
+      "infrastructure_note": "The Ultris S5 and the Cubert CUVIS are the institute's own hyperspectral capability, which is what the §1.2 hyperspectral-to-Sentinel resampling needs; §1.2 should name them. Two open checks from input pack item 12, neither blocking: the inventory is a 2025 snapshot and needs a currency check, and the ELTE Department of Meteorology's own capacity (met-data holdings, modelling infrastructure, compute) is not described anywhere, so the co-supervisor is currently named with no institutional capacity behind him.",
+      "key_people": [
+        {
+          "name": "Prof. András Jung",
+          "project_role": "SUPERVISOR",
+          "description": "Professor at the Institute of Cartography and Geoinformatics; remote sensing, geospatial technologies and environmental monitoring. ELTE also records a temporary deputy directorship; §3.2 should describe him by his professorship rather than by that post.",
+          "validation_status": "Confirmed",
+          "source_ref": "Operator input pack items 7 and 12 (2026-08-11), quoting PLANTDIGISENSE Part B-1 §3.2"
+        },
+        {
+          "name": "Dr. Roland Hollós",
+          "project_role": "CO_SUPERVISOR",
+          "description": "ELTE Department of Meteorology. Machine learning and meta-modelling of crop and grassland multi-model outputs; responsible for the methodological lead and quality assurance of model development and testing in WP3 and WP4. ORCID 0000-0001-5137-7471.",
+          "validation_status": "Confirmed",
+          "source_ref": "Operator input pack items 7 and 12 (2026-08-11); affiliation verified on Hollós et al. 2026, Geoscientific Model Development 19, 4385-4438"
+        }
+      ],
+      "key_people_note": "Two people, and only two. The institute Director is not associated with the call and is deliberately not listed (input pack item 4, amended C6). Prof. Zoltán Barcza of the same Department of Meteorology is noted in item 12 as a co-author of Hollós but is proposed for no role.",
+      "hosting_arrangements_and_support_services": "Dedicated office and laboratory space at ELTE. Full integration into the institute's research groups, weekly meetings and interdisciplinary workshops. Administrative and technical support for relocation, project management, procurement and dissemination. Access to short-term training courses. Participation in international networks (COST Actions, FAO and EU webinars).",
+      "hosting_arrangements_status": "Confirmed",
+      "hosting_arrangements_note": "Answered on 2026-08-11 from PLANTDIGISENSE Part B-1 §3.2 — the same applicant, host, institute and supervisor, submitted 2025. Reuse is legitimate: hosting arrangements are institutional facts. Three adjustments are owed before Phase 8 drafts §3.2, and none of them is a Tier 3 fact this fold can supply. First, the action is 30 months and includes a six-month external placement, so §3.2 must state what ELTE's arrangements are during M25-M30. Second, the equipment inventory needs a currency check. Third, the mentoring structure item 12 asks for is not described in PLANTDIGISENSE; item 4's accepted supervision cadence supplies most of it and should be cross-referenced.",
+      "recent_projects_and_publications": null,
+      "recent_projects_and_publications_status": "Unresolved",
+      "recent_projects_and_publications_note": "Deferred by the operator on 2026-08-11. CORDIS is the wrong instrument: it indexes participants at university level, so an ELTE query returns faculty-wide projects with no connection to the Institute of Cartography and Geoinformatics. The institute's own project list is what is wanted and only Prof. Jung or the institute can supply it.",
+      "previous_msca_hosting": null,
+      "previous_msca_hosting_status": "Unresolved",
+      "previous_msca_hosting_note": "Deferred by the operator on 2026-08-11. PLANTDIGISENSE (HORIZON-MSCA-2025-PF, proposal 101284764, scored 70.40%) evidences that ELTE hosted an MSCA-PF application with the same fellow and supervisor. It does not evidence hosting a funded fellow, and §3.2 must not blur the two claims. The ELTE research office holds the answer.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 12, answered in part 2026-08-11 (quoting PLANTDIGISENSE Part B-1 §3.2, pages 9-10); item 7 (co-supervisor); §3.2 ¶425-426 (draft function statement)"
+    },
+    {
+      "organisation_id": "DATA_PARTNER",
+      "short_name": "MATE",
+      "department_and_team": "Institute of Horticultural Sciences.",
+      "department_and_team_status": "Confirmed",
+      "infrastructure": "Field trials, the source-domain scientific dataset, and the primary model-development and validation environment.",
+      "infrastructure_status": "Confirmed",
+      "infrastructure_note": "The five-year hyperspectral archive is the single most important asset in the proposal and is described in one clause. Input pack item 12 asks MATE for the years covered, the instrument make and model, the number of measurement campaigns and plots, and the accompanying soil and meteorological station data. Without it, gap G2 and hypothesis H2 rest on an asset the proposal has not described. This is an open action, not a gap this fold can fill.",
+      "key_people": [
+        {
+          "name": "Dr. Sándor Takács",
+          "project_role": "MATE project contact and DATA_PARTNER representative on the Steering Group",
+          "description": "Title and institute unverified. Input pack item 12 places him in the Institute of Horticultural Sciences.",
+          "validation_status": "Assumed",
+          "note": "Operator-supplied and not independently verified, so the record is Assumed rather than Confirmed and carries the declaration contact_person_MATE in working_assumptions.json. phase_06_gate predicate g07_p08 reads the name, which is present; Part B-2 §5 needs the title, which is not available.",
+          "source_ref": "Operator input pack items 1, 4 and 12 (operator-supplied 2026-08-11, not independently verified)"
+        },
+        {
+          "name": "Prof. Gábor Milics",
+          "project_role": "Scientific advisor to the fellow",
+          "description": "Full professor at MATE, Gödöllő; Hungary's country representative to the International Society of Precision Agriculture; works on remote sensing in precision agriculture. He held the same advisory role in PLANTDIGISENSE and the operator confirmed on 2026-08-11 that he continues in it for FIELDWISE.",
+          "validation_status": "Confirmed",
+          "source_ref": "Operator input pack item 12, discrepancy resolved 2026-08-11 (quoting PLANTDIGISENSE Part B-1 §3.2)"
+        }
+      ],
+      "key_people_note": "Two people in distinct roles, resolved on 2026-08-11. Takács is the organisational contact and the name phase_06_gate predicate g07_p08 reads; Milics advises the fellow personally and sits outside the governance structure. Milics gets no role token and no partners.json entry — input pack item 12 is explicit that 'advisor' is not a role token and that one must not be invented for him. He belongs in §1.3, where he adds a second supervision strand the draft lacks.",
+      "recent_projects_and_publications": null,
+      "recent_projects_and_publications_status": "Unresolved",
+      "recent_projects_and_publications_note": "Deferred by the operator on 2026-08-11. One citable line is already established elsewhere in the pack and is not a substitute for the list: MATE coordinates AGRIGEP, grant 101094158, verified on CORDIS, which evidences EU project capability.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 12, answered in part 2026-08-11; §3.2 ¶427-428 (draft capacity statement)"
+    },
+    {
+      "organisation_id": "TRANSFER_PARTNER",
+      "short_name": "MVCRI",
+      "department_and_team": "Technologies in Vegetable Crops Production — one of MVCRI's two departments, headed by Prof. Vinelina Yankova (entomology, vegetable production, breeding). The other is Breeding, Variety Maintenance and Introduction, headed by Assoc. Prof. Stanislava Grozeva. The institute is a vegetable breeding and crop science institute of the Agricultural Academy, with tomato breeding and abiotic-stress physiology groups relevant to FIELDWISE.",
+      "department_and_team_status": "Confirmed",
+      "infrastructure": "Secondary access to field trials.",
+      "infrastructure_status": "Confirmed",
+      "infrastructure_note": "Input pack item 12 records that this understates the role: WP4 depends on MVCRI having real experimental capacity, and the trial area, the tomato germplasm held and the available measurement instruments are all unasked. An open action, not a fabricated field.",
+      "key_people": [
+        {
+          "name": "Prof. Vinelina Yankova",
+          "project_role": "MVCRI project contact and TRANSFER_PARTNER seat on the Steering Group",
+          "description": "Head of Department, Technologies in Vegetable Crops Production. Entomology, vegetable production, breeding. Her department's remit is the one WP4's Bulgarian transfer test sits in.",
+          "validation_status": "Confirmed",
+          "source_ref": "Operator input pack items 1, 4 and 12 (verified 2026-08-11 against the institute's own departments page)"
+        },
+        {
+          "name": "Assoc. Prof. Stanislava Grozeva",
+          "project_role": "None assigned; institutional capacity only",
+          "description": "Head of Department, Breeding, Variety Maintenance and Introduction.",
+          "validation_status": "Confirmed",
+          "source_ref": "Operator input pack item 12 (verified 2026-08-11 against the institute's own departments page)"
+        }
+      ],
+      "key_people_note": "Dr. Rositsa Cholakova is MVCRI staff but is the FELLOW, and input pack item 12 is explicit that she must not be listed here as institutional capacity. Publications remain absent: Yankova's and Grozeva's own outputs would suit §3.2, since the point is capacity independent of the fellow.",
+      "recent_projects_and_publications": "FP7 grant 205941, 'Balkan Vegetables Research Centre for transfer of European knowledge, research and practice' — MVCRI was the coordinator in its own name under PIC 999533009, verified on CORDIS. ZEMDKT 17, Agricultural Academy, 2024-2026, Task 7: 'Resistance to abiotic stress — drought and salinity in Solanum lycopersicum', the same crop and the same stress as FIELDWISE, running now. KP-06-COST/2, National Science Fund (Ministry of Education and Science), 2025-ongoing: 'Monitoring of vegetable crops in support of precision agriculture using satellite and unmanned aerial systems', with the Space Research and Technology Institute, Bulgarian Academy of Sciences, under COST Action PANGEOS.",
+      "recent_projects_and_publications_status": "Confirmed",
+      "recent_projects_and_publications_note": "Answered on 2026-08-11, closing what the deferral note originally listed. The FP7 coordination is verified on CORDIS; the two current projects come from the item 11 CV and are as reliable as that document.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack items 1, 11 and 12, answered 2026-08-11; §3.2 ¶429-430 (draft capacity statement)"
+    },
+    {
+      "organisation_id": "VALIDATION_PARTNER",
+      "short_name": "AgroVIR",
+      "organisation_profile": "AgroVIR Kft., founded 2007 and seated in Budaörs, Hungary, develops and operates a cloud-based farm management information system built on twenty years of practice in Hungarian commercial agriculture. The platform is in production use across more than 745,000 hectares in eight countries: Hungary (500,000+ ha), Romania (120,000+), Azerbaijan (50,000+), Slovakia (40,000+), Bulgaria (15,000+), Serbia (10,000+), Ukraine (7,000+) and Argentina (3,000+). This is the commercial-scale operating environment against which WP5 tests research-to-farm transferability, and the Bulgarian and Hungarian footprints match the two countries FIELDWISE works in. The company is registered under NACE 7020 (business and management consulting), reflecting its founding activity; its current business is agricultural software.",
+      "organisation_profile_status": "Confirmed",
+      "organisation_profile_note": "Drafted in input pack item 12 from the company's own published figures and adopted with the item 1 C9 closing clause, which names the registration discrepancy rather than leaving an evaluator to find it.",
+      "infrastructure_and_farm_access": "Network access to the AgroVIR platform and its commercial farm base, and validation of the prediction pipeline through the AgroVIR software.",
+      "infrastructure_and_farm_access_status": "Confirmed",
+      "infrastructure_and_farm_access_note": "The operator's own wording was 'network access, MCP validaation via the agrovir software'. Two corrections applied at the fold, both formal rather than substantive: the typo, and the unexpanded acronym MCP, which input pack item 12 flags as unreadable to an evaluator. It is rendered here as validation of the prediction pipeline through the AgroVIR software, which is what WP5 tasks T5.4 and T5.6 describe. If MCP means something else, this line needs the operator's correction before Phase 8 drafts §3.2.",
+      "key_people": null,
+      "key_people_status": "Unresolved",
+      "key_people_note": "Deferred by the operator on 2026-08-11. Only Zsuzsanna Balázs is named, with no role, and she is recorded in partners.json as the Assumed contact. The placement additionally needs a named on-site supervisor for M25-M30, who may or may not be her. Nothing here is guessed.",
+      "relevant_track_record": null,
+      "relevant_track_record_status": "Unresolved",
+      "relevant_track_record_note": "Deferred by the operator on 2026-08-11. No EU-funded research participation was found. Input pack item 12 instructs that if there is none, §3.2 says so plainly and leans on the commercial footprint, because an unevidenced claim of research experience is worse than an honest absence.",
+      "hosting_capacity_for_the_placement": null,
+      "hosting_capacity_status": "Unresolved",
+      "hosting_capacity_note": "Opened by the placement decision of 2026-08-11 and named in input pack item 12 as the largest single content gap it creates. The placement is evaluated, so Part B-1 must show AgroVIR can host a researcher: who supervises her on site and with what seniority, what workspace and system access she gets, what she does for six months, and what she gains that ELTE cannot give her. None of this exists in any source. It blocks no gate and it is scored.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack items 1, 2 and 12, answered in part 2026-08-11; §3.2 ¶431-432 (draft capacity statement)"
+    }
+  ],
+  "researcher_profile": {
+    "record_id": "CV",
+    "full_name": "Rositsa Cholakova",
+    "publishing_name_variant": "Rositsa Cholakova-Bimbalova",
+    "name_variant_note": "Every publication up to and including the 2020 thesis is under Cholakova-Bimbalova; everything from 2025 is under Cholakova, and nothing in the public record links the two. Part A must carry both, and §1.4 should state the change the first time it cites a pre-2020 work.",
+    "orcid": "0009-0008-3761-3106",
+    "orcid_status": "Assumed",
+    "orcid_note": "Supplied by the operator and not independently verifiable: pub.orcid.org blocks automated access, orcid.org needs JavaScript, and Crossref returns no works carrying this iD. Declared in working_assumptions.json under key researcher_orcid.",
+    "current_position": "Chief Assistant Professor, plant physiology researcher, Maritsa Vegetable Crops Research Institute (MVCRI), Agricultural Academy, Plovdiv, Bulgaria, from 2024-10-15.",
+    "doctorate": {
+      "title_english": "Response of maize (Zea mays L.) to low temperatures and the effectiveness of subsequent foliar fertilisation",
+      "title_status": "Inferred",
+      "title_note": "An English rendering of the Bulgarian original, read from a truncated copy. Input pack item 11 asks for the exact Bulgarian title and its official English form. The rendering is the pack's, derived from the published abstract, not a draft or registry string.",
+      "award_date": "2020-10-10",
+      "doctoral_studies": "2014-11-15 to 2020-10-10",
+      "institution": "Agricultural University - Plovdiv, Faculty of Agronomy, Department of Plant Physiology and Biochemistry. Doctoral programme: Plant Physiology. Professional field 6.1 Agronomy. EQF level 8, 291 ECTS.",
+      "supervisor": "Prof. Dr. Andon Vassilev",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 11 (Europass CV supplied 2026-08-11, and the PhD abstract published by Agricultural University - Plovdiv)"
+    },
+    "positions_held": [
+      {"role": "Chief Assistant Professor, plant physiology researcher", "organisation": "MVCRI, Agricultural Academy, Plovdiv, BG", "from": "2024-10-15", "to": "present"},
+      {"role": "Data Analyst", "organisation": "KPMG Global Hungary, Budapest, HU", "from": "2024-06-01", "to": "2024-10-01"},
+      {"role": "Full-time parenting, career break", "organisation": "Budapest, HU", "from": "2021-07-25", "to": "2024-05-31"},
+      {"role": "Assistant Professor in Plant Physiology and Plant Stress Physiology", "organisation": "Agricultural University, Plovdiv, BG", "from": "2015-11-15", "to": "2020-10-20"},
+      {"role": "Agricultural Market Analyst", "organisation": "Kleffmann Group Bulgaria, Plovdiv, BG", "from": "2013-06-03", "to": "2013-11-29"}
+    ],
+    "teaching_and_supervision": "Agricultural University Plovdiv, 2015-2020: syllabus design, lectures and examinations in Bulgarian and English including for Erasmus students; supervision of student research projects and Bachelor's theses; specialist consultant to farmers on physiological monitoring and integrated plant protection. Five years of university teaching, which is why input pack C7 reframed the EI-06 measure and the Career Development Plan's teaching component from a competence to acquire into an existing strength transferred to a new discipline, institution and language of instruction.",
+    "publications_summary": "Nine items. Two carry a DOI (Cholakova-Bimbalova et al. 2019, Acta Agrobotanica 72(2) 1769, doi:10.5586/aa.1769; Cholakova-Bimbalova and Vassilev 2017, CBU International Conference Proceedings 5, 1118-1123, doi:10.12955/cbup.v5.1081), four are publisher-verified without one, and three could not be verified. Only three touch remote sensing, all 2025 or later and all with her as a middle author. Input pack item 11 states the honest §1.4 consequence: the Earth-observation half of the profile rests on the STSM, the Erasmus mobilities and the UAV licence rather than on publications, and §1.4 should tell it that way.",
+    "projects_and_grants": "ZEMDKT 17, MVCRI / Agricultural Academy, 2024-2026, Task 7: abiotic stress, drought and salinity in Solanum lycopersicum — the FIELDWISE crop and the FIELDWISE stress, already funded and running. KP-06-COST/2, National Science Fund, 2025-ongoing, satellite and UAV monitoring of vegetable crops, with the Space Research and Technology Institute, Bulgarian Academy of Sciences. HORIZON-MSCA-2025-SE-01-01 SolGenSys, 2026-2030, tomato multi-stress tolerance. Agricultural University Plovdiv projects OA-17 and DN 16/8, 2016-2020.",
+    "awards_and_mobilities": "STSM awardee, COST Action CA22136 PANGEOS, at MATE, Hungary, 2025. Three Erasmus+ staff mobility grants, MATE (HU) and University of Novi Sad (RS), 2025-2026. Erasmus PhD mobility, Russian State Agrarian University - Moscow Timiryazev Academy, three months, 2018. Erasmus master's mobility internship, ELTE Budapest, three months, 2026. UAV pilot licence A1/A3, Civil Aviation Administration Bulgaria, BGR-RP-t8drlyacolpq. Member of COST Actions CA22136 PANGEOS, CA22149 AI4Insect and CA22141 REcrop.",
+    "second_masters": "MSc Environmental Engineering, Agricultural University Plovdiv, 2025-09-15 to 2026-05-31. Earlier: MSc Plant Protection (2013) and BSc Plant Protection (2012), both AU Plovdiv.",
+    "previous_msca_submission": "PLANTDIGISENSE, HORIZON-MSCA-2025-PF, proposal 101284764, host ELTE, total score 70.40% against a 70.00 threshold. FIELDWISE is therefore a resubmission that must move a score rather than repair a failure, and the draft answers that evaluation in three places (§1.2.1, §2.2 and the §3.1 note on late milestones). The Evaluation Summary Report is not in Tier 3; input pack item 11 names it as the highest-value missing input to Phase 8 drafting.",
+    "invited_talks": null,
+    "invited_talks_status": "Unresolved",
+    "invited_talks_note": "Not in the CV. The operator has not supplied any and has not confirmed there are none. Input pack item 11 leaves it open; it blocks no gate and ticket 7 lists it.",
+    "career_break": "2021-07-25 to 2024-05-31, full-time parenting, in Budapest, Hungary. Just over 34 months. Declared in Part A. It does not count against the research-experience ceiling.",
+    "mobility_eligibility": {
+      "validation_status": "Assumed",
+      "position": "Operator-declared, 2026-08-11. The C5 mobility question is overridden by the operator on the stated basis that the CV's residence lines will be rectified, which removes 8.76 of the 15.81 months and leaves 7.05 against the 12-month cap.",
+      "note": "Recorded as an operator-declared position under §13.3, not promoted to Confirmed: the underlying facts have not changed and no new evidence was supplied. Two of the three periods survive any CV revision — KPMG Global Hungary as an employer of record in Hungary (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months), together 7.05 months. The rectified CV must stay consistent with both, and with ELTE's own Erasmus records. Declared in working_assumptions.json under key mobility_eligibility with checklist_ref MOBILITY_ELIGIBILITY. Ticket 7 must carry the override, its basis and its date into the authorisation packet without promoting it.",
+      "source_ref": "Operator input pack items 7 and 11, C5 override 2026-08-11"
+    },
+    "validation_status": "Confirmed",
+    "source_ref": "Operator input pack item 11, answered 2026-08-11 (Europass CV JRC_2026.pdf, ORCID 0009-0008-3761-3106, and the PhD abstract published by Agricultural University - Plovdiv)",
+    "note": "The draft §1.4 (¶212-216) describes the researcher's profile qualitatively and names no publication, date or institution. Everything in this record comes from input pack item 11, not from the draft. It feeds Part B-1 §1.4 and, at submission, the Part B-2 §4 CV. The verbatim §1.4 lift in project_brief/strategic_positioning.md is deliberately not rewritten here: Phase 8 drafting consumes this record, and a hand-edit of a verbatim draft lift would destroy the character-for-character check the ticket 3 lift rests on."
+  },
   "part_b2_capacity_detail": {
     "validation_status": "Unresolved",
-    "note": "Part B-2 §5 requires one capacity table per organisation: department and hosting team, infrastructure and facilities, key people with their project role, recent projects and publications, and previous MSCA hosting experience. Part B-1 §3.2 additionally requires ELTE's hosting arrangements, office and laboratory access, administrative and career support, and the mentoring structure. The draft carries one function sentence per organisation and none of these fields. They are operator input pack item 12, answered in part and deferred in part on 2026-08-11; ticket 6 folds the answered fields and records five deferred fields as Unresolved for the ticket 7 authorisation packet. Nothing is invented here.",
+    "note": "Folded in part at ticket 6 from operator input pack item 12, answered in part and deferred in part on 2026-08-11. The answered fields are in participant_capacity above. Five fields remain deferred by the operator and are listed below with their own Unresolved status on the records they belong to; the placement-hosting capacity is a sixth open field, opened by the item 2 placement decision rather than deferred. Nothing is invented. This record survives so ticket 7 can enumerate the residual gaps in one place.",
     "deferred_fields_named_by_the_operator": [
       "ELTE recent_projects_and_publications",
       "ELTE previous_msca_hosting",
@@ -155,6 +333,14 @@
       "AgroVIR key_people",
       "AgroVIR relevant_track_record"
     ],
-    "gate_impact": "None. No runner predicate reads this file. Item 12 feeds Part B-1 §3.2, which is scored under Implementation but not gated."
+    "opened_by_the_placement_decision": [
+      "AgroVIR hosting capacity for the M25-M30 placement: named on-site supervisor, workspace and system access, and the six-month work content"
+    ],
+    "closed_since_the_deferral_was_written": [
+      "ELTE hosting_arrangements_and_support_services — answered in full from PLANTDIGISENSE §3.2, the field §3.2 is most directly scored on",
+      "MVCRI recent_projects_and_publications — FP7 205941, ZEMDKT 17 and KP-06-COST/2",
+      "ELTE infrastructure — replaced with the actual equipment inventory rather than a paraphrase"
+    ],
+    "gate_impact": "None directly. No runner predicate reads this file. Item 12 feeds Part B-1 §3.2, which is scored under Implementation but not gated. The one gate to watch is phase_06_gate g07_p09, which requires every instrument-mandated implementation section to be addressed: §3.2 will be thin, not empty, and 'addressed' is a low bar."
   }
 }

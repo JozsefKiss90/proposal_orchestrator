@@ -182,11 +182,44 @@ person-months in `workpackage_seed.json`. Each decided item gets a decision-log 
 
 **Blocked by:** Operator input pack; Seed architecture inputs; Seed consortium files.
 
-- [ ] No consortium record remains Unresolved for a reason the input pack answered.
-- [ ] Every Assumed fact in Tier 3 has a matching declaration in `working_assumptions.json`.
-- [ ] `confirmation_checklist.json` covers the identity spine and every operator decision.
-- [ ] Items the operator deferred remain Unresolved and are listed for the authorisation packet.
-- [ ] Each of the eight decision items has a decision-log record.
+- [x] No consortium record remains Unresolved for a reason the input pack answered.
+- [x] Every Assumed fact in Tier 3 has a matching declaration in `working_assumptions.json`.
+- [x] `confirmation_checklist.json` covers the identity spine and every operator decision.
+- [x] Items the operator deferred remain Unresolved and are listed for the authorisation packet.
+- [x] Each of the eight decision items has a decision-log record.
+
+The eight decision items are 3, 4, 5, 6, 8, 9, 13 and 14 — the ones the form offered a drafted
+candidate for. Items 1, 2, 10, 11 and 12 are folded too, and their records sit in the ticket 6 fold
+entry rather than in eight separate files.
+
+One deviation from the input pack, recorded in the fold decision-log entry.
+
+Item 9 asks for `project_duration_months` to be declared in `working_assumptions.json`. It is not,
+and `host_country` is not either. Both are Confirmed in `selected_call.json`, which is where the
+deriver resolves them first and where `phase_04_gate` reads the duration by name. The shared reader
+stamps every declaration Assumed, so declaring either would render an operator-Confirmed fact as
+Assumed in the declared surface and contradict the call binding inside one tier. The substance is
+kept in the call binding, in the checklist under `DURATION`, and in the item 9 record.
+
+Four corrections applied at the fold, all recorded.
+
+- Input pack item 8 carries two figures for the co-supervisor. The fold takes 2.0, the answer-block
+  value, because the operator's own stated partner total of 11.4 is consistent only with it.
+- WP5 now ends at M30 and the cross-cutting strand runs to M30. Ticket 4 lifted the draft's M24
+  faithfully, which a 9.0 person-month WP5 would have contradicted.
+- `selected_call.json` described the C5 mobility question as deferred. The operator overrode it the
+  same day, so the file now records the override and points at the declaration.
+- The AgroVIR capacity line read "network access, MCP validaation via the agrovir software". It is
+  rendered readable, with the operator's own wording kept in the note.
+
+Three things the operator raised and did not decide are not folded as though answered. K11 stays an
+Unresolved candidate in `impacts.json`. The placement-completion milestone and the M27 steering point
+become an Unresolved record in `milestones_seed.json` rather than an invented milestone. The T5.6
+placement-window indication is recorded for Phase 4 instead of narrowing one task's months.
+
+The ticket 4 and ticket 5 test files pinned the pre-fold state — Unresolved participants, Unresolved
+person-months and KPIs, WP5 ending at M24. Those assertions now pin what stays true of the lift, and
+the folded state is pinned by `tests/runner/test_fieldwise_ticket6_fold.py`.
 
 ## 7. Authorisation packet
 

@@ -178,26 +178,50 @@ class TestDerivedContentIsInferred:
 
 
 class TestNothingInvented:
-    def test_person_months_unresolved_not_numeric(self):
+    def test_no_person_months_are_attributed_to_the_draft(self):
+        """Ticket 4 invented no effort figure, and none may sit on a WP record.
+
+        The person_months collection itself was Unresolved at ticket 4 and is
+        folded at ticket 6 from operator input pack item 8; that folded state
+        is pinned by test_fieldwise_ticket6_fold.py. What stays true of the
+        lift is that no work-package record carries an effort figure, because
+        the draft states none.
+        """
         data = _load("workpackage_seed.json")
         pm = data["person_months"]
-        assert pm["validation_status"] == "Unresolved"
         assert pm.get("note", "").strip()
+        assert "operator input pack item 8" in pm["note"].lower()
         for wp in data["work_packages"]:
             assert "person_months" not in wp, (
                 f"{wp['id']} carries a person_months value with no draft source"
             )
 
-    def test_kpis_unresolved_not_invented(self):
+    def test_no_kpi_is_attributed_to_the_draft(self):
+        """The draft declines numeric targets, so no KPI may cite it.
+
+        KPIs were Unresolved at ticket 4 and are folded at ticket 6 from
+        operator input pack item 5. Every folded KPI must cite the pack, never
+        a draft paragraph.
+        """
         data = _load("impacts.json")
         kpis = data["kpis"]
-        assert kpis["validation_status"] == "Unresolved"
         assert kpis.get("note", "").strip()
-        assert "values" not in kpis and "targets" not in kpis
+        for kpi in kpis.get("items", []):
+            cited = kpi["source_ref"].lower()
+            assert "input pack" in cited or "operator_input_pack" in cited, (
+                f"{kpi['kpi_id']} cites something other than the operator pack"
+            )
 
 
 class TestWorkPackages:
     def test_five_wps_confirmed_with_draft_month_ranges(self):
+        """The draft's own month ranges survive, WP5's end month included.
+
+        Ticket 6 extends WP5 to M30 on the operator's placement decision and
+        preserves the draft's M24 as draft_end_month, so the lifted fact stays
+        checkable against §3.1 ¶303. The extended range is pinned by
+        test_fieldwise_ticket6_fold.py.
+        """
         data = _load("workpackage_seed.json")
         wps = {wp["id"]: wp for wp in data["work_packages"]}
         expected = {
@@ -212,7 +236,8 @@ class TestWorkPackages:
             record = wps[wp_id]
             assert record["validation_status"] == "Confirmed", wp_id
             assert record["start_month"] == start, wp_id
-            assert record["end_month"] == end, wp_id
+            drafted = record.get("draft_end_month", record["end_month"])
+            assert drafted == end, wp_id
 
     def test_seed_satisfies_dependency_normalizer_bounds(self):
         from runner.dependency_normalizer import _build_wp_bounds

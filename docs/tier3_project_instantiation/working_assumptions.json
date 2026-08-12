@@ -1,0 +1,116 @@
+{
+  "record_type": "working_assumptions",
+  "provenance_class": "manually_placed",
+  "_authored_by": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3), 2026-08-12, from the returned operator input pack. In-tier source copy: docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md. Fold record: docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json.",
+  "_scope": "One declaration for every fact that Tier 3 marks Assumed. A declaration turns an Unresolved or unevidenced fact into a conscious Assumed (§12.2) owned and dated by the operator; it never makes a fact Confirmed. Every Assumed record in Tier 3 names its declaration_key here, and every key below backs at least one such record.",
+  "_deliberately_not_declared": {
+    "project_duration_months": "30 is Confirmed in call_binding/selected_call.json, which is where runner/unit_cost_budget.py resolves it first (_resolve_confirmed_months) and where phase_04_gate's timeline_within_duration reads it by name. Input pack item 9 asked for a duration declaration here as well. It is deliberately omitted: the reader stamps every declaration Assumed, so declaring the duration would render an operator-Confirmed fact as Assumed in the declared surface and in the canonical reference pack, contradicting the call binding inside one tier — which is what §12.3 exists to prevent. The declaration would also be inert, because the call binding wins the precedence order. The substance of item 9's instruction is kept: the duration and its basis are recorded in the call binding, in the confirmation checklist under DURATION, and in the ticket 6 fold record.",
+    "host_country": "HU is Confirmed in call_binding/selected_call.json and resolves the unit-cost living-allowance coefficient from there (_resolve_host_country). The same reasoning applies as for the duration."
+  },
+  "declarations": [
+    {
+      "key": "family_allowance",
+      "value": "does not apply",
+      "declared_by": "operator (FIELDWISE input pack item 9)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Family status is established at recruitment, not at proposal stage. The unit-cost derivation is built without the family rate. If the fellow's circumstances at recruitment trigger the allowance, it is added at grant preparation, which is the normal route and does not affect the proposal budget. Note the engine gap this declaration keeps dormant: derive_unit_cost_budget never sets include_family (runner/unit_cost_budget.py:159, call at line 507), so an 'applies' answer could not reach the derived artifact without a code change.",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES"
+    },
+    {
+      "key": "long_term_leave_allowance",
+      "value": "does not apply",
+      "declared_by": "operator (FIELDWISE input pack item 9)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Not foreseeable at proposal stage. The deriver has no representation for this line, so it would be handled by amendment if it arose.",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES"
+    },
+    {
+      "key": "special_needs_allowance",
+      "value": "does not apply",
+      "declared_by": "operator (FIELDWISE input pack item 9)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Situational in the rate table and not foreseeable at proposal stage. The operator recorded this line as clean rather than as an explicit assumption; it is declared here on the same footing as the other two so all three optional lines resolve from one place.",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES"
+    },
+    {
+      "key": "person_months_MATE",
+      "value": 2.4,
+      "declared_by": "operator (FIELDWISE input pack item 8)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "In-kind effort estimate for MATE across the 30-month action, corrected from 0.24 (C4, a misplaced decimal). Roughly ten working days a year for supervision, data preparation and experiment access. The operator's estimate, not MATE's own statement, and to be checked with the partner. In kind and uncosted: MSCA-PF funds only the fellow's months.",
+      "checklist_ref": "DATA_PARTNER"
+    },
+    {
+      "key": "person_months_MVCRI",
+      "value": 1.5,
+      "declared_by": "operator (FIELDWISE input pack item 8)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "In-kind effort estimate for MVCRI: WP4 trial hosting and management, ground and physiological measurement, data preparation under the pre-registered protocol, the contact and steering-group role, and co-authorship of the transfer-test outputs. To be checked with the partner.",
+      "checklist_ref": "TRANSFER_PARTNER"
+    },
+    {
+      "key": "person_months_AgroVIR",
+      "value": 3.0,
+      "declared_by": "operator (FIELDWISE input pack item 8)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "In-kind effort estimate for AgroVIR: WP5 co-lead from M16 and placement host M25-M30, covering on-site supervision, the nine-dimension MVP assessment producing D5.4, farmer-field access and liaison, FMIS roadmap input, and the steering-group seat. Deliberately the largest partner figure, because it is the only partner hosting the fellow. To be checked with the partner.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "person_months_ELTE_supervisor",
+      "value": 2.5,
+      "declared_by": "operator (FIELDWISE input pack item 8)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "In-kind effort estimate for the supervisor, built bottom-up from the accepted governance of input pack item 4 over 30 months (weekly one-to-ones with preparation, monthly progress records, quarterly Career Development Plan reviews, chairing the Steering Group, reading drafts and deliverables, delivering the eleven §1.3 competences). About 8% FTE. To be checked with the supervisor.",
+      "checklist_ref": "SUPERVISOR"
+    },
+    {
+      "key": "person_months_ELTE_co_supervisor",
+      "value": 2.0,
+      "declared_by": "operator (FIELDWISE input pack item 8)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "In-kind effort estimate for the co-supervisor. Item 8 carries two figures — 2.0 in its answer block, which its stated partner total of 11.4 corroborates, and 1.5 in a derivation paragraph built on a fortnightly cadence that item 4 later raised to weekly through WP3 and WP4. The answer block is the post-amendment value and is declared here; the reasoning is recorded in workpackage_seed.json under co_supervisor_figure_contradiction, and ticket 7 should put the correction to the operator.",
+      "checklist_ref": "CO_SUPERVISOR"
+    },
+    {
+      "key": "contact_person_MATE",
+      "value": "Dr. Sándor Takács",
+      "declared_by": "operator (FIELDWISE input pack item 1)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Operator-supplied and not independently verified. His exact title and institute are unconfirmed; input pack item 12 places him in the Institute of Horticultural Sciences. phase_06_gate predicate g07_p08 reads the name, which is present and resolves to MATE in partners.json; Part B-2 §5 needs the title, which is not available.",
+      "checklist_ref": "DATA_PARTNER"
+    },
+    {
+      "key": "contact_person_AgroVIR",
+      "value": "Zsuzsanna Balázs",
+      "declared_by": "operator (FIELDWISE input pack item 1)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Operator-supplied and not independently verified; the company website names no staff and her role is unknown. Recorded in Hungarian name order as Balázs Zsuzsanna in item 1 and in western order in item 4; the same person. The placement additionally needs a named on-site supervisor, who may or may not be her; that gap is Unresolved in capabilities.json, not declared here.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "contact_email_MVCRI",
+      "value": "vinelina@abv.bg",
+      "declared_by": "operator (FIELDWISE input pack item 1)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Operator-supplied and unverified. Prof. Vinelina Yankova's name and departmental role are verified against the institute's own departments page and are Confirmed in partners.json; only the address is assumed. It is on the same free provider (abv.bg) the institute itself publishes on, so it is consistent with local practice, but it must be confirmed to reach her before Part B-2 §5 uses it.",
+      "checklist_ref": "TRANSFER_PARTNER"
+    },
+    {
+      "key": "researcher_orcid",
+      "value": "0009-0008-3761-3106",
+      "declared_by": "operator (FIELDWISE input pack item 11)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Supplied by the operator and not independently verifiable: pub.orcid.org blocks automated access, orcid.org needs JavaScript, and Crossref returns no works carrying this iD. Claiming her publications on the ORCID record before submission would make the whole record findable under one identifier, which matters because her pre-2020 work is published under Cholakova-Bimbalova.",
+      "checklist_ref": "FELLOW"
+    },
+    {
+      "key": "mobility_eligibility",
+      "value": "European Fellowship mobility rule satisfied on the rectified CV: 7.05 months of residence or main activity in Hungary within the 36 months before the 2026-09-09 deadline, against a 12-month cap.",
+      "declared_by": "operator (FIELDWISE input pack item 7, C5 override)",
+      "declared_on": "2026-08-11T00:00:00Z",
+      "rationale": "Operator override of contradiction C5, declared under §13.3 rather than confirmed: the underlying facts have not changed and no new evidence was supplied. The stated basis is that the CV's residence lines will be rectified, which removes 8.76 of the 15.81 months counted on the CV's face. Two periods survive any revision and are fixed points the rectified CV must remain consistent with — KPMG Global Hungary as an employer of record (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months). Eligibility is self-declared and verified at grant agreement preparation, so the risk scales with success. Ticket 7 must carry this override, its basis and its date into the authorisation packet without promoting it to Confirmed.",
+      "checklist_ref": "MOBILITY_ELIGIBILITY"
+    }
+  ]
+}

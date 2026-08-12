@@ -1,0 +1,30 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-item13-security-green-charter",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+  "decided_on": "2026-08-11",
+  "decided_by": "operator, FIELDWISE input pack item 13",
+  "authority": "Operator decision returned in plans/fieldwise_operator_input_pack.md item 13, folded into Tier 3 by plans/fieldwise_tickets.md ticket 6. Recorded per CLAUDE.md §9.4; status per §12.2.",
+
+  "decision": "Both candidate statements are accepted unchanged. Security screening: no concerns arise. Green Charter: six commitments, four of which the draft already supports.",
+
+  "why": "Part B-2 §7 and §8 need both statements at submission. The draft supplies nothing for §7 and real material for §8 in §1.2 without naming the Charter. This run does not draft Part B-2, so the statements are held in Tier 3 rather than consumed by a phase.",
+
+  "security_screening": "The project handles no classified or EU-restricted information. It uses open Copernicus data and institutional field measurements. It involves no dual-use goods or technology and no entity established outside the EU.",
+
+  "green_charter_commitments": [
+    {"commitment": "Reuse before regeneration: the five-year MATE archive is the primary data source rather than a new campaign", "basis": "Draft §1.2 layer 1"},
+    {"commitment": "Prefer the simplest adequate model, introducing deep architectures only where sample size and temporal density justify them", "basis": "Draft §1.2 layer 6"},
+    {"commitment": "Run computation on shared ELTE infrastructure rather than provisioning dedicated hardware", "basis": "New, operator decision"},
+    {"commitment": "Travel: default to remote collaboration, with at most one physical visit to MVCRI per growing season and shared transport for field campaigns", "basis": "New, operator decision"},
+    {"commitment": "Conferences: hybrid attendance by default, at most one in-person conference per year", "basis": "New, operator decision"},
+    {"commitment": "Purpose: the project targets better irrigation timing, which serves the Charter's environmental aim directly", "basis": "Draft §2.3"}
+  ],
+
+  "consistency_check": "The security statement's claim that no entity is established outside the EU is true of the consortium as it stands — ELTE and MATE in Hungary, MVCRI in Bulgaria, AgroVIR in Hungary — and stays true under the item 2 placement decision. Recorded so the fold does not re-derive it.",
+
+  "lands_in": ["docs/tier3_project_instantiation/call_binding/confirmation_checklist.json operator_decisions item 13"],
+  "gate_effect": "None. No runner gate reads this item; section_schema_registry.json marks Part B-2 sections 4 to 8 as out of scope for this run.",
+  "status": "Confirmed"
+}

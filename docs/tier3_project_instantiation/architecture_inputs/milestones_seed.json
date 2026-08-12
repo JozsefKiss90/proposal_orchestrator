@@ -9,6 +9,12 @@
     "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
     "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
     "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "ticket6_fold": {
+      "date": "2026-08-12",
+      "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
+      "what": "MS1 to MS5 are unchanged draft lifts. The fold adds one Unresolved record, placement_period_monitoring, because extending the action to 30 months leaves the placement window without a milestone and the operator decided no new one.",
+      "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json"
+    },
     "scope_note": "criterion_statement is the draft's milestone line, verbatim. Turning each statement into a verifiable achievement criterion with a responsible party is Phase 4's output (CLAUDE.md §7 Phase 4), not this seed's. The draft additionally states that the M6/M12/M16/M20 structure introduces corrective decision points answering a prior ESR criticism (¶379)."
   },
   "spine_status": "confirmed_real",
@@ -53,5 +59,15 @@
       "validation_status": "Confirmed",
       "source_ref": "§3.1 ¶317"
     }
-  ]
+  ],
+  "placement_period_monitoring": {
+    "validation_status": "Unresolved",
+    "note": "Opened by the ticket 6 fold of input pack items 2 and 8. The action now runs 30 months, WP5 ends at M30, and the five draft milestones all fall at or before M23. That leaves the M23-M30 placement period with no milestone and the M6/M12/M16/M20 decision points with a ten-month unmonitored tail. Input pack item 8 raises two candidates — moving or companioning MS5 with a placement-completion milestone, and adding a fifth steering point at M27 — and the operator decided neither. Neither is invented here (§13.3): a milestone with a fabricated month and criterion would be exactly the kind of project fact the seed rule forbids. Phase 4 owns milestone definition and can resolve this from the extended WP5 range; ticket 7 should surface it, because it is visible to an evaluator reading the Gantt.",
+    "candidates_raised_not_decided": [
+      "A placement-completion milestone at the end of the M25-M30 window",
+      "A fifth Steering Group decision point at M27"
+    ],
+    "gate_impact": "phase_04_gate requires every milestone to carry a verifiable criterion and the timeline to fit the duration. Five milestones inside a 30-month timeline satisfy both. The gap is a quality matter, not a gate failure.",
+    "source_ref": "plans/fieldwise_operator_input_pack.md item 8 ('MONTH RANGES ARE NOT JUST THIS TABLE', 2026-08-11); §3.1 ¶379 (the draft's own corrective-decision-point argument)"
+  }
 }
