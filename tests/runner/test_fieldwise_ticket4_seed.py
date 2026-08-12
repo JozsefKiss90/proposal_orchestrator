@@ -115,13 +115,22 @@ class TestObjectives:
 
 class TestMilestones:
     def test_ms1_to_ms5_confirmed_with_draft_months(self):
+        """The draft's five milestones, lifted with their own months.
+
+        Ticket 7 added MS6 at M30 on operator direction, Inferred and with no
+        draft paragraph. That addition is guarded by the ticket 6 and ticket 7
+        tests. What ticket 4 pins is that the five draft milestones are still
+        the five draft milestones.
+        """
         data = _load("milestones_seed.json")
         milestones = {m["milestone_id"]: m for m in data["milestones"]}
-        assert sorted(milestones) == ["MS1", "MS2", "MS3", "MS4", "MS5"]
+        assert {"MS1", "MS2", "MS3", "MS4", "MS5"} <= set(milestones)
         expected_months = {"MS1": 6, "MS2": 12, "MS3": 16, "MS4": 20, "MS5": 23}
-        for mid, record in milestones.items():
+        for mid, month in expected_months.items():
+            record = milestones[mid]
             assert record["validation_status"] == "Confirmed", mid
-            assert record["due_month"] == expected_months[mid], mid
+            assert record["due_month"] == month, mid
+            assert "¶" in record["source_ref"], mid
 
 
 class TestRisks:
@@ -199,17 +208,25 @@ class TestNothingInvented:
     def test_no_kpi_is_attributed_to_the_draft(self):
         """The draft declines numeric targets, so no KPI may cite it.
 
-        KPIs were Unresolved at ticket 4 and are folded at ticket 6 from
-        operator input pack item 5. Every folded KPI must cite the pack, never
-        a draft paragraph.
+        KPIs were Unresolved at ticket 4. K1-K10 were folded at ticket 6 from
+        operator input pack item 5, and K11 was decided at the ticket 7
+        authorisation review, which cites a decision-log record rather than an
+        input pack item. Both are operator sources. What must never appear is a
+        draft paragraph reference.
         """
         data = _load("impacts.json")
         kpis = data["kpis"]
         assert kpis.get("note", "").strip()
         for kpi in kpis.get("items", []):
             cited = kpi["source_ref"].lower()
-            assert "input pack" in cited or "operator_input_pack" in cited, (
-                f"{kpi['kpi_id']} cites something other than the operator pack"
+            assert (
+                "input pack" in cited
+                or "operator_input_pack" in cited
+                or "decision_log/" in cited
+            ), f"{kpi['kpi_id']} cites neither the operator pack nor a decision record"
+            assert "¶" not in kpi["source_ref"], (
+                f"{kpi['kpi_id']} cites a draft paragraph; the draft sets no "
+                "numeric targets (§2.3 ¶243)"
             )
 
 

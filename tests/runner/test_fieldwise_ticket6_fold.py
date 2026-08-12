@@ -209,12 +209,15 @@ class TestCriterion1NoAnsweredRecordStaysUnresolved:
         impacts = _load(ARCHITECTURE / "impacts.json")
         kpis = impacts["kpis"]
         assert kpis["validation_status"] == "Confirmed"
-        confirmed = [
-            k for k in kpis["items"] if k["validation_status"] == "Confirmed"
-        ]
-        assert [k["kpi_id"] for k in confirmed] == [
-            f"K{i}" for i in range(1, 11)
-        ]
+        confirmed = {
+            k["kpi_id"]
+            for k in kpis["items"]
+            if k["validation_status"] == "Confirmed"
+        }
+        # K1-K10 are what the ticket 6 fold confirmed from input pack item 5.
+        # K11 was raised there and left undecided; ticket 7 decided it, so it
+        # may be Confirmed too and is pinned by the ticket 7 test instead.
+        assert {f"K{i}" for i in range(1, 11)} <= confirmed
         wp_seed = _load(ARCHITECTURE / "workpackage_seed.json")
         known = {
             d["deliverable_id"]
@@ -462,11 +465,22 @@ class TestCriterion3ChecklistCoverage:
 
 class TestCriterion4DeferredItemsStayUnresolvedAndListed:
     def test_the_five_deferred_capacity_fields_are_named(self, capabilities):
+        """All five fields the operator deferred on 2026-08-11 stay accounted for.
+
+        Ticket 7 answered one of the five, AgroVIR key_people, in part. The
+        ticket 6 guarantee is that no deferred field disappears silently, so
+        each of the five must still be named somewhere on this record: four as
+        still deferred, and any that were later answered as answered.
+        """
         detail = capabilities["part_b2_capacity_detail"]
         assert detail["validation_status"] == "Unresolved"
-        assert detail["deferred_fields_named_by_the_operator"] == (
-            DEFERRED_CAPACITY_FIELDS
-        )
+        still_deferred = detail["deferred_fields_named_by_the_operator"]
+        answered = detail.get("answered_in_part_at_ticket_7", [])
+        accounted = " | ".join(still_deferred + answered)
+        for field in DEFERRED_CAPACITY_FIELDS:
+            assert field in accounted, (
+                f"{field} was deferred on 2026-08-11 and is no longer named"
+            )
 
     def test_the_deferred_fields_are_null_on_their_own_records(
         self, capabilities
@@ -475,11 +489,12 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
             entry["short_name"]: entry
             for entry in capabilities["participant_capacity"]
         }
+        # AgroVIR key_people was the fifth. Ticket 7 answered it in part, so it
+        # is pinned by the ticket 7 test rather than here.
         expected_unresolved = [
             ("ELTE", "recent_projects_and_publications"),
             ("ELTE", "previous_msca_hosting"),
             ("MATE", "recent_projects_and_publications"),
-            ("AgroVIR", "key_people"),
             ("AgroVIR", "relevant_track_record"),
         ]
         for short_name, field in expected_unresolved:
@@ -512,18 +527,48 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
         assert cv["invited_talks_status"] == "Unresolved"
 
     def test_undecided_candidates_are_not_folded_as_accepted(self):
+        """A candidate may only leave Unresolved by an operator decision.
+
+        Ticket 6 left K11 and the placement-window monitoring undecided. Ticket
+        7 closed both, so the durable guarantee is no longer that they are
+        Unresolved: it is that neither turned Confirmed without an operator
+        decision record behind it, and that no milestone was invented for the
+        placement window.
+        """
         impacts = _load(ARCHITECTURE / "impacts.json")
         k11 = next(
             k for k in impacts["kpis"]["items"] if k["kpi_id"] == "K11"
         )
-        assert k11["validation_status"] == "Unresolved"
+        if k11["validation_status"] != "Unresolved":
+            assert "decision_log/" in k11["source_ref"], (
+                "K11 left Unresolved without citing an operator decision"
+            )
+
         milestones = _load(ARCHITECTURE / "milestones_seed.json")
-        assert len(milestones["milestones"]) == 5, (
-            "no milestone may be invented for the placement window"
-        )
+        # The draft carries five. Any milestone beyond them must be an operator
+        # decision with a decision-log source, must not claim a draft
+        # paragraph, and must not be Confirmed on evidence that does not exist.
+        draft_milestones = [
+            m for m in milestones["milestones"] if "¶" in m["source_ref"]
+        ]
+        assert len(draft_milestones) == 5
+        for extra in milestones["milestones"][len(draft_milestones):]:
+            assert "decision_log/" in extra["source_ref"], (
+                f"{extra['milestone_id']} was invented for the placement window"
+            )
+            assert extra["validation_status"] in {"Inferred", "Confirmed"}
+            assert extra.get("note", "").strip()
+
         monitoring = milestones["placement_period_monitoring"]
-        assert monitoring["validation_status"] == "Unresolved"
-        assert monitoring["candidates_raised_not_decided"]
+        if monitoring["validation_status"] != "Unresolved":
+            assert "decision_log/" in monitoring["source_ref"], (
+                "the monitoring gap was closed without an operator decision"
+            )
+            assert monitoring["decided"], (
+                "a closed monitoring record must say what was decided"
+            )
+        else:
+            assert monitoring["candidates_raised_not_decided"]
 
     def test_the_authorisation_packet_list_covers_the_open_items(
         self, checklist
@@ -534,8 +579,17 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
             assert entry["what"]
             assert entry["why_open"]
         blob = json.dumps(open_items, ensure_ascii=False)
-        for expected in ("C5", "invited_talks", "PIC", "K11"):
+        for expected in ("C5", "invited_talks", "PIC"):
             assert expected in blob, f"{expected} is not listed for ticket 7"
+        # K11 was listed here at ticket 6 and closed at ticket 7. An item may
+        # leave the open list only by being recorded as closed.
+        closed = json.dumps(
+            checklist["open_for_authorisation"].get("closed_on_2026_08_12", []),
+            ensure_ascii=False,
+        )
+        assert "K11" in blob or "K11" in closed, (
+            "K11 left the open list without being recorded as closed"
+        )
 
 
 class TestCriterion5DecisionLogRecords:

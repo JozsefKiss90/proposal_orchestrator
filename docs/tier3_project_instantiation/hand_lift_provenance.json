@@ -222,6 +222,56 @@
     }
   ],
 
+  "authorisation_review_artifacts": {
+    "ticket": "plans/fieldwise_tickets.md ticket 7 (Authorisation packet)",
+    "date": "2026-08-12",
+    "source": "Operator answers given at the two authorisation reviews, recorded in decision_log/fieldwise-placement-hosting_2026-08-12.json, decision_log/fieldwise-ticket7-open-items_2026-08-12.json and decision_log/fieldwise-ticket7-review-round2_2026-08-12.json. These answers are not in the operator input pack: the on-disk pack and its in-tier copy are byte-identical and contain no answer to the placement-hosting question. Records folded from them cite the decision-log entries, which are durable Tier 4 state, rather than an input pack item.",
+    "status_rule": "Unchanged from the fold rule above. A fact the operator decided is Confirmed, cited to the decision-log record and its date. A name or figure the operator supplied without a verifiable source is Assumed and carries a declaration. A field the operator deferred or answered with something else stays Unresolved with the missing content named.",
+    "artifacts": [
+      {
+        "artifact": "consortium/capabilities.json",
+        "fold_mode": "placement_gap_answered_in_part",
+        "validation_status_summary": "AgroVIR key_people moves from Unresolved to Assumed with two declared names and two Unresolved titles. hosting_capacity_for_the_placement is decomposed from a single null field into five sub-records: the supervisor (Assumed), the workspace (Unresolved, four missing fields named), the six-month content (Confirmed, four items), what the placement gives that ELTE cannot (Inferred), and the supplied field access (Confirmed, recorded as supplementary rather than as workspace). The invited_talks deferral of 2026-08-12 is recorded. Every draft-lifted collection is untouched."
+      },
+      {
+        "artifact": "architecture_inputs/impacts.json",
+        "fold_mode": "unresolved_record_resolved",
+        "validation_status_summary": "K11 moves from Unresolved to Confirmed, tracing to D1.3. Every accepted deliverable now carries a KPI. The five draft-lifted impact claims and the six expected-impact mappings are unchanged."
+      },
+      {
+        "artifact": "architecture_inputs/milestones_seed.json",
+        "fold_mode": "unresolved_record_resolved_plus_new_collections",
+        "validation_status_summary": "placement_period_monitoring moves from Unresolved to Confirmed. A steering_decision_points collection is added, carrying M6, M12, M16 and M20 from the draft and item 4, and M27 from the first review of 2026-08-12. The second review of the same day adds milestone MS6 at M30, Inferred, and a placement_verification record naming D5.4 and D5.5 as what carries the placement's verification. MS1 to MS5 and their draft-verbatim criterion statements are unchanged. The placement_verification record carries one Unresolved sub-record: D5.4 is claimed by both MS5 at M23 and the placement window, and Phase 4 owns the resolution."
+      },
+      {
+        "artifact": "architecture_inputs/outcomes.json",
+        "fold_mode": "consistency_correction",
+        "validation_status_summary": "No record changed status. The D1.3 note read 'reviewed at M6/M12/M16/M20' and now reads five points, because AR-10 added an M27 Career Development Plan review. The Inferred outcome separation and every draft-lifted output and transition are untouched."
+      },
+      {
+        "artifact": "architecture_inputs/workpackage_seed.json",
+        "fold_mode": "operator_confirmation_plus_derived_check",
+        "validation_status_summary": "The co-supervisor's 2.0 person-months is confirmed by the operator; the value is unchanged and stays Assumed. WP5 gains an Inferred deliverable_sequencing_check placing D5.1 before M25, which the seeded MS5 at M23 already satisfies. No task, deliverable or month range changes."
+      },
+      {
+        "artifact": "working_assumptions.json",
+        "fold_mode": "operator_declarations",
+        "validation_status_summary": "One declaration added, placement_supervisor_AgroVIR. Fourteen declarations in total, all Assumed by construction. The person_months_ELTE_co_supervisor rationale records the operator's confirmation; its value is unchanged."
+      },
+      {
+        "artifact": "call_binding/confirmation_checklist.json",
+        "fold_mode": "amended_plus_new_collection",
+        "validation_status_summary": "Items 4, 5, 8 and 12 carry amendment notes and amendment_record references. A new authorisation_review_decisions collection carries AR-1 to AR-8. open_for_authorisation is rewritten from twelve entries to eleven, with the four closed entries listed as closed."
+      },
+      {
+        "artifact": "project_brief/project_summary.json",
+        "fold_mode": "consistency_correction",
+        "validation_status_summary": "No record changed status and no value changed. The spine_note described the C5 mobility question as deferred, which the operator superseded on 2026-08-11. Ticket 6 corrected the same sentence in selected_call.json and left this copy standing; ticket 7 applies the same correction."
+      }
+    ],
+    "not_written": "call_binding/selected_call.json. Its action_confirmation_ref stays null and Unresolved until the operator authorises the run, which is a separate act with its own decision-log record."
+  },
+
   "not_seeded": [
     "call_binding/topic_mapping.json — Phase 2 writes it (plan §3).",
     "call_binding/compliance_profile.json — Phase 2 writes it (plan §3)."

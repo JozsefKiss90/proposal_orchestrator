@@ -42,7 +42,7 @@
       "deliverables": [
         {"deliverable_id": "D1.1", "title": "Harmonised historical database", "validation_status": "Confirmed", "source_ref": "§3.1 ¶260"},
         {"deliverable_id": "D1.2", "title": "Data/target/validation protocol", "validation_status": "Confirmed", "source_ref": "§3.1 ¶261"},
-        {"deliverable_id": "D1.3", "title": "Career Development Plan", "due_month": 3, "validation_status": "Confirmed", "checklist_ref": "CDP_DELIVERABLE", "source_ref": "Operator input pack item 6, accepted 2026-08-11 (CC-13 instrument mandate)", "note": "Not in the draft's deliverable list. Operator-added: agreed by M3, owned by FELLOW and SUPERVISOR, reviewed at M6/M12/M16/M20. Seeded per the ticket 2 correction ('Ticket 4 must seed D1.3 if the operator accepts item 6'). Confirmed on the same footing as the 30-month duration in selected_call.json: an operator decision of 2026-08-11, recorded in the input pack, which ticket 6 copies into Tier 3 source materials; the status reasoning is in the lift decision-log extension. checklist_ref resolves when ticket 6 re-authors confirmation_checklist.json. Placed in WP1 because its due month falls inside WP1's M1-M6 range; Phase 3 may relocate it to a management/training strand."}
+        {"deliverable_id": "D1.3", "title": "Career Development Plan", "due_month": 3, "validation_status": "Confirmed", "checklist_ref": "CDP_DELIVERABLE", "source_ref": "Operator input pack item 6, accepted 2026-08-11 (CC-13 instrument mandate)", "note": "Not in the draft's deliverable list. Operator-added: agreed by M3, owned by FELLOW and SUPERVISOR, reviewed at M6/M12/M16/M20/M27 (the M27 review added by AR-10 on 2026-08-12, decision_log/fieldwise-ticket7-review-round2_2026-08-12.json). Seeded per the ticket 2 correction ('Ticket 4 must seed D1.3 if the operator accepts item 6'). Confirmed on the same footing as the 30-month duration in selected_call.json: an operator decision of 2026-08-11, recorded in the input pack, which ticket 6 copies into Tier 3 source materials; the status reasoning is in the lift decision-log extension. checklist_ref resolves when ticket 6 re-authors confirmation_checklist.json. Placed in WP1 because its due month falls inside WP1's M1-M6 range; Phase 3 may relocate it to a management/training strand."}
       ]
     },
     {
@@ -125,6 +125,12 @@
       "draft_end_month": 24,
       "end_month_status": "Confirmed",
       "end_month_note": "Extended from the draft's M24 to M30 at the ticket 6 fold. The operator decided the six-month non-academic placement at AgroVIR on 2026-08-11 (input pack items 2 and 8), AgroVIR is the WP5 partner, and the placement therefore extends this work package by construction rather than by allocation choice. selected_call.json carries the same decision as project_duration_months 30. WP1 to WP4 are untouched: none runs past M21 and the placement adds nothing to them.",
+      "deliverable_sequencing_check": {
+        "validation_status": "Inferred",
+        "statement": "D5.1, the DrR web MVP, must land before M25 so that the M25-M30 placement is validation and transfer rather than first build.",
+        "note": "Raised by the operator on 2026-08-12 and already satisfied by the seeded state. MS5 at M23 requires the web MVP to be externally evaluated under farmer conditions (¶317), which cannot happen before D5.1 exists, so the MVP precedes the placement window by construction. Phase 4 owns deliverable due months and must not schedule D5.1 into M25-M30. The placement work content in capabilities.json assumes a built MVP: it hardens the pipeline, assesses it and writes the integration roadmap.",
+        "source_ref": "§3.1 ¶312 (D5.1), ¶317 (MS5 at M23); operator check of 2026-08-12, decision_log/fieldwise-placement-hosting_2026-08-12.json"
+      },
       "lead": "ELTE + AgroVIR",
       "lead_role_tokens": ["HOST", "VALIDATION_PARTNER"],
       "milestone": "MS5",
@@ -269,12 +275,13 @@
         "what": "Input pack item 8 carries two figures for the co-supervisor. Its answer block reads 2.0 and states a partner in-kind total of 11.4, which 2.4 + 1.5 + 3.0 + 2.5 + 2.0 satisfies exactly. Its derivation paragraph reads 1.5, which would make the total 10.9 and contradict the stated total.",
         "resolved_as": "2.0, the answer-block figure.",
         "why": "The 1.5 derivation is built on 'fortnightly technical sessions ... through M6-M21', and item 4 supersedes that cadence: it raises the co-supervisor's sessions to weekly through WP3 and WP4 once the operator confirmed he is responsible for model development and testing. Weekly sessions across that window roughly double the session hours in the derivation, which lands the figure at about 2.0. So the answer block is the post-amendment value and the derivation paragraph is stale, not the other way round. The stated total corroborates it.",
-        "status": "Resolved at the fold rather than referred back, because both readings are the operator's own and one of them is arithmetically inconsistent with the total the operator also stated. The figure is Assumed either way, it is in kind and uncosted, and it changes no gate. Ticket 7 should note the correction in the authorisation packet so the operator can overturn it in one line."
+        "status": "Resolved at the fold rather than referred back, because both readings are the operator's own and one of them is arithmetically inconsistent with the total the operator also stated. The figure is Assumed either way, it is in kind and uncosted, and it changes no gate.",
+        "operator_confirmation": "The ticket 7 authorisation packet put the correction to the operator, who confirmed 2.0 on 2026-08-12 and restated the reasoning: the figure was raised when Dr. Hollós was confirmed responsible for model development and testing, with the cadence raised from fortnightly to weekly through WP3 and WP4 (M6-M21). The partner in-kind total stands at 11.4. The contradiction is closed. The figure remains Assumed, because it is an in-kind estimate the partner has not seen, not because the reading is in doubt. Recorded in decision_log/fieldwise-ticket7-open-items_2026-08-12.json."
       }
     },
     "open_consequences_for_phase_4": [
       "The monthly profile is tighter than it was. M16-M21 now carries WP4 and a heavier WP5 concurrently. The totals fit inside 30 person-months over 30 months, but phase_04_gate's check that concurrent work packages never demand more than one FTE in any month is the one that will tell. Partner in-kind effort is outside that check.",
-      "The draft's four corrective decision points at M6, M12, M16 and M20 leave a ten-month unmonitored tail in a 30-month action. Input pack item 8 suggests a fifth point at M27 and a placement-completion milestone, and the operator decided neither. Recorded as Unresolved in milestones_seed.json rather than invented here."
+      "The draft's four corrective decision points at M6, M12, M16 and M20 left a ten-month unmonitored tail in a 30-month action. The operator closed half of it on 2026-08-12 by adding a fifth Steering Group decision point at M27, on the ground that the placement is evaluated and must not run unmonitored. The placement-completion milestone that input pack item 8 also raised was not adopted. Both outcomes are recorded in milestones_seed.json."
     ]
   }
 }

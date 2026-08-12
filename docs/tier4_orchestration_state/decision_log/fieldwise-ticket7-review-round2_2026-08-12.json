@@ -1,0 +1,89 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-ticket7-review-round2",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+
+  "authority": "Operator decisions taken at the second ticket 7 authorisation review (plans/fieldwise_tickets.md ticket 7, Authorisation packet). Durable recording per CLAUDE.md §9.4; status assignment per §12.2; no fabricated project facts per §13.3; contradiction resolution recorded per §12.3.",
+
+  "why": "The operator reviewed revision 2 of the authorisation packet and raised two things. The placement window carried no verification, and the M27 steering point added earlier the same day had made an item 6 clause false. Both are recorded here rather than by rewriting the first-round record.",
+
+  "supersedes_in_part": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json (AR-5 and AR-7)",
+
+  "decisions": [
+    {
+      "id": "AR-9",
+      "title": "Verification of the M25-M30 placement window",
+      "status": "Confirmed",
+      "operator_statement": "The placement has no milestone. If MS1-MS5 all complete by M23, a 30-month action ends with seven unmilestoned months containing an evaluated placement producing D5.4 and D5.5. The M27 steering point is governance, not a verifiable checkpoint.",
+      "operator_options": [
+        "Seed a sixth milestone in the placement window",
+        "State explicitly that D5.4 and D5.5 carry the verification"
+      ],
+      "decision": "Both, because each answers half of the problem. MS6 is seeded at M30 with status Inferred, and a placement_verification record names D5.4 and D5.5 as the deliverables the verification rests on.",
+      "why_both": "The milestone gives Phase 4 something to attach a verifiable criterion to and gives an evaluator a checkpoint in the Gantt. The statement names what evidences it, which a milestone alone does not. Neither is redundant.",
+      "why_inferred_not_confirmed": "MS1 to MS5 carry the draft's own criterion statements verbatim. MS6 has no draft source, because the draft's action ran to M24. Its month is WP5's Confirmed end month, and its criterion restates two AR-3 work-content items that already produce named deliverables, so nothing is invented: no new deliverable, no new task, no new month. Inferred with the derivation stated is the honest status. Phase 4 owns turning the statement into a verifiable achievement criterion with a responsible party, exactly as for the other five.",
+      "reverses": {
+        "what": "AR-7, taken earlier the same day, adopted the M27 steering point and declined the placement-completion milestone that input pack item 8 raised alongside it.",
+        "why_the_reversal_stands": "The operator's ground is that a steering point is governance and not verification. Both candidates item 8 raised are now adopted. The AR-7 text is left as decided and is not rewritten; milestones_seed.json records the reversal under placement_period_monitoring.reversal_note."
+      },
+      "gate_position": "phase_04_gate predicate g05_p05 requires every milestone in the Phase 4 output to carry a verifiable criterion and a due month. It does not require a milestone in any particular window. The gate passed with five milestones and passes with six. MS6 is an evaluator-facing quality decision, not a gate fix.",
+      "opens": {
+        "id": "D5.4 double claim",
+        "status": "Unresolved",
+        "what": "D5.4 is claimed by two points in the timeline. MS5 at M23 states that the web MVP is 'externally evaluated under farmer/operational conditions' (§3.1 ¶317), and the AR-3 placement content puts the nine-dimension operational assessment producing D5.4 inside M25-M30. Input pack item 8 separately names T5.6, the AgroVIR functional and interoperability assessment, as the natural occupant of the placement window.",
+        "why_it_matters": "If D5.4 lands by M23 to satisfy MS5, MS6 rests on D5.5 alone and the placement repeats an evaluation already delivered. If D5.4 lands in the placement, MS5 at M23 needs a different output, most likely D5.2 or D5.3.",
+        "not_resolved_here": "Deliverable due months are Phase 4's output and no source states which reading the draft intended. Choosing one would fabricate a scheduling fact (§13.3). It is recorded as Unresolved, listed in the authorisation packet, and left to Phase 4.",
+        "found_by": "This decision. Seeding MS6 against D5.4 and D5.5 is what made the double claim visible."
+      },
+      "lands_in": [
+        "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+        "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      ]
+    },
+    {
+      "id": "AR-10",
+      "title": "An M27 Career Development Plan review",
+      "status": "Confirmed",
+      "operator_statement": "Item 6's accepted text says the Career Development Plan is reviewed at M6, M12, M16 and M20 alongside the steering points of item 4. There are now five steering points and four reviews, so that clause is false.",
+      "operator_options": [
+        "Drop the word 'alongside'",
+        "Add an M27 review"
+      ],
+      "decision": "Add an M27 review. The Career Development Plan is reviewed at M6, M12, M16, M20 and M27.",
+      "reason": "The operator's ground is that M27 falls inside the non-academic placement, which is when non-academic career development is most in play. Dropping 'alongside' would remove a contradiction by weakening a true statement about how the governance and the plan are tied together.",
+      "contradiction_resolved": "AR-7 created it. Adding a fifth steering point on 2026-08-12 left the item 6 clause asserting an alignment that no longer held. This is a §12.3 contradiction inside one tier, resolved explicitly rather than by silent edit.",
+      "knock_ons_applied": [
+        "call_binding/confirmation_checklist.json item 6 review_points is [6, 12, 16, 20, 27], with the amendment stated on the record",
+        "architecture_inputs/impacts.json K11 target reads 'all five steering points', not four",
+        "architecture_inputs/outcomes.json and architecture_inputs/workpackage_seed.json D1.3 notes read M6/M12/M16/M20/M27",
+        "architecture_inputs/milestones_seed.json steering_decision_points.consequence no longer says the plan reviews stay at four",
+        "decision_log/fieldwise-item6-career-development-plan_2026-08-12.json carries an amended_by block; its decision text is left as decided on 2026-08-11"
+      ],
+      "note": "K11's target was written on 2026-08-12 as 'reviewed at all four steering points' and is amended the same day. The KPI is Confirmed either way; what changed is the count it measures against.",
+      "lands_in": [
+        "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+        "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+        "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+        "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+        "docs/tier4_orchestration_state/decision_log/fieldwise-item6-career-development-plan_2026-08-12.json"
+      ]
+    }
+  ],
+
+  "correction_to_the_packet": "Revision 2 stated that phase_04_gate requires every milestone to carry a verifiable criterion, and that five milestones inside a 30-month timeline satisfy it. That is accurate and is unchanged. The operator's point is not a gate point: the placement window had no checkpoint an evaluator could read and no milestone for Phase 4 to attach a criterion to. Revision 3 of the packet states the distinction rather than resting on the gate verdict.",
+
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-item6-career-development-plan_2026-08-12.json",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json",
+    "docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md"
+  ],
+
+  "what_this_record_does_not_do": "It does not authorise the run. Authorisation is a separate operator act with its own record, and selected_call.json action_confirmation_ref stays null until it happens."
+}

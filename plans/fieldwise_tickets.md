@@ -231,9 +231,53 @@ decision log.
 **Blocked by:** Seed call binding and project brief; Seed architecture inputs; Seed consortium
 files; Fold operator answers into Tier 3.
 
-- [ ] The packet enumerates every seeded record with status and source reference.
-- [ ] Every remaining Unresolved item is listed with the gate it blocks.
+- [x] The packet enumerates every seeded record with status and source reference.
+- [x] Every remaining Unresolved item is listed with the gate it blocks.
 - [ ] Operator authorisation is recorded in the decision log before any phase runs.
+
+The packet is `docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md`.
+It covers 301 records: 230 Confirmed, 19 Inferred, 34 Assumed, 18 Unresolved. Acceptance is pinned by
+`tests/runner/test_fieldwise_ticket7_authorisation.py`.
+
+**The third criterion is open.** The operator reviewed revisions 1 and 2 on 2026-08-12 and held
+authorisation both times. No decision-log authorisation record exists, and `selected_call.json` keeps
+`action_confirmation_ref` at null with status Unresolved. Ticket 8 stays blocked.
+
+Three deviations, all recorded in the three decision-log entries the reviews produced.
+
+- The packet lives in Tier 4, not `plans/`. The first draft went to `plans/` alongside the operator
+  input pack, and the operator directed the move. Tier 4 is the better fit under §12.1 and §12.2. The
+  neighbouring files in `validation_reports/` are run-scoped skill output named `<check>_<run_id>.json`,
+  so this one carries a date instead of a run id.
+- Ticket 7 folded operator answers into Tier 3, which is ticket 6's job. The packet surfaced the AgroVIR
+  placement-hosting gap and four one-line decisions, and the operator answered ten items across two
+  reviews, against the packet rather than against the input pack. Records folded from those answers cite
+  `decision_log/fieldwise-placement-hosting_2026-08-12.json`,
+  `decision_log/fieldwise-ticket7-open-items_2026-08-12.json` and
+  `decision_log/fieldwise-ticket7-review-round2_2026-08-12.json`, because no input pack item carries them.
+- The second review reversed part of the first, on the operator's direction. AR-7 declined a
+  placement-completion milestone and AR-9 adopted one, MS6 at M30, seeded Inferred because the draft's
+  action ran to M24 and supplies no criterion. The reversal is recorded rather than overwritten. AR-9
+  also exposed a conflict that was already in the state: D5.4 is claimed by MS5 at M23 and by the
+  placement window, and Phase 4 owns the resolution.
+- The ticket 4, 5 and 6 test files needed amending again, as at ticket 6. Their assertions now pin what
+  stays true of the lift and of the earlier fold. Three of the failures across the two rounds were real
+  defects in the new Tier 3 records, not test drift, and the artifacts were fixed: a Confirmed record
+  with no `source_ref`, an Assumed record with no `note`, and an Unresolved record with no `note`.
+
+Two verifications the operator asked for before re-presenting.
+
+- The on-disk operator input pack is not current. `plans/fieldwise_operator_input_pack.md` and its Tier 3
+  copy are byte-identical, and the pack still carries both co-supervisor figures. It contains no
+  occurrence of "Maróti" and holds the placement question rather than an answer. Operator revisions
+  delivered as files outside the repository are not repository state.
+- Predicate `g04_p07` tests record existence. Function `all_partners_in_tier3` at
+  `runner/predicates/coverage_predicates.py:720` reads `partner_id` and tests subset membership, and it
+  reads no other field. AgroVIR's absent PIC therefore blocks submission and not `phase_03_gate`.
+
+One correction to the ticket 5 note. That note said ticket 7 should carry the PIC finding, which it
+does. The finding is now verified in the predicate implementation rather than asserted from the gate
+prose.
 
 ## 8. Run Phases 1–2
 

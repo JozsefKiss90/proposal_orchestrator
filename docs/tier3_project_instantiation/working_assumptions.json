@@ -2,6 +2,7 @@
   "record_type": "working_assumptions",
   "provenance_class": "manually_placed",
   "_authored_by": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3), 2026-08-12, from the returned operator input pack. In-tier source copy: docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md. Fold record: docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json.",
+  "_extended_by": "plans/fieldwise_tickets.md ticket 7 (Authorisation packet), 2026-08-12. One declaration added, placement_supervisor_AgroVIR, from the operator's answers at the authorisation review. Those answers are not in the input pack and cite decision-log records instead: decision_log/fieldwise-placement-hosting_2026-08-12.json and decision_log/fieldwise-ticket7-open-items_2026-08-12.json. The person_months_ELTE_co_supervisor rationale is updated with the operator's confirmation of 2.0; the value is unchanged.",
   "_scope": "One declaration for every fact that Tier 3 marks Assumed. A declaration turns an Unresolved or unevidenced fact into a conscious Assumed (§12.2) owned and dated by the operator; it never makes a fact Confirmed. Every Assumed record in Tier 3 names its declaration_key here, and every key below backs at least one such record.",
   "_deliberately_not_declared": {
     "project_duration_months": "30 is Confirmed in call_binding/selected_call.json, which is where runner/unit_cost_budget.py resolves it first (_resolve_confirmed_months) and where phase_04_gate's timeline_within_duration reads it by name. Input pack item 9 asked for a duration declaration here as well. It is deliberately omitted: the reader stamps every declaration Assumed, so declaring the duration would render an operator-Confirmed fact as Assumed in the declared surface and in the canonical reference pack, contradicting the call binding inside one tier — which is what §12.3 exists to prevent. The declaration would also be inert, because the call binding wins the precedence order. The substance of item 9's instruction is kept: the duration and its basis are recorded in the call binding, in the confirmation checklist under DURATION, and in the ticket 6 fold record.",
@@ -69,7 +70,7 @@
       "value": 2.0,
       "declared_by": "operator (FIELDWISE input pack item 8)",
       "declared_on": "2026-08-11T00:00:00Z",
-      "rationale": "In-kind effort estimate for the co-supervisor. Item 8 carries two figures — 2.0 in its answer block, which its stated partner total of 11.4 corroborates, and 1.5 in a derivation paragraph built on a fortnightly cadence that item 4 later raised to weekly through WP3 and WP4. The answer block is the post-amendment value and is declared here; the reasoning is recorded in workpackage_seed.json under co_supervisor_figure_contradiction, and ticket 7 should put the correction to the operator.",
+      "rationale": "In-kind effort estimate for the co-supervisor. Item 8 carries two figures: 2.0 in its answer block, which its stated partner total of 11.4 corroborates, and 1.5 in a derivation paragraph built on a fortnightly cadence that item 4 later raised to weekly through WP3 and WP4. The ticket 7 authorisation packet put the correction to the operator, who confirmed 2.0 on 2026-08-12 and restated the reasoning: the figure was raised when Dr. Hollós was confirmed responsible for model development and testing, with the cadence raised from fortnightly to weekly through M6-M21. The contradiction is closed. The value stays Assumed because it is an in-kind estimate the co-supervisor has not seen, not because the reading is in doubt. Recorded in decision_log/fieldwise-ticket7-open-items_2026-08-12.json.",
       "checklist_ref": "CO_SUPERVISOR"
     },
     {
@@ -86,6 +87,14 @@
       "declared_by": "operator (FIELDWISE input pack item 1)",
       "declared_on": "2026-08-11T00:00:00Z",
       "rationale": "Operator-supplied and not independently verified; the company website names no staff and her role is unknown. Recorded in Hungarian name order as Balázs Zsuzsanna in item 1 and in western order in item 4; the same person. The placement additionally needs a named on-site supervisor, who may or may not be her; that gap is Unresolved in capabilities.json, not declared here.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "placement_supervisor_AgroVIR",
+      "value": "Miklós Maróti",
+      "declared_by": "operator (FIELDWISE ticket 7 authorisation review)",
+      "declared_on": "2026-08-12T00:00:00Z",
+      "rationale": "On-site supervisor for the M25-M30 non-academic placement at AgroVIR. Operator-supplied and not independently verified: the company website names no staff, as with the Balázs contact. His role and seniority inside the company are not supplied and stay Unresolved on the capabilities.json key_people record; Part B-2 §5 needs them, and the Part B-1 placement argument is weaker without a stated seniority. Declared rather than Confirmed for the same reason the other operator-supplied names are: a name with no verifiable source behind it is an assumption the operator owns, not a fact the repository can evidence.",
       "checklist_ref": "VALIDATION_PARTNER"
     },
     {

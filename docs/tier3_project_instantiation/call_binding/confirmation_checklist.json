@@ -173,7 +173,8 @@
       "gate": "phase_06_gate predicates g07_p07 (a governance body with composition and decision scope) and g07_p08 (every management role names a partner that exists in partners.json).",
       "decision": {
         "supervision_cadence": "Weekly one-to-one meeting between FELLOW and SUPERVISOR. Weekly technical session with the CO_SUPERVISOR through WP3 and WP4 (M6-M21), tapering to monthly outside that window. Monthly written progress record held by the fellow. Quarterly review against the Career Development Plan, attended by both supervisors.",
-        "governance_body": "Project Steering Group, chaired by SUPERVISOR, with FELLOW, CO_SUPERVISOR and one named contact each from DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER. It meets at M6, M12, M16 and M20 — the four corrective decision points the draft already names — and issues a go or no-go verdict on milestones MS1 to MS5.",
+        "governance_body": "Project Steering Group, chaired by SUPERVISOR, with FELLOW, CO_SUPERVISOR and one named contact each from DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER. It meets at M6, M12, M16, M20 and M27, and issues a go or no-go verdict on milestones MS1 to MS5.",
+        "governance_body_amendment": "The first four points are the corrective decision points the draft already names (§3.1 ¶379) and are unchanged. M27 is the operator's decision of 2026-08-12 at the authorisation review, taken because the four accepted points leave the M23-M30 placement entirely unmonitored. The M27 meeting is a mid-placement review and carries no milestone: the operator added a steering point and did not adopt the placement-completion milestone raised alongside it. The schedule is carried in architecture_inputs/milestones_seed.json under steering_decision_points, and the decision is recorded in decision_log/fieldwise-ticket7-open-items_2026-08-12.json.",
         "decision_rights": [
           {"decision": "Scientific method, day-to-day research choices", "owner": "FELLOW", "escalation": "SUPERVISOR"},
           {"decision": "Model development and testing: methodological lead and quality assurance", "owner": "CO_SUPERVISOR", "escalation": "SUPERVISOR"},
@@ -199,10 +200,12 @@
       "status": "Confirmed",
       "decided_on": "2026-08-11",
       "gate": "phase_05_gate predicates g06_p04 (every Tier 2B expected impact carries a mapped project output) and g06_p05 (every KPI names a deliverable in the Phase 3 structure).",
-      "decision": "Ten KPIs K1-K10, each tied to one draft deliverable, and mappings for all six Tier 2B expected impacts. EI-04 is accepted with the HRS4R claim removed permanently: the operator confirmed ELTE does not hold the HR Excellence in Research award. EI-06 is raised beyond the original candidate, because the CV shows five years of university teaching. K11 for the Career Development Plan was raised and not decided.",
+      "decision": "Eleven KPIs K1-K11, each tied to one deliverable, and mappings for all six Tier 2B expected impacts. EI-04 is accepted with the HRS4R claim removed permanently: the operator confirmed ELTE does not hold the HR Excellence in Research award. EI-06 is raised beyond the original candidate, because the CV shows five years of university teaching.",
+      "k11_amendment": "K1-K10 were accepted on 2026-08-11 and K11 was raised and left undecided. The operator decided K11 on 2026-08-12 at the authorisation review, tracing to D1.3, on the ground that D1.3 would otherwise be the one accepted deliverable with no KPI tracing to it. The target now reads 'agreed by M3 and reviewed at all five steering points'. The candidate wording said four, and the second review of the same day added an M27 Career Development Plan review, so the count is five: M6, M12, M16, M20 and M27. Item 6's review_points carries the same list.",
       "lands_in": ["architecture_inputs/impacts.json"],
-      "source_ref": "Operator input pack item 5, accepted 2026-08-11 with the C7 and C8 resolutions.",
-      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item5-kpis_2026-08-12.json"
+      "source_ref": "Operator input pack item 5, accepted 2026-08-11 with the C7 and C8 resolutions; K11 decided 2026-08-12.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item5-kpis_2026-08-12.json",
+      "amendment_record": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json"
     },
     {
       "item": 6,
@@ -213,7 +216,8 @@
       "decision": {
         "components": "Research objectives (O1-O6); training and career needs (the eleven ELTE-to-fellow competences, delivered as supervised practice plus named ELTE courses); transferable skills (research integrity, open science and FAIR practice, generative-AI literacy, grant writing, IP and exploitation, project management, science communication); teaching; publications planning (outputs P1-P4, at least two peer-reviewed submissions during or shortly after the fellowship); open-science engagement (open-access publication, code and model cards where IP permits, FAIR metadata, validation split manifests).",
         "agreed_by_month": 3,
-        "review_points": [6, 12, 16, 20],
+        "review_points": [6, 12, 16, 20, 27],
+        "review_points_amendment": "Accepted on 2026-08-11 as M6, M12, M16 and M20, described as running alongside the item 4 steering points. AR-7 added a fifth steering point at M27 on 2026-08-12, which made that description false: five steering points and four reviews. The operator resolved it in the second review of the same day by adding an M27 plan review rather than dropping the alongside clause, because M27 falls inside the placement, which is when non-academic career development is most in play. K11's target reads five accordingly. Recorded in decision_log/fieldwise-ticket7-review-round2_2026-08-12.json.",
         "deliverable": "D1.3 Career Development Plan, due M3, owned by FELLOW and SUPERVISOR.",
         "teaching_component": "Reframed by C7 from a competence to acquire into an existing strength transferred to a new discipline, a new institution and a new language of instruction, and stepping up from Bachelor's to Master's and doctoral supervision.",
         "signature": "CC-13 requires the plan to be established jointly by supervisor and researcher. With a co-supervisor in place it should be signed by both supervisors and the fellow."
@@ -233,8 +237,10 @@
       "decision": "Fellow: WP1 3.0, WP2 5.5, WP3 5.5, WP4 4.0, WP5 9.0, cross-cutting 3.0, total 30.0. Partner in-kind, all Assumed: MATE 2.4, MVCRI 1.5, AgroVIR 3.0, ELTE supervisor 2.5, ELTE co-supervisor 2.0, total 11.4. WP5 and the cross-cutting strand extend to M30.",
       "lands_in": ["architecture_inputs/workpackage_seed.json", "working_assumptions.json"],
       "assumed_declarations": ["person_months_MATE", "person_months_MVCRI", "person_months_AgroVIR", "person_months_ELTE_supervisor", "person_months_ELTE_co_supervisor"],
-      "source_ref": "Operator input pack item 8, consolidated 2026-08-11 with the C4 correction.",
-      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json"
+      "co_supervisor_figure_confirmed": "The pack carried both 2.0 and 1.5 for the co-supervisor, and the ticket 6 fold took 2.0 on the arithmetic of the operator's own stated total. The operator confirmed 2.0 on 2026-08-12 at the authorisation review and restated the reasoning: the figure was raised when Dr. Hollós was confirmed responsible for model development and testing, with the cadence raised from fortnightly to weekly through WP3 and WP4 (M6-M21). The partner in-kind total stands at 11.4. The figure stays Assumed, because it is an in-kind estimate the co-supervisor has not seen.",
+      "source_ref": "Operator input pack item 8, consolidated 2026-08-11 with the C4 correction; co-supervisor figure confirmed 2026-08-12.",
+      "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json",
+      "amendment_record": "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json"
     },
     {
       "item": 9,
@@ -323,34 +329,144 @@
       "status": "Unresolved",
       "decided_on": "2026-08-11",
       "gate": "None directly. phase_06_gate g07_p09 requires §3.2 to be addressed, and it will be thin rather than empty.",
-      "decision": "Answered in part and deferred in part. Answered: ELTE hosting arrangements (from PLANTDIGISENSE §3.2), the ELTE equipment inventory, all department and team lines, ELTE and MATE key people, MVCRI key people and recent projects, and the AgroVIR organisation profile and farm access. Deferred: five named fields, listed below.",
+      "decision": "Answered in part and deferred in part. Answered: ELTE hosting arrangements (from PLANTDIGISENSE §3.2), the ELTE equipment inventory, all department and team lines, ELTE and MATE key people, MVCRI key people and recent projects, and the AgroVIR organisation profile and farm access. Deferred on 2026-08-11: five named fields. One of the five, AgroVIR key_people, was answered in part on 2026-08-12.",
       "deferred_fields": [
         "ELTE recent_projects_and_publications",
         "ELTE previous_msca_hosting",
         "MATE recent_projects_and_publications",
-        "AgroVIR key_people",
         "AgroVIR relevant_track_record"
       ],
+      "answered_in_part_2026_08_12": [
+        "AgroVIR key_people — Miklós Maróti as on-site placement supervisor and Zsuzsanna Balázs as project contact, both Assumed and declared, both titles Unresolved."
+      ],
       "lands_in": ["consortium/capabilities.json participant_capacity"],
-      "source_ref": "Operator input pack item 12, partial deferral 2026-08-11."
+      "source_ref": "Operator input pack item 12, partial deferral 2026-08-11; AgroVIR key people answered in part 2026-08-12.",
+      "amendment_record": "docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json"
     }
   ],
 
+  "authorisation_review_decisions": {
+    "note": "Operator decisions taken on 2026-08-12 at the ticket 7 authorisation reviews, against the packet rather than against the input pack. They are not input pack items and cite decision-log records instead. Each one amends a record above or a Tier 3 artifact, named per entry. AR-1 to AR-8 come from the first review and AR-9 and AR-10 from the second, which reversed part of AR-7 and corrected a contradiction AR-7 created.",
+    "decision_records": [
+      "docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json",
+      "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json",
+      "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-review-round2_2026-08-12.json"
+    ],
+    "decisions": [
+      {
+        "id": "AR-1",
+        "title": "AgroVIR on-site placement supervisor",
+        "status": "Assumed",
+        "decision": "Miklós Maróti supervises the fellow on site during M25-M30.",
+        "declaration_key": "placement_supervisor_AgroVIR",
+        "open": "His title and seniority inside AgroVIR are Unresolved. Part B-2 §5 needs both.",
+        "lands_in": ["consortium/capabilities.json participant_capacity AgroVIR key_people", "consortium/capabilities.json hosting_capacity_for_the_placement"]
+      },
+      {
+        "id": "AR-2",
+        "title": "AgroVIR placement workspace and system access",
+        "status": "Unresolved",
+        "decision": "Not answered. The supplied answer described field access, which AgroVIR already provides as VALIDATION_PARTNER from M16 and which would be true had the placement never been decided. It is recorded as a supplementary fact, not as workspace.",
+        "missing": ["Desk or office location", "FMIS development or staging environment access", "Customer-data environment access", "The team she joins"],
+        "lands_in": ["consortium/capabilities.json hosting_capacity_for_the_placement workspace_and_system_access"]
+      },
+      {
+        "id": "AR-3",
+        "title": "AgroVIR six-month placement work content",
+        "status": "Confirmed",
+        "decision": "Four items: operational hardening of the prediction pipeline in a production FMIS environment; the nine-dimension operational assessment producing D5.4; the FMIS integration roadmap written from inside the implementing company, producing D5.5; requirements engineering and user testing with commercial growers.",
+        "reframed_from": "The operator's first answer, 'developing further the MVP prototype', which he then reframed rather than replaced. An MSCA placement must serve the fellow's training and not the host company's engineering. The draft calls the MVP the research-to-operation demonstrator and not the primary scientific objective. And §2.2 records the DrR components as the fellow's background IP, so six months developing her own prototype inside a commercial partner raises an ownership question the proposal has not addressed.",
+        "open": "The background-IP question is a §2.2 drafting matter and stays open.",
+        "lands_in": ["consortium/capabilities.json hosting_capacity_for_the_placement six_month_work_content"]
+      },
+      {
+        "id": "AR-4",
+        "title": "D5.1 sequencing against the placement window",
+        "status": "Inferred",
+        "decision": "D5.1 must land before M25 so the placement is validation and transfer rather than first build. The seeded state already satisfies this: MS5 at M23 requires an externally evaluated MVP, which cannot precede D5.1.",
+        "open": "Phase 4 owns deliverable due months and must not schedule D5.1 into M25-M30.",
+        "lands_in": ["architecture_inputs/workpackage_seed.json WP5 deliverable_sequencing_check"]
+      },
+      {
+        "id": "AR-5",
+        "title": "K11, the Career Development Plan KPI",
+        "status": "Confirmed",
+        "decision": "Added. 'Career Development Plan agreed by M3 and reviewed at all five steering points', tracing to D1.3. Every accepted deliverable now has a KPI.",
+        "amends": "Item 5",
+        "amended_by": "AR-10, which raised the review count from four to five.",
+        "lands_in": ["architecture_inputs/impacts.json kpis"]
+      },
+      {
+        "id": "AR-6",
+        "title": "The co-supervisor's person-month figure",
+        "status": "Assumed",
+        "decision": "2.0 confirmed, not 1.5. The partner in-kind total stands at 11.4. The value is unchanged from the ticket 6 fold and the contradiction is now closed by the operator rather than by arithmetic.",
+        "amends": "Item 8",
+        "lands_in": ["architecture_inputs/workpackage_seed.json", "working_assumptions.json person_months_ELTE_co_supervisor"]
+      },
+      {
+        "id": "AR-7",
+        "title": "The M23-M30 monitoring gap",
+        "status": "Confirmed",
+        "decision": "A fifth Steering Group decision point at M27, because the four accepted points leave an evaluated placement entirely unmonitored.",
+        "amends": "Item 4 governance schedule",
+        "superseded_in_part_by": "AR-9. AR-7 also declined the placement-completion milestone. The operator reversed that in the second review of the same day, and MS6 at M30 is now seeded.",
+        "lands_in": ["architecture_inputs/milestones_seed.json steering_decision_points", "architecture_inputs/milestones_seed.json placement_period_monitoring"]
+      },
+      {
+        "id": "AR-8",
+        "title": "Invited talks",
+        "status": "Unresolved",
+        "decision": "Deferred again, and named. Not in the CV, and the operator has neither supplied any nor confirmed there are none.",
+        "amends": "Item 11",
+        "lands_in": ["consortium/capabilities.json researcher_profile invited_talks"]
+      },
+      {
+        "id": "AR-9",
+        "title": "Verification of the placement window",
+        "status": "Confirmed",
+        "decision": "The placement window carries verification two ways. Milestone MS6 is seeded at M30, Inferred, and a placement_verification record names D5.4 and D5.5 as the deliverables that carry it.",
+        "reason": "Five milestones all completing by M23 leave a 30-month action with seven unmilestoned months containing an evaluated placement that produces D5.4 and D5.5. The M27 steering point is governance, not verification.",
+        "reverses": "AR-7's decision not to adopt a placement-completion milestone, taken earlier the same day.",
+        "why_inferred_not_confirmed": "The month is WP5's Confirmed end month and the criterion restates two AR-3 work-content items that already produce named deliverables. No deliverable, task or month is invented. Phase 4 owns turning the statement into a verifiable achievement criterion, as it does for MS1 to MS5.",
+        "opens": "D5.4 is now claimed by both MS5 at M23 and the placement window. The sequencing question is Unresolved and belongs to Phase 4.",
+        "lands_in": ["architecture_inputs/milestones_seed.json milestones MS6", "architecture_inputs/milestones_seed.json placement_verification"]
+      },
+      {
+        "id": "AR-10",
+        "title": "An M27 Career Development Plan review",
+        "status": "Confirmed",
+        "decision": "The Career Development Plan is reviewed at five points: M6, M12, M16, M20 and M27.",
+        "reason": "Item 6's accepted text says the plan is reviewed alongside the item 4 steering points. AR-7 made that false by adding a fifth steering point against four reviews. The operator resolved it by adding the review rather than dropping the clause, because M27 falls inside the placement, which is when non-academic career development is most in play.",
+        "amends": "Item 6 review_points, and K11's target, which now reads five",
+        "lands_in": ["call_binding/confirmation_checklist.json item 6", "architecture_inputs/impacts.json K11", "architecture_inputs/outcomes.json D1.3", "architecture_inputs/workpackage_seed.json D1.3"]
+      }
+    ]
+  },
+
   "open_for_authorisation": {
-    "note": "What ticket 7 must carry into the authorisation packet. None of these blocks a runner gate; the packet is where they are visible to the operator before any phase runs.",
+    "note": "What the authorisation packet carries. None of these blocks a runner gate in Phases 1 to 7. The packet is where they are visible to the operator before any phase runs. Rewritten on 2026-08-12 after the authorisation-review decisions above closed four earlier entries.",
     "items": [
       {"what": "The C5 mobility override", "status": "Assumed", "why_open": "An operator-declared position pending a rectified CV that is consistent with Part A and with ELTE's Erasmus records. It must be listed with its basis and date, and never promoted to Confirmed."},
-      {"what": "Item 12's five deferred capacity fields", "status": "Unresolved", "why_open": "Only the organisations themselves can supply them. §3.2 drafts thin."},
-      {"what": "AgroVIR's hosting capacity for the M25-M30 placement", "status": "Unresolved", "why_open": "The placement is evaluated and has no named on-site supervisor, no described workspace and no stated six-month work content. The largest single content gap the placement decision opens."},
-      {"what": "Item 11's invited_talks", "status": "Unresolved", "why_open": "Not in the CV. The operator has neither supplied any nor confirmed there are none."},
+      {"what": "AgroVIR's placement workspace and system access", "status": "Unresolved", "why_open": "Desk or office location, FMIS development or staging access, customer-data environment access, and the team she joins. The one count of the four hosting-capacity counts with nothing behind it, and the count an evaluator tests the placement's reality against."},
+      {"what": "Miklós Maróti's title and seniority", "status": "Unresolved", "why_open": "The name is supplied and declared. Part B-2 §5 needs the role, and the Part B-1 placement argument leans on the seniority."},
+      {"what": "Item 12's four remaining deferred capacity fields", "status": "Unresolved", "why_open": "ELTE recent projects, ELTE previous MSCA hosting, MATE recent projects, AgroVIR track record. Only the organisations themselves can supply them. §3.2 drafts thin."},
+      {"what": "The background-IP question on the DrR components", "status": "Unresolved", "why_open": "Raised by the operator when reframing the placement content. §2.2 records the components as the fellow's background IP, and the proposal does not address ownership of work done on them inside a commercial partner."},
+      {"what": "Item 11's invited_talks", "status": "Unresolved", "why_open": "Not in the CV. Deferred again on 2026-08-12: supply or confirm none."},
       {"what": "AgroVIR's PIC", "status": "Confirmed absent", "why_open": "Blocks submission rather than a gate. AgroVIR hosts the placement, so it goes in Part A, where every participant needs a PIC. Only the EU Participant Register can supply one."},
-      {"what": "AgroVIR's company registration number", "status": "Unresolved", "why_open": "Two conflicting readings; the company must confirm."},
+      {"what": "AgroVIR's company registration number", "status": "Unresolved", "why_open": "Two conflicting readings. The company must confirm."},
       {"what": "MVCRI's signatory authority", "status": "Unresolved", "why_open": "Whether the institute director or the Agricultural Academy signs a partnership agreement."},
-      {"what": "The M23-M30 monitoring gap", "status": "Unresolved", "why_open": "Five milestones all fall at or before M23 in a 30-month action. A placement-completion milestone and an M27 steering point were raised and not decided."},
-      {"what": "K11 for the Career Development Plan", "status": "Unresolved", "why_open": "Raised in item 5 and not answered. D1.3 is the one deliverable with no KPI."},
-      {"what": "The co-supervisor's ELTE contract status", "status": "Unresolved", "why_open": "MSCA requires supervision at the beneficiary. It decides whether CO_SUPERVISOR is the right token; it blocks no gate."},
-      {"what": "The co-supervisor's person-month figure", "status": "Assumed", "why_open": "Item 8 carries both 2.0 and 1.5. The fold resolved it to 2.0 on the arithmetic of the operator's own stated total; the operator can overturn it in one line."},
-      {"what": "Roles and titles for Takács (MATE) and Balázs (AgroVIR)", "status": "Assumed", "why_open": "Names are known, roles are not. g07_p08 reads the name; Part B-2 §5 needs the role."}
+      {"what": "The co-supervisor's ELTE contract status", "status": "Unresolved", "why_open": "MSCA requires supervision at the beneficiary. It decides whether CO_SUPERVISOR is the right token, and it blocks no gate."},
+      {"what": "Roles and titles for Takács (MATE) and Balázs (AgroVIR)", "status": "Assumed", "why_open": "Names are known, roles are not. Predicate g07_p08 reads the name, and Part B-2 §5 needs the role."},
+      {"what": "Which point in the timeline D5.4 belongs to", "status": "Unresolved", "why_open": "MS5 at M23 states the web MVP is externally evaluated under farmer conditions, and the AR-3 placement content puts the operational assessment producing D5.4 inside M25-M30. One of the two must give. Phase 4 owns deliverable due months and no source states which reading the draft intended."}
+    ],
+    "closed_on_2026_08_12": [
+      "K11 for the Career Development Plan — decided, AR-5",
+      "The co-supervisor's person-month figure — confirmed at 2.0, AR-6",
+      "The M23-M30 monitoring gap — decided as an M27 steering point, AR-7",
+      "AgroVIR's on-site placement supervisor and six-month work content — answered, AR-1 and AR-3. Workspace and the supervisor's title remain, as separate entries above",
+      "The placement window's verification — closed by AR-9. MS6 at M30 is seeded and D5.4 and D5.5 are named as what carries it. The D5.4 sequencing question it opened is a new entry above",
+      "The item 6 review-count contradiction AR-7 created — closed by AR-10. Five steering points and five plan reviews"
     ]
   },
 
@@ -362,8 +478,13 @@
     "operator_decision_items_confirmed": 9,
     "operator_decision_items_assumed": 1,
     "operator_decision_items_unresolved": 1,
-    "working_assumption_declarations": 13,
-    "state": "Spine confirmed with one operator-declared assumption (mobility eligibility). Every input pack item is folded; item 12 is partly deferred by the operator and stays Unresolved.",
+    "authorisation_review_decisions_total": 10,
+    "authorisation_review_decisions_confirmed": 5,
+    "authorisation_review_decisions_inferred": 1,
+    "authorisation_review_decisions_assumed": 2,
+    "authorisation_review_decisions_unresolved": 2,
+    "working_assumption_declarations": 14,
+    "state": "Spine confirmed with one operator-declared assumption (mobility eligibility). Every input pack item is folded. Item 12 is partly deferred and stays Unresolved. Ten further decisions were taken at the two authorisation reviews of 2026-08-12 and are recorded in authorisation_review_decisions.",
     "note": "The counts cover this file only. Residual Unresolved fields inside Tier 3 artifacts are enumerated in open_for_authorisation above."
   }
 }
