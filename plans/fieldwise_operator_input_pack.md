@@ -137,17 +137,24 @@ MVCRI
   address_city:     Plovdiv                                                                  [V]
   address_postcode: 4003                                                                     [V]
   address_country_code: BG                                                                   [V]
-  contact_person: Prof. Vinelina Yankova, PhD                                                    [!!]
-  contact_email:  vinelina@abv.bg                                              [!!]
-    C1 RESOLVED IN STRUCTURE, 2026-08-11 — operator chose "name another MVCRI colleague".
-    Dr. Rositsa Cholakova is REMOVED from this field. She is the FELLOW, and naming her as
-    the transfer partner's contact made the independent cross-country test answerable to the
-    person whose model it tests.
-    ONE NAME STILL NEEDED. Supply it once and it fills both this field and item 4's
-    TRANSFER_PARTNER seat — the same token `<<MVCRI_COLLEAGUE>>` marks both.
-    Candidates visible from her co-authorships, roles unconfirmed: Stanislava Grozeva,
-    Ivanka Tringovska, Daniela Ganeva, Elena Topalova. The institute director would be the
-    conventional choice for a partner contact; a head of department is equally acceptable.
+  contact_person: Prof. Vinelina Yankova                                                     [V]
+    Head of Department, Technologies in Vegetable Crops Production, MVCRI.
+    Expertise: entomology, vegetable production, breeding.
+  contact_email:  vinelina@abv.bg                                                            [O]
+    **C1 FULLY RESOLVED, 2026-08-11.** Operator supplied the name; the role was then verified
+    independently against the institute's own departments page, http://izk-maritsa.org/en/departments/,
+    which lists MVCRI as having two departments — Breeding, Variety Maintenance and
+    Introduction (Assoc. Prof. Stanislava Grozeva) and Technologies in Vegetable Crops
+    Production (Prof. Vinelina Yankova).
+    This is a good choice on the merits, not merely a different name. She heads the
+    department whose remit — vegetable production technology — is the one WP4's Bulgarian
+    transfer test actually sits in, and she is senior enough that the seat carries weight on
+    a body issuing go/no-go verdicts. Dr. Rositsa Cholakova is removed from this field: she
+    is the FELLOW, and naming her here made the independent cross-country test answerable to
+    the person whose model it tests.
+    [!] The title above is verified; the email is operator-supplied and unverified. It is on
+        the same free provider (abv.bg) the institute itself publishes on, so it is
+        consistent with local practice — but confirm it reaches her before Part B-2 §5 uses it.
     [!] Use an institutional address if one exists. Worth knowing: MVCRI appears to have no
         institutional mail domain — its own published addresses are izk_maritsa@abv.bg and
         seme_izk@abv.bg, both on the free provider abv.bg. So a free-provider address is
@@ -159,8 +166,10 @@ AgroVIR
   legal_name_national:  AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság         [V]
     short form: AGROVIR Kft.
   legal_name_english:   AgroVIR Business Consulting Ltd.                                     [V]
-  pic: none                                                                                  [!!]
-    MUST BE CREATED BEFORE SUBMISSION. See "What item 1 still blocks" below.
+  pic: none — CONFIRMED ABSENT by the operator, 2026-08-11                                 [!!]
+    Not "unknown" and not "not yet checked": AgroVIR has no PIC. This is now a settled fact
+    rather than an open question, and `phase_03_gate` `g04_p07` will fail on it. See
+    "What item 1 still blocks" below for what that means and what it costs to change.
   entity_type:  Private for-profit company, limited liability (Kft.). SME. Founded 2007.
     Main activity NACE 7020, business and management consulting.                             [V]
     [!] SME status is inferred from the published revenue band, not from a self-assessment.
@@ -182,8 +191,15 @@ AgroVIR
   contact_email:  balazs.zsuzsanna@agrovir.hu                                                [O]
     [!] Role not verified — the company website names no staff. Supply her title.
   already_registered_in_participant_register: no                                             [O]
-  letter_of_commitment: none                                                                 [!!]
-    "None" is a problem here, not a neutral answer. See below.
+  letter_of_commitment: none — AND NONE IS WANTED                                            [✓]
+    CORRECTED 2026-08-11. Earlier notes in this pack called the missing letter load-bearing
+    and "the most urgent open action". That was WRONG. The 2026 Guide for Applicants
+    instructs, for non-academic placement hosts: "None. Do not include a letter(s) of
+    commitment." Only a Global Fellowship's outgoing-phase partner must supply one. A letter
+    is therefore not submitted, not evaluated, and its absence is not a weakness.
+    Get one anyway if it is cheap — for the partnership agreement and for ELTE's own comfort
+    that the placement is real — but it is an internal document, not a proposal annexe, and
+    it must not be attached.
 ```
 
 ### Sources for the verified fields
@@ -204,20 +220,53 @@ AgroVIR
 `consortium/partners.json`. MATE and MVCRI now resolve completely — verified legal name, verified
 PIC, verified address. They will pass.
 
-**AgroVIR will not.** It has no PIC and no letter of commitment, and the draft makes it WP5 co-lead.
-Three consequences, in the order they bite.
+**AgroVIR will not.** It has no PIC and no letter of commitment, and the draft makes it WP5 co-lead
+and — since the placement decision — the host for M25–M30. Three consequences, in the order they
+bite.
 
-The PIC is the easy one. Registering in the Participant Register is free, takes minutes, and needs
-only the legal name, address and tax number — all three of which are now filled in above. Nothing
-blocks doing it today. Until it exists, `partners.json` carries an Unresolved record for a partner
-the work plan assigns a work package to, and `g04_p07` fails on it.
+**The PIC is confirmed absent as of 2026-08-11, so `g04_p07` fails.** This is now a known, honest
+gate failure rather than an open question, and it should be recorded as such: `partners.json` carries
+an Unresolved record for a partner the work plan assigns a work package to, and Phase 3 stops there
+with a diagnosed cause. Under ticket 8's own standard — "an honest gate failure is a valid terminal
+state ... provided its cause is diagnosed and reported" — that is an acceptable outcome for the run.
+It is not an acceptable outcome for a submission.
 
-The letter is harder, and it interacts with item 2. If AgroVIR becomes a **non-academic placement
-host**, constraint CC-09 requires the placement to be integral to the proposal, and it is
-*evaluated*. A placement host that has given no letter of commitment is the weakest possible version
-of that, and evaluators read it as an arrangement that may not exist. As an **associated partner**
-or **secondment host** a letter is still expected, but the exposure is smaller. Decide item 2 and
-you will know how hard to push.
+Two things follow, and they point in different directions depending on what this run is for.
+
+  If the run is a rehearsal, leave it. The failure is informative: it demonstrates the gate catching
+  a genuinely missing participant rather than passing on a fabricated one. Record it in the
+  authorisation packet and let Phase 3 fail cleanly.
+
+  If a submission follows, register. Nothing about this is hard — the Participant Register is free,
+  takes minutes, and needs only the legal name, address and tax number, all three of which are now
+  filled in above (AGROVIR Üzletviteli Tanácsadó Kft., 2040 Budaörs, Kinizsi utca 30, tax number
+  14000838-2-13). A proposal cannot be submitted with a participant that has no PIC, so this is not
+  optional at submission time — only at run time.
+
+[!] Worth being explicit about the sequencing, because it is easy to get wrong: the PIC is created
+    by AgroVIR itself, or by ELTE on its behalf, in the EU Funding & Tenders portal. It is not
+    something this run can generate, and no amount of Tier 3 seeding substitutes for it.
+
+**The letter of commitment is NOT required — correction, 2026-08-11.** Earlier versions of this
+section said the opposite and said it emphatically. The Guide for Applicants is explicit that for a
+non-academic placement host the answer on letters of commitment is "None. Do not include a letter(s)
+of commitment." Only the outgoing-phase partner of a Global Fellowship must provide one, submitted in
+Part B-2. So the letter is not an open action for submission at all. The placement is still
+*evaluated* — that part was right — but it is evaluated on how Part B-1 argues it, not on a letter.
+
+**What DOES bind, and is the real answer to "what does AgroVIR need":** AgroVIR must appear in Part A.
+The Guide states that "Only the associated partners hosting the outgoing phase of GF and/or hosting a
+non-academic placement should be included in the proposal's Part A", in Section 2 Participants — and
+separately that "Each participating entity in Horizon Europe (beneficiaries and associated partners)
+must have a Participant Identification Code (PIC)". AgroVIR is the placement host, so it goes in
+Part A, so it needs a PIC. That is not negotiable and no Tier 3 seeding substitutes for it.
+
+[!] A corollary worth carrying into item 12 and Phase 8. **MATE and MVCRI do not go into Part A.**
+    They are associated partners that host neither a GF outgoing phase nor the placement, so under
+    the same rule they are described in Part B — §3.2 and Part B-2 §5 — and not encoded as Part A
+    participants. Their verified PICs remain useful for the partnership agreements and for grant
+    preparation, but the PIC requirement bites only on ELTE and AgroVIR at submission. The one
+    partner without a PIC is the one partner that actually needs one.
 
 The third is quieter, and it is contradiction C9.
 
@@ -298,7 +347,10 @@ AgroVIR:  non_academic_placement          <-- DECIDED by the operator, 2026-08-1
 
 Total action duration after this decision (months):  30
 
-Statement on MVCRI independence given the fellow's current affiliation:
+Statement on MVCRI independence given the fellow's current affiliation:  ACCEPTED as drafted,
+  operator, 2026-08-11. The drafted text below is adopted verbatim, and its final clause is
+  now true in fact: MVCRI's project contact and steering-group seat are held by
+  Prof. Vinelina Yankova, not by the fellow.
 
 --- DECISION RECORDED 2026-08-11 -------------------------------------------------
 RESOLVED. AgroVIR is the non-academic placement host. Six months are added at the end
@@ -328,10 +380,12 @@ WHAT IT COSTS, and all of it is now live work.
      current draft does this. It is new §1.2/§1.3/§3.1 content for Phase 8.
   2. Part A needs a separate budget line. The Guide is explicit: add the number of months
      requested for the non-academic placement as a separate line in Part A Section 3.
-  3. AgroVIR's letter of commitment moves from "nice to have" to load-bearing. An
-     evaluated placement resting on a host that has provided no letter is the weakest
-     version of this decision. See item 1 — this is now the most urgent open action in
-     the pack after the mobility flag.
+  3. ~~AgroVIR's letter of commitment moves from "nice to have" to load-bearing.~~
+     **WITHDRAWN 2026-08-11 — this was wrong.** The Guide instructs that no letter of
+     commitment is to be included for a non-academic placement host. What the placement
+     actually requires is that AgroVIR be encoded in Part A Section 2 as the placement host,
+     which means it needs a PIC. See item 1. The placement is still evaluated — on the
+     Part B-1 argument, not on a letter.
   4. Location is fine. The placement organisation must be in an EU Member State or
      Associated Country; the Guide does not prohibit the same country as the beneficiary.
      AgroVIR in Budaörs, Hungary, is eligible. Confirmed, no action needed.
@@ -358,8 +412,9 @@ Statement on MVCRI independence — DRAFTED, accept or replace:
   evaluation split manifest is published under the open-science commitments of §1.2."
   [✓] C1 RESOLVED 2026-08-11. That last sentence is now true in structure: the fellow has
       been removed from item 1's MVCRI contact field and item 4's TRANSFER_PARTNER seat,
-      both of which now carry `<<MVCRI_COLLEAGUE>>`. It becomes true in fact when you supply
-      the name. The statement above can be adopted as drafted.
+      both of which now carry Prof. Vinelina Yankova, Head of the Department of Technologies
+      in Vegetable Crops Production. It is now true in fact, and the operator adopted the
+      statement as drafted on 2026-08-11.
   [!] One addition the placement decision forces: WP4's Bulgarian transfer test must
       complete before the placement begins at M25, or the fellow is evaluating the
       Hungary-to-Bulgaria transfer from inside a Hungarian commercial software company.
@@ -494,7 +549,8 @@ decision_rights_table:      ACCEPT
 conflict_resolution:        ACCEPT 
 named contacts per partner (needed for g07_p08):
   DATA_PARTNER (MATE): Dr. Sándor Takács
-  TRANSFER_PARTNER (MVCRI): Vinelina Yankova         
+  TRANSFER_PARTNER (MVCRI): Prof. Vinelina Yankova       <-- C1 closed 2026-08-11
+    Head of Department, Technologies in Vegetable Crops Production, MVCRI
   VALIDATION_PARTNER (AgroVIR): Zsuzsanna Balázs
 
 --- sweep 2026-08-11 -------------------------------------------------------------
@@ -502,38 +558,88 @@ Complete. `g07_p07` passes on the accepted Steering Group. `g07_p08` will pass o
 three names resolve to partners in `partners.json`, which item 1 now makes possible for
 MATE and MVCRI and not yet for AgroVIR.
 
-[✓] C1 RESOLVED IN STRUCTURE, 2026-08-11. The fellow is removed from the TRANSFER_PARTNER
-    seat. She previously sat on the Steering Group twice — once as FELLOW and once as the
-    transfer partner's representative — on a body that issues go/no-go verdicts on MS1–MS5.
-    The same `<<MVCRI_COLLEAGUE>>` name fills item 1's contact field; supply it once.
+[✓] C1 FULLY RESOLVED, 2026-08-11. Prof. Vinelina Yankova, Head of the Department of
+    Technologies in Vegetable Crops Production, takes the TRANSFER_PARTNER seat. The fellow
+    previously sat on the Steering Group twice — once as FELLOW and once as the transfer
+    partner's representative — on a body that issues go/no-go verdicts on MS1–MS5. She now
+    sits once. `g07_p08` resolves for this role as soon as `partners.json` carries MVCRI,
+    which item 1's verified PIC and legal identity make straightforward.
 
 [✓] The knock-on is fixed by the same change. The accepted decision-rights table routes
     "access to partner data and field sites" to "the owning partner", escalating to the
     Steering Group. With the fellow holding MVCRI's seat she owned, escalated and voted.
-    With a colleague in the seat, the escalation is genuine.
+    With a department head in the seat, the escalation is genuine.
 
-[✓] C6 RESOLVED 2026-08-11. The accepted conflict-resolution route escalates past the
-    SUPERVISOR to "the ELTE Institute of Cartography and Geoinformatics head" — but the
-    supervisor IS the deputy head of that institute, so the route partly looped back on the
-    person being escalated past. The head is a different person and the route is sound once
-    named.
+[!] All three partner contacts now resolve to real people, but only one carries a verified
+    title: Yankova (Head of Department, confirmed against the institute's own site). Takács
+    at MATE and Balázs at AgroVIR are still names without roles, and `g07_p08` reads the
+    name while Part B-2 §5 needs the role. Two short emails close that.
 
-      Head of Institute: Dr. Mátyás Gede, habil. associate professor, Director of the
-      Institute of Cartography and Geoinformatics, ELTE Faculty of Informatics,
-      H-1117 Budapest, Pázmány Péter sétány 1/C.
-      Verified: https://www.inf.elte.hu/en/units/institute-of-cartography-science-and-geoinformatics
+--- CO-SUPERVISOR ADDED 2026-08-11: what item 4 needs to say -----------------------
+Dr. Roland Hollós (ELTE Department of Meteorology) joins as CO_SUPERVISOR — see item 7 for
+the record and the verification. The accepted governance text was written for a single
+supervisor and needs three amendments. None affects `g07_p07` or `g07_p08`: the governance
+body is unchanged in kind, and Hollós resolves to ELTE, which exists in `partners.json`.
+
+  **Supervision cadence.** The accepted text reads "weekly one-to-one meeting between FELLOW
+  and SUPERVISOR". Amended: weekly one-to-one with the SUPERVISOR as now, plus a **weekly
+  technical session with the CO_SUPERVISOR through WP3 and WP4 (M6–M21)** — raised from
+  fortnightly once the operator confirmed he is responsible for model development and
+  testing, which is not a fortnightly commitment — tapering to monthly outside that window.
+  Both supervisors attend the quarterly Career Development Plan review. Prof. Jung remains
+  the primary line and the Steering Group chair.
+
+  **Decision rights.** The accepted table gives "scientific method, day-to-day research
+  choices" to FELLOW escalating to SUPERVISOR, and "training plan, resources, milestone
+  go/no-go recommendation" to SUPERVISOR. Amended: add one row —
+  *model development and testing: methodological lead and quality assurance →
+  CO_SUPERVISOR, escalating to SUPERVISOR.*
+  The wording is deliberate. It gives him authority matching his responsibility, which
+  prevents the usual failure where a co-supervisor is accountable for a strand he cannot
+  decide — while keeping the fellow as the person who designs, builds and runs the models.
+  See the wording-risk note in item 7: this distinction has to survive into Part B.
+  Everything else is unchanged; SUPERVISOR remains the escalation point and the chair.
+
+  **Steering Group.** Proposed: CO_SUPERVISOR attends as a member, alongside FELLOW,
+  SUPERVISOR and the three partner contacts. He does not chair and does not add a partner
+  seat — he is ELTE staff, and ELTE is already represented by the chair.
+
+  [!] Item 6's Career Development Plan is affected too. CC-13 requires the plan to be
+      "established jointly by supervisor and researcher". With a co-supervisor, the plan
+      should be signed by both supervisors and the fellow. Item 6's accepted answer does not
+      say this; one line closes it.
+
+[✓] C6 RESOLVED 2026-08-11, AMENDED SAME DAY. The accepted conflict-resolution route
+    escalates past the SUPERVISOR to "the ELTE Institute of Cartography and Geoinformatics
+    head" — but the supervisor is himself deputy head of that institute, so the route partly
+    looped back on the person being escalated past. That defect is real and still needs
+    fixing.
+
+    **AMENDMENT: the escalation names an OFFICE, not a person.** An earlier version of this
+    note named the incumbent Director. The operator has confirmed that person is **not
+    associated with the call in any way**, and naming an individual who has no role in the
+    action is both inaccurate and unnecessary — governance escalation routes point at posts,
+    not participants. All references to the incumbent are removed from this pack.
 
     Corrected escalation, replacing the accepted text's second step:
       "FELLOW and SUPERVISOR resolve disagreements directly and record the outcome in the
-      monthly progress record. Anything unresolved after one cycle goes to the Director of
-      the Institute of Cartography and Geoinformatics (Dr. Mátyás Gede), and then to the
-      ELTE research integrity route. Data access disputes follow the dispute clause of the
+      monthly progress record. Anything unresolved after one cycle goes to the **Director of
+      the Institute of Cartography and Geoinformatics** as an office, and then to the ELTE
+      research integrity route. Data access disputes follow the dispute clause of the
       relevant data-sharing agreement."
 
-    [!] One caveat worth carrying. ELTE lists Dr. Jung's deputy directorship as *temporary*.
-        If he ceases to be deputy director during a 30-month action the escalation route is
-        unaffected — it names the Director by office — but item 12's §3.2 text should
-        describe him by his professorship rather than by a temporary administrative post.
+    This still fixes C6: the Director and the Deputy Director are different posts, so the
+    route no longer returns to the supervisor. It is also more robust — ELTE lists Prof.
+    Jung's deputy directorship as *temporary*, and an office-based route survives any change
+    of incumbent in either post across a 30-month action.
+
+    [!] If you would rather the Institute directorate not appear at all, the alternative is
+        to escalate directly from SUPERVISOR to the ELTE research integrity route, skipping
+        the institute tier. That is simpler but removes the local step that usually resolves
+        things fastest. Your call; the office-based version above is what is written in.
+
+    [!] Related: §3.2 should describe Prof. Jung by his professorship, not by a temporary
+        administrative post.
 ----------------------------------------------------------------------------------
 ```
 
@@ -596,40 +702,54 @@ edits:
 
 EI-03 public engagement measure:  ACCEPT candidate 
 EI-04 Charter alignment measure:  ACCEPT, WITH THE HRS4R CLAIM REMOVED  <-- C8, 2026-08-11
-  does ELTE hold HR Excellence in Research? unknown — claim dropped, see C8 below
+  does ELTE hold HR Excellence in Research?  NO — operator-confirmed 2026-08-11.
+    ELTE does not hold the award. The claim is removed permanently, not provisionally.
 EI-06 teaching measure:           RAISED, see C7 below                  <-- C7, 2026-08-11
 
 --- sweep 2026-08-11 -------------------------------------------------------------
 Complete enough for `g06_p04` — all six expected impacts now map to an output. `g06_p05`
 passes on the ten KPIs, each of which names a deliverable.
 
-[✓] C8 RESOLVED 2026-08-11 by removing the claim rather than by verifying it. Two rounds of
-    checking failed: the EURAXESS acknowledged-institutions list is robots-blocked to
-    automated access, targeted searches of elte.hu and euraxess.ec.europa.eu returned
-    nothing either way, and https://www.elte.hu/en/hrs4r returns 404. That last point is
-    weak evidence rather than proof — institutions holding the award usually publish a page
-    — but it is not evidence of absence and I am not asserting ELTE lacks it.
+[✓] C8 CLOSED 2026-08-11. **The operator confirms ELTE does NOT hold the HR Excellence in
+    Research award.** My two rounds of automated checking were inconclusive — the EURAXESS
+    acknowledged-institutions list is robots-blocked, searches of elte.hu and
+    euraxess.ec.europa.eu returned nothing either way, and https://www.elte.hu/en/hrs4r
+    returns 404 — so this is settled by the operator's own knowledge, which is the better
+    source. The 404 was pointing the right way after all.
 
-    The contradiction was internal: the accepted EI-04 candidate asserts "ELTE's HR
-    Excellence in Research status ... stated in §3.2" while the answer line to its immediate
-    right says "unknown". A proposal cannot both claim the status and record not knowing it.
+    The contradiction was internal: the accepted EI-04 candidate asserted "ELTE's HR
+    Excellence in Research status ... stated in §3.2" while the answer line beside it said
+    "unknown". Had that gone forward unchecked, a **false institutional claim** would have
+    reached a submitted proposal — the worst failure mode available in this item, because it
+    is checkable by any evaluator in one click and it is attributed to the host rather than
+    to the fellow.
 
-    ADOPTED EI-04 WORDING, which does not depend on the answer:
+    ADOPTED EI-04 WORDING — now permanent, not a placeholder:
       "Charter alignment is evidenced at instrument level by the Career Development Plan
       (D1.3), by ELTE's open recruitment and researcher-development policies, and by the
       supervision and training arrangements set out in §1.3."
 
-    The asymmetry decides it: if ELTE does hold the award, adding one sentence later costs
-    nothing; if it does not, the original wording puts a false institutional claim into a
-    submitted proposal. One email to ELTE's HR or research office settles it — restore the
-    stronger claim the moment they confirm, and not before.
+    **Do not restore the HRS4R claim.** An earlier version of this note said to add it back
+    once ELTE confirmed. That instruction is withdrawn: ELTE has been asked and the answer is
+    no. Treat the wording above as final unless ELTE actually obtains the award.
+
+[!] One consequence to carry. EI-04 is now the thinnest of the six expected-impact mappings —
+    it rests on D1.3, institutional policy and the §1.3 supervision arrangements, with no
+    external accreditation behind it. `g06_p04` still passes, because the predicate requires a
+    mapped output and D1.3 is one. But if any impact mapping draws an evaluator comment, this
+    is the one. Two cheap ways to thicken it, neither requiring the award:
+      • Name ELTE's own researcher-development or HR policy document in §3.2 if one exists —
+        a named policy reads stronger than an unnamed practice.
+      • Point EI-04 at the Career Development Plan's review cadence (agreed M3, reviewed
+        M6/M12/M16/M20) rather than at its existence. A reviewed plan evidences Charter
+        alignment more concretely than a drafted one.
 
 [✓] C1 knock-on RESOLVED 2026-08-11. K5 "cross-country gap quantified" and K6 "adaptation
     cost stated" both trace to D4.2/D4.3 in WP4, whose target domain is MVCRI. While the
     fellow held MVCRI's contact and steering seat, these two KPIs were measured by her
     against her own employer's data with no third party in the loop. With
-    `<<MVCRI_COLLEAGUE>>` in both seats, K5 and K6 are reported to someone at MVCRI who is
-    not their author. No change to the KPI wording is needed — only to who receives it.
+    Prof. Vinelina Yankova in both seats, K5 and K6 are reported to a department head at
+    MVCRI who is not their author. No change to the KPI wording is needed — only to who receives it.
 
 [!] Item 6's D1.3 Career Development Plan carries no KPI. Item 6 accepted it as a
     deliverable, so the KPI list is now one short of covering every deliverable it claims
@@ -748,7 +868,7 @@ Seven records carry forward from the pre-purge checklist. Confirm or correct eac
 |--------|-----------------|
 | FELLOW | Dr. Rositsa Cholakova, plant physiologist. Current affiliation MVCRI, Bulgarian Agricultural Academy, Plovdiv. PhD 2020 |
 | HOST | Eötvös Loránd University, Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest, Hungary |
-| SUPERVISOR | Dr. András Jung, Deputy Head, Institute of Cartography and Geoinformatics, ELTE |
+| SUPERVISOR | Prof. András Jung, Deputy Head, Institute of Cartography and Geoinformatics, ELTE |
 | VALIDATION_PARTNER | AgroVIR, Hungary, associated partner for farmer access and field validation |
 | FELLOWSHIP_TYPE | European Fellowship, from the Bulgaria to Hungary intra-EU move |
 | DURATION | 24 months, carried in `selected_call.json` as `project_duration_months` |
@@ -770,6 +890,7 @@ ITEM 7 — IDENTITY SPINE
 FELLOW:               CONFIRM 
 HOST:                 CONFIRM — CONDITIONAL on C5        <-- amended 2026-08-11
 SUPERVISOR:           CONFIRM — corroborated, see below  <-- amended 2026-08-11
+CO_SUPERVISOR:        NEW RECORD, added by the operator 2026-08-11 — see below
 VALIDATION_PARTNER:   CONFIRM 
 FELLOWSHIP_TYPE:      CONFIRM — CONDITIONAL on C5        <-- amended 2026-08-11
 DURATION:             CONFIRM   <-- AMENDED, see below
@@ -838,15 +959,69 @@ RQ1 to RQ10 decisions are superseded by the draft: CONFIRM
     placement is an extension of it, not a different instrument. No amendment needed
     beyond the duration.
 
---- C5 DEFERRED BY THE OPERATOR, 2026-08-11 --------------------------------------
-Status: DEFER — "I will consult with the fellow." Under this pack's own rules a deferred
-item stays Unresolved and goes into the authorisation packet. No runner gate reads it, so
-the run can proceed; ticket 7 must not issue authorisation while it is open.
+--- C5 OPERATOR OVERRIDE, 2026-08-11 (supersedes the deferral below) --------------
+Status: **OVERRIDDEN BY THE OPERATOR.** Recorded as an operator-declared position under
+§13.3, not as a Confirmed fact — the underlying facts have not changed and no new evidence
+has been supplied.
 
-HOST and FELLOWSHIP_TYPE are therefore marked CONFIRM — CONDITIONAL rather than plain
-CONFIRM. The records themselves are right: ELTE is the intended host and a European
-Fellowship is the intended instrument. What is unresolved is whether that combination is
-*available* to this fellow at this deadline.
+  Operator decision, 2026-08-11: "Treat C5 as overridden by the operator, the CV will be
+  rectified."
+
+  Basis as stated: the CV's residence lines will be corrected. C5 rests entirely on the
+  CV's assertion that the 2021–2024 career break was spent residing in Budapest. If that
+  assertion is inaccurate, correcting it removes 8.76 of the 15.81 months and the mobility
+  rule is satisfied with margin.
+
+  Arithmetic after the stated rectification, if the career break is not Hungarian residence:
+    KPMG Global Hungary   2024-06-01 → 2024-10-01    4.03 months
+    Erasmus at ELTE       3 months in 2026           3.02 months
+    TOTAL                                            7.05 months  vs a 12-month cap — PASSES
+
+HOST and FELLOWSHIP_TYPE remain CONFIRM — CONDITIONAL rather than plain CONFIRM. The
+records themselves are right: ELTE is the intended host and a European Fellowship is the
+intended instrument. What the override settles is that the run proceeds; what it does not
+settle is the underlying fact, which is why the status stays conditional until the
+rectified CV exists and is consistent with the Part A mobility declaration.
+
+WHAT THE OVERRIDE DOES NOT CHANGE, and what ticket 7 must carry into the authorisation
+packet.
+
+  Two of the three periods are not the fellow's to restate, and survive any CV revision:
+    • KPMG Global Hungary is an employer of record, in Hungary, 4.03 months.
+    • The Erasmus mobility is documented by ELTE — the host organisation and the
+      beneficiary that signs the grant — 3.02 months.
+  Together 7.05 months. They fit under the cap, but they are fixed points: the rectified
+  CV must remain consistent with them, and with ELTE's own records of the Erasmus.
+
+  The rectification is load-bearing and must be a correction of fact. The CV is not an
+  external document — Part B-2 §4 requires it inside the proposal, and its dates must
+  agree with Part A. A CV stating Budapest residence beside a mobility declaration under
+  12 months is a contradiction visible on the same desk, without any investigation. The
+  converse is what makes the override safe: a CV that accurately records where she resided
+  is consistent with a declaration built from the same facts.
+
+  One technical caution for whoever prepares the rectified CV: **registration is evidence
+  of residence, not a substitute for it.** Work programme footnote 92 defines the adjacent
+  concept by where the researcher "is physically based". A retained Bulgarian address does
+  not carry a period of actual physical residence in Budapest. If the correction rests on
+  registration while the physical facts run the other way, the exposure is unchanged and
+  simply moves from the CV to the declaration.
+
+  Residual risk, stated once and then left alone. Eligibility is self-declared; the REA
+  Guide for Applicants confirms no documents are uploaded and that "the proposed beneficiary
+  must ensure compliance ... before submitting the proposal and must maintain all supporting
+  documentation". The obligation sits with ELTE as beneficiary. Verification, when it
+  happens, happens at grant agreement preparation — which is reached only if the proposal is
+  selected. The risk therefore scales with success rather than away from it.
+
+  Ticket 7: record this override, its basis and its date in the authorisation packet as an
+  operator-declared position. Do not promote it to Confirmed, and do not drop it — an
+  override that disappears from the record is indistinguishable from a fact.
+
+--- superseded: C5 DEFERRED BY THE OPERATOR, 2026-08-11 --------------------------
+~~Status: DEFER — "I will consult with the fellow."~~ Superseded by the override above,
+same day. The analysis below stands unchanged and is retained because the override rests
+on it: it is what the rectified CV has to be consistent with.
 
 THE RULE IS NOT AMBIGUOUS. I checked the 2026 Guide for Applicants directly. The mobility
 rule reads: "The researcher cannot have resided or carried out their main activity (work,
@@ -900,13 +1075,86 @@ THE FOUR OPTIONS, preserved for when you have the answer.
      relationship, the MATE archive and the PLANTDIGISENSE continuity. A different proposal.
 
 [✓] SUPERVISOR record independently corroborated, 2026-08-11. ELTE's Faculty of Informatics
-    lists Dr. András Jung as Professor and Deputy Director of the Institute of Cartography
+    lists Prof. András Jung as Professor and Deputy Director of the Institute of Cartography
     and Geoinformatics, H-1117 Budapest, Pázmány Péter sétány 1/C. The pre-purge record said
     "Deputy Head" and is accurate. The listing marks the deputy role as temporary, which is
     worth knowing for a 30-month action but does not affect the confirmation.
 
 [!] The placement decision does not touch C5. The placement runs after the deadline and has
     no bearing on the 36-month look-back.
+
+--- NEW RECORD: CO_SUPERVISOR, added by the operator 2026-08-11 -------------------
+  CO_SUPERVISOR: Dr. Roland Hollós, Department of Meteorology, ELTE Eötvös Loránd
+    University, Budapest. ORCID 0000-0001-5137-7471.
+
+  VERIFIED. The ELTE Department of Meteorology affiliation is confirmed on his own 2026
+  first-authored paper — Hollós, R., Zrinyi, N., Barcza, Z., Bellocchi, G., Sándor, R.,
+  Ruff, J., & Fodor, N. (2026). Meta-modelling of carbon fluxes from crop and grassland
+  multi-model outputs. *Geoscientific Model Development*, 19, 4385–4438.
+  https://doi.org/10.5194/gmd-19-4385-2026
+
+  ROLE, as set by the operator 2026-08-11: he brings **machine learning expertise** and is
+  **responsible for model development and testing**.
+
+  THE PUBLISHED RECORD SUPPORTS THAT, and it is worth knowing how, because §1.3 will have to
+  evidence the ML claim rather than assert it. His work is on **meta-modelling of crop and
+  grassland multi-model outputs** — that is, building statistical and machine-learning
+  surrogates that emulate process-based crop model behaviour — alongside development of the
+  Biome-BGCMuSo biogeochemical model. So the ML expertise is not adjacent to his record, it
+  *is* his record: he applies learned models to crop-system data and validates them against
+  process-based simulations. Cite the 2026 *Geoscientific Model Development* paper when §1.3
+  makes the claim; it is first-authored, recent and in a strong journal.
+
+  WHAT HIS APPOINTMENT FIXES. Three places where FIELDWISE was previously unstaffed:
+
+    • **Model development and testing across WP3 and WP4.** This is now his explicit
+      responsibility — prospective uncertainty-aware prediction, and the temporal and
+      cross-country transferability tests.
+    • **Methodology layer 6.** The draft compares transparent baselines, tree-based ML and
+      probabilistic/hierarchical modelling, and names process-based crop simulation
+      alongside them (reference R22, Tolomio & Casa, is in the list for exactly this). Until
+      now nobody named in the proposal could deliver either the ML comparison or the
+      process-based strand: Prof. Jung's expertise is remote sensing and geoinformatics.
+    • **Layer 1's agro-meteorology.** Rainfall, temperature, relative humidity, VPD,
+      radiation, ET₀ and cumulative atmospheric demand are the water-driving half of the
+      model, and a Department of Meteorology co-supervisor covers them properly.
+
+  It also repairs a quiet gap in §1.3. The draft's ELTE→Fellow list promises "Bayesian
+  hierarchical modelling", "spatio-temporal modelling", "uncertainty quantification" and
+  "transfer learning/domain adaptation" without saying who teaches them. Attributed to a
+  supervisor whose field is cartography and geoinformatics, that list was thin. With Hollós
+  it is credible — and those four items are now traceable to a named person with a record.
+
+  [!!] ONE WORDING RISK, and it matters more than it looks. "Responsible for model
+       development and testing" is right for internal division of labour, but it must not
+       reach Part B in a form suggesting the co-supervisor rather than the fellow drives the
+       core science. An MSCA-PF is awarded for *her* development; an evaluator who reads the
+       modelling as owned by a supervisor will mark down both Excellence and the career
+       argument in §2.1. Write it as supervisory responsibility — he provides the
+       methodological lead and quality-assures the modelling, she designs, builds and runs
+       it. Item 4's decision-rights row below is phrased that way deliberately.
+
+  FOUR THINGS TO SETTLE, none of which blocks a gate.
+
+  1. **Confirm his ELTE contract status.** He holds three affiliations — HUN-REN Centre for
+     Agricultural Research (Martonvásár), ELTE Department of Meteorology, and the Global
+     Change Research Institute of the Czech Academy of Sciences (Brno). MSCA requires
+     supervision at the beneficiary, so what matters is that he is ELTE staff, not merely
+     ELTE-affiliated on publications. If his primary employment is HUN-REN, he can still
+     advise, but he cannot be recorded as an ELTE co-supervisor. **Check this first** — it
+     is the one thing that could unwind the appointment.
+  2. **Part A can hold him.** The Funding & Tenders Mobility tab records *Supervisors*
+     (plural), with names, roles and tenure periods, so a co-supervisor is representable.
+  3. **`roles.json` has no CO_SUPERVISOR token.** Ticket 5's acceptance criterion lists
+     exactly six — FELLOW, HOST, SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER,
+     VALIDATION_PARTNER. Unlike Prof. Milics, who is an *advisor* at a partner and needs no
+     token, a co-supervisor is a management role at the beneficiary that `g07_p08` will read.
+     Ticket 5 has been amended to add the token. He resolves to ELTE, which exists in
+     `partners.json`, so `g07_p08` passes.
+  4. **He is not a professor.** He is a PhD researcher with a strong recent record in a
+     good journal. That is perfectly acceptable for a co-supervisor, but §1.3 should lead
+     with the modelling record rather than the title, and the main supervisor remains
+     Prof. Jung.
 ----------------------------------------------------------------------------------
 ```
 
@@ -954,11 +1202,13 @@ ITEM 8 — PERSON-MONTHS
 fellow allocation as drafted:  ACCEPT / replace with:
   WP1:   WP2:   WP3:   WP4:   WP5:   cross-cutting:    (must total the action duration)
 
-person-months, optional:
-  MATE: 2.4                <-- C4, corrected from 0.24 by the operator, 2026-08-11
-  MVCRI: -
-  AgroVIR: -
-  ELTE supervisor: -
+person-months, optional:   ALL FOUR ARE INDICATIVE AND ASSUMED — see the derivation below.
+  MATE: 2.4                <-- operator, corrected from 0.24 on 2026-08-11
+  MVCRI: 1.5               <-- ESTIMATE, 2026-08-11, to be checked with the partner
+  AgroVIR: 3.0             <-- ESTIMATE, 2026-08-11, to be checked with the partner
+  ELTE supervisor: 2.5     <-- ESTIMATE, 2026-08-11, to be checked with the supervisor
+  ELTE co-supervisor: 2.0  <-- ESTIMATE, 2026-08-11 (Dr. Roland Hollós, added to item 7)
+  Partner in-kind total: 11.4 PM, alongside the fellow's 30.0 MSCA-funded months.
 
 --- consolidated 2026-08-11 ------------------------------------------------------
 You answered `fellow allocation as drafted: ACCEPT`. Taken as accepting the drafted
@@ -1021,16 +1271,62 @@ largest effort block would look like a budget device rather than a research plan
     the number is the operator's estimate, not MATE's own statement, and it needs a matching
     declaration in `working_assumptions.json`.
 
-[!] STILL OPEN, and it is the residue of C4 rather than a new problem. MVCRI, AgroVIR and
-    the ELTE supervisor are all "-". A literal zero for the supervisor contradicts item 4's
-    accepted weekly one-to-ones and quarterly reviews, and a literal zero for AgroVIR is now
-    plainly wrong — it hosts the fellow for six months. Two ways to close it:
-      (a) Give each a nominal indicative figure, declared Assumed like MATE's 2.4.
-      (b) State in §3.1 that partner contributions are in kind and deliberately not
-          quantified, and drop the per-partner lines entirely — including MATE's.
-    (b) is the more honest option if none of these figures comes from the partners
-    themselves. What is not defensible is a table where one partner carries a number and
-    three carry dashes, because the dashes then read as zero.
+--- C4 RESIDUE CLOSED 2026-08-11: the three dashes replaced with estimates ---------
+Operator asked for estimates to be checked with the partners later. Each figure below is
+derived from a commitment already accepted elsewhere in this pack, so the partners can
+argue with the assumptions rather than with an unexplained number. **All four values,
+including MATE's 2.4, are Assumed** and need matching declarations in
+`working_assumptions.json`. None is costed: MSCA-PF funds only the fellow's months, so
+these affect the §3.1 Implementation narrative and nothing in the budget.
+
+**ELTE supervisor — 2.5 PM.** Built bottom-up from item 4's accepted governance over 30
+months: ~120 weekly one-to-ones at 1 h (120 h), preparation and follow-up at 0.5 h each
+(60 h), 30 monthly progress-record reviews (30 h), 10 quarterly Career Development Plan
+reviews at 2 h (20 h), chairing the Steering Group at M6/M12/M16/M20 with preparation
+(16 h), reading and commenting on the P1–P4 drafts and deliverables (40 h), and delivering
+the eleven §1.3 competences (40 h). That is 326 h ≈ 2.2 PM; rounded to **2.5** for the
+supervision the model does not enumerate. Sanity check: 8% FTE, about 3 h a week. If the
+figure looks low to the supervisor, the weekly-meeting assumption is where to push.
+
+**AgroVIR — 3.0 PM.** WP5 co-lead from M16 plus placement host M25–M30: on-site supervision
+of the fellow for six months at roughly 15% of one person (0.9), the MVP assessment across
+the nine dimensions §1.2 lists, producing D5.4 (1.0), farmer-field access, data and farm
+liaison (0.7), FMIS integration roadmap input for D5.5 (0.3), and the steering-group seat
+(0.2). Total 3.1, rounded to **3.0**. This is deliberately the largest partner figure — it
+is the only partner hosting the fellow, and a placement host showing less effort than a data
+provider would read oddly against an *evaluated* placement.
+
+**MVCRI — 1.5 PM.** WP4 target domain, M12–M21: Bulgarian field trial hosting and management
+(0.5), ground and physiological measurement plus data provision (0.4), data preparation and
+transfer under the pre-registered protocol (0.2), Prof. Yankova's contact and steering-group
+role (0.2), and co-authoring the transfer-test outputs (0.2). Total **1.5**. Lower than MATE
+because MVCRI's role is one cross-country test rather than a five-year archive plus the
+experimental programme — which is the distinction §1.2 draws itself.
+
+[!] One tension to put to the partners, not to hide. Anchored on MATE's 2.4, the scale is
+    modest: MATE supplies the five-year hyperspectral archive, runs the tomato experiments,
+    co-leads WP1 and WP2 and hosts prospective validation, all for 2.4 PM — while AgroVIR
+    gets 3.0 for hosting a six-month placement. Both cannot obviously be right. Either MATE's
+    2.4 is low for what it actually contributes, or AgroVIR's 3.0 is generous. I have kept
+    MATE at the operator's figure and let AgroVIR exceed it on the placement, but this is the
+    first thing a partner will query and the first thing worth checking.
+
+**ELTE co-supervisor — 1.5 PM.** Added 2026-08-11 with Dr. Roland Hollós. Derived from the
+supervision cadence proposed in item 4: fortnightly technical sessions at 1.5 h through the
+modelling-intensive window WP3–WP4, M6–M21, which is about 32 sessions (48 h); monthly
+sessions at 1 h outside it, about 14 (14 h); the four quarterly Career Development Plan
+reviews he attends (8 h); Steering Group membership at four meetings with preparation (12 h);
+and reviewing the modelling and validation-design outputs — D3.1, D3.2, D4.2, D4.3 — plus the
+model card (~130 h). That is roughly 212 h ≈ 1.5 PM, or 5% FTE. Deliberately less than the
+main supervisor's 2.5: he covers one domain intensively rather than the whole fellowship.
+
+[!] These do not affect `phase_04_gate`. Its FTE check applies to the fellow's concurrent
+    effort, not to partner in-kind contributions.
+
+    If the partners come back reluctant to commit numbers, the fallback remains: state in
+    §3.1 that partner contributions are in kind and deliberately not quantified, and drop all
+    four lines together. A table with one real figure and three estimates is fine; a table
+    with one figure and three dashes is not.
 ----------------------------------------------------------------------------------
 ```
 
@@ -1747,25 +2043,144 @@ Per organisation, and additionally for ELTE the hosting arrangements that §3.2 
 ```
 ITEM 12 — CAPACITY
 
+DEFER — PARTIAL, seven named fields only. Operator, 2026-08-11.
+Reason: these seven can only come from the organisations themselves, and the operator cannot
+answer them at this point. They are deferred rather than left blank, so ticket 6 records them
+as Unresolved and ticket 7 lists them in the authorisation packet.
+
+  DEFERRED FIELDS — REDUCED FROM SEVEN TO FIVE on 2026-08-11, after the PLANTDIGISENSE
+  Part B-1 was supplied. The complete current list:
+    ELTE     recent_projects_and_publications    (CORDIS checked — wrong granularity, see below)
+    ELTE     previous_msca_hosting
+    MATE     recent_projects_and_publications
+    AgroVIR  key_people
+    AgroVIR  relevant_track_record
+
+  CLOSED SINCE THE DEFERRAL WAS WRITTEN:
+    ELTE  hosting_arrangements_and_support_services  — answered in full from PLANTDIGISENSE
+          §3.2. This was the costly one, the field §3.2 is most directly scored on and the
+          one with no substitute. It is now the best-evidenced field in the item.
+    MVCRI recent_projects_and_publications           — answered: FP7 205941 (MVCRI as
+          coordinator, verified on CORDIS), ZEMDKT 17, and KP-06-COST/2.
+    ELTE  infrastructure                             — not deferred, but replaced with the
+          actual equipment inventory rather than a paraphrase.
+
+  NOT DEFERRED — already answered or drafted, and ticket 6 should fold these normally:
+    every department_and_team, every infrastructure line, ELTE and MATE key_people,
+    MVCRI key_people (both department heads, verified), AgroVIR organisation_profile and
+    infrastructure_and_farm_access (drafted below from the company's published figures).
+
+  Gate impact: NONE. Item 12 blocks no runner gate. It feeds Part B-1 §3.2, which is scored
+  under Implementation but not gated, and Part B-2 §5, which this run does not draft.
+  Consequence of deferring: Phase 8 drafts a thin §3.2. See the note below on what that costs
+  and the one gate worth watching.
+
 ELTE (beneficiary)
-  department_and_team: Faculty of Informatics
-  infrastructure: drones, satelite access (hyerpsetcral, multispectral), claude storage, computing infrastructure for machine learing   
-  key_people: Dr. András Jung
-  recent_projects_and_publications:
-  previous_msca_hosting:
-  hosting_arrangements_and_support_services:
+  department_and_team: Faculty of Informatics, Institute of Cartography and Geoinformatics,
+    H-1117 Budapest, Pázmány Péter sétány 1/C. The hosting team is the institute's
+    remote-sensing group.
+  infrastructure: REPLACED 2026-08-11 from PLANTDIGISENSE §3.2 — the earlier line
+    ("drones, satelite access, claude storage") was a paraphrase; this is the actual kit.
+    GIS and Remote Sensing Laboratory: DJI Matrice 350 RTK industrial drone with RTK GPS;
+    DJI Zenmuse L1 (LiDAR + RGB); DJI Zenmuse P1 (45 MP photogrammetry); DJI Zenmuse H20T
+    (thermal, zoom, wide); Ultris S5 hyperspectral camera (VIS–NIR narrow bands); Cubert
+    CUVIS Lab Lite package (hyperspectral imaging with calibration tools).
+    Software: licensed ArcGIS, ENVI, MATLAB; Google Earth Engine, QGIS, SNAP, Python, R.
+    High-performance computing clusters for AI and large-scale geospatial analysis; secure
+    storage and backup for large remote-sensing datasets. ELTE library, IT services and open
+    science repositories.
+    [!] The Ultris S5 and the Cubert CUVIS matter more than the drones here: they are the
+        institute's own hyperspectral capability, which is what methodology layer 3's
+        hyperspectral-to-Sentinel resampling actually needs. §1.2 should name them.
+  key_people: TWO, and only two. The institute Director is NOT associated with the call and
+    is deliberately not listed — see item 4's amended C6 note.
+    **Prof. András Jung** — SUPERVISOR. Professor at the Institute of Cartography and
+    Geoinformatics; expertise in remote sensing, geospatial technologies and environmental
+    monitoring (PLANTDIGISENSE §3.2). ELTE also records a temporary deputy directorship;
+    §3.2 should describe him by his professorship, not by that post.
+    **Dr. Roland Hollós — CO_SUPERVISOR, added 2026-08-11. ELTE Department of Meteorology**
+    (a different ELTE department from the hosting institute, which is worth stating rather
+    than hiding: it makes the supervision genuinely interdisciplinary within the beneficiary).
+    Brings **machine learning expertise** and is **responsible for model development and
+    testing**. ORCID 0000-0001-5137-7471.
+    [!] §3.2 now needs a second department described. The Department of Meteorology brings
+        agro-meteorological data handling and process-model capability that the Institute of
+        Cartography and Geoinformatics inventory above does not cover, and none of it is
+        currently listed. Ask Hollós what his department contributes — met data holdings,
+        modelling infrastructure, compute — because right now the co-supervisor is named with
+        no institutional capacity behind him.
+    [!] Prof. Zoltán Barcza is also at the ELTE Department of Meteorology and co-authors with
+        Hollós. Not proposed for any role — noted only so that, if the department's capacity
+        is described, the group's standing can be evidenced rather than asserted.
+  recent_projects_and_publications: DEFERRED — see the deferral note above. CORDIS was
+    checked and is the wrong instrument: it indexes participants at university level, so an
+    ELTE query returns faculty-wide projects (AI4EU and similar) with no connection to the
+    Institute of Cartography and Geoinformatics. Listing those would read as padding. This
+    has to come from Prof. Jung or the institute — one email, and it is the institute's own
+    project list that is wanted, not the university's.
+  previous_msca_hosting: DEFERRED. PLANTDIGISENSE evidences that ELTE hosted an MSCA-PF
+    *application* (HORIZON-MSCA-2025-PF, proposal 101284764, scored 70.40%) — not that it has
+    hosted a funded fellow. Those are different claims and §3.2 must not blur them. Ask the
+    ELTE research office how many MSCA fellows the institution has hosted.
+  hosting_arrangements_and_support_services: ANSWERED 2026-08-11 from PLANTDIGISENSE §3.2,
+    the same host, same institute, same supervisor and same fellow, submitted 2025:
+      • Dedicated office and laboratory space at ELTE.
+      • Full integration into the institute's research groups, weekly meetings and
+        interdisciplinary workshops.
+      • Administrative and technical support for relocation, project management, procurement
+        and dissemination.
+      • Access to short-term training courses.
+      • Participation in international networks (COST Actions, FAO/EU webinars).
+    [!] Three things to adjust before this is reused verbatim — see "Reusing PLANTDIGISENSE"
+        below. In short: the action is now 30 months with a six-month external placement, the
+        equipment list needs a currency check, and the mentoring structure §3.2 asks for is
+        still not explicitly described.
 
 MATE
   department_and_team:  Institute of Horticultural Sciences
   infrastructure: field trials, source-domain scientific dataset and primary model-development/validation environment
-  key_people: Dr. Sándor Takács
+  key_people: TWO PEOPLE, DISTINCT ROLES — discrepancy resolved 2026-08-11.
+    • Dr. Sándor Takács — MATE project contact (item 1) and DATA_PARTNER representative on
+      the Steering Group (item 4). Title still unverified; supply it, `g07_p08` reads the name.
+    • Prof. Gábor Milics — SCIENTIFIC ADVISOR to the fellow. Full professor at MATE,
+      Gödöllő; Hungary's country representative to the International Society of Precision
+      Agriculture; works on remote sensing in precision agriculture. He held the same
+      advisory role in PLANTDIGISENSE §3.2; the operator confirmed on 2026-08-11 that he
+      continues in it for FIELDWISE.
+      His fit is unusually good: precision agriculture and agricultural remote sensing, at
+      the partner supplying the five-year hyperspectral archive. §3.2 should say so rather
+      than listing him as a name.
   recent_projects_and_publications:
 
 MVCRI
-  department_and_team:
+  department_and_team: Technologies in Vegetable Crops Production — one of MVCRI's two
+    departments, headed by Prof. Vinelina Yankova (entomology, vegetable production,
+    breeding). The other is Breeding, Variety Maintenance and Introduction, headed by
+    Assoc. Prof. Stanislava Grozeva. Operator-supplied; verified against the institute's
+    own departments page.
   infrastructure: secondary access to field trials
-  key_people: 
-  recent_projects_and_publications:
+  key_people: Prof. Vinelina Yankova (Head, Technologies in Vegetable Crops Production —
+    project contact and steering-group seat); Assoc. Prof. Stanislava Grozeva (Head,
+    Breeding, Variety Maintenance and Introduction). Dr. Rositsa Cholakova is MVCRI staff
+    but is the FELLOW and must not be listed here as institutional capacity.
+  recent_projects_and_publications: ANSWERED 2026-08-11. Three, of which one is EU-funded and
+    two are current and directly on FIELDWISE's topic:
+      • FP7 grant 205941, "Balkan Vegetables Research Centre for transfer of European
+        knowledge, research and practice" — **MVCRI was the coordinator**, in its own name,
+        under PIC 999533009. Verified on CORDIS. Older, but it is hard evidence that the
+        institute can hold an EU grant as coordinator, which is the capacity §3.2 is asking
+        about.
+      • ZEMDKT 17, Agricultural Academy, 2024–2026, Task 7: "Resistance to abiotic stress —
+        drought and salinity in Solanum lycopersicum." Same crop, same stress as FIELDWISE,
+        running now. This is the strongest single line available for MVCRI.
+      • KP-06-COST/2, National Science Fund (Ministry of Education and Science),
+        2025–ongoing: "Monitoring of vegetable crops in support of precision agriculture
+        using satellite and unmanned aerial systems", with the Space Research and Technology
+        Institute, Bulgarian Academy of Sciences, under COST Action PANGEOS.
+    The last two come from the item 11 CV and are as reliable as that document. CORDIS adds
+    nothing beyond the FP7 project — an MVCRI query returns only grant 205941.
+    [!] Publications are still absent. Yankova's and Grozeva's own outputs would suit §3.2
+        better than the fellow's, since the point is institutional capacity independent of her.
 
 AgroVIR
   organisation_profile:
@@ -1773,9 +2188,100 @@ AgroVIR
   key_people: 
   relevant_track_record:
 
+--- Reusing PLANTDIGISENSE §3.2 — legitimate, with four adjustments ----------------
+Source: `PLANTDIGISENSE_Part_B1.pdf`, §3.2 "Quality and capacity of the host institutions
+and participating organizations, including hosting arrangements", pages 9–10.
+
+**Reuse is entirely legitimate.** It is the same applicant describing the same host, the same
+institute and the same supervisor. Hosting arrangements are institutional facts, not creative
+content, and there is no self-plagiarism concern in an applicant restating their own host's
+provisions across two applications. It is also the *better* source than anything we could
+reconstruct: it was written with the host's input and it is specific where a reconstruction
+would be vague.
+
+Four adjustments before it goes into FIELDWISE.
+
+  1. **The action is 30 months, not 24, and includes a six-month external placement.**
+     PLANTDIGISENSE was a 24-month fellowship entirely at ELTE. FIELDWISE puts the fellow at
+     AgroVIR for M25–M30. §3.2 must say what ELTE's arrangements are *during* the placement —
+     whether the office and integration persist, and how supervision continues remotely. That
+     is new text; nothing in PLANTDIGISENSE covers it.
+  2. **Currency check on the equipment.** The inventory is a 2025 snapshot. Confirm the
+     Ultris S5 and Cubert CUVIS are still in service and ask whether anything has been added.
+     A named instrument that no longer exists is worse than a generic description.
+  3. **The mentoring structure is still missing.** Item 12 asks for it explicitly and
+     PLANTDIGISENSE's §3.2 does not describe one — it lists integration, meetings and
+     workshops, which is not the same thing. Item 4's accepted supervision cadence supplies
+     most of the answer; cross-reference it rather than leaving §3.2 silent.
+  4. **Check the Evaluation Summary Report before reusing.** PLANTDIGISENSE scored 70.40%,
+     above threshold and unfunded. If evaluators commented on §3.2, reusing the text verbatim
+     reproduces the weakness into a proposal that is meant to score higher. This is the single
+     best argument for obtaining the ESR, which item 11 already flags as the highest-value
+     missing input.
+
+[✓] DISCREPANCY RESOLVED 2026-08-11 — both, in distinct roles. PLANTDIGISENSE §3.2 named
+    **Prof. Gábor Milics** as MATE scientific advisor; this pack names **Dr. Sándor Takács**
+    as MATE's contact and DATA_PARTNER seat. The operator confirms Milics continues as an
+    advisor. So:
+      Takács  — organisational: MATE's project contact (item 1) and its Steering Group
+                representative (item 4). This is the name `g07_p08` reads. Unchanged.
+      Milics  — personal and scientific: advisor to the fellow. No change to items 1 or 4.
+
+    Three consequences, none of them a gate problem.
+
+    **No role token, and no `partners.json` entry.** Ticket 5 defines exactly six role tokens
+    — FELLOW, HOST, SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER, VALIDATION_PARTNER — and
+    "advisor" is not among them. Milics is a named person within MATE, which already holds
+    DATA_PARTNER. Do not invent a token for him; `roles.json` stays as ticket 5 specifies.
+
+    **No Steering Group seat.** Item 4's accepted composition gives one named contact per
+    partner organisation, and for MATE that is Takács. Milics advises the fellow directly and
+    sits outside the governance structure. That is the right shape — recorded here so nobody
+    later reads his absence from the governance table as an omission.
+
+    **He belongs in §1.3, and that is the real gain.** The FIELDWISE draft's §1.3 describes
+    only the ELTE↔Fellow two-way transfer. A named MATE professor in precision agriculture
+    and agricultural remote sensing, advising the fellow, adds a second supervision strand
+    that the draft currently lacks entirely — and it is a strand the previous evaluation would
+    have seen, since PLANTDIGISENSE had it. Add him to §1.3 and to §3.2's key people; he is
+    worth more in the supervision narrative than in a capacity list.
+
+[!] CORDIS was tested for both institutions and is only useful for one. An MVCRI query
+    returns FP7 205941 and nothing else — already captured. An ELTE query returns
+    university-wide participation (AI4EU and similar) with no way to filter to the Institute
+    of Cartography and Geoinformatics, so it cannot evidence the hosting *team's* record,
+    which is what §3.2 asks about. For ELTE, the institute's own list is the only usable
+    source.
+
+--- what the deferral costs, and the one gate worth watching -----------------------
+No runner gate reads this item, so the deferral is mechanically free. Two things are worth
+knowing anyway.
+
+**The one gate to watch is `phase_06_gate` `g07_p09`**, which requires every
+instrument-mandated implementation section to be *addressed*. §3.2 is such a section, so a
+completely empty capacity picture could in principle trip it. It should not, because ticket 5
+seeds `capabilities.json` from the draft's own knowledge-transfer and capacity statements —
+the draft gives one function sentence per organisation — and the fields left undeferred above
+add substantially more. §3.2 will therefore be thin, not empty, and "addressed" is a low bar.
+If Phase 6 does fail there, the cause will be named and it is recoverable by adding capacity
+text later; nothing has to be re-run from scratch.
+
+**The scored cost is smaller than the field count suggests.** Seven fields are deferred, but
+the substance of §3.2 is largely already here: MVCRI's departments and both department heads
+are verified, MATE is a verified Horizon coordinator (grant 101094158), AgroVIR's scale is
+documented from its own published figures, and ELTE's PLANTDIGISENSE submission evidences
+MSCA application experience. What is genuinely missing is ELTE's hosting arrangements — which
+is the field §3.2 is most directly scored on and the one no substitute exists for — plus
+publication and project lists that are quick to obtain once someone asks.
+
+**Item 14 partly absorbs this.** The accepted page budget gives §3.2 only 0.25 pages, so a
+thin §3.2 fits the space already allocated. That is a reason not to panic, not a reason to
+leave it thin: if the deferred fields arrive later, revisit item 14's §3.2 allocation at the
+same time, because 0.25 pages will not hold a good answer.
+
 --- sweep 2026-08-11: what I could fill from sources already in hand ---------------
-Blocks no gate. Feeds Part B-1 §3.2, which IS in scope for this run, so the blanks below
-will show up in the drafted proposal.
+Feeds Part B-1 §3.2, which IS in scope for this run, so the deferred fields above will show
+up as gaps in the drafted proposal.
 
 AgroVIR — organisation_profile, DRAFTED from the company's own published figures:
   "AgroVIR Kft., founded 2007 and seated in Budaörs, Hungary, develops and operates a
@@ -1942,7 +2448,12 @@ must fit inside §3.1's 1.5 pages, so the risk table is likely to compress to a 
 ```
 ITEM 14 — PAGE BUDGET
 
-page budget as drafted:  ACCEPT / replace with:
+page budget as drafted:  REVISED TABLE ACCEPTED, operator, 2026-08-11.
+  The 30-month revision below is adopted: §1.3 → 1.00, §2.2 → 0.50, §3.1 → 1.75, §3.2 → 0.25,
+  all other sections unchanged, total 10.00. Phase 8 drafts to this budget.
+  [!] §3.2 at 0.25 pages remains the weak point flagged below. The preferred remedy —
+      compressing the 13-row risk table in §3.1 to a grouped form and returning the space —
+      is still open and should be decided before Phase 8 drafts §3.1.
 edits:
 
 if you disagree that the draft is under the cap, state what you measured:
@@ -2047,73 +2558,120 @@ answers; ticket 7 carries whatever is still open into the authorisation packet.
 > placement at AgroVIR and set the duration to 30 months. Items 2, 7, 8, 9, 12 and 14 have been
 > updated to match. The table below reflects the post-decision state.
 
-| # | Item | State | Gate | Verdict |
-|---|------|-------|------|---------|
-| 1 | Legal identity | **Complete** | `g04_p07` | MATE and MVCRI pass. AgroVIR fails: no PIC |
-| 2 | Participation mode | **DECIDED** | `g04_p07` | Non-academic placement, 30 months. New Part B-1 content owed |
-| 3 | Ethics | **Complete** | `g07_p06` | **C2 resolved.** Passes, contradiction gone |
-| 4 | Governance | Complete | `g07_p07`, `g07_p08` | **C1 resolved in structure.** Needs one MVCRI name |
-| 5 | KPIs | Complete | `g06_p04`, `g06_p05` | Passes. **C7 and C8 resolved** — EI-06 raised, HRS4R claim removed |
-| 6 | Career Development Plan | Complete | `g07_p09` | Passes. **C7 resolved** — teaching component reframed |
-| 7 | Identity spine | **Amended** | none | DURATION now 30; ticket 3 deviation written. **C5 DEFERRED** — HOST and FELLOWSHIP_TYPE conditional |
-| 8 | Person-months | **Proposed** | none | 30-month split drafted; accept or replace. **C4 resolved** (MATE 2.4) |
-| 9 | Unit-cost lines | **CLOSED** | `gate_09` `g08_uc03` | **C3 resolved.** All components resolve → **gate passes** |
-| 10 | References | Complete | none | 35 refs. DrR alone uncited |
-| 11 | Researcher CV | Complete | none | **Carries an eligibility risk that outranks everything** |
-| 12 | Capacity | **Partial** | none | ELTE hosting blank; AgroVIR must now show it can host a placement |
-| 13 | Security / Green Charter | Complete | none | Nothing outstanding |
-| 14 | Page budget | **Proposed** | none | Revised 30-month budget drafted; §3.2 squeezed to 0.25 |
+| # | Item | State | Gate(s) it feeds | Gate verdict |
+|---|------|-------|------------------|--------------|
+| 1 | Legal identity | **Complete** | `g04_p07` | **Passes.** All three partners have a verified legal identity. The predicate is existence in `partners.json`, not field completeness — AgroVIR's missing PIC does not fail it |
+| 2 | Participation mode | **Complete** | `g04_p07` | **Passes.** All three modes assigned; AgroVIR is the non-academic placement host |
+| 3 | Ethics | **Complete** | `g07_p06` | **Passes** |
+| 4 | Governance | **Complete** | `g07_p07`, `g07_p08` | **Passes.** All five management roles name organisations that will exist in `partners.json` |
+| 5 | KPIs | **Complete** | `g06_p04`, `g06_p05` | **Passes.** Six of six expected impacts mapped; ten KPIs each name a deliverable |
+| 6 | Career Development Plan | **Complete** | `g07_p09` | **Passes** |
+| 7 | Identity spine | **Complete, amended** | none directly; sets `project_duration_months` for `phase_04_gate` | DURATION 30. C5 operator override; HOST and FELLOWSHIP_TYPE CONFIRM — CONDITIONAL |
+| 8 | Person-months | **Complete** | `phase_04_gate` (indirectly) | Fellow 30.0 across five WPs plus cross-cutting; four partner estimates |
+| 9 | Unit-cost lines | **Complete** | `gate_09` `g08_uc03` | **Passes.** All three components resolve |
+| 10 | References | **Complete** | none | 35 refs. DrR strand Unresolved |
+| 11 | Researcher CV | **Complete** | none | Carries the C5 eligibility override |
+| 12 | Capacity | **Deferred, 5 named fields** | `g07_p09` (weakly) | **Passes with a watch.** §3.2 drafts thin, not empty |
+| 13 | Security / Green Charter | **Complete** | none | Nothing outstanding |
+| 14 | Page budget | **Complete** | none | Revised 30-month budget accepted |
 
-## Blocking a runner gate
+## Gate audit — 2026-08-11
 
-Two remain. Item 2 is off this list.
+**No runner gate is currently blocked by an unanswered item in this pack.** Every gate-bearing
+item, 1 to 9, is answered. An earlier version of this register said otherwise; it was stale and
+is corrected here.
 
-**AgroVIR has no PIC — `phase_03_gate` `g04_p07`.** The draft assigns it WP5 co-lead, and the
-placement decision now also makes it the host for M25–M30, so `partners.json` must contain it.
-Registration is free and takes minutes, and item 1 supplies every field it needs: AGROVIR
-Üzletviteli Tanácsadó Kft., 2040 Budaörs, Kinizsi utca 30, tax number 14000838-2-13. This is the
-cheapest blocker on the list, and the placement decision made it more urgent, not less.
+| Gate | Predicate | Fed by | Status |
+|------|-----------|--------|--------|
+| `phase_03_gate` | `g04_p07` | items 1, 2 | **Passes**, subject to ticket 5 seeding all three partners |
+| `phase_04_gate` | task months, milestone criteria, critical path, `timeline_within_duration` | items 7, 8 | **Passes**, subject to ticket 3 writing `project_duration_months: 30` and ticket 4 deriving M1–M30 ranges |
+| `phase_05_gate` | `g06_p04` | item 5 | **Passes** |
+| `phase_05_gate` | `g06_p05` | item 5 | **Passes** |
+| `phase_06_gate` | `g07_p06` | item 3 | **Passes** |
+| `phase_06_gate` | `g07_p07` | item 4 | **Passes** |
+| `phase_06_gate` | `g07_p08` | item 4 | **Passes**, subject to ticket 5 adding the `CO_SUPERVISOR` token |
+| `phase_06_gate` | `g07_p09` | items 6, 12 | **Passes with a watch** — item 12's deferral makes §3.2 thin |
+| `gate_09_budget_consistency` | `g08_uc03` | item 9 | **Passes** |
+| `gate_12` | — | ticket 10 | Out of scope until Phase 8 |
 
-**~~Item 9's two "unknown" answers~~ — CLOSED 2026-08-11 (C3).** Both lines are now declared
-"does not apply" as operator-declared Assumed. With duration Confirmed at 30, all three components
-of `g08_uc03` resolve and **`gate_09` passes**. The declaration text for
-`working_assumptions.json` is in item 9.
+### Why item 1 is no longer a gate blocker
+
+Earlier versions of this register said "AgroVIR fails `g04_p07`: no PIC". That was wrong, and the
+error is worth naming so it is not reintroduced. `g04_p07` requires every work-package-assigned
+partner to **exist** in `consortium/partners.json`. It does not require the record to be complete.
+Ticket 5's own acceptance criterion says the opposite of completeness — "the three new
+participants are Unresolved with missing fields named, never guessed". A record for AgroVIR
+carrying its verified legal name, address, entity type and tax number, with `pic: null` marked
+Unresolved and the reason stated, is exactly what the design intends and satisfies the predicate.
+
+**The AgroVIR PIC is a submission requirement, not a gate blocker.** It is needed because AgroVIR
+hosts the placement and must therefore appear in Part A Section 2, and every Part A participant
+needs a PIC. That binds at submission, not at run time.
+
+### Why item 2 is no longer a gate blocker
+
+It was listed against `g04_p07` while the participation mode was undecided, because an unassigned
+mode meant `roles.json` and `partners.json` could not record one. The operator decided it on
+2026-08-11. The mode is assigned, the duration follows from it, and the gate column now records
+what item 2 *feeds* rather than what it blocks.
+
+### The three real residual risks
+
+None is an unanswered item; all three are execution or verification risks.
+
+1. **`g04_p07`'s definition is assumed, not verified.** Everything above rests on the pack's own
+   statement that the predicate tests existence. `gate_rules_library.yaml` could not be read to
+   confirm it. If the predicate also tests field completeness, AgroVIR's null PIC fails and the
+   PIC becomes a run blocker as well as a submission one. **Check this before Phase 3.**
+2. **Two gates pass only if tickets 3, 4 and 5 do their jobs.** `phase_04_gate` needs
+   `project_duration_months: 30` in `selected_call.json` — the ticket 3 deviation — and M1–M30
+   work-package and milestone ranges from ticket 4. `g07_p08` needs ticket 5's added
+   `CO_SUPERVISOR` token. These are not open questions, they are work not yet done.
+3. **`g07_p09` is the one gate the item 12 deferral could touch.** It requires every
+   instrument-mandated implementation section to be *addressed*, and §3.2 is one. Ticket 5 seeds
+   `capabilities.json` from the draft, and the undeferred fields add more, so §3.2 will be thin
+   rather than empty. "Addressed" is a low bar and this should pass — but it is the only place
+   the deferral reaches a gate at all.
+
+### What blocks authorisation rather than a gate
+
+Ticket 7 is a process step, not a runner gate, and it must not issue authorisation while these
+are open: the **C5 mobility override**, listed as an operator-declared position with its basis
+and not promoted to Confirmed; **item 12's five deferred fields**; and **item 11's
+`invited_talks`**.
 
 ### Contradiction register
 
-Nine contradictions were flagged in the sweep. Four are resolved.
+Nine contradictions were found in the sweep. **Eight are resolved; C5 is overridden.**
 
 | # | Contradiction | State |
 |---|---------------|-------|
-| C1 | Fellow held every MVCRI seat | **Resolved in structure** — needs one name |
+| C1 | Fellow held every MVCRI seat | **Resolved** — Prof. Vinelina Yankova holds the contact and steering seat |
 | C2 | Ethics answers contradicted the accepted candidates | **Resolved** |
-| C3 | Family allowance held two answers; both unknowns failed the gate | **Resolved — gate now passes** |
-| C4 | MATE at 0.24 PM against its own capacity claim | **Resolved** — 2.4. Residue: three dashes still read as zero |
-| C5 | Item 7 confirms HOST/FELLOWSHIP_TYPE; item 11 says they may be unavailable | **DEFERRED** — operator consulting the fellow. Rule text confirmed; records marked conditional |
-| C6 | Escalation routes past the supervisor to a post the supervisor deputises | **Resolved** — Director is Dr. Mátyás Gede, a different person |
+| C3 | Family allowance held two answers; both unknowns failed the gate | **Resolved — `gate_09` passes** |
+| C4 | MATE at 0.24 PM against its own capacity claim | **Resolved** — 2.4, and all four partner figures now estimated |
+| C5 | Item 7 confirms HOST/FELLOWSHIP_TYPE; item 11 says they may be unavailable | **OPERATOR OVERRIDE** — CV to be rectified. A declared position, not a Confirmed fact |
+| C6 | Escalation routes past the supervisor to a post he deputises | **Resolved** — escalation names the Director's *office*; no individual named |
 | C7 | Teaching treated as a competence to build; the CV shows five years of it | **Resolved** — EI-06 raised, CDP component reframed |
-| C8 | EI-04 asserts ELTE holds HRS4R while the same item answers "unknown" | **Resolved** — claim removed; restore only if ELTE confirms |
-| C9 | AgroVIR registered as a consultancy, named as technology partner and placement host | **Resolved** — named explicitly in the §3.2 / Part B-2 §5 wording |
+| C8 | EI-04 asserts ELTE holds HRS4R while the same item answers "unknown" | **Resolved** — ELTE does not hold it; claim removed permanently |
+| C9 | AgroVIR registered as a consultancy, named as technology partner and placement host | **Resolved** — named explicitly in the §3.2 wording |
 
-Eight of nine resolved. C5 is deferred, not closed: no runner gate reads it, so the run proceeds,
-but **ticket 7 must not issue authorisation while it is open** — it is the one item that can
-invalidate the identity spine rather than merely weaken a score.
+### Open actions
 
-Open actions carried out of the contradiction pass, none of which I can close:
+Deduplicated and pruned of everything closed. Nothing here blocks a runner gate.
 
 | Action | For | Blocks |
 |--------|-----|--------|
-| The fellow's documented residence across 2023-09-09 to 2026-09-09 | C5 | Authorisation |
-| One MVCRI colleague's name and email | C1 | `g07_p08` resolution, item 1, item 4 |
-| Confirm whether ELTE holds HRS4R | C8 | Nothing — restores a stronger EI-04 claim |
+| Rectified CV, consistent with Part A and ELTE's Erasmus records | C5 | **Authorisation** (ticket 7) |
+| Register AgroVIR in the Participant Register | item 1 | **Submission.** It hosts the placement, so it must be in Part A §2, so it needs a PIC. Free, online, immediate |
+| Verify `g04_p07` tests existence, not field completeness | item 1 | Nothing yet — but it decides whether the PIC is also a run blocker |
+| Confirm Dr. Hollós is ELTE **staff**, not only ELTE-affiliated | item 7 | Nothing at gate; decides whether `CO_SUPERVISOR` is the right token |
+| Item 12's five deferred fields | item 12 | Authorisation listing; §3.2 quality |
+| Item 11's `invited_talks` | item 11 | Authorisation listing |
+| Roles/titles for Takács (MATE) and Balázs (AgroVIR) | items 1, 4, 12 | Nothing at gate; Part B-2 §5 needs them |
+| Named on-site placement supervisor at AgroVIR | item 12 | Nothing at gate; the placement is scored |
 | Confirm an MSCA fellow may primary-supervise an ELTE MSc thesis | C7 | Nothing — else EI-06 drops to co-supervision |
-| AgroVIR letter of commitment and named on-site placement supervisor | C9, item 12 | Nothing at gate; scored |
-| Decide the three dashes in item 8's partner effort table | C4 residue | Nothing at gate; scored |
-
-**~~Item 2's undecided mode~~ — CLOSED 2026-08-11.** The placement is approved. `roles.json` and
-`partners.json` can now record `non_academic_placement` for AgroVIR, the duration is 30 months,
-item 8's allocation totals 30, item 9's derivation runs at 30, and `selected_call.json`
-`project_duration_months` is set to 30 — subject to the ticket 3 collision recorded in item 7.
+| Compress §3.1's risk table to return space to §3.2 | item 14 | Nothing; decide before Phase 8 drafts §3.1 |
 
 ## What the placement decision opened
 
@@ -2210,9 +2768,14 @@ refugee and temporary-protection procedures, and short stays defined as periods 
 research-experience criterion, not from this one. So the arithmetic above stands unless the fellow's
 documented residence differs from what her CV states.
 
-The operator has deferred pending consultation with the fellow. Item 7 now carries HOST and
-FELLOWSHIP_TYPE as CONFIRM — CONDITIONAL, and the four available routes, including deferring to the
-2027 call where the window clears to about 3.8 months, are recorded in item 7.
+**Overridden by the operator, same day.** The stated basis is that the CV will be rectified: C5
+rests entirely on the CV's assertion that the career break was spent residing in Budapest, and
+correcting that assertion removes 8.76 of the 15.81 months, leaving 7.05 against a 12-month cap.
+Recorded in item 7 as an operator-declared position under §13.3, not promoted to Confirmed. HOST and
+FELLOWSHIP_TYPE remain CONFIRM — CONDITIONAL until the rectified CV exists and agrees with the
+Part A mobility declaration. The four alternative routes, including the 2027 call where the window
+clears to about 3.8 months on the unrectified facts, are retained in item 7 in case the
+rectification does not carry.
 
 ## One thread running through four items
 
