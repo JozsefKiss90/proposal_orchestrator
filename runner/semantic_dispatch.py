@@ -24,8 +24,9 @@ For each semantic predicate the dispatcher:
 3. Builds a system prompt that states the agent's role, the predicate
    description, the constitutional rule, and the mandatory JSON response
    schema (§4.9).
-4. Invokes ``claude-sonnet-4-6`` via the runtime transport with the
-   system prompt and a user message containing the artifact content.
+4. Invokes the model named by :data:`AGENT_MODEL` via the runtime
+   transport with the system prompt and a user message containing the
+   artifact content.
 5. Parses the agent's JSON response and validates it with
    :func:`validate_semantic_result`.
 
@@ -90,7 +91,7 @@ REQUIRED_FINDING_FIELDS: frozenset[str] = frozenset(
 VALID_SEVERITIES: frozenset[str] = frozenset({"critical", "major"})
 
 #: Claude model used for semantic predicate evaluation.
-AGENT_MODEL: str = "claude-sonnet-4-6"
+AGENT_MODEL: str = "claude-opus-4-6"
 
 #: Maximum tokens the agent may use in its response.
 AGENT_MAX_TOKENS: int = 2048
@@ -672,10 +673,10 @@ def invoke_agent(
     """
     Invoke the designated agent via the configured runtime transport.
 
-    Reads artifact content, builds prompts, invokes ``claude-sonnet-4-6``
-    through the resolved transport backend (Claude CLI, Bedrock Converse,
-    or OpenAI-compatible), and returns the raw result dict for validation
-    by :func:`validate_semantic_result`.
+    Reads artifact content, builds prompts, invokes the model named by
+    :data:`AGENT_MODEL` through the resolved transport backend (Claude CLI,
+    Bedrock Converse, or OpenAI-compatible), and returns the raw result dict
+    for validation by :func:`validate_semantic_result`.
 
     Parameters
     ----------

@@ -32,10 +32,11 @@ Approach B predicate resolution (step 4):
 
 Semantic predicates are invoked via ``runner.semantic_dispatch.invoke_agent``,
 which reads artifact files from disk, constructs system/user prompts embedding
-artifact content and the applicable constitutional rule, and invokes
-``claude-sonnet-4-6`` through the Claude runtime transport.  Unknown function
-names and non-parseable responses produce a ``_dispatch_error`` sentinel that
-intentionally fails ``validate_semantic_result()``, surfacing as
+artifact content and the applicable constitutional rule, and invokes the model
+named by ``semantic_dispatch.AGENT_MODEL`` through the Claude runtime
+transport.  Unknown function names and non-parseable responses produce a
+``_dispatch_error`` sentinel that intentionally fails
+``validate_semantic_result()``, surfacing as
 ``failure_reason: "semantic_result_malformed"`` in the GateResult.
 
 See gate_rules_library_plan.md §6 for the full specification.

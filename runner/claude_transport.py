@@ -360,7 +360,9 @@ def invoke_claude_text(
     user_prompt:
         User prompt text.  Always passed via stdin.
     model:
-        Model identifier (e.g. ``"claude-sonnet-4-6"`` or ``"sonnet"``).
+        Model identifier: either a full id or a short alias
+        (e.g. ``"claude-opus-4-6"`` or ``"opus"``).  The transport is
+        model-agnostic; callers supply the model.
     max_tokens:
         Accepted for interface compatibility but **not currently enforced**
         by the ``claude -p`` CLI transport.  The ``claude`` CLI does not
