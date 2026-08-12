@@ -8,7 +8,9 @@ Pins the durable acceptance criteria of plans/fieldwise_tickets.md ticket 7:
 
 Criterion 3 is pinned as an invariant rather than as a fact: the packet may sit
 unauthorised, but ``action_confirmation_ref`` and ``action_confirmation_status``
-must agree with each other and with the decision log either way.
+must agree with each other and with the decision log either way.  The operator
+authorised the seed on 2026-08-12, so the authorised branch of that invariant is
+the live one, and ``TestAuthorisationRecorded`` pins what the record must say.
 
 The file also pins the authorisation-review fold of 2026-08-12 (AR-1 to AR-8),
 which answered the AgroVIR placement gap in part and closed three of the four
@@ -38,6 +40,9 @@ PLACEMENT_RECORD = (
 OPEN_ITEMS_RECORD = (
     TIER4 / "decision_log" / "fieldwise-ticket7-open-items_2026-08-12.json"
 )
+AUTHORISATION_RECORD = (
+    TIER4 / "decision_log" / "fieldwise-authorisation_2026-08-12.json"
+)
 
 VALID_STATUSES = {"Confirmed", "Inferred", "Assumed", "Unresolved"}
 
@@ -64,6 +69,10 @@ TIER3_ARTIFACTS = [
 # Unresolved record with no entry here fails the coverage test, which is the
 # point: the packet must not silently stop covering the open state.
 UNRESOLVED_COVERAGE = {
+    # .action_confirmation_status was Unresolved until the operator authorised
+    # the seed on 2026-08-12.  It is Confirmed now, so it no longer reaches this
+    # map; the entry is kept because a rerun on an unauthorised branch must
+    # still find the packet covering it.
     ".action_confirmation_status": "action_confirmation",
     ".participant_capacity[0].recent_projects_and_publications_status":
         "ELTE `recent_projects_and_publications`",
@@ -353,6 +362,122 @@ class TestCriterion3AuthorisationRecord:
         assert not produced, (
             "phase outputs exist while the run is unauthorised: "
             + ", ".join(str(p.relative_to(REPO_ROOT)) for p in produced)
+        )
+
+
+class TestAuthorisationRecorded:
+    """Criterion 3: the operator authorised the seed on 2026-08-12.
+
+    These tests read the record rather than restate it.  What they pin is that
+    the record says what an authorisation must say, that the call binding points
+    at it, and that the state it authorised is the state on disk.
+    """
+
+    @pytest.fixture(scope="class")
+    def record(self) -> dict:
+        return _load(AUTHORISATION_RECORD)
+
+    def test_the_record_exists_and_carries_the_envelope(self, record):
+        assert record["record_type"] == "decision"
+        assert record["date"] == "2026-08-12"
+        assert record["branch"] == "fieldwise-run-01"
+        assert record["authorised"] is True
+        assert record["operator_instruction"]
+
+    def test_the_call_binding_points_at_the_record(self):
+        call = _load(TIER3 / "call_binding" / "selected_call.json")
+        assert call["action_confirmation_status"] == "Confirmed"
+        ref = REPO_ROOT / call["action_confirmation_ref"]
+        assert ref.resolve() == AUTHORISATION_RECORD.resolve()
+
+    def test_the_record_names_the_packet_it_authorises(self, record):
+        authorised = record["what_was_authorised"]
+        packet_ref = REPO_ROOT / authorised["packet"]
+        assert packet_ref.resolve() == PACKET.resolve()
+        assert authorised["packet_revision"] == 3
+
+    def test_the_record_carries_every_open_item(self, record, checklist):
+        """Authorisation lists what it accepted as open, not a summary of it."""
+        accepted = record["open_items_accepted"]
+        items = accepted["items"]
+        assert accepted["count"] == len(items)
+        recorded = {entry["what"] for entry in items}
+        expected = {
+            entry["what"] for entry in checklist["open_for_authorisation"]["items"]
+        }
+        assert recorded == expected, (
+            "the authorisation record and the checklist disagree about what is "
+            f"open: {sorted(recorded ^ expected)}"
+        )
+        for entry in items:
+            assert entry["status"] and entry["why_open"]
+
+    def test_the_record_carries_every_declaration(self, record):
+        declared = {
+            d["key"]
+            for d in _load(TIER3 / "working_assumptions.json")["declarations"]
+        }
+        standing = record["declarations_standing"]
+        assert set(standing["keys"]) == declared
+        assert standing["count"] == len(declared)
+
+    def test_the_record_states_what_it_does_not_do(self, record):
+        limits = record["what_this_authorisation_does_not_do"]
+        for key in ("status", "gates", "budget", "submission", "amendment"):
+            assert limits[key].strip(), f"{key} limit is not stated"
+        assert "waives no gate" in limits["gates"]
+
+    def test_authorisation_promotes_no_status(self, record):
+        """The one status that moved is the authorisation field itself."""
+        assert "changes no record status" in (
+            record["what_this_authorisation_does_not_do"]["status"]
+        )
+        assert "Assumed" in record["c5_override_carried_without_promotion"]
+        checklist = _load(TIER3 / "call_binding" / "confirmation_checklist.json")
+        mobility = next(
+            r for r in checklist["spine_identity"] if r["id"] == "MOBILITY_ELIGIBILITY"
+        )
+        assert mobility["status"] == "Assumed"
+
+    def test_the_authorised_state_is_the_state_on_disk(self, record):
+        """A fingerprinted artifact that moved must say so in ``amendments``.
+
+        Authorisation is of a state.  If a later ticket edits one of the
+        fifteen artifacts, that is allowed and is not a fault — but it must be
+        declared in the record, not left for a reader to discover.
+        """
+        from runner.fingerprints import fingerprint_path
+
+        fingerprints = record["authorised_state_fingerprint"]
+        recorded = fingerprints["per_artifact"]
+        assert fingerprints["artifact_count"] == len(recorded) == 15
+
+        declared = {
+            entry["artifact"] for entry in record["amendments"]
+        }
+        drifted = [
+            path
+            for path, digest in sorted(recorded.items())
+            if fingerprint_path(REPO_ROOT / path) != digest and path not in declared
+        ]
+        assert not drifted, (
+            "these artifacts changed after authorisation and no amendments entry "
+            "declares it: " + ", ".join(drifted)
+        )
+
+    def test_the_packet_records_the_authorisation(self, packet):
+        assert "AUTHORISED 2026-08-12" in packet
+        assert "fieldwise-authorisation_2026-08-12.json" in packet
+        assert "## 12. What authorisation recorded" in packet
+        assert "Ticket 8 is unblocked" in packet
+
+    def test_the_ticket_marks_criterion_three_met(self):
+        ticket = (REPO_ROOT / "plans" / "fieldwise_tickets.md").read_text(
+            encoding="utf-8"
+        )
+        criterion = "Operator authorisation is recorded in the decision log"
+        assert f"- [x] {criterion}" in ticket, (
+            "ticket 7's third checkbox is not ticked"
         )
 
 
@@ -690,4 +815,8 @@ class TestInvariantsThePacketRestsOn:
             "project_brief/project_summary.json",
         ):
             assert artifact in covered, f"{artifact} is not in the manifest"
-        assert "selected_call.json" in review["not_written"]
+        # selected_call.json was the one artifact the reviews did not touch,
+        # because authorisation is a separate act.  It joined the block when
+        # the operator authorised the seed.
+        assert "call_binding/selected_call.json" in covered
+        assert "Nothing" in review["not_written"]

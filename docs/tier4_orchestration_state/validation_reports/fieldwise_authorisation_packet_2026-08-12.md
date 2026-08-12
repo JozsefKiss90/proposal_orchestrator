@@ -3,6 +3,13 @@
 **Branch:** `fieldwise-run-01` · **Date:** 2026-08-12 · **Ticket:** `plans/fieldwise_tickets.md` ticket 7 ·
 **Plan step:** `plans/fieldwise_reinstantiation_plan.md` §7 S6 · **Revision:** 3, after the second authorisation review
 
+> **AUTHORISED 2026-08-12.** You authorised the seeded state on revision 3, having held authorisation on
+> revisions 1 and 2 the same day. The record is
+> `docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json`, and
+> `selected_call.json` now points `action_confirmation_ref` at it. Section 12 states what that record
+> holds. The stamp, the section 12 rewrite and the one count it moved are the only edits made after you
+> authorised; sections 1 to 11 are the text you read.
+
 This is the document you authorise the run on. It lists every record tickets 3 to 7 seeded into Tier 3,
 with its status and its source reference. It lists every residual open item under the gate it affects.
 It states which gates the seeded state can pass and which depend on what the run itself produces.
@@ -88,7 +95,7 @@ declarations, and the two narrative front matters.
 | Call-scoped block: call id, topic, instrument, deadline, opening, work programme, call extract, type of action, indicative budget, `max_project_duration_months` 36, `budget_regime` unit_cost | HORIZON-MSCA-2026-PF-01 | Carried forward | Pre-purge binding at commit `6d96a60`, unchanged |
 | `host_country` | HU | Confirmed | Input pack item 7, 2026-08-11 |
 | `project_duration_months` | 30 | Confirmed | Input pack items 2 and 7, 2026-08-11 |
-| `action_confirmation_ref` | null | Unresolved | Pending this packet. Section 12 closes it |
+| `action_confirmation_ref` | `decision_log/fieldwise-authorisation_2026-08-12.json` | Confirmed | Your authorisation of 2026-08-12. Section 12 records it |
 
 ### 4.2 Confirmation checklist — `call_binding/confirmation_checklist.json`
 
@@ -303,10 +310,10 @@ design, not a gap.
 
 | Status | Count | Change since revision 1 |
 |--------|-------|--------------------------|
-| Confirmed | 230 | +16 |
+| Confirmed | 231 | +17 |
 | Inferred | 19 | +5 |
 | Assumed | 34 | +7 |
-| Unresolved | 18 | +4 |
+| Unresolved | 17 | +3 |
 | **Total** | **301** | **+32** |
 
 The count covers 251 `validation_status` and `*_status` fields across the Tier 3 JSON, plus 34
@@ -319,7 +326,9 @@ rather than hidden inside a deferred field. The eighteenth is the D5.4 sequencin
 did not create but did make visible. Counting named gaps went up because fewer gaps are hidden.
 Section 6 counts distinct open items instead, which stands at twelve against revision 1's twelve.
 
-Section 12 moves `action_confirmation` from Unresolved to Confirmed at authorisation.
+The table above reads seventeen Unresolved, not the eighteen you reviewed. Your authorisation moved
+`action_confirmation` in `selected_call.json` from Unresolved to Confirmed. Nothing else moved, and the
+twelve open items of section 6 are untouched.
 
 ## 6. Residual open items, by the gate they affect
 
@@ -542,14 +551,24 @@ the `steering_decision_points` consequence. The item 6 decision-log record keeps
 and carries an `amended_by` block, because a decision record states what was decided, not what is
 currently true.
 
-## 12. What authorisation records
+## 12. What authorisation recorded
 
-Your authorisation writes one decision-log entry,
-`docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json`. It records the
-date, the Tier 3 state authorised, the twelve items left open, and the C5 override carried without
-promotion.
+You authorised the seed on 2026-08-12. Two files carry the act.
 
-`selected_call.json` then points `action_confirmation_ref` at that entry and moves
-`action_confirmation_status` from Unresolved to Confirmed. That field has dangled since ticket 1
-archived the superseded run's authorisation record. No runner predicate reads it, so the pending state
-blocked no gate. Ticket 7 blocked the run on it instead.
+`docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json` holds the date,
+your instruction, the scope, the twelve items accepted as open, the fourteen declarations that stand,
+the C5 override carried without promotion, and what the authorisation does not do. It also fingerprints
+the fifteen Tier 3 artifacts it authorised, so a later reader can tell whether what ran is what you
+approved.
+
+`selected_call.json` points `action_confirmation_ref` at that record and moves
+`action_confirmation_status` to Confirmed. The field had dangled since ticket 1 archived the superseded
+run's authorisation record. No runner predicate reads it, so neither the pending state nor this one
+moves a gate. Ticket 7 blocked the run on it, and that block is released.
+
+**What the authorisation does not do.** It changes no record status. The twelve open items of section 6
+stay open, the C5 override stays Assumed, and the thirty-four Assumed records stay Assumed. It waives
+no gate and grants no permission to fill a gap. A gate that fails on incomplete input still fails, which
+is CLAUDE.md §12.4 working as intended.
+
+**Ticket 8 is unblocked.** Phases 1 and 2 may run.

@@ -1,0 +1,150 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-authorisation",
+  "date": "2026-08-12",
+  "branch": "fieldwise-run-01",
+  "run_id": "fieldwise-run-01",
+  "authority": "Operator authorisation of the seeded Tier 3 state, given in session on 2026-08-12. Recorded durably per CLAUDE.md 9.4, because the authorisation governs every later reading of what the run was permitted to proceed on. Status vocabulary per 12.2. The record asserts no project fact of its own, so 13.3 is not engaged.",
+  "why": "plans/fieldwise_tickets.md ticket 7 requires operator authorisation to be recorded in the decision log before any phase runs. This is that record. Without it the third acceptance criterion is open and ticket 8 stays blocked.",
+  "operator_instruction": "authorize the seed of ticket 7",
+  "authorised": true,
+  "what_was_authorised": {
+    "statement": "Execution of Phases 1 to 8 against the Tier 3 state of 2026-08-12, with twelve items open and thirty-four records Assumed.",
+    "packet": "docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md",
+    "packet_revision": 3,
+    "scope_source": "Section 1 of the packet. The operator's words authorise the seed. The packet is what the seed was presented as, and its section 1 states the scope as Phases 1 to 8.",
+    "record_count": "301 records: 231 Confirmed, 19 Inferred, 34 Assumed, 17 Unresolved. The Unresolved count is one lower than the eighteen reviewed, because this authorisation moved action_confirmation in selected_call.json to Confirmed. No other status changed."
+  },
+  "prior_holds": {
+    "note": "The operator held authorisation twice on 2026-08-12 and answered ten items across the two reviews. The holds are part of the record: this authorisation is of revision 3, not of what was first presented.",
+    "revision_1": "Held. Answers folded as AR-1 to AR-8, in decision_log/fieldwise-placement-hosting_2026-08-12.json and decision_log/fieldwise-ticket7-open-items_2026-08-12.json.",
+    "revision_2": "Held. Answers folded as AR-9 and AR-10, in decision_log/fieldwise-ticket7-review-round2_2026-08-12.json. AR-9 reversed part of AR-7 on operator direction, and the reversal is recorded rather than overwritten."
+  },
+  "open_items_accepted": {
+    "note": "Twelve distinct items were open at authorisation and stay open. Accepting the run with them open is not evidence that resolves any of them. None fails a runner gate in Phases 1 to 7, and packet section 6 states the gate position of each.",
+    "count": 12,
+    "items": [
+      {
+        "what": "The C5 mobility override",
+        "status": "Assumed",
+        "why_open": "An operator-declared position pending a rectified CV that is consistent with Part A and with ELTE's Erasmus records. It must be listed with its basis and date, and never promoted to Confirmed."
+      },
+      {
+        "what": "AgroVIR's placement workspace and system access",
+        "status": "Unresolved",
+        "why_open": "Desk or office location, FMIS development or staging access, customer-data environment access, and the team she joins. The one count of the four hosting-capacity counts with nothing behind it, and the count an evaluator tests the placement's reality against."
+      },
+      {
+        "what": "Miklós Maróti's title and seniority",
+        "status": "Unresolved",
+        "why_open": "The name is supplied and declared. Part B-2 §5 needs the role, and the Part B-1 placement argument leans on the seniority."
+      },
+      {
+        "what": "Item 12's four remaining deferred capacity fields",
+        "status": "Unresolved",
+        "why_open": "ELTE recent projects, ELTE previous MSCA hosting, MATE recent projects, AgroVIR track record. Only the organisations themselves can supply them. §3.2 drafts thin."
+      },
+      {
+        "what": "The background-IP question on the DrR components",
+        "status": "Unresolved",
+        "why_open": "Raised by the operator when reframing the placement content. §2.2 records the components as the fellow's background IP, and the proposal does not address ownership of work done on them inside a commercial partner."
+      },
+      {
+        "what": "Item 11's invited_talks",
+        "status": "Unresolved",
+        "why_open": "Not in the CV. Deferred again on 2026-08-12: supply or confirm none."
+      },
+      {
+        "what": "AgroVIR's PIC",
+        "status": "Confirmed absent",
+        "why_open": "Blocks submission rather than a gate. AgroVIR hosts the placement, so it goes in Part A, where every participant needs a PIC. Only the EU Participant Register can supply one."
+      },
+      {
+        "what": "AgroVIR's company registration number",
+        "status": "Unresolved",
+        "why_open": "Two conflicting readings. The company must confirm."
+      },
+      {
+        "what": "MVCRI's signatory authority",
+        "status": "Unresolved",
+        "why_open": "Whether the institute director or the Agricultural Academy signs a partnership agreement."
+      },
+      {
+        "what": "The co-supervisor's ELTE contract status",
+        "status": "Unresolved",
+        "why_open": "MSCA requires supervision at the beneficiary. It decides whether CO_SUPERVISOR is the right token, and it blocks no gate."
+      },
+      {
+        "what": "Roles and titles for Takács (MATE) and Balázs (AgroVIR)",
+        "status": "Assumed",
+        "why_open": "Names are known, roles are not. Predicate g07_p08 reads the name, and Part B-2 §5 needs the role."
+      },
+      {
+        "what": "Which point in the timeline D5.4 belongs to",
+        "status": "Unresolved",
+        "why_open": "MS5 at M23 states the web MVP is externally evaluated under farmer conditions, and the AR-3 placement content puts the operational assessment producing D5.4 inside M25-M30. One of the two must give. Phase 4 owns deliverable due months and no source states which reading the draft intended."
+      }
+    ]
+  },
+  "declarations_standing": {
+    "note": "Fourteen operator declarations in working_assumptions.json back every Assumed record. They are also the only claim ids an assumed Phase 8 claim may carry, because g09a_p11, g09b_p12 and g09c_p11 match claim_id against a declaration key and claim_summary against the declared value exactly.",
+    "count": 14,
+    "keys": [
+      "family_allowance",
+      "long_term_leave_allowance",
+      "special_needs_allowance",
+      "person_months_MATE",
+      "person_months_MVCRI",
+      "person_months_AgroVIR",
+      "person_months_ELTE_supervisor",
+      "person_months_ELTE_co_supervisor",
+      "contact_person_MATE",
+      "contact_person_AgroVIR",
+      "placement_supervisor_AgroVIR",
+      "contact_email_MVCRI",
+      "researcher_orcid",
+      "mobility_eligibility"
+    ]
+  },
+  "c5_override_carried_without_promotion": "The mobility-eligibility override of 2026-08-11 stays Assumed. It is declared under key mobility_eligibility, registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and carried in capabilities.json researcher_profile at status Assumed. Authorising the seed does not promote it to Confirmed, and nothing in the run may. Only a rectified CV consistent with Part A and with ELTE's Erasmus records can do that.",
+  "what_this_authorisation_does_not_do": {
+    "status": "It changes no record status. The twelve open items stay at the status they carry, the thirty-four Assumed records stay Assumed, and no Unresolved field becomes fillable because the run was authorised.",
+    "gates": "It waives no gate and weakens no gate condition. A gate that fails on incomplete input still fails, and that failure is a correct output under CLAUDE.md 12.4. Weakening a gate to let the run proceed would violate 13.7.",
+    "budget": "It does not touch the Phase 7 budget gate. gate_09 passes on the unit-cost derivation of CLAUDE.md 8.1 or it does not, and Phase 8 stays categorically blocked until it does (8.4, 13.4).",
+    "submission": "It does not authorise submission. AgroVIR has no PIC, which blocks Part A and is settled fact rather than an open question.",
+    "amendment": "It amends no constitution and no ticket. Authorisation is an operator act on the state, not a change to the rules the state is read under."
+  },
+  "authorised_state_fingerprint": {
+    "why": "Authorisation is of a state, not of a repository. Recording the content hash of every artifact authorised lets a later reader tell whether what ran is what was approved, which is the auditability CLAUDE.md 9.5 requires. Divergence is not forbidden. Undeclared divergence is.",
+    "method": "runner.fingerprints.compute_fingerprints, the same SHA-256 helper the gate evaluator uses for input_artifact_fingerprints. Raw file bytes, sorted by path.",
+    "artifact_count": 15,
+    "combined": "sha256:c4c5084d129fb6c904e3ee8a3264fef2660222266bb959239d77917ae105429a",
+    "per_artifact": {
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json": "sha256:8f18b977cabd13d077fbee178c3bf1df49071b6c96d5929777d37c109b282200",
+      "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json": "sha256:47395fb02f8e6fb2678b82ec15f3557e8663db8cbdb2a98608d7e0bc10ecfe9b",
+      "docs/tier3_project_instantiation/architecture_inputs/objectives.json": "sha256:04d2070a3d46f915f76e68420118f0171cec289acb130e9e0cc702fa326026cb",
+      "docs/tier3_project_instantiation/architecture_inputs/outcomes.json": "sha256:c9c711ebeda7dfce85191eeaa56ec985787c0b82462d35d8dfa7b59b89503888",
+      "docs/tier3_project_instantiation/architecture_inputs/risks.json": "sha256:2d79f4fb608b9b3d3cf06ac1ac1b6f9efe2c79e2a0584c3bf4556d5b02749b50",
+      "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json": "sha256:22f9289b0883cf641ec98ef2c26ddeced3d37523f8840bccbf3dd90b65877f14",
+      "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json": "sha256:f73f217a6a23691c539a6f15ab6cf87a59cb8cd502e3fd2f3b35e48bd937b357",
+      "docs/tier3_project_instantiation/call_binding/selected_call.json": "sha256:5a689e63d4ec2c054f6ab6b407061808c620f1cf883598b169031b476d4e80ed",
+      "docs/tier3_project_instantiation/consortium/capabilities.json": "sha256:edb161a9eecfe79e02eded56500ccf2a96fc07e3e6ccca9bf4cfe8881a4cfad2",
+      "docs/tier3_project_instantiation/consortium/partners.json": "sha256:32ef51e018ec6c55a2024bf13868f090c29c83ba29f67f91658a4007e75c9d11",
+      "docs/tier3_project_instantiation/consortium/roles.json": "sha256:617613deaedaa6fbb8264bda78ccc2cb6d0e81bcdc191cd78c146f7d43b80d66",
+      "docs/tier3_project_instantiation/project_brief/concept_note.md": "sha256:eba1d10513f461d0b60456d3467c7eb58c06526d8c43648f3b7432c0c4a110f5",
+      "docs/tier3_project_instantiation/project_brief/project_summary.json": "sha256:e491a61471e17934ea1b9063b6eae506c7357c5042086b44555a477570266120",
+      "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "sha256:0399fdd930d67406f557f7f107a40c9c308d2772db1b08a2be9c85dedaf17341",
+      "docs/tier3_project_instantiation/working_assumptions.json": "sha256:89c48282c048564ea28e6ea3d1769a052b87c3793bebf3c6cf6ac5fc43c5ff80"
+    }
+  },
+  "amendments": [],
+  "amendment_rule": "If any fingerprinted artifact changes after this date, add an entry to amendments naming the artifact, the change, its date, and whether the operator was asked. An entry declares that the authorised state moved. It is not permission for it to move silently. tests/runner/test_fieldwise_ticket7_authorisation.py enforces the pairing: a changed artifact with no entry fails.",
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/call_binding/selected_call.json",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md",
+    "plans/fieldwise_tickets.md"
+  ],
+  "unblocks": "plans/fieldwise_tickets.md ticket 8, Run Phases 1-2. Ticket 7's third acceptance criterion is met by this record."
+}

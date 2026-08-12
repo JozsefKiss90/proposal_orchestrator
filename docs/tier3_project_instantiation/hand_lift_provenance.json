@@ -8,32 +8,42 @@
     "plans/fieldwise_reinstantiation_plan.md §5 (seed template and status rule)"
   ],
   "purpose": "Durable, per-artifact provenance manifest of the FIELDWISE hand-lift from the master draft into Tier 3. Records, for each seeded artifact, the draft sections and paragraph ranges it lifts and the validation-status rule applied, so every Tier 3 claim traces to a citable draft location. Tickets 4 and 5 append their artifacts to lifted_artifacts as their slices land.",
-
   "source_document": {
     "path": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
     "description": "FIELDWISE_MSCA_Master_Draft.docx (Part B Draft v0), the source of truth for the reseed per plans/fieldwise_reinstantiation_plan.md.",
     "paragraph_numbering_scheme": "¶N is the Nth non-empty paragraph in document body order, counting table-cell paragraphs in row-major order at the table's position in the body and skipping empty paragraphs. 436 paragraphs total. This reproduces the numbering used by plans/fieldwise_reinstantiation_plan.md (anchor check: the §1.1.8 heading falls at ¶80 and the §3.2 heading at ¶424). Reproducible with python-docx by iterating the document body's w:p and w:tbl children in order.",
     "section_anchors": {
       "cover_block": "¶1-18",
-      "§1.1.1": "¶21", "§1.1.2": "¶27", "§1.1.3": "¶36", "§1.1.4": "¶50",
-      "§1.1.5": "¶63", "§1.1.6": "¶65", "§1.1.7": "¶73", "§1.1.8": "¶80",
-      "§1.1.9": "¶102", "§1.2": "¶111", "§1.3": "¶182", "§1.4": "¶212",
-      "§2.1": "¶218", "§2.2": "¶223", "§2.3": "¶239",
-      "§3.1": "¶251", "gantt": "¶318", "risk_table": "¶380", "§3.2": "¶424",
-      "one_sentence": "¶433", "core_message": "¶435"
+      "§1.1.1": "¶21",
+      "§1.1.2": "¶27",
+      "§1.1.3": "¶36",
+      "§1.1.4": "¶50",
+      "§1.1.5": "¶63",
+      "§1.1.6": "¶65",
+      "§1.1.7": "¶73",
+      "§1.1.8": "¶80",
+      "§1.1.9": "¶102",
+      "§1.2": "¶111",
+      "§1.3": "¶182",
+      "§1.4": "¶212",
+      "§2.1": "¶218",
+      "§2.2": "¶223",
+      "§2.3": "¶239",
+      "§3.1": "¶251",
+      "gantt": "¶318",
+      "risk_table": "¶380",
+      "§3.2": "¶424",
+      "one_sentence": "¶433",
+      "core_message": "¶435"
     }
   },
-
   "status_rule": "Text present in the draft is Confirmed. Content derived by reasoning from draft text is Inferred, with the derivation stated in note. Content adopted with no draft basis is Assumed and must have a matching declaration in working_assumptions.json. Content that is missing or contradicted is Unresolved and blocks the gate that needs it. No seed invents a project fact. (plans/fieldwise_reinstantiation_plan.md §5)",
-
   "operator_input_pack": {
     "path": "docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
     "authored_at": "plans/fieldwise_operator_input_pack.md (the form the operator filled in; the Tier 3 file is a copy placed by ticket 6)",
     "role": "Authority for project-scoped operator decisions. Items 2 and 7 (decided and confirmed 2026-08-11) fed the selected_call.json corrections at ticket 3 and the identity-spine records in consortium/roles.json and consortium/partners.json at ticket 5 — the draft names no person, so item 7 is the only source for them. Item 6 fed deliverable D1.3 at ticket 4. Ticket 6 folded the remaining items and copied the completed pack into Tier 3, which is what makes the operator-decided records cite an in-tier source under §12.2."
   },
-
   "fold_status_rule": "A fact the operator decided is Confirmed, cited to the input pack item and its decision date. A figure the operator estimated is Assumed and carries a declaration in working_assumptions.json. A field the operator deferred or left blank stays Unresolved with the missing content named. Nothing the operator did not answer is folded as though answered (§13.3).",
-
   "lifted_artifacts": [
     {
       "artifact": "call_binding/selected_call.json",
@@ -47,21 +57,37 @@
       "artifact": "project_brief/project_summary.json",
       "ticket": 3,
       "lift_mode": "draft_lift",
-      "source_refs": ["Cover block ¶1-18", "The project in one sentence ¶433-434", "Core message ¶435-436"],
+      "source_refs": [
+        "Cover block ¶1-18",
+        "The project in one sentence ¶433-434",
+        "Core message ¶435-436"
+      ],
       "validation_status_summary": "All records Confirmed against the draft. Duration deliberately not duplicated here (operator decision, lives in selected_call.json). No person named."
     },
     {
       "artifact": "project_brief/concept_note.md",
       "ticket": 3,
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§1.1.1 ¶21-26", "§1.1.2 ¶27-35", "§1.1.3 ¶36-49", "§1.1.4 ¶50-62 (G1-G6)", "§1.1.5 ¶63-64", "§1.1.6 ¶65-72 (RQ1-RQ7)", "§1.1.7 ¶73-79 (H1-H6)"],
+      "source_refs": [
+        "§1.1.1 ¶21-26",
+        "§1.1.2 ¶27-35",
+        "§1.1.3 ¶36-49",
+        "§1.1.4 ¶50-62 (G1-G6)",
+        "§1.1.5 ¶63-64",
+        "§1.1.6 ¶65-72 (RQ1-RQ7)",
+        "§1.1.7 ¶73-79 (H1-H6)"
+      ],
       "validation_status_summary": "Confirmed; prose lifted verbatim, per-section source_ref comments inline. List formatting reproduces the draft's own paragraph breaks; no sentence added, merged or reworded."
     },
     {
       "artifact": "project_brief/strategic_positioning.md",
       "ticket": 3,
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§1.1.9 ¶102-110 (six transitions, validation ladder)", "§2.3 ¶239-249 (five impact blocks)", "prior-evaluation responses ¶114, ¶233, ¶379"],
+      "source_refs": [
+        "§1.1.9 ¶102-110 (six transitions, validation ladder)",
+        "§2.3 ¶239-249 (five impact blocks)",
+        "prior-evaluation responses ¶114, ¶233, ¶379"
+      ],
       "validation_status_summary": "Confirmed; prose lifted verbatim, per-section source_ref comments inline. The prior-evaluation responses are the draft's own statements; the previous evaluation report is not a Tier 3 source."
     },
     {
@@ -69,7 +95,11 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift",
-      "source_refs": ["§1.1.8 ¶80-101 (O1-O6 table)", "§3.1 WP blocks ¶252-317 (WP links, milestones)", "§1.1.6 ¶65-72 and §1.1.7 ¶73-79 (RQ/H links)"],
+      "source_refs": [
+        "§1.1.8 ¶80-101 (O1-O6 table)",
+        "§3.1 WP blocks ¶252-317 (WP links, milestones)",
+        "§1.1.6 ¶65-72 and §1.1.7 ¶73-79 (RQ/H links)"
+      ],
       "validation_status_summary": "O1-O6 Confirmed. title = Purpose column, measurable_output = Verification column; WP/RQ/H links and target months from the cited WP blocks and milestone lines per the plan §5 worked example."
     },
     {
@@ -77,7 +107,11 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_plus_inferred_separation",
-      "source_refs": ["§3.1 deliverable lines ¶260-261, ¶272-273, ¶285-286, ¶298-300, ¶312-316 (outputs)", "§1.1.9 ¶103-110 (transitions)", "§2.1 ¶219-222 and §1.4 ¶216 (career outcome)"],
+      "source_refs": [
+        "§3.1 deliverable lines ¶260-261, ¶272-273, ¶285-286, ¶298-300, ¶312-316 (outputs)",
+        "§1.1.9 ¶103-110 (transitions)",
+        "§2.1 ¶219-222 and §1.4 ¶216 (career outcome)"
+      ],
       "validation_status_summary": "Outputs (D1.1-D5.5) and transitions Confirmed; D1.3 Confirmed against operator input pack item 6 (not in the draft). Outcome records OC1-OC6 are the Inferred output/outcome separation the draft lacks; each note states the derivation."
     },
     {
@@ -85,7 +119,9 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§2.3 ¶239-249 (five impact claims, verbatim)"],
+      "source_refs": [
+        "§2.3 ¶239-249 (five impact claims, verbatim)"
+      ],
       "validation_status_summary": "Five impact claims Confirmed. KPIs and the EI-03/EI-04/EI-06 expected-impact mappings are Unresolved records pending the ticket 6 fold of input pack item 5; no KPI value is invented."
     },
     {
@@ -93,7 +129,10 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_plus_inferred_schedule",
-      "source_refs": ["§3.1 ¶252-317 (WP1-WP5: titles, month lines, leads, tasks T1.1-T5.7, deliverables D1.1-D5.5)", "§1.1.9 ¶110 and §1.2 ¶116-128, ¶156 (dependency derivations)"],
+      "source_refs": [
+        "§3.1 ¶252-317 (WP1-WP5: titles, month lines, leads, tasks T1.1-T5.7, deliverables D1.1-D5.5)",
+        "§1.1.9 ¶110 and §1.2 ¶116-128, ¶156 (dependency derivations)"
+      ],
       "validation_status_summary": "WPs, month ranges, leads, 32 tasks and 14 draft deliverables Confirmed; D1.3 Confirmed against operator input pack item 6. Task months Inferred (each task inherits its WP range) and six inter-WP dependency edges Inferred, derivations stated. Person-months Unresolved pending the ticket 6 fold of item 8."
     },
     {
@@ -101,7 +140,9 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§3.1 ¶262, ¶274, ¶287, ¶301, ¶317 (MS1-MS5 lines)"],
+      "source_refs": [
+        "§3.1 ¶262, ¶274, ¶287, ¶301, ¶317 (MS1-MS5 lines)"
+      ],
       "validation_status_summary": "MS1-MS5 Confirmed with the draft's months (6/12/16/20/23) and criterion statements verbatim. Verifiable criteria and responsible parties are Phase 4 outputs, not seeded."
     },
     {
@@ -109,7 +150,10 @@
       "ticket": 4,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§3.1 risk table ¶380-422 (13 risks)", "§3.1 ¶423 (zero-shot risk philosophy)"],
+      "source_refs": [
+        "§3.1 risk table ¶380-422 (13 risks)",
+        "§3.1 ¶423 (zero-shot risk philosophy)"
+      ],
       "validation_status_summary": "13 risks Confirmed; L/I column split into likelihood and impact. Categories, owners and WP mappings are absent from the draft and left to Phase 6."
     },
     {
@@ -117,7 +161,14 @@
       "ticket": 5,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_plus_confirmed_spine",
-      "source_refs": ["Cover block ¶7-18 (host and the three participating organisations)", "§1.3 ¶182-211 (supervision, two-way transfer, partner contributions)", "§1.4 ¶212-216 (researcher profile)", "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (WP month lines naming the organisations)", "§3.2 ¶425-432 (capacity statements)", "Operator input pack item 7 (identity spine, confirmed 2026-08-11)"],
+      "source_refs": [
+        "Cover block ¶7-18 (host and the three participating organisations)",
+        "§1.3 ¶182-211 (supervision, two-way transfer, partner contributions)",
+        "§1.4 ¶212-216 (researcher profile)",
+        "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (WP month lines naming the organisations)",
+        "§3.2 ¶425-432 (capacity statements)",
+        "Operator input pack item 7 (identity spine, confirmed 2026-08-11)"
+      ],
       "validation_status_summary": "Seven role tokens. HOST Confirmed from the draft and item 7. FELLOW, SUPERVISOR and CO_SUPERVISOR Confirmed from item 7, which the draft cannot supply because it names no person. DATA_PARTNER (MATE), TRANSFER_PARTNER (MVCRI) and VALIDATION_PARTNER (AgroVIR) Unresolved: role, country and function are draft-confirmed, and legal identity (item 1) and participation mode (item 2) are named as missing for the ticket 6 fold.",
       "deviation": "CO_SUPERVISOR is a seventh token beyond the six the ticket names, added on the instruction of input pack item 7. Recorded in decision_log/fieldwise-tier3-lift_2026-08-11.json."
     },
@@ -126,7 +177,10 @@
       "ticket": 5,
       "date": "2026-08-12",
       "lift_mode": "derived_from_roles",
-      "source_refs": ["consortium/roles.json (every entity, name, country and role)", "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (token coverage of the draft work plan)"],
+      "source_refs": [
+        "consortium/roles.json (every entity, name, country and role)",
+        "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (token coverage of the draft work plan)"
+      ],
       "validation_status_summary": "The same seven tokens with legal-identity fields added. Every role token the draft work plan references is present, so phase_03_gate predicate g04_p07 can resolve. Legal name, PIC, entity type, address and contact person are null for the three participating organisations and are not guessed."
     },
     {
@@ -134,11 +188,14 @@
       "ticket": 5,
       "date": "2026-08-12",
       "lift_mode": "draft_lift_verbatim",
-      "source_refs": ["§1.3 ¶183-194 (ELTE to Fellow), ¶195-204 (Fellow to ELTE), ¶205 (bidirectionality), ¶206-211 (partner contributions)", "§3.2 ¶425-432 (four capacity statements)", "§2.1 ¶220 and §1.4 ¶215-216 (training and career progression)"],
+      "source_refs": [
+        "§1.3 ¶183-194 (ELTE to Fellow), ¶195-204 (Fellow to ELTE), ¶205 (bidirectionality), ¶206-211 (partner contributions)",
+        "§3.2 ¶425-432 (four capacity statements)",
+        "§2.1 ¶220 and §1.4 ¶215-216 (training and career progression)"
+      ],
       "validation_status_summary": "All lifted records Confirmed, verbatim including the draft's trailing punctuation, so each entry checks character-for-character against its cited paragraph. The Part B-2 §5 capacity detail is a single Unresolved record: the draft carries one function sentence per organisation and none of the required fields, which are input pack item 12 for the ticket 6 fold."
     }
   ],
-
   "folded_artifacts": [
     {
       "artifact": "source_materials/operator_input_pack/fieldwise_operator_input_pack.md",
@@ -153,7 +210,9 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "re_authored",
-      "source_refs": ["Operator input pack items 1 to 14 (answered 2026-08-11)"],
+      "source_refs": [
+        "Operator input pack items 1 to 14 (answered 2026-08-11)"
+      ],
       "validation_status_summary": "Eleven spine records: ten Confirmed and MOBILITY_ELIGIBILITY Assumed. Eleven operator-decision records: nine Confirmed, item 9 Assumed, item 12 Unresolved. Two superseded-record confirmations (DATA_PROVIDERS, RQ1-RQ10). The demo run's checklist carries forward in no part."
     },
     {
@@ -161,7 +220,9 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "operator_declarations",
-      "source_refs": ["Operator input pack items 1, 7, 8, 9 and 11"],
+      "source_refs": [
+        "Operator input pack items 1, 7, 8, 9 and 11"
+      ],
       "validation_status_summary": "Thirteen declarations, all Assumed by construction. Every Assumed record in Tier 3 names its key here. project_duration_months and host_country are deliberately not declared: both are Confirmed in selected_call.json, which wins the deriver's precedence order, and declaring them would render a Confirmed fact Assumed in the declared surface."
     },
     {
@@ -169,7 +230,10 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "unresolved_records_resolved",
-      "source_refs": ["Operator input pack item 1 (legal identity)", "item 2 (participation mode)"],
+      "source_refs": [
+        "Operator input pack item 1 (legal identity)",
+        "item 2 (participation mode)"
+      ],
       "validation_status_summary": "MATE, MVCRI and AgroVIR move from Unresolved to Confirmed. Fields that remain open are named per record with their own status: AgroVIR's company registration number and MVCRI's signatory authority Unresolved, the MATE and AgroVIR contacts Assumed and declared, AgroVIR's PIC Confirmed absent."
     },
     {
@@ -177,7 +241,9 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "unresolved_records_resolved",
-      "source_refs": ["Operator input pack items 1 and 2"],
+      "source_refs": [
+        "Operator input pack items 1 and 2"
+      ],
       "validation_status_summary": "The three participating-organisation tokens gain their legal name and participation mode and move to Confirmed. The four spine tokens are unchanged."
     },
     {
@@ -185,7 +251,11 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "additive_fold",
-      "source_refs": ["Operator input pack item 12 (capacity, quoting PLANTDIGISENSE Part B-1 §3.2)", "item 11 (researcher CV)", "items 1, 4 and 7 (key people)"],
+      "source_refs": [
+        "Operator input pack item 12 (capacity, quoting PLANTDIGISENSE Part B-1 §3.2)",
+        "item 11 (researcher CV)",
+        "items 1, 4 and 7 (key people)"
+      ],
       "validation_status_summary": "Two new collections, participant_capacity and researcher_profile. The draft-lifted collections are untouched and remain verbatim. Five operator-deferred capacity fields and the AgroVIR placement-hosting gap stay Unresolved on their own records; the CV's ORCID is Assumed and invited_talks Unresolved."
     },
     {
@@ -193,7 +263,9 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "unresolved_records_resolved",
-      "source_refs": ["Operator input pack item 5 (KPIs and expected-impact mappings, accepted 2026-08-11)"],
+      "source_refs": [
+        "Operator input pack item 5 (KPIs and expected-impact mappings, accepted 2026-08-11)"
+      ],
       "validation_status_summary": "K1-K10 Confirmed with a deliverable each; all six EI mappings Confirmed. K11 stays Unresolved as a raised-not-answered candidate. The five §2.3 impact claims are unchanged draft lifts."
     },
     {
@@ -201,7 +273,10 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "unresolved_records_resolved_plus_range_extension",
-      "source_refs": ["Operator input pack item 8 (person-months, consolidated 2026-08-11)", "item 2 (placement, decided 2026-08-11)"],
+      "source_refs": [
+        "Operator input pack item 8 (person-months, consolidated 2026-08-11)",
+        "item 2 (placement, decided 2026-08-11)"
+      ],
       "validation_status_summary": "Fellow allocation Confirmed and totalling 30.0; five partner in-kind figures Assumed and declared. WP5 and the cross-cutting strand extend to M30, with the draft's M24 preserved as draft_end_month, and T5.1-T5.7 inherit the extended range."
     },
     {
@@ -209,7 +284,9 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "additive_unresolved_record",
-      "source_refs": ["Operator input pack item 8"],
+      "source_refs": [
+        "Operator input pack item 8"
+      ],
       "validation_status_summary": "MS1-MS5 unchanged. One Unresolved record, placement_period_monitoring: five milestones fall at or before M23 in a 30-month action, and the operator decided neither of the two candidates item 8 raised."
     },
     {
@@ -217,11 +294,12 @@
       "ticket": 6,
       "date": "2026-08-12",
       "fold_mode": "corrections_for_internal_consistency",
-      "source_refs": ["Operator input pack item 7 (C5 override, 2026-08-11)"],
+      "source_refs": [
+        "Operator input pack item 7 (C5 override, 2026-08-11)"
+      ],
       "validation_status_summary": "Three corrections, none to a call-scoped field: the C5 question is recorded as overridden rather than deferred, the supervisor's title matches the consortium files, the co-supervisor is named, and a confirmation_checklist_ref is added."
     }
   ],
-
   "authorisation_review_artifacts": {
     "ticket": "plans/fieldwise_tickets.md ticket 7 (Authorisation packet)",
     "date": "2026-08-12",
@@ -267,11 +345,15 @@
         "artifact": "project_brief/project_summary.json",
         "fold_mode": "consistency_correction",
         "validation_status_summary": "No record changed status and no value changed. The spine_note described the C5 mobility question as deferred, which the operator superseded on 2026-08-11. Ticket 6 corrected the same sentence in selected_call.json and left this copy standing; ticket 7 applies the same correction."
+      },
+      {
+        "artifact": "call_binding/selected_call.json",
+        "fold_mode": "authorisation_recorded",
+        "validation_status_summary": "action_confirmation_ref moves from null to decision_log/fieldwise-authorisation_2026-08-12.json and action_confirmation_status from Unresolved to Confirmed. The operator authorised the seeded state on 2026-08-12 against revision 3 of the packet. No other field changes, and no record status changes: the twelve open items stay open at the status they carry."
       }
     ],
-    "not_written": "call_binding/selected_call.json. Its action_confirmation_ref stays null and Unresolved until the operator authorises the run, which is a separate act with its own decision-log record."
+    "not_written": "Nothing. The block above covered eight artifacts while authorisation was held; call_binding/selected_call.json joined them on 2026-08-12 when the operator authorised the seed. No Tier 1 or Tier 2 file was touched at any point (CLAUDE.md 13.11)."
   },
-
   "not_seeded": [
     "call_binding/topic_mapping.json — Phase 2 writes it (plan §3).",
     "call_binding/compliance_profile.json — Phase 2 writes it (plan §3)."

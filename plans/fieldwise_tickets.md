@@ -233,15 +233,23 @@ files; Fold operator answers into Tier 3.
 
 - [x] The packet enumerates every seeded record with status and source reference.
 - [x] Every remaining Unresolved item is listed with the gate it blocks.
-- [ ] Operator authorisation is recorded in the decision log before any phase runs.
+- [x] Operator authorisation is recorded in the decision log before any phase runs.
 
 The packet is `docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md`.
-It covers 301 records: 230 Confirmed, 19 Inferred, 34 Assumed, 18 Unresolved. Acceptance is pinned by
+It covers 301 records: 231 Confirmed, 19 Inferred, 34 Assumed, 17 Unresolved. Acceptance is pinned by
 `tests/runner/test_fieldwise_ticket7_authorisation.py`.
 
-**The third criterion is open.** The operator reviewed revisions 1 and 2 on 2026-08-12 and held
-authorisation both times. No decision-log authorisation record exists, and `selected_call.json` keeps
-`action_confirmation_ref` at null with status Unresolved. Ticket 8 stays blocked.
+The operator reviewed revisions 1 and 2 on 2026-08-12 and held authorisation both times, then
+authorised revision 3 the same day. The record is
+`docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json`, and
+`selected_call.json` points `action_confirmation_ref` at it with status Confirmed. That flip is the one
+status the authorisation moved, which is why Unresolved reads 17 rather than the 18 reviewed. Ticket 8
+is unblocked.
+
+The record fingerprints the fifteen Tier 3 artifacts it authorised, using the same SHA-256 helper the
+gate evaluator uses. A later edit to any of them is allowed and must be declared in the record's
+`amendments` list. The test fails on undeclared drift, so the state that runs stays the state that was
+approved.
 
 Three deviations, all recorded in the three decision-log entries the reviews produced.
 
