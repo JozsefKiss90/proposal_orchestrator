@@ -28,14 +28,18 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 from runner.claude_transport import (
+    ClaudeCLITimeoutError,
     _kill_process_tree,
     _tree_killable_popen_kwargs,
+    invoke_claude_text,
 )
 
 
@@ -203,3 +207,93 @@ class TestTreeKillablePopenKwargs:
             assert "start_new_session" not in kwargs
         else:
             assert kwargs.get("start_new_session") is True
+
+    def test_windows_detaches_child_console(self) -> None:
+        """TR-2 trigger immunity: the child must not share the operator's
+        console.  A QuickEdit selection (or Ctrl+S) freezes the console host,
+        and a child *attaching* to a frozen console blocks before ``main()``
+        — it never drains stdin, which is what turned a console click into a
+        93-minute untimeoutable hang.  ``CREATE_NO_WINDOW`` gives the child
+        its own invisible console, so the operator's terminal can never
+        freeze it."""
+        kwargs = _tree_killable_popen_kwargs()
+        if os.name == "nt":
+            assert (
+                kwargs.get("creationflags", 0) & subprocess.CREATE_NO_WINDOW
+            ), "child shares the operator console — frozen-console hang risk"
+        else:
+            assert "creationflags" not in kwargs
+
+
+class TestStdinWriteDeadline:
+    """TR-2: the timeout must fire even when the child never reads stdin.
+
+    The bug: ``communicate(input=...)`` writes stdin *synchronously on the
+    calling thread before any deadline check* (CPython Windows
+    ``_communicate``).  A child that is blocked pre-``main()`` (frozen
+    console) never drains the pipe, the 35 KB prompt write blocks forever,
+    and ``TimeoutExpired`` is structurally unreachable — the production
+    93-minute hang with the 1200 s timeout inert.
+
+    Red-capable: against the old ``communicate(input=...)`` call, the
+    invocation hangs past its deadline and the watchdog assertion fails.
+    With the stdin-writer-thread fix, ``ClaudeCLITimeoutError`` is raised
+    on schedule.
+    """
+
+    # Far larger than any OS pipe buffer, so the write cannot be absorbed.
+    _BIG_PROMPT = "x" * 1_000_000
+
+    def test_timeout_fires_when_child_never_reads_stdin(self) -> None:
+        real_popen = subprocess.Popen
+        spawned: dict = {}
+
+        def popen_never_reads_stdin(cmd, **kwargs):
+            # Same pipes, kwargs, and platform flags as the real call —
+            # only the executable is swapped for a stdin-ignoring sleeper.
+            proc = real_popen(
+                [sys.executable, "-c", "import time; time.sleep(120)"],
+                **kwargs,
+            )
+            spawned["proc"] = proc
+            return proc
+
+        result: dict = {}
+
+        def call() -> None:
+            try:
+                with patch(
+                    "runner.claude_transport.subprocess.Popen",
+                    side_effect=popen_never_reads_stdin,
+                ):
+                    invoke_claude_text(
+                        system_prompt="s",
+                        user_prompt=self._BIG_PROMPT,
+                        model="claude-sonnet-4-6",
+                        max_tokens=1,
+                        timeout_seconds=2,
+                    )
+            except BaseException as exc:  # noqa: BLE001 — captured for assert
+                result["exc"] = exc
+
+        worker = threading.Thread(target=call, daemon=True)
+        worker.start()
+        worker.join(timeout=30)
+        try:
+            assert not worker.is_alive(), (
+                "invoke_claude_text hung past its deadline — stdin write "
+                "blocked with no timeout (TR-2 regression)"
+            )
+            exc = result.get("exc")
+            assert isinstance(exc, ClaudeCLITimeoutError), (
+                f"expected ClaudeCLITimeoutError, got {exc!r}"
+            )
+            # The error must tell the operator stdin never drained — that is
+            # the frozen-console signature.
+            assert "stdin" in str(exc), (
+                "timeout error does not surface the undrained-stdin signature"
+            )
+        finally:
+            proc = spawned.get("proc")
+            if proc is not None:
+                _force_cleanup(proc.pid)

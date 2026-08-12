@@ -24,6 +24,7 @@ import json
 import os
 import signal
 import subprocess
+import threading
 import time
 
 
@@ -262,16 +263,20 @@ def _tree_killable_popen_kwargs() -> dict:
     whole group — including grandchildren such as the ``claude`` CLI's Node
     child — without ever reaching this process's own group (the test runner).
 
-    On Windows this returns no extra kwargs: ``taskkill /T`` walks the
-    parent/child PID tree from the direct child's PID, so no process-group
-    creation flag is required, and adding one would needlessly alter the
-    child's console-signal behavior.
+    On Windows this returns ``CREATE_NO_WINDOW`` (TR-2): the child gets its
+    own invisible console instead of attaching to the operator's terminal.
+    A child attaching to a *frozen* console (QuickEdit text selection or
+    Ctrl+S in the operator's window freezes the console host) blocks before
+    ``main()`` and never drains stdin — the observed multi-hour hang.  A
+    detached child cannot be frozen by the operator's terminal.  ``taskkill
+    /T`` walks the parent/child PID tree from the direct child's PID, so no
+    process-group creation flag is required.
 
     The transport and its regression tests must spawn children through the
     *same* helper so the kill semantics they exercise match production.
     """
     if _IS_WINDOWS:
-        return {}
+        return {"creationflags": subprocess.CREATE_NO_WINDOW}
     return {"start_new_session": True}
 
 
@@ -361,7 +366,7 @@ def invoke_claude_text(
         User prompt text.  Always passed via stdin.
     model:
         Model identifier: either a full id or a short alias
-        (e.g. ``"claude-opus-4-6"`` or ``"opus"``).  The transport is
+        (e.g. ``"claude-sonnet-4-6"`` or ``"sonnet"``).  The transport is
         model-agnostic; callers supply the model.
     max_tokens:
         Accepted for interface compatibility but **not currently enforced**
@@ -467,11 +472,36 @@ def invoke_claude_text(
             f"Claude CLI invocation failed: {type(exc).__name__}: {exc}"
         ) from exc
 
+    # TR-2: write stdin from a daemon thread so the deadline below is
+    # unconditional.  ``communicate(input=...)`` writes stdin synchronously
+    # on the calling thread *before* any deadline check (CPython Windows
+    # ``_communicate``); a child that stalls before reading input (e.g.
+    # startup blocked by a frozen console) never drains the pipe, the write
+    # blocks forever, and ``TimeoutExpired`` becomes structurally
+    # unreachable.
+    _stdin_done = threading.Event()
+    _stdin_pipe = proc.stdin
+
+    def _feed_stdin() -> None:
+        try:
+            _stdin_pipe.write(effective_user_prompt)
+            _stdin_pipe.close()
+            _stdin_done.set()
+        except OSError:
+            # Child exited or was tree-killed before draining stdin; the
+            # main thread surfaces the real error.
+            pass
+
+    _writer = threading.Thread(
+        target=_feed_stdin, name="claude-stdin-writer", daemon=True
+    )
+    _writer.start()
+    # communicate() must not close or flush the pipe the writer thread owns.
+    proc.stdin = None
+
     try:
-        stdout, stderr = proc.communicate(
-            input=effective_user_prompt,
-            timeout=timeout_seconds,
-        )
+        stdout, stderr = proc.communicate(timeout=timeout_seconds)
+        _writer.join(timeout=5)
     except subprocess.TimeoutExpired as exc:
         _elapsed = time.monotonic() - _t0
         # Kill the whole tree (the direct child *and* its Node descendants),
@@ -481,8 +511,19 @@ def invoke_claude_text(
         _drained_out, _drained_err = _drain_after_kill(proc)
         _to_out = exc.stdout if isinstance(exc.stdout, str) else _drained_out
         _to_err = exc.stderr if isinstance(exc.stderr, str) else _drained_err
+        _stdin_note = (
+            ""
+            if _stdin_done.is_set()
+            else (
+                ". The user prompt was never fully written to the CLI's "
+                "stdin: the child stalled before reading its input pipe "
+                "(e.g. startup blocked by a frozen console — QuickEdit text "
+                "selection or Ctrl+S in the operator's terminal)"
+            )
+        )
         raise ClaudeCLITimeoutError(
-            f"Claude CLI invocation timed out after {timeout_seconds}s",
+            f"Claude CLI invocation timed out after {timeout_seconds}s"
+            f"{_stdin_note}",
             stdout=_to_out if isinstance(_to_out, str) else None,
             stderr=_to_err if isinstance(_to_err, str) else None,
             command=cmd,

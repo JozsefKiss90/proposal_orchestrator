@@ -75,7 +75,7 @@ _SLUG_CRITERION: dict[str, str] = {
 #: Production drafter model / token budget.  The token budget is deliberately
 #: generous (soft caps lifted, D5): each call drafts a single sub-section, so
 #: the monolithic ~20 KB whole-section ceiling no longer binds.
-_DRAFTER_MODEL: str = "claude-opus-4-6"
+_DRAFTER_MODEL: str = "claude-sonnet-4-6"
 _DRAFTER_MAX_TOKENS: int = 8000
 
 #: TAPM timeout for a grounded per-sub-section drafting call.  Each call reads

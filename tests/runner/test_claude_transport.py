@@ -52,6 +52,9 @@ def _mock_proc(stdout: str | None = "response", stderr: str = "", returncode: in
     # poll() reports "exited" so any teardown path is a safe no-op.
     proc.poll.return_value = returncode
     proc.pid = 4242
+    # The transport hands the stdin pipe to a writer thread (TR-2); spec'd
+    # mocks do not expose instance-only attributes, so set it explicitly.
+    proc.stdin = MagicMock()
     return proc
 
 
@@ -72,6 +75,7 @@ def _timeout_proc(
     proc.returncode = None
     proc.poll.return_value = poll
     proc.pid = 4242
+    proc.stdin = MagicMock()
     return proc
 
 
@@ -99,10 +103,18 @@ class TestSuccessPath:
 
     def test_passes_user_prompt_via_stdin(self) -> None:
         proc = _mock_proc("ok")
+        # The transport detaches proc.stdin (sets it to None) after handing
+        # the pipe to the TR-2 writer thread — capture the pipe first.
+        pipe = proc.stdin
         with patch(_POPEN_TARGET, return_value=proc):
             invoke_claude_text(**_call_kwargs())
-        # The user prompt is sent through communicate(input=...), not Popen.
-        assert proc.communicate.call_args.kwargs["input"] == "Hello"
+        # The user prompt is written to the stdin pipe by the TR-2 writer
+        # thread (never via communicate(input=...), whose synchronous write
+        # would defeat the deadline), and the pipe is closed afterwards.
+        stdin_writes = "".join(c.args[0] for c in pipe.write.call_args_list)
+        assert stdin_writes == "Hello"
+        pipe.close.assert_called_once()
+        assert "input" not in (proc.communicate.call_args.kwargs or {})
 
     def test_uses_text_mode_and_utf8(self) -> None:
         with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
@@ -330,6 +342,7 @@ class TestSystemPromptFallback:
     def test_long_system_prompt_embedded_in_user_prompt(self) -> None:
         long_prompt = "x" * (_MAX_SYSTEM_PROMPT_CLI_LENGTH + 1)
         proc = _mock_proc("ok")
+        pipe = proc.stdin  # captured before the transport detaches it
         with patch(_POPEN_TARGET, return_value=proc) as mock_popen:
             invoke_claude_text(
                 system_prompt=long_prompt,
@@ -339,7 +352,7 @@ class TestSystemPromptFallback:
             )
         cmd = mock_popen.call_args.args[0]
         assert "--system-prompt" not in cmd
-        stdin_input = proc.communicate.call_args.kwargs["input"]
+        stdin_input = "".join(c.args[0] for c in pipe.write.call_args_list)
         assert "SYSTEM INSTRUCTIONS" in stdin_input
         assert long_prompt in stdin_input
         assert "Hello" in stdin_input
@@ -585,6 +598,7 @@ class TestUnexpectedException:
         proc.communicate.side_effect = OSError("pipe broke")
         proc.poll.return_value = 1  # already exited -> tree kill is a no-op
         proc.pid = 4242
+        proc.stdin = MagicMock()
         with patch(_POPEN_TARGET, return_value=proc):
             with pytest.raises(ClaudeTransportError, match="pipe broke"):
                 invoke_claude_text(**_call_kwargs())
