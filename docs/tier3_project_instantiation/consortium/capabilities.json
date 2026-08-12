@@ -1,0 +1,160 @@
+{
+  "_provenance": {
+    "record_type": "tier3_consortium_capabilities",
+    "collection_key": "knowledge_transfer",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts, §10.5 traceability"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "lift_mode": "Verbatim. Every competence item and every capacity statement below is the draft's own string, including the draft's trailing punctuation, so each entry can be checked character-for-character against the cited paragraph. Role tokens are attached alongside the draft's own names, never in place of them.",
+    "consumer_note": "Optional Phase 6 input, recommended by plans/fieldwise_reinstantiation_plan.md §3. No runner predicate reads this file. It feeds Part B-1 §3.2 (quality and capacity of participating organisations) and the §1.3 supervision and knowledge-transfer narrative.",
+    "unresolved_scope": "Part B-2 §5 capacity fields — department and team, infrastructure, key people, recent projects and publications, previous MSCA hosting, and the ELTE hosting arrangements — are absent from the draft. They are input pack item 12, which the operator answered in part and deferred in part on 2026-08-11. Ticket 6 folds them."
+  },
+  "spine_status": "confirmed_real",
+  "knowledge_transfer": [
+    {
+      "transfer_id": "KT1",
+      "direction": "ELTE -> Fellow",
+      "from_role": "HOST",
+      "to_role": "FELLOW",
+      "competences": [
+        "geoinformatics;",
+        "EO time-series analysis;",
+        "optical/SAR integration;",
+        "hyperspectral-to-multispectral transfer;",
+        "spatio-temporal modelling;",
+        "Bayesian hierarchical modelling;",
+        "uncertainty quantification;",
+        "transfer learning/domain adaptation;",
+        "reproducible geospatial computation;",
+        "research software/web deployment;",
+        "IP and research exploitation."
+      ],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶183-194"
+    },
+    {
+      "transfer_id": "KT2",
+      "direction": "Fellow -> ELTE",
+      "from_role": "FELLOW",
+      "to_role": "HOST",
+      "competences": [
+        "plant physiology;",
+        "horticultural crop science;",
+        "plant protection/agronomy;",
+        "water-stress experimentation;",
+        "physiological phenotyping;",
+        "hyperspectral field measurements;",
+        "biological interpretation of EO;",
+        "DrR - Digital Agronomist preliminary development;",
+        "access to complementary agricultural research collaborations."
+      ],
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶195-204"
+    },
+    {
+      "transfer_id": "KT3",
+      "direction": "Bidirectional",
+      "from_role": "FELLOW",
+      "to_role": "HOST",
+      "statement": "The transfer is genuinely bidirectional: crop physiology/agronomy <-> geospatial/data science.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶205"
+    }
+  ],
+  "partner_contributions": [
+    {
+      "contribution_id": "PC1",
+      "heading": "MATE -> FIELDWISE",
+      "role_token": "DATA_PARTNER",
+      "statement": "MATE provides the long-term experimental knowledge and source-domain dataset necessary for model development and validation. Its contribution is central to historical data, processing-tomato experiments, hyperspectral measurements, soil/weather observations and prospective validation.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶206-207"
+    },
+    {
+      "contribution_id": "PC2",
+      "heading": "MVCRI -> FIELDWISE",
+      "role_token": "TRANSFER_PARTNER",
+      "statement": "MVCRI provides the independent Bulgarian research environment required for cross-country scientific transferability. Its role is specifically Hungary -> Bulgaria rather than simply increasing sample size.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶208-209"
+    },
+    {
+      "contribution_id": "PC3",
+      "heading": "AgroVIR -> FIELDWISE",
+      "role_token": "VALIDATION_PARTNER",
+      "statement": "AgroVIR provides the bridge from research field to farmer field and from research prototype to operational requirements. This produces a genuine academic-research-industry knowledge chain.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.3 ¶210-211"
+    }
+  ],
+  "capacity_statements": [
+    {
+      "capacity_id": "CAP1",
+      "heading": "ELTE - MSCA beneficiary",
+      "role_token": "HOST",
+      "statement": "Primary methodological and training environment: geoinformatics, EO, advanced modelling, uncertainty, transferability and research integration.",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.2 ¶425-426"
+    },
+    {
+      "capacity_id": "CAP2",
+      "heading": "MATE - source scientific environment",
+      "role_token": "DATA_PARTNER",
+      "statement": "Provides five-year data, processing-tomato experimental environment, hyperspectral/soil/weather information and primary scientific validation.",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.2 ¶427-428"
+    },
+    {
+      "capacity_id": "CAP3",
+      "heading": "MVCRI, Bulgarian Agricultural Academy - geographic transfer environment",
+      "role_token": "TRANSFER_PARTNER",
+      "statement": "Provides an independent processing-tomato environment, contrasting country/agro-climate and cross-country model validation and calibration.",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.2 ¶429-430"
+    },
+    {
+      "capacity_id": "CAP4",
+      "heading": "AgroVIR - operational transfer environment",
+      "role_token": "VALIDATION_PARTNER",
+      "statement": "Provides commercial farmer-field testing, research-to-operation transferability, MVP requirements/interoperability evaluation and a prospective FMIS integration pathway.",
+      "validation_status": "Confirmed",
+      "source_ref": "§3.2 ¶431-432"
+    }
+  ],
+  "training_and_career": [
+    {
+      "record_id": "TR-COMP",
+      "statement": "The fellowship will provide advanced competence in Bayesian/probabilistic modelling, uncertainty quantification, spatio-temporal validation, sensor-domain transfer, cross-country adaptation, operational AI evaluation, research-to-MVP translation and IP/exploitation.",
+      "validation_status": "Confirmed",
+      "source_ref": "§2.1 ¶220"
+    },
+    {
+      "record_id": "TR-GAP",
+      "statement": "FIELDWISE will address the remaining competence gap in Bayesian modelling, spatio-temporal AI, sensor transfer, uncertainty, domain adaptation and decision evaluation.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.4 ¶215"
+    },
+    {
+      "record_id": "TR-PROGRESSION",
+      "statement": "Intended career progression: Plant Physiologist/Agronomist -> EO/Geospatial Crop Scientist -> Independent researcher in transferable agricultural intelligence.",
+      "validation_status": "Confirmed",
+      "source_ref": "§1.4 ¶216"
+    }
+  ],
+  "part_b2_capacity_detail": {
+    "validation_status": "Unresolved",
+    "note": "Part B-2 §5 requires one capacity table per organisation: department and hosting team, infrastructure and facilities, key people with their project role, recent projects and publications, and previous MSCA hosting experience. Part B-1 §3.2 additionally requires ELTE's hosting arrangements, office and laboratory access, administrative and career support, and the mentoring structure. The draft carries one function sentence per organisation and none of these fields. They are operator input pack item 12, answered in part and deferred in part on 2026-08-11; ticket 6 folds the answered fields and records five deferred fields as Unresolved for the ticket 7 authorisation packet. Nothing is invented here.",
+    "deferred_fields_named_by_the_operator": [
+      "ELTE recent_projects_and_publications",
+      "ELTE previous_msca_hosting",
+      "MATE recent_projects_and_publications",
+      "AgroVIR key_people",
+      "AgroVIR relevant_track_record"
+    ],
+    "gate_impact": "None. No runner predicate reads this file. Item 12 feeds Part B-1 §3.2, which is scored under Implementation but not gated."
+  }
+}

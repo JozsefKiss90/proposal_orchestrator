@@ -150,11 +150,28 @@ and participation mode named as missing and tied to blocking items 1 and 2.
 
 **Blocked by:** Seed call binding and project brief.
 
-- [ ] `roles.json` defines FELLOW, HOST, SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER, VALIDATION_PARTNER.
-- [ ] `partners.json` covers every role token referenced by the draft work plan.
-- [ ] The three new participants are Unresolved with missing fields named, never guessed.
-- [ ] `capabilities.json` is lifted from the draft's knowledge-transfer and capacity statements.
-- [ ] `hand_lift_provenance.json` covers these files.
+- [x] `roles.json` defines FELLOW, HOST, SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER, VALIDATION_PARTNER.
+- [x] `partners.json` covers every role token referenced by the draft work plan.
+- [x] The three new participants are Unresolved with missing fields named, never guessed.
+- [x] `capabilities.json` is lifted from the draft's knowledge-transfer and capacity statements.
+- [x] `hand_lift_provenance.json` covers these files.
+
+Two deviations, both recorded in the lift decision-log entry.
+
+- A seventh role token, `CO_SUPERVISOR`, is added. Input pack item 7 created the record on
+  2026-08-11 and instructed this ticket to add the token, because a co-supervisor is a management
+  role at the beneficiary that `g07_p08` reads. The pack states the ticket "has been amended". It had
+  not been, so this line is that amendment.
+- The identity spine is seeded here, not deferred to ticket 6. The draft names no person, so
+  `FELLOW`, `SUPERVISOR` and `CO_SUPERVISOR` come from input pack item 7. Ticket 3 already folded
+  item 7 into the `selected_call.json` spine note, so leaving the same identities Unresolved would
+  contradict the call binding inside one tier. Items 1, 2 and 12 stay with ticket 6.
+
+One correction to input pack item 1. A missing PIC does not fail `phase_03_gate`. Predicate
+`g04_p07` compares work-package partner ids against the ids in `partners.json` and reads no PIC, so
+AgroVIR passes the gate on token membership while its record stays Unresolved. The absent PIC blocks
+submission instead, because AgroVIR hosts the placement and therefore appears in Part A. Ticket 7
+should carry that, and not a gate failure that will not happen.
 
 ## 6. Fold operator answers into Tier 3
 

@@ -70,6 +70,32 @@
       "operator_added_deliverable": "D1.3 Career Development Plan (due M3, FELLOW + SUPERVISOR, reviewed M6/M12/M16/M20) is seeded into WP1 and outcomes.json outputs per the ticket 2 correction: CC-13 requires the plan as a deliverable and the draft's D1.1-D5.5 list has none. Source: operator input pack item 6, accepted 2026-08-11 — an operator decision, not draft content, and cited as such.",
       "d13_status_reasoning": "D1.3 is marked Confirmed, not Assumed, as a deliberate narrowing of the plan §5 rule ('no draft basis -> Assumed'). That rule guards against content nobody decided; D1.3 is an explicit operator decision (input pack item 6, accepted 2026-08-11), the same footing on which ticket 3 marked the 30-month duration Confirmed in selected_call.json with the tickets file's sanction ('Confirmed is honest now that you have decided it'). §12.2's 'named source in Tier 1-3' is satisfied prospectively: ticket 6 copies the completed input pack into Tier 3 source_materials, at which point the citation is in-tier. Both D1.3 records carry checklist_ref CDP_DELIVERABLE, which ticket 6's re-authored confirmation_checklist.json must resolve. Declaring it Assumed instead would require a working_assumptions.json declaration that ticket 6 owns, and would misstate the epistemic state: the fact is decided, not adopted for want of evidence.",
       "tests": "tests/runner/test_fieldwise_ticket4_seed.py pins the acceptance criteria (envelope, statuses, Confirmed sets, Inferred derivations, Unresolved person-months/KPIs, provenance coverage, dependency_normalizer compatibility)."
+    },
+    {
+      "ticket": 5,
+      "date": "2026-08-12",
+      "what": "Third seeding slice: the three consortium files, lifted from the draft under the same §5 envelope and status rule.",
+      "artifacts_written": [
+        "docs/tier3_project_instantiation/consortium/roles.json",
+        "docs/tier3_project_instantiation/consortium/partners.json",
+        "docs/tier3_project_instantiation/consortium/capabilities.json"
+      ],
+      "confirmed_content": "HOST (ELTE) from the cover block ¶7-8 and §3.2 ¶425-426. The §1.3 two-way knowledge transfer (¶183-194 and ¶195-204), the bidirectionality statement (¶205), the three partner contributions (¶206-211), the four §3.2 capacity statements (¶425-432) and the training and career-progression statements (§2.1 ¶220, §1.4 ¶215-216), all verbatim including the draft's trailing punctuation. Every capabilities.json string was checked character-for-character against its cited paragraph.",
+      "identity_spine_content": "FELLOW, SUPERVISOR and CO_SUPERVISOR are Confirmed from operator input pack item 7 (confirmed 2026-08-11), not from the draft, which names no person. This follows ticket 3, which already folded item 7 into the selected_call.json spine note; leaving the same identities Unresolved here would contradict the call binding inside one tier, which is what §12.3 exists to prevent. The C5 mobility override of 2026-08-11 is carried on the HOST record as an operator-declared position for ticket 7, not promoted to a verified fact.",
+      "unresolved_content": "MATE, MVCRI and AgroVIR. Role, country, function and work-plan role are draft-confirmed; legal name, PIC, entity type, registered address, contact person and participation mode are null and named as missing, tied to input pack items 1 and 2. The operator answered both items on 2026-08-11, and ticket 6 owns the fold; seeding the answers here would blur the lift/fold boundary the ticket structure draws. Part B-2 §5 capacity detail is a single Unresolved record tied to item 12. Nothing is invented (§13.3).",
+      "co_supervisor_deviation": {
+        "what": "roles.json and partners.json carry a seventh token, CO_SUPERVISOR (Dr. Roland Hollós, ELTE Department of Meteorology), beyond the six the ticket 5 acceptance criterion names.",
+        "why": "Operator input pack item 7 added the record on 2026-08-11 and instructed ticket 5 to add the token: a co-supervisor is a management role at the beneficiary that phase_06_gate predicate g07_p08 reads, and he resolves to ELTE, which exists in partners.json. The pack states that ticket 5 'has been amended'; plans/fieldwise_tickets.md had not been amended, so this run amends it and records the deviation here.",
+        "status_reasoning": "Confirmed as an operator decision, on the same footing as ticket 4's D1.3 and ticket 3's 30-month duration, with the one open check named in the record: his primary employment must be ELTE rather than HUN-REN, because MSCA requires supervision at the beneficiary. The check blocks no gate."
+      },
+      "input_pack_correction": {
+        "what": "Input pack item 1 states that AgroVIR's confirmed-absent PIC makes phase_03_gate predicate g04_p07 fail. It does not.",
+        "evidence": "g04_p07 is all_partners_in_tier3 in runner/predicates/coverage_predicates.py. It compares the set of lead and contributing partner ids in wp_structure.json against the partner ids in partners.json, resolved as partner_id then id then short_name. It reads no PIC, no legal name and no participation mode.",
+        "consequence": "VALIDATION_PARTNER is present, so g04_p07 passes on token membership even while the record stays Unresolved. The absent PIC blocks submission instead: AgroVIR hosts the non-academic placement, so it goes in Part A, where every participant needs a PIC. The correction is written into the VALIDATION_PARTNER notes in both consortium files and belongs in the ticket 7 authorisation packet, which should not carry a gate failure that will not happen.",
+        "unchanged": "Item 1's substantive answer stands. The PIC is confirmed absent and only the EU Participant Register can supply it."
+      },
+      "not_seeded_here": "Legal identities and participation modes (items 1 and 2), the Part B-2 §5 capacity fields (item 12), confirmation_checklist.json and working_assumptions.json. All are ticket 6. The checklist_ref tokens FELLOW, HOST, SUPERVISOR, CO_SUPERVISOR, DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER must all resolve in ticket 6's re-authored confirmation_checklist.json.",
+      "tests": "tests/runner/test_fieldwise_ticket5_seed.py pins the acceptance criteria (envelope, statuses, the seven role tokens, work-plan token coverage, Unresolved participants with named missing fields and no guessed values, verbatim capabilities lift against the draft, provenance coverage, and g04_p07 resolvability of the seeded partner ids)."
     }
   ]
 }

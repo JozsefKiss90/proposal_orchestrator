@@ -28,7 +28,7 @@
 
   "operator_input_pack": {
     "path": "plans/fieldwise_operator_input_pack.md",
-    "role": "Authority for project-scoped operator decisions. Items 2 and 7 (decided/confirmed 2026-08-11) feed the selected_call.json corrections; the remaining items land in Tier 3 at ticket 6, which also copies the completed pack into source_materials/operator_input_pack/."
+    "role": "Authority for project-scoped operator decisions. Items 2 and 7 (decided/confirmed 2026-08-11) feed the selected_call.json corrections and, at ticket 5, the identity-spine records in consortium/roles.json and consortium/partners.json — the draft names no person, so item 7 is the only source for them. Item 6 feeds deliverable D1.3 at ticket 4. The remaining items land in Tier 3 at ticket 6, which also copies the completed pack into source_materials/operator_input_pack/."
   },
 
   "lifted_artifacts": [
@@ -108,6 +108,31 @@
       "lift_mode": "draft_lift_verbatim",
       "source_refs": ["§3.1 risk table ¶380-422 (13 risks)", "§3.1 ¶423 (zero-shot risk philosophy)"],
       "validation_status_summary": "13 risks Confirmed; L/I column split into likelihood and impact. Categories, owners and WP mappings are absent from the draft and left to Phase 6."
+    },
+    {
+      "artifact": "consortium/roles.json",
+      "ticket": 5,
+      "date": "2026-08-12",
+      "lift_mode": "draft_lift_plus_confirmed_spine",
+      "source_refs": ["Cover block ¶7-18 (host and the three participating organisations)", "§1.3 ¶182-211 (supervision, two-way transfer, partner contributions)", "§1.4 ¶212-216 (researcher profile)", "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (WP month lines naming the organisations)", "§3.2 ¶425-432 (capacity statements)", "Operator input pack item 7 (identity spine, confirmed 2026-08-11)"],
+      "validation_status_summary": "Seven role tokens. HOST Confirmed from the draft and item 7. FELLOW, SUPERVISOR and CO_SUPERVISOR Confirmed from item 7, which the draft cannot supply because it names no person. DATA_PARTNER (MATE), TRANSFER_PARTNER (MVCRI) and VALIDATION_PARTNER (AgroVIR) Unresolved: role, country and function are draft-confirmed, and legal identity (item 1) and participation mode (item 2) are named as missing for the ticket 6 fold.",
+      "deviation": "CO_SUPERVISOR is a seventh token beyond the six the ticket names, added on the instruction of input pack item 7. Recorded in decision_log/fieldwise-tier3-lift_2026-08-11.json."
+    },
+    {
+      "artifact": "consortium/partners.json",
+      "ticket": 5,
+      "date": "2026-08-12",
+      "lift_mode": "derived_from_roles",
+      "source_refs": ["consortium/roles.json (every entity, name, country and role)", "§3.1 ¶253, ¶264, ¶276, ¶289, ¶303 (token coverage of the draft work plan)"],
+      "validation_status_summary": "The same seven tokens with legal-identity fields added. Every role token the draft work plan references is present, so phase_03_gate predicate g04_p07 can resolve. Legal name, PIC, entity type, address and contact person are null for the three participating organisations and are not guessed."
+    },
+    {
+      "artifact": "consortium/capabilities.json",
+      "ticket": 5,
+      "date": "2026-08-12",
+      "lift_mode": "draft_lift_verbatim",
+      "source_refs": ["§1.3 ¶183-194 (ELTE to Fellow), ¶195-204 (Fellow to ELTE), ¶205 (bidirectionality), ¶206-211 (partner contributions)", "§3.2 ¶425-432 (four capacity statements)", "§2.1 ¶220 and §1.4 ¶215-216 (training and career progression)"],
+      "validation_status_summary": "All lifted records Confirmed, verbatim including the draft's trailing punctuation, so each entry checks character-for-character against its cited paragraph. The Part B-2 §5 capacity detail is a single Unresolved record: the draft carries one function sentence per organisation and none of the required fields, which are input pack item 12 for the ticket 6 fold."
     }
   ],
 

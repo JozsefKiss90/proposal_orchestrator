@@ -1,0 +1,123 @@
+{
+  "_provenance": {
+    "record_type": "tier3_consortium_roles",
+    "collection_key": "roles",
+    "authority": [
+      "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
+    ],
+    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
+    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
+    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
+    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
+    "instrument_note": "MSCA-PF is a single-fellow, single-beneficiary action, not a consortium. Only HOST is a beneficiary legal entity. FELLOW, SUPERVISOR and CO_SUPERVISOR are natural persons. DATA_PARTNER, TRANSFER_PARTNER and VALIDATION_PARTNER are participating organisations without beneficiary status. 'Role token' means an identifier the work plan assigns work to, not a consortium seat.",
+    "identity_spine_source": "The draft names no person. FELLOW, SUPERVISOR and CO_SUPERVISOR identities come from operator input pack item 7 (identity spine, confirmed 2026-08-11), which is the same authority ticket 3 used for the selected_call.json spine note. HOST is named by the draft (cover block ¶8, §3.2 ¶425) and corroborated by item 7.",
+    "unresolved_scope": "MATE, MVCRI and AgroVIR carry draft-confirmed role, country and function. Their legal identity (input pack item 1) and participation mode (item 2) are Unresolved here and are folded at ticket 6, per plans/fieldwise_tickets.md tickets 5 and 6.",
+    "fellowship_type_ref": "Fellowship type and duration are not duplicated here. Their single authoritative home is call_binding/selected_call.json (European Fellowship, 30 months = 24 at ELTE + a 6-month non-academic placement at AgroVIR under CC-07)."
+  },
+  "spine_status": "confirmed_real",
+  "roles": [
+    {
+      "role_token": "FELLOW",
+      "role": "Experienced researcher / postdoctoral fellow (applicant)",
+      "identity": "Dr. Rositsa Cholakova",
+      "current_affiliation": "Maritsa Vegetable Crops Research Institute (MVCRI), Bulgarian Agricultural Academy, Plovdiv, Bulgaria",
+      "country_of_origin": "BG",
+      "profile": "Combines a foundation in agronomy, plant protection and plant physiology with developing expertise in EO, GIS and agricultural data science. Experience in physiological measurements and crop experimentation supplies the biological basis; hyperspectral and EO/GIS experience bridges toward scalable monitoring; DrR - Digital Agronomist demonstrates a trajectory toward agricultural digital tools.",
+      "competence_gap_addressed": "Bayesian modelling, spatio-temporal AI, sensor transfer, uncertainty, domain adaptation and decision evaluation.",
+      "executes": "All work packages. This is a single-researcher action, so the fellow is not repeated as a per-WP participant in workpackage_seed.json.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 7 (identity, confirmed 2026-08-11); §1.4 ¶212-216 (profile and competence gap, draft)",
+      "checklist_ref": "FELLOW",
+      "note": "The draft describes the researcher's profile but never names her. The name is an operator confirmation, not a draft fact, and is cited as such. Her current MVCRI affiliation is the same institute as TRANSFER_PARTNER; the two records are distinct, and item 1's contact-person correction of 2026-08-11 deliberately removed her from MVCRI's institutional seat so the cross-country test is not answerable to the person whose model it tests."
+    },
+    {
+      "role_token": "HOST",
+      "role": "Beneficiary and host organisation (sole beneficiary)",
+      "identity": "Eötvös Loránd University (ELTE), Hungary",
+      "organisational_unit": "Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest",
+      "country": "Hungary",
+      "country_code": "HU",
+      "function": "Primary methodological and training environment: geoinformatics, EO, advanced modelling, uncertainty, transferability and research integration.",
+      "work_plan_role": "Named on four WP month lines: 'MATE + ELTE' (WP1, WP2), 'ELTE + MATE' (WP3), 'ELTE + AgroVIR' (WP5). The draft's month lines name organisations without ranking them, so lead assignment is a Phase 3 output rather than a lifted fact.",
+      "validation_status": "Confirmed",
+      "source_ref": "Cover block ¶7-8; §1.3 ¶183; §3.2 ¶425-426; §3.1 ¶253, ¶264, ¶276, ¶303; operator input pack item 7 (organisational unit)",
+      "checklist_ref": "HOST",
+      "note": "Organisation, country and function are draft facts. The faculty and institute come from input pack item 7. Item 7 records HOST as CONFIRM-CONDITIONAL on the C5 mobility question, which the operator overrode on 2026-08-11 as an operator-declared position pending a rectified CV; ticket 7 must carry that override into the authorisation packet. Country HU also drives the Phase-7 unit-cost host-country coefficient through selected_call.json."
+    },
+    {
+      "role_token": "SUPERVISOR",
+      "role": "Supervisor at the host institution",
+      "identity": "Prof. András Jung",
+      "affiliation": "ELTE Faculty of Informatics; Professor and Deputy Director, Institute of Cartography and Geoinformatics, H-1117 Budapest, Pázmány Péter sétány 1/C",
+      "field": "Remote sensing, hyperspectral imaging and field spectroscopy, geoinformatics",
+      "country_code": "HU",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 7 (confirmed 2026-08-11, independently corroborated against the ELTE Faculty of Informatics staff listing); §1.3 ¶182-194 (supervision and the host-to-fellow transfer the draft attributes to ELTE)",
+      "checklist_ref": "SUPERVISOR",
+      "note": "The draft has a supervision section but names no supervisor. Item 7 confirms the identity and corroborates the professorship and deputy directorship. The listing marks the deputy role as temporary, so Part B §3.2 should describe him by his professorship rather than by that role."
+    },
+    {
+      "role_token": "CO_SUPERVISOR",
+      "role": "Co-supervisor at the host institution; methodological lead and quality assurance for model development and testing",
+      "identity": "Dr. Roland Hollós",
+      "affiliation": "ELTE Department of Meteorology, Budapest",
+      "orcid": "0000-0001-5137-7471",
+      "field": "Machine learning and meta-modelling of crop and grassland model outputs; agro-meteorology; process-based crop simulation",
+      "country_code": "HU",
+      "responsibility": "Model development and testing across WP3 and WP4, as supervisory responsibility. The fellow designs, builds and runs the models; the co-supervisor provides the methodological lead and quality-assures them.",
+      "validation_status": "Confirmed",
+      "source_ref": "Operator input pack item 7, new record added 2026-08-11 (ELTE Department of Meteorology affiliation verified on Hollós et al. 2026, Geoscientific Model Development 19, 4385-4438, doi:10.5194/gmd-19-4385-2026)",
+      "checklist_ref": "CO_SUPERVISOR",
+      "note": "Seventh token, beyond the six the ticket lists. Input pack item 7 instructs ticket 5 to add it: a co-supervisor is a management role at the beneficiary that phase_06_gate predicate g07_p08 reads, and he resolves to ELTE, which exists in partners.json. The deviation is recorded in the lift decision-log entry. One check remains open and blocks no gate: his primary employment must be ELTE rather than HUN-REN, because MSCA requires supervision at the beneficiary. Status is Confirmed as an operator decision with that check named, not as a verified contract."
+    },
+    {
+      "role_token": "DATA_PARTNER",
+      "short_name": "MATE",
+      "role": "Primary experimental and data environment; source scientific environment",
+      "legal_name": null,
+      "country": "Hungary",
+      "country_code": "HU",
+      "function": "Provides five-year data, processing-tomato experimental environment, hyperspectral/soil/weather information and primary scientific validation.",
+      "work_plan_role": "Named on four WP month lines: 'MATE + ELTE' (WP1, WP2), 'ELTE + MATE' (WP3), 'MATE -> MVCRI' (WP4, source domain). Lead assignment within a shared month line is a Phase 3 output, not a lifted fact.",
+      "participation_mode": null,
+      "beneficiary": false,
+      "validation_status": "Unresolved",
+      "source_ref": "Cover block ¶9-10; §1.3 ¶206-207; §3.2 ¶427-428; §3.1 ¶253, ¶264, ¶276, ¶289",
+      "checklist_ref": "DATA_PARTNER",
+      "note": "Short name, country, function and work-plan role are draft-confirmed. Full legal name, PIC, registered address and contact person are absent from the draft and await the fold of input pack item 1 (blocking). Participation mode — associated partner, secondment host or informal collaborator — awaits item 2 (blocking). The operator answered both items on 2026-08-11; folding the answers into Tier 3 is ticket 6's scope, so this record states what the draft confirms and names what it does not."
+    },
+    {
+      "role_token": "TRANSFER_PARTNER",
+      "short_name": "MVCRI",
+      "role": "Cross-country transferability environment; geographic transfer environment",
+      "legal_name": null,
+      "parent_organisation": "Bulgarian Agricultural Academy",
+      "country": "Bulgaria",
+      "country_code": "BG",
+      "function": "Provides an independent processing-tomato environment, contrasting country/agro-climate and cross-country model validation and calibration.",
+      "work_plan_role": "Named on the WP4 month line, 'MATE -> MVCRI', as the target domain of the transfer.",
+      "participation_mode": null,
+      "beneficiary": false,
+      "validation_status": "Unresolved",
+      "source_ref": "Cover block ¶11-12; §1.3 ¶208-209; §3.2 ¶429-430; §3.1 ¶289",
+      "checklist_ref": "TRANSFER_PARTNER",
+      "note": "Short name, parent organisation, country, function and work-plan role are draft-confirmed. Full legal name, PIC, registered address and contact person are absent from the draft and await the fold of input pack item 1 (blocking). Participation mode awaits item 2 (blocking). MVCRI is also the fellow's current affiliation; the two records are distinct."
+    },
+    {
+      "role_token": "VALIDATION_PARTNER",
+      "short_name": "AgroVIR",
+      "role": "Operational and farmer-field evaluator; operational transfer environment",
+      "legal_name": null,
+      "country": "Hungary",
+      "country_code": "HU",
+      "function": "Provides commercial farmer-field testing, research-to-operation transferability, MVP requirements/interoperability evaluation and a prospective FMIS integration pathway.",
+      "work_plan_role": "Named on the WP5 month line, 'ELTE + AgroVIR'. Lead assignment within a shared month line is a Phase 3 output, not a lifted fact.",
+      "participation_mode": null,
+      "beneficiary": false,
+      "validation_status": "Unresolved",
+      "source_ref": "Cover block ¶17-18; §1.3 ¶210-211; §3.2 ¶431-432; §3.1 ¶303",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "note": "Short name, country, function and work-plan role are draft-confirmed. Full legal name, PIC, registered address and contact person are absent from the draft and await the fold of input pack item 1 (blocking). Participation mode awaits item 2 (blocking). Item 1 records the PIC as confirmed absent. That absence blocks submission rather than phase_03_gate, whose predicate g04_p07 reads partner ids and no PIC; the correction is recorded in the lift decision-log entry. Ticket 6 folds the item 1 answer and ticket 7 carries the missing PIC into the authorisation packet."
+    }
+  ]
+}
