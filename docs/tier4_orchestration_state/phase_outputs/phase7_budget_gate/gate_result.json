@@ -1,0 +1,102 @@
+{
+  "schema_id": "orch.gate_result.v1",
+  "gate_id": "gate_09_budget_consistency",
+  "gate_kind": "exit",
+  "run_id": "9468e1cf-2c71-49e8-91fb-57f6e7192126",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:8986375920f2c122ec16d727284fce50cd18638085574f433de12a2d6136f5f7",
+  "input_artifact_fingerprints": {
+    "docs/integrations/lump_sum_budget_planner/received": "sha256:06106607e17f964f282d89a2d396e96e604bd2ee3568ca18413abe509ee4e429",
+    "docs/integrations/lump_sum_budget_planner/validation": "sha256:06106607e17f964f282d89a2d396e96e604bd2ee3568ca18413abe509ee4e429",
+    "docs/tier2b_topic_and_call_sources/extracted/unit_cost_rates.json": "sha256:9d291b89e6880015689d872bb2219cb6e033ef456d6e494f2059c162d575d9b1",
+    "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json": "sha256:b7d89606570bba0e6f764a855512f1128e13d912051a69e5c254994bccdaee01",
+    "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json": "sha256:9d905c28e10373f0a2144b9e39c7e9a8b63aff2a7fd46bf6a7d8b707fafbfa1f",
+    "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json": "sha256:b6a2dc5fd91802eab052a4a0cc328541aa5c8d5385251f0a8f3a4fc334c30a87"
+  },
+  "evaluated_at": "2026-08-13T15:47:03.290752+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "pass",
+  "deterministic_predicates": {
+    "passed": [
+      "g08_uc01",
+      "g08_uc02",
+      "g08_p01",
+      "g08_uc03"
+    ],
+    "failed": []
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": []
+  },
+  "skipped_semantic": false,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\gate_result.json",
+  "skipped_not_applicable_predicates": [
+    {
+      "predicate_id": "g08_p02",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p03",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p04",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p05",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p06",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p07",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p08",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    },
+    {
+      "predicate_id": "g08_p09",
+      "applies_when": {
+        "budget_regime": "lump_sum"
+      },
+      "resolved_budget_regime": "unit_cost",
+      "reason": "not applicable for resolved budget_regime"
+    }
+  ]
+}

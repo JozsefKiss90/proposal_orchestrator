@@ -1,0 +1,92 @@
+{
+  "schema_id": "orch.phase7.budget_gate_assessment.v1",
+  "run_id": "9468e1cf-2c71-49e8-91fb-57f6e7192126",
+  "gate_pass_declaration": "fail",
+  "budget_response_reference": null,
+  "validation_artifact_reference": null,
+  "wp_coverage_results": [
+    {
+      "wp_id": "WP1",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; WP coverage cannot be confirmed"
+      ]
+    },
+    {
+      "wp_id": "WP2",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; WP coverage cannot be confirmed"
+      ]
+    },
+    {
+      "wp_id": "WP3",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; WP coverage cannot be confirmed"
+      ]
+    },
+    {
+      "wp_id": "WP4",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; WP coverage cannot be confirmed"
+      ]
+    },
+    {
+      "wp_id": "WP5",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; WP coverage cannot be confirmed"
+      ]
+    }
+  ],
+  "partner_coverage_results": [
+    {
+      "partner_id": "DATA_PARTNER",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; partner coverage cannot be confirmed"
+      ]
+    },
+    {
+      "partner_id": "HOST",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; partner coverage cannot be confirmed"
+      ]
+    },
+    {
+      "partner_id": "TRANSFER_PARTNER",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; partner coverage cannot be confirmed"
+      ]
+    },
+    {
+      "partner_id": "VALIDATION_PARTNER",
+      "present_in_budget": false,
+      "budget_line_reference": null,
+      "inconsistencies": [
+        "No budget response present in received/; partner coverage cannot be confirmed"
+      ]
+    }
+  ],
+  "blocking_inconsistencies": [
+    {
+      "inconsistency_id": "BI-01",
+      "description": "No budget response is present in docs/integrations/lump_sum_budget_planner/received/ (directory contains only a .gitkeep placeholder; no budget response file). Absent budget artifacts in the integration received/ directory constitute a blocking gate failure, not a hold state, per CLAUDE.md §8.4 and §13.4. Because no response was received, interface-contract conformance and structural WP/partner coverage against wp_structure.json could not be evaluated.",
+      "severity": "blocking",
+      "resolution": "unresolved",
+      "resolution_note": "A budget response must be received in docs/integrations/lump_sum_budget_planner/received/ and validated for interface-contract conformance and structural consistency with wp_structure.json before the budget gate can pass on the lump-sum path. Until a conforming, structurally consistent response is present, gate_pass_declaration remains fail and Phase 8 is hard-blocked."
+    }
+  ]
+}
