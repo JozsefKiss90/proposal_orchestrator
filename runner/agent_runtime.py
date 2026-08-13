@@ -99,6 +99,12 @@ _TIER5_DELIVERABLE_DIRS: tuple[str, ...] = (
     "docs/tier5_deliverables/assembled_drafts",
 )
 
+#: Character budget for the "subsequent failures" tail appended to a
+#: node's reported failure_reason.  The cause is reported in full; the
+#: failures that followed it are summarised, since they are usually
+#: consequences of the cause and the manifest field must stay readable.
+_SUBSEQUENT_FAILURE_CHARS: int = 600
+
 #: Phase 8 primary drafting skills.  If any of these fail, the agent
 #: body halts immediately (stale-artifact guard) to prevent audit
 #: skills from running against stale artifacts from a prior run.
@@ -1400,6 +1406,26 @@ def run_agent(
     had_failure = False
     failure_reason_accumulator: str | None = None
     failure_category_accumulator: str | None = None
+    # Every non-halt failure, in invocation order.  The accumulators above
+    # report the FIRST entry, never the last.  A skill that fails takes its
+    # consumers down with it, and overwriting the accumulator made the run
+    # manifest name the last consumer instead of the cause: run 0395b136
+    # reported concept-call-binding-derivation's MISSING_INPUT, when the
+    # input it was missing was the artifact concept-alignment-check had
+    # failed to produce two skills earlier.  The later failures are kept
+    # and reported after the cause, not in place of it.
+    failure_chain: list[str] = []
+
+    def _record_failure(reason: str, category: str) -> None:
+        """Record a non-halt failure; the first one recorded is the cause."""
+        nonlocal had_failure
+        nonlocal failure_reason_accumulator
+        nonlocal failure_category_accumulator
+        had_failure = True
+        failure_chain.append(reason)
+        if failure_reason_accumulator is None:
+            failure_reason_accumulator = reason
+            failure_category_accumulator = category
 
     _skip_set = frozenset(skip_skills) if skip_skills else frozenset()
 
@@ -1509,11 +1535,10 @@ def run_agent(
                     failure_category="MISSING_INPUT",
                 )
                 all_invocations.append(record)
-                had_failure = True
-                failure_reason_accumulator = (
-                    f"Skill {sid!r} failed: {_fail_reason}"
+                _record_failure(
+                    f"Skill {sid!r} failed: {_fail_reason}",
+                    "SKILL_FAILURE",
                 )
-                failure_category_accumulator = "SKILL_FAILURE"
                 logger.warning(
                     "Skill %s skipped (instrument type unresolvable): %s",
                     sid, _fail_reason,
@@ -1591,11 +1616,10 @@ def run_agent(
                     failure_category="MISSING_INPUT",
                 )
                 all_invocations.append(record)
-                had_failure = True
-                failure_reason_accumulator = (
-                    f"Skill {sid!r} skipped: {_fail_reason}"
+                _record_failure(
+                    f"Skill {sid!r} skipped: {_fail_reason}",
+                    "SKILL_FAILURE",
                 )
-                failure_category_accumulator = "SKILL_FAILURE"
                 logger.warning(
                     "Skill %s skipped (no auditable artifact): %s",
                     sid, _fail_reason,
@@ -1735,12 +1759,11 @@ def run_agent(
                                     invoked_skills=all_invocations,
                                     invoked_components=all_invoked_components,
                                 )
-                            had_failure = True
-                            failure_reason_accumulator = (
+                            _record_failure(
                                 f"Sub-agent skill {sub_sid!r} failed: "
-                                f"{sub_result.failure_reason}"
+                                f"{sub_result.failure_reason}",
+                                "SKILL_FAILURE",
                             )
-                            failure_category_accumulator = "SKILL_FAILURE"
 
                     # Mark sub-agent skills as consumed
                     sub_agent_skills = []
@@ -1799,11 +1822,10 @@ def run_agent(
             #   from other inputs
             # - can_evaluate_exit_gate is determined from disk state
             #   at the end, not from individual skill success
-            had_failure = True
-            failure_reason_accumulator = (
-                f"Skill {sid!r} failed: {result.failure_reason}"
+            _record_failure(
+                f"Skill {sid!r} failed: {result.failure_reason}",
+                "SKILL_FAILURE",
             )
-            failure_category_accumulator = "SKILL_FAILURE"
 
     # Invoke any remaining sub-agent skills that weren't triggered
     # during the primary skill loop.  Check artifact readiness first:
@@ -1849,24 +1871,22 @@ def run_agent(
                             invoked_skills=all_invocations,
                             invoked_components=all_invoked_components,
                         )
-                    had_failure = True
-                    failure_reason_accumulator = (
+                    _record_failure(
                         f"Sub-agent skill {sub_sid!r} failed: "
-                        f"{sub_result.failure_reason}"
+                        f"{sub_result.failure_reason}",
+                        "SKILL_FAILURE",
                     )
-                    failure_category_accumulator = "SKILL_FAILURE"
         else:
             # Sub-agent's declared inputs are not on disk — the
             # parent agent did not produce the required artifacts.
             # Fail closed per CLAUDE.md §6.5.
-            had_failure = True
-            failure_reason_accumulator = (
+            _record_failure(
                 f"Declared sub-agent {sub_agent_id!r} cannot run: "
                 f"its required inputs (from agent_catalog.yaml "
                 f"reads_from) are not present on disk; the parent "
-                f"agent did not produce the required artifacts"
+                f"agent did not produce the required artifacts",
+                "INCOMPLETE_OUTPUT",
             )
-            failure_category_accumulator = "INCOMPLETE_OUTPUT"
             logger.warning(
                 "Sub-agent %s inputs not ready at fallback; "
                 "failing closed",
@@ -1892,10 +1912,26 @@ def run_agent(
     # to proceed to gate evaluation when status="failure".
 
     if had_failure:
+        # The cause first, then the failures that followed it.  Later
+        # entries are usually consequences (a consumer skill reporting the
+        # input its failed producer never wrote), so they are labelled as
+        # subsequent rather than presented as the fault.
+        _reported_reason = failure_reason_accumulator
+        if len(failure_chain) > 1:
+            _subsequent = "; ".join(failure_chain[1:])
+            if len(_subsequent) > _SUBSEQUENT_FAILURE_CHARS:
+                _subsequent = (
+                    _subsequent[:_SUBSEQUENT_FAILURE_CHARS] + " ..."
+                )
+            _reported_reason = (
+                f"{failure_reason_accumulator} "
+                f"[+{len(failure_chain) - 1} subsequent failure(s) in the "
+                f"same node, likely consequences: {_subsequent}]"
+            )
         return AgentResult(
             status="failure",
             can_evaluate_exit_gate=can_evaluate,
-            failure_reason=failure_reason_accumulator,
+            failure_reason=_reported_reason,
             failure_category=failure_category_accumulator,
             outputs_written=all_outputs,
             validation_reports=all_validation_reports,

@@ -49,7 +49,7 @@ Transport
 ---------
 All live calls route through the local ``claude`` CLI (Max-authenticated) via
 the ``CLAUDE_REFERENCE`` preset — no Bedrock/IAM.  The model the CLI receives
-is the runtime's hardcoded ``claude-sonnet-4-6`` (valid on the local CLI); the
+is the runtime's hardcoded ``claude-opus-4-8`` (valid on the local CLI); the
 Bedrock-style model id in ``.env`` is never used on this path.
 
 Usage

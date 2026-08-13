@@ -2357,3 +2357,116 @@ class TestBudgetGateArtifactReadinessInstrumentConditional:
                 "n07_budget_gate", tmp_path
             )
         assert any("budget_request.json" in p for p in paths)
+
+
+# ---------------------------------------------------------------------------
+# Failure attribution — the cause, not the last consequence
+# ---------------------------------------------------------------------------
+
+
+class TestFirstFailureIsReported:
+    """A failed skill takes its consumers down with it.
+
+    The agent body continues past a non-halt skill failure by design, so a
+    node that loses its producer skill then collects one MISSING_INPUT per
+    consumer.  The accumulator used to be overwritten by each of those, so
+    the run manifest named the last consumer as the fault: run 0395b136
+    reported ``concept-call-binding-derivation`` missing
+    ``concept_refinement_summary.json`` — the artifact
+    ``concept-alignment-check`` had failed to write one skill earlier.  The
+    first failure is the cause and must be what the node reports.
+    """
+
+    def test_reported_reason_is_the_first_failure(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill(
+                "INCOMPLETE_OUTPUT", "unparseable response"
+            ),
+            "consumer-skill": _failure_skill(
+                "MISSING_INPUT", "summary.json not found"
+            ),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert reason.startswith("Skill 'producer-skill' failed")
+        assert "unparseable response" in reason
+
+    def test_subsequent_failures_are_kept_and_labelled(
+        self, tmp_path: Path
+    ) -> None:
+        """The consequences are not discarded — they are reported after the
+        cause, marked as subsequent, so the manifest still shows the full
+        blast radius."""
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill(
+                "INCOMPLETE_OUTPUT", "unparseable response"
+            ),
+            "consumer-skill": _failure_skill(
+                "MISSING_INPUT", "summary.json not found"
+            ),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert "+1 subsequent failure(s)" in reason
+        assert "summary.json not found" in reason
+        assert reason.index("unparseable response") < reason.index(
+            "summary.json not found"
+        )
+
+    def test_single_failure_reports_no_subsequent_tail(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            if skill_id == "producer-skill":
+                return _failure_skill("INCOMPLETE_OUTPUT", "only failure")
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert "subsequent failure" not in reason
+        assert "only failure" in reason
+
+    def test_category_comes_from_the_first_failure(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill("INCOMPLETE_OUTPUT", "cause"),
+            "consumer-skill": _failure_skill("MISSING_INPUT", "consequence"),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        assert result.failure_category == "SKILL_FAILURE"
+        assert (result.failure_reason or "").startswith(
+            "Skill 'producer-skill' failed"
+        )
+

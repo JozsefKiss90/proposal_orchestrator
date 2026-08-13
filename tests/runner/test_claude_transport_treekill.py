@@ -246,16 +246,19 @@ class TestStdinWriteDeadline:
 
     def test_timeout_fires_when_child_never_reads_stdin(self) -> None:
         real_popen = subprocess.Popen
-        spawned: dict = {}
+        spawned: list = []
 
         def popen_never_reads_stdin(cmd, **kwargs):
             # Same pipes, kwargs, and platform flags as the real call —
             # only the executable is swapped for a stdin-ignoring sleeper.
+            # NOTE: the patch also intercepts the transport's own taskkill
+            # spawn on the kill path, so every spawn is tracked for cleanup
+            # and only the FIRST is the "claude" child under test.
             proc = real_popen(
                 [sys.executable, "-c", "import time; time.sleep(120)"],
                 **kwargs,
             )
-            spawned["proc"] = proc
+            spawned.append(proc)
             return proc
 
         result: dict = {}
@@ -289,11 +292,15 @@ class TestStdinWriteDeadline:
                 f"expected ClaudeCLITimeoutError, got {exc!r}"
             )
             # The error must tell the operator stdin never drained — that is
-            # the frozen-console signature.
+            # the pre-main-stall signature.
             assert "stdin" in str(exc), (
                 "timeout error does not surface the undrained-stdin signature"
             )
+            # And it must carry the pre-kill process-tree snapshot, so a
+            # recurrence identifies what the stuck child looked like.
+            assert spawned, "fake claude child was never spawned"
+            assert f"pid={spawned[0].pid}" in str(exc), (
+                "timeout error does not include the child-tree snapshot"
+            )
         finally:
-            proc = spawned.get("proc")
-            if proc is not None:
-                _force_cleanup(proc.pid)
+            _force_cleanup(*[p.pid for p in spawned])

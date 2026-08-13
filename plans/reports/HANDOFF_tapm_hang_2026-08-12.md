@@ -1,6 +1,6 @@
 # Handoff — Phase 1 hangs forever at `skill INVOKE`; the 1200 s timeout never fires
 
-**Status:** RESOLVED 2026-08-13. Root cause: frozen console. Fixes landed in `runner/claude_transport.py`. See §0.
+**Status:** MECHANISM RESOLVED 2026-08-13; trigger unattributed. The child stalls pre-`main()` and the timeout was structurally unreachable. Fixes landed in `runner/claude_transport.py` make any recurrence a diagnosable 1200 s failure. See §0.
 **Date:** 2026-08-12 · **Branch:** `fieldwise-run-01` · **Blocks:** ticket 8 (Run Phases 1–2) — unblocked; Phase 1 passed its gate on run `11d4fcae`.
 
 ---
@@ -13,35 +13,82 @@ The §5 test ran the exact runner invocation: `--tools Read,Glob`, `--system-pro
 
 The full command also reproduced green. `python -m runner --phase 1 --verbose` completed all four Phase 1 skills (484 s, 223 s, 349 s, 232 s) and passed `phase_01_gate`.
 
-### 0.2 Root cause — a frozen console blocks the child before `main()`
+### 0.2 What is proven — the child stalls pre-`main()`, in its first seconds
 
-Forensics first. Neither hung run left a CLI session transcript in `~/.claude/projects/`, and neither wrote any `~/.claude` state. The child stalled before creating a session and before draining stdin. Diag trials completed at 23:01 local while run `f3a12cac` hung concurrently, which excludes global conditions (network, rate limit).
+Forensics. Neither hung run left a CLI session transcript in `~/.claude/projects/`, wrote any `~/.claude` state, or spawned a single MCP server (no `claude-cli-nodejs` log stamps at 19:31Z or 22:06–22:27Z). A healthy child drains stdin at ~3–6 s and stamps MCP logs within ~10 s. Both hung children therefore froze within their first seconds and stayed frozen for hours. Diag trials completed at 23:01 local while run `f3a12cac` hung concurrently, which excludes global conditions (network, rate limit).
 
-The mechanism, demonstrated on this machine by `tools/diag_console_freeze.py`:
+That early stall explains both §1 anomalies. A child that never reads stdin leaves the 35 KB prompt write blocked, and CPython's `communicate(input=...)` writes stdin synchronously before any deadline check, so the 1200 s timeout is structurally unreachable.
 
-- A QuickEdit text selection (enabled here: `HKCU\Console` `QuickEdit=1`) or Ctrl+S freezes the console host process.
-- A child process attaching to a frozen console blocks before `main()`. It never reads stdin.
-- The 35 KB prompt write then blocks forever: CPython's `communicate(input=...)` writes stdin synchronously before any deadline check, so the 1200 s timeout is structurally unreachable.
-- Ctrl+C is swallowed by selection mode. Closing the terminal is the only exit. Both §1 anomalies follow from one stall.
+### 0.2a Trigger — unattributed; two candidate classes
 
-Measured: a console-attached piped child blocked 24.9 s — the full freeze window — and drained instantly on resume. A `CREATE_NO_WINDOW` child drained the same payload in 0.11 s while the console stayed frozen.
+The operator confirms the terminal was untouched for at least the first hour of each hang. The initial stall was therefore not caused by console interaction. The candidate classes that fit "frozen at process start, twice, user-terminal only, no traces":
 
-This also explains the immunity pattern. Every completed trial was agent-spawned into a console nobody clicks. Both hangs ran in the operator's interactive terminal.
+- **Unserviced console at spawn.** `tools/diag_console_freeze.py` proves the mechanism: a child attaching to a frozen console blocks pre-`main()` (blocked 24.9 s under freeze; drained in 0.11 s with `CREATE_NO_WINDOW`). A console can be unserviced without user input (e.g. a stalled ConPTY consumer), but no such state was observed.
+- **Startup deadlock in the stale CLI binary.** The runner resolves `AppData\Roaming\npm\claude.EXE` — a 242 MB self-contained build dated 2026-03-23 (v2.1.81), not the 2.1.224 the shell runs. An internal early-startup deadlock fits the evidence equally well.
 
-Attribution caveat: the past hangs cannot be rerun. Console freeze is the only hypothesis consistent with every observed fact, and the fixes below remove the entire failure class regardless of the exact freeze trigger.
+Two samples, both unreproducible after the fact; the classes cannot be distinguished post-hoc. The fixes below cover both, and the new tree snapshot makes the next occurrence self-identifying.
 
 ### 0.3 Fixes landed (`runner/claude_transport.py`)
 
 1. **Unconditional deadline** (§6 fix 1). A daemon thread now writes stdin; `communicate(timeout=...)` always holds the deadline. A never-draining child becomes `ClaudeCLITimeoutError` + tree kill, not an infinite hang.
-2. **Console detach** (§6 fix 2 class). `_tree_killable_popen_kwargs()` adds `CREATE_NO_WINDOW` on Windows. The operator's terminal can never freeze the child.
-3. **Diagnosable timeout.** The timeout error now states when stdin was never fully written — the frozen-console signature.
+2. **Console detach** (§6 fix 2 class). `_tree_killable_popen_kwargs()` adds `CREATE_NO_WINDOW` on Windows. The operator's terminal can never freeze the child, closing the unserviced-console trigger class.
+3. **Diagnosable timeout.** The timeout error states when stdin was never fully written (the pre-`main()`-stall signature) and embeds a pre-kill snapshot of the child's process tree, so the next occurrence identifies where the child was stuck.
 
 Regression locks: `tests/runner/test_claude_transport_treekill.py::TestStdinWriteDeadline` (red against the old code) and `TestTreeKillablePopenKwargs::test_windows_detaches_child_console`. Transport suites 57/57; transport-hook 27/27; TAPM skill-runtime 35/35. Live smoke through the fixed transport returned in 52 s.
 
 ### 0.4 Still open (operator decisions, from §6)
 
-- Pin the CLI to an absolute path. Python subprocess resolves 2.1.81 (`claude.EXE`) while the shell runs 2.1.224 (`claude.ps1`).
+- **Pin the CLI to an absolute path — now strongly recommended.** Python subprocess resolves the stale March build (2.1.81, a trigger suspect per §0.2a) while the shell runs 2.1.224. Removing or replacing `AppData\Roaming\npm\claude.EXE` also removes that suspect. **Mechanism landed (TR-3); the version choice is yours — see §0.5.**
 - Isolate the runner's CLI environment (`--strict-mcp-config` or a dedicated settings dir) to cut the 20–30 s / ~$0.10+ startup floor.
+
+### 0.5 CLI pin — TR-3
+
+Why the two layers disagreed: the runner spawns with `shell=False`, so the OS
+resolves `claude` through PATH × PATHEXT — not the resolution PowerShell
+performs. Neither layer was wrong; they answer different questions, and
+nothing in the run record said which build had served an invocation.
+
+Landed:
+
+1. `runner/claude_transport.py` — `resolve_claude_cli()`. `cmd[0]` is now the
+   *resolved* executable, never the bare name. `ORCHESTRATOR_CLAUDE_CLI_PATH`
+   pins it; unset keeps the old behaviour but resolves to an absolute path.
+   Fail-closed: a pin naming a missing file, an unresolvable bare name, or
+   (on Windows) a `.ps1` raises `ClaudeCLIUnavailableError` before any spawn.
+   It never falls back to a path search — a typo must stop the run, not
+   quietly restore the ambiguity being closed.
+2. The resolved path is logged once per run under `--verbose`
+   (`runner/__main__.py` wires the transport logger), so every future run
+   states which build it used. Combined with §0.3's tree snapshot, a
+   recurrence names both the build and where its child was stuck — which is
+   what would distinguish §0.2a's two trigger classes.
+3. `tools/diag_cli_resolution.py` — enumerates every `claude*` on PATH and in
+   the known install locations, probes each with `--version` **through the
+   production spawn path**, reports what `shutil.which` and `Get-Command`
+   each pick, and prints a ready-to-paste `.env` line.
+
+Regression lock: `tests/runner/test_claude_transport.py::TestCliPathResolution`
+(15 cases — precedence, quote/`~`/`%VAR%` handling, every fail-closed branch,
+and the `.ps1` rejection as a Windows-only spawn rule).
+
+Operator action — decide the version, then pin it:
+
+```powershell
+python tools/diag_cli_resolution.py
+# then add the recommended line to .env
+```
+
+The two candidates pull in opposite directions. §3 measures 2.1.81 at
+≈$0.099/invocation against 2.1.224 at ≈$0.29 sonnet / $0.50 opus — but 2.1.81
+is the March build that §0.2a names as a trigger suspect, and cost is the
+cheaper problem of the two. Pinning 2.1.224 retires the suspect; the price
+gap is then worth re-measuring after `--strict-mcp-config` lands, since most
+of that spread is MCP, plugin and skill context the runner never uses.
+
+**Windows caveat:** pin the `.exe` or `.cmd`, never the `.ps1`.
+`Get-Command claude` reports the `.ps1` shim, and `CreateProcess` cannot start
+a PowerShell script — which is why the transport rejects that value at
+resolution rather than letting it fail as an opaque `WinError 193` mid-run.
 
 Sections below are the pre-resolution record, kept verbatim.
 
@@ -214,32 +261,15 @@ CPU-seconds. Sweep before each repro or the machine degrades.
 
 `git diff` before committing alongside the ticket 7 fold.
 
-## 9. Falbe sessions output 
+## 9. Fable session output — 2026-08-13
 
-Diagnosed and fixed. The hang was never the CLI flags — it was a frozen console. Full story:
+An earlier version of this section recorded the session's first conclusion: a QuickEdit click froze the console and caused the hang. The operator refuted the trigger: the terminal was untouched for at least the first hour of each hang.
 
-Root cause
+MCP log forensics confirmed the refutation. The hung children spawned no MCP servers, so they froze within their first seconds — long before any interaction. §0 holds the corrected record: mechanism proven and fixed, trigger unattributed (§0.2a).
 
-When you click (QuickEdit selection) or press Ctrl+S in the terminal running python -m runner, Windows freezes that console's host process. A child process that spawns attached to a frozen console blocks before main() — the claude CLI never started working and never read stdin. The 35 KB prompt write then blocked forever, and because CPython's communicate(input=…) writes stdin synchronously before any deadline check, the 1200 s timeout was structurally unreachable. Ctrl+C was swallowed by selection mode. One stall, both anomalies.
+Session deliverables:
 
-How it was pinned down
-
-- H5 died first: the handoff's own next-step test completed in 44 s — the CLI denies unapproved tools non-interactively and exits; stdin drained at 6 s.
-- The real command reproduced green: python -m runner --phase 1 completed all four skills and passed phase_01_gate (run 11d4fcae) — so the bug was environmental, not deterministic. Side effect worth knowing: that run wrote real Phase 1 artifacts (Tier 2B extracted + Tier 4 phase output), which is your ticket 8 evidence.
-- Forensics: neither hung run left a CLI transcript or any ~/.claude write — theiag trials succeeded at 23:01 while run 1 was concurrently hung, excludingnetwork/rate-limit causes. Every completed invocation was agent-spawned (headless console); both hangs ran in your interactive terminal. Your registry has QuickEdit=1.
-- Mechanism proven on your machine: with the console host suspended, a piped child blocked 24.9 s (the whole freeze) and drained instantly on resume — tools/diag_console_freeze.py reproduces this on demand.
-
-Fixes (in runner/claude_transport.py)
-
-1. Unconditional deadline — stdin is written from a daemon thread, so communicate(timeout=…) always fires; a wedged child now becomes ClaudeCLITimeoutError + tree-kill + diagnostics instead
-of a 93-minute silent hang.
-2. CREATE_NO_WINDOW on Windows — the CLI child gets its own invisible console, so clicking in your terminal can never freeze it again (verified: detached child drained in 0.11 s while the console was frozen).
-3. The timeout error now says when stdin never drained — the frozen-console sign
-
-Regression tests added at the real-process seam (TestStdinWriteDeadline, red against the old code, plus the console-detach assertion). Transport suite 57/57, transport-hook 27/27, TAPM skill-runtime 35/35, and a live CLI smoke through the fixed transport passed. The handoff report is updated to RESOLVED with the full record.
-
-Left for you (from the handoff's §6, deliberate non-changes)
-
-- Pin the CLI path: python resolves claude.EXE = 2.1.81 while your shell runs 2.1.224 — pick one deliberately (2.1.224 costs ~3–5× per invocation per the handoff's measurements).
-- --strict-mcp-config for the runner would cut the ~20–30 s / ~$0.10 startup flo
-- The tree has uncommitted work (this fix, the diag tools, the ticket 7 fold items) — I've left committing to you.
+- Transport fixes and regression tests per §0.3. Transport suites 57/57; live CLI smoke passed.
+- Phase 1 passed `phase_01_gate` on run `11d4fcae`, writing real Tier 2B extracted files and Tier 4 phase outputs (ticket 8 evidence).
+- `tools/diag_console_freeze.py` — frozen-console mechanism demo; `--detached` shows the `CREATE_NO_WINDOW` immunity.
+- Committing is left to the operator, alongside the ticket 7 fold.

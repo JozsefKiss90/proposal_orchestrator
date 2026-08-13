@@ -1,0 +1,84 @@
+{
+  "decision_id": "scope_check_call_analyzer_2026-08-13T000000Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "call_analyzer",
+  "phase_context": "phase_01_call_analysis",
+  "scope_findings": [
+    {
+      "claim": "Project identifies as MSCA-PF European Fellowship with host Eötvös Loránd University (ELTE), Hungary, an EU Member State institution",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Fellowship duration: 24-month European Fellowship, within the 12–24 month range specified for European Postdoctoral Fellowships",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-02",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Fellowship is grounded in international mobility within Europe: researcher conducts work across MATE (Hungary) and MVCRI (Bulgaria), both EU Member States",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "Optional non-academic sector placement with AgroVIR for 6 months, described as an additional period at the end of the project for operational transferability testing",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "AgroVIR non-academic placement added value: project-level benefit is described (operational transferability testing under commercial farming conditions); added value for the researcher's career development is not addressed in the concept note or project summary",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-05",
+      "status": "flagged",
+      "flag_reason": "CC-05 requires explicit justification of added value for both the project AND the career development of the researcher. The concept note describes project-level added value (operational transferability testing) but does not address the researcher career development benefit of the AgroVIR placement. Partial compliance with CC-05; the proposal body must explicitly address researcher career benefit to fully satisfy this constraint."
+    },
+    {
+      "claim": "Cross-country collaboration with MVCRI, Bulgaria for geographic model transferability testing; this collaboration may constitute a formal secondment within the European Fellowship",
+      "scope_element_ref": "SR-07",
+      "constraint_ref": "CC-07",
+      "status": "flagged",
+      "flag_reason": "If the MVCRI Bulgaria collaboration constitutes a formal secondment (SR-07), its duration must not exceed 12 months (half of the 24-month European Fellowship excluding any non-academic placement period, per CC-07). The concept note and project summary do not specify the duration of researcher presence at MVCRI, Bulgaria; compliance with the CC-07 half-duration limit cannot be verified from the content provided. Duration must be specified and confirmed in the full proposal."
+    },
+    {
+      "claim": "Research domain: agricultural water stress prediction and irrigation management using machine learning and AI for high-value processing tomato crops, targeting early physiologically grounded detection of developing crop water stress",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this research domain (agricultural water stress prediction, irrigation management, ML/AI for crop monitoring) is in-scope. MSCA-PF scope requirements (SR-01 to SR-08) are fellowship-structural and do not specify required or excluded research domains; the call is research-domain-agnostic. This claim cannot be confirmed as in-scope from Tier 2B scope_requirements.json data alone. No excluded_topic entry exists in scope_requirements.json or call_constraints.json that would render this domain out-of-scope."
+    },
+    {
+      "claim": "Technology focus: integration of Sentinel-2 satellite Earth Observation data, proximal hyperspectral sensors, IoT soil sensors, and field meteorological station observations within a predictive modelling environment for crop water stress forecasting",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm the technology focus (Sentinel-2 EO, hyperspectral sensing, IoT, soil sensors, meteorological data integration for predictive modelling) is in-scope. MSCA-PF scope requirements (SR-01 to SR-08) do not specify permitted research methodologies or technologies. Cannot confirm in-scope from Tier 2B data alone. No excluded_topic constraint excludes this technology domain."
+    },
+    {
+      "claim": "Research methodology: fundamental shift from retrospective accuracy metrics (R², RMSE, F1) to prospective prediction, temporal transferability, geographic transferability, and field-level decision value (Field Decision Value, FDV)",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this research methodology (prospective prediction over retrospective accuracy, transferability framework, FDV metric) is in-scope. MSCA-PF scope requirements (SR-01 to SR-08) do not specify required or excluded research methodologies. Cannot confirm in-scope from Tier 2B data alone. No excluded_topic entry applies."
+    },
+    {
+      "claim": "Knowledge valorisation pathway: DrR desktop research prototype progressing through FIELDWISE scientific validation to DrR - Digital Agronomist Web MVP (drR-digiagro.com) for field-level irrigation decisions",
+      "scope_element_ref": "SR-04",
+      "constraint_ref": null,
+      "status": "in_scope",
+      "flag_reason": null
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); Tier 2B call_constraints.json (docs/tier2b_topic_and_call_sources/extracted/call_constraints.json)",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-08-13T00:00:00Z"
+}

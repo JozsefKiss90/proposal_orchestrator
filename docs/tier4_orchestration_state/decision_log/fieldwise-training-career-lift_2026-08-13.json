@@ -1,0 +1,67 @@
+{
+  "record_type": "decision",
+  "id": "fieldwise-training-career-lift",
+  "date": "2026-08-13",
+  "branch": "fieldwise-run-01",
+
+  "authority": "Operator-directed amendment following the phase_02_gate failure of run d00fc75d. Extends decision_log/fieldwise-tier3-lift_2026-08-11.json (ticket 3) and decision_log/fieldwise-ticket6-fold_2026-08-12.json (ticket 6). Durable recording per CLAUDE.md §9.4. Status assignment per §12.2; no fabricated project facts per §13.3; prose lifted without rewriting per §10.5.",
+
+  "why": "Phase 2 run d00fc75d wrote concept_refinement_summary.json with four unresolved scope conflicts and failed phase_02_gate semantic predicate g03_p06 (no_unresolved_scope_conflicts). The gate finding is correct about the artifact it inspected and wrong about the project: the material answering all four conflicts was already decided, but none of it was reachable by the skill that produced the artifact. concept-alignment-check declares exactly one Tier 3 read path, docs/tier3_project_instantiation/project_brief/, which at the time held only the three ticket-3 lifts of draft sections 1.1.x. The decided material sat in source_materials/operator_input_pack/, in consortium/capabilities.json, in working_assumptions.json and in this decision log — all outside the skill's reads_from. This record moves that material into project_brief/ so the concept surface the gate tests contains the evidence the project already has.",
+
+  "conflicts_addressed": [
+    {
+      "conflict_id": "CF-01",
+      "scope_elements": ["SR-04", "CC-09"],
+      "requirement": "Training activities addressing key transferable and digital skills including generative AI, fostering Open Science culture and knowledge valorisation, and good scientific conduct such as research integrity.",
+      "evidence_now_in_project_brief": "Input pack item 6 transferable-skills component (research integrity; open science and FAIR practice; generative-AI literacy; grant writing; IP and exploitation; project management; science communication), ACCEPTed by the operator 2026-08-11. Draft ¶181 Open Science. Draft §1.3 ¶183-194 eleven ELTE-to-fellow competences. Draft §2.2 ¶231-238 exploitation pathway and IP strategy as the valorisation substance.",
+      "previously_unreachable_because": "Item 6 lives in source_materials/; ¶181 and §1.3 were lifted to consortium/capabilities.json, not to project_brief/."
+    },
+    {
+      "conflict_id": "CF-02",
+      "scope_elements": ["SR-05", "CC-10"],
+      "requirement": "A Career Development Plan established jointly by supervisor(s) and researcher and submitted as an early project deliverable.",
+      "evidence_now_in_project_brief": "Input pack item 6, ACCEPTed in full: six components, agreed M3, reviewed M6/M12/M16/M20, new deliverable D1.3 Career Development Plan at M3 owned by FELLOW and SUPERVISOR. Item 4's co-supervisor amendment adds that the plan is signed by both supervisors and the fellow.",
+      "previously_unreachable_because": "Item 6 lives in source_materials/; D1.3 is seeded in architecture_inputs/workpackage_seed.json, also outside the skill's read path."
+    },
+    {
+      "conflict_id": "CF-03",
+      "scope_elements": ["EO-03", "EO-04", "EO-05", "EO-06", "EO-08"],
+      "requirement": "Fellow-development and participating-organisation framing that the concept's scientific/technological framing did not carry.",
+      "evidence_now_in_project_brief": "EO-03: input pack item 5 EI-03 (one public field demonstration with AgroVIR farmers, one public-facing article per year) plus draft §2.2 ¶224-230 scientific dissemination. EO-04: item 5 EI-04 adopted wording. EO-05: item 4 governance cadence plus draft §1.3. EO-06: item 12 capacity, draft §3.2 ¶425-432. EO-08: item 5 C7 raised teaching measure.",
+      "previously_unreachable_because": "All five sit in the input pack, consortium/ or this log."
+    },
+    {
+      "conflict_id": "CF-04",
+      "scope_elements": ["CC-05", "SR-06"],
+      "requirement": "Explicit, separately-evaluated justification of the non-academic placement's added value for the project and for the researcher's career.",
+      "evidence_now_in_project_brief": "The placement decision of 2026-08-11 (input pack item 2; decision_log/fieldwise-placement-hosting_2026-08-12.json): AgroVIR as placement host M25-M30, the 'what the decision buys' argument, and the Guide for Applicants finding that Part B-1 must argue the placement because evaluators score it. Career-side added value drawn from draft §2.1 ¶219-222 and the AgroVIR role in §3.2 ¶432.",
+      "previously_unreachable_because": "The placement is an operator decision recorded in call_binding/selected_call.json and this log; project_summary.json deliberately does not duplicate it (ticket 3 duration_note)."
+    }
+  ],
+
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+    "docs/tier3_project_instantiation/hand_lift_provenance.json (lifted_artifacts entry appended)"
+  ],
+
+  "not_written": [
+    "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json — a run-produced Tier 4 artifact. Hand-editing it to mark the conflicts resolved would be overwritten on the next run and would assert a resolution the concept surface did not support. The amendment is made at Tier 3, where the evidence belongs, and Phase 2 is re-run.",
+    "skill_catalog.yaml — concept-alignment-check's reads_from is unchanged. Widening it to source_materials/ was considered and declined: source_materials/ holds raw operator input (the pack is 2,788 lines), not curated concept material, and resolving call conflicts against an un-curated source would move the concept surface out of project_brief/ without saying so."
+  ],
+
+  "status_assignments": {
+    "Confirmed": "Draft-lifted prose (verbatim, cited to ¶ ranges) and operator-decided content where the input pack records an explicit ACCEPT with a date.",
+    "Assumed": "Primary supervision of an ELTE MSc thesis, which may require a formal ELTE affiliation the fellow will not automatically hold. Open action with the Faculty of Informatics; the fallback (co-supervision plus the module unit) is stated in the record.",
+    "Unresolved": "Three, each named in the record rather than omitted: the item 4 C6 escalation-route defect, where the accepted route ran past the supervisor to a post he himself holds; the EI-04 Charter mapping, which rests on D1.3 and institutional policy with no external accreditation; and the five deferred item 12 capacity fields plus the ELTE mentoring structure."
+  },
+
+  "explicitly_not_claimed": "ELTE does NOT hold the HR Excellence in Research (HRS4R) award. The operator confirmed this on 2026-08-11 (input pack C8) and the claim was removed permanently. The record states the removal so a later editor cannot reintroduce it from the superseded candidate wording. An earlier candidate asserted the status while the answer beside it read 'unknown'; carrying it forward would have put a false, one-click-checkable institutional claim about the host into a submitted proposal.",
+
+  "open_items_carried_forward": [
+    "K11 — the input pack notes that D1.3 carries no KPI, leaving the item 5 list one short of the deliverable coverage it claims. Proposed: 'Career Development Plan agreed by M3 and reviewed at all four steering points' -> D1.3. Affects Phase 5/6, not phase_02_gate.",
+    "The raised EI-06 teaching workload (module unit co-design plus primary MSc supervision plus PhD field-component co-supervision) does not fit comfortably in the 3.0 cross-cutting person-months. Either raise cross-cutting or state in §3.1 that teaching sits within the training allocation.",
+    "CC-07's six-month placement ceiling is used in full; no headroom if the plan later needs a seventh month."
+  ],
+
+  "verification": "Re-run phase 2. Expected: concept-alignment-check finds Tier 3 evidence for SR-04, SR-05, CC-09, CC-10 and CC-05, writes them as covered or partially_covered rather than unresolved, and records CF-01 to CF-04 with resolution_status 'resolved' and a resolution_note citing this record. g03_p06 then has no unresolved entry to fail on. If a conflict still returns unresolved, the gap is real and belongs in working_assumptions.json as a declaration, not in this record."
+}

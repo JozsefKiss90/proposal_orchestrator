@@ -10,6 +10,7 @@ from __future__ import annotations
 
 CHAR_TO_TOKEN_RATIOS: dict[str, float] = {
     # Claude models
+    "claude-opus-4-8": 3.5,
     "claude-sonnet-4-6": 3.5,
     "claude-opus-4-6": 3.5,
     "claude-haiku-4-5": 3.5,

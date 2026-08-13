@@ -20,20 +20,40 @@ Test groups:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from runner.claude_transport import (
     ClaudeCLIRateLimitError,
+    ClaudeCLIResolution,
     ClaudeCLITimeoutError,
     ClaudeCLIUnavailableError,
     ClaudeTransportError,
     DEFAULT_TIMEOUT_SECONDS,
+    _CLI_MAX_OUTPUT_TOKENS_VAR,
+    _CLI_PATH_ENV_VAR,
+    _MAX_OUTPUT_TOKENS_DEFAULT,
+    _MAX_OUTPUT_TOKENS_ENV_VAR,
     _MAX_SYSTEM_PROMPT_CLI_LENGTH,
     invoke_claude_text,
+    resolve_claude_cli,
 )
+
+
+@pytest.fixture(autouse=True)
+def _unpinned_cli(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Neutralise a developer's own CLI pin for every test in this module.
+
+    ``ORCHESTRATOR_CLAUDE_CLI_PATH`` is a machine-local operator setting.  If
+    it leaks into the test environment, every command-construction assertion
+    below would depend on that machine's install layout.  Tests that exercise
+    the pin set it themselves (autouse fixtures run first).
+    """
+    monkeypatch.delenv(_CLI_PATH_ENV_VAR, raising=False)
 
 
 # ---------------------------------------------------------------------------
@@ -233,12 +253,25 @@ class TestToolsParameter:
 # ---------------------------------------------------------------------------
 
 
-def _assistant_event(*blocks: dict, parent_tool_use_id: str | None = None) -> dict:
-    """Build a stream-json assistant event with the given content blocks."""
+def _assistant_event(
+    *blocks: dict,
+    parent_tool_use_id: str | None = None,
+    stop_reason: str | None = None,
+) -> dict:
+    """Build a stream-json assistant event with the given content blocks.
+
+    ``stop_reason`` mirrors the CLI's ``message.stop_reason``.  It is what
+    distinguishes a turn the model finished from one the output-token
+    ceiling cut short, and the reassembler joins the two cases differently.
+    """
     return {
         "type": "assistant",
         "parent_tool_use_id": parent_tool_use_id,
-        "message": {"role": "assistant", "content": list(blocks)},
+        "message": {
+            "role": "assistant",
+            "content": list(blocks),
+            "stop_reason": stop_reason,
+        },
     }
 
 
@@ -528,7 +561,10 @@ class TestTimeout:
                 invoke_claude_text(**_call_kwargs(), timeout_seconds=60)
         err = exc_info.value
         assert isinstance(err.command, list)
-        assert err.command[0] == "claude"
+        # cmd[0] is the *resolved* executable (TR-3), not the bare name — an
+        # absolute path when one is found, the bare name only when nothing is
+        # on the search path.  Either way it identifies the claude CLI.
+        assert os.path.basename(err.command[0]).lower().startswith("claude")
 
     def test_timeout_has_elapsed_seconds(self) -> None:
         te = subprocess.TimeoutExpired(cmd="claude", timeout=30)
@@ -602,3 +638,318 @@ class TestUnexpectedException:
         with patch(_POPEN_TARGET, return_value=proc):
             with pytest.raises(ClaudeTransportError, match="pipe broke"):
                 invoke_claude_text(**_call_kwargs())
+
+
+# ---------------------------------------------------------------------------
+# Executable resolution / CLI pin (TR-3)
+# ---------------------------------------------------------------------------
+
+
+class TestCliPathResolution:
+    """The pin decides which installed CLI build the runner spawns.
+
+    Regression target: ``Popen(["claude", ...])`` resolved a *different*
+    executable than the operator's shell did (2.1.81 vs 2.1.224 on the
+    reference machine), so the runner was never exercising the CLI under
+    test.  These tests lock the resolution rules, not the CLI's behaviour.
+    """
+
+    # -- unpinned -----------------------------------------------------------
+
+    def test_unset_pin_uses_absolute_path_search_result(self) -> None:
+        with patch(
+            "runner.claude_transport.shutil.which",
+            return_value=os.path.join(os.sep, "usr", "local", "bin", "claude"),
+        ):
+            assert resolve_claude_cli() == ClaudeCLIResolution(
+                os.path.join(os.sep, "usr", "local", "bin", "claude"), "path"
+            )
+
+    def test_unset_pin_with_nothing_on_path_falls_back_to_bare_name(self) -> None:
+        """Historical contract: the spawn fails and reports it from one place."""
+        with patch("runner.claude_transport.shutil.which", return_value=None):
+            assert resolve_claude_cli() == ClaudeCLIResolution("claude", "unresolved")
+
+    def test_unresolved_name_still_raises_cli_unavailable(self) -> None:
+        with patch("runner.claude_transport.shutil.which", return_value=None):
+            with patch(_POPEN_TARGET, side_effect=FileNotFoundError("nope")):
+                with pytest.raises(
+                    ClaudeCLIUnavailableError, match=_CLI_PATH_ENV_VAR
+                ):
+                    invoke_claude_text(**_call_kwargs())
+
+    # -- pinned -------------------------------------------------------------
+
+    def test_pin_wins_over_path_search(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        pinned = tmp_path / "claude.exe"
+        pinned.write_text("stub")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(pinned))
+        with patch(
+            "runner.claude_transport.shutil.which", return_value="/somewhere/else/claude"
+        ):
+            resolution = resolve_claude_cli()
+        assert resolution == ClaudeCLIResolution(str(pinned), "env")
+
+    def test_pinned_path_becomes_argv0(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        pinned = tmp_path / "claude.exe"
+        pinned.write_text("stub")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(pinned))
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs())
+        assert mock_popen.call_args.args[0][0] == str(pinned)
+
+    def test_pin_tolerates_quotes_and_whitespace(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Operators paste paths straight out of a shell prompt."""
+        pinned = tmp_path / "claude.exe"
+        pinned.write_text("stub")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, f'  "{pinned}"  ')
+        assert resolve_claude_cli().path == str(pinned)
+
+    def test_pin_expands_user_and_env_vars(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        pinned = tmp_path / "claude.exe"
+        pinned.write_text("stub")
+        monkeypatch.setenv("PIN_TEST_HOME", str(tmp_path))
+        monkeypatch.setenv(
+            _CLI_PATH_ENV_VAR, os.path.join("$PIN_TEST_HOME", "claude.exe")
+        )
+        assert resolve_claude_cli().path == str(pinned)
+
+    def test_bare_command_name_pin_is_resolved_on_path(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        target = tmp_path / "claude-nightly"
+        target.write_text("stub")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, "claude-nightly")
+        with patch("runner.claude_transport.shutil.which", return_value=str(target)):
+            assert resolve_claude_cli() == ClaudeCLIResolution(str(target), "env")
+
+    # -- fail-closed --------------------------------------------------------
+
+    def test_missing_pinned_file_fails_closed(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A typo must stop the run, never silently fall back to a search."""
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(tmp_path / "does_not_exist.exe"))
+        with patch(
+            "runner.claude_transport.shutil.which", return_value="/usr/bin/claude"
+        ):
+            with pytest.raises(ClaudeCLIUnavailableError, match="no file exists"):
+                resolve_claude_cli()
+
+    def test_missing_pinned_file_never_spawns(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(tmp_path / "does_not_exist.exe"))
+        with patch(_POPEN_TARGET) as mock_popen:
+            with pytest.raises(ClaudeCLIUnavailableError):
+                invoke_claude_text(**_call_kwargs())
+        mock_popen.assert_not_called()
+
+    def test_directory_pin_fails_closed(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(tmp_path))
+        with pytest.raises(ClaudeCLIUnavailableError, match="no file exists"):
+            resolve_claude_cli()
+
+    def test_unresolvable_bare_name_pin_fails_closed(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, "claude-nightly")
+        with patch("runner.claude_transport.shutil.which", return_value=None):
+            with pytest.raises(ClaudeCLIUnavailableError, match="bare command name"):
+                resolve_claude_cli()
+
+    def test_windows_ps1_pin_is_rejected(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """`Get-Command claude` reports the .ps1 shim — the one value that
+        can never work with shell=False, so it must fail loudly at resolution
+        rather than as an opaque WinError at spawn time."""
+        pinned = tmp_path / "claude.ps1"
+        pinned.write_text("# shim")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(pinned))
+        with patch("runner.claude_transport._IS_WINDOWS", True):
+            with pytest.raises(ClaudeCLIUnavailableError, match="PowerShell script"):
+                resolve_claude_cli()
+
+    def test_posix_does_not_reject_ps1_suffix(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The .ps1 guard is a Windows spawn rule, not a naming policy."""
+        pinned = tmp_path / "claude.ps1"
+        pinned.write_text("# shim")
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, str(pinned))
+        with patch("runner.claude_transport._IS_WINDOWS", False):
+            assert resolve_claude_cli().source == "env"
+
+    # -- empty / whitespace-only pin ---------------------------------------
+
+    def test_whitespace_only_pin_is_treated_as_unset(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv(_CLI_PATH_ENV_VAR, "   ")
+        with patch(
+            "runner.claude_transport.shutil.which", return_value="/usr/bin/claude"
+        ):
+            assert resolve_claude_cli().source == "path"
+
+
+# ---------------------------------------------------------------------------
+# Continuation restart splice (run 0395b136 concept-alignment-check)
+# ---------------------------------------------------------------------------
+
+
+class TestContinuationRestartSplice:
+    """An output-token cut inside a fenced code block is not resumed at the
+    token boundary: the CLI's auto-continuation re-opens a fence and the
+    model re-emits the element it was cut inside, so the two turns overlap.
+
+    Joining them verbatim is what broke run 0395b136 — turn 1 ended at
+    ``"coverage_description": "CC`` and turn 2 began ```` ```json ```` +
+    ``"CC-12": {``, putting a raw newline inside a JSON string.  The whole
+    38k-character artifact was lost, the skill failed with a bare "non-JSON
+    response", and the node reported the *downstream* skill's missing input
+    as the fault.
+    """
+
+    _INIT = {"type": "system", "subtype": "init", "session_id": "s1"}
+
+    def test_fenced_restart_is_spliced_at_the_overlap(self) -> None:
+        cut = (
+            '```json\n{\n  "scope_coverage": {\n'
+            '    "CC-11": {"coverage_status": "covered"},\n'
+            '    "CC-12": {\n      "scope_element_id": "CC-12",\n'
+            '      "coverage_description": "CC'
+        )
+        restart = (
+            '```json\n    "CC-12": {\n      "scope_element_id": "CC-12",\n'
+            '      "coverage_description": "CC-12 specifies admissibility."\n'
+            '    }\n  }\n}\n```'
+        )
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text(cut), stop_reason="max_tokens"),
+            _assistant_event(_text(restart), stop_reason="end_turn"),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+
+        body = result.strip().split("\n", 1)[1].rsplit("```", 1)[0]
+        parsed = json.loads(body)
+        assert set(parsed["scope_coverage"]) == {"CC-11", "CC-12"}
+        assert (
+            parsed["scope_coverage"]["CC-12"]["coverage_description"]
+            == "CC-12 specifies admissibility."
+        )
+        # The re-emitted prefix is counted once, not twice.
+        assert result.count('"scope_element_id": "CC-12"') == 1
+
+    def test_seamless_token_split_still_joins_verbatim(self) -> None:
+        """A cut that the model *does* resume at the token boundary must
+        keep the existing behaviour: no separator, no splice."""
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text('{"content": "WP'), stop_reason="max_tokens"),
+            _assistant_event(_text('5 covers comms."}'), stop_reason="end_turn"),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+        assert json.loads(result) == {"content": "WP5 covers comms."}
+
+    def test_fenced_turn_after_a_completed_turn_is_not_spliced(self) -> None:
+        """Only a ``max_tokens`` boundary can be a restart.  A turn that
+        ended normally and is followed by a fenced block is ordinary
+        multi-turn output and must be joined verbatim."""
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text("Here is the answer.\n"), stop_reason="tool_use"),
+            _assistant_event(_text('```json\n{"k": 1}\n```'), stop_reason="end_turn"),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+        assert result == 'Here is the answer.\n```json\n{"k": 1}\n```'
+
+    def test_restart_without_an_anchor_falls_back_to_verbatim_join(self) -> None:
+        """No unambiguous resume point means no splice.  The transport must
+        not guess: the verbatim join stands and the response fails closed in
+        the caller's parser (§17.6.5)."""
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text('{"x": "aaa'), stop_reason="max_tokens"),
+            _assistant_event(
+                _text('```json\n"never-seen-key": 1\n```'), stop_reason="end_turn"
+            ),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+        assert result == '{"x": "aaa```json\n"never-seen-key": 1\n```'
+
+    def test_missing_stop_reason_is_treated_as_a_finished_turn(self) -> None:
+        """A CLI build that omits stop_reason must not trigger a splice."""
+        out = _stream(
+            self._INIT,
+            _assistant_event(_text("head ")),
+            _assistant_event(_text("```json\nhead {}\n```")),
+        )
+        with patch(_POPEN_TARGET, return_value=_mock_proc(out)):
+            result = invoke_claude_text(**_call_kwargs())
+        assert result == "head ```json\nhead {}\n```"
+
+
+# ---------------------------------------------------------------------------
+# Output-token ceiling
+# ---------------------------------------------------------------------------
+
+
+class TestOutputTokenCeiling:
+    """The ceiling is *assigned*, never defaulted.
+
+    It used to be applied with ``setdefault``, so a CLAUDE_CODE_MAX_OUTPUT_
+    TOKENS inherited from the operator's shell silently won and capped every
+    skill generation at whatever that shell carried — the cut that produced
+    the run 0395b136 restart.  Overrides must be deliberate.
+    """
+
+    def _spawn_env(self, monkeypatch: pytest.MonkeyPatch) -> dict:
+        with patch(_POPEN_TARGET, return_value=_mock_proc("ok")) as mock_popen:
+            invoke_claude_text(**_call_kwargs())
+        return mock_popen.call_args.kwargs["env"]
+
+    def test_default_ceiling_applied(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv(_MAX_OUTPUT_TOKENS_ENV_VAR, raising=False)
+        monkeypatch.delenv(_CLI_MAX_OUTPUT_TOKENS_VAR, raising=False)
+        env = self._spawn_env(monkeypatch)
+        assert env[_CLI_MAX_OUTPUT_TOKENS_VAR] == _MAX_OUTPUT_TOKENS_DEFAULT
+
+    def test_ambient_cli_variable_does_not_win(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv(_MAX_OUTPUT_TOKENS_ENV_VAR, raising=False)
+        monkeypatch.setenv(_CLI_MAX_OUTPUT_TOKENS_VAR, "8192")
+        env = self._spawn_env(monkeypatch)
+        assert env[_CLI_MAX_OUTPUT_TOKENS_VAR] == _MAX_OUTPUT_TOKENS_DEFAULT
+
+    def test_orchestrator_override_wins(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv(_MAX_OUTPUT_TOKENS_ENV_VAR, "48000")
+        env = self._spawn_env(monkeypatch)
+        assert env[_CLI_MAX_OUTPUT_TOKENS_VAR] == "48000"
+
+    @pytest.mark.parametrize("bad", ["nonsense", "0", "-1", "  "])
+    def test_invalid_override_falls_back_to_default(
+        self, monkeypatch: pytest.MonkeyPatch, bad: str
+    ) -> None:
+        monkeypatch.setenv(_MAX_OUTPUT_TOKENS_ENV_VAR, bad)
+        env = self._spawn_env(monkeypatch)
+        assert env[_CLI_MAX_OUTPUT_TOKENS_VAR] == _MAX_OUTPUT_TOKENS_DEFAULT
+

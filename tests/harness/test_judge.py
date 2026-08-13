@@ -87,7 +87,7 @@ class TestJudgeConfig:
             _cfg(model=drafter)
 
     def test_drafter_models_includes_pipeline_models(self):
-        assert "claude-sonnet-4-6" in drafter_models()
+        assert "claude-opus-4-8" in drafter_models()
 
 
 class TestResolveJudgeConfig:

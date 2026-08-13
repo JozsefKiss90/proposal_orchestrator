@@ -169,6 +169,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
     sched_logger = logging.getLogger("runner.scheduler")
     skill_logger = logging.getLogger("runner.skill_runtime")
+    # The transport announces which `claude` executable it resolved, once per
+    # run.  Without a handler here that line is dropped, and the run record
+    # again fails to say *which* installed CLI build served the invocations.
+    transport_logger = logging.getLogger("runner.claude_transport")
     if args.verbose:
         handler = logging.StreamHandler(sys.stderr)
         handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
@@ -176,11 +180,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         sched_logger.addHandler(handler)
         skill_logger.setLevel(logging.INFO)
         skill_logger.addHandler(handler)
+        transport_logger.setLevel(logging.INFO)
+        transport_logger.addHandler(handler)
     else:
         # INFO level so phase-scoped messages appear, but only with a handler
         # when --verbose is set; without a handler, messages are silently dropped.
         sched_logger.setLevel(logging.WARNING)
         skill_logger.setLevel(logging.WARNING)
+        transport_logger.setLevel(logging.WARNING)
 
     # ------------------------------------------------------------------
     # Output helpers (text vs JSON-lines)

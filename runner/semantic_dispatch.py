@@ -91,7 +91,11 @@ REQUIRED_FINDING_FIELDS: frozenset[str] = frozenset(
 VALID_SEVERITIES: frozenset[str] = frozenset({"critical", "major"})
 
 #: Claude model used for semantic predicate evaluation.
-AGENT_MODEL: str = "claude-sonnet-4-6"
+#: Switched from ``claude-sonnet-4-6`` on 2026-08-13, in step with
+#: ``skill_runtime.SKILL_MODEL``.  Read by
+#: ``harness.judge.drafter_models()``: the out-of-band judge may never be
+#: this model, since it reviews what this model produced.
+AGENT_MODEL: str = "claude-opus-4-8"
 
 #: Maximum tokens the agent may use in its response.
 AGENT_MAX_TOKENS: int = 2048

@@ -72,7 +72,14 @@ ARTIFACT_SCHEMA_REL_PATH: str = (
 SKILL_SPECS_REL_DIR: str = ".claude/skills"
 
 #: Claude model used for skill execution.
-SKILL_MODEL: str = "claude-sonnet-4-6"
+#:
+#: Switched from ``claude-sonnet-4-6`` on 2026-08-13.  Kept as a separate
+#: constant from ``semantic_dispatch.AGENT_MODEL`` and
+#: ``decomposed_drafting._DRAFTER_MODEL`` so the three runtime roles (skill
+#: execution, in-run semantic review, per-sub-section drafting) can diverge
+#: again without a refactor.  ``harness.judge.drafter_models()`` reads this
+#: constant directly, so the grader-independence guard tracks it.
+SKILL_MODEL: str = "claude-opus-4-8"
 
 #: Maximum tokens for skill execution responses.
 #: NOTE: This value is passed to invoke_claude_text() for interface
@@ -967,6 +974,53 @@ _write_timeout_diagnostics = _write_transport_failure_diagnostics
 # ---------------------------------------------------------------------------
 # Phase D — Response parsing and validation
 # ---------------------------------------------------------------------------
+
+
+def _json_break_point(text: str) -> str:
+    """Describe, in one clause, where a response stopped being valid JSON.
+
+    A bare "returned non-JSON response" plus the first 300 characters is
+    unactionable when the break is 30k characters in: the head looks
+    perfect, so the message reads as if the model ignored the contract when
+    in fact one interior character is wrong.  This renders the decoder's own
+    position and a short window around it, which names the real fault
+    (truncation, a stray fence, an unescaped control character) at a glance.
+
+    Purely descriptive: nothing is parsed, repaired, or returned to the
+    caller as data.
+    """
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        newline = stripped.find("\n")
+        if newline != -1:
+            stripped = stripped[newline + 1:]
+        if stripped.rstrip().endswith("```"):
+            stripped = stripped.rstrip()[: -len("```")]
+    if not stripped.lstrip().startswith("{"):
+        return "response does not open with a JSON object"
+    try:
+        json.loads(stripped)
+    except json.JSONDecodeError as exc:
+        if exc.msg == "Extra data":
+            return (
+                f"a complete JSON value ends at char {exc.pos} but "
+                f"{len(stripped) - exc.pos} more characters follow — the "
+                f"response carries an interior fragment (front-truncated) "
+                f"or more than one object; next: "
+                f"{stripped[exc.pos: exc.pos + 80]!r}"
+            )
+        window = stripped[max(0, exc.pos - 60): exc.pos + 60]
+        return (
+            f"invalid JSON at line {exc.lineno} col {exc.colno} "
+            f"(char {exc.pos} of {len(stripped)}): {exc.msg}; "
+            f"near {window!r}"
+        )
+    except ValueError:  # pragma: no cover — defensive
+        return "response could not be decoded as JSON"
+    return (
+        "response decodes as valid JSON — the rejection came from the "
+        "artifact contract (a non-object value), not the decoder"
+    )
 
 
 def _extract_json_response(text: str) -> dict | None:
@@ -1892,11 +1946,29 @@ def run_skill(
             pass
 
     if parsed is None:
+        # The parse-failure path used to return silently: no ``skill FAIL``
+        # line was emitted, so a skill that failed here vanished from the
+        # console between its INVOKE line and the next skill's START line
+        # (run 0395b136 concept-alignment-check).  The console then showed
+        # only the *downstream* skill's MISSING_INPUT failure, which points
+        # at the wrong fault.  Log the failure and say where the response
+        # broke.
+        _elapsed = time.monotonic() - _skill_t0
+        _where = _json_break_point(response_text)
+        _diag_rel = (
+            f".claude/skill_diag/{skill_id}_{run_id[:8]}_response.txt"
+        )
+        logger.info(
+            "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs"
+            "  (unparseable response: %s)  diag=%s",
+            skill_id, _elapsed, _where, _diag_rel,
+        )
         return SkillResult(
             status="failure",
             failure_reason=(
-                f"Skill {skill_id!r}: Claude returned non-JSON response: "
-                f"{response_text[:300]!r}"
+                f"Skill {skill_id!r}: Claude returned non-JSON response "
+                f"({len(response_text)} chars; {_where}). Full response: "
+                f"{_diag_rel}. Head: {response_text[:300]!r}"
             ),
             failure_category="INCOMPLETE_OUTPUT",
         )

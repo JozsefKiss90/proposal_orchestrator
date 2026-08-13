@@ -39,6 +39,7 @@ from runner.skill_runtime import (
     _assemble_skill_prompt,
     _atomic_write,
     _extract_json_response,
+    _json_break_point,
     _validate_skill_inputs,
     _validate_skill_output,
     run_skill,
@@ -1688,3 +1689,48 @@ class TestModuleIsolation:
         import runner.skill_runtime as mod
         source = Path(mod.__file__).read_text(encoding="utf-8")
         assert "import anthropic" not in source
+
+
+# ---------------------------------------------------------------------------
+# Parse-failure diagnosis
+# ---------------------------------------------------------------------------
+
+
+class TestJsonBreakPoint:
+    """A response that breaks 30k characters in has a perfect-looking head.
+
+    Reporting only "non-JSON response" plus the first 300 characters reads
+    as if the model ignored the output contract, when in fact one interior
+    character is wrong — the run 0395b136 failure, where a fenced
+    continuation restart put a raw newline inside a JSON string at char
+    30723.  The break point names the real fault.
+    """
+
+    def test_reports_position_and_context_of_the_break(self) -> None:
+        text = '{"a": "ok", "b": "cut' + '```json\n"b": "resumed"}'
+        message = _json_break_point(text)
+        assert "invalid JSON" in message
+        assert "char " in message
+        assert "```json" in message
+
+    def test_fenced_valid_json_is_not_reported_as_broken(self) -> None:
+        message = _json_break_point('```json\n{"a": 1}\n```')
+        assert "invalid JSON" not in message
+
+    def test_prose_response_is_named_as_such(self) -> None:
+        assert "does not open with a JSON object" in _json_break_point(
+            "I was unable to complete this."
+        )
+
+    def test_front_truncated_fragment_is_named_as_such(self) -> None:
+        """A response whose opening was lost decodes an interior object and
+        then hits the rest of the payload.  The message must say so, not
+        just "invalid JSON"."""
+        message = _json_break_point('{"b": 2}, "c": 3}')
+        assert "front-truncated" in message
+        assert "more characters follow" in message
+
+    def test_diagnosis_never_raises(self) -> None:
+        for probe in ("", "   ", "{", "```", "```json", "null", "[1, 2]"):
+            assert isinstance(_json_break_point(probe), str)
+
