@@ -76,23 +76,31 @@ entry and exit gates run exactly as inside a full-phase run, evaluated by the sc
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Re-verify the finding against current code: `_parse_phase` still collapses `8a` to `8`, the
+- [x] Re-verify the finding against current code: `_parse_phase` still collapses `8a` to `8`, the
       dispatch loop still drains every ready in-scope node, and `substep` is still read by nothing
-      in `runner/`.
-- [ ] The CLI accepts a single-node scope in both spellings. It is mutually exclusive with `--phase`
+      in `runner/`. *(Verified 2026-08-13: all three findings held before this ticket.)*
+- [x] The CLI accepts a single-node scope in both spellings. It is mutually exclusive with `--phase`
       (distinct argument error when both are given). Scope resolution reads the manifest only
       (§16.5). An id or substep that matches no manifest node is a distinct argument error, not a
-      silent empty run.
-- [ ] A scoped run dispatches exactly the named node. A scoped node whose predecessors are not
+      silent empty run. *(`--node` flag; `ManifestGraph.resolve_node_scope` resolves via the
+      manifest `phase_number`/`substep` fields only; argparse mutually-exclusive group; unknown
+      scope → exit 3 with a distinct message. `_parse_phase` now rejects `8a`-style input with a
+      pointer to `--node` instead of silently collapsing it.)*
+- [x] A scoped run dispatches exactly the named node. A scoped node whose predecessors are not
       released in the loaded `RunContext` fails closed with a report naming the unmet predecessors —
       it is never dispatched (§13.7). (Durable-evidence re-verification of those predecessors is
-      ticket 3, not this one.)
-- [ ] Entry-gate and exit-gate evaluation paths are unchanged and remain scheduler-owned (§17.6.2).
-      `--dry-run` and `--json` work under node scope.
-- [ ] Regression tests cover: single-node dispatch (only that node runs), substep shorthand
+      ticket 3, not this one.) *(Abort message + `[BLOCKED]` console/JSON lines name each unmet
+      predecessor and its gate; no gate is evaluated for a never-dispatched node.)*
+- [x] Entry-gate and exit-gate evaluation paths are unchanged and remain scheduler-owned (§17.6.2).
+      `--dry-run` and `--json` work under node scope. *(`_dispatch_node` untouched; node scope
+      reuses the same `scope_node_ids` filter as phase scope. Upstream-phase bootstrap reuses
+      `bootstrap_phase_prerequisites` with the node's phase number — in-phase siblings are never
+      seeded, per operator decision 1.)*
+- [x] Regression tests cover: single-node dispatch (only that node runs), substep shorthand
       resolution, unknown id/substep rejection, `--phase`/node mutual exclusion, and the
-      not-ready fail-closed path.
-- [ ] Zero new test failures against the baseline; committed from the repo root.
+      not-ready fail-closed path. *(`tests/runner/test_node_scoped_execution.py`, 28 tests, incl.
+      in-process CLI runs with hermetic transport patches.)*
+- [x] Zero new test failures against the baseline; committed from the repo root.
 
 ## 3. Same-run-id resume — predecessors proven by durable evidence, fail-closed
 

@@ -74,6 +74,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -130,6 +131,10 @@ _FALLBACK_GATE_RESULT_SUB: str = "gate_results"
 
 #: Filename of the run summary artifact written by RunSummary.write().
 RUN_SUMMARY_FILENAME: str = "run_summary.json"
+
+#: Phase+substep shorthand for single-node scope, e.g. ``8b`` -> phase 8,
+#: substep "b".  Resolved against the manifest ``substep`` field only.
+_SUBSTEP_SHORTHAND_RE = re.compile(r"^0*(\d+)([a-z])$")
 
 
 # ---------------------------------------------------------------------------
@@ -398,6 +403,7 @@ class RunSummary:
     dispatched_nodes: list[str]
     phase_scope: int | None = None
     phase_scope_nodes: list[str] = field(default_factory=list)
+    node_scope: str | None = None
     reuse_decisions: dict[str, dict] = field(default_factory=dict)
 
     # ------------------------------------------------------------------
@@ -417,6 +423,7 @@ class RunSummary:
         completed_at: str,
         phase_scope: int | None = None,
         phase_scope_nodes: list[str] | None = None,
+        node_scope: str | None = None,
         reuse_decisions: dict[str, dict] | None = None,
     ) -> RunSummary:
         """
@@ -469,14 +476,25 @@ class RunSummary:
         # ------------------------------------------------------------------
         _phase_nodes = phase_scope_nodes or []
 
-        if phase_scope is not None and _phase_nodes:
-            # Phase-scoped: status is based on the phase's own nodes only.
-            phase_st = {n: node_states.get(n, "pending") for n in _phase_nodes}
-            p_pending = [n for n, s in phase_st.items() if s == "pending"]
-            p_released = [n for n, s in phase_st.items() if s == "released"]
+        # Scoped runs (phase or single node): status is based on the
+        # in-scope nodes only.  Node scope takes precedence — the two are
+        # mutually exclusive at the scheduler constructor.
+        if node_scope is not None:
+            _scope_status_nodes: list[str] = [node_scope]
+        elif phase_scope is not None and _phase_nodes:
+            _scope_status_nodes = list(_phase_nodes)
+        else:
+            _scope_status_nodes = []
+
+        if _scope_status_nodes:
+            scope_st = {
+                n: node_states.get(n, "pending") for n in _scope_status_nodes
+            }
+            p_pending = [n for n, s in scope_st.items() if s == "pending"]
+            p_released = [n for n, s in scope_st.items() if s == "released"]
             if p_pending:
                 overall_status = "aborted"
-            elif len(p_released) == len(_phase_nodes):
+            elif len(p_released) == len(_scope_status_nodes):
                 overall_status = "pass"
             elif p_released:
                 overall_status = "partial_pass"
@@ -574,6 +592,7 @@ class RunSummary:
             dispatched_nodes=list(dispatched_nodes),
             phase_scope=phase_scope,
             phase_scope_nodes=list(_phase_nodes),
+            node_scope=node_scope,
             reuse_decisions=reuse_decisions or {},
         )
 
@@ -622,6 +641,7 @@ class RunSummary:
             "dispatched_nodes": list(self.dispatched_nodes),
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": list(self.phase_scope_nodes),
+            "node_scope": self.node_scope,
             "reuse_decisions": dict(self.reuse_decisions),
             # --- Backward-compat derived fields ---
             "released_nodes": [
@@ -667,6 +687,7 @@ class RunSummary:
             "dispatched_nodes": self.dispatched_nodes,
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": self.phase_scope_nodes,
+            "node_scope": self.node_scope,
             "reuse_decisions": self.reuse_decisions,
         }
         path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
@@ -1089,6 +1110,70 @@ class ManifestGraph:
         """Return sorted list of all distinct ``phase_number`` values."""
         return sorted(self._phase_map.keys())
 
+    def node_phase_number(self, node_id: str) -> Optional[int]:
+        """Return the ``phase_number`` of *node_id*, or ``None`` when absent.
+
+        Raises
+        ------
+        DAGSchedulerError
+            If *node_id* is not in the graph.
+        """
+        self._require_known(node_id)
+        pn = self._nodes[node_id].get("phase_number")
+        return int(pn) if pn is not None else None
+
+    def resolve_node_scope(self, spec: str) -> str:
+        """Resolve a single-node scope *spec* to a canonical node ID.
+
+        Accepts either a canonical ``node_id`` (e.g. ``n08b_impact_drafting``)
+        or a phase+substep shorthand (e.g. ``8b``), resolved through the
+        manifest ``phase_number`` and ``substep`` fields.  The manifest is
+        the only binding source (§16.5); nothing is inferred from naming
+        conventions.
+
+        Raises
+        ------
+        DAGSchedulerError
+            When *spec* matches no manifest node (a distinct error — never
+            a silent empty scope) or a substep shorthand is ambiguous.
+        """
+        raw = spec.strip()
+        if raw in self._nodes:
+            return raw
+
+        m = _SUBSTEP_SHORTHAND_RE.match(raw.lower())
+        if m:
+            phase, sub = int(m.group(1)), m.group(2)
+            matches = [
+                nid
+                for nid in self._phase_map.get(phase, [])
+                if str(self._nodes[nid].get("substep") or "").lower() == sub
+            ]
+            if len(matches) == 1:
+                return matches[0]
+            if len(matches) > 1:
+                raise DAGSchedulerError(
+                    f"Ambiguous node scope {spec!r}: substep {sub!r} of "
+                    f"phase {phase} matches multiple manifest nodes: "
+                    f"{sorted(matches)!r}"
+                )
+            known_substeps = sorted(
+                f"{phase}{str(self._nodes[nid].get('substep')).lower()}"
+                for nid in self._phase_map.get(phase, [])
+                if self._nodes[nid].get("substep")
+            )
+            raise DAGSchedulerError(
+                f"Unknown node scope {spec!r}: no node of phase {phase} "
+                f"declares substep {sub!r} in the manifest.  "
+                f"Known substeps for phase {phase}: {known_substeps!r}"
+            )
+
+        raise DAGSchedulerError(
+            f"Unknown node scope {spec!r}.  Expected a manifest node_id "
+            f"(known: {sorted(self._nodes)!r}) or a phase+substep "
+            f"shorthand such as '8b' matching a manifest 'substep' field."
+        )
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -1158,8 +1243,14 @@ class DAGScheduler:
         library_path: Optional[Path] = None,
         manifest_path: Optional[Path] = None,
         phase: Optional[int] = None,
+        node: Optional[str] = None,
         preseed_phase8_sections: bool = False,
     ) -> None:
+        if phase is not None and node is not None:
+            raise DAGSchedulerError(
+                "Phase scope and node scope are mutually exclusive: "
+                f"got phase={phase!r} and node={node!r}.  Pass one or neither."
+            )
         self.graph: ManifestGraph = graph
         self.ctx: RunContext = ctx
         self.repo_root: Path = Path(repo_root)
@@ -1167,6 +1258,9 @@ class DAGScheduler:
         self.manifest_path: Optional[Path] = manifest_path
         #: Phase scope: when set, only nodes with this phase_number are dispatched.
         self._phase_scope: Optional[int] = phase
+        #: Node scope: when set, exactly one node (resolved via the manifest —
+        #: canonical node_id or phase+substep shorthand) is dispatchable.
+        self._node_scope_spec: Optional[str] = node
         #: When True, manually prepared preseed artifacts take precedence
         #: over both reuse and LLM drafting for n08a/n08b/n08c.
         self._preseed_phase8_sections: bool = preseed_phase8_sections
@@ -1201,10 +1295,15 @@ class DAGScheduler:
         Execute nodes in dependency order until no node is ready.
 
         When ``phase`` was passed to the constructor, only nodes belonging
-        to that phase are eligible for dispatch.  All prerequisite checks
+        to that phase are eligible for dispatch.  When ``node`` was passed,
+        exactly that node (resolved via the manifest — canonical node_id or
+        phase+substep shorthand) is eligible.  All prerequisite checks
         (dependency state, incoming conditions, entry gates, artifacts)
-        still use the full DAG — the phase filter restricts *which* nodes
-        may be dispatched, not *which rules apply*.
+        still use the full DAG — the scope filter restricts *which* nodes
+        may be dispatched, not *which rules apply*.  A scoped node whose
+        predecessors are not ``released`` in the loaded ``RunContext`` is
+        never dispatched; the run aborts naming the unmet predecessors
+        (fail-closed, §13.7).
 
         Each iteration recomputes the ready set from the current
         ``RunContext`` state.  Nodes are dispatched in manifest registry
@@ -1227,8 +1326,9 @@ class DAGScheduler:
         RunAbortedError
             When in-scope nodes remain ``pending`` after the loop exits.
         DAGSchedulerError
-            If the requested phase has no nodes, or a dispatched node has
-            no exit gate defined.
+            If the requested phase has no nodes, the requested node scope
+            matches no manifest node, or a dispatched node has no exit
+            gate defined.
         """
         started_at: str = datetime.now(timezone.utc).isoformat()
         _run_t0 = time.monotonic()
@@ -1263,10 +1363,19 @@ class DAGScheduler:
                 log.warning("Call slicer skipped (non-blocking): %s", exc)
 
             # ------------------------------------------------------------------
-            # Phase scope resolution
+            # Scope resolution (single node, phase, or full DAG)
             # ------------------------------------------------------------------
             scope_node_ids: set[str] | None = None
-            if self._phase_scope is not None:
+            node_scope_id: str | None = None
+            if self._node_scope_spec is not None:
+                # Raises DAGSchedulerError on an unknown id/substep — a
+                # distinct configuration error, never a silent empty run.
+                node_scope_id = self.graph.resolve_node_scope(
+                    self._node_scope_spec
+                )
+                scope_node_ids = {node_scope_id}
+                log.info("Node-scoped execution: node=%s", node_scope_id)
+            elif self._phase_scope is not None:
                 phase_nodes = self.graph.nodes_for_phase(self._phase_scope)
                 if not phase_nodes:
                     raise DAGSchedulerError(
@@ -1419,7 +1528,12 @@ class DAGScheduler:
                 started_at=started_at,
                 completed_at=completed_at,
                 phase_scope=self._phase_scope,
-                phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
+                phase_scope_nodes=(
+                    sorted(scope_node_ids)
+                    if scope_node_ids and self._phase_scope is not None
+                    else []
+                ),
+                node_scope=node_scope_id,
                 reuse_decisions=self._reuse_decisions,
             )
             summary.write(self.ctx.run_dir)
@@ -1433,11 +1547,25 @@ class DAGScheduler:
 
             if summary.overall_status == "aborted":
                 stalled_ids = [e["node_id"] for e in stall_report]
+                unmet_detail = ""
+                if node_scope_id is not None:
+                    # Fail-closed report (§13.7): name the unmet predecessors
+                    # that kept the scoped node from ever being dispatched.
+                    unmet_bits = [
+                        f"{c['source_node_id']}={c['source_node_state']} "
+                        f"(requires {c['gate_id']})"
+                        for e in stall_report
+                        for c in e.get("unsatisfied_conditions", [])
+                    ]
+                    if unmet_bits:
+                        unmet_detail = (
+                            "  Unmet predecessors: " + "; ".join(unmet_bits)
+                        )
                 raise RunAbortedError(
                     f"Run {self.ctx.run_id!r} aborted: "
                     f"{len(summary.pending_nodes)} node(s) remain pending with "
                     f"no further progress possible.  "
-                    f"Stalled nodes: {stalled_ids!r}",
+                    f"Stalled nodes: {stalled_ids!r}{unmet_detail}",
                     summary,
                 )
 

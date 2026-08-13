@@ -17,6 +17,9 @@ Arguments
 --library-path  Path to gate_rules_library.yaml (default: repo_root / LIBRARY_REL_PATH).
 --manifest-path Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).
 --phase         Execute only the specified phase (e.g. 1, phase1, phase_01).
+--node          Execute exactly one node, by canonical manifest node_id
+                (e.g. n08b_impact_drafting) or phase+substep shorthand
+                (e.g. 8b).  Mutually exclusive with --phase.
 --dry-run       Print ready nodes and exit without evaluating gates.
 --json          Emit progress as JSON lines to stdout.
 --verbose       Enable detailed scheduler logging to stderr.
@@ -59,7 +62,17 @@ def _ts() -> str:
 
 
 def _parse_phase(raw: str) -> int:
-    """Parse a phase argument like ``1``, ``phase1``, ``phase_01``, ``phase_01_call_analysis``."""
+    """Parse a phase argument like ``1``, ``phase1``, ``phase_01``, ``phase_01_call_analysis``.
+
+    A phase+substep shorthand (e.g. ``8a``) is rejected rather than silently
+    collapsed to its phase number: sub-phases are single-node scopes and must
+    be requested via ``--node``.
+    """
+    if re.fullmatch(r"0*\d+[a-z]", raw.lower().strip()):
+        raise argparse.ArgumentTypeError(
+            f"{raw!r} names a sub-phase, not a phase.  "
+            "Use --node for single-node scope (e.g. --node 8a)."
+        )
     m = re.match(r"^(?:phase[_-]?)?0*(\d+)", raw.lower())
     if not m:
         raise argparse.ArgumentTypeError(
@@ -101,14 +114,29 @@ def main(argv: Optional[list[str]] = None) -> int:
         default=None,
         help="Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).",
     )
-    parser.add_argument(
+    scope_group = parser.add_mutually_exclusive_group()
+    scope_group.add_argument(
         "--phase",
         type=_parse_phase,
         default=None,
         help=(
             "Execute only the specified phase (e.g. 1, phase1, phase_01).  "
             "All prerequisite gates and artifacts must already be satisfied.  "
-            "No downstream phases are dispatched."
+            "No downstream phases are dispatched.  "
+            "Mutually exclusive with --node."
+        ),
+    )
+    scope_group.add_argument(
+        "--node",
+        default=None,
+        metavar="NODE",
+        help=(
+            "Execute exactly one node, named by canonical manifest node_id "
+            "(e.g. n08b_impact_drafting) or phase+substep shorthand "
+            "(e.g. 8b, resolved via the manifest 'substep' field).  "
+            "Predecessors must already be released in the loaded run "
+            "context; otherwise the run fails closed without dispatching.  "
+            "Mutually exclusive with --phase."
         ),
     )
     parser.add_argument(
@@ -285,6 +313,19 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 3
 
     # ------------------------------------------------------------------
+    # Single-node scope resolution (manifest-only, §16.5)
+    # ------------------------------------------------------------------
+    # Resolved before anything else runs so that an unknown id/substep is
+    # a distinct configuration error, never a silent empty run.
+    node_scope_id: Optional[str] = None
+    if args.node is not None:
+        try:
+            node_scope_id = graph.resolve_node_scope(args.node)
+        except DAGSchedulerError as exc:
+            _err(str(exc))
+            return 3
+
+    # ------------------------------------------------------------------
     # Backend resolution and startup logging
     # ------------------------------------------------------------------
     try:
@@ -315,10 +356,19 @@ def main(argv: Optional[list[str]] = None) -> int:
     # phase-by-phase execution with new run-ids (each invocation reads
     # prior-run evidence) and also works with existing run-ids (already-
     # loaded states are preserved; only "pending" nodes are candidates).
-    if args.phase is not None:
+    #
+    # A node scope reuses the same channel with the node's own phase
+    # number: upstream *phases* may be seeded from durable evidence, but
+    # nodes inside that phase never are (bootstrap_phase_prerequisites
+    # excludes them) — same-run-id resume is the only in-phase evidence
+    # carrier.
+    bootstrap_phase: Optional[int] = args.phase
+    if bootstrap_phase is None and node_scope_id is not None:
+        bootstrap_phase = graph.node_phase_number(node_scope_id)
+    if bootstrap_phase is not None:
         try:
             bootstrapped = bootstrap_phase_prerequisites(
-                ctx, graph, repo_root, args.phase
+                ctx, graph, repo_root, bootstrap_phase
             )
             if bootstrapped:
                 _out(
@@ -334,11 +384,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             sched_logger.warning("Bootstrap failed (non-blocking): %s", exc)
 
     phase_label = f"  phase={args.phase}" if args.phase else ""
+    node_label = f"  node={node_scope_id}" if node_scope_id else ""
     run_start_fields: dict[str, object] = {"run_id": args.run_id}
     if args.phase is not None:
         run_start_fields["phase"] = args.phase
+    if node_scope_id is not None:
+        run_start_fields["node"] = node_scope_id
     _out(
-        f"[RUN]   run_id={args.run_id}{phase_label}",
+        f"[RUN]   run_id={args.run_id}{phase_label}{node_label}",
         "run_start",
         **run_start_fields,
     )
@@ -353,7 +406,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
 
     if args.dry_run:
-        scope = set(graph.nodes_for_phase(args.phase)) if args.phase else None
+        if node_scope_id is not None:
+            scope: Optional[set] = {node_scope_id}
+        elif args.phase:
+            scope = set(graph.nodes_for_phase(args.phase))
+        else:
+            scope = None
         ready = [
             nid for nid in graph.node_ids()
             if graph.is_ready(nid, ctx)
@@ -374,6 +432,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         library_path=library_path,
         manifest_path=manifest_path,
         phase=args.phase,
+        node=node_scope_id,
         preseed_phase8_sections=args.preseed_phase8_sections,
     )
 
@@ -391,6 +450,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     ps = getattr(summary, "phase_scope", None)
     has_phase = isinstance(ps, int)
     phase_info = f"  phase={ps}" if has_phase else ""
+    ns = getattr(summary, "node_scope", None)
+    has_node = isinstance(ns, str)
+    node_info = f"  node={ns}" if has_node else ""
     summary_fields: dict[str, object] = {
         "overall_status": summary.overall_status,
         "nodes_released": released_count,
@@ -401,12 +463,36 @@ def main(argv: Optional[list[str]] = None) -> int:
         summary_fields["phase_scope"] = ps
         psn = getattr(summary, "phase_scope_nodes", None)
         summary_fields["phase_scope_nodes"] = list(psn) if isinstance(psn, list) else []
+    if has_node:
+        summary_fields["node_scope"] = ns
+
+    # Fail-closed visibility for a node-scoped run (§13.7): when the scoped
+    # node was never dispatched, name the unmet predecessors on the console
+    # so the operator does not have to open run_summary.json.
+    if has_node:
+        for entry in summary.stalled_nodes:
+            unmet = entry.get("unsatisfied_conditions", [])
+            if not unmet:
+                continue
+            detail = "; ".join(
+                f"{c['source_node_id']}={c['source_node_state']}"
+                f" (requires {c['gate_id']})"
+                for c in unmet
+            )
+            _out(
+                f"[BLOCKED] {entry['node_id']} not dispatched — "
+                f"unmet predecessors: {detail}",
+                "node_scope_blocked",
+                node_id=entry["node_id"],
+                unsatisfied_conditions=unmet,
+            )
+
     _out(
         f"[SUMMARY] overall_status={summary.overall_status}"
         f"  nodes_released={released_count}"
         f"  stalled={len(summary.stalled_nodes)}"
         f"  hard_blocked={len(summary.hard_blocked_nodes)}"
-        f"{phase_info}",
+        f"{phase_info}{node_info}",
         "summary",
         **summary_fields,
     )
