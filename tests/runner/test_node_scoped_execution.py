@@ -593,6 +593,16 @@ class TestCLINodeArgument:
         with pytest.raises(argparse.ArgumentTypeError, match="--node"):
             _parse_phase("08b")
 
+    def test_parse_phase_rejects_prefixed_substep_spellings(self):
+        """phase8a / phase_8a / phase-8a must not silently collapse to 8."""
+        import argparse
+
+        from runner.__main__ import _parse_phase
+
+        for spelling in ("phase8a", "phase_8a", "phase-8a", "phase_08b"):
+            with pytest.raises(argparse.ArgumentTypeError, match="--node"):
+                _parse_phase(spelling)
+
     def test_parse_phase_still_accepts_full_phase_ids(self):
         """Regression guard: existing spellings keep working."""
         from runner.__main__ import _parse_phase

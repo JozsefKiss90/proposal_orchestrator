@@ -44,6 +44,7 @@ from runner.dag_scheduler import (
     ManifestGraph,
     RunAbortedError,
     bootstrap_phase_prerequisites,
+    format_unsatisfied_condition,
 )
 from runner.gate_library import LIBRARY_REL_PATH
 from runner.manifest_reader import MANIFEST_REL_PATH
@@ -68,7 +69,7 @@ def _parse_phase(raw: str) -> int:
     collapsed to its phase number: sub-phases are single-node scopes and must
     be requested via ``--node``.
     """
-    if re.fullmatch(r"0*\d+[a-z]", raw.lower().strip()):
+    if re.fullmatch(r"(?:phase[_-]?)?0*\d+[a-z]", raw.lower().strip()):
         raise argparse.ArgumentTypeError(
             f"{raw!r} names a sub-phase, not a phase.  "
             "Use --node for single-node scope (e.g. --node 8a)."
@@ -407,7 +408,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     if args.dry_run:
         if node_scope_id is not None:
-            scope: Optional[set] = {node_scope_id}
+            scope: Optional[set[str]] = {node_scope_id}
         elif args.phase:
             scope = set(graph.nodes_for_phase(args.phase))
         else:
@@ -475,9 +476,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             if not unmet:
                 continue
             detail = "; ".join(
-                f"{c['source_node_id']}={c['source_node_state']}"
-                f" (requires {c['gate_id']})"
-                for c in unmet
+                format_unsatisfied_condition(c) for c in unmet
             )
             _out(
                 f"[BLOCKED] {entry['node_id']} not dispatched — "

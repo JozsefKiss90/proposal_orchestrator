@@ -155,6 +155,19 @@ def _gate_result_repo_path(gate_id: str) -> str:
     return f"{_TIER4_ROOT_REL}/{_FALLBACK_GATE_RESULT_SUB}/{gate_id}.json"
 
 
+def format_unsatisfied_condition(cond: dict) -> str:
+    """
+    Render one stall-report unsatisfied-condition entry for operator output.
+
+    Shared by the scheduler's abort message and the CLI's ``[BLOCKED]``
+    report so the two name unmet predecessors identically.
+    """
+    return (
+        f"{cond['source_node_id']}={cond['source_node_state']} "
+        f"(requires {cond['gate_id']})"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Phase-scoped continuation bootstrap
 # ---------------------------------------------------------------------------
@@ -490,13 +503,13 @@ class RunSummary:
             scope_st = {
                 n: node_states.get(n, "pending") for n in _scope_status_nodes
             }
-            p_pending = [n for n, s in scope_st.items() if s == "pending"]
-            p_released = [n for n, s in scope_st.items() if s == "released"]
-            if p_pending:
+            scope_pending = [n for n, s in scope_st.items() if s == "pending"]
+            scope_released = [n for n, s in scope_st.items() if s == "released"]
+            if scope_pending:
                 overall_status = "aborted"
-            elif len(p_released) == len(_scope_status_nodes):
+            elif len(scope_released) == len(_scope_status_nodes):
                 overall_status = "pass"
-            elif p_released:
+            elif scope_released:
                 overall_status = "partial_pass"
             else:
                 overall_status = "fail"
@@ -1552,8 +1565,7 @@ class DAGScheduler:
                     # Fail-closed report (§13.7): name the unmet predecessors
                     # that kept the scoped node from ever being dispatched.
                     unmet_bits = [
-                        f"{c['source_node_id']}={c['source_node_state']} "
-                        f"(requires {c['gate_id']})"
+                        format_unsatisfied_condition(c)
                         for e in stall_report
                         for c in e.get("unsatisfied_conditions", [])
                     ]
