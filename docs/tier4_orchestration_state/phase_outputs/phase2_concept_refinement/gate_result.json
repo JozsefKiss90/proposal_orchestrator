@@ -2,7 +2,7 @@
   "schema_id": "orch.gate_result.v1",
   "gate_id": "phase_02_gate",
   "gate_kind": "exit",
-  "run_id": "d00fc75d-924f-4e08-a2d5-0299db7e1039",
+  "run_id": "7acc143b-ed3a-440e-8d9c-ef88a866c85e",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
@@ -13,9 +13,9 @@
     "docs/tier3_project_instantiation/project_brief/strategic_positioning.md": "sha256:0399fdd930d67406f557f7f107a40c9c308d2772db1b08a2be9c85dedaf17341",
     "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json": "sha256:925c9a51e3b1110c61098d29bdceba85b795710a717fc9027ecd7f04e20fa421"
   },
-  "evaluated_at": "2026-08-13T11:08:26.972501+00:00",
+  "evaluated_at": "2026-08-13T11:40:22.653937+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g03_p02",
@@ -28,52 +28,10 @@
     "failed": []
   },
   "semantic_predicates": {
-    "passed": [],
-    "failed": [
-      {
-        "predicate_id": "g03_p06",
-        "function": "no_unresolved_scope_conflicts",
-        "failure_reason": "semantic_fail",
-        "constitutional_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-        "findings": [
-          {
-            "claim": "scope_conflict_log entry CF-01: mandatory training-activities requirement (SR-04 / CC-09) \u2014 integration of transferable and digital skills incl. generative AI, Open Science, knowledge valorisation, research integrity \u2014 is not described in the concept; resolution_status = 'unresolved', resolution_note = null.",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          },
-          {
-            "claim": "scope_conflict_log entry CF-02: mandatory Career Development Plan deliverable (SR-05 / CC-10), jointly established and submitted as an early deliverable, is not described in the concept material; resolution_status = 'unresolved', resolution_note = null.",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          },
-          {
-            "claim": "scope_conflict_log entry CF-03: framing mismatch between the concept's scientific/technological framing and MSCA-PF expected outcomes EO-03/EO-04/EO-05/EO-06/EO-08 (fellow-development and institutional capacity), which lack a direct project mechanism; resolution_status = 'unresolved', resolution_note = null.",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "major"
-          },
-          {
-            "claim": "scope_conflict_log entry CF-04: non-academic placement added-value justification (CC-05 / SR-06) not yet presented as the integral, separately-evaluated justification required; resolution_status = 'unresolved', resolution_note = null.",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "major"
-          },
-          {
-            "claim": "scope_coverage marks SR-04, SR-05, CC-09 and CC-10 with coverage_status = 'unresolved' ('Mandatory requirement with no Tier 3 evidence'), corresponding to Tier 2B mandatory (mandatory=true) requirements SR-04 and SR-05 in scope_requirements.json.",
-            "violated_rule": "CLAUDE.md \u00a77 Phase 2 gate",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-            "severity": "critical"
-          }
-        ],
-        "fail_message": "The Phase 2 concept refinement summary records four unresolved scope conflicts (CF-01 through CF-04) and multiple 'unresolved' mandatory scope-coverage elements against Tier 2B, so the \u00a77 Phase 2 gate condition of no unresolved scope conflicts is not satisfied.",
-        "artifacts_inspected": [
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\concept_refinement_summary.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\scope_requirements.json"
-        ]
-      }
-    ]
+    "passed": [
+      "g03_p06"
+    ],
+    "failed": []
   },
   "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase2_concept_refinement\\gate_result.json"
