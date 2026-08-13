@@ -156,6 +156,15 @@ skill_catalog:
     reads_from:
       - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
       - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    caller_context_from:
+      # Step 1.5 requires the valid_partner_ids set and halts MISSING_INPUT
+      # without it. The binding was missing until 2026-08-13, so the skill
+      # was invoked with no context on every Phase 3 run; in run 4caa2586 it
+      # did not halt but synthesised valid_partner_ids from the seed's
+      # organisation names, making the Step 2.4 anti-fabrication check
+      # vacuous and failing g04_p07. Inside wp_designer's reads_from
+      # (consortium/), so the binding is legal.
+      - docs/tier3_project_instantiation/consortium/partners.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
     notes: >

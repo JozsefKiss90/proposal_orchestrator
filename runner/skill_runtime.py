@@ -2455,7 +2455,20 @@ def run_skill(
             else:
                 pending_writes.append((canonical_rel, sub_artifact))
 
+        # Every return below logs its outcome.  The whole multi-artifact
+        # branch used to return silently — success and failure alike — so a
+        # skill on this contract vanished from the console between its
+        # INVOKE line and the next skill's START line (observed for
+        # concept-call-binding-derivation in runs 0395b136 and 7acc143b).
+        # A genuine failure here looked identical to the skill never having
+        # run.
         if all_errors:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=MALFORMED_ARTIFACT  "
+                "contract=multi_artifact  elapsed=%.1fs  errors=%d",
+                skill_id, _elapsed, len(all_errors),
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -2466,6 +2479,13 @@ def run_skill(
             )
 
         if not pending_writes:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                "contract=multi_artifact  elapsed=%.1fs  "
+                "(no sub-artifact matched; parsed keys=%s)",
+                skill_id, _elapsed, list(parsed.keys()),
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -2478,6 +2498,13 @@ def run_skill(
         for canonical_rel, content in pending_writes:
             write_error = _atomic_write(content, repo_root / canonical_rel)
             if write_error is not None:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "contract=multi_artifact  elapsed=%.1fs  "
+                    "(atomic write to %s failed)",
+                    skill_id, _elapsed, canonical_rel,
+                )
                 return SkillResult(
                     status="failure",
                     failure_reason=(
@@ -2488,6 +2515,12 @@ def run_skill(
                 )
             outputs_written.append(canonical_rel)
 
+        _elapsed = time.monotonic() - _skill_t0
+        logger.info(
+            "  skill OK     id=%s  contract=multi_artifact  outputs=%d  "
+            "elapsed=%.1fs",
+            skill_id, len(outputs_written), _elapsed,
+        )
         return SkillResult(
             status="success",
             outputs_written=outputs_written,

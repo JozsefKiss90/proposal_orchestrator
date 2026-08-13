@@ -22,6 +22,7 @@ All tests use synthetic skill catalogs and mock the Claude runtime transport.
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -1733,4 +1734,72 @@ class TestJsonBreakPoint:
     def test_diagnosis_never_raises(self) -> None:
         for probe in ("", "   ", "{", "```", "```json", "null", "[1, 2]"):
             assert isinstance(_json_break_point(probe), str)
+
+
+# ---------------------------------------------------------------------------
+# Multi-artifact observability
+# ---------------------------------------------------------------------------
+
+
+class TestMultiArtifactLogging:
+    """The multi-artifact branch used to return silently on every path.
+
+    A skill on this contract therefore vanished from the console between its
+    INVOKE line and the next skill's START line — concept-call-binding-
+    derivation did exactly that in runs 0395b136 and 7acc143b, once while
+    failing and once while succeeding, and the two were indistinguishable.
+    """
+
+    def test_success_logs_an_ok_line(self, multi_env: Path, caplog) -> None:
+        response = {
+            "constraints": [{"id": "c1"}],
+            "outcomes": [{"id": "o1"}],
+        }
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns(response):
+                result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        lines = [r.getMessage() for r in caplog.records]
+        ok = [m for m in lines if "skill OK" in m and "multi-skill" in m]
+        assert ok, f"no skill OK line emitted; got {lines}"
+        assert "contract=multi_artifact" in ok[0]
+        assert "outputs=2" in ok[0]
+
+    def test_validation_failure_logs_a_fail_line(
+        self, multi_env: Path, caplog
+    ) -> None:
+        """A sub-artifact missing its required field must be visible."""
+        response = {
+            "constraints": [{"id": "c1"}],
+            "outcomes": "not-a-list-but-present",
+            "call_constraints.json": {"wrong_field": 1},
+        }
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns({"unrelated_field": 1}):
+                result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "failure"
+        lines = [r.getMessage() for r in caplog.records]
+        fail = [m for m in lines if "skill FAIL" in m and "multi-skill" in m]
+        assert fail, f"no skill FAIL line emitted; got {lines}"
+        assert "contract=multi_artifact" in fail[0]
+
+    def test_no_path_returns_without_logging(
+        self, multi_env: Path, caplog
+    ) -> None:
+        """Every multi-artifact outcome — success or failure — is logged."""
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns({"constraints": [{"id": "c1"}],
+                                  "outcomes": [{"id": "o1"}]}):
+                run_skill("multi-skill", "run-001", multi_env)
+            with _claude_returns({"unrelated_field": 1}):
+                run_skill("multi-skill", "run-002", multi_env)
+
+        lines = [r.getMessage() for r in caplog.records]
+        outcomes = [
+            m for m in lines
+            if ("skill OK" in m or "skill FAIL" in m) and "multi-skill" in m
+        ]
+        assert len(outcomes) == 2, f"expected 2 outcome lines, got {outcomes}"
 

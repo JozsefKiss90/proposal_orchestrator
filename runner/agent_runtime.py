@@ -775,6 +775,56 @@ _SKILL_CONTEXT_SOURCES: dict[str, tuple[str, ...]] = {
     ),
 }
 
+#: Skill-catalog field declaring a skill's caller-context sources.
+#:
+#: New bindings go in ``skill_catalog.yaml`` beside the skill's other
+#: declarations, NOT in the dict above.  Two reasons.  A skill's context
+#: need is a property of the skill, so it belongs with its ``reads_from``
+#: and ``writes_to``; and ``agent_runtime`` is required to stay
+#: skill-name-agnostic in executable code (see
+#: ``test_no_hardcoded_skill_name_trigger_in_source``), so a name added
+#: here would couple the runtime to a specific skill.  The dict above is
+#: retained only for ``topic-scope-check``, which predates the field.
+_CATALOG_CONTEXT_FIELD: str = "caller_context_from"
+
+
+def _context_sources_for(skill_id: str, repo_root: Path) -> tuple[str, ...]:
+    """Resolve a skill's declared caller-context sources.
+
+    Merges the catalog's ``caller_context_from`` list with any built-in
+    entry in :data:`_SKILL_CONTEXT_SOURCES`, preserving order and dropping
+    duplicates.  A catalog that cannot be read yields the built-in entry
+    alone: context resolution must not turn a catalog problem into a
+    silent loss of context, and ``run_skill`` reports the catalog fault
+    itself.
+    """
+    sources: list[str] = []
+
+    try:
+        from runner.skill_runtime import _get_skill_entry
+
+        entry = _get_skill_entry(skill_id, repo_root)
+    except Exception:  # noqa: BLE001 — catalog faults reported by run_skill
+        entry = None
+
+    if isinstance(entry, dict):
+        declared = entry.get(_CATALOG_CONTEXT_FIELD)
+        if isinstance(declared, list):
+            for item in declared:
+                if isinstance(item, str) and item.strip():
+                    sources.append(item.strip())
+
+    for item in _SKILL_CONTEXT_SOURCES.get(skill_id, ()):
+        sources.append(item)
+
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in sources:
+        if item not in seen:
+            seen.add(item)
+            ordered.append(item)
+    return tuple(ordered)
+
 
 def _build_caller_context(
     skill_id: str,
@@ -795,8 +845,8 @@ def _build_caller_context(
     skill's own input validation (e.g. Step 1.4 of ``topic-scope-check``)
     will produce the appropriate ``MISSING_INPUT`` failure.
     """
-    source_paths = _SKILL_CONTEXT_SOURCES.get(skill_id)
-    if source_paths is None:
+    source_paths = _context_sources_for(skill_id, repo_root)
+    if not source_paths:
         return {}
 
     context: dict[str, Any] = {}
@@ -821,6 +871,22 @@ def _build_caller_context(
                 pass  # absent/unreadable — skip; fail-closed downstream
 
     return context
+
+
+def _missing_context_sources(
+    skill_id: str,
+    caller_context: dict[str, Any],
+    repo_root: Path,
+) -> list[str]:
+    """Declared context sources for *skill_id* that produced no content.
+
+    Returns an empty list for a skill that declares no context sources —
+    such a skill has no context need, so nothing is missing.
+    """
+    source_paths = _context_sources_for(skill_id, repo_root)
+    if not source_paths:
+        return []
+    return [p for p in source_paths if p not in caller_context]
 
 
 # ---------------------------------------------------------------------------
@@ -1488,6 +1554,54 @@ def run_agent(
         caller_context = _build_caller_context(
             sid, resolved_inputs, repo_root
         )
+
+        # Fail closed when a registered skill received NO context at all.
+        #
+        # _build_caller_context returns {} both for a skill that declares no
+        # context need and for one whose declared sources are all absent.
+        # The two were indistinguishable, and the fail-closed guarantee was
+        # delegated to the skill spec — "the skill's own input validation
+        # will produce the appropriate MISSING_INPUT failure".  A skill spec
+        # is a prompt, and in run 4caa2586 the model did not halt: it
+        # invented the context it was missing.  The guarantee belongs here,
+        # where it is deterministic.
+        #
+        # Deliberately scoped to "no source resolved" rather than "any
+        # source missing": a partially-available context is warned about but
+        # still passed through, so this cannot newly break a skill whose
+        # registered sources are legitimately optional in some project.
+        # Tightening to any-missing is a one-line change if that is wanted.
+        _missing_ctx = _missing_context_sources(sid, caller_context, repo_root)
+        if _missing_ctx:
+            _declared = _context_sources_for(sid, repo_root)
+            if len(_missing_ctx) == len(_declared):
+                _fail_reason = (
+                    f"Declared caller context for skill {sid!r} is "
+                    f"unavailable: none of its declared context sources "
+                    f"could be read ({', '.join(_missing_ctx)}). The skill "
+                    f"requires this content and must not synthesise it from "
+                    f"its other inputs"
+                )
+                record = SkillInvocationRecord(
+                    skill_id=sid,
+                    status="failure",
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+                all_invocations.append(record)
+                _record_failure(
+                    f"Skill {sid!r} failed: {_fail_reason}",
+                    "SKILL_FAILURE",
+                )
+                logger.warning(
+                    "Skill %s not invoked (caller context unavailable): %s",
+                    sid, _fail_reason,
+                )
+                continue
+            logger.warning(
+                "Skill %s invoked with partial caller context; missing: %s",
+                sid, ", ".join(_missing_ctx),
+            )
 
         # Inject invocation_mode for budget-interface-validation.
         # When invoked by the primary agent body the skill operates in

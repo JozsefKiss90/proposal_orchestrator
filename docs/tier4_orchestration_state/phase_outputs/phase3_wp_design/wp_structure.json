@@ -1,0 +1,589 @@
+{
+  "schema_id": "orch.phase3.wp_structure.v1",
+  "run_id": "bd337f0b-072d-43ec-b751-fd0572c96f88",
+  "work_packages": [
+    {
+      "wp_id": "WP1",
+      "title": "Historical Data and Target Design",
+      "objectives": [
+        "Harmonise the five-year hyperspectral and agronomic archive",
+        "Define the physiological stress target and leakage-safe validation design"
+      ],
+      "lead_partner": "DATA_PARTNER",
+      "contributing_partners": [
+        "HOST"
+      ],
+      "tasks": [
+        {
+          "task_id": "T1.1",
+          "title": "Harmonise five-year MATE hyperspectral archive",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1.2",
+          "title": "Integrate soil/weather/management information",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1.3",
+          "title": "Audit missingness and data quality",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1.4",
+          "title": "Establish physiological stress definition",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T1.5",
+          "title": "Establish leakage-safe validation design",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D1.1",
+          "title": "Harmonised historical database",
+          "type": "dataset",
+          "due_month": 6,
+          "responsible_partner": "DATA_PARTNER"
+        },
+        {
+          "deliverable_id": "D1.2",
+          "title": "Data/target/validation protocol",
+          "type": "report",
+          "due_month": 6,
+          "responsible_partner": "DATA_PARTNER"
+        },
+        {
+          "deliverable_id": "D1.3",
+          "title": "Career Development Plan",
+          "type": "report",
+          "due_month": 3,
+          "responsible_partner": "FELLOW"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Physiological Early Warning and Hyperspectral-to-Sentinel Transfer",
+      "objectives": [
+        "Discover hyperspectral physiological stress signatures",
+        "Build a hyperspectral-to-Sentinel transfer library"
+      ],
+      "lead_partner": "DATA_PARTNER",
+      "contributing_partners": [
+        "HOST"
+      ],
+      "tasks": [
+        {
+          "task_id": "T2.1",
+          "title": "Prospective physiological monitoring",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2.2",
+          "title": "Hyperspectral stress-signature discovery",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2.3",
+          "title": "Sentinel spectral-response resampling",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2.4",
+          "title": "Concurrent hyperspectral/Sentinel observations",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2.5",
+          "title": "Spatial-scale calibration",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T2.6",
+          "title": "Sentinel-compatible feature identification",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D2.1",
+          "title": "Physiological validation dataset",
+          "type": "dataset",
+          "due_month": 14,
+          "responsible_partner": "DATA_PARTNER"
+        },
+        {
+          "deliverable_id": "D2.2",
+          "title": "Hyperspectral-to-Sentinel transfer library",
+          "type": "software",
+          "due_month": 14,
+          "responsible_partner": "DATA_PARTNER"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP1",
+          "dependency_type": "data_input",
+          "notes": "Signature discovery operates on the WP1 harmonised archive"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Prospective and Uncertainty-Aware Prediction",
+      "objectives": [
+        "Develop uncertainty-aware prospective prediction models",
+        "Benchmark modelling approaches with calibrated uncertainty"
+      ],
+      "lead_partner": "HOST",
+      "contributing_partners": [
+        "DATA_PARTNER"
+      ],
+      "tasks": [
+        {
+          "task_id": "T3.1",
+          "title": "Temporal feature engineering",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.2",
+          "title": "Transparent baseline models",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.3",
+          "title": "RF/XGBoost models",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.4",
+          "title": "Bayesian/hierarchical modelling",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.5",
+          "title": "Multi-horizon forecasting",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.6",
+          "title": "Probability calibration/uncertainty",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T3.7",
+          "title": "Feature ablation and error analysis",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D3.1",
+          "title": "Comparative modelling benchmark",
+          "type": "report",
+          "due_month": 18,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D3.2",
+          "title": "FIELDWISE predictive engine/model card",
+          "type": "software",
+          "due_month": 18,
+          "responsible_partner": "HOST"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP1",
+          "dependency_type": "data_input",
+          "notes": "T1.5 sets the leakage-safe validation design WP3 must follow"
+        },
+        {
+          "depends_on_wp_id": "WP2",
+          "dependency_type": "data_input",
+          "notes": "Sentinel-compatible features (D2.2) are candidate predictors"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Temporal and Cross-Country Transferability",
+      "objectives": [
+        "Assess temporal transferability within the MATE data",
+        "Evaluate cross-country Hungary-to-Bulgaria transfer"
+      ],
+      "lead_partner": "DATA_PARTNER",
+      "contributing_partners": [
+        "TRANSFER_PARTNER"
+      ],
+      "tasks": [
+        {
+          "task_id": "T4.1",
+          "title": "Leave-one-year-out MATE validation",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.2",
+          "title": "Independent MATE field/plot validation where possible",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.3",
+          "title": "Zero-shot MATE->MVCRI transfer",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.4",
+          "title": "Geographic transferability-gap assessment",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.5",
+          "title": "Limited Bulgarian calibration",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.6",
+          "title": "Hierarchical/Bayesian adaptation",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T4.7",
+          "title": "Identification of universal versus site-specific predictors",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D4.1",
+          "title": "Temporal transferability benchmark",
+          "type": "report",
+          "due_month": 21,
+          "responsible_partner": "DATA_PARTNER"
+        },
+        {
+          "deliverable_id": "D4.2",
+          "title": "Hungary->Bulgaria transferability report",
+          "type": "report",
+          "due_month": 21,
+          "responsible_partner": "DATA_PARTNER"
+        },
+        {
+          "deliverable_id": "D4.3",
+          "title": "Adaptation protocol",
+          "type": "report",
+          "due_month": 21,
+          "responsible_partner": "DATA_PARTNER"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "data_input",
+          "notes": "T4.3 zero-shot transfer requires the WP3 engine (D3.2)"
+        }
+      ]
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Operational Transfer, Decision Value and Web MVP",
+      "objectives": [
+        "Deliver the operational DrR web MVP and decision-value framework",
+        "Validate the model at AgroVIR farmer fields and define the FMIS integration roadmap"
+      ],
+      "lead_partner": "HOST",
+      "contributing_partners": [
+        "VALIDATION_PARTNER"
+      ],
+      "tasks": [
+        {
+          "task_id": "T5.1",
+          "title": "Develop irrigation-priority logic",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.2",
+          "title": "Establish Field Decision Value framework",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.3",
+          "title": "Implement DrR - Digital Agronomist web MVP",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.4",
+          "title": "Transfer model to AgroVIR farmer field(s)",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.5",
+          "title": "Quantify research->commercial transferability",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.6",
+          "title": "Conduct AgroVIR functional/interoperability assessment",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        },
+        {
+          "task_id": "T5.7",
+          "title": "Establish post-MSCA FMIS integration and exploitation roadmap",
+          "responsible_partner": "FELLOW",
+          "contributing_partners": []
+        }
+      ],
+      "deliverables": [
+        {
+          "deliverable_id": "D5.1",
+          "title": "DrR web MVP",
+          "type": "software",
+          "due_month": 24,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D5.2",
+          "title": "Commercial-field transferability assessment",
+          "type": "report",
+          "due_month": 30,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D5.3",
+          "title": "Field Decision Value report",
+          "type": "report",
+          "due_month": 30,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D5.4",
+          "title": "AgroVIR functional/technical evaluation",
+          "type": "report",
+          "due_month": 30,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D5.5",
+          "title": "FMIS integration roadmap",
+          "type": "report",
+          "due_month": 30,
+          "responsible_partner": "HOST"
+        }
+      ],
+      "dependencies": [
+        {
+          "depends_on_wp_id": "WP4",
+          "dependency_type": "data_input",
+          "notes": "Cross-country transferability conclusions feed operational transfer (T5.5)"
+        },
+        {
+          "depends_on_wp_id": "WP3",
+          "dependency_type": "data_input",
+          "notes": "T5.3/T5.4 transfer the WP3 predictive engine (D3.2) into the MVP"
+        }
+      ]
+    }
+  ],
+  "dependency_map": {
+    "nodes": [
+      "WP1",
+      "WP2",
+      "WP3",
+      "WP4",
+      "WP5",
+      "T1.1",
+      "T1.2",
+      "T1.3",
+      "T1.4",
+      "T1.5",
+      "T2.1",
+      "T2.2",
+      "T2.3",
+      "T2.4",
+      "T2.5",
+      "T2.6",
+      "T3.1",
+      "T3.2",
+      "T3.3",
+      "T3.4",
+      "T3.5",
+      "T3.6",
+      "T3.7",
+      "T4.1",
+      "T4.2",
+      "T4.3",
+      "T4.4",
+      "T4.5",
+      "T4.6",
+      "T4.7",
+      "T5.1",
+      "T5.2",
+      "T5.3",
+      "T5.4",
+      "T5.5",
+      "T5.6",
+      "T5.7"
+    ],
+    "edges": [
+      {
+        "from": "WP1",
+        "to": "WP2",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP1",
+        "to": "WP3",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP2",
+        "to": "WP3",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "WP4",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP4",
+        "to": "WP5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "WP5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "T1.5",
+        "to": "WP3",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "T4.3",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP4",
+        "to": "T5.5",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "T5.3",
+        "edge_type": "data_input"
+      },
+      {
+        "from": "WP3",
+        "to": "T5.4",
+        "edge_type": "data_input"
+      }
+    ]
+  },
+  "cycle_detected": false,
+  "cycle_flags": [],
+  "critical_path_nodes": [
+    "WP1",
+    "WP2",
+    "WP3",
+    "WP4",
+    "WP5"
+  ],
+  "partner_role_matrix": [
+    {
+      "partner_id": "DATA_PARTNER",
+      "wps_as_lead": [
+        "WP1",
+        "WP2",
+        "WP4"
+      ],
+      "wps_as_contributor": [
+        "WP3"
+      ]
+    },
+    {
+      "partner_id": "HOST",
+      "wps_as_lead": [
+        "WP3",
+        "WP5"
+      ],
+      "wps_as_contributor": [
+        "WP1",
+        "WP2"
+      ]
+    },
+    {
+      "partner_id": "TRANSFER_PARTNER",
+      "wps_as_lead": [],
+      "wps_as_contributor": [
+        "WP4"
+      ]
+    },
+    {
+      "partner_id": "VALIDATION_PARTNER",
+      "wps_as_lead": [],
+      "wps_as_contributor": [
+        "WP5"
+      ]
+    }
+  ],
+  "normalization_issues": [
+    {
+      "severity": "advisory",
+      "scope": "all_wps",
+      "issue": "objectives arrays absent in seed; synthesized 1-2 short objective statements per WP from WP titles and tasks"
+    },
+    {
+      "severity": "advisory",
+      "scope": "all_tasks",
+      "issue": "responsible_partner absent in seed tasks; assigned FELLOW (single-researcher action executes all work packages), a valid Tier 3 partner_id"
+    },
+    {
+      "severity": "advisory",
+      "scope": "all_deliverables",
+      "issue": "type and due_month absent in most seed deliverables; type inferred from deliverable title, due_month set to WP end_month (D1.3 due_month=3 from seed; D5.1 set to 24 to precede the M25-M30 placement window per seed sequencing note)"
+    },
+    {
+      "severity": "advisory",
+      "scope": "partner_identifiers",
+      "issue": "lead_partner and contributing_partners derived from seed lead_role_tokens (first token = lead), not the prose 'lead' field; all partner_ids validated against caller-supplied valid_partner_ids"
+    }
+  ]
+}

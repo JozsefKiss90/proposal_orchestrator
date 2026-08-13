@@ -26,8 +26,10 @@ import pytest
 import yaml
 
 from runner.runtime_models import AgentResult, SkillInvocationRecord, SkillResult
+import runner.agent_runtime as ar
 from runner.agent_runtime import run_agent, AgentRuntimeError
 from runner.deterministic_components import COMPONENT_REGISTRY
+from runner.paths import find_repo_root
 
 
 # ---------------------------------------------------------------------------
@@ -2469,4 +2471,153 @@ class TestFirstFailureIsReported:
         assert (result.failure_reason or "").startswith(
             "Skill 'producer-skill' failed"
         )
+
+
+# ---------------------------------------------------------------------------
+# Caller-context bindings and the fail-closed guard
+# ---------------------------------------------------------------------------
+
+
+class TestCallerContextBindings:
+    """A skill's caller-context sources are declared in the skill catalog.
+
+    `work-package-normalization` had no binding anywhere, so its Step 1.5
+    MISSING_INPUT halt could never fire on real input — the skill was
+    invoked with no context at all on every Phase 3 run (4caa2586).
+
+    The binding lives in `skill_catalog.yaml`, not in a dict keyed by skill
+    name in `agent_runtime.py`: the runtime must stay skill-name-agnostic in
+    executable code (see `test_no_hardcoded_skill_name_trigger_in_source`).
+    """
+
+    def test_real_catalog_binds_work_package_normalization(self) -> None:
+        repo_root = find_repo_root()
+        sources = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        assert sources, "work-package-normalization has no context binding"
+        assert any("consortium/partners.json" in s for s in sources)
+
+    def test_binding_is_declared_in_the_catalog_not_the_runtime(self) -> None:
+        assert (
+            "work-package-normalization" not in ar._SKILL_CONTEXT_SOURCES
+        ), "binding belongs in skill_catalog.yaml, not the runtime dict"
+
+    def test_catalog_sources_are_within_the_agent_read_scope(self) -> None:
+        """A declared context source must be readable by the invoking agent."""
+        repo_root = find_repo_root()
+        sources = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        for src in sources:
+            assert src.startswith("docs/tier3_project_instantiation/"), src
+
+    def test_skill_with_no_declaration_has_no_sources(
+        self, tmp_path: Path
+    ) -> None:
+        _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        assert ar._context_sources_for("skill-a", tmp_path) == ()
+
+
+class TestMissingContextSources:
+    def test_undeclared_skill_reports_nothing_missing(
+        self, tmp_path: Path
+    ) -> None:
+        _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        assert ar._missing_context_sources("skill-a", {}, tmp_path) == []
+
+    def test_declared_skill_with_no_content_reports_all(self) -> None:
+        repo_root = find_repo_root()
+        declared = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        missing = ar._missing_context_sources(
+            "work-package-normalization", {}, repo_root
+        )
+        assert missing == list(declared)
+
+    def test_present_source_is_not_reported(self) -> None:
+        repo_root = find_repo_root()
+        src = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )[0]
+        assert ar._missing_context_sources(
+            "work-package-normalization", {src: {"partners": []}}, repo_root
+        ) == []
+
+
+class TestCallerContextFailsClosed:
+    """The fail-closed guarantee used to live in the skill spec, i.e. in a
+    prompt. Run 4caa2586 shows why that is not a guarantee: the model did
+    not halt on absent context, it synthesised the context instead. The
+    runtime now refuses to invoke the skill.
+    """
+
+    _CTX_SKILL = "ctx-bound-skill"
+    _CTX_SOURCE = "docs/tier3/partners.json"
+
+    def _env(self, tmp_path: Path) -> dict:
+        kwargs = _make_agent_env(tmp_path, skill_ids=[self._CTX_SKILL])
+        # Declare the context binding in this environment's skill catalog.
+        catalog_path = (
+            tmp_path
+            / ".claude/workflows/system_orchestration/skill_catalog.yaml"
+        )
+        data = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        for entry in data.get("skill_catalog", []):
+            if entry.get("id") == self._CTX_SKILL:
+                entry["caller_context_from"] = [self._CTX_SOURCE]
+        catalog_path.write_text(yaml.safe_dump(data), encoding="utf-8")
+        import runner.skill_runtime as _sr
+        _sr._catalog_cache.clear()
+        return kwargs
+
+    def test_skill_not_invoked_when_context_absent(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = self._env(tmp_path)
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            result = run_agent(**kwargs)
+
+        assert run.call_count == 0, "skill was invoked without its context"
+        assert result.status == "failure"
+        reason = result.failure_reason or ""
+        assert "caller context" in reason
+        assert self._CTX_SKILL in reason
+
+    def test_failure_is_recorded_as_missing_input(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = self._env(tmp_path)
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(**kwargs)
+
+        records = [
+            r for r in result.invoked_skills if r.skill_id == self._CTX_SKILL
+        ]
+        assert records, "no invocation record for the skipped skill"
+        assert records[0].status == "failure"
+        assert records[0].failure_category == "MISSING_INPUT"
+
+    def test_skill_runs_when_context_is_present(self, tmp_path: Path) -> None:
+        kwargs = self._env(tmp_path)
+        target = tmp_path / self._CTX_SOURCE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps({"partners": [{"partner_id": "HOST"}]}),
+            encoding="utf-8",
+        )
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            run_agent(**kwargs)
+
+        assert run.call_count == 1
+        passed_context = run.call_args.kwargs.get("caller_context") or {}
+        assert self._CTX_SOURCE in passed_context
+
+    def test_undeclared_skill_is_unaffected(self, tmp_path: Path) -> None:
+        """A skill that declares no context need must still be invoked."""
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            run_agent(**kwargs)
+        assert run.call_count == 1
 
