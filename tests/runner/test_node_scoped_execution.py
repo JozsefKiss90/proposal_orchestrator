@@ -32,6 +32,11 @@ from runner.dag_scheduler import (
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult
 
+# Ticket 3: a scoped step re-verifies released predecessors against their
+# durable Tier 4 gate results, so fixtures that claim a release must also
+# write the durable evidence backing it.
+from tests.runner.test_node_scope_resume_evidence import write_gate_evidence
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -65,6 +70,23 @@ def _seed_tier3_tier4(repo: Path) -> None:
     _obj.write_text('{"objectives":[{"id":"OBJ-1","title":"T","measurable_target":"≥1"}]}', encoding="utf-8")
     _wp.write_text('{"work_packages":[{"wp_id":"WP1","title":"T","lead_partner":"P","deliverables":[{"deliverable_id":"D1-01","title":"D","due_month":3}]}]}', encoding="utf-8")
     _pt.write_text('{"partners":[{"short_name":"P","legal_name":"Partner One"}]}', encoding="utf-8")
+
+
+#: Exit gates of the manifest nodes these tests release as predecessors.
+_NODE_EXIT_GATES = {
+    "n07_budget_gate": "gate_09_budget_consistency",
+    "n08a_excellence_drafting": "gate_10a_excellence_completeness",
+    "n08b_impact_drafting": "gate_10b_impact_completeness",
+    "n08c_implementation_drafting": "gate_10c_implementation_completeness",
+}
+
+
+def _release_with_evidence(repo: Path, ctx: RunContext, *node_ids: str) -> None:
+    """Set *node_ids* released AND write the durable gate results proving it."""
+    for nid in node_ids:
+        ctx.set_node_state(nid, "released")
+        write_gate_evidence(repo, _NODE_EXIT_GATES[nid], run_id=ctx.run_id)
+    ctx.save()
 
 
 def _phase8_substep_manifest() -> dict:
@@ -289,8 +311,7 @@ class TestNodeScopedDispatch:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-id")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         with patch("runner.dag_scheduler.evaluate_gate", return_value=_GATE_PASS):
             sched = DAGScheduler(
@@ -316,8 +337,7 @@ class TestNodeScopedDispatch:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-shorthand")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         with patch("runner.dag_scheduler.evaluate_gate", return_value=_GATE_PASS):
             sched = DAGScheduler(
@@ -336,14 +356,14 @@ class TestNodeScopedDispatch:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-mid")
-        for nid in (
+        _release_with_evidence(
+            tmp_path,
+            ctx,
             "n07_budget_gate",
             "n08a_excellence_drafting",
             "n08b_impact_drafting",
             "n08c_implementation_drafting",
-        ):
-            ctx.set_node_state(nid, "released")
-        ctx.save()
+        )
 
         with patch("runner.dag_scheduler.evaluate_gate", return_value=_GATE_PASS):
             sched = DAGScheduler(
@@ -397,8 +417,7 @@ class TestNodeScopedFailClosed:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-notready")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         evaluate_gate_calls: list[str] = []
 
@@ -473,8 +492,7 @@ class TestNodeScopedGateEvaluation:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-gate")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         evaluated: list[str] = []
 
@@ -498,8 +516,7 @@ class TestNodeScopedGateEvaluation:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-gatefail")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         with patch("runner.dag_scheduler.evaluate_gate", return_value=_GATE_FAIL):
             sched = DAGScheduler(
@@ -525,8 +542,7 @@ class TestRunSummaryNodeScope:
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         graph = ManifestGraph.load(manifest_path)
         ctx = RunContext.initialize(tmp_path, "test-node-summary")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         with patch("runner.dag_scheduler.evaluate_gate", return_value=_GATE_PASS):
             sched = DAGScheduler(
@@ -636,8 +652,7 @@ class TestCLINodeArgument:
 
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         ctx = RunContext.initialize(tmp_path, "cli-node-dry")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         p1, p2, p3 = _cli_patches()
         with p1, p2, p3:
@@ -659,8 +674,7 @@ class TestCLINodeArgument:
         _seed_tier3_tier4(tmp_path)
         manifest_path = _write_manifest(tmp_path, _phase8_substep_manifest())
         ctx = RunContext.initialize(tmp_path, "cli-node-json")
-        ctx.set_node_state("n07_budget_gate", "released")
-        ctx.save()
+        _release_with_evidence(tmp_path, ctx, "n07_budget_gate")
 
         p1, p2, p3 = _cli_patches()
         with p1, p2, p3:

@@ -59,6 +59,13 @@ resume logic.  ``ManifestGraph.is_ready()`` continues to rely on current
 ``RunContext`` node states; the bootstrap ensures those states are correctly
 initialized from prior evidence.
 
+For single-node scope, same-run-id resume is the in-phase evidence carrier:
+:func:`verify_released_predecessors` re-proves every predecessor the loaded
+``RunContext`` claims ``released`` against its durable exit-gate result
+(present, schema-valid, ``status: pass``, content-fresh) before the scoped
+node may dispatch.  An unproven claim fails the step closed (§6.3/§9.4);
+the check is read-only (§17.6.3).
+
 Scope boundaries
 ----------------
 This module implements gate-evaluation dispatch with integrated node body
@@ -90,7 +97,7 @@ from runner.agent_runtime import run_agent
 from runner.call_slicer import CallSlicerError, generate_call_slice
 from runner.deterministic_components import partition_draft_consuming
 from runner.gate_evaluator import evaluate_gate
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
@@ -111,7 +118,10 @@ from runner.phase8_reuse import (
     write_reuse_metadata,
 )
 from runner.phase8_skip_binding import validate_skip_binding
-from runner.predicates.gate_pass_predicates import is_gate_fresh
+from runner.predicates.gate_pass_predicates import (
+    GATE_RESULT_MANDATORY_FIELDS,
+    is_gate_fresh,
+)
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult, NodeExecutionResult
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
@@ -166,6 +176,205 @@ def format_unsatisfied_condition(cond: dict) -> str:
         f"{cond['source_node_id']}={cond['source_node_state']} "
         f"(requires {cond['gate_id']})"
     )
+
+
+def format_evidence_violation(violation: dict) -> str:
+    """
+    Render one predecessor durable-evidence violation for operator output.
+
+    Shared by the scheduler's abort message and the CLI's ``[BLOCKED]``
+    report so the two name evidence violations identically.
+    """
+    return (
+        f"{violation['node_id']} [{violation['reason_code']}] "
+        f"{violation['gate_id']} @ {violation['evidence_path']}: "
+        f"{violation.get('detail')}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Durable-evidence verification of released predecessors (scoped resume)
+# ---------------------------------------------------------------------------
+
+
+def verify_released_predecessors(
+    ctx: RunContext,
+    graph: "ManifestGraph",
+    repo_root: Path,
+    node_id: str,
+) -> list[dict]:
+    """Re-verify every ``released`` predecessor of *node_id* against its
+    durable Tier 4 gate result.
+
+    Same-run-id resume makes the loaded ``RunContext`` the in-phase evidence
+    carrier for stepped execution — but a persisted ``released`` state string
+    in ``.claude/runs/`` is runtime execution memory, not source truth
+    (§9.2).  Before a scoped step counts a predecessor as released, that
+    claim must be backed by the predecessor's durable exit-gate result at
+    its canonical ``gate_result_registry`` path: present, schema-valid,
+    ``status: pass``, and content-fresh per :func:`is_gate_fresh` (§6.3,
+    §9.4).
+
+    The check is **read-only and scheduler-side**: no gate result is
+    written, re-stamped, or repaired (§17.6.3), and no node state is
+    modified.  All transitive upstream predecessors are examined — a step
+    that cannot prove its predecessors passed fails closed (§13.7).
+
+    Returns
+    -------
+    list[dict]
+        One violation dict per unproven claim, in manifest registry order;
+        empty when every released predecessor is proven.  Each violation
+        carries ``node_id``, ``gate_id``, ``evidence_path``, a distinct
+        ``reason_code`` (``missing_evidence``, ``unreadable_evidence``,
+        ``malformed_evidence``, ``non_pass_status``, ``stale_evidence``,
+        ``unverifiable_no_exit_gate``) and a human-readable ``detail``
+        (plus ``stale_inputs`` for stale evidence).
+    """
+    upstream: set[str] = set()
+    _collect_upstream_nodes(graph, {node_id}, upstream)
+    upstream.discard(node_id)
+
+    violations: list[dict] = []
+    for nid in graph.node_ids():  # preserve manifest registry order
+        if nid not in upstream:
+            continue
+        if ctx.get_node_state(nid) != "released":
+            continue  # non-released predecessors are the ready-check's concern
+
+        exit_gate_id = graph.exit_gate(nid)
+        if exit_gate_id is None:
+            violations.append(
+                {
+                    "node_id": nid,
+                    "gate_id": None,
+                    "evidence_path": None,
+                    "reason_code": "unverifiable_no_exit_gate",
+                    "detail": (
+                        "node is released in the RunContext but declares no "
+                        "exit gate in the manifest, so no durable gate result "
+                        "can prove the release (§6.3)"
+                    ),
+                }
+            )
+            continue
+
+        evidence_rel = _gate_result_repo_path(exit_gate_id)
+        base = {
+            "node_id": nid,
+            "gate_id": exit_gate_id,
+            "evidence_path": evidence_rel,
+        }
+        evidence_abs = repo_root / evidence_rel
+
+        if not evidence_abs.exists():
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "missing_evidence",
+                    "detail": "no durable gate result artifact on disk",
+                }
+            )
+            continue
+
+        try:
+            data = json.loads(evidence_abs.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "unreadable_evidence",
+                    "detail": f"cannot read/parse gate result: {exc}",
+                }
+            )
+            continue
+
+        if not isinstance(data, dict):
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": "gate result root is not a JSON object",
+                }
+            )
+            continue
+
+        missing_fields = sorted(
+            f for f in GATE_RESULT_MANDATORY_FIELDS if data.get(f) is None
+        )
+        if missing_fields:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"mandatory gate result fields missing or null: "
+                        f"{missing_fields}"
+                    ),
+                }
+            )
+            continue
+        if data.get("schema_id") != GATE_RESULT_SCHEMA_ID:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"schema_id {data.get('schema_id')!r} != "
+                        f"{GATE_RESULT_SCHEMA_ID!r}"
+                    ),
+                }
+            )
+            continue
+        if data.get("gate_id") != exit_gate_id:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"gate result claims gate_id {data.get('gate_id')!r}, "
+                        f"expected {exit_gate_id!r}"
+                    ),
+                }
+            )
+            continue
+
+        if data.get("status") != "pass":
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "non_pass_status",
+                    "detail": f"recorded status is {data.get('status')!r}",
+                }
+            )
+            continue
+
+        try:
+            fresh, stale_reason, stale_inputs = is_gate_fresh(
+                exit_gate_id, data, repo_root
+            )
+        except (OSError, TypeError, ValueError) as exc:
+            # A freshness check that cannot run proves nothing — that is an
+            # unverifiable claim, not a demonstrated fingerprint mismatch.
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "unreadable_evidence",
+                    "detail": f"freshness check failed: {exc}",
+                }
+            )
+            continue
+        if not fresh:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "stale_evidence",
+                    "detail": stale_reason,
+                    "stale_inputs": stale_inputs,
+                }
+            )
+
+    return violations
 
 
 # ---------------------------------------------------------------------------
@@ -1405,9 +1614,40 @@ class DAGScheduler:
                 log.info("Full DAG execution mode")
 
             # ------------------------------------------------------------------
+            # Durable-evidence verification of released predecessors
+            # ------------------------------------------------------------------
+            # Same-run-id resume carries predecessor release claims in the
+            # loaded RunContext — runtime memory, not source truth (§9.2).
+            # Before a scoped step is dispatched, every predecessor it counts
+            # as released must be proven by its durable Tier 4 gate result
+            # (present, schema-valid, status: pass, content-fresh).  A claim
+            # without durable, fresh evidence fails the step closed
+            # (§6.3/§9.4): the scoped node is never dispatched and no gate is
+            # evaluated.  Read-only — no gate result is written (§17.6.3).
+            # Only a step that would actually dispatch is verified; re-running
+            # an already-settled node is the rerun policy's concern.
+            predecessor_violations: list[dict] = []
+            if (
+                node_scope_id is not None
+                and self.ctx.get_node_state(node_scope_id) == "pending"
+            ):
+                predecessor_violations = verify_released_predecessors(
+                    self.ctx, self.graph, self.repo_root, node_scope_id
+                )
+                for v in predecessor_violations:
+                    log.error(
+                        "  [%s] predecessor evidence violation: %s",
+                        node_scope_id,
+                        format_evidence_violation(v),
+                    )
+
+            # ------------------------------------------------------------------
             # Dispatch loop
             # ------------------------------------------------------------------
-            while True:
+            # Skipped entirely when predecessor evidence verification failed:
+            # the scoped node must never be dispatched on an unproven release
+            # claim (§13.7 fail-closed).
+            while not predecessor_violations:
                 ready = [
                     nid
                     for nid in self.graph.node_ids()
@@ -1458,6 +1698,28 @@ class DAGScheduler:
             stall_report = self._settle_stalled_nodes(
                 scope_node_ids=scope_node_ids
             )
+
+            # Attach evidence violations to the scoped node's stall entry so
+            # the refusal survives the console in run_summary.json (an
+            # account of the run, not Tier 4 evidence — §9.2), rather than
+            # living only in the log stream.
+            if predecessor_violations:
+                for entry in stall_report:
+                    if entry["node_id"] == node_scope_id:
+                        entry["predecessor_evidence_violations"] = (
+                            predecessor_violations
+                        )
+                        break
+                else:
+                    stall_report.append(
+                        {
+                            "node_id": node_scope_id,
+                            "unsatisfied_conditions": [],
+                            "predecessor_evidence_violations": (
+                                predecessor_violations
+                            ),
+                        }
+                    )
 
             # ------------------------------------------------------------------
             # Benchmark: finalize and write artifacts
@@ -1572,6 +1834,16 @@ class DAGScheduler:
                     if unmet_bits:
                         unmet_detail = (
                             "  Unmet predecessors: " + "; ".join(unmet_bits)
+                        )
+                    viol_bits = [
+                        format_evidence_violation(v)
+                        for e in stall_report
+                        for v in e.get("predecessor_evidence_violations", [])
+                    ]
+                    if viol_bits:
+                        unmet_detail += (
+                            "  Predecessor durable-evidence violations "
+                            "(§6.3/§9.4, fail-closed): " + "; ".join(viol_bits)
                         )
                 raise RunAbortedError(
                     f"Run {self.ctx.run_id!r} aborted: "

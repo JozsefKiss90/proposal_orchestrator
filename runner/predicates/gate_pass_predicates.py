@@ -40,7 +40,10 @@ PathLike = Union[str, os.PathLike[str]]
 # §gate_result_schema.fields.schema_id; its *value* is additionally checked
 # below, because that section requires this predicate to fail with
 # MALFORMED_ARTIFACT when it finds a different schema_id.
-_MANDATORY_FIELDS: frozenset[str] = frozenset({
+# Public: the scheduler's released-predecessor verification
+# (``dag_scheduler.verify_released_predecessors``) applies the same field set,
+# so schema-validity means one thing for both readers.
+GATE_RESULT_MANDATORY_FIELDS: frozenset[str] = frozenset({
     "schema_id",
     "gate_id",
     "run_id",
@@ -51,6 +54,9 @@ _MANDATORY_FIELDS: frozenset[str] = frozenset({
     "library_version",
     "constitution_version",
 })
+
+#: Backward-compatible alias (pre-ticket-3 private name).
+_MANDATORY_FIELDS = GATE_RESULT_MANDATORY_FIELDS
 
 
 def _parse_iso8601(ts: Any) -> Optional[datetime]:

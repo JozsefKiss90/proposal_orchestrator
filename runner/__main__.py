@@ -44,6 +44,7 @@ from runner.dag_scheduler import (
     ManifestGraph,
     RunAbortedError,
     bootstrap_phase_prerequisites,
+    format_evidence_violation,
     format_unsatisfied_condition,
 )
 from runner.gate_library import LIBRARY_REL_PATH
@@ -468,22 +469,35 @@ def main(argv: Optional[list[str]] = None) -> int:
         summary_fields["node_scope"] = ns
 
     # Fail-closed visibility for a node-scoped run (§13.7): when the scoped
-    # node was never dispatched, name the unmet predecessors on the console
+    # node was never dispatched, name the unmet predecessors and any
+    # predecessor durable-evidence violations (§6.3/§9.4) on the console
     # so the operator does not have to open run_summary.json.
     if has_node:
         for entry in summary.stalled_nodes:
             unmet = entry.get("unsatisfied_conditions", [])
-            if not unmet:
+            violations = entry.get("predecessor_evidence_violations", [])
+            if not unmet and not violations:
                 continue
-            detail = "; ".join(
-                format_unsatisfied_condition(c) for c in unmet
-            )
+            detail_parts = []
+            if unmet:
+                detail_parts.append(
+                    "unmet predecessors: "
+                    + "; ".join(format_unsatisfied_condition(c) for c in unmet)
+                )
+            if violations:
+                detail_parts.append(
+                    "predecessor evidence violations: "
+                    + "; ".join(
+                        format_evidence_violation(v) for v in violations
+                    )
+                )
             _out(
                 f"[BLOCKED] {entry['node_id']} not dispatched — "
-                f"unmet predecessors: {detail}",
+                + "  ".join(detail_parts),
                 "node_scope_blocked",
                 node_id=entry["node_id"],
                 unsatisfied_conditions=unmet,
+                predecessor_evidence_violations=violations,
             )
 
     _out(

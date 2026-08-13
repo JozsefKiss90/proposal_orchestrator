@@ -115,20 +115,35 @@ durable, fresh evidence fails closed (§6.3/§9.4).
 
 **Blocked by:** 1. Manifest hygiene, 2. Single-node CLI scope.
 
-- [ ] Re-verify the finding against current code: resume preserves node states verbatim, and nothing
+- [x] Re-verify the finding against current code: resume preserves node states verbatim, and nothing
       re-checks a released predecessor's durable gate result or freshness on resume. Confirm the
       in-phase bootstrap refusal (`upstream_needed -= phase_nodes`) still stands, so same-run-id
-      resume is the only in-phase evidence carrier.
-- [ ] On a scoped step, every predecessor treated as released is re-verified against its durable
+      resume is the only in-phase evidence carrier. *(Verified 2026-08-13: `load_or_initialize`
+      loads persisted states verbatim; the bootstrap touches only `pending` nodes; the in-phase
+      refusal stands at `dag_scheduler.py` `upstream_needed -= phase_nodes`.)*
+- [x] On a scoped step, every predecessor treated as released is re-verified against its durable
       gate result artifact: present, schema-valid, `status: pass`, and content-fresh. Verification
       is read-only and scheduler-side. No gate result is written or re-stamped (§17.6.3).
-- [ ] A predecessor with released state but a missing, failed, or unreadable durable gate result
+      *(`verify_released_predecessors` in `dag_scheduler.py`, run by `DAGScheduler.run()` under
+      node scope before the dispatch loop, over all transitive upstream nodes; freshness via the
+      existing `is_gate_fresh`; schema validity via the `gate_pass_recorded` mandatory-field set +
+      `schema_id`/`gate_id` match. Applies only to a step that would actually dispatch — rerun of
+      an already-settled node is ticket 4's policy.)*
+- [x] A predecessor with released state but a missing, failed, or unreadable durable gate result
       fails the step closed with a distinct reason. Stale evidence (fingerprint mismatch) fails
       closed with its own distinct reason. Neither is silently re-accepted or silently re-run.
-- [ ] Regression tests cover: resume with durable fresh evidence proceeds; released-in-context but
+      *(Distinct `reason_code`s: `missing_evidence` / `unreadable_evidence` / `malformed_evidence`
+      / `non_pass_status` / `stale_evidence` / `unverifiable_no_exit_gate`. The scoped node is
+      never dispatched, no gate is evaluated; violations are durable in `run_summary.json`
+      `stalled_nodes[].predecessor_evidence_violations` and named in the abort message and the
+      CLI `[BLOCKED]` line.)*
+- [x] Regression tests cover: resume with durable fresh evidence proceeds; released-in-context but
       no durable artifact fails closed; durable artifact present but stale fails closed;
       upstream-phase (1–7) acceptance via `accepted_upstream_gates` still works unchanged alongside.
-- [ ] Zero new test failures against the baseline; committed from the repo root.
+      *(`tests/runner/test_node_scope_resume_evidence.py`, 27 tests, incl. a 4-invocation
+      same-run-id a→d resume sequence and phase-scope/full-DAG non-regression; ticket-2 fixtures
+      now write durable evidence for every release they claim.)*
+- [x] Zero new test failures against the baseline; committed from the repo root.
 
 ## 4. Rerun of an already-gated sub-phase — refuse by default, force + decision log
 
