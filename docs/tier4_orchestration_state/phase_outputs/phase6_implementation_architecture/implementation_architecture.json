@@ -1,0 +1,417 @@
+{
+  "schema_id": "orch.phase6.implementation_architecture.v1",
+  "run_id": "9aa8ea49-2cde-4072-9357-d2f662b3275c",
+  "governance_matrix": [
+    {
+      "body_name": "Fellowship Supervisory Board",
+      "composition": [
+        "HOST",
+        "SUPERVISOR",
+        "CO_SUPERVISOR",
+        "FELLOW"
+      ],
+      "decision_scope": "Scientific direction, supervision and training oversight, quality assurance of model development and testing (WP3, WP4), Career Development Plan review, and academic integrity of the fellowship. FELLOW executes all work packages; SUPERVISOR and CO_SUPERVISOR provide methodological lead and quality assurance; HOST is the sole beneficiary and hosting environment.",
+      "meeting_frequency": "Monthly during active work-package execution (M1-M30), with additional ad hoc sessions at deliverable due-months.",
+      "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted (governance_principles.json no_prescribed_meeting_frequency = true); selected as a project-operational assumption sized to a single-fellow 30-month action.",
+      "escalation_path": "Unresolved supervisory or scientific-quality matters are escalated within HOST (ELTE) internal governance to the coordinating beneficiary; where a matter touches obligations of the grant agreement (proper implementation, ethics and values, data protection, IPR, open science), it is handled per the host's grant-agreement implementation route.",
+      "source_basis": [
+        "docs/tier1_normative_framework/extracted/governance_principles.json — no_prescribed_governance_body_names, no_prescribed_meeting_frequency, escalation_path_constraint, grant_agreement_implementation_articles",
+        "docs/tier3_project_instantiation/consortium/roles.json — HOST, SUPERVISOR, CO_SUPERVISOR, FELLOW role tokens",
+        "docs/tier3_project_instantiation/consortium/partners.json — HOST sole beneficiary; FELLOW, SUPERVISOR, CO_SUPERVISOR natural persons at/aligned to ELTE",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — WP3/WP4 supervisory responsibility"
+      ]
+    },
+    {
+      "body_name": "Participating Organisations Coordination Group",
+      "composition": [
+        "HOST",
+        "DATA_PARTNER",
+        "TRANSFER_PARTNER",
+        "VALIDATION_PARTNER"
+      ],
+      "decision_scope": "Coordination of data provision, experimental environments and cross-organisation activities across the work plan: MATE (DATA_PARTNER) primary experimental/data environment (WP1, WP2, WP4 source domain), MVCRI (TRANSFER_PARTNER) cross-country transferability environment (WP4 target domain), and AgroVIR (VALIDATION_PARTNER) operational evaluator and non-academic placement host (WP5, M25-M30 placement). Resolves inter-organisation data-access, scheduling and interface questions.",
+      "meeting_frequency": "Quarterly, aligned to work-package milestones and the WP4 cross-country transfer and WP5 placement windows.",
+      "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted (governance_principles.json no_prescribed_meeting_frequency = true); selected as a project-operational assumption to synchronise the associated organisations named on the work-package month lines.",
+      "escalation_path": "Coordination disputes between participating organisations are escalated to HOST as sole beneficiary; matters requiring a binding inter-organisation arrangement are routed to any partnership/consortium-type agreement, which per Tier 1 must complement and not contradict the grant agreement.",
+      "source_basis": [
+        "docs/tier1_normative_framework/extracted/governance_principles.json — consortium_agreement_guidance, escalation_path_constraint, no_prescribed_governance_body_names",
+        "docs/tier3_project_instantiation/consortium/partners.json — DATA_PARTNER (MATE), TRANSFER_PARTNER (MVCRI), VALIDATION_PARTNER (AgroVIR), HOST (ELTE)",
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — partner_role_matrix; WP1/WP2/WP4/WP5 lead and contributor assignments"
+      ]
+    }
+  ],
+  "management_roles": [
+    {
+      "role_id": "COORD",
+      "role_name": "Coordinating beneficiary / host management",
+      "assigned_to": "HOST",
+      "responsibilities": [
+        "Act as sole beneficiary and legal/administrative coordinator of the action (ELTE)",
+        "Own overall project management, reporting and grant-agreement compliance",
+        "Provide the primary methodological and training environment",
+        "Chair the Fellowship Supervisory Board"
+      ]
+    },
+    {
+      "role_id": "FELLOW-EXEC",
+      "role_name": "Experienced researcher / postdoctoral fellow (executing researcher)",
+      "assigned_to": "FELLOW",
+      "responsibilities": [
+        "Execute all work packages (single-researcher action)",
+        "Co-own deliverable D1.3 Career Development Plan with SUPERVISOR",
+        "Design, build and run the predictive and transfer models across WP1-WP5"
+      ]
+    },
+    {
+      "role_id": "SUP",
+      "role_name": "Supervisor",
+      "assigned_to": "SUPERVISOR",
+      "responsibilities": [
+        "Provide scientific supervision and training at the host institution",
+        "Co-own deliverable D1.3 Career Development Plan with FELLOW",
+        "Support the two-way transfer of knowledge between researcher and host"
+      ]
+    },
+    {
+      "role_id": "CO-SUP",
+      "role_name": "Co-supervisor / methodological quality-assurance lead",
+      "assigned_to": "CO_SUPERVISOR",
+      "responsibilities": [
+        "Provide the methodological lead and quality assurance for model development and testing in WP3 and WP4",
+        "Quality-assure the models the fellow designs and runs"
+      ]
+    },
+    {
+      "role_id": "WPL-WP1",
+      "role_name": "Work Package 1 lead — Historical Data and Target Design",
+      "assigned_to": "DATA_PARTNER",
+      "responsibilities": [
+        "Lead WP1: harmonise the five-year hyperspectral and agronomic archive; define physiological stress target and leakage-safe validation design",
+        "Own deliverables D1.1 and D1.2"
+      ]
+    },
+    {
+      "role_id": "WPL-WP2",
+      "role_name": "Work Package 2 lead — Physiological Early Warning and Hyperspectral-to-Sentinel Transfer",
+      "assigned_to": "DATA_PARTNER",
+      "responsibilities": [
+        "Lead WP2: hyperspectral physiological stress-signature discovery and hyperspectral-to-Sentinel transfer library",
+        "Own deliverables D2.1 and D2.2"
+      ]
+    },
+    {
+      "role_id": "WPL-WP3",
+      "role_name": "Work Package 3 lead — Prospective and Uncertainty-Aware Prediction",
+      "assigned_to": "HOST",
+      "responsibilities": [
+        "Lead WP3: uncertainty-aware prospective prediction models and comparative modelling benchmark",
+        "Own deliverables D3.1 and D3.2"
+      ]
+    },
+    {
+      "role_id": "WPL-WP4",
+      "role_name": "Work Package 4 lead — Temporal and Cross-Country Transferability",
+      "assigned_to": "DATA_PARTNER",
+      "responsibilities": [
+        "Lead WP4: temporal transferability within MATE data and cross-country Hungary-to-Bulgaria transfer with TRANSFER_PARTNER",
+        "Own deliverables D4.1, D4.2 and D4.3"
+      ]
+    },
+    {
+      "role_id": "WPL-WP5",
+      "role_name": "Work Package 5 lead — Operational Transfer, Decision Value and Web MVP",
+      "assigned_to": "HOST",
+      "responsibilities": [
+        "Lead WP5: operational DrR web MVP, decision-value framework, AgroVIR farmer-field validation and FMIS integration roadmap",
+        "Own deliverables D5.1-D5.5"
+      ]
+    }
+  ],
+  "risk_register": [
+    {
+      "risk_id": "R01",
+      "description": "Historical MATE information incomplete",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Common-data subset; quality flags; prospective augmentation",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R02",
+      "description": "Hyperspectral index has no Sentinel equivalent",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Retain for physiological discovery; exclude from operational Sentinel model",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R03",
+      "description": "Spectral domain mismatch",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "SRF resampling + concurrent sensor comparison",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R04",
+      "description": "Proximal/satellite spatial mismatch",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Representative plot/zone aggregation",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R05",
+      "description": "Insufficient physiological stress events",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Targeted temporal sampling across stress gradients",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R06",
+      "description": "Cloud gaps",
+      "category": "external",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "Temporal windows and Sentinel-1 where scientifically useful",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R07",
+      "description": "Unseen-year performance drops",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Expected scientific outcome; quantify and adapt",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R08",
+      "description": "Hungary->Bulgaria performance drops",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Limited local/Bayesian adaptation",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R09",
+      "description": "Farmer-field performance drops",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Quantify operational gap; simplify inputs/model where necessary",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R10",
+      "description": "Bayesian approach does not outperform ML",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "low",
+      "mitigation": "Retain simpler model if superior in calibration/FDV",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R11",
+      "description": "Prediction is accurate but too late",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "high",
+      "mitigation": "Lead time included as primary model-selection criterion",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R12",
+      "description": "Web development delayed",
+      "category": "organisational",
+      "likelihood": "low",
+      "impact": "medium",
+      "mitigation": "Modular development building on existing DrR prototype",
+      "responsible_partner": "FELLOW"
+    },
+    {
+      "risk_id": "R13",
+      "description": "Full AgroVIR integration not feasible",
+      "category": "technical",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "MVP assessment + integration roadmap remain successful endpoint",
+      "responsible_partner": "FELLOW"
+    }
+  ],
+  "ethics_assessment": {
+    "ethics_issues_identified": true,
+    "issues": [
+      {
+        "issue_id": "ETH-01",
+        "category": "Artificial intelligence",
+        "description": "The action develops and deploys AI/ML-based predictive systems: the FIELDWISE predictive engine (D3.2, WP3) and the DrR - Digital Agronomist web MVP (D5.1, WP5). An ethics self-assessment must address the ethical dimension of these systems, including any human-rights and values considerations and how they are addressed.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json — ethics_self_assessment_required, ethics_appraisal_summary",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — WP3 D3.2 predictive engine; WP5 D5.1 DrR web MVP"
+        ],
+        "status": "flagged_for_self_assessment"
+      },
+      {
+        "issue_id": "ETH-02",
+        "category": "Personal data / data protection",
+        "description": "WP5 transfers the model to AgroVIR farmer field(s) and conducts commercial-field and functional evaluation, which may involve processing of personal or commercially sensitive data from farm operators. An ethics self-assessment must confirm compliance with data-protection principles and relevant legislation, proportionate to the methods used.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json — ethics_self_assessment_required, ethics_appraisal_summary",
+          "docs/tier1_normative_framework/extracted/governance_principles.json — grant_agreement_implementation_articles (data protection)",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json — WP5 T5.4/T5.6 AgroVIR farmer-field validation and functional assessment"
+        ],
+        "status": "flagged_for_self_assessment"
+      },
+      {
+        "issue_id": "ETH-03",
+        "category": "Research integrity and Open Science conduct",
+        "description": "Training under the fellowship must foster Open Science culture, knowledge valorisation and good scientific conduct including research integrity, and a Career Development Plan (D1.3) covering these must be established jointly by the supervisor(s) and the researcher and submitted at the start of the action.",
+        "source_basis": [
+          "docs/tier1_normative_framework/extracted/implementation_constraints.json — ethics_appraisal_summary; dissemination_and_exploitation_requirement",
+          "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json — SR-04 (Scope), SR-05 (Scope)",
+          "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json — CC-09 (Scope), CC-10 (Scope)"
+        ],
+        "status": "addressed_via_career_development_plan"
+      }
+    ],
+    "self_assessment_statement": "An ethics self-assessment is completed as an integral part of this proposal, as required by the Tier 1 extracted rule ethics_self_assessment_required; projects with ethics issues may undergo ethics review and resulting ethics requirements may become contractual obligations (implementation_constraints.json). The action focuses exclusively on civil applications and does not involve any of the excluded activities (human cloning for reproductive purposes, heritable-genome modification, or creation/destruction of human embryos), consistent with the Tier 1 civil_focus_constraint. Two ethics dimensions are identified from the project scope and flagged for the self-assessment: (1) the development and deployment of AI/ML-based predictive systems (the FIELDWISE predictive engine in WP3 and the DrR web MVP in WP5), and (2) potential processing of personal or commercially sensitive data during AgroVIR farmer-field validation in WP5. Regarding ethics review: the Tier 3 compliance_profile.json records ethics_review_required: true as a compliance flag derived during call binding; no Tier 2B extracted source path cites an ethics review as a topic-specific mandate for this call, so this is treated as a Tier 3 derivative flag pending call-specific confirmation rather than a confirmed call mandate. Regarding the gender dimension: integration of the gender dimension in research and innovation content follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. Regarding gender equality at the organisational level, beneficiaries must promote equal opportunities and aim for gender balance at all levels of personnel, and public bodies, research organisations and higher education establishments in Member States/Associated Countries must hold a gender equality plan at grant signature (Tier 1 gender_equality_plan_eligibility, gender_management_balance_guidance); the Tier 3 compliance_profile.json separately records gender_plan_required: true as a compliance flag derived during call binding."
+  },
+  "instrument_sections_addressed": [
+    {
+      "section_id": "3",
+      "section_name": "Quality and Efficiency of the Implementation",
+      "status": "addressed"
+    },
+    {
+      "section_id": "3.1",
+      "section_name": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
+      "status": "addressed"
+    },
+    {
+      "section_id": "3.2",
+      "section_name": "Quality and capacity of the host institutions and participating organisations, including hosting arrangements",
+      "status": "addressed"
+    },
+    {
+      "section_id": "6",
+      "section_name": "Additional ethics information",
+      "status": "conditionally_addressed",
+      "note": "Part B-2 conditional ('if applicable') section; ethics dimensions ETH-01 and ETH-02 are flagged in ethics_assessment and grounded in the Tier 3 compliance_profile.json ethics_review_required derivative flag. This section is deferred by scope in milestone 1 (Part B-2) per section_schema_registry.json."
+    },
+    {
+      "section_id": "8",
+      "section_name": "Environmental considerations in light of the MSCA Green Charter",
+      "status": "deferred_part_b2",
+      "note": "Mandatory Part B-2 section for all MSCA-PF submissions; deferred by scope in milestone 1 (Part B-2) per section_schema_registry.json. No Tier 1 or Tier 3 mechanism in the declared inputs grounds this section's content at Phase 6."
+    }
+  ],
+  "traceability_footer": {
+    "primary_sources": [
+      {
+        "tier": 1,
+        "source_path": "docs/tier1_normative_framework/extracted/governance_principles.json",
+        "relevant_fields": [
+          "no_prescribed_governance_body_names",
+          "no_prescribed_meeting_frequency",
+          "consortium_agreement_guidance",
+          "grant_agreement_implementation_articles",
+          "escalation_path_constraint"
+        ]
+      },
+      {
+        "tier": 1,
+        "source_path": "docs/tier1_normative_framework/extracted/implementation_constraints.json",
+        "relevant_fields": [
+          "ethics_self_assessment_required",
+          "ethics_appraisal_summary",
+          "gender_equality_plan_eligibility",
+          "gender_management_balance_guidance",
+          "gender_dimension_in_content",
+          "civil_focus_constraint",
+          "dissemination_and_exploitation_requirement"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+        "relevant_fields": [
+          "instruments[].instrument_type=MSCA-PF",
+          "sections[].section_id (3, 3.1, 3.2, 6, 8)",
+          "section_type",
+          "mandatory"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
+        "relevant_fields": [
+          "SR-04",
+          "SR-05"
+        ]
+      },
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
+        "relevant_fields": [
+          "CC-09",
+          "CC-10"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/partners.json",
+        "relevant_fields": [
+          "partner_id",
+          "partner short_name",
+          "beneficiary",
+          "role"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/consortium/roles.json",
+        "relevant_fields": [
+          "role_token",
+          "role",
+          "responsibility",
+          "work_plan_role"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/compliance_profile.json",
+        "relevant_fields": [
+          "ethics_review_required",
+          "gender_plan_required",
+          "open_science_requirements",
+          "eligibility_confirmed"
+        ]
+      },
+      {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+        "relevant_fields": [
+          "instrument_type",
+          "project_duration_months"
+        ]
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+        "relevant_fields": [
+          "work_packages[].wp_id",
+          "work_packages[].lead_partner",
+          "partner_role_matrix"
+        ]
+      }
+    ]
+  }
+}

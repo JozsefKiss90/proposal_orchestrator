@@ -1,0 +1,223 @@
+{
+  "schema_id": "orch.phase4.scheduling_constraints.v1",
+  "run_id": "1e1b9408-ac82-48fd-9dcf-09e0fec01d0b",
+  "source_wp_structure_run_id": "bd337f0b-072d-43ec-b751-fd0572c96f88",
+  "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
+  "normalization_timestamp": "2026-08-13T12:45:15.436554+00:00",
+  "project_duration_months": 30,
+  "wp_bounds": {
+    "WP1": {
+      "start_month": 1,
+      "end_month": 6
+    },
+    "WP2": {
+      "start_month": 3,
+      "end_month": 14
+    },
+    "WP3": {
+      "start_month": 6,
+      "end_month": 18
+    },
+    "WP4": {
+      "start_month": 12,
+      "end_month": 21
+    },
+    "WP5": {
+      "start_month": 16,
+      "end_month": 30
+    }
+  },
+  "strict_constraints": [],
+  "non_strict_constraints": [
+    {
+      "from": "WP1",
+      "to": "WP2",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP1",
+      "to": "WP3",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP2",
+      "to": "WP3",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP4",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "WP5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T1.5",
+      "to": "WP3",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "T4.3",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP4",
+      "to": "T5.5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "T5.3",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "WP3",
+      "to": "T5.4",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "normalization_log": [
+    {
+      "edge": {
+        "from": "WP1",
+        "to": "WP2"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP1",
+        "to": "WP3"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP2",
+        "to": "WP3"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP4"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "WP5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T1.5",
+        "to": "WP3"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "T4.3"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP4",
+        "to": "T5.5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "T5.3"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "WP3",
+        "to": "T5.4"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    }
+  ],
+  "unresolved_constraints": []
+}
