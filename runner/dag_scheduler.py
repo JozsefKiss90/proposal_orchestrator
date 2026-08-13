@@ -14,7 +14,7 @@ Node ID convention
 ------------------
 All node IDs are **canonical manifest node IDs** as defined in
 ``manifest.compile.yaml`` ``node_registry`` (e.g. ``n01_call_analysis``,
-``n08a_section_drafting``).  Short-form IDs (e.g. ``n01``, ``n08a``) are
+``n08a_excellence_drafting``).  Short-form IDs (e.g. ``n01``, ``n08a``) are
 never used.
 
 Node state machine
@@ -768,7 +768,7 @@ class ManifestGraph:
     Invariants
     ----------
     * All node IDs are the canonical ``node_id`` values from the manifest
-      ``node_registry`` (e.g. ``n01_call_analysis``, ``n08a_section_drafting``).
+      ``node_registry`` (e.g. ``n01_call_analysis``, ``n08a_excellence_drafting``).
     * ``node_ids()`` returns IDs in registry insertion order.
     * ``incoming_conditions(n)`` returns one ``IncomingCondition`` per
       incoming edge to ``n``, plus one per ``additional_condition`` present

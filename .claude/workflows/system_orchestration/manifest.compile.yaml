@@ -845,41 +845,41 @@ artifact_registry:
     path: docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
     tier: tier2a_extracted
     produced_by: n01_call_analysis
-    consumed_by: [n03_wp_design, n06_implementation_architecture, n08a_section_drafting]
+    consumed_by: [n03_wp_design, n06_implementation_architecture, n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting]
 
   - artifact_id: a_t2a_evaluator_expectation_registry
     path: docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json
     tier: tier2a_extracted
     produced_by: n01_call_analysis
-    consumed_by: [n08a_section_drafting, n08c_evaluator_review]
+    consumed_by: [n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting]
 
   # Tier 4 phase output artifacts
   - artifact_id: a_t4_phase1
     path: docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
     tier: tier4_phase_output
     produced_by: n01_call_analysis
-    consumed_by: [n02_concept_refinement, n08a_section_drafting, n08c_evaluator_review]
+    consumed_by: [n02_concept_refinement, n08a_excellence_drafting, n08e_evaluator_review]
     gate_dependency: phase_01_gate
 
   - artifact_id: a_t4_phase2
     path: docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
     tier: tier4_phase_output
     produced_by: n02_concept_refinement
-    consumed_by: [n03_wp_design, n05_impact_architecture, n08a_section_drafting]
+    consumed_by: [n03_wp_design, n05_impact_architecture, n08a_excellence_drafting]
     gate_dependency: phase_02_gate
 
   - artifact_id: a_t4_phase3
     path: docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
     tier: tier4_phase_output
     produced_by: n03_wp_design
-    consumed_by: [n04_gantt_milestones, n05_impact_architecture, n06_implementation_architecture, n07_budget_gate, n08a_section_drafting]
+    consumed_by: [n04_gantt_milestones, n05_impact_architecture, n06_implementation_architecture, n07_budget_gate, n08a_excellence_drafting, n08b_impact_drafting, n08c_implementation_drafting, n08d_assembly]
     gate_dependency: phase_03_gate
 
   - artifact_id: a_t4_phase4
     path: docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
     tier: tier4_phase_output
     produced_by: n04_gantt_milestones
-    consumed_by: [n06_implementation_architecture, n07_budget_gate, n08a_section_drafting]
+    consumed_by: [n06_implementation_architecture, n07_budget_gate, n08c_implementation_drafting]
     gate_dependency: phase_04_gate
 
   - artifact_id: a_t4_phase4_scheduling_constraints
@@ -894,14 +894,14 @@ artifact_registry:
     path: docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
     tier: tier4_phase_output
     produced_by: n05_impact_architecture
-    consumed_by: [n06_implementation_architecture, n08a_section_drafting]
+    consumed_by: [n06_implementation_architecture, n08b_impact_drafting, n08d_assembly]
     gate_dependency: phase_05_gate
 
   - artifact_id: a_t4_phase6
     path: docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
     tier: tier4_phase_output
     produced_by: n06_implementation_architecture
-    consumed_by: [n07_budget_gate, n08a_section_drafting]
+    consumed_by: [n07_budget_gate, n08c_implementation_drafting, n08d_assembly]
     gate_dependency: phase_06_gate
 
   - artifact_id: a_t4_phase7
