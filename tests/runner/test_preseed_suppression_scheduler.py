@@ -177,6 +177,19 @@ def _write_canonical_pack_inputs(repo: Path) -> None:
         },
     )
     _write_json(
+        repo / "docs/tier3_project_instantiation/architecture_inputs"
+        / "outcomes.json",
+        {
+            "outcomes": [
+                {
+                    "id": "OC1",
+                    "title": "Outcome one",
+                    "linked_objectives": ["O1"],
+                }
+            ]
+        },
+    )
+    _write_json(
         repo / "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design"
         / "wp_structure.json",
         {

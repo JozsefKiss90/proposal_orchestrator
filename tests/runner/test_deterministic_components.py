@@ -192,6 +192,10 @@ def _write_pack_fixtures(tmp_path: Path) -> None:
     obj.write_text(json.dumps({
         "objectives": [{"id": "OBJ-1", "title": "T", "measurable_target": "x"}],
     }), encoding="utf-8")
+    out = base / "tier3_project_instantiation" / "architecture_inputs" / "outcomes.json"
+    out.write_text(json.dumps({
+        "outcomes": [{"id": "OUT-1", "title": "O", "linked_objectives": ["OBJ-1"]}],
+    }), encoding="utf-8")
     wp = base / "tier4_orchestration_state" / "phase_outputs" / "phase3_wp_design" / "wp_structure.json"
     wp.parent.mkdir(parents=True, exist_ok=True)
     wp.write_text(json.dumps({

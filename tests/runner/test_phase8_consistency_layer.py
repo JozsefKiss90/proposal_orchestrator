@@ -257,8 +257,21 @@ class TestCanonicalPackGeneration:
         assert data["outcomes"][0]["id"] == "OUT-1"
         assert data["outcomes"][0]["title"] == "Neuro-symbolic planning framework"
 
-    def test_missing_outcomes_file_produces_empty_list(self, tmp_path: Path) -> None:
-        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+    def test_missing_outcomes_file_blocks(self, tmp_path: Path) -> None:
+        """An absent outcomes source is a §12.4 block, not a silently empty array.
+
+        Supersedes ``test_missing_outcomes_file_produces_empty_list``.  Emitting
+        an empty ``outcomes`` array is not a safe degradation: the outcome-title
+        loop in ``canonical_terminology_preserved`` and the
+        ``outcomes[].linked_objectives`` metric-propagation path in
+        ``measurable_targets_preserved`` both iterate the array, so an empty one
+        makes those checks *vacuously* pass over unchecked prose.  ``outcomes``
+        therefore joins :data:`_REQUIRED_NONEMPTY` and fails closed here.
+        """
+        from runner.phase8_canonical_pack import (
+            CanonicalPackError,
+            build_phase8_canonical_reference_pack,
+        )
 
         _populate_tier3_and_tier4(tmp_path)
         outcomes_path = (
@@ -266,9 +279,116 @@ class TestCanonicalPackGeneration:
             / "architecture_inputs" / "outcomes.json"
         )
         outcomes_path.unlink()
+        with pytest.raises(CanonicalPackError) as exc:
+            build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        assert "outcomes" in str(exc.value)
+
+
+class TestCanonicalPackSourceFieldAliases:
+    """Tier-3 records are admitted under their FIELDWISE source field names.
+
+    The pack contract read by the Phase-8 preservation predicates is ``id`` /
+    ``title`` / ``measurable_target``; the FIELDWISE hand-lift authored the
+    Tier-3 sources with ``objective_id`` / ``measurable_output`` and
+    ``outcome_id`` / ``statement``.  Unaliased, every record failed the
+    ``entry.get("id")`` admission test and was dropped — emptying ``objectives``
+    (a hard §12.4 block) and ``outcomes`` (silently, pre-fix).
+    """
+
+    def test_fieldwise_objective_and_outcome_keys_are_lifted(
+        self, tmp_path: Path,
+    ) -> None:
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        arch = (
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs"
+        )
+        _write_json(arch / "objectives.json", {
+            "objectives": [{
+                "objective_id": "O1",
+                "title": "Construct a harmonised dataset",
+                "measurable_output": "QC-controlled historical database",
+            }],
+        })
+        _write_json(arch / "outcomes.json", {
+            "outcomes": [{
+                "outcome_id": "OC1",
+                "statement": "A physiologically defined water-stress target",
+                "linked_objectives": ["O1"],
+            }],
+        })
+
         out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
         data = json.loads(out.read_text(encoding="utf-8"))
-        assert data["outcomes"] == []
+
+        assert [o["id"] for o in data["objectives"]] == ["O1"]
+        assert data["objectives"][0]["measurable_target"] == (
+            "QC-controlled historical database"
+        )
+        assert [o["id"] for o in data["outcomes"]] == ["OC1"]
+        assert data["outcomes"][0]["title"] == (
+            "A physiologically defined water-stress target"
+        )
+        # The metric-propagation path depends on this link surviving the lift.
+        assert data["outcomes"][0]["linked_objectives"] == ["O1"]
+        # Renamed source keys must not leak alongside their pack-key twins.
+        assert "objective_id" not in data["objectives"][0]
+        assert "measurable_output" not in data["objectives"][0]
+        assert "outcome_id" not in data["outcomes"][0]
+        assert "statement" not in data["outcomes"][0]
+
+    def test_canonical_keys_win_over_aliases(self, tmp_path: Path) -> None:
+        """A source already speaking the pack contract round-trips unchanged."""
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "objectives.json",
+            {"objectives": [{
+                "id": "OBJ-1",
+                "objective_id": "IGNORED",
+                "title": "Canonical wins",
+                "measurable_target": "≥5 sites",
+                "measurable_output": "IGNORED",
+            }]},
+        )
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        assert data["objectives"][0]["id"] == "OBJ-1"
+        assert data["objectives"][0]["measurable_target"] == "≥5 sites"
+
+    def test_involved_partners_is_not_inferred_into_partner_roles(
+        self, tmp_path: Path,
+    ) -> None:
+        """``involved_partners`` is dropped, never folded into a role field (§13.3).
+
+        The FIELDWISE array does not distinguish a responsible partner from
+        contributing ones, so mapping it either way would be inference about a
+        project fact — which this deterministic component may not perform.
+        """
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "objectives.json",
+            {"objectives": [{
+                "objective_id": "O1",
+                "title": "Objective with undifferentiated partners",
+                "involved_partners": ["DATA_PARTNER", "HOST"],
+            }]},
+        )
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        obj = json.loads(out.read_text(encoding="utf-8"))["objectives"][0]
+
+        assert obj["id"] == "O1"
+        assert "responsible_partner" not in obj
+        assert "contributing_partners" not in obj
+        assert "involved_partners" not in obj
 
 
 # ===========================================================================
@@ -1317,6 +1437,13 @@ class TestMeasurableTargetPreservation:
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
         )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
+        )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))
 
@@ -1346,6 +1473,13 @@ class TestMeasurableTargetPreservation:
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
         )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
+        )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))
         assert data["objectives"][0]["measurable_target"] == target
@@ -1369,6 +1503,13 @@ class TestMeasurableTargetPreservation:
             tmp_path / "docs" / "tier3_project_instantiation"
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
+        )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
         )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))

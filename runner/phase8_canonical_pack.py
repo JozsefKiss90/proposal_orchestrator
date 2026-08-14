@@ -78,7 +78,60 @@ PROVENANCE_CONFIRMED = "confirmed"
 #: instrument with no consortium ``partners.json`` (the host is declared via
 #: ``working_assumptions.json``, quarantined into ``declared_assumptions``), so
 #: requiring it would be a RIA-shaped assumption (ticket 2 no-RIA-leak mandate).
-_REQUIRED_NONEMPTY: tuple[str, ...] = ("objectives", "wps", "deliverables")
+#:
+#: ``outcomes`` is included: the vacuous-pass argument that justifies the
+#: backstop applies to it identically.  ``canonical_terminology_preserved``
+#: iterates ``pack_data["outcomes"]`` for outcome-title checks and
+#: ``measurable_targets_preserved`` walks ``outcomes[].linked_objectives`` to
+#: propagate metric enforcement from a mentioned outcome to its objectives —
+#: both perform **zero** checks on an empty array.  An outcomes source that
+#: silently yields nothing therefore buys a green gate over unchecked prose,
+#: which is precisely the failure mode §12.4 requires be blocked rather than
+#: passed.
+_REQUIRED_NONEMPTY: tuple[str, ...] = (
+    "objectives", "outcomes", "wps", "deliverables",
+)
+
+#: Pack fields lifted from each Tier-3 objective / outcome record, in pack order.
+_OBJECTIVE_KEYS: tuple[str, ...] = (
+    "id", "title", "measurable_target", "responsible_partner",
+    "contributing_partners",
+)
+_OUTCOME_KEYS: tuple[str, ...] = (
+    "id", "title", "linked_objectives", "linked_wp_ids",
+    "linked_deliverable_ids",
+)
+
+#: Tier-3 source keys that carry a pack field's value under a different name,
+#: as ``{pack_key: source_key}``.
+#:
+#: The canonical pack contract read by the Phase-8 preservation predicates is
+#: ``id`` / ``title`` / ``measurable_target`` (see
+#: ``runner/predicates/phase8_section_predicates.py`` — ``obj.get("id")``,
+#: ``obj.get("measurable_target")``, ``outcome.get("id")``).  The FIELDWISE
+#: hand-lift authored the Tier-3 sources with entity-scoped id keys
+#: (``objective_id``, ``outcome_id``) and its own column-derived value names
+#: (``measurable_output``, named after the draft's "Verification" column;
+#: ``statement`` for an outcome's text).  Without this map every record fails
+#: the ``entry.get("id")`` admission test and is dropped, emptying the array.
+#:
+#: Each mapping is a **pure rename** — the same value under the pack's key.  It
+#: adds no fact and makes no judgment, so the component remains deterministic
+#: and inference-free (§17.5.3).  An alias is consulted only when the canonical
+#: key is absent, so a source already speaking the pack contract is untouched.
+#:
+#: Deliberately **not** mapped: the FIELDWISE ``involved_partners`` array does
+#: not distinguish a responsible partner from contributing ones, so folding it
+#: into ``responsible_partner`` / ``contributing_partners`` would be inference
+#: about project facts (§13.3).  It is dropped, like any unrecognised field.
+_OBJECTIVE_ALIASES: dict[str, str] = {
+    "id": "objective_id",
+    "measurable_target": "measurable_output",
+}
+_OUTCOME_ALIASES: dict[str, str] = {
+    "id": "outcome_id",
+    "title": "statement",
+}
 
 
 class CanonicalPackError(Exception):
@@ -109,33 +162,61 @@ def _read_json(path: Path) -> dict | None:
         return None
 
 
+def _lift(
+    source: dict[str, Any],
+    keys: tuple[str, ...],
+    aliases: dict[str, str],
+) -> dict[str, Any]:
+    """Copy *keys* out of *source* verbatim, honouring *aliases* for absent keys.
+
+    *aliases* maps a **pack** key to the Tier-3 **source** key carrying the same
+    value (:data:`_OBJECTIVE_ALIASES`, :data:`_OUTCOME_ALIASES`).  The canonical
+    key always wins; an alias is consulted only when the canonical key is absent,
+    so a source that already speaks the pack contract round-trips unchanged.
+
+    Values are copied by reference with no coercion, no defaults, and no
+    derivation — the rename is the only transformation, keeping the deriver a
+    lookup-plus-verbatim-copy (§17.5.3).  Keys absent under both their canonical
+    and alias name are simply omitted, never fabricated.
+    """
+    entry: dict[str, Any] = {}
+    for key in keys:
+        if key in source:
+            entry[key] = source[key]
+            continue
+        alias = aliases.get(key)
+        if alias is not None and alias in source:
+            entry[key] = source[alias]
+    return entry
+
+
 def _extract_objectives(data: dict) -> list[dict[str, Any]]:
-    """Extract objectives preserving id, title, measurable_target, responsible_partner."""
+    """Extract objectives preserving id, title, measurable_target, responsible_partner.
+
+    Accepts the FIELDWISE Tier-3 spelling (``objective_id`` /
+    ``measurable_output``) via :data:`_OBJECTIVE_ALIASES`.
+    """
     result: list[dict[str, Any]] = []
     for obj in data.get("objectives", []):
         if not isinstance(obj, dict):
             continue
-        entry: dict[str, Any] = {}
-        for key in ("id", "title", "measurable_target",
-                     "responsible_partner", "contributing_partners"):
-            if key in obj:
-                entry[key] = obj[key]
+        entry = _lift(obj, _OBJECTIVE_KEYS, _OBJECTIVE_ALIASES)
         if entry.get("id"):
             result.append(_confirmed(entry))
     return result
 
 
 def _extract_outcomes(data: dict) -> list[dict[str, Any]]:
-    """Extract outcomes preserving id, title, linked_objectives, linked_wp_ids."""
+    """Extract outcomes preserving id, title, linked_objectives, linked_wp_ids.
+
+    Accepts the FIELDWISE Tier-3 spelling (``outcome_id`` / ``statement``) via
+    :data:`_OUTCOME_ALIASES`.
+    """
     result: list[dict[str, Any]] = []
     for out in data.get("outcomes", []):
         if not isinstance(out, dict):
             continue
-        entry: dict[str, Any] = {}
-        for key in ("id", "title", "linked_objectives", "linked_wp_ids",
-                     "linked_deliverable_ids"):
-            if key in out:
-                entry[key] = out[key]
+        entry = _lift(out, _OUTCOME_KEYS, _OUTCOME_ALIASES)
         if entry.get("id"):
             result.append(_confirmed(entry))
     return result

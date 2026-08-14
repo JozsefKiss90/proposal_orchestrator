@@ -694,13 +694,22 @@ class TestCanonicalPackCoversImpactImplementation:
 
     def _seed_pack_sources(self, repo_root: Path) -> None:
         """Seed the confirmed Tier 3/4 the deriver requires (non-empty
-        objectives / wps / deliverables per its fail-closed backstop)."""
+        objectives / outcomes / wps / deliverables per its fail-closed
+        backstop)."""
         _write(
             repo_root
             / "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
             {"objectives": [
                 {"id": "OBJ-1", "title": "First objective"},
                 {"id": "OBJ-2", "title": "Second objective"},
+            ]},
+        )
+        _write(
+            repo_root
+            / "docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+            {"outcomes": [
+                {"id": "OUT-1", "title": "First outcome",
+                 "linked_objectives": ["OBJ-1"]},
             ]},
         )
         _write(

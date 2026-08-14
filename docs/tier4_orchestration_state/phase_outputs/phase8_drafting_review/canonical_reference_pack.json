@@ -1,0 +1,381 @@
+{
+  "schema_id": "orch.phase8.canonical_reference_pack.v1",
+  "run_id": "9a5dfb55-de01-48b2-acec-86498a8ad171",
+  "objectives": [
+    {
+      "id": "O1",
+      "title": "Construct a harmonised five-year MATE soil-plant-atmosphere dataset",
+      "measurable_target": "QC-controlled historical database and documented metadata",
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O2",
+      "title": "Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability",
+      "measurable_target": "Validated hyperspectral/Sentinel-compatible feature library",
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O3",
+      "title": "Develop prospective uncertainty-aware crop water-stress forecasts",
+      "measurable_target": "Calibrated forecasts at actionable horizons",
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O4",
+      "title": "Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation",
+      "measurable_target": "Independent transferability benchmark",
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O5",
+      "title": "Quantify research->commercial-field operational transferability",
+      "measurable_target": "AgroVIR farmer-field evaluation",
+      "provenance": "confirmed"
+    },
+    {
+      "id": "O6",
+      "title": "Translate validated predictions into irrigation priority and a functional web MVP",
+      "measurable_target": "DrR web MVP + Field Decision Value + AgroVIR requirements assessment",
+      "provenance": "confirmed"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "OC1",
+      "title": "A physiologically defined water-stress target and a Sentinel-2-transferable early-warning feature basis, replacing spectral-proxy stress definitions.",
+      "linked_objectives": [
+        "O1",
+        "O2"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC2",
+      "title": "A prospective, uncertainty-aware stress-forecasting capability at actionable horizons, in place of static detection.",
+      "linked_objectives": [
+        "O3"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC3",
+      "title": "Quantified temporal and Hungary-to-Bulgaria transferability of the predictive model, with a stated local-calibration cost for adapting it to a new agro-environment.",
+      "linked_objectives": [
+        "O4"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC4",
+      "title": "Evidence of field-level decision value under commercial farming conditions, enabling model selection by usefulness rather than retrospective accuracy.",
+      "linked_objectives": [
+        "O5",
+        "O6"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC5",
+      "title": "A research-to-operation delivery path: an externally evaluated web MVP and a named post-MSCA FMIS integration route.",
+      "linked_objectives": [
+        "O6"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC6",
+      "title": "A researcher profile combining biological understanding, scalable geospatial prediction and operational decision support, carried by an agreed and reviewed Career Development Plan.",
+      "linked_objectives": [],
+      "provenance": "confirmed"
+    }
+  ],
+  "wps": [
+    {
+      "wp_id": "WP1",
+      "title": "Historical Data and Target Design",
+      "lead_partner": "DATA_PARTNER",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP2",
+      "title": "Physiological Early Warning and Hyperspectral-to-Sentinel Transfer",
+      "lead_partner": "DATA_PARTNER",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP3",
+      "title": "Prospective and Uncertainty-Aware Prediction",
+      "lead_partner": "HOST",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP4",
+      "title": "Temporal and Cross-Country Transferability",
+      "lead_partner": "DATA_PARTNER",
+      "provenance": "confirmed"
+    },
+    {
+      "wp_id": "WP5",
+      "title": "Operational Transfer, Decision Value and Web MVP",
+      "lead_partner": "HOST",
+      "provenance": "confirmed"
+    }
+  ],
+  "deliverables": [
+    {
+      "deliverable_id": "D1.1",
+      "title": "Harmonised historical database",
+      "due_month": 6,
+      "type": "dataset",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D1.2",
+      "title": "Data/target/validation protocol",
+      "due_month": 6,
+      "type": "report",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D1.3",
+      "title": "Career Development Plan",
+      "due_month": 3,
+      "type": "report",
+      "parent_wp": "WP1",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2.1",
+      "title": "Physiological validation dataset",
+      "due_month": 14,
+      "type": "dataset",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D2.2",
+      "title": "Hyperspectral-to-Sentinel transfer library",
+      "due_month": 14,
+      "type": "software",
+      "parent_wp": "WP2",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.1",
+      "title": "Comparative modelling benchmark",
+      "due_month": 18,
+      "type": "report",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D3.2",
+      "title": "FIELDWISE predictive engine/model card",
+      "due_month": 18,
+      "type": "software",
+      "parent_wp": "WP3",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.1",
+      "title": "Temporal transferability benchmark",
+      "due_month": 21,
+      "type": "report",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.2",
+      "title": "Hungary->Bulgaria transferability report",
+      "due_month": 21,
+      "type": "report",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D4.3",
+      "title": "Adaptation protocol",
+      "due_month": 21,
+      "type": "report",
+      "parent_wp": "WP4",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.1",
+      "title": "DrR web MVP",
+      "due_month": 24,
+      "type": "software",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.2",
+      "title": "Commercial-field transferability assessment",
+      "due_month": 30,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.3",
+      "title": "Field Decision Value report",
+      "due_month": 30,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.4",
+      "title": "AgroVIR functional/technical evaluation",
+      "due_month": 30,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    },
+    {
+      "deliverable_id": "D5.5",
+      "title": "FMIS integration roadmap",
+      "due_month": 30,
+      "type": "report",
+      "parent_wp": "WP5",
+      "provenance": "confirmed"
+    }
+  ],
+  "partners": [
+    {
+      "short_name": "ELTE",
+      "legal_name": "Eötvös Loránd University (ELTE)",
+      "country": "Hungary",
+      "role": "Beneficiary and host organisation (sole beneficiary)",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "FELLOW",
+      "legal_name": "Dr. Rositsa Cholakova",
+      "role": "Experienced researcher / postdoctoral fellow (applicant)",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "SUPERVISOR",
+      "legal_name": "Prof. András Jung",
+      "role": "Supervisor at the host institution",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "CO_SUPERVISOR",
+      "legal_name": "Dr. Roland Hollós",
+      "role": "Co-supervisor at the host institution",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "MATE",
+      "legal_name": "Magyar Agrár- és Élettudományi Egyetem",
+      "country": "Hungary",
+      "role": "Primary experimental and data environment",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "MVCRI",
+      "legal_name": "Институт по зеленчукови култури „Марица“ – Пловдив",
+      "country": "Bulgaria",
+      "role": "Cross-country transferability environment",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "AgroVIR",
+      "legal_name": "AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság",
+      "country": "Hungary",
+      "role": "Operational and farmer-field evaluator; non-academic placement host",
+      "provenance": "confirmed"
+    }
+  ],
+  "declared_assumptions": [
+    {
+      "key": "family_allowance",
+      "declared_value": "does not apply",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES",
+      "provenance": "assumed"
+    },
+    {
+      "key": "long_term_leave_allowance",
+      "declared_value": "does not apply",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES",
+      "provenance": "assumed"
+    },
+    {
+      "key": "special_needs_allowance",
+      "declared_value": "does not apply",
+      "checklist_ref": "BUDGET_OPTIONAL_LINES",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_MATE",
+      "declared_value": 2.4,
+      "checklist_ref": "DATA_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_MVCRI",
+      "declared_value": 1.5,
+      "checklist_ref": "TRANSFER_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_AgroVIR",
+      "declared_value": 3.0,
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_ELTE_supervisor",
+      "declared_value": 2.5,
+      "checklist_ref": "SUPERVISOR",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_ELTE_co_supervisor",
+      "declared_value": 2.0,
+      "checklist_ref": "CO_SUPERVISOR",
+      "provenance": "assumed"
+    },
+    {
+      "key": "contact_person_MATE",
+      "declared_value": "Dr. Sándor Takács",
+      "checklist_ref": "DATA_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "contact_person_AgroVIR",
+      "declared_value": "Zsuzsanna Balázs",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "placement_supervisor_AgroVIR",
+      "declared_value": "Miklós Maróti",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "contact_email_MVCRI",
+      "declared_value": "vinelina@abv.bg",
+      "checklist_ref": "TRANSFER_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "researcher_orcid",
+      "declared_value": "0009-0008-3761-3106",
+      "checklist_ref": "FELLOW",
+      "provenance": "assumed"
+    },
+    {
+      "key": "mobility_eligibility",
+      "declared_value": "European Fellowship mobility rule satisfied on the rectified CV: 7.05 months of residence or main activity in Hungary within the 36 months before the 2026-09-09 deadline, against a 12-month cap.",
+      "checklist_ref": "MOBILITY_ELIGIBILITY",
+      "provenance": "assumed"
+    }
+  ],
+  "aliases": []
+}
