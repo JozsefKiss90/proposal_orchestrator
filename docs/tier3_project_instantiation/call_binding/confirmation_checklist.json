@@ -41,8 +41,11 @@
         "consortium/partners.json",
         "call_binding/selected_call.json host_country"
       ],
+      "assumed_declarations": [
+        "elte_previous_msca_hosting"
+      ],
       "conditionality": "Item 7 records HOST as CONFIRM - CONDITIONAL on the C5 mobility question. See the MOBILITY_ELIGIBILITY record: the operator overrode C5 as a declared position, and the record itself (ELTE is the intended host) is not in doubt.",
-      "note": "Country HU drives the Phase 7 unit-cost living-allowance coefficient through selected_call.json."
+      "note": "Country HU drives the Phase 7 unit-cost living-allowance coefficient through selected_call.json. The assumed declaration added 2026-08-14 backs the previous_msca_hosting field on the ELTE participant_capacity record in consortium/capabilities.json: the operator answered 'none', and it is declared rather than Confirmed because the ELTE research office holds the institutional record and has not been asked."
     },
     {
       "id": "SUPERVISOR",
@@ -74,7 +77,8 @@
       "assumed_declarations": [
         "person_months_ELTE_co_supervisor"
       ],
-      "open_check": "His primary employment must be ELTE rather than HUN-REN, because MSCA requires supervision at the beneficiary. The check blocks no gate and decides whether CO_SUPERVISOR is the right token.",
+      "open_check": "CLOSED 2026-08-14. The check was: his primary employment must be ELTE rather than HUN-REN, because MSCA requires supervision at the beneficiary, and it decided whether CO_SUPERVISOR is the right token. The operator confirmed on 2026-08-14 that ELTE is his primary employment and, separately, that his supervision under this action will be carried out only at the beneficiary. Both halves matter and only together do they close the check: the first makes him an ELTE supervisor rather than a HUN-REN one, and the second commits the supervision itself to the beneficiary regardless of what other affiliations he holds. CO_SUPERVISOR is therefore the right token and it resolves to HOST. No employment contract is in Tier 3; this rests on the operator's confirmation, and the published affiliation on Hollós et al. 2026 corroborates the ELTE department but not the primacy. See decision_log/fieldwise-open-items-fold_2026-08-14.json.",
+      "open_check_status": "Closed",
       "note": "phase_06_gate predicate g07_p08 reads management roles against partners.json; he resolves to ELTE, which is present as HOST. Part B must present his responsibility as supervisory — he provides the methodological lead and quality-assures the modelling, the fellow designs, builds and runs it."
     },
     {
@@ -123,7 +127,9 @@
       ],
       "assumed_declarations": [
         "contact_person_AgroVIR",
-        "person_months_AgroVIR"
+        "person_months_AgroVIR",
+        "placement_supervisor_title_AgroVIR",
+        "placement_workspace_AgroVIR"
       ],
       "open_check": "The absent PIC blocks submission, not phase_03_gate: AgroVIR hosts the placement, so it appears in Part A Section 2, where every participant needs one. Registration is free and needs only the legal name, address and tax number, all three recorded. The company registration number is Unresolved (two conflicting readings), and no letter of commitment is submitted — the Guide for Applicants instructs that none be included for a non-academic placement host."
     },

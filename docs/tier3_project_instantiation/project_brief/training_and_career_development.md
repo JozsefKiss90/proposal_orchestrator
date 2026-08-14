@@ -121,7 +121,6 @@ Research results feed back into teaching at the host through three measures:
 
 - Co-design and deliver a full module unit within an ELTE MSc course on Earth observation for
   agriculture, rather than a single guest lecture.
-- Primary-supervise one ELTE MSc thesis to completion.
 - Co-supervise the field-experiment component of one PhD student's work.
 
 In the Career Development Plan the teaching component is framed as an existing strength
@@ -131,12 +130,19 @@ Plovdiv (2015-2020), including syllabus design, lecturing and examining in Bulga
 English, and Bachelor's thesis supervision. The developmental content is the move from plant
 protection teaching in Bulgarian at a Bulgarian agricultural university to Earth-observation
 teaching in English at a Hungarian informatics faculty, and the step from Bachelor's to
-Master's and doctoral supervision.
+doctoral supervision.
 
-> **Assumed (§12.2).** Primary supervision of an ELTE MSc thesis may require a formal ELTE
-> affiliation or status the fellow will not automatically hold. This is an open action with the
-> Faculty of Informatics. If primary supervision is not available, the measure drops back to
-> co-supervision and the module unit carries the ambition.
+> **Confirmed (§12.2).** MSc thesis supervision was removed by the operator on 2026-08-14. The
+> measure previously read "primary-supervise one ELTE MSc thesis to completion" and carried an
+> Assumed note, because primary supervision may require a formal ELTE affiliation or status the
+> fellow will not automatically hold. The operator has decided against MSc thesis supervision
+> rather than resolving that status question, so the measure is withdrawn outright — the
+> fallback to co-supervision is withdrawn with it, since the decision is about MSc thesis
+> supervision as such and not about the grade of it. Two measures carry the teaching component:
+> the module unit, which was always the one that carries the ambition, and the PhD
+> field-experiment co-supervision, which is unaffected. This is an operator decision about the
+> action's own design, so it is Confirmed rather than declared. See
+> decision_log/fieldwise-open-items-fold_2026-08-14.json.
 
 <!-- DRAFT-LIFTED §2.2 ¶224-230 | OPERATOR-DECIDED input pack item 5, EI-03 (ACCEPT, 2026-08-11) -->
 ## Networking, communication and public engagement

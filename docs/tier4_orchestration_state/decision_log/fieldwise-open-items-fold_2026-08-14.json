@@ -1,0 +1,102 @@
+{
+  "record_type": "decision_log_entry",
+  "id": "fieldwise-open-items-fold-2026-08-14",
+  "date": "2026-08-14",
+  "branch": "fieldwise-run-01",
+  "authority": "CLAUDE.md §9.4 (durable decisions), §12.2 (status categories), §12.3 (explicit contradiction resolution), §13.3 (no fabricated project facts)",
+  "why": "Six claims in the Phase 8 Excellence drafts stood at Unresolved and together held validation_status.overall_status at 'unresolved', which fails gate_10a predicate g09a_p06 (no_unresolved_material_claims). Five of the six were open items formally accepted at the 2026-08-12 authorisation review. The operator answered all six on 2026-08-14. This record folds those answers into Tier 3 and states the status each was given and why.",
+  "operator_instruction": "Operator supplied, verbatim: ELTE_PREV_MSCA_HOSTING - none; TEACHING_MSC_PRIMARY_SUP - no msc thesis supervision; PLACEMENT_WORKSPACE - AgroVIR placement workspace and system access: desk/office, FMIS dev/staging, customer-data environment confirmed; PLACEMENT_ONSITE_SUPERVISOR - senior research officer; CO_SUP_ELTE_CONTRACT - co-supervisor's primary employment being ELTE confirmed & supervision will be done only at the beneficiary; invited_talks - none yet.",
+  "status_rule_applied": {
+    "rule": "An operator answer is Confirmed when it is a decision about the action's own design, which the operator owns and can therefore settle. It is Assumed and declared when it reports a fact about a third party — a person's title, an institution's record, a company's facilities — which only that third party can evidence. This follows working_assumptions.json _scope ('a declaration turns an Unresolved or unevidenced fact into a conscious Assumed; it never makes a fact Confirmed') and the precedent already set in consortium/capabilities.json, where six_month_work_content is Confirmed as an operator decision while the AgroVIR contacts are Assumed and declared.",
+    "consequence": "Three of the six are Confirmed and three are Assumed with new declarations. No answer was promoted beyond what its evidence supports, and no answer was demoted below it."
+  },
+  "decisions": [
+    {
+      "claim_id": "ELTE_PREV_MSCA_HOSTING",
+      "answer": "None.",
+      "status": "Assumed",
+      "declaration_key": "elte_previous_msca_hosting",
+      "lands_in": ["consortium/capabilities.json participant_capacity HOST", "working_assumptions.json"],
+      "reasoning": "A fact about ELTE's institutional record. The ELTE research office holds it and has not been asked, so this is the operator's statement about a third party. Declared, not Confirmed. The value of the answer is that §3.2 can now state the absence as a fact rather than leave the field blank; the standing distinction is preserved in the record — PLANTDIGISENSE evidences an MSCA-PF application at ELTE with the same fellow and supervisor, not a funded hosting, and §3.2 must not blur the two."
+    },
+    {
+      "claim_id": "TEACHING_MSC_PRIMARY_SUP",
+      "answer": "No MSc thesis supervision.",
+      "status": "Confirmed",
+      "lands_in": ["project_brief/training_and_career_development.md", "architecture_inputs/impacts.json EI-06", "call_binding/topic_mapping.json EO-08"],
+      "reasoning": "A decision about the action's own design, so Confirmed rather than declared. The measure previously read 'primary-supervise one ELTE MSc thesis to completion' and carried an Assumed note because primary supervision may require a formal ELTE affiliation the fellow will not automatically hold. The operator resolved this by withdrawing the activity rather than by settling the status question. The documented fallback to co-supervision falls with it: the instruction is about MSc thesis supervision as such, not about the grade of it.",
+      "ripple": "EI-06 and EO-08 both still map. Two measures remain — the module unit, which was always the element carrying the ambition, and the PhD field-experiment co-supervision, which is untouched. phase_05_gate predicate g06_p04 (every Tier 2B expected impact carries at least one mapped output) is therefore still satisfiable."
+    },
+    {
+      "claim_id": "PLACEMENT_WORKSPACE",
+      "answer": "Desk/office, FMIS dev/staging, customer-data environment.",
+      "status": "Assumed",
+      "declaration_key": "placement_workspace_AgroVIR",
+      "lands_in": ["consortium/capabilities.json hosting_capacity_for_the_placement", "working_assumptions.json"],
+      "reasoning": "AgroVIR's own facilities, which only AgroVIR can evidence; the operator relayed them and no written confirmation from the company is in Tier 3. Declared, not Confirmed. This was the one hosting-capacity count with nothing behind it and the count an evaluator tests the placement's reality against; it now has substance on a working location and on the two systems the six-month work content actually runs on.",
+      "not_closed": "Three of the record's four missing fields are answered. The fourth, 'the team she joins', is not, and is left Unresolved on the workspace record rather than inferred from the supervisor's name. Part B-2 §5 still asks for it.",
+      "not_adopted": "The earlier 2026-08-12 answer, 'field trials with farmers via the AgroVIR network', remains not adopted as workspace. It is VALIDATION_PARTNER field access that exists independently of the placement and stays recorded as supplementary_field_access."
+    },
+    {
+      "claim_id": "PLACEMENT_ONSITE_SUPERVISOR",
+      "answer": "Senior research officer.",
+      "status": "Assumed",
+      "declaration_key": "placement_supervisor_title_AgroVIR",
+      "lands_in": ["consortium/capabilities.json AgroVIR key_people", "working_assumptions.json"],
+      "reasoning": "Miklós Maróti's title inside AgroVIR, on the same footing as his name, which was declared on 2026-08-12: operator-supplied and not independently verifiable, because the company website names no staff. Closes what Part B-2 §5 asks for and supplies the seniority the Part B-1 §1.3 placement argument leans on."
+    },
+    {
+      "claim_id": "CO_SUP_ELTE_CONTRACT",
+      "answer": "Primary employment is ELTE; supervision will be carried out only at the beneficiary.",
+      "status": "Confirmed",
+      "lands_in": ["call_binding/confirmation_checklist.json CO_SUPERVISOR open_check", "consortium/partners.json CO_SUPERVISOR", "consortium/roles.json CO_SUPERVISOR"],
+      "reasoning": "Two halves, and only together do they close the check. The first makes Dr. Roland Hollós an ELTE supervisor rather than a HUN-REN one; the second commits the supervision itself to the beneficiary regardless of what other affiliations he holds, which is what MSCA requires. The records were already Confirmed as an operator decision with the check named; closing the check does not change their status, it removes the caveat. Recorded honestly: no employment contract is in Tier 3, and the published affiliation on Hollós et al. 2026 corroborates the ELTE department but not its primacy. CO_SUPERVISOR is confirmed as the right token and resolves to HOST."
+    },
+    {
+      "claim_id": "invited_talks",
+      "answer": "None yet.",
+      "status": "Confirmed",
+      "lands_in": ["consortium/capabilities.json researcher_profile"],
+      "reasoning": "The field's own standing note set the closing action as 'supply or confirm none', on the stated ground that 'not supplied' and 'there are none' are different facts and only the second can be written into §1.4. The operator has now confirmed the second. Recorded as a confirmed absence on two mutually corroborating sources: the Europass CV supplied under item 11 lists no invited talks, and the operator confirmed the absence directly against the question. The operator's 'yet' is not carried into the record as a forward claim.",
+      "drafting_note": "A confirmed absence is a licence for §1.4 to be silent on the topic, not an instruction to advertise a gap."
+    }
+  ],
+  "authorisation_impact": {
+    "note": "Five of the six were listed in fieldwise-authorisation_2026-08-12.json open_items_accepted. That record fingerprints 15 Tier 3 artifacts under the rule 'divergence is not forbidden, undeclared divergence is', enforced by tests/runner/test_fieldwise_ticket7_authorisation.py. Six of the fifteen move with this fold and each has an amendments entry naming the artifact, the change and the date.",
+    "artifacts_moved": [
+      "docs/tier3_project_instantiation/consortium/capabilities.json",
+      "docs/tier3_project_instantiation/consortium/partners.json",
+      "docs/tier3_project_instantiation/consortium/roles.json",
+      "docs/tier3_project_instantiation/working_assumptions.json",
+      "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+      "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+    ],
+    "open_items_remaining": "Six of the twelve accepted open items stay open, untouched by this fold: the C5 mobility override, ELTE and MATE recent projects, AgroVIR's track record, AgroVIR's PIC and registration number, the background-IP question on the DrR components, MVCRI's signatory authority, and — newly narrowed rather than closed — the team the fellow joins during the placement."
+  },
+  "gate_impact": {
+    "note": "Three of the moved artifacts are recorded inputs to already-released gates, so ST-1 content-based staleness invalidates those gates and their nodes will not bootstrap as released until re-run. This is the staleness mechanism working as designed and is recorded here rather than worked around (§13.7).",
+    "stale": [
+      {"gate": "phase_04_gate", "node": "n04_gantt_milestones", "via": "consortium/roles.json"},
+      {"gate": "phase_05_gate", "node": "n05_impact_architecture", "via": "architecture_inputs/impacts.json"},
+      {"gate": "phase_06_gate", "node": "n06_implementation_architecture", "via": "consortium/partners.json"}
+    ],
+    "unaffected": "capabilities.json, working_assumptions.json, confirmation_checklist.json and topic_mapping.json are not recorded inputs to any released gate.",
+    "expected_outcome": "All three edits are to note and description text plus the EI-06 measure, which still maps. No predicate is expected to change verdict; the gates need re-evaluation, not repair."
+  },
+  "what_this_does_not_do": [
+    "It does not resolve the C-CANONICAL-PACK-MISMATCH claim in the Excellence 1.1 draft. That claim is a tooling artifact whose premise — an absent canonical reference pack — was fixed separately in runner/phase8_canonical_pack.py, and it clears when the Excellence section is re-drafted, not by any Tier 3 change.",
+    "It does not re-draft any Phase 8 section. The drafts still carry the pre-fold statuses until they are regenerated.",
+    "It does not promote any Assumed value to Confirmed, and it does not close the four capacity fields the organisations themselves must supply."
+  ],
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/consortium/capabilities.json",
+    "docs/tier3_project_instantiation/consortium/partners.json",
+    "docs/tier3_project_instantiation/consortium/roles.json",
+    "docs/tier3_project_instantiation/working_assumptions.json",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+    "docs/tier3_project_instantiation/call_binding/topic_mapping.json",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+    "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json (amendments only)"
+  ]
+}

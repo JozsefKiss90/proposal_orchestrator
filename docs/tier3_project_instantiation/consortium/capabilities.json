@@ -193,9 +193,10 @@
       "recent_projects_and_publications": null,
       "recent_projects_and_publications_status": "Unresolved",
       "recent_projects_and_publications_note": "Deferred by the operator on 2026-08-11. CORDIS is the wrong instrument: it indexes participants at university level, so an ELTE query returns faculty-wide projects with no connection to the Institute of Cartography and Geoinformatics. The institute's own project list is what is wanted and only Prof. Jung or the institute can supply it.",
-      "previous_msca_hosting": null,
-      "previous_msca_hosting_status": "Unresolved",
-      "previous_msca_hosting_note": "Deferred by the operator on 2026-08-11. PLANTDIGISENSE (HORIZON-MSCA-2025-PF, proposal 101284764, scored 70.40%) evidences that ELTE hosted an MSCA-PF application with the same fellow and supervisor. It does not evidence hosting a funded fellow, and §3.2 must not blur the two claims. The ELTE research office holds the answer.",
+      "previous_msca_hosting": "None. ELTE has not previously hosted a funded MSCA fellow.",
+      "previous_msca_hosting_status": "Assumed",
+      "previous_msca_hosting_note": "Declared in working_assumptions.json under key elte_previous_msca_hosting, registered on the HOST record in call_binding/confirmation_checklist.json assumed_declarations. Answered by the operator on 2026-08-14: none. This closes the field as a stated absence rather than as a deferral, which is the form §3.2 can actually use — 'not supplied' and 'there are none' are different facts and only the second can be written into the capacity section. Recorded Assumed and declared, not Confirmed: the ELTE research office is the body that holds the institutional record and it has not been asked, so this is the operator's statement about a third party on the same footing as the AgroVIR contacts. The distinction the earlier note protects still holds and §3.2 must keep it: PLANTDIGISENSE (HORIZON-MSCA-2025-PF, proposal 101284764, scored 70.40%) evidences that ELTE hosted an MSCA-PF application with the same fellow and supervisor, not that it hosted a funded fellow. §3.2 therefore states the absence plainly and leans on the application record and the institute's supervision capacity, rather than implying hosting experience it does not have.",
+      "previous_msca_hosting_source_ref": "Operator answer of 2026-08-14, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-open-items-fold_2026-08-14.json",
       "validation_status": "Confirmed",
       "source_ref": "Operator input pack item 12, answered in part 2026-08-11 (quoting PLANTDIGISENSE Part B-1 §3.2, pages 9-10); item 7 (co-supervisor); §3.2 ¶425-426 (draft function statement)"
     },
@@ -275,9 +276,9 @@
         {
           "name": "Miklós Maróti",
           "project_role": "On-site placement supervisor for the M25-M30 non-academic placement",
-          "title": null,
-          "title_status": "Unresolved",
-          "title_note": "His role and seniority inside AgroVIR are not supplied. Part B-2 §5 needs both. The Part B-1 §1.3 placement argument also leans on seniority: an evaluator reads 'supervised by a named person' differently from 'supervised by the head of engineering'.",
+          "title": "Senior research officer",
+          "title_status": "Assumed",
+          "title_note": "Declared in working_assumptions.json under key placement_supervisor_title_AgroVIR, registered on the VALIDATION_PARTNER record in call_binding/confirmation_checklist.json assumed_declarations; the name itself is declared separately under placement_supervisor_AgroVIR via the declaration_key on this record. Answered by the operator on 2026-08-14: senior research officer. Assumed and declared on the same footing as the name itself — operator-supplied and not independently verifiable, because the company website names no staff. This closes the Part B-2 §5 requirement for a role and gives the Part B-1 §1.3 placement argument the seniority it leans on: a research officer at senior grade is a research-side supervisor, which is the register the placement's training rationale needs, rather than a purely commercial engineering post.",
           "validation_status": "Assumed",
           "declaration_key": "placement_supervisor_AgroVIR",
           "source_ref": "Operator answer of 2026-08-12, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json",
@@ -300,28 +301,32 @@
       "relevant_track_record_status": "Unresolved",
       "relevant_track_record_note": "Deferred by the operator on 2026-08-11. No EU-funded research participation was found. Input pack item 12 instructs that if there is none, §3.2 says so plainly and leans on the commercial footprint, because an unevidenced claim of research experience is worse than an honest absence.",
       "hosting_capacity_for_the_placement": {
-        "validation_status": "Unresolved",
-        "note": "Opened by the placement decision of 2026-08-11 and answered in part by the operator on 2026-08-12. Part B-1 must show AgroVIR can host a researcher on four counts: who supervises her on site, what workspace and system access she gets, what she does for six months, and what she gains that ELTE cannot give her. Two counts are answered, one is derived from them, and one has nothing behind it. The record stays Unresolved overall on that one count.",
-        "source_ref": "Operator answers of 2026-08-12, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json; input pack item 12 (the four counts); input pack item 2 (the placement decision of 2026-08-11)",
+        "validation_status": "Assumed",
+        "note": "Opened by the placement decision of 2026-08-11, answered in part by the operator on 2026-08-12, and completed on 2026-08-14. Part B-1 must show AgroVIR can host a researcher on four counts: who supervises her on site, what workspace and system access she gets, what she does for six months, and what she gains that ELTE cannot give her. All four now have content. The record moves from Unresolved to Assumed rather than to Confirmed: three of the four rest on operator declarations about AgroVIR's own staff and facilities, which only AgroVIR can evidence, and the fourth is a derivation. One sub-field stays open inside the workspace record — the team she joins — and it is named there rather than closed by inference.",
+        "source_ref": "Operator answers of 2026-08-12, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json, and of 2026-08-14, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-open-items-fold_2026-08-14.json; input pack item 12 (the four counts); input pack item 2 (the placement decision of 2026-08-11)",
         "on_site_supervisor": {
           "value": "Miklós Maróti",
           "validation_status": "Assumed",
           "declaration_key": "placement_supervisor_AgroVIR",
-          "open": "Title and seniority, recorded on the key_people record above as Unresolved.",
+          "open": "Closed on 2026-08-14: title and seniority are senior research officer, recorded and declared on the key_people record above as Assumed.",
           "note": "Operator-supplied on 2026-08-12 and not independently verified; the company website names no staff. Assumed and declared rather than Confirmed, on the same footing as the Balázs and Takács contacts. The full record, including the Unresolved title, is the key_people entry above; this field is the hosting-capacity view of it.",
           "source_ref": "Operator answer of 2026-08-12, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json"
         },
         "workspace_and_system_access": {
-          "value": null,
-          "validation_status": "Unresolved",
-          "supplied_answer_not_adopted": "The operator's supplied answer was 'field trials with farmers via the AgroVIR network'. It answers a different question. Field access is what AgroVIR already provides as VALIDATION_PARTNER from M16, independently of the placement, and it is recorded as supplementary_field_access below rather than as workspace. A non-academic placement is about embedding the fellow in the organisation, not about access to its customers' fields.",
-          "missing_fields": [
+          "value": "Desk or office space at AgroVIR for M25-M30, access to the FMIS development and staging environment, and access to the customer-data environment.",
+          "validation_status": "Assumed",
+          "declaration_key": "placement_workspace_AgroVIR",
+          "answered_fields": [
             "Desk or office location during M25-M30",
             "Access to the FMIS development or staging environment",
-            "Access to the customer-data environment",
+            "Access to the customer-data environment"
+          ],
+          "missing_fields": [
             "The team she joins"
           ],
-          "note": "This is the one count of the four with nothing behind it, and it is the count an evaluator tests the placement's reality against. Only AgroVIR can supply it. Nothing is guessed."
+          "supplied_answer_not_adopted": "The operator's earlier answer of 2026-08-12 was 'field trials with farmers via the AgroVIR network'. It answers a different question and is still not adopted here. Field access is what AgroVIR already provides as VALIDATION_PARTNER from M16, independently of the placement, and it stays recorded as supplementary_field_access below rather than as workspace. A non-academic placement is about embedding the fellow in the organisation, not about access to its customers' fields. The 2026-08-14 answer supersedes it by answering the question actually asked.",
+          "source_ref": "Operator answer of 2026-08-14, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-open-items-fold_2026-08-14.json",
+          "note": "Answered by the operator on 2026-08-14 for three of the four fields. This was the one count of the four hosting-capacity counts with nothing behind it, and the count an evaluator tests the placement's reality against; it now has substance on the two that matter most to that test — a working location for the six months, and access to the two systems the placement's work content actually runs on. The three access claims map onto the six_month_work_content items: FMIS development or staging is what 'operational hardening of the prediction pipeline in a production FMIS environment' requires, and the customer-data environment is what the nine-dimension assessment and the requirements work with commercial growers require. Recorded Assumed and declared, not Confirmed: these are AgroVIR's facilities and only AgroVIR can evidence them; the operator relayed them and no written confirmation from the company is in Tier 3. The desk or office location is given as a fact of provision rather than as a named room, which is what §1.3 needs and all the operator supplied. One field stays open and is not closed by inference: the team she joins. Part B-2 §5 asks for it and nothing supplied names it, so it is left Unresolved rather than guessed from the supervisor's name."
         },
         "six_month_work_content": {
           "validation_status": "Confirmed",
@@ -354,8 +359,8 @@
           "source_ref": "§3.1 ¶312 (D5.1), ¶317 (MS5 at M23); operator check of 2026-08-12"
         }
       },
-      "hosting_capacity_status": "Unresolved",
-      "hosting_capacity_note": "Was a single null field with everything missing. The operator answered two of the four counts on 2026-08-12 and the record is decomposed accordingly. It blocks no gate and it is scored. What remains open is workspace and system access, plus the supervisor's title and seniority.",
+      "hosting_capacity_status": "Assumed",
+      "hosting_capacity_note": "Was a single null field with everything missing. The operator answered two of the four counts on 2026-08-12, the record was decomposed accordingly, and the remaining answers arrived on 2026-08-14: workspace and system access, and the supervisor's title and seniority. All four counts now have content and the status moves to Assumed, because what closed them is operator declaration about a third party's staff and facilities rather than evidence from AgroVIR itself. It blocks no gate and it is scored. One sub-field remains open and is named on the workspace record: the team she joins.",
       "validation_status": "Confirmed",
       "source_ref": "Operator input pack items 1, 2 and 12, answered in part 2026-08-11; §3.2 ¶431-432 (draft capacity statement)"
     }
@@ -393,9 +398,10 @@
     "awards_and_mobilities": "STSM awardee, COST Action CA22136 PANGEOS, at MATE, Hungary, 2025. Three Erasmus+ staff mobility grants, MATE (HU) and University of Novi Sad (RS), 2025-2026. Erasmus PhD mobility, Russian State Agrarian University - Moscow Timiryazev Academy, three months, 2018. Erasmus master's mobility internship, ELTE Budapest, three months, 2026. UAV pilot licence A1/A3, Civil Aviation Administration Bulgaria, BGR-RP-t8drlyacolpq. Member of COST Actions CA22136 PANGEOS, CA22149 AI4Insect and CA22141 REcrop.",
     "second_masters": "MSc Environmental Engineering, Agricultural University Plovdiv, 2025-09-15 to 2026-05-31. Earlier: MSc Plant Protection (2013) and BSc Plant Protection (2012), both AU Plovdiv.",
     "previous_msca_submission": "PLANTDIGISENSE, HORIZON-MSCA-2025-PF, proposal 101284764, host ELTE, total score 70.40% against a 70.00 threshold. FIELDWISE is therefore a resubmission that must move a score rather than repair a failure, and the draft answers that evaluation in three places (§1.2.1, §2.2 and the §3.1 note on late milestones). The Evaluation Summary Report is not in Tier 3; input pack item 11 names it as the highest-value missing input to Phase 8 drafting.",
-    "invited_talks": null,
-    "invited_talks_status": "Unresolved",
-    "invited_talks_note": "Not in the CV. Input pack item 11 left it open, and the operator explicitly deferred it again on 2026-08-12 at the authorisation review: supply or confirm none. It stays Unresolved and named rather than being closed as an absence, because 'not supplied' and 'there are none' are different facts and only the second can be written into §1.4. It blocks no gate.",
+    "invited_talks": "None to date.",
+    "invited_talks_status": "Confirmed",
+    "invited_talks_note": "Closed by the operator on 2026-08-14: none yet. Input pack item 11 left this open and the operator deferred it again on 2026-08-12 at the authorisation review, with the closing action stated as 'supply or confirm none'. That is what has now happened, so the field moves to a confirmed absence rather than staying a deferral — the distinction the earlier note protected is precisely that 'not supplied' and 'there are none' are different facts and only the second can be written into §1.4. Recorded Confirmed rather than Assumed on two mutually corroborating sources: the Europass CV supplied under item 11 lists no invited talks, and the operator has now confirmed the absence directly against the question. §1.4 must state the absence only if it has reason to raise the topic at all; a confirmed absence is a licence to be silent, not an instruction to advertise a gap. The 'yet' is the operator's and is not carried into the record as a forward claim.",
+    "invited_talks_source_ref": "Operator input pack item 11 (Europass CV supplied 2026-08-11, no invited talks listed); operator confirmation of 2026-08-14, recorded in docs/tier4_orchestration_state/decision_log/fieldwise-open-items-fold_2026-08-14.json",
     "career_break": "2021-07-25 to 2024-05-31, full-time parenting, in Budapest, Hungary. Just over 34 months. Declared in Part A. It does not count against the research-experience ceiling.",
     "mobility_eligibility": {
       "validation_status": "Assumed",

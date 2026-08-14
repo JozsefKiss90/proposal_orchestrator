@@ -308,16 +308,29 @@ design, not a gap.
 
 ## 5. Status totals
 
-| Status | Count | Change since revision 1 |
-|--------|-------|--------------------------|
-| Confirmed | 231 | +17 |
-| Inferred | 19 | +5 |
-| Assumed | 34 | +7 |
-| Unresolved | 17 | +3 |
-| **Total** | **301** | **+32** |
+| Status | Count | Change since revision 1 | Change at the 2026-08-14 fold |
+|--------|-------|--------------------------|-------------------------------|
+| Confirmed | 232 | +17 | +1 |
+| Inferred | 19 | +5 | 0 |
+| Assumed | 42 | +7 | +8 |
+| Unresolved | 11 | +3 | -6 |
+| **Total** | **304** | **+32** | **+3** |
 
-The count covers 251 `validation_status` and `*_status` fields across the Tier 3 JSON, plus 34
-checklist records, 14 declarations, and the 2 narrative front matters.
+The count covers 254 `validation_status` and `*_status` fields across the Tier 3 JSON, plus 34
+checklist records, 17 declarations, and the 2 narrative front matters.
+
+**Amended 2026-08-14 (open-items fold).** The counts above are recomputed, not the ones tallied at
+the 2026-08-12 review; the fourth column isolates what the fold moved. The operator answered six of
+the twelve accepted open items and Tier 3 was updated accordingly, so six Unresolved records closed:
+ELTE's previous MSCA hosting, the AgroVIR placement supervisor's title, the placement workspace and
+system access, the two hosting-capacity roll-ups, and the researcher's invited talks. Five closed to
+Assumed, backed by three new declarations, because they report facts about a third party that only
+that third party can evidence; the sixth, invited talks, closed to a Confirmed absence on the CV plus
+the operator's direct confirmation. The MSc thesis supervision withdrawal and the co-supervisor's
+employment check moved records that were already Confirmed and so changed no total. One new named gap
+was created rather than closed and is counted in the 11: the team the fellow joins during the
+placement, which the workspace decomposition separated out. Record:
+`decision_log/fieldwise-open-items-fold_2026-08-14.json`.
 
 **Unresolved rose while the state improved.** That is the decomposition, not a regression. Revision 1
 carried AgroVIR's hosting capacity as one opaque null field with all four counts missing. It is now

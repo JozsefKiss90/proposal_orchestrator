@@ -517,8 +517,11 @@ class TestAuthorisationReviewFold:
         )
         assert supervisor["validation_status"] == "Assumed"
         assert supervisor["declaration_key"] == "placement_supervisor_AgroVIR"
-        assert supervisor["title"] is None
-        assert supervisor["title_status"] == "Unresolved"
+        # Title answered by the operator at the 2026-08-14 open-items fold and
+        # declared under its own key, on the same footing as the name: still
+        # operator-supplied and still not independently verifiable.
+        assert supervisor["title"] == "Senior research officer"
+        assert supervisor["title_status"] == "Assumed"
 
     def test_the_workspace_answer_was_not_adopted_as_workspace(self, capabilities):
         agrovir = next(
@@ -528,9 +531,15 @@ class TestAuthorisationReviewFold:
         )
         hosting = agrovir["hosting_capacity_for_the_placement"]
         workspace = hosting["workspace_and_system_access"]
-        assert workspace["value"] is None
-        assert workspace["validation_status"] == "Unresolved"
-        assert len(workspace["missing_fields"]) == 4
+        # Answered at the 2026-08-14 open-items fold for three of the four
+        # fields and declared; the fourth is named, not inferred.
+        assert workspace["validation_status"] == "Assumed"
+        assert workspace["declaration_key"] == "placement_workspace_AgroVIR"
+        assert len(workspace["answered_fields"]) == 3
+        assert workspace["missing_fields"] == ["The team she joins"]
+        # The rejected field-access answer is still rejected as workspace: the
+        # fold answered the question asked, it did not retrofit the old answer.
+        assert "not adopted" in workspace["supplied_answer_not_adopted"].lower()
         # The supplied field-access answer survives, as a supplementary fact.
         supplementary = hosting["supplementary_field_access"]
         assert supplementary["validation_status"] == "Confirmed"
@@ -718,11 +727,21 @@ class TestPlacementVerification:
             "fieldwise-ticket7-review-round2_2026-08-12.json"
         )
 
-    def test_invited_talks_stay_unresolved(self, capabilities):
+    def test_invited_talks_closed_as_a_confirmed_absence(self, capabilities):
+        """Closed at the 2026-08-14 fold, on the terms the field itself set.
+
+        The standing note made the closing action explicit — 'supply or confirm
+        none' — on the ground that 'not supplied' and 'there are none' are
+        different facts and only the second can be written into §1.4.  The
+        operator confirmed the second, so this is a Confirmed absence rather
+        than a deferral, and the record must still carry the deferral history.
+        """
         profile = capabilities["researcher_profile"]
-        assert profile["invited_talks"] is None
-        assert profile["invited_talks_status"] == "Unresolved"
-        assert "2026-08-12" in profile["invited_talks_note"]
+        assert profile["invited_talks"] == "None to date."
+        assert profile["invited_talks_status"] == "Confirmed"
+        note = profile["invited_talks_note"]
+        assert "2026-08-12" in note, "the deferral history must survive"
+        assert "2026-08-14" in note, "the closing date must be named"
 
 
 class TestInvariantsThePacketRestsOn:

@@ -490,10 +490,13 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
             for entry in capabilities["participant_capacity"]
         }
         # AgroVIR key_people was the fifth. Ticket 7 answered it in part, so it
-        # is pinned by the ticket 7 test rather than here.
+        # is pinned by the ticket 7 test rather than here.  ELTE
+        # previous_msca_hosting was the sixth: the operator answered it at the
+        # 2026-08-14 open-items fold, so it moved to Assumed and is asserted
+        # below rather than here.  Only the organisations themselves can supply
+        # what is left, so these three stay null and named.
         expected_unresolved = [
             ("ELTE", "recent_projects_and_publications"),
-            ("ELTE", "previous_msca_hosting"),
             ("MATE", "recent_projects_and_publications"),
             ("AgroVIR", "relevant_track_record"),
         ]
@@ -501,6 +504,15 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
             entry = by_short_name[short_name]
             assert entry[field] is None, f"{short_name} {field} was guessed"
             assert entry[f"{field}_status"] == "Unresolved"
+
+        # Answered 2026-08-14 as a stated absence and declared, not Confirmed:
+        # the ELTE research office holds the institutional record.
+        elte = by_short_name["ELTE"]
+        assert elte["previous_msca_hosting_status"] == "Assumed"
+        assert elte["previous_msca_hosting"] is not None
+        # The distinction the field protected throughout must survive: an
+        # application at ELTE is not a funded hosting.
+        assert "PLANTDIGISENSE" in elte["previous_msca_hosting_note"]
 
     def test_answered_capacity_fields_are_filled(self, capabilities):
         elte = next(
@@ -522,9 +534,14 @@ class TestCriterion4DeferredItemsStayUnresolvedAndListed:
     ):
         cv = capabilities["researcher_profile"]
         assert cv["validation_status"] == "Confirmed"
+        # The ORCID stays Assumed: supplied by the operator and still not
+        # independently verifiable through any of the three routes tried.
         assert cv["orcid_status"] == "Assumed"
-        assert cv["invited_talks"] is None
-        assert cv["invited_talks_status"] == "Unresolved"
+        # invited_talks was the CV's one Unresolved field.  The operator closed
+        # it at the 2026-08-14 fold by confirming the absence, which is the one
+        # form of answer the field's own note said §1.4 could use.
+        assert cv["invited_talks_status"] == "Confirmed"
+        assert cv["invited_talks"] == "None to date."
 
     def test_undecided_candidates_are_not_folded_as_accepted(self):
         """A candidate may only leave Unresolved by an operator decision.

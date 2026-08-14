@@ -1,0 +1,57 @@
+{
+  "schema_id": "orch.gate_result.v1",
+  "gate_id": "gate_10a_excellence_completeness",
+  "gate_kind": "exit",
+  "run_id": "9a5dfb55-de01-48b2-acec-86498a8ad171",
+  "manifest_version": "1.1",
+  "library_version": "1.0",
+  "constitution_version": "21430b0",
+  "input_fingerprint": "sha256:d5dafe4497727050cedc0b84470bf503c476900fbef4711f1a0d664870406a25",
+  "input_artifact_fingerprints": {
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:9656f4ece7b503b06d75a0affe47b9ea790834d374534c046ce36d6cb9252b9d",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:03de4475ce9f94c26eb2deb50a0b5cb7655bd457a8f1b58692592c88a84884b0"
+  },
+  "evaluated_at": "2026-08-14T12:27:22.635798+00:00",
+  "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
+  "status": "fail",
+  "deterministic_predicates": {
+    "passed": [
+      "g09a_p02",
+      "g09a_p03",
+      "g09a_p01",
+      "g09a_p04",
+      "g09a_p05",
+      "g09a_p05b",
+      "g09a_p07",
+      "g09a_p08",
+      "g09a_p09",
+      "g09a_p10",
+      "g09a_p11"
+    ],
+    "failed": [
+      {
+        "predicate_id": "g09a_p06",
+        "type": "coverage",
+        "function": "no_unresolved_material_claims",
+        "args": {
+          "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+        },
+        "failure_category": "POLICY_VIOLATION",
+        "reason": "Unresolved material claims in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: validation_status.overall_status is 'unresolved'",
+        "details": {
+          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
+          "overall_status": "unresolved"
+        },
+        "fail_message": "Excellence section contains unresolved material claims (validation_status.overall_status is \"unresolved\").\n",
+        "prose_condition": "No unresolved material claims in Excellence section"
+      }
+    ]
+  },
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
+  "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
+}
