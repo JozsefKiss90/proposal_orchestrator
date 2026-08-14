@@ -87,9 +87,9 @@
     ]
   },
   "declarations_standing": {
-    "note": "Operator declarations in working_assumptions.json back every Assumed record. They are also the only claim ids an assumed Phase 8 claim may carry, because g09a_p11, g09b_p12 and g09c_p11 match claim_id against a declaration key and claim_summary against the declared value exactly. Fourteen stood at authorisation on 2026-08-12; three were added by the open-items fold of 2026-08-14 (elte_previous_msca_hosting, placement_supervisor_title_AgroVIR, placement_workspace_AgroVIR), each declared in the amendments entry for working_assumptions.json and recorded in decision_log/fieldwise-open-items-fold_2026-08-14.json. The list is kept current rather than frozen at the authorisation date, because it is what the three Phase 8 predicates match against at run time.",
+    "note": "Operator declarations in working_assumptions.json back every Assumed record. They are also the only claim ids an assumed Phase 8 claim may carry, because g09a_p11, g09b_p12 and g09c_p11 match claim_id against a declaration key and claim_summary against the declared value exactly. Fourteen stood at authorisation on 2026-08-12; three were added by the open-items fold of 2026-08-14 (elte_previous_msca_hosting, placement_supervisor_title_AgroVIR, placement_workspace_AgroVIR), each declared in the amendments entry for working_assumptions.json and recorded in decision_log/fieldwise-open-items-fold_2026-08-14.json. The list is kept current rather than frozen at the authorisation date, because it is what the three Phase 8 predicates match against at run time. Amended 2026-08-14: mobility_eligibility is WITHDRAWN from this list. The operator instructed that mobility eligibility is confirmed, so the fact is now held as Confirmed in confirmation_checklist.json and capabilities.json and no longer as a declaration — a declaration cannot back a Confirmed record, because the reader stamps every declaration Assumed. This supersedes c5_override_carried_without_promotion below, which forbade exactly this promotion; the override is the operator's and is recorded in decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json. Also synced 2026-08-14: four declarations added by the operator's placeholder fold (agrovir_relevant_track_record, placement_team_AgroVIR, contact_person_title_AgroVIR, signatory_authority_MVCRI) were absent from this list and are added, so it matches working_assumptions.json exactly as the packet invariant requires.",
     "count_at_authorisation": 14,
-    "count": 17,
+    "count": 20,
     "keys": [
       "family_allowance",
       "long_term_leave_allowance",
@@ -104,13 +104,16 @@
       "placement_supervisor_AgroVIR",
       "contact_email_MVCRI",
       "researcher_orcid",
-      "mobility_eligibility",
       "elte_previous_msca_hosting",
       "placement_supervisor_title_AgroVIR",
-      "placement_workspace_AgroVIR"
+      "placement_workspace_AgroVIR",
+      "agrovir_relevant_track_record",
+      "placement_team_AgroVIR",
+      "contact_person_title_AgroVIR",
+      "signatory_authority_MVCRI"
     ]
   },
-  "c5_override_carried_without_promotion": "The mobility-eligibility override of 2026-08-11 stays Assumed. It is declared under key mobility_eligibility, registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and carried in capabilities.json researcher_profile at status Assumed. Authorising the seed does not promote it to Confirmed, and nothing in the run may. Only a rectified CV consistent with Part A and with ELTE's Erasmus records can do that.",
+  "c5_override_carried_without_promotion": "The mobility-eligibility override of 2026-08-11 stays Assumed. It is declared under key mobility_eligibility, registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and carried in capabilities.json researcher_profile at status Assumed. Authorising the seed does not promote it to Confirmed, and nothing in the run may. Only a rectified CV consistent with Part A and with ELTE's Erasmus records can do that. SUPERSEDED 2026-08-14. The operator instructed that mobility eligibility is confirmed, and an explicit in-session instruction outranks this constraint (CLAUDE.md §3 priority 1). The fact is now Confirmed in confirmation_checklist.json and capabilities.json and the declaration is withdrawn. The sentence above is left standing because it is what was authorised on 2026-08-12: an override that erases the rule it overrode is indistinguishable from there never having been one. See decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json.",
   "what_this_authorisation_does_not_do": {
     "status": "It changes no record status. The twelve open items stay at the status they carry, the thirty-four Assumed records stay Assumed, and no Unresolved field becomes fillable because the run was authorised.",
     "gates": "It waives no gate and weakens no gate condition. A gate that fails on incomplete input still fails, and that failure is a correct output under CLAUDE.md 12.4. Weakening a gate to let the run proceed would violate 13.7.",
@@ -183,6 +186,13 @@
       "operator_asked": true,
       "change": "EI-06 mapped_measure loses its third element, primary supervision of one ELTE MSc thesis to completion, which the operator withdrew. The documented fallback to co-supervision falls with it. Two measures remain and EI-06 still maps, so phase_05_gate predicate g06_p04 stays satisfiable. The mirror records in project_brief/training_and_career_development.md and call_binding/topic_mapping.json are amended in step; neither is fingerprinted here.",
       "record": "docs/tier4_orchestration_state/decision_log/fieldwise-open-items-fold_2026-08-14.json"
+    },
+    {
+      "artifact": "docs/tier3_project_instantiation/working_assumptions.json",
+      "date": "2026-08-14",
+      "operator_asked": true,
+      "change": "The mobility_eligibility declaration is withdrawn (declarations 21 -> 20) because the operator promoted the fact to Confirmed. Three placeholder declarations and the other 2026-08-14 additions are unaffected.",
+      "record": "docs/tier4_orchestration_state/decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json"
     }
   ],
   "amendment_rule": "If any fingerprinted artifact changes after this date, add an entry to amendments naming the artifact, the change, its date, and whether the operator was asked. An entry declares that the authorised state moved. It is not permission for it to move silently. tests/runner/test_fieldwise_ticket7_authorisation.py enforces the pairing: a changed artifact with no entry fails.",

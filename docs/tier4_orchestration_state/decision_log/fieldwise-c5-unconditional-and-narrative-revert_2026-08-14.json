@@ -1,0 +1,49 @@
+{
+  "record_type": "decision_log_entry",
+  "id": "fieldwise-c5-unconditional-and-narrative-revert-2026-08-14",
+  "date": "2026-08-14",
+  "branch": "fieldwise-run-01",
+  "authority": "CLAUDE.md §9.4 (durable decisions), §12.3 (explicit contradiction resolution), §13.7 (no silent gate weakening)",
+  "why": "Two decisions are recorded together because the second exists only to serve the first cheaply. (1) The operator removed the C5 conditionality on 2026-08-14. (2) The narrative restating that removal had been written into two gate-input artifacts, where a prose-only edit invalidated three upstream gates under ST-1 content staleness; the prose was reverted and its substance moved here. Nothing about the decision itself is weakened by the move — only where it is written down.",
+
+  "decision_1_c5_unconditional": {
+    "what": "The HOST and FELLOWSHIP_TYPE confirmations cease to be CONFIRM — CONDITIONAL. The operator overrode contradiction C5 on 2026-08-11 as a declared position pending a rectified CV, and on 2026-08-14 confirmed that eligibility is met and that the CV is not the authoritative record of residence, so nothing further is being waited on.",
+    "status": "Assumed — unchanged, and deliberately so",
+    "status_reasoning": "An operator declaration surfaces as Assumed wherever it appears, by design. The status records how the fact is held, not any doubt about the operator's position. Removing the conditionality does not promote the declaration, and nothing in any run may promote it: only residence evidence consistent with Part A and with ELTE's own Erasmus records could do that.",
+    "fixed_points": "Two periods are documented outside the CV and any later residence evidence must stay consistent with them: KPMG Global Hungary as employer of record (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months), together 7.05 months against a 12-month cap. On the CV's face the count is about 15.81 months, or 12.7 discounting the ELTE Erasmus entirely.",
+    "durable_home": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json, record MOBILITY_ELIGIBILITY — which already carries the full reasoning, the dates and the fixed points. The declaration itself is working_assumptions.json key mobility_eligibility; the Tier 3 surface is capabilities.json researcher_profile.mobility_eligibility.",
+    "submission_note": "Eligibility is self-declared at submission and verified at grant agreement preparation, so Part A's residence declaration must state what the checklist record states. The override, its basis and its dates stay on the record: an override that disappears from the record is indistinguishable from a fact."
+  },
+
+  "decision_2_narrative_reverted_from_gate_inputs": {
+    "what": "The 2026-08-14 restatement had been written into the `notes` field of call_binding/selected_call.json and the `spine_note` field of project_brief/project_summary.json. Both edits were reverted to their committed text. No structured field was touched by either the edit or the revert — each was a single narrative string.",
+    "why": "ST-1 judges gate freshness by whole-artifact content fingerprint. selected_call.json is a recorded input to BOTH phase_01_gate and phase_04_gate, and project_summary.json to phase_02_gate, so two prose edits invalidated three gates and would have forced three node re-runs. No predicate reads `notes` or `spine_note` (verified by search across runner/predicates/ and runner/), so the prose bought nothing a gate could see while costing three re-runs of live Claude work.",
+    "why_this_is_not_gate_weakening": "§13.7 forbids weakening a gate condition to let work proceed. Nothing here weakens one. The gates were invalidated by a change that carried no fact any predicate evaluates; reverting that change restores the exact state those gates were computed against, and their verdicts stand on the same bytes they were computed on. The substantive Tier 3 changes of 2026-08-14 — partners.json, capabilities.json, working_assumptions.json, confirmation_checklist.json — are NOT reverted, and the one gate genuinely invalidated by them (phase_06_gate, via partners.json) stays stale and must be re-run.",
+    "verified_after": "phase_01, phase_02, phase_03, phase_04, phase_05 and gate_09 fresh; phase_06_gate stale via consortium/partners.json, which is correct and is the only node needing a re-run."
+  },
+
+  "precedence_ruling_12_3": {
+    "contradiction": "call_binding/selected_call.json `notes` and project_brief/project_summary.json `spine_note` again read that the HOST and FELLOWSHIP_TYPE confirmations 'remain conditional on the C5 mobility-eligibility question'. The confirmation checklist records them as unconditional from 2026-08-14. Read literally, one tier now disagrees with itself.",
+    "resolution": "The confirmation checklist prevails. selected_call.json itself names it as the authority through its own `confirmation_checklist_ref` field, so this is the precedence the binding already declares rather than one invented to settle the conflict. The two narrative fields are carried-forward description of the binding as written on 2026-08-11; they are not the register in which confirmation status is held.",
+    "consequence_for_drafting": "Any consumer reading confirmation status — including Phase 8 drafting — must take it from confirmation_checklist.json, not from the two narrative fields. Neither field should be cited as a source for a claim about C5, mobility eligibility, or the conditionality of HOST or FELLOWSHIP_TYPE.",
+    "how_to_close_it_properly": "Rewriting the two narrative fields is the clean fix, and it costs a re-run of phase_01, phase_02 and phase_04. Batch it with the next occasion those phases must re-run for a substantive reason; do not spend three node runs on prose alone."
+  },
+
+  "reverted_prose_preserved_verbatim": {
+    "note": "Kept here so the revert loses no wording. Both strings are the 2026-08-14 versions that were removed from the two artifacts.",
+    "selected_call_json_notes": "The HOST and FELLOWSHIP_TYPE confirmations were conditional on the C5 mobility-eligibility question until 2026-08-14 and are now unconditional: the operator overrode C5 on 2026-08-11 as a declared position pending a rectified CV, and on 2026-08-14 confirmed that eligibility is met and that the CV is not the authoritative record of residence, so nothing further is being waited for. The override is declared in working_assumptions.json under key mobility_eligibility and registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and it stays at status Assumed — a declaration is stamped Assumed wherever it surfaces, so the status records how the fact is held, not any doubt about the operator's position. It must reach the authorisation packet with its basis and its dates and must not be promoted to Confirmed.",
+    "project_summary_json_spine_note": "The HOST and FELLOWSHIP_TYPE confirmations were conditional on the C5 mobility-eligibility question and became unconditional on 2026-08-14: the operator overrode C5 on 2026-08-11 as a declared position pending a rectified CV, then confirmed on 2026-08-14 that eligibility is met and that the CV is not the authoritative record of residence, so nothing is being waited for. The override is declared in working_assumptions.json under key mobility_eligibility and registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and stays at status Assumed, which is how a declaration is always stamped and not a doubt about the operator's position."
+  },
+
+  "operational_finding_line_endings": {
+    "what": "`git checkout` of the two files did NOT restore gate freshness on its own. The working copy is written CRLF while the gates recorded the LF bytes, so the fingerprints differed by line endings alone with the JSON content identical. The files were rewritten with LF to restore the exact recorded fingerprint.",
+    "evidence": "selected_call.json — recorded sha256:5a689e63…80ed; CRLF copy sha256:425a0f66…5a36; the same bytes as LF hash back to the recorded value.",
+    "why_it_matters": "On Windows any `git checkout`, stash pop or branch switch touching a gate-input artifact can silently invalidate upstream gates with zero content change, and the cost is measured in live Claude re-runs. ST-1 is behaving correctly — it fingerprints bytes — but a repo-level `.gitattributes` pinning these artifacts to LF would remove the hazard. Filed as a follow-up rather than fixed here."
+  },
+
+  "artifacts_written": [
+    "docs/tier3_project_instantiation/call_binding/selected_call.json (reverted to committed text, normalized to LF)",
+    "docs/tier3_project_instantiation/project_brief/project_summary.json (reverted to committed text, normalized to LF)",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (MOBILITY_ELIGIBILITY note corrected to match where the record now lives)"
+  ]
+}

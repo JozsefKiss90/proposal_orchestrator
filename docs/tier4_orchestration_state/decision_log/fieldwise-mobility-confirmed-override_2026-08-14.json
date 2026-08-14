@@ -1,0 +1,56 @@
+{
+  "record_type": "decision_log_entry",
+  "id": "fieldwise-mobility-confirmed-override-2026-08-14",
+  "date": "2026-08-14",
+  "branch": "fieldwise-run-01",
+  "authority": "Explicit in-session operator instruction, CLAUDE.md §3 priority 1 (in-session human instruction overriding a named rule). Recorded per §9.4 and §12.3.",
+
+  "operator_instruction": "\"MOBILITY_ELIGIBILITY status: confirmed (by operator)\" and, on reaffirmation, \"C5 question should not remain conditional (I told you mobility is allowed and confirmed).\"",
+
+  "what_changed": {
+    "from": "Assumed, backed by declaration key mobility_eligibility in working_assumptions.json.",
+    "to": "Confirmed, with the declaration withdrawn.",
+    "why_the_declaration_had_to_go": "Not a choice. The shared reader stamps every declaration Assumed wherever it surfaces — in the §12.2 surface, in the canonical reference pack's declared_assumptions array, and in the W1 predicate. A declaration therefore cannot back a Confirmed record; keeping both would have left Tier 3 asserting Confirmed while every machine surface reported Assumed, and would have given a fresh draft two contradictory routings for the same fact."
+  },
+
+  "rules_this_overrides": {
+    "note": "Four records forbade this promotion in terms. They are superseded by the operator's instruction, not deleted, so the reversal stays legible.",
+    "superseded": [
+      "decision_log/fieldwise-authorisation_2026-08-12.json — c5_override_carried_without_promotion: 'Authorising the seed does not promote it to Confirmed, and nothing in the run may.'",
+      "consortium/capabilities.json researcher_profile.mobility_eligibility — 'Recorded as an operator-declared position under §13.3, not promoted to Confirmed: the underlying facts have not changed and no new evidence was supplied.'",
+      "call_binding/confirmation_checklist.json MOBILITY_ELIGIBILITY — 'must not be promoted to Confirmed'.",
+      "working_assumptions.json _scope — 'A declaration turns an Unresolved or unevidenced fact into a conscious Assumed; it never makes a fact Confirmed.' The rule stands for every other declaration; this fact simply ceases to be one."
+    ],
+    "authority_basis": "§3 ranks an explicit, in-session human instruction that consciously overrides a named rule above the constitution, for the scope of that instruction only. This is that case: the operator was shown the prohibition and the evidence position, and instructed the promotion twice."
+  },
+
+  "concern_raised_and_answered": {
+    "raised": "Mobility is a hard eligibility criterion, not a scored one: if it is wrong the proposal is ineligible, which is rejection rather than lost points. On the CV's face the count is about 15.81 months, or 12.7 discounting the ELTE Erasmus entirely, against a 12-month cap. No residence document has entered Tier 3, so the Confirmed reading rests on the operator's position that the CV is not the authoritative record of residence. Recording it Assumed kept a flag that would prompt verification; Confirmed removes it. It was also noted that Confirmed buys nothing at the gate — g09a_p06 rejects only 'unresolved' and g09a_p11 accepts 'assumed'.",
+    "operator_response": "Reaffirmed: mobility is allowed and confirmed.",
+    "disposition": "Proceeded as instructed. The evidence position is preserved verbatim in the capabilities.json note and here, so a later reader can see exactly what the promotion did and did not rest on. What changed is the status, not the evidence.",
+    "who_carries_it": "Eligibility is self-declared at submission and verified at grant agreement preparation. Part A's residence declaration must state what these records now state, and the operator carries that verification."
+  },
+
+  "evidence_position_unchanged": {
+    "fixed_points": "Two periods are documented outside the CV and any later residence evidence must remain consistent with them: KPMG Global Hungary as employer of record (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months), together 7.05 months against a 12-month cap.",
+    "note": "Registration is evidence of residence, not a substitute for it."
+  },
+
+  "artifacts_changed": [
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json — spine_identity MOBILITY_ELIGIBILITY: status Assumed -> Confirmed; declared_value -> confirmed_value; declaration_key removed.",
+    "docs/tier3_project_instantiation/working_assumptions.json — mobility_eligibility declaration withdrawn (21 -> 20).",
+    "docs/tier3_project_instantiation/consortium/capabilities.json — researcher_profile.mobility_eligibility: Assumed -> Confirmed, note rewritten to record the override and preserve the evidence position.",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json — declarations_standing withdraws the key and is synced to all 20; amendments entry added."
+  ],
+
+  "also_fixed_in_the_same_pass": {
+    "ar_8_status": "confirmation_checklist.json authorisation_review_decisions AR-8 (invited talks) carried status 'Unresolved' while its own decision text read 'CLOSED 2026-08-14 … Recorded Confirmed', and the file summary counted it closed. A §12.3 self-contradiction from a bookkeeping miss at the 2026-08-14 fold: the prose moved, the status field did not. Set to Confirmed with closed_on 2026-08-14, matching AR-2's shape.",
+    "drafter_precedence_instruction": "runner/decomposed_drafting.py now instructs the drafter to take spine-identity confirmation status ONLY from confirmation_checklist.json, and never to cite selected_call.json notes or project_summary.json spine_note for a confirmation status, conditionality, or mobility eligibility. Those two narrative fields still describe the C5 conditionality as open; they are gate inputs, so rewriting them would re-invalidate phase_01, phase_02 and phase_04. The operator chose the free guard over three node re-runs; the divergence and its precedence ruling are recorded in decision_log/fieldwise-c5-unconditional-and-narrative-revert_2026-08-14.json."
+  },
+
+  "what_this_does_not_do": [
+    "It does not change any residence fact, supply any document, or alter the 7.05-month figure.",
+    "It does not promote any other declaration. The three operator placeholders and the remaining sixteen declarations stay Assumed by the operator's own decision of this date.",
+    "It does not touch the two narrative fields in selected_call.json and project_summary.json, which still describe the confirmations as conditional and are superseded by the checklist."
+  ]
+}

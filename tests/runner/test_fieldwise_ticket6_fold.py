@@ -336,20 +336,27 @@ class TestCriterion2EveryAssumedFactIsDeclared:
             assert decl.value == "does not apply"
             assert decl.checklist_ref == "BUDGET_OPTIONAL_LINES"
 
-    def test_the_mobility_override_is_declared_and_not_promoted(
+    def test_the_mobility_fact_is_confirmed_and_no_longer_declared(
         self, declarations, checklist
     ):
-        decl = declarations.declaration("mobility_eligibility")
-        assert decl is not None
-        assert decl.checklist_ref == "MOBILITY_ELIGIBILITY"
+        """C5 was promoted to Confirmed by operator override on 2026-08-14.
+
+        Until then this asserted the opposite, on the rule that a declaration
+        never makes a fact Confirmed.  The operator's explicit instruction
+        outranks that rule (CLAUDE.md §3).  What must still hold is the
+        *exclusivity*: the fact is held in exactly one register.  A Confirmed
+        record with a live declaration behind it would report Assumed through
+        every machine surface while Tier 3 read Confirmed.
+        """
         record = next(
             r
             for r in checklist["spine_identity"]
             if r["id"] == "MOBILITY_ELIGIBILITY"
         )
-        assert record["status"] == "Assumed", (
-            "the C5 override is an operator-declared position and must never "
-            "be promoted to Confirmed"
+        assert record["status"] == "Confirmed"
+        assert declarations.declaration("mobility_eligibility") is None, (
+            "a Confirmed fact must not also be declared — the reader stamps "
+            "every declaration Assumed"
         )
 
     def test_duration_and_host_country_stay_in_the_call_binding(

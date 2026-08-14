@@ -3,7 +3,8 @@
   "provenance_class": "manually_placed",
   "_authored_by": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3), 2026-08-12, from the returned operator input pack. In-tier source copy: docs/tier3_project_instantiation/source_materials/operator_input_pack/fieldwise_operator_input_pack.md. Fold record: docs/tier4_orchestration_state/decision_log/fieldwise-ticket6-fold_2026-08-12.json.",
   "_extended_by": "plans/fieldwise_tickets.md ticket 7 (Authorisation packet), 2026-08-12. One declaration added, placement_supervisor_AgroVIR, from the operator's answers at the authorisation review. Those answers are not in the input pack and cite decision-log records instead: decision_log/fieldwise-placement-hosting_2026-08-12.json and decision_log/fieldwise-ticket7-open-items_2026-08-12.json. The person_months_ELTE_co_supervisor rationale is updated with the operator's confirmation of 2.0; the value is unchanged.",
-  "_scope": "One declaration for every fact that Tier 3 marks Assumed. A declaration turns an Unresolved or unevidenced fact into a conscious Assumed (§12.2) owned and dated by the operator; it never makes a fact Confirmed. Every Assumed record in Tier 3 names its declaration_key here, and every key below backs at least one such record.",
+  "_extended_by_2026_08_14": "Operator instruction of 2026-08-14, to unblock Phase 8 drafting (n08a) with no budget for a further input round. Four declarations added: agrovir_relevant_track_record (a stated absence in the form input pack item 12 prescribed) and three PLACEHOLDERS — placement_team_AgroVIR, contact_person_title_AgroVIR and signatory_authority_MVCRI — enumerated under _operator_placeholders below. The mobility_eligibility declaration is restated unconditionally: its value drops the words 'on the rectified CV' and its rationale records the operator's position that the CV is not authoritative on residence; the arithmetic and the status are unchanged. Two fields that closed the same day are deliberately NOT declared here because they closed on evidence: the ELTE and MATE recent_projects_and_publications lists (each DOI verified against the publisher record) and AgroVIR's company registration number (13-09-200433, identified in the Hungarian company register). They are Confirmed on their own records in consortium/.",
+  "_scope": "One declaration for every fact that Tier 3 marks Assumed. A declaration turns an Unresolved or unevidenced fact into a conscious Assumed (§12.2) owned and dated by the operator; it never makes a fact Confirmed. Every Assumed record in Tier 3 names its declaration_key here, and every key below backs at least one such record. From 2026-08-14 the file carries two kinds of declaration and the difference is not visible downstream: most relay something the operator knows and cannot evidence, while three are placeholders standing in for something nobody has supplied. _operator_placeholders names those three; read it before treating any Assumed value here as a fact about the world.",
   "_deliberately_not_declared": {
     "project_duration_months": "30 is Confirmed in call_binding/selected_call.json, which is where runner/unit_cost_budget.py resolves it first (_resolve_confirmed_months) and where phase_04_gate's timeline_within_duration reads it by name. Input pack item 9 asked for a duration declaration here as well. It is deliberately omitted: the reader stamps every declaration Assumed, so declaring the duration would render an operator-Confirmed fact as Assumed in the declared surface and in the canonical reference pack, contradicting the call binding inside one tier — which is what §12.3 exists to prevent. The declaration would also be inert, because the call binding wins the precedence order. The substance of item 9's instruction is kept: the duration and its basis are recorded in the call binding, in the confirmation checklist under DURATION, and in the ticket 6 fold record.",
     "host_country": "HU is Confirmed in call_binding/selected_call.json and resolves the unit-cost living-allowance coefficient from there (_resolve_host_country). The same reasoning applies as for the duration."
@@ -114,14 +115,6 @@
       "checklist_ref": "FELLOW"
     },
     {
-      "key": "mobility_eligibility",
-      "value": "European Fellowship mobility rule satisfied on the rectified CV: 7.05 months of residence or main activity in Hungary within the 36 months before the 2026-09-09 deadline, against a 12-month cap.",
-      "declared_by": "operator (FIELDWISE input pack item 7, C5 override)",
-      "declared_on": "2026-08-11T00:00:00Z",
-      "rationale": "Operator override of contradiction C5, declared under §13.3 rather than confirmed: the underlying facts have not changed and no new evidence was supplied. The stated basis is that the CV's residence lines will be rectified, which removes 8.76 of the 15.81 months counted on the CV's face. Two periods survive any revision and are fixed points the rectified CV must remain consistent with — KPMG Global Hungary as an employer of record (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months). Eligibility is self-declared and verified at grant agreement preparation, so the risk scales with success. Ticket 7 must carry this override, its basis and its date into the authorisation packet without promoting it to Confirmed.",
-      "checklist_ref": "MOBILITY_ELIGIBILITY"
-    },
-    {
       "key": "elte_previous_msca_hosting",
       "value": "None. ELTE has not previously hosted a funded MSCA fellow.",
       "declared_by": "operator (open-items fold, 2026-08-14)",
@@ -142,8 +135,56 @@
       "value": "Desk or office space at AgroVIR for M25-M30, access to the FMIS development and staging environment, and access to the customer-data environment.",
       "declared_by": "operator (open-items fold, 2026-08-14)",
       "declared_on": "2026-08-14T00:00:00Z",
-      "rationale": "The workspace and system access count of the placement hosting-capacity record, which had nothing behind it at authorisation and is the count an evaluator tests the placement's reality against. Answered on 2026-08-14 for three of its four fields. Declared rather than Confirmed because these are AgroVIR's own facilities and only AgroVIR can evidence them; the operator relayed them and no written confirmation from the company is in Tier 3. The three access claims are the ones the six-month work content actually depends on: FMIS development or staging for operational hardening of the pipeline, and the customer-data environment for the nine-dimension assessment and the requirements work with commercial growers. One field is deliberately not covered by this declaration and stays Unresolved on the record: the team she joins. The earlier 2026-08-12 answer, 'field trials with farmers via the AgroVIR network', remains not adopted as workspace — it is VALIDATION_PARTNER field access that exists independently of the placement.",
+      "rationale": "The workspace and system access count of the placement hosting-capacity record, which had nothing behind it at authorisation and is the count an evaluator tests the placement's reality against. Answered on 2026-08-14 for three of its four fields. Declared rather than Confirmed because these are AgroVIR's own facilities and only AgroVIR can evidence them; the operator relayed them and no written confirmation from the company is in Tier 3. The three access claims are the ones the six-month work content actually depends on: FMIS development or staging for operational hardening of the pipeline, and the customer-data environment for the nine-dimension assessment and the requirements work with commercial growers. The fourth field, the team she joins, is deliberately not covered by this declaration — it is carried separately under placement_team_AgroVIR, which is an authorised placeholder rather than an operator answer, so the two must not be corrected or trusted together. The earlier 2026-08-12 answer, 'field trials with farmers via the AgroVIR network', remains not adopted as workspace — it is VALIDATION_PARTNER field access that exists independently of the placement.",
       "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "agrovir_relevant_track_record",
+      "value": "No participation in EU-funded research projects. AgroVIR's relevant track record is commercial rather than scientific: twenty years of practice in Hungarian commercial agriculture, and a farm management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in.",
+      "declared_by": "operator (authorisation of 2026-08-14)",
+      "declared_on": "2026-08-14T00:00:00Z",
+      "rationale": "The last of item 12's four deferred capacity fields, deferred on 2026-08-11 and closed on 2026-08-14 as a stated absence plus the commercial footprint. This is not a placeholder: item 12 instructs that where there is no EU-funded research participation, §3.2 says so plainly and leans on the commercial footprint, because an unevidenced claim of research experience is worse than an honest absence. The searches behind the deferral found no EU-funded participation and this declaration is that finding written down instead of left blank. Declared rather than Confirmed because a negative about a third party's funding history cannot be evidenced from outside the company; the EU Participant Register would settle it and AgroVIR holds no PIC there. The commercial half is not declared — it is the Confirmed organisation_profile record in consortium/capabilities.json, drawn from the company's own published figures. §3.2 must not let this sentence drift into implying research collaboration.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "placement_team_AgroVIR",
+      "value": "The AgroVIR product development team responsible for the FMIS platform.",
+      "declared_by": "operator (authorised placeholder, 2026-08-14)",
+      "declared_on": "2026-08-14T00:00:00Z",
+      "rationale": "PLACEHOLDER — see _operator_placeholders. The fourth field of the placement workspace record: the team the fellow joins for M25-M30. AgroVIR has named no team, and the record deliberately refused to guess it from the supervisor's name. This placeholder does not guess a name either; it identifies the team by the function the placement's own answered content requires. Two of the three access claims are the FMIS development or staging environment and the customer-data environment, and three of the four work-content items are operational hardening of the prediction pipeline in a production FMIS environment, the FMIS integration roadmap, and requirements engineering with commercial growers. A fellow with that access doing that work sits with whoever builds and runs the FMIS. It is consistent with the rest of the record and it is still not an answer: AgroVIR may name the team differently, split it, or seat her with an agronomy or customer-facing group. Of the three placeholders this is the one to replace first — Part B-2 §5 asks for it and it is where an evaluator tests whether the placement is real.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "contact_person_title_AgroVIR",
+      "value": "Project manager",
+      "declared_by": "operator (authorised placeholder, 2026-08-14)",
+      "declared_on": "2026-08-14T00:00:00Z",
+      "rationale": "PLACEHOLDER — see _operator_placeholders. Zsuzsanna Balázs's title inside AgroVIR, Unresolved since her name was declared on 2026-08-11. It is not a fact about her: AgroVIR has supplied no title and the company website names no staff. It is the least specific title consistent with what the record does establish — that she is the company's project contact and holds its VALIDATION_PARTNER seat on the Steering Group — chosen so that being wrong costs a job title and not a claim. It closes the Part B-2 §5 requirement for a role so the section can draft. Note the asymmetry with placement_supervisor_title_AgroVIR: 'senior research officer' is the operator's answer about a real person and carries the §1.3 placement argument, while this one carries no argument and must not be made to. Replace with her actual title before submission.",
+      "checklist_ref": "VALIDATION_PARTNER"
+    },
+    {
+      "key": "signatory_authority_MVCRI",
+      "value": "The Director of the Maritsa Vegetable Crops Research Institute signs for the institute, with the Agricultural Academy countersigning where its statutes reserve the signature to the Academy. The post is held by Prof. Dr. Daniela Ganeva.",
+      "declared_by": "operator (authorised placeholder, 2026-08-14)",
+      "declared_on": "2026-08-14T00:00:00Z",
+      "rationale": "PLACEHOLDER — see _operator_placeholders. Who signs a partnership agreement for MVCRI, open since input pack item 1. What is unsettled is a question of Bulgarian law and of the Agricultural Academy's statutes: institutes of the Academy are structural units, so the signature may sit with the institute or with the Academy, and nothing consulted decides it. The placeholder takes the institute-signs reading and names the Academy as countersignatory, which is the form that is wrong in the smallest way if the Academy turns out to hold the signature alone. One half is not a placeholder and should survive the correction: the Director's post is held by Prof. Dr. Daniela Ganeva, named as director of the structural unit in the Agricultural Academy's own press record — a 2024-era source that must be re-checked before anything is signed. This binds at partnership-agreement time and reaches no proposal section, so the placeholder buys a phase pass and nothing an evaluator reads.",
+      "checklist_ref": "TRANSFER_PARTNER"
     }
-  ]
+  ],
+  "_operator_placeholders": {
+    "note": "Register of the values written into Tier 3 on 2026-08-14 as operator-authorised PLACEHOLDERS rather than as answers. The operator authorised them to unblock Phase 8 drafting with no budget for a further input round, on the stated basis that they are minor and will be corrected by hand in the final draft. They are declarations like any other and surface as Assumed, but they differ from every other declaration in this file in kind: the rest relay something the operator knows about a third party, while these stand in for something nobody has supplied. Nothing downstream distinguishes the two, which is why they are enumerated here.",
+    "authority": "Operator instruction of 2026-08-14. It overrides the standing instruction in input pack item 1 that no value be guessed for these fields, and it overrides it only for the three keys listed below.",
+    "keys": [
+      "placement_team_AgroVIR",
+      "contact_person_title_AgroVIR",
+      "signatory_authority_MVCRI"
+    ],
+    "not_placeholders_despite_landing_the_same_day": [
+      "agrovir_relevant_track_record — a stated absence in the form input pack item 12 prescribed, not a stand-in. Do not 'correct' it into a positive claim.",
+      "ELTE and MATE recent_projects_and_publications — operator-supplied and each DOI verified against the publisher record; recorded Confirmed in consortium/capabilities.json with no declaration.",
+      "AgroVIR company_registration_number — resolved to 13-09-200433 against the Hungarian company register, not placeheld; recorded Confirmed in consortium/partners.json with no declaration.",
+      "mobility_eligibility — an operator position restated unconditionally on 2026-08-14, not a stand-in for a missing fact."
+    ],
+    "before_submission": "Each key above must be replaced with the real answer or removed, and the Tier 3 records it backs corrected with it. Removing a key returns its field to Unresolved and re-blocks whatever it unblocked, which is the intended behaviour. signatory_authority_MVCRI reaches no proposal section and binds only at partnership-agreement time; the other two reach Part B-2 §5 and, for the team, the Part B-1 §1.3 placement argument."
+  }
 }

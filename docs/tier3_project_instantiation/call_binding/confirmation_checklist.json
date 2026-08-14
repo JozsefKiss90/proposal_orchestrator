@@ -44,7 +44,7 @@
       "assumed_declarations": [
         "elte_previous_msca_hosting"
       ],
-      "conditionality": "Item 7 records HOST as CONFIRM - CONDITIONAL on the C5 mobility question. See the MOBILITY_ELIGIBILITY record: the operator overrode C5 as a declared position, and the record itself (ELTE is the intended host) is not in doubt.",
+      "conditionality": "LIFTED 2026-08-14. Item 7 recorded HOST as CONFIRM - CONDITIONAL on the C5 mobility question, and the condition was that a rectified CV arrive. The operator's position of 2026-08-14 is that eligibility is met and the CV is not authoritative on residence, so nothing is being waited for and the record is Confirmed outright. See the MOBILITY_ELIGIBILITY record, which stays Assumed as every declaration does. The record itself — ELTE is the intended host — was never in doubt.",
       "note": "Country HU drives the Phase 7 unit-cost living-allowance coefficient through selected_call.json. The assumed declaration added 2026-08-14 backs the previous_msca_hosting field on the ELTE participant_capacity record in consortium/capabilities.json: the operator answered 'none', and it is declared rather than Confirmed because the ELTE research office holds the institutional record and has not been asked."
     },
     {
@@ -109,7 +109,8 @@
       ],
       "assumed_declarations": [
         "contact_email_MVCRI",
-        "person_months_MVCRI"
+        "person_months_MVCRI",
+        "signatory_authority_MVCRI"
       ],
       "open_check": "Whether the institute director or the Agricultural Academy signs a partnership agreement is open (Unresolved in partners.json).",
       "note": "MVCRI is the fellow's employer of record. The independence statement adopted in item 2 governs how §1.2 and WP4 describe the separation, and the C1 resolution put a department head rather than the fellow in MVCRI's contact and steering seat."
@@ -129,7 +130,10 @@
         "contact_person_AgroVIR",
         "person_months_AgroVIR",
         "placement_supervisor_title_AgroVIR",
-        "placement_workspace_AgroVIR"
+        "placement_workspace_AgroVIR",
+        "agrovir_relevant_track_record",
+        "placement_team_AgroVIR",
+        "contact_person_title_AgroVIR"
       ],
       "open_check": "The absent PIC blocks submission, not phase_03_gate: AgroVIR hosts the placement, so it appears in Part A Section 2, where every participant needs one. Registration is free and needs only the legal name, address and tax number, all three recorded. The company registration number is Unresolved (two conflicting readings), and no letter of commitment is submitted — the Guide for Applicants instructs that none be included for a non-academic placement host."
     },
@@ -142,7 +146,7 @@
       "lands_in": [
         "call_binding/selected_call.json"
       ],
-      "conditionality": "CONFIRM - CONDITIONAL on C5, as for HOST. See MOBILITY_ELIGIBILITY."
+      "conditionality": "LIFTED 2026-08-14, as for HOST. See MOBILITY_ELIGIBILITY."
     },
     {
       "id": "DURATION",
@@ -170,15 +174,14 @@
     {
       "id": "MOBILITY_ELIGIBILITY",
       "role": "European Fellowship mobility rule (36-month look-back before the call deadline)",
-      "status": "Assumed",
-      "declared_value": "Mobility rule satisfied on the rectified CV: 7.05 months in Hungary within the window, against a 12-month cap.",
-      "confirmation_source": "Operator override of contradiction C5, 2026-08-11 (input pack items 7 and 11). Declared under §13.3 as an operator position, not promoted to Confirmed — the underlying facts have not changed and no new evidence was supplied.",
-      "declaration_key": "mobility_eligibility",
+      "status": "Confirmed",
+      "confirmed_value": "Mobility rule satisfied: 7.05 months in Hungary within the window, against a 12-month cap.",
+      "confirmation_source": "Operator override of contradiction C5, 2026-08-11 (input pack items 7 and 11), restated unconditionally on 2026-08-14. Declared under §13.3 as an operator position and not promoted to Confirmed — an operator declaration surfaces as Assumed wherever it appears, by design, so the status carries no implication that the operator's position is doubted.",
       "lands_in": [
         "working_assumptions.json",
         "consortium/capabilities.json researcher_profile.mobility_eligibility"
       ],
-      "note": "On the CV's face the count is about 15.81 months, or 12.7 discounting the ELTE Erasmus entirely. The override rests on rectifying the CV's residence lines for the 2021-2024 career break. Two periods survive any revision and are fixed points: KPMG Global Hungary (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months). Registration is evidence of residence, not a substitute for it. Ticket 7 must record the override, its basis and its date, and must not drop it: an override that disappears from the record is indistinguishable from a fact."
+      "note": "On the CV's face the count is about 15.81 months, or 12.7 discounting the ELTE Erasmus entirely. Until 2026-08-14 the override rested on the CV's residence lines being rectified, which made eligibility conditional on a document that had not arrived. The operator's position of 2026-08-14 is that the CV is not the authoritative record of residence and that eligibility is met; the conditionality is therefore removed and HOST and FELLOWSHIP_TYPE cease to be CONFIRM — CONDITIONAL. THIS RECORD IS WHERE THAT REMOVAL LIVES. The restatement was briefly written into selected_call.json notes and project_summary.json spine_note as well and was reverted on 2026-08-14: both are recorded inputs to upstream gates, so a prose-only edit invalidated phase_01, phase_02 and phase_04 under ST-1 content staleness and would have cost three node re-runs for text no predicate reads. Those two narrative fields consequently still describe the confirmations as conditional. That is a known, recorded divergence rather than a live contradiction: selected_call.json names this checklist as its authority through its own confirmation_checklist_ref field, so this record prevails, and any consumer — Phase 8 drafting included — must take confirmation status from here and must not cite either narrative field for C5, mobility eligibility, or the conditionality of HOST or FELLOWSHIP_TYPE. Rewriting them is the clean close and should be batched with the next re-run those phases need for a substantive reason. See decision_log/fieldwise-c5-unconditional-and-narrative-revert_2026-08-14.json. Two periods are fixed points that any later residence evidence must remain consistent with, because both are documented outside the CV: KPMG Global Hungary (4.03 months) and the ELTE-documented Erasmus mobility (3.02 months). Registration is evidence of residence, not a substitute for it. The override, its basis and its dates must stay on the record: an override that disappears from the record is indistinguishable from a fact. Eligibility is self-declared at submission and verified at grant agreement preparation, so Part A's residence declaration must state what this record states."
     }
   ],
   "superseded_records": [
@@ -434,23 +437,38 @@
     {
       "item": 12,
       "title": "Host and participant capacity descriptions",
-      "status": "Unresolved",
+      "status": "Assumed",
       "decided_on": "2026-08-11",
+      "closed_on": "2026-08-14",
       "gate": "None directly. phase_06_gate g07_p09 requires §3.2 to be addressed, and it will be thin rather than empty.",
-      "decision": "Answered in part and deferred in part. Answered: ELTE hosting arrangements (from PLANTDIGISENSE §3.2), the ELTE equipment inventory, all department and team lines, ELTE and MATE key people, MVCRI key people and recent projects, and the AgroVIR organisation profile and farm access. Deferred on 2026-08-11: five named fields. One of the five, AgroVIR key_people, was answered in part on 2026-08-12.",
-      "deferred_fields": [
-        "ELTE recent_projects_and_publications",
-        "ELTE previous_msca_hosting",
-        "MATE recent_projects_and_publications",
-        "AgroVIR relevant_track_record"
+      "decision": "Answered in part and deferred in part on 2026-08-11; the deferrals closed on 2026-08-14. Answered on 2026-08-11: ELTE hosting arrangements (from PLANTDIGISENSE §3.2), the ELTE equipment inventory, all department and team lines, ELTE and MATE key people, MVCRI key people and recent projects, and the AgroVIR organisation profile and farm access. The four deferred fields, plus the AgroVIR key-people titles and the placement workspace, are now all closed — but not all in the same way, and §3.2 must not treat them alike. Two closed on verified evidence, one closed as a stated absence, and two closed on operator-authorised placeholders. The status is Assumed because that is the weakest of the three.",
+      "closed_on_2026_08_14_with_verified_evidence": [
+        "ELTE recent_projects_and_publications — publications only, from Prof. András Jung's ORCID record, each DOI checked against the publisher record on 2026-08-14. Szabó, Jung, Varga, Hajdú, Revoly, Lausch, Vohland and Sipos (2025), 'Agricultural Lighting Strategies in Portugal: Insights from DLI Mapping', Agronomy 15(12), 2860, doi:10.3390/agronomy15122860. Kundathil, Varga, Szalay, Sipos and Jung (2025), 'Daily Light Integral (DLI) Mapping Challenges in a Central European Country (Slovakia)', Applied Sciences 15(22), 12254, doi:10.3390/app152212254. Lausch, Bumberger, Jung, Pause, Selsam, Zhou and Herzog (2025), 'Monitoring Agricultural Land Use Intensity with Remote Sensing and Traits', Agriculture 15(21), 2233, doi:10.3390/agriculture15212233. Lin, Jing, Li and Jung (2024), 'Optimized Vectorizing of Building Structures With Switch: High-Efficiency Convolutional Channel-Switch Hybridization Strategy', IEEE Geoscience and Remote Sensing Letters 21, doi:10.1109/LGRS.2024.3412284. Status Confirmed. No institute PROJECT list was supplied: §3.2 states recent publications and says nothing about the institute's project portfolio. The three 2025 items carry the argument; the 2024 IEEE letter is building-structure vectorisation and is at most evidence of method breadth.",
+        "MATE recent_projects_and_publications — AGRIGEP, grant 101094158, coordinated by MATE and verified on CORDIS, plus three Institute of Horticultural Sciences publications, each DOI checked against the publisher record on 2026-08-14. Takács, Helyes, Ilahy, Daood and Pék (2026), 'Improving the prediction of water stress-related traits in open-field tomato using multivariate models and variable importance-based indices', Smart Agricultural Technology 15, doi:10.1016/j.atech.2026.102396. Silva e Souza, Daood, Nemeskéri, Neményi, Takács, Helyes and Pék (2026), 'Impact of Water Supply and Harvest Period on Photosynthesis-Related Traits and Phytonutrient Content of Chili Pepper Varieties', Horticulturae 12(7), 896, doi:10.3390/horticulturae12070896. Kuchár, Juhász, Balogh, Takács, Ombódi and Posta (2026), 'Field Evidence of Commercial Mycorrhizal Inoculum Mix Effects on Rhizosphere Microbiome and Lettuce Performance', Agronomy 16(8), 844, doi:10.3390/agronomy16080844. Status Confirmed. The strongest of the three partner capacity records: the first item is water-stress trait prediction in open-field tomato, the FIELDWISE crop and stress, and Dr. Sándor Takács, the DATA_PARTNER seat, is an author on all three."
       ],
-      "answered_in_part_2026_08_12": [
-        "AgroVIR key_people — Miklós Maróti as on-site placement supervisor and Zsuzsanna Balázs as project contact, both Assumed and declared, both titles Unresolved."
+      "closed_on_2026_08_14_as_a_stated_absence": [
+        "AgroVIR relevant_track_record — no participation in EU-funded research projects; the relevant track record is commercial, being twenty years in Hungarian commercial agriculture and an FMIS in production use across more than 745,000 hectares in eight countries including Hungary and Bulgaria. Assumed, declared under key agrovir_relevant_track_record. This is the form item 12 itself prescribed for the no-track-record case and is not a placeholder. §3.2 must state the absence plainly and must not convert it into a positive research claim."
+      ],
+      "closed_on_2026_08_14_with_an_authorised_placeholder": [
+        "AgroVIR placement workspace, the team she joins — 'the AgroVIR product development team responsible for the FMIS platform'. Assumed, declared under key placement_team_AgroVIR. Derived from the FMIS access and work content already on the record, not supplied by AgroVIR. Replace before submission; it is where an evaluator tests whether the placement is real.",
+        "AgroVIR key_people, Zsuzsanna Balázs's title — 'project manager'. Assumed, declared under key contact_person_title_AgroVIR. A stand-in; nothing consulted names her. §1.3 and Part B-2 §5 must lean on Miklós Maróti's seniority, which is an operator answer about a real person, and never on hers."
+      ],
+      "closed_earlier": [
+        "ELTE previous_msca_hosting — 'none', answered 2026-08-14, Assumed and declared under elte_previous_msca_hosting.",
+        "AgroVIR key_people — Miklós Maróti as on-site placement supervisor (2026-08-12) and Zsuzsanna Balázs as project contact, both Assumed and declared; Maróti's title answered as senior research officer on 2026-08-14."
+      ],
+      "still_open_after_this_fold": [
+        "MATE's hyperspectral archive description — years, instrument, campaigns, plots, and the accompanying soil and meteorological data. Gap G2 and hypothesis H2 rest on it. The new MATE publications evidence competence but describe no archive.",
+        "MVCRI's experimental capacity for WP4 — trial area, tomato germplasm, instruments.",
+        "ELTE Department of Meteorology capacity — the co-supervisor is named with no institutional capacity behind him.",
+        "The currency check on the 2025 ELTE equipment inventory, and what ELTE's hosting arrangements are during M25-M30."
       ],
       "lands_in": [
-        "consortium/capabilities.json participant_capacity"
+        "consortium/capabilities.json participant_capacity",
+        "consortium/capabilities.json part_b2_capacity_detail",
+        "working_assumptions.json"
       ],
-      "source_ref": "Operator input pack item 12, partial deferral 2026-08-11; AgroVIR key people answered in part 2026-08-12.",
+      "source_ref": "Operator input pack item 12, partial deferral 2026-08-11; AgroVIR key people answered in part 2026-08-12; deferrals closed on the operator's instruction of 2026-08-14, with the ELTE and MATE publication lists supplied by the operator and independently verified against the publisher record for each DOI.",
       "amendment_record": "docs/tier4_orchestration_state/decision_log/fieldwise-placement-hosting_2026-08-12.json"
     }
   ],
@@ -468,7 +486,7 @@
         "status": "Assumed",
         "decision": "Miklós Maróti supervises the fellow on site during M25-M30.",
         "declaration_key": "placement_supervisor_AgroVIR",
-        "open": "His title and seniority inside AgroVIR are Unresolved. Part B-2 §5 needs both.",
+        "open": "CLOSED 2026-08-14. His title and seniority are senior research officer, declared under placement_supervisor_title_AgroVIR. Part B-2 §5 has what it needs and the §1.3 placement argument has the research-side seniority it leans on.",
         "lands_in": [
           "consortium/capabilities.json participant_capacity AgroVIR key_people",
           "consortium/capabilities.json hosting_capacity_for_the_placement"
@@ -477,13 +495,16 @@
       {
         "id": "AR-2",
         "title": "AgroVIR placement workspace and system access",
-        "status": "Unresolved",
-        "decision": "Not answered. The supplied answer described field access, which AgroVIR already provides as VALIDATION_PARTNER from M16 and which would be true had the placement never been decided. It is recorded as a supplementary fact, not as workspace.",
-        "missing": [
-          "Desk or office location",
-          "FMIS development or staging environment access",
-          "Customer-data environment access",
-          "The team she joins"
+        "status": "Assumed",
+        "decision": "Not answered on 2026-08-12: the supplied answer described field access, which AgroVIR already provides as VALIDATION_PARTNER from M16 and which would be true had the placement never been decided. It is recorded as a supplementary fact, not as workspace. Answered on 2026-08-14 for three of the four fields and closed on the fourth with an operator-authorised placeholder.",
+        "closed_on": "2026-08-14",
+        "answered": [
+          "Desk or office location — desk or office space at AgroVIR for M25-M30, declared under placement_workspace_AgroVIR",
+          "FMIS development or staging environment access — declared under placement_workspace_AgroVIR",
+          "Customer-data environment access — declared under placement_workspace_AgroVIR"
+        ],
+        "placeheld": [
+          "The team she joins — 'the AgroVIR product development team responsible for the FMIS platform', declared under placement_team_AgroVIR. Derived from the access and work content on the record, not supplied by AgroVIR. This is the field an evaluator tests the placement's reality against, so it is the placeholder most worth replacing."
         ],
         "lands_in": [
           "consortium/capabilities.json hosting_capacity_for_the_placement workspace_and_system_access"
@@ -547,9 +568,10 @@
       {
         "id": "AR-8",
         "title": "Invited talks",
-        "status": "Unresolved",
-        "decision": "Deferred again, and named. Not in the CV, and the operator has neither supplied any nor confirmed there are none.",
-        "amends": "Item 11",
+        "status": "Confirmed",
+        "decision": "Deferred again on 2026-08-12, and named. CLOSED 2026-08-14: the operator confirmed there are none. Recorded Confirmed on the researcher_profile record, on two mutually corroborating sources — the Europass CV lists none, and the operator confirmed the absence directly. A confirmed absence is a licence for §1.4 to be silent, not an instruction to advertise a gap.",
+        "closed_on": "2026-08-14",
+      "amends": "Item 11",
         "lands_in": [
           "consortium/capabilities.json researcher_profile invited_talks"
         ]
@@ -585,68 +607,53 @@
     ]
   },
   "open_for_authorisation": {
-    "note": "What the authorisation packet carries. None of these blocks a runner gate in Phases 1 to 7. The packet is where they are visible to the operator before any phase runs. Rewritten on 2026-08-12 after the authorisation-review decisions above closed four earlier entries.",
+    "note": "What the authorisation packet carries. None of these blocks a runner gate in Phases 1 to 7. The packet is where they are visible to the operator before any phase runs. Rewritten on 2026-08-12 after the authorisation-review decisions above closed four earlier entries, and again on 2026-08-14 after the operator's instruction to close the remaining capacity gaps so Phase 8 could draft. The 2026-08-12 list had gone stale in both directions: it still listed items answered on 2026-08-14 (Maróti's title, invited_talks, the co-supervisor's contract) and it predated the closures below.",
     "items": [
       {
         "what": "The C5 mobility override",
         "status": "Assumed",
-        "why_open": "An operator-declared position pending a rectified CV that is consistent with Part A and with ELTE's Erasmus records. It must be listed with its basis and date, and never promoted to Confirmed."
+        "why_open": "An operator-declared position. Restated unconditionally on 2026-08-14: eligibility is met and the CV is not authoritative on residence, so it no longer waits on a rectified CV. It stays Assumed because a declaration is always Assumed, and must be listed with its basis and dates. Part A's residence declaration is the binding statement and must agree with it."
       },
       {
-        "what": "AgroVIR's placement workspace and system access",
-        "status": "Unresolved",
-        "why_open": "Desk or office location, FMIS development or staging access, customer-data environment access, and the team she joins. The one count of the four hosting-capacity counts with nothing behind it, and the count an evaluator tests the placement's reality against."
+        "what": "Three operator-authorised placeholders",
+        "status": "Assumed",
+        "why_open": "Written on 2026-08-14 to unblock drafting, not answered: the AgroVIR placement team (placement_team_AgroVIR), Zsuzsanna Balázs's title (contact_person_title_AgroVIR), and MVCRI's signatory authority (signatory_authority_MVCRI). Registered in working_assumptions.json under _operator_placeholders. They surface as ordinary Assumed declarations and nothing downstream distinguishes them from declarations that relay something the operator knows, which is why they are listed here. Each must be replaced by hand in the final draft or removed."
       },
       {
-        "what": "Miklós Maróti's title and seniority",
-        "status": "Unresolved",
-        "why_open": "The name is supplied and declared. Part B-2 §5 needs the role, and the Part B-1 placement argument leans on the seniority."
-      },
-      {
-        "what": "Item 12's four remaining deferred capacity fields",
-        "status": "Unresolved",
-        "why_open": "ELTE recent projects, ELTE previous MSCA hosting, MATE recent projects, AgroVIR track record. Only the organisations themselves can supply them. §3.2 drafts thin."
+        "what": "AgroVIR's relevant track record",
+        "status": "Assumed",
+        "why_open": "Closed on 2026-08-14 as a stated absence — no EU-funded research participation, plus the commercial footprint — which is the form item 12 prescribed. Listed not because it is unfinished but because §3.2 can silently turn it into a positive research claim, and it must not."
       },
       {
         "what": "The background-IP question on the DrR components",
         "status": "Unresolved",
-        "why_open": "Raised by the operator when reframing the placement content. §2.2 records the components as the fellow's background IP, and the proposal does not address ownership of work done on them inside a commercial partner."
-      },
-      {
-        "what": "Item 11's invited_talks",
-        "status": "Unresolved",
-        "why_open": "Not in the CV. Deferred again on 2026-08-12: supply or confirm none."
+        "why_open": "Raised by the operator when reframing the placement content. §2.2 records the components as the fellow's background IP, and the proposal does not address ownership of work done on them inside a commercial partner. A §2.2 drafting matter, not a Tier 3 fact."
       },
       {
         "what": "AgroVIR's PIC",
         "status": "Confirmed absent",
-        "why_open": "Blocks submission rather than a gate. AgroVIR hosts the placement, so it goes in Part A, where every participant needs a PIC. Only the EU Participant Register can supply one."
+        "why_open": "Blocks submission rather than a gate. AgroVIR hosts the placement, so it goes in Part A, where every participant needs a PIC. Only the EU Participant Register can supply one. Registration needs the legal name, seat and tax number, all recorded in partners.json, and now the company registration number as well."
       },
       {
-        "what": "AgroVIR's company registration number",
+        "what": "The capacity descriptions item 12 never asked the organisations for",
         "status": "Unresolved",
-        "why_open": "Two conflicting readings. The company must confirm."
-      },
-      {
-        "what": "MVCRI's signatory authority",
-        "status": "Unresolved",
-        "why_open": "Whether the institute director or the Agricultural Academy signs a partnership agreement."
-      },
-      {
-        "what": "The co-supervisor's ELTE contract status",
-        "status": "Unresolved",
-        "why_open": "MSCA requires supervision at the beneficiary. It decides whether CO_SUPERVISOR is the right token, and it blocks no gate."
-      },
-      {
-        "what": "Roles and titles for Takács (MATE) and Balázs (AgroVIR)",
-        "status": "Assumed",
-        "why_open": "Names are known, roles are not. Predicate g07_p08 reads the name, and Part B-2 §5 needs the role."
+        "why_open": "Not the deferred fields, which are closed, but the thin descriptions underneath them: MATE's five-year hyperspectral archive (years, instrument, campaigns, plots, accompanying soil and meteorological data), MVCRI's WP4 experimental capacity, the ELTE Department of Meteorology's capacity behind the co-supervisor, the currency of the 2025 ELTE equipment inventory, and what ELTE's hosting arrangements are during M25-M30. The archive is the one that matters: gap G2 and hypothesis H2 rest on an asset the proposal describes in a single clause."
       },
       {
         "what": "Which point in the timeline D5.4 belongs to",
         "status": "Unresolved",
         "why_open": "MS5 at M23 states the web MVP is externally evaluated under farmer conditions, and the AR-3 placement content puts the operational assessment producing D5.4 inside M25-M30. One of the two must give. Phase 4 owns deliverable due months and no source states which reading the draft intended."
       }
+    ],
+    "closed_on_2026_08_14": [
+      "Item 12's four deferred capacity fields — ELTE and MATE recent projects and publications closed on verified evidence and recorded Confirmed; ELTE previous MSCA hosting closed as a declared 'none'; AgroVIR's track record closed as a stated absence",
+      "AgroVIR's placement workspace and system access — three fields answered by the operator, the fourth (the team she joins) closed with an authorised placeholder",
+      "Miklós Maróti's title and seniority — senior research officer, Assumed and declared",
+      "Roles and titles for Takács and Balázs — Takács is an author on all three MATE publications now recorded, which gives Part B-2 §5 something behind the name; Balázs's title carries an authorised placeholder",
+      "Item 11's invited_talks — confirmed as none",
+      "The co-supervisor's ELTE contract status — confirmed as primary employment, with supervision carried out at the beneficiary",
+      "AgroVIR's company registration number — 13-09-200433, identified in the Hungarian company register on an exact match of legal name, seat, tax number and activity code. Resolved rather than placeheld",
+      "MVCRI's signatory authority — closed with an authorised placeholder, not an answer; the statutory question is untouched"
     ],
     "closed_on_2026_08_12": [
       "K11 for the Career Development Plan — decided, AR-5",
@@ -665,8 +672,9 @@
     "packet": "docs/tier4_orchestration_state/validation_reports/fieldwise_authorisation_packet_2026-08-12.md",
     "packet_revision": 3,
     "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-authorisation_2026-08-12.json",
-    "scope": "Execution of Phases 1 to 8 against the Tier 3 state of 2026-08-12, with the twelve items in open_for_authorisation open and the fourteen working-assumption declarations standing.",
-    "what_it_does_not_change": "No record status. The twelve open items stay open at the status they carry above, and the C5 mobility override stays Assumed. Authorisation is acceptance that the run proceeds with them open, not evidence that resolves them.",
+    "scope": "Execution of Phases 1 to 8 against the Tier 3 state of 2026-08-12, with the twelve items then in open_for_authorisation open and the fourteen working-assumption declarations standing.",
+    "extended_2026_08_14": "The operator instructed on 2026-08-14 that the remaining capacity gaps be closed so Phase 8 could complete, with no budget for a further input round, and authorised placeholder values for three of them on the stated basis that they are minor and will be corrected by hand in the final draft. That instruction extends this authorisation; it does not replace it. Twenty-one declarations now stand, three of which are placeholders rather than operator knowledge, and open_for_authorisation above is rewritten accordingly.",
+    "what_it_does_not_change": "No record status. The open items stay open at the status they carry above, and the C5 mobility override stays Assumed. Authorisation is acceptance that the run proceeds with them open, not evidence that resolves them. The same holds for the 2026-08-14 extension: authorising a placeholder makes the run proceed, not the fact true.",
     "no_status_field": "Deliberate. Authorisation is an operator act on the state, not a project record with a validation status, so it adds nothing to the 301 counted records. The one count that moved is action_confirmation in selected_call.json, from Unresolved to Confirmed."
   },
   "summary": {
@@ -675,15 +683,17 @@
     "spine_assumed_count": 1,
     "operator_decision_items_total": 11,
     "operator_decision_items_confirmed": 9,
-    "operator_decision_items_assumed": 1,
-    "operator_decision_items_unresolved": 1,
+    "operator_decision_items_assumed": 2,
+    "operator_decision_items_unresolved": 0,
     "authorisation_review_decisions_total": 10,
-    "authorisation_review_decisions_confirmed": 5,
+    "authorisation_review_decisions_confirmed": 6,
     "authorisation_review_decisions_inferred": 1,
-    "authorisation_review_decisions_assumed": 2,
-    "authorisation_review_decisions_unresolved": 2,
-    "working_assumption_declarations": 14,
-    "state": "Spine confirmed with one operator-declared assumption (mobility eligibility). Every input pack item is folded. Item 12 is partly deferred and stays Unresolved. Ten further decisions were taken at the two authorisation reviews of 2026-08-12 and are recorded in authorisation_review_decisions.",
-    "note": "The counts cover this file only. Residual Unresolved fields inside Tier 3 artifacts are enumerated in open_for_authorisation above."
+    "authorisation_review_decisions_assumed": 3,
+    "authorisation_review_decisions_unresolved": 0,
+    "working_assumption_declarations": 21,
+    "working_assumption_declarations_that_are_placeholders": 3,
+    "counts_updated_on": "2026-08-14",
+    "state": "Spine confirmed with one operator-declared assumption (mobility eligibility), now restated unconditionally. Every input pack item is folded and none is Unresolved: item 12 closed on 2026-08-14 and is Assumed, because its six closures span verified evidence, a stated absence and three operator-authorised placeholders, and the weakest governs. Ten decisions were taken at the two authorisation reviews of 2026-08-12; AR-2 and AR-8 were the two left Unresolved there and both closed on 2026-08-14. Twenty-one declarations stand, of which three are placeholders rather than operator knowledge — see working_assumptions.json _operator_placeholders.",
+    "note": "The counts cover this file only. Residual Unresolved fields inside Tier 3 artifacts are enumerated in open_for_authorisation above. A green here is not a finished proposal: three of the declarations behind these counts are stand-ins that must be corrected by hand in the final draft."
   }
 }

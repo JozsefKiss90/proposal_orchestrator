@@ -343,6 +343,19 @@ def _default_claude_drafter(
             "claim_id to its confirmation_checklist.json token (HOST, FELLOW, "
             "SUPERVISOR, FELLOWSHIP_TYPE, DURATION). Never invent an identity "
             "and never emit status 'assumed' yourself. "
+            # Confirmation-status precedence.  selected_call.json is a grounding
+            # input and its `notes` field is carried-forward narrative that can
+            # lag the checklist: as of 2026-08-14 it still describes HOST and
+            # FELLOWSHIP_TYPE as conditional on the C5 mobility question, which
+            # the checklist records as closed.  selected_call.json names the
+            # checklist as its authority through its own confirmation_checklist_ref
+            # field, so that is the precedence the binding already declares.
+            "Take the confirmation status of any spine-identity fact ONLY from "
+            "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json. "
+            "The 'notes' field of selected_call.json and the 'spine_note' field of "
+            "project_summary.json are carried-forward narrative that may lag it; "
+            "never cite either as the source for a confirmation status, for "
+            "whether a confirmation is conditional, or for mobility eligibility. "
             # W2 (g09a_p12): the drafter cannot emit 'assumed', so a fact whose
             # only backing is an operator declaration has no correct terminal
             # status available to it — and 'inferred' is the wrong one, because

@@ -433,11 +433,20 @@ class TestAuthorisationRecorded:
             record["what_this_authorisation_does_not_do"]["status"]
         )
         assert "Assumed" in record["c5_override_carried_without_promotion"]
+        # C5 was later promoted to Confirmed by operator override (2026-08-14).
+        # The authorisation itself still promoted nothing — which is what this
+        # test is about — so the original sentence stays standing and is marked
+        # superseded in place rather than rewritten.  An override that erases
+        # the rule it overrode is indistinguishable from there never having
+        # been one.
+        assert "SUPERSEDED 2026-08-14" in (
+            record["c5_override_carried_without_promotion"]
+        )
         checklist = _load(TIER3 / "call_binding" / "confirmation_checklist.json")
         mobility = next(
             r for r in checklist["spine_identity"] if r["id"] == "MOBILITY_ELIGIBILITY"
         )
-        assert mobility["status"] == "Assumed"
+        assert mobility["status"] == "Confirmed"
 
     def test_the_authorised_state_is_the_state_on_disk(self, record):
         """A fingerprinted artifact that moved must say so in ``amendments``.
@@ -778,22 +787,63 @@ class TestInvariantsThePacketRestsOn:
             f"declarations backing nothing: {sorted(declarations - referenced)}"
         )
 
-    def test_the_c5_override_is_never_promoted_to_confirmed(self, capabilities):
+    def test_the_c5_promotion_is_consistent_and_declared(self, capabilities):
+        """C5 was promoted to Confirmed on 2026-08-14 by operator override.
+
+        The original guard asserted the promotion could never happen, on the
+        rule recorded in four places that a declaration never makes a fact
+        Confirmed.  An explicit in-session operator instruction outranks that
+        (CLAUDE.md §3 priority 1), so the guard now enforces what still must
+        hold: the promotion is applied *consistently* across every surface, the
+        backing declaration is *withdrawn* (a declaration is stamped Assumed
+        wherever it surfaces and cannot coexist with a Confirmed record), and
+        the override is *recorded* rather than silent.  An undeclared promotion
+        still fails here — which is what the guard was really protecting.
+        """
         checklist = _load(TIER3 / "call_binding" / "confirmation_checklist.json")
         record = next(
             r for r in checklist["spine_identity"] if r["id"] == "MOBILITY_ELIGIBILITY"
         )
-        assert record["status"] == "Assumed"
-        profile_status = capabilities["researcher_profile"]["mobility_eligibility"][
-            "validation_status"
-        ]
-        assert profile_status == "Assumed"
-        declaration = next(
-            d
-            for d in _load(TIER3 / "working_assumptions.json")["declarations"]
-            if d["key"] == "mobility_eligibility"
+        assert record["status"] == "Confirmed"
+        assert "declaration_key" not in record, (
+            "a Confirmed record must not still point at a declaration"
         )
-        assert declaration["declared_by"].startswith("operator")
+
+        profile = capabilities["researcher_profile"]["mobility_eligibility"]
+        assert profile["validation_status"] == "Confirmed", (
+            "the two surfaces must agree; a half-applied promotion is worse "
+            "than either state"
+        )
+
+        keys = {
+            d["key"]
+            for d in _load(TIER3 / "working_assumptions.json")["declarations"]
+        }
+        assert "mobility_eligibility" not in keys, (
+            "the declaration must be withdrawn, or every machine surface "
+            "(canonical pack, §12.2 surface, W1) still reports Assumed"
+        )
+
+        # The override must be legible, and the evidence position must survive
+        # it: promoting the status changed no residence fact.
+        note = profile["note"]
+        assert "2026-08-14" in note
+        assert "15.81" in note and "7.05" in note, (
+            "the evidence position must be preserved, not erased by the promotion"
+        )
+
+    def test_the_c5_override_is_recorded_in_the_decision_log(self):
+        """A promotion this rule-laden must be traceable to its instruction."""
+        record = _load(
+            REPO_ROOT
+            / "docs/tier4_orchestration_state/decision_log"
+            / "fieldwise-mobility-confirmed-override_2026-08-14.json"
+        )
+        assert record["operator_instruction"]
+        assert record["rules_this_overrides"]["superseded"], (
+            "the rules it overrides must be named, not quietly dropped"
+        )
+        assert record["concern_raised_and_answered"]["operator_response"]
 
     def test_the_c5_basis_and_date_are_carried_into_the_packet(self, packet):
         assert "7.05" in packet and "15.81" in packet and "8.76" in packet
