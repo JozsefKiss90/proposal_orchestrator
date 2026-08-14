@@ -1,0 +1,112 @@
+{
+  "report_id": "compliance_check_budget_gate_assessment_budget_gate_validator_2026-08-14T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "budget_gate_validator",
+  "run_id_reference": "7b67fe1d-1c73-4301-a951-5f7294022897",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partner names, capabilities, roles, objectives, budget figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress when inputs are incomplete.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete, contradictory, or unvalidated without flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of HE programme rules as a substitute for reading Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1–4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "check_reasoning": {
+    "13.1": "Phase 7 orchestration-state artifact. Content and references contain no 'Annex N', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural schema authority. The only lump-sum reference is to the integration received/ channel, cited as a non-applicable budget source, not as a schema.",
+    "13.2": "Artifact asserts no call requirement, scope boundary, or eligibility condition. instrument_type (MSCA-PF) and budget_regime (unit_cost) are instrument/regime determinations grounded in the cited CLAUDE.md C1 amendment, not fabricated Tier 2B call constraints.",
+    "13.3": "Partner identifiers (DATA_PARTNER, HOST, TRANSFER_PARTNER, VALIDATION_PARTNER) and work-package identifiers (WP1–WP5) are explicitly attributed in assessment_note to Phase 3 wp_structure.json (a prior phase output derived from Tier 3), not newly invented. No fabricated capabilities, roles, or team facts are asserted. Per skill scope, only the presence of a source reference is checked, not the referenced entry's existence.",
+    "13.4": "Not a Phase 8 artifact (schema_id 'orch.phase7.budget_gate_assessment.v1' begins with 'orch.phase7.', not 'orch.tier5.'/'orch.phase8.'). This artifact is the budget gate itself; it does not commence Phase 8 activity. No budget figures materialised.",
+    "13.5": "Not verifiable from artifact content alone; enforced by decision-log-update skill. Recorded pass per skill specification.",
+    "13.6": "Not verifiable from an artifact. Recorded pass per skill specification. Artifact explicitly subordinates itself to CLAUDE.md ('ranks above this skill specification').",
+    "13.7": "Phase 7 artifact references only lower/prior phases (Phase 3 wp_structure.json, Phase 4 confirmed_months) as legitimate inputs. No higher-phase (Phase 8) output is referenced as an input; no phase reordering evident.",
+    "13.8": "Not applicable — this is a Tier 4 orchestration-state artifact, not a Tier 5 deliverable; it contains no validation_status/finalized proposal text. Recorded pass with non-applicability reason.",
+    "13.9": "Regulatory/regime claims (unit-cost budget gate applicability) are grounded in the cited CLAUDE.md constitutional amendment C1 (§8.1, §8.4, §7 Phase 7) — the governing authority — not asserted as unsourced generic programme knowledge substituting for Tier 1 documents.",
+    "13.10": "Not applicable — not a Tier 5 artifact. Recorded pass with non-applicability reason.",
+    "13.11": "Not checkable from a phase output; the artifact does not modify any Tier 1/Tier 2 source document. Recorded pass per skill specification.",
+    "13.12": "Not directly checkable from an artifact; recorded pass per skill specification. Artifact honors CLAUDE.md as binding and governing."
+  },
+  "timestamp": "2026-08-14T00:00:00Z"
+}

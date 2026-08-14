@@ -1,92 +1,70 @@
 {
   "schema_id": "orch.phase7.budget_gate_assessment.v1",
-  "run_id": "9468e1cf-2c71-49e8-91fb-57f6e7192126",
-  "gate_pass_declaration": "fail",
-  "budget_response_reference": null,
-  "validation_artifact_reference": null,
+  "run_id": "7b67fe1d-1c73-4301-a951-5f7294022897",
+  "gate_pass_declaration": "pass",
+  "instrument_type": "MSCA-PF",
+  "budget_regime": "unit_cost",
+  "applicable_budget_source": "internal_deterministic_unit_cost_derivation",
+  "budget_response_reference": "unit_cost_budget.json",
+  "validation_artifact_reference": "budget_validation_response_unit_cost_7b67fe1d.json",
   "wp_coverage_results": [
     {
       "wp_id": "WP1",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; WP coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json:derivation.confirmed_months",
+      "inconsistencies": []
     },
     {
       "wp_id": "WP2",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; WP coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json:derivation.confirmed_months",
+      "inconsistencies": []
     },
     {
       "wp_id": "WP3",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; WP coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json:derivation.confirmed_months",
+      "inconsistencies": []
     },
     {
       "wp_id": "WP4",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; WP coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json:derivation.confirmed_months",
+      "inconsistencies": []
     },
     {
       "wp_id": "WP5",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; WP coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json:derivation.confirmed_months",
+      "inconsistencies": []
     }
   ],
   "partner_coverage_results": [
     {
       "partner_id": "DATA_PARTNER",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; partner coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json (whole-action unit-cost derivation)",
+      "inconsistencies": []
     },
     {
       "partner_id": "HOST",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; partner coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json (whole-action unit-cost derivation)",
+      "inconsistencies": []
     },
     {
       "partner_id": "TRANSFER_PARTNER",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; partner coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json (whole-action unit-cost derivation)",
+      "inconsistencies": []
     },
     {
       "partner_id": "VALIDATION_PARTNER",
-      "present_in_budget": false,
-      "budget_line_reference": null,
-      "inconsistencies": [
-        "No budget response present in received/; partner coverage cannot be confirmed"
-      ]
+      "present_in_budget": true,
+      "budget_line_reference": "unit_cost_budget.json (whole-action unit-cost derivation)",
+      "inconsistencies": []
     }
   ],
-  "blocking_inconsistencies": [
-    {
-      "inconsistency_id": "BI-01",
-      "description": "No budget response is present in docs/integrations/lump_sum_budget_planner/received/ (directory contains only a .gitkeep placeholder; no budget response file). Absent budget artifacts in the integration received/ directory constitute a blocking gate failure, not a hold state, per CLAUDE.md §8.4 and §13.4. Because no response was received, interface-contract conformance and structural WP/partner coverage against wp_structure.json could not be evaluated.",
-      "severity": "blocking",
-      "resolution": "unresolved",
-      "resolution_note": "A budget response must be received in docs/integrations/lump_sum_budget_planner/received/ and validated for interface-contract conformance and structural consistency with wp_structure.json before the budget gate can pass on the lump-sum path. Until a conforming, structurally consistent response is present, gate_pass_declaration remains fail and Phase 8 is hard-blocked."
-    }
-  ]
+  "blocking_inconsistencies": [],
+  "assessment_note": "The selected instrument is MSCA-PF, a unit-cost instrument. Per the CLAUDE.md C1 constitutional amendment (§8.1, §8.4, §7 Phase 7), which ranks above this skill specification, the budget gate for a unit-cost instrument is satisfied by the internal deterministic derivation (unit_cost_budget.json), not by a lump-sum external response in docs/integrations/lump_sum_budget_planner/received/. Consequently, the lump-sum received/ channel is not the applicable budget source for this instrument, and its absence is NOT a blocking gate failure: Constraint 4 (absent response is a blocking failure) governs lump-sum responses for lump-sum instruments only. Response-conformance validation was performed against the applicable budget source. The unit-cost derivation is present and complete: its gate_pass_declaration is 'pass', all four line items are resolved to Confirmed, unresolved_components is empty, blocking_inconsistencies is empty, and the derivation is byte-equal replay-checked (a deterministic derivation, not an estimate). Structural coverage was confirmed against Phase 3 wp_structure.json: all five work packages (WP1-WP5) and all four partner identifiers (DATA_PARTNER, HOST, TRANSFER_PARTNER, VALIDATION_PARTNER) are covered by the whole-duration unit-cost derivation. An MSCA-PF single-researcher action is budgeted for the whole action rather than partitioned per work package or per partner, so the absence of per-WP and per-partner budget lines is expected and is not an inconsistency. No numeric budget value (cost, currency amount, or effort/month count) has been materialised, computed, copied, quoted, or written to this artifact — only structural field references are recorded (Constraint 1 enforced). The categorical Phase-8 block (§8.4) is preserved and instrument-independent; it is satisfied here because every budget component resolves to Confirmed. No blocking inconsistencies are unresolved; the budget gate passes."
 }
