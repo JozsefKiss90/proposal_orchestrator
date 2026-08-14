@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-08-14T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "phase_05_gate failed: deterministic predicate 'every_pathway_project_outputs_non_empty' failed because impact pathways PW-EI-03 (EI-03) and PW-EI-06 (EI-06) have empty project_outputs arrays. Per CLAUDE.md §7 Phase 5, each expected impact must have at least one mapped project output; EI-03 (public engagement) and EI-06 (integration of research results into teaching) map only to operator-decided activity measures with no deliverable id in wp_structure.json. The artifact honestly flags both pathways as 'Unresolved' rather than fabricating a deliverable (§13.3). Phase 3 owns the deliverable list; a downstream rerun that adds dissemination/teaching deliverables would allow these pathways to be linked.",
+  "predicates_failed": [
+    "every_pathway_project_outputs_non_empty"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (Phase 5 gate condition: each expected impact has at least one mapped project output; no impact claim asserted without a traceable project mechanism), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-08-14T00:00:00Z"
+}

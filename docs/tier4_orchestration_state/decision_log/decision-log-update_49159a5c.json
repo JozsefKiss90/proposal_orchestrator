@@ -1,0 +1,16 @@
+{
+  "decision_id": "scope_check_gantt_designer_2026-08-14T13-35-00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
+  "run_id_reference": "49159a5c-42e9-4ad1-a3ae-a2f1d32bf22c",
+  "decision_description": "The Phase 4 timeline was designed so that all 31 tasks (T1.1-T5.7) and all 6 milestones (MS1-MS6) fall within months 1-30, with the latest task end (T5.6, T5.7) and MS6 both at month 30. This confirms the project timeline fits within the operator-confirmed project duration of 30 months (a 24-month European Fellowship at ELTE, M1-M24, plus a 6-month non-academic placement at AgroVIR, M25-M30, under constraint CC-07), which in turn sits within the call-level maximum of 36 months. The scheduling_constraints WP bounds (WP5 end_month=30) and the FULL milestone-consistency check (6/6 milestones consistent, each milestone due_month >= its task_completion_month) corroborate that no task or milestone is scheduled beyond the confirmed duration and that phase_04_gate's timeline_within_duration condition is satisfiable by field name.",
+  "alternatives_considered": [
+    "Anchor the timeline to the call-level maximum of 36 months (max_project_duration_months) rather than the operator-confirmed 30-month project duration; rejected because selected_call.json records project_duration_months=30 as a Confirmed project fact that governs the specific timeline, while 36 is only the call-level ceiling.",
+    "Compress the M25-M30 non-academic placement work (T5.6, T5.7, MS6) into the 24-month European Fellowship window; rejected because the placement window M25-M30 is an operator-confirmed Tier 3 fact under CC-07 and reshaping it would fabricate a project fact not supported by the consortium roles record."
+  ],
+  "tier_authority_applied": "Tier 3 call_binding/selected_call.json (project_duration_months=30, Confirmed; project_duration_status=Confirmed) governs the specific project timeline; the ceiling check is against the same file's max_project_duration_months=36, and the timeline-fit obligation derives from CLAUDE.md §7 phase_04_gate condition (timeline fits within the call-specified duration).",
+  "rationale": "Phase 4's gate condition requires that the timeline fit within the call-specified duration and that all tasks be assigned to months. The authoritative duration is the operator-confirmed project fact (30 months) in selected_call.json, not agent memory or generic MSCA knowledge, per CLAUDE.md §9.3 and §13.3. All 31 tasks and 6 milestones were placed at months <= 30, and the FULL milestone-consistency check found no milestone due before its dependency tasks complete, so the scope check against the confirmed duration is satisfied. Recording this determination durably ensures the Phase 4 gate rationale is auditable and traceable to its Tier 3 source rather than held only in agent memory.",
+  "resolution_status": "resolved",
+  "timestamp": "2026-08-14T13:35:00+00:00"
+}
