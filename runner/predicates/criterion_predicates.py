@@ -366,6 +366,133 @@ def assumed_claims_are_operator_declared(
 
 
 # ---------------------------------------------------------------------------
+# declared_facts_are_not_inferred
+# ---------------------------------------------------------------------------
+
+#: Tier 3 artifact that, cited as a claim's source, means the claim rests on an
+#: operator declaration.  Matched on the path tail so a repo-relative ref, an
+#: absolute path and a POSIX/Windows separator all resolve alike.
+_WORKING_ASSUMPTIONS_BASENAME = "working_assumptions.json"
+
+
+def _cites_working_assumptions(claim: dict) -> bool:
+    """True iff this claim names ``working_assumptions.json`` as a source.
+
+    ``source_ref`` is either a string (free-form, often several refs joined by
+    ``;``) or an object carrying ``source_path``.  Both shapes appear in real
+    drafts, so both are inspected; anything else is not a citation.
+    """
+    ref = claim.get("source_ref")
+    if isinstance(ref, str):
+        return _WORKING_ASSUMPTIONS_BASENAME in ref
+    if isinstance(ref, dict):
+        return _WORKING_ASSUMPTIONS_BASENAME in str(ref.get("source_path", ""))
+    return False
+
+
+def declared_facts_are_not_inferred(
+    path: PathLike,
+    *,
+    repo_root: Optional[Path] = None,
+) -> PredicateResult:
+    """Pass iff no claim sourced to ``working_assumptions.json`` is ``inferred``.
+
+    Closes the escape hatch beside W1 (:func:`assumed_claims_are_operator_declared`).
+    W1 audits claims already marked ``assumed``; it is silent about a claim that
+    *should* be ``assumed`` but is not.  A drafter that labels an operator
+    declaration ``inferred`` therefore passes both W1 (no ``assumed`` claims to
+    audit — it passes **vacuously**) and ``no_unresolved_material_claims`` (not
+    ``unresolved`` either), and the declared-assumption honesty apparatus goes
+    inert on that section.
+
+    Under §12.2 the two statuses are not interchangeable.  ``Inferred`` is
+    *derived by logical reasoning from confirmed evidence*; ``Assumed`` is
+    *adopted in the absence of direct evidence*.  An operator declaration is
+    adopted precisely because there is no evidence — so citing
+    ``working_assumptions.json`` while claiming ``inferred`` tells an evaluator
+    the fact was reasoned from established evidence when the repository's own
+    record says it was not.  That is a §12.2 misstatement of provenance and,
+    because the quarantine exists to stop a declared value masquerading as
+    something stronger, a §13.3 concern too.
+
+    Deliberately narrow.  It judges only claims that name
+    ``working_assumptions.json`` themselves — it never infers from a claim's
+    wording that it *ought* to have cited a declaration, since that would be the
+    kind of judgment a gate predicate must not make.  A claim that is genuinely
+    inferred from confirmed Tier 1–4 evidence is untouched, and a section with no
+    declaration-sourced ``inferred`` claims passes.
+
+    Failure categories:
+        MISSING_MANDATORY_INPUT — section path does not exist
+        MALFORMED_ARTIFACT — section malformed
+        POLICY_VIOLATION — a declaration-sourced claim is marked ``inferred``
+    """
+    resolved = resolve_repo_path(path, repo_root)
+    data, err = _read_json_object(resolved)
+    if err is not None:
+        return err
+
+    validation_status = data.get("validation_status")
+    if not isinstance(validation_status, dict):
+        return PredicateResult(passed=True)
+
+    claim_statuses = validation_status.get("claim_statuses", [])
+    if not isinstance(claim_statuses, list):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"validation_status.claim_statuses in {resolved} must be an "
+                f"array, got {type(claim_statuses).__name__}"
+            ),
+            details={"path": str(resolved)},
+        )
+
+    violations: list[dict] = []
+    for index, claim in enumerate(claim_statuses):
+        if not isinstance(claim, dict):
+            return PredicateResult(
+                passed=False,
+                failure_category=MALFORMED_ARTIFACT,
+                reason=(
+                    f"claim_statuses[{index}] in {resolved} must be an object, "
+                    f"got {type(claim).__name__}"
+                ),
+                details={"path": str(resolved)},
+            )
+        if str(claim.get("status", "")).lower() != "inferred":
+            continue
+        if not _cites_working_assumptions(claim):
+            continue
+        violations.append(
+            {
+                "claim_id": claim.get("claim_id"),
+                "index": index,
+                "issue": (
+                    "claim cites working_assumptions.json but is marked "
+                    "'inferred'; an operator declaration is adopted without "
+                    "evidence and is therefore 'assumed' (§12.2)"
+                ),
+                "claim_summary": claim.get("claim_summary"),
+            }
+        )
+
+    if violations:
+        first = violations[0]
+        return PredicateResult(
+            passed=False,
+            failure_category=POLICY_VIOLATION,
+            reason=(
+                f"{len(violations)} claim(s) in {resolved} are sourced to "
+                f"working_assumptions.json but marked 'inferred' rather than "
+                f"'assumed' (§12.2). First: {first}"
+            ),
+            details={"path": str(resolved), "violations": violations},
+        )
+    return PredicateResult(passed=True)
+
+
+# ---------------------------------------------------------------------------
 # impact_pathways_covered
 # ---------------------------------------------------------------------------
 

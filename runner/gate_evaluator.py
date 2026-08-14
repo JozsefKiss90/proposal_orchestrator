@@ -80,6 +80,7 @@ from runner.predicates.coverage_predicates import (
 from runner.predicates.criterion_predicates import (
     assumed_claims_are_operator_declared,
     cross_section_consistency,
+    declared_facts_are_not_inferred,
     impact_pathways_covered,
     implementation_coverage_complete,
     no_unresolved_material_claims,
@@ -228,6 +229,7 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "schema_id_matches": schema_id_matches,
     "no_unresolved_material_claims": no_unresolved_material_claims,
     "assumed_claims_are_operator_declared": assumed_claims_are_operator_declared,
+    "declared_facts_are_not_inferred": declared_facts_are_not_inferred,
     "impact_pathways_covered": impact_pathways_covered,
     "implementation_coverage_complete": implementation_coverage_complete,
     "cross_section_consistency": cross_section_consistency,

@@ -10,17 +10,30 @@ the mechanism that *applies* those declarations to the drafted claims.
 
 **What it does — and only this.**  For each per-sub-section draft in
 ``section_drafts/<slug>/``, every claim whose ``status`` is ``unresolved`` and
-whose ``claim_id`` matches an operator declaration ``key`` is flipped to
-``assumed``: its ``claim_summary`` is set to the declared value (via the shared
+whose ``claim_id`` resolves to an operator declaration is flipped to
+``assumed``: its ``claim_id`` is normalized to the declaration ``key``, its
+``claim_summary`` is set to the declared value (via the shared
 :func:`runner.working_assumptions.declared_claim_summary`) and
 ``assumption_declared`` is set ``true``.  It then re-derives the section spine's
 ``overall_status`` from the post-flip claims so the section the assembler
 carries verbatim stays internally consistent.  Nothing else is touched.
 
+**Resolution uses both of the reader's lookups.**  A claim resolves by
+declaration ``key`` first and, failing that, through the ``checklist_ref``
+bridge when exactly one declaration carries that ref (see
+:func:`_resolve_declaration`).  A drafter that names a claim after the
+confirmation-checklist record rather than after the declaration is therefore
+still matched, which is what the two-lookup reader design intends; an ambiguous
+ref resolves to nothing and the honest block stands.
+
 **It cannot invent (§13.3).**  It flips *only* enumerated ``unresolved →
-assumed`` claims, and *only* where a declaration backs them by ``claim_id``.  It
+assumed`` claims, and *only* where a declaration backs them.  It
 never creates a claim, never flips ``confirmed``/``inferred``, and never
-upgrades ``assumed`` further.  The W1 predicate
+upgrades ``assumed`` further.  Note the deliberate asymmetry: because it will
+not touch ``inferred``, a drafter that mislabels a declared assumption as
+``inferred`` escapes this component entirely — that gap is closed upstream by
+the drafting specifications and downstream by
+``declared_facts_are_not_inferred``, not here.  The W1 predicate
 (``assumed_claims_are_operator_declared``, ticket 9) independently re-checks on
 the assembled section that every ``assumed`` claim maps to a declaration — so a
 flip this applier makes is exactly what W1 will accept, and any ``assumed`` claim
@@ -76,6 +89,42 @@ class AssumptionApplierError(Exception):
     """Raised when the declared assumptions cannot be applied to the drafts."""
 
 
+def _resolve_declaration(wa: WorkingAssumptions, claim_id: str):
+    """Resolve *claim_id* to a declaration by key, else by ``checklist_ref``.
+
+    The reader offers **two** lookups (see the :mod:`runner.working_assumptions`
+    module docstring): the declaration ``key``, and the ``checklist_ref`` bridge
+    that ties a declaration to the confirmation-checklist record it backs.  This
+    applier originally consumed only the first, which made the flip unreachable
+    whenever a drafter named a claim after the checklist record rather than
+    after the declaration — e.g. ``MOBILITY_ELIGIBILITY`` (the ref) against
+    ``mobility_eligibility`` (the key).  The operator had declared the fact, the
+    claim stayed ``unresolved``, and ``gate_10a`` blocked on a gap that was
+    already consciously closed in Tier 3.
+
+    Resolution order, deliberately:
+
+    1. **Exact key match wins.**  A declaration key is the canonical handle and
+       is never overridden by a ref that happens to collide with it.
+    2. **``checklist_ref`` bridge, and only when unambiguous.**  A ref may back
+       several declarations (``DATA_PARTNER`` backs two).  Flipping one claim
+       from a set of candidates would be a choice, and this component may not
+       choose (§13.3) — so a multi-candidate ref resolves to ``None`` and the
+       honest block stands.
+
+    Returns the declaration, or ``None`` when the claim is undeclared or the
+    bridge is ambiguous.  Both lookups are exact and case-sensitive: a
+    near-miss is a miss, never a fuzzy match.
+    """
+    decl = wa.declaration(claim_id)
+    if decl is not None:
+        return decl
+    candidates = wa.by_checklist_ref(claim_id)
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
 def _read_json_object(path: Path, label: str) -> dict[str, Any]:
     """Read *path* as a UTF-8 JSON object, failing closed on any issue."""
     if not path.is_file():
@@ -127,10 +176,20 @@ def _flip_declared_claims(
             # An unresolved claim with no id cannot be declared against; leave
             # it unresolved (it will keep the section blocked, honestly).
             continue
-        decl = wa.declaration(claim_id)
+        decl = _resolve_declaration(wa, claim_id)
         if decl is None:
             continue  # undeclared → stays unresolved (honest block persists)
         claim["status"] = _ASSUMED
+        # Normalize the claim onto its declaration.  W1
+        # (``assumed_claims_are_operator_declared``) re-checks the assembled
+        # section by matching claim_id against a declaration *key* and
+        # claim_summary against the *declared value* exactly, so a claim flipped
+        # via the checklist_ref bridge must carry the key, not the ref —
+        # otherwise this component would trade a p06 failure for a p11 failure
+        # and call it progress.  Setting the key unconditionally is a no-op on
+        # the exact-key path, so both paths converge on the same shape and W1
+        # needs no change.
+        claim["claim_id"] = decl.key
         claim["claim_summary"] = declared_claim_summary(decl.value)
         claim["assumption_declared"] = True
         changed = True

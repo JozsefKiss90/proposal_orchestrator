@@ -365,3 +365,136 @@ class TestFailClosed:
         _declare_host(tmp_path)  # declarations present, but no drafts seeded
         with pytest.raises(AssumptionApplierError):
             apply_assumptions(RUN_ID, tmp_path, "excellence")
+
+
+class TestChecklistRefBridge:
+    """A claim named after the checklist_ref still resolves to its declaration.
+
+    The reader offers two lookups — the declaration ``key`` and the
+    ``checklist_ref`` bridge.  The applier originally consumed only the first,
+    so a drafter that named a claim ``MOBILITY_ELIGIBILITY`` (the ref) rather
+    than ``mobility_eligibility`` (the key) was never flipped: the operator had
+    declared the fact and ``gate_10a`` still blocked on it.
+    """
+
+    def _seed_ref_named_claim(self, repo_root: Path, claim_id: str) -> Path:
+        d = _drafts_dir(repo_root)
+        _write(d / "section_spine.json", _spine())
+        _write(
+            d / "B.1.1.draft.json",
+            _draft_b11(
+                claim_statuses=[
+                    {
+                        "claim_id": claim_id,
+                        "claim_summary": "Host institution — UNCONFIRMED",
+                        "status": "unresolved",
+                    }
+                ]
+            ),
+        )
+        _write(d / "B.1.2.draft.json", _draft_b12())
+        return d
+
+    def test_claim_named_by_checklist_ref_is_flipped(self, tmp_path: Path) -> None:
+        d = self._seed_ref_named_claim(tmp_path, "HOST")  # the ref, not the key
+        _declare_host(tmp_path)
+
+        written = apply_assumptions(RUN_ID, tmp_path, "excellence")
+        assert written, "the ref-named claim should have been flipped"
+
+        claim = _claims_of(d / "B.1.1.draft.json")[0]
+        assert claim["status"] == "assumed"
+        assert claim["assumption_declared"] is True
+
+    def test_flip_normalizes_claim_id_to_the_declaration_key(
+        self, tmp_path: Path
+    ) -> None:
+        """W1 matches by key, so a bridged flip must carry the key.
+
+        Without this the applier would trade a ``no_unresolved_material_claims``
+        failure for an ``assumed_claims_are_operator_declared`` failure.
+        """
+        d = self._seed_ref_named_claim(tmp_path, "HOST")
+        _declare_host(tmp_path)
+        apply_assumptions(RUN_ID, tmp_path, "excellence")
+
+        claim = _claims_of(d / "B.1.1.draft.json")[0]
+        assert claim["claim_id"] == HOST_CLAIM_ID, "claim_id was not normalized"
+        assert claim["claim_summary"] != "Host institution — UNCONFIRMED"
+
+    def test_exact_key_match_still_wins_over_the_bridge(
+        self, tmp_path: Path
+    ) -> None:
+        """The key is the canonical handle; a colliding ref never overrides it."""
+        d = _drafts_dir(tmp_path)
+        _write(d / "section_spine.json", _spine())
+        _write(d / "B.1.1.draft.json", _draft_b11())  # claim_id == the key
+        _write(d / "B.1.2.draft.json", _draft_b12())
+        _write(
+            tmp_path / WORKING_ASSUMPTIONS_REL,
+            {
+                "provenance_class": "manually_placed",
+                "declarations": [
+                    {
+                        "key": HOST_CLAIM_ID,
+                        "value": HOST_VALUE,
+                        "declared_by": "operator",
+                        "declared_on": "2026-07-13",
+                    },
+                    # A decoy whose ref collides with the other's key.
+                    {
+                        "key": "decoy",
+                        "value": "WRONG VALUE",
+                        "declared_by": "operator",
+                        "declared_on": "2026-07-13",
+                        "checklist_ref": HOST_CLAIM_ID,
+                    },
+                ],
+            },
+        )
+        apply_assumptions(RUN_ID, tmp_path, "excellence")
+
+        claim = next(
+            c for c in _claims_of(d / "B.1.1.draft.json")
+            if c["claim_id"] == HOST_CLAIM_ID
+        )
+        assert "WRONG VALUE" not in claim["claim_summary"]
+
+    def test_ambiguous_ref_does_not_flip(self, tmp_path: Path) -> None:
+        """Two declarations sharing a ref is a choice the component may not make."""
+        d = self._seed_ref_named_claim(tmp_path, "SHARED")
+        _write(
+            tmp_path / WORKING_ASSUMPTIONS_REL,
+            {
+                "provenance_class": "manually_placed",
+                "declarations": [
+                    {
+                        "key": "first",
+                        "value": "one",
+                        "declared_by": "operator",
+                        "declared_on": "2026-07-13",
+                        "checklist_ref": "SHARED",
+                    },
+                    {
+                        "key": "second",
+                        "value": "two",
+                        "declared_by": "operator",
+                        "declared_on": "2026-07-13",
+                        "checklist_ref": "SHARED",
+                    },
+                ],
+            },
+        )
+        apply_assumptions(RUN_ID, tmp_path, "excellence")
+
+        claim = _claims_of(d / "B.1.1.draft.json")[0]
+        assert claim["status"] == "unresolved", "the honest block must stand"
+        assert claim["claim_id"] == "SHARED", "an unflipped claim keeps its id"
+
+    def test_bridge_is_case_sensitive(self, tmp_path: Path) -> None:
+        """A near-miss is a miss; the applier never fuzzy-matches."""
+        d = self._seed_ref_named_claim(tmp_path, "host")  # ref is "HOST"
+        _declare_host(tmp_path)
+        apply_assumptions(RUN_ID, tmp_path, "excellence")
+
+        assert _claims_of(d / "B.1.1.draft.json")[0]["status"] == "unresolved"

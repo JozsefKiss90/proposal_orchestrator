@@ -342,7 +342,36 @@ def _default_claude_drafter(
             "fellowship type, duration), set status 'unresolved' and set "
             "claim_id to its confirmation_checklist.json token (HOST, FELLOW, "
             "SUPERVISOR, FELLOWSHIP_TYPE, DURATION). Never invent an identity "
-            "and never emit status 'assumed' yourself."
+            "and never emit status 'assumed' yourself. "
+            # W2 (g09a_p12): the drafter cannot emit 'assumed', so a fact whose
+            # only backing is an operator declaration has no correct terminal
+            # status available to it — and 'inferred' is the wrong one, because
+            # §12.2 Inferred means derived from confirmed evidence while a
+            # declaration is adopted in its ABSENCE.  Route it to 'unresolved'
+            # keyed on the declaration, which is exactly what the
+            # assumption-applier flips to 'assumed' pre-assembly.  Ask for the
+            # declaration `key`; the applier's checklist_ref bridge covers a
+            # drafter that reaches for the ref instead.
+            "If a fact's only support is an operator declaration in "
+            "docs/tier3_project_instantiation/working_assumptions.json, set its "
+            "status to 'unresolved' and set claim_id to that declaration's "
+            "'key' field exactly as written (for example 'mobility_eligibility'"
+            ", not the upper-case checklist_ref). NEVER mark such a fact "
+            "'inferred': 'inferred' asserts the fact was derived from confirmed "
+            "evidence, whereas an operator declaration is adopted precisely "
+            "because no evidence exists, and a later deterministic pass "
+            "converts these to 'assumed' with the operator's own wording. "
+            # Fix 3: the ledger is a record of what the prose claims, not a
+            # notebook.  Meta-entries about repository state have twice blocked
+            # gate_10a on claims the section never made (C-CANONICAL-PACK-
+            # MISMATCH; CC_ELTE_TRACK_RECORD_DEFERRED).
+            "Record in claim_statuses ONLY the material claims this "
+            "sub-section's prose actually makes. Do not add an entry for a fact "
+            "you deliberately did not assert, for a topic you decided to leave "
+            "out, or for the state of the repository, its inputs or its tooling "
+            "(a missing, stale or inconsistent input file is never a claim — if "
+            "an input you need is unusable, draft only what the remaining "
+            "sources support and say nothing about the file itself)."
         )
         user_prompt = (
             f"Grounding inputs to Read (relative to the repository root):\n"

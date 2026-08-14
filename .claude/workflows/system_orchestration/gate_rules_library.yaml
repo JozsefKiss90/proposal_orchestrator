@@ -1346,6 +1346,27 @@ gate_rules:
           declared value equals the claim_summary (CLAUDE.md §13.3; ticket 9).
         prose_condition: "Every assumed claim is operator-declared (W1)"
 
+      # W2 — the other half of the β honesty layer.  W1 audits claims already
+      # marked 'assumed' and is silent about one that should be assumed but is
+      # not: a drafter that labels an operator declaration 'inferred' passes W1
+      # vacuously (nothing to audit) and no_unresolved_material_claims too, and
+      # the honesty apparatus goes inert.  Under §12.2 Inferred is derived from
+      # confirmed evidence while Assumed is adopted in its absence, so a claim
+      # citing working_assumptions.json cannot be Inferred.  Judges only claims
+      # that name the file themselves — it never infers that a claim ought to
+      # have cited a declaration.
+      - predicate_id: g09a_p12
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+        fail_message: >
+          Excellence section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
+
 
   # ===========================================================================
   # GATE 09b — gate_10b_impact_completeness
@@ -1506,6 +1527,20 @@ gate_rules:
           declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
         prose_condition: "Every assumed claim is operator-declared (W1)"
 
+      # W2 — see the g09a_p12 note.  A claim citing working_assumptions.json
+      # cannot be Inferred: a declaration is adopted without evidence (§12.2).
+      - predicate_id: g09b_p13
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          Impact section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
+
 
   # ===========================================================================
   # GATE 09c — gate_10c_implementation_completeness
@@ -1655,6 +1690,20 @@ gate_rules:
           claim must map by claim_id to a manually_placed declaration whose
           declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
         prose_condition: "Every assumed claim is operator-declared (W1)"
+
+      # W2 — see the g09a_p12 note.  A claim citing working_assumptions.json
+      # cannot be Inferred: a declaration is adopted without evidence (§12.2).
+      - predicate_id: g09c_p12
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          Implementation section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
 
 
   # ===========================================================================
