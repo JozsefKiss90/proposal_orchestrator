@@ -1,0 +1,120 @@
+{
+  "report_id": "compliance_check_excellence_section_compliance_validator_2026-08-14T12:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "ec01fb84-4d7f-4744-a534-79739a225db2",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed, or asserting budget-dependent content without a passed budget gate.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete/contradictory/unvalidated without explicitly flagging the gap in the deliverable.",
+      "check_status": "violation",
+      "violation_evidence": "validation_status.overall_status is 'unresolved' and no_unsupported_claims_declaration is true, yet claim MOBILITY_ELIGIBILITY carries status 'unresolved' with summary 'Whether the European Fellowship mobility rule is satisfied rests on an operator-declared assumption (rectified CV giving 7.05 months in Hungary against a 12-month cap); the CV's face count is contested and it is not confirmed.' This unresolved eligibility matter is NOT surfaced anywhere in the section prose: sub-section 1.4.5 presents the researcher's Hungarian mobilities and host familiarity as settled ('she arrives already familiar with the host country, the partner MATE ... and the host institution itself') and flags only the career break, never the unresolved/contested mobility-eligibility question. The section therefore reads as complete while carrying an unflagged unresolved claim.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1-4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 1,
+    "check_notes": {
+      "13.4": "Artifact schema_id 'orch.tier5.excellence_section.v1' is a Phase 8 deliverable. The budget gate is confirmed passed: docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists with gate_pass_declaration='pass' (MSCA-PF unit-cost derivation). The section content contains no euro figures, currency amounts, or person-month values used as confirmed budget claims. No violation.",
+      "13.5": "Not directly verifiable from artifact content; enforced by decision-log-update skill. Recorded pass per skill spec.",
+      "13.6": "Not directly verifiable from an artifact. Recorded pass per skill spec.",
+      "13.9": "Programme-rule / participation-condition claims present (experienced-researcher condition, European Fellowship mobility rule, six-month placement ceiling, career-break exemption) are each attributed to documented Tier 2B scope_requirements and Tier 3 call_binding/working_assumptions sources rather than to agent memory; MSCA-PF participation conditions are call-level (Tier 2B) sources. No financial-regulation or grant-agreement-term claim is asserted without documented attribution. Substantive test of 13.9 satisfied.",
+      "13.10": "traceability_footer.no_unsupported_claims_declaration is true; every entry in validation_status.claim_statuses (including the two 'unresolved' claims CC_ELTE_TRACK_RECORD_DEFERRED and MOBILITY_ELIGIBILITY) carries a source_ref. No unsupported-claim mechanism triggered.",
+      "13.11": "Not verifiable from a deliverable artifact. Recorded pass per skill spec.",
+      "13.12": "Not directly verifiable from an artifact. Recorded pass per skill spec."
+    }
+  },
+  "timestamp": "2026-08-14T12:00:00Z",
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-08-14T12:00:00Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.8_excellence_section_2026-08-14T12:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.8",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The excellence_section deliverable has validation_status.overall_status='unresolved' and asserts no_unsupported_claims_declaration=true, but the unresolved claim MOBILITY_ELIGIBILITY (European Fellowship mobility rule not confirmed; CV month-count contested) is not flagged anywhere in the section prose (sub-section 1.4.5 presents the researcher's mobility profile as settled). Per CLAUDE.md §13.8 and §11.5 the gap must be explicitly flagged in the deliverable rather than left implicit. This skill flags the violation and does not resolve it.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-08-14T12:00:00Z"
+    }
+  ]
+}
