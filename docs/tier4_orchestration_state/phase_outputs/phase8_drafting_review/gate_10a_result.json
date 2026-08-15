@@ -2,18 +2,18 @@
   "schema_id": "orch.gate_result.v1",
   "gate_id": "gate_10a_excellence_completeness",
   "gate_kind": "exit",
-  "run_id": "ec01fb84-4d7f-4744-a534-79739a225db2",
+  "run_id": "7612dbaf-9d7d-428b-a5f0-7b4c1288b775",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:61735c2c6f085c7baf7e2fe01ba53047d9ea8e1bbfe6c8440a9174652a749ce7",
+  "input_fingerprint": "sha256:5cf9e1c3d1c801c986d844638e97cf8fad4f670d3cd13c24c43a8af8f1544a2b",
   "input_artifact_fingerprints": {
-    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:564292eda60b49ddc7709e1988c63caed399abad6ccd81e965a4722027b8f6d2",
-    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:073b0d4cef71f169917268c2b0b197023556a535e9802c84bc6467b1eef199e4"
+    "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json": "sha256:5142a43d4289d66b67e7998276432d3008e1f0acd1995f3035d73bf1aff8fb62",
+    "docs/tier5_deliverables/proposal_sections/excellence_section.json": "sha256:fe50baa3b60a615391c7ad939265996b636eea34c1f84ea4a7961fa8eb2cd202"
   },
-  "evaluated_at": "2026-08-14T16:51:25.153679+00:00",
+  "evaluated_at": "2026-08-14T22:01:48.133218+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
-  "status": "fail",
+  "status": "pass",
   "deterministic_predicates": {
     "passed": [
       "g09a_p02",
@@ -22,36 +22,20 @@
       "g09a_p04",
       "g09a_p05",
       "g09a_p05b",
+      "g09a_p06",
       "g09a_p07",
       "g09a_p08",
       "g09a_p09",
       "g09a_p10",
-      "g09a_p11"
+      "g09a_p11",
+      "g09a_p12"
     ],
-    "failed": [
-      {
-        "predicate_id": "g09a_p06",
-        "type": "coverage",
-        "function": "no_unresolved_material_claims",
-        "args": {
-          "path": "docs/tier5_deliverables/proposal_sections/excellence_section.json"
-        },
-        "failure_category": "POLICY_VIOLATION",
-        "reason": "Unresolved material claims in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json: validation_status.overall_status is 'unresolved'",
-        "details": {
-          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "overall_status": "unresolved"
-        },
-        "fail_message": "Excellence section contains unresolved material claims (validation_status.overall_status is \"unresolved\").\n",
-        "prose_condition": "No unresolved material claims in Excellence section"
-      }
-    ]
+    "failed": []
   },
   "semantic_predicates": {
     "passed": [],
-    "failed": [],
-    "skipped": true
+    "failed": []
   },
-  "skipped_semantic": true,
+  "skipped_semantic": false,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_10a_result.json"
 }

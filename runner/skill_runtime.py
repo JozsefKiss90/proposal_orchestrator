@@ -100,6 +100,30 @@ SKILL_MAX_TOKENS: int = 32768
 TAPM_TIMEOUT_SECONDS: int = 1200
 
 
+def _run_id_echo_directive(run_id: str) -> str:
+    """Instruction block telling Claude to *copy* ``run_id``, not retype it.
+
+    ``run_id`` is a 36-character random UUID that the model must reproduce
+    byte-exactly.  It carries no meaning the model can reconstruct, so a
+    model that regenerates it from memory rather than copying it produces a
+    plausible-looking but wrong token.  That is a whole-node failure: run
+    ``9e27694f`` (2026-08-14) lost n07 after every skill had succeeded,
+    because the final payload echoed ``9e27694f-9443-4436-…`` in place of
+    ``9e27694f-e13b-4449-…``.
+
+    This hardens the *request*.  It deliberately does not touch validation:
+    a mismatched ``run_id`` remains a hard failure, never auto-corrected,
+    per §17.6.5.
+    """
+    return (
+        f'- "run_id": "{run_id}"\n'
+        "  Copy this run_id character-for-character from the line above. "
+        "It is a random identifier with no derivable structure — do not "
+        "retype it from memory, reformat it, or generate a new UUID. "
+        "A single wrong character fails the entire node.\n"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Transport backend resolution
 # ---------------------------------------------------------------------------
@@ -518,8 +542,8 @@ def _assemble_skill_prompt(
     if any_schema_requires_run_id:
         system_prompt += (
             "\nYou MUST include these fields in every output artifact:\n"
-            f'- "run_id": "{run_id}"\n'
-            "- The appropriate schema_id as defined in the skill "
+            + _run_id_echo_directive(run_id)
+            + "- The appropriate schema_id as defined in the skill "
             "specification\n"
             "- Do NOT include an artifact_status field\n"
         )
@@ -661,8 +685,8 @@ def _assemble_tapm_prompt(
     if any_schema_requires_run_id:
         system_prompt += (
             "You MUST include these fields in every output artifact:\n"
-            f'- "run_id": "{run_id}"\n'
-            "- The appropriate schema_id as defined in the skill "
+            + _run_id_echo_directive(run_id)
+            + "- The appropriate schema_id as defined in the skill "
             "specification\n"
             "- Do NOT include an artifact_status field\n"
         )
@@ -777,6 +801,19 @@ def _assemble_tapm_prompt(
                 "Do NOT nest artifacts under file names or paths — use the "
                 "flat structure shown above.\n"
             )
+
+    if output_contract == "payload":
+        # Payload-contract skills return an in-memory payload rather than a
+        # written artifact, so the "output artifact" framing of the system
+        # prompt does not visibly cover them.  Restate the run_id echo
+        # requirement against the payload itself — this is the exact field
+        # that lost run 9e27694f's n07 (see _run_id_echo_directive).
+        user_prompt += (
+            "\n## CRITICAL: run_id in the returned payload\n\n"
+            "This skill returns a payload, not a written artifact. The "
+            "payload MUST carry the run_id:\n\n"
+            + _run_id_echo_directive(run_id)
+        )
 
     user_prompt += (
         "\nReturn a single JSON object conforming to the output schema "

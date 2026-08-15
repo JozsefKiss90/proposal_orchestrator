@@ -1,101 +1,11 @@
 {
   "sub_section_id": "1.2",
   "title": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)",
-  "content": "# 1.2 Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)\n\n## 1.2.1 Overall methodology: the concepts, models and assumptions that underpin the work\n\nThe methodological core of FIELDWISE is a deliberate reorientation of how an agricultural prediction model is defined, built and judged. The concept that underpins the whole methodology is that operational value in irrigation support is not established by retrospective fit. Agricultural machine learning is predominantly evaluated through retrospective metrics such as R², RMSE, F1-score or classification accuracy, and a model can achieve strong retrospective performance while being unsuitable for irrigation management: observations from related seasons, plots or fields can leak between training and testing and produce optimistic estimates; a model can learn environment-specific relationships tied to a particular soil, cultivar, management regime or year rather than transferable crop-water relationships; accurate identification of an already-established stress condition can arrive too late to change the decision; and a model that transfers between research experiments can still fail under the heterogeneity and incomplete data of commercial farming. The methodology is therefore organised as a staged progression — from retrospective accuracy to prospective prediction, then to transferability, and finally to field-level decision value — and every methodological choice below is subordinate to that progression. This design directly enables the six objectives: it is the mechanism by which O1 through O6 are discharged with evidence rather than assertion.\n\n**Concepts and target definition (enables O1, O2).** The first methodological commitment is to define water stress through physiologically meaningful plant responses rather than solely through vegetation-index proxies, replacing a spectral-proxy definition with a physiologically grounded target. In WP1 (Historical Data and Target Design) the approximately five-year MATE hyperspectral, soil, weather and management archive is harmonised, its missingness and data quality are audited, a physiological stress definition is established, and — critically — a leakage-safe validation design is fixed before any predictive claim is made. This is the concept that governs measurement integrity for the entire project: the validation split manifests are treated as a first-class, versioned methodological artefact, published in D1.2 (Data/target/validation protocol, due month 6) alongside D1.1 (Harmonised historical database, due month 6). WP2 (Physiological Early Warning and Hyperspectral-to-Sentinel Transfer) then discovers hyperspectral stress signatures and establishes which of them can be reproduced or approximated at Sentinel-2 spectral and spatial resolution, using spectral-response-function resampling, concurrent proximal/satellite observation and scale-aware calibration. The methodological output is a validated, Sentinel-compatible feature basis, captured in D2.1 (Physiological validation dataset, due month 14) and D2.2 (Hyperspectral-to-Sentinel transfer library, due month 14). This bridge between high-information proximal hyperspectral observation and scalable satellite prediction is one of the two genuinely novel methodological contributions of the action.\n\n**Models (enables O3).** WP3 (Prospective and Uncertainty-Aware Prediction) turns the feature basis into prospective, uncertainty-aware forecasts of future stress at actionable lead times, rather than mapping current condition. The modelling strategy is deliberately laddered from transparent to complex: temporal feature engineering, then transparent baseline models, then random-forest/gradient-boosted (RF/XGBoost) models, then Bayesian and hierarchical models, with explicit multi-horizon forecasting, probability calibration and uncertainty quantification, and feature-ablation and error analysis. The guiding assumption is parsimony: the simplest adequate model is preferred and deeper architectures are introduced only where sample size and temporal density justify them, which is also the project's stated environmental-sustainability posture. The comparative evidence is reported in D3.1 (Comparative modelling benchmark, due month 18) and the released engine is documented in D3.2 (FIELDWISE predictive engine/model card, due month 18).\n\n**Transferability and decision value (enables O4, O5, O6).** The methodology's distinctive feature is that a single predictive engine is then subjected, in sequence, to temporal, geographic and operational transfer. WP4 (Temporal and Cross-Country Transferability) uses leave-one-year-out validation on the MATE archive, independent field/plot validation where possible, zero-shot MATE→MVCRI transfer, a quantified geographic transferability-gap assessment, limited Bulgarian calibration and hierarchical/Bayesian adaptation, and the identification of universal versus site-specific predictors — reported in D4.1 (Temporal transferability benchmark, due month 21), D4.2 (Hungary->Bulgaria transferability report, due month 21) and D4.3 (Adaptation protocol, due month 21). WP5 (Operational Transfer, Decision Value and Web MVP) carries the surviving model into commercial conditions and introduces Field Decision Value (FDV) as the final evaluation layer: FDV computes usefulness — warning lead time, calibration, and the balance of false and missed interventions — for competing models, evidenced in D5.3 (Field Decision Value report, due month 30). The concrete artefacts are the DrR web MVP (D5.1, due month 24), the commercial-field evaluation D5.2 (Commercial-field transferability assessment, due month 30) and D5.4 (AgroVIR functional/technical evaluation, due month 30), and D5.5 (FMIS integration roadmap, due month 30).\n\n**Underpinning assumptions, stated as testable hypotheses.** The methodology does not smuggle its assumptions in as background conditions; it states them as six falsifiable hypotheses and designs the experiments to confirm or refute them. H1 assumes soil-water and atmospheric-demand information combined with hyperspectral crop-response information will identify developing stress before substantial canopy-greenness deterioration; H2 assumes a subset of hyperspectral features can be made Sentinel-compatible through resampling, concurrent observation and scale-aware calibration; H3 assumes unseen-season performance will be lower than under conventional random validation; H4 assumes performance will decrease from MATE, Hungary to MVCRI, Bulgaria, with limited local calibration and/or hierarchical modelling recovering part of the loss; H5 assumes further degradation on transfer from research to farmer-managed fields, revealing which inputs and components are operationally robust; and H6 assumes the model with the highest retrospective accuracy will not necessarily deliver the greatest decision value. The methodological consequence of H3–H5 is a performance-degradation model of transfer: the project expects and quantifies loss at each transfer step rather than assuming portability. This is the assumption base that makes the honest-estimate design coherent.\n\n## 1.2.2 Methodological challenges identified and how they are overcome\n\nThe project has identified its principal methodological challenges explicitly and pairs each with a concrete mitigation, so that the risks are treated as design parameters rather than contingencies. Historical MATE information may be incomplete (mitigated by a common-data subset, quality flags and prospective augmentation); a hyperspectral index may have no Sentinel equivalent (retained for physiological discovery but excluded from the operational Sentinel model); spectral-domain mismatch (SRF resampling plus concurrent-sensor comparison) and proximal/satellite spatial mismatch (representative plot/zone aggregation) are addressed at the transfer step; insufficient physiological stress events are countered by targeted temporal sampling across stress gradients; cloud gaps are handled with temporal windows and Sentinel-1 where scientifically useful. The transfer-failure challenges are met head-on: unseen-year, Hungary→Bulgaria and farmer-field performance drops are treated as expected scientific outcomes to be quantified and adapted to (through limited local/Bayesian adaptation and, where necessary, input/model simplification), rather than as failures to be hidden. Two further challenges are structural to the project's thesis: a prediction that is accurate but too late is guarded against by making lead time a primary model-selection criterion; and the risk that a Bayesian approach does not outperform simpler machine learning is resolved by retaining the simpler model when it is superior in calibration or FDV. Crucially, the methodology adopts an explicit risk philosophy: failure of zero-shot transfer is not project failure — establishing that a MATE-trained model cannot reliably transfer to Bulgaria without a defined amount of local calibration is itself a significant scientific finding. This is what makes the leakage-safe, honest-estimate design methodologically sound: because the deliverables carry quantified degradation and a stated adaptation cost, a negative transfer result is still an evidenced, publishable result. This posture directly answers the prior submission's recorded criticism that its methodological treatment of heterogeneous spatial, spectral and temporal information was insufficient, and that milestones occurred too late to enable corrective action; WP1 fixes validation integrity up front so non-optimistic estimates are available at each subsequent transfer step.\n\n## 1.2.3 Integration of methods and disciplines in pursuit of the objectives\n\nAn interdisciplinary approach is not optional for FIELDWISE; it is constitutive of the objectives, because the central problem sits precisely at the interface of crop physiology and geospatial data science. The methodology therefore integrates two disciplinary bases that are normally kept apart. From plant science it draws physiological definition of water stress, horticultural crop and plant-protection knowledge, water-stress experimentation, physiological phenotyping and hyperspectral field measurement, together with the biological interpretation of Earth-observation signals; from geoinformatics and data science it draws EO time-series analysis, optical/SAR integration, hyperspectral-to-multispectral transfer, spatio-temporal modelling, Bayesian hierarchical modelling, uncertainty quantification, transfer learning/domain adaptation, reproducible geospatial computation and research-software/web deployment. The integration is realised as a genuinely bidirectional, two-way transfer of knowledge between the experienced researcher, Dr. Rositsa Cholakova, whose foundation is in agronomy, plant protection and plant physiology, and the host, Eötvös Loránd University (ELTE), whose remote-sensing and geoinformatics competence supplies the geospatial and modelling methods. This is what makes the physiological-target methodology of WP1–WP2 and the modelling methodology of WP3 a single method rather than two adjacent workstreams: the physiological target defines what the geospatial model must predict, and the geospatial-modelling apparatus determines which physiological signatures can be scaled and forecast.\n\nThe disciplinary integration is also operationalised through the supervision structure. Methodological responsibility for model development and testing — the machine-learning, Bayesian/hierarchical and meta-modelling methods and the quality assurance of the modelling and validation design — is provided by the co-supervisor, Dr. Roland Hollós, whose expertise is in machine learning and meta-modelling of crop and grassland multi-model outputs and in agro-meteorology, while overall scientific supervision, remote sensing, hyperspectral imaging and field spectroscopy are provided by the supervisor, Prof. András Jung. The consortium extends the interdisciplinary reach across sectors and countries: MATE supplies the long-term experimental and physiological knowledge and the source-domain dataset; MVCRI supplies the independent Bulgarian research environment for a true cross-country transfer test (Hungary→Bulgaria, not merely a larger sample); and AgroVIR supplies the bridge from research field to farmer field and from research prototype to operational requirements, producing an academic–research–industry knowledge chain. The methods of these disciplines are not simply juxtaposed: the leakage-safe validation design (data science) governs the physiological experiments (plant science), the FDV framework (decision science and agronomy) governs model selection over the statistical models (machine learning), and the operational assessment (agricultural software engineering, delivered through the non-academic placement) determines which scientific inputs survive into practice. This integration is the vehicle for the call's expected outcomes on new interdisciplinary and inter-sectoral mind-sets and on strengthened R&I capacity and knowledge transfer among participating organisations.\n\n## 1.2.4 Gender dimension and other diversity aspects in the research content\n\nConsistent with the instruction that this question concerns the content of the research and innovation rather than gender balance in the team, the gender dimension has been assessed against the two distinct layers of the methodology. The core scientific object of FIELDWISE is a biophysical system — the water-stress physiology of processing tomato and its interaction with soil water, atmospheric demand, developmental stage and irrigation management, observed through hyperspectral, soil and meteorological data and Sentinel-2. Sex and gender are not explanatory variables for these crop-water and spectral processes, so a sex/gender dimension is not relevant to the biophysical target definition, the hyperspectral-to-Sentinel transfer, the forecasting models or the temporal and geographic transferability tests. This is the justification the evaluation framework permits where a gender dimension is genuinely not applicable to the research content, and it is stated deliberately rather than by omission.\n\nA gender and diversity dimension does, however, become pertinent at the user-facing layer of the methodology, and the project treats it there. WP5 delivers the DrR web MVP as a decision-support tool for human end-users and includes requirements engineering and user testing with commercial growers together with structured feedback from AgroVIR staff and participating farmers. Because these activities engage human participants (assessed as low-risk in the project's ethics self-assessment, under informed consent with a right of withdrawal and with no special-category data collected), the usability and requirements methodology will consider the diversity of the end-user population — so that the interface, the way stress probability, uncertainty and irrigation priority are communicated, and the operational assumptions are designed for and evaluated with a representative range of users rather than an implicitly homogeneous one; results from human participants are reported only in aggregated or anonymised form. Beyond gender, the research design foregrounds a further diversity axis that is intrinsic to its scientific content: heterogeneity of agro-environments and farming realities. The Hungary-to-Bulgaria transfer test and the research-field-to-commercial-field transfer are, by construction, an examination of whether a model developed in one context remains valid across contrasting soils, cultivars, management regimes and countries — the project's explicit concern with universal versus site-specific predictors is a methodological treatment of environmental and operational diversity, and it is one of the ways the action contributes to the wider European question of how locally developed agricultural intelligence can become reliably transferable.\n\n## 1.2.5 Open science practices as an integral part of the methodology\n\nOpen science is embedded in the methodology rather than appended to it, under the governing principle 'as open as possible, as closed as necessary'. The expected open outputs are specified concretely and map onto the methodological artefacts described above: harmonisation protocols and the validation split manifests (the latter being the anti-leakage backbone of the whole approach), the hyperspectral-to-Sentinel methodology, analysis and model code where IP permits, model cards for released models, FAIR (findable, accessible, interoperable, reusable) metadata, selected derived or anonymised datasets, and open-access publications of the four principal scientific outputs. Two features make these practices load-bearing rather than declarative. First, reproducibility is intrinsic to the scientific claim: because FIELDWISE reports transfer-performance degradation and adaptation cost, the credibility of those numbers depends on publishing the validation design (D1.2, Data/target/validation protocol, due month 6) and the model documentation (the model card in D3.2, due month 18) so that the honest-estimate methodology is externally auditable. Second, open-science competence is trained, not assumed: open science and FAIR practice, research integrity, and generative-AI literacy are named transferable-skill strands of the Career Development Plan (D1.3, due month 3), aligning the action with the call's requirement that training foster an Open Science culture, knowledge valorisation and good scientific conduct including research integrity. The project also observes the necessary closures: farmer yields, irrigation records and field geometries from AgroVIR farms are commercially sensitive and are governed by a data-sharing agreement, so results derived from them are published only in aggregated or anonymised form; personal data in the MVP (user accounts, farm contact details and field boundaries tied to a named holding) are minimised and reviewed by ELTE's Data Protection Officer; and all data remain within the EU. On the specific requirement for a Data Management Plan delivered by month 6: the project commits to a DMP as an integral open-science instrument consistent with this requirement, and its month-6 data-governance artefact in the confirmed work-package structure is D1.2 (Data/target/validation protocol, due month 6), which fixes data harmonisation, quality flags, metadata, the physiological target and the validation design. In candour, the confirmed FIELDWISE deliverable set does not enumerate a separate, standalone 'Data Management Plan' deliverable distinct from D1.2; the DMP is provided here as the standard Horizon Europe/MSCA open-science instrument the action undertakes to deliver by month 6, and this point is flagged rather than presented as an already-scheduled project deliverable, so that the evaluator can see exactly where the confirmed structure ends and the instrument-level commitment begins.",
+  "content": "## 1.2 Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)\n\n### 1.2.1 Overall methodology: concepts, models and assumptions\n\nThe methodological core of FIELDWISE is a single, coherent design principle: a predictive crop-water-stress capability is only scientifically credible if it is evaluated the way it will be used, and is therefore built and tested along a graded chain of increasingly demanding validation rather than optimised against a retrospective accuracy metric. The overall methodology instantiates this principle as a four-stage validation ladder — scientific development and validation on the primary Hungarian data environment (MATE), an independent cross-country transferability test in Bulgaria (MVCRI), operational transferability under commercial farmer-field conditions (AgroVIR), and a research-to-operation delivery step through the *DrR web MVP*. The five work packages are the operational form of this ladder: WP1 *Historical Data and Target Design*, WP2 *Physiological Early Warning and Hyperspectral-to-Sentinel Transfer*, WP3 *Prospective and Uncertainty-Aware Prediction*, WP4 *Temporal and Cross-Country Transferability*, and WP5 *Operational Transfer, Decision Value and Web MVP*, connected by the dependency chain WP1→WP2→WP3, WP1→WP3, WP2→WP3, WP3→WP4 and WP3/WP4→WP5. This is a single-researcher action: the fellow executes every work package, and this is what makes the methodology integrative by construction rather than by hand-off.\n\nThe methodology rests on four explicit modelling concepts. First, a *physiologically grounded stress target*: water stress is defined through physiologically meaningful plant responses rather than through vegetation-index thresholds alone, so that the quantity the models predict is biologically interpretable (task *Establish physiological stress definition*, WP1). Second, a *leakage-safe validation design* established before any model is trained (task *Establish leakage-safe validation design*, WP1), which forbids observations from related seasons, plots or fields appearing simultaneously in training and testing and thereby prevents the optimistic performance estimates that the field's accuracy-centred evaluation routinely produces. Third, a *sensor-domain bridge* from high-information proximal hyperspectral observation to scalable Sentinel-2 prediction, built from spectral-response resampling, concurrent proximal/satellite observation and spatial-scale calibration (WP2), which asks specifically which physiological signatures survive resampling to Sentinel-2 spectral and spatial resolution. Fourth, a *prospective, uncertainty-aware forecasting* layer: temporal feature engineering feeds a graded model portfolio — transparent baseline models, random-forest/XGBoost models, and Bayesian/hierarchical models — with multi-horizon forecasting, probability calibration and uncertainty quantification, and feature ablation and error analysis (WP3), so that the system outputs calibrated forecasts at actionable lead times rather than a single point classification of an already-established condition.\n\nThe assumptions that underpin the work are stated as six falsifiable hypotheses, several of which are deliberately framed as performance degradations to be *quantified* rather than as optimistic claims to be confirmed. H1 assumes that combining soil-water availability and atmospheric demand with hyperspectral crop-response information identifies developing stress before substantial canopy-greenness deterioration; H2 assumes that a subset of physiologically meaningful hyperspectral features can be translated into Sentinel-compatible predictors through resampling, concurrent observation and scale-aware calibration; H3 assumes unseen-season performance will fall below conventional random-validation performance; H4 assumes a Hungary→Bulgaria performance drop that limited local calibration and/or hierarchical modelling can partly recover; H5 assumes further degradation moving from research to farmer-managed fields; and H6 assumes that the highest-accuracy model will not necessarily deliver the greatest irrigation decision value. Because each hypothesis can fail, the methodology is genuinely testable, and the final evaluation layer — the *Field Decision Value* (FDV) framework (WP5) — makes the selection criterion itself an object of study, selecting models by field-level irrigation usefulness (lead time, calibration, avoided false/missed interventions) rather than by retrospective accuracy.\n\nA further underpinning assumption is that the empirical foundation already exists: the approximately five-year MATE soil-plant-atmosphere archive is harmonised and quality-controlled rather than newly collected, and the *DrR - Digital Agronomist* desktop research prototype already demonstrates integration of soil-sensor, field-meteorological and Sentinel-2 data in a common digital environment. This means the principal residual uncertainties are scientific (whether signatures transfer, whether forecasts remain useful) rather than infrastructural, which is what makes the ladder tractable within a 30-month action.\n\n### 1.2.2 How the methodology delivers the objectives\n\nThe methodology maps one-to-one onto the six research and innovation objectives, and each mapping is closed by named deliverables. WP1 delivers O1 (*Construct a harmonised five-year MATE soil-plant-atmosphere dataset*) through the *Harmonised historical database* and the *Data/target/validation protocol*, both due in month 6, which front-load the leakage-safe foundations on which every later transferability claim depends. WP2 delivers O2 (*Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability*) through the *Physiological validation dataset* and the *Hyperspectral-to-Sentinel transfer library*, both due in month 14. WP3 delivers O3 (*Develop prospective uncertainty-aware crop water-stress forecasts*) through the *Comparative modelling benchmark* and the *FIELDWISE predictive engine/model card*, both due in month 18. WP4 delivers O4 (*Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation*) through the *Temporal transferability benchmark*, the *Hungary->Bulgaria transferability report* and the *Adaptation protocol*, all due in month 21. WP5 delivers O5 (*Quantify research->commercial-field operational transferability*) and O6 (*Translate validated predictions into irrigation priority and a functional web MVP*) through the *DrR web MVP* (due month 24) and, at month 30, the *Commercial-field transferability assessment*, the *Field Decision Value report*, the *AgroVIR functional/technical evaluation* and the *FMIS integration roadmap*. Because the modelling method is validated before the next stage depends on it — leakage-safe design before modelling, cross-country transfer before operational transfer, a built MVP (month 24) before the non-academic placement (months 25–30) — the sequence guarantees that the operational-transfer conclusions rest on scientifically validated evidence and not on optimistic extrapolation.\n\n### 1.2.3 Key methodological challenges and mitigation\n\nFive methodological challenges are identified in the design, each with a mitigation that is built into the work plan rather than deferred. (1) *Data leakage and optimistic estimation.* The dominant risk in agricultural ML is that related seasons, plots or fields contaminate the train/test split. Mitigation: the leakage-safe validation design is a month-6 deliverable (*Data/target/validation protocol*) that constrains all downstream modelling, and temporal generalisation is measured directly through leave-one-year-out validation (WP4). (2) *Sensor-domain scale gap.* It is not guaranteed that proximal hyperspectral stress signatures survive resampling to Sentinel-2 resolution. Mitigation: concurrent hyperspectral/Sentinel observations and spatial-scale calibration (WP2), with the outcome recorded transparently as a per-feature *Hyperspectral-to-Sentinel transfer library* so that a partial result is a documented finding rather than a hidden failure. (3) *Limited sample size and temporal density.* Mitigation: a graded model portfolio that begins with transparent baselines and introduces more complex Bayesian/hierarchical or deep architectures only where sample size and temporal density justify them, keeping model complexity proportionate to the evidence. (4) *Cross-country transfer failure.* A Hungarian-trained model may encode site-specific relationships. Mitigation: an explicit zero-shot Hungary→Bulgaria transfer, a geographic transferability-gap assessment, limited Bulgarian calibration and hierarchical/Bayesian adaptation (WP4), with the *Adaptation protocol* quantifying how much local information is required to recover performance. (5) *Commercial-field heterogeneity and incomplete data.* A model that transfers between research experiments may still fail under farmer-managed conditions. Mitigation: operational transfer to AgroVIR farmer field(s) and quantification of research→commercial transferability (WP5), identifying which inputs and model components are robust enough for operational use, with the FDV framework ensuring that the model finally recommended is the one most useful for irrigation decisions, not the one with the highest retrospective accuracy. This architecture directly answers a previous submission's identified weakness in the methodological treatment of heterogeneous spatial, spectral and temporal information.\n\n### 1.2.4 Integration of methods and disciplines\n\nAn interdisciplinary approach is intrinsic to the project and is not optional: the central research question runs from plant physiology, through proximal and satellite remote sensing, through machine learning and uncertainty quantification, to operational agricultural decision support, and no single discipline can answer it. The methodology therefore integrates six method families. Plant physiology and horticultural crop science supply the physiologically grounded stress target and the processing-tomato experimental system (contributed through MATE, the primary experimental and data environment). Remote sensing, hyperspectral imaging and field spectroscopy supply the early-warning signatures and the sensor-domain bridge; this is the disciplinary home of the supervisor, Prof. András Jung, whose expertise is in remote sensing, hyperspectral imaging and field spectroscopy, and geoinformatics. Geoinformatics and Earth Observation supply the Sentinel-2 scaling and reproducible geospatial computation. Machine learning, meta-modelling and agro-meteorology supply the prospective, uncertainty-aware modelling and its quality assurance; this is the disciplinary home of the co-supervisor, Dr. Roland Hollós, whose expertise is in machine learning and meta-modelling of crop and grassland multi-model outputs and in agro-meteorology, and who provides the methodological lead and quality assurance for model development and testing. Software and operational information-systems engineering supply the research-to-operation translation and the FMIS interoperability assessment (contributed through AgroVIR).\n\nIntegration is realised through three concrete mechanisms rather than asserted. First, structurally: because the fellow — a plant physiologist extending into geospatial data science — personally executes all five work packages, the biological definition of the target, its spectral representation, its predictive modelling and its operational evaluation are carried through by one integrating agent, and the fellowship's two-way transfer of knowledge (crop physiology and agronomy into the host; geoinformatics, EO time-series analysis, Bayesian hierarchical modelling and uncertainty quantification into the fellow) is the disciplinary bridge. Second, through supervision: the division of methodological responsibility — the fellow designing, building and running the models, the co-supervisor quality-assuring the model development and testing, and the supervisor providing the remote-sensing and geoinformatics lead — binds the physiological, geospatial and machine-learning strands at the point of method design. Third, through governance: the Project Steering Group brings the host and the three partners (MATE, MVCRI, AgroVIR) into a common decision structure at defined review points, so that the source-domain data environment, the cross-country transfer environment and the operational environment are coordinated against the same milestones. The disciplinary integration is thus embedded in who does the work, who assures it, and how the partners are coordinated.\n\n### 1.2.5 Gender dimension and other diversity aspects\n\nConsistent with the guidance that this question concerns the *content* of the planned research and innovation activities and not gender balance in the team, a biological sex or gender dimension is not relevant to the core research content of FIELDWISE, and a justification is provided. The subject of study is a plant crop — processing tomato — and its physiological water-stress response as observed through soil, meteorological, hyperspectral and satellite data and modelled with machine learning. There is no human or animal subject in the modelled system, and neither the physiological stress target, the spectral features, nor the predictive models contain a variable for which human sex or gender is an analytically meaningful factor. Introducing a gender variable into the crop-physiology or Earth-observation content would therefore be artificial rather than sound.\n\nOther diversity aspects are, however, addressed where they are genuinely relevant to the research content. The methodology is explicitly built around *agro-environmental and geographic diversity*: the model is developed in one European agro-climate (Hungary, MATE) and deliberately transferred to a contrasting one (Bulgaria, MVCRI), and then from research fields to commercially managed farmer fields (AgroVIR). This diversity of environments is not incidental — it is the mechanism by which the project distinguishes transferable crop–water relationships from site-specific artefacts, and the MVCRI role is specifically a Hungary→Bulgaria transferability test rather than a means of enlarging the sample. Where human participants do enter the research content — the structured usability and interoperability feedback collected from AgroVIR staff and participating farmers in WP5 — the design applies informed consent and a right of withdrawal, collects no health, biometric or special-category data, and reports results only in aggregated or anonymised form; inclusive and representative engagement of the participating end-users is the appropriate diversity consideration at that point. Personal data (farm contact details and field boundaries tied to a named holding) and commercially sensitive farmer data (yields, irrigation records, field geometries) are handled under data minimisation, review by the host's Data Protection Officer, and a data-sharing agreement, which is both an ethics and a diversity-of-stakeholder safeguard on the research content.\n\n### 1.2.6 Open science practices and research data management\n\nOpen science is implemented as an integral part of the methodology under the principle \"as open as possible, as closed as necessary\", consistent with the call's requirement that training and research activities foster an open-science culture, knowledge valorisation and good scientific conduct including research integrity. The methodology produces open outputs by design rather than as an afterthought: the harmonisation protocols and documented metadata of the *Harmonised historical database*; the *Data/target/validation protocol* including the validation split manifests that make the leakage-safe design reproducible; the hyperspectral-to-Sentinel methodology and the *Hyperspectral-to-Sentinel transfer library*; analysis and model code where intellectual property permits; the model card accompanying the *FIELDWISE predictive engine/model card*; FAIR metadata; selected derived or anonymised datasets; and open-access publications built around the project's principal scientific outputs. Reproducibility is further supported by pre-registered measurement protocols for the cross-country work at MVCRI and by transparent baseline models and documented feature-ablation and error analysis in the modelling work package. Open-science engagement — open-access publication, code and model cards where IP permits, FAIR metadata and validation split manifests — is also a named component of the *Career Development Plan* (agreed by month 3), so that the practice is trained as well as executed.\n\nResearch data management is treated as a first-class methodological instrument. A Data Management Plan will be produced as an early project deliverable by month 6, aligned with the harmonised database and the data/target/validation protocol, defining for each data class its FAIR handling, access conditions, retention and licensing. The plan makes explicit the boundary between open and restricted outputs: Copernicus/Sentinel-2 inputs and the project's own methodological and derived-data outputs are opened to the fullest extent compatible with intellectual-property constraints, while personal data held by the *DrR web MVP* and commercially sensitive farmer data from AgroVIR are protected under GDPR-compliant minimisation, data-sharing agreements and aggregated or anonymised publication. Two known constraints are stated honestly rather than glossed: some code is subject to the background intellectual property of the pre-existing *DrR - Digital Agronomist* components, and some farmer-supplied data is commercially sensitive; in both cases the \"as closed as necessary\" qualifier is invoked deliberately and the corresponding methodology, metadata and anonymised derivatives are opened even where the raw asset cannot be. This yields an open-science posture that maximises reuse and reproducibility of the scientific method while remaining compliant with data-protection and IP obligations.",
   "claim_statuses": [
     {
-      "claim_id": "CL-1.2-01",
-      "claim_summary": "The overall methodology reorients agricultural AI from retrospective accuracy to prospective prediction, then transferability, then field-level decision value, because retrospective metrics can mislead (leakage, environment-specific learning, late detection, commercial-field failure).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-02",
-      "claim_summary": "Water stress is defined through physiologically meaningful plant responses rather than spectral proxies (WP1 target design; T1.4).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-03",
-      "claim_summary": "A leakage-safe validation design is fixed in WP1 before any predictive claim and published as D1.2 (Data/target/validation protocol, due month 6), with validation split manifests treated as a versioned methodological artefact.",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-04",
-      "claim_summary": "WP2 establishes hyperspectral stress signatures and their Sentinel-2 transferability via SRF resampling, concurrent proximal/satellite observation and scale-aware calibration (D2.1, D2.2, due month 14).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-05",
-      "claim_summary": "WP3 builds prospective, uncertainty-aware, multi-horizon forecasts using a laddered model set (transparent baselines, RF/XGBoost, Bayesian/hierarchical) with calibration and ablation (D3.1, D3.2, due month 18).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-06",
-      "claim_summary": "WP4 applies leave-one-year-out validation, zero-shot MATE->MVCRI transfer, geographic gap assessment, limited Bulgarian calibration and hierarchical adaptation (D4.1, D4.2, D4.3, due month 21).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-07",
-      "claim_summary": "WP5 introduces Field Decision Value (FDV) as the final evaluation layer over lead time, calibration and false/missed interventions (D5.3, due month 30) and delivers the DrR web MVP (D5.1, due month 24) plus commercial-field evaluation (D5.2, D5.4, due month 30).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-08",
-      "claim_summary": "The underpinning assumptions are stated as six falsifiable hypotheses H1-H6, including expected performance degradation across temporal, geographic and operational transfer (H3-H5) and the decision-value hypothesis (H6).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-09",
-      "claim_summary": "Identified methodological challenges (R01-R13) are each paired with a concrete mitigation (e.g. common-data subset, SRF resampling, plot/zone aggregation, targeted temporal sampling, lead time as selection criterion).",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-10",
-      "claim_summary": "The methodology adopts an explicit risk philosophy: failure of zero-shot transfer is a significant scientific finding, not project failure.",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-11",
-      "claim_summary": "The methodology directly responds to the prior submission's recorded criticisms on heterogeneous-data treatment and late milestone placement.",
+      "claim_id": "C1",
+      "claim_summary": "The overall methodology is a four-stage transferability validation ladder (MATE scientific development/validation -> MVCRI cross-country transferability -> AgroVIR operational transferability -> DrR Web MVP research-to-operation delivery), instantiated as five work packages with the stated dependency chain.",
       "status": "confirmed",
       "source_ref": {
         "tier": 3,
@@ -103,44 +13,26 @@
       }
     },
     {
-      "claim_id": "CL-1.2-12",
-      "claim_summary": "An interdisciplinary approach is constitutive of the objectives: a genuinely bidirectional two-way transfer integrates crop physiology/agronomy with geoinformatics/data science across ELTE, MATE, MVCRI and AgroVIR.",
+      "claim_id": "C2",
+      "claim_summary": "Work stress is defined through a physiologically grounded target replacing spectral-proxy definitions (WP1 task Establish physiological stress definition; gap G1; transition TR1).",
       "status": "confirmed",
-      "source_ref": {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-13",
-      "claim_summary": "Methodological lead and quality assurance for model development and testing rest with co-supervisor Dr. Roland Hollós (ML/meta-modelling, agro-meteorology); scientific supervision and remote sensing/hyperspectral expertise rest with supervisor Prof. András Jung.",
-      "status": "confirmed",
-      "source_ref": {
-        "tier": 4,
-        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-      }
-    },
-    {
-      "claim_id": "CL-1.2-14",
-      "claim_summary": "The gender dimension is not relevant to the biophysical crop-water-stress research object (processing tomato; spectral/soil/atmospheric processes); a justification is given consistent with the form's provision.",
-      "status": "inferred",
       "source_ref": {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
       }
     },
     {
-      "claim_id": "CL-1.2-15",
-      "claim_summary": "At the user-facing layer (WP5 requirements engineering and T5.6 structured usability feedback with human participants under consent), diversity of the end-user population is considered in the usability/requirements methodology, with anonymised/aggregated reporting.",
-      "status": "inferred",
+      "claim_id": "C3",
+      "claim_summary": "A leakage-safe validation design is established in WP1 and delivered as the Data/target/validation protocol due in month 6, constraining downstream modelling.",
+      "status": "confirmed",
       "source_ref": {
         "tier": 4,
         "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
       }
     },
     {
-      "claim_id": "CL-1.2-16",
-      "claim_summary": "Heterogeneity of agro-environments and farming realities (Hungary vs Bulgaria; research vs commercial fields; universal vs site-specific predictors) is a diversity axis intrinsic to the research content and is treated methodologically.",
+      "claim_id": "C4",
+      "claim_summary": "The sensor-domain bridge from proximal hyperspectral to Sentinel-2 uses spectral-response resampling, concurrent proximal/satellite observation and spatial-scale calibration (WP2 tasks), delivered as the Hyperspectral-to-Sentinel transfer library due in month 14.",
       "status": "confirmed",
       "source_ref": {
         "tier": 3,
@@ -148,26 +40,53 @@
       }
     },
     {
-      "claim_id": "CL-1.2-17",
-      "claim_summary": "Open science follows 'as open as possible, as closed as necessary', with expected open outputs (harmonisation protocols, validation split manifests, transfer methodology, code where IP permits, model cards, FAIR metadata, derived/anonymised datasets, open-access publications).",
+      "claim_id": "C5",
+      "claim_summary": "The prediction layer uses temporal feature engineering, transparent baselines, RF/XGBoost, Bayesian/hierarchical models, multi-horizon forecasting, probability calibration and uncertainty quantification, and feature ablation/error analysis (WP3 tasks).",
       "status": "confirmed",
       "source_ref": {
         "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
       }
     },
     {
-      "claim_id": "CL-1.2-18",
-      "claim_summary": "Open science and FAIR practice, research integrity and generative-AI literacy are trained transferable-skill strands of the Career Development Plan (D1.3, due month 3), aligning with the call's training requirements (SR-04).",
+      "claim_id": "C6",
+      "claim_summary": "The underpinning assumptions are stated as six falsifiable hypotheses H1-H6, several framed as performance degradations to be quantified rather than confirmed.",
       "status": "confirmed",
       "source_ref": {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
       }
     },
     {
-      "claim_id": "CL-1.2-19",
-      "claim_summary": "Necessary closures apply: commercially sensitive AgroVIR farm data under a data-sharing agreement (aggregated/anonymised publication), minimised personal data in the MVP reviewed by ELTE's DPO, all data retained within the EU.",
+      "claim_id": "C7",
+      "claim_summary": "Field Decision Value (FDV) is established in WP5 as the final evaluation layer selecting models by field-level irrigation usefulness (lead time, calibration, avoided false/missed interventions) rather than retrospective accuracy; delivered as the Field Decision Value report due in month 30.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+      }
+    },
+    {
+      "claim_id": "C8",
+      "claim_summary": "The methodology rests on an existing approximately five-year MATE archive (harmonised, not newly collected) and the DrR - Digital Agronomist desktop research prototype, making residual risks scientific rather than infrastructural.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      }
+    },
+    {
+      "claim_id": "C9",
+      "claim_summary": "Objective-to-work-package mapping (O1<-WP1, O2<-WP2, O3<-WP3, O4<-WP4, O5/O6<-WP5), each closed by named deliverables with the stated due months.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      }
+    },
+    {
+      "claim_id": "C10",
+      "claim_summary": "Deliverable titles and due months (D1.1/D1.2 month 6, D2.1/D2.2 month 14, D3.1/D3.2 month 18, D4.1/D4.2/D4.3 month 21, D5.1 month 24, D5.2-D5.5 month 30; D1.3 Career Development Plan agreed by month 3).",
       "status": "confirmed",
       "source_ref": {
         "tier": 4,
@@ -175,8 +94,98 @@
       }
     },
     {
-      "claim_id": "CL-1.2-20",
-      "claim_summary": "The instrument requires a Data Management Plan delivered by month 6; the confirmed FIELDWISE deliverable set enumerates D1.2 (Data/target/validation protocol, due month 6) as its month-6 data-governance artefact but does not enumerate a separate standalone DMP deliverable, so the DMP is stated as an instrument-level commitment and the gap is flagged, not fabricated.",
+      "claim_id": "C11",
+      "claim_summary": "The five identified methodological challenges (data leakage, sensor-domain scale gap, limited sample/temporal density, cross-country transfer failure, commercial-field heterogeneity) each have a mitigation built into the work plan (leave-one-year-out validation, concurrent observation/scale calibration, graded model portfolio, zero-shot transfer plus limited Bulgarian calibration and hierarchical adaptation, operational transfer with robustness identification).",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+      }
+    },
+    {
+      "claim_id": "C12",
+      "claim_summary": "The architecture directly responds to a previous submission's identified weakness in the methodological treatment of heterogeneous spatial, spectral and temporal information.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+      }
+    },
+    {
+      "claim_id": "C13",
+      "claim_summary": "An interdisciplinary approach is necessary because the central question spans plant physiology, remote sensing, geoinformatics/EO, machine learning/uncertainty, and operational decision support; no single discipline answers it.",
+      "status": "inferred",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      }
+    },
+    {
+      "claim_id": "C14",
+      "claim_summary": "The integrated disciplines and their carriers: supervisor Prof. Andras Jung (remote sensing, hyperspectral imaging, field spectroscopy, geoinformatics) and co-supervisor Dr. Roland Hollos (machine learning and meta-modelling, agro-meteorology) providing the methodological lead and quality assurance for model development and testing.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      }
+    },
+    {
+      "claim_id": "C15",
+      "claim_summary": "Integration is realised structurally (the fellow, a single researcher, executes all five work packages, with two-way transfer of knowledge between crop physiology/agronomy and geospatial data science), through supervision (division of methodological responsibility and QA), and through governance (the Project Steering Group coordinating host, MATE, MVCRI and AgroVIR).",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+      }
+    },
+    {
+      "claim_id": "C16",
+      "claim_summary": "A biological sex/gender dimension is not relevant to the core research content because the subject is a crop (processing tomato) with no human/animal subject in the modelled system; justification provided per the guidance.",
+      "status": "inferred",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      }
+    },
+    {
+      "claim_id": "C17",
+      "claim_summary": "Relevant diversity aspects are addressed through agro-environmental/geographic diversity (Hungary MATE, Bulgaria MVCRI, commercial AgroVIR fields) and, where human participants provide structured feedback in WP5, inclusive engagement under informed consent with no special-category data and aggregated/anonymised reporting.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      }
+    },
+    {
+      "claim_id": "C18",
+      "claim_summary": "Personal data (MVP user/farm details, field boundaries) and commercially sensitive farmer data are handled under GDPR data minimisation, DPO review and a data-sharing agreement, with results published only in aggregated or anonymised form.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      }
+    },
+    {
+      "claim_id": "C19",
+      "claim_summary": "Open science is implemented as an integral part of the methodology under 'as open as possible, as closed as necessary', producing harmonisation protocols, validation split manifests, hyperspectral-to-Sentinel methodology, code where IP permits, model cards, FAIR metadata, anonymised derived datasets and open-access publications; open-science engagement is also a named Career Development Plan component.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      }
+    },
+    {
+      "claim_id": "C20",
+      "claim_summary": "The call mandates that training/research activities foster an open-science culture, knowledge valorisation and research integrity, which the methodology's open-science practices satisfy.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+      }
+    },
+    {
+      "claim_id": "C21",
+      "claim_summary": "A Data Management Plan will be produced as an early deliverable by month 6, defining FAIR handling, access conditions, retention and licensing, and the open/restricted boundary.",
       "status": "inferred",
       "source_ref": {
         "tier": 2,
@@ -184,17 +193,26 @@
       }
     },
     {
-      "claim_id": "CL-1.2-21",
-      "claim_summary": "The methodology serves the call's expected outcomes on new interdisciplinary/inter-sectoral mind-sets and strengthened R&I capacity and knowledge transfer among participating organisations.",
+      "claim_id": "C22",
+      "claim_summary": "Cross-country measurements at MVCRI are collected under a pre-registered protocol, supporting reproducibility.",
       "status": "confirmed",
       "source_ref": {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
       }
     },
     {
-      "claim_id": "CL-1.2-22",
-      "claim_summary": "The action is a 30-month European Fellowship hosted at Eötvös Loránd University (ELTE) with experienced researcher Dr. Rositsa Cholakova and supervisor Prof. András Jung.",
+      "claim_id": "C23",
+      "claim_summary": "Two open-science constraints are stated: some code is subject to the background IP of the pre-existing DrR components, and some farmer data is commercially sensitive, invoking 'as closed as necessary' while still opening methodology, metadata and anonymised derivatives.",
+      "status": "confirmed",
+      "source_ref": {
+        "tier": 3,
+        "source_path": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      }
+    },
+    {
+      "claim_id": "C24",
+      "claim_summary": "The host is Eotvos Lorand University (ELTE); the action is a European Fellowship with a six-month non-academic placement at AgroVIR, running 30 months (M1-M24 at ELTE, M25-M30 placement).",
       "status": "confirmed",
       "source_ref": {
         "tier": 3,
@@ -217,15 +235,15 @@
     },
     {
       "tier": 3,
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "tier": 3,
       "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
     },
     {
       "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
-    },
-    {
-      "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
     },
     {
       "tier": 3,
@@ -236,28 +254,16 @@
       "source_path": "docs/tier3_project_instantiation/call_binding/selected_call.json"
     },
     {
-      "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
-    },
-    {
       "tier": 2,
       "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
     },
     {
-      "tier": 2,
-      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
-    },
-    {
-      "tier": 2,
-      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+      "tier": 4,
+      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
     },
     {
       "tier": 4,
       "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-    },
-    {
-      "tier": 4,
-      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
     }
   ]
 }

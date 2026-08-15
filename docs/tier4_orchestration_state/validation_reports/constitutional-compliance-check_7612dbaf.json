@@ -1,0 +1,112 @@
+{
+  "report_id": "compliance_check_excellence_section_compliance_validator_2026-08-15T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "7612dbaf-9d7d-428b-a5f0-7b4c1288b775",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity (including drafting) before the budget gate has passed, or including budget-dependent content without a passing gate.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress with incomplete inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete/contradictory/unvalidated without explicitly flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1-4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0,
+    "check_notes": {
+      "13.1": "Artifact schema_id is orch.tier5.excellence_section.v1 (an application-form section). Content references only 'Part B-1' and the 'Guide for Applicants'; no 'Annex N', 'Grant Agreement Annex', 'AGA Template' or 'Model Grant Agreement template' is used as a structural/schema authority. No violation.",
+      "13.2": "Call-requirement claims (SR-04, SR-06, EO-02/05/06/07/08, open-science mandate) carry Tier 2B source_refs (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json, expected_outcomes.json), and the traceability_footer.primary_sources includes Tier 2B expected_impacts.json, expected_outcomes.json and scope_requirements.json. Every call-requirement claim provides a Tier 2B reference.",
+      "13.3": "All project-fact claims (ELTE, MATE, MVCRI, AgroVIR, Prof. Jung, Dr. Hollos, Prof. Milics, Dr. Cholakova, deliverables, WP structure) carry Tier 3 source_refs (consortium/capabilities.json, call_binding/confirmation_checklist.json, project_brief/*, architecture_inputs/*). Facts lacking direct evidence (placement on-site supervisor 'Miklos Maroti', title, workspace, team; ELTE not previously hosting a funded MSCA fellow) are status 'assumed' with assumption_declared: true and source_ref to Tier 3 working_assumptions.json, and are explicitly flagged as unconfirmed in the section content (§1.3.4). No fabricated project fact.",
+      "13.4": "This is a Phase 8 (orch.tier5.*) artifact. Content was scanned for budget figures (patterns '€N', 'N EUR', 'N person-months'); none are present — numeric references are timeline months (e.g. month 6/14/18/21/24/30), not budget values. The Excellence section carries no budget-dependent claims, so no budget-gate dependency is evidenced. Per the TAPM input boundary, the budget_gate_assessment.json was not read; the pass rests on the absence of budget-dependent content in the audited artifact, not on an assertion about gate state.",
+      "13.5": "Not verifiable from artifact content alone; enforced by the decision-log-update skill. Recorded pass as structurally non-applicable to an artifact-level audit.",
+      "13.6": "Not verifiable from an artifact; a scope/authority-expansion concern, not an artifact property. Recorded pass as structurally non-applicable.",
+      "13.7": "Phase 8 is the terminal drafting phase; the artifact legitimately consumes upstream phase outputs (phase2_concept_refinement, phase3_wp_design, phase8_drafting_review canonical_reference_pack) and contains no forward reference to a phase higher than the current one. No silent reordering.",
+      "13.8": "validation_status.overall_status is 'assumed' (not 'unresolved'); the 13.8 unresolved-suppression trigger does not fire. The assumed claims are explicitly flagged in the section content (§1.3.4 parenthetical noting host-supplied placement details 'still to be confirmed by AgroVIR before submission ... not yet independently evidenced'; §1.3.1 candid statement that ELTE has not previously hosted a funded MSCA fellow). No apparently-complete text conceals unresolved claims.",
+      "13.9": "The artifact makes no claims invoking Tier 1 normative-framework instruments (EU Financial Regulation, Model Grant Agreement terms, primary legislation). Programme/participation conditions referenced (non-academic placement provision, transferable-skills/open-science requirements, expected outcomes) are cited to Tier 2B call sources and the Tier 3 call_binding/confirmation_checklist, which is the appropriate tier for MSCA-PF call rules. No generic-knowledge substitution for an accessible Tier 1 document is evidenced.",
+      "13.10": "traceability_footer.no_unsupported_claims_declaration is true; the 13.10 false-declaration branch does not fire. All claim_statuses entries carry a source_ref and none have status 'unresolved'. Tier 5 content is traceable to Tier 2B/Tier 3/Tier 4 sources.",
+      "13.11": "Not checkable from a deliverable artifact (concerns edits to Tier 1/2 sources). Recorded pass as structurally non-applicable.",
+      "13.12": "Not checkable from an artifact. This audit itself was performed by reading CLAUDE.md §13 from disk and applying all 12 prohibitions, treating the constitution as binding. Recorded pass as structurally non-applicable to artifact content."
+    }
+  },
+  "timestamp": "2026-08-15T00:00:00Z"
+}
