@@ -1,0 +1,122 @@
+{
+  "report_id": "compliance_check_impact_section_compliance_validator_2026-08-16T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "2649ff21-c9fa-4488-b802-a4b215d769b8",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, budget figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "check_status": "violation",
+      "violation_evidence": "The audited artifact is a Phase 8 Tier 5 deliverable (schema_id 'orch.tier5.impact_section.v1', a fully drafted proposal section with three sub-sections and word counts 1647/1449/1664). The Phase 7 budget gate at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json declares 'gate_pass_declaration': 'fail' with blocking inconsistency BLK-01 (unresolved). The section also asserts budget-dependent resource content: 'a dedicated cross-cutting allocation of 3.0 of the fellow's 30 person-months, running the full M1-M30 span, covers management, training and dissemination continuously'. Per CLAUDE.md §13.4 and §8.4, no Phase 8 substep (including drafting) may exist before gate_09 confirms a complete, structurally consistent budget.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete/contradictory/unvalidated without flagging.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents.",
+      "check_status": "violation",
+      "violation_evidence": "The section makes claims about grant-agreement terms without any Tier 1 source reference: 'ownership of placement results is set to follow the grant-agreement default, vesting in ELTE as the beneficiary acting through the fellow' and 'ownership ... follows the grant agreement default'. The traceability_footer.primary_sources[] contains only Tier 2, Tier 3, and Tier 4 paths — no path within docs/tier1_normative_framework/extracted/. The regulatory (grant-agreement-terms) claim is grounded in docs/tier3_project_instantiation/working_assumptions.json (assumed, declared) rather than a Tier 1 normative source. Note: the section does honestly declare this as an operator-adopted assumption 'presented as a foreseen measure rather than a settled fact'; nonetheless the grant-agreement-terms claim carries no Tier 1 traceability.",
+      "severity": "major"
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1-4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 2
+  },
+  "timestamp": "2026-08-16T00:00:00Z",
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-08-16T00:00:00Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.4_impact_section_2026-08-16T00:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.4",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. A Phase 8 Tier 5 proposal section exists while the Phase 7 budget gate declares gate_pass_declaration='fail' (blocking inconsistency BLK-01, unresolved). Per §8.4 the categorical Phase 8 block is unconditional; this section must not be finalized until gate_09 confirms a complete, structurally consistent budget. This skill flags the violation and does not resolve it.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-08-16T00:00:00Z"
+    },
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-08-16T00:00:01Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.9_impact_section_2026-08-16T00:00:01Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.9",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. Grant-agreement-terms claims ('ownership ... follows the grant-agreement default') carry no Tier 1 source reference in traceability_footer.primary_sources[] (only Tier 2/3/4 paths present). The claim is sourced to a Tier 3 working assumption rather than a Tier 1 normative document. This skill flags the violation and does not resolve it.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-08-16T00:00:01Z"
+    }
+  ]
+}
