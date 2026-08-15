@@ -87,9 +87,9 @@
     ]
   },
   "declarations_standing": {
-    "note": "Operator declarations in working_assumptions.json back every Assumed record. They are also the only claim ids an assumed Phase 8 claim may carry, because g09a_p11, g09b_p12 and g09c_p11 match claim_id against a declaration key and claim_summary against the declared value exactly. Fourteen stood at authorisation on 2026-08-12; three were added by the open-items fold of 2026-08-14 (elte_previous_msca_hosting, placement_supervisor_title_AgroVIR, placement_workspace_AgroVIR), each declared in the amendments entry for working_assumptions.json and recorded in decision_log/fieldwise-open-items-fold_2026-08-14.json. The list is kept current rather than frozen at the authorisation date, because it is what the three Phase 8 predicates match against at run time. Amended 2026-08-14: mobility_eligibility is WITHDRAWN from this list. The operator instructed that mobility eligibility is confirmed, so the fact is now held as Confirmed in confirmation_checklist.json and capabilities.json and no longer as a declaration — a declaration cannot back a Confirmed record, because the reader stamps every declaration Assumed. This supersedes c5_override_carried_without_promotion below, which forbade exactly this promotion; the override is the operator's and is recorded in decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json. Also synced 2026-08-14: four declarations added by the operator's placeholder fold (agrovir_relevant_track_record, placement_team_AgroVIR, contact_person_title_AgroVIR, signatory_authority_MVCRI) were absent from this list and are added, so it matches working_assumptions.json exactly as the packet invariant requires.",
+    "note": "Operator declarations in working_assumptions.json back every Assumed record. They are also the only claim ids an assumed Phase 8 claim may carry, because g09a_p11, g09b_p12 and g09c_p11 match claim_id against a declaration key and claim_summary against the declared value exactly. Fourteen stood at authorisation on 2026-08-12; three were added by the open-items fold of 2026-08-14 (elte_previous_msca_hosting, placement_supervisor_title_AgroVIR, placement_workspace_AgroVIR), each declared in the amendments entry for working_assumptions.json and recorded in decision_log/fieldwise-open-items-fold_2026-08-14.json. The list is kept current rather than frozen at the authorisation date, because it is what the three Phase 8 predicates match against at run time. Amended 2026-08-14: mobility_eligibility is WITHDRAWN from this list. The operator instructed that mobility eligibility is confirmed, so the fact is now held as Confirmed in confirmation_checklist.json and capabilities.json and no longer as a declaration — a declaration cannot back a Confirmed record, because the reader stamps every declaration Assumed. This supersedes c5_override_carried_without_promotion below, which forbade exactly this promotion; the override is the operator's and is recorded in decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json. Also synced 2026-08-14: four declarations added by the operator's placeholder fold (agrovir_relevant_track_record, placement_team_AgroVIR, contact_person_title_AgroVIR, signatory_authority_MVCRI) were absent from this list and are added, so it matches working_assumptions.json exactly as the packet invariant requires. Synced 2026-08-15: placement_ip_ownership added (21st), closing the background-IP open item; recorded in decision_log/fieldwise-placement-ip-declaration_2026-08-15.json.",
     "count_at_authorisation": 14,
-    "count": 20,
+    "count": 21,
     "keys": [
       "family_allowance",
       "long_term_leave_allowance",
@@ -110,7 +110,8 @@
       "agrovir_relevant_track_record",
       "placement_team_AgroVIR",
       "contact_person_title_AgroVIR",
-      "signatory_authority_MVCRI"
+      "signatory_authority_MVCRI",
+      "placement_ip_ownership"
     ]
   },
   "c5_override_carried_without_promotion": "The mobility-eligibility override of 2026-08-11 stays Assumed. It is declared under key mobility_eligibility, registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY, and carried in capabilities.json researcher_profile at status Assumed. Authorising the seed does not promote it to Confirmed, and nothing in the run may. Only a rectified CV consistent with Part A and with ELTE's Erasmus records can do that. SUPERSEDED 2026-08-14. The operator instructed that mobility eligibility is confirmed, and an explicit in-session instruction outranks this constraint (CLAUDE.md §3 priority 1). The fact is now Confirmed in confirmation_checklist.json and capabilities.json and the declaration is withdrawn. The sentence above is left standing because it is what was authorised on 2026-08-12: an override that erases the rule it overrode is indistinguishable from there never having been one. See decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json.",
@@ -193,6 +194,20 @@
       "operator_asked": true,
       "change": "The mobility_eligibility declaration is withdrawn (declarations 21 -> 20) because the operator promoted the fact to Confirmed. Three placeholder declarations and the other 2026-08-14 additions are unaffected.",
       "record": "docs/tier4_orchestration_state/decision_log/fieldwise-mobility-confirmed-override_2026-08-14.json"
+    },
+    {
+      "artifact": "docs/tier3_project_instantiation/working_assumptions.json",
+      "date": "2026-08-15",
+      "operator_asked": true,
+      "change": "One declaration added, taking the count from 20 to 21: placement_ip_ownership. It closes the background-IP open item by adopting the grant-default allocation (results vest in ELTE) with a confirmatory written agreement between the fellow, ELTE and AgroVIR to be concluded before the placement. Option C of plans/reports/p07_placement_ip_declaration_options.md, approved by the operator in session to resolve gate_10b predicate g09b_p07 (run 5dd0e971). No existing declaration is altered.",
+      "record": "docs/tier4_orchestration_state/decision_log/fieldwise-placement-ip-declaration_2026-08-15.json"
+    },
+    {
+      "artifact": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+      "date": "2026-08-15",
+      "operator_asked": true,
+      "change": "The background-IP open item in open_for_authorisation moves Unresolved -> Assumed, closed by declaration placement_ip_ownership. The item stays listed, per the AgroVIR track-record precedent, because §2.2 prose must carry the allocation as Assumed and must not present the arrangement as settled fact. No token, field or other item changed.",
+      "record": "docs/tier4_orchestration_state/decision_log/fieldwise-placement-ip-declaration_2026-08-15.json"
     }
   ],
   "amendment_rule": "If any fingerprinted artifact changes after this date, add an entry to amendments naming the artifact, the change, its date, and whether the operator was asked. An entry declares that the authorised state moved. It is not permission for it to move silently. tests/runner/test_fieldwise_ticket7_authorisation.py enforces the pairing: a changed artifact with no entry fails.",

@@ -1,0 +1,20 @@
+{
+  "record_type": "decision_log_entry",
+  "id": "fieldwise-p06-communication-route-2026-08-15",
+  "date": "2026-08-15",
+  "branch": "fieldwise-run-01",
+  "authority": "CLAUDE.md §9.4 (durable decisions), §16.7 (divergence between skill output and manifest-defined expectations is a failure), §5 (Tier 4 updated by reruns). Operator instruction in session on 2026-08-15: p06 is resolved by a scoped n05 rerun; the operator invokes the run.",
+  "why": "Run 5dd0e971 failed gate_10b predicate g09b_p06: the impact section's dec_coverage reported communication_addressed false. The flag derives deterministically from phase5_impact_architecture/impact_architecture.json, which contained no communication content. Root cause is a specification divergence, not a drafting defect: the phase_05 workflow spec mandates a communication strategy ('Define the communication strategy: public-facing activities, target audiences, objectives'; gate summary: 'Dissemination, exploitation, and communication plans are present'), but the impact-dec-enricher skill and the impact_architecture artifact schema both dropped the C of DEC — the enricher's own contract emitted only dissemination_plan, exploitation_plan and sustainability_mechanism. A rerun without the spec fix would have reproduced the gap.",
+  "decision": {
+    "route": "Scoped n05 rerun after restoring the skill and schema to the phase spec. Rejected alternatives: hand-amending the Phase-5 artifact outside a rerun (constitutionally gray under §6.4), and redesigning the dec_coverage check (changing an oracle right after it failed).",
+    "spec_changes": [
+      "artifact_schema_specification.yaml: communication_plan added to the impact_architecture schema (optional at schema level so the core-builder base artifact stays valid; activities with activity_type, target_audience, objective, responsible_partner, timing).",
+      "impact-dec-enricher.md: fourth DEC field added — new Core Processing section 5 builds communication_plan from public-facing Tier 3/2B material, distinguished from dissemination (public audiences vs specialist), with the same no-fabrication fallback rule as dissemination; output example and scope list updated; constraint added against re-labeling dissemination as communication.",
+      "skill_catalog.yaml: enricher purpose updated from three to four DEC fields."
+    ],
+    "not_changed": "No gate, predicate, phase definition, or tier meaning changed. gate_10b g09b_p06 remains the enforcement point exactly as written; phase_05_gate predicates are untouched. The change makes the skill produce what the phase spec already required (§10.2 execution-aid correction, not a redefinition)."
+  },
+  "rerun_cascade": "Content-based gate staleness (ST-1) propagates the rerun: phase_06_gate fingerprints impact_architecture.json, gate_09 fingerprints implementation_architecture.json, and gate_10a/gate_10b fingerprint budget_gate_assessment.json. A rerun of n05 therefore requires reruns of n06, n07 and n08a before n08b can pass its transitive durable-evidence verification. This cost was surfaced to the operator before invocation; the fail-closed propagation is by design (§13.7) and is not weakened.",
+  "expected_effect_on_gates": "The n05 rerun produces impact_architecture.json with a populated communication_plan; the deterministic extra_fields deriver then sets dec_coverage.communication_addressed true and g09b_p06 passes on real artifact content. No predicate logic changes.",
+  "what_this_does_not_do": "It does not create communication content by fiat: the enricher must ground activities in Tier 3/2B public-facing material and the DEC check re-verifies the plans. It does not pass any gate before the reruns actually produce the artifacts."
+}

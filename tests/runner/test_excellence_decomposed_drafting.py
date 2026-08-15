@@ -348,3 +348,117 @@ class TestParseDrafterResponse:
             _parse_drafter_response(raw, "2.3")
         # head + tail excerpt, never the full 100k payload
         assert len(str(exc_info.value)) < 1200
+
+
+class TestQuoteTranscriptionFailClosed:
+    """Run 30a60152 ('2.3', impact): the drafter reproduced a canonical name
+    quoted „…“ in every Tier 3 source but emitted the closing quote as an
+    ASCII '\"' (U+0022) — unescaped inside a JSON string value, which breaks
+    the entire reply.  The parser must fail closed (§17.5.4 — no silent
+    repair), and the failure must hinge on that single codepoint."""
+
+    # Miniature of the captured response: narrative preamble, an EMPTY
+    # ```json fence, prose, then the bare draft object.
+    _TEMPLATE = (
+        "I'll start by reading the grounding inputs.\n\n"
+        "```json\n```\n\n"
+        "Here is the sub-section draft:\n\n"
+        '{"content":"produced with the „Марица%s institute",'
+        '"claim_statuses":[],"source_refs":[]}'
+    )
+
+    def test_unescaped_ascii_close_quote_fails_closed(self) -> None:
+        raw = self._TEMPLATE % '"'  # ASCII U+0022, unescaped → broken JSON
+        with pytest.raises(DecomposedDraftingError, match="no parseable JSON"):
+            _parse_drafter_response(raw, "2.3")
+
+    def test_typographic_close_quote_parses(self) -> None:
+        # The load-bearing character: U+201C (as in every Tier 3 source) is
+        # legal unescaped in a JSON string, and the same reply parses.
+        raw = self._TEMPLATE % "“"
+        parsed = _parse_drafter_response(raw, "2.3")
+        assert parsed["content"].startswith("produced with the")
+
+
+class TestProductionDrafterPromptHardening:
+    """The production drafter's prompts must carry the strict-JSON quote
+    directive (request-side hardening for the run-30a60152 class; acceptance
+    is unchanged — a broken reply still fails closed)."""
+
+    def test_prompts_carry_strict_json_quote_directive(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import runner.claude_transport as ct
+        from runner.decomposed_drafting import _default_claude_drafter
+
+        captured: dict[str, Any] = {}
+
+        def _fake_invoke(**kwargs: Any) -> str:
+            captured.update(kwargs)
+            return json.dumps(
+                {"content": "prose", "claim_statuses": [], "source_refs": []}
+            )
+
+        monkeypatch.setattr(ct, "invoke_claude_text", _fake_invoke)
+        drafter = _default_claude_drafter(tmp_path, run_id="r-1", slug="impact")
+        sub = {
+            "section_id": "2.3",
+            "section_name": "Magnitude of contribution",
+            "field_requirements": ["Describe magnitude."],
+        }
+        out = drafter(sub, "Impact", [])
+        assert out["content"] == "prose"
+
+        system_prompt = captured["system_prompt"].lower()
+        user_prompt = captured["user_prompt"].lower()
+        # System prompt: the escaping rule and the typographic-quote rule.
+        assert "ascii double quote" in system_prompt
+        assert "escap" in system_prompt
+        assert "typographic" in system_prompt
+        # Final output contract reminder (last-position instruction): the
+        # strict-JSON rule must survive a long Read/Glob session.
+        assert "ascii double quote" in user_prompt
+
+    def test_prompt_covers_declaration_derived_facts(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Run 5dd0e971 (g09b_p13): the drafter derived seniority from the
+        declared title placement_supervisor_title_AgroVIR, marked the
+        derivation 'inferred' and invented its own claim_id, defeating the
+        assumption-applier's key match.  The W2 instruction must state that a
+        derivation from a declared (assumed) premise is routed exactly like
+        the declared fact itself: status 'unresolved', claim_id = the
+        declaration's key — and its example key must be a live declaration
+        (mobility_eligibility was withdrawn 2026-08-14)."""
+        import runner.claude_transport as ct
+        from runner.decomposed_drafting import _default_claude_drafter
+
+        captured: dict[str, Any] = {}
+
+        def _fake_invoke(**kwargs: Any) -> str:
+            captured.update(kwargs)
+            return json.dumps(
+                {"content": "prose", "claim_statuses": [], "source_refs": []}
+            )
+
+        monkeypatch.setattr(ct, "invoke_claude_text", _fake_invoke)
+        drafter = _default_claude_drafter(tmp_path, run_id="r-1", slug="impact")
+        drafter(
+            {
+                "section_id": "2.1",
+                "section_name": "Career perspectives",
+                "field_requirements": ["Describe."],
+            },
+            "Impact",
+            [],
+        )
+
+        system_prompt = captured["system_prompt"]
+        # The derivation rule: derived-from-declared is routed like declared.
+        assert "deriv" in system_prompt.lower()
+        assert "assumed premise" in system_prompt.lower()
+        # The invented-claim_id failure mode is named.
+        assert "claim_id" in system_prompt
+        # The stale example: a withdrawn declaration key must not be the
+        # instruction's worked example.
+        assert "mobility_eligibility" not in system_prompt

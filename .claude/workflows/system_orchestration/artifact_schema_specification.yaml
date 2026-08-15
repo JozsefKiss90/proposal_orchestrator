@@ -924,6 +924,46 @@ tier4_phase_output_schemas:
             type: string
             required: false
 
+      communication_plan:
+        type: object
+        required: false
+        description: >
+          Structured communication strategy: public-facing activities aimed at
+          audiences beyond the research and user communities, per the phase_05
+          workflow spec ("Define the communication strategy: public-facing
+          activities, target audiences, objectives"). Optional at schema level
+          so the impact-pathway-core-builder base artifact (which nulls the
+          DEC fields) stays valid without it; the impact-dec-enricher builds
+          it unconditionally, and the Phase 8 impact section dec_coverage
+          check (communication_addressed, gate_10b g09b_p06) enforces its
+          presence downstream. Added 2026-08-15: the enricher and this schema
+          had dropped the C of DEC that the phase spec already mandated
+          (run 5dd0e971 g09b_p06 failure).
+        fields:
+          activities:
+            type: array
+            required: true
+            item_schema:
+              activity_type:
+                type: string
+                required: true
+              target_audience:
+                type: string
+                required: true
+                description: >
+                  Public-facing audience (e.g. growers, regional press, the
+                  interested public), not the specialist research or user
+                  communities dissemination already covers.
+              objective:
+                type: string
+                required: true
+              responsible_partner:
+                type: string
+                required: true
+              timing:
+                type: string
+                required: false
+
       sustainability_mechanism:
         type: object
         required: true

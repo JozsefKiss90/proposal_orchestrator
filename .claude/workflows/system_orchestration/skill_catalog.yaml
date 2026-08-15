@@ -282,10 +282,11 @@ skill_catalog:
     enrichment_base_artifact: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
     purpose: >
       Enrich the existing impact_architecture.json by populating dissemination_plan,
-      exploitation_plan, and sustainability_mechanism fields. Emits only the three
-      DEC fields as a compact JSON patch; the runtime merges them into the existing
-      base artifact produced by impact-pathway-core-builder. Does NOT emit or modify
-      impact_pathways or kpis — those are preserved by the runtime merge.
+      exploitation_plan, communication_plan, and sustainability_mechanism fields.
+      Emits only these four DEC fields as a compact JSON patch; the runtime merges
+      them into the existing base artifact produced by impact-pathway-core-builder.
+      Does NOT emit or modify impact_pathways or kpis — those are preserved by the
+      runtime merge.
     used_by_agents:
       - impact_architect
     reads_from:

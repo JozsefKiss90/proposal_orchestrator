@@ -1,0 +1,112 @@
+{
+  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-08-15T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "8167365d-01e4-4207-99ce-9b9633053266",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes or impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, budget figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete/contradictory/unvalidated without flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using generic Horizon Europe knowledge as a substitute for Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to Tier 1–4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "check_notes": {
+    "13.1": "Phase 6 output; structural authority for instrument sections is Tier 2A section_schema_registry.json (MSCA-PF), not any Grant Agreement Annex/AGA/Model Grant Agreement template. No annex used as schema source.",
+    "13.2": "Call-requirement claims (training/Open Science/research integrity in ETH-02) carry Tier 2B references in traceability_footer.primary_sources (scope_requirements.json SR-04; call_constraints.json CC-09/CC-10). No call constraint asserted without a Tier 2B source reference.",
+    "13.3": "Named project facts (HOST/ELTE, DATA_PARTNER, TRANSFER_PARTNER, VALIDATION_PARTNER/AgroVIR, roles, WP leads) carry Tier 3 references (partners.json, roles.json, compliance_profile.json) and Tier 4 wp_structure.json. No project fact asserted without a Tier 3/4 source reference.",
+    "13.4": "Not a Phase 8 artifact — schema_id 'orch.phase6.implementation_architecture.v1' begins with 'orch.phase6.', not 'orch.tier5.' or 'orch.phase8.'. No confirmed budget figures asserted. Structurally non-applicable.",
+    "13.5": "Not directly checkable from artifact content; enforced by decision-log-update skill. Recorded pass per skill spec.",
+    "13.6": "Not directly checkable from artifact content. Recorded pass per skill spec.",
+    "13.7": "Phase 6 artifact references only upstream phase outputs (Tier 4 phase3_wp_design/wp_structure.json). No dependency on a higher/later phase (e.g. Phase 5+) as input. No reordering evidenced.",
+    "13.8": "Structurally non-applicable (not a Tier 5 deliverable). Note: incomplete portions (section 3.1 partially_addressed, section 8 pending, ethics-review as Tier 3 derivative flag pending Tier 2B confirmation) are explicitly flagged in-artifact.",
+    "13.9": "Regulatory/programme claims (ethics self-assessment, gender equality plan eligibility, gender dimension in content, civil-focus constraint) carry Tier 1 references (implementation_constraints.json, governance_principles.json) in traceability_footer. No regulatory claim asserted without a Tier 1 source reference.",
+    "13.10": "Structurally non-applicable (not a Tier 5 artifact). traceability_footer nonetheless enumerates Tier 1–4 primary sources for material claims.",
+    "13.11": "Not checkable from a phase output artifact. Recorded pass per skill spec.",
+    "13.12": "Not directly checkable from artifact content. Recorded pass per skill spec."
+  },
+  "timestamp": "2026-08-15T00:00:00Z"
+}

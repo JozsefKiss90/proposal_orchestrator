@@ -1,0 +1,12 @@
+{
+  "decision_id": "gate_failure_phase_05_gate_impact_architect_2026-08-15T00:00:00Z",
+  "decision_type": "gate_failure",
+  "gate_id": "phase_05_gate",
+  "failure_reason": "Deterministic predicate 'pathway_project_outputs_non_empty' failed: impact pathways PW-EI-03 (EI-03) and PW-EI-06 (EI-06) have empty project_outputs arrays. Each expected impact must map to at least one project output (CLAUDE.md §7 Phase 5). EI-03 and EI-06 are Tier-3-mapped only to activity measures with no deliverable_id; linking a project output would fabricate a project fact (§13.3).",
+  "predicates_failed": [
+    "pathway_project_outputs_non_empty"
+  ],
+  "tier_authority_applied": "CLAUDE.md §6 (phase gate conditions are mandatory), §7 (Phase 5 gate: each expected impact has at least one mapped project output), §12.4 (missing mandatory inputs trigger gate failure), §15 (prefer explicit gate failure over fabricated completion)",
+  "resolution_required": true,
+  "timestamp": "2026-08-15T00:00:00Z"
+}

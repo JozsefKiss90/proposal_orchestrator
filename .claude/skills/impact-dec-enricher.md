@@ -2,10 +2,11 @@
 skill_id: impact-dec-enricher
 purpose_summary: >
   Enrich the existing impact_architecture.json by populating the dissemination_plan,
-  exploitation_plan, and sustainability_mechanism fields. Emits only the three DEC
-  fields as a compact JSON patch; the runtime merges them into the existing base
-  artifact produced by impact-pathway-core-builder. Does NOT emit or modify
-  impact_pathways or kpis — those are preserved automatically by the runtime merge.
+  exploitation_plan, communication_plan, and sustainability_mechanism fields. Emits
+  only these four DEC fields as a compact JSON patch; the runtime merges them into
+  the existing base artifact produced by impact-pathway-core-builder. Does NOT emit
+  or modify impact_pathways or kpis — those are preserved automatically by the
+  runtime merge.
 used_by_agents:
   - impact_architect
 reads_from:
@@ -19,6 +20,7 @@ constitutional_constraints:
   - "DEC plans must be specific to the project; generic templates are insufficient"
   - "Target groups must be defined with specificity"
   - "Must preserve existing impact_pathways and kpis fields without modification"
+  - "Communication activities target public audiences; do not re-label specialist dissemination as communication"
 ---
 
 ## Input Access (TAPM Mode)
@@ -39,9 +41,10 @@ in the Declared Inputs section from disk using the Read tool.
 
 ## Scope Limitation
 
-This skill ONLY produces three fields as a compact enrichment patch:
+This skill ONLY produces four fields as a compact enrichment patch:
 - `dissemination_plan`
 - `exploitation_plan`
+- `communication_plan`
 - `sustainability_mechanism`
 
 The runtime will automatically merge these fields into the existing
@@ -97,13 +100,19 @@ The runtime merge handles preservation of all base artifact fields.
 - Step 4.2: `activities` array — each entry: `activity_type`, `expected_result`, `responsible_partner`, `timing`.
 - Step 4.3: `ipr_strategy` — string (may be brief if no explicit IPR data in Tier 3).
 
-### 5. Core Processing — Sustainability Mechanism
+### 5. Core Processing — Communication Plan
 
-- Step 5.1: Build `sustainability_mechanism` from `impacts.json` sustainability data.
-- Step 5.2: `description` — non-empty string describing how results persist post-project.
-- Step 5.3: `responsible_partners` — non-empty array of partner_ids from `impacts.json`.
+- Step 5.1: Build `communication_plan` from the public-facing material in `impacts.json` (public engagement, demonstrations) and from `expected_impacts.json` entries that require public engagement or outreach (e.g. broadened public engagement). Communication addresses **public audiences beyond the research and user communities** — growers as a public, regional and sector press, the interested public — and states an objective per activity; it is distinct from dissemination (specialist audiences) and must not re-label dissemination entries.
+- Step 5.2: `activities` array — each entry: `activity_type`, `target_audience` (public-facing, specific), `objective`, `responsible_partner`, `timing`.
+- Step 5.3: If `impacts.json` lacks explicit communication data, construct minimal compliant entries from the public-facing elements already present in the impact pathways and dissemination material (e.g. a public field demonstration is a communication activity when aimed at growers and press rather than at researchers), grounded in Tier 3/2B content only — do not invent activities, channels, or audiences with no Tier 3/2B basis.
 
-### 6. Output Construction
+### 6. Core Processing — Sustainability Mechanism
+
+- Step 6.1: Build `sustainability_mechanism` from `impacts.json` sustainability data.
+- Step 6.2: `description` — non-empty string describing how results persist post-project.
+- Step 6.3: `responsible_partners` — non-empty array of partner_ids from `impacts.json`.
+
+### 7. Output Construction
 
 Produce a compact JSON enrichment patch with ONLY these fields:
 
@@ -113,6 +122,7 @@ Produce a compact JSON enrichment patch with ONLY these fields:
   "run_id": "<copied from existing artifact>",
   "dissemination_plan": { "activities": [...], "open_access_policy": "..." },
   "exploitation_plan": { "activities": [...], "ipr_strategy": "..." },
+  "communication_plan": { "activities": [...] },
   "sustainability_mechanism": { "description": "...", "responsible_partners": [...] }
 }
 ```

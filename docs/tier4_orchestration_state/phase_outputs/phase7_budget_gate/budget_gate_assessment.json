@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase7.budget_gate_assessment.v1",
-  "run_id": "7612dbaf-9d7d-428b-a5f0-7b4c1288b775",
+  "run_id": "584ecd9f-81c8-4caf-a8d8-c7c95f6a28b3",
   "gate_pass_declaration": "fail",
   "budget_response_reference": null,
   "validation_artifact_reference": null,
@@ -9,10 +9,10 @@
   "blocking_inconsistencies": [
     {
       "inconsistency_id": "BLK-01",
-      "description": "The lump-sum budget response directory docs/integrations/lump_sum_budget_planner/received/ contains no budget response file (only a .gitkeep placeholder is present). No budget response was received through the integration channel. Absent budget artifacts constitute a blocking gate failure, not a hold or pending state, per CLAUDE.md Section 8.4 and Section 13.4. No structural WP or partner coverage check could be performed because no response exists to validate against wp_structure.json.",
+      "description": "docs/integrations/lump_sum_budget_planner/received/ contains no externally received budget response (only a .gitkeep placeholder is present). Mode B (response_validation) requires a non-empty received/ directory (dir_non_empty). No interface-contract-conforming budget response exists to validate. Per CLAUDE.md §8.4 and §13.4, absent budget artifacts constitute a blocking gate failure, not a hold state.",
       "severity": "blocking",
       "resolution": "unresolved",
-      "resolution_note": "A validated budget response must be received in docs/integrations/lump_sum_budget_planner/received/ and pass interface-contract conformance and structural-consistency validation before this gate can be re-evaluated. This skill validates the lump-sum interface channel only and does not compute, estimate, or substitute any budget figure. Phase 8 remains fully blocked (CLAUDE.md Section 8.4) until gate_09 confirms a complete, structurally consistent budget."
+      "resolution_note": "Step B.1.1 blocking gate failure trigger fired: received/ is empty/absent, so no further Mode B processing (interface-contract conformance, WP coverage against wp_structure.json work_packages[], or partner coverage against partner_role_matrix[]) was executed. This skill must not fabricate, estimate, or substitute budget figures (Constraint 1 / §8.1, §8.3). gate_pass_declaration is set to 'fail' as a durable record of the blocking failure; Phase 8 remains blocked (gate_09) until a validated, interface-contract-conforming budget response is present in received/ with corresponding validation artifacts in validation/. Note: this instrument resolves to MSCA-PF (unit_cost regime), whose sanctioned budget source is the internal deterministic derivation (unit_cost_budget.json), not the lump-sum integration channel validated by this skill."
     }
   ]
 }

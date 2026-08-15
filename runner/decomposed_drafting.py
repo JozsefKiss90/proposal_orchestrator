@@ -335,7 +335,19 @@ def _default_claude_drafter(
             "claim_statuses (array of {claim_id, claim_summary, status, "
             "source_ref}), source_refs (array of {tier, source_path}, where "
             "tier is the INTEGER 1, 2, 3, or 4 — never a string such as "
-            "'Tier 2B'). Each "
+            "'Tier 2B'). "
+            # Strict-JSON quote discipline.  Run 30a60152 ('2.3', impact): the
+            # drafter reproduced a name every source writes as „Марица“ but
+            # emitted the closing quote as ASCII U+0022 — unescaped inside a
+            # JSON string value, which broke the whole 20 KB reply.  Hardens
+            # the request only; a broken reply still fails closed (§17.5.4).
+            "The reply must parse as strict JSON: any ASCII double quote "
+            "character occurring inside a string value must be escaped with a "
+            "backslash. Typographic quotation marks inside canonical names "
+            "(for example „…“ or “…”) are legal in JSON strings and must be "
+            "reproduced as those exact Unicode characters — never substitute "
+            "an ASCII double quote for them, because unescaped it terminates "
+            "the string and invalidates the entire reply. Each "
             "material claim's status is 'confirmed' or 'inferred' with a "
             "source_ref into Tier 1-4, or 'unresolved'. For a spine-identity "
             "fact not confirmed in Tier 3 (researcher, host, supervisor, "
@@ -368,12 +380,29 @@ def _default_claude_drafter(
             "If a fact's only support is an operator declaration in "
             "docs/tier3_project_instantiation/working_assumptions.json, set its "
             "status to 'unresolved' and set claim_id to that declaration's "
-            "'key' field exactly as written (for example 'mobility_eligibility'"
-            ", not the upper-case checklist_ref). NEVER mark such a fact "
+            "'key' field exactly as written (for example "
+            "'placement_supervisor_title_AgroVIR', not the upper-case "
+            "checklist_ref). NEVER mark such a fact "
             "'inferred': 'inferred' asserts the fact was derived from confirmed "
             "evidence, whereas an operator declaration is adopted precisely "
             "because no evidence exists, and a later deterministic pass "
             "converts these to 'assumed' with the operator's own wording. "
+            # W2, derived-fact extension.  Run 5dd0e971 (g09b_p13): the drafter
+            # read seniority off the declared title, called the derivation
+            # 'inferred' and coined claim_id 'placement_onsite_supervisor_
+            # seniority', which no declaration key matches — so the applier's
+            # flip never fired and the gate correctly failed the claim.
+            "This applies equally to any fact you DERIVE from a declared "
+            "value — a seniority read off a declared job title, a capability "
+            "read off a declared team description: a derivation from an "
+            "assumed premise is itself assumed, never 'inferred' (§12.2 — "
+            "inference chains only from confirmed evidence). Route the "
+            "derived claim exactly like the declared fact: status "
+            "'unresolved', claim_id set to the underlying declaration's key, "
+            "even when your sentence paraphrases or derives from the declared "
+            "value rather than restating it. Do not coin a new claim_id for "
+            "it: an unmatched claim_id defeats the deterministic pass that "
+            "converts these claims to 'assumed'. "
             # Fix 3: the ledger is a record of what the prose claims, not a
             # notebook.  Meta-entries about repository state have twice blocked
             # gate_10a on claims the section never made (C-CANONICAL-PACK-
@@ -402,7 +431,10 @@ def _default_claude_drafter(
               "done, your final reply must be ONLY the single JSON object "
               "described in the system instructions — beginning with '{' and "
               "ending with '}', with no preamble, commentary, or markdown "
-              "fence around it."
+              "fence around it — and it must parse as strict JSON: escape "
+              "every ASCII double quote inside a string value, and keep "
+              "typographic quotes in names exactly as the source writes them "
+              "(never converted to ASCII quotes)."
         )
         try:
             raw = invoke_claude_text(
