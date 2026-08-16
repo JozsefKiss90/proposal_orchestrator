@@ -1,140 +1,128 @@
 {
   "sub_section_id": "2.3",
   "title": "The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts",
-  "content": "## 2.3 The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts\n\n### How FIELDWISE makes a difference beyond its immediate scope\n\nFIELDWISE is a single-researcher, 30-month European Fellowship whose experimental object is deliberately narrow — physiologically grounded water-stress prediction in processing tomato, developed at ELTE and tested from Hungary to Bulgaria and from research fields to commercial farming. Its contribution to impact, however, is designed to generalise well beyond that object. The action defines five distinct impact channels — scientific (IMP-SCI), environmental (IMP-ENV), agricultural and food-production (IMP-AGRI), technological (IMP-TECH) and European (IMP-EU) — and each is constructed so that the difference it makes outlasts the fellowship and detaches from the specific crop, region and sensor archive on which it was first demonstrated. The magnitude of that difference is expressed, throughout this section, through what the project actually controls and delivers: reusable outputs, an externally evaluated operational route, and eleven KPIs each tracing to a named deliverable. Where a credible macro-scale figure exists it is stated; where one would be speculative, the project explicitly refuses to assert it in advance and commits instead to quantifying it from project evidence — a discipline that is itself a mark of the estimate's credibility rather than a gap in it.\n\n### Scientific impact: a transferability-based evaluation paradigm and a portable sensor-domain bridge (IMP-SCI)\n\nThe project's scientific contribution has two components, and both are consequential beyond the immediate result. First, FIELDWISE provides a framework for agricultural AI evaluated according to temporal, geographic and operational transferability rather than only retrospective accuracy. This is a methodological reorientation, not a single dataset: it replaces the field's dominant habit of scoring models on in-distribution R², RMSE or classification accuracy with an evaluation that asks whether a model still performs on an unseen season, in a second country, and under commercial-field heterogeneity — and, ultimately, whether it is useful for an irrigation decision at all. Because the paradigm is about how models are judged rather than about tomato specifically, its importance extends to any crop, sensor and region where agricultural intelligence must move from the field in which it was trained to the field in which it must operate. Second, the action establishes a methodological bridge between high-information proximal hyperspectral observations and scalable Sentinel-based prediction — a bridge that answers a general question (which locally discovered spectral signatures survive translation to freely available satellite resolution) that recurs across precision-agriculture applications far beyond this project.\n\nThe magnitude of this scientific contribution is made verifiable through outputs the project controls. The Hyperspectral-to-Sentinel transfer library records, for every candidate hyperspectral feature, an explicit transferable-or-hyperspectral-only verdict, so the sensor-domain bridge is delivered as an auditable, reusable artefact rather than an assertion. The FIELDWISE predictive engine/model card is released with a published model card documenting the engine, making the model interrogable and reusable by other groups. The prospective forecasting capability is evaluated at multiple actionable horizons (t+1, t+3 and t+5) with reported calibration and prediction-interval coverage, and field-level usefulness is measured by computing Field Decision Value for at least two competing models with lead time, false-action rate and missed-stress rate reported — directly instantiating, and testing, the hypothesis that the most retrospectively accurate model is not necessarily the most useful one. These findings are disseminated by peer-reviewed open-access publication, with at least two high-quality submissions targeted during or shortly after the fellowship, so the paradigm and the bridge enter the scientific record and contribute to the enriched, cross-boundary European R&I culture the call sets as a systemic scientific impact (EI-02).\n\n### Economic and technological impact: a concrete, externally validated route from research to operational use (IMP-TECH)\n\nFIELDWISE advances the work from a desktop research prototype to a scientifically validated web MVP — the DrR web MVP, delivered at M24, before the placement window — and then subjects that MVP to external functional and technical evaluation by the non-academic partner. This is the axis on which the project's economic and technological magnitude is most concrete, because the route to users is named rather than aspirational. The AgroVIR functional/technical evaluation supplies independent evidence, across all nine assessment dimensions, on whether the resulting technology meets the requirements of real agricultural software, and the FMIS integration roadmap — written from inside the implementing company — names the required interfaces and the concrete post-fellowship steps for embedding the engine in farm-management information systems. Together these constitute a research-to-operation delivery path (outcome OC5): an externally evaluated MVP plus a named post-MSCA integration route, which is precisely the kind of onward exploitation trajectory that converts a fellowship result into economic value beyond the action.\n\nThe importance of this route is amplified by the nature of the uptake channel. The named exploitation partner operates a farm-management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries in which FIELDWISE works — which indicates a realistic scale at which a validated engine could be adopted rather than shelved; this commercial footprint is an operator-declared characterisation to be confirmed with the partner, and it is presented as such rather than as an established fact. The economic relevance is grounded in the application itself: processing tomato is a high-value horticultural test case in which improved irrigation timing bears directly on productivity, fruit quality, water-use efficiency and economic return, so even modest gains in decision quality translate into agronomic and economic value in a crop system where the margin for mistiming is narrow. At the systemic level, this strengthens the R&I capacity, output and knowledge-transfer standing of the participating organisations that the call identifies as an economic impact (EI-05), through reusable, uptake-ready outputs rather than through claims.\n\n### Societal and environmental impact: better irrigation decisions against a quantified European water problem (IMP-ENV, IMP-AGRI)\n\nThe societal significance of the contribution is anchored in a quantified statement of the problem it addresses. Approximately 30% of EU territory is affected by seasonal water scarcity in an average year, and water scarcity already translates into agricultural yield losses and higher water costs, while irrigation demand is expected to increase under climate change. Against this backdrop, FIELDWISE contributes to the EU-level opportunity for water savings in irrigated agriculture by improving the timing and spatial prioritisation of irrigation decisions — the two levers a physiologically grounded, uncertainty-aware, spatially explicit forecast is positioned to move. This is the channel through which the project's results make a societal difference beyond their immediate scope: an irrigation-timing capability validated on processing tomato and released with a stated adaptation cost is reusable against the same water-scarcity pressure in other high-value crops and regions.\n\nCrucially, the project bounds this claim honestly. It does not assert in advance that it will achieve a particular percentage reduction in water use; the environmental impact will be quantified from project evidence rather than promised as a headline figure. This restraint is deliberate and is the credible form of the estimate: the magnitude is expressed through what the project can demonstrate — earlier, calibrated warnings; measured field-level decision value; spatial prioritisation of where irrigation matters most — rather than through an unfounded macro-number that an evaluator would rightly discount. Public understanding of transferable agricultural AI for water-efficient farming is broadened through the recurring public-engagement activities set out in the dissemination and communication plan (contributing to EI-03), so the societal benefit reaches growers and the wider public and not only the scientific audience.\n\n### European impact: transferability as a continent-scale question, with a stated cost of reuse (IMP-EU)\n\nThe project's European dimension is more than a two-country test; it is a direct investigation of a question that limits the value of locally developed agricultural intelligence across Europe. The MATE and MVCRI architecture investigates whether agricultural AI developed in one European environment can be transferred to another, and FIELDWISE thereby contributes to the wider European question of how locally developed agricultural intelligence can become reliably transferable rather than remaining confined to the field in which it was trained. The magnitude of this contribution is made tangible and, importantly, quantifiable in the dimension that matters for reuse: the Adaptation protocol states the minimum local-calibration volume needed to move the model to a new agro-environment, and the Hungary->Bulgaria transferability report reports both zero-shot and locally calibrated performance and is delivered to Prof. Vinelina Yankova at MVCRI. Stating the adaptation cost converts an abstract transferability claim into an operational one — a research group or agri-technology provider in another European region can read, in advance, how much local data it would take to re-calibrate the models — and that is what lets the contribution scale beyond the specific Hungary-to-Bulgaria corridor. Together with the openly released transfer library, the documented predictive engine and the adaptation protocol, this sustains a cross-European knowledge-transfer contribution (EI-05) whose reach is limited by adoption effort rather than by the models being locked to their training site.\n\n### Magnitude and importance, taken together\n\nThe importance of FIELDWISE's contribution rests on the fact that it addresses a systemic weakness the field has largely tolerated — models optimised for retrospective accuracy that fail on unseen seasons, in new countries, or under commercial conditions — and replaces it with an evaluation paradigm, a portable sensor-domain method, a stated cost of geographic reuse, and an externally evaluated operational route. Its magnitude is presented in the register an evaluator can check: a quantified statement of the European water problem it serves; deliverable-anchored KPIs that bound each claim (per-feature transferability verdicts, a published model card, calibrated multi-horizon forecasts, Field Decision Value across competing models, a nine-dimension external evaluation, a named FMIS integration route, a stated minimum calibration volume); and a deliberate refusal to attach a speculative water-saving percentage to results that have not yet been produced. This combination — ambition that reaches beyond processing tomato, coupled with estimates disciplined to what the action controls — is what makes the project's contribution to the expected scientific, societal and economic impacts both material and credible, proportionately to a single-researcher fellowship.",
+  "content": "## 2.3 The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts\n\nFIELDWISE is a single-researcher European Fellowship hosted by Eötvös Loránd University (ELTE) with a six-month non-academic placement at AgroVIR, and the importance of its results rests not on the size of the action but on the generality of what a small, tightly-scoped action can demonstrate. Where sub-section 2.1 concerns the fellow's own development and 2.2 concerns the machinery that carries the results to their audiences, this sub-section states how those results make a difference beyond their immediate scope — beyond one crop, one host institution and one growing season — and sizes that difference against the call's expected impacts, with quantified indicators wherever a credible and honest number is available. The project addresses a problem of genuine European magnitude: approximately 30% of EU territory is affected by seasonal water scarcity in an average year, referenced to the European Environment Agency, and climate change is expected both to increase the agricultural area requiring irrigation and to raise irrigation demand where irrigation is already practised, so that the timing of irrigation decisions is a lever on a continent-scale resource problem. FIELDWISE does not claim to solve that problem; it changes the way one class of decision-support technology is built, evaluated and transferred, and the value of that change is what the paragraphs below quantify. Each contribution is anchored to the project's eleven KPIs (K1 to K11), each of which fixes a verifiable target on a named project output, so that magnitude is asserted against measurable commitments rather than rhetorically.\n\n### Scientific impact and its reach beyond the project\n\nThe project's primary scientific contribution is a framework for agricultural AI evaluated according to temporal, geographic and operational transferability rather than only retrospective accuracy, and, additionally, a methodological bridge between high-information proximal hyperspectral observations and scalable Sentinel-based prediction. The importance of this is that it is not confined to processing tomato or to the two study regions: the failure mode it corrects — models that score well on retrospective metrics such as R², RMSE or classification accuracy yet transfer poorly to new seasons, new regions and real farms — is generic to accuracy-centred agricultural machine learning, so a demonstrated, reusable alternative evaluation discipline is of interest to the wider agricultural remote-sensing and agricultural-AI community well beyond FIELDWISE's own experiments. The magnitude of this contribution is made concrete and durable by three openly released assets rather than by publications alone: the Hyperspectral-to-Sentinel transfer library (D2.2), released with an explicit transferable or hyperspectral-only verdict recorded against every candidate feature (K2); the FIELDWISE predictive engine/model card (D3.2), released with a published model card (K4) and reporting calibration and prediction-interval coverage at forecast horizons t+1, t+3 and t+5 (K3); and the Adaptation protocol (D4.3), which states the minimum local-calibration volume needed to re-fit the model to a new agro-environment (K6). These map directly to the call's expected impacts of an enriched, more inter-connected European R&I culture and of increased R&I capacity, output and knowledge transfer among European research organisations, and the last of them — a stated minimum calibration cost — is precisely what converts a locally trained model into an asset other European groups can re-use at a known, bounded cost, which is the mechanism by which the scientific contribution propagates beyond the immediate scope.\n\n### Economic and technological impact\n\nThe economic and technological importance of FIELDWISE lies in its deliberate advancement of the work from a desktop research prototype to a scientifically validated web MVP, and in the fact that its readiness for real use is judged not by the project itself but by an external, non-academic evaluator. The DrR web MVP (D5.1) is a reachable tool serving stress probability, uncertainty, spatial risk, irrigation priority and temporal evolution (K7); the AgroVIR functional/technical evaluation (D5.4) assesses it against real agricultural-software requirements across all nine assessment dimensions (K9); and the FMIS integration roadmap (D5.5) names the required interfaces and the concrete post-fellowship steps for embedding the engine in farm-management information systems (K10). The importance of this chain is that it makes the route to economic uptake explicit and independently tested rather than asserted, which is the specific remedy to the previous submission's finding that the economic and technological route to users was insufficiently substantiated. The economic relevance of the target problem is itself substantial: water scarcity already produces agricultural yield losses and higher water costs in Europe, irrigation demand is expected to increase under climate change, and processing tomato is a high-value horticultural crop in which improved irrigation timing can therefore carry substantial agronomic and economic relevance. The magnitude of the available exploitation channel is unusually favourable for a single-fellow action because the non-academic partner is not a laboratory but a company whose farm-management information system is reported to be in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in — so the roadmap it writes from inside the implementing company points at an existing operational footprint rather than a hypothetical market. This substantiates the call's expected impact of strengthened R&I competitiveness and knowledge-transfer capacity of participating organisations; it is presented as the scale of the route to users, not as a promise of adoption within the fellowship, which the project explicitly does not make.\n\n### Societal and environmental impact\n\nThe societal and environmental contribution follows from the same mechanism seen from the public side. By improving the timing and spatial prioritisation of irrigation decisions, FIELDWISE contributes to the EU-level opportunity for water savings in irrigated agriculture. Importantly, and as a matter of credibility rather than modesty, the project does not claim in advance that it will achieve a particular percentage reduction in water use; the environmental benefit will be quantified from project evidence rather than pre-declared. This discipline is deliberate: an MSCA-PF action with one fellow and a 30-month horizon cannot honestly commit to a headline water-saving number, and stating one would weaken rather than strengthen the impact case. What the project can commit to, and does, is the field-level measurement that makes any later saving assessable — the Field Decision Value report (D5.3) computes decision value for at least two competing models and reports lead time, false action rate and missed stress rate (K8), so that model choice is driven by operational usefulness rather than retrospective fit. Beyond the environmental route, the societal reach of the action is broadened by two public-facing measures the project commits to as activities: one public field demonstration with AgroVIR farmers and one public-facing article per year, which serve the call's expected impact of broadened public engagement with research and innovation and which, being operator-decided activities, carry no deliverable identifier of their own. The results are also carried into education through the co-design and delivery of a module unit within an ELTE MSc course on Earth observation for agriculture, serving the expected impact on the feedback of research results into teaching; and, at the level of the individual researcher, the fellowship's contribution to improved employability and career mobility within and beyond academia — carried by the Career Development Plan (D1.3) and the inter-sectoral placement, and argued in full in 2.1 — feeds the call's broader societal aim of a more dynamic and flexible European research talent base. Convergence of researcher working conditions with the European Charter for Researchers is evidenced at instrument level by the Career Development Plan (D1.3) and by ELTE's recruitment and researcher-development policies; no HR Excellence in Research accreditation is claimed.\n\n### The European dimension and replicability\n\nThe distinctively European importance of FIELDWISE is that its architecture directly investigates whether agricultural AI developed in one European environment can be transferred to another. The MATE-to-MVCRI design tests this concretely — the Hungary->Bulgaria transferability report (D4.2) reports both zero-shot and locally calibrated performance (K5) — but the contribution reaches past these two sites, because the question it answers is the general one of how locally developed agricultural intelligence can become reliably transferable rather than remaining confined to the field in which it was trained. This is why the Adaptation protocol (D4.3), by stating the minimum local calibration required to move the model to a new agro-environment, is as much a European-impact instrument as a scientific one: it turns a Hungary-to-Bulgaria result into a re-usable recipe for adaptation to other European growing regions, so the magnitude of the contribution is bounded below by the two tested regions and, through the protocol, extensible to others at a stated cost. The cross-country, inter-sectoral and interdisciplinary character of the action — international transfer with MVCRI, inter-sectoral evaluation and placement with AgroVIR, and the two-way transfer between plant physiology and geoinformatics between the fellow and ELTE — is exactly the profile the call associates with strengthened European research collaboration.\n\n### Magnitude, importance and the discipline of the quantified claim\n\nTaken together, the project's contribution is proportionate to a single-fellow action yet structured so that its importance is not: the transferability-first evaluation framework, the hyperspectral-to-Sentinel bridge, the reusable transfer library, model card and adaptation protocol, the externally evaluated MVP and the named FMIS integration route are each designed to outlive the fellowship and to be picked up by others. The magnitude of each claim is disciplined by an explicit KPI, so an evaluator can check the commitment rather than take the ambition on trust: five integrated seasons (K1), an explicit transferability verdict on every candidate feature (K2), three evaluated forecast horizons (K3), a published model card (K4), a reported zero-shot and calibrated cross-country gap (K5), a stated adaptation cost (K6), a reachable MVP (K7), decision value computed for at least two models (K8), a nine-dimension external evaluation (K9), a defined integration path (K10), and a career plan agreed and reviewed on a fixed cadence (K11). Where a number would be credible and meaningful — the extent of European water scarcity, the horizons at which forecasts are issued, the dimensions on which the tool is externally assessed, the operational footprint of the exploitation channel — the project states it; where a number could only be guessed — the eventual water saving — it refuses to pre-commit and instead builds the measurement that will supply the number honestly. That combination of demonstrable reach and refusal to over-claim is the substance of FIELDWISE's contribution to the expected scientific, societal and economic impacts.",
   "claim_statuses": [
     {
       "claim_id": "IMP-SCI",
-      "claim_summary": "FIELDWISE provides a framework for agricultural AI evaluated by temporal, geographic and operational transferability rather than only retrospective accuracy, and establishes a methodological bridge from proximal hyperspectral observation to scalable Sentinel-based prediction, with impact beyond the specific crop/region.",
+      "claim_summary": "FIELDWISE's primary scientific contribution is a framework for agricultural AI evaluated by temporal, geographic and operational transferability rather than only retrospective accuracy, plus a methodological bridge from proximal hyperspectral observation to scalable Sentinel-based prediction.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-SCI, §2.3 ¶240-241)"
     },
     {
       "claim_id": "IMP-ENV",
-      "claim_summary": "The project contributes to the EU-level opportunity for water savings by improving irrigation timing and spatial prioritisation, and explicitly does not claim a particular percentage reduction in advance, committing to quantify impact from project evidence.",
+      "claim_summary": "The project contributes to the EU-level opportunity for water savings by improving irrigation timing and spatial prioritisation, and deliberately does not pre-claim a percentage water reduction; the benefit is to be quantified from project evidence.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-ENV, §2.3 ¶242-243)"
     },
     {
       "claim_id": "IMP-AGRI",
-      "claim_summary": "Water scarcity already causes agricultural yield losses and higher water costs and irrigation demand is expected to rise; processing tomato is a high-value horticultural test case where improved timing has substantial agronomic and economic relevance.",
+      "claim_summary": "Water scarcity already causes yield losses and higher water costs while irrigation demand is rising, and processing tomato is a high-value crop in which improved timing carries substantial agronomic and economic relevance.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-AGRI, §2.3 ¶244-245)"
     },
     {
       "claim_id": "IMP-TECH",
-      "claim_summary": "FIELDWISE advances a desktop research prototype to a scientifically validated web MVP that is externally evaluated by AgroVIR for fitness against real agricultural-software requirements.",
+      "claim_summary": "The project advances the work from a desktop research prototype to a scientifically validated web MVP, with external AgroVIR evaluation providing evidence on whether the technology meets real agricultural-software requirements.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-TECH, §2.3 ¶246-247)"
     },
     {
       "claim_id": "IMP-EU",
-      "claim_summary": "The MATE-MVCRI architecture investigates whether agricultural AI developed in one European environment transfers to another, contributing to the wider European question of making locally developed agricultural intelligence reliably transferable.",
+      "claim_summary": "The MATE-MVCRI architecture investigates whether agricultural AI developed in one European environment can transfer to another, contributing to the wider European question of making locally developed agricultural intelligence reliably transferable.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-EU, §2.3 ¶248-249)"
     },
     {
       "claim_id": "eu_water_scarcity_30pct",
-      "claim_summary": "Approximately 30% of EU territory is affected by seasonal water scarcity in an average year, with water scarcity already translating into yield losses and higher water costs and irrigation demand expected to increase under climate change.",
+      "claim_summary": "Approximately 30% of EU territory is affected by seasonal water scarcity in an average year, with irrigation demand and irrigated area expected to rise under climate change.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md (§1.1.1 ¶22); reference R01 European Environment Agency indicator WAT001 per confirmation_checklist item 10"
+    },
+    {
+      "claim_id": "scientific_impact_maps_EI02_EI05",
+      "claim_summary": "The scientific dissemination assets map to the call's expected impacts of an enriched, more inter-connected European R&I culture (EI-02) and increased R&I capacity, output and knowledge transfer among European research organisations (EI-05).",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-02, EI-05); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+    },
+    {
+      "claim_id": "reusable_assets_D22_D32_D43",
+      "claim_summary": "Three openly released assets — the Hyperspectral-to-Sentinel transfer library (D2.2), the FIELDWISE predictive engine/model card (D3.2) and the Adaptation protocol (D4.3) — carry the scientific contribution beyond the project, tracked by KPIs K2, K3, K4 and K6.",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables); docs/tier3_project_instantiation/architecture_inputs/impacts.json (kpis K2, K3, K4, K6)"
+    },
+    {
+      "claim_id": "adaptation_protocol_min_calibration",
+      "claim_summary": "The Adaptation protocol (D4.3) states the minimum local-calibration volume needed to re-fit the model to a new agro-environment, enabling reuse by other European regions at a stated cost.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json (OC3); docs/tier3_project_instantiation/architecture_inputs/impacts.json (K6)"
+    },
+    {
+      "claim_id": "mvp_external_eval_roadmap",
+      "claim_summary": "The DrR web MVP (D5.1, K7), the AgroVIR functional/technical evaluation across nine assessment dimensions (D5.4, K9) and the FMIS integration roadmap (D5.5, K10) make the economic/technological route to users explicit and externally tested.",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables); docs/tier3_project_instantiation/architecture_inputs/impacts.json (kpis K7, K9, K10)"
+    },
+    {
+      "claim_id": "prior_eval_route_to_users_remedy",
+      "claim_summary": "The externally tested MVP-to-FMIS chain is the specific remedy to the previous submission's finding that the economic and technological route to users was insufficiently substantiated.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md (§2.2 ¶233)"
     },
     {
       "claim_id": "agrovir_relevant_track_record",
       "claim_summary": "No participation in EU-funded research projects. AgroVIR's relevant track record is commercial rather than scientific: twenty years of practice in Hungarian commercial agriculture, and a farm management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in.",
       "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (declaration agrovir_relevant_track_record)",
       "assumption_declared": true
     },
     {
-      "claim_id": "OC5_research_to_operation_route",
-      "claim_summary": "The action delivers a research-to-operation path (OC5): an externally evaluated web MVP plus a named post-MSCA FMIS integration route, giving a concrete onward exploitation trajectory beyond the fellowship.",
+      "claim_id": "fdv_report_K8",
+      "claim_summary": "The Field Decision Value report (D5.3) computes decision value for at least two competing models and reports lead time, false action rate and missed stress rate (K8), making later water/environmental benefit assessable.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D5.3); docs/tier3_project_instantiation/architecture_inputs/impacts.json (K8)"
     },
     {
-      "claim_id": "D5.1_web_mvp_M24",
-      "claim_summary": "The DrR web MVP is delivered at M24, before the placement window.",
+      "claim_id": "public_engagement_EI03",
+      "claim_summary": "Two public-facing measures — one public field demonstration with AgroVIR farmers and one public-facing article per year — serve the call's expected impact of broadened public engagement (EI-03) and carry no deliverable identifier of their own.",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-03); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
     },
     {
-      "claim_id": "K9_nine_dimensions",
-      "claim_summary": "The AgroVIR functional/technical evaluation covers all nine assessment dimensions.",
+      "claim_id": "teaching_integration_EI06",
+      "claim_summary": "Co-design and delivery of a module unit within an ELTE MSc course on Earth observation for agriculture serves the expected impact of feedback of research results into teaching (EI-06).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-06); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
     },
     {
-      "claim_id": "K10_fmis_roadmap",
-      "claim_summary": "The FMIS integration roadmap names the required interfaces and the post-fellowship steps for embedding the engine in farm-management information systems.",
+      "claim_id": "employability_talent_base_EI01",
+      "claim_summary": "The fellowship's contribution to improved researcher employability and career mobility within and beyond academia, carried by the Career Development Plan (D1.3) and the placement, feeds the societal aim of a more dynamic European research talent base (EI-01).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-01); docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
     },
     {
-      "claim_id": "K2_transfer_verdicts",
-      "claim_summary": "The Hyperspectral-to-Sentinel transfer library records an explicit transferable-or-hyperspectral-only verdict against every candidate hyperspectral feature.",
+      "claim_id": "charter_convergence_EI04_no_hrs4r",
+      "claim_summary": "Convergence of working conditions with the European Charter for Researchers is evidenced by the Career Development Plan (D1.3) and ELTE policies, with no HR Excellence in Research accreditation claimed.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-04, HRS4R claim removed)"
     },
     {
-      "claim_id": "K4_model_card",
-      "claim_summary": "One model card is published for the released FIELDWISE predictive engine/model card.",
+      "claim_id": "cross_country_transfer_D42_K5",
+      "claim_summary": "The Hungary->Bulgaria transferability report (D4.2) reports both zero-shot and locally calibrated performance (K5), concretely testing cross-European transfer.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D4.2); docs/tier3_project_instantiation/architecture_inputs/impacts.json (K5)"
     },
     {
-      "claim_id": "K3_forecast_horizons",
-      "claim_summary": "Forecast horizons t+1, t+3 and t+5 are each reported with calibration and prediction-interval coverage.",
+      "claim_id": "eleven_kpis_quantified",
+      "claim_summary": "The project's magnitude is disciplined by eleven KPIs (K1 to K11), each fixing a verifiable target on a named output, including five integrated seasons, forecast horizons t+1/t+3/t+5, and a nine-dimension external evaluation.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (kpis K1-K11)"
     },
     {
-      "claim_id": "K8_field_decision_value",
-      "claim_summary": "Field Decision Value is computed for at least two competing models, with lead time, false-action rate and missed-stress rate reported.",
+      "claim_id": "interdisciplinary_intersectoral_profile",
+      "claim_summary": "The action's international (MVCRI), inter-sectoral (AgroVIR) and interdisciplinary (physiology-geoinformatics, fellow-ELTE) character matches the collaboration profile the call associates with strengthened European research collaboration.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
-    },
-    {
-      "claim_id": "K6_adaptation_cost",
-      "claim_summary": "The Adaptation protocol states the minimum local-calibration volume needed to move the model to a new agro-environment, bounding the cost of geographic reuse.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
-    },
-    {
-      "claim_id": "K5_hu_bg_report",
-      "claim_summary": "The Hungary->Bulgaria transferability report reports both zero-shot and locally calibrated performance and is delivered to Prof. Vinelina Yankova at MVCRI.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
-    },
-    {
-      "claim_id": "EI-02_scientific_culture",
-      "claim_summary": "Open-access dissemination of the transferability paradigm and sensor-domain method contributes to the enriched, cross-boundary European R&I culture the call sets as a systemic scientific impact (EI-02).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
-    },
-    {
-      "claim_id": "EI-05_economic_knowledge_transfer",
-      "claim_summary": "Reusable, uptake-ready outputs strengthen the R&I capacity, output and knowledge-transfer standing of participating organisations that the call identifies as an economic/competitiveness impact (EI-05).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
-    },
-    {
-      "claim_id": "EI-03_public_engagement",
-      "claim_summary": "Recurring public-engagement activities broaden public understanding of transferable agricultural AI for water-efficient farming, contributing to EI-03.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
-    },
-    {
-      "claim_id": "two_peer_reviewed_submissions",
-      "claim_summary": "At least two high-quality peer-reviewed open-access submissions are targeted during or shortly after the fellowship.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
-    },
-    {
-      "claim_id": "kpi_bounded_magnitude",
-      "claim_summary": "The magnitude of the contribution is expressed through eleven KPIs each tracing to a named deliverable, so each impact claim is deliverable-anchored and evaluator-verifiable.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (expected_impact_coverage EI-02); docs/tier3_project_instantiation/project_brief/strategic_positioning.md (validation ladder §1.1.9 ¶110)"
     }
   ],
   "source_refs": [
@@ -169,10 +157,6 @@
     {
       "tier": 2,
       "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
-    },
-    {
-      "tier": 4,
-      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
     },
     {
       "tier": 4,

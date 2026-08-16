@@ -162,6 +162,12 @@ re-run and re-gate — nothing auto-passes (§13.7).
       `531ec9f0` precedent, and no refusal or invalidation mechanism exists yet. (Precedent: an
       `n08f` re-run staled the `review_packet.json` that `gate_11` had gated on, failing
       `gate_12/g11_p01`.)
+- [ ] Blocked-node retry needs a CLI path, not just released-node refusal: a node persisted as
+      `blocked_at_entry`/`blocked_at_exit` is never re-dispatched (`is_ready` requires `pending`),
+      so retrying after a fixed gate failure requires hand-editing `run_manifest.json` (observed
+      2026-08-16, n08b reuse retry under run `845413cf`). Retrying a blocked node needs no force —
+      nothing downstream gated on it — but the reset must be an explicit runner action, not a
+      hand edit.
 - [ ] Scoping an already-released node with gated successors refuses by default, naming each
       downstream gate whose evidence is at risk. Scoping an already-released node with **no** gated
       successors needs no force (nothing downstream to corrupt).
@@ -219,4 +225,46 @@ as tests only.
       refused, and the refusal is observable in the step report.
 - [ ] Rerun-cycle test: force-re-running a mid-sequence node invalidates its successors, and
       re-stepping from there reconverges to a fully released a→f with re-evaluated gates.
+- [ ] Zero new test failures against the baseline; committed from the repo root.
+
+## 7. Declared-assumed invariant — one rule for reuse ownership and the snapshot tests
+
+**What to build:** The rule "a section artifact may carry `assumed` claims iff every assumed claim
+is keyed to an operator declaration in `working_assumptions.json`". It is stated once as a test,
+then applied everywhere the older blanket rule "no assumed claims ever" still survives. Today the
+blanket rule lives in two places that contradict the gates' own behaviour (gate_10a/b/c pass
+declared-assumed sections via W1):
+
+1. `is_reuse_owned_artifact_valid` (`runner/phase8_reuse.py` ~L729–737) rejects any `assumed` claim
+   with reason `claim_status_assumed`. Observed live 2026-08-16 (run `845413cf`, n08b reuse):
+   `gate_10b/g09b_p03` failed on `impact_section.json` (4 declared-assumed claims) even though
+   gate_10b itself had passed the artifact 14/14. Interim workaround in force: operator-approved
+   `approved_artifacts` entries in `.claude/runs/845413cf-…/reuse_policy.json` for the impact and
+   implementation sections — remove reliance on this once the rule lands.
+2. `tests/runner/test_phase8_gate_content.py::TestCurrentArtifactState::test_excellence_no_assumed_claims`
+   and `::test_excellence_overall_status_not_assumed` — red since n08a by design (handoff
+   2026-08-16 §3.1); the question they pose now covers all three drafted sections.
+
+**Operator sign-off (2026-08-16):** this ticket's creation records the operator's decision to adopt
+the declared-assumed invariant. Scope is deliberately small: no gate predicate changes (W1 already
+enforces the invariant at gate time), no schema changes, no new binding.
+
+**Blocked by:** None — can start immediately.
+
+- [ ] Re-verify the finding against current code: the two sites above still carry the blanket rule;
+      confirm `validate_reuse_candidate` and the preseed path do NOT (they reject only `unresolved`
+      overall status + roll-up inconsistency) so parity is not accidentally widened.
+- [ ] State the invariant as a test first (tdd): an assumed claim whose `claim_id` matches a
+      declaration key in `working_assumptions.json` (via the shared `runner/working_assumptions.py`
+      reader — no second lookup implementation) is acceptable; an assumed claim with no matching
+      declaration stays a hard rejection (`claim_status_assumed_undeclared` or equivalent distinct
+      reason).
+- [ ] Apply to `is_reuse_owned_artifact_valid`: declared-assumed passes ownership; undeclared
+      assumed and any `unresolved` still fail closed. Reason strings stay casing-independent.
+- [ ] Rewrite the two snapshot tests to assert the invariant (every assumed claim in every drafted
+      section artifact is operator-declared) instead of asserting absence; drop the
+      `overall_status != assumed` assertion in favour of roll-up consistency (worst-wins §12.2).
+- [ ] Regression tests cover: declared-assumed accepted, undeclared-assumed rejected with the
+      distinct reason, `unresolved` unchanged, and the reuse-ownership path passing end-to-end on a
+      declared-assumed fixture without an `approved_artifacts` entry.
 - [ ] Zero new test failures against the baseline; committed from the repo root.

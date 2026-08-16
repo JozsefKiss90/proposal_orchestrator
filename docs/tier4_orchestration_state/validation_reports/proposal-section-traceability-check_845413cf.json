@@ -1,688 +1,436 @@
 {
-  "report_id": "traceability_excellence_traceability_auditor_2026-08-16T00:00:00Z",
+  "report_id": "traceability_implementation_implementation_writer_2026-08-16T00:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "traceability_auditor",
+  "invoking_agent": "implementation_writer",
   "run_id_reference": "845413cf-88d3-4137-9c3f-b5413e679323",
-  "section_id_audited": "excellence",
+  "section_id_audited": "implementation",
   "claim_audit_results": [
     {
-      "claim_id": "objectives_O1_O6",
-      "claim_summary": "Six R&I objectives O1-O6 with titles and measurable outputs.",
+      "claim_id": "wp_structure_five_wps",
+      "claim_summary": "Five work packages WP1-WP5 with canonical titles.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "measurable_outputs_per_objective",
-      "claim_summary": "Each objective carries a stated measurable output.",
+      "claim_id": "wp_leads",
+      "claim_summary": "WP1/WP2/WP4 led by MATE (DATA_PARTNER); WP3/WP5 led by ELTE (HOST).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "wp_month_ranges",
+      "claim_summary": "WP1 M1-M6, WP2 M3-M14, WP3 M6-M18, WP4 M12-M21, WP5 M16-M30.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "flag_reason": null
     },
     {
       "claim_id": "deliverables_and_due_months",
-      "claim_summary": "Dated deliverables D1.1-D5.5 with titles and due months.",
+      "claim_summary": "Deliverable due months D1.1-D5.5 with canonical titles.",
       "status": "confirmed",
       "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
+      "flag_reason": null
     },
     {
-      "claim_id": "wp_structure_mapping",
-      "claim_summary": "Objectives map to WP1-WP5 with inter-WP dependencies and leakage-safe validation.",
+      "claim_id": "milestones_ms1_to_ms5",
+      "claim_summary": "MS1(M6) MS2(M12) MS3(M16) MS4(M20) MS5(M23) with criteria.",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "central_research_question",
-      "claim_summary": "Single central research question on forecasting tomato water stress across seasons/countries/fields.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "research_questions_RQ1_RQ7",
-      "claim_summary": "Seven research questions RQ1-RQ7.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "hypotheses_H1_H6",
-      "claim_summary": "Six falsifiable hypotheses H1-H6 with predicted effects.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "scientific_gaps_G1_G6",
-      "claim_summary": "Six scientific gaps G1-G6 each addressed by a transition.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "retrospective_accuracy_limitation",
-      "claim_summary": "Agricultural ML judged by retrospective metrics unsuitable for irrigation management.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "six_transitions_beyond_sota",
-      "claim_summary": "Ambition expressed as six transitions beyond the state of the art.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "validation_ladder",
-      "claim_summary": "Four-step validation ladder MATE->MVCRI->AgroVIR->DrR Web MVP.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "field_decision_value_layer",
-      "claim_summary": "Field Decision Value introduced as a final evaluation layer.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "hyperspectral_to_sentinel_bridge",
-      "claim_summary": "Methodological bridge from proximal hyperspectral to Sentinel-based prediction.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "drr_prototype_preliminary_work",
-      "claim_summary": "DrR - Digital Agronomist prototype already initiated; FIELDWISE adds validation/transferability.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "mate_five_year_archive",
-      "claim_summary": "~Five-year MATE hyperspectral archive underpins the source-domain dataset.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "water_scarcity_30pct",
-      "claim_summary": "~30% of EU territory affected by seasonal water scarcity.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "processing_tomato_model_crop",
-      "claim_summary": "Processing tomato used as demanding predictive-irrigation model crop.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "fellowship_structure_and_duration",
-      "claim_summary": "30-month PF: 24-month ELTE fellowship + 6-month AgroVIR placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "identity_spine_host_fellow_supervisors",
-      "claim_summary": "Fellow Cholakova, host ELTE, supervisor Jung, co-supervisor Hollós.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "consortium_roles_for_objectives",
-      "claim_summary": "MATE validation, MVCRI cross-country, AgroVIR commercial bridge.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier3_project_instantiation/project_brief/training_and_career_development.md; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "single_researcher_execution",
-      "claim_summary": "Fellow executes all five WPs as a single-researcher action.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json; docs/tier3_project_instantiation/architecture_inputs/objectives.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M1",
-      "claim_summary": "Four-stage validation ladder reframing accuracy to decision value.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M2",
-      "claim_summary": "Water stress defined physiologically not via VI proxies (H1).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M3",
-      "claim_summary": "Hyperspectral-to-Sentinel transfer via SRF resampling, concurrent obs, scale-aware calibration (H2).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M4",
-      "claim_summary": "Prospective uncertainty-aware prediction across baselines/RF-XGBoost/Bayesian.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M5",
-      "claim_summary": "Leakage-safe validation, LOYO and zero-shot HU->BG transfer test.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M6",
-      "claim_summary": "FDV final evaluation layer; lead time a primary selection criterion (H6).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M7",
-      "claim_summary": "Each objective maps to a named WP with deliverables from the reference pack.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M8",
-      "claim_summary": "Inter-WP data dependencies form a single evidential chain.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M9",
-      "claim_summary": "Methodological challenges as risks R01-R13 with matched mitigations.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M10",
-      "claim_summary": "Interdisciplinary integration of four disciplinary strands.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M11",
-      "claim_summary": "Bidirectional knowledge transfer forming an academic-research-industry chain.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M12",
-      "claim_summary": "Spine identities of fellow/host/supervisor/co-supervisor.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M13",
-      "claim_summary": "Partners each own the environment their discipline requires.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M14",
-      "claim_summary": "Biological sex/gender dimension not relevant to research content; reasoned justification.",
+      "claim_id": "milestone_ms6",
+      "claim_summary": "MS6 at M30 marks placement completion, carried by D5.4/D5.5.",
       "status": "inferred",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": "Derived judgment that no biological subject makes sex/gender an analytical variable; inference chain from concept_note research content."
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (AR-9 seeded MS6, Inferred)",
+      "flag_reason": null
     },
     {
-      "claim_id": "M15",
-      "claim_summary": "Relevant diversity is agro-environmental/operational, spanned by the validation ladder.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M16",
-      "claim_summary": "End-user engagement under informed consent, no special-category data, aggregated publication.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M17",
-      "claim_summary": "Open science 'as open as possible, as closed as necessary' with named outputs.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M18",
-      "claim_summary": "DMP delivered by month 6 consistent with Open Science training requirement.",
+      "claim_id": "task_schedule_and_critical_path",
+      "claim_summary": "Task month allocations and critical path as finalised in the Gantt.",
       "status": "inferred",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
-      "flag_reason": "DMP-by-M6 derived from instrument Open Science requirement; inference chain stated against scope_requirements."
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "M19",
-      "claim_summary": "Open science/FAIR, gen-AI literacy, integrity carried as CDP transferable strands.",
+      "claim_id": "d54_sequencing_resolution",
+      "claim_summary": "D5.4 dated M30 in placement; MS5 at M23 evidenced by Field Decision Value assessment.",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "single_researcher_fte",
+      "claim_summary": "Single-researcher action; concurrent WPs within one FTE/month; no unresolved scheduling constraints.",
+      "status": "inferred",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "fellow_person_months",
+      "claim_summary": "Fellow 30.0 PM: WP1 3.0, WP2 5.5, WP3 5.5, WP4 4.0, WP5 9.0, cross-cutting 3.0.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "M20",
-      "claim_summary": "Source-domain ~five-year MATE archive; model crop processing tomato.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "M21",
-      "claim_summary": "ELTE DPO consulted before first web MVP user account created.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "FELLOW",
-      "claim_summary": "Fellow Dr. Rositsa Cholakova, plant physiologist, prior teaching at AU-Plovdiv.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "HOST",
-      "claim_summary": "Host ELTE, Faculty of Informatics, Institute of Cartography and Geoinformatics.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "SUPERVISOR",
-      "claim_summary": "Supervisor Prof. András Jung, remote sensing/hyperspectral, chairs Steering Group.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "CO_SUPERVISOR",
-      "claim_summary": "Co-supervisor Dr. Roland Hollós, ML/meta-modelling, methodological lead/QA.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "supervisor_publication_track_record",
-      "claim_summary": "Jung's 2024-2025 EO/hyperspectral publications evidence active programme.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "co_supervisor_publication_track_record",
-      "claim_summary": "Hollós 2026 Geoscientific Model Development contribution.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "host_equipment_infrastructure",
-      "claim_summary": "Host GIS/RS Lab holds hyperspectral instruments, UAV, HPC.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "FELLOWSHIP_TYPE",
-      "claim_summary": "European Fellowship; two-way transfer applies.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "DURATION",
-      "claim_summary": "30-month action: 24-month ELTE + 6-month AgroVIR placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "cdp_deliverable",
-      "claim_summary": "D1.3 Career Development Plan due M3, established jointly.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "cdp_components",
-      "claim_summary": "CDP six components enumerated.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "cdp_review_points",
-      "claim_summary": "CDP agreed by M3, reviewed at M6/12/16/20/27.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "eleven_competences_training",
-      "claim_summary": "Eleven host-to-fellow competences via practice + ELTE courses.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "transferable_skill_strands",
-      "claim_summary": "Seven transferable-skill strands.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "career_progression_path",
-      "claim_summary": "Progression from plant physiologist to independent researcher, closing competence gap.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "open_science_training",
-      "claim_summary": "Open-science competence trained/evidenced via open access, code, FAIR.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "publications_planning",
-      "claim_summary": "Four outputs P1-P4; >=2 peer-reviewed submissions plus public engagement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "supervision_cadence",
-      "claim_summary": "Weekly 1:1, weekly co-supervisor session in WP3/4, monthly record, quarterly review.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "steering_group",
-      "claim_summary": "Steering Group chaired by supervisor issues go/no-go on MS1-MS5.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "decision_rights",
-      "claim_summary": "Decision rights allocated without overlap.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "two_way_transfer_host_to_fellow",
-      "claim_summary": "Host-to-fellow transfer competences enumerated.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "two_way_transfer_fellow_to_host",
-      "claim_summary": "Fellow-to-host transfer competences enumerated.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "bidirectional_mechanism",
-      "claim_summary": "Bidirectional transfer is the mechanism of the science.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "teaching_measures",
-      "claim_summary": "Two teaching measures: ELTE MSc module unit and PhD field-component co-supervision.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "placement_rationale_added_value",
-      "claim_summary": "AgroVIR placement makes operational transfer structural (G5/H5) and adds inter-sectoral career value.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "placement_work_content_deliverables",
-      "claim_summary": "Placement work content and D5.4/D5.5; AgroVIR co-leads WP5, D5.1 built pre-placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "placement_supervisor_AgroVIR",
-      "claim_summary": "On-site placement supervisor Miklós Maróti (project fact, not independently verified).",
+      "claim_id": "person_months_MATE",
+      "claim_summary": "MATE in-kind 2.4 PM.",
       "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared assumption (assumption_declared=true); name not independently evidenced, correctly not Confirmed."
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_MATE)",
+      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
     },
     {
-      "claim_id": "placement_supervisor_title_AgroVIR",
-      "claim_summary": "Placement supervisor title 'Senior research officer' (project fact).",
+      "claim_id": "person_months_MVCRI",
+      "claim_summary": "MVCRI in-kind 1.5 PM.",
       "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared assumption; company supplies no title, correctly not Confirmed."
-    },
-    {
-      "claim_id": "placement_team_AgroVIR",
-      "claim_summary": "Placement team = AgroVIR FMIS product-development team (authorised placeholder).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-authorised placeholder per _operator_placeholders; must be replaced before submission."
-    },
-    {
-      "claim_id": "placement_workspace_AgroVIR",
-      "claim_summary": "Desk/office and FMIS/customer-data access for M25-M30 (project fact).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared assumption; AgroVIR's own facilities, no written confirmation in Tier 3."
-    },
-    {
-      "claim_id": "person_months_ELTE_supervisor",
-      "claim_summary": "Supervisor in-kind ~2.5 PM (project fact/estimate).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared in-kind estimate; not seen by supervisor, correctly not Confirmed."
-    },
-    {
-      "claim_id": "person_months_ELTE_co_supervisor",
-      "claim_summary": "Co-supervisor in-kind ~2.0 PM (project fact/estimate).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared in-kind estimate; contradiction closed but value stays Assumed."
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_MVCRI)",
+      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
     },
     {
       "claim_id": "person_months_AgroVIR",
-      "claim_summary": "AgroVIR in-kind ~3.0 PM (project fact/estimate).",
+      "claim_summary": "AgroVIR in-kind 3.0 PM.",
       "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-      "flag_reason": "Operator-declared in-kind estimate; to be checked with partner, correctly not Confirmed."
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_AgroVIR)",
+      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
     },
     {
-      "claim_id": "call_alignment_training_supervision",
-      "claim_summary": "Training/supervision serves call expected outcomes/scope (SR-04/05/06, EO-05/08).",
+      "claim_id": "person_months_ELTE_supervisor",
+      "claim_summary": "ELTE supervisor in-kind 2.5 PM.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_ELTE_supervisor)",
+      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
+    },
+    {
+      "claim_id": "person_months_ELTE_co_supervisor",
+      "claim_summary": "ELTE co-supervisor in-kind 2.0 PM.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_ELTE_co_supervisor)",
+      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
+    },
+    {
+      "claim_id": "risk_register",
+      "claim_summary": "13-entry risk register R01-R13 with likelihood/impact/mitigation.",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "FELLOW_1_4",
-      "claim_summary": "Fellow Dr. Rositsa Cholakova, plant physiologist (1.4 restatement).",
+      "claim_id": "risk_philosophy",
+      "claim_summary": "Zero-shot transfer failure is not project failure; quantified gap is a scientific finding.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json spine_identity FELLOW",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "HOST_1_4",
-      "claim_summary": "Host ELTE (1.4 restatement).",
+      "claim_id": "steering_group_points",
+      "claim_summary": "Steering Group chaired by Prof. Jung meets M6/M12/M16/M20/M27 with go/no-go; M27 mid-placement.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json spine_identity HOST",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "FELLOWSHIP_TYPE_1_4",
-      "claim_summary": "European Postdoctoral Fellowship (1.4 restatement).",
+      "claim_id": "co_supervisor_role",
+      "claim_summary": "Dr. Roland Hollós provides methodological lead and QA in WP3-WP4.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json spine_identity FELLOWSHIP_TYPE",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "name_variant",
-      "claim_summary": "Fellow published pre-2020 as Cholakova-Bimbalova; same person.",
+      "claim_id": "placement_window",
+      "claim_summary": "Six-month non-academic placement at AgroVIR M25-M30 in a 30-month action.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.publishing_name_variant",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "doctorate",
-      "claim_summary": "PhD Plant Physiology (2020), AU-Plovdiv, under Prof. Vassilev.",
+      "claim_id": "DURATION",
+      "claim_summary": "Project duration 30 months (24-month EF + 6-month placement).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.doctorate",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
+      "flag_reason": null
     },
     {
-      "claim_id": "doctorate_topic",
-      "claim_summary": "Doctoral research on maize low-temperature response and foliar fertilisation.",
+      "claim_id": "host_identity_sole_beneficiary",
+      "claim_summary": "ELTE is sole beneficiary and host for the 30-month action.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "FELLOWSHIP_TYPE",
+      "claim_summary": "European Fellowship; GF outgoing/return-host outlining does not apply.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "gf_provisions_not_applicable",
+      "claim_summary": "Call distinguishes EF from GF; GF outgoing/return-host outlining not required here.",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-01, SR-02)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "placement_optional_evaluated",
+      "claim_summary": "Optional non-academic placement up to 6 months, subject to evaluation as integral part.",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "duration_and_placement_window",
+      "claim_summary": "30-month action with 6-month AgroVIR placement M25-M30 under CC-07.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_department_and_team",
+      "claim_summary": "ELTE Faculty of Informatics, Institute of Cartography and Geoinformatics, remote-sensing group; co-supervisor in Dept of Meteorology.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST department_and_team)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_infrastructure",
+      "claim_summary": "ELTE GIS/RS Laboratory equipment, hyperspectral cameras, software, HPC and storage.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST infrastructure)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_recent_publications",
+      "claim_summary": "Recent hosting-group publications from Prof. Jung's record, DOIs verified.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST recent_projects_and_publications)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "supervisor_jung",
+      "claim_summary": "Supervisor Prof. András Jung, Institute of Cartography and Geoinformatics; Steering Group chair.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "co_supervisor_hollos",
+      "claim_summary": "Co-supervisor Dr. Roland Hollós, ELTE Dept of Meteorology, QA for modelling WP3-WP4.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (CO_SUPERVISOR)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_previous_msca_hosting",
+      "claim_summary": "ELTE has not previously hosted a funded MSCA fellow.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_previous_msca_hosting)",
+      "flag_reason": "Operator statement about a third party; assumption_declared=true"
+    },
+    {
+      "claim_id": "plantdigisense_application_record",
+      "claim_summary": "ELTE hosted PLANTDIGISENSE MSCA-PF application (101284764, 70.40%) with same fellow/supervisor.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (researcher_profile previous_msca_submission)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_hosting_arrangements",
+      "claim_summary": "ELTE hosting arrangements: office/lab space, integration, admin/technical support, training, networks.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST hosting_arrangements_and_support_services)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "bidirectional_knowledge_transfer",
+      "claim_summary": "Bidirectional knowledge transfer between ELTE and the fellow.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (knowledge_transfer KT1-KT3)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "elte_beneficiary_throughout_placement",
+      "claim_summary": "ELTE remains beneficiary/home institution across full 30 months incl. placement.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION, FELLOWSHIP_TYPE)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mate_identity_and_capacity",
+      "claim_summary": "MATE (Institute of Horticultural Sciences), associated partner, source-domain data and validation.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json and capabilities.json (DATA_PARTNER)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mate_projects_publications",
+      "claim_summary": "MATE coordinates AGRIGEP (101094158) and has recent IHS publications incl. Takács et al. (2026).",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "contact_person_MATE",
+      "claim_summary": "Dr. Sándor Takács.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_MATE)",
+      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
+    },
+    {
+      "claim_id": "mate_takacs_authorship",
+      "claim_summary": "Dr. Sándor Takács is an author on all three recorded MATE IHS publications.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications_note)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mate_advisor_milics",
+      "claim_summary": "Prof. Gábor Milics advises the fellow personally, outside governance.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER key_people)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mvcri_identity_and_capacity",
+      "claim_summary": "MVCRI, associated partner and Agricultural Academy institute, Bulgarian transfer-test environment; departments and heads named.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json and partners.json (TRANSFER_PARTNER)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mvcri_projects",
+      "claim_summary": "MVCRI coordinated FP7 205941 and runs ZEMDKT 17 and KP-06-COST/2 under COST PANGEOS.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (TRANSFER_PARTNER recent_projects_and_publications)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mvcri_contact_yankova",
+      "claim_summary": "Prof. Vinelina Yankova, Head of Department, is MVCRI contact and Steering Group seat.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (TRANSFER_PARTNER contact_person)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "mvcri_independence",
+      "claim_summary": "MVCRI is fellow's employer of record; contact/seat held by department head to keep transfer test independent.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (TRANSFER_PARTNER note)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "agrovir_profile",
+      "claim_summary": "AgroVIR Hungarian SME (2007, Budaörs), FMIS across 745,000+ ha in eight countries; NACE 7020.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER organisation_profile)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "agrovir_company_registration",
+      "claim_summary": "AgroVIR company registration number 13-09-200433.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER company_registration_number)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "agrovir_infrastructure_farm_access",
+      "claim_summary": "AgroVIR provides platform/farm-base access and pipeline validation via its software.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER infrastructure_and_farm_access)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "agrovir_relevant_track_record",
+      "claim_summary": "No EU-funded research participation; commercial track record only.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (agrovir_relevant_track_record)",
+      "flag_reason": "Stated absence about a third party's funding history; assumption_declared=true"
+    },
+    {
+      "claim_id": "agrovir_placement_host_no_lc",
+      "claim_summary": "AgroVIR is placement host; per 2026 Guide no letter of commitment included, absence not a weakness.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER letter_of_commitment_note)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "placement_supervisor_AgroVIR",
+      "claim_summary": "Miklós Maróti as AgroVIR on-site placement supervisor.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_AgroVIR)",
+      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
+    },
+    {
+      "claim_id": "placement_supervisor_title_AgroVIR",
+      "claim_summary": "Senior research officer (Maróti's grade).",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_title_AgroVIR)",
+      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
+    },
+    {
+      "claim_id": "placement_workspace_AgroVIR",
+      "claim_summary": "Desk/office space and FMIS dev/staging + customer-data environment access at AgroVIR M25-M30.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_workspace_AgroVIR)",
+      "flag_reason": "AgroVIR's own facilities, operator-relayed; assumption_declared=true"
+    },
+    {
+      "claim_id": "placement_team_AgroVIR",
+      "claim_summary": "AgroVIR product development team responsible for the FMIS platform.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_team_AgroVIR)",
+      "flag_reason": "Operator-authorised placeholder; assumption_declared=true"
+    },
+    {
+      "claim_id": "placement_work_content",
+      "claim_summary": "Four-item placement programme: pipeline hardening, D5.4 assessment, D5.5 roadmap, requirements/user testing.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER six_month_work_content)",
+      "flag_reason": null
+    },
+    {
+      "claim_id": "placement_added_value_vs_elte",
+      "claim_summary": "Placement offers production FMIS environment, commercial engineering and grower contact ELTE cannot supply.",
       "status": "inferred",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.doctorate.title_english",
-      "flag_reason": "Source marks the English title as Inferred; carried forward as inferred."
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER what_the_placement_gives_that_elte_cannot)",
+      "flag_reason": null
     },
     {
-      "claim_id": "current_position",
-      "claim_summary": "Chief Assistant Professor at MVCRI Plovdiv.",
+      "claim_id": "agrovir_supplementary_field_access",
+      "claim_summary": "AgroVIR provides farmer field trials from M16 as operational evaluator, independent of placement.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.current_position",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER supplementary_field_access)",
+      "flag_reason": null
     },
     {
-      "claim_id": "prior_academic_position",
-      "claim_summary": "Assistant Professor at AU-Plovdiv (2015-2020).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.positions_held",
-      "flag_reason": ""
+      "claim_id": "contact_person_AgroVIR",
+      "claim_summary": "Zsuzsanna Balázs.",
+      "status": "assumed",
+      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_AgroVIR)",
+      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
     },
     {
-      "claim_id": "teaching_experience",
-      "claim_summary": "Five years teaching at AU-Plovdiv, BG/EN, thesis supervision.",
+      "claim_id": "partner_steering_group_seats",
+      "claim_summary": "Named Steering Group seats: MATE (Takács), MVCRI (Yankova), AgroVIR (Balázs).",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.teaching_and_supervision",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 4 named_partner_contacts)",
+      "flag_reason": null
     },
     {
-      "claim_id": "current_projects",
-      "claim_summary": "ZEMDKT 17, KP-06-COST/2, SolGenSys; COST Actions CA22136/CA22149/CA22141.",
+      "claim_id": "participation_modes",
+      "claim_summary": "MATE/MVCRI associated partners, AgroVIR placement host; academic-to-industry chain around ELTE.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.projects_and_grants",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "publications_scope",
-      "claim_summary": "Of nine publications only three touch remote sensing (2025+, middle author).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.publications_summary",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "mobilities_and_training",
-      "claim_summary": "STSM, Erasmus mobilities, UAV licence, second MSc.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.awards_and_mobilities",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "drR_prototype",
-      "claim_summary": "DrR - Digital Agronomist prototype integrating soil/met/Sentinel-2 data.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json knowledge_transfer KT2",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "cross_sector_experience",
-      "claim_summary": "Data Analyst at KPMG (2024) and Market Analyst at Kleffmann (2013).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.positions_held",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "competence_gap",
-      "claim_summary": "Fellowship closes gap in Bayesian/spatio-temporal AI, transfer, uncertainty, decision eval.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json training_and_career TR-GAP",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "career_progression",
-      "claim_summary": "Progression to independent researcher in transferable agricultural intelligence.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json training_and_career TR-PROGRESSION",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "employability",
-      "claim_summary": "Profile relevant to research institutes, EO orgs, precision-ag/FMIS providers.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md; docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json EO-01",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "two_way_fit",
-      "claim_summary": "Researcher supplies physiological competence; fellowship supplies geospatial/ML.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json knowledge_transfer KT2/KT3",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "previous_msca_submission",
-      "claim_summary": "Resubmission of PLANTDIGISENSE (101284764), scored 70.40% vs 70.00 threshold.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.previous_msca_submission",
-      "flag_reason": ""
-    },
-    {
-      "claim_id": "career_break",
-      "claim_summary": "Parenting career break 2021-2024 (~34 months), declared, not counted against ceiling.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.career_break",
-      "flag_reason": ""
+      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (participation_mode)",
+      "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 96,
-    "confirmed": 86,
-    "inferred": 3,
-    "assumed": 7,
+    "total_claims": 60,
+    "confirmed": 42,
+    "inferred": 5,
+    "assumed": 13,
     "unresolved": 0
   },
   "no_unsupported_claims_declaration": false,
