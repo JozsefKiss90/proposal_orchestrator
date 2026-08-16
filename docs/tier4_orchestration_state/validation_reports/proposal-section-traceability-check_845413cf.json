@@ -1,438 +1,75 @@
 {
-  "report_id": "traceability_implementation_implementation_writer_2026-08-16T00:00:00Z",
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-08-16T12:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "implementation_writer",
+  "invoking_agent": "proposal_integrator",
   "run_id_reference": "845413cf-88d3-4137-9c3f-b5413e679323",
-  "section_id_audited": "implementation",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
   "claim_audit_results": [
     {
-      "claim_id": "wp_structure_five_wps",
-      "claim_summary": "Five work packages WP1-WP5 with canonical titles.",
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft schema and section index present",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json (schema_id=orch.tier5.part_b_assembled_draft.v1; sections[] length 3)",
       "flag_reason": null
     },
     {
-      "claim_id": "wp_leads",
-      "claim_summary": "WP1/WP2/WP4 led by MATE (DATA_PARTNER); WP3/WP5 led by ELTE (HOST).",
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "All three section artifacts (excellence, impact, implementation) referenced and exist on disk",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/excellence_section.json; impact_section.json; implementation_section.json",
       "flag_reason": null
     },
     {
-      "claim_id": "wp_month_ranges",
-      "claim_summary": "WP1 M1-M6, WP2 M3-M14, WP3 M6-M18, WP4 M12-M21, WP5 M16-M30.",
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order correct: excellence(1), impact(2), implementation(3)",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "source_ref": "part_b_assembled_draft.json sections[].order",
       "flag_reason": null
     },
     {
-      "claim_id": "deliverables_and_due_months",
-      "claim_summary": "Deliverable due months D1.1-D5.5 with canonical titles.",
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "Each referenced section exposes non-empty traceability_footer.primary_sources",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "excellence_section.json (18); impact_section.json (12); implementation_section.json (15)",
       "flag_reason": null
     },
     {
-      "claim_id": "milestones_ms1_to_ms5",
-      "claim_summary": "MS1(M6) MS2(M12) MS3(M16) MS4(M20) MS5(M23) with criteria.",
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "Each referenced section declares no_unsupported_claims_declaration=true",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
+      "source_ref": "traceability_footer.no_unsupported_claims_declaration across all three sections",
       "flag_reason": null
     },
     {
-      "claim_id": "milestone_ms6",
-      "claim_summary": "MS6 at M30 marks placement completion, carried by D5.4/D5.5.",
-      "status": "inferred",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json (AR-9 seeded MS6, Inferred)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "task_schedule_and_critical_path",
-      "claim_summary": "Task month allocations and critical path as finalised in the Gantt.",
-      "status": "inferred",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "d54_sequencing_resolution",
-      "claim_summary": "D5.4 dated M30 in placement; MS5 at M23 evidenced by Field Decision Value assessment.",
-      "status": "inferred",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "single_researcher_fte",
-      "claim_summary": "Single-researcher action; concurrent WPs within one FTE/month; no unresolved scheduling constraints.",
-      "status": "inferred",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "fellow_person_months",
-      "claim_summary": "Fellow 30.0 PM: WP1 3.0, WP2 5.5, WP3 5.5, WP4 4.0, WP5 9.0, cross-cutting 3.0.",
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "Each referenced section validation_status.overall_status not unresolved and claim_statuses non-empty",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
+      "source_ref": "all three sections overall_status='assumed', claim_statuses populated",
       "flag_reason": null
     },
     {
-      "claim_id": "person_months_MATE",
-      "claim_summary": "MATE in-kind 2.4 PM.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_MATE)",
-      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
-    },
-    {
-      "claim_id": "person_months_MVCRI",
-      "claim_summary": "MVCRI in-kind 1.5 PM.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_MVCRI)",
-      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
-    },
-    {
-      "claim_id": "person_months_AgroVIR",
-      "claim_summary": "AgroVIR in-kind 3.0 PM.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_AgroVIR)",
-      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
-    },
-    {
-      "claim_id": "person_months_ELTE_supervisor",
-      "claim_summary": "ELTE supervisor in-kind 2.5 PM.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_ELTE_supervisor)",
-      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
-    },
-    {
-      "claim_id": "person_months_ELTE_co_supervisor",
-      "claim_summary": "ELTE co-supervisor in-kind 2.0 PM.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (person_months_ELTE_co_supervisor)",
-      "flag_reason": "Operator-declared assumption; in-kind estimate, assumption_declared=true"
-    },
-    {
-      "claim_id": "risk_register",
-      "claim_summary": "13-entry risk register R01-R13 with likelihood/impact/mitigation.",
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "Consistency log present (CC-01..CC-12) with no inconsistency_flagged or unresolved entries",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
+      "source_ref": "part_b_assembled_draft.json consistency_log[] all status='consistent'",
       "flag_reason": null
     },
     {
-      "claim_id": "risk_philosophy",
-      "claim_summary": "Zero-shot transfer failure is not project failure; quantified gap is a scientific finding.",
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft traceability_footer present with non-empty primary_sources and declaration consistent with section-level",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "steering_group_points",
-      "claim_summary": "Steering Group chaired by Prof. Jung meets M6/M12/M16/M20/M27 with go/no-go; M27 mid-placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "co_supervisor_role",
-      "claim_summary": "Dr. Roland Hollós provides methodological lead and QA in WP3-WP4.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_window",
-      "claim_summary": "Six-month non-academic placement at AgroVIR M25-M30 in a 30-month action.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "DURATION",
-      "claim_summary": "Project duration 30 months (24-month EF + 6-month placement).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "host_identity_sole_beneficiary",
-      "claim_summary": "ELTE is sole beneficiary and host for the 30-month action.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "FELLOWSHIP_TYPE",
-      "claim_summary": "European Fellowship; GF outgoing/return-host outlining does not apply.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "gf_provisions_not_applicable",
-      "claim_summary": "Call distinguishes EF from GF; GF outgoing/return-host outlining not required here.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-01, SR-02)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_optional_evaluated",
-      "claim_summary": "Optional non-academic placement up to 6 months, subject to evaluation as integral part.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "duration_and_placement_window",
-      "claim_summary": "30-month action with 6-month AgroVIR placement M25-M30 under CC-07.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_department_and_team",
-      "claim_summary": "ELTE Faculty of Informatics, Institute of Cartography and Geoinformatics, remote-sensing group; co-supervisor in Dept of Meteorology.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST department_and_team)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_infrastructure",
-      "claim_summary": "ELTE GIS/RS Laboratory equipment, hyperspectral cameras, software, HPC and storage.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST infrastructure)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_recent_publications",
-      "claim_summary": "Recent hosting-group publications from Prof. Jung's record, DOIs verified.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST recent_projects_and_publications)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "supervisor_jung",
-      "claim_summary": "Supervisor Prof. András Jung, Institute of Cartography and Geoinformatics; Steering Group chair.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "co_supervisor_hollos",
-      "claim_summary": "Co-supervisor Dr. Roland Hollós, ELTE Dept of Meteorology, QA for modelling WP3-WP4.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (CO_SUPERVISOR)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_previous_msca_hosting",
-      "claim_summary": "ELTE has not previously hosted a funded MSCA fellow.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_previous_msca_hosting)",
-      "flag_reason": "Operator statement about a third party; assumption_declared=true"
-    },
-    {
-      "claim_id": "plantdigisense_application_record",
-      "claim_summary": "ELTE hosted PLANTDIGISENSE MSCA-PF application (101284764, 70.40%) with same fellow/supervisor.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (researcher_profile previous_msca_submission)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_hosting_arrangements",
-      "claim_summary": "ELTE hosting arrangements: office/lab space, integration, admin/technical support, training, networks.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (HOST hosting_arrangements_and_support_services)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "bidirectional_knowledge_transfer",
-      "claim_summary": "Bidirectional knowledge transfer between ELTE and the fellow.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (knowledge_transfer KT1-KT3)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_beneficiary_throughout_placement",
-      "claim_summary": "ELTE remains beneficiary/home institution across full 30 months incl. placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION, FELLOWSHIP_TYPE)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mate_identity_and_capacity",
-      "claim_summary": "MATE (Institute of Horticultural Sciences), associated partner, source-domain data and validation.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json and capabilities.json (DATA_PARTNER)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mate_projects_publications",
-      "claim_summary": "MATE coordinates AGRIGEP (101094158) and has recent IHS publications incl. Takács et al. (2026).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "contact_person_MATE",
-      "claim_summary": "Dr. Sándor Takács.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_MATE)",
-      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
-    },
-    {
-      "claim_id": "mate_takacs_authorship",
-      "claim_summary": "Dr. Sándor Takács is an author on all three recorded MATE IHS publications.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications_note)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mate_advisor_milics",
-      "claim_summary": "Prof. Gábor Milics advises the fellow personally, outside governance.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER key_people)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mvcri_identity_and_capacity",
-      "claim_summary": "MVCRI, associated partner and Agricultural Academy institute, Bulgarian transfer-test environment; departments and heads named.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json and partners.json (TRANSFER_PARTNER)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mvcri_projects",
-      "claim_summary": "MVCRI coordinated FP7 205941 and runs ZEMDKT 17 and KP-06-COST/2 under COST PANGEOS.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (TRANSFER_PARTNER recent_projects_and_publications)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mvcri_contact_yankova",
-      "claim_summary": "Prof. Vinelina Yankova, Head of Department, is MVCRI contact and Steering Group seat.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (TRANSFER_PARTNER contact_person)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mvcri_independence",
-      "claim_summary": "MVCRI is fellow's employer of record; contact/seat held by department head to keep transfer test independent.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (TRANSFER_PARTNER note)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "agrovir_profile",
-      "claim_summary": "AgroVIR Hungarian SME (2007, Budaörs), FMIS across 745,000+ ha in eight countries; NACE 7020.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER organisation_profile)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "agrovir_company_registration",
-      "claim_summary": "AgroVIR company registration number 13-09-200433.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER company_registration_number)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "agrovir_infrastructure_farm_access",
-      "claim_summary": "AgroVIR provides platform/farm-base access and pipeline validation via its software.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER infrastructure_and_farm_access)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "agrovir_relevant_track_record",
-      "claim_summary": "No EU-funded research participation; commercial track record only.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (agrovir_relevant_track_record)",
-      "flag_reason": "Stated absence about a third party's funding history; assumption_declared=true"
-    },
-    {
-      "claim_id": "agrovir_placement_host_no_lc",
-      "claim_summary": "AgroVIR is placement host; per 2026 Guide no letter of commitment included, absence not a weakness.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER letter_of_commitment_note)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_supervisor_AgroVIR",
-      "claim_summary": "Miklós Maróti as AgroVIR on-site placement supervisor.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_AgroVIR)",
-      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
-    },
-    {
-      "claim_id": "placement_supervisor_title_AgroVIR",
-      "claim_summary": "Senior research officer (Maróti's grade).",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_title_AgroVIR)",
-      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
-    },
-    {
-      "claim_id": "placement_workspace_AgroVIR",
-      "claim_summary": "Desk/office space and FMIS dev/staging + customer-data environment access at AgroVIR M25-M30.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_workspace_AgroVIR)",
-      "flag_reason": "AgroVIR's own facilities, operator-relayed; assumption_declared=true"
-    },
-    {
-      "claim_id": "placement_team_AgroVIR",
-      "claim_summary": "AgroVIR product development team responsible for the FMIS platform.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_team_AgroVIR)",
-      "flag_reason": "Operator-authorised placeholder; assumption_declared=true"
-    },
-    {
-      "claim_id": "placement_work_content",
-      "claim_summary": "Four-item placement programme: pipeline hardening, D5.4 assessment, D5.5 roadmap, requirements/user testing.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER six_month_work_content)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_added_value_vs_elte",
-      "claim_summary": "Placement offers production FMIS environment, commercial engineering and grower contact ELTE cannot supply.",
-      "status": "inferred",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER what_the_placement_gives_that_elte_cannot)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "agrovir_supplementary_field_access",
-      "claim_summary": "AgroVIR provides farmer field trials from M16 as operational evaluator, independent of placement.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER supplementary_field_access)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "contact_person_AgroVIR",
-      "claim_summary": "Zsuzsanna Balázs.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_AgroVIR)",
-      "flag_reason": "Operator-supplied, not independently verified; assumption_declared=true"
-    },
-    {
-      "claim_id": "partner_steering_group_seats",
-      "claim_summary": "Named Steering Group seats: MATE (Takács), MVCRI (Yankova), AgroVIR (Balázs).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 4 named_partner_contacts)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "participation_modes",
-      "claim_summary": "MATE/MVCRI associated partners, AgroVIR placement host; academic-to-industry chain around ELTE.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (participation_mode)",
+      "source_ref": "part_b_assembled_draft.json traceability_footer (7 sources; no_unsupported_claims_declaration=true)",
       "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 60,
-    "confirmed": 42,
-    "inferred": 5,
-    "assumed": 13,
+    "total_claims": 8,
+    "confirmed": 8,
+    "inferred": 0,
+    "assumed": 0,
     "unresolved": 0
   },
-  "no_unsupported_claims_declaration": false,
-  "timestamp": "2026-08-16T00:00:00Z"
+  "no_unsupported_claims_declaration": true,
+  "timestamp": "2026-08-16T12:00:00Z"
 }
