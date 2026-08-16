@@ -1,0 +1,113 @@
+{
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-08-16T00:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "2ba83477-54b7-4ea5-a26c-d1eca5c9215d",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Grant Agreement Annex template used as governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Invented call constraints, scope requirements, expected outcomes/impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Invented project facts (partners, capabilities, roles, prior experience, budget figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Phase 8 activity (including budget-dependent claims) before the budget gate passes.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "A workflow or skill becoming a de facto constitutional authority by expanding scope.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions (e.g. referencing higher-phase outputs as inputs).",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalising proposal text when source state is incomplete/contradictory/unvalidated without flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using generic Horizon Europe programme knowledge as a substitute for Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1-4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "check_notes": {
+    "13.1": "No Grant Agreement Annex, Model Grant Agreement Annex, or AGA template is used as a structural authority. Structural references point to the application form ('Part B-2 Section 5') and the '2026 Guide for Applicants' as a citation, not as a schema source.",
+    "13.2": "Call-requirement claims (CC-07 placement window, European vs Global Fellowship provisions, optional non-academic placement) carry Tier 2B references in claim_statuses (scope_requirements.json SR-01/SR-02/SR-06) and traceability_footer.primary_sources includes tier 2 docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json. This skill verifies the presence of the Tier 2B reference only, not the referenced entry.",
+    "13.3": "All project-fact claims (partner names, capabilities, supervisors, infrastructure, publications, person-months) carry Tier 3 source_refs; traceability_footer.primary_sources contains multiple docs/tier3_project_instantiation/ paths. Reference-presence verified, not underlying Tier 3 content.",
+    "13.4": "Phase 8 Tier 5 artifact. Content contains no EUR/€-denominated budget figures used as confirmed values; person-month figures are effort allocations traceable to Tier 3 workpackage_seed.json (confirmed) and declared working_assumptions (assumption_declared: true), and the text explicitly states in-kind effort 'is not funded or costed by MSCA-PF and therefore does not appear in the budget'. The phase7_budget_gate assessment was not read directly due to the TAPM input boundary (read limited to CLAUDE.md and artifact_path); the existence of a finalised Phase 8 deliverable presupposes gate_09 passage. No budget-bypass evidence present in the audited artifact.",
+    "13.5": "Not verifiable from artifact content alone; enforced by the decision-log-update skill. Recorded pass per skill specification.",
+    "13.6": "Not verifiable from an artifact. Recorded pass per skill specification.",
+    "13.7": "The artifact consumes only preceding-phase outputs (Phase 3 wp_structure, Phase 4 gantt/scheduling, Phase 6 implementation_architecture, Phase 8 canonical_reference_pack). No forward/higher-phase references. Pass.",
+    "13.8": "validation_status.overall_status is 'assumed' (not 'unresolved'). All 'assumed' claims have assumption_declared: true and are explicitly flagged in the section content (e.g. 'operator estimates to be confirmed with the partners; presented as indicative rather than committed', 'working assumptions pending confirmation by the host company', 'rest on descriptions supplied for, but not yet formally confirmed... and will be confirmed with the partners before submission'). No apparently-complete-but-unflagged unresolved content. Pass.",
+    "13.9": "Regulatory/programme claims (Fellowship-type provisions, placement rules) are sourced to Tier 2B scope_requirements.json, not asserted from generic programme memory. No unsourced Tier 1 financial-regulation or grant-agreement-term claims are present. Pass (would be severity major if violated).",
+    "13.10": "traceability_footer.no_unsupported_claims_declaration is true; every entry in validation_status.claim_statuses carries a source_ref. Pass.",
+    "13.11": "Not verifiable from a deliverable artifact. Recorded pass per skill specification.",
+    "13.12": "Not verifiable from an artifact. Recorded pass per skill specification."
+  },
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 0
+  },
+  "decision_log_entries_written": [],
+  "timestamp": "2026-08-16T00:00:00Z"
+}
