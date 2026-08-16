@@ -1,0 +1,123 @@
+{
+  "report_id": "compliance_check_excellence_section_compliance_validator_2026-08-16T12:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "845413cf-88d3-4137-9c3f-b5413e679323",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Grant Agreement Annex / Model Grant Agreement / AGA template used as governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes or expected impacts not present in Tier 2B.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, prior experience, figures) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity (including preparatory drafting) before the budget gate (Phase 7) has passed.",
+      "check_status": "violation",
+      "violation_evidence": "Audited artifact is a Phase 8 Tier 5 proposal section (schema_id \"orch.tier5.excellence_section.v1\"), yet docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json has gate_pass_declaration: \"fail\" with blocking inconsistency BLK-01 (\"absent budget artifacts constitute a blocking gate failure, not a hold state\"). The drafted section also asserts budget-figure references without a passing gate: \"an in-kind contribution of the order of 2.5 person-months from the supervisor and 2.0 person-months from the co-supervisor\" and \"An in-kind commitment of the order of 3.0 person-months from the placement host\". Per CLAUDE.md §13.4 and §8.4 the Phase-8 block is unconditional and instrument-independent until gate_09 passes.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or referencing outputs of a phase higher than the current phase.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalising text with incomplete source state without flagging the gap in the deliverable.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using generic programme knowledge as a substitute for Tier 1 source documents for regulatory claims.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1-4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "check_notes": {
+    "13.1": "No 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' appears as a structural authority in the sub_section content or in traceability_footer.primary_sources[].",
+    "13.2": "Call-requirement claims (e.g. call_alignment_training_supervision, M18) carry Tier 2B source references (docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json); traceability_footer lists Tier 2B expected_impacts.json, expected_outcomes.json, scope_requirements.json. Presence of a Tier 2B reference is confirmed; this skill does not verify the referenced entry against the Tier 2B files.",
+    "13.3": "Every project-fact claim (fellow, host, supervisors, capabilities, DrR prototype, consortium roles) carries a Tier 3 source_ref (call_binding/confirmation_checklist.json, consortium/capabilities.json, project_brief/*). The four placement/person-month figures are status 'assumed' with assumption_declared: true and source_ref docs/tier3_project_instantiation/working_assumptions.json.",
+    "13.4": "VIOLATION. Phase 7 budget gate at phase7_budget_gate/budget_gate_assessment.json declares gate_pass_declaration: 'fail' (BLK-01). A Phase 8 Tier 5 section therefore exists before gate_09 passed, and the content carries person-month budget-figure references without a passing gate.",
+    "13.5": "Not verifiable from artifact content alone; enforced by the decision-log-update skill. Recorded pass per skill specification Step 2.",
+    "13.6": "Not verifiable from an artifact. Recorded pass per skill specification Step 2.",
+    "13.7": "No forward reference to a higher-numbered phase; a Phase 8 drafting section legitimately consumes Phase 1-6 outputs listed in the traceability_footer (Tier 4 phase1/phase2/phase3/phase8 references).",
+    "13.8": "validation_status.overall_status is 'assumed', not 'unresolved'; no claim_statuses[] entry has status 'unresolved'; all 'assumed' claims carry assumption_declared: true, so no unresolved content is presented as complete.",
+    "13.9": "No Tier-1-level regulatory claim (EU Financial Regulation, legislative participation conditions, grant agreement legal terms) is asserted. Instrument/call requirements (Career Development Plan, Open Science training) are sourced to Tier 2B scope_requirements.json and the Tier 4 canonical reference pack. Would be major severity if violated.",
+    "13.10": "traceability_footer.no_unsupported_claims_declaration is true and every claim_statuses[] entry carries a source_ref; the §13.10 unresolved-claim branch is not triggered.",
+    "13.11": "Not checkable from a deliverable artifact. Recorded pass per skill specification Step 2.",
+    "13.12": "Not directly checkable from an artifact. Recorded pass per skill specification Step 2."
+  },
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 1
+  },
+  "decision_log_entry": {
+    "decision_id": "constitutional_violation_compliance_validator_2026-08-16T12:00:00Z",
+    "decision_type": "constitutional_violation",
+    "violation_id": "13.4_excellence_section_2026-08-16T12:00:00Z",
+    "constitutional_rule_ref": "CLAUDE.md §13.4",
+    "artifact_affected": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+    "resolution_status": "unresolved",
+    "resolution_note": "Constitutional violation detected; requires human operator resolution. A Phase 8 Tier 5 proposal section (excellence_section.json) exists while the Phase 7 budget gate declares gate_pass_declaration: 'fail' (BLK-01). Per CLAUDE.md §8.4/§13.4 the Phase-8 block is unconditional and instrument-independent until gate_09 confirms a complete, structurally consistent budget. This skill flags the violation; it does not resolve it.",
+    "tier_authority_applied": "CLAUDE.md §13",
+    "timestamp": "2026-08-16T12:00:00Z"
+  },
+  "timestamp": "2026-08-16T12:00:00Z"
+}

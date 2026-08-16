@@ -1061,11 +1061,14 @@ def _json_break_point(text: str) -> str:
 
 
 def _extract_json_response(text: str) -> dict | None:
-    """Extract the first JSON object from Claude's response text.
+    """Extract the artifact JSON object from Claude's response text.
 
     Handles bare JSON, JSON inside markdown code fences, and JSON
-    preceded or followed by prose.  Returns ``None`` if no valid JSON
-    dict can be found.
+    preceded or followed by prose.  When several parseable objects are
+    present (e.g. a throwaway fenced decoy from an intermediate assistant
+    turn followed by the real payload — run 23ce21a0), the largest by
+    character span wins; a fence carries no positional priority.  Returns
+    ``None`` if no valid JSON dict can be found.
 
     Uses ``json.JSONDecoder.raw_decode()`` as an early fallback when
     the response starts with ``{`` but ``json.loads()`` fails.  This
@@ -1146,19 +1149,18 @@ def _extract_json_response(text: str) -> dict | None:
             # which do not start with '{'.  Fail closed.
             return None
 
-    # 2. Try markdown code fence
-    code_match = re.search(
-        r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL
-    )
-    if code_match:
-        try:
-            data = json.loads(code_match.group(1))
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-
-    # 3. Try any JSON object in the text.
+    # 2+3. Candidate competition: every parseable JSON object in the text —
+    #    fenced or bare — competes by character span, and the largest wins.
+    #
+    #    Fenced blocks are NOT given positional priority.  The transport
+    #    reassembles ALL assistant turns into one text (stream-json fix), so
+    #    an intermediate turn's throwaway fenced object can precede the final
+    #    turn's real artifact.  Observed live in run 23ce21a0 (n08a, '1.1'):
+    #    the reply carried a fenced 27-char decoy ({"placeholder":"see final"})
+    #    followed by the complete ~15KB draft object; fence-first extraction
+    #    returned the decoy and failed the node on a missing 'content' key.
+    #    Span competition returns the artifact regardless of decoration order.
+    #
     #    LLMs often emit narrative reasoning before the JSON payload.  A greedy
     #    forward regex (r"\{.*\}") would match from the first '{' in the prose
     #    to the last '}' in the JSON, producing an invalid blob.  Instead, we
@@ -1167,9 +1169,21 @@ def _extract_json_response(text: str) -> dict | None:
     #    heuristic than key count because the root skill output object may have
     #    few top-level keys (e.g. {"instruments": [...]}) while deeply nested
     #    child objects may have many keys.
-    decoder = json.JSONDecoder()
     best: dict | None = None
     best_span: int = 0
+    for code_match in re.finditer(
+        r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL
+    ):
+        try:
+            data = json.loads(code_match.group(1))
+        except json.JSONDecodeError:
+            continue
+        span = len(code_match.group(1))
+        if isinstance(data, dict) and span > best_span:
+            best = data
+            best_span = span
+
+    decoder = json.JSONDecoder()
     for i, ch in enumerate(stripped):
         if ch != "{":
             continue

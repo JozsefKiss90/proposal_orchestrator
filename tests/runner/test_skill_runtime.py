@@ -787,6 +787,42 @@ class TestExtractJsonResponse:
         assert _extract_json_response('{unterminated') is None
         assert _extract_json_response('') is None
 
+    def test_fenced_decoy_then_larger_bare_object(self) -> None:
+        """A fenced throwaway object must not shadow the larger real payload.
+
+        Run 23ce21a0 (n08a, sub-section '1.1'): the stream-json transport
+        reassembles all assistant turns, so an intermediate turn's fenced
+        decoy ({"placeholder":"see final"}) landed ahead of the final turn's
+        complete draft object.  Fence-first extraction returned the decoy and
+        the node failed on a missing 'content' key."""
+        draft = (
+            '{"content": "## 1.1 Quality and pertinence of the objectives — '
+            + "x" * 200
+            + '", "claim_statuses": [], "source_refs": []}'
+        )
+        text = (
+            "I have sufficient grounding. Here is the drafted sub-section.\n\n"
+            '```\n{"placeholder":"see final"}\n```\n\n'
+            "Wait — producing final output now.\n\n" + draft
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert "content" in result
+        assert "placeholder" not in result
+
+    def test_larger_fenced_object_beats_smaller_bare_object(self) -> None:
+        """Span competition is symmetric: when the fenced object IS the
+        artifact and a smaller bare object appears in surrounding prose,
+        the fenced one still wins."""
+        text = (
+            'A quick note {"aside": 1} first.\n'
+            '```json\n{"content": "the real artifact ' + "y" * 100
+            + '", "claim_statuses": []}\n```\n'
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert "content" in result
+
     def test_gate_enforcement_real_payload(self) -> None:
         """The exact gate-enforcement response shape that caused run 2ec96048 failure."""
         import json as _json
