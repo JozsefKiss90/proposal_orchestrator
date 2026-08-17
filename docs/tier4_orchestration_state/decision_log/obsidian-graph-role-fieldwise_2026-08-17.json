@@ -1,0 +1,35 @@
+{
+  "record_type": "decision",
+  "id": "obsidian-graph-role-fieldwise",
+  "date": "2026-08-17",
+  "branch": "fieldwise-run-01",
+
+  "authority": "CLAUDE.md §9.4 (durable decisions are written down), §12.3 (tier/record conflicts are resolved explicitly, never silently). Operator-approved ticket plans/tickets_obsidian_graph_alignment.md ticket 1 (breakdown approved 2026-08-17; the re-author-in-place reconciliation below was put to the operator and approved the same day). This record RECONCILES with — and does not override — vault-supersession-fieldwise_2026-08-11.json and dod-1d-open-q4-parallel-explicit-promote_2026-07-28.json. NOT a constitutional amendment.",
+
+  "role_statement": "The Obsidian graph is a PARALLEL authoring and review surface plus a Tier-4 dashboard mirror. It is never a gate input: nothing in the Phase 1-8 execution path reads the vault, and the projector mirror is derived, read-only state (§9.2). The graph becomes authoritative for Tier 3 / Part B content ONLY through the explicit, fail-closed human promote of dod-1d ('parallel + explicit promote'). This record instantiates that standing role for the FIELDWISE project and pins the four points below so no later session re-litigates them.",
+
+  "point_1_vault_identity": "The FIELDWISE vault IS MSCA/methodology_graph, re-authored in place — NOT a fresh scaffold. This follows the standing quarantine decision (vault-supersession-fieldwise_2026-08-11.json) and its named closure path (plans/fieldwise_tickets.md ticket 12): the deterministic authoring tool is rewritten for FIELDWISE and regenerates the project-specific folders; the project-neutral folders (00_meta, 01_sources, 09_terminology, 90_dashboards, 99_governance) are preserved. The superseded msca-pf-reference content is retained by git history only. A fresh scaffold was considered and rejected: it would discard the neutral folders the template cannot reproduce, force a re-point of the claim-verifier real-vault tests, and silently contradict the standing record (§12.3).",
+
+  "point_2_sequencing_relaxation": "The supersession record sequenced re-authoring 'after the run'; n08f_revision has not yet run. Starting the vault work now is a CONSCIOUS, RECORDED relaxation, not a silent reorder: (a) the vault is not a gate input, so no §13.7 gate-condition concern arises; (b) Tier 3 and Tier 5 are settled through n08e under run 845413cf-88d3-4137-9c3f-b5413e679323, and any movement from the pending handout confirmations (A-2/A-5/A-8, A-1 literature) is absorbed by re-running the deterministic authoring tool — the expensive artifact is the tool, which is stable, not the generated nodes, which are replayable (§9.5). The original 'author against settled Tier 3, not the draft twice' rationale is honoured: the tool authors against committed Tier 3 records, and a confirmation-driven Tier 3 update simply triggers a cheap deterministic re-run.",
+
+  "point_3_direction_of_authority": "Per data class, unchanged from dod-1d and the D6 sync split: Tier 4 flows docs→graph ONLY, via runner/graph_projector.py, which owns exactly the 18_phase_gate_state folder and writes no docs/** path. Tier 3 and Part B prose flow graph→docs ONLY through `python -m runner --from-graph <config>` staging (non-destructive, diff-reported) followed by the explicit human `tools/promote_graph_staging.py --apply`. The compiler never writes canonical paths; the projector never feeds gate evaluation. docs/ remains the §9.1 authoritative layer at all times.",
+
+  "point_4_revision_cycle_role": "When the two handouts (plans/reports/FIELDWISE_open_decisions.docx, FIELDWISE_PartB_draft_review_copy.docx) return operator/partner feedback, confirmations that upgrade Assumed claims are authored in the vault first, then flow compile-staging → diff review → explicit promote → committed Tier 3. That feeds the A-2/A-5/A-8 (and, once literature sources enter Tier 3 source materials, A-1) resolutions that n08f will disposition. The vault additionally surfaces the n08e review packet findings/actions and the declared working assumptions via dashboards, as a read-only trace (assumption → claim → section → action).",
+
+  "node_type_vocabulary": "NO node_type extension is sanctioned. The existing controlled vocabulary (runner/graph_schema.py NODE_TYPES = methodology types + binding types) is sufficient: review findings, actions and assumptions are surfaced through dashboards over existing node front-matter, not through new node types. Extending NODE_TYPES is a generic-layer change (agnosticism-lint scope, ms2-ticket9) and would require its own recorded decision.",
+
+  "project_id_choice": "The re-targeted vault's graph.config.yaml project_id becomes 'fieldwise-msca-pf' (was 'msca-pf-reference'). The id is opaque and not interpreted as content; it is the fail-closed promote guard field, distinct from run ids (per the dod-1c/dod-1d run_id-vs-project_id observation).",
+
+  "supersession_interaction": "This record does NOT close vault-supersession-fieldwise_2026-08-11.json. Its closure CONDITION stands unchanged: graph_claim_verifier passing against the committed FIELDWISE Tier 5 sections, at which point its contradiction_status becomes Confirmed and the closing commit is named in that record. Its named CLOSER is re-routed: fieldwise ticket 12 is hereby realised via plans/tickets_obsidian_graph_alignment.md tickets 2-5 (ticket 5 carries the closure checkbox), which decompose ticket 12 and add the projector mirror and revision-cycle utilization it did not cover. A cross-note recording this re-routing is added to fieldwise ticket 12 itself, so the two plans do not silently disagree (§12.3); the standing record's own text is left byte-unchanged until its anticipated closure edit.",
+
+  "execution_plan": "plans/tickets_obsidian_graph_alignment.md (amended 2026-08-17 to match this record): ticket 2 re-targets the quarantined vault (config project_id, stale project-specific folder inventory), ticket 3 projects Tier-4 gate state, ticket 4 authors Tier-3 binding folders with a residual-0 round-trip oracle, ticket 5 authors Part B section nodes to claim-verifier green (closing the supersession record), ticket 6 builds the revision-cycle surface.",
+
+  "companion_records": [
+    "vault-supersession-fieldwise_2026-08-11.json — the standing quarantine + re-author decision this record refines.",
+    "dod-1d-open-q4-parallel-explicit-promote_2026-07-28.json — the direction-of-authority ruling applied unchanged.",
+    "dod-1c-determinism-recheck-from-graph_2026-07-28.json — the determinism guarantee the sequencing relaxation leans on.",
+    "ms2-ticket8-author-proposal-graph_2026-07-20.json — the msca-pf-reference authoring pass being superseded."
+  ],
+
+  "effect": "The graph's role for FIELDWISE is durably pinned: same vault re-authored in place, project_id fieldwise-msca-pf, DOD-1d authority direction unchanged, revision-cycle flow defined, no node_type extension. Alignment tickets 2-6 execute against this record; the vault-supersession record retains its own closure condition."
+}

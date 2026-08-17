@@ -342,6 +342,11 @@ against the new Tier 5, or mark the lane expected-red on this branch. Apply the 
 
 ## 12. Re-author the vault for FIELDWISE
 
+> **Re-routed 2026-08-17.** This ticket is realised via `plans/tickets_obsidian_graph_alignment.md`
+> tickets 2-5 (ticket 5 carries the closure checkbox). The "after the run" blocker below is relaxed
+> by a recorded decision: `decision_log/obsidian-graph-role-fieldwise_2026-08-17.json`, point 2.
+> The closure condition (claim verifier green) is unchanged.
+
 **What to build:** The Obsidian vault rebuilt to describe FIELDWISE, after the run, per the plan's
 recommended sequencing. The deterministic authoring tool is rewritten for FIELDWISE rather than the
 vault being hand-edited. The claim verifier then passes against the new Tier 5 sections, clearing
