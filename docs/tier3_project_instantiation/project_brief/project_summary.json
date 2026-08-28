@@ -4,74 +4,100 @@
     "authority": [
       "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
     ],
-    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
-    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
-    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included)."
+    "source": [
+      "docs/tier3_project_instantiation/source_materials/consolidated_pack_2026-08-28/FIELDWISE_Consolidated_Partner_Review_Pack_2026-08-28.docx ('Pack §N' / cover table)"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/fieldwise-run-02-baseline_2026-08-28.json",
+    "supersedes": "The Master Draft summary of fieldwise-run-01 (title 'Beyond Prediction Accuracy: ...', host ELTE, MVCRI in-action)."
   },
   "spine_status": "confirmed_real",
-  "spine_note": "Identity spine confirmed by the operator (input pack item 7, 2026-08-11). The HOST and FELLOWSHIP_TYPE confirmations remain conditional on the C5 mobility-eligibility question, which the operator overrode on 2026-08-11 as a declared position pending a rectified CV. The override is declared in working_assumptions.json under key mobility_eligibility and registered in confirmation_checklist.json as MOBILITY_ELIGIBILITY (status Assumed). Ticket 7 carries it into the authorisation packet without promoting it to Confirmed. This sentence described C5 as deferred until ticket 7 corrected it: the deferral is what the pack recorded when ticket 3 ran, and the override superseded it the same day. Ticket 6 applied the same correction to selected_call.json and left this copy standing. This file holds only draft-lifted facts and names no person.",
+  "spine_note": "Identity spine per the 2026-08-28 baseline: FELLOW Dr. Rositsa Cholakova; HOST HUN-REN ATK; SUPERVISOR Dr. Roland Hollós (ATK); CO_SUPERVISOR Prof. András Jung (ELTE, associated partner). Confirmation statuses live in call_binding/confirmation_checklist.json, which prevails over any narrative field here.",
   "summary": {
     "acronym": {
       "value": "FIELDWISE",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶1, ¶3-4"
+      "source_ref": "Pack cover"
     },
     "title": {
-      "value": "Beyond Prediction Accuracy: From Transferable Crop Water-Stress Forecasts to Field-Level Irrigation Decisions",
+      "value": "From Plant Water-Stress Signatures to Transferable Irrigation Decision Support for High-Value Horticulture: Processing Tomato as the Model Crop",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶2"
+      "source_ref": "Pack cover and concept title block"
     },
     "instrument_type": {
       "value": "MSCA-PF",
       "validation_status": "Confirmed",
-      "source_ref": "call_binding/selected_call.json (call-scoped fact); draft cover block ¶7 'MSCA Host', §1.1.3 ¶48 'The MSCA fellowship'"
+      "source_ref": "call_binding/selected_call.json (call-scoped fact); Pack cover ('MSCA beneficiary / host')"
     },
-    "target_crop": {
-      "value": "Processing tomato - high-value horticultural crop",
+    "development_crop": {
+      "value": "Processing tomato — selected because approximately five years (2022-2026) of heterogeneous MATE data, strong experimental expertise and established collaborations already exist",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶5-6"
+      "source_ref": "Pack cover, Pack A"
+    },
+    "wider_application_domain": {
+      "value": "Irrigated high-value horticultural crops — transferable core + crop-specific physiology/phenology/calibration modules",
+      "validation_status": "Confirmed",
+      "source_ref": "Pack A, §1.1.1"
     },
     "host": {
-      "value": "Eötvös Loránd University (ELTE), Hungary",
+      "value": "HUN-REN Centre for Agricultural Research (HUN-REN ATK), Martonvásár, Hungary",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶7-8"
+      "source_ref": "Pack cover; host-switch decision 2026-08-26"
     },
-    "primary_experimental_data_environment": {
-      "value": "MATE, Hungary",
+    "primary_supervisor": {
+      "value": "Dr. Roland Hollós, HUN-REN ATK",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶9-10"
+      "source_ref": "Pack cover; ATK staff page (2026-08-28)"
     },
-    "cross_country_transferability_environment": {
-      "value": "Agricultural Academy / Maritsa Vegetable Crops Research Institute (MVCRI), Bulgaria",
+    "associated_remote_sensing_partner": {
+      "value": "Eötvös Loránd University (ELTE), Hungary — Prof. András Jung, co-supervisor",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶11-12"
+      "source_ref": "Pack cover"
+    },
+    "historical_scientific_dataset": {
+      "value": "MATE, Hungary — approximately five experimental seasons (2022-2026)",
+      "validation_status": "Confirmed",
+      "source_ref": "Pack cover, Stage 1"
+    },
+    "primary_prospective_validation": {
+      "value": "Independent commercial farmer site in Hungary, introduced through the fellow's established professional collaboration; instrumented by the project (meteorological station + soil sensors)",
+      "validation_status": "Confirmed",
+      "source_ref": "Pack cover, Stage 3"
+    },
+    "contingency_validation_option": {
+      "value": "Planned Bulgarian model garden at the Szentendre Skanzen — contingency/complementary only, subject to formal agreement and suitability",
+      "validation_status": "Confirmed",
+      "source_ref": "Pack cover, Stage 4"
     },
     "existing_research_prototype": {
-      "value": "DrR - Digital Agronomist",
+      "value": "DrR - Digital Agronomist — the fellow's pre-existing, self-financed research tool; currently a sensor/EO monitoring and data-integration tool, not a validated irrigation advisory product",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶13-14"
+      "source_ref": "Pack cover, §1.1.3, Appendix A"
     },
-    "planned_web_mvp": {
-      "value": "drR-digiagro.com",
+    "software_development_and_uptake_partner": {
+      "value": "Krumatic Ltd. (Krumatic EOOD), Bulgaria — coding/software implementation from project start + Bulgarian farmer-facing dissemination/uptake",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶15-16"
+      "source_ref": "Pack cover, §2.2"
     },
-    "operational_farmer_field_evaluator": {
-      "value": "AgroVIR",
+    "operational_evaluator_placement_host": {
+      "value": "AgroVIR, Hungary — early consultation M1-M24 and non-academic placement M25-M30 (mainly remote, monthly face-to-face)",
       "validation_status": "Confirmed",
-      "source_ref": "Cover block ¶17-18"
+      "source_ref": "Pack cover, §2.1"
+    },
+    "post_msca_route": {
+      "value": "MVCRI / Bulgarian Agricultural Academy — post-MSCA replication, local recalibration and extension; Hungary-Bulgaria scientific, teaching and mobility bridge",
+      "validation_status": "Confirmed",
+      "source_ref": "Pack cover, §3.2, Appendix B"
     },
     "project_in_one_sentence": {
-      "value": "FIELDWISE will use five years of MATE hyperspectral, soil and meteorological observations to identify physiologically meaningful early water-stress signatures in high-value processing tomato, determine which signatures can be scaled to Sentinel-2, develop uncertainty-aware prospective forecasts, rigorously test their temporal transferability at MATE, geographic transferability at MVCRI in Bulgaria and operational transferability under AgroVIR farmer-field conditions, and translate the validated intelligence into the DrR - Digital Agronomist web MVP for field-level irrigation decisions.",
+      "value": "FIELDWISE will use heterogeneous 2022-2026 MATE physiological, soil, meteorological and proximal spectral observations to build and validate the first processing-tomato module of a physiologically grounded, crop-configurable irrigation decision-support framework for irrigated high-value horticulture; develop an interpretable HUN-REN-led predictive workflow; bridge sensing scales with ELTE hyperspectral/UAV/EO expertise; test transfer prospectively in a newly instrumented commercial farmer field; and translate the validated architecture into a DrR web MVP designed for later crop-specific extension and evaluated by AgroVIR.",
       "validation_status": "Confirmed",
-      "source_ref": "¶433-434"
+      "source_ref": "Pack 'Project in one sentence'"
     },
     "core_message": {
-      "value": "FIELDWISE moves agricultural AI beyond retrospective accuracy by asking whether a water-stress signal discovered under scientific conditions can survive the entire journey from plant physiology to satellite observation, from Hungary to Bulgaria, and from experimental fields to farming reality-while arriving early enough to improve the irrigation decision.",
+      "value": "FIELDWISE moves crop-stress modelling beyond retrospective accuracy by asking whether a physiologically meaningful water-stress signal survives unseen years, a new real production environment and a change of sensing scale — and whether the validated workflow can be separated into a reusable decision-support core and crop-specific biological/calibration components. Processing tomato is the evidence-rich starting crop; the ambition is a scientifically controlled pathway toward additional irrigated high-value horticultural crops, not a universal tomato model imposed on all crops.",
       "validation_status": "Confirmed",
-      "source_ref": "¶435-436"
+      "source_ref": "Pack 'Core message'"
     }
   },
-  "duration_note": "Project duration is deliberately not duplicated here. The 30-month duration (24-month European Fellowship plus 6-month non-academic placement) is an operator decision, not a draft fact, and its single authoritative home is call_binding/selected_call.json per the ticket 3 deviation record."
+  "duration_note": "Project duration is deliberately not duplicated here. The 30-month duration (24-month European Fellowship at ATK plus 6-month AgroVIR placement) has its single authoritative home in call_binding/selected_call.json."
 }

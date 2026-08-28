@@ -5,122 +5,75 @@
     "authority": [
       "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
     ],
-    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
-    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
-    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
-    "ticket6_fold": {
-      "date": "2026-08-12",
-      "ticket": "plans/fieldwise_tickets.md ticket 6 (Fold operator answers into Tier 3)",
-      "what": "MS1 to MS5 are unchanged draft lifts. The fold adds one Unresolved record, placement_period_monitoring, because extending the action to 30 months leaves the placement window without a milestone and the operator decided no new one.",
-      "fold_record": "docs/tier4_orchestration_state/decision_log/fieldwise-item8-person-months_2026-08-12.json"
-    },
-    "ticket7_fold": {
-      "date": "2026-08-12",
-      "ticket": "plans/fieldwise_tickets.md ticket 7 (Authorisation packet)",
-      "round_1": "The operator decided the M23-M30 monitoring gap at the first authorisation review: a fifth Steering Group decision point at M27, and no placement-completion milestone. placement_period_monitoring moved from Unresolved to Confirmed and a steering_decision_points collection was added.",
-      "round_2": "The operator reopened the milestone half at the second review: a steering point is governance, not verification, and a 30-month action whose last milestone falls at M23 leaves seven unmilestoned months containing an evaluated placement. MS6 at M30 is seeded as Inferred, a placement_verification record names D5.4 and D5.5 as what carries the verification, and the D5.4 double-claim against MS5 is recorded as an Unresolved sequencing question for Phase 4.",
-      "unchanged": "MS1 to MS5, including their draft-verbatim criterion statements and paragraph references.",
-      "fold_records": [
-        "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-open-items_2026-08-12.json",
-        "docs/tier4_orchestration_state/decision_log/fieldwise-ticket7-review-round2_2026-08-12.json"
-      ]
-    },
-    "scope_note": "criterion_statement is the draft's milestone line, verbatim. Turning each statement into a verifiable achievement criterion with a responsible party is Phase 4's output (CLAUDE.md §7 Phase 4), not this seed's. The draft additionally states that the M6/M12/M16/M20 structure introduces corrective decision points answering a prior ESR criticism (¶379)."
+    "source": [
+      "docs/tier3_project_instantiation/source_materials/consolidated_pack_2026-08-28/FIELDWISE_Consolidated_Partner_Review_Pack_2026-08-28.docx ('Pack §3.1' milestone lines)"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/fieldwise-run-02-baseline_2026-08-28.json",
+    "supersedes": "The MS1-MS6 set of fieldwise-run-01 (MS1 M6, MS2 M12, MS3 M16, MS4 M20, MS5 M23, MS6 M30). The Pack carries five milestones whose last falls at M30, so the placement window is milestoned by construction and no seeded MS6 is needed; the prior D5.4 double-claim sequencing question dissolves with the deliverable set that carried it.",
+    "scope_note": "criterion_statement is the Pack's milestone line, verbatim in substance. Turning each statement into a verifiable achievement criterion with a responsible party is Phase 4's output (CLAUDE.md §7 Phase 4), not this seed's."
   },
   "spine_status": "confirmed_real",
   "milestones": [
     {
       "milestone_id": "MS1",
       "due_month": 6,
-      "criterion_statement": "Data and target readiness.",
+      "criterion_statement": "Historical knowledge base and target definition complete.",
       "linked_work_package": "WP1",
       "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶262"
+      "source_ref": "Pack §3.1 MS1"
     },
     {
       "milestone_id": "MS2",
-      "due_month": 12,
-      "criterion_statement": "Sentinel-observable physiologically meaningful early-warning signature established.",
+      "due_month": 14,
+      "criterion_statement": "Model and scale-transition framework ready for final prospective assessment.",
       "linked_work_package": "WP2",
       "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶274"
+      "source_ref": "Pack §3.1 MS2"
     },
     {
       "milestone_id": "MS3",
-      "due_month": 16,
-      "criterion_statement": "Predictor ready for independent transferability testing.",
+      "due_month": 18,
+      "criterion_statement": "Independent real-world transferability quantified.",
       "linked_work_package": "WP3",
       "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶287"
+      "source_ref": "Pack §3.1 MS3"
     },
     {
       "milestone_id": "MS4",
-      "due_month": 20,
-      "criterion_statement": "Independent cross-country transferability quantified.",
+      "due_month": 24,
+      "criterion_statement": "MVP ready for industrial placement evaluation.",
       "linked_work_package": "WP4",
       "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶301"
+      "source_ref": "Pack §3.1 MS4"
     },
     {
       "milestone_id": "MS5",
-      "due_month": 23,
-      "criterion_statement": "Web MVP externally evaluated under farmer/operational conditions.",
-      "linked_work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶317"
-    },
-    {
-      "milestone_id": "MS6",
       "due_month": 30,
-      "criterion_statement": "Non-academic placement completed: the operational assessment and the FMIS integration roadmap are delivered from inside the host company.",
+      "criterion_statement": "Industrial evaluation and placement completed.",
       "linked_work_package": "WP5",
-      "carried_by_deliverables": ["D5.4", "D5.5"],
-      "validation_status": "Inferred",
-      "source_ref": "Operator direction of 2026-08-12 (second authorisation review), decision_log/fieldwise-ticket7-review-round2_2026-08-12.json; AR-3 placement work content, decision_log/fieldwise-placement-hosting_2026-08-12.json; WP5 end month M30",
-      "note": "Not a draft milestone. The draft has five and its action ran to M24. Derivation: the month is WP5's end month and the placement's last month, both already Confirmed, and the criterion restates two AR-3 work-content items that already produce named deliverables, D5.4 and D5.5. Nothing is invented — no new deliverable, no new task, no new month. It is Inferred rather than Confirmed because the operator directed that the placement window carry verification and left the form of it open between a sixth milestone and an explicit statement that D5.4 and D5.5 carry it; this record does both, and Phase 4 owns turning the statement into a verifiable achievement criterion with a responsible party, as it does for MS1 to MS5.",
-      "supersedes": "The AR-7 position of the same day, that no placement-completion milestone would be adopted. The operator reopened it on the ground that five milestones all completing by M23 leave a 30-month action with seven unmilestoned months containing an evaluated placement, and that a steering point is governance rather than verification."
+      "carried_by_deliverables": ["D5.1", "D5.2"],
+      "validation_status": "Confirmed",
+      "source_ref": "Pack §3.1 MS5",
+      "note": "MS5 at M30 milestones the placement's completion directly, resolving by construction the monitoring concern that produced the seeded MS6 of the prior structure: the operational assessment (D5.1) and the exploitation roadmap (D5.2) are the deliverables that evidence it."
     }
   ],
   "steering_decision_points": {
     "validation_status": "Confirmed",
-    "source_ref": "§3.1 ¶379 (the draft's corrective decision points); operator input pack item 4, accepted 2026-08-11 (the Steering Group meeting schedule); operator decision of 2026-08-12, decision_log/fieldwise-ticket7-open-items_2026-08-12.json (the M27 point)",
-    "note": "The Steering Group's corrective decision points. M6, M12, M16 and M20 are the draft's own structure, which §3.1 ¶379 introduces as its answer to a prior evaluation criticism, and input pack item 4 adopted them as the Steering Group's meeting schedule. M27 is the operator's decision of 2026-08-12, taken at the authorisation review. These are decision points, not milestones: MS1-MS5 above are the milestone set and Phase 4 owns it.",
+    "source_ref": "Operator ruling of 2026-08-28 (decision_log/fieldwise-run-02-baseline_2026-08-28.json), re-anchoring the item-4 governance pattern to the Pack's milestone months",
+    "note": "The Steering Group's corrective decision points track the milestones (go/no-go verdicts on MS1-MS5), plus the retained mid-placement review at M27. Re-derivation of the operator's 2026-08-12 pattern, ratified 2026-08-28: the prior calendar (M6/12/16/20/27) tracked the superseded milestone months; the verdicts belong at the milestone months, and the M27 mid-placement point survives on its original reasoning (an evaluated placement must not run unmonitored between M24 and M30... the M27 point reviews the placement mid-window; MS5 at M30 closes it).",
     "points": [
-      {"month": 6, "linked_milestone": "MS1", "validation_status": "Confirmed", "source_ref": "§3.1 ¶379; operator input pack item 4, accepted 2026-08-11"},
-      {"month": 12, "linked_milestone": "MS2", "validation_status": "Confirmed", "source_ref": "§3.1 ¶379; operator input pack item 4, accepted 2026-08-11"},
-      {"month": 16, "linked_milestone": "MS3", "validation_status": "Confirmed", "source_ref": "§3.1 ¶379; operator input pack item 4, accepted 2026-08-11"},
-      {"month": 20, "linked_milestone": "MS4", "validation_status": "Confirmed", "source_ref": "§3.1 ¶379; operator input pack item 4, accepted 2026-08-11"},
-      {"month": 27, "linked_milestone": null, "purpose": "Mid-placement review of the M25-M30 non-academic placement at AgroVIR.", "validation_status": "Confirmed", "source_ref": "Operator decision of 2026-08-12, decision_log/fieldwise-ticket7-open-items_2026-08-12.json", "note": "Added because the four accepted points leave the entire placement unmonitored, which the operator judged unacceptable for an evaluated placement. It carries no milestone: the operator added a steering point and did not adopt the placement-completion milestone that input pack item 8 raised alongside it. Phase 6 writes it into the governance structure, and the item 4 governance record in confirmation_checklist.json carries the amended schedule."}
+      {"month": 6, "linked_milestone": "MS1", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS1"},
+      {"month": 14, "linked_milestone": "MS2", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS2"},
+      {"month": 18, "linked_milestone": "MS3", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS3"},
+      {"month": 24, "linked_milestone": "MS4", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS4"},
+      {"month": 27, "linked_milestone": null, "purpose": "Mid-placement review of the M25-M30 non-academic placement at AgroVIR (aligned with the monthly face-to-face technical review of T5.3).", "validation_status": "Confirmed", "source_ref": "Operator decision of 2026-08-12, retained by the 2026-08-28 ruling", "note": "Carries no milestone: MS5 at M30 verifies placement completion; M27 is governance, not verification."}
     ],
-    "consequence": "The Steering Group meets five times, not four. Input pack item 4's governance record is amended accordingly. The Career Development Plan is reviewed at all five points: the operator added an M27 plan review on 2026-08-12 in the second authorisation review, because M27 falls inside the placement, which is when non-academic career development is most in play. Item 6's review_points and K11's target both read five."
+    "consequence": "The Steering Group meets five times: M6, M14, M18, M24, M27. The Career Development Plan is reviewed at the same five points (the plan-review-alongside-steering-points pattern of item 6 / AR-10, re-anchored). K11's target reads the same five points."
   },
-
   "placement_verification": {
     "validation_status": "Confirmed",
-    "statement": "The verification of the M25-M30 placement period is carried by deliverables D5.4, the operational assessment, and D5.5, the FMIS integration roadmap. Milestone MS6 at M30 attaches to both.",
-    "note": "Recorded on the operator's direction of 2026-08-12. The placement produces two named deliverables under the AR-3 work content, so the window is not evidence-free; what it lacked was a milestone to attach a verifiable criterion to, and an evaluator reading the Gantt saw seven unmilestoned months at the end of a 30-month action. Both halves of the operator's instruction are applied: MS6 is seeded above, and the deliverables that carry the verification are named here.",
-    "gate_position": "phase_04_gate predicate g05_p05 requires every milestone in the Phase 4 output to carry a verifiable criterion and a due month. It does not require a milestone in any particular window, so the gate passed with five milestones and passes with six. MS6 is a quality and evaluator-facing decision, not a gate fix.",
-    "open_sequencing_question": {
-      "validation_status": "Unresolved",
-      "note": "A conflict AR-9 exposed rather than created: it was already in the state once the AR-3 placement content named D5.4, and seeding MS6 against D5.4 and D5.5 is what made it visible. Recorded here rather than resolved, because deliverable due months are Phase 4's output and no source states which reading the draft intended. See what, why_it_matters and not_resolved_here below.",
-      "what": "D5.4 is claimed by two points in the timeline. MS5 at M23 states that the web MVP is 'externally evaluated under farmer/operational conditions' (§3.1 ¶317), and the AR-3 placement content puts the nine-dimension operational assessment producing D5.4 inside M25-M30. Input pack item 8 separately names T5.6, the AgroVIR functional and interoperability assessment, as the natural occupant of the placement window.",
-      "why_it_matters": "If D5.4 lands by M23 to satisfy MS5, then MS6 rests on D5.5 alone and the placement repeats or deepens an evaluation already delivered. If D5.4 lands in the placement, MS5 at M23 cannot be evidenced by it and needs a different output, most likely D5.2 or D5.3.",
-      "not_resolved_here": "Deliverable due months are Phase 4's output, not this seed's, and no source states which reading the draft intended. Resolving it by choosing one would fabricate a scheduling fact (§13.3). Phase 4 must decide it, and it is listed in the authorisation packet.",
-      "source_ref": "§3.1 ¶309 (T5.6), ¶315 (D5.4), ¶317 (MS5); operator input pack item 8; AR-3 in decision_log/fieldwise-placement-hosting_2026-08-12.json"
-    },
-    "source_ref": "Operator direction of 2026-08-12, decision_log/fieldwise-ticket7-review-round2_2026-08-12.json"
-  },
-  "placement_period_monitoring": {
-    "validation_status": "Confirmed",
-    "note": "Opened by the ticket 6 fold of input pack items 2 and 8, and decided by the operator on 2026-08-12. The action runs 30 months, WP5 ends at M30, and the five draft milestones all fall at or before M23, which left the placement period unmonitored. Input pack item 8 raised two candidates and the operator adopted one: a fifth Steering Group decision point at M27, recorded in steering_decision_points above. The placement-completion milestone was not adopted, so no milestone is added and MS1-MS5 stand unchanged. Nothing is invented: the M27 point is the operator's own decision and the milestone that was not adopted is recorded as not adopted rather than quietly dropped.",
-    "decided": [
-      "A fifth Steering Group decision point at M27 — adopted 2026-08-12",
-      "A placement-completion milestone, MS6 at M30 — adopted 2026-08-12 in the second authorisation review, after being declined earlier the same day"
-    ],
-    "raised_and_not_adopted": [],
-    "reversal_note": "The first authorisation review (AR-7) adopted the steering point and declined the milestone. The second review reversed the second half: a steering point is governance and not verification, and seven unmilestoned months at the end of an evaluated placement is what an evaluator sees in the Gantt. Both candidates input pack item 8 raised are therefore now adopted. The reversal is recorded rather than overwritten, so the earlier position stays legible.",
-    "gate_impact": "phase_04_gate requires every milestone to carry a verifiable criterion and the timeline to fit the duration. Five milestones inside a 30-month timeline satisfy both, before and after this decision. The M27 point is a governance fact that Phase 6 consumes, not a gate input.",
-    "source_ref": "plans/fieldwise_operator_input_pack.md item 8 ('MONTH RANGES ARE NOT JUST THIS TABLE', 2026-08-11); §3.1 ¶379 (the draft's own corrective-decision-point argument); operator decision of 2026-08-12, decision_log/fieldwise-ticket7-open-items_2026-08-12.json"
+    "statement": "The verification of the M25-M30 placement period is carried by MS5 at M30 and its deliverables D5.1 (operational/interoperability assessment) and D5.2 (post-MSCA FMIS integration and exploitation roadmap).",
+    "note": "Structural in the Pack: the milestone falls at the placement's last month. The prior structure's seeded-MS6 workaround and its D5.4 double-claim Unresolved question are retired with the structure that needed them.",
+    "source_ref": "Pack §3.1 MS5, D5.1, D5.2"
   }
 }

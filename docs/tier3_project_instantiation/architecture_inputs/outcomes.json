@@ -5,227 +5,87 @@
     "authority": [
       "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
     ],
-    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
-    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
-    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
-    "separation_note": "The draft names deliverables and six ambition transitions but never separates a project output from the outcome it produces (plan §3). outputs below are the draft's deliverables, Confirmed. outcomes below are an Inferred first pass at that separation, derived from the deliverables and the §1.1.9 transitions; each note states the derivation. Phase 5 refines this separation against the Tier 2B expected outcomes."
+    "source": [
+      "docs/tier3_project_instantiation/source_materials/consolidated_pack_2026-08-28/FIELDWISE_Consolidated_Partner_Review_Pack_2026-08-28.docx ('Pack §N' / 'Pack B')"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/fieldwise-run-02-baseline_2026-08-28.json",
+    "supersedes": "The outputs/transitions/outcomes of the Master Draft configuration (fieldwise-run-01).",
+    "separation_note": "outputs below are the Pack's deliverables plus the operator-preserved D1.3, Confirmed. transitions are the Pack §1.1.9 ambition arrows, Confirmed. outcomes are an Inferred separation derived from the deliverables and transitions; each note states the derivation. Phase 5 refines this separation against the Tier 2B expected outcomes."
   },
   "spine_status": "confirmed_real",
   "outputs": [
-    {
-      "deliverable_id": "D1.1",
-      "title": "Harmonised historical database",
-      "work_package": "WP1",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶260"
-    },
-    {
-      "deliverable_id": "D1.2",
-      "title": "Data/target/validation protocol",
-      "work_package": "WP1",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶261"
-    },
-    {
-      "deliverable_id": "D1.3",
-      "title": "Career Development Plan",
-      "work_package": "WP1",
-      "due_month": 3,
-      "validation_status": "Confirmed",
-      "checklist_ref": "CDP_DELIVERABLE",
-      "source_ref": "Operator input pack item 6, accepted 2026-08-11 (CC-13 instrument mandate)",
-      "note": "Not in the draft's deliverable list. Operator-added deliverable: agreed by M3, owned by FELLOW and SUPERVISOR, reviewed at M6/M12/M16/M20/M27 (the M27 review added by AR-10 on 2026-08-12, decision_log/fieldwise-ticket7-review-round2_2026-08-12.json). Seeded here per the ticket 2 correction ('Ticket 4 must seed D1.3 if the operator accepts item 6'). Confirmed on the same footing as the 30-month duration in selected_call.json (operator decision of 2026-08-11; status reasoning in the lift decision-log extension); checklist_ref resolves when ticket 6 re-authors confirmation_checklist.json."
-    },
-    {
-      "deliverable_id": "D2.1",
-      "title": "Physiological validation dataset",
-      "work_package": "WP2",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶272"
-    },
-    {
-      "deliverable_id": "D2.2",
-      "title": "Hyperspectral-to-Sentinel transfer library",
-      "work_package": "WP2",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶273"
-    },
-    {
-      "deliverable_id": "D3.1",
-      "title": "Comparative modelling benchmark",
-      "work_package": "WP3",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶285"
-    },
-    {
-      "deliverable_id": "D3.2",
-      "title": "FIELDWISE predictive engine/model card",
-      "work_package": "WP3",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶286"
-    },
-    {
-      "deliverable_id": "D4.1",
-      "title": "Temporal transferability benchmark",
-      "work_package": "WP4",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶298"
-    },
-    {
-      "deliverable_id": "D4.2",
-      "title": "Hungary->Bulgaria transferability report",
-      "work_package": "WP4",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶299"
-    },
-    {
-      "deliverable_id": "D4.3",
-      "title": "Adaptation protocol",
-      "work_package": "WP4",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶300"
-    },
-    {
-      "deliverable_id": "D5.1",
-      "title": "DrR web MVP",
-      "work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶312"
-    },
-    {
-      "deliverable_id": "D5.2",
-      "title": "Commercial-field transferability assessment",
-      "work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶313"
-    },
-    {
-      "deliverable_id": "D5.3",
-      "title": "Field Decision Value report",
-      "work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶314"
-    },
-    {
-      "deliverable_id": "D5.4",
-      "title": "AgroVIR functional/technical evaluation",
-      "work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶315"
-    },
-    {
-      "deliverable_id": "D5.5",
-      "title": "FMIS integration roadmap",
-      "work_package": "WP5",
-      "validation_status": "Confirmed",
-      "source_ref": "§3.1 ¶316"
-    }
+    {"deliverable_id": "D1.1", "title": "Harmonised database/metadata and variable-availability map", "work_package": "WP1", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D1.1"},
+    {"deliverable_id": "D1.2", "title": "Stress-target, feature-selection and validation protocol", "work_package": "WP1", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D1.2"},
+    {"deliverable_id": "D1.3", "title": "Career Development Plan", "work_package": "WP1", "due_month": 3, "validation_status": "Confirmed", "checklist_ref": "CDP_DELIVERABLE", "source_ref": "Operator input pack item 6 (CC-13 mandate), preserved by the 2026-08-28 baseline", "note": "Owned by FELLOW and SUPERVISOR (Dr. Hollós, ATK); reviewed at the five re-anchored steering points M6/M14/M18/M24/M27."},
+    {"deliverable_id": "D2.1", "title": "Primary model, benchmark and model card", "work_package": "WP2", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D2.1"},
+    {"deliverable_id": "D2.2", "title": "Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification", "work_package": "WP2", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D2.2"},
+    {"deliverable_id": "D3.1", "title": "Independent commercial-field validation dataset", "work_package": "WP3", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D3.1"},
+    {"deliverable_id": "D3.2", "title": "Prospective transferability, uncertainty and limited-recalibration report", "work_package": "WP3", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D3.2"},
+    {"deliverable_id": "D4.1", "title": "Crop-configurable DrR web MVP with validated processing-tomato module and reusable core functions", "work_package": "WP4", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D4.1"},
+    {"deliverable_id": "D4.2", "title": "Pre-placement technical/usability requirements dossier", "work_package": "WP4", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D4.2"},
+    {"deliverable_id": "D5.1", "title": "AgroVIR operational/interoperability assessment", "work_package": "WP5", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D5.1"},
+    {"deliverable_id": "D5.2", "title": "Post-MSCA FMIS integration and exploitation roadmap", "work_package": "WP5", "validation_status": "Confirmed", "source_ref": "Pack §3.1 D5.2"}
   ],
   "transitions": [
-    {
-      "transition_id": "TR1",
-      "statement": "Spectral proxy -> Physiological target",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶104"
-    },
-    {
-      "transition_id": "TR2",
-      "statement": "Hyperspectral discovery -> Satellite scaling",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶105"
-    },
-    {
-      "transition_id": "TR3",
-      "statement": "Static detection -> Prospective prediction",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶106"
-    },
-    {
-      "transition_id": "TR4",
-      "statement": "Internal validation -> Temporal transferability",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶107"
-    },
-    {
-      "transition_id": "TR5",
-      "statement": "Single-country modelling -> Geographic transferability",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶108"
-    },
-    {
-      "transition_id": "TR6",
-      "statement": "Research accuracy -> Commercial-field decision value",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶109"
-    },
-    {
-      "transition_id": "VL",
-      "statement": "Validation ladder: MATE - scientific development and validation -> MVCRI - cross-country transferability -> AgroVIR farmer field - operational transferability -> DrR Web MVP - research-to-operation delivery.",
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.9 ¶110"
-    }
+    {"transition_id": "TR1", "statement": "Stress proxy -> physiologically defined stress target", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 1"},
+    {"transition_id": "TR2", "statement": "Heterogeneous five-season archive -> explicit common-variable/missingness design", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 2"},
+    {"transition_id": "TR3", "statement": "Internal fit -> blocked unseen-year validation -> independent commercial-field validation", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 3"},
+    {"transition_id": "TR4", "statement": "Leaf/proximal sensing -> ELTE hyperspectral/UAV bridge -> Sentinel-2 field-scale operational inputs", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 4"},
+    {"transition_id": "TR5", "statement": "Standalone model -> continuously developed DrR web MVP -> AgroVIR industrial evaluation", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 5"},
+    {"transition_id": "TR6", "statement": "Academic-only validation -> farmer-facing real-world test plus a defined post-MSCA Bulgarian replication route through MVCRI", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 6"},
+    {"transition_id": "TR7", "statement": "Tomato-specific prototype -> crop-configurable high-value-horticulture framework with explicit crop-specific validation/calibration gates", "validation_status": "Confirmed", "source_ref": "Pack §1.1.9 arrow 7"},
+    {"transition_id": "CHAIN", "statement": "Project logic in one chain: MATE longitudinal evidence -> physiological stress definition -> HUN-REN modelling and uncertainty -> ELTE proximal/UAV/Sentinel scale bridging -> independent commercial-farmer validation -> validated crop module -> Krumatic software implementation -> DrR web MVP -> AgroVIR operational/FMIS evaluation -> post-MSCA Bulgarian replication and additional crop modules.", "validation_status": "Confirmed", "source_ref": "Pack B"}
   ],
   "outcomes": [
     {
       "outcome_id": "OC1",
-      "statement": "A physiologically defined water-stress target and a Sentinel-2-transferable early-warning feature basis, replacing spectral-proxy stress definitions.",
-      "produced_by_outputs": ["D1.1", "D1.2", "D2.1", "D2.2"],
+      "statement": "A physiologically defined water-stress target with a harmonised, QC-controlled five-season evidence base, replacing spectral-proxy stress definitions.",
+      "produced_by_outputs": ["D1.1", "D1.2"],
       "linked_transitions": ["TR1", "TR2"],
-      "linked_objectives": ["O1", "O2"],
+      "linked_objectives": ["O1"],
       "validation_status": "Inferred",
-      "source_ref": "§1.1.9 ¶104-105; §3.1 ¶260-261, ¶272-273",
-      "note": "Derived: transitions TR1/TR2 state the intended change of state, and D1.1/D1.2/D2.1/D2.2 are the outputs whose content (harmonised data, physiological target, transfer library) brings that state about. The draft states both ends but not the output->outcome link."
+      "source_ref": "Pack §1.1.9 arrows 1-2; §3.1 D1.1, D1.2",
+      "note": "Derived: TR1/TR2 state the intended change of state; D1.1/D1.2 are the outputs whose content brings it about."
     },
     {
       "outcome_id": "OC2",
-      "statement": "A prospective, uncertainty-aware stress-forecasting capability at actionable horizons, in place of static detection.",
+      "statement": "A parsimonious, interpretable, uncertainty-aware predictive framework whose reusable components are explicitly separated from crop-specific parameters, with a documented crop-transfer specification.",
+      "produced_by_outputs": ["D2.1", "D2.2"],
+      "linked_transitions": ["TR4", "TR7"],
+      "linked_objectives": ["O2"],
+      "validation_status": "Inferred",
+      "source_ref": "Pack §1.1.9 arrows 4, 7; §3.1 D2.1, D2.2",
+      "note": "Derived: the scale bridge (TR4) and crop-configurability (TR7) are realised by the model card and the harmonisation/crop-transfer specification."
+    },
+    {
+      "outcome_id": "OC3",
+      "statement": "Quantified real-world transferability: the transfer gap from research experiments to an independent commercial field measured prospectively, with uncertainty and any limited recalibration stated.",
       "produced_by_outputs": ["D3.1", "D3.2"],
       "linked_transitions": ["TR3"],
       "linked_objectives": ["O3"],
       "validation_status": "Inferred",
-      "source_ref": "§1.1.9 ¶106; §3.1 ¶285-286",
-      "note": "Derived: TR3 names the static-to-prospective transition; D3.1/D3.2 (modelling benchmark, predictive engine with model card) are the outputs that realise it. Link inferred, not stated."
-    },
-    {
-      "outcome_id": "OC3",
-      "statement": "Quantified temporal and Hungary-to-Bulgaria transferability of the predictive model, with a stated local-calibration cost for adapting it to a new agro-environment.",
-      "produced_by_outputs": ["D4.1", "D4.2", "D4.3"],
-      "linked_transitions": ["TR4", "TR5"],
-      "linked_objectives": ["O4"],
-      "validation_status": "Inferred",
-      "source_ref": "§1.1.9 ¶107-108; §3.1 ¶298-300",
-      "note": "Derived: TR4/TR5 name the transferability transitions; D4.1-D4.3 are the benchmark, report and protocol that quantify them. Link inferred, not stated."
+      "source_ref": "Pack §1.1.9 arrow 3; §3.1 D3.1, D3.2",
+      "note": "Derived: TR3 names the validation ladder; D3.1/D3.2 are the dataset and report that quantify it."
     },
     {
       "outcome_id": "OC4",
-      "statement": "Evidence of field-level decision value under commercial farming conditions, enabling model selection by usefulness rather than retrospective accuracy.",
-      "produced_by_outputs": ["D5.2", "D5.3", "D5.4"],
-      "linked_transitions": ["TR6"],
-      "linked_objectives": ["O5", "O6"],
+      "statement": "A research-to-operation delivery path: a crop-configurable web MVP carrying the validated tomato module, industrially evaluated by AgroVIR, with a named post-MSCA FMIS-integration and exploitation route and a Bulgarian replication route through MVCRI.",
+      "produced_by_outputs": ["D4.1", "D4.2", "D5.1", "D5.2"],
+      "linked_transitions": ["TR5", "TR6"],
+      "linked_objectives": ["O4"],
       "validation_status": "Inferred",
-      "source_ref": "§1.1.9 ¶109; §3.1 ¶313-315",
-      "note": "Derived: TR6 names the accuracy-to-decision-value transition; D5.2-D5.4 (commercial-field assessment, FDV report, AgroVIR evaluation) are the outputs that evidence it. Link inferred, not stated."
+      "source_ref": "Pack §1.1.9 arrows 5-6; §3.1 D4.1-D5.2; Pack Appendix B",
+      "note": "Derived: TR5/TR6 name the operational and replication transitions; the four outputs realise them. The Pack bounds this outcome: the MVP supports decisions rather than automatically controlling irrigation, and any new crop requires a defined validation/calibration step before operational use."
     },
     {
       "outcome_id": "OC5",
-      "statement": "A research-to-operation delivery path: an externally evaluated web MVP and a named post-MSCA FMIS integration route.",
-      "produced_by_outputs": ["D5.1", "D5.5"],
-      "linked_transitions": ["VL"],
-      "linked_objectives": ["O6"],
-      "validation_status": "Inferred",
-      "source_ref": "§1.1.9 ¶110; §3.1 ¶312, ¶316; §1.2 ¶156-158, ¶170",
-      "note": "Derived from the validation ladder's final rung and D5.1/D5.5. The draft itself bounds this outcome: the MVP is the research-to-operation demonstrator, not the primary scientific objective (¶158), and full commercial integration is not promised within the fellowship (¶170)."
-    },
-    {
-      "outcome_id": "OC6",
-      "statement": "A researcher profile combining biological understanding, scalable geospatial prediction and operational decision support, carried by an agreed and reviewed Career Development Plan.",
+      "statement": "A researcher profile consolidated as an Agricultural Data Scientist specialised in plant stress, Earth observation and decision support, carried by an agreed and reviewed Career Development Plan and the inter-sectoral placement.",
       "produced_by_outputs": ["D1.3"],
       "linked_transitions": [],
       "linked_objectives": [],
       "validation_status": "Inferred",
-      "source_ref": "§2.1 ¶219-222; §1.4 ¶216; operator input pack item 6",
-      "note": "Derived: §2.1 states the career outcome and §1.4 the intended progression; D1.3 (operator-added, item 6) is the output that carries them. The draft states the career claims but assembles no plan and names no deliverable for them."
+      "source_ref": "Pack §1.4, §2.1; DI item 14; operator input pack item 6",
+      "note": "Derived: §2.1 states the career outcome and §1.4 the progression; D1.3 is the output that carries them."
     }
   ]
 }

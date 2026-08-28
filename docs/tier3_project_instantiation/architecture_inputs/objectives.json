@@ -5,86 +5,73 @@
     "authority": [
       "CLAUDE.md §5 Tier 3, §12.2 status categories, §13.3 no fabricated project facts"
     ],
-    "source": "docs/tier3_project_instantiation/source_materials/part_b_draft_v0/FIELDWISE_MSCA_Master_Draft.docx",
-    "lift_record": "docs/tier4_orchestration_state/decision_log/fieldwise-tier3-lift_2026-08-11.json",
-    "provenance_manifest": "docs/tier3_project_instantiation/hand_lift_provenance.json",
-    "paragraph_numbering": "¶N per the numbering scheme defined in hand_lift_provenance.json (436 non-empty paragraphs, table cells included).",
-    "field_mapping": "The draft table's header cells are Objective | Purpose | Verification (¶81-83). title is the Purpose column; measurable_output is the Verification column, named after the section heading 'Objectives and measurable outputs' (¶80). The plan §5 worked example calls this column's content measurable_target and additionally shows a 'verification' value ('Feature library documented with per-feature Sentinel-2 transferability verdict') that appears nowhere in the draft; this seed carries only the two draft columns and no elaborated verification text, per §13.3. addressed_by_work_packages, linked_research_questions, linked_hypotheses and target_month come from the cited §3.1 work-package block, the RQ/H lists and the milestone line, per the worked example.",
-    "partner_tokens": "involved_partners uses the role tokens the plan defines (DATA_PARTNER = MATE, HOST = ELTE, TRANSFER_PARTNER = MVCRI, VALIDATION_PARTNER = AgroVIR; cover block ¶9-18, §1.3 ¶206-211). Tokens list the organisations the cited WP month-line names; the FELLOW executes all work packages in this single-researcher action and is not repeated per objective."
+    "source": [
+      "docs/tier3_project_instantiation/source_materials/consolidated_pack_2026-08-28/FIELDWISE_Consolidated_Partner_Review_Pack_2026-08-28.docx ('Pack §N')"
+    ],
+    "baseline_record": "docs/tier4_orchestration_state/decision_log/fieldwise-run-02-baseline_2026-08-28.json",
+    "supersedes": "The six objectives O1-O6 of the Master Draft configuration (fieldwise-run-01). The Pack §1.1.8 objectives table carries four objectives O1-O4; RQ and hypothesis sets shrink to RQ1-RQ5 and H1-H4 (Pack §1.1.6, §1.1.7).",
+    "field_mapping": "The Pack's objectives table columns are Objective | Purpose | Verification / output (§1.1.8). title is the Purpose column; measurable_output is the Verification/output column. addressed_by_work_packages and target_month come from the §3.1 work-package block and milestone lines. linked_research_questions and linked_hypotheses are Inferred: the Pack states RQ1-RQ5 and H1-H4 but does not cross-link them to objectives; the links below are derivations from subject-matter identity, and each objective's note states the derivation. Statuses: title/measurable_output/WPs/months are Confirmed (Pack-stated); the RQ/H links are Inferred.",
+    "partner_tokens": "involved_partners uses the fieldwise-run-02 role tokens (HOST = HUN-REN ATK, EO_PARTNER = ELTE, DATA_PARTNER = MATE, SOFTWARE_PARTNER = Krumatic, VALIDATION_PARTNER = AgroVIR, VALIDATION_SITE = commercial farmer). Tokens list the organisations the cited WP month-lines name; the FELLOW executes all work packages and is not repeated per objective."
   },
   "spine_status": "confirmed_real",
   "objectives": [
     {
       "objective_id": "O1",
-      "title": "Construct a harmonised five-year MATE soil-plant-atmosphere dataset",
-      "measurable_output": "QC-controlled historical database and documented metadata",
+      "title": "Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target",
+      "measurable_output": "QC-controlled common-variable matrix; missingness/measurement-frequency map; target and validation protocol",
       "addressed_by_work_packages": ["WP1"],
-      "linked_research_questions": [],
-      "linked_hypotheses": [],
+      "linked_research_questions": ["RQ1"],
+      "linked_hypotheses": ["H1"],
       "target_month": 6,
-      "involved_partners": ["DATA_PARTNER", "HOST"],
+      "involved_partners": ["HOST", "DATA_PARTNER", "EO_PARTNER"],
       "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶84-86; WP1 §3.1 ¶252-262; MS1 ¶262"
+      "source_ref": "Pack §1.1.8 (O1 row); §3.1 WP1 (M1-M6, MS1 at M6)",
+      "note": "RQ1/H1 link Inferred: RQ1 asks which variables of the 2022-2026 archive most robustly indicate developing stress, and H1 is the physiological-signature hypothesis — both are what the O1 target definition operationalises."
     },
     {
       "objective_id": "O2",
-      "title": "Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability",
-      "measurable_output": "Validated hyperspectral/Sentinel-compatible feature library",
+      "title": "Develop a parsimonious, interpretable and uncertainty-aware predictive framework under HUN-REN supervision, with ELTE spectral/EO harmonisation, and separate reusable system components from crop-specific biological/calibration parameters",
+      "measurable_output": "Ranked predictor set; primary model and nonlinear benchmark where justified; calibration/uncertainty assessment; model card; crop-transfer specification",
       "addressed_by_work_packages": ["WP2"],
-      "linked_research_questions": ["RQ1", "RQ2"],
-      "linked_hypotheses": ["H1", "H2"],
-      "target_month": 12,
-      "involved_partners": ["DATA_PARTNER", "HOST"],
+      "linked_research_questions": ["RQ2", "RQ4"],
+      "linked_hypotheses": ["H1", "H3"],
+      "target_month": 14,
+      "involved_partners": ["HOST", "EO_PARTNER", "DATA_PARTNER"],
       "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶87-89; WP2 §3.1 ¶263-274; MS2 ¶274"
+      "source_ref": "Pack §1.1.8 (O2 row); §3.1 WP2 (M3-M14, MS2 at M14)",
+      "note": "RQ2 (parsimonious process-informed/AI-supported prediction) and RQ4 (cross-scale translation toward Sentinel-2) are WP2's two strands (T2.1-T2.4); H3 is the scale-transition hypothesis. Links Inferred from subject identity."
     },
     {
       "objective_id": "O3",
-      "title": "Develop prospective uncertainty-aware crop water-stress forecasts",
-      "measurable_output": "Calibrated forecasts at actionable horizons",
+      "title": "Prospectively validate the framework at an independent commercial farmer site equipped with project meteorological and soil sensing, supported by physiological, proximal, UAV and Sentinel observations",
+      "measurable_output": "Prospective validation dataset; unseen-environment benchmark; spatial scaling assessment; limited-recalibration protocol if required",
       "addressed_by_work_packages": ["WP3"],
       "linked_research_questions": ["RQ3"],
-      "linked_hypotheses": [],
-      "target_month": 16,
-      "involved_partners": ["HOST", "DATA_PARTNER"],
+      "linked_hypotheses": ["H2"],
+      "target_month": 18,
+      "involved_partners": ["VALIDATION_SITE", "DATA_PARTNER", "EO_PARTNER", "HOST"],
       "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶90-92; WP3 §3.1 ¶275-287; MS3 ¶287"
+      "source_ref": "Pack §1.1.8 (O3 row); §3.1 WP3 (first complete tomato season within M4-M18, MS3 at M18)",
+      "note": "RQ3 (which relationships remain stable under blocked unseen-year validation and prospective transfer to the commercial field) and H2 (transferability hypothesis) are what the prospective validation tests. Links Inferred."
     },
     {
       "objective_id": "O4",
-      "title": "Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation",
-      "measurable_output": "Independent transferability benchmark",
-      "addressed_by_work_packages": ["WP4"],
-      "linked_research_questions": ["RQ4", "RQ5"],
-      "linked_hypotheses": ["H3", "H4"],
-      "target_month": 20,
-      "involved_partners": ["DATA_PARTNER", "TRANSFER_PARTNER"],
+      "title": "Operationalise validated outputs in a crop-configurable DrR architecture through continuous Krumatic software development and AgroVIR requirements feedback, followed by industrial evaluation in M25-M30",
+      "measurable_output": "Web MVP with validated processing-tomato module; irrigation-attention output; crop-extension specification; AgroVIR requirements/interoperability report; post-MSCA integration and exploitation roadmap",
+      "addressed_by_work_packages": ["WP4", "WP5"],
+      "linked_research_questions": ["RQ5"],
+      "linked_hypotheses": ["H4"],
+      "target_month": 30,
+      "involved_partners": ["SOFTWARE_PARTNER", "VALIDATION_PARTNER", "HOST"],
       "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶93-95; WP4 §3.1 ¶288-301; MS4 ¶301"
-    },
-    {
-      "objective_id": "O5",
-      "title": "Quantify research->commercial-field operational transferability",
-      "measurable_output": "AgroVIR farmer-field evaluation",
-      "addressed_by_work_packages": ["WP5"],
-      "linked_research_questions": ["RQ6"],
-      "linked_hypotheses": ["H5"],
-      "target_month": 23,
-      "involved_partners": ["HOST", "VALIDATION_PARTNER"],
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶96-98; WP5 §3.1 ¶302-317; MS5 ¶317"
-    },
-    {
-      "objective_id": "O6",
-      "title": "Translate validated predictions into irrigation priority and a functional web MVP",
-      "measurable_output": "DrR web MVP + Field Decision Value + AgroVIR requirements assessment",
-      "addressed_by_work_packages": ["WP5"],
-      "linked_research_questions": ["RQ7"],
-      "linked_hypotheses": ["H6"],
-      "target_month": 23,
-      "involved_partners": ["HOST", "VALIDATION_PARTNER"],
-      "validation_status": "Confirmed",
-      "source_ref": "§1.1.8 ¶99-101; WP5 §3.1 ¶302-317; MS5 ¶317"
+      "source_ref": "Pack §1.1.8 (O4 row); §3.1 WP4 (M1-M24, MS4 at M24) and WP5 (M25-M30, MS5 at M30)",
+      "note": "RQ5 (incremental implementation in a crop-configurable web MVP meeting performance gates and AgroVIR usability/interoperability requirements) and H4 (operational-relevance hypothesis) are O4's question and bet. Links Inferred."
     }
-  ]
+  ],
+  "research_questions_ref": "RQ1-RQ5 are carried verbatim in project_brief/concept_note.md (Pack §1.1.6); hypotheses H1-H4 likewise (Pack §1.1.7). This file links; it does not restate.",
+  "central_challenge": {
+    "statement": "Can a water-stress signal discovered in a data-rich processing-tomato system remain biologically meaningful across seasons and sensing scales, survive prospective validation under real farmer conditions, and be encoded in a crop-configurable decision-support framework that can later be adapted to other irrigated high-value horticultural crops?",
+    "validation_status": "Confirmed",
+    "source_ref": "Pack §1.1.1 (Central challenge box)"
+  }
 }

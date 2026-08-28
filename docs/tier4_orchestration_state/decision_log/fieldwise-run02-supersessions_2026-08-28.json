@@ -1,0 +1,61 @@
+{
+  "record_type": "decision_log_entry",
+  "decision_id": "fieldwise-run02-supersessions_2026-08-28",
+  "date": "2026-08-28",
+  "branch": "fieldwise-run-02",
+  "authority": "CLAUDE.md §12.3; operator rulings of 2026-08-28 (fieldwise-run-02-baseline_2026-08-28.json), applying the newest-agreed-position principle: the Consolidated Partner Review Pack of 2026-08-28 is the latest partner-reviewed position and prevails over earlier operator answers where they conflict.",
+  "title": "Supersessions bundled with the ATK baseline: placement arrangement, placement-supervisor title, placement IP parties, teaching route, ethics/DPO anchoring, MVCRI in-action seat",
+  "supersessions": [
+    {
+      "id": "S1",
+      "what": "AgroVIR placement arrangement",
+      "prior": "Declaration placement_workspace_AgroVIR (2026-08-14): desk or office at AgroVIR for M25-M30, access to the FMIS development and staging environment, access to the customer-data environment.",
+      "new": "Declaration placement_arrangement_AgroVIR (2026-08-28): mainly remote collaboration with monthly face-to-face technical meetings; no direct access to proprietary software, customer databases, office infrastructure or computing equipment required; protected, coded or anonymised extracts (the 'Field X' pattern) supplied for interoperability testing.",
+      "why_new_prevails": "Pack §2.1/§3.2 and DI line 102 state the remote arrangement expressly and it is the partner-reviewed position; the pack's risk R09 is built on it ('unrestricted customer-system access is not a project dependency'). The old workspace declaration is withdrawn, not amended.",
+      "conflict_note": "decision_inputs_2026-08.md also carries the old workspace text (line 97) — an internal contradiction inside the input file. Resolved for the Pack reading because the Pack is dated 2026-08-28, is the curated partner-review document, and its §2.1 sentence explicitly negates the access list."
+    },
+    {
+      "id": "S2",
+      "what": "Placement supervisor's title",
+      "prior": "placement_supervisor_title_AgroVIR = 'Senior research officer' (operator answer of 2026-08-14).",
+      "new": "'Managing Director of AgroVIR' (Pack §2.1; DI line 102).",
+      "why_new_prevails": "Both sources of the new baseline name him Managing Director; the supervision argument now leans on his managing-director experience in agricultural digitalisation and FMIS rather than on a research grade. Remains Assumed pending AgroVIR's written confirmation of the supervision arrangement."
+    },
+    {
+      "id": "S3",
+      "what": "Placement-IP declaration parties",
+      "prior": "placement_ip_ownership (2026-08-15, Option C): results vest in ELTE as beneficiary; agreement between the fellow, ELTE and AgroVIR.",
+      "new": "Results vest in HUN-REN ATK as beneficiary by the same grant default; agreement between the fellow, HUN-REN ATK and AgroVIR, concluded before the placement begins.",
+      "why_new_prevails": "Mechanical re-anchoring under the host switch, stated in the canonical open-decisions document ('the parties become the fellow, HUN-REN ATK and AgroVIR, and results vest in the new beneficiary by the grant default'). The allocation logic of Option C is unchanged."
+    },
+    {
+      "id": "S4",
+      "what": "EI-06 / EO-08 teaching route",
+      "prior": "Co-design and delivery of a full module unit within an ELTE MSc course on Earth observation for agriculture; co-supervision of the field-experiment component of one PhD student's work.",
+      "new": "Short guest lectures, seminars or practical sessions at MATE and, where institutionally possible, the Agricultural University of Plovdiv, linking plant-stress physiology with UAV/EO monitoring, precision agriculture and agricultural data science.",
+      "why_new_prevails": "The ELTE measures fell with the university host: ATK is a research organisation and ELTE is now an associated partner whose commitments are evidence-grade declarations. The Pack §1.3 states the new route explicitly and grounds it in the fellow's five years of teaching and the Bulgarian-Hungarian academic links."
+    },
+    {
+      "id": "S5",
+      "what": "Ethics-committee and DPO anchoring",
+      "prior": "Item 3 (2026-08-11): ELTE research ethics committee consulted on the human-feedback task; ELTE Data Protection Officer consulted before the first MVP user account.",
+      "new": "The HUN-REN ATK research-ethics route and the competent HUN-REN/ATK DPO function, same triggers and timing (committee consultation before fieldwork, written position by M12; DPO before the first user account). The function is named until ATK's written confirmation names the body.",
+      "why_new_prevails": "The canonical open-decisions document lists this re-anchoring as a consequential change of the switch. The ethics substance (GDPR-limited personal data, commercial farmer data, low-risk human feedback, no animals/dual-use/non-EU transfer, ethics_issues_identified = true) is unchanged."
+    },
+    {
+      "id": "S6",
+      "what": "MVCRI's in-action seat",
+      "prior": "TRANSFER_PARTNER with the WP4 Bulgarian trial ('MATE -> MVCRI'), 1.5 PM in-kind effort, a Steering Group seat, and KPIs K5/K6 reported to its contact.",
+      "new": "Post-MSCA replication and transferability route on no WP month line; no in-action effort; no Steering Group seat; the record retained for narrative traceability and the fellow's employer-of-record disclosure.",
+      "why_new_prevails": "Pack §3.2 and Appendix C item 9 state the re-scoping and its reason (protect 24-month feasibility while preserving a credible replication route). The person_months_MVCRI declaration is removed; contact_email_MVCRI and the signatory placeholder are retained for the post-MSCA route."
+    }
+  ],
+  "impacted_artifacts": [
+    "docs/tier3_project_instantiation/working_assumptions.json (placement_arrangement_AgroVIR new; placement_workspace_AgroVIR withdrawn; placement_supervisor_title_AgroVIR value; placement_ip_ownership re-anchored; person_months_MVCRI removed)",
+    "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER, TRANSFER_PARTNER)",
+    "docs/tier3_project_instantiation/consortium/capabilities.json (AgroVIR hosting capacity; MVCRI record)",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json (EI-06 mapping)",
+    "docs/tier3_project_instantiation/call_binding/topic_mapping.json (EO-08)",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (items 3, 5; VALIDATION_PARTNER, TRANSFER_PARTNER records)"
+  ]
+}

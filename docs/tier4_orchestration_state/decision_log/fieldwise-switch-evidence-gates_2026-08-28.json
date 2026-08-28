@@ -1,0 +1,42 @@
+{
+  "record_type": "decision_log_entry",
+  "decision_id": "fieldwise-switch-evidence-gates_2026-08-28",
+  "date": "2026-08-28",
+  "branch": "fieldwise-run-02",
+  "authority": "Operator rulings of 2026-08-28 (fieldwise-run-02-baseline_2026-08-28.json, ruling Q5); web evidence gathered in session.",
+  "title": "Closure of the three evidence gates the host switch rests on, plus the ATK hosting-record finding",
+  "gates": [
+    {
+      "id": "G1",
+      "what": "The official PLANTDIGISENSE score",
+      "status": "Assumed",
+      "closure": "70.40% per the researcher's CV, declared under key plantdigisense_official_score. The Evaluation Summary Report — the score of record — has not been retrieved; converting evidence is the ESR or the Funding & Tenders Portal record.",
+      "risk_note": "The switch is the safe course under either reading: at >=80% the resubmission bar would simply not apply, so the declared score cannot make the configuration worse."
+    },
+    {
+      "id": "G2",
+      "what": "The NCP/REA answer to the eligibility query of 2026-08-24",
+      "status": "Assumed",
+      "closure": "Declared reading under key resubmission_bar_reading: the bar keys on 'the same recruiting organisation and individual researcher', so a new recruiting organisation releases it, and an associated partner is not a recruiting organisation, so ELTE's continued seat does not re-trigger it. Converting evidence is the written NCP/REA answer (query at plans/reports/NCP_eligibility_query_2026-08-24.md).",
+      "risk_note": "The proposal text does not argue the bar; the declaration governs the internal eligibility position only."
+    },
+    {
+      "id": "G3",
+      "what": "ATK's PIC registration status",
+      "status": "Confirmed",
+      "closure": "PIC 866599553, active on CORDIS for ATK's current Horizon Europe participations (COUSIN 101135314, AI4SoilHealth 101086179, TUdi 101000224; legal name 'HUN-REN Agrartudomanyi Kutatokozpont', Brunszvik u. 2, 2462 Martonvásár; consulted 2026-08-28). An earlier participation under PIC 954478449 is marked ended, consistent with the network transformations.",
+      "risk_note": "Caveat recorded on the HOST record: the October 2025 HUN-REN transformation is recent; ATK's grants office should confirm the PIC and legal form survive it unchanged. A Part A verification, not a gate input."
+    }
+  ],
+  "additional_finding": {
+    "what": "ATK's prior MSCA hosting record",
+    "status": "Confirmed",
+    "finding": "YES — ATK coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (H2020 grant 752453, funding scheme MSCA-IF-EF-ST Standard European Fellowship, 2017-10-01 to 2019-09-30, EUR 146,239.20), verified on CORDIS 2026-08-28. This answers the open-decisions item 'whether ATK, or its predecessor centre, has hosted a funded MSCA fellow' and re-founds the institutional-readiness case (old editorial item A-7) on a real hosting record."
+  },
+  "impacted_artifacts": [
+    "docs/tier3_project_instantiation/working_assumptions.json (plantdigisense_official_score, resubmission_bar_reading)",
+    "docs/tier3_project_instantiation/consortium/partners.json (HOST pic, prior_msca_hosting)",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (PLANTDIGISENSE_SCORE, RESUBMISSION_BAR, HOST)",
+    "docs/tier3_project_instantiation/consortium/capabilities.json (ATK participant_capacity)"
+  ]
+}
