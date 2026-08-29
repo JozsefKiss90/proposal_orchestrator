@@ -1,0 +1,16 @@
+{
+  "decision_id": "scope_check_gantt_designer_2026-08-29T09-46-35Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "gantt_designer",
+  "phase_context": "phase_04_gantt_milestones",
+  "run_id_reference": "fieldwise-run-02",
+  "decision_description": "Phase 4 timeline places all 27 tasks and all 5 milestones (MS1-MS5) within months 1-30. The latest scheduled end month (month 30: WP5/T5.4 and MS5) equals the operator-confirmed project_duration_months (30) and is within the call-level maximum project duration of 36 months. The Tier 2A deliverable due-month upper bound could not be enforced because project_duration_months is null in section_schema_registry.json for MSCA-PF; the confirmed Tier 3 call-binding project duration of 30 months (24-month European Fellowship at HUN-REN ATK plus a 6-month AgroVIR placement under CC-07) governed the timeline_within_duration determination instead. The milestone-consistency-check returned 5/5 consistent with all verifiable criteria present, so no unresolved critical-path or milestone conflict remains.",
+  "alternatives_considered": [
+    "Bound the timeline against the call-level maximum of 36 months (max_project_duration_months in selected_call.json) rather than the confirmed 30-month project duration; rejected because the operator-confirmed project fact (project_duration_months = 30, Confirmed) is the authoritative project-specific duration and is the field read by phase_04_gate's timeline_within_duration check.",
+    "Treat the absent Tier 2A project_duration_months (null) as blocking and halt the gantt derivation; rejected because Tier 2A does not specify a value here (absence, not conflict), so the confirmed Tier 3 duration governs without a tier contradiction."
+  ],
+  "tier_authority_applied": "Tier 3 call_binding/selected_call.json project_duration_months = 30 (Confirmed); CLAUDE.md §7 Phase 4 gate condition (timeline fits within the call-specified duration)",
+  "rationale": "CLAUDE.md §7 Phase 4 requires that the timeline fit within the project duration constraint. Because Tier 2A section_schema_registry.json carries a null project_duration_months for MSCA-PF, the Confirmed Tier 3 project-specific duration of 30 months is the operative bound per the CLAUDE.md §3 authority hierarchy (Tier 3 supplies project-specific facts where Tier 2A is silent). All task and milestone end months (max = 30) fall within that bound and within the 36-month call-level maximum, so the timeline_within_duration gate condition is satisfied and the interpretation is recorded durably per CLAUDE.md §9.4 rather than held only in agent memory.",
+  "resolution_status": "resolved",
+  "timestamp": "2026-08-29T09:46:35Z"
+}

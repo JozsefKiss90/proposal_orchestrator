@@ -1,9 +1,9 @@
 {
   "schema_id": "orch.phase4.scheduling_constraints.v1",
-  "run_id": "49159a5c-42e9-4ad1-a3ae-a2f1d32bf22c",
-  "source_wp_structure_run_id": "bd337f0b-072d-43ec-b751-fd0572c96f88",
+  "run_id": "fieldwise-run-02",
+  "source_wp_structure_run_id": "fieldwise-run-02",
   "derived_from_artifact": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-  "normalization_timestamp": "2026-08-14T13:22:28.254619+00:00",
+  "normalization_timestamp": "2026-08-29T09:46:22.952648+00:00",
   "project_duration_months": 30,
   "wp_bounds": {
     "WP1": {
@@ -15,19 +15,34 @@
       "end_month": 14
     },
     "WP3": {
-      "start_month": 6,
+      "start_month": 4,
       "end_month": 18
     },
     "WP4": {
-      "start_month": 12,
-      "end_month": 21
+      "start_month": 1,
+      "end_month": 24
     },
     "WP5": {
-      "start_month": 16,
+      "start_month": 25,
       "end_month": 30
     }
   },
-  "strict_constraints": [],
+  "strict_constraints": [
+    {
+      "from": "WP4",
+      "to": "WP5",
+      "original_edge_type": "finish_to_start",
+      "action": "preserved",
+      "reason": "WP-level finish_to_start is feasible: WP4 ends M24, WP5 starts M25"
+    },
+    {
+      "from": "T4.3",
+      "to": "T5.1",
+      "original_edge_type": "finish_to_start",
+      "action": "preserved",
+      "reason": "task-level finish_to_start: enforceable temporal constraint"
+    }
+  ],
   "non_strict_constraints": [
     {
       "from": "WP1",
@@ -51,6 +66,13 @@
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
+      "from": "WP2",
+      "to": "WP4",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
       "from": "WP3",
       "to": "WP4",
       "original_edge_type": "data_input",
@@ -58,50 +80,64 @@
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
-      "from": "WP4",
-      "to": "WP5",
+      "from": "T1.2",
+      "to": "T2.1",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
-      "from": "WP3",
-      "to": "WP5",
+      "from": "T1.3",
+      "to": "T2.1",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T1.2",
+      "to": "T2.2",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T1.3",
+      "to": "T2.2",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
       "from": "T1.5",
-      "to": "WP3",
+      "to": "T3.3",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
     },
     {
-      "from": "WP3",
+      "from": "T2.2",
+      "to": "T3.5",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T2.5",
+      "to": "T4.2",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T2.6",
+      "to": "T4.2",
+      "original_edge_type": "data_input",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "from": "T3.5",
       "to": "T4.3",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP4",
-      "to": "T5.5",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP3",
-      "to": "T5.3",
-      "original_edge_type": "data_input",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "from": "WP3",
-      "to": "T5.4",
       "original_edge_type": "data_input",
       "action": "preserved",
       "reason": "data_input edge: no temporal ordering enforced"
@@ -140,6 +176,16 @@
     },
     {
       "edge": {
+        "from": "WP2",
+        "to": "WP4"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
         "from": "WP3",
         "to": "WP4"
       },
@@ -153,6 +199,16 @@
         "from": "WP4",
         "to": "WP5"
       },
+      "original_type": "finish_to_start",
+      "normalized_type": "strict",
+      "action": "preserved",
+      "reason": "WP-level finish_to_start is feasible: WP4 ends M24, WP5 starts M25"
+    },
+    {
+      "edge": {
+        "from": "T1.2",
+        "to": "T2.1"
+      },
       "original_type": "data_input",
       "normalized_type": "non_strict",
       "action": "preserved",
@@ -160,8 +216,28 @@
     },
     {
       "edge": {
-        "from": "WP3",
-        "to": "WP5"
+        "from": "T1.3",
+        "to": "T2.1"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T1.2",
+        "to": "T2.2"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T1.3",
+        "to": "T2.2"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",
@@ -171,7 +247,7 @@
     {
       "edge": {
         "from": "T1.5",
-        "to": "WP3"
+        "to": "T3.3"
       },
       "original_type": "data_input",
       "normalized_type": "non_strict",
@@ -180,7 +256,37 @@
     },
     {
       "edge": {
-        "from": "WP3",
+        "from": "T2.2",
+        "to": "T3.5"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T2.5",
+        "to": "T4.2"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T2.6",
+        "to": "T4.2"
+      },
+      "original_type": "data_input",
+      "normalized_type": "non_strict",
+      "action": "preserved",
+      "reason": "data_input edge: no temporal ordering enforced"
+    },
+    {
+      "edge": {
+        "from": "T3.5",
         "to": "T4.3"
       },
       "original_type": "data_input",
@@ -190,33 +296,13 @@
     },
     {
       "edge": {
-        "from": "WP4",
-        "to": "T5.5"
+        "from": "T4.3",
+        "to": "T5.1"
       },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
+      "original_type": "finish_to_start",
+      "normalized_type": "strict",
       "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "WP3",
-        "to": "T5.3"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
-    },
-    {
-      "edge": {
-        "from": "WP3",
-        "to": "T5.4"
-      },
-      "original_type": "data_input",
-      "normalized_type": "non_strict",
-      "action": "preserved",
-      "reason": "data_input edge: no temporal ordering enforced"
+      "reason": "task-level finish_to_start: enforceable temporal constraint"
     }
   ],
   "unresolved_constraints": []
