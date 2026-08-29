@@ -1,33 +1,33 @@
 {
   "schema_id": "orch.tier5.part_b_assembled_draft.v1",
-  "run_id": "845413cf-88d3-4137-9c3f-b5413e679323",
+  "run_id": "fieldwise-run-02",
   "sections": [
     {
       "section_id": "excellence",
       "criterion": "Excellence",
       "order": 1,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "word_count": 6852
+      "word_count": 5182
     },
     {
       "section_id": "impact",
       "criterion": "Impact",
       "order": 2,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/impact_section.json",
-      "word_count": 4801
+      "word_count": 3934
     },
     {
       "section_id": "implementation",
       "criterion": "Quality and efficiency of the implementation",
       "order": 3,
       "artifact_path": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
-      "word_count": 4088
+      "word_count": 3795
     }
   ],
   "consistency_log": [
     {
       "check_id": "CC-01",
-      "description": "Objective consistency across Excellence and Implementation sections, cross-checked against Tier 3 objectives.json",
+      "description": "Objective consistency across Excellence and Implementation sections, cross-checked to Tier 3 objectives.",
       "sections_checked": [
         "excellence",
         "implementation"
@@ -42,7 +42,7 @@
     },
     {
       "check_id": "CC-02",
-      "description": "Work-package reference consistency: WP IDs cited in Excellence (methodology) and Impact (pathway grounding) match the canonical WP1-WP5 list defined in Implementation wp_table_refs",
+      "description": "WP reference consistency: WP IDs cited in Excellence (methodology) and Impact (pathway grounding) match the canonical WP1-WP5 defined in Implementation.",
       "sections_checked": [
         "excellence",
         "impact",
@@ -50,11 +50,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Section wp_table_refs (Implementation), WP titles cross-read from Excellence 1.1/1.2 and Impact 2.2; canonical WP structure Tier 4 phase3_wp_design"
+      "source_basis": "Section content wp_table_refs (Implementation WP1-WP5); Excellence 1.2 and Impact 2.2 WP references"
     },
     {
       "check_id": "CC-03",
-      "description": "Partner name consistency across all three sections, cross-checked against Tier 3 partners.json legal_name/short_name (ELTE, MATE, MVCRI, AgroVIR, fellow, supervisors)",
+      "description": "Partner name consistency across all three sections, cross-checked to Tier 3 partners registry (ATK/HUN-REN ATK, ELTE, MATE, Krumatic, AgroVIR, MVCRI, and named individuals).",
       "sections_checked": [
         "excellence",
         "impact",
@@ -63,15 +63,12 @@
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
-        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-        "docs/tier5_deliverables/proposal_sections/impact_section.json",
-        "docs/tier5_deliverables/proposal_sections/implementation_section.json",
         "docs/tier3_project_instantiation/consortium/partners.json"
       ]
     },
     {
       "check_id": "CC-04",
-      "description": "Deliverable ID and title consistency for D1.1-D5.5 across Excellence, Impact and Implementation, including due months",
+      "description": "Deliverable ID consistency: D1.1-D5.2 titles and IDs referenced in Excellence, Impact and Implementation match the deliverable set.",
       "sections_checked": [
         "excellence",
         "impact",
@@ -79,33 +76,24 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Deliverable enumerations in Excellence 1.1, Impact 2.2/2.3 and Implementation 3.1; canonical deliverable titles/months Tier 4 phase8 canonical_reference_pack"
+      "source_refs": [
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+      ]
     },
     {
       "check_id": "CC-05",
-      "description": "Milestone ID consistency between Impact (pathway references) and Implementation (milestone_refs MS1-MS6)",
+      "description": "Milestone ID consistency: milestone references MS1-MS5 used consistently between Impact and Implementation.",
       "sections_checked": [
         "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Implementation milestone_refs MS1-MS6 and MS1(M6)/MS2(M12)/MS3(M16)/MS4(M20)/MS5(M23)/MS6(M30) definitions; Impact carries no conflicting milestone IDs"
+      "source_basis": "Implementation milestone_refs MS1-MS5; Impact pathway references"
     },
     {
       "check_id": "CC-06",
-      "description": "KPI consistency: KPIs K1-K11 referenced across Impact sub-sections 2.2 and 2.3 use consistent identifiers and target descriptions; Implementation does not restate KPI targets",
-      "sections_checked": [
-        "impact",
-        "implementation"
-      ],
-      "status": "consistent",
-      "inconsistency_note": null,
-      "source_basis": "Impact 2.2/2.3 KPI references K1-K11; Tier 3 impacts.json KPI definitions"
-    },
-    {
-      "check_id": "CC-07",
-      "description": "Impact claim grounding: every deliverable/WP cited by an Impact claim (D2.2, D3.2, D4.2, D4.3, D5.1, D5.3, D5.4, D5.5; WP2-WP5) exists in the Implementation work plan",
+      "description": "KPI consistency: KPI set (K1-K11, eleven KPIs) referenced consistently within Impact; no conflicting KPI definitions or targets appear in Excellence or Implementation.",
       "sections_checked": [
         "impact",
         "implementation"
@@ -113,24 +101,36 @@
       "status": "consistent",
       "inconsistency_note": null,
       "source_refs": [
-        "docs/tier5_deliverables/proposal_sections/impact_section.json",
-        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
+      ]
+    },
+    {
+      "check_id": "CC-07",
+      "description": "Impact claim grounding: each impact claim's cited mechanism (WP, deliverable, MVP, partner) exists in the Implementation work plan.",
+      "sections_checked": [
+        "impact",
+        "implementation"
+      ],
+      "status": "consistent",
+      "inconsistency_note": null,
+      "source_refs": [
+        "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
       ]
     },
     {
       "check_id": "CC-08",
-      "description": "Budget/resource claim consistency: person-month figures (fellow 30.0 PM; supervisor 2.5; co-supervisor 2.0; AgroVIR 3.0 in-kind) stated in Excellence 1.3 match Implementation 3.1 effort allocation",
+      "description": "Budget/resource claim consistency: person-month allocations and the AgroVIR operational footprint (>745,000 ha in eight countries) are stated only in Implementation and Impact and agree; no conflicting resource figures across sections.",
       "sections_checked": [
-        "excellence",
+        "impact",
         "implementation"
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Excellence 1.3 in-kind supervisory PM figures; Implementation 3.1 effort table and partner in-kind estimates; Tier 3 working_assumptions.json (declared assumed PM values)"
+      "source_basis": "Implementation 3.1 fellow/partner person-months and Impact 2.3/Implementation 3.2 AgroVIR footprint"
     },
     {
       "check_id": "CC-09",
-      "description": "Terminology consistency for key technical terms (validation ladder, Field Decision Value/FDV, hyperspectral-to-Sentinel transfer, DrR - Digital Agronomist, processing tomato, leakage-safe validation) across all three sections",
+      "description": "Terminology consistency: key terms (DrR web MVP, crop-transfer specification, model card, blocked temporal validation, irrigation-attention output, crop-configurable architecture) used consistently across all three sections.",
       "sections_checked": [
         "excellence",
         "impact",
@@ -138,11 +138,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Cross-section reading of canonical component/system names against Tier 3 objective titles and concept vocabulary"
+      "source_basis": "Cross-section content comparison of canonical technical terms"
     },
     {
       "check_id": "CC-10",
-      "description": "Section ordering and completeness: Excellence (1), Impact (2), Implementation (3) all present and in the MSCA-PF Part B criterion order",
+      "description": "Section ordering and completeness: all three criterion sections present and ordered Excellence (1), Impact (2), Implementation (3) per standard MSCA-PF/RIA Part B structure (application_forms template directory empty; standard ordering applied).",
       "sections_checked": [
         "excellence",
         "impact",
@@ -150,11 +150,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_basis": "Three section artifacts present with criterion fields; MSCA-PF Part B ordering from tier2a application_forms (msca af_he-msca-pf)"
+      "source_basis": "Standard Part B section order; three section artifacts present"
     },
     {
       "check_id": "CC-11",
-      "description": "Traceability footer consistency: each section has a non-empty traceability_footer.primary_sources and no_unsupported_claims_declaration consistent with validation_status.overall_status (none unresolved)",
+      "description": "Traceability footer consistency: all three sections carry non-empty traceability_footer.primary_sources; none declares no_unsupported_claims_declaration:true while overall_status is unresolved (all three are 'assumed').",
       "sections_checked": [
         "excellence",
         "impact",
@@ -162,15 +162,11 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_refs": [
-        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-        "docs/tier5_deliverables/proposal_sections/impact_section.json",
-        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
-      ]
+      "source_basis": "Section validation_status.overall_status and traceability_footer fields"
     },
     {
       "check_id": "CC-12",
-      "description": "Validation status aggregation (informational): all three sections report validation_status.overall_status = 'assumed', reflecting declared working assumptions (placement-host details, partner in-kind person-months) rather than unresolved contradictions; flagged for downstream review",
+      "description": "Validation status aggregation (informational): all three sections report overall_status 'assumed', reflecting operator-declared assumed items (partner acceptances, person-months, placement/access arrangements); flagged as a cross-section concern for downstream review, not a contradiction.",
       "sections_checked": [
         "excellence",
         "impact",
@@ -178,11 +174,7 @@
       ],
       "status": "consistent",
       "inconsistency_note": null,
-      "source_refs": [
-        "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-        "docs/tier5_deliverables/proposal_sections/impact_section.json",
-        "docs/tier5_deliverables/proposal_sections/implementation_section.json"
-      ]
+      "source_basis": "Section validation_status.overall_status = assumed across all three"
     }
   ],
   "traceability_footer": {
@@ -193,7 +185,8 @@
       "docs/tier3_project_instantiation/architecture_inputs/objectives.json",
       "docs/tier3_project_instantiation/consortium/partners.json",
       "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
-      "docs/tier3_project_instantiation/architecture_inputs/impacts.json"
+      "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json",
+      "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
     ],
     "no_unsupported_claims_declaration": true,
     "derivation_note": "Assembled draft inherits section-level proposal claim traceability from referenced section artifacts; this artifact adds only section index and cross-section consistency findings."
