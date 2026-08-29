@@ -1,163 +1,165 @@
 {
   "sub_section_id": "1.1",
   "title": "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
-  "content": "1.1 Quality and pertinence of the research and innovation objectives\n\nOverall objective and pertinence. FIELDWISE is a European Postdoctoral Fellowship carried out by Dr. Rositsa Cholakova and hosted by Eötvös Loránd University (ELTE), under the supervision of Prof. András Jung and the co-supervision of Dr. Roland Hollós. The action runs for 30 months, comprising a 24-month research fellowship at ELTE (M1-M24) and a 6-month non-academic placement at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (M25-M30). It targets a sharply defined and highly pertinent European problem. European agriculture is entering an increasingly water-constrained production environment: approximately 30% of EU territory is affected by seasonal water scarcity in an average year, and climate change is expected to intensify drought frequency and severity while increasing both the irrigated area and irrigation demand. For high-value horticultural field crops, inappropriate irrigation timing degrades productivity, fruit quality, water-use efficiency and economic return. The fellowship uses processing tomato as its model crop precisely because it is a demanding predictive-irrigation system, in which productivity depends strongly on the temporal interaction of water availability, atmospheric demand, developmental stage and irrigation management.\n\nThe scientific problem the objectives attack is a genuine gap in the state of practice rather than a restatement of it. The rapid expansion of Earth Observation, proximal sensing, IoT and machine learning has produced increasingly sophisticated crop-monitoring systems, yet agricultural machine learning is still evaluated predominantly through retrospective metrics (R², RMSE, F1-score, classification accuracy). A model can post excellent retrospective performance and remain unsuitable for irrigation management: related seasons, plots or fields may leak between training and test data, producing optimistically biased estimates; a model may learn environment-specific relationships tied to a particular soil, cultivar, management regime or year rather than transferable crop-water relationships; accurate identification of an already established stress condition may come too late to change the irrigation decision; and a model that transfers between research experiments may still fail on the heterogeneity and incomplete data of commercial farming. FIELDWISE therefore reframes the object of study from retrospective accuracy to prospective prediction, then to transferability, and finally to field-level decision value. This reframing is the source of the sub-section's pertinence: the objectives are constructed to interrogate exactly the failure modes that separate a publishable model from an operationally useful one.\n\nCentral research question. The objectives are organised around a single, testable central question: can physiologically grounded crop water stress in high-value processing tomato be forecast early enough to support irrigation decisions, while maintaining reliable predictive performance as the model moves from historical experimental observations to unseen seasons, from Hungary to Bulgaria, and ultimately from research fields to commercial farming conditions? This question decomposes into seven research questions (RQ1-RQ7) and six falsifiable hypotheses (H1-H6), which give every objective an explicit, checkable expectation rather than an open-ended aspiration.\n\nThe six research and innovation objectives. The fellowship pursues six objectives, each bound to a work package, a stated measurable output, and named deliverables that render it verifiable:\n\n- O1 - Construct a harmonised five-year MATE soil-plant-atmosphere dataset. Measurable output: a QC-controlled historical database and documented metadata. Delivered and verified through WP1 Historical Data and Target Design as D1.1 Harmonised historical database (M6) and D1.2 Data/target/validation protocol (M6).\n- O2 - Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability. Measurable output: a validated hyperspectral/Sentinel-compatible feature library. Delivered through WP2 Physiological Early Warning and Hyperspectral-to-Sentinel Transfer as D2.1 Physiological validation dataset (M14) and D2.2 Hyperspectral-to-Sentinel transfer library (M14).\n- O3 - Develop prospective uncertainty-aware crop water-stress forecasts. Measurable output: calibrated forecasts at actionable horizons. Delivered through WP3 Prospective and Uncertainty-Aware Prediction as D3.1 Comparative modelling benchmark (M18) and D3.2 FIELDWISE predictive engine/model card (M18).\n- O4 - Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation. Measurable output: an independent transferability benchmark. Delivered through WP4 Temporal and Cross-Country Transferability as D4.1 Temporal transferability benchmark (M21), D4.2 Hungary->Bulgaria transferability report (M21) and D4.3 Adaptation protocol (M21).\n- O5 - Quantify research->commercial-field operational transferability. Measurable output: an AgroVIR farmer-field evaluation. Delivered through WP5 Operational Transfer, Decision Value and Web MVP, evidenced by D5.2 Commercial-field transferability assessment (M30) and D5.4 AgroVIR functional/technical evaluation (M30).\n- O6 - Translate validated predictions into irrigation priority and a functional web MVP. Measurable output: a DrR web MVP plus Field Decision Value plus an AgroVIR requirements assessment. Delivered through WP5 as D5.1 DrR web MVP (M24), D5.3 Field Decision Value report (M30) and D5.5 FMIS integration roadmap (M30).\n\nAre the objectives measurable and verifiable? Yes, on three complementary levels. First, each objective carries an explicit measurable output (a QC-controlled database, a validated feature library, calibrated forecasts, an independent transferability benchmark, a farmer-field evaluation, a web MVP with a decision-value assessment), so completion is judged against a concrete artefact rather than a subjective claim. Second, each objective terminates in one or more dated, typed deliverables (datasets, software, reports) that an evaluator and a reviewer can inspect at fixed points in the timeline, spanning D1.3 Career Development Plan (M3) through the WP5 outputs at M30. Third, and most distinctively, the objectives are stated as falsifiable propositions: H3 predicts that performance on an unseen season will be lower than that obtained by conventional random validation, thereby quantifying temporal generalisation; H4 predicts a measurable performance drop when the model is transferred from MATE in Hungary to Институт по зеленчукови култури „Марица“ – Пловдив in Bulgaria, part of which limited local calibration and/or hierarchical modelling should recover; H5 predicts further degradation when moving from controlled research environments to farmer-managed commercial fields; and H6 predicts that the model with the highest retrospective accuracy will not necessarily deliver the greatest irrigation decision value. Because each hypothesis specifies a direction of effect that project evidence can confirm or refute, the objectives are verifiable in the strict sense: they can be shown to have failed. The methodological safeguards reinforce this - a leakage-safe validation design fixed in WP1, leave-one-year-out validation and an explicit zero-shot Hungary->Bulgaria transfer test in WP4 - so measured performance reflects genuine generalisation rather than optimistic in-sample scoring.\n\nAre they realistically achievable? Yes. The programme does not start from a conceptual base. The researcher has already initiated DrR - Digital Agronomist, a desktop research prototype operating on data from a scientific experimental field, which already demonstrates the technical feasibility of integrating soil-sensor information, field meteorological-station observations and Sentinel-2A data in a common digital environment; FIELDWISE supplies the missing scientific validation and transferability framework rather than a build from zero. The data foundation exists: an approximately five-year historical hyperspectral archive is available from MATE (Magyar Agrár- és Élettudományi Egyetem), so the source-domain dataset does not depend on a speculative new measurement campaign. The consortium is configured to service each objective end to end - ELTE contributes geoinformatics, EO time-series, Bayesian/hierarchical modelling and research-software deployment; MATE provides the experimental environment and primary scientific validation; MVCRI provides an independent contrasting-country processing-tomato environment for the cross-country test in O4; and AgroVIR provides the commercial farmer-field bridge for O5/O6. The scope is that of a single-researcher action executed by the fellow across all five work packages, sequenced through explicit inter-WP data dependencies (WP1 feeds WP2 and WP3; WP3 feeds WP4 and WP5; WP4 feeds WP5), which keeps the objectives proportionate to a 30-month fellowship. Ambition is thus paired with feasibility: each objective builds on a demonstrated capability, a real dataset and a partner able to supply the environment it needs.\n\nAmbition and going beyond the state of the art. FIELDWISE is ambitious because it does not seek a single incremental gain but a sequenced advance that reframes how agricultural AI is judged. Its ambition is expressed as six explicit transitions beyond current practice: (1) spectral proxy -> physiological target; (2) hyperspectral discovery -> satellite scaling; (3) static detection -> prospective prediction; (4) internal validation -> temporal transferability; (5) single-country modelling -> geographic transferability; and (6) research accuracy -> commercial-field decision value. Each transition answers a specific scientific gap identified in the concept: the physiological-target gap (G1), where stress is defined through physiologically meaningful plant responses rather than vegetation-index thresholds; the sensor-domain gap (G2), where proximal hyperspectral stress signatures are explicitly investigated for transfer to Sentinel-2; the temporal gap (G3), modelling stress trajectories and forecasting future stress rather than mapping current condition; the geographic-transferability gap (G4), tested by transferring the model to Bulgaria as an independent cross-country experiment; the operational-transferability gap (G5), bridged by the AgroVIR research-to-farmer-field step; and the decision-value gap (G6), addressed by introducing Field Decision Value (FDV) as a final evaluation layer.\n\nTwo elements make the advance qualitatively rather than incrementally ambitious. First, FIELDWISE establishes a methodological bridge between high-information proximal hyperspectral observation and scalable Sentinel-based prediction - resolving the tension between physiological richness and satellite scalability that has kept the two literatures apart - through spectral resampling, concurrent proximal/satellite observation and scale-aware calibration (H2). Second, it proposes a framework in which agricultural models are evaluated according to temporal, geographic and operational transferability, and ultimately field-level decision value, rather than retrospective accuracy alone. This ambition is disciplined by a four-step validation ladder that each stage could genuinely fail at, and whose design measures the failure rather than concealing it: MATE (scientific development and validation) -> MVCRI (cross-country transferability) -> AgroVIR farmer field (operational transferability) -> DrR Web MVP (research-to-operation delivery). Embedding the operational step inside a company that runs commercial farms, via the six-month non-academic placement, converts the operational-transfer claim from an assertion into structural evidence, which is the strongest available demonstration that the project takes its own hardest gap seriously. The objectives are therefore both pertinent - they map directly onto a documented European water-scarcity challenge and onto the specific weaknesses of accuracy-centred agricultural AI - and ambitious in a controlled, verifiable way, advancing the state of the art along a chain of transitions whose end point is transferable, operationally useful agricultural intelligence rather than a model confined to the field in which it was trained.",
+  "content": "## 1.1 Quality and pertinence of the project's research and innovation objectives\n\n**Problem and overarching aim.** Irrigation decisions in high-value horticulture are increasingly taken under water scarcity, yet the water-stress signals that drive those decisions are typically spectral proxies whose biological meaning, stability across seasons and operational transferability are rarely tested. FIELDWISE confronts this gap directly. Its overarching research and innovation aim is to establish whether a physiologically meaningful water-stress signal, discovered in a data-rich processing-tomato system, remains biologically valid across unseen seasons and a change of sensing scale, survives prospective validation under real commercial-farm conditions, and can be encoded in a crop-configurable decision-support framework that is later adaptable to other irrigated high-value horticultural crops. This central challenge is not a rhetorical framing but the explicit organising question of the work plan: can a water-stress signal remain biologically meaningful across seasons and sensing scales, survive prospective validation under real farmer conditions, and be encoded in a crop-configurable framework that can later be adapted to other crops. Processing tomato is chosen deliberately as the model crop because approximately five years (2022–2026) of heterogeneous physiological, soil, meteorological and proximal-spectral observations already exist at MATE, giving the objectives an evidentiary foundation rather than requiring a speculative new data campaign.\n\n**Pertinence.** The objectives are pertinent on the two axes the MSCA-PF Excellence criterion weighs together: scientific pertinence and pertinence to the fellow's development. Scientifically, they target a recognised weakness in agricultural remote sensing — the routine substitution of correlative spectral proxies and retrospective accuracy for biologically grounded, prospectively validated, operationally transferable stress prediction — in a domain (water use in irrigated horticulture) of clear European relevance. In terms of career development, the four objectives are structured as a single scientific thread that carries one concept through biological definition, leakage-safe modelling, unseen-condition validation, software implementation and industrial evaluation; executing that thread is precisely what completes the fellow's progression from plant physiologist/agronomist to an independent Agricultural Data Scientist, and it is delivered through an international move (a European Fellowship recruiting the researcher from Bulgaria to the host in Hungary) with inter-sectoral and interdisciplinary exposure. The objectives thus serve both the research problem and the fellowship's training purpose, satisfying the call's requirement that fellowships be provided to excellent researchers undertaking international mobility.\n\n**The four objectives, and why they are measurable and verifiable.** The programme is organised around four research and innovation objectives, each carrying a stated measurable output and each verified by named, dated deliverables so that achievement can be judged against evidence rather than assertion:\n\n- **O1 — Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target.** Measurable output: a QC-controlled common-variable matrix, a missingness/measurement-frequency map, and a target and validation protocol. Verification: the deliverables *Harmonised database/metadata and variable-availability map* and *Stress-target, feature-selection and validation protocol*.\n\n- **O2 — Develop a parsimonious, interpretable and uncertainty-aware predictive framework under HUN-REN supervision, with ELTE spectral/EO harmonisation, and separate reusable system components from crop-specific biological/calibration parameters.** Measurable output: a ranked predictor set; a primary model and a nonlinear benchmark where justified; a calibration/uncertainty assessment; a model card; and a crop-transfer specification. Verification: the deliverables *Primary model, benchmark and model card* and *Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification*.\n\n- **O3 — Prospectively validate the framework at an independent commercial farmer site equipped with project meteorological and soil sensing, supported by physiological, proximal, UAV and Sentinel observations.** Measurable output: a prospective validation dataset; an unseen-environment benchmark; a spatial scaling assessment; and a limited-recalibration protocol if required. Verification: the deliverables *Independent commercial-field validation dataset* and *Prospective transferability, uncertainty and limited-recalibration report*.\n\n- **O4 — Operationalise validated outputs in a crop-configurable DrR architecture through continuous Krumatic software development and AgroVIR requirements feedback, followed by industrial evaluation in M25-M30.** Measurable output: a web MVP with a validated processing-tomato module; an irrigation-attention output; a crop-extension specification; an AgroVIR requirements/interoperability report; and a post-MSCA integration and exploitation roadmap. Verification: the deliverables *Crop-configurable DrR web MVP with validated processing-tomato module*, *Pre-placement technical/usability requirements dossier*, *AgroVIR operational/interoperability assessment* and *Post-MSCA FMIS integration and exploitation roadmap*.\n\nMeasurability and verifiability are reinforced by two design choices. First, blocked temporal (unseen-year) validation and model-selection criteria are predefined before results are seen, so that success is judged against thresholds fixed in advance rather than chosen post hoc; calibration, uncertainty and interpretability are quantified rather than asserted. Second, the objectives map cleanly onto the project's research questions (RQ1–RQ5) and hypotheses (H1–H4) — for example, O1 operationalises the physiological-signature hypothesis, O3 tests the transferability hypothesis, and O4 tests the operational-relevance hypothesis — so each objective corresponds to a falsifiable claim with a defined output.\n\n**Realistically achievable.** The objectives are ambitious but bounded, and several features make them realistically deliverable within a 30-month action (a 24-month European Fellowship at the host followed by a six-month non-academic placement). The primary evidence base already exists (the 2022–2026 MATE archive), so the work begins from data rather than data collection. A working research prototype — DrR, the fellow's pre-existing, self-financed sensor/EO monitoring and data-integration tool — provides the software starting point for the web MVP rather than a green-field build. The supervisory environment supplies the complementary competences the objectives require: modelling and uncertainty analysis on the host side, and hyperspectral/UAV/Earth-observation scale harmonisation through the ELTE co-supervision strand. A parsimony principle (prefer the simplest adequate model; no deep-learning dependency) is adopted explicitly, matching model complexity to the available sample size and reducing the risk of over-fitting an ambitious pipeline to limited data. Finally, the single new instrumented commercial-farmer validation site is the minimum the prospective-validation logic requires, and a contingency route (a planned Bulgarian model garden at the Szentendre Skanzen) is held in reserve should primary-site access fail — so the highest-risk objective (O3) is protected without inflating the field programme.\n\n**Beyond the state of the art, and the extent of the ambition.** The project's ambition lies less in any single algorithm than in refusing four assumptions that are routinely conflated in crop-stress remote sensing, and in testing each of them explicitly within one validation chain. (i) It refuses the equation of a vegetation index with water stress, replacing spectral-proxy stress definitions with a physiologically defined water-stress target built on a harmonised, QC-controlled five-season evidence base. (ii) It refuses the equation of proximal indices with satellite indices, instead constructing an explicit scale bridge from leaf/proximal sensing through an ELTE hyperspectral/UAV layer to Sentinel-2 field-scale operational inputs. (iii) It refuses the equation of internal cross-validation with field transferability, moving from internal fit through blocked unseen-year validation to prospective validation at an independent commercial field, with the transfer gap from research experiments to a real production environment measured prospectively and any limited recalibration stated. (iv) It refuses the assumption that a tomato-trained model transfers unchanged to another crop, separating a reusable decision-support core from crop-specific physiological targets and calibration parameters and defining explicit crop-transfer and recalibration gates, so that the result is a crop-configurable framework for irrigated high-value horticulture rather than a single tomato model imposed on all crops. Cutting across all four, FIELDWISE moves the very definition of success beyond retrospective predictive accuracy toward demonstrated field-level decision value: the validated architecture is delivered as a continuously developed DrR web MVP (implemented with the software partner Krumatic), evaluated industrially through a non-academic placement at AgroVIR against operational and interoperability requirements, and given a defined post-MSCA replication route through MVCRI as a Hungary–Bulgaria scientific and mobility bridge. This combination — biological truth, rigorous transferability testing, sensing-scale integration and operationally evaluated decision support connected in a single chain and deliberately engineered for reuse beyond the development crop — is what places the objectives beyond the current state of the art and defines the level of ambition of the proposed work.",
   "claim_statuses": [
     {
-      "claim_id": "objectives_O1_O6",
-      "claim_summary": "The fellowship defines six R&I objectives O1-O6 with the exact titles and measurable outputs stated (harmonised five-year MATE dataset; hyperspectral early-warning signatures and Sentinel-2 transferability; prospective uncertainty-aware forecasts; temporal and Hungary->Bulgaria transferability; research->commercial-field operational transferability; translation to irrigation priority and a web MVP).",
+      "claim_id": "central_challenge",
+      "claim_summary": "FIELDWISE tests whether a physiologically meaningful water-stress signal survives unseen seasons, a change of sensing scale and prospective real-farm validation, and can be encoded in a crop-configurable decision-support framework.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
     },
     {
-      "claim_id": "measurable_outputs_per_objective",
-      "claim_summary": "Each objective carries a stated measurable output (QC-controlled historical database and documented metadata; validated hyperspectral/Sentinel-compatible feature library; calibrated forecasts at actionable horizons; independent transferability benchmark; AgroVIR farmer-field evaluation; DrR web MVP + Field Decision Value + AgroVIR requirements assessment).",
+      "claim_id": "development_crop_rationale",
+      "claim_summary": "Processing tomato is the model crop because ~5 years (2022-2026) of heterogeneous MATE data already exist, giving the objectives an evidentiary base.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
     },
     {
-      "claim_id": "deliverables_and_due_months",
-      "claim_summary": "Objectives are made verifiable through dated deliverables: D1.1 (M6), D1.2 (M6), D1.3 (M3), D2.1 (M14), D2.2 (M14), D3.1 (M18), D3.2 (M18), D4.1 (M21), D4.2 (M21), D4.3 (M21), D5.1 (M24), D5.2 (M30), D5.3 (M30), D5.4 (M30), D5.5 (M30) with the exact titles given.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-    },
-    {
-      "claim_id": "wp_structure_mapping",
-      "claim_summary": "Objectives map to WP1 Historical Data and Target Design, WP2 Physiological Early Warning and Hyperspectral-to-Sentinel Transfer, WP3 Prospective and Uncertainty-Aware Prediction, WP4 Temporal and Cross-Country Transferability, and WP5 Operational Transfer, Decision Value and Web MVP, with staged inter-WP data dependencies and leakage-safe validation, leave-one-year-out validation and a zero-shot Hungary->Bulgaria transfer test.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
-    },
-    {
-      "claim_id": "central_research_question",
-      "claim_summary": "The objectives are organised around a single central research question about forecasting physiologically grounded processing-tomato water stress early enough for irrigation decisions while maintaining reliability across seasons, from Hungary to Bulgaria, and from research to commercial fields.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "research_questions_RQ1_RQ7",
-      "claim_summary": "The programme decomposes into seven research questions RQ1-RQ7 addressing earliest reliable indicators, Sentinel-2 reproducibility of signatures, forecast lead time, cross-season/cross-country stability, local-calibration cost, commercial-field usefulness, and decision-value selection.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "hypotheses_H1_H6",
-      "claim_summary": "Six falsifiable hypotheses H1-H6 (physiological early warning, sensor transfer, temporal transfer, geographic transfer, operational transfer, decision value) give each objective a testable direction of effect; H3, H4, H5 and H6 are described with their predicted effects.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "scientific_gaps_G1_G6",
-      "claim_summary": "Six scientific gaps G1-G6 (physiological target, sensor-domain, temporal, geographic transferability, operational transferability, decision-value) are identified and each is addressed by a transition/objective.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "retrospective_accuracy_limitation",
-      "claim_summary": "Agricultural ML is predominantly evaluated by retrospective metrics (R2, RMSE, F1, accuracy) and can score well retrospectively while being unsuitable for irrigation management due to data leakage, environment-specific learning, late detection, and failure under commercial heterogeneity.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "six_transitions_beyond_sota",
-      "claim_summary": "Ambition beyond the state of the art is expressed as six transitions: spectral proxy->physiological target; hyperspectral discovery->satellite scaling; static detection->prospective prediction; internal validation->temporal transferability; single-country modelling->geographic transferability; research accuracy->commercial-field decision value.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
-    },
-    {
-      "claim_id": "validation_ladder",
-      "claim_summary": "A four-step validation ladder structures the ambition: MATE (scientific development and validation) -> MVCRI (cross-country transferability) -> AgroVIR farmer field (operational transferability) -> DrR Web MVP (research-to-operation delivery).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
-    },
-    {
-      "claim_id": "field_decision_value_layer",
-      "claim_summary": "FIELDWISE introduces Field Decision Value (FDV) as a final evaluation layer, since prediction performance does not automatically equal irrigation usefulness.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
-    },
-    {
-      "claim_id": "hyperspectral_to_sentinel_bridge",
-      "claim_summary": "The project establishes a methodological bridge between high-information proximal hyperspectral observation and scalable Sentinel-based prediction via spectral resampling, concurrent proximal/satellite observation and scale-aware calibration.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md; docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "drr_prototype_preliminary_work",
-      "claim_summary": "The researcher has already initiated DrR - Digital Agronomist, a desktop research prototype that demonstrates the feasibility of integrating soil-sensor, field meteorological-station and Sentinel-2A data; FIELDWISE supplies the missing validation and transferability framework rather than a build from scratch.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "mate_five_year_archive",
-      "claim_summary": "An approximately five-year historical hyperspectral archive (primarily handheld hyperspectral measurements) is available from MATE and underpins the source-domain dataset for O1/O2, so the data foundation is not a speculative new campaign.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "water_scarcity_30pct",
-      "claim_summary": "Approximately 30% of EU territory is affected by seasonal water scarcity in an average year, framing the European relevance of the objectives.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-    },
-    {
-      "claim_id": "processing_tomato_model_crop",
-      "claim_summary": "The fellowship uses processing tomato as its model crop because it is a demanding predictive-irrigation system where productivity depends on the temporal interaction of water availability, atmospheric demand, developmental stage and irrigation management.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "claim_id": "fellowship_structure_and_duration",
-      "claim_summary": "FIELDWISE is a European Postdoctoral Fellowship structured as a 30-month action: a 24-month research fellowship at ELTE (M1-M24) plus a 6-month non-academic placement at AgroVIR (M25-M30).",
+      "claim_id": "HOST",
+      "claim_summary": "Host/beneficiary is HUN-REN Centre for Agricultural Research (HUN-REN ATK), a European Fellowship recruiting the fellow from Bulgaria to Hungary.",
       "status": "confirmed",
       "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
     },
     {
-      "claim_id": "identity_spine_host_fellow_supervisors",
-      "claim_summary": "The action is carried out by Dr. Rositsa Cholakova, hosted by Eötvös Loránd University (ELTE), supervised by Prof. András Jung and co-supervised by Dr. Roland Hollós.",
+      "claim_id": "FELLOWSHIP_TYPE",
+      "claim_summary": "The action is a European Postdoctoral Fellowship with a six-month non-academic placement extension.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
     },
     {
-      "claim_id": "consortium_roles_for_objectives",
-      "claim_summary": "MATE provides the experimental environment and primary validation, MVCRI provides the independent contrasting-country Bulgarian environment for the cross-country test (O4), and AgroVIR provides the commercial farmer-field bridge for O5/O6.",
+      "claim_id": "DURATION",
+      "claim_summary": "The action runs 30 months: a 24-month European Fellowship at the host plus a 6-month non-academic placement at AgroVIR.",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md; docs/tier3_project_instantiation/project_brief/training_and_career_development.md; docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
     },
     {
-      "claim_id": "single_researcher_execution",
-      "claim_summary": "The fellow executes all five work packages as a single-researcher action, keeping the objectives proportionate to a 30-month fellowship.",
+      "claim_id": "objective_O1",
+      "claim_summary": "O1 harmonises the 2022-2026 MATE archive and defines a physiological water-stress target; measurable output = QC-controlled common-variable matrix, missingness map, target/validation protocol.",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json; docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "claim_id": "objective_O2",
+      "claim_summary": "O2 develops a parsimonious, interpretable, uncertainty-aware framework with ELTE spectral/EO harmonisation and separates reusable components from crop-specific parameters; outputs include model card and crop-transfer specification.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "claim_id": "objective_O3",
+      "claim_summary": "O3 prospectively validates the framework at an independent commercial farmer site with project sensing; outputs include prospective dataset, unseen-environment benchmark, limited-recalibration protocol.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "claim_id": "objective_O4",
+      "claim_summary": "O4 operationalises validated outputs in a crop-configurable DrR web MVP via Krumatic development and AgroVIR feedback, with industrial evaluation and a post-MSCA roadmap.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "claim_id": "deliverable_verification_set",
+      "claim_summary": "Each objective is verified by named deliverables (D1.1/D1.2/D1.3, D2.1/D2.2, D3.1/D3.2, D4.1/D4.2, D5.1/D5.2) with their exact titles.",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "predefined_validation_criteria",
+      "claim_summary": "Blocked temporal (unseen-year) validation and model-selection criteria are predefined, fixing success thresholds in advance and making results verifiable.",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
+    },
+    {
+      "claim_id": "objective_rq_hypothesis_mapping",
+      "claim_summary": "The objectives map onto research questions RQ1-RQ5 and hypotheses H1-H4 (e.g. O1 to the physiological-signature hypothesis, O3 to the transferability hypothesis, O4 to the operational-relevance hypothesis).",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "claim_id": "achievability_existing_archive",
+      "claim_summary": "Achievability is supported by the pre-existing 2022-2026 MATE archive, so work begins from data rather than a new collection campaign.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+    },
+    {
+      "claim_id": "achievability_drr_prototype",
+      "claim_summary": "The fellow's pre-existing, self-financed DrR prototype provides the software starting point for the web MVP.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+    },
+    {
+      "claim_id": "achievability_parsimony",
+      "claim_summary": "A parsimony principle (simplest adequate model; no deep-learning dependency) matches model complexity to sample size and reduces over-fitting risk.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+    },
+    {
+      "claim_id": "achievability_contingency_site",
+      "claim_summary": "A single new instrumented commercial-farmer validation site is used, with a Szentendre Skanzen contingency route held in reserve if primary-site access fails.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+    },
+    {
+      "claim_id": "beyond_sota_four_refused_assumptions",
+      "claim_summary": "The project's ambition is to refuse and explicitly test four commonly conflated assumptions (index=stress; proximal=satellite; cross-validation=field transfer; one crop model transfers unchanged).",
+      "status": "confirmed",
+      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
+    },
+    {
+      "claim_id": "transition_proxy_to_physiological",
+      "claim_summary": "Beyond SOTA: replacing spectral-proxy stress definitions with a physiologically defined water-stress target on a harmonised five-season base.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "transition_scale_bridge",
+      "claim_summary": "Beyond SOTA: an explicit proximal to hyperspectral/UAV to Sentinel-2 scale bridge for field-scale operational inputs.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "transition_prospective_validation",
+      "claim_summary": "Beyond SOTA: moving from internal fit through blocked unseen-year validation to prospective validation at an independent commercial field, quantifying the transfer gap.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "transition_crop_configurable",
+      "claim_summary": "Beyond SOTA: separating a reusable decision-support core from crop-specific targets/calibration with explicit crop-transfer/recalibration gates, yielding a crop-configurable framework.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "transition_research_to_operation",
+      "claim_summary": "Beyond retrospective accuracy: delivery as a DrR web MVP (with Krumatic), industrial evaluation at AgroVIR, and a post-MSCA MVCRI replication route as a Hungary-Bulgaria bridge.",
+      "status": "confirmed",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "career_trajectory_pertinence",
+      "claim_summary": "The objective chain consolidates the fellow's progression from plant physiologist/agronomist to an independent Agricultural Data Scientist.",
+      "status": "inferred",
+      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
+    },
+    {
+      "claim_id": "pertinence_call_scope",
+      "claim_summary": "The objectives are pertinent to the call scope: an excellent researcher undertaking international mobility under a European Postdoctoral Fellowship.",
+      "status": "confirmed",
+      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
     }
   ],
   "source_refs": [
     {
-      "tier": 2,
-      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
-    },
-    {
-      "tier": 2,
-      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
-    },
-    {
-      "tier": 2,
-      "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
-    },
-    {
       "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/project_brief/concept_note.md"
-    },
-    {
-      "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
-    },
-    {
-      "tier": 3,
-      "source_path": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
     },
     {
       "tier": 3,
       "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+    },
+    {
+      "tier": 3,
+      "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
     },
     {
       "tier": 3,
@@ -168,8 +170,12 @@
       "source_path": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
     },
     {
-      "tier": 4,
-      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
+      "tier": 2,
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+    },
+    {
+      "tier": 2,
+      "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
     },
     {
       "tier": 4,
@@ -178,10 +184,6 @@
     {
       "tier": 4,
       "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
-    },
-    {
-      "tier": 4,
-      "source_path": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
     }
   ]
 }

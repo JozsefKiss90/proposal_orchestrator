@@ -1,90 +1,68 @@
 {
   "schema_id": "orch.phase8.canonical_reference_pack.v1",
-  "run_id": "845413cf-88d3-4137-9c3f-b5413e679323",
+  "run_id": "fieldwise-run-02",
   "objectives": [
     {
       "id": "O1",
-      "title": "Construct a harmonised five-year MATE soil-plant-atmosphere dataset",
-      "measurable_target": "QC-controlled historical database and documented metadata",
+      "title": "Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target",
+      "measurable_target": "QC-controlled common-variable matrix; missingness/measurement-frequency map; target and validation protocol",
       "provenance": "confirmed"
     },
     {
       "id": "O2",
-      "title": "Identify physiologically meaningful hyperspectral early-warning signatures and establish their Sentinel-2 transferability",
-      "measurable_target": "Validated hyperspectral/Sentinel-compatible feature library",
+      "title": "Develop a parsimonious, interpretable and uncertainty-aware predictive framework under HUN-REN supervision, with ELTE spectral/EO harmonisation, and separate reusable system components from crop-specific biological/calibration parameters",
+      "measurable_target": "Ranked predictor set; primary model and nonlinear benchmark where justified; calibration/uncertainty assessment; model card; crop-transfer specification",
       "provenance": "confirmed"
     },
     {
       "id": "O3",
-      "title": "Develop prospective uncertainty-aware crop water-stress forecasts",
-      "measurable_target": "Calibrated forecasts at actionable horizons",
+      "title": "Prospectively validate the framework at an independent commercial farmer site equipped with project meteorological and soil sensing, supported by physiological, proximal, UAV and Sentinel observations",
+      "measurable_target": "Prospective validation dataset; unseen-environment benchmark; spatial scaling assessment; limited-recalibration protocol if required",
       "provenance": "confirmed"
     },
     {
       "id": "O4",
-      "title": "Quantify temporal and Hungary->Bulgaria geographic transferability and evaluate adaptation",
-      "measurable_target": "Independent transferability benchmark",
-      "provenance": "confirmed"
-    },
-    {
-      "id": "O5",
-      "title": "Quantify research->commercial-field operational transferability",
-      "measurable_target": "AgroVIR farmer-field evaluation",
-      "provenance": "confirmed"
-    },
-    {
-      "id": "O6",
-      "title": "Translate validated predictions into irrigation priority and a functional web MVP",
-      "measurable_target": "DrR web MVP + Field Decision Value + AgroVIR requirements assessment",
+      "title": "Operationalise validated outputs in a crop-configurable DrR architecture through continuous Krumatic software development and AgroVIR requirements feedback, followed by industrial evaluation in M25-M30",
+      "measurable_target": "Web MVP with validated processing-tomato module; irrigation-attention output; crop-extension specification; AgroVIR requirements/interoperability report; post-MSCA integration and exploitation roadmap",
       "provenance": "confirmed"
     }
   ],
   "outcomes": [
     {
       "id": "OC1",
-      "title": "A physiologically defined water-stress target and a Sentinel-2-transferable early-warning feature basis, replacing spectral-proxy stress definitions.",
+      "title": "A physiologically defined water-stress target with a harmonised, QC-controlled five-season evidence base, replacing spectral-proxy stress definitions.",
       "linked_objectives": [
-        "O1",
-        "O2"
+        "O1"
       ],
       "provenance": "confirmed"
     },
     {
       "id": "OC2",
-      "title": "A prospective, uncertainty-aware stress-forecasting capability at actionable horizons, in place of static detection.",
+      "title": "A parsimonious, interpretable, uncertainty-aware predictive framework whose reusable components are explicitly separated from crop-specific parameters, with a documented crop-transfer specification.",
+      "linked_objectives": [
+        "O2"
+      ],
+      "provenance": "confirmed"
+    },
+    {
+      "id": "OC3",
+      "title": "Quantified real-world transferability: the transfer gap from research experiments to an independent commercial field measured prospectively, with uncertainty and any limited recalibration stated.",
       "linked_objectives": [
         "O3"
       ],
       "provenance": "confirmed"
     },
     {
-      "id": "OC3",
-      "title": "Quantified temporal and Hungary-to-Bulgaria transferability of the predictive model, with a stated local-calibration cost for adapting it to a new agro-environment.",
+      "id": "OC4",
+      "title": "A research-to-operation delivery path: a crop-configurable web MVP carrying the validated tomato module, industrially evaluated by AgroVIR, with a named post-MSCA FMIS-integration and exploitation route and a Bulgarian replication route through MVCRI.",
       "linked_objectives": [
         "O4"
       ],
       "provenance": "confirmed"
     },
     {
-      "id": "OC4",
-      "title": "Evidence of field-level decision value under commercial farming conditions, enabling model selection by usefulness rather than retrospective accuracy.",
-      "linked_objectives": [
-        "O5",
-        "O6"
-      ],
-      "provenance": "confirmed"
-    },
-    {
       "id": "OC5",
-      "title": "A research-to-operation delivery path: an externally evaluated web MVP and a named post-MSCA FMIS integration route.",
-      "linked_objectives": [
-        "O6"
-      ],
-      "provenance": "confirmed"
-    },
-    {
-      "id": "OC6",
-      "title": "A researcher profile combining biological understanding, scalable geospatial prediction and operational decision support, carried by an agreed and reviewed Career Development Plan.",
+      "title": "A researcher profile consolidated as an Agricultural Data Scientist specialised in plant stress, Earth observation and decision support, carried by an agreed and reviewed Career Development Plan and the inter-sectoral placement.",
       "linked_objectives": [],
       "provenance": "confirmed"
     }
@@ -92,39 +70,39 @@
   "wps": [
     {
       "wp_id": "WP1",
-      "title": "Historical Data and Target Design",
-      "lead_partner": "DATA_PARTNER",
+      "title": "Data Harmonisation and Physiological Stress Definition",
+      "lead_partner": "HOST",
       "provenance": "confirmed"
     },
     {
       "wp_id": "WP2",
-      "title": "Physiological Early Warning and Hyperspectral-to-Sentinel Transfer",
-      "lead_partner": "DATA_PARTNER",
+      "title": "HUN-REN Modelling and ELTE Scale Harmonisation",
+      "lead_partner": "HOST",
       "provenance": "confirmed"
     },
     {
       "wp_id": "WP3",
-      "title": "Prospective and Uncertainty-Aware Prediction",
-      "lead_partner": "HOST",
+      "title": "Independent Commercial-Farmer Prospective Validation",
+      "lead_partner": "VALIDATION_SITE",
       "provenance": "confirmed"
     },
     {
       "wp_id": "WP4",
-      "title": "Temporal and Cross-Country Transferability",
-      "lead_partner": "DATA_PARTNER",
+      "title": "DrR Web MVP, Co-development and Exploitation Preparation",
+      "lead_partner": "SOFTWARE_PARTNER",
       "provenance": "confirmed"
     },
     {
       "wp_id": "WP5",
-      "title": "Operational Transfer, Decision Value and Web MVP",
-      "lead_partner": "HOST",
+      "title": "AgroVIR Non-Academic Placement",
+      "lead_partner": "VALIDATION_PARTNER",
       "provenance": "confirmed"
     }
   ],
   "deliverables": [
     {
       "deliverable_id": "D1.1",
-      "title": "Harmonised historical database",
+      "title": "Harmonised database/metadata and variable-availability map",
       "due_month": 6,
       "type": "dataset",
       "parent_wp": "WP1",
@@ -132,7 +110,7 @@
     },
     {
       "deliverable_id": "D1.2",
-      "title": "Data/target/validation protocol",
+      "title": "Stress-target, feature-selection and validation protocol",
       "due_month": 6,
       "type": "report",
       "parent_wp": "WP1",
@@ -148,95 +126,63 @@
     },
     {
       "deliverable_id": "D2.1",
-      "title": "Physiological validation dataset",
+      "title": "Primary model, benchmark and model card",
       "due_month": 14,
-      "type": "dataset",
+      "type": "report",
       "parent_wp": "WP2",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D2.2",
-      "title": "Hyperspectral-to-Sentinel transfer library",
+      "title": "Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification",
       "due_month": 14,
-      "type": "software",
+      "type": "report",
       "parent_wp": "WP2",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D3.1",
-      "title": "Comparative modelling benchmark",
+      "title": "Independent commercial-field validation dataset",
       "due_month": 18,
-      "type": "report",
+      "type": "dataset",
       "parent_wp": "WP3",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D3.2",
-      "title": "FIELDWISE predictive engine/model card",
+      "title": "Prospective transferability, uncertainty and limited-recalibration report",
       "due_month": 18,
-      "type": "software",
+      "type": "report",
       "parent_wp": "WP3",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D4.1",
-      "title": "Temporal transferability benchmark",
-      "due_month": 21,
-      "type": "report",
+      "title": "Crop-configurable DrR web MVP with validated processing-tomato module",
+      "due_month": 24,
+      "type": "software",
       "parent_wp": "WP4",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D4.2",
-      "title": "Hungary->Bulgaria transferability report",
-      "due_month": 21,
-      "type": "report",
-      "parent_wp": "WP4",
-      "provenance": "confirmed"
-    },
-    {
-      "deliverable_id": "D4.3",
-      "title": "Adaptation protocol",
-      "due_month": 21,
+      "title": "Pre-placement technical/usability requirements dossier",
+      "due_month": 24,
       "type": "report",
       "parent_wp": "WP4",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D5.1",
-      "title": "DrR web MVP",
-      "due_month": 24,
-      "type": "software",
+      "title": "AgroVIR operational/interoperability assessment",
+      "due_month": 30,
+      "type": "report",
       "parent_wp": "WP5",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D5.2",
-      "title": "Commercial-field transferability assessment",
-      "due_month": 30,
-      "type": "report",
-      "parent_wp": "WP5",
-      "provenance": "confirmed"
-    },
-    {
-      "deliverable_id": "D5.3",
-      "title": "Field Decision Value report",
-      "due_month": 30,
-      "type": "report",
-      "parent_wp": "WP5",
-      "provenance": "confirmed"
-    },
-    {
-      "deliverable_id": "D5.4",
-      "title": "AgroVIR functional/technical evaluation",
-      "due_month": 30,
-      "type": "report",
-      "parent_wp": "WP5",
-      "provenance": "confirmed"
-    },
-    {
-      "deliverable_id": "D5.5",
-      "title": "FMIS integration roadmap",
+      "title": "Post-MSCA FMIS integration and exploitation roadmap",
       "due_month": 30,
       "type": "report",
       "parent_wp": "WP5",
@@ -245,10 +191,10 @@
   ],
   "partners": [
     {
-      "short_name": "ELTE",
-      "legal_name": "Eötvös Loránd University (ELTE)",
+      "short_name": "ATK",
+      "legal_name": "HUN-REN Agrartudomanyi Kutatokozpont",
       "country": "Hungary",
-      "role": "Beneficiary and host organisation (sole beneficiary)",
+      "role": "Beneficiary, recruiting organisation and host (sole beneficiary)",
       "provenance": "confirmed"
     },
     {
@@ -259,35 +205,56 @@
     },
     {
       "short_name": "SUPERVISOR",
-      "legal_name": "Prof. András Jung",
-      "role": "Supervisor at the host institution",
+      "legal_name": "Dr. Roland Hollós",
+      "role": "Primary supervisor at the recruiting organisation (HUN-REN ATK)",
       "provenance": "confirmed"
     },
     {
       "short_name": "CO_SUPERVISOR",
-      "legal_name": "Dr. Roland Hollós",
-      "role": "Co-supervisor at the host institution",
+      "legal_name": "Prof. András Jung",
+      "role": "Co-supervisor, at associated partner ELTE",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "ELTE",
+      "legal_name": "Eötvös Loránd University (ELTE)",
+      "country": "Hungary",
+      "role": "Associated partner: remote-sensing, UAV/hyperspectral and geoinformatics environment",
       "provenance": "confirmed"
     },
     {
       "short_name": "MATE",
       "legal_name": "Magyar Agrár- és Élettudományi Egyetem",
       "country": "Hungary",
-      "role": "Primary experimental and data environment",
+      "role": "Source scientific environment: the 2022-2026 processing-tomato archive and the experimental/validation instrument base",
       "provenance": "confirmed"
     },
     {
       "short_name": "MVCRI",
       "legal_name": "Институт по зеленчукови култури „Марица“ – Пловдив",
       "country": "Bulgaria",
-      "role": "Cross-country transferability environment",
+      "role": "Post-MSCA replication and transferability route (NOT an in-action work-package participant)",
       "provenance": "confirmed"
     },
     {
       "short_name": "AgroVIR",
       "legal_name": "AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság",
       "country": "Hungary",
-      "role": "Operational and farmer-field evaluator; non-academic placement host",
+      "role": "Operational evaluator and non-academic placement host; requirements consultation from project start",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "Krumatic",
+      "legal_name": "КРУМАТИК ЕООД",
+      "country": "Bulgaria",
+      "role": "Associated partner: software development from project start and Bulgarian farmer-facing dissemination and uptake",
+      "provenance": "confirmed"
+    },
+    {
+      "short_name": "FARMER",
+      "legal_name": null,
+      "country": "Hungary",
+      "role": "Independent commercial-farmer prospective validation site",
       "provenance": "confirmed"
     }
   ],
@@ -311,27 +278,33 @@
       "provenance": "assumed"
     },
     {
-      "key": "person_months_MATE",
-      "declared_value": 2.4,
-      "checklist_ref": "DATA_PARTNER",
+      "key": "atk_agreement_to_host",
+      "declared_value": "HUN-REN ATK acts as recruiting organisation and beneficiary for the fellowship, hosting the fellow at the Agricultural Institute, Martonvásár, with workspace, integration into the hosting group, administrative support, and continuation of arrangements during the M25-M30 placement.",
+      "checklist_ref": "HOST",
       "provenance": "assumed"
     },
     {
-      "key": "person_months_MVCRI",
-      "declared_value": 1.5,
-      "checklist_ref": "TRANSFER_PARTNER",
+      "key": "atk_contact_person",
+      "declared_value": "Dr. Roland Hollós (hollos.roland@atk.hun-ren.hu) is the interim project contact until ATK names its administrative or grants-office contact.",
+      "checklist_ref": "HOST",
       "provenance": "assumed"
     },
     {
-      "key": "person_months_AgroVIR",
-      "declared_value": 3.0,
-      "checklist_ref": "VALIDATION_PARTNER",
+      "key": "hollos_supervisor_acceptance",
+      "declared_value": "Dr. Roland Hollós accepts the primary-supervisor role, with weekly technical sessions through the modelling-intensive work packages and the supervision routine of the governance record.",
+      "checklist_ref": "SUPERVISOR",
       "provenance": "assumed"
     },
     {
-      "key": "person_months_ELTE_supervisor",
+      "key": "person_months_ATK_supervisor",
       "declared_value": 2.5,
       "checklist_ref": "SUPERVISOR",
+      "provenance": "assumed"
+    },
+    {
+      "key": "jung_co_supervision_acceptance",
+      "declared_value": "Prof. András Jung accepts the co-supervisor role, carrying the hyperspectral/UAV/EO harmonisation strand as a substantive methodological role.",
+      "checklist_ref": "CO_SUPERVISOR",
       "provenance": "assumed"
     },
     {
@@ -341,21 +314,33 @@
       "provenance": "assumed"
     },
     {
+      "key": "elte_associated_partner_agreement",
+      "declared_value": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment and the co-supervisor.",
+      "checklist_ref": "EO_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "elte_instrument_access",
+      "declared_value": "The fellow conducts or co-conducts UAV and hyperspectral measurements with ELTE's DJI Matrice 350 RTK platform (Zenmuse L1/P1/H20T) and Ultris S5 / Cubert CUVIS cameras, supported by Dr. Zsófia Varga for flight planning, sensor operation and data acquisition, scheduled around key physiological measurement dates at the validation site; ELTE software environments are available for processing.",
+      "checklist_ref": "EO_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_MATE",
+      "declared_value": 2.4,
+      "checklist_ref": "DATA_PARTNER",
+      "provenance": "assumed"
+    },
+    {
       "key": "contact_person_MATE",
       "declared_value": "Dr. Sándor Takács",
       "checklist_ref": "DATA_PARTNER",
       "provenance": "assumed"
     },
     {
-      "key": "contact_person_AgroVIR",
-      "declared_value": "Zsuzsanna Balázs",
-      "checklist_ref": "VALIDATION_PARTNER",
-      "provenance": "assumed"
-    },
-    {
-      "key": "placement_supervisor_AgroVIR",
-      "declared_value": "Miklós Maróti",
-      "checklist_ref": "VALIDATION_PARTNER",
+      "key": "mate_data_rights",
+      "declared_value": "MATE grants the project rights and access to the 2022-2026 processing-tomato archive for the approved scientific purposes of FIELDWISE, with experimental metadata, under institutional data-use conditions to be documented before the action starts.",
+      "checklist_ref": "DATA_PARTNER",
       "provenance": "assumed"
     },
     {
@@ -365,38 +350,26 @@
       "provenance": "assumed"
     },
     {
-      "key": "researcher_orcid",
-      "declared_value": "0009-0008-3761-3106",
+      "key": "signatory_authority_MVCRI",
+      "declared_value": "The Director of the Maritsa Vegetable Crops Research Institute signs for the institute, with the Agricultural Academy countersigning where its statutes reserve the signature to the Academy. The post is held by Prof. Dr. Daniela Ganeva.",
+      "checklist_ref": "TRANSFER_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "mvcri_drr_independence",
+      "declared_value": "DrR - Digital Agronomist was initiated and developed by the fellow independently, using her own time and personal financial resources; it was not commissioned or financed by MVCRI, and MVCRI holds no ownership position in it.",
       "checklist_ref": "FELLOW",
       "provenance": "assumed"
     },
     {
-      "key": "elte_previous_msca_hosting",
-      "declared_value": "None. ELTE has not previously hosted a funded MSCA fellow.",
-      "checklist_ref": "HOST",
-      "provenance": "assumed"
-    },
-    {
-      "key": "placement_supervisor_title_AgroVIR",
-      "declared_value": "Senior research officer",
+      "key": "person_months_AgroVIR",
+      "declared_value": 3.0,
       "checklist_ref": "VALIDATION_PARTNER",
       "provenance": "assumed"
     },
     {
-      "key": "placement_workspace_AgroVIR",
-      "declared_value": "Desk or office space at AgroVIR for M25-M30, access to the FMIS development and staging environment, and access to the customer-data environment.",
-      "checklist_ref": "VALIDATION_PARTNER",
-      "provenance": "assumed"
-    },
-    {
-      "key": "agrovir_relevant_track_record",
-      "declared_value": "No participation in EU-funded research projects. AgroVIR's relevant track record is commercial rather than scientific: twenty years of practice in Hungarian commercial agriculture, and a farm management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in.",
-      "checklist_ref": "VALIDATION_PARTNER",
-      "provenance": "assumed"
-    },
-    {
-      "key": "placement_team_AgroVIR",
-      "declared_value": "The AgroVIR product development team responsible for the FMIS platform.",
+      "key": "contact_person_AgroVIR",
+      "declared_value": "Zsuzsanna Balázs",
       "checklist_ref": "VALIDATION_PARTNER",
       "provenance": "assumed"
     },
@@ -407,14 +380,87 @@
       "provenance": "assumed"
     },
     {
-      "key": "signatory_authority_MVCRI",
-      "declared_value": "The Director of the Maritsa Vegetable Crops Research Institute signs for the institute, with the Agricultural Academy countersigning where its statutes reserve the signature to the Academy. The post is held by Prof. Dr. Daniela Ganeva.",
-      "checklist_ref": "TRANSFER_PARTNER",
+      "key": "placement_supervisor_AgroVIR",
+      "declared_value": "Miklós Maróti",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "placement_supervisor_title_AgroVIR",
+      "declared_value": "Managing Director of AgroVIR",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "placement_arrangement_AgroVIR",
+      "declared_value": "The M25-M30 placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment. The fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment; AgroVIR provides the information and data extracts required for interoperability testing in protected form (coded or anonymised field identifiers, e.g. 'Field X'). The fellow works with the AgroVIR product development team responsible for the FMIS platform.",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "placement_team_AgroVIR",
+      "declared_value": "The AgroVIR product development team responsible for the FMIS platform.",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "agrovir_relevant_track_record",
+      "declared_value": "No participation in EU-funded research projects. AgroVIR's relevant track record is commercial rather than scientific: twenty years of practice in Hungarian commercial agriculture, and a farm management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in.",
+      "checklist_ref": "VALIDATION_PARTNER",
       "provenance": "assumed"
     },
     {
       "key": "placement_ip_ownership",
-      "declared_value": "Ownership of placement results follows the grant agreement default, vesting in ELTE as the beneficiary acting through the fellow; a written placement agreement between the fellow, ELTE and AgroVIR, concluded before the placement begins, will confirm this allocation and the access terms to the fellow's DrR background IP.",
+      "declared_value": "Ownership of placement results follows the grant agreement default, vesting in HUN-REN ATK as the beneficiary acting through the fellow; a written placement agreement between the fellow, HUN-REN ATK and AgroVIR, concluded before the placement begins, will confirm this allocation and the access terms to the fellow's DrR background IP.",
+      "checklist_ref": "VALIDATION_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "person_months_Krumatic",
+      "declared_value": 1.5,
+      "checklist_ref": "SOFTWARE_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "krumatic_independence",
+      "declared_value": "Krumatic's prior involvement in deploying the AgroVIR farm-management platform in Bulgaria is a commercial-deployment relationship, stated openly; no ownership, employment or family relationship between Krumatic and the fellow or another partner is known.",
+      "checklist_ref": "SOFTWARE_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "krumatic_sme_status",
+      "declared_value": "SME",
+      "checklist_ref": "SOFTWARE_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "farmer_field_access",
+      "declared_value": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
+      "checklist_ref": "VALIDATION_SITE",
+      "provenance": "assumed"
+    },
+    {
+      "key": "plantdigisense_official_score",
+      "declared_value": "70.40%",
+      "checklist_ref": "PLANTDIGISENSE_SCORE",
+      "provenance": "assumed"
+    },
+    {
+      "key": "resubmission_bar_reading",
+      "declared_value": "The 2026 resubmission bar ('proposals involving the same recruiting organisation and individual researcher ... must not be resubmitted') is released by changing the recruiting organisation: ATK as recruiting organisation with the same researcher is not barred, and ELTE's continued involvement as an associated partner does not re-trigger the bar, because an associated partner is not a recruiting organisation.",
+      "checklist_ref": "RESUBMISSION_BAR",
+      "provenance": "assumed"
+    },
+    {
+      "key": "elte_previous_msca_hosting",
+      "declared_value": "None. ELTE has not previously hosted a funded MSCA fellow.",
+      "checklist_ref": "EO_PARTNER",
+      "provenance": "assumed"
+    },
+    {
+      "key": "researcher_orcid",
+      "declared_value": "0009-0008-3761-3106",
+      "checklist_ref": "FELLOW",
       "provenance": "assumed"
     }
   ],
