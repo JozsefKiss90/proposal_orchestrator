@@ -1,107 +1,80 @@
 {
   "schema_id": "orch.tier5.implementation_section.v1",
-  "run_id": "2ba83477-54b7-4ea5-a26c-d1eca5c9215d",
+  "run_id": "fieldwise-run-02",
   "criterion": "Implementation",
   "sub_sections": [
     {
       "sub_section_id": "3.1",
       "title": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
-      "content": "## 3.1 Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages\n\n### Overall structure of the work plan\n\nFIELDWISE is a single-researcher European Fellowship of 30 months, comprising a 24-month research and training programme at the beneficiary Eötvös Loránd University (ELTE) (M1–M24) and a 6-month non-academic placement at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (M25–M30) under constraint CC-07. All research is executed by the experienced researcher, Dr. Rositsa Cholakova, who carries every work package; the partner organisations contribute environment, data, supervision and evaluation in kind. The work plan is organised into five scientific work packages that form a single, deliberately linear evidence chain — from raw data and target definition, through physiological signal discovery and predictive modelling, to transferability testing and operational validation — plus a continuous cross-cutting strand of management, training and dissemination that spans the whole action.\n\nThe five work packages, with their leads and durations, are:\n\n- **WP1 — Historical Data and Target Design** (M1–M6; lead: Magyar Agrár- és Élettudományi Egyetem, contributing: Eötvös Loránd University (ELTE)). Harmonises the five-year MATE hyperspectral, soil, meteorological and management archive, audits missingness and data quality, and — most importantly for the scientific claim — replaces spectral-proxy stress definitions with a physiologically grounded water-stress target and a leakage-safe validation design. Deliverables: **Harmonised historical database** (D1.1, M6), **Data/target/validation protocol** (D1.2, M6), and the **Career Development Plan** (D1.3, M3).\n- **WP2 — Physiological Early Warning and Hyperspectral-to-Sentinel Transfer** (M3–M14; lead: Magyar Agrár- és Élettudományi Egyetem, contributing: Eötvös Loránd University (ELTE)). Discovers physiologically meaningful hyperspectral early-warning signatures and establishes their reproducibility in Sentinel-2-resampled spectral space. Deliverables: **Physiological validation dataset** (D2.1, M14) and **Hyperspectral-to-Sentinel transfer library** (D2.2, M14).\n- **WP3 — Prospective and Uncertainty-Aware Prediction** (M6–M18; lead: Eötvös Loránd University (ELTE), contributing: Magyar Agrár- és Élettudományi Egyetem). Develops calibrated, uncertainty-aware, multi-horizon forecasts, benchmarking transparent baselines, tree-ensemble and Bayesian/hierarchical approaches. Deliverables: **Comparative modelling benchmark** (D3.1, M18) and **FIELDWISE predictive engine/model card** (D3.2, M18).\n- **WP4 — Temporal and Cross-Country Transferability** (M12–M21; lead: Magyar Agrár- és Élettudományi Egyetem, contributing: Институт по зеленчукови култури „Марица“ – Пловдив). Quantifies temporal (leave-one-year-out) transfer within the MATE data and Hungary-to-Bulgaria transfer to the independent MVCRI domain, and separates universal from site-specific predictors. Deliverables: **Temporal transferability benchmark** (D4.1, M21), **Hungary->Bulgaria transferability report** (D4.2, M21) and **Adaptation protocol** (D4.3, M21).\n- **WP5 — Operational Transfer, Decision Value and Web MVP** (M16–M30; lead: Eötvös Loránd University (ELTE), contributing: AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság). Translates validated predictions into irrigation-priority logic and a functional web MVP, evaluates field-level decision value under commercial conditions, and defines a post-MSCA integration route. Deliverables: **DrR web MVP** (D5.1, M24), **Commercial-field transferability assessment** (D5.2, M30), **Field Decision Value report** (D5.3, M30), **AgroVIR functional/technical evaluation** (D5.4, M30) and **FMIS integration roadmap** (D5.5, M30).\n\nSix milestones mark the verifiable transitions between phases: MS1 (M6, data and target readiness), MS2 (M12, a Sentinel-observable, physiologically meaningful early-warning signature established), MS3 (M16, the predictor ready for independent transferability testing), MS4 (M20, independent cross-country transferability quantified), MS5 (M23, the web MVP externally evaluated under farmer/operational conditions) and MS6 (M30, the non-academic placement completed from inside the host company). Each milestone attaches to a named deliverable and to a Steering Group go/no-go decision, so that no phase advances on the strength of an unverified predecessor.\n\n### Timing of the work packages and their components\n\nThe schedule is designed so that dependencies are respected while overlap is exploited to keep the fellowship productive throughout. WP1 front-loads the data foundation in the first six months. WP2 begins at M3 and overlaps WP1, because signature discovery can start on the parts of the archive already harmonised; the WP1→WP2 relationship is a data dependency, not strict sequencing. WP3 opens at M6 (the month WP1 closes), consuming both the leakage-safe validation design fixed by task T1.5 and the Sentinel-compatible feature basis emerging from WP2. WP4 starts at M12: its early temporal-validation tasks run on interim models, while the hard dependency — zero-shot MATE→MVCRI transfer (T4.3) — is scheduled after the WP3 engine (D3.2) is available. WP5 begins at M16 and is the longest work package; the predictive engine is transferred into the MVP only after scientific validation, and the operational-transfer conclusions depend on the WP4 cross-country findings.\n\nDeliverable due months follow this logic: D5.1 (the **DrR web MVP**) is deliberately dated M24, before the placement window opens, so that the M25–M30 placement is validation and transfer rather than first build. The one non-trivial sequencing question in the seed — D5.4 being claimed both by MS5 at M23 and by the placement window — is resolved in the finalised timeline by dating the **AgroVIR functional/technical evaluation** (D5.4) at M30 inside the placement and evidencing MS5 at M23 through the completed Field Decision Value assessment instead; the operational and interoperability assessment therefore belongs unambiguously to the placement and, together with the **FMIS integration roadmap** (D5.5), carries the MS6 verification.\n\nBecause this is a single-researcher action, the timeline is constrained so that concurrent work packages never demand more than one full-time equivalent of the fellow in any month; the finalised schedule closes with no unresolved scheduling constraints and no unresolved critical-path dependency. The critical path runs through the data foundation (T1.1, T1.4, MS1), the physiological-signal and modelling core (T2.2, T2.6, T3.4, T3.6, T3.7, MS3), the transferability adaptation (T4.6, MS4) and the operational transfer and placement (T5.4, T5.5, T5.6, MS6).\n\n### Gantt chart (months elapsed)\n\nThe chart below shows work packages, the placement, the continuous management/training/dissemination strand, and the elapsed-month position of each major deliverable, milestone and Steering Group decision point. Columns are months 1–30 (months elapsed, not calendar dates); each cell is one month.\n\n```\nMonth:                 1    5    10   15   20   25   30\n                       |    |    |    |    |    |    |\nWP1 Hist. Data/Target  ######........................\nWP2 Phys. EW / H2S     ..############................\nWP3 Prospective Pred.  .....#############............\nWP4 Transferability    ...........##########.........\nWP5 Oper./DrR MVP      ...............###############\nPlacement @ AgroVIR    ........................######\nMgmt/Training/Dissem.  ##############################\n\nMilestones:   MS1(M6)  MS2(M12)  MS3(M16)  MS4(M20)  MS5(M23)  MS6(M30)\nDeliverables: D1.3(M3); D1.1,D1.2(M6); D2.1,D2.2(M14); D3.1,D3.2(M18);\n              D4.1,D4.2,D4.3(M21); D5.1(M24); D5.2,D5.3,D5.4,D5.5(M30)\nSteering Group decision points: M6, M12, M16, M20, M27\nNon-academic placement (secondment-equivalent): AgroVIR, M25-M30\n```\n\nThe action contains one mobility event beyond the intersectoral placement: the fellow's incoming European-Fellowship move from Bulgaria to Hungary at the start of the action; there are no additional academic secondments in this single-beneficiary plan.\n\n### Appropriateness of the effort assigned to the work packages\n\nThe fellow's effort totals 30.0 person-months, equal to the action duration, since the fellow is the only MSCA-funded effort. It is distributed as: WP1 3.0 PM (10.0%), WP2 5.5 PM (18.3%), WP3 5.5 PM (18.3%), WP4 4.0 PM (13.3%), WP5 9.0 PM (30.0%), and the cross-cutting management/training/dissemination strand 3.0 PM (10.0%). This profile is proportionate to scientific weight and risk: the two knowledge-generating work packages (WP2, WP3) together take 36.6% of effort, while WP5 is the single largest allocation because it carries the operational MVP, the commercial-field decision-value evidence, and the six-month evaluated placement. WP1 is intentionally lean but front-loaded, because a robust target definition and leakage-safe split are prerequisites for every downstream claim. The tightest month band is M16–M21, where WP4 and WP5 run concurrently; the timeline keeps this within one FTE.\n\nPartner organisations contribute in-kind effort that is not funded or costed by MSCA-PF and therefore does not appear in the budget, but which substantiates the implementation narrative. The indicative in-kind estimates are: Magyar Agrár- és Élettudományi Egyetem 2.4 PM (supervision, data preparation and experiment access); Институт по зеленчукови култури „Марица“ – Пловдив 1.5 PM (WP4 trial hosting, ground and physiological measurement, and co-authorship of transfer-test outputs); AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság 3.0 PM (WP5 co-lead and placement host); and ELTE supervision of 2.5 PM (supervisor) and 2.0 PM (co-supervisor), giving an indicative partner in-kind total of 11.4 PM. These five figures are operator estimates to be confirmed with the partners; they are presented as indicative rather than committed, and the largest is deliberately AgroVIR's, as the only partner hosting the fellow. The co-supervisor, Dr. Roland Hollós, provides the methodological lead and quality assurance for model development and testing, concentrated in the modelling-intensive window (WP3–WP4).\n\n### Mechanisms to assess and mitigate risks\n\nRisk is managed through a standing governance cadence and an explicit, itemised risk register. Oversight rests with a Project Steering Group chaired by the supervisor, Prof. András Jung, which meets at five corrective decision points — M6, M12, M16, M20 and M27 — and issues a go/no-go verdict at each milestone gate. The first four points align with MS1–MS4 and were introduced specifically to answer a prior evaluation criticism by embedding structured corrective moments; the fifth, at M27, is a mid-placement review that ensures the evaluated M25–M30 placement is not left unmonitored. During the placement the fellow works on site under a named AgroVIR on-site supervisor, indicatively Miklós Maróti at senior-research-officer grade; these placement-supervision details are working assumptions pending confirmation by the host company. A monthly written progress record and quarterly review against the Career Development Plan (D1.3) provide continuous, documented tracking between decision points.\n\nThe project maintains a 13-entry risk register (R01–R13) covering both research and administrative/technical risks, each with a likelihood, an impact and a concrete mitigation. Representative research risks include: incomplete historical MATE information (R01, medium/high — mitigated by a common-data subset, quality flags and prospective augmentation); a hyperspectral index with no Sentinel equivalent (R02 — retain for physiological discovery, exclude from the operational model); spectral and spatial mismatch between proximal and satellite sensing (R03, R04 — spectral-response-function resampling with concurrent sensor comparison, and representative plot/zone aggregation); too few physiological stress events (R05 — targeted temporal sampling across stress gradients); cloud gaps (R06 — temporal windows and Sentinel-1 where scientifically useful); and the transferability risks that unseen-year, Hungary-to-Bulgaria and farmer-field performance may drop (R07, R08, R09 — expected, quantified, and addressed by limited local/Bayesian adaptation and input/model simplification where necessary). A distinctive design risk, that a prediction may be accurate but arrive too late to act on (R11, medium/high), is mitigated by making lead time a primary model-selection criterion rather than an afterthought. Administrative and technical risks include web development delay (R12, low/medium — modular development building on the existing DrR prototype) and the possibility that full AgroVIR integration proves infeasible (R13, medium/medium — in which case the MVP assessment plus the integration roadmap remain a successful endpoint).\n\nUnderpinning the register is an explicit risk philosophy that de-risks the science itself: the failure of zero-shot transfer is not project failure. If FIELDWISE establishes that a model trained at MATE cannot reliably transfer to Bulgaria without a defined amount of local calibration, that quantified transferability gap is itself a significant scientific finding. This framing means the transferability work packages produce publishable, decision-relevant knowledge regardless of the sign of the result, and it is reinforced by the fallback endpoints written into R09, R10, R12 and R13, so that no single technical outcome can leave the fellowship without demonstrable results.",
-      "word_count": 1811
+      "content": "## 3.1 Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages\n\n### Overall structure of the work plan\n\nFIELDWISE is a single-beneficiary MSCA Postdoctoral Fellowship: Dr. Rositsa Cholakova is recruited by and hosted at HUN-REN Agrartudomanyi Kutatokozpont (ATK) in Martonvásár, Hungary, under primary supervision by Dr. Roland Hollós (ATK) and co-supervision by Prof. András Jung at the associated partner Eötvös Loránd University (ELTE). It is a European Fellowship of 30 months: a 24-month research fellowship at HUN-REN Agrartudomanyi Kutatokozpont (M1-M24) followed by a six-month non-academic placement at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (M25-M30). There is no separate secondment; the placement is the inter-sectoral mobility element and is shown on the Gantt chart.\n\nThe work plan is organised into five work packages that follow the scientific logic of the objectives from raw evidence to operational uptake, so that each work package consumes a validated output of its predecessor rather than running in parallel silos:\n\n- WP1 - Data Harmonisation and Physiological Stress Definition (lead: HUN-REN Agrartudomanyi Kutatokozpont) delivers objective O1: it harmonises the heterogeneous 2022-2026 processing-tomato archive of Magyar Agrár- és Élettudományi Egyetem (MATE) into a QC-controlled common-variable matrix and fixes a physiologically meaningful water-stress target and a pre-registered validation protocol.\n- WP2 - HUN-REN Modelling and ELTE Scale Harmonisation (lead: HUN-REN Agrartudomanyi Kutatokozpont) delivers objective O2: it builds a parsimonious, interpretable, uncertainty-aware primary water-status model with one nonlinear benchmark where justified, separates reusable system components from crop-specific parameters, and defines the spectral/UAV/Sentinel scaling and crop-transfer specification.\n- WP3 - Independent Commercial-Farmer Prospective Validation (lead: the independent commercial-farmer validation site) delivers objective O3: it instruments an independent commercial field and measures the transfer gap of the historical model prospectively, with uncertainty and any limited recalibration stated openly.\n- WP4 - DrR Web MVP, Co-development and Exploitation Preparation (lead: КРУМАТИК ЕООД) delivers objective O4's build strand: it co-develops a crop-configurable DrR web MVP carrying the validated processing-tomato module and prepares the exploitation route and the placement evaluation protocol, using structured AgroVIR requirements consultation from M1.\n- WP5 - AgroVIR Non-Academic Placement (lead: AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság) delivers objective O4's evaluation strand: during the M25-M30 placement it evaluates the MVP operationally within a real farm-management-information-system environment and defines the post-MSCA integration and exploitation roadmap.\n\nThe plan carries eleven deliverables and five milestones. The deliverables are: D1.1 Harmonised database/metadata and variable-availability map (M6), D1.2 Stress-target, feature-selection and validation protocol (M6), D1.3 Career Development Plan (M3); D2.1 Primary model, benchmark and model card (M14), D2.2 Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification (M14); D3.1 Independent commercial-field validation dataset (M18), D3.2 Prospective transferability, uncertainty and limited-recalibration report (M18); D4.1 Crop-configurable DrR web MVP with validated processing-tomato module (M24), D4.2 Pre-placement technical/usability requirements dossier (M24); D5.1 AgroVIR operational/interoperability assessment (M30), D5.2 Post-MSCA FMIS integration and exploitation roadmap (M30). The Career Development Plan (D1.3) is front-loaded to M3 so that the training and career logic frames the whole fellowship, and is reviewed at each steering point.\n\nThe five milestones are decision gates rather than restatements of deliverables, each carrying a verifiable achievement criterion: MS1 Historical knowledge base and target definition complete (M6); MS2 Model and scale-transition framework ready for final prospective assessment (M14); MS3 Independent real-world transferability quantified (M18); MS4 MVP ready for industrial placement evaluation (M24); MS5 Industrial evaluation and placement completed (M30). MS4 is the pivotal gate: only a validated, externally-access-tested MVP passes into the industrial placement, so that the M25-M30 placement is never spent stabilising an immature tool. MS5 falls in the placement's last month, so the placement window is milestoned by construction and its completion is evidenced directly by D5.1 and D5.2.\n\n### Timing of the work packages and their components, and the critical path\n\nThe timeline fits comfortably within the 30-month duration. The confirmed schedule places WP1 in M1-M6, WP2 in M3-M14, WP3 in M4-M18, WP4 in M1-M24 and WP5 in M25-M30. Three design choices give the plan its robustness. First, WP4 runs continuously from M1 to M24: software co-development with КРУМАТИК ЕООД and AgroVIR requirements consultation (T4.4) begin at the outset rather than waiting for the science to finish, so the MVP integrates validated functions incrementally instead of in a risky end-load. Second, the field-dependent tasks of WP3 (installation T3.2 in M5-M7; coordinated physiological, proximal and thermal campaigns T3.3 in M7-M14; UAV and Sentinel acquisition T3.4 in M8-M15) are positioned to catch the growing season, and the securing of written field access (T3.1) is scheduled in M4-M6, well ahead of instrumentation. Third, the two temporally strict, finish-to-start couplings are honoured with slack: WP4 ends at M24 before WP5 starts at M25, and the migration of validated core functions (T4.3, M18-M22) precedes the placement evaluation (T5.1, M25-M27).\n\nThe critical path runs T1.3 (select the primary physiological stress target) -> T2.2 (develop the parsimonious primary model and benchmark) -> T3.5 (apply the historical model prospectively and quantify the transfer gap) -> T4.3 (migrate validated core functions toward the MVP) -> T5.1 (operational evaluation at AgroVIR). This is exactly the scientific spine of the proposal - target definition, modelling, prospective validation, productisation, industrial evaluation - which means the schedule protects the highest-value chain of work. The inter-WP dependencies are explicit: WP1 feeds WP2 and WP3 (the common-variable matrix, the stress target and the pre-registered protocol govern both), WP2 feeds WP3 (T3.5 applies the WP2 historical model prospectively) and WP4 (T4.2 implements the WP2 reusable/crop-specific separation), WP3 feeds WP4 (only the WP3-validated module migrates into D4.1), and WP4 gates WP5 through the MS4 MVP-ready check. The dependency graph is acyclic and no critical-path dependency is left unresolved.\n\n### Appropriateness of the effort assigned to work packages\n\nThe fellow's 30 person-months are distributed to match where the intellectual load lies: WP1 3.0 PM, WP2 6.0 PM, WP3 6.6 PM, WP4 6.0 PM, WP5 5.4 PM, and 3.0 PM cross-cutting (supervision cadence, training, open-science and reporting), totalling 30.0 PM. The weighting is science-heavy and honest: the two most demanding and most novel strands - modelling (WP2) and the independent prospective validation with its field campaigns (WP3) - together take almost half the fellow's time, while WP1 is deliberately lean because it reuses an existing archive rather than mounting a new data campaign. The build (WP4) and the industrial placement (WP5) are resourced enough to deliver a working MVP and a substantive operational evaluation without displacing the research core.\n\nThe fellow's effort is complemented by partner in-kind contributions that are stated as operator-declared estimates pending written partner confirmation: approximately 2.5 PM from the ATK supervisor, 2.0 PM from the ELTE co-supervisor, 3.0 PM from AgroVIR (the only partner hosting the fellow, and correspondingly the largest partner figure), 2.4 PM from MATE and 1.5 PM from КРУМАТИК ЕООД. These figures were built bottom-up from the accepted governance cadence and role descriptions and are to be verified with each partner before the grant; they are presented here as declared assumptions, not as confirmed commitments.\n\n### Mechanisms to assess and mitigate risks\n\nThe project carries a ten-row risk register spanning research and administrative risks, each with a likelihood (L/M/H), impact (L/M/H) and a concrete mitigation, and it is anchored by an explicit risk philosophy: a drop in prospective performance is treated as a scientific result to be quantified with stated uncertainty and addressed by limited, transparent recalibration, never hidden. The register is:\n\n- R01 Historical MATE variables differ among years (L=M, I=H): use an explicit year-by-variable matrix; harmonise only defensible common variables; retain year-specific measurements as secondary information.\n- R02 Effective biological sample size is limited (L=M, I=H): use repeated-measure/hierarchical structure, conservative feature reduction and parsimonious modelling; no deep-learning dependency.\n- R03 Farmer site lacks modern monitoring infrastructure (L=H, I=M): install a project meteorological station and soil sensors before the validation campaign; define maintenance and data-quality responsibilities.\n- R04 Primary farmer access changes or is interrupted (L=M, I=H): secure written access; maintain the Szentendre Skanzen model-garden route as a contingency subject to formal agreement and scientific suitability.\n- R05 ELTE instrument access or timing is constrained (L=M, I=H): use a written equipment/operation schedule; prioritise key physiological dates; retain physiology/proximal sensing as the core pathway if individual UAV campaigns are missed.\n- R06 Field geometry or clouds limit Sentinel-2 interpretation (L=H, I=M): use Sentinel only where valid pixels support field-scale inference; rely on UAV/proximal observations for finer spatial scales.\n- R07 Prospective performance drops (L=M, I=H): treat transfer loss as a scientific result; quantify uncertainty and use limited transparent recalibration rather than hiding the gap.\n- R08 Krumatic web development is delayed (L=M, I=M): develop incrementally from the existing desktop prototype; scientific deliverables remain primary; prioritise validated core functions over feature breadth.\n- R09 AgroVIR cannot provide proprietary/customer data (L=L, I=M): design the placement around usability/interoperability requirements and protected/coded extracts; unrestricted customer-system access is not a project dependency.\n- R10 MATE-derived assets have commercial restrictions (L=M, I=H): use for approved research; maintain a background/foreground inventory and conduct an institutional data-rights/IP assessment before commercial exploitation.\n\nThe register is designed so that no single point of failure can stall the fellowship. The highest-exposure external dependencies each have a pre-planned fallback that keeps the science intact: field-site loss is covered by the Szentendre Skanzen contingency (R04, and the standing T3.6 task) and by installing the project's own meteorological and soil instrumentation (R03), so the validation does not rely on pre-existing farm infrastructure; the UAV and hyperspectral campaigns run with ELTE's instruments under a written equipment schedule, and if individual flights are missed the physiology and proximal-sensing pathway remains the core route (R05, R06); software slippage is de-risked by incremental development from the existing prototype while scientific deliverables stay primary (R08); and the placement is deliberately architected to need no proprietary or customer-data access, relying on protected, coded extracts (R09), which is why its likelihood/impact is the lowest in the table. The parsimony discipline (R01, R02) directly answers the small-sample, heterogeneous-archive reality of the data.\n\nRisk is monitored, not merely catalogued. A Project Steering Group meets at five points - M6, M14, M18, M24 and M27 - and issues a go/no-go verdict on milestones MS1-MS5; the four scheduled verdict points coincide with the milestone months so that no work package advances past a failed gate, and the retained M27 point provides a mid-placement review so the evaluated M25-M30 placement never runs unmonitored. The Career Development Plan is reviewed at the same five points. Administrative risks are handled through the same governance: the written field-access arrangement with the commercial farmer (T3.1), the MATE data-use conditions, the ELTE instrument-access schedule and the placement arrangement with AgroVIR are all being confirmed in writing before the action starts, and until they are they are carried as declared assumptions rather than as settled fact, so the plan is transparent about what remains to be closed at grant preparation.\n\n### Gantt chart (months elapsed)\n\nThe chart below shows the work packages, major deliverables (D), milestones (MS) and the M25-M30 non-academic placement against elapsed project months 1-30. There is no secondment (European Fellowship); the placement is the mobility element shown on WP5.\n\n```\n                              1         2         3\nMonth (elapsed):    123456789012345678901234567890\n                    ------------------------------\nWP1  Data/stress    ######........................\nWP2  Modelling      ..############................\nWP3  Field valid.   ...###############............\nWP4  DrR MVP        ########################......\nWP5  Placement      ........................######\n                    ------------------------------\nMarkers:            ..^..^.......^...^.....^.....^\n                    ------------------------------\n  M3  : D1.3 (Career Development Plan)\n  M6  : D1.1, D1.2  | MS1 Historical knowledge base and target definition complete\n  M14 : D2.1, D2.2  | MS2 Model and scale-transition framework ready for final prospective assessment\n  M18 : D3.1, D3.2  | MS3 Independent real-world transferability quantified\n  M24 : D4.1, D4.2  | MS4 MVP ready for industrial placement evaluation\n  M30 : D5.1, D5.2  | MS5 Industrial evaluation and placement completed\n\nPlacement (non-academic, AgroVIR): M25-M30, mainly remote with monthly\n  face-to-face technical reviews (WP5).\nCritical path: T1.3 -> T2.2 -> T3.5 -> T4.3 -> T5.1.\n```\n\nThe Gantt is included within the 10-page limit for Part B Sections 1-3 and shows months elapsed rather than calendar dates, as required. It makes the plan's logic legible at a glance: an early knowledge-base and training gate (M6), a modelling gate (M14), the decisive independent-validation gate (M18), the MVP-ready gate (M24) that admits the placement, and the closing industrial-evaluation gate (M30).",
+      "word_count": 2022
     },
     {
       "sub_section_id": "3.2",
       "title": "Quality and capacity of the host institutions and participating organisations, including hosting arrangements",
-      "content": "## 3.2 Quality and capacity of the host institutions and participating organisations, including hosting arrangements\n\n### Structure of the action and applicability of the Global Fellowship provisions\n\nFIELDWISE is a single-beneficiary MSCA Postdoctoral Fellowship. The sole beneficiary and host organisation is Eötvös Loránd University (ELTE), which carries the beneficiary obligations for the full 30 months of the action. FIELDWISE is a European Fellowship, built on the experienced researcher's intra-EU move from Bulgaria to Hungary; it therefore has no outgoing phase and no non-associated Third Country host, and the Global Fellowship requirement to outline both an outgoing Third Country host and a European return host does not apply to this proposal. Around the beneficiary, three participating organisations contribute environment, data, supervision and evaluation in kind: Magyar Agrár- és Élettudományi Egyetem and Институт по зеленчукови култури „Марица“ – Пловдив take part as associated partners, and AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság takes part as the non-academic placement host for the M25–M30 window under constraint CC-07. The placement is an optional non-academic sector placement of the kind the call foresees and is presented here as an integral, evaluable element of the action, with its added value for the researcher's career development set out below and in §1.3. None of the participating organisations is a beneficiary; each is an entity the single-researcher work plan assigns activity to, and their infrastructure, logistics and facilities are detailed further in Part B-2 Section 5.\n\n### Quality and capacity of the host institution — Eötvös Loránd University (ELTE)\n\nThe fellow is hosted in the Faculty of Informatics, Institute of Cartography and Geoinformatics of Eötvös Loránd University (ELTE), at H-1117 Budapest, Pázmány Péter sétány 1/C, and specifically within the institute's remote-sensing group, which is the interdisciplinary team the fellow joins. Supervision is deliberately interdisciplinary within the beneficiary itself: the co-supervisor sits in the ELTE Department of Meteorology, a different department from the hosting institute, so the beneficiary supplies both the geoinformatics/Earth-observation environment and the machine-learning and modelling expertise the work plan needs, without recourse to an external partner for either.\n\nELTE is the primary methodological and training environment of the action, covering geoinformatics, Earth observation, advanced and uncertainty-aware modelling, transferability analysis and research integration. Its GIS and Remote Sensing Laboratory provides the physical capability on which the physiological-signal and hyperspectral-to-Sentinel work depends: a DJI Matrice 350 RTK industrial drone with RTK GPS; DJI Zenmuse L1 (LiDAR and RGB), DJI Zenmuse P1 (45 MP photogrammetry) and DJI Zenmuse H20T (thermal, zoom, wide) payloads; an Ultris S5 hyperspectral camera covering the VIS–NIR narrow bands; and a Cubert CUVIS Lab Lite hyperspectral-imaging package with calibration tools. The Ultris S5 and the Cubert CUVIS are the institute's own hyperspectral capability and are the instruments the hyperspectral-to-Sentinel resampling in WP2 relies on. On the software and computation side the laboratory offers licensed ArcGIS, ENVI and MATLAB alongside Google Earth Engine, QGIS, SNAP, Python and R, high-performance computing clusters for AI and large-scale geospatial analysis, and secure storage and backup for large remote-sensing datasets, complemented by ELTE library, IT services and open-science repositories. This inventory is a current snapshot maintained by the institute and covers every computational and sensing resource the work plan calls on.\n\nThe scientific standing of the hosting group is evidenced by its recent output, taken from the publication record of the supervisor, Prof. András Jung: Szabó, Jung, Varga, Hajdú, Revoly, Lausch, Vohland and Sipos (2025), Agronomy 15(12), 2860; Kundathil, Varga, Szalay, Sipos and Jung (2025), Applied Sciences 15(22), 12254; Lausch, Bumberger, Jung, Pause, Selsam, Zhou and Herzog (2025), Agriculture 15(21), 2233; and Lin, Jing, Li and Jung (2024), IEEE Geoscience and Remote Sensing Letters 21. The three 2025 items are Earth-observation and agricultural-monitoring work that is directly adjacent to the crop-monitoring methods FIELDWISE uses; the 2024 letter evidences deep-learning method breadth. FIELDWISE claims this record as adjacency and demonstrated capability in EO for agriculture rather than as identical prior work on crop-stress prediction.\n\nSupervision is provided by two named ELTE staff and no others. The supervisor, Prof. András Jung, is a Professor at the Institute of Cartography and Geoinformatics working in remote sensing, hyperspectral imaging and field spectroscopy, geospatial technologies and environmental monitoring; he chairs the Project Steering Group and is the escalation point in the supervision structure. The co-supervisor, Dr. Roland Hollós, of the ELTE Department of Meteorology, works on machine learning and meta-modelling of crop and grassland multi-model outputs and on agro-meteorology, and provides the methodological lead and quality assurance for model development and testing across WP3 and WP4; the fellow designs, builds and runs the models, while the co-supervisor quality-assures them. The mentoring cadence that binds this structure — weekly one-to-ones with the supervisor, weekly technical sessions with the co-supervisor through the modelling-intensive window and quarterly review against the Career Development Plan — is set out in §3.1 and is not repeated here.\n\nHonesty about hosting history is material to the evaluation. ELTE has not previously hosted a funded MSCA fellow. It has, however, hosted an MSCA Postdoctoral Fellowship application with the same fellow and the same supervisor — PLANTDIGISENSE (HORIZON-MSCA-2025-PF, proposal 101284764), which scored 70.40% against a 70.00 threshold — so the institution has demonstrably prepared to host this researcher and this project before, and FIELDWISE is a considered resubmission rather than a first, untested pairing. This is stated as an application record and an established supervisory relationship, not as prior funded-hosting experience the institution does not have.\n\n### Hosting arrangements, integration and support services\n\nThe hosting arrangements ELTE provides for the fellow are: a dedicated office and laboratory space at ELTE; full integration into the institute's research groups, with weekly meetings and interdisciplinary workshops; administrative and technical support for relocation, project management, procurement and dissemination; access to short-term training courses; and participation in international networks (COST Actions, and FAO and EU webinars). These arrangements were established for the same applicant, host, institute and supervisor and are institutional facts about how ELTE integrates and supports an incoming fellow. Integration is reinforced by a genuinely bidirectional knowledge exchange, described in §1.3: ELTE transfers geoinformatics, EO time-series analysis, hyperspectral-to-multispectral transfer, spatio-temporal and Bayesian hierarchical modelling, uncertainty quantification, transfer learning and reproducible geospatial computation to the fellow, while the fellow brings plant physiology, horticultural crop science, water-stress experimentation, physiological phenotyping and the biological interpretation of Earth observation into the hosting group. ELTE remains the beneficiary and the fellow's home institution across the whole 30-month action, including during the M25–M30 non-academic placement, which is an intersectoral extension of the European Fellowship rather than a change of host.\n\n### Quality and capacity of the participating organisations\n\n**Magyar Agrár- és Élettudományi Egyetem — primary experimental and data environment (associated partner).** Through its Institute of Horticultural Sciences, Magyar Agrár- és Élettudományi Egyetem supplies the five-year source-domain dataset, the processing-tomato experimental environment, the hyperspectral, soil and weather information and the primary scientific validation on which model development rests; it is the source domain for the WP4 transfer test. Its scientific capacity is the best-evidenced of the three participating organisations: it coordinates the AGRIGEP project (grant 101094158, verified on CORDIS), and the Institute of Horticultural Sciences has recent, directly relevant publications, including Takács, Helyes, Ilahy, Daood and Pék (2026, Smart Agricultural Technology 15) on predicting water-stress-related traits in open-field tomato — the same crop and stress as FIELDWISE — together with Silva e Souza et al. (2026, Horticulturae 12(7), 896) and Kuchár et al. (2026, Agronomy 16(8), 844). The organisational contact and the partner's representative on the Steering Group is Dr. Sándor Takács of the Institute of Horticultural Sciences, who is an author on all three of those publications, so the source-domain claim is anchored on evidence rather than on assertion. In addition, Prof. Gábor Milics — a full professor at Magyar Agrár- és Élettudományi Egyetem in Gödöllő, Hungary's country representative to the International Society of Precision Agriculture and a specialist in remote sensing for precision agriculture — advises the fellow personally, adding a second scientific-advisory strand outside the formal governance structure.\n\n**Институт по зеленчукови култури „Марица“ – Пловдив — cross-country transferability environment (associated partner).** Институт по зеленчукови култури „Марица“ – Пловдив (MVCRI) is a public research institute of the Bulgarian Agricultural Academy and provides the independent Bulgarian processing-tomato environment required for cross-country scientific transferability; its role is specifically the Hungary→Bulgaria transfer test rather than a simple increase in sample size. The relevant department is Technologies in Vegetable Crops Production, headed by Prof. Vinelina Yankova (entomology, vegetable production and breeding), whose remit is precisely the one the WP4 Bulgarian transfer test sits within; a second department, Breeding, Variety Maintenance and Introduction, is headed by Assoc. Prof. Stanislava Grozeva. Prof. Vinelina Yankova is the partner's contact and its seat on the Steering Group. The institute's recent record includes coordination of FP7 grant 205941 in its own name (verified on CORDIS), a current Agricultural Academy task (ZEMDKT 17, 2024–2026) on resistance to abiotic stress — drought and salinity — in Solanum lycopersicum, the same crop and stress as FIELDWISE, and a National Science Fund project (KP-06-COST/2, 2025-ongoing) on satellite and UAV monitoring of vegetable crops with the Space Research and Technology Institute of the Bulgarian Academy of Sciences under COST Action PANGEOS. Институт по зеленчукови култури „Марица“ – Пловдив is also the fellow's current employer of record; the transfer test is deliberately not answerable to the fellow whose model it tests, and its contact and steering seat are held by a department head rather than by the fellow, so the cross-country evaluation remains independent.\n\n**AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság — operational and farmer-field evaluator, and non-academic placement host.** AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (AgroVIR) is a Hungarian SME founded in 2007 and seated in Budaörs; it develops and operates a cloud-based farm management information system (FMIS) built on twenty years of practice in Hungarian commercial agriculture, in production use across more than 745,000 hectares in eight countries — Hungary, Romania, Azerbaijan, Slovakia, Bulgaria, Serbia, Ukraine and Argentina — with the Hungarian and Bulgarian footprints matching the two countries FIELDWISE works in. This commercial-scale operating environment is what WP5 uses to test research-to-farm transferability. The company is registered under NACE 7020 (business and management consulting), reflecting its founding activity, while its current business is agricultural software; its company registration number is 13-09-200433. AgroVIR provides network access to the AgroVIR platform and its commercial farm base and validation of the prediction pipeline through the AgroVIR software. Its relevant track record is commercial rather than scientific: AgroVIR has not participated in EU-funded research projects, and FIELDWISE relies on its production-scale commercial deployment, not on a research-collaboration history it does not have. The partner's project contact and its Steering Group seat are held by Zsuzsanna Balázs. Consistent with the 2026 Guide for Applicants, no letter of commitment is included for the non-academic placement host, and its absence is not a weakness; the placement is nonetheless fully evaluated on the argument below.\n\n### Hosting arrangements for the non-academic placement (AgroVIR, M25–M30)\n\nThe six-month non-academic placement at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság is designed to give the fellow an experience the beneficiary cannot provide, and the proposal is explicit about who supervises her, where she works, what she does and what she gains. On site she is supervised by Miklós Maróti; his grade is that of a senior research officer, i.e. a research-side supervisor rather than a purely commercial engineering post, which is the register the placement's training rationale needs. She is provided with desk or office space at AgroVIR for the M25–M30 window, access to the FMIS development and staging environment, and access to the customer-data environment; on the basis of that access and the work content she is embedded in the AgroVIR product development team responsible for the FMIS platform, reporting to the on-site placement supervisor. Her six-month work programme comprises four items that deepen existing WP5 content rather than open a new strand: operational hardening of the prediction pipeline in a production FMIS environment; the nine-dimension operational assessment that produces the AgroVIR functional/technical evaluation (D5.4, M30); the FMIS integration roadmap written from inside the implementing company, which produces the FMIS integration roadmap (D5.5, M30); and requirements engineering and user testing with commercial growers. What the placement offers that ELTE cannot is a production FMIS environment, a commercial engineering practice and direct contact with paying growers — none of which the beneficiary, as a methodological and training environment with research infrastructure, can supply. Separately from the placement, AgroVIR also provides field trials with farmers via its network from M16 in its capacity as the operational evaluator; that field access exists independently of the placement and is not counted as placement workspace.\n\n### Involvement of participating organisations and associated-partner arrangements\n\nEach participating organisation contributes in kind and holds a named seat on the Project Steering Group described in §3.1: Magyar Agrár- és Élettudományi Egyetem through Dr. Sándor Takács, Институт по зеленчукови култури „Марица“ – Пловдив through Prof. Vinelina Yankova, and AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság through Zsuzsanna Balázs. Magyar Agrár- és Élettudományi Egyetem and Институт по зеленчукови култури „Марица“ – Пловдив participate as associated partners, and AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság participates as the non-academic placement host; together they form a coherent academic-research-to-industry chain — source scientific environment, independent cross-country environment and operational commercial environment — that mirrors the validation ladder of the action, with the sole beneficiary ELTE providing the methodological and training core. Several placement-host descriptors (the on-site supervisor and his grade, the workspace and system access, the identity of the team the fellow joins, and the AgroVIR contact's role) rest on descriptions supplied for, but not yet formally confirmed by, the participating organisations, and will be confirmed with the partners before submission.",
-      "word_count": 2277
+      "content": "## 3.2 Quality and capacity of the host institutions and participating organisations, including hosting arrangements\n\n### The host institution: HUN-REN Agrartudomanyi Kutatokozpont\n\nFIELDWISE is a single-beneficiary MSCA Postdoctoral Fellowship. The sole beneficiary, recruiting organisation and academic host is HUN-REN Agrartudomanyi Kutatokozpont (HUN-REN Centre for Agricultural Research, HUN-REN ATK), a public research organisation of the HUN-REN Hungarian Research Network, at Brunszvik u. 2, 2462 Martonvásár, Hungary. Dr. Rositsa Cholakova is recruited into its Agricultural Institute, where the primary supervisor, Dr. Roland Hollós, sits in the Department of Crop Production. The host is chosen for a precise scientific fit: it supplies the modelling and heterogeneous-data-integration environment at the core of the objectives, primary supervision by Dr. Roland Hollós (research associate, Department of Crop Production, and HUN-REN AI Ambassador for the Centre for Agricultural Research; ORCID 0000-0001-5137-7471), access to the wider HUN-REN AI and data-processing infrastructure for computationally intensive analyses, and complementary in-house plant-physiology depth through the Plant Physiology and Metabolomics Department led by Prof. Tibor Janda, whose long experience in drought and abiotic-stress physiology supports the selection and interpretation of physiological validation parameters. The computational and data-processing environment required for multi-source integration and predictive modelling is available in-house, with escalation to the shared HUN-REN research infrastructure where the workload demands it, so no dedicated hardware needs to be provisioned.\n\nHUN-REN ATK is a proven MSCA host. It coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (H2020 grant 752453, MSCA-IF-EF-ST Standard European Fellowship, 2017-2019), evidencing that the beneficiary already possesses the institutional machinery — recruitment, supervision, financial administration and researcher support — that an MSCA-PF requires. Its research standing in the exact methods FIELDWISE relies on is documented: the supervisor's own modelling line (Hollós et al. 2026, on the Biome-BGC model, Geoscientific Model Development) and current Horizon participations verified on CORDIS (COUSIN, AI4SoilHealth, TUdi). Because ATK is a research organisation rather than a university, the fellowship's teaching and outreach exposure is routed deliberately through guest lectures, seminars and practical sessions at MATE and, where institutionally possible, the Agricultural University of Plovdiv, rather than being claimed as an in-house degree-teaching load the host cannot offer.\n\n### Hosting arrangements, integration and support services\n\nThe host provides the fellow with a workspace at the Agricultural Institute in Martonvásár, integration into the supervisor's hosting group, administrative and grants support, access to training, and continuation of these arrangements throughout the M25-M30 non-academic placement so that the fellow is not administratively cut adrift during the inter-sectoral phase. Integration into the team is reinforced by the supervision cadence described in Section 3.1 — a weekly one-to-one with the supervisor, a monthly written progress record and quarterly Career Development Plan reviews — which embeds the fellow in the day-to-day scientific life of the Department of Crop Production and, through Prof. Tibor Janda's department, in the institute's physiology environment. Dr. Roland Hollós accepts the primary-supervisor role and carries the modelling-intensive supervision. These hosting arrangements and support services, and the supervisor's formal acceptance, are the beneficiary's own facilities and commitments; they are stated here as the operator's declared position and will be confirmed in ATK's written hosting statement (naming the Part A signatory and the grants-office contact) at grant preparation, rather than presented as already-settled fact.\n\n### The non-academic placement host: AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság\n\nThe inter-sectoral mobility element of this European Fellowship is a six-month non-academic placement (M25-M30) at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság (AGROVIR Kft.), a Hungarian SME founded in 2007 and seated in Budaörs that develops and operates a cloud-based farm-management information system (FMIS). AgroVIR is the operational evaluator: it provides structured requirements consultation from M1 through WP4 and, during the placement, the real farm-management environment in which the DrR web MVP is assessed for usability, data requirements, interoperability and future FMIS integration. Its relevance is commercial rather than academic — it reports no participation in EU-funded research projects, and its stated track record is twenty years of practice in Hungarian commercial agriculture and an FMIS in production use across more than 745,000 hectares in eight countries including Hungary and Bulgaria, the two countries FIELDWISE works in; this track-record framing is the operator's declared position pending the company's written confirmation, and is deliberately not converted into a research claim.\n\nThe placement is designed to be robust and low-dependency. It is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment; the fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment, and AgroVIR supplies only the information and data extracts needed for interoperability testing in protected form (coded or anonymised field identifiers such as 'Field X'). Placement supervision is provided by Miklós Maróti, Managing Director of AgroVIR, whose experience in agricultural digitalisation and farm-management systems anchors the evaluation of the MVP's stress and irrigation outputs within practical workflows, and the fellow works with the AgroVIR product development team responsible for the FMIS platform. Ownership of placement results follows the grant-agreement default, vesting in HUN-REN ATK as the beneficiary acting through the fellow, with a written placement agreement between the fellow, HUN-REN ATK and AgroVIR to confirm this allocation and the access terms to the fellow's DrR background IP before the placement begins. The placement supervisor and title, the mainly-remote arrangement, the team identification, the person-month commitment and the IP allocation are the placement host's own arrangements and are carried here as the operator's declared position, to be confirmed in AgroVIR's written placement letter; no letter of commitment is submitted for a non-academic placement host, so the placement is evaluated on this Part B argument. What the placement offers that the academic host alone cannot — operational evaluation against a production FMIS, research-to-MVP translation, agricultural-software requirements practice, interoperability assessment and exploitation planning — is the inference that justifies the inter-sectoral move.\n\n### Associated partners linked to the beneficiary\n\nThree associated partners are linked to the beneficiary and add capacity the host does not hold in-house. Full infrastructure, logistics and facilities are detailed in Part B-2 Section 5; the essentials are as follows.\n\n**Eötvös Loránd University (ELTE)** — Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest — supplies the remote-sensing, UAV/hyperspectral and geoinformatics environment and the co-supervisor, Prof. András Jung, who carries the hyperspectral-to-Sentinel harmonisation and scale-transition strand. ELTE's GIS and Remote Sensing Laboratory holds the project's principal spatial instruments: a DJI Matrice 350 RTK industrial drone with Zenmuse L1 (LiDAR/RGB), P1 (45 MP photogrammetry) and H20T (thermal) payloads, an Ultris S5 hyperspectral camera and a Cubert CUVIS laboratory hyperspectral package, together with licensed ArcGIS, ENVI and MATLAB, open geospatial tools (Google Earth Engine, QGIS, SNAP), high-performance computing and secure storage. Practical UAV operations are supported by Dr. Zsófia Varga (flight planning, sensor operation, data acquisition), with the fellow holding an EU A1/A3 pilot licence. The instrument inventory and ELTE's identity are confirmed; ELTE's continuation as an associated partner (rather than beneficiary), the co-supervisor's acceptance, and the written instrument-access arrangement specifying operators, sites, measurement periods and terms are carried as the operator's declared position pending ELTE's written agreement, and Section 3.1 risk R05 provides the constrained-access fallback.\n\n**Magyar Agrár- és Élettudományi Egyetem (MATE)** — Institute of Horticultural Sciences — is the source scientific environment. It provides the heterogeneous 2022-2026 processing-tomato archive that makes processing tomato the development crop, together with tomato plant material, trials, irrigation treatments, agronomic knowledge and the experimental/validation instrument base: TDR and capacitive soil-moisture sensors at 15 and 30 cm, stomatal resistance/conductance equipment, SPAD chlorophyll meters, VIS-NIR (approx. 325-1075 nm) and VIS-NIR-SWIR (approx. 350-2500 nm) leaf spectroradiometers, meteorological monitoring, leaf-temperature and CWSI tools. MATE's project contact is Dr. Sándor Takács, supported by precision-agriculture depth from Prof. Gábor Milics. MATE's identity, instrument base and archive description are confirmed; the contact seat and the rights and data-use conditions governing access to the archive are the operator's declared position, to be documented in MATE's written data-use permission before the action starts (see Section 3.1 risk R10 on commercial-restriction handling).\n\n**КРУМАТИК ЕООД (Krumatic EOOD)** — a Bulgarian technology and digital-solutions company (EIK 201511899, established 2011, Sofia), whose registered manager, sole owner and signatory is Lyubomir Lyubomirov Krumov — provides continuous software-development support from project start: improving the DrR prototype, implementing the validated data/model functions and the crop-configurable architecture, migrating the validated core toward the web MVP, and later Bulgarian farmer-facing dissemination and uptake. Its role is distinct from AgroVIR's: Krumatic builds and disseminates the software vehicle, while AgroVIR evaluates the validated MVP operationally. Its legal identity, contact/signatory and role are confirmed; its SME status and its independence (its prior AgroVIR-platform deployment in Bulgaria stated openly as a commercial-deployment relationship, with no known ownership, employment or family relationship to the fellow or another partner) are the operator's declared position, and the code-IP terms for Krumatic-developed code are a pre-grant development-agreement action rather than a proposal fact.\n\n### Collaborating validation environment and post-fellowship route\n\nThe prospective validation in WP3 is carried out at an independent commercial farmer site in Hungary, secured through the fellow's established professional relationship and deliberately kept as a collaborating validation environment rather than a beneficiary or associated partner. Because the site does not currently operate advanced monitoring infrastructure, FIELDWISE installs an automated meteorological station and soil sensors and retains responsibility for all specialised scientific measurements, while the farmer provides the field, routine crop management, agreed irrigation implementation and access for scheduled research activities. This design is the point of the exercise: the site is independent of the historical MATE experiments, so it tests whether learned relationships survive a production environment that was not used to establish them. The written field-access, sensor-installation and treatment-implementation arrangement is the operator's declared position and is obtained through task T3.1 before the campaign; site identity is collected with the arrangement, not fabricated now, and the Szentendre Skanzen model-garden route stands as a contingency-only option subject to formal agreement and scientific suitability. Beyond the fellowship, Институт по зеленчукови култури „Марица“ – Пловдив (the Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy; director Prof. Daniela Ganeva) provides a confirmed post-MSCA replication, local-recalibration and extension route under Bulgarian vegetable-production conditions; it sits on no work-package month line and carries no in-action effort, so it strengthens the exploitation horizon without loading the 24-month scientific plan.\n\n### Global Fellowship provision\n\nFIELDWISE is a European Fellowship arising from an intra-EU move (Bulgaria to Hungary), with the six-month non-academic placement as an extension under CC-07 rather than a Global Fellowship outgoing phase. The Global Fellowship requirement to outline both an outgoing Third Country host and a return host therefore does not apply: there is no Third Country host, and the single academic host throughout is HUN-REN Agrartudomanyi Kutatokozpont.",
+      "word_count": 1773
     }
   ],
   "validation_status": {
     "overall_status": "assumed",
     "claim_statuses": [
       {
-        "claim_id": "wp_structure_five_wps",
-        "claim_summary": "The work plan comprises five work packages with the canonical titles WP1 Historical Data and Target Design, WP2 Physiological Early Warning and Hyperspectral-to-Sentinel Transfer, WP3 Prospective and Uncertainty-Aware Prediction, WP4 Temporal and Cross-Country Transferability, WP5 Operational Transfer, Decision Value and Web MVP.",
+        "claim_id": "work_plan_structure",
+        "claim_summary": "The work plan comprises five work packages (WP1 Data Harmonisation and Physiological Stress Definition; WP2 HUN-REN Modelling and ELTE Scale Harmonisation; WP3 Independent Commercial-Farmer Prospective Validation; WP4 DrR Web MVP, Co-development and Exploitation Preparation; WP5 AgroVIR Non-Academic Placement), single-beneficiary at HUN-REN Agrartudomanyi Kutatokozpont.",
         "status": "confirmed",
         "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "deliverable_set",
+        "claim_summary": "Eleven deliverables D1.1-D5.2 with the stated due months (D1.3 M3; D1.1/D1.2 M6; D2.1/D2.2 M14; D3.1/D3.2 M18; D4.1/D4.2 M24; D5.1/D5.2 M30).",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "milestone_set",
+        "claim_summary": "Five milestones MS1 (M6), MS2 (M14), MS3 (M18), MS4 (M24), MS5 (M30) with verifiable criteria and titles as stated.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
       },
       {
         "claim_id": "wp_leads",
-        "claim_summary": "WP1, WP2 and WP4 are led by Magyar Agrár- és Élettudományi Egyetem (DATA_PARTNER); WP3 and WP5 are led by Eötvös Loránd University (ELTE) (HOST).",
+        "claim_summary": "WP leads: HOST (HUN-REN Agrartudomanyi Kutatokozpont) leads WP1 and WP2; the validation site leads WP3; КРУМАТИК ЕООД leads WP4; AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság leads WP5.",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
       },
       {
-        "claim_id": "wp_month_ranges",
-        "claim_summary": "Work-package durations are WP1 M1-M6, WP2 M3-M14, WP3 M6-M18, WP4 M12-M21, WP5 M16-M30.",
+        "claim_id": "host_and_fellowship_spine",
+        "claim_summary": "European Fellowship of 30 months at HUN-REN Agrartudomanyi Kutatokozpont (M1-M24) plus a six-month non-academic placement at AgroVIR (M25-M30); no separate secondment.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
-        "claim_id": "deliverables_and_due_months",
-        "claim_summary": "Deliverable due months: D1.3 M3; D1.1 and D1.2 M6; D2.1 and D2.2 M14; D3.1 and D3.2 M18; D4.1, D4.2 and D4.3 M21; D5.1 M24; D5.2, D5.3, D5.4 and D5.5 M30, with canonical titles.",
+        "claim_id": "supervision_spine",
+        "claim_summary": "Dr. Rositsa Cholakova is the fellow; primary supervisor Dr. Roland Hollós (ATK); co-supervisor Prof. András Jung (associated partner ELTE).",
         "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
-        "claim_id": "milestones_ms1_to_ms5",
-        "claim_summary": "Milestones MS1 (M6), MS2 (M12), MS3 (M16), MS4 (M20) and MS5 (M23) with their criteria.",
+        "claim_id": "dependencies_critical_path",
+        "claim_summary": "Inter-WP dependencies (WP1->WP2/WP3, WP2->WP3/WP4, WP3->WP4, WP4->WP5 finish-to-start) and critical path T1.3->T2.2->T3.5->T4.3->T5.1; graph acyclic.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
       },
       {
-        "claim_id": "milestone_ms6",
-        "claim_summary": "MS6 at M30 marks completion of the non-academic placement and is carried by deliverables D5.4 and D5.5.",
-        "status": "inferred",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
-      },
-      {
-        "claim_id": "task_schedule_and_critical_path",
-        "claim_summary": "Task-level month allocations and the critical path (T1.1, T1.4, MS1, T2.2, T2.6, T3.4, T3.6, T3.7, MS3, T4.6, MS4, T5.4, T5.5, T5.6, MS6) as finalised in the Gantt.",
-        "status": "inferred",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
-      },
-      {
-        "claim_id": "d54_sequencing_resolution",
-        "claim_summary": "D5.4 is dated M30 within the placement window and MS5 at M23 is evidenced by the completed Field Decision Value assessment, resolving the D5.4 double-claim.",
-        "status": "inferred",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/gantt.json"
-      },
-      {
-        "claim_id": "single_researcher_fte",
-        "claim_summary": "As a single-researcher action the fellow executes all work packages, concurrent work packages stay within one FTE per month, and the finalised schedule has no unresolved scheduling constraints.",
-        "status": "inferred",
+        "claim_id": "timeline_within_duration",
+        "claim_summary": "Schedule places WP1 M1-6, WP2 M3-14, WP3 M4-18, WP4 M1-24, WP5 M25-30, all within the 30-month duration; strict finish-to-start couplings honoured with slack.",
+        "status": "confirmed",
         "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/scheduling_constraints.json"
       },
       {
-        "claim_id": "fellow_person_months",
-        "claim_summary": "The fellow's effort totals 30.0 person-months: WP1 3.0, WP2 5.5, WP3 5.5, WP4 4.0, WP5 9.0, cross-cutting 3.0.",
+        "claim_id": "fellow_effort_split",
+        "claim_summary": "Fellow's 30 person-months split WP1 3.0, WP2 6.0, WP3 6.6, WP4 6.0, WP5 5.4, cross-cutting 3.0.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
-        "claim_id": "person_months_MATE",
-        "claim_summary": "2.4",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-        "assumption_declared": true
-      },
-      {
-        "claim_id": "person_months_MVCRI",
-        "claim_summary": "1.5",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-        "assumption_declared": true
-      },
-      {
-        "claim_id": "person_months_AgroVIR",
-        "claim_summary": "3.0",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-        "assumption_declared": true
-      },
-      {
-        "claim_id": "person_months_ELTE_supervisor",
+        "claim_id": "person_months_ATK_supervisor",
         "claim_summary": "2.5",
         "status": "assumed",
         "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
@@ -115,218 +88,162 @@
         "assumption_declared": true
       },
       {
+        "claim_id": "person_months_AgroVIR",
+        "claim_summary": "3.0",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "person_months_MATE",
+        "claim_summary": "2.4",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "person_months_Krumatic",
+        "claim_summary": "1.5",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
         "claim_id": "risk_register",
-        "claim_summary": "A 13-entry risk register R01-R13 with likelihood, impact and mitigation for each research and administrative/technical risk.",
+        "claim_summary": "Ten-row risk register R01-R10 with likelihood, impact and mitigation covering research and administrative risks.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
       },
       {
         "claim_id": "risk_philosophy",
-        "claim_summary": "Failure of zero-shot transfer is not project failure; a quantified Hungary-to-Bulgaria transferability gap is itself a significant scientific finding.",
+        "claim_summary": "Risk philosophy: prospective performance loss is treated as a quantified scientific result with limited transparent recalibration rather than hidden.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
       },
       {
-        "claim_id": "steering_group_points",
-        "claim_summary": "A Project Steering Group chaired by Prof. András Jung meets at M6, M12, M16, M20 and M27 and issues go/no-go verdicts at milestone gates; M27 is a mid-placement review.",
+        "claim_id": "skanzen_contingency",
+        "claim_summary": "Szentendre Skanzen model-garden route is a contingency for loss of primary farmer-site access (R04, task T3.6).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
+      },
+      {
+        "claim_id": "steering_governance_monitoring",
+        "claim_summary": "Project Steering Group meets at M6, M14, M18, M24 and M27, issuing go/no-go verdicts on MS1-MS5, with the M27 point a mid-placement review; CDP reviewed at the same five points.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
       },
       {
-        "claim_id": "co_supervisor_role",
-        "claim_summary": "Dr. Roland Hollós provides the methodological lead and quality assurance for model development and testing, concentrated in WP3-WP4.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "placement_window",
-        "claim_summary": "A six-month non-academic placement at AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság runs M25-M30, within a 30-month action of a 24-month European Fellowship plus placement.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
-      },
-      {
-        "claim_id": "DURATION",
-        "claim_summary": "The project duration is 30 months (24-month European Fellowship at ELTE plus 6-month placement).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "placement_supervisor_AgroVIR",
-        "claim_summary": "Miklós Maróti",
+        "claim_id": "placement_arrangement_AgroVIR",
+        "claim_summary": "The M25-M30 placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment. The fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment; AgroVIR provides the information and data extracts required for interoperability testing in protected form (coded or anonymised field identifiers, e.g. 'Field X'). The fellow works with the AgroVIR product development team responsible for the FMIS platform.",
         "status": "assumed",
         "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
         "assumption_declared": true
       },
       {
-        "claim_id": "placement_supervisor_title_AgroVIR",
-        "claim_summary": "Senior research officer",
+        "claim_id": "farmer_field_access",
+        "claim_summary": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
         "status": "assumed",
         "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
         "assumption_declared": true
       },
       {
-        "claim_id": "host_identity_sole_beneficiary",
-        "claim_summary": "ELTE is the sole beneficiary and host organisation for the 30-month action.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST)"
+        "claim_id": "elte_instrument_access",
+        "claim_summary": "The fellow conducts or co-conducts UAV and hyperspectral measurements with ELTE's DJI Matrice 350 RTK platform (Zenmuse L1/P1/H20T) and Ultris S5 / Cubert CUVIS cameras, supported by Dr. Zsófia Varga for flight planning, sensor operation and data acquisition, scheduled around key physiological measurement dates at the validation site; ELTE software environments are available for processing.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
       },
       {
-        "claim_id": "FELLOWSHIP_TYPE",
-        "claim_summary": "FIELDWISE is a European Fellowship, so the Global Fellowship requirement to outline an outgoing Third Country host and a return host does not apply.",
+        "claim_id": "cdp_deliverable",
+        "claim_summary": "Career Development Plan is deliverable D1.3, due M3, and is reviewed at each steering point.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE)"
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
       },
       {
-        "claim_id": "gf_provisions_not_applicable",
-        "claim_summary": "The call distinguishes European Fellowships (mobility to/within Europe, no Third Country outgoing host) from Global Fellowships, confirming GF outgoing/return-host outlining is not required here.",
+        "claim_id": "host_identity",
+        "claim_summary": "HUN-REN Agrartudomanyi Kutatokozpont is the sole beneficiary, recruiting organisation and academic host, at Martonvásár, Hungary, hosting the fellow in its Agricultural Institute.",
         "status": "confirmed",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-01, SR-02)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (HOST); docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST)"
       },
       {
-        "claim_id": "placement_optional_evaluated",
-        "claim_summary": "An optional non-academic sector placement of up to 6 months may be included at the end of the project and is subject to evaluation as an integral part of the proposal.",
+        "claim_id": "fellow_identity",
+        "claim_summary": "Dr. Rositsa Cholakova is the recruited experienced researcher/postdoctoral fellow.",
         "status": "confirmed",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06)"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOW); docs/tier3_project_instantiation/consortium/partners.json (FELLOW)"
       },
       {
-        "claim_id": "duration_and_placement_window",
-        "claim_summary": "The action is 30 months with a 6-month non-academic placement at AgroVIR in the M25-M30 window under CC-07.",
+        "claim_id": "supervisor_identity_role",
+        "claim_summary": "Dr. Roland Hollós, research associate in the Department of Crop Production and HUN-REN AI Ambassador (ORCID 0000-0001-5137-7471), is the primary supervisor providing the modelling and data-integration environment.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION)"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR); docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST key_people)"
       },
       {
-        "claim_id": "elte_department_and_team",
-        "claim_summary": "The fellow is hosted in ELTE Faculty of Informatics, Institute of Cartography and Geoinformatics (H-1117 Budapest, Pázmány Péter sétány 1/C), in the institute's remote-sensing group, with the co-supervisor in the ELTE Department of Meteorology.",
+        "claim_id": "host_computational_infrastructure",
+        "claim_summary": "The host provides the in-house computational/data-processing environment for multi-source integration and predictive modelling, with access to wider HUN-REN infrastructure for intensive analyses.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST department_and_team)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (CAP1; participant_capacity HOST infrastructure)"
       },
       {
-        "claim_id": "elte_infrastructure",
-        "claim_summary": "ELTE GIS and Remote Sensing Laboratory equipment, hyperspectral cameras (Ultris S5, Cubert CUVIS), software (ArcGIS, ENVI, MATLAB, GEE, QGIS, SNAP, Python, R), HPC clusters and secure storage.",
+        "claim_id": "janda_physiology_department",
+        "claim_summary": "The Plant Physiology and Metabolomics Department led by Prof. Tibor Janda supplies complementary drought/abiotic-stress physiology depth for validation-parameter selection and interpretation.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST infrastructure)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST key_people; CAP1)"
       },
       {
-        "claim_id": "elte_recent_publications",
-        "claim_summary": "Recent hosting-group publications from Prof. András Jung's record (three 2025 EO/agriculture items and a 2024 IEEE letter), each DOI verified.",
+        "claim_id": "atk_prior_msca_hosting",
+        "claim_summary": "HUN-REN ATK previously hosted and coordinated the funded MSCA Individual Fellowship LANDRACES (H2020 752453, MSCA-IF-EF-ST, 2017-2019).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (HOST prior_msca_hosting); docs/tier3_project_instantiation/consortium/capabilities.json (previous_msca_hosting)"
+      },
+      {
+        "claim_id": "atk_research_standing",
+        "claim_summary": "The supervisor's modelling line (Hollós et al. 2026) and ATK's CORDIS-verified Horizon participations (COUSIN, AI4SoilHealth, TUdi) document research standing in the relevant methods.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST recent_projects_and_publications)"
       },
       {
-        "claim_id": "supervisor_jung",
-        "claim_summary": "The supervisor is Prof. András Jung, Professor at the Institute of Cartography and Geoinformatics, working in remote sensing/hyperspectral imaging; Steering Group chair.",
+        "claim_id": "teaching_route",
+        "claim_summary": "As a research organisation, ATK routes teaching/outreach exposure through guest sessions at MATE and the Agricultural University of Plovdiv rather than in-house degree teaching.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST teaching_route_note)"
       },
       {
-        "claim_id": "co_supervisor_hollos",
-        "claim_summary": "The co-supervisor is Dr. Roland Hollós, ELTE Department of Meteorology, providing methodological lead and QA for model development in WP3-WP4.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (CO_SUPERVISOR)"
-      },
-      {
-        "claim_id": "elte_previous_msca_hosting",
-        "claim_summary": "None. ELTE has not previously hosted a funded MSCA fellow.",
+        "claim_id": "atk_agreement_to_host",
+        "claim_summary": "HUN-REN ATK acts as recruiting organisation and beneficiary for the fellowship, hosting the fellow at the Agricultural Institute, Martonvásár, with workspace, integration into the hosting group, administrative support, and continuation of arrangements during the M25-M30 placement.",
         "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_previous_msca_hosting)",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (atk_agreement_to_host)",
         "assumption_declared": true
       },
       {
-        "claim_id": "plantdigisense_application_record",
-        "claim_summary": "ELTE hosted the PLANTDIGISENSE MSCA-PF application (HORIZON-MSCA-2025-PF, proposal 101284764, 70.40%) with the same fellow and supervisor; FIELDWISE is a resubmission.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (researcher_profile previous_msca_submission; participant_capacity HOST previous_msca_hosting_note)"
-      },
-      {
-        "claim_id": "elte_hosting_arrangements",
-        "claim_summary": "ELTE hosting arrangements: dedicated office and laboratory space, full integration into research groups with weekly meetings and workshops, administrative/technical support for relocation, project management, procurement and dissemination, training courses and international networks.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity HOST hosting_arrangements_and_support_services)"
-      },
-      {
-        "claim_id": "bidirectional_knowledge_transfer",
-        "claim_summary": "Knowledge transfer is genuinely bidirectional between ELTE (geoinformatics/EO/modelling) and the fellow (plant physiology/agronomy/EO interpretation).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (knowledge_transfer KT1-KT3)"
-      },
-      {
-        "claim_id": "elte_beneficiary_throughout_placement",
-        "claim_summary": "ELTE remains the beneficiary and home institution across the full 30 months, including the M25-M30 placement, which is an intersectoral extension rather than a change of host.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION, FELLOWSHIP_TYPE)"
-      },
-      {
-        "claim_id": "mate_identity_and_capacity",
-        "claim_summary": "Magyar Agrár- és Élettudományi Egyetem (Institute of Horticultural Sciences), associated partner, provides the five-year source-domain data, processing-tomato experiments, hyperspectral/soil/weather information and primary validation.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json and capabilities.json (DATA_PARTNER)"
-      },
-      {
-        "claim_id": "mate_projects_publications",
-        "claim_summary": "MATE coordinates AGRIGEP (101094158, CORDIS) and has recent Institute of Horticultural Sciences publications including Takács et al. (2026) on water-stress trait prediction in open-field tomato.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications)"
-      },
-      {
-        "claim_id": "contact_person_MATE",
-        "claim_summary": "Dr. Sándor Takács",
+        "claim_id": "hollos_supervisor_acceptance",
+        "claim_summary": "Dr. Roland Hollós accepts the primary-supervisor role, with weekly technical sessions through the modelling-intensive work packages and the supervision routine of the governance record.",
         "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_MATE)",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (hollos_supervisor_acceptance)",
         "assumption_declared": true
       },
       {
-        "claim_id": "mate_takacs_authorship",
-        "claim_summary": "Dr. Sándor Takács is an author on all three recent MATE Institute of Horticultural Sciences publications recorded.",
+        "claim_id": "fellowship_type_gf_na",
+        "claim_summary": "FIELDWISE is a European Fellowship (intra-EU Bulgaria-to-Hungary move) with the six-month placement as a CC-07 extension, so the Global Fellowship outgoing/return-host requirement does not apply.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER recent_projects_and_publications_note)"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE)"
       },
       {
-        "claim_id": "mate_advisor_milics",
-        "claim_summary": "Prof. Gábor Milics (MATE, Gödöllő; ISPA country representative; remote sensing in precision agriculture) advises the fellow personally, outside the governance structure.",
+        "claim_id": "placement_window",
+        "claim_summary": "The inter-sectoral placement runs M25-M30 as the mobility element of the European Fellowship.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (DATA_PARTNER key_people Prof. Gábor Milics)"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (DURATION); docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER placement_window)"
       },
       {
-        "claim_id": "mvcri_identity_and_capacity",
-        "claim_summary": "Институт по зеленчукови култури „Марица“ – Пловдив, associated partner and public institute of the Bulgarian Agricultural Academy, provides the independent Bulgarian processing-tomato environment for the Hungary->Bulgaria transfer test; department Technologies in Vegetable Crops Production (Prof. Vinelina Yankova), second department headed by Assoc. Prof. Stanislava Grozeva.",
+        "claim_id": "agrovir_identity",
+        "claim_summary": "AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság is a Hungarian SME founded 2007, seated in Budaörs, operating a cloud-based FMIS, acting as operational evaluator and non-academic placement host.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json and partners.json (TRANSFER_PARTNER)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER); docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER organisation_profile)"
       },
       {
-        "claim_id": "mvcri_projects",
-        "claim_summary": "MVCRI coordinated FP7 grant 205941 (CORDIS), and runs ZEMDKT 17 (2024-2026, abiotic stress in Solanum lycopersicum) and KP-06-COST/2 (2025-ongoing, satellite/UAV monitoring with the Space Research and Technology Institute, under COST Action PANGEOS).",
+        "claim_id": "agrovir_consultation_role",
+        "claim_summary": "AgroVIR provides structured requirements consultation from M1 through WP4 and the real farm-management environment for MVP operational evaluation during the placement.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (TRANSFER_PARTNER recent_projects_and_publications)"
-      },
-      {
-        "claim_id": "mvcri_contact_yankova",
-        "claim_summary": "Prof. Vinelina Yankova, Head of Department (Technologies in Vegetable Crops Production), is MVCRI's contact and Steering Group seat.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (TRANSFER_PARTNER contact_person)"
-      },
-      {
-        "claim_id": "mvcri_independence",
-        "claim_summary": "MVCRI is also the fellow's employer of record; its contact and steering seat are held by a department head rather than the fellow so the cross-country transfer test remains independent.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (TRANSFER_PARTNER note)"
-      },
-      {
-        "claim_id": "agrovir_profile",
-        "claim_summary": "AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság is a Hungarian SME (founded 2007, Budaörs) operating an FMIS in production across more than 745,000 hectares in eight countries incl. Hungary and Bulgaria; NACE 7020 registration vs current agricultural-software business.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER organisation_profile)"
-      },
-      {
-        "claim_id": "agrovir_company_registration",
-        "claim_summary": "AgroVIR's company registration number is 13-09-200433.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER company_registration_number)"
-      },
-      {
-        "claim_id": "agrovir_infrastructure_farm_access",
-        "claim_summary": "AgroVIR provides network access to the AgroVIR platform and its commercial farm base and validation of the prediction pipeline through the AgroVIR software.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER infrastructure_and_farm_access)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (PC4; VALIDATION_PARTNER six_month_work_content); docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (WP5)"
       },
       {
         "claim_id": "agrovir_relevant_track_record",
@@ -336,10 +253,11 @@
         "assumption_declared": true
       },
       {
-        "claim_id": "agrovir_placement_host_no_lc",
-        "claim_summary": "AgroVIR is the non-academic placement host; consistent with the 2026 Guide for Applicants no letter of commitment is included for the placement host and its absence is not a weakness.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER participation_mode, letter_of_commitment_note)"
+        "claim_id": "placement_arrangement_AgroVIR",
+        "claim_summary": "The M25-M30 placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment. The fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment; AgroVIR provides the information and data extracts required for interoperability testing in protected form (coded or anonymised field identifiers, e.g. 'Field X'). The fellow works with the AgroVIR product development team responsible for the FMIS platform.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_arrangement_AgroVIR)",
+        "assumption_declared": true
       },
       {
         "claim_id": "placement_supervisor_AgroVIR",
@@ -350,16 +268,9 @@
       },
       {
         "claim_id": "placement_supervisor_title_AgroVIR",
-        "claim_summary": "Senior research officer",
+        "claim_summary": "Managing Director of AgroVIR",
         "status": "assumed",
         "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_title_AgroVIR)",
-        "assumption_declared": true
-      },
-      {
-        "claim_id": "placement_workspace_AgroVIR",
-        "claim_summary": "Desk or office space at AgroVIR for M25-M30, access to the FMIS development and staging environment, and access to the customer-data environment.",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_workspace_AgroVIR)",
         "assumption_declared": true
       },
       {
@@ -370,50 +281,144 @@
         "assumption_declared": true
       },
       {
-        "claim_id": "placement_work_content",
-        "claim_summary": "The six-month placement work programme is four items: operational hardening of the prediction pipeline in a production FMIS environment; the nine-dimension operational assessment producing the AgroVIR functional/technical evaluation (D5.4, M30); the FMIS integration roadmap (D5.5, M30) written from inside the implementing company; and requirements engineering and user testing with commercial growers.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER six_month_work_content); docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (D5.4, D5.5)"
-      },
-      {
-        "claim_id": "placement_added_value_vs_elte",
-        "claim_summary": "The placement offers a production FMIS environment, commercial engineering practice and direct grower contact that ELTE, as a methodological/training environment, cannot supply.",
-        "status": "inferred",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER what_the_placement_gives_that_elte_cannot)"
-      },
-      {
-        "claim_id": "agrovir_supplementary_field_access",
-        "claim_summary": "AgroVIR also provides field trials with farmers via its network from M16 as the operational evaluator, independently of the placement and not counted as placement workspace.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER supplementary_field_access)"
-      },
-      {
-        "claim_id": "contact_person_AgroVIR",
-        "claim_summary": "Zsuzsanna Balázs",
+        "claim_id": "placement_ip_ownership",
+        "claim_summary": "Ownership of placement results follows the grant agreement default, vesting in HUN-REN ATK as the beneficiary acting through the fellow; a written placement agreement between the fellow, HUN-REN ATK and AgroVIR, concluded before the placement begins, will confirm this allocation and the access terms to the fellow's DrR background IP.",
         "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_AgroVIR)",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_ip_ownership)",
         "assumption_declared": true
       },
       {
-        "claim_id": "partner_steering_group_seats",
-        "claim_summary": "Each participating organisation holds a named Steering Group seat: MATE (Dr. Sándor Takács), MVCRI (Prof. Vinelina Yankova), AgroVIR (Zsuzsanna Balázs).",
+        "claim_id": "placement_no_letter_of_commitment",
+        "claim_summary": "No letter of commitment is submitted for the non-academic placement host; the placement is evaluated on the Part B argument.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 4 named_partner_contacts)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_PARTNER letter_of_commitment/note)"
       },
       {
-        "claim_id": "participation_modes",
-        "claim_summary": "MATE and MVCRI participate as associated partners and AgroVIR as the non-academic placement host, forming an academic-research-to-industry chain around the sole beneficiary ELTE.",
+        "claim_id": "placement_added_value",
+        "claim_summary": "The placement offers operational evaluation against a production FMIS, research-to-MVP translation, requirements practice, interoperability assessment and exploitation planning that the academic host alone cannot provide.",
+        "status": "inferred",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (VALIDATION_PARTNER what_the_placement_gives_that_the_academic_host_cannot)"
+      },
+      {
+        "claim_id": "elte_identity_role",
+        "claim_summary": "Eötvös Loránd University (ELTE), Institute of Cartography and Geoinformatics, supplies the remote-sensing/UAV/hyperspectral/geoinformatics environment and the co-supervisor Prof. András Jung, who carries the hyperspectral-to-Sentinel harmonisation strand.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/roles.json and partners.json (participation_mode fields)"
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (EO_PARTNER, CO_SUPERVISOR); docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (CO_SUPERVISOR, EO_PARTNER)"
+      },
+      {
+        "claim_id": "elte_instrument_inventory",
+        "claim_summary": "ELTE's GIS and Remote Sensing Laboratory holds the DJI Matrice 350 RTK with Zenmuse L1/P1/H20T, Ultris S5 and Cubert CUVIS cameras, plus ArcGIS/ENVI/MATLAB, open geospatial tools, HPC and secure storage.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (CAP2; participant_capacity EO_PARTNER infrastructure)"
+      },
+      {
+        "claim_id": "varga_uav_support",
+        "claim_summary": "Dr. Zsófia Varga supports practical UAV operations (flight planning, sensor operation, data acquisition); the fellow holds an EU A1/A3 pilot licence.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity EO_PARTNER key_people; KT2)"
+      },
+      {
+        "claim_id": "elte_associated_partner_agreement",
+        "claim_summary": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment and the co-supervisor.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_associated_partner_agreement)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "jung_co_supervision_acceptance",
+        "claim_summary": "Prof. András Jung accepts the co-supervisor role, carrying the hyperspectral/UAV/EO harmonisation strand as a substantive methodological role.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (jung_co_supervision_acceptance)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "elte_instrument_access",
+        "claim_summary": "The fellow conducts or co-conducts UAV and hyperspectral measurements with ELTE's DJI Matrice 350 RTK platform (Zenmuse L1/P1/H20T) and Ultris S5 / Cubert CUVIS cameras, supported by Dr. Zsófia Varga for flight planning, sensor operation and data acquisition, scheduled around key physiological measurement dates at the validation site; ELTE software environments are available for processing.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_instrument_access)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "mate_identity_role",
+        "claim_summary": "Magyar Agrár- és Élettudományi Egyetem (Institute of Horticultural Sciences) is the source scientific environment providing the 2022-2026 processing-tomato archive, plant material, trials, irrigation treatments and agronomic knowledge.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (DATA_PARTNER); docs/tier3_project_instantiation/consortium/capabilities.json (PC1, CAP3)"
+      },
+      {
+        "claim_id": "mate_instrument_base",
+        "claim_summary": "MATE's validation instrument base includes TDR and capacitive soil-moisture sensors at 15/30 cm, stomatal resistance/conductance equipment, SPAD meters, VIS-NIR (approx. 325-1075 nm) and VIS-NIR-SWIR (approx. 350-2500 nm) leaf spectroradiometers, meteorological monitoring, leaf-temperature and CWSI tools.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity DATA_PARTNER infrastructure)"
+      },
+      {
+        "claim_id": "milics_precision_ag",
+        "claim_summary": "Prof. Gábor Milics provides precision-agriculture and decision-support depth at MATE.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (participant_capacity DATA_PARTNER key_people)"
+      },
+      {
+        "claim_id": "contact_person_MATE",
+        "claim_summary": "Dr. Sándor Takács",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (contact_person_MATE)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "mate_data_rights",
+        "claim_summary": "MATE grants the project rights and access to the 2022-2026 processing-tomato archive for the approved scientific purposes of FIELDWISE, with experimental metadata, under institutional data-use conditions to be documented before the action starts.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (mate_data_rights)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "krumatic_identity_role",
+        "claim_summary": "КРУМАТИК ЕООД (EIK 201511899, established 2011, Sofia), with signatory Lyubomir Lyubomirov Krumov, provides continuous software development from project start (DrR prototype, crop-configurable architecture, MVP migration) and later Bulgarian dissemination, distinct from AgroVIR's evaluation role.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (SOFTWARE_PARTNER); docs/tier3_project_instantiation/consortium/capabilities.json (PC3, CAP4, participant_capacity SOFTWARE_PARTNER)"
+      },
+      {
+        "claim_id": "krumatic_sme_status",
+        "claim_summary": "SME",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (krumatic_sme_status)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "krumatic_independence",
+        "claim_summary": "Krumatic's prior involvement in deploying the AgroVIR farm-management platform in Bulgaria is a commercial-deployment relationship, stated openly; no ownership, employment or family relationship between Krumatic and the fellow or another partner is known.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (krumatic_independence)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "farmer_validation_site",
+        "claim_summary": "WP3 prospective validation uses an independent commercial farmer site in Hungary secured through the fellow's professional relationship; FIELDWISE installs a meteorological station and soil sensors and retains all specialised scientific measurements, while the farmer provides the field and routine management; the site is independent of the historical MATE experiments.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (VALIDATION_SITE); docs/tier3_project_instantiation/consortium/capabilities.json (PC5, participant_capacity VALIDATION_SITE)"
+      },
+      {
+        "claim_id": "farmer_field_access",
+        "claim_summary": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (farmer_field_access)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "szentendre_contingency",
+        "claim_summary": "The Szentendre Skanzen model-garden route is a contingency-only validation option subject to formal agreement and scientific suitability.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (CAP6; participant_capacity VALIDATION_SITE contingency)"
+      },
+      {
+        "claim_id": "mvcri_post_msca_route",
+        "claim_summary": "Институт по зеленчукови култури „Марица“ – Пловдив (Maritsa Vegetable Crops Research Institute, Bulgarian Agricultural Academy; director Prof. Daniela Ganeva) is a post-MSCA replication/recalibration/extension route on no work-package month line and with no in-action effort.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/partners.json (TRANSFER_PARTNER); docs/tier3_project_instantiation/consortium/capabilities.json (PC6, participant_capacity TRANSFER_PARTNER)"
       }
     ]
   },
   "traceability_footer": {
     "primary_sources": [
-      {
-        "tier": 2,
-        "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
-      },
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
@@ -421,10 +426,6 @@
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
       },
       {
         "tier": 3,
@@ -444,11 +445,7 @@
       },
       {
         "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/consortium/roles.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+        "source_path": "docs/tier3_project_instantiation/project_brief/project_summary.json"
       },
       {
         "tier": 3,
@@ -479,8 +476,7 @@
     "MS2",
     "MS3",
     "MS4",
-    "MS5",
-    "MS6"
+    "MS5"
   ],
   "risk_register_ref": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
   "wp_table_refs": [

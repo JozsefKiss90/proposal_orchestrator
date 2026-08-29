@@ -1,34 +1,34 @@
 {
-  "report_id": "compliance_check_impact_section_compliance_validator_2026-08-29T09:15:00Z",
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-08-29T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
   "invoking_agent": "compliance_validator",
   "run_id_reference": "fieldwise-run-02",
-  "artifact_audited": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
-      "prohibition_description": "Grant Agreement Annex / Model Grant Agreement / AGA template used as governing structural schema for proposal writing.",
+      "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Invented call constraints, scope requirements, expected outcomes, or expected impacts not traceable to Tier 2B.",
-      "check_status": "pass",
-      "violation_evidence": null,
-      "severity": null
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "violation",
+      "violation_evidence": "The section asserts call/instrument constraints without any Tier 2B source reference in its traceability footer. Constraint claims include: 'The Gantt is included within the 10-page limit for Part B Sections 1-3 and shows months elapsed rather than calendar dates, as required'; 'the six-month non-academic placement as an extension under CC-07'; and 'The Global Fellowship requirement to outline both an outgoing Third Country host and a return host therefore does not apply'. traceability_footer.primary_sources[] contains only tier 3 and tier 4 entries and no reference to docs/tier2b_topic_and_call_sources/extracted/. Applied conservatively per constraint 3: the artifact provides no Tier 2B source reference for these call-requirement claims.",
+      "severity": "critical"
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Invented project facts (partners, capabilities, roles, prior experience, budget figures, team sizes, equipment) not traceable to Tier 3.",
+      "prohibition_description": "Inventing project facts (partner names, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment) not present in Tier 3.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Phase 8 activity (Tier 5 drafting) before the budget gate has passed; budget-dependent content without a passing gate.",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed; budget-dependent content without a passing budget gate.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -42,35 +42,35 @@
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "A workflow or skill becoming a de facto constitutional authority by expanding its scope.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions; referencing a higher (later) phase's outputs as inputs.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress with incomplete inputs.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalising proposal text when source state is incomplete/contradictory/unvalidated without explicitly flagging the gap.",
+      "prohibition_description": "Finalising proposal text when source state is incomplete, contradictory, or unvalidated without explicitly flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using generic programme knowledge as a substitute for Tier 1 source documents; regulatory (grant-agreement-terms) claims lacking a Tier 1 source reference.",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents.",
       "check_status": "violation",
-      "violation_evidence": "Sub-section 2.2 asserts a grant-agreement-terms rule as authority for an IP allocation: \"Ownership of placement results follows the grant-agreement default, vesting in HUN-REN ATK as beneficiary acting through the fellow\". This regulatory claim invokes the Model Grant Agreement ownership default, but the artifact's traceability_footer.primary_sources[] contains NO Tier 1 reference (only tiers 2, 3, 4); the backing claim_status 'placement_ip_ownership' is source_ref'd to Tier 3 working_assumptions.json, not docs/tier1_normative_framework/extracted/. Mitigating context (for human adjudication, not self-resolution): the claim is declared status 'assumed' with assumption_declared:true and framed as 'to be confirmed by a written placement agreement'. Flagged conservatively per skill instruction; requires human operator resolution — either add a Tier 1 source reference for the grant-agreement default or re-scope the phrase as a declared project assumption without asserting the regulatory default.",
+      "violation_evidence": "The section makes Horizon Europe regulatory / grant-architecture claims with no Tier 1 source reference in its traceability footer. Examples: 'Ownership of placement results follows the grant-agreement default, vesting in HUN-REN ATK as the beneficiary acting through the fellow'; 'no letter of commitment is submitted for a non-academic placement host, so the placement is evaluated on this Part B argument'. traceability_footer.primary_sources[] contains only tier 3 and tier 4 entries and no reference to docs/tier1_normative_framework/extracted/. Applied conservatively per constraint 3: these grant-agreement-rule claims carry no Tier 1 source reference in the artifact's footer.",
       "severity": "major"
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Tier 5 outputs not traceable to Tier 1–4; unresolved claims lacking a source_ref while no_unsupported_claims_declaration is false.",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1-4.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -92,7 +92,48 @@
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 1
+    "violations_found": 2
   },
-  "timestamp": "2026-08-29T09:15:00Z"
+  "timestamp": "2026-08-29T00:00:00Z",
+  "check_notes": {
+    "13.1": "Content references 'Part B Sections 1-3', 'Part B-2 Section 5', and the 'grant-agreement default' for IP ownership; none of these use a Grant Agreement Annex, Model Grant Agreement Annex, or AGA template as a structural schema source. No 'Annex [0-9]' structural authority present.",
+    "13.3": "Every project-fact claim (partners HUN-REN ATK, AgroVIR, ELTE, MATE, КРУМАТИК ЕООД; supervisors Hollós/Jung/Maróti; equipment; fellow identity) carries a Tier 3 source_ref in validation_status.claim_statuses[], and traceability_footer.primary_sources[] includes docs/tier3_project_instantiation/consortium/partners.json, capabilities.json, call_binding/confirmation_checklist.json and working_assumptions.json. Project facts are traceable to Tier 3.",
+    "13.4": "This is a Phase 8 Tier 5 artifact (schema_id orch.tier5.implementation_section.v1). No monetary budget figures (€/EUR) appear. The person-month references (fellow 30 PM split; partner in-kind PMs) are work-package effort allocations required by the Implementation criterion Section 3.1, and the partner in-kind PMs are explicitly flagged as 'operator-declared estimates pending written partner confirmation' / 'declared assumptions, not as confirmed commitments'. Direct re-verification of docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json is outside the permitted TAPM read boundary (reads restricted to CLAUDE.md and the audited artifact); no evidence of a budget-dependent violation is present in the readable content, so recorded as pass.",
+    "13.5": "Not directly checkable from artifact content; enforced by the decision-log-update skill. Recorded pass per skill specification.",
+    "13.6": "Not directly checkable from an artifact. Recorded pass per skill specification.",
+    "13.7": "As a Phase 8 artifact, the section references outputs of lower/upstream phases only (Phase 3 wp_structure, Phase 4 gantt/scheduling_constraints, Phase 6 implementation_architecture, Phase 8 canonical_reference_pack). No reference to a phase higher than the current phase. No reordering indicated.",
+    "13.8": "validation_status.overall_status is 'assumed' (not 'unresolved'); no claim_status entry has status 'unresolved'. All 'assumed' claims carry assumption_declared: true and are explicitly flagged in the prose ('operator-declared estimates', 'declared assumptions', 'the operator's declared position ... to be confirmed'). No unflagged unresolved content.",
+    "13.10": "traceability_footer.no_unsupported_claims_declaration is true and every entry in validation_status.claim_statuses[] carries a source_ref to Tier 3 or Tier 4. No unresolved claim lacking a source_ref. Tier 5 output is traceable to Tier 3-4.",
+    "13.11": "Not checkable from a deliverable artifact. Recorded pass per skill specification.",
+    "13.12": "Not directly checkable from an artifact. Recorded pass per skill specification."
+  },
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-08-29T00:00:00Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.2_implementation_section_2026-08-29T00:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.2",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected: call/instrument-constraint claims (10-page Part B limit; 'months elapsed ... as required'; CC-07 extension; Global Fellowship outgoing/return-host rule) are asserted with no Tier 2B source reference in the artifact's traceability_footer.primary_sources[]. Requires human operator resolution — either add the traceable Tier 2B (docs/tier2b_topic_and_call_sources/extracted/) source references or remove/re-scope the unsupported call-constraint claims. This skill flags; it does not resolve.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-08-29T00:00:00Z"
+    },
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-08-29T00:00:01Z",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.9_implementation_section_2026-08-29T00:00:01Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.9",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected: Horizon Europe grant-architecture claims ('grant-agreement default' governing IP ownership; 'no letter of commitment ... for a non-academic placement host') are asserted with no Tier 1 source reference in the artifact's traceability_footer.primary_sources[]. Requires human operator resolution — either add the traceable Tier 1 (docs/tier1_normative_framework/extracted/) source references or re-scope the regulatory claims. This skill flags; it does not resolve.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-08-29T00:00:01Z"
+    }
+  ],
+  "outputs_written": [
+    "docs/tier4_orchestration_state/validation_reports/compliance_check_implementation_section_compliance_validator_2026-08-29T00:00:00Z.json",
+    "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_2026-08-29T00:00:00Z.json",
+    "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_2026-08-29T00:00:01Z.json"
+  ]
 }
