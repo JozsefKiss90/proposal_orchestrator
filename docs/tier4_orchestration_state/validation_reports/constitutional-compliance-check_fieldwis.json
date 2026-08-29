@@ -1,9 +1,9 @@
 {
-  "report_id": "compliance_check_implementation_architecture_compliance_validator_2026-08-29T00:00:00Z",
+  "report_id": "compliance_check_budget_gate_assessment_budget_gate_validator_2026-08-29T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "budget_gate_validator",
   "run_id_reference": "fieldwise-run-02",
-  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/implementation_architecture.json",
+  "artifact_audited": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
@@ -21,14 +21,14 @@
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget, team size, equipment) not present in Tier 3.",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, budget figures, etc.) not present in Tier 3.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity before the budget gate (Phase 7) has passed.",
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -49,7 +49,7 @@
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress with incomplete inputs.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions when inputs are incomplete.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -63,14 +63,14 @@
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using generic Horizon Europe programme knowledge as a substitute for Tier 1 source documents.",
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe rules as a substitute for reading Tier 1 source documents.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1–4 inputs.",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1-4.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null
@@ -92,7 +92,21 @@
   ],
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 0
+    "violations_found": 0,
+    "check_notes": {
+      "13.1": "Phase 7 output (schema_id orch.phase7.budget_gate_assessment.v1). No structural reference to any Grant Agreement Annex, Model Grant Agreement Annex, or 'AGA' template as a schema source. Only interface_contract.json, the Lump Sum Budget Planner integration, and unit_cost_budget.json are referenced. No annex-as-schema pattern present.",
+      "13.2": "No invented call constraints. Call-binding facts (budget_regime='unit_cost', host_country='HU', project_duration_months=30) are attributed to selected_call.json; published rate inputs are attributed to 'published_rates(Tier 2B)'. No call requirement is asserted without a source reference.",
+      "13.3": "Partner identifiers (HOST, DATA_PARTNER, EO_PARTNER, VALIDATION_SITE, SOFTWARE_PARTNER, VALIDATION_PARTNER) and WP identifiers (WP1-WP5) are structural coverage references drawn from upstream Phase 3 WP structure and consortium data, consistent with a budget-gate coverage assessment. No fabricated specifics (no invented budget figures, team sizes, or equipment). Note: this artifact is a Tier 4 phase output and carries no traceability_footer.primary_sources[] schema; the check keys on that footer for Tier 5 deliverables. No fabricated project facts detected.",
+      "13.4": "Not a Phase 8 artifact (schema_id is orch.phase7.*, not orch.tier5.* or orch.phase8.*); check non-applicable to artifact type. Additionally, no numeric budget values are materialized in this assessment (explicitly stated), so no budget-dependent confirmed values are present.",
+      "13.5": "Not checkable from artifact content alone; enforced by decision-log-update skill. Recorded pass per skill spec.",
+      "13.6": "Not directly checkable from an artifact. Recorded pass per skill spec.",
+      "13.7": "No silent phase reordering. The artifact references only lower/upstream phases (Phase 4 confirmed_months, Phase 3 WP structure) in the correct dependency direction; no Phase 8 output is consumed as an input.",
+      "13.8": "Non-applicable to artifact type: this is a Tier 4 phase output, not a Tier 5 deliverable, and has no validation_status.overall_status field. The artifact declares blocking_inconsistencies=[] and all components Confirmed with no unresolved content presented as final.",
+      "13.9": "No generic-programme-knowledge substitution. Regulatory/instrument governance claims are attributed to CLAUDE.md sections (§8.1, §8.4, C1) and the instrument profile / selected_call.json; unit-cost rules are cited to CLAUDE.md §8.1, not asserted from memory. Severity would be major if violated; not violated.",
+      "13.10": "Non-applicable to artifact type: this is a Tier 4 phase output, not a Tier 5 artifact. All material claims are attributed to unit_cost_budget.json, selected_call.json, Tier 2B published rates, and CLAUDE.md.",
+      "13.11": "Not checkable from a phase output/deliverable artifact. Recorded pass per skill spec.",
+      "13.12": "Not directly checkable from an artifact. Recorded pass per skill spec; the artifact in fact treats CLAUDE.md §8.1/§8.4/C1 as binding governing authority."
+    }
   },
   "timestamp": "2026-08-29T00:00:00Z"
 }
