@@ -1,0 +1,47 @@
+{
+  "record_type": "decision_log_entry",
+  "decision_id": "n08b-impact-claim-provenance-correction_2026-08-29",
+  "date": "2026-08-29",
+  "branch": "fieldwise-run-02",
+  "run_id": "fieldwise-run-02",
+  "node": "n08b_impact_drafting",
+  "authority": "CLAUDE.md §9.4 (durable decision), §12.2 (status vocabulary), §12.3 (contradiction resolution). Operator instruction of 2026-08-29 following the gate_10b failure.",
+  "title": "Correction of two mis-provenanced claims in the Impact 2.2 draft that blocked gate_10b/g09b_p07",
+  "trigger": {
+    "gate": "gate_10b_impact_completeness",
+    "failed_predicate": "g09b_p07 (no_unresolved_material_claims)",
+    "reason": "validation_status.overall_status was 'unresolved'; two claims in section_drafts/impact/2.2.draft.json carried status 'unresolved' with coined claim_ids that no working_assumptions.json declaration key or checklist_ref could resolve, so runner/assumption_applier.py could not flip them.",
+    "note": "The node body completed normally. The failure was an honest gate block, not an effect of the operator's machine freeze during the run."
+  },
+  "corrections": [
+    {
+      "id": "C1",
+      "claim": "c14 — 'The M25-M30 placement is supervised by Miklós Maróti and the fellow works with the AgroVIR product development team responsible for the FMIS platform.'",
+      "prior": "claim_id 'c14', status 'unresolved', source_ref working_assumptions.json. The coined id matched no declaration, so the applier's flip never fired.",
+      "new": "claim_id re-keyed to 'placement_supervisor_AgroVIR'; status left 'unresolved' so the assumption-applier flips it to 'assumed' pre-assembly with the operator's own declared wording.",
+      "why": "Both underlying facts are operator declarations, not evidence: placement_supervisor_AgroVIR is operator-supplied ('the Pack asks AgroVIR to confirm the supervision arrangement in writing') and placement_team_AgroVIR is an authorised placeholder registered in working_assumptions.json _operator_placeholders. Marking the claim Confirmed would have asserted a partner confirmation the repository's own record says has not been filed (§12.3), and no deterministic predicate would have caught it — g09b_p13 (declared_facts_are_not_inferred) fires only on 'inferred'.",
+      "team_half": "Not lost: the AgroVIR product-development-team fact is separately carried in the same draft as the declared claim 'placement_team_AgroVIR' (already Assumed). The composite c14 was redundant."
+    },
+    {
+      "id": "C2",
+      "claim": "c16 — 'IP strategy separates rights layers: DrR background, FIELDWISE foreground, institutional datasets and Krumatic-developed code, each documented before the action starts.'",
+      "prior": "status 'unresolved', source_ref working_assumptions.json.",
+      "new": "status 'confirmed', source_ref re-pointed to docs/tier3_project_instantiation/source_materials/consolidated_pack_2026-08-28/FIELDWISE_Consolidated_Partner_Review_Pack_2026-08-28.extracted.txt (added to the draft's source_refs as tier 3).",
+      "why": "The claim was mis-sourced, not undeclared. The consolidated pack states it directly at line 74 ('Pre-MSCA DrR background, FIELDWISE scientific foreground, institutional datasets and Krumatic-developed code must be treated as separate rights layers ... ownership and permitted use should be documented explicitly before the action starts') and again in Appendix A at line 404. It is carried into architecture_inputs/impacts.json:34, project_brief/strategic_positioning.md:82 and phase6_implementation_architecture/implementation_architecture.json:47,239. A named Tier 3 source evidences it directly, which is Confirmed under §12.2. Leaving working_assumptions.json as the source_ref of a Confirmed claim would have been self-contradictory: a declaration is adopted in the absence of evidence and can never confirm."
+    }
+  ],
+  "artifacts_modified": [
+    "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/section_drafts/impact/2.2.draft.json"
+  ],
+  "expected_effect": {
+    "assumption_applier": "flips placement_supervisor_AgroVIR unresolved -> assumed and re-derives section_spine.overall_status",
+    "section_overall_status": "assumed (verified by read-only simulation over all three impact drafts, 2026-08-29)",
+    "g09b_p07": "passes (fails only on overall_status == 'unresolved')",
+    "g09b_p12": "unaffected — the applier normalises claim_id to the declaration key and claim_summary to the declared value, which is exactly what W1 checks"
+  },
+  "open_item": {
+    "what": "AgroVIR's written confirmation of the M25-M30 supervision arrangement exists per the operator (2026-08-29) but is not yet filed in the repository.",
+    "action_when_filed": "File it under docs/tier3_project_instantiation/source_materials/, retire placement_supervisor_AgroVIR (and placement_team_AgroVIR if the letter covers the team) into working_assumptions.json _superseded_and_removed, record the evidence on the VALIDATION_PARTNER record, then the claim may be promoted from Assumed to Confirmed citing that source.",
+    "status_until_then": "Assumed — a conscious, operator-owned green (mode β), not a fabricated Confirmed."
+  }
+}
