@@ -102,3 +102,11 @@ carried by row labels). Formatting follows the template's binding conditions: A4
 Roman ≥11 pt including table text, single spacing. Internal EO-xx/EI-xx codes were dropped from
 evaluator-facing text; the AgroVIR footprint is qualified as the company's declared position in 1.3, 2.3
 and 3.2. Builder script kept in the session scratchpad (`build_partb1.py`).
+
+**Citations added (same day):** 18 footnotes carrying 29 references, all drawn verbatim from the
+operator-authorised `source_materials/references/fieldwise_references.bib` (item 10). Distribution:
+Excellence 1.1/1.2/1.4 (areas 1–8 of the bib's area map) plus the 2.3 impact-magnitude sources R36–R40.
+Deliberately excluded: `tarraf2024` and `wilks2001` (bib flags both as needing re-verification before
+submission) and DrR (uncitable per the item-10 decision — deposit on Zenodo to close). Footnotes are
+Times New Roman 8 pt (template floor for non-body text). Result: exactly 10 of 10 pages, with roughly
+0.4 page of slack on the final page. Inserter script: scratchpad `add_footnotes.py` (Word COM).
