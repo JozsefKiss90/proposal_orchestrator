@@ -1,436 +1,563 @@
 {
   "schema_id": "orch.tier5.excellence_section.v1",
-  "run_id": "fieldwise-run-02",
+  "run_id": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
   "criterion": "Excellence",
   "sub_sections": [
     {
       "sub_section_id": "1.1",
       "title": "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)",
-      "content": "## 1.1 Quality and pertinence of the project's research and innovation objectives\n\n**Problem and overarching aim.** Irrigation decisions in high-value horticulture are increasingly taken under water scarcity, yet the water-stress signals that drive those decisions are typically spectral proxies whose biological meaning, stability across seasons and operational transferability are rarely tested. FIELDWISE confronts this gap directly. Its overarching research and innovation aim is to establish whether a physiologically meaningful water-stress signal, discovered in a data-rich processing-tomato system, remains biologically valid across unseen seasons and a change of sensing scale, survives prospective validation under real commercial-farm conditions, and can be encoded in a crop-configurable decision-support framework that is later adaptable to other irrigated high-value horticultural crops. This central challenge is not a rhetorical framing but the explicit organising question of the work plan: can a water-stress signal remain biologically meaningful across seasons and sensing scales, survive prospective validation under real farmer conditions, and be encoded in a crop-configurable framework that can later be adapted to other crops. Processing tomato is chosen deliberately as the model crop because approximately five years (2022–2026) of heterogeneous physiological, soil, meteorological and proximal-spectral observations already exist at MATE, giving the objectives an evidentiary foundation rather than requiring a speculative new data campaign.\n\n**Pertinence.** The objectives are pertinent on the two axes the MSCA-PF Excellence criterion weighs together: scientific pertinence and pertinence to the fellow's development. Scientifically, they target a recognised weakness in agricultural remote sensing — the routine substitution of correlative spectral proxies and retrospective accuracy for biologically grounded, prospectively validated, operationally transferable stress prediction — in a domain (water use in irrigated horticulture) of clear European relevance. In terms of career development, the four objectives are structured as a single scientific thread that carries one concept through biological definition, leakage-safe modelling, unseen-condition validation, software implementation and industrial evaluation; executing that thread is precisely what completes the fellow's progression from plant physiologist/agronomist to an independent Agricultural Data Scientist, and it is delivered through an international move (a European Fellowship recruiting the researcher from Bulgaria to the host in Hungary) with inter-sectoral and interdisciplinary exposure. The objectives thus serve both the research problem and the fellowship's training purpose, satisfying the call's requirement that fellowships be provided to excellent researchers undertaking international mobility.\n\n**The four objectives, and why they are measurable and verifiable.** The programme is organised around four research and innovation objectives, each carrying a stated measurable output and each verified by named, dated deliverables so that achievement can be judged against evidence rather than assertion:\n\n- **O1 — Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target.** Measurable output: a QC-controlled common-variable matrix, a missingness/measurement-frequency map, and a target and validation protocol. Verification: the deliverables *Harmonised database/metadata and variable-availability map* and *Stress-target, feature-selection and validation protocol*.\n\n- **O2 — Develop a parsimonious, interpretable and uncertainty-aware predictive framework under HUN-REN supervision, with ELTE spectral/EO harmonisation, and separate reusable system components from crop-specific biological/calibration parameters.** Measurable output: a ranked predictor set; a primary model and a nonlinear benchmark where justified; a calibration/uncertainty assessment; a model card; and a crop-transfer specification. Verification: the deliverables *Primary model, benchmark and model card* and *Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification*.\n\n- **O3 — Prospectively validate the framework at an independent commercial farmer site equipped with project meteorological and soil sensing, supported by physiological, proximal, UAV and Sentinel observations.** Measurable output: a prospective validation dataset; an unseen-environment benchmark; a spatial scaling assessment; and a limited-recalibration protocol if required. Verification: the deliverables *Independent commercial-field validation dataset* and *Prospective transferability, uncertainty and limited-recalibration report*.\n\n- **O4 — Operationalise validated outputs in a crop-configurable DrR architecture through continuous Krumatic software development and AgroVIR requirements feedback, followed by industrial evaluation in M25-M30.** Measurable output: a web MVP with a validated processing-tomato module; an irrigation-attention output; a crop-extension specification; an AgroVIR requirements/interoperability report; and a post-MSCA integration and exploitation roadmap. Verification: the deliverables *Crop-configurable DrR web MVP with validated processing-tomato module*, *Pre-placement technical/usability requirements dossier*, *AgroVIR operational/interoperability assessment* and *Post-MSCA FMIS integration and exploitation roadmap*.\n\nMeasurability and verifiability are reinforced by two design choices. First, blocked temporal (unseen-year) validation and model-selection criteria are predefined before results are seen, so that success is judged against thresholds fixed in advance rather than chosen post hoc; calibration, uncertainty and interpretability are quantified rather than asserted. Second, the objectives map cleanly onto the project's research questions (RQ1–RQ5) and hypotheses (H1–H4) — for example, O1 operationalises the physiological-signature hypothesis, O3 tests the transferability hypothesis, and O4 tests the operational-relevance hypothesis — so each objective corresponds to a falsifiable claim with a defined output.\n\n**Realistically achievable.** The objectives are ambitious but bounded, and several features make them realistically deliverable within a 30-month action (a 24-month European Fellowship at the host followed by a six-month non-academic placement). The primary evidence base already exists (the 2022–2026 MATE archive), so the work begins from data rather than data collection. A working research prototype — DrR, the fellow's pre-existing, self-financed sensor/EO monitoring and data-integration tool — provides the software starting point for the web MVP rather than a green-field build. The supervisory environment supplies the complementary competences the objectives require: modelling and uncertainty analysis on the host side, and hyperspectral/UAV/Earth-observation scale harmonisation through the ELTE co-supervision strand. A parsimony principle (prefer the simplest adequate model; no deep-learning dependency) is adopted explicitly, matching model complexity to the available sample size and reducing the risk of over-fitting an ambitious pipeline to limited data. Finally, the single new instrumented commercial-farmer validation site is the minimum the prospective-validation logic requires, and a contingency route (a planned Bulgarian model garden at the Szentendre Skanzen) is held in reserve should primary-site access fail — so the highest-risk objective (O3) is protected without inflating the field programme.\n\n**Beyond the state of the art, and the extent of the ambition.** The project's ambition lies less in any single algorithm than in refusing four assumptions that are routinely conflated in crop-stress remote sensing, and in testing each of them explicitly within one validation chain. (i) It refuses the equation of a vegetation index with water stress, replacing spectral-proxy stress definitions with a physiologically defined water-stress target built on a harmonised, QC-controlled five-season evidence base. (ii) It refuses the equation of proximal indices with satellite indices, instead constructing an explicit scale bridge from leaf/proximal sensing through an ELTE hyperspectral/UAV layer to Sentinel-2 field-scale operational inputs. (iii) It refuses the equation of internal cross-validation with field transferability, moving from internal fit through blocked unseen-year validation to prospective validation at an independent commercial field, with the transfer gap from research experiments to a real production environment measured prospectively and any limited recalibration stated. (iv) It refuses the assumption that a tomato-trained model transfers unchanged to another crop, separating a reusable decision-support core from crop-specific physiological targets and calibration parameters and defining explicit crop-transfer and recalibration gates, so that the result is a crop-configurable framework for irrigated high-value horticulture rather than a single tomato model imposed on all crops. Cutting across all four, FIELDWISE moves the very definition of success beyond retrospective predictive accuracy toward demonstrated field-level decision value: the validated architecture is delivered as a continuously developed DrR web MVP (implemented with the software partner Krumatic), evaluated industrially through a non-academic placement at AgroVIR against operational and interoperability requirements, and given a defined post-MSCA replication route through MVCRI as a Hungary–Bulgaria scientific and mobility bridge. This combination — biological truth, rigorous transferability testing, sensing-scale integration and operationally evaluated decision support connected in a single chain and deliberately engineered for reuse beyond the development crop — is what places the objectives beyond the current state of the art and defines the level of ambition of the proposed work.",
-      "word_count": 1281
+      "content": "1.1 Quality and pertinence of the project's research and innovation objectives\n\nPertinence and framing. FIELDWISE addresses a problem of direct European relevance — water scarcity and rising climatic variability are intensifying the need for more efficient irrigation management in high-value horticulture, while irrigation decisions are still frequently based on delayed visual symptoms, isolated sensor thresholds or retrospective crop-performance information. It pursues this through the researcher-centred logic of the MSCA Postdoctoral Fellowships 2026 call (HORIZON-MSCA-2026-PF-01). The action is a European Postdoctoral Fellowship of 30 months, hosted at HUN-REN Agrartudomanyi Kutatokozpont (ATK), Martonvásár, Hungary, and carried out by the experienced researcher Dr. Rositsa Cholakova. Its research and innovation objectives are pertinent on two axes simultaneously. Scientifically, they close three focused gaps: the physiological grounding of plant water-stress indicators (spectral and environmental variables are too often treated as stress proxies without demonstrating that they track an actual plant response); transferability across unseen conditions, sensing scales and horticultural crops; and irrigation decision relevance. In instrument terms, the same objectives are the vehicle through which the fellow completes a documented transition from plant physiologist and agronomist toward an independent Agricultural Data Scientist, acquiring the interdisciplinary (plant-stress physiology combined with agricultural data science and with hyperspectral, UAV and Earth-observation methods) and inter-sectoral competences that the call's expected outcomes explicitly seek. The proposal deliberately draws its evidence base from an existing five-season archive rather than a new campaign, and channels its inter-sectoral exposure through an integral end-of-project non-academic placement, so that its scientific and career objectives reinforce one another rather than compete.\n\nThe four objectives. The scientific programme is organised around one central challenge — whether a water-stress signal discovered in a data-rich processing-tomato system can remain biologically meaningful across seasons and sensing scales, survive prospective validation under real farmer conditions, and be encoded in a crop-configurable decision-support framework that can later be adapted to other irrigated high-value horticultural crops. This challenge is operationalised as four objectives. O1 is to \"Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target\". O2 is to \"Develop a parsimonious, interpretable and uncertainty-aware predictive framework under HUN-REN supervision, with ELTE spectral/EO harmonisation, and separate reusable system components from crop-specific biological/calibration parameters\". O3 is to \"Prospectively validate the framework at an independent commercial farmer site equipped with project meteorological and soil sensing, supported by physiological, proximal, UAV and Sentinel observations\". O4 is to \"Operationalise validated outputs in a crop-configurable DrR architecture through continuous Krumatic software development and AgroVIR requirements feedback, followed by industrial evaluation in M25-M30\". Processing tomato is chosen as the model crop precisely because approximately five years of heterogeneous data, strong experimental expertise and established collaborations already exist for it; it is the scientifically justified starting point, not the intended limit of the technology.\n\nMeasurable and verifiable. Each objective is defined by concrete, checkable outputs rather than by aspiration, and each is anchored to a dated project deliverable so that an evaluator (and later a reviewer) can verify achievement. O1 delivers a QC-controlled common-variable matrix, a missingness/measurement-frequency map, and a target and validation protocol — captured in the harmonised database and variable-availability map (D1.1, month 14) and the Stress-target, feature-selection and validation protocol (D1.2, month 14). O2 delivers a ranked predictor set, a primary model with a nonlinear benchmark where justified, a calibration/uncertainty assessment, a model card and a crop-transfer specification — captured in the Primary model, benchmark and model card (D2.1, month 3) and the Spectral/UAV/Sentinel harmonisation and crop-transfer specification (D2.2, month 14). O3 delivers a prospective validation dataset, an unseen-environment benchmark, a spatial scaling assessment and a limited-recalibration protocol if required — captured in the Independent commercial-field validation dataset (D3.1, month 18) and the Prospective transferability, uncertainty and limited-recalibration report (D3.2, month 18). O4 delivers a web MVP with a validated processing-tomato module, an irrigation-attention output, a crop-extension specification, an AgroVIR requirements/interoperability report and a post-MSCA integration and exploitation roadmap — captured in the Crop-configurable DrR web MVP with validated processing-tomato module (D4.1, month 24), the AgroVIR operational/interoperability assessment (D5.1, month 30) and the Post-MSCA FMIS integration and exploitation roadmap (D5.2, month 30). Verifiability is reinforced by an explicit evaluation discipline: model performance is judged under blocked, leakage-safe unseen-year validation against a pre-specified physiological stress target, using pre-registered metrics — balanced accuracy, F1 and ROC-AUC for classified stress detection; RMSE, MAE and R² for continuous prediction; reliability diagrams, the Brier score and prediction-interval coverage probability for calibration; and stress-detection lead time and per-season false-alarm rate for operational value — with literature-derived acceptance thresholds fixed in D1.2 before the prospective season, and with the primary model frozen and its model card registered (D2.1) before the first field season. Pre-committing thresholds and freezing the model before validation converts each objective into a falsifiable, auditable claim rather than a moving target.\n\nRealistically achievable. The objectives are ambitious yet grounded in resources that already exist. O1 and O2 rest on the 2022-2026 MATE processing-tomato archive (physiological, soil, meteorological and proximal spectral observations) and are developed under HUN-REN ATK supervision (primary supervisor Prof. Tibor Janda) with ELTE spectral/EO harmonisation and UAV/hyperspectral instrumentation. O3 is a single, focused prospective test at an independent commercial farmer field instrumented by the project (meteorological station and soil sensors) — the minimum that the prospective-validation logic requires — with a defined site-contingency ladder so that the transferability claim is protected. O4 builds on the fellow's pre-existing, self-financed research tool DrR - Digital Agronomist, currently a sensor/EO monitoring and data-integration tool rather than a validated advisory product, used as a research-to-application vehicle: only validated scientific components are incrementally incorporated, Krumatic supports software engineering from project start, and AgroVIR provides requirements-oriented consultation from the outset before hosting the M25-M30 placement. The scope is bounded honestly — validation within the action is limited to processing tomato, and the crop-transfer specification defines the components, parameters, minimum datasets and recalibration gates any later crop must pass — while the concrete follow-on route to additional cultivars and Bulgarian production conditions is placed after the action through MVCRI, with no in-action MVCRI effort claimed. This bounding is itself a realism argument: the fellowship promises only what its data, timeline and consortium can deliver.\n\nBeyond the state of the art and extent of ambition. FIELDWISE is ambitious because it connects biological truth, rigorous transferability testing, sensing scale and operational decision support within a single validation chain, while deliberately designing the resulting digital framework for reuse beyond the development crop. It explicitly refuses four assumptions that are common in the field: that a vegetation index is equivalent to water stress; that proximal and satellite indices are interchangeable; that internal cross-validation proves field transferability; and that one tomato-trained model can be transferred unchanged to another horticultural crop. Its advance over current practice is expressed as seven concrete transitions: (1) from a stress proxy to a physiologically defined stress target; (2) from a heterogeneous five-season archive to an explicit common-variable/missingness design; (3) from internal fit to blocked unseen-year validation to independent commercial-field validation; (4) from leaf/proximal sensing through an ELTE hyperspectral/UAV bridge to Sentinel-2 field-scale operational inputs; (5) from a standalone model to a continuously developed DrR web MVP with AgroVIR industrial evaluation; (6) from academic-only validation to a farmer-facing real-world test plus a defined post-MSCA Bulgarian replication route through MVCRI; and (7) from a tomato-specific prototype to a crop-configurable high-value-horticulture framework with explicit crop-specific validation/calibration gates. The genuine novelty is not a new machine-learning algorithm — the deliberate methodological stance is parsimony and interpretability, avoiding a deep-learning dependency — but the construction and demonstration of a validation framework in which operationally obtainable data streams are judged against independent plant-level ground truth, challenged under both unseen-year and new commercial-field conditions, translated across sensing scales without assuming equivalence, and then separated into a reusable decision-support core and crop-specific biological/calibration components. This moves crop-stress modelling beyond retrospective predictive accuracy toward demonstrated physiological validity, transferability and management relevance, which is where the field's current weakness lies and where the project's ambition is concentrated.",
+      "word_count": 1324
     },
     {
       "sub_section_id": "1.2",
       "title": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality of open science practices)",
-      "content": "## 1.2 Soundness of the proposed methodology\n\n**Overall methodology: concepts, models and assumptions.** FIELDWISE rests on one methodological conviction: a water-stress signal used to drive irrigation must be judged not by retrospective predictive accuracy alone but by four linked criteria evaluated in sequence — physiological validity, predictive performance, transferability to unseen conditions, and management relevance. Every concept, model and assumption follows from this. Processing tomato is adopted as the model crop because approximately five seasons (2022–2026) of heterogeneous physiological, soil, meteorological and proximal-spectral observations already exist at MATE, so the work begins from a curated evidence base rather than a speculative new data campaign. The methodology is organised as a single validation chain executed across five work packages.\n\nStage 1 (WP1, 'Data Harmonisation and Physiological Stress Definition') establishes the empirical substrate. The heterogeneous archive is audited variable-by-variable, with its year, frequency and replicate structure mapped; a common-variable matrix and an explicit missingness strategy are defined; and the effective statistical unit is fixed. The stress construct is then defined physiologically — a primary physiological stress target with corroborating endpoints — rather than by equating a vegetation index with stress, and a restricted set of candidate soil-water, meteorological and proximal-spectral signatures is identified against that target. Decisively for methodological soundness, the evaluation regime is fixed before any result is seen: blocked temporal (unseen-year) validation and model-selection criteria are predefined, making the pipeline leakage-safe and judging success against thresholds set in advance. These choices are captured in the deliverables 'Harmonised database/metadata and variable-availability map' and 'Stress-target, feature-selection and validation protocol'.\n\nStage 2 (WP2, 'HUN-REN Modelling and ELTE Scale Harmonisation') builds the predictive framework under HUN-REN ATK supervision on three explicit assumptions. First, parsimony: process-informed water-status predictors are constructed from meteorology, irrigation and soil data, and a single interpretable primary model is developed alongside at most one nonlinear benchmark where justified, with no deep-learning dependency, so that model complexity is matched to the limited effective sample size. Second, uncertainty-awareness: calibration, predictive uncertainty, interpretability and blocked unseen-year performance are quantified rather than asserted and documented in a model card. Third, non-equivalence of sensing scales: proximal and hyperspectral signals are not assumed interchangeable with satellite bands, so an explicit hyperspectral/UAV-to-Sentinel-2 harmonisation is defined only at spatial scales where field geometry supports valid Earth-observation interpretation, drawing on ELTE's remote-sensing expertise through the co-supervision strand. A fourth, cross-cutting assumption governs reuse: the DrR data structures are configured to separate reusable sensor/weather/EO/uncertainty workflows from crop-specific physiological, phenological and calibration parameters, and a crop-transfer specification fixes the transferable core, the crop-specific parameters, and the minimum validation dataset and recalibration gates required before any new irrigated high-value horticultural crop is added.\n\nStage 3 (WP3, 'Independent Commercial-Farmer Prospective Validation') tests the assumption that internal cross-validation does not prove field transferability. The historical model is applied prospectively at an independent commercial farmer field newly instrumented by the project (meteorological station and soil sensors) and supported by coordinated physiological, proximal-spectral, thermal, UAV and Sentinel-2 observations where spatially valid; the transfer gap is quantified and only limited, transparent recalibration is applied where required. The governing methodological stance is that transfer loss is a scientific result to be measured and reported with its uncertainty, not concealed.\n\nStages 4–5 (WP4, 'DrR Web MVP, Co-development and Exploitation Preparation', and WP5, 'AgroVIR Non-Academic Placement') operationalise validated outputs on the principle that the software follows the science: only validated scientific components are progressively incorporated into a crop-configurable DrR web MVP that exposes stress probability/class, uncertainty, temporal trend and an irrigation-attention output while keeping crop-specific parameters explicit. The M25–M30 non-academic placement then evaluates the MVP's inputs, usability, missing-data behaviour, decision outputs and interoperability against real operational requirements.\n\nThese assumptions are stated as falsifiable hypotheses that the methodology is designed to test: coordinated plant responses to declining soil-water availability and rising atmospheric demand can be captured by a parsimonious subset of proximal-spectral and environmental indicators (H1); performance will decrease from internal fitting to unseen-year and independent-field validation, but a stable, reusable core of the physiology-to-prediction workflow can be identified (H2); proximal signatures will not map one-to-one to satellite bands, yet a subset of relationships survives explicit harmonisation (H3); and a model selected for physiological validity, calibration, uncertainty and stability will provide more useful irrigation-attention information than one selected solely for retrospective accuracy (H4). Delivering objectives O1–O4 is precisely the sequential testing of H1–H4, which is how the methodology enables the project to meet its objectives.\n\n**Important methodological challenges and how they are overcome.** The chosen methodology carries intrinsic challenges that are anticipated as design choices rather than deferred. (i) Archive variables differ among years: this is met with an explicit year-by-variable matrix, harmonising only defensible common variables and retaining year-specific measurements as secondary information. (ii) The effective biological sample size is limited: this is met with repeated-measure/hierarchical structure, conservative feature reduction and deliberate parsimony (no deep-learning dependency) to avoid over-fitting. (iii) Prospective performance may drop on the unseen commercial field: this is met by treating transfer loss as a quantified result and applying only limited, transparent recalibration. (iv) Field geometry and cloud cover may limit Sentinel-2 interpretation: Sentinel-2 is used only where valid pixels support field-scale inference, with UAV and proximal observations carrying the finer scales. (v) Site infrastructure and access risks are met by installing project meteorological and soil sensors before the campaign and by holding a Bulgarian model-garden contingency at the Szentendre Skanzen in reserve should primary-site access fail. Each mitigation is a methodological safeguard embedded in the work plan.\n\n**Integration of methods and disciplines in pursuit of the objectives.** An interdisciplinary approach is necessary, not optional: the central challenge runs from plant biology through statistical modelling and sensing-scale physics to operational decision support, and no single discipline spans it. FIELDWISE integrates five complementary competences. Plant physiology and agronomy — the fellow's and MATE's domain — define the biologically meaningful stress target and the physiological measurements that ground it. Data science, predictive modelling and uncertainty quantification, supplied under HUN-REN ATK supervision, convert that target into a parsimonious, calibrated, interpretable forecasting framework. Remote sensing, hyperspectral imaging, UAV operation and geoinformatics, supplied by ELTE through the co-supervision strand led by Prof. András Jung, provide the scale bridge from leaf/proximal measurement toward Sentinel-2 field monitoring. Software engineering, supplied by Krumatic, implements validated components in the DrR web MVP. Operational agronomy and farm-management-information-system knowledge, supplied by AgroVIR, anchor usability and interoperability in real farm practice. Integration is structural rather than rhetorical: the disciplines are bound into one validation chain (physiological definition → modelling and uncertainty → scale bridging → prospective field validation → operational evaluation); DrR is the shared integration vehicle through which biological and geospatial evidence becomes decision support; and the crop-transfer specification is the explicit interface that keeps reusable engineering separate from crop-specific biology. Weekly supervision, a dedicated EO-harmonisation strand with the co-supervisor, and a cross-partner Steering Group coordinate the disciplinary hand-offs. This interdisciplinary and inter-sectoral integration is also the mechanism by which the fellowship forges the new interdisciplinary mind-set the call expects of its fellows.\n\n**Gender dimension and other diversity aspects.** Consistent with the guidance that this question concerns the content of the research and innovation activities rather than the gender balance of teams, the analytical sex/gender dimension has been examined and found not to be a relevant biological variable in the research content: the study object is the water-stress physiology of processing tomato, in which no human sex or gender factor is present, so sex/gender is not a meaningful analytical category for the stress-signature, modelling or scale-transfer work. Diversity is, however, pertinent to the innovation content — the decision-support tool and its intended users. FIELDWISE deliberately targets operationally obtainable data streams and an interpretable irrigation-attention output rather than presupposing advanced on-farm infrastructure, so that the resulting tool can serve heterogeneous end-users, including smaller and less digitally equipped holdings, and is not tailored only to large, well-resourced, high-technology farms. This attention to user diversity — differences in farm size, resource level and digital literacy among the agronomists and farm decision-makers who would use the output — is carried into the usability and interoperability requirements gathered through structured AgroVIR consultation and the placement evaluation, and into the crop-configurable design that lets the same physiology-to-decision workflow serve varied cropping contexts. Where structured feedback is collected from participating farmers and staff, participation is voluntary, under informed consent and a right of withdrawal, and no health, biometric or special-category personal data is collected.\n\n**Open science practices as an integral part of the methodology.** Open science is built into the workflow rather than appended to it, under the principle 'as open as possible, as closed as necessary'. A Data Management Plan is prepared and submitted as an early deliverable by month 6 in line with the MSCA-PF requirement, and FAIR handling is designed in from Stage 1: the harmonised database and its metadata/variable-availability map, the stress-target and validation protocol, and the model card documenting assumptions, calibration, uncertainty and limitations are structured for findability, accessibility, interoperability and reuse. Reproducibility is a first-class methodological commitment: validation and model-selection criteria are predefined and leakage-safe, and the prospective transfer gap and any recalibration are reported transparently rather than hidden. Peer-reviewed results are targeted for open-access publication, and the project both builds on and returns to open data, Copernicus/Sentinel-2 observations being open by default. Commercially sensitive information from the farmer site and from AgroVIR is handled proportionately: results are published only in aggregated, coded or anonymised form, and all data remain within the EU. The fellow's pre-existing DrR background is documented with a dated background declaration and deposited (for example on Zenodo), keeping the DrR background and the FIELDWISE foreground cleanly separated for reuse and citation. Finally, open-science and FAIR-data practice, research integrity and digital skills including generative-AI literacy are embedded as trained competences in the Career Development Plan, satisfying the call's requirement that training foster open science.",
-      "word_count": 1637
+      "content": "## 1.2 Soundness of the proposed methodology\n\n### Overall methodology: concepts, models and assumptions\n\nThe methodological spine of FIELDWISE is a single, disciplined validation chain that carries one physiologically grounded water-stress signal from a heterogeneous multi-season evidence base, through leakage-safe modelling, to prospective testing under real commercial conditions and finally into an operational decision-support prototype. The design is deliberately not organised around inventing a new machine-learning algorithm; its methodological stance is parsimony, interpretability and uncertainty-awareness, and it explicitly avoids a deep-learning dependency. The unifying concept is that a model is only useful for irrigation if it has been judged against four linked criteria at once — physiological validity, predictive performance, transferability to unseen conditions, and management relevance — rather than against retrospective accuracy alone. This four-criterion evaluation frame is the organising idea from which every methodological choice below is derived.\n\nThe work rests on an explicit and falsifiable model of the underlying biology, stated as four working hypotheses. H1 (physiological-signature hypothesis) assumes that declining soil-water availability and increasing atmospheric demand produce coordinated plant responses that can be captured by a parsimonious subset of proximal spectral and environmental indicators. H2 (transferability hypothesis) assumes that predictive performance will degrade when moving from internal fitting to unseen-year and independent commercial-field validation, but that a stable core of the physiology-to-prediction workflow can nonetheless be identified and separated from crop-specific components. H3 (scale-transition hypothesis) assumes that physiologically meaningful proximal signatures will not map one-to-one onto satellite bands, but that a subset of relationships survives explicit hyperspectral/UAV-to-Sentinel harmonisation at spatial scales where field geometry supports valid Earth-observation interpretation. H4 (operational-relevance hypothesis) assumes that a model selected for physiological validity, calibration, uncertainty and stability will provide more useful irrigation-attention information than one selected solely for retrospective accuracy. Stating these as hypotheses, rather than as design assertions, is itself a methodological commitment: each is testable and each can fail visibly.\n\nConcretely, the model to be built learns the relationship between operationally obtainable predictors — soil-water, meteorological and spectral/Earth-observation variables — and an independently measured physiological water-stress target. Defining that target is the first methodological act and the foundation of everything that follows. Rather than treating a vegetation index or an environmental threshold as a stress proxy, the project harmonises the existing 2022-2026 processing-tomato archive into a QC-controlled common-variable matrix with an explicit missingness and measurement-frequency map, and fixes a physiologically meaningful stress target and validation protocol before any model fitting. This is captured in the Harmonised database/metadata and variable-availability map and the Stress-target, feature-selection and validation protocol, and it directly delivers Objective O1. A pre-specified stress-target hierarchy is fixed in the Stress-target, feature-selection and validation protocol before model training, so that any substitution forced by the archive audit is made and documented before results are inspected, never after.\n\nThe predictive framework itself (Objective O2) is developed to be parsimonious, interpretable and uncertainty-aware: a ranked predictor set, a primary model with a single nonlinear benchmark only where justified, an explicit calibration and uncertainty assessment, and a model card. Two methodological safeguards convert each objective into an auditable claim rather than a moving target. First, model selection and evaluation are performed under blocked, leakage-safe unseen-year temporal validation, so that year-, treatment- or site-specific correlations cannot masquerade as generalisation. Second, evaluation uses pre-registered metrics — balanced accuracy, F1 and ROC-AUC for classified stress detection; RMSE, MAE and R² for continuous prediction; reliability diagrams, the Brier score and prediction-interval coverage probability for calibration; and stress-detection lead time and per-season false-alarm rate for operational value — with literature-derived acceptance thresholds fixed in the validation protocol before the prospective season, and with the primary model frozen and its model card registered in the Primary model, benchmark and model card before the first field season. Freezing the model and pre-committing thresholds before the prospective test is the methodological device that makes the transferability claim honest.\n\nTransferability is treated at three distinct levels rather than conflated. Temporal transfer is tested by the blocked unseen-year validation above; environmental transfer is tested by prospectively applying the frozen model at an independent commercial farmer field instrumented by the project with a meteorological station and soil sensors, supported by physiological, proximal, UAV and Sentinel observations (Objective O3), quantifying the research-to-commercial transfer gap and applying a limited, pre-specified recalibration only if transfer is incomplete, as captured in the Independent commercial-field validation dataset and the Prospective transferability, uncertainty and limited-recalibration report; and methodological/crop transfer is handled by explicitly separating a reusable decision-support core (data architecture, physiology-to-prediction workflow, uncertainty logic, sensing-scale integration and the irrigation-attention interface) from crop-specific components (physiological reference ranges, phenological interpretation, stress thresholds and calibration parameters), documented in the Spectral/UAV/Sentinel harmonisation and crop-transfer specification with explicit recalibration gates any later crop must pass. Processing tomato is the scientifically justified starting crop — chosen because roughly five heterogeneous seasons of data and established expertise exist for it — not the intended limit of the technology; the project builds and documents the methodology required for controlled transfer rather than claiming that a tomato-trained model can be applied unchanged elsewhere.\n\nOperationalisation (Objective O4) follows the science rather than leading it. The pre-existing DrR - Digital Agronomist prototype is used as a research-to-application vehicle: only validated scientific components are incrementally incorporated into a crop-configurable web MVP that keeps crop-specific parameters explicit, delivered as the Crop-configurable DrR web MVP with validated processing-tomato module and evaluated for operational usability and interoperability by AgroVIR. The principle \"the software follows the science, not the other way around\" is a methodological constraint that protects the fellowship from becoming a software-development project.\n\n**Identified challenges and how they are overcome.** The methodology names its own principal risks and builds the countermeasures into the workflow. (i) Archive heterogeneity and missingness: overcome by the common-variable matrix, an explicit missingness strategy and a defined effective statistical unit fixed before modelling. (ii) Optimistic generalisation from random splits: overcome by blocked, leakage-safe unseen-year validation and pre-registered metrics/thresholds. (iii) The research-to-field transfer gap: overcome by a frozen model, prospective commercial-field testing and a pre-specified limited-recalibration protocol, so that any performance drop is measured and reported rather than hidden. (iv) Fragility of UAV/hyperspectral campaigns: overcome by prioritising acquisitions around key physiological measurement dates and by retaining physiology and proximal sensing as the core pathway if individual UAV campaigns are missed. (v) Dependence on a single commercial validation site: overcome by a defined site-contingency ladder, in which a second independent commercial processing-tomato producer serves as a first-line, claim-preserving backup and a public-garden route serves as a measurement-only fallback with an explicitly downgraded transferability claim. (vi) The temptation to over-fit for accuracy: overcome by the parsimony-and-interpretability stance and by scoring operational value (lead time, false-alarm rate) alongside statistical fit.\n\n### Integration of methods and disciplines to pursue the objectives\n\nAn interdisciplinary approach is essential here, not optional: the central challenge cannot be met by any single discipline, because it requires a physiological definition of stress, a rigorous data-science treatment of prediction and uncertainty, a remote-sensing treatment of scale, and an agricultural/operational treatment of decision relevance to co-exist within one workflow. FIELDWISE integrates four method families. Plant-stress physiology and agronomy supply the physiologically meaningful stress target, the corroborating endpoints and the judgement of whether model-derived signals track genuine plant responses; this strand is anchored in the HUN-REN ATK Plant Physiology and Metabolomics Department, whose head is a plant-stress physiologist, and in the processing-tomato experimental and archive base contributed by MATE. Agricultural data science supplies the parsimonious modelling, feature engineering, calibration, uncertainty analysis and leakage-safe validation design. Remote sensing and geoinformatics supply the hyperspectral/UAV-to-Sentinel scale-transition methodology that prevents leaf-, plot- and satellite-scale measurements from being treated as equivalent. Software engineering and operational farm-management expertise supply the translation of validated functions into a maintainable, interoperable prototype: Krumatic provides software development from project start, and AgroVIR provides requirements-oriented consultation from the outset and later operational and interoperability evaluation.\n\nThe integration mechanism is deliberately structured rather than assumed. The disciplines meet at defined methodological interfaces — the physiological target definition constrains the predictor set; the predictor set and validation protocol constrain the model; the scale-transition specification governs how proximal signals become field-scale inputs; and the reusable-core/crop-specific separation governs what is allowed to enter the DrR architecture. This is reinforced by a deliberately complementary two-way transfer of knowledge: the fellow contributes agronomy, plant protection, plant-stress physiology, physiological phenotyping, horticultural field experimentation, proximal spectral interpretation and the existing DrR concept, while the host and partners contribute advanced agricultural data science, robust modelling and uncertainty analysis, hyperspectral/UAV/EO integration, precision-agriculture workflows and research-to-software/industry translation. The remote-sensing, UAV and hyperspectral environment and a co-supervisory methodological strand for scale-aware EO interpretation are provided on the ELTE side as an associated partner, and the predictive-modelling/machine-learning methodological leadership is carried by a named ELTE-side team member. The result is an interdisciplinary design in which the fellow is the integrating agent who, by the end of the action, will have carried a scientific concept through biological definition, model development, unseen-condition validation, software implementation and industrial evaluation.\n\n### Gender dimension and other diversity aspects\n\nA sex/gender dimension in the *content* of the research is not relevant to FIELDWISE, and this conclusion follows directly from the nature of the research object rather than being an omission. The biological subject of study is the processing-tomato crop and its physiological water-stress response; the project collects no human or animal biological data, no health, biometric or special-category data, and no personal attributes for which sex or gender is an analytical variable. There is therefore no biological or physiological endpoint in the research on which a sex/gender analysis could operate, and introducing one would be artificial. In line with the guidance that this question concerns research content and not team composition, no gender-dimension claim is made about the scientific model.\n\nOther diversity aspects are, however, taken into account where the research and innovation content actually touches people — namely in the design and evaluation of the decision-support output. Because the DrR web MVP and its irrigation-attention interface are intended for real growers, inclusive, user-centred design is treated as a methodological requirement: structured requirements consultation and usability, missing-data-behaviour and interoperability evaluation with AgroVIR and with participating farmers are used to ensure the tool serves users with differing farm sizes, differing degrees of digital literacy and differing operating contexts, rather than an idealised advanced user. The dissemination and uptake pathway is explicitly bilingual and cross-border, with Krumatic supporting Bulgarian farmer-facing uptake alongside the Hungarian validation and evaluation environment, so that the innovation is accessible across the two national grower communities the project works in. Where human participants provide feedback — grower requirements and the operational evaluation — participation is governed by informed consent and a right of withdrawal, and farmer and commercial data are minimised and processed in coded or anonymised form. These measures are the appropriate treatment of diversity for a project whose only human dimension is end-user engagement.\n\n### Open science practices as an integral part of the methodology\n\nOpen science is embedded in the workflow rather than appended to it, under the governing principle \"as open as possible, as closed as necessary\". Several methodological choices are simultaneously open-science practices. The pre-registration of the stress target, feature-selection approach, metrics and literature-derived acceptance thresholds before the prospective season — fixed in the Stress-target, feature-selection and validation protocol — is a reproducibility and transparency commitment that guards against outcome-selective reporting. The primary model is documented with a model card in the Primary model, benchmark and model card, exposing its intended use, predictors, performance, calibration and known limitations. The evidence base itself is treated FAIR-by-design: the Harmonised database/metadata and variable-availability map produces documented, quality-controlled data and metadata, and methods, metadata and publications are made reusable wherever possible. The project relies on open Copernicus/Sentinel-2 Earth-observation data for its field-scale inputs, and results derived from commercially sensitive farmer or partner information are published only in aggregated, coded or anonymised form.\n\nOpen access to publications is planned: at least two high-quality peer-reviewed papers (physiologically grounded water-stress signatures; modelling, uncertainty and transfer from historical experiments to prospective commercial-field validation), with an optional third methods/application paper, are targeted for open-access dissemination, complemented by conference presentations, seminars and practitioner-facing demonstrations. Open science is also carried into training as a transferable-skills competence (research integrity, open science and FAIR practice, generative-AI literacy), so that the fellow consolidates these practices as part of the career transition. Data governance is handled honestly rather than naively: a background/foreground inventory is established at project start, and pre-existing DrR background, FIELDWISE scientific foreground, institutional datasets and partner-developed code are treated as separate rights layers, with potentially protectable foreground evaluated before public disclosure — the \"as closed as necessary\" side of the principle that legitimately balances openness against valorisation. Consistent with the standard MSCA requirement for FAIR data management and open science, a Data Management Plan will be produced as an early project deliverable, within the first six months of the action, detailing data types, standards, storage, sharing, access and long-term reuse arrangements and operationalising the FAIR and open-access commitments above across all work packages.",
+      "word_count": 2168
     },
     {
       "sub_section_id": "1.3",
       "title": "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host",
-      "content": "## 1.3 Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host\n\n**Supervisory architecture.** FIELDWISE is a European Fellowship recruiting Dr. Rositsa Cholakova from Bulgaria to the sole beneficiary and recruiting organisation, HUN-REN Centre for Agricultural Research (HUN-REN ATK), Martonvásár, Hungary. Because it is a European Fellowship rather than a Global Fellowship, the training relationship centres on a genuine two-way transfer of knowledge between the researcher and the host (there is no outgoing-phase associated partner and hence no three-way transfer to construct). The supervision is deliberately matched to the interdisciplinary reach of the work plan and is delivered by a two-supervisor structure reinforced by named specialist support. Dr. Roland Hollós, research associate in the Department of Crop Production at HUN-REN ATK and HUN-REN AI Ambassador for the Centre for Agricultural Research, is the primary supervisor and carries the modelling, data-integration and uncertainty-analysis core of the training. Prof. András Jung, Professor at the Institute of Cartography and Geoinformatics of Eötvös Loránd University (ELTE) — the associated remote-sensing partner — is the co-supervisor and carries the hyperspectral-to-Sentinel scale-harmonisation strand. This mirrors the methodological spine of Sections 1.1 and 1.2: the biological-to-operational validation chain requires both robust predictive modelling and rigorous sensing-scale integration, and each competence is anchored in a supervisor who owns it.\n\n**Qualifications, experience and track record of the supervisors.** The primary supervisor's expertise is in AI-based agricultural and ecosystem modelling, climate-related modelling, heterogeneous agricultural-data integration and sustainable agricultural decision-making; his central role is to structure the modelling workflow, integrate historical field observations with remote-sensing and physiological information, select the AI/ML approaches and interpret model performance from an agricultural standpoint. His research track record is evidenced by his own modelling line — the 2026 reimplementation and improvement of the Biome-BGC model published in Geoscientific Model Development — and by HUN-REN ATK's active participation in relevant EU projects (COUSIN, AI4SoilHealth and TUdi, verified on CORDIS). Critically for the assessment of advanced-level training capacity, HUN-REN ATK is not a first-time host: it hosted and coordinated a funded Marie Skłodowska-Curie Individual Fellowship, LANDRACES (2017-2019), so the recruiting organisation has demonstrated institutional experience of supervising and training a fellow at postdoctoral level and of discharging the associated administrative and mentoring obligations. The co-supervisor is a full professor whose field spans remote sensing, hyperspectral imaging, field spectroscopy and multisensor data fusion; his standing is evidenced by a current publication record from the hosting group in Earth-observation and agricultural venues (for example items in Agronomy, Applied Sciences and Agriculture in 2025 and an IEEE Geoscience and Remote Sensing Letters paper in 2024). The supervisory core is complemented by three named specialists who broaden the training envelope without diluting accountability: Prof. Tibor Janda, head of the Plant Physiology and Metabolomics Department at HUN-REN ATK, provides physiological interpretation of remotely sensed and model-derived stress indicators and consultation on the selection of validation parameters; Prof. Gábor Milics (MATE) supports translation of stress indicators into a precision-agriculture and farm-management context; and Dr. Zsófia Varga (ELTE) provides practical UAV flight-planning and imaging-sensor operation support. The host also supplies the material training environment: the computational and data-processing infrastructure required for multi-source data integration and predictive modelling, with access to the wider HUN-REN research infrastructure for computationally intensive analyses, and an established plant-physiology and abiotic-stress department for physiological validation.\n\n**Planned training activities.** The training is structured, personalised and evidenced by a mandatory Career Development Plan (deliverable D1.3, Career Development Plan), agreed by month 3, owned jointly by the fellow and the primary supervisor, signed by both supervisors and the fellow, and reviewed at the project's scheduled milestone review points and quarterly against the plan. Training operates on three complementary tracks. (i) Scientific and technical training is delivered as supervised practice embedded in the work plan rather than as detached coursework: from the host side, heterogeneous agricultural-data integration, AI/ML-supported modelling and feature engineering, leakage-safe validation design and blocked temporal evaluation, uncertainty analysis and model interpretation; from the ELTE side, geoinformatics and field spectroscopy, hyperspectral/UAV methods and multisensor data fusion, scale-aware Earth-observation interpretation from proximal through UAV to Sentinel-2, and spectral-feature selection and spatial/spectral harmonisation, with hands-on UAV operation supported by the specialist support role. This directly closes the fellow's stated remaining competence gap — rigorous predictive modelling and model validation across time, sensing scales and environments — and delivers the intended career progression from plant physiologist/agronomist using digital tools to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems. (ii) Management and research-leadership training is delivered through progressive ownership: the fellow coordinates the WP3 validation protocol, conducts or co-conducts the UAV campaigns, and leads the day-to-day scientific choices under a defined escalation structure. (iii) Transferable-skills training, embedded in the Career Development Plan, covers research integrity, open-science and FAIR-data practice, generative-AI literacy, grant writing, IP and exploitation, project management and science communication — satisfying the call's expectation that fellowships foster open science and rounded professional development. A teaching strand runs through guest lectures, seminars and practical sessions at MATE and, where institutionally possible, the Agricultural University of Plovdiv; this builds on the fellow's approximately five years of prior university teaching, transferring that experience into precision agriculture and Earth observation rather than starting it from scratch.\n\n**Two-way transfer of knowledge between the researcher and the host.** The transfer is genuinely bidirectional and deliberately complementary, as a European Fellowship requires. Into the fellow flow the host's and associated partner's advanced competences: advanced agricultural data science, robust and interpretable modelling, uncertainty quantification, hyperspectral/UAV/Earth-observation integration, precision-agriculture workflows and research-to-software translation. From the fellow flow competences the host gains: agronomy, plant protection and plant physiology; plant-stress biology and physiological phenotyping; horticultural field experimentation; proximal spectral interpretation; and the concept and multi-source data-integration experience embodied in DrR - Digital Agronomist, the fellow's pre-existing, self-financed research tool. Because the host's strength is modelling and data science while the fellow's is the biological and experimental grounding of the stress signal, neither side is merely a recipient: the fellow supplies the physiological meaning that keeps the modelling honest, and the host supplies the statistical and geospatial rigour that makes the biology operational. The mechanism for this exchange is concrete and continuous: weekly one-to-one meetings between the fellow and the primary supervisor, technical sessions with the co-supervisor through the Earth-observation harmonisation strand, a monthly written progress record, quarterly review against the Career Development Plan attended by both supervisors, and a cross-partner Project Steering Group that coordinates the disciplinary hand-offs.\n\n**Rationale and added value of the non-academic placement.** The fellowship includes a six-month non-academic placement at AgroVIR (AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság) over months M25-M30, structured as an extension of the European Fellowship rather than a change of instrument, and preceded by delivery of the DrR web MVP so that the placement is evaluation and transfer rather than first build. Its rationale is that the project's optimisation target — demonstrated field-level decision value, not retrospective accuracy alone — can only be tested against a real operational environment, and AgroVIR provides exactly that: a farm-management-software company whose FMIS is in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria, the two countries in which FIELDWISE works. During the placement the fellow evaluates the MVP's inputs, usability, missing-data behaviour, decision outputs and workflow compatibility; assesses interoperability requirements using protected or coded information; conducts monthly face-to-face technical reviews alongside routine collaboration; and finalises the FMIS integration requirements, exploitation roadmap and career-transfer outputs. The added value is precisely the set of competences the academic host cannot provide alone: operational model evaluation against a production FMIS, research-to-MVP translation, agricultural-software requirements practice, interoperability assessment, user-centred decision support and exploitation planning. The placement is supervised by Miklós Maróti, AgroVIR's Managing Director, whose experience in agricultural digitalisation and farm-management systems suits the evaluation of the MVP's stress and irrigation outputs within practical farm workflows; it is conducted mainly through remote collaboration with monthly face-to-face technical meetings, working with the AgroVIR product development team responsible for the FMIS platform, and it does not require access to proprietary customer databases or production systems because protected, coded or anonymised extracts are sufficient for interoperability testing. Ownership of placement results follows the grant-agreement default, vesting in HUN-REN ATK as the beneficiary acting through the fellow; a written placement agreement between the fellow, HUN-REN ATK and AgroVIR, concluded before the placement begins, will confirm this allocation and the access terms to the fellow's DrR background IP. Taken together, the supervisory structure, the personalised training plan and the inter-sectoral placement consolidate an already-established interdisciplinary trajectory into the independent Agricultural Data Scientist profile that is the fellowship's career-development objective.",
-      "word_count": 1436
+      "content": "### 1.3 Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host\n\n**A complementary supervisory team matched to the two pillars of the action.** FIELDWISE is a 30-month European Postdoctoral Fellowship (24 months at the host, M1–M24, plus a 6-month non-academic placement, M25–M30, under CC-07), and its supervision is structured around the two disciplinary pillars on which the science depends: plant-stress physiology and agricultural data science / Earth observation. Primary supervision is provided at the recruiting organisation and host, HUN-REN Agrartudomanyi Kutatokozpont (ATK), Martonvásár, by Prof. Tibor Janda, Head of the Plant Physiology and Metabolomics Department at the Agricultural Institute. His expertise — plant physiology, abiotic-stress (including drought) physiology and stress metabolomics — is exactly the competence the scientific spine of the project requires: he anchors the definition of the physiologically meaningful water-stress target, the judgement of whether model-derived and remotely sensed signals track genuine plant responses, and the physiological measurement programme. As head of an established department with extensive drought and abiotic-stress research, he directs a mature advanced-training environment and is positioned to supervise at the level the fellowship demands. The host's institutional capacity to deliver high-quality MSCA supervision is evidenced, not asserted: HUN-REN Agrartudomanyi Kutatokozpont coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (752453, 2017–2019) and participates in Horizon Europe today (COUSIN, AI4SoilHealth, TUdi). A committed supervisory effort of approximately 2.5 person-months across the action underwrites substantive, recurring engagement rather than nominal oversight.\n\nCo-supervision is provided by Prof. András Jung of Eötvös Loránd University (ELTE), Institute of Cartography and Geoinformatics — a specialist in remote sensing, hyperspectral imaging, field spectroscopy and multisensor data fusion — who carries the hyperspectral/UAV-to-Sentinel scale-transition strand, the second methodological pillar, with a co-supervisory effort of approximately 2.0 person-months. As an associated partner, Eötvös Loránd University (ELTE) additionally contributes Dr. Roland Hollós as the named team member responsible for the predictive-modelling/machine-learning strand (heterogeneous agricultural-data integration, AI/ML approach selection, feature engineering, validation design, uncertainty analysis and model interpretation) and Dr. Zsófia Varga for practical UAV operation, flight planning and imaging-sensor deployment. The source scientific environment, Magyar Agrár- és Élettudományi Egyetem (MATE), contributes the longitudinal 2022–2026 processing-tomato archive and agronomic/irrigation expertise through Dr. Sándor Takács, with senior precision-agriculture and decision-support consultation from Prof. Gábor Milics. The result is a single fellow supported by named specialists covering every methodological interface the project crosses — physiological definition, modelling and uncertainty, sensing-scale transition, and operational translation — so that no strand of the interdisciplinary programme is left without expert guidance.\n\n**Structured supervision and governance.** Supervision is delivered through a defined cadence rather than ad hoc contact: a weekly one-to-one meeting between the fellow and the supervisor; technical sessions with the co-supervisor through the EO-harmonisation strand and with the ELTE-side predictive-modelling team member through the modelling-intensive window, tapering outside them; a monthly written progress record held by the fellow; and a quarterly review against the Career Development Plan attended by both supervisors. A Project Steering Group chaired by the supervisor, with the fellow, the co-supervisor, the ELTE-side modelling team member and one named contact each from the data, software and placement partners, provides go/no-go oversight at defined steering points across the action, including a mid-placement review. Decision rights and a two-step, office-based conflict-resolution route are pre-defined, so that scientific, methodological, resourcing and access decisions each have a clear owner and escalation path. This governance is designed to give an experienced researcher returning to full-time research after a documented career break a stable, well-defined support structure while protecting her scientific independence.\n\n**Planned training activities (scientific, management and transferable skills).** The training design is that of supervised practice on real project work, organised as three scientific strands and a transferable-skills programme, and it directly serves the call's expected outcomes of increased research and transferable skills, improved employability, and enhanced quality and sustainability of research training and supervision. Scientifically, the fellow is trained in (i) physiological water-stress interpretation, validation-parameter selection and phenotyping practice at the host under the supervisor; (ii) geoinformatics, field spectroscopy, hyperspectral/UAV methods, multisensor fusion and scale-aware EO interpretation in the Eötvös Loránd University (ELTE) spatial-sensing environment under the co-supervisor and with UAV operations support; and (iii) heterogeneous-data integration, AI/ML-supported modelling, feature engineering, leakage-safe validation design and uncertainty analysis with the ELTE-side predictive-modelling team member. This addresses the fellow's one remaining competence gap — rigorous predictive modelling and model validation across time, sensing scales and environments — and completes her progression from plant physiologist/agronomist using digital tools to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems. Management and research-management competences are built through leading the harmonisation, validation and MVP work and coordinating multi-partner data, instrument and field-site access. Transferable skills are trained explicitly and in line with the call's requirement to integrate digital, open-science, valorisation and integrity competences: research integrity; open science and FAIR practice; generative-AI literacy; grant writing; IP and exploitation; project management; and science communication. A teaching strand transfers an existing strength — approximately five years of university teaching in plant physiology and plant-stress physiology at the Agricultural University of Plovdiv — into the new discipline through short guest lectures, seminars and practical sessions at Magyar Agrár- és Élettudományi Egyetem (MATE) and, where institutionally possible, the Agricultural University of Plovdiv, feeding research results back into teaching. The whole plan is consolidated in the Career Development Plan, established jointly by both supervisors and the fellow and submitted early as an obligatory deliverable (Career Development Plan), and reviewed at defined steering points across the action, satisfying the call's Career Development Plan requirement.\n\n**Two-way transfer of knowledge between the researcher and the host.** Because FIELDWISE is a European Fellowship, the relevant transfer is the two-way exchange between the researcher and the host and its associated partners; there is no outgoing phase and therefore no three-way construction. The transfer is deliberately complementary and bidirectional. The fellow brings into the host environment agronomy, plant protection, plant-stress biology, physiological phenotyping, horticultural field experimentation, proximal spectral interpretation and the existing DrR concept and multi-source data-integration experience — grounding that the modelling and EO strands need in order to be physiologically valid rather than merely statistically accurate. The host and partners provide, in return, advanced agricultural data science, robust modelling and uncertainty analysis, hyperspectral/UAV/EO integration, precision-agriculture workflows and research-to-software/industry translation. Concretely, the host contributes plant-stress-physiology supervision and institutional research integration; the associated Earth-observation partner contributes scale-aware sensing and the predictive-modelling strand; and the fellow contributes the biological and experimental grounding and the DrR application concept. This is a genuine exchange — the fellow strengthens the host's biological grounding and application reach while the host consolidates the fellow's data-science and EO competences — which is precisely the knowledge-transfer and R&I-capacity outcome the call seeks for participating organisations.\n\n**Rationale and added value of the non-academic placement.** The proposal includes an integral, end-of-project non-academic placement (WP5 — AgroVIR Non-Academic Placement) at AgroVIR (M25–M30), included as an integral and separately evaluated part of the proposal in line with the call's optional up-to-six-month placement provision; no separate secondment is proposed. The placement supplies inter-sectoral competences the academic host cannot provide alone: operational model evaluation against a production farm-management information system, research-to-MVP translation, agricultural-software requirements engineering, interoperability assessment, user-centred decision support and exploitation planning. AgroVIR's added value is credible on operational grounds — its farm management information system is in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria, the two countries FIELDWISE works in — even though its track record is commercial rather than research-based, with no participation in EU-funded research projects. The placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings, and is designed so that the fellow does not require access to proprietary customer databases or production systems: AgroVIR supplies protected, coded or anonymised extracts (for example coded field identifiers) sufficient for the agreed evaluation tasks (MVP usability, missing-data behaviour, interoperability, and finalisation of FMIS-integration requirements, an exploitation roadmap and career-transfer outputs). It is supervised by Miklós Maróti, whose managing-director experience in agricultural digitalisation and farm-management systems is the basis for the supervision argument, with a committed partner effort of approximately 3.0 person-months. Crucially, the placement deepens an established collaboration rather than opening a cold one: AgroVIR is consulted from M1, so requirements feedback shapes the MVP throughout WP4 before the formal evaluation begins. Ownership of placement results follows the grant-agreement default, vesting in HUN-REN Agrartudomanyi Kutatokozpont as beneficiary acting through the fellow, with a written placement agreement between the fellow, HUN-REN Agrartudomanyi Kutatokozpont and AgroVIR concluded before the placement begins to confirm this allocation and the access terms to the fellow's DrR background. By completion, the fellow will demonstrably have carried a scientific concept through biological definition, model development, unseen-condition validation, software implementation and industrial evaluation — a distinctive, cross-sectoral competence profile relevant to universities, research organisations, precision-agriculture and irrigation-technology companies, EO/geospatial organisations and FMIS providers.\n\nThe status of the forward-looking supervision and placement commitments is stated transparently: the supervisor's and co-supervisor's formal acceptance of their seats and committed effort, the ELTE-side representation of the predictive-modelling team member and the instrument-access arrangement, the named data-partner contact, and the placement arrangement, supervisor, effort and IP allocation are operator-declared working assumptions to be confirmed in partner writing before the action starts; the identities, institutional roles and infrastructure on which they rest are confirmed on public and partner-authored evidence.",
+      "word_count": 1560
     },
     {
       "sub_section_id": "1.4",
       "title": "Quality and appropriateness of the researcher's professional experience, competences and skills",
-      "content": "## 1.4 Quality and appropriateness of the researcher's professional experience, competences and skills\n\n**A profile matched to the project's interdisciplinary chain.** FIELDWISE runs a single validation chain from plant biology through predictive modelling and sensing-scale integration to operational decision support (Sections 1.1 and 1.2), and Dr. Rositsa Cholakova's existing professional experience is appropriate to that chain because it is strong precisely where the science is biologically demanding and developing precisely where the fellowship supplies its training. She is a plant physiologist and agronomist who publishes under Cholakova (and, before 2020, under Rositsa Cholakova-Bimbalova); her experience covers the biological, experimental and prototype-tool foundations of the project in full, with one clearly identified developmental need that is the direct subject of the supervised training.\n\n**Biological and experimental foundation.** The researcher supplies the disciplinary anchor on which the whole project depends. She holds a PhD in Plant Physiology (2020) from the Agricultural University of Plovdiv, supervised by Prof. Dr. Andon Vassilev, with doctoral research in plant stress physiology (the low-temperature stress response of maize and the effectiveness of subsequent foliar fertilisation). She served as Assistant Professor in Plant Physiology and Plant Stress Physiology at the same university from 2015 to 2020, and holds BSc and MSc degrees in Plant Protection alongside a recent second MSc in Environmental Engineering (2025-2026). This experience carries plant-stress biology, physiological phenotyping, horticultural field experimentation and proximal spectral interpretation — exactly the competences required to define the physiologically meaningful water-stress target of objective O1 and the harmonised evidence base of WP1, and exactly the competences the researcher contributes into the two-way knowledge transfer with the host. Her current appointment as Chief Assistant Professor and plant-physiology researcher, and current participation in projects on abiotic stress (ZEMDKT 17, drought and salinity in Solanum lycopersicum) and on satellite and UAV monitoring of vegetable crops (KP-06-COST/2), keep this expertise active and directly relevant to processing-tomato water stress.\n\n**Data-science and Earth-observation competences already in place.** Onto this biological core the researcher has already built the data-science and remote-sensing competences the modelling and scale-harmonisation strands call for, which is why the fellowship is a consolidation of an established interdisciplinary trajectory rather than a change of field. She worked as a Data Analyst at KPMG Global Hungary in 2024 (Python, R, basic machine learning, Power BI and spreadsheet analysis over large datasets), following earlier experience as an agricultural market analyst; she holds an A1/A3 UAV pilot licence issued by the Civil Aviation Administration of Bulgaria; and she uses DrR - Digital Agronomist in her current research as a sensor and Earth-observation monitoring and data-integration environment, the same prototype that provides the software starting point for the project's web MVP. DrR is a self-initiated, self-financed research prototype she developed independently. Her standing in the geospatial community is evidenced by a COST Action CA22136 PANGEOS Short-Term Scientific Mission hosted at MATE in 2025 and by membership of COST Actions CA22136 PANGEOS, CA22149 AI4Insect and CA22141 REcrop.\n\n**International mobility and teaching experience.** The researcher's mobility record demonstrates the international, cross-institutional orientation an MSCA fellowship rewards and establishes working relationships with the very environments FIELDWISE draws on: three Erasmus+ staff mobilities to MATE and the University of Novi Sad (2025-2026), an Erasmus master's research internship at ELTE Budapest (2026) and an earlier Erasmus PhD mobility to the Moscow Timiryazev Academy. She enters the action being recruited internationally from Bulgaria to the host in Hungary under a European Fellowship. Her approximately five years of university teaching at the Agricultural University of Plovdiv — syllabus design, lecturing and examining in Bulgarian and English including for Erasmus students, and supervision of Bachelor's theses — is the pre-existing strength the fellowship's teaching strand transfers into precision agriculture and Earth observation, rather than a skill built from scratch.\n\n**Honest appraisal of fit and developmental need.** Assessed candidly against the project, the profile is deliberately complementary to the host's. The publication record is concentrated in plant physiology; the three items touching remote sensing are recent and carry the researcher as a middle author, so the Earth-observation half of her profile rests on the STSM, the Erasmus mobilities and the UAV licence rather than on a mature publication list. The single remaining competence gap — rigorous predictive modelling and model validation across time, sensing scales and environments — is exactly what FIELDWISE is designed to close, completing the progression from a plant physiologist and agronomist using digital tools to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems. The appropriateness of the postdoctoral stage is reinforced, not weakened, by a full-time parenting career break from July 2021 to May 2024, which is declared and does not count against the research-experience eligibility ceiling. The overall judgement is therefore that the researcher's existing experience makes her both able to carry the biologically anchored science immediately and the right candidate to acquire, through this fellowship's supervision and inter-sectoral placement, the one methodological capability that turns that science into transferable, operationally evaluated decision support.",
-      "word_count": 828
+      "content": "**1.4 Quality and appropriateness of the researcher's professional experience, competences and skills**\n\n**A profile deliberately matched to the two pillars of the action.** The experienced researcher, Dr. Rositsa Cholakova — who published before 2020 under the name Rositsa Cholakova-Bimbalova — brings a professional profile that is closely and demonstrably matched to FIELDWISE, because the project was conceived around the two competence axes on which her career already sits: established depth in plant-stress physiology and agronomy, and a rapidly consolidating capability in agricultural data science and Earth observation. Appropriateness here is not a general assertion of excellence but a specific fit — each strand of the scientific programme draws on experience she already holds, and the single element she does not yet hold at the required level is precisely the element the fellowship is designed to supply. Her existing experience therefore maps onto the project by design rather than by coincidence.\n\n**Established scientific foundation in plant-stress physiology and agronomy.** Her doctoral and academic record supplies the physiological grounding on which the project depends. She holds a PhD in Plant Physiology (2020, Agricultural University of Plovdiv, under Prof. Dr. Andon Vassilev), preceded by BSc and MSc degrees in Plant Protection, giving her the agronomy-and-plant-protection base that the crop-facing work of the action requires. From 2015 to 2020 she was Assistant Professor in Plant Physiology and Plant Stress Physiology at the Agricultural University of Plovdiv — approximately five years of teaching and supervised research directly in the discipline that anchors the physiologically meaningful water-stress target at the heart of objective O1 (Harmonise the heterogeneous 2022-2026 MATE archive and define a physiologically meaningful water-stress target). Since 2024 she has been Chief Assistant Professor and plant-physiology researcher at the Maritsa Vegetable Crops Research Institute (MVCRI), where her current abiotic-stress work — including the drought and salinity strand of the ZEMDKT 17 programme in Solanum lycopersicum and the tomato multi-stress SolGenSys action — keeps her scientifically active in exactly the crop and the stress domain that FIELDWISE studies. This is the competence that allows her to judge whether a model-derived or remotely sensed signal tracks a genuine plant response rather than an unvalidated spectral proxy — the discriminating judgement the whole validation chain rests on.\n\n**Horticultural field experimentation and physiological measurement practice.** Alongside the theoretical grounding, she brings hands-on horticultural field experimentation, physiological phenotyping and proximal spectral interpretation. This experimental competence is directly appropriate to the archive-harmonisation, stress-target definition and physiological-validation activities of the project, and it is the biological grounding she contributes into the host environment as her half of the two-way knowledge transfer, ensuring the modelling and Earth-observation work remain physiologically valid rather than merely statistically accurate.\n\n**An already-underway transition into data science and Earth observation.** The second pillar — the one the fellowship helps her consolidate — is already substantially underway, which is what makes the transition credible rather than aspirational. Her applied data-science experience includes a period as a Data Analyst at KPMG Global Hungary (Python, R, basic machine learning, Power BI and work over large datasets) and earlier agricultural-market analysis using survey and database tools; it is embodied most concretely in DrR - Digital Agronomist, her self-financed, pre-existing research tool, which she already uses in her MVCRI research as a sensor, Earth-observation and data-integration environment (not, at this stage, a validated advisory product). Her Earth-observation and remote-sensing competence is evidenced through a coherent set of recent, verifiable activities rather than resting on a publication record: a COST Short-Term Scientific Mission (CA22136 PANGEOS) hosted at MATE in 2025, Erasmus+ staff mobilities to MATE and the University of Novi Sad in 2025-2026, an Erasmus master's internship at ELTE in 2026, an A1/A3 UAV pilot licence, an in-progress second MSc in Environmental Engineering, and membership of three COST Actions (PANGEOS, AI4Insect and REcrop). The proposal is explicit and honest that the Earth-observation half of her profile rests on this practical, mobility- and licence-based experience rather than on deep publication output — of her nine recorded publications only a small number touch remote sensing, all recent and as a contributing author — and this candour is itself appropriate to an interdisciplinary transition still in progress.\n\n**Precise alignment with the project, and the one remaining gap.** Taken together, her existing profile maps onto every strand of FIELDWISE except one, and that single remaining gap is the explicit rationale for the fellowship. Her competence base already covers physiological definition, agronomy and plant protection, horticultural experimentation, proximal sensing, practical UAV/EO practice and applied data handling; what it does not yet include at the level the science demands is rigorous predictive modelling and model validation across time, sensing scales and environments. FIELDWISE is therefore a consolidation of an already-established interdisciplinary trajectory — from plant physiologist and agronomist using digital tools toward an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems — rather than a change of field, and it is structured so that this one gap is closed through supervised practice on the project's own modelling and validation work (the training design that delivers this is set out in section 1.3 and is not repeated here).\n\n**Professional maturity, timing and integrating capacity.** She is, in addition, a returning researcher: following a documented full-time-parenting career break of just over 34 months (2021-2024, in Budapest), she has re-entered research with clear momentum, and the break does not count against the MSCA research-experience window — making the timing of the fellowship apt for an experienced researcher re-establishing a full-time research trajectory. Her teaching record — approximately five years of university lecturing and examining in Bulgarian and English, including for Erasmus students, with supervision of Bachelor's theses — supplies the communication and knowledge-transfer skills on which the action's teaching and dissemination activities draw. The combined profile makes her well placed to be the integrating agent the project needs: a single researcher able to carry one physiologically defined concept through biological definition, model development, unseen-condition validation, software implementation and industrial evaluation — which is exactly the distinctive, cross-sectoral competence the fellowship is built to produce.",
+      "word_count": 1006
     }
   ],
   "validation_status": {
     "overall_status": "assumed",
     "claim_statuses": [
       {
-        "claim_id": "central_challenge",
-        "claim_summary": "FIELDWISE tests whether a physiologically meaningful water-stress signal survives unseen seasons, a change of sensing scale and prospective real-farm validation, and can be encoded in a crop-configurable decision-support framework.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "development_crop_rationale",
-        "claim_summary": "Processing tomato is the model crop because ~5 years (2022-2026) of heterogeneous MATE data already exist, giving the objectives an evidentiary base.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
-      },
-      {
-        "claim_id": "HOST",
-        "claim_summary": "Host/beneficiary is HUN-REN Centre for Agricultural Research (HUN-REN ATK), a European Fellowship recruiting the fellow from Bulgaria to Hungary.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "FELLOWSHIP_TYPE",
-        "claim_summary": "The action is a European Postdoctoral Fellowship with a six-month non-academic placement extension.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "DURATION",
-        "claim_summary": "The action runs 30 months: a 24-month European Fellowship at the host plus a 6-month non-academic placement at AgroVIR.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "objective_O1",
-        "claim_summary": "O1 harmonises the 2022-2026 MATE archive and defines a physiological water-stress target; measurable output = QC-controlled common-variable matrix, missingness map, target/validation protocol.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "objective_O2",
-        "claim_summary": "O2 develops a parsimonious, interpretable, uncertainty-aware framework with ELTE spectral/EO harmonisation and separates reusable components from crop-specific parameters; outputs include model card and crop-transfer specification.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "objective_O3",
-        "claim_summary": "O3 prospectively validates the framework at an independent commercial farmer site with project sensing; outputs include prospective dataset, unseen-environment benchmark, limited-recalibration protocol.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "objective_O4",
-        "claim_summary": "O4 operationalises validated outputs in a crop-configurable DrR web MVP via Krumatic development and AgroVIR feedback, with industrial evaluation and a post-MSCA roadmap.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "deliverable_verification_set",
-        "claim_summary": "Each objective is verified by named deliverables (D1.1/D1.2/D1.3, D2.1/D2.2, D3.1/D3.2, D4.1/D4.2, D5.1/D5.2) with their exact titles.",
-        "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
-      },
-      {
-        "claim_id": "predefined_validation_criteria",
-        "claim_summary": "Blocked temporal (unseen-year) validation and model-selection criteria are predefined, fixing success thresholds in advance and making results verifiable.",
-        "status": "confirmed",
-        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json"
-      },
-      {
-        "claim_id": "objective_rq_hypothesis_mapping",
-        "claim_summary": "The objectives map onto research questions RQ1-RQ5 and hypotheses H1-H4 (e.g. O1 to the physiological-signature hypothesis, O3 to the transferability hypothesis, O4 to the operational-relevance hypothesis).",
-        "status": "inferred",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "achievability_existing_archive",
-        "claim_summary": "Achievability is supported by the pre-existing 2022-2026 MATE archive, so work begins from data rather than a new collection campaign.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
-      },
-      {
-        "claim_id": "achievability_drr_prototype",
-        "claim_summary": "The fellow's pre-existing, self-financed DrR prototype provides the software starting point for the web MVP.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
-      },
-      {
-        "claim_id": "achievability_parsimony",
-        "claim_summary": "A parsimony principle (simplest adequate model; no deep-learning dependency) matches model complexity to sample size and reduces over-fitting risk.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "achievability_contingency_site",
-        "claim_summary": "A single new instrumented commercial-farmer validation site is used, with a Szentendre Skanzen contingency route held in reserve if primary-site access fails.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
-      },
-      {
-        "claim_id": "beyond_sota_four_refused_assumptions",
-        "claim_summary": "The project's ambition is to refuse and explicitly test four commonly conflated assumptions (index=stress; proximal=satellite; cross-validation=field transfer; one crop model transfers unchanged).",
+        "claim_id": "call_pertinence_msca_pf",
+        "claim_summary": "The objectives are pertinent to the MSCA-PF 2026 call (HORIZON-MSCA-2026-PF-01), addressing both scientific gaps and the researcher's interdisciplinary/inter-sectoral skill development sought by the call's expected outcomes.",
         "status": "confirmed",
         "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/concept_refinement_summary.json"
       },
       {
-        "claim_id": "transition_proxy_to_physiological",
-        "claim_summary": "Beyond SOTA: replacing spectral-proxy stress definitions with a physiologically defined water-stress target on a harmonised five-season base.",
+        "claim_id": "call_id",
+        "claim_summary": "The selected call is HORIZON-MSCA-2026-PF-01 (MSCA Postdoctoral Fellowships 2026).",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "transition_scale_bridge",
-        "claim_summary": "Beyond SOTA: an explicit proximal to hyperspectral/UAV to Sentinel-2 scale bridge for field-scale operational inputs.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "transition_prospective_validation",
-        "claim_summary": "Beyond SOTA: moving from internal fit through blocked unseen-year validation to prospective validation at an independent commercial field, quantifying the transfer gap.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "transition_crop_configurable",
-        "claim_summary": "Beyond SOTA: separating a reusable decision-support core from crop-specific targets/calibration with explicit crop-transfer/recalibration gates, yielding a crop-configurable framework.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "transition_research_to_operation",
-        "claim_summary": "Beyond retrospective accuracy: delivery as a DrR web MVP (with Krumatic), industrial evaluation at AgroVIR, and a post-MSCA MVCRI replication route as a Hungary-Bulgaria bridge.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "career_trajectory_pertinence",
-        "claim_summary": "The objective chain consolidates the fellow's progression from plant physiologist/agronomist to an independent Agricultural Data Scientist.",
-        "status": "inferred",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "claim_id": "pertinence_call_scope",
-        "claim_summary": "The objectives are pertinent to the call scope: an excellent researcher undertaking international mobility under a European Postdoctoral Fellowship.",
-        "status": "confirmed",
-        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
-      },
-      {
-        "claim_id": "methodology_four_criteria",
-        "claim_summary": "The methodology judges a water-stress signal by four linked criteria (physiological validity, predictive performance, transferability, management relevance) rather than retrospective accuracy alone.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/concept_note.md (§1.1.2)"
-      },
-      {
-        "claim_id": "model_crop_and_evidence_base",
-        "claim_summary": "Processing tomato is the model crop, chosen because ~5 seasons (2022–2026) of heterogeneous MATE observations already exist, forming the evidence base.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/project_summary.json; concept_note.md (§1.1.1)"
-      },
-      {
-        "claim_id": "wp1_harmonisation_and_physiological_target",
-        "claim_summary": "WP1 defines a common-variable matrix, missingness strategy and effective statistical unit, a physiologically defined stress target with corroborating endpoints, candidate signatures, and predefined leakage-safe blocked-temporal validation and model-selection criteria; deliverables D1.1 and D1.2.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP1, T1.1–T1.5, D1.1, D1.2)"
-      },
-      {
-        "claim_id": "wp2_parsimonious_uncertainty_aware_model",
-        "claim_summary": "WP2 builds process-informed predictors and a parsimonious interpretable primary model plus at most one nonlinear benchmark where justified (no deep-learning dependency), quantifying calibration, uncertainty, interpretability and blocked unseen-year performance in a model card.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP2, T2.1–T2.3, D2.1)"
-      },
-      {
-        "claim_id": "wp2_scale_transition_nonequivalence",
-        "claim_summary": "An explicit hyperspectral/UAV-to-Sentinel-2 harmonisation is defined only where field geometry supports valid EO interpretation, not assuming leaf/plot/satellite equivalence.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (T2.4); concept_note.md (H3)"
-      },
-      {
-        "claim_id": "crop_transfer_separation",
-        "claim_summary": "DrR data structures separate reusable workflows from crop-specific parameters, and a crop-transfer specification fixes the transferable core, crop-specific parameters and minimum validation/recalibration gates before adding a new crop.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (T2.5, T2.6, D2.2)"
-      },
-      {
-        "claim_id": "wp3_prospective_validation",
-        "claim_summary": "WP3 applies the historical model prospectively at an independent project-instrumented commercial farmer field (met station + soil sensors) with physiological/proximal/thermal/UAV/Sentinel-2 observations, quantifying the transfer gap and applying only limited transparent recalibration; transfer loss is treated as a scientific result.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP3, T3.1–T3.5); risks.json (R07, risk_philosophy)"
-      },
-      {
-        "claim_id": "wp4_wp5_operationalisation",
-        "claim_summary": "Following the software-follows-the-science principle, validated components are incorporated into a crop-configurable DrR web MVP (stress probability/class, uncertainty, temporal trend, irrigation-attention output; crop-specific parameters explicit), evaluated at the M25–M30 AgroVIR placement for usability, missing-data behaviour, decision outputs and interoperability.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP4, WP5); concept_note.md (§1.1.3)"
-      },
-      {
-        "claim_id": "hypotheses_h1_h4_and_objectives",
-        "claim_summary": "Hypotheses H1–H4 (physiological signature, transferability, scale-transition, operational relevance) are the falsifiable assumptions the methodology tests, and delivering objectives O1–O4 is their sequential testing.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/concept_note.md (§1.1.7); architecture_inputs/objectives.json"
-      },
-      {
-        "claim_id": "methodological_challenges_mitigations",
-        "claim_summary": "Intrinsic methodological challenges (year-to-year variable differences, limited sample size, prospective performance drop, Sentinel-2 geometry/cloud limits, site infrastructure/access) are met by specific mitigations including a year-by-variable matrix, parsimony, transparent recalibration, valid-pixel-only Sentinel use, project sensor installation, and the Szentendre Skanzen contingency.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/risks.json (R01–R07)"
-      },
-      {
-        "claim_id": "interdisciplinary_integration_partners",
-        "claim_summary": "Five competences are integrated across the consortium: physiology/agronomy (fellow, MATE), modelling/uncertainty (HUN-REN ATK supervision), remote sensing/UAV/geoinformatics (ELTE via Prof. András Jung co-supervision), software engineering (Krumatic) and operational FMIS knowledge (AgroVIR).",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (spine_identity); architecture_inputs/objectives.json; project_brief/concept_note.md"
-      },
-      {
-        "claim_id": "integration_mechanisms",
-        "claim_summary": "Integration is achieved through one validation chain, DrR as the shared integration vehicle, the crop-transfer specification as the disciplinary interface, and coordination via weekly supervision, the EO-harmonisation strand and a cross-partner Steering Group.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/strategic_positioning.md; call_binding/confirmation_checklist.json (operator_decisions item 4)"
-      },
-      {
-        "claim_id": "interdisciplinary_mindset_outcome",
-        "claim_summary": "The interdisciplinary and inter-sectoral integration forges the new interdisciplinary mind-set expected of MSCA fellows.",
-        "status": "inferred",
-        "source_ref": "Tier 2: docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-02)"
-      },
-      {
-        "claim_id": "gender_dimension_not_biologically_relevant",
-        "claim_summary": "The analytical sex/gender dimension is not a relevant biological variable because the research object is processing-tomato water-stress physiology, with no human sex/gender factor (justification per the field's allowance).",
-        "status": "inferred",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/concept_note.md (§1.1.1)"
-      },
-      {
-        "claim_id": "user_diversity_in_innovation_content",
-        "claim_summary": "Diversity is addressed in the innovation content by targeting operationally obtainable data streams and an interpretable output usable by heterogeneous end-users (including smaller, less digitally equipped holdings), carried into AgroVIR usability/interoperability requirements and the crop-configurable design.",
-        "status": "inferred",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (T4.4, T5.1); risks.json (R03); concept_note.md (§1.1.4 G3)"
-      },
-      {
-        "claim_id": "human_feedback_consent",
-        "claim_summary": "Structured feedback from farmers and staff is voluntary, under informed consent and a right of withdrawal, with no special-category personal data collected.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 3, human_participants)"
-      },
-      {
-        "claim_id": "open_science_principle_and_training",
-        "claim_summary": "Open science follows the principle 'as open as possible, as closed as necessary', embedded as trained competences (open-science/FAIR practice, research integrity, generative-AI literacy) in the Career Development Plan.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 6); Tier 2: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06)"
-      },
-      {
-        "claim_id": "dmp_deliverable_month6",
-        "claim_summary": "A Data Management Plan is submitted as an early deliverable by month 6, in line with the MSCA-PF requirement.",
-        "status": "inferred",
-        "source_ref": "Tier 2: docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06, Open Science / FAIR data)"
-      },
-      {
-        "claim_id": "fair_and_reproducibility",
-        "claim_summary": "FAIR handling covers the harmonised database/metadata, the validation protocol and the model card; reproducibility is supported by predefined leakage-safe criteria and transparent reporting of the transfer gap and recalibration.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (T1.5, D1.1, D1.2, D2.1); risks.json (R07)"
-      },
-      {
-        "claim_id": "open_access_and_open_data",
-        "claim_summary": "Peer-reviewed results are targeted for open-access publication and the project builds on and returns to open Copernicus/Sentinel-2 data.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 6; item 13 green_charter); project_brief/concept_note.md"
-      },
-      {
-        "claim_id": "sensitive_data_protection",
-        "claim_summary": "Commercially sensitive farmer and AgroVIR information is published only in aggregated, coded or anonymised form and all data remain within the EU.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (operator_decisions item 3, farmer_commercial_data, non_eu_data_transfer)"
-      },
-      {
-        "claim_id": "drr_background_deposit_separation",
-        "claim_summary": "The pre-existing DrR background is documented with a dated background declaration and deposited (e.g. Zenodo), keeping DrR background and FIELDWISE foreground separated for reuse and citation.",
-        "status": "confirmed",
-        "source_ref": "Tier 3: docs/tier3_project_instantiation/project_brief/concept_note.md (§1.1.3); call_binding/confirmation_checklist.json (operator_decisions item 10)"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json"
       },
       {
         "claim_id": "FELLOWSHIP_TYPE",
-        "claim_summary": "FIELDWISE is a European Fellowship, so the training centres on two-way (researcher<->host) knowledge transfer, not the three-way transfer of a Global Fellowship outgoing phase.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "HOST",
-        "claim_summary": "The host, sole beneficiary and recruiting organisation is HUN-REN Centre for Agricultural Research (HUN-REN ATK), Martonvásár, Hungary.",
+        "claim_summary": "The action is a European Postdoctoral Fellowship with a 6-month non-academic placement extension.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
         "claim_id": "DURATION",
-        "claim_summary": "The action is 30 months: a 24-month European Fellowship at HUN-REN ATK plus a 6-month non-academic placement at AgroVIR (M25-M30) under CC-07.",
+        "claim_summary": "The project duration is 30 months (24-month fellowship phase at the host plus a 6-month placement).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "HOST",
+        "claim_summary": "The host/recruiting organisation is HUN-REN Agrartudomanyi Kutatokozpont (ATK), Martonvásár, Hungary.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "FELLOW",
+        "claim_summary": "The experienced researcher/applicant is Dr. Rositsa Cholakova.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
         "claim_id": "SUPERVISOR",
-        "claim_summary": "Dr. Roland Hollós, research associate in the Department of Crop Production at HUN-REN ATK and HUN-REN AI Ambassador, is the primary supervisor with expertise in AI-based agricultural modelling, heterogeneous data integration and uncertainty analysis.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "supervisor_track_record",
-        "claim_summary": "The primary supervisor's track record is evidenced by his 2026 Biome-BGC model paper in Geoscientific Model Development and by HUN-REN ATK's participation in COUSIN, AI4SoilHealth and TUdi (CORDIS-verified).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "host_advanced_training_capacity",
-        "claim_summary": "HUN-REN ATK previously hosted and coordinated a funded MSCA Individual Fellowship, LANDRACES (2017-2019), evidencing institutional capacity to supervise and train a fellow at postdoctoral level.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "CO_SUPERVISOR",
-        "claim_summary": "Prof. András Jung, Professor at ELTE's Institute of Cartography and Geoinformatics (associated partner), is the co-supervisor carrying the hyperspectral-to-Sentinel scale-harmonisation strand.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "co_supervisor_track_record",
-        "claim_summary": "The co-supervisor's expertise in remote sensing, hyperspectral imaging and multisensor fusion is evidenced by a current hosting-group publication record in EO/agricultural venues (2024-2025).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "complementary_specialists",
-        "claim_summary": "Supervision is complemented by Prof. Tibor Janda (ATK, plant physiology/abiotic stress), Prof. Gábor Milics (MATE, precision agriculture) and Dr. Zsófia Varga (ELTE, UAV operations support).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "host_training_infrastructure",
-        "claim_summary": "The host provides the computational/data-processing environment for multi-source integration and predictive modelling, access to wider HUN-REN infrastructure, and an established Plant Physiology and Metabolomics Department for physiological validation.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "scientific_training_strands",
-        "claim_summary": "Scientific/technical training is delivered as supervised practice: host-side data integration, AI/ML modelling, leakage-safe validation and uncertainty analysis (KT1); ELTE-side geoinformatics, hyperspectral/UAV methods and scale-aware EO interpretation (KT2).",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "career_development_plan",
-        "claim_summary": "A Career Development Plan (D1.3) is agreed by month 3, owned by the fellow and primary supervisor, signed by both supervisors and the fellow, and reviewed at scheduled review points.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
-      },
-      {
-        "claim_id": "transferable_skills_training",
-        "claim_summary": "Transferable-skills training in the CDP covers research integrity, open-science/FAIR practice, generative-AI literacy, grant writing, IP and exploitation, project management and science communication.",
+        "claim_summary": "The primary supervisor at HUN-REN ATK is Prof. Tibor Janda.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
       },
       {
-        "claim_id": "teaching_route",
-        "claim_summary": "A teaching strand runs through guest lectures/seminars/practical sessions at MATE and, where possible, the Agricultural University of Plovdiv, building on the fellow's approximately five years of prior university teaching.",
+        "claim_id": "objectives_O1_O4",
+        "claim_summary": "The programme is organised around four objectives O1-O4 whose canonical titles are reproduced verbatim.",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "central_challenge",
+        "claim_summary": "The central challenge is whether a water-stress signal found in processing tomato stays biologically meaningful across seasons/scales, survives prospective field validation, and can be encoded in a crop-configurable decision-support framework.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      },
+      {
+        "claim_id": "three_scientific_gaps",
+        "claim_summary": "The objectives close three focused gaps: physiological grounding of stress indicators, transferability across unseen conditions/scales/crops, and irrigation decision relevance.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      },
+      {
+        "claim_id": "objective_measurable_targets",
+        "claim_summary": "Each objective is defined by concrete measurable outputs (e.g. QC-controlled common-variable matrix; ranked predictor set, model card and crop-transfer specification; prospective validation dataset and unseen-environment benchmark; web MVP with validated tomato module).",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "deliverables_verification_due_months",
+        "claim_summary": "Objectives are anchored to dated deliverables — D1.1/D1.2/D2.2 (month 14), D2.1 (month 3), D3.1/D3.2 (month 18), D4.1 (month 24), D5.1/D5.2 (month 30) — enabling verification.",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "pre_registered_metrics_thresholds",
+        "claim_summary": "Model evaluation uses pre-registered metrics under blocked unseen-year validation with literature-derived acceptance thresholds fixed in D1.2 before the prospective season, and the primary model is frozen and its model card registered before the first field season.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      },
+      {
+        "claim_id": "mate_archive_basis",
+        "claim_summary": "O1/O2 are grounded in the heterogeneous 2022-2026 MATE processing-tomato archive of physiological, soil, meteorological and proximal spectral observations.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+      },
+      {
+        "claim_id": "drr_preexisting_prototype",
+        "claim_summary": "DrR - Digital Agronomist is the fellow's pre-existing, self-financed research tool (a sensor/EO monitoring and data-integration tool, not a validated advisory product) used as the research-to-application vehicle.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/project_summary.json"
+      },
+      {
+        "claim_id": "commercial_farmer_validation_site",
+        "claim_summary": "O3 is validated prospectively at an independent commercial farmer site instrumented by the project (meteorological station and soil sensors), with a defined site-contingency ladder.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "agrovir_placement_krumatic",
+        "claim_summary": "O4 operationalisation relies on Krumatic software development from project start and AgroVIR requirements consultation followed by the M25-M30 industrial evaluation/placement.",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "post_msca_mvcri_route",
+        "claim_summary": "Extension to additional cultivars/Bulgarian conditions is placed after the action as a post-MSCA replication route through MVCRI, with no in-action MVCRI effort claimed.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+      },
+      {
+        "claim_id": "beyond_sota_seven_transitions",
+        "claim_summary": "Ambition beyond the state of the art is expressed as seven concrete transitions (stress proxy to physiological target; internal fit to blocked unseen-year to independent commercial-field validation; proximal to UAV to Sentinel-2 scale bridge; standalone model to DrR web MVP with AgroVIR evaluation; tomato prototype to crop-configurable framework, etc.).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+      },
+      {
+        "claim_id": "refused_assumptions",
+        "claim_summary": "The project explicitly refuses four common assumptions (vegetation index equals water stress; proximal and satellite indices interchangeable; internal cross-validation proves field transferability; one tomato-trained model transfers unchanged to other crops).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md"
+      },
+      {
+        "claim_id": "parsimony_no_deep_learning",
+        "claim_summary": "The methodological novelty is a physiologically grounded validation framework rather than a new algorithm; the stance is parsimony and interpretability without a deep-learning dependency.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+      },
+      {
+        "claim_id": "reusable_core_crop_specific_separation",
+        "claim_summary": "The framework separates a reusable, crop-configurable decision-support core from crop-specific physiological/phenological/calibration components, with explicit crop-transfer validation/calibration gates.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
+      },
+      {
+        "claim_id": "M-REUSE-ARCHIVE",
+        "claim_summary": "The methodology reuses the existing 2022-2026 processing-tomato archive as its primary evidence base rather than mounting a new campaign, harmonised into a QC-controlled common-variable matrix (O1).",
+        "status": "confirmed",
+        "source_ref": "Tier 3: architecture_inputs/objectives.json (O1); project_brief/concept_note.md (G2, Pack §1.1.4)"
+      },
+      {
+        "claim_id": "M-PHYSIO-TARGET",
+        "claim_summary": "A physiologically meaningful water-stress target is defined and fixed before modelling, replacing spectral-proxy stress definitions.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: architecture_inputs/objectives.json (O1); project_brief/concept_note.md (G1, evaluation-discipline block)"
+      },
+      {
+        "claim_id": "M-PARSIMONY",
+        "claim_summary": "The predictive framework is parsimonious, interpretable and uncertainty-aware and deliberately avoids a deep-learning dependency.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.2); architecture_inputs/objectives.json (O2)"
+      },
+      {
+        "claim_id": "M-HYPOTHESES",
+        "claim_summary": "The work rests on four testable hypotheses H1-H4 (physiological signature, transferability, scale-transition, operational relevance) as underpinning assumptions.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.7 Hypotheses)"
+      },
+      {
+        "claim_id": "M-MODEL-LEARNS",
+        "claim_summary": "The model learns the relationship between operational predictors (soil-water, weather, spectral/EO) and an independently measured physiological water-stress target.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (evaluation-discipline block, review issue 12)"
+      },
+      {
+        "claim_id": "M-LEAKAGE-SAFE",
+        "claim_summary": "Model selection and evaluation use blocked, leakage-safe unseen-year temporal validation.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.2, evaluation-discipline block); phase3_wp_design/wp_structure.json (T1.5)"
+      },
+      {
+        "claim_id": "M-PREREG-METRICS",
+        "claim_summary": "Evaluation uses pre-registered metrics (balanced accuracy, F1, ROC-AUC; RMSE, MAE, R2; reliability diagrams, Brier score, PICP; lead time, false-alarm rate) with literature-derived acceptance thresholds fixed in the validation protocol before the prospective season.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (OD-3 pre-registered metrics block)"
+      },
+      {
+        "claim_id": "M-FREEZE-MODEL",
+        "claim_summary": "The primary model is frozen and its model card registered in the Primary model, benchmark and model card (D2.1, month 3) before the first field season.",
+        "status": "confirmed",
+        "source_ref": "Tier 4: phase8_drafting_review/canonical_reference_pack.json (D2.1, due_month 3); phase3_wp_design/wp_structure.json (T2.3)"
+      },
+      {
+        "claim_id": "M-THREE-TRANSFER-LEVELS",
+        "claim_summary": "Transferability is treated at three distinct levels: temporal (unseen-year), environmental (research-to-commercial field), and methodological/crop transfer.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (G2); architecture_inputs/objectives.json (O2, O3)"
+      },
+      {
+        "claim_id": "M-PROSPECTIVE-VALIDATION",
+        "claim_summary": "The frozen model is validated prospectively at an independent commercial farmer field instrumented with a meteorological station and soil sensors, with a limited-recalibration protocol if transfer is incomplete (O3).",
+        "status": "confirmed",
+        "source_ref": "Tier 3: architecture_inputs/objectives.json (O3); Tier 4: phase3_wp_design/wp_structure.json (WP3, T3.5)"
+      },
+      {
+        "claim_id": "M-CORE-SEPARATION",
+        "claim_summary": "A reusable decision-support core is explicitly separated from crop-specific biological/calibration parameters, with a documented crop-transfer specification and recalibration gates.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: architecture_inputs/objectives.json (O2); project_brief/concept_note.md (§1.1.1); Tier 4: phase3_wp_design/wp_structure.json (T2.5, T2.6)"
+      },
+      {
+        "claim_id": "M-TOMATO-STARTING-CROP",
+        "claim_summary": "Processing tomato is the scientifically justified starting crop, not the intended limit; the project builds the methodology for controlled transfer rather than claiming unchanged transfer.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.1)"
+      },
+      {
+        "claim_id": "M-DRR-VEHICLE",
+        "claim_summary": "The pre-existing DrR prototype is used as a research-to-application vehicle; only validated scientific components are incrementally incorporated into a crop-configurable web MVP; the software follows the science.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.3); architecture_inputs/objectives.json (O4)"
+      },
+      {
+        "claim_id": "M-CHALLENGE-MISSINGNESS",
+        "claim_summary": "Archive heterogeneity/missingness is mitigated by a common-variable matrix, explicit missingness strategy and defined effective statistical unit fixed before modelling.",
+        "status": "confirmed",
+        "source_ref": "Tier 4: phase3_wp_design/wp_structure.json (T1.1, T1.2); Tier 3: architecture_inputs/objectives.json (O1)"
+      },
+      {
+        "claim_id": "M-CHALLENGE-UAV",
+        "claim_summary": "Fragility of UAV/hyperspectral campaigns is mitigated by prioritising acquisitions around key physiological dates and retaining physiology/proximal sensing as the core pathway.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: working_assumptions.json (elte_instrument_access rationale, risk R05)"
+      },
+      {
+        "claim_id": "M-INTERDISCIPLINARY-NECESSARY",
+        "claim_summary": "An interdisciplinary approach integrating plant-stress physiology, agricultural data science, hyperspectral/UAV/EO remote sensing and operational software/FMIS expertise is necessary and structured through defined methodological interfaces.",
+        "status": "confirmed",
+        "source_ref": "Tier 4: phase2_concept_refinement/concept_refinement_summary.json (EO-02); Tier 3: project_brief/training_and_career_development.md (two-way transfer of knowledge)"
+      },
+      {
+        "claim_id": "M-PHYSIO-ANCHOR-ATK",
+        "claim_summary": "The plant-stress-physiology strand is anchored in the HUN-REN ATK Plant Physiology and Metabolomics Department (headed by a plant-stress physiologist) and modelling is under HUN-REN supervision.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: call_binding/confirmation_checklist.json (SUPERVISOR confirmed identity/headship); architecture_inputs/objectives.json (O2 'under HUN-REN supervision')"
+      },
+      {
+        "claim_id": "M-KRUMATIC-AGROVIR",
+        "claim_summary": "Krumatic provides software development from project start and AgroVIR provides requirements consultation from the outset and later operational/interoperability evaluation.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: architecture_inputs/objectives.json (O4); Tier 4: phase3_wp_design/wp_structure.json (WP4 T4.4, WP5)"
+      },
+      {
+        "claim_id": "M-GENDER-NOT-RELEVANT",
+        "claim_summary": "A sex/gender dimension in the research content is not relevant because the biological subject is processing tomato and no human/animal or special-category data is collected; justification provided.",
+        "status": "inferred",
+        "source_ref": "Tier 3: project_brief/concept_note.md (§1.1.1 crop subject); call_binding/confirmation_checklist.json (ethics: animal_subjects=No, no special-category data)"
+      },
+      {
+        "claim_id": "M-DIVERSITY-USERS",
+        "claim_summary": "Diversity is addressed via inclusive user-centred design in requirements/usability/interoperability evaluation and bilingual cross-border (Hungary/Bulgaria) farmer-facing uptake.",
+        "status": "confirmed",
+        "source_ref": "Tier 4: phase3_wp_design/wp_structure.json (T4.4, T5.1, T5.2); Tier 3: project_brief/training_and_career_development.md (networking/dissemination, Krumatic Bulgarian uptake)"
+      },
+      {
+        "claim_id": "M-HUMAN-CONSENT",
+        "claim_summary": "Human-participant feedback is governed by informed consent and right of withdrawal; farmer/commercial data are minimised and processed in coded or anonymised form.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: call_binding/confirmation_checklist.json (operator_decisions item 3, ethics: human_participants, farmer_commercial_data)"
+      },
+      {
+        "claim_id": "M-OPEN-PRINCIPLE",
+        "claim_summary": "Open science follows 'as open as possible, as closed as necessary', with FAIR-by-design data/metadata and reusable methods, metadata and publications.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/training_and_career_development.md (Open Science, data governance and IP)"
+      },
+      {
+        "claim_id": "M-OPEN-ACCESS-PUBS",
+        "claim_summary": "At least two peer-reviewed publications (plus an optional third) are targeted for open-access dissemination alongside a model card and pre-registration as reproducibility practices.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/training_and_career_development.md (Publications planning, networking); Tier 4: canonical_reference_pack.json (D2.1 model card)"
+      },
+      {
+        "claim_id": "M-OPEN-DATA-COPERNICUS",
+        "claim_summary": "The project relies on open Copernicus/Sentinel-2 data and publishes commercially sensitive results only in aggregated/coded/anonymised form.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: call_binding/confirmation_checklist.json (ethics: dual_use_and_misuse, farmer_commercial_data); Tier 3: project_brief/concept_note.md (Sentinel-2 inputs)"
+      },
+      {
+        "claim_id": "M-RIGHTS-LAYERS",
+        "claim_summary": "Separate rights layers (DrR background, FIELDWISE foreground, institutional datasets, partner-developed code) are documented and potentially protectable foreground is evaluated before disclosure.",
+        "status": "confirmed",
+        "source_ref": "Tier 3: project_brief/training_and_career_development.md (Open Science / IP; CDP open-science engagement row)"
+      },
+      {
+        "claim_id": "M-DMP-MONTH6",
+        "claim_summary": "A Data Management Plan is produced as an early deliverable within the first six months, operationalising FAIR and open-access commitments, consistent with the MSCA FAIR data-management/open-science training requirement.",
+        "status": "inferred",
+        "source_ref": "Tier 2: tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07 FAIR data management/Open Science) and the MSCA-PF application-form Part B 1.2 open-science field requirement"
+      },
+      {
+        "claim_id": "hollos_elte_ml_role",
+        "claim_summary": "Dr. Roland Hollós participates in FIELDWISE on the ELTE side (associated partner) as the named team member responsible for the predictive-modelling/machine-learning component, retaining the methodological leadership of the modelling workflow (AI/ML approach selection, heterogeneous data integration, model interpretation).",
+        "status": "assumed",
+        "source_ref": "Tier 3: working_assumptions.json (hollos_elte_ml_role, declared; awaiting ELTE written associated-partner confirmation)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "jung_co_supervision_acceptance",
+        "claim_summary": "Prof. András Jung accepts the co-supervisor role, carrying the hyperspectral/UAV/EO harmonisation strand as a substantive methodological role.",
+        "status": "assumed",
+        "source_ref": "Tier 3: working_assumptions.json (jung_co_supervision_acceptance, declared; awaiting written acceptance)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "elte_instrument_access",
+        "claim_summary": "The fellow conducts or co-conducts UAV and hyperspectral measurements with ELTE's DJI Matrice 350 RTK platform (Zenmuse L1/P1/H20T) and Ultris S5 / Cubert CUVIS cameras, supported by Dr. Zsófia Varga for flight planning, sensor operation and data acquisition, scheduled around key physiological measurement dates at the validation site; ELTE software environments are available for processing.",
+        "status": "assumed",
+        "source_ref": "Tier 3: working_assumptions.json (elte_instrument_access, declared; awaiting written instrument-access agreement)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "farmer2_backup_site",
+        "claim_summary": "A second independent commercial processing-tomato producer, reachable through the same MATE/ATK professional channel, has been identified and informally approached to serve as first-line backup validation site. If activated and the site meets the measurement protocol, the prospective commercial-field validation claim is preserved; written access is obtained under the same M1 access task as the primary site.",
+        "status": "assumed",
+        "source_ref": "Tier 3: working_assumptions.json (farmer2_backup_site, declared; awaiting written backup agreement)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "farmer_field_access",
+        "claim_summary": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
+        "status": "assumed",
+        "source_ref": "Tier 3: working_assumptions.json (farmer_field_access, declared; written access obtained under the M1 access task)",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "SUPERVISOR",
+        "claim_summary": "Primary supervisor is Prof. Tibor Janda, Head of the Plant Physiology and Metabolomics Department at HUN-REN Agrartudomanyi Kutatokozpont (Agricultural Institute, Martonvásár), specialist in plant physiology, abiotic/drought-stress physiology and stress metabolomics.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "janda_supervisor_acceptance",
+        "claim_summary": "Prof. Tibor Janda accepts the primary-supervisor role at HUN-REN ATK, anchoring supervision in the Plant Physiology and Metabolomics Department (which he heads) and carrying the supervision routine of the governance record.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "person_months_ATK_supervisor",
+        "claim_summary": "2.5",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "janda_advanced_supervision_capacity",
+        "claim_summary": "As head of an established department with extensive drought/abiotic-stress research, the supervisor directs a mature advanced-training environment able to supervise at the required level.",
+        "status": "inferred",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+      },
+      {
+        "claim_id": "atk_prior_msca_hosting",
+        "claim_summary": "The host coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (752453, 2017-2019) and participates in Horizon Europe (COUSIN, AI4SoilHealth, TUdi), evidencing institutional supervision/training capacity.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
-        "claim_id": "career_progression",
-        "claim_summary": "The intended progression is from plant physiologist/agronomist using digital tools to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems.",
+        "claim_id": "HOST",
+        "claim_summary": "HUN-REN Agrartudomanyi Kutatokozpont is the recruiting organisation, beneficiary and primary scientific host.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "CO_SUPERVISOR",
+        "claim_summary": "Co-supervisor is Prof. András Jung (Eötvös Loránd University (ELTE), Institute of Cartography and Geoinformatics), specialist in remote sensing, hyperspectral imaging, field spectroscopy and multisensor fusion, carrying the hyperspectral/UAV-to-Sentinel scale-transition strand.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "jung_co_supervision_acceptance",
+        "claim_summary": "Prof. András Jung accepts the co-supervisor role, carrying the hyperspectral/UAV/EO harmonisation strand as a substantive methodological role.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "person_months_ELTE_co_supervisor",
+        "claim_summary": "2.0",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "hollos_elte_ml_role",
+        "claim_summary": "Dr. Roland Hollós participates in FIELDWISE on the ELTE side (associated partner) as the named team member responsible for the predictive-modelling/machine-learning component, retaining the methodological leadership of the modelling workflow (AI/ML approach selection, heterogeneous data integration, model interpretation).",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "varga_uav_support",
+        "claim_summary": "Dr. Zsófia Varga provides practical UAV operation, flight planning and imaging-sensor deployment support.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
-        "claim_id": "two_way_transfer",
-        "claim_summary": "The transfer is bidirectional and complementary: host/ELTE supply data science, modelling, uncertainty and EO integration; the fellow supplies plant physiology, stress biology, phenotyping, proximal spectral interpretation and the DrR concept (KT1-KT4).",
+        "claim_id": "mate_archive_and_expertise",
+        "claim_summary": "Magyar Agrár- és Élettudományi Egyetem (MATE) contributes the longitudinal 2022-2026 processing-tomato archive and agronomic/irrigation expertise.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+      },
+      {
+        "claim_id": "contact_person_MATE",
+        "claim_summary": "Dr. Sándor Takács",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "milics_consultation",
+        "claim_summary": "Prof. Gábor Milics provides senior precision-agriculture and decision-support consultation.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
         "claim_id": "supervision_cadence",
-        "claim_summary": "The supervision mechanism comprises weekly one-to-one meetings with the primary supervisor, technical sessions with the co-supervisor via the EO strand, a monthly progress record, quarterly CDP reviews and a cross-partner Project Steering Group.",
+        "claim_summary": "Supervision follows a defined cadence: weekly one-to-ones, tapering technical sessions with the co-supervisor and modelling team member, a monthly written progress record, quarterly CDP reviews, and a Project Steering Group with go/no-go oversight at defined steering points including a mid-placement review, with pre-defined decision rights and an office-based conflict-resolution route.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
       },
       {
-        "claim_id": "placement_partner_window",
-        "claim_summary": "A six-month non-academic placement is hosted by AgroVIR (AGROVIR Üzletviteli Tanácsadó Korlátolt Felelősségű Társaság) over M25-M30, structured as an extension of the European Fellowship.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/roles.json"
-      },
-      {
-        "claim_id": "agrovir_production_footprint",
-        "claim_summary": "AgroVIR operates an FMIS in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria, the two countries FIELDWISE works in.",
+        "claim_id": "career_break",
+        "claim_summary": "The fellow returns to full-time research after a documented career break and is supported by the structured supervision arrangement.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
-        "claim_id": "placement_work_content",
-        "claim_summary": "During the placement the fellow evaluates MVP inputs/usability/missing-data behaviour/decision outputs (T5.1), assesses interoperability using protected/coded information (T5.2), conducts monthly face-to-face reviews (T5.3) and finalises FMIS integration requirements and the exploitation/career-transfer roadmap (T5.4).",
+        "claim_id": "training_scientific_strands",
+        "claim_summary": "Scientific training comprises physiological water-stress interpretation/phenotyping at the host, geoinformatics/hyperspectral/UAV/scale-aware EO at ELTE, and data-integration/AI-ML/leakage-safe validation/uncertainty analysis via supervised practice.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
+        "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      },
+      {
+        "claim_id": "training_transferable_skills",
+        "claim_summary": "Transferable-skills training covers research integrity, open science and FAIR practice, generative-AI literacy, grant writing, IP and exploitation, project management and science communication.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      },
+      {
+        "claim_id": "SR-07",
+        "claim_summary": "The call requires training to integrate transferable skills including digital/generative-AI, open science, knowledge valorisation and research integrity.",
+        "status": "confirmed",
+        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+      },
+      {
+        "claim_id": "career_transition",
+        "claim_summary": "Training addresses the fellow's remaining competence gap in predictive modelling and validation and completes her progression to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision support.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+      },
+      {
+        "claim_id": "teaching_route",
+        "claim_summary": "A teaching strand transfers the fellow's approximately five years of AU Plovdiv teaching into the new discipline via guest sessions at MATE and, where possible, the Agricultural University of Plovdiv, feeding results into teaching.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      },
+      {
+        "claim_id": "cdp_deliverable",
+        "claim_summary": "The Career Development Plan is established jointly by both supervisors and the fellow, submitted early as an obligatory deliverable (Career Development Plan, due month 3) and reviewed at defined steering points.",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "SR-08",
+        "claim_summary": "The call requires a Career Development Plan established jointly by supervisor(s) and researcher and submitted as an early deliverable.",
+        "status": "confirmed",
+        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
+      },
+      {
+        "claim_id": "FELLOWSHIP_TYPE",
+        "claim_summary": "The action is a European Fellowship, so the relevant transfer is two-way between researcher and host with no outgoing/three-way phase.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "DURATION",
+        "claim_summary": "The fellowship runs 30 months: 24 months at the host (M1-M24) plus a 6-month non-academic placement (M25-M30) under CC-07.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+      },
+      {
+        "claim_id": "two_way_transfer",
+        "claim_summary": "The two-way knowledge transfer is complementary: the fellow contributes agronomy, plant-stress biology, phenotyping, horticultural field experimentation, proximal spectral interpretation and the DrR concept; the host and partners contribute advanced data science, robust modelling, uncertainty analysis, EO integration, precision-agriculture workflows and research-to-software translation.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+      },
+      {
+        "claim_id": "placement_wp5_integral",
+        "claim_summary": "The proposal includes an integral, separately evaluated non-academic placement (WP5 — AgroVIR Non-Academic Placement) at AgroVIR in M25-M30 under the call's optional up-to-six-month placement provision, with no separate secondment.",
+        "status": "confirmed",
+        "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json"
+      },
+      {
+        "claim_id": "SR-06",
+        "claim_summary": "The call permits an optional up-to-six-month end-of-project non-academic placement that, if included, must be an integral, evaluated part of the proposal.",
+        "status": "confirmed",
+        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json"
       },
       {
         "claim_id": "placement_added_value",
-        "claim_summary": "The placement delivers operational model evaluation against a production FMIS, research-to-MVP translation, agricultural-software requirements practice, interoperability assessment and exploitation planning — competences the academic host cannot provide alone.",
-        "status": "inferred",
+        "claim_summary": "The placement supplies inter-sectoral competences the academic host cannot provide alone: operational model evaluation against a production FMIS, research-to-MVP translation, agricultural-software requirements, interoperability assessment, user-centred decision support and exploitation planning.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
+      },
+      {
+        "claim_id": "agrovir_operational_footprint",
+        "claim_summary": "AgroVIR's FMIS is in production use across more than 745,000 hectares in eight countries including Hungary and Bulgaria.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+      },
+      {
+        "claim_id": "agrovir_relevant_track_record",
+        "claim_summary": "No participation in EU-funded research projects. AgroVIR's relevant track record is commercial rather than scientific: twenty years of practice in Hungarian commercial agriculture, and a farm management information system in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria — the two countries FIELDWISE works in.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "placement_arrangement_AgroVIR",
+        "claim_summary": "The M25-M30 placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment. The fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment; AgroVIR provides the information and data extracts required for interoperability testing in protected form (coded or anonymised field identifiers, e.g. 'Field X'). The fellow works with the AgroVIR product development team responsible for the FMIS platform.",
+        "status": "assumed",
+        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
+        "assumption_declared": true
+      },
+      {
+        "claim_id": "placement_work_content",
+        "claim_summary": "Placement work content covers MVP usability/missing-data-behaviour/interoperability evaluation and finalisation of FMIS-integration requirements, an exploitation roadmap and career-transfer outputs.",
+        "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
@@ -448,18 +575,17 @@
         "assumption_declared": true
       },
       {
-        "claim_id": "placement_arrangement_AgroVIR",
-        "claim_summary": "The M25-M30 placement is conducted mainly through remote collaboration with monthly face-to-face technical meetings for review, feedback and progress assessment. The fellow does not require direct access to AgroVIR's proprietary software, customer databases, office infrastructure or computing equipment; AgroVIR provides the information and data extracts required for interoperability testing in protected form (coded or anonymised field identifiers, e.g. 'Field X'). The fellow works with the AgroVIR product development team responsible for the FMIS platform.",
+        "claim_id": "person_months_AgroVIR",
+        "claim_summary": "3.0",
         "status": "assumed",
         "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
         "assumption_declared": true
       },
       {
-        "claim_id": "placement_team_AgroVIR",
-        "claim_summary": "The AgroVIR product development team responsible for the FMIS platform.",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-        "assumption_declared": true
+        "claim_id": "agrovir_consulted_from_m1",
+        "claim_summary": "AgroVIR is consulted from M1 so the placement deepens an established collaboration rather than opening a cold one.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
         "claim_id": "placement_ip_ownership",
@@ -469,142 +595,115 @@
         "assumption_declared": true
       },
       {
-        "claim_id": "fellow_profile_and_training_need",
-        "claim_summary": "The fellow is a plant physiologist (PhD) with data-science exposure (KPMG data-analyst role, DrR tool); her remaining competence gap is rigorous predictive modelling and validation across time, scales and environments.",
+        "claim_id": "career_profile_outcome",
+        "claim_summary": "By completion the fellow will have carried a concept through biological definition, modelling, unseen-condition validation, software implementation and industrial evaluation, yielding a cross-sectoral profile relevant to academic and non-academic careers.",
         "status": "confirmed",
         "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
       },
       {
-        "claim_id": "fellow_identity",
-        "claim_summary": "The applicant researcher is Dr. Rositsa Cholakova, a plant physiologist and agronomist (publishing before 2020 as Rositsa Cholakova-Bimbalova), currently Chief Assistant Professor / plant-physiology researcher.",
+        "claim_id": "EO-01_EO-05_EO-07",
+        "claim_summary": "The supervision and training design serves the call's expected outcomes of increased researcher skills and employability, enhanced quality and sustainability of training and supervision, and better knowledge transfer among participating organisations.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
       },
       {
-        "claim_id": "name_variant",
-        "claim_summary": "She publishes under Cholakova and, before 2020, under Cholakova-Bimbalova; the change is noted at first citation of pre-2020 work.",
+        "claim_id": "C01_fellow_identity",
+        "claim_summary": "The experienced researcher is Dr. Rositsa Cholakova, a plant physiologist who published before 2020 as Rositsa Cholakova-Bimbalova.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOW); docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile"
       },
       {
-        "claim_id": "phd_plant_physiology",
-        "claim_summary": "She holds a PhD in Plant Physiology (2020) from the Agricultural University of Plovdiv, supervised by Prof. Dr. Andon Vassilev.",
+        "claim_id": "C02_phd_and_degrees",
+        "claim_summary": "She holds a PhD in Plant Physiology (2020, Agricultural University of Plovdiv, under Prof. Dr. Andon Vassilev), with prior BSc and MSc degrees in Plant Protection.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.doctorate / second_masters"
       },
       {
-        "claim_id": "phd_thesis_subject",
-        "claim_summary": "Her doctoral research addressed the low-temperature stress response of maize and the effectiveness of subsequent foliar fertilisation.",
+        "claim_id": "C03_au_plovdiv_teaching",
+        "claim_summary": "She was Assistant Professor in Plant Physiology and Plant Stress Physiology at the Agricultural University of Plovdiv 2015-2020, about five years teaching and supervised research in the discipline.",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.positions_held / teaching_and_supervision"
+      },
+      {
+        "claim_id": "C04_current_mvcri_role",
+        "claim_summary": "Since 2024 she is Chief Assistant Professor and plant-physiology researcher at MVCRI, active in abiotic-stress/drought tomato research (ZEMDKT 17 in Solanum lycopersicum; SolGenSys tomato multi-stress).",
+        "status": "confirmed",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.positions_held / projects_and_grants"
+      },
+      {
+        "claim_id": "C05_physiology_maps_to_O1",
+        "claim_summary": "Her plant-stress-physiology competence lets her judge whether model-derived/remotely sensed signals track a genuine plant response and underpins the O1 physiological water-stress target.",
         "status": "inferred",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json (researcher_profile, knowledge_transfer KT1/KT3); docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json objectives O1"
       },
       {
-        "claim_id": "assistant_professor_plant_stress_physiology",
-        "claim_summary": "She was Assistant Professor in Plant Physiology and Plant Stress Physiology at the Agricultural University of Plovdiv, 2015-2020.",
+        "claim_id": "C06_field_experimentation",
+        "claim_summary": "She brings horticultural field experimentation, physiological phenotyping and proximal spectral interpretation competences relevant to archive-harmonisation, stress-target and validation work.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile / knowledge_transfer KT3"
       },
       {
-        "claim_id": "degrees_plant_protection_env_eng",
-        "claim_summary": "She holds BSc and MSc degrees in Plant Protection and a recent second MSc in Environmental Engineering (2025-2026).",
+        "claim_id": "C07_data_science_experience",
+        "claim_summary": "Her data-science experience includes a Data Analyst role at KPMG Global Hungary (Python, R, basic ML, Power BI, large datasets) and earlier agricultural-market analysis with survey/database tools.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.data_science_evidence / positions_held"
       },
       {
-        "claim_id": "biological_competence",
-        "claim_summary": "Her experience covers plant-stress biology, physiological phenotyping, horticultural field experimentation and proximal spectral interpretation, matching the physiological stress-target and WP1 needs.",
+        "claim_id": "C08_drr_tool",
+        "claim_summary": "DrR - Digital Agronomist is her self-financed, pre-existing research tool used in her MVCRI research as a sensor/Earth-observation monitoring and data-integration environment, not a validated advisory product.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.data_science_evidence; docs/tier3_project_instantiation/project_brief/project_summary.json existing_research_prototype; docs/tier3_project_instantiation/project_brief/concept_note.md"
       },
       {
-        "claim_id": "current_projects",
-        "claim_summary": "She currently participates in projects on abiotic stress (ZEMDKT 17, drought and salinity in Solanum lycopersicum) and on satellite/UAV monitoring of vegetable crops (KP-06-COST/2).",
+        "claim_id": "C09_eo_activities",
+        "claim_summary": "Her EO/remote-sensing competence is evidenced by a COST STSM (CA22136 PANGEOS) at MATE 2025, Erasmus+ staff mobilities to MATE and Novi Sad 2025-2026, an Erasmus master's internship at ELTE 2026, an A1/A3 UAV licence, an in-progress MSc in Environmental Engineering, and membership of three COST Actions.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.awards_and_mobilities / second_masters"
       },
       {
-        "claim_id": "kpmg_data_analyst",
-        "claim_summary": "She worked as a Data Analyst at KPMG Global Hungary (2024) using Python, R, basic machine learning and Power BI, with earlier agricultural market-analyst experience.",
+        "claim_id": "C10_eo_rests_on_practice_not_publications",
+        "claim_summary": "The EO half of her profile rests on practical mobility/licence-based experience rather than publications; of nine recorded publications only a small number touch remote sensing, all recent and as a contributing author.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.publications_summary"
       },
       {
-        "claim_id": "uav_pilot_licence",
-        "claim_summary": "She holds an A1/A3 UAV pilot licence issued by the Civil Aviation Administration of Bulgaria.",
+        "claim_id": "C11_competence_gap",
+        "claim_summary": "Her one remaining competence gap is rigorous predictive modelling and model validation across time, sensing scales and environments, which the fellowship is designed to close.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json training_and_career TR-GAP; docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
       },
       {
-        "claim_id": "drr_used_in_research",
-        "claim_summary": "She uses DrR - Digital Agronomist in her current research as a sensor/Earth-observation monitoring and data-integration environment, and it is the software starting point for the project's web MVP.",
+        "claim_id": "C12_career_progression",
+        "claim_summary": "FIELDWISE consolidates an established trajectory from plant physiologist/agronomist using digital tools toward an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision support, not a change of field.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/project_brief/concept_note.md"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json training_and_career TR-PROGRESSION; docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
       },
       {
-        "claim_id": "mvcri_drr_independence",
-        "claim_summary": "DrR - Digital Agronomist was initiated and developed by the fellow independently, using her own time and personal financial resources; it was not commissioned or financed by MVCRI, and MVCRI holds no ownership position in it.",
-        "status": "assumed",
-        "source_ref": "docs/tier3_project_instantiation/working_assumptions.json",
-        "assumption_declared": true
-      },
-      {
-        "claim_id": "pangeos_stsm_mate",
-        "claim_summary": "She undertook a COST Action CA22136 PANGEOS Short-Term Scientific Mission hosted at MATE in 2025.",
+        "claim_id": "C13_career_break",
+        "claim_summary": "She is a returning researcher after a documented full-time-parenting career break of just over 34 months (2021-2024), which does not count against the MSCA research-experience window.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.career_break"
       },
       {
-        "claim_id": "cost_action_memberships",
-        "claim_summary": "She is a member of COST Actions CA22136 PANGEOS, CA22149 AI4Insect and CA22141 REcrop.",
+        "claim_id": "C14_teaching_transferable_skills",
+        "claim_summary": "About five years of university lecturing and examining in Bulgarian and English, including for Erasmus students and Bachelor's supervision, supply communication and knowledge-transfer skills for the action's teaching and dissemination.",
         "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json researcher_profile.teaching_and_supervision"
       },
       {
-        "claim_id": "erasmus_mobilities",
-        "claim_summary": "She has undertaken three Erasmus+ staff mobilities to MATE and the University of Novi Sad (2025-2026), an Erasmus master's research internship at ELTE Budapest (2026) and an earlier Erasmus PhD mobility to the Moscow Timiryazev Academy.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "international_recruitment",
-        "claim_summary": "She is recruited internationally from Bulgaria to the host in Hungary under a European Fellowship.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
-      },
-      {
-        "claim_id": "teaching_experience",
-        "claim_summary": "She has approximately five years of university teaching at the Agricultural University of Plovdiv, including syllabus design and examining in Bulgarian and English for Erasmus students and Bachelor's-thesis supervision.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "publications_eo_limitation",
-        "claim_summary": "Her publication record is concentrated in plant physiology, with only three recent middle-author items touching remote sensing, so the Earth-observation half of her profile rests on the STSM, Erasmus mobilities and UAV licence rather than on a mature publication list.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "competence_gap",
-        "claim_summary": "The remaining competence gap the fellowship addresses is rigorous predictive modelling and model validation across time, sensing scales and environments.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "progression_data_scientist",
-        "claim_summary": "The fellowship completes her progression from plant physiologist/agronomist using digital tools to an independent Agricultural Data Scientist specialised in plant stress, Earth observation and decision-support systems, consolidating an established interdisciplinary trajectory rather than changing field.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "claim_id": "career_break",
-        "claim_summary": "A full-time parenting career break from July 2021 to May 2024 is declared and does not count against the research-experience eligibility ceiling.",
-        "status": "confirmed",
-        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json"
+        "claim_id": "C15_integrating_agent",
+        "claim_summary": "Her combined profile makes her well placed to be the integrating agent carrying one concept through biological definition, model development, validation, software implementation and industrial evaluation.",
+        "status": "inferred",
+        "source_ref": "docs/tier3_project_instantiation/consortium/capabilities.json training_and_career TR-COMP; docs/tier3_project_instantiation/project_brief/training_and_career_development.md"
       }
     ]
   },
   "traceability_footer": {
     "primary_sources": [
+      {
+        "tier": 2,
+        "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json"
+      },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json"
@@ -615,23 +714,7 @@
       },
       {
         "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/milestones_seed.json"
-      },
-      {
-        "tier": 3,
         "source_path": "docs/tier3_project_instantiation/architecture_inputs/objectives.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/outcomes.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/risks.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json"
       },
       {
         "tier": 3,
@@ -644,10 +727,6 @@
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/consortium/capabilities.json"
-      },
-      {
-        "tier": 3,
-        "source_path": "docs/tier3_project_instantiation/consortium/roles.json"
       },
       {
         "tier": 3,
@@ -668,6 +747,10 @@
       {
         "tier": 3,
         "source_path": "docs/tier3_project_instantiation/working_assumptions.json"
+      },
+      {
+        "tier": 4,
+        "source_path": "docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/call_analysis_summary.json"
       },
       {
         "tier": 4,

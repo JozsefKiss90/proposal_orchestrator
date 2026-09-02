@@ -1,0 +1,139 @@
+{
+  "report_id": "compliance_check_implementation_section_compliance_validator_2026-09-03T12:00:00Z",
+  "skill_id": "constitutional-compliance-check",
+  "invoking_agent": "compliance_validator",
+  "run_id_reference": "822eae16-453c-4efc-968b-e577d96f94a3",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+  "section13_checks": [
+    {
+      "prohibition_id": "13.1",
+      "prohibition_description": "Grant Agreement Annex / Model Grant Agreement Annex / AGA template used as governing structural schema for proposal writing.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.2",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "check_status": "violation",
+      "violation_evidence": "The artifact asserts call/eligibility constraints — e.g. 'a 6-month non-academic placement (months 25-30) under CC-07', 'The six-month non-academic placement ... is an extension under constraint CC-07', and 'the Global Fellowship two-host requirement does not apply' — but traceability_footer.primary_sources[] contains only Tier 3 and Tier 4 paths (confirmation_checklist.json, selected_call.json, wp_structure.json, etc.) and NO reference to any path within docs/tier2b_topic_and_call_sources/extracted/. Call-requirement claims carry no Tier 2B source reference in the artifact's traceability footer.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.3",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment) not present in Tier 3.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.4",
+      "prohibition_description": "Commencing Phase 8 activity (including drafting) before the budget gate (Phase 7) has passed.",
+      "check_status": "violation",
+      "violation_evidence": "The audited artifact is a Phase 8 / Tier 5 deliverable (schema_id 'orch.tier5.implementation_section.v1'). The Phase 7 assessment at docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json has gate_pass_declaration: 'fail' (blocking inconsistency BLK-01: no lump-sum budget response in received/). The section nonetheless contains budget-dependent effort claims presented as confirmed values, e.g. '30 person-months of full-time work over the 30-month action, distributed to match ... WP1 ... 9.0 PM, WP3 6.6 PM, WP4 6.0 PM, WP5 5.4 PM, and 3.0 PM cross-cutting ... totalling 30.0 PM' and partner PM figures (host supervisor 2.5 PM, ELTE co-supervisor 2.0 PM, AgroVIR 3.0 PM, MATE 2.4 PM, КРУМАТИК 1.5 PM). Phase 8 drafting exists despite a failed/unpassed budget gate, contrary to CLAUDE.md §8.4 and §13.4.",
+      "severity": "critical"
+    },
+    {
+      "prohibition_id": "13.5",
+      "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.6",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.7",
+      "prohibition_description": "Silently reordering phases or referencing a higher phase's outputs as inputs to a lower phase.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.8",
+      "prohibition_description": "Finalising text with incomplete/contradictory/unvalidated source state without explicitly flagging the gap.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.9",
+      "prohibition_description": "Using generic Horizon Europe programme knowledge as a substitute for Tier 1 source documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.10",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific Tier 1–4 inputs.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.11",
+      "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    },
+    {
+      "prohibition_id": "13.12",
+      "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
+    }
+  ],
+  "summary": {
+    "total_prohibitions_checked": 12,
+    "violations_found": 2
+  },
+  "timestamp": "2026-09-03T12:00:00Z",
+  "check_notes": {
+    "13.1": "No 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' used as a structural authority. References to 'Part A' and 'Part B-2 Section 5' are application-form structure (Tier 2A), not grant annex schema.",
+    "13.3": "All partner, capability, equipment, and role claims carry source_ref values pointing within docs/tier3_project_instantiation/ (partners.json, capabilities.json, working_assumptions.json, call_binding/), and traceability_footer.primary_sources includes the corresponding Tier 3 paths.",
+    "13.5": "Not checkable from artifact content alone; enforced by the decision-log-update skill. Recorded pass per skill spec.",
+    "13.6": "Not checkable from an artifact. Recorded pass per skill spec.",
+    "13.7": "Artifact references only phase3, phase4, phase6, and phase8 outputs — none higher than the current (Phase 8) drafting stage; no forward/out-of-order phase reference detected.",
+    "13.8": "validation_status.overall_status is 'assumed' (not 'unresolved'); no claim_status has status 'unresolved'. All 'assumed' claims carry assumption_declared: true and are explicitly flagged in the section prose as 'operator-declared commitment pending written confirmation'. The 13.8 unresolved-but-unflagged trigger does not fire.",
+    "13.9": "No distinct Tier 1 legislative/financial-regulation/AGA legal-term claim is asserted. The programme-rule statements (European Fellowship / CC-07 / Global Fellowship two-host rule) are call-level constraints; their missing source backing is captured under check 13.2 (Tier 2B), not as a separate Tier 1 substitution.",
+    "13.10": "traceability_footer.no_unsupported_claims_declaration is true and every entry in validation_status.claim_statuses carries a source_ref within Tier 3 or Tier 4; no unresolved claim lacking a source_ref.",
+    "13.11": "Not checkable from a phase output or deliverable artifact. Recorded pass per skill spec.",
+    "13.12": "Not directly checkable from an artifact. Recorded pass per skill spec."
+  },
+  "decision_log_entries": [
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-09-03T12:00:00Z_13-4",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.4_implementation_section_2026-09-03T12:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.4",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. A Phase 8 / Tier 5 drafting artifact containing budget-dependent person-month effort allocations exists while the Phase 7 budget gate is 'fail' (BLK-01: no lump-sum budget response in received/). Per §8.4 and §13.4 the categorical Phase-8 block is unconditional; this section must not be finalized until gate_09 confirms a complete, structurally consistent budget.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-09-03T12:00:00Z"
+    },
+    {
+      "decision_id": "constitutional_violation_compliance_validator_2026-09-03T12:00:00Z_13-2",
+      "decision_type": "constitutional_violation",
+      "violation_id": "13.2_implementation_section_2026-09-03T12:00:00Z",
+      "constitutional_rule_ref": "CLAUDE.md §13.2",
+      "artifact_affected": "docs/tier5_deliverables/proposal_sections/implementation_section.json",
+      "resolution_status": "unresolved",
+      "resolution_note": "Constitutional violation detected; requires human operator resolution. The section asserts call/eligibility constraints (CC-07 placement extension; non-applicability of the Global Fellowship two-host requirement; European Fellowship structure) without any Tier 2B source reference in traceability_footer.primary_sources[] (all entries are Tier 3/Tier 4). Call-requirement claims must be traceable to docs/tier2b_topic_and_call_sources/extracted/. This skill checks only for the presence of a Tier 2B reference in the footer, not the referenced entry's content.",
+      "tier_authority_applied": "CLAUDE.md §13",
+      "timestamp": "2026-09-03T12:00:00Z"
+    }
+  ],
+  "outputs_written": [
+    "docs/tier4_orchestration_state/validation_reports/compliance_check_implementation_section_2026-09-03T12:00:00Z.json",
+    "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_2026-09-03T12:00:00Z_13-4.json",
+    "docs/tier4_orchestration_state/decision_log/constitutional_violation_compliance_validator_2026-09-03T12:00:00Z_13-2.json"
+  ]
+}

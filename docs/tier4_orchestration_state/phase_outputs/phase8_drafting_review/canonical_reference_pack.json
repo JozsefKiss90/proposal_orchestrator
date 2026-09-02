@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase8.canonical_reference_pack.v1",
-  "run_id": "fieldwise-run-02",
+  "run_id": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
   "objectives": [
     {
       "id": "O1",
@@ -70,13 +70,7 @@
   "wps": [
     {
       "wp_id": "WP1",
-      "title": "Data Harmonisation and Physiological Stress Definition",
-      "lead_partner": "HOST",
-      "provenance": "confirmed"
-    },
-    {
-      "wp_id": "WP2",
-      "title": "HUN-REN Modelling and ELTE Scale Harmonisation",
+      "title": "Data Harmonisation, Stress Definition and Model Development",
       "lead_partner": "HOST",
       "provenance": "confirmed"
     },
@@ -103,7 +97,7 @@
     {
       "deliverable_id": "D1.1",
       "title": "Harmonised database/metadata and variable-availability map",
-      "due_month": 6,
+      "due_month": 14,
       "type": "dataset",
       "parent_wp": "WP1",
       "provenance": "confirmed"
@@ -111,7 +105,7 @@
     {
       "deliverable_id": "D1.2",
       "title": "Stress-target, feature-selection and validation protocol",
-      "due_month": 6,
+      "due_month": 14,
       "type": "report",
       "parent_wp": "WP1",
       "provenance": "confirmed"
@@ -127,17 +121,17 @@
     {
       "deliverable_id": "D2.1",
       "title": "Primary model, benchmark and model card",
-      "due_month": 14,
-      "type": "report",
-      "parent_wp": "WP2",
+      "due_month": 3,
+      "type": "software",
+      "parent_wp": "WP1",
       "provenance": "confirmed"
     },
     {
       "deliverable_id": "D2.2",
-      "title": "Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification",
+      "title": "Spectral/UAV/Sentinel harmonisation and crop-transfer specification",
       "due_month": 14,
       "type": "report",
-      "parent_wp": "WP2",
+      "parent_wp": "WP1",
       "provenance": "confirmed"
     },
     {
@@ -205,7 +199,7 @@
     },
     {
       "short_name": "SUPERVISOR",
-      "legal_name": "Dr. Roland Hollós",
+      "legal_name": "Prof. Tibor Janda",
       "role": "Primary supervisor at the recruiting organisation (HUN-REN ATK)",
       "provenance": "confirmed"
     },
@@ -290,8 +284,8 @@
       "provenance": "assumed"
     },
     {
-      "key": "hollos_supervisor_acceptance",
-      "declared_value": "Dr. Roland Hollós accepts the primary-supervisor role, with weekly technical sessions through the modelling-intensive work packages and the supervision routine of the governance record.",
+      "key": "janda_supervisor_acceptance",
+      "declared_value": "Prof. Tibor Janda accepts the primary-supervisor role at HUN-REN ATK, anchoring supervision in the Plant Physiology and Metabolomics Department (which he heads) and carrying the supervision routine of the governance record.",
       "checklist_ref": "SUPERVISOR",
       "provenance": "assumed"
     },
@@ -299,6 +293,12 @@
       "key": "person_months_ATK_supervisor",
       "declared_value": 2.5,
       "checklist_ref": "SUPERVISOR",
+      "provenance": "assumed"
+    },
+    {
+      "key": "hollos_elte_ml_role",
+      "declared_value": "Dr. Roland Hollós participates in FIELDWISE on the ELTE side (associated partner) as the named team member responsible for the predictive-modelling/machine-learning component, retaining the methodological leadership of the modelling workflow (AI/ML approach selection, heterogeneous data integration, model interpretation).",
+      "checklist_ref": "EO_PARTNER",
       "provenance": "assumed"
     },
     {
@@ -315,7 +315,7 @@
     },
     {
       "key": "elte_associated_partner_agreement",
-      "declared_value": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment and the co-supervisor.",
+      "declared_value": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment, the co-supervisor, and (from 2026-09-02) the named predictive-modelling/ML team member (see hollos_elte_ml_role).",
       "checklist_ref": "EO_PARTNER",
       "provenance": "assumed"
     },
@@ -436,6 +436,12 @@
     {
       "key": "farmer_field_access",
       "declared_value": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
+      "checklist_ref": "VALIDATION_SITE",
+      "provenance": "assumed"
+    },
+    {
+      "key": "farmer2_backup_site",
+      "declared_value": "A second independent commercial processing-tomato producer, reachable through the same MATE/ATK professional channel, has been identified and informally approached to serve as first-line backup validation site. If activated and the site meets the measurement protocol, the prospective commercial-field validation claim is preserved; written access is obtained under the same M1 access task as the primary site.",
       "checklist_ref": "VALIDATION_SITE",
       "provenance": "assumed"
     },
