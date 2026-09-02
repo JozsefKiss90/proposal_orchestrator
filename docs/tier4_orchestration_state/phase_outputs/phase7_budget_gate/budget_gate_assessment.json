@@ -1,83 +1,18 @@
 {
   "schema_id": "orch.phase7.budget_gate_assessment.v1",
-  "run_id": "fieldwise-run-02",
-  "gate_pass_declaration": "pass",
-  "instrument_type": "MSCA-PF",
-  "budget_regime": "unit_cost",
-  "budget_source": "internal_deterministic_derivation",
-  "budget_response_reference": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json",
-  "validation_artifact_reference": "unit_cost_budget.json (internal deterministic derivation validated by byte-equal replay per CLAUDE.md §8.1/C1; a lump-sum interface_contract.json response-conformance validation artifact is not applicable for a unit-cost instrument because no external Lump Sum Budget Planner response exists to validate)",
-  "wp_coverage_results": [
+  "run_id": "49dc10ca-2f91-4922-9f6f-3f9dd6d5a72a",
+  "gate_pass_declaration": "fail",
+  "budget_response_reference": null,
+  "validation_artifact_reference": null,
+  "wp_coverage_results": [],
+  "partner_coverage_results": [],
+  "blocking_inconsistencies": [
     {
-      "wp_id": "WP1",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher fellowship unit costs fund the fellow executing all work packages at the host; the MSCA-PF unit-cost instrument carries no per-WP budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "wp_id": "WP2",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher fellowship unit costs fund the fellow executing all work packages at the host; the MSCA-PF unit-cost instrument carries no per-WP budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "wp_id": "WP3",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher fellowship unit costs fund the fellow executing all work packages at the host; the MSCA-PF unit-cost instrument carries no per-WP budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "wp_id": "WP4",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher fellowship unit costs fund the fellow executing all work packages at the host; the MSCA-PF unit-cost instrument carries no per-WP budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "wp_id": "WP5",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher fellowship unit costs fund the fellow; the M25-M30 non-academic placement is part of the single work plan under CC-07; the MSCA-PF unit-cost instrument carries no per-WP budget line — not-applicable, not missing)",
-      "inconsistencies": []
+      "inconsistency_id": "BLK-01",
+      "description": "docs/integrations/lump_sum_budget_planner/received/ contains no lump-sum budget response (only a .gitkeep placeholder is present). No externally supplied budget response file exists to validate for interface-contract conformance or for structural consistency against wp_structure.json.",
+      "severity": "blocking",
+      "resolution": "unresolved",
+      "resolution_note": "Absent budget artifacts in received/ constitute a blocking gate failure, not a hold or pending state, per CLAUDE.md §8.4 and §13.4. Mode B Step B.1.1 halts before any conformance, WP-coverage, or partner-coverage check; those checks could not be performed because no response file is available. This lump-sum interface validation cannot declare the budget gate passed. Resolution requires a conforming lump-sum budget response to be delivered to the received/ directory and re-validated."
     }
-  ],
-  "partner_coverage_results": [
-    {
-      "partner_id": "HOST",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (host beneficiary; the unit-cost living/mobility/research-training-networking/management lines fund the fellowship at the host, with the HU host-country coefficient applied to the host-dependent living-allowance line)",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "DATA_PARTNER",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher instrument budgets the fellowship as a whole, not per partner; DATA_PARTNER contributes to the single work plan and has no separate unit-cost budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "EO_PARTNER",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher instrument budgets the fellowship as a whole, not per partner; EO_PARTNER contributes to the single work plan and has no separate unit-cost budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "VALIDATION_SITE",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher instrument budgets the fellowship as a whole, not per partner; VALIDATION_SITE provides the field environment within the single work plan and has no separate unit-cost budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "SOFTWARE_PARTNER",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher instrument budgets the fellowship as a whole, not per partner; SOFTWARE_PARTNER contributes to the single work plan and has no separate unit-cost budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    },
-    {
-      "partner_id": "VALIDATION_PARTNER",
-      "present_in_budget": true,
-      "budget_line_reference": "unit_cost_budget.json (single-researcher instrument budgets the fellowship as a whole, not per partner; VALIDATION_PARTNER hosts the M25-M30 non-academic placement within the single work plan and has no separate unit-cost budget line — not-applicable, not missing)",
-      "inconsistencies": []
-    }
-  ],
-  "blocking_inconsistencies": [],
-  "coverage_model": "single_researcher_unit_cost",
-  "assessment_note": "MSCA-PF is a unit-cost, single-researcher instrument (selected_call.json: budget_regime='unit_cost', host_country='HU', project_duration_months=30). Per CLAUDE.md §8.1 and §8.4 as amended by C1, the budget-gate source is instrument-conditional: for a unit-cost instrument the sanctioned source is the internal deterministic derivation (unit_cost_budget.json = confirmed_months × published_rates × host_country_coefficient, byte-equal replay-checked), NOT the external Lump Sum Budget Planner. This response_validation invocation therefore evaluates the internal derivation rather than a lump-sum received/ response. The lump-sum received/ directory (containing only .gitkeep, i.e. no external response) is inapplicable for this instrument; the C1 amendment expressly scopes 'absence of a received/ response is a blocking gate failure' to lump-sum instruments only, so its emptiness here is not a blocking gate failure and is documented explicitly rather than silently treated as passing. The categorical Phase-8 block (§8.4) is preserved and instrument-independent, and is satisfied here because every unit_cost_budget.json component — including the host-dependent living-allowance line — resolves to 'Confirmed', with unresolved_components=[] and blocking_inconsistencies=[]. Structural consistency is assessed against the single-researcher work plan and host per §7 Phase 7: the fellowship unit costs fund the fellow at the host executing all five work packages; the instrument carries no per-WP or per-partner budget lines, so per-WP/per-partner absence of a dedicated line is not-applicable rather than a missing-coverage inconsistency. No numeric budget values are materialized into this assessment (Constraint 1 / §8.1 / §8.3): all figures remain solely within unit_cost_budget.json and are referenced only by filename. gate_pass_declaration='pass' is grounded in: (1) the applicable budget is present via the sanctioned internal derivation, (2) it is complete and internally consistent with every component Confirmed, and (3) no unresolved blocking inconsistencies exist."
+  ]
 }

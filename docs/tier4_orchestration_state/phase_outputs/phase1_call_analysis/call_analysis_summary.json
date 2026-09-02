@@ -1,71 +1,74 @@
 {
   "schema_id": "orch.phase1.call_analysis_summary.v1",
-  "run_id": "fieldwise-run-02",
+  "run_id": "4993d771-0fd9-41e6-9e02-de1fe9382e46",
   "resolved_instrument_type": "MSCA-PF",
   "evaluation_matrix": {
     "Excellence": {
       "criterion_id": "Excellence",
       "criterion_name": "Excellence",
       "weight": null,
-      "source_section": "1. Evaluation > 1. Excellence (Score 1)",
+      "weight_source": "tier2b_evaluation_priority_weights.json",
+      "source_section": "1. EVALUATION > 1. Excellence (Score 1)",
       "source_document": "ef_he-msca_en.pdf"
     },
     "Impact": {
       "criterion_id": "Impact",
       "criterion_name": "Impact",
       "weight": null,
-      "source_section": "1. Evaluation > 2. Impact (Score 2)",
+      "weight_source": "tier2b_evaluation_priority_weights.json",
+      "source_section": "1. EVALUATION > 2. Impact (Score 2)",
       "source_document": "ef_he-msca_en.pdf"
     },
     "Implementation": {
       "criterion_id": "Implementation",
       "criterion_name": "Quality and efficiency of the implementation",
       "weight": null,
-      "source_section": "1. Evaluation > 3. Quality and efficiency of the implementation (Score 3)",
+      "weight_source": "tier2b_evaluation_priority_weights.json",
+      "source_section": "1. EVALUATION > 3. Quality and efficiency of the implementation (Score 3)",
       "source_document": "ef_he-msca_en.pdf"
     }
   },
   "compliance_checklist": [
     {
       "requirement_id": "CR-01",
-      "description": "Scope of the application: based on the information provided, the application must correspond, wholly or in part, to the topic description against which it was submitted ('in scope'). Partial out-of-scope must be reflected in scoring.",
+      "description": "Scope of the application: the proposal must correspond, wholly or in part, to the topic description against which it was submitted ('in scope'); partial out-of-scope must be reflected in scoring.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Scope of the application",
+      "source_section": "2. OTHER QUESTIONS > Scope of the application",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-02",
-      "description": "Exceptional funding: a third-country participant/international organisation not listed in the General Annex may exceptionally receive funding only if participation is essential for carrying out the project.",
+      "description": "Overall threshold: the sum of the three individual scores (0-5 each, one-decimal resolution) must reach the overall threshold of 70/100; weighting (50/30/20) applies only to ranking, not to threshold determination.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Exceptional funding",
+      "source_section": "IMPORTANT NOTICE > Thresholds & weighting",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-03",
-      "description": "Use of human embryonic stem cells (hESC): assess whether the proposal involves hESC and, if so, whether their use is necessary to achieve the scientific objectives.",
+      "description": "Exclusive focus on civil applications: the proposed activities must have an exclusive focus on civil applications; activities intended for military application or purposes cannot be funded.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Use of human embryonic stem cells (hESC)",
+      "source_section": "2. OTHER QUESTIONS > Exclusive focus on civil applications",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-04",
-      "description": "Use of human embryos: assess whether the proposal involves the use of human embryos and how they will be used.",
+      "description": "Ethics — use of human embryonic stem cells (hESC): declare whether the proposal involves hESC and, if so, whether their use is necessary to achieve the scientific objectives.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Use of human embryos",
+      "source_section": "2. OTHER QUESTIONS > Use of human embryonic stem cells (hESC)",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-05",
-      "description": "Activities excluded from funding: the proposal must not include human reproductive cloning, heritable genetic modification of human beings, creation of human embryos solely for research or stem cell procurement, or destruction of human embryos.",
+      "description": "Ethics — use of human embryos: declare whether the proposal involves the use of human embryos and, if so, how they will be used.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Activities excluded from funding",
+      "source_section": "2. OTHER QUESTIONS > Use of human embryos",
       "source_document": "ef_he-msca_en.pdf"
     },
     {
       "requirement_id": "CR-06",
-      "description": "Exclusive focus on civil applications: the proposed activities must have an exclusive focus on civil applications; activities for military application or purposes cannot be funded.",
+      "description": "Activities excluded from funding: the proposal must not include human reproductive cloning, heritable genetic modification of humans, creation of human embryos solely for research/stem-cell procurement, or destruction of human embryos.",
       "status": "requires_review",
-      "source_section": "2. Other Questions > Exclusive focus on civil applications",
+      "source_section": "2. OTHER QUESTIONS > Activities excluded from funding",
       "source_document": "ef_he-msca_en.pdf"
     }
   ]

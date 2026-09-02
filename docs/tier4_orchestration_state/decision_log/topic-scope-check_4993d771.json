@@ -1,0 +1,98 @@
+{
+  "decision_id": "scope_check_concept_refiner_2026-09-02T00:00:00Z",
+  "decision_type": "scope_check",
+  "invoking_agent": "concept_refiner",
+  "phase_context": "phase_02_concept_refinement",
+  "scope_findings": [
+    {
+      "claim": "FIELDWISE is submitted jointly by the individual researcher (Dr. Rositsa Cholakova) and the recruiting/beneficiary host organisation HUN-REN ATK, with supervision restructured around the host and ELTE as associated partner.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-03",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The action is a fellowship provided to an excellent researcher (the fellow, Dr. Rositsa Cholakova) hosted at HUN-REN ATK.",
+      "scope_element_ref": "SR-01",
+      "constraint_ref": "CC-04",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The project comprises a 24-month European Fellowship phase at HUN-REN ATK.",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": "CC-01",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "An additional non-academic placement of up to six months at AgroVIR (Hungary, an EU Member State) is included at the end of the project (M25-M30) as an integral, evaluated part of the proposal.",
+      "scope_element_ref": "SR-06",
+      "constraint_ref": "CC-07",
+      "status": "in_scope",
+      "flag_reason": null
+    },
+    {
+      "claim": "The fellow will undertake international mobility as an incoming/moving researcher (submission from the new recruiting organisation HUN-REN ATK).",
+      "scope_element_ref": "SR-03",
+      "constraint_ref": "CC-04",
+      "status": "flagged",
+      "flag_reason": "Claim partially maps to SR-03 (European Postdoctoral Fellowship mobility) but the provided content does not establish the researcher's mobility eligibility (country-of-origin / mobility rule) against SR-03 or SR-04; mobility dimension is unresolved in the supplied text and cannot be confirmed against the Tier 2B scope element without additional eligibility data."
+    },
+    {
+      "claim": "FIELDWISE will develop a physiologically grounded water-stress prediction framework using processing tomato as the model crop, converting multi-year MATE observations into a parsimonious predictive model validated under blocked unseen-year and prospective commercial-field conditions.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this claim is in-scope; the scope_requirements.json and call_constraints.json entries for this MSCA-PF call are structural/eligibility requirements and contain no thematic (required_focus/excluded_topic) scope element covering the scientific research domain. Scope boundary is defined by Tier 2B only; confirming or excluding this scientific topic would require generic programme knowledge, which is prohibited."
+    },
+    {
+      "claim": "The framework will be crop-configurable, separating a transferable decision-support core from crop-specific physiology/calibration modules for later extension to other irrigated high-value horticultural crops.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this claim is in-scope; no thematic scope boundary is present in scope_requirements.json or call_constraints.json for this call. Scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "The project will bridge sensing scales through ELTE hyperspectral/UAV expertise toward Sentinel-2 field-scale Earth Observation monitoring.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this claim is in-scope; the loaded Tier 2B scope and constraint entries do not define a thematic/methodological scope boundary for the research approach. Scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "Validated scientific components will be incrementally incorporated into the DrR - Digital Agronomist prototype and delivered as a crop-configurable web MVP, with Krumatic supporting software implementation.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this software/exploitation activity is in-scope; scope_requirements.json and call_constraints.json contain no element addressing project technical content or exploitation scope. Scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "The project will translate validated stress predictions into interpretable irrigation-attention decision support and reference published water-saving benchmarks (roughly 8-30%) as bounded literature context only.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this claim is in-scope; no thematic or impact-scope boundary is present in the loaded Tier 2B files. Scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "A post-MSCA Bulgarian replication route through MVCRI / the Bulgarian Agricultural Academy is defined as knowledge transfer outside the 24-month work plan, with Krumatic supporting Bulgarian farmer-facing uptake.",
+      "scope_element_ref": null,
+      "constraint_ref": null,
+      "status": "flagged",
+      "flag_reason": "No Tier 2B scope element found to confirm this dissemination/uptake and post-project replication claim is in-scope; the loaded Tier 2B files contain no element governing post-action activities. Scope boundary is defined by Tier 2B only."
+    },
+    {
+      "claim": "The consortium includes ELTE as an associated partner, Krumatic EOOD as software/uptake partner, and AgroVIR as operational evaluator/placement host, in addition to the beneficiary HUN-REN ATK.",
+      "scope_element_ref": "SR-02",
+      "constraint_ref": "CC-03",
+      "status": "flagged",
+      "flag_reason": "The joint-application requirement (SR-02 / CC-03: researcher plus beneficiary) is satisfied by the researcher-HUN-REN ATK pairing, but the additional associated/partner organisations (ELTE, Krumatic EOOD, AgroVIR) are not addressed by any specific Tier 2B scope element; their participation is borderline against SR-02 and cannot be confirmed in-scope from the loaded Tier 2B data. Scope boundary is defined by Tier 2B only."
+    }
+  ],
+  "tier2b_source_refs": [
+    "Scope"
+  ],
+  "tier_authority_applied": "Tier 2B scope_requirements.json; Tier 2B call_constraints.json",
+  "resolution_status": "unresolved",
+  "timestamp": "2026-09-02T00:00:00Z"
+}

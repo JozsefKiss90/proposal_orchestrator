@@ -1,13 +1,13 @@
 {
   "schema_id": "orch.phase3.wp_structure.v1",
-  "run_id": "fieldwise-run-02",
+  "run_id": "fab35320-47d8-46ee-aa8f-b5b17cc9d7e0",
   "work_packages": [
     {
       "wp_id": "WP1",
-      "title": "Data Harmonisation and Physiological Stress Definition",
+      "title": "Data Harmonisation, Stress Definition and Model Development",
       "objectives": [
-        "Harmonise the 2022-2026 MATE archive into a common-variable matrix",
-        "Define the physiological stress target, feature selection and validation protocol"
+        "Harmonise the 2022-2026 archive and define the physiological stress target",
+        "Develop, evaluate and freeze the primary water-status model"
       ],
       "lead_partner": "HOST",
       "contributing_partners": [
@@ -44,46 +44,7 @@
           "title": "Predefine blocked temporal validation and model-selection criteria",
           "responsible_partner": "HOST",
           "contributing_partners": []
-        }
-      ],
-      "deliverables": [
-        {
-          "deliverable_id": "D1.1",
-          "title": "Harmonised database/metadata and variable-availability map",
-          "type": "dataset",
-          "due_month": 6,
-          "responsible_partner": "HOST"
         },
-        {
-          "deliverable_id": "D1.2",
-          "title": "Stress-target, feature-selection and validation protocol",
-          "type": "report",
-          "due_month": 6,
-          "responsible_partner": "HOST"
-        },
-        {
-          "deliverable_id": "D1.3",
-          "title": "Career Development Plan",
-          "type": "report",
-          "due_month": 3,
-          "responsible_partner": "HOST"
-        }
-      ],
-      "dependencies": []
-    },
-    {
-      "wp_id": "WP2",
-      "title": "HUN-REN Modelling and ELTE Scale Harmonisation",
-      "objectives": [
-        "Develop and validate the parsimonious primary water-status model",
-        "Define spectral/UAV/Sentinel scaling and the crop-transfer specification"
-      ],
-      "lead_partner": "HOST",
-      "contributing_partners": [
-        "EO_PARTNER",
-        "DATA_PARTNER"
-      ],
-      "tasks": [
         {
           "task_id": "T2.1",
           "title": "Construct process-informed water-status predictors from meteorology, irrigation and soil data",
@@ -98,13 +59,13 @@
         },
         {
           "task_id": "T2.3",
-          "title": "Quantify calibration, uncertainty, interpretability and blocked unseen-year performance",
+          "title": "Quantify performance and freeze the primary model at MS6 before the first field season",
           "responsible_partner": "HOST",
           "contributing_partners": []
         },
         {
           "task_id": "T2.4",
-          "title": "Harmonise proximal/hyperspectral information and define the UAV/Sentinel scale-transition strategy",
+          "title": "Harmonise proximal/hyperspectral information and define UAV/Sentinel scale-transition strategy",
           "responsible_partner": "HOST",
           "contributing_partners": []
         },
@@ -123,34 +84,48 @@
       ],
       "deliverables": [
         {
-          "deliverable_id": "D2.1",
-          "title": "Primary model, benchmark and model card",
+          "deliverable_id": "D1.1",
+          "title": "Harmonised database/metadata and variable-availability map",
+          "type": "dataset",
+          "due_month": 14,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D1.2",
+          "title": "Stress-target, feature-selection and validation protocol",
           "type": "report",
           "due_month": 14,
           "responsible_partner": "HOST"
         },
         {
+          "deliverable_id": "D1.3",
+          "title": "Career Development Plan",
+          "type": "report",
+          "due_month": 3,
+          "responsible_partner": "HOST"
+        },
+        {
+          "deliverable_id": "D2.1",
+          "title": "Primary model, benchmark and model card",
+          "type": "software",
+          "due_month": 3,
+          "responsible_partner": "HOST"
+        },
+        {
           "deliverable_id": "D2.2",
-          "title": "Spectral/UAV/Sentinel harmonisation, scaling and crop-transfer specification",
+          "title": "Spectral/UAV/Sentinel harmonisation and crop-transfer specification",
           "type": "report",
           "due_month": 14,
           "responsible_partner": "HOST"
         }
       ],
-      "dependencies": [
-        {
-          "depends_on_wp_id": "WP1",
-          "dependency_type": "data_input",
-          "notes": "T2.1/T2.2 operate on the WP1 common-variable matrix and stress target"
-        }
-      ]
+      "dependencies": []
     },
     {
       "wp_id": "WP3",
       "title": "Independent Commercial-Farmer Prospective Validation",
       "objectives": [
-        "Run the independent commercial-farmer prospective validation campaign",
-        "Quantify the prospective transfer gap and limited recalibration"
+        "Validate the frozen primary model prospectively at an independent commercial farm"
       ],
       "lead_partner": "VALIDATION_SITE",
       "contributing_partners": [
@@ -185,13 +160,13 @@
         },
         {
           "task_id": "T3.5",
-          "title": "Apply the historical model prospectively, quantify the transfer gap and evaluate limited recalibration",
+          "title": "Apply the frozen primary model prospectively, quantify the transfer gap and recalibrate post-season",
           "responsible_partner": "VALIDATION_SITE",
           "contributing_partners": []
         },
         {
           "task_id": "T3.6",
-          "title": "Activate the Szentendre Skanzen contingency only if primary-site access fails",
+          "title": "Activate the site-contingency ladder if primary-site access fails",
           "responsible_partner": "VALIDATION_SITE",
           "contributing_partners": []
         }
@@ -216,12 +191,7 @@
         {
           "depends_on_wp_id": "WP1",
           "dependency_type": "data_input",
-          "notes": "T1.5 criteria and D1.2 protocol govern the WP3 campaign"
-        },
-        {
-          "depends_on_wp_id": "WP2",
-          "dependency_type": "data_input",
-          "notes": "T3.5 applies the WP2 historical model prospectively"
+          "notes": "T3.5 applies the MS6-frozen primary model and follows the D1.2 validation protocol"
         }
       ]
     },
@@ -229,8 +199,7 @@
       "wp_id": "WP4",
       "title": "DrR Web MVP, Co-development and Exploitation Preparation",
       "objectives": [
-        "Co-develop the crop-configurable DrR web MVP with a validated processing-tomato module",
-        "Prepare the exploitation route and placement evaluation protocol"
+        "Co-develop the crop-configurable DrR web MVP and prepare the post-MSCA exploitation route"
       ],
       "lead_partner": "SOFTWARE_PARTNER",
       "contributing_partners": [
@@ -246,7 +215,7 @@
         },
         {
           "task_id": "T4.2",
-          "title": "Implement a crop-configurable architecture with explicit crop-specific parameters",
+          "title": "Implement a crop-configurable architecture keeping crop-specific parameters explicit",
           "responsible_partner": "SOFTWARE_PARTNER",
           "contributing_partners": []
         },
@@ -258,7 +227,7 @@
         },
         {
           "task_id": "T4.4",
-          "title": "Use structured AgroVIR consultation from M1 for inputs, usability and interoperability",
+          "title": "Use structured AgroVIR consultation from M1 to review inputs, usability and interoperability",
           "responsible_partner": "SOFTWARE_PARTNER",
           "contributing_partners": []
         },
@@ -293,14 +262,14 @@
       ],
       "dependencies": [
         {
-          "depends_on_wp_id": "WP2",
+          "depends_on_wp_id": "WP1",
           "dependency_type": "data_input",
-          "notes": "T4.2 implements the WP2 reusable/crop-specific separation and crop-transfer specification"
+          "notes": "T4.2 implements the reusable/crop-specific separation and crop-transfer specification from WP1"
         },
         {
           "depends_on_wp_id": "WP3",
           "dependency_type": "data_input",
-          "notes": "D4.1 validated module and T4.3 migration require the WP3 prospective validation"
+          "notes": "D4.1 validated module and T4.3 migration require WP3 prospective validation"
         }
       ]
     },
@@ -308,15 +277,14 @@
       "wp_id": "WP5",
       "title": "AgroVIR Non-Academic Placement",
       "objectives": [
-        "Operationally evaluate the MVP within the AgroVIR FMIS environment",
-        "Define the post-MSCA FMIS integration and exploitation roadmap"
+        "Evaluate the MVP operationally during the AgroVIR placement and finalise the exploitation roadmap"
       ],
       "lead_partner": "VALIDATION_PARTNER",
       "contributing_partners": [],
       "tasks": [
         {
           "task_id": "T5.1",
-          "title": "Evaluate MVP inputs, usability, missing-data behaviour, decision outputs and workflow compatibility",
+          "title": "Evaluate MVP inputs, usability, missing-data behaviour, outputs and workflow compatibility",
           "responsible_partner": "VALIDATION_PARTNER",
           "contributing_partners": []
         },
@@ -359,7 +327,7 @@
         {
           "depends_on_wp_id": "WP4",
           "dependency_type": "finish_to_start",
-          "notes": "MS4 MVP-ready gate precedes the M25-M30 placement evaluation"
+          "notes": "WP5 (M25-M30) evaluates the MVP delivered at MS4 (M24); strict sequencing"
         }
       ]
     }
@@ -367,7 +335,6 @@
   "dependency_map": {
     "nodes": [
       "WP1",
-      "WP2",
       "WP3",
       "WP4",
       "WP5",
@@ -402,21 +369,11 @@
     "edges": [
       {
         "from": "WP1",
-        "to": "WP2",
+        "to": "WP3",
         "edge_type": "data_input"
       },
       {
         "from": "WP1",
-        "to": "WP3",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP2",
-        "to": "WP3",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "WP2",
         "to": "WP4",
         "edge_type": "data_input"
       },
@@ -431,32 +388,7 @@
         "edge_type": "finish_to_start"
       },
       {
-        "from": "T1.2",
-        "to": "T2.1",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "T1.3",
-        "to": "T2.1",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "T1.2",
-        "to": "T2.2",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "T1.3",
-        "to": "T2.2",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "T1.5",
-        "to": "T3.3",
-        "edge_type": "data_input"
-      },
-      {
-        "from": "T2.2",
+        "from": "T2.3",
         "to": "T3.5",
         "edge_type": "data_input"
       },
@@ -485,8 +417,7 @@
   "cycle_detected": false,
   "cycle_flags": [],
   "critical_path_nodes": [
-    "T1.3",
-    "T2.2",
+    "T2.3",
     "T3.5",
     "T4.3",
     "T5.1"
@@ -495,8 +426,7 @@
     {
       "partner_id": "HOST",
       "wps_as_lead": [
-        "WP1",
-        "WP2"
+        "WP1"
       ],
       "wps_as_contributor": [
         "WP3",
@@ -508,7 +438,6 @@
       "wps_as_lead": [],
       "wps_as_contributor": [
         "WP1",
-        "WP2",
         "WP3"
       ]
     },
@@ -517,7 +446,6 @@
       "wps_as_lead": [],
       "wps_as_contributor": [
         "WP1",
-        "WP2",
         "WP3"
       ]
     },
@@ -548,44 +476,28 @@
   "normalization_issues": [
     {
       "severity": "advisory",
-      "wp_id": "WP1",
-      "issue": "objectives synthesized from WP title/tasks; seed provided no objectives array"
+      "scope": "WP1,WP3,WP4,WP5",
+      "issue": "objectives arrays synthesized from WP titles; the seed provides no explicit objectives field per WP"
     },
     {
       "severity": "advisory",
-      "wp_id": "WP2",
-      "issue": "objectives synthesized from WP title/tasks; seed provided no objectives array"
+      "scope": "all tasks",
+      "issue": "task responsible_partner assigned from the WP lead_partner; seed tasks carry no responsible_partner field (FELLOW executes all WPs in this single-researcher action)"
     },
     {
       "severity": "advisory",
-      "wp_id": "WP3",
-      "issue": "objectives synthesized from WP title/tasks; seed provided no objectives array"
+      "scope": "deliverables lacking a seed due_month",
+      "issue": "due_month synthesized to the WP end_month for D1.1, D1.2, D2.2, D3.1, D3.2, D4.1, D4.2, D5.1, D5.2; project_duration_months is null in section_schema_registry for MSCA-PF so no duration bound is violated"
     },
     {
       "severity": "advisory",
-      "wp_id": "WP4",
-      "issue": "objectives synthesized from WP title/tasks; seed provided no objectives array"
+      "scope": "all deliverables",
+      "issue": "deliverable type synthesized (dataset/software/report) from titles; seed deliverables carry no type field"
     },
     {
       "severity": "advisory",
-      "wp_id": "WP5",
-      "issue": "objectives synthesized from WP title/tasks; seed provided no objectives array"
-    },
-    {
-      "severity": "advisory",
-      "issue": "task responsible_partner assigned from each WP's lead_partner (first lead_role_token); seed tasks carried no responsible_partner field"
-    },
-    {
-      "severity": "advisory",
-      "issue": "deliverable type and due_month synthesized (due_month set to WP end_month except D1.3 which carried due_month 3); seed deliverables carried no type or due_month except D1.3"
-    },
-    {
-      "severity": "advisory",
-      "issue": "lead_partner and contributing_partners derived from seed lead_role_tokens (first element lead, remainder contributors); seed prose 'lead' field not parsed for identifiers per partner-identifier vocabulary rule"
-    },
-    {
-      "severity": "advisory",
-      "issue": "project_duration_months is null in section_schema_registry.json for MSCA-PF; deliverable due-month upper bound not enforced from Tier 2A. All synthesized due months fall within the 30-month plan duration stated in the seed."
+      "scope": "instrument constraints",
+      "issue": "resolved_instrument_type MSCA-PF has max_work_packages=null and max_deliverable_count=null; WP count 4 imposes no Tier 2A limit breach"
     }
   ]
 }

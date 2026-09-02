@@ -1,6 +1,6 @@
 {
   "schema_id": "orch.phase6.implementation_architecture.v1",
-  "run_id": "fieldwise-run-02",
+  "run_id": "1b25a128-34e1-45ab-ad6a-79239ae5e2eb",
   "governance_matrix": [
     {
       "body_name": "Fellowship Steering Group",
@@ -10,12 +10,12 @@
         "FELLOW",
         "HOST"
       ],
-      "decision_scope": "Scientific direction and methodology decisions; approval of the harmonisation, modelling and validation protocols; milestone go/no-go decisions across WP1-WP5; integration of the physiological, proximal-spectral, UAV/hyperspectral and Sentinel strands; and approval of the Career Development Plan. Chaired by the primary supervisor (SUPERVISOR), per the Tier 3 roles record that the supervisor 'Chairs the Steering Group'.",
-      "meeting_frequency": "Quarterly, with additional ad-hoc sessions convened at milestone gates and at each WP transition.",
+      "decision_scope": "Scientific direction and methodology decisions across the work plan; approval of the harmonisation, modelling and validation protocols; milestone go/no-go decisions; integration of the physiological, proximal-spectral, UAV/hyperspectral and Sentinel strands; and approval of the Career Development Plan. Chaired by the primary supervisor (SUPERVISOR), per the Tier 3 roles record that the supervisor 'Chairs the Steering Group'.",
+      "meeting_frequency": "Quarterly, with additional ad-hoc sessions convened at milestone gates and at each work-package transition.",
       "escalation_path": "Scientific or protocol disputes not resolved within the Steering Group are escalated to the host beneficiary (HOST) as the sole beneficiary legal entity responsible for proper implementation of the action. Framed as a project governance route consistent with Tier 1 grant-agreement implementation provisions, not as an unsourced generic Horizon practice.",
       "source_basis": [
         "docs/tier3_project_instantiation/consortium/roles.json (SUPERVISOR role_token: 'Chairs the Steering Group')",
-        "docs/tier1_normative_framework/extracted/governance_principles.json governance_constraints.grant_agreement_implementation_articles (escalation to beneficiary tied to proper-implementation provisions)",
+        "docs/tier1_normative_framework/extracted/governance_principles.json governance_constraints.grant_agreement_implementation_articles",
         "docs/tier1_normative_framework/extracted/governance_principles.json governance_constraints.escalation_path_constraint"
       ],
       "assumption_note": "Meeting frequency not specified in Tier 3 and not prescribed in Tier 1 extracted (no_prescribed_meeting_frequency: true); the quarterly-plus-milestone cadence is selected as a project-operational assumption for a 30-month single-fellow action."
@@ -27,7 +27,7 @@
         "FELLOW",
         "SUPERVISOR"
       ],
-      "decision_scope": "Day-to-day execution of the work plan by the fellow at the host beneficiary: task scheduling, data-integration and modelling progress (WP1-WP2), coordination of the WP3 field campaign logistics, deliverable preparation, training-plan progress and resolution of routine operational blockers.",
+      "decision_scope": "Day-to-day execution of the work plan by the fellow at the host beneficiary: task scheduling, data-integration and modelling progress (WP1), coordination of the WP3 field-campaign logistics, deliverable preparation, training-plan progress and resolution of routine operational blockers.",
       "meeting_frequency": "Monthly, aligned with the fellow's residence at the host beneficiary (M1-M24).",
       "escalation_path": "Operational issues that cannot be resolved between the fellow, supervisor and host administration are escalated to the Fellowship Steering Group, and thereafter to the host beneficiary (HOST). This is a project governance route consistent with Tier 1 implementation provisions.",
       "source_basis": [
@@ -64,7 +64,7 @@
         "Sole beneficiary legal entity responsible for proper implementation of the action",
         "Administrative and financial management of the fellowship and the M25-M30 placement arrangement",
         "Primary point of escalation and interface with the granting authority",
-        "Hosting environment for data integration, AI/ML modelling and computationally intensive analyses"
+        "Hosting environment for data integration, modelling and computationally intensive analyses"
       ]
     },
     {
@@ -72,8 +72,8 @@
       "role_name": "Primary supervisor",
       "assigned_to": "SUPERVISOR",
       "responsibilities": [
-        "Primary scientific supervision and training environment at the beneficiary (Department of Crop Production, HUN-REN ATK)",
-        "Structuring the modelling workflow and integrating historical field, remote-sensing and physiological information",
+        "Primary scientific supervision anchored in plant stress physiology at the beneficiary (Plant Physiology and Metabolomics Department, HUN-REN ATK)",
+        "Guidance on the physiological water-stress target, physiological validity of model outputs and the physiological measurement programme",
         "Chairs the Fellowship Steering Group",
         "Co-establishes the Career Development Plan with the fellow"
       ]
@@ -101,20 +101,11 @@
     },
     {
       "role_id": "WPL-WP1",
-      "role_name": "Work package leader — WP1 Data Harmonisation and Physiological Stress Definition",
+      "role_name": "Work package leader — WP1 Data Harmonisation, Stress Definition and Model Development",
       "assigned_to": "HOST",
       "responsibilities": [
-        "Lead WP1 objectives: harmonise the 2022-2026 MATE archive into a common-variable matrix; define the physiological stress target, feature selection and validation protocol",
-        "Deliver D1.1, D1.2 and D1.3"
-      ]
-    },
-    {
-      "role_id": "WPL-WP2",
-      "role_name": "Work package leader — WP2 HUN-REN Modelling and ELTE Scale Harmonisation",
-      "assigned_to": "HOST",
-      "responsibilities": [
-        "Lead WP2 objectives: develop and validate the parsimonious primary water-status model; define spectral/UAV/Sentinel scaling and the crop-transfer specification",
-        "Deliver D2.1 and D2.2"
+        "Lead WP1 objectives: harmonise the 2022-2026 MATE archive and define the physiological stress target; develop, evaluate and freeze the primary water-status model",
+        "Deliver D1.1, D1.2, D1.3, D2.1 and D2.2"
       ]
     },
     {
@@ -132,7 +123,7 @@
       "role_name": "Work package leader — WP4 DrR Web MVP, Co-development and Exploitation Preparation",
       "assigned_to": "SOFTWARE_PARTNER",
       "responsibilities": [
-        "Lead WP4 objectives: co-develop the crop-configurable DrR web MVP with a validated processing-tomato module; prepare the exploitation route and placement evaluation protocol",
+        "Lead WP4 objectives: co-develop the crop-configurable DrR web MVP with a validated processing-tomato module; prepare the post-MSCA exploitation route",
         "Provide continuous software-development support for the DrR prototype from M1",
         "Deliver D4.1 and D4.2"
       ]
@@ -155,7 +146,7 @@
       "category": "technical",
       "likelihood": "medium",
       "impact": "high",
-      "mitigation": "Use an explicit year-by-variable matrix; harmonise only defensible common variables; retain year-specific measurements as secondary information. [Affects: WP1 (Data Harmonisation and Physiological Stress Definition)]",
+      "mitigation": "Use an explicit year-by-variable matrix; harmonise only defensible common variables; retain year-specific measurements as secondary information. [Affects: WP1 (Data Harmonisation, Stress Definition and Model Development)]",
       "responsible_partner": "HOST"
     },
     {
@@ -164,13 +155,13 @@
       "category": "technical",
       "likelihood": "medium",
       "impact": "high",
-      "mitigation": "Use repeated-measure/hierarchical structure, conservative feature reduction and parsimonious modelling; no deep-learning dependency. [Affects: WP2 (HUN-REN Modelling and ELTE Scale Harmonisation)]",
+      "mitigation": "Use repeated-measure/hierarchical structure, conservative feature reduction and parsimonious modelling; no deep-learning dependency. [Affects: WP1 (Data Harmonisation, Stress Definition and Model Development)]",
       "responsible_partner": "HOST"
     },
     {
       "risk_id": "R03",
       "description": "Farmer site lacks modern monitoring infrastructure",
-      "category": "organisational",
+      "category": "external",
       "likelihood": "high",
       "impact": "medium",
       "mitigation": "Install project meteorological station and soil sensors before the validation campaign; define maintenance and data-quality responsibilities. [Affects: WP3 (Independent Commercial-Farmer Prospective Validation)]",
@@ -182,7 +173,7 @@
       "category": "external",
       "likelihood": "medium",
       "impact": "high",
-      "mitigation": "Secure written access; maintain the Szentendre Skanzen model-garden route as a contingency subject to formal agreement and scientific suitability. [Affects: WP3 (Independent Commercial-Farmer Prospective Validation)]",
+      "mitigation": "Secure written access (T3.1). Contingency ladder (2026-09-02): first activate the identified second commercial processing-tomato producer (Farmer 2, declaration farmer2_backup_site) — if its site meets the measurement protocol, the prospective commercial-field validation claim is preserved; only if that also fails, activate the Szentendre Skanzen model-garden route, subject to formal agreement and scientific suitability. Skanzen activation preserves the physiological measurement programme but does NOT substitute for independent commercial-field transferability evidence: the commercial-transferability claim is then downgraded/deferred and reported as such (review issue 7 boundary). [Affects: WP3 (Independent Commercial-Farmer Prospective Validation)]",
       "responsible_partner": "VALIDATION_SITE"
     },
     {
@@ -191,8 +182,8 @@
       "category": "organisational",
       "likelihood": "medium",
       "impact": "high",
-      "mitigation": "Use a written equipment/operation schedule; prioritise key physiological dates; retain physiology/proximal sensing as the core pathway if individual UAV campaigns are missed. [Affects: WP2 (HUN-REN Modelling and ELTE Scale Harmonisation)]",
-      "responsible_partner": "HOST"
+      "mitigation": "Use a written equipment/operation schedule; prioritise key physiological dates; retain physiology/proximal sensing as the core pathway if individual UAV campaigns are missed. [Affects: WP3 (Independent Commercial-Farmer Prospective Validation)]",
+      "responsible_partner": "VALIDATION_SITE"
     },
     {
       "risk_id": "R06",
@@ -237,7 +228,7 @@
       "likelihood": "medium",
       "impact": "high",
       "mitigation": "Use for approved research; maintain background/foreground inventory and conduct institutional data-rights/IP assessment before commercial exploitation. [Affects: WP4 (DrR Web MVP, Co-development and Exploitation Preparation)]",
-      "responsible_partner": "HOST"
+      "responsible_partner": "SOFTWARE_PARTNER"
     }
   ],
   "ethics_assessment": {
@@ -248,7 +239,7 @@
         "category": "Artificial intelligence",
         "description": "The action develops and deploys AI/ML-supported predictive models and a decision-support system (the DrR digital-agronomist prototype and crop-configurable web MVP). The ethical dimension concerns model interpretability, uncertainty communication to end users, and avoidance of misleading agronomic recommendations.",
         "source_basis": [
-          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP2 AI/ML modelling and uncertainty; WP4 DrR web MVP)",
+          "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json (WP1 model development and uncertainty quantification; WP4 DrR web MVP)",
           "docs/tier1_normative_framework/extracted/implementation_constraints.json implementation_rules.ethics_appraisal_summary (applicant awareness of ethical and social impacts)"
         ]
       },
@@ -262,7 +253,7 @@
         ]
       }
     ],
-    "self_assessment_statement": "An ethics self-assessment is completed as an integral part of this proposal, in line with the Tier 1 rule that applicants must complete an ethics self-assessment and that projects with ethics issues may undergo ethics review with ethics requirements becoming contractual obligations (implementation_constraints.json ethics_self_assessment_required; ethics_appraisal_summary). The action focuses exclusively on civil agricultural applications and involves no excluded activities (human-embryo, cloning, or heritable-genome-modification research), consistent with the Tier 1 civil-focus constraint. Two ethics issues are identified and addressed above: (ETH-01) the development and deployment of AI/ML-based agricultural decision-support tools, addressed through interpretability, uncertainty quantification and responsible-recommendation design; and (ETH-02) processing of data extracts during interoperability testing, addressed by using only protected/coded or anonymised extracts and by obtaining written field-access arrangements, with processing to comply with applicable data-protection legislation. On gender: the beneficiary and academic participating organisations are expected to maintain gender equality plans where the Tier 1 eligibility rule applies (gender_equality_plan_eligibility), and the action will promote equal opportunities and, to the extent possible, gender balance at all levels of personnel including supervisory and managerial level (gender_management_balance_guidance). Regarding integration of the gender dimension in research and innovation content: this follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. On open science: the fellowship's training activities integrate transferable and digital skills and foster Open Science, knowledge valorisation and research integrity, and prepare the fellow for digitally enabled collaboration (FAIR data), as evidenced in the Tier 2B scope requirement SR-06 (Scope — Training activities) and call constraint CC-10 (Scope — Training activities); a Data Management Plan is delivered as a distinct deliverable within the first six months. Note on derivative flags: the Tier 3 compliance_profile.json records ethics_review_required: true and gender_plan_required: true as compliance flags derived during call binding; no Tier 2B extracted source path cites an ethics review or a gender equality plan as a topic-specific mandate for this call, so these are treated as Tier 3 derivative compliance flags rather than confirmed call-specific mandates, while the underlying ethics self-assessment and gender requirements are grounded in Tier 1 extracted rules."
+    "self_assessment_statement": "An ethics self-assessment is completed as an integral part of this proposal, in line with the Tier 1 rule that applicants must complete an ethics self-assessment and that projects with ethics issues may undergo ethics review with ethics requirements becoming contractual obligations (implementation_constraints.json ethics_self_assessment_required; ethics_appraisal_summary). The action focuses exclusively on civil agricultural applications and involves no excluded activities (human-embryo, cloning, or heritable-genome-modification research), consistent with the Tier 1 civil-focus constraint. Two ethics issues are identified and addressed above: (ETH-01) the development and deployment of AI/ML-based agricultural decision-support tools, addressed through interpretability, uncertainty quantification and responsible-recommendation design; and (ETH-02) processing of data extracts during interoperability testing, addressed by using only protected/coded or anonymised extracts and by obtaining written field-access arrangements, with processing to comply with applicable data-protection legislation. On gender balance and equality: the beneficiary and academic participating organisations are expected to maintain gender equality plans where the Tier 1 eligibility rule applies (gender_equality_plan_eligibility), and the action will promote equal opportunities and, to the extent possible, gender balance at all levels of personnel including supervisory and managerial level (gender_management_balance_guidance). Regarding integration of the gender dimension in research and innovation content: this follows the Tier 1 default rule that it is mandatory unless the topic explicitly states non-relevance. No Tier 2B exemption source is currently cited in this Phase 6 artifact; Phase 8 drafting must either add the relevant Tier 2B topic-source reference or keep the claim framed as pending call-specific confirmation. On open science: the fellowship's training activities integrate transferable and digital skills and foster Open Science, knowledge valorisation and research integrity, and prepare the fellow for digitally enabled collaboration (FAIR data), as evidenced in the Tier 2B scope requirement SR-07 (Scope — Training activities) and call constraint CC-09 (Scope — Training activities); a Data Management Plan is delivered as a distinct deliverable within the first six months. Note on derivative flags: the Tier 3 compliance_profile.json records ethics_review_required: true and gender_plan_required: true as compliance flags derived during call binding; no Tier 2B extracted source path cites an ethics review or a gender equality plan as a topic-specific mandate for this call, so these are treated as Tier 3 derivative compliance flags rather than confirmed call-specific mandates, while the underlying ethics self-assessment and gender requirements are grounded in Tier 1 extracted rules."
   },
   "instrument_sections_addressed": [
     {
@@ -273,8 +264,8 @@
     {
       "section_id": "3.1",
       "section_name": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages",
-      "status": "partially_addressed",
-      "note": "Governance and management structure addressed here; the risk-assessment component (risk_register) is populated by the risk-register-builder skill in a subsequent invocation before the Phase 6 gate."
+      "status": "addressed",
+      "note": "Governance and management structure addressed here; the risk-assessment component (risk_register) is co-produced by the risk-register-builder skill and must be complete before the Phase 6 gate."
     },
     {
       "section_id": "3.2",
@@ -331,14 +322,14 @@
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
         "relevant_fields": [
-          "requirements[SR-06] (Scope — Training activities: Open Science, research integrity, FAIR data)"
+          "requirements[SR-07] (Scope — Training activities: Open Science, research integrity, FAIR data)"
         ]
       },
       {
         "tier": 2,
         "source_path": "docs/tier2b_topic_and_call_sources/extracted/call_constraints.json",
         "relevant_fields": [
-          "constraints[CC-10] (Scope — Training activities: transferable/digital skills, Open Science, research integrity)",
+          "constraints[CC-09] (Scope — Training activities: transferable/digital skills, Open Science, research integrity)",
           "constraints[CC-07] (non-academic placement basis for WP5)"
         ]
       },
@@ -382,7 +373,7 @@
         "tier": 4,
         "source_path": "docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/wp_structure.json",
         "relevant_fields": [
-          "work_packages[].lead_partner (WP1/WP2 HOST, WP3 VALIDATION_SITE, WP4 SOFTWARE_PARTNER, WP5 VALIDATION_PARTNER)",
+          "work_packages[].lead_partner (WP1 HOST, WP3 VALIDATION_SITE, WP4 SOFTWARE_PARTNER, WP5 VALIDATION_PARTNER)",
           "partner_role_matrix"
         ]
       }
