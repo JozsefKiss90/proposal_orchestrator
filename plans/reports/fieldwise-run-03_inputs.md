@@ -1,0 +1,10 @@
+The new 'fieldwise-run-03' is necessary due to significant project changes. The most significant change is the new supervisor, Dr Tibor Janda from HUN REN (see publications here: https://scholar.google.com/citations?user=DaAV-MYAAAAJ&hl=en; see CV here: docs\tier3_project_instantiation\source_materials\cv). Dr Roland Hollós will represent ELTE as an associated partner and will remain responsible for the predictive modelling/machine learning component. Regarding the round 2 open decisions, the most important changes are:
+OD-1: WP1 and WP2 should be combined to form one WP. The current WP1 should span M1-M2, and WP2 should span M2-M3. These should be listed as tasks.The other WPs should also have tasks and not be singular monoliths. However, decide first if the Phase: 3 — WP Design and Dependency Mapping — enable this, or they should be created manually after drafting.
+OD-2: Use fallback; don't change anything if it is already covered in the draft.
+OD-3: Thresholds will be approved by external literature for different validation tools, states, stresses, etc. 
+OD-4: Use fallback.
+OD-5: Use fallback.
+Commercial site contingency: Backup for measurement work. Farmer 2 as backup.
+Cross-crop claims: If not, MCVI will support it. It has the required design structure. It will be part of the knowledge transfer to other cultivars to validate the outcomes.
+OD-6: Use fallback.
+The tier 3 reinstatement should be surgical and deterministic with no phase blockers, and assumed claims should be present. If any of the above decisions cannot be carried into tier 3 directly, they should be flagged for manual editing in the reproduced draft. Also flag any missing inputs or phase blockers. As for 'fieldwise-run-02' and the new branch and run directory, a clear deliverable and orchestration state should be established for 'fieldwise-run-03'. 

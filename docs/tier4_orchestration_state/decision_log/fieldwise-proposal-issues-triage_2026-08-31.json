@@ -1,0 +1,70 @@
+{
+  "record_type": "decision_log_entry",
+  "decision_id": "fieldwise-proposal-issues-triage_2026-08-31",
+  "date": "2026-08-31",
+  "branch": "fieldwise-run-02",
+  "decided_by": "operator (grilling session 2026-08-31)",
+  "authority": [
+    "CLAUDE.md §9.4 (durable decisions logged)",
+    "CLAUDE.md §11.4 (Tier 5 derivable from Tier 1-4)",
+    "CLAUDE.md §12.3 (explicit contradiction resolution)",
+    "CLAUDE.md §13.3 (no fabricated project facts)",
+    "CLAUDE.md §13.8 (gaps flagged, not filled)"
+  ],
+  "context": "External review comments on the current proposal state (docs/tier5_deliverables/final_exports, esp. FIELDWISE_Part_B1_manual-condensed_2026-08-30.docx) were collected in plans/proposal_issues.md (12 issues + research-gap and closure framing). The operator cannot yet answer four of the raised questions. Submission deadline HORIZON-MSCA-2026-PF-01 is 2026-09-09.",
+  "decisions": [
+    {
+      "id": "D1-tier3-authority",
+      "decision": "Tier 3 remains the authoritative substrate. Every issue resolution is folded into the matching Tier 3 artifact; deliverable text derives from it. 'Reinstating' Tier 3 was assessed and rejected as a non-action: git history shows no Tier 3 deletions since the ATK-hosted transcription (6cc8fd3); there is nothing to restore, only updates to apply."
+    },
+    {
+      "id": "D2-submission",
+      "decision": "FIELDWISE is submitted to the 2026-09-09 deadline."
+    },
+    {
+      "id": "D3-master-track",
+      "decision": "The manual condensed Part B (working copy of FIELDWISE_Part_B1_manual-condensed_2026-08-30.docx) is the submission master. fieldwise-run-03 is a POST-submission reconciliation run with a new run id, not a pre-deadline regeneration. Pre-submission, no runner phases are dispatched for this remediation.",
+      "rationale": "Nine days to deadline; the condensation labor is not pipeline-reproducible in that window; run-02's pipeline record stays intact for the reconciliation diff."
+    },
+    {
+      "id": "D4-paired-edits",
+      "decision": "Every content fix is a paired edit: submission master + matching Tier 3 artifact in the same pass, keeping §11.4 divergence at zero. Where Tier 3 already carries the correct content (KPIs K1-K11 in impacts.json, RQ1-RQ5 in concept_note.md), the Tier 3 half is verification only."
+    },
+    {
+      "id": "D5-triage",
+      "decision": "Checklist (mechanical, plans/tickets_proposal_issues_2026-09.md): issues 2, 3, 6, 7, 9, 10, 11, 12 plus the para-14/16 framing. Open decisions (plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.md): issue 1 (OD-1), 4 (OD-2), 5 (OD-3), 8 (OD-4/5/6).",
+      "notes": [
+        "Issue 7 was promoted from open-decision to checklist because the fix only weakens a claim (Skanzen contingency = measurement backup, never commercial-transferability proof).",
+        "Issue 9 is resolved as PRESENTATIONAL REFRAME ONLY: 'mainly remote with monthly face-to-face reviews' is a Confirmed Tier 3 fact (2026-08-28 supersession record) and stays factually unchanged; the deliverable text drops the self-deprecating phrase and leads with what the placement delivers. No on-site presence is implied (§13.3)."
+      ]
+    },
+    {
+      "id": "D6-od1-framing",
+      "decision": "OD-1 (WP timing) is put to Dr. Hollós as the underlying question (first prospective field season month; feasibility of a pre-season model freeze) with two candidate schemes: the reviewer's M2/M3/M4 compression and a minimal-change freeze-milestone variant. Fallback: current Confirmed timing unchanged, no freeze commitment."
+    },
+    {
+      "id": "D7-draft-for-confirmation",
+      "decision": "OD-2 (stress-target hierarchy) and OD-3 (performance/calibration metrics) use the draft-for-confirmation pattern: candidate answers drafted strictly from Pack/Tier 3 vocabulary, marked Assumed-pending-confirmation; nothing enters the submission master until Dr. Cholakova confirms. Fallbacks state the pre-registration-in-D1.2 position without naming the unconfirmed content."
+    },
+    {
+      "id": "D8-schedule",
+      "decision": "Schedule spine: partner/fellow answers needed by 2026-09-03 EOD; confirmed answers applied 2026-09-04/05; submission master frozen 2026-09-06 (hash recorded); upload by 2026-09-08. Fallbacks fire automatically at the 09-03 cut-off."
+    }
+  ],
+  "artifacts_produced": [
+    "plans/tickets_proposal_issues_2026-09.md",
+    "plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.md",
+    "plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.docx",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-proposal-issues-triage_2026-08-31.json"
+  ],
+  "source_inputs": [
+    "plans/proposal_issues.md",
+    "docs/tier3_project_instantiation/architecture_inputs/impacts.json (K1-K11, adopted_claim_form)",
+    "docs/tier3_project_instantiation/project_brief/concept_note.md (RQ1-RQ5)",
+    "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json (WP spans, T3.6, T2.6)",
+    "docs/tier3_project_instantiation/working_assumptions.json (mate_data_rights, farmer_field_access, placement_* keys)",
+    "docs/tier3_project_instantiation/call_binding/selected_call.json (deadline 2026-09-09)",
+    "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json"
+  ],
+  "constitutional_notes": "No gate condition is weakened and no phase is reordered: the manual-master decision affects only how the already-exported Tier 5 text is remediated pre-submission; the pipeline's next execution is the post-submission fieldwise-run-03 reconciliation run, which re-evaluates all gates against updated Tier 3 fingerprints (ST-1). The write-once phase8 checkpoint must be archived before that rerun."
+}
