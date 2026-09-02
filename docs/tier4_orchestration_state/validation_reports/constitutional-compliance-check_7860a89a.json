@@ -1,9 +1,9 @@
 {
-  "report_id": "compliance_check_excellence_section_compliance_validator_2026-09-03T12:00:00Z",
+  "report_id": "compliance_check_impact_section_unspecified_2026-09-03T00:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "compliance_validator",
+  "invoking_agent": "unspecified",
   "run_id_reference": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
-  "artifact_audited": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
+  "artifact_audited": "docs/tier5_deliverables/proposal_sections/impact_section.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
@@ -11,15 +11,15 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "The artifact is structured as MSCA-PF application-form Part B Excellence sub-sections 1.1-1.4 (schema orch.tier5.excellence_section.v1). References to 'the grant agreement default' and 'the call's optional up-to-six-month placement provision' are cited as substantive rules, not used as a structural schema. No 'Annex N', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' is used as the structural authority for the section."
+      "reason": "The section content references 'the grant-agreement default' only as a citation basis for IP ownership allocation, not as a structural schema. No 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' string is used as a structural authority in the content or traceability_footer. Section structure follows the Impact criterion sub-sections (2.1/2.2/2.3), i.e. an application-form (Tier 2A) structure."
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Call-requirement claims are traced to Tier 2B extracted sources. The traceability_footer.primary_sources[] contains docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json, expected_outcomes.json, and expected_impacts.json; call-constraint claim_statuses (SR-06, SR-07, SR-08, EO-01_EO-05_EO-07) each carry a Tier 2B source_ref. Per skill scope this check verifies presence of a Tier 2B reference only, not the referenced entry's content."
+      "reason": "Every call-requirement claim (SR-06, SR-07, SR-08 and expected outcomes/impacts EO-01/02/03, EI-01/02/03/05) carries a Tier 2B source reference. traceability_footer.primary_sources[] contains docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json, .../expected_outcomes.json and .../scope_requirements.json; corresponding claim_statuses entries cite these tier-2 paths. This skill checks only for the presence of a Tier 2B reference, not the referenced content."
     },
     {
       "prohibition_id": "13.3",
@@ -27,15 +27,15 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Project-fact claims (partners, researcher profile, objectives, prototype, sites, roles) carry Tier 3 source_refs (call_binding/confirmation_checklist.json, consortium/capabilities.json, architecture_inputs/objectives.json, project_brief/*, working_assumptions.json), and the traceability_footer includes these Tier 3 paths. Forward-looking, unconfirmed facts (supervisor/co-supervisor acceptance, effort person-months, contact persons, backup site, placement IP) are marked status 'assumed' with assumption_declared:true. Per skill scope this check verifies presence of a Tier 3 reference only."
+      "reason": "All project-fact claims (Dr. Rositsa Cholakova; HUN-REN ATK host; Prof. Tibor Janda; Prof. Andras Jung; Dr. Roland Hollos; Dr. Zsofia Varga; Miklos Maroti/AgroVIR; ELTE, MATE, Krumatic, MVCRI; deliverables and durations) carry Tier 3 source references in claim_statuses (docs/tier3_project_instantiation/...) and the traceability_footer. Assumed facts (e.g. supervisor acceptances, MATE data rights) are sourced to docs/tier3_project_instantiation/working_assumptions.json with assumption_declared:true. This skill checks only for the presence of a Tier 3 reference."
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity — including preparatory drafting — before the budget gate (Phase 7) has passed. Absent/failed budget artifacts are a blocking gate failure.",
+      "prohibition_description": "Commencing any Phase 8 activity (including preparatory drafting) before the budget gate (Phase 7) has passed.",
       "check_status": "violation",
-      "violation_evidence": "The audited artifact is a finalized Phase 8 Tier 5 deliverable (schema_id 'orch.tier5.excellence_section.v1') with four fully drafted Excellence sub-sections. However docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json exists with \"gate_pass_declaration\": \"fail\" and blocking inconsistency BLK-01: 'docs/integrations/lump_sum_budget_planner/received/ contains no lump-sum budget response ... Absent budget artifacts in received/ constitute a blocking gate failure, not a hold or pending state, per CLAUDE.md §8.4 and §13.4.' A completed Phase 8 drafting artifact exists while the budget gate has NOT passed. Additionally the section content presents budget-relevant effort figures — 'a committed supervisory effort of approximately 2.5 person-months', 'a co-supervisory effort of approximately 2.0 person-months', and 'a committed partner effort of approximately 3.0 person-months' — i.e. budget-dependent effort claims present without a passing budget gate.",
+      "violation_evidence": "The audited artifact is a finalized Phase 8 Tier 5 deliverable (schema_id 'orch.tier5.impact_section.v1' with three drafted sub-section contents, 1369/1566/1264 words). However docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json has \"gate_pass_declaration\": \"fail\" with blocking inconsistency BLK-01 ('docs/integrations/lump_sum_budget_planner/received/ contains no lump-sum budget response ... Absent budget artifacts ... constitute a blocking gate failure'). A drafted Phase 8 proposal section exists while gate_09/Phase 7 is failed and unresolved.",
       "severity": "critical",
-      "reason": "Phase 8 artifact present and materially drafted while Phase 7 gate_pass_declaration == 'fail'. This is the categorical, unconditional, instrument-independent Phase-8 block of CLAUDE.md §8.4 and §13.4. Flagged, not resolved."
+      "reason": "Per CLAUDE.md §13.4 and §8.4, no Phase 8 substep (including drafting) may commence before the budget gate passes; this block is unconditional and instrument-independent. The existence of a completed Tier 5 impact_section draft while the Phase 7 gate is declared 'fail' evidences the violation."
     },
     {
       "prohibition_id": "13.5",
@@ -43,15 +43,15 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Not verifiable from artifact content alone; enforced by the decision-log-update skill and the orchestration runtime, not detectable within a single Tier 5 deliverable. Recorded pass per skill specification Step 2 (13.5)."
+      "reason": "Not verifiable from artifact content alone; this prohibition is enforced by the decision-log-update mechanism, not by inspecting a deliverable. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by expanding its scope.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by redefining phase/tier/gate meanings.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Not directly checkable from a phase output or deliverable artifact; this is a structural/scope property of workflow and skill definitions, not of the audited proposal section. Recorded pass per skill specification Step 2 (13.6)."
+      "reason": "Not directly checkable from a deliverable artifact. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
     },
     {
       "prohibition_id": "13.7",
@@ -59,31 +59,31 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "The artifact is a Phase 8 output and references only same-or-earlier phase inputs (phase1_call_analysis, phase2_concept_refinement, phase3_wp_design, phase8_drafting_review canonical_reference_pack) plus Tier 2B/Tier 3 sources. No reference to a phase later than the current phase is present. (Note: the separate §13.4 finding concerns a failed gate being bypassed, which is recorded under 13.4.)"
+      "reason": "The artifact references only same-phase and upstream inputs (Phase 8 canonical_reference_pack, Phase 2 concept_refinement_summary, Phase 3 wp_structure) in its traceability_footer. It does not consume outputs from a phase higher than its own as inputs. Note: the separate §13.4 finding concerns a failed upstream gate, not silent phase reordering within this artifact."
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is known to be incomplete, contradictory, or unvalidated, without explicitly flagging the gap in the deliverable.",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete, contradictory, or unvalidated, without explicitly flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "validation_status.overall_status is 'assumed', not 'unresolved'; no claim_status has status 'unresolved'. The §13.8 check triggers specifically on unflagged 'unresolved' status. Unconfirmed items are transparently disclosed in the body (e.g. 1.3: 'the supervisor's and co-supervisor's formal acceptance ... the placement arrangement, supervisor, effort and IP allocation are operator-declared working assumptions to be confirmed in partner writing before the action starts') and each carries assumption_declared:true. The specific 13.8 violation condition does not fire. (Budget-dependent finalization is captured under 13.4.)"
+      "reason": "validation_status.overall_status is 'assumed' (not 'unresolved'); no claim_statuses entry has status 'unresolved'. All assumed claims carry assumption_declared:true and are explicitly flagged in the content itself (e.g. 'no institutional HR award is claimed for HUN-REN ATK, as its status has not been established'; 'rest on operator declarations pending partner writing and are presented as such rather than as settled fact'; the Skanzen demonstration 'stated conditionally and carries no unconditional promise'). The literal §13.8 trigger (unresolved status not flagged) is not met."
     },
     {
       "prohibition_id": "13.9",
       "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present.",
       "check_status": "violation",
-      "violation_evidence": "The section asserts Horizon Europe grant/eligibility rules that carry no Tier 1 source reference: (1) 1.3 — 'Ownership of placement results follows the grant-agreement default, vesting in HUN-REN Agrartudomanyi Kutatokozpont as beneficiary acting through the fellow' (a grant-agreement term); the corresponding claim_status 'placement_ip_ownership' is sourced only to Tier 3 working_assumptions.json. (2) 1.4 — 'the break does not count against the MSCA research-experience window' (an MSCA participation/eligibility condition); claim_status 'C13_career_break' is sourced only to Tier 3 consortium/capabilities.json. The traceability_footer.primary_sources[] contains only Tier 2, Tier 3, and Tier 4 entries and NO path within docs/tier1_normative_framework/extracted/. These regulatory claims therefore carry no Tier 1 source reference.",
+      "violation_evidence": "The content asserts a grant-agreement-terms (regulatory) claim: 'ownership of results is to follow the grant-agreement default, vesting in HUN-REN ATK as beneficiary acting through the fellow'. Its sole source_ref (claim placement_ip_ownership) is Tier 3 docs/tier3_project_instantiation/working_assumptions.json, and the artifact's traceability_footer.primary_sources[] contains no Tier 1 (docs/tier1_normative_framework/extracted/) path reference at all.",
       "severity": "major",
-      "reason": "Regulatory claims (grant-agreement default IP vesting; MSCA research-experience-window eligibility) are stated without any Tier 1 normative-framework traceability. Per skill scope this check verifies only the presence of a Tier 1 reference in the traceability footer, not the referenced file's existence. Applied conservatively per constraint 3."
+      "reason": "Per CLAUDE.md §13.9, a claim referencing Horizon Europe grant agreement terms (the 'grant-agreement default' ownership rule) must trace to a Tier 1 source. This skill checks only for the presence of a Tier 1 reference in the traceability footer; none is present, so the check is applied conservatively and flagged as a violation."
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing Tier 5 outputs that are not traceable to specific inputs in Tier 1–4.",
+      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1-4.",
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "traceability_footer.no_unsupported_claims_declaration is true; the §13.10 examination path (triggered when that declaration is false) does not fire. Every entry in validation_status.claim_statuses[] carries a source_ref, and no claim has status 'unresolved' lacking a source_ref."
+      "reason": "traceability_footer.no_unsupported_claims_declaration is true. All claim_statuses entries have status 'confirmed' or 'assumed' and each carries a source_ref; no entry has status 'unresolved' lacking a source_ref. The §13.10 trigger (unresolved claim with no source_ref) is not met."
     },
     {
       "prohibition_id": "13.11",
@@ -91,7 +91,7 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Not checkable from a phase output or deliverable artifact; modification of Tier 1/Tier 2 source documents cannot be detected by inspecting a Tier 5 deliverable. Recorded pass per skill specification Step 2 (13.11)."
+      "reason": "Not checkable from a Tier 5 deliverable artifact (this audit does not read or write Tier 1/Tier 2 sources). Recorded as pass per skill specification (non-applicable to artifact-level audit)."
     },
     {
       "prohibition_id": "13.12",
@@ -99,25 +99,12 @@
       "check_status": "pass",
       "violation_evidence": null,
       "severity": null,
-      "reason": "Not directly checkable from an artifact's content; this is a behavioural property of agents and processes, not of the audited proposal section. Recorded pass per skill specification Step 2 (13.12)."
+      "reason": "Not directly checkable from a deliverable artifact. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
     }
   ],
   "summary": {
     "total_prohibitions_checked": 12,
     "violations_found": 2
   },
-  "timestamp": "2026-09-03T12:00:00Z",
-  "decision_log_entries": [
-    {
-      "decision_id": "constitutional_violation_compliance_validator_2026-09-03T12:00:00Z",
-      "decision_type": "constitutional_violation",
-      "violation_id": "13.4_excellence_section_2026-09-03T12:00:00Z",
-      "constitutional_rule_ref": "CLAUDE.md §13.4 (and §8.4, §7 Phase 7)",
-      "artifact_affected": "docs/tier5_deliverables/proposal_sections/excellence_section.json",
-      "resolution_status": "unresolved",
-      "resolution_note": "Constitutional violation detected: a finalized Phase 8 Tier 5 deliverable exists while docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json reports gate_pass_declaration='fail' (blocking inconsistency BLK-01). The categorical Phase-8 block is unconditional. This skill flags the violation; it does not resolve it. Requires human operator resolution.",
-      "tier_authority_applied": "CLAUDE.md §13",
-      "timestamp": "2026-09-03T12:00:00Z"
-    }
-  ]
+  "timestamp": "2026-09-03T00:00:00Z"
 }
