@@ -16,19 +16,28 @@
   "milestones": [
     {
       "milestone_id": "MS1",
-      "due_month": 6,
+      "due_month": 2,
       "criterion_statement": "Historical knowledge base and target definition complete.",
       "linked_work_package": "WP1",
       "validation_status": "Confirmed",
-      "source_ref": "Pack §3.1 MS1"
+      "source_ref": "Pack §3.1 MS1; due month moved M6->M2 by the OD-1 partner-backed answer of 2026-09-02 (decision_log/fieldwise-run03-instantiation_2026-09-02.json)"
+    },
+    {
+      "milestone_id": "MS6",
+      "due_month": 3,
+      "criterion_statement": "Primary model frozen and registered: parameters fixed and the model card (D2.1) registered before the first prospective commercial field season; post-freeze WP1 work (T2.4-T2.6) is scale-harmonisation and crop-transfer specification, never target-model changes.",
+      "linked_work_package": "WP1",
+      "validation_status": "Confirmed",
+      "source_ref": "OD-1 partner-backed answer of 2026-09-02 (plans/reports/fieldwise-run-03_inputs.md; decision_log/fieldwise-run03-instantiation_2026-09-02.json)",
+      "note": "New milestone of the OD-1 adoption. The id MS6 is chosen to avoid renumbering the Pack-anchored MS1-MS5 set; its chronological position (M3) between MS1 and MS2 is intentional and documented. (The retired fieldwise-run-01 MS6 was a different milestone in a superseded structure.)"
     },
     {
       "milestone_id": "MS2",
       "due_month": 14,
       "criterion_statement": "Model and scale-transition framework ready for final prospective assessment.",
-      "linked_work_package": "WP2",
+      "linked_work_package": "WP1",
       "validation_status": "Confirmed",
-      "source_ref": "Pack §3.1 MS2"
+      "source_ref": "Pack §3.1 MS2; re-linked from the former WP2 container to the merged WP1 (OD-1, 2026-09-02)"
     },
     {
       "milestone_id": "MS3",
@@ -61,8 +70,9 @@
     "validation_status": "Confirmed",
     "source_ref": "Operator ruling of 2026-08-28 (decision_log/fieldwise-run-02-baseline_2026-08-28.json), re-anchoring the item-4 governance pattern to the Pack's milestone months",
     "note": "The Steering Group's corrective decision points track the milestones (go/no-go verdicts on MS1-MS5), plus the retained mid-placement review at M27. Re-derivation of the operator's 2026-08-12 pattern, ratified 2026-08-28: the prior calendar (M6/12/16/20/27) tracked the superseded milestone months; the verdicts belong at the milestone months, and the M27 mid-placement point survives on its original reasoning (an evaluated placement must not run unmonitored between M24 and M30... the M27 point reviews the placement mid-window; MS5 at M30 closes it).",
+    "od1_calendar_note": "OD-1 (2026-09-02) moves MS1 to M2 and adds MS6 at M3, both before the first steering meeting. The five-point steering calendar (M6/M14/M18/M24/M27) is deliberately UNCHANGED to preserve the ratified governance pattern and K11's target: MS1 and MS6 are verified on occurrence (their deliverables D1.1/D1.2 and the registered model card D2.1 are the evidence) and their verdicts are ratified at the M6 meeting. Status: Inferred (operator-note, not partner writing) — flagged for operator confirmation in the run-03 flag list.",
     "points": [
-      {"month": 6, "linked_milestone": "MS1", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS1"},
+      {"month": 6, "linked_milestone": "MS1", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS1", "note": "From 2026-09-02 this meeting ratifies the already-due MS1 (M2) and MS6 (M3) verdicts — see od1_calendar_note."},
       {"month": 14, "linked_milestone": "MS2", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS2"},
       {"month": 18, "linked_milestone": "MS3", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS3"},
       {"month": 24, "linked_milestone": "MS4", "validation_status": "Confirmed", "source_ref": "Operator ruling 2026-08-28; Pack §3.1 MS4"},

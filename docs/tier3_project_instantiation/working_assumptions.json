@@ -4,6 +4,7 @@
   "_authored_by": "fieldwise-run-02 baseline transcription of 2026-08-28 (decision_log/fieldwise-run-02-baseline_2026-08-28.json), rewriting the fieldwise-run-01 declaration set for the ATK-hosted configuration. Prior file preserved on branch fieldwise-run-01. Sources: the Consolidated Partner Review Pack of 2026-08-28 and decision_inputs_2026-08.md (both committed under source_materials/consolidated_pack_2026-08-28/), plus the operator rulings of the 2026-08-28 session.",
   "_scope": "One declaration for every fact that Tier 3 marks Assumed. A declaration turns an Unresolved or unevidenced fact into a conscious Assumed (§12.2) owned and dated by the operator; it never makes a fact Confirmed. Every Assumed record in Tier 3 names its declaration_key here, and every key below backs at least one such record. The file carries two kinds of declaration: most relay something the operator knows or has decided and cannot yet evidence in partner writing; the keys listed in _operator_placeholders stand in for something nobody has supplied.",
   "_superseded_and_removed": {
+    "hollos_supervisor_acceptance": "Withdrawn and superseded 2026-09-02: the primary-supervisor seat re-targets from Dr. Roland Hollós to Prof. Tibor Janda (operator instruction, plans/reports/fieldwise-run-03_inputs.md; decision_log/fieldwise-run03-instantiation_2026-09-02.json). Dr. Hollós moves to the ELTE side as the named predictive-modelling/ML team member (new key hollos_elte_ml_role). The supervisor-acceptance declaration is now janda_supervisor_acceptance.",
     "person_months_ELTE_supervisor": "Removed. The supervisor role moved to ATK with Dr. Hollós under the host switch; the supervisor figure is now person_months_ATK_supervisor. The 2.5 value follows the role (operator ruling of 2026-08-28: role-for-role swap).",
     "person_months_MVCRI": "Removed. MVCRI's in-action trial seat is removed under full pack adoption (post-MSCA route, no WP line, no in-action effort). See decision_log/fieldwise-run02-supersessions_2026-08-28.json.",
     "placement_workspace_AgroVIR": "Withdrawn and superseded by placement_arrangement_AgroVIR. The 2026-08-14 value promised a desk/office plus FMIS development, staging and customer-data environment access; the consolidated pack's arrangement is mainly remote with monthly face-to-face meetings and protected/coded extracts, and expressly states the fellow does not require access to proprietary software, customer databases, office infrastructure or computing equipment. The newest agreed position governs. See decision_log/fieldwise-run02-supersessions_2026-08-28.json.",
@@ -55,31 +56,39 @@
       "value": "Dr. Roland Hollós (hollos.roland@atk.hun-ren.hu) is the interim project contact until ATK names its administrative or grants-office contact.",
       "declared_by": "operator (2026-08-28 baseline)",
       "declared_on": "2026-08-28T00:00:00Z",
-      "rationale": "The open-decisions handout asks for ATK's administrative contact; none has been supplied. The supervisor as interim contact is the least-invented closure: his identity and address are Confirmed from the ATK staff page, and only his acting-as-contact is assumed. Replace with the grants-office contact when ATK's written confirmation arrives.",
+      "rationale": "The open-decisions handout asks for ATK's administrative contact; none has been supplied. Dr. Hollós as interim contact is the least-invented closure: his identity and ATK address are Confirmed from the ATK staff page. NOTE 2026-09-02: he is no longer the supervisor (see janda_supervisor_acceptance) and moves to the ELTE side; his ATK address remains the only evidenced contact channel, so the interim-contact declaration stands until ATK names its administrative or grants-office contact (expected with the Janda confirmation). Replace then.",
       "checklist_ref": "HOST"
     },
     {
-      "key": "hollos_supervisor_acceptance",
-      "value": "Dr. Roland Hollós accepts the primary-supervisor role, with weekly technical sessions through the modelling-intensive work packages and the supervision routine of the governance record.",
-      "declared_by": "operator (host-switch decision of 2026-08-26; role text DI lines 14-16)",
-      "declared_on": "2026-08-28T00:00:00Z",
-      "rationale": "His central-role text is partner-authored (DI), but the formal acceptance of the supervisor role, his position grade and start date at ATK are not yet in writing. The employment itself is Confirmed (ATK staff page); the acceptance is declared.",
+      "key": "janda_supervisor_acceptance",
+      "value": "Prof. Tibor Janda accepts the primary-supervisor role at HUN-REN ATK, anchoring supervision in the Plant Physiology and Metabolomics Department (which he heads) and carrying the supervision routine of the governance record.",
+      "declared_by": "operator (fieldwise-run-03 instruction of 2026-09-02, plans/reports/fieldwise-run-03_inputs.md)",
+      "declared_on": "2026-09-02T00:00:00Z",
+      "rationale": "His identity, department headship and the department's drought/abiotic-stress profile are Confirmed (capabilities.json ATK record; CV committed at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf; Scholar profile DaAV-MYAAAAJ). What is declared is the acceptance of the supervisor role: nothing is yet in partner writing. Converts to Confirmed on ATK's/Prof. Janda's written confirmation. Supersedes hollos_supervisor_acceptance (see _superseded_and_removed).",
       "checklist_ref": "SUPERVISOR"
     },
     {
       "key": "person_months_ATK_supervisor",
       "value": 2.5,
-      "declared_by": "operator (2026-08-28 ruling: role-for-role swap)",
-      "declared_on": "2026-08-28T00:00:00Z",
-      "rationale": "The supervisor figure follows the role, not the person: 2.5 PM was the supervisor figure of the prior configuration, built bottom-up from the accepted governance cadence over 30 months (weekly one-to-ones, monthly progress records, quarterly CDP reviews, chairing the Steering Group, reading drafts and deliverables). About 8% FTE. To be checked with Dr. Hollós and ATK.",
+      "declared_by": "operator (2026-08-28 ruling: role-for-role swap; carried to the Janda seat 2026-09-02)",
+      "declared_on": "2026-09-02T00:00:00Z",
+      "rationale": "The supervisor figure follows the role, not the person: 2.5 PM was the supervisor figure of the prior configuration, built bottom-up from the accepted governance cadence over 30 months (weekly one-to-ones, monthly progress records, quarterly CDP reviews, chairing the Steering Group, reading drafts and deliverables). About 8% FTE. Unchanged by the 2026-09-02 supervisor change; to be checked with Prof. Janda and ATK.",
       "checklist_ref": "SUPERVISOR"
+    },
+    {
+      "key": "hollos_elte_ml_role",
+      "value": "Dr. Roland Hollós participates in FIELDWISE on the ELTE side (associated partner) as the named team member responsible for the predictive-modelling/machine-learning component, retaining the methodological leadership of the modelling workflow (AI/ML approach selection, heterogeneous data integration, model interpretation).",
+      "declared_by": "operator (fieldwise-run-03 instruction of 2026-09-02, plans/reports/fieldwise-run-03_inputs.md)",
+      "declared_on": "2026-09-02T00:00:00Z",
+      "rationale": "His modelling-role text is partner-authored (DI lines 14-16) and his identity is Confirmed. What is declared is the ELTE-side participation basis: his evidenced employment is at ATK (staff page, consulted 2026-08-28), and the arrangement under which he represents ELTE as associated partner is not yet in writing. Converts to Confirmed on ELTE's written associated-partner confirmation naming him. Until then no deliverable may state his ELTE affiliation as settled fact.",
+      "checklist_ref": "EO_PARTNER"
     },
     {
       "key": "jung_co_supervision_acceptance",
       "value": "Prof. András Jung accepts the co-supervisor role, carrying the hyperspectral/UAV/EO harmonisation strand as a substantive methodological role.",
       "declared_by": "operator (host-switch decision of 2026-08-26; role text DI lines 17-19)",
       "declared_on": "2026-08-28T00:00:00Z",
-      "rationale": "His methodological role text is partner-authored; the formal acceptance of the co-supervisor role (a demotion from the prior supervisor seat) is not yet in writing and is declared per the 2026-08-26 evidence-grade ruling on ELTE-dependent facts.",
+      "rationale": "His methodological role text is partner-authored; the formal acceptance of the co-supervisor role (a demotion from the prior supervisor seat) is not yet in writing and is declared per the 2026-08-26 evidence-grade ruling on ELTE-dependent facts. His continuation as co-supervisor under the 2026-09-02 supervisor change (Janda seat; Hollós to the ELTE side) is part of this same declaration and is equally pending written confirmation.",
       "checklist_ref": "CO_SUPERVISOR"
     },
     {
@@ -92,7 +101,7 @@
     },
     {
       "key": "elte_associated_partner_agreement",
-      "value": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment and the co-supervisor.",
+      "value": "ELTE continues in FIELDWISE as an associated partner (not beneficiary), providing the remote-sensing/UAV/hyperspectral environment, the co-supervisor, and (from 2026-09-02) the named predictive-modelling/ML team member (see hollos_elte_ml_role).",
       "declared_by": "operator (host-switch decision of 2026-08-26)",
       "declared_on": "2026-08-28T00:00:00Z",
       "rationale": "Per the operator ruling of 2026-08-26, ELTE's written agreement is evidence-grade only and not a gate requirement; ELTE-dependent facts run as operator-declared Assumed (the AgroVIR pattern). ELTE's PIC and contact person are collected at Part A.",
@@ -255,7 +264,15 @@
       "value": "The independent commercial farmer provides written field access: site availability for the validation season(s) within M4-M18, permission for sensor installation (automated meteorological station, soil sensors), field measurements and UAV campaigns, agreed irrigation-treatment implementation, and routine crop management responsibilities.",
       "declared_by": "operator (2026-08-28 baseline; Pack Stage 3, T3.1, Pack C row 'Commercial farmer')",
       "declared_on": "2026-08-28T00:00:00Z",
-      "rationale": "Pack C lists the written access confirmation as OPEN and T3.1 schedules obtaining it before the campaign. The relationship is established (the fellow has previously worked with the farmer), but the written arrangement does not yet exist; site location and area are deliberately not recorded (operator decision: unnamed collaborator). Contingency: the Szentendre Skanzen route, contingency-only (T3.6, risk R04).",
+      "rationale": "Pack C lists the written access confirmation as OPEN and T3.1 schedules obtaining it before the campaign. The relationship is established (the fellow has previously worked with the farmer), but the written arrangement does not yet exist; site location and area are deliberately not recorded (operator decision: unnamed collaborator). Contingency ladder (2026-09-02): first backup the identified second commercial producer (key farmer2_backup_site, commercial-transferability claim preserved), then the Szentendre Skanzen route (measurement backup only, claim downgraded; T3.6-successor task, risk R04).",
+      "checklist_ref": "VALIDATION_SITE"
+    },
+    {
+      "key": "farmer2_backup_site",
+      "value": "A second independent commercial processing-tomato producer, reachable through the same MATE/ATK professional channel, has been identified and informally approached to serve as first-line backup validation site. If activated and the site meets the measurement protocol, the prospective commercial-field validation claim is preserved; written access is obtained under the same M1 access task as the primary site.",
+      "declared_by": "operator (fieldwise-run-03 instruction of 2026-09-02, plans/reports/fieldwise-run-03_inputs.md; grilling session ruling)",
+      "declared_on": "2026-09-02T00:00:00Z",
+      "rationale": "Nothing is in writing: the identification and informal approach are operator-relayed. Declared so the site-contingency ladder (primary farmer -> Farmer 2 -> Skanzen) can be stated without fabrication. Only the Skanzen tier triggers the transferability-claim downgrade; Farmer 2 activation is claim-preserving because it is still an independent commercial site. Identity deliberately not recorded, matching the primary-site convention. Converts to Confirmed on the farmer's written backup agreement.",
       "checklist_ref": "VALIDATION_SITE"
     },
     {

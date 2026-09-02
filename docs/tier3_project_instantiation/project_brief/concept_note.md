@@ -162,3 +162,36 @@ explicit crop-specific validation and calibration?
 - **H4 - Operational relevance hypothesis.** A model selected for physiological validity,
   calibration, uncertainty and stability will provide more useful irrigation-attention
   information than one selected solely for retrospective predictive accuracy.
+
+<!-- OPERATOR-DECIDED 2026-09-02 | OD-2/OD-3 landings + review-issue-12 closure discipline | decision_log/fieldwise-run03-instantiation_2026-09-02.json -->
+## Evaluation discipline and closure narrative
+
+**What the model is (one sentence, review issue 12):** the model learns the relationship
+between operational predictors — soil-water, weather and spectral/EO data — and an
+independently measured physiological water-stress target.
+
+**Pre-specified stress-target hierarchy (OD-2, fallback position):** the primary
+physiological stress target and its corroborating endpoints follow a pre-specified
+hierarchy that is fixed in the stress-target and validation protocol (D1.2) before any
+model fitting. The order is fixed in D1.2, not at proposal level; every substitution the
+T1.1 archive audit forces is made and documented before model training, never after
+inspecting model results.
+
+**Pre-registered metrics and literature-derived thresholds (OD-3):** model evaluation uses
+pre-registered metrics under blocked unseen-year validation — for classified stress
+detection, balanced accuracy and F1 against the pre-specified physiological stress state,
+with ROC-AUC for threshold-free comparison; for continuous prediction, RMSE and MAE with
+R² for context; for calibration, reliability diagrams with the Brier score for
+probabilistic stress classification and prediction-interval coverage probability (PICP)
+with mean interval width for continuous predictions; and for operational value,
+stress-detection lead time and per-season false-alarm rate. Acceptance thresholds for
+each metric are derived from the published literature for the relevant validation tools,
+stress states and crop conditions, and are pre-registered in D1.2 before the prospective
+season.
+
+**Closure narrative (review issue 12 / ¶16, freeze clause committed under OD-1):** the
+five-season MATE dataset grounds the physiological stress definition; the model is built
+and challenged under blocked unseen-year validation; the primary model is frozen and its
+model card registered before the new field season (MS6, M3); the frozen model is tested
+prospectively on an independent commercial field; and the validated functions — not the
+unvalidated ambitions — are carried into the DrR web MVP.

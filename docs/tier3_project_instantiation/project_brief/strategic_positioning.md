@@ -71,16 +71,27 @@ and about 7.5% less than evapotranspiration-based scheduling, with yield differe
 underline the need to quantify water-yield trade-offs; a 2026 study reported 25% water
 saving from early-timed controlled deficit without statistically significant yield loss,
 while poorly timed or prolonged deficits reduced yield. FIELDWISE uses an external benchmark
-range of roughly 8-30% only as bounded literature context, never as a project promise;
-project-specific water saving, yield, quality and uncertainty are reported from the
-prospective validation data.
+range of roughly 8-30% only as bounded literature context, never as a project promise. The
+project's claimed decision value is correct stress detection, lead time, uncertainty
+honesty, usability and irrigation-attention relevance; prospective water-saving
+quantification is claimed only to the extent the farmer-field irrigation-treatment
+arrangement actually supports it (working assumption farmer_field_access), and otherwise
+detection, lead-time and uncertainty outcomes are reported together with yield and quality
+from the prospective validation data.
 
 ### Technological and economic impact
 
 The web-based DrR MVP provides a tangible route from validated research to external testing,
 preserving the distinction between the fellow's pre-existing DrR background and FIELDWISE
 foreground. The architecture is crop-configurable; AgroVIR identifies the requirements for
-future FMIS integration and Krumatic supports implementation and Bulgarian uptake. Economic
+future FMIS integration and Krumatic supports implementation and Bulgarian uptake. Within
+the action, validation is limited to processing tomato; the crop-transfer specification
+(T2.6) defines the components, parameters, minimum datasets and recalibration gates any
+later crop addition must pass. The named follow-on route is concrete: MVCRI — with its
+established vegetable-crop variety-trial design infrastructure — is the post-MSCA channel
+through which the validated outcomes are transferred to and validated on additional tomato
+cultivars under Bulgarian production conditions, as knowledge transfer outside the
+24-month work plan (no in-action MVCRI effort is claimed). Economic
 value is not expressed as an invented EUR/ha promise; FIELDWISE quantifies the measured
 quantities from which later economic value can be assessed.
 

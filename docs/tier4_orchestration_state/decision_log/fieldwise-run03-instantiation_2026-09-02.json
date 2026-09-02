@@ -1,0 +1,104 @@
+{
+  "record_type": "decision_log_entry",
+  "decision_id": "fieldwise-run03-instantiation_2026-09-02",
+  "date": "2026-09-02",
+  "branch": "fieldwise-run-03",
+  "decided_by": "operator (grilling session 2026-09-02; inputs in plans/reports/fieldwise-run-03_inputs.md)",
+  "authority": [
+    "CLAUDE.md §9.4 (durable decisions logged)",
+    "CLAUDE.md §12.2 (status categories)",
+    "CLAUDE.md §12.3 (explicit contradiction resolution)",
+    "CLAUDE.md §13.3 (no fabricated project facts)",
+    "CLAUDE.md §13.8 (gaps flagged, not filled)"
+  ],
+  "context": "The operator delivered fieldwise-run-03 inputs on 2026-09-02 (before the 2026-09-03 EOD round-2 cut-off): a supervisor change (Prof. Tibor Janda), the OD-1 WP-merge answer, OD-2..OD-6 dispositions, a Farmer 2 site backup, and MVCRI cultivar-transfer framing. Each decision below was put to the operator one-by-one in a grilling session and confirmed; the full enactment (surgical Tier 3 update, run-03 branch, regeneration) was confirmed as a package.",
+  "decisions": [
+    {
+      "id": "R3-D1-run03-presubmission",
+      "decision": "SUPERSEDES D3 of fieldwise-proposal-issues-triage_2026-08-31: fieldwise-run-03 is a PRE-submission regeneration run, not a post-submission reconciliation. Tier 3 is updated now; the operator reruns Phases 1-8 from the CLI (~2026-09-03/04); the submission master is a manual condensation of the run-03 export (agent-produced, operator-reviewed), frozen 2026-09-06, uploaded by 2026-09-08 for the 2026-09-09 deadline.",
+      "rationale": "The supervisor change and WP merge must appear in the submitted text and touch nearly every Part B section; hand-editing the condensed docx for all of it invites §11.4 divergence. The prior D3 rationale (condensation labor not pipeline-reproducible) is preserved by keeping condensation manual, from the regenerated export.",
+      "supersedes": "fieldwise-proposal-issues-triage_2026-08-31 decision D3 (manual-master track; run-03 post-submission)"
+    },
+    {
+      "id": "R3-D2-supervision-spine",
+      "decision": "Supervision spine change, ALL elements operator-declared Assumed (nothing in partner writing on 2026-09-02): SUPERVISOR = Prof. Tibor Janda (HUN-REN ATK, head of the Plant Physiology and Metabolomics Department; CV committed at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf); CO_SUPERVISOR = Prof. András Jung (ELTE) CONTINUES; Dr. Roland Hollós moves to the ELTE side as named team member responsible for the predictive-modelling/ML component. Host, duration, placement unchanged.",
+      "rationale": "Operator instruction (fieldwise-run-03_inputs.md). 'Both stay at ELTE' ruling: Jung keeps the hyperspectral/scale-harmonisation grounding (WP scale strand, T2.4), Hollós keeps ML leadership. Declarations: janda_supervisor_acceptance, hollos_elte_ml_role, jung_co_supervision_acceptance (amended), person_months_ATK_supervisor (carried to the Janda seat). hollos_supervisor_acceptance withdrawn. The confirmation_checklist SUPERVISOR row's prior Confirmed value is superseded, not erased (supersession_note on the row).",
+      "open_inputs": [
+        "Written confirmations for all three spine elements, requested before the 2026-09-06 freeze",
+        "Prof. Janda's ORCID and position details (arrive with ATK's written confirmation)",
+        "ELTE-side ML team member (Hollós) person-months: not quantified, not invented"
+      ]
+    },
+    {
+      "id": "R3-D3-od1-wp-merge",
+      "decision": "OD-1 adopted as the PARTNER-BACKED answer (Hollós/Cholakova reviewed the reviewer's scheme and judged it feasible): former WP1 (M1-M6) and WP2 (M3-M14) merge into one WP1 'Data Harmonisation, Stress Definition and Model Development' spanning M1-M14. Task timing: T1.1-T1.5 at M1-M2; T2.1-T2.3 at M2-M3 ending in the model freeze; T2.4-T2.6 post-freeze at M4-M14 (non-target-model work). New milestone MS6 (M3): primary model frozen and registered (model card D2.1 = evidence). MS1 moves M6->M2; MS2 (M14) re-links to the merged WP1. T3.5 re-scoped to apply the FROZEN model prospectively, recalibration only after the season. The closure narrative now commits to the pre-season freeze (unparking ticket T2's clause).",
+      "rationale": "Meets the reviewer's prospective-validation demand (review issue 1) while keeping T2.4-T2.6 honest about post-freeze months (the round-2 doc's own Scheme B observation). Partner backing recorded per the operator's session answer; strongest defensibility position."
+    },
+    {
+      "id": "R3-D4-id-stability",
+      "decision": "ID-STABILITY RULE (deviation from the session summary's renumbering sketch, adopted deliberately): task ids (T1.x/T2.x/T3.x/T4.x/T5.x), deliverable ids (D1.x..D5.x) and the surviving WP ids (WP3, WP4, WP5) are NOT renumbered. The WP2 container ceases to exist. Evaluator-facing display numbering (WP1->'WP1', WP3->'WP2', WP4->'WP3', WP5->'WP4', with task/deliverable display ids following) is a presentation mapping recorded once in workpackage_seed.json _provenance.od1_merge_2026_09_02 and applied at drafting/condensation.",
+      "rationale": "Renumbering would silently re-target every existing cross-reference (e.g. 'T2.6', 'WP2') across Tier 3, Tier 4 and the plans — silent misreference is the worst failure mode for a 'surgical and deterministic' update. A dangling WP2-container reference is detectable; a re-meaning one is not. KPI->deliverable traces in impacts.json survive unchanged as a direct consequence.",
+      "flag": "Operator may veto and request full renumbering; the display mapping keeps the evaluator-facing document contiguous either way."
+    },
+    {
+      "id": "R3-D5-od2-od3",
+      "decision": "OD-2: fallback adopted — the proposal states that a pre-specified stress-target hierarchy is fixed in D1.2 before any model fitting, without naming the order at proposal level; existing draft coverage is left unchanged where already adequate. OD-3: NAMED METRICS + LITERATURE THRESHOLDS — the draft's metric set (balanced accuracy/F1/ROC-AUC; RMSE/MAE with R²; Brier/reliability diagrams; PICP/interval width; lead time and per-season false-alarm rate) enters the proposal, with acceptance thresholds derived from published literature per validation tool, stress state and crop condition, pre-registered in D1.2 before the prospective season. Landed in concept_note.md 'Evaluation discipline and closure narrative' and the D1.2 seed note.",
+      "rationale": "OD-3 operator answer ('thresholds approved by external literature') combined with the reviewer's named-metrics ask; no numeric thresholds are stated at proposal level, so nothing is invented."
+    },
+    {
+      "id": "R3-D6-od4-od5-od6",
+      "decision": "OD-4 (MATE data-use), OD-5 (farmer field access) and OD-6 (AgroVIR confirmation) take their stated fallbacks: the existing Assumed declarations stand unchanged; confirmations continue to be chased.",
+      "rationale": "Operator instruction: 'use fallback' for each."
+    },
+    {
+      "id": "R3-D7-farmer2-ladder",
+      "decision": "Site-contingency ladder: primary farmer -> Farmer 2 -> Skanzen. Farmer 2 = an identified second independent commercial processing-tomato producer, informally approached via the MATE/ATK channel, NOTHING in writing (declaration farmer2_backup_site, Assumed; identity deliberately unrecorded, matching the primary-site convention). Farmer 2 activation PRESERVES the commercial-transferability claim (still an independent commercial site, if it meets the measurement protocol); Skanzen activation preserves the measurement programme only and downgrades the claim (review issue 7 boundary unchanged). Written backup access folds into the M1 access task (T3.1 scope).",
+      "rationale": "Operator ruling in session; strengthens WP3 robustness without weakening claim discipline."
+    },
+    {
+      "id": "R3-D8-mvcri-cultivar-route",
+      "decision": "MVCRI ('MCVI' in the inputs = typo for MVCRI, operator-confirmed reading) stays a post-MSCA route on no WP line with no in-action effort (2026-08-28 supersession preserved), but is now NAMED CONCRETELY in the transferability defence: its vegetable-crop variety-trial design infrastructure is the channel through which validated outcomes are transferred to and validated on additional tomato cultivars post-MSCA, via the T2.6 crop-transfer specification. Landed in strategic_positioning.md (Technological and economic impact).",
+      "rationale": "Answers the cross-crop review challenge with an existing, evidenced capability (capabilities.json MVCRI record) without reversing the person_months_MVCRI removal or strengthening any in-action claim."
+    },
+    {
+      "id": "R3-D9-governance-calendar",
+      "decision": "The five-point steering calendar (M6/M14/M18/M24/M27) is UNCHANGED despite MS1 (M2) and MS6 (M3) now falling before the first meeting: both are verified on occurrence (D1.1/D1.2 and the registered model card D2.1 as evidence) and their verdicts ratified at M6. Status: Inferred operator-note — ON THE FLAG LIST for operator confirmation.",
+      "rationale": "Preserves the ratified governance pattern, K11's five-point target and the CDP review calendar without inventing a new partner commitment."
+    },
+    {
+      "id": "R3-D10-execution",
+      "decision": "Execution: branch fieldwise-run-03 (from fieldwise-run-02 @ 99f6105); no checkpoint to archive (run-02 published none — ARCHIVE_NOTE_fieldwise-run-02.md); operator runs all phases from the CLI (standing rule, never the agent); the agent produces the condensed submission master from the run-03 export reusing the 2026-08-30 condensation as pattern, operator reviews before the 2026-09-06 freeze. Tickets file re-scoped: docx halves of T1-T8 subsumed by regeneration+condensation; T12 retired as a separate run (divergence logging folds into T11).",
+      "rationale": "Confirmed in session. Interpretation of 'surgical/deterministic/no phase blockers/assumed claims present' confirmed as: (a) minimal decision-traceable edits, (b) every edit checked against gate conditions pre-run, (c) Assumed content appears flagged in the draft rather than omitted, (d) anything not encodable in Tier 3 goes on the manual-edit flag list applied at condensation."
+    }
+  ],
+  "artifacts_produced": [
+    "docs/tier4_orchestration_state/checkpoints/ARCHIVE_NOTE_fieldwise-run-02.md",
+    "CONTEXT.md (domain glossary, new)",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-run03-instantiation_2026-09-02.json",
+    "plans/reports/fieldwise-run-03_flags.md (pre-run consistency report + manual-edit flag list)"
+  ],
+  "tier3_artifacts_edited": [
+    "working_assumptions.json (janda_supervisor_acceptance, hollos_elte_ml_role, farmer2_backup_site added; hollos_supervisor_acceptance withdrawn; person_months_ATK_supervisor, jung_co_supervision_acceptance, atk_contact_person, elte_associated_partner_agreement, farmer_field_access amended)",
+    "consortium/partners.json, consortium/roles.json, consortium/capabilities.json (spine, KT1/KT1B, key people, ladder)",
+    "call_binding/confirmation_checklist.json (role tokens, SUPERVISOR row supersession, EO_PARTNER declarations, governance rows, effort decision)",
+    "call_binding/selected_call.json (notes spine)",
+    "project_brief/project_summary.json (spine_note, primary_supervisor, associated partner, contingency ladder)",
+    "project_brief/training_and_career_development.md (CDP owner, supervision narrative, steering group, decision rights, host capacity)",
+    "project_brief/concept_note.md (new 'Evaluation discipline and closure narrative' section)",
+    "project_brief/strategic_positioning.md (decision-value boundary, MVCRI cultivar route)",
+    "architecture_inputs/workpackage_seed.json (OD-1 merge, task months, dependencies, person-months, T3.5/T3.6)",
+    "architecture_inputs/milestones_seed.json (MS1->M2, MS6 new, MS2 re-link, calendar note)",
+    "architecture_inputs/objectives.json (O1 target month, O2 re-link)",
+    "architecture_inputs/outcomes.json (D2.1/D2.2 re-home, D1.3 owner)",
+    "architecture_inputs/risks.json (R04 ladder)",
+    "architecture_inputs/impacts.json (adopted_claim_form sharpening)"
+  ],
+  "source_inputs": [
+    "plans/reports/fieldwise-run-03_inputs.md (operator inputs of 2026-09-02)",
+    "plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.md (OD definitions and fallbacks)",
+    "docs/tier4_orchestration_state/decision_log/fieldwise-proposal-issues-triage_2026-08-31.json (superseded D3; triage context)",
+    "docs/tier3_project_instantiation/source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf (Janda CV)",
+    "plans/tickets_proposal_issues_2026-09.md (T1-T12, re-scoped)"
+  ],
+  "constitutional_notes": "No gate condition is weakened and no phase is reordered. The run-03 rerun re-evaluates all gates against updated Tier 3 fingerprints (ST-1 content staleness, fail-closed). The write-once checkpoint guard does not bind (no checkpoint on the run-02 line). The §12.3 contradiction between triage D3 and the 2026-09-02 inputs is resolved explicitly here (R3-D1), with the newer operator instruction prevailing. All 2026-09-02 project-fact changes enter as Assumed declarations, never as fabricated Confirmed facts (§13.3); the draft must carry them flagged (§13.8)."
+}

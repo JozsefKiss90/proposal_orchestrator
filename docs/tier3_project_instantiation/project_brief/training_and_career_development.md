@@ -24,13 +24,14 @@ note: >
 
 A Career Development Plan is established jointly by the supervisors and the researcher and
 submitted as an early project deliverable, **D1.3 Career Development Plan, due M3, owned by
-FELLOW and SUPERVISOR (Dr. Roland Hollós, ATK)**. The plan is agreed by M3 and reviewed at
+FELLOW and SUPERVISOR (Prof. Tibor Janda, ATK)**. The plan is agreed by M3 and reviewed at
 the five steering points M6, M14, M18, M24 and M27.
+<!-- AMENDED 2026-09-02 | supervisor seat re-targeted to Prof. Janda | fieldwise-run03-instantiation_2026-09-02.json -->
 
 | Component | Content |
 |-----------|---------|
 | Research objectives | O1 to O4 (Pack §1.1.8) |
-| Training and career needs | The ATK modelling/data-integration strand and the ELTE EO/spatial-sensing strand of Pack §1.3, delivered as supervised practice |
+| Training and career needs | The ATK plant-physiology/validation strand (supervisor), the ELTE predictive-modelling/data-integration strand (Dr. Hollós) and the ELTE EO/spatial-sensing strand (co-supervisor) of Pack §1.3 as re-anchored 2026-09-02, delivered as supervised practice |
 | Transferable skills | Research integrity; open science and FAIR practice; generative-AI literacy; grant writing; IP and exploitation; project management; science communication |
 | Teaching | See "Teaching and education" below |
 | Publications planning | P1 and P2 targeted (at least two high-quality peer-reviewed submissions during or shortly after the fellowship); a third methods/application paper if the independent dataset supports it |
@@ -54,29 +55,34 @@ research/validation purposes. Pre-MSCA DrR background, FIELDWISE scientific fore
 institutional datasets and Krumatic-developed code are separate rights layers, each
 documented before the action starts (Pack D).
 
-<!-- PACK-LIFTED | §1.3 -->
+<!-- PACK-LIFTED | §1.3 | AMENDED 2026-09-02: supervisor seat to Prof. Janda, Hollós to the ELTE side | fieldwise-run03-instantiation_2026-09-02.json -->
 ## Supervision, training and two-way transfer of knowledge
 
-HUN-REN ATK is the recruiting organisation and primary scientific host. Dr. Roland Hollós
-serves as primary supervisor and provides the central training environment for
-heterogeneous agricultural-data integration, AI/ML-supported modelling, feature
-engineering, validation design, uncertainty analysis, model interpretation and scientific
-integration. His role as an AI researcher and HUN-REN AI Ambassador for the Centre for
-Agricultural Research provides a strong link to the network-wide AI 4 Science environment.
+HUN-REN ATK is the recruiting organisation and primary scientific host. Prof. Tibor Janda,
+head of the Plant Physiology and Metabolomics Department, serves as primary supervisor,
+anchoring supervision in plant stress physiology: the physiological water-stress target
+definition, the physiological validity of model outputs and the physiological measurement
+programme, so that remotely sensed and model-derived signals are assessed against genuine
+plant responses. ATK additionally provides the modelling and data-integration environment
+and access to the wider HUN-REN research infrastructure. (Supervisor acceptance is a
+declared working assumption, key janda_supervisor_acceptance.)
 
-ELTE participates as an associated partner, with Prof. András Jung as co-supervisor for
-geoinformatics, field spectroscopy, hyperspectral/UAV methods, multisensor fusion and
-scale-aware EO interpretation. ELTE provides the main spatial-sensing training environment
-and access to the agreed UAV/hyperspectral infrastructure; Dr. Zsófia Varga supports
-practical UAV operation, mission planning and imaging-sensor deployment.
+ELTE participates as an associated partner with two named strands: Prof. András Jung as
+co-supervisor for geoinformatics, field spectroscopy, hyperspectral/UAV methods,
+multisensor fusion and scale-aware EO interpretation; and Dr. Roland Hollós as the named
+team member responsible for the predictive-modelling/machine-learning component —
+heterogeneous agricultural-data integration, AI/ML-supported modelling, feature
+engineering, validation design, uncertainty analysis and model interpretation — whose role
+as HUN-REN AI Ambassador retains the strong link to the network-wide AI 4 Science
+environment (ELTE-side seat declared, key hollos_elte_ml_role). ELTE provides the main
+spatial-sensing training environment and access to the agreed UAV/hyperspectral
+infrastructure; Dr. Zsófia Varga supports practical UAV operation, mission planning and
+imaging-sensor deployment.
 
 MATE provides the longitudinal processing-tomato dataset and agronomic/irrigation expertise
 through Dr. Sándor Takács. Prof. Gábor Milics provides senior consultation in precision
 agriculture, GIS, agricultural digitalisation and translation of model outputs into
-farm-level decision-support concepts. Prof. Tibor Janda at the HUN-REN Centre for
-Agricultural Research provides complementary plant-physiology and abiotic-stress expertise,
-ensuring that remotely sensed and model-derived signals are assessed against genuine plant
-responses.
+farm-level decision-support concepts.
 
 The two-way transfer is deliberately complementary. The fellow contributes agronomy, plant
 protection, plant physiology, plant-stress biology, physiological phenotyping,
@@ -94,14 +100,17 @@ monthly written progress record held by the fellow. A quarterly review against t
 Development Plan, attended by both supervisors. During M25-M30, the monthly face-to-face
 placement reviews (T5.3) join the cadence.
 
-A Project Steering Group chaired by the supervisor (Dr. Hollós, ATK), with the fellow, the
-co-supervisor (Prof. Jung — ELTE's named associated-partner seat) and one named contact
+A Project Steering Group chaired by the supervisor (Prof. Janda, ATK), with the fellow, the
+co-supervisor (Prof. Jung — ELTE's named associated-partner seat), the ELTE-side ML team
+member (Dr. Hollós) and one named contact
 each from MATE (Dr. Takács), Krumatic (L. Krumov) and AgroVIR (Zs. Balázs). It meets at
 M6, M14, M18, M24 and M27 — the milestone months plus the mid-placement review — and
 issues a go/no-go verdict on milestones MS1 to MS5.
 
 Decision rights: scientific method and day-to-day research choices rest with the fellow,
-escalating to the supervisor; modelling methodology rests with the supervisor and the EO
+escalating to the supervisor; physiological methodology and the validity of the stress
+target rest with the supervisor; modelling methodology rests with the ELTE-side ML team
+member (Dr. Hollós) and the EO
 strand's quality assurance with the co-supervisor, escalating to the Steering Group;
 training plan, resources and milestone go/no-go recommendation rest with the supervisor,
 escalating to the Steering Group; contract, finance, IP and open-access policy rest with
@@ -204,11 +213,13 @@ than opening a cold one.
 <!-- PACK-LIFTED | §3.2 -->
 ## Host capacity, attractiveness and visibility
 
-HUN-REN ATK hosts at the Agricultural Institute, Martonvásár: the primary supervision,
-modelling and data-integration environment through Dr. Hollós, access to the wider HUN-REN
-AI/data-processing infrastructure for computationally intensive analysis, and
-complementary plant-physiology expertise including Prof. Tibor Janda's Plant Physiology
-and Metabolomics Department. ATK's institutional readiness rests on evidence: it
+HUN-REN ATK hosts at the Agricultural Institute, Martonvásár: primary supervision anchored
+in Prof. Tibor Janda's Plant Physiology and Metabolomics Department (the physiological
+target-definition and validation environment), the modelling and data-integration
+environment, and access to the wider HUN-REN
+AI/data-processing infrastructure for computationally intensive analysis; the
+predictive-modelling/ML methodological strand is carried on the ELTE side by Dr. Hollós.
+ATK's institutional readiness rests on evidence: it
 coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (752453,
 2017-2019), and participates in Horizon Europe today (COUSIN, AI4SoilHealth, TUdi —
 CORDIS, 2026-08-28). The exact hosting unit's arrangements, support services and committed

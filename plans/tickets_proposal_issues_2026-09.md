@@ -1,13 +1,24 @@
 # Tickets — Proposal Issues Remediation (2026-09 submission window)
 
-Status: ACTIVE. Governs the remediation of `plans/proposal_issues.md` against the
-submission master for the 2026-09-09 deadline (HORIZON-MSCA-2026-PF-01-01).
+Status: ACTIVE — **RE-SCOPED 2026-09-02** by
+`docs/tier4_orchestration_state/decision_log/fieldwise-run03-instantiation_2026-09-02.json`
+(R3-D1 supersedes triage D3): fieldwise-run-03 is now a **pre-submission regeneration
+run**. The Tier 3 halves of T1–T8 and the T9 open-decision answers were applied on
+2026-09-02 on branch `fieldwise-run-03`. The docx halves are **subsumed**: the submission
+master is now produced by condensing the run-03 pipeline export (agent-condensed,
+operator-reviewed), carrying the manual-edit flags of
+`plans/reports/fieldwise-run-03_flags.md`. T0 is retired (no working copy of the old
+docx); T12 is retired as a separate run (divergence logging folds into T11). T10 (freeze
+2026-09-06) and T11 (submission record) stand.
+
+Original scope (2026-08-31): governs the remediation of `plans/proposal_issues.md` against
+the submission master for the 2026-09-09 deadline (HORIZON-MSCA-2026-PF-01-01).
 
 Session decisions behind this file:
 `docs/tier4_orchestration_state/decision_log/fieldwise-proposal-issues-triage_2026-08-31.json`.
 Open decisions (issues #1, #4, #5, #8) live in
-`plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.md` — they are NOT tickets here
-until answered; ticket T9 applies their answers.
+`plans/reports/FIELDWISE_open_decisions_round2_2026-08-31.md` — ANSWERED/fallback-applied
+2026-09-02 (see the run-03 instantiation record).
 
 ## Ground rules
 

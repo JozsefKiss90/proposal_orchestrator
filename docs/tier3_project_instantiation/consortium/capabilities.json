@@ -22,15 +22,32 @@
       "from_role": "HOST",
       "to_role": "FELLOW",
       "competences": [
+        "plant stress physiology and abiotic-stress (including drought) interpretation",
+        "selection and interpretation of physiological validation parameters",
+        "plant phenotyping and physiological measurement practice",
+        "scientific integration of multi-source observations into decision-support information",
+        "institutional research integration at the host (modelling and data-integration environment, wider HUN-REN infrastructure)"
+      ],
+      "validation_status": "Confirmed",
+      "source_ref": "Pack §1.3, §3.2 (ATK physiological environment); DI lines 26-28 (Janda role text), item 5 (infrastructure)",
+      "note": "RE-ANCHORED 2026-09-02: the host-side transfer follows the supervisor seat to Prof. Janda (plant physiology). The AI/ML strand moves to KT1B (ELTE side, Dr. Hollós). Competence content is Pack/DI-grounded; the re-anchoring is the operator's 2026-09-02 spine decision."
+    },
+    {
+      "transfer_id": "KT1B",
+      "direction": "ELTE (Dr. Hollós) -> Fellow",
+      "from_role": "EO_PARTNER",
+      "to_role": "FELLOW",
+      "competences": [
         "heterogeneous agricultural-data integration",
         "AI/ML-supported modelling and feature engineering",
         "validation design and blocked temporal evaluation",
         "uncertainty analysis and model interpretation",
-        "agricultural and ecosystem modelling, climate-related modelling",
-        "scientific integration of multi-source observations into decision-support information"
+        "agricultural and ecosystem modelling, climate-related modelling"
       ],
-      "validation_status": "Confirmed",
-      "source_ref": "Pack §1.3 (primary training environment under Dr. Hollós); DI lines 14-16"
+      "validation_status": "Assumed",
+      "declaration_key": "hollos_elte_ml_role",
+      "source_ref": "DI lines 14-16 (role text, partner-authored); operator instruction of 2026-09-02 (plans/reports/fieldwise-run-03_inputs.md)",
+      "note": "The competence content is the former KT1 AI/ML strand, unchanged and partner-authored; what is Assumed is its ELTE-side delivery basis (Dr. Hollós's ELTE representation, pending written confirmation)."
     },
     {
       "transfer_id": "KT2",
@@ -139,34 +156,27 @@
     {
       "organisation_id": "HOST",
       "short_name": "ATK",
-      "department_and_team": "HUN-REN Centre for Agricultural Research, Agricultural Institute, Brunszvik u. 2, 2462 Martonvásár. The supervisor, Dr. Roland Hollós, sits in the Department of Crop Production; the Plant Physiology and Metabolomics Department (head: Prof. Tibor Janda) provides the physiological-validation environment.",
+      "department_and_team": "HUN-REN Centre for Agricultural Research, Agricultural Institute, Brunszvik u. 2, 2462 Martonvásár. From 2026-09-02 the supervisor, Prof. Tibor Janda, heads the Plant Physiology and Metabolomics Department, which is also the physiological-validation environment; modelling/data-integration collaboration continues with the Department of Crop Production.",
       "department_and_team_status": "Confirmed",
-      "department_and_team_source_ref": "ATK staff page (Hollós, consulted 2026-08-28); Pack §3.2; DI lines 3, 8 (department URLs)",
+      "department_and_team_source_ref": "Pack §3.2; DI lines 3, 8 (department URLs); operator instruction of 2026-09-02 (supervisor seat); CV at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf",
       "infrastructure": "The computational and data-processing environment required for multi-source data integration and predictive modelling, with access to the wider HUN-REN research infrastructure for computationally intensive analyses where needed. Strong expertise in plant phenotyping; a well-established Plant Physiology and Metabolomics Department with extensive experience in drought and abiotic stress for physiological and phenotypic consultation and validation support.",
       "infrastructure_status": "Confirmed",
       "infrastructure_note": "Partner-authored (DI lines 1-8, item 5). The exact hosting unit's office/laboratory arrangements and support services are ATK's to confirm and run as declared (key atk_agreement_to_host). The spatial instruments are ELTE's, deliberately not listed here.",
       "key_people": [
         {
-          "name": "Dr. Roland Hollós",
-          "project_role": "SUPERVISOR",
-          "description": "Research associate, Department of Crop Production, HUN-REN ATK; HUN-REN AI Ambassador for the Centre for Agricultural Research. Agricultural and ecosystem modelling, climate-related modelling, AI-based approaches, heterogeneous data integration. Central role: structuring the modelling workflow, integrating historical field observations with remote-sensing and physiological information, selecting AI/ML approaches, interpreting model performance agriculturally. ORCID 0000-0001-5137-7471.",
-          "validation_status": "Confirmed",
-          "source_ref": "ATK staff page (consulted 2026-08-28); DI lines 14-16; Pack §1.3"
-        },
-        {
           "name": "Prof. Tibor Janda",
-          "project_role": "Complementary plant-physiology and abiotic-stress expertise (no management token)",
-          "description": "Head of the Plant Physiology and Metabolomics Department at the Agricultural Institute, HUN-REN ATK. Physiological interpretation of remotely sensed and model-derived stress indicators; consultation on selection and interpretation of physiological validation parameters.",
+          "project_role": "SUPERVISOR",
+          "description": "Head of the Plant Physiology and Metabolomics Department at the Agricultural Institute, HUN-REN ATK. Plant physiology, abiotic-stress (including drought) physiology and stress metabolomics. Primary supervision: physiological water-stress target guidance, physiological validity of model outputs, the physiological measurement programme, institutional integration of the fellow; physiological interpretation of remotely sensed and model-derived stress indicators.",
           "validation_status": "Confirmed",
-          "source_ref": "Pack §1.3, §3.2; DI lines 26-28 (role text), line 8 (department URL)",
-          "note": "AFFILIATION CORRECTION vs the superseded configuration, which listed him under MATE-adjacent advisory text: the Pack places him at the HUN-REN Centre for Agricultural Research. No role token; like Milics, he is institutional capacity and a §1.3 strand, not a governance seat."
+          "source_ref": "Pack §1.3, §3.2; DI lines 26-28 (role text), line 8 (department URL); CV at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf; Google Scholar profile DaAV-MYAAAAJ",
+          "note": "SUPERVISOR CHANGE 2026-09-02 (decision_log/fieldwise-run03-instantiation_2026-09-02.json): promoted from the prior 'complementary plant-physiology expertise (no management token)' record to the SUPERVISOR seat; identity and headship Confirmed, seat acceptance Assumed (key janda_supervisor_acceptance). Detailed track record for §3.2/§1.3 must be drawn from the committed CV, not authored from memory."
         }
       ],
-      "key_people_note": "Two people. No ATK director or administrative figure is listed; the grants-office contact arrives with the written hosting confirmation (declaration atk_contact_person carries the interim).",
+      "key_people_note": "One person. Dr. Roland Hollós moved to the EO_PARTNER (ELTE) record 2026-09-02 as named ML team member; his ATK staff-page employment record remains evidence for his identity. No ATK director or administrative figure is listed; the grants-office contact arrives with the written hosting confirmation (declaration atk_contact_person carries the interim).",
       "hosting_arrangements_and_support_services": "Workspace and integration into the hosting group at Martonvásár, administrative support, training access, and continuation of arrangements during the M25-M30 placement.",
       "hosting_arrangements_status": "Assumed",
       "hosting_arrangements_note": "Operator-declared under key atk_agreement_to_host; these are ATK's own facilities and only ATK can evidence them. The Pack itself marks the hosting-unit and support arrangements as requiring institutional confirmation.",
-      "recent_projects_and_publications": "Hollós et al. 2026, 'Reimplementation and improvement of the Biome-BGC model' (Geoscientific Model Development 19, 4385-4438, doi:10.5194/gmd-19-4385-2026) — the supervisor's own modelling line. ATK Horizon participations verified on CORDIS 2026-08-28: COUSIN (101135314), AI4SoilHealth (101086179), TUdi (101000224). Funded MSCA hosting record: LANDRACES (H2020 752453, MSCA-IF-EF-ST, 2017-2019, coordinated by ATK).",
+      "recent_projects_and_publications": "Hollós et al. 2026, 'Reimplementation and improvement of the Biome-BGC model' (Geoscientific Model Development 19, 4385-4438, doi:10.5194/gmd-19-4385-2026) — evidences the ATK modelling environment (Dr. Hollós is the ELTE-side ML team member from 2026-09-02). The supervisor's (Prof. Janda's) publication record is in the committed CV and Scholar profile and must be drawn from there for §3.2, not authored from memory. ATK Horizon participations verified on CORDIS 2026-08-28: COUSIN (101135314), AI4SoilHealth (101086179), TUdi (101000224). Funded MSCA hosting record: LANDRACES (H2020 752453, MSCA-IF-EF-ST, 2017-2019, coordinated by ATK).",
       "recent_projects_and_publications_status": "Confirmed",
       "recent_projects_and_publications_source_ref": "CORDIS project records 101135314, 101086179, 101000224, 752453 (consulted 2026-08-28); Hollós et al. 2026 (publisher record verified in the 2026-08-11 fold)",
       "previous_msca_hosting": "Yes — LANDRACES (752453), a funded MSCA Individual Fellowship (Standard EF) hosted and coordinated by ATK, 2017-2019.",
@@ -191,6 +201,15 @@
           "description": "Professor, Institute of Cartography and Geoinformatics. Remote sensing, hyperspectral imaging, field spectroscopy, multisensor data fusion. Carries the hyperspectral-to-Sentinel harmonisation strand and the scale-transition methodology.",
           "validation_status": "Confirmed",
           "source_ref": "Pack §1.3; DI lines 17-19; corroborated staff-listing record of 2026-08-11"
+        },
+        {
+          "name": "Dr. Roland Hollós",
+          "project_role": "ELTE-side named team member: predictive modelling / machine learning (no supervision token)",
+          "description": "Methodological lead for the predictive-modelling/machine-learning component: structuring the modelling workflow, integrating historical field observations with remote-sensing and physiological information, selecting AI/ML approaches, interpreting model performance agriculturally. HUN-REN AI Ambassador for the Centre for Agricultural Research; author of the Biome-BGC reimplementation line (Hollós et al. 2026, Geoscientific Model Development 19, doi:10.5194/gmd-19-4385-2026). ORCID 0000-0001-5137-7471.",
+          "validation_status": "Assumed",
+          "declaration_key": "hollos_elte_ml_role",
+          "source_ref": "DI lines 14-16 (role text, partner-authored); ATK staff page (identity, consulted 2026-08-28); operator instruction of 2026-09-02 (plans/reports/fieldwise-run-03_inputs.md)",
+          "note": "SEAT MOVE 2026-09-02: previously the SUPERVISOR at ATK (see the HOST record's history and decision_log/fieldwise-run03-instantiation_2026-09-02.json). His competence content and identity are Confirmed; what is Assumed is the ELTE-side participation basis — his evidenced employment is at ATK and the ELTE representation awaits written confirmation."
         },
         {
           "name": "Dr. Zsófia Varga",
@@ -411,7 +430,7 @@
     "note": "Roll-up of the participant-capacity state after the 2026-08-28 transcription; the weakest closure governs the status. Every capacity field has content; three placeholders and the declared commitments remain to be converted by partner writing.",
     "confirmed_on_evidence": [
       "ATK identity, PIC 866599553, Horizon participations and LANDRACES MSCA hosting (CORDIS, 2026-08-28)",
-      "Hollós ATK employment (ATK staff page, 2026-08-28) and role text (partner-authored)",
+      "Hollós identity/ATK employment record (ATK staff page, 2026-08-28) and ML role text (partner-authored); Janda identity and department headship (Pack §3.2, DI lines 26-28, committed CV)",
       "ELTE instrument inventory (partner-authored current snapshot) and DOI-verified publication lists (ELTE, MATE)",
       "MATE instrument base and 2022-2026 archive description (DI item 4; Pack Stage 1)",
       "Krumatic legal identity, contact/signatory, profile and role (DI items 10-13)",
@@ -419,12 +438,12 @@
     ],
     "declared_pending_partner_writing": [
       "ATK agreement to host, hosting arrangements, grants-office contact (atk_agreement_to_host, atk_contact_person)",
-      "Hollós acceptance/effort (hollos_supervisor_acceptance, person_months_ATK_supervisor)",
-      "ELTE associated-partner agreement, instrument-access arrangement, Jung acceptance/effort (elte_associated_partner_agreement, elte_instrument_access, jung_co_supervision_acceptance, person_months_ELTE_co_supervisor)",
+      "Janda supervisor acceptance/effort (janda_supervisor_acceptance, person_months_ATK_supervisor)",
+      "ELTE associated-partner agreement, instrument-access arrangement, Jung acceptance/effort, Hollós ELTE-side ML seat (elte_associated_partner_agreement, elte_instrument_access, jung_co_supervision_acceptance, person_months_ELTE_co_supervisor, hollos_elte_ml_role)",
       "MATE data rights and contact seat (mate_data_rights, contact_person_MATE, person_months_MATE)",
       "AgroVIR placement arrangement and supervision (placement_arrangement_AgroVIR, placement_supervisor_AgroVIR, placement_supervisor_title_AgroVIR, person_months_AgroVIR)",
       "Krumatic effort, independence, SME status (person_months_Krumatic, krumatic_independence, krumatic_sme_status)",
-      "Farmer written field access (farmer_field_access)",
+      "Farmer written field access and Farmer 2 backup arrangement (farmer_field_access, farmer2_backup_site)",
       "MVCRI DrR-independence confirmation (mvcri_drr_independence)",
       "Switch evidence: PLANTDIGISENSE score (plantdigisense_official_score), resubmission-bar reading (resubmission_bar_reading)"
     ],

@@ -15,7 +15,7 @@
   ],
   "purpose": "Register of the FIELDWISE ATK-hosted identity spine and of every operator decision behind the fieldwise-run-02 baseline, with the Tier 3 artifact each one lands in. This file replaces the fieldwise-run-01 checklist (ELTE-hosted), which is preserved on that branch; operator decisions that survive the host switch are carried forward below with their re-anchoring stated.",
   "status_vocabulary": "status values are exactly the four CLAUDE.md §12.2 categories (Confirmed / Inferred / Assumed / Unresolved). Assumed items carry a matching declaration in docs/tier3_project_instantiation/working_assumptions.json, named per record. Nothing in this file is Unresolved.",
-  "role_token_convention": "FELLOW = the applicant researcher; HOST = HUN-REN ATK (beneficiary/recruiting organisation); SUPERVISOR = Dr. Hollós (ATK); CO_SUPERVISOR = Prof. Jung (ELTE); EO_PARTNER = ELTE (associated partner); DATA_PARTNER = MATE; SOFTWARE_PARTNER = Krumatic; VALIDATION_PARTNER = AgroVIR (placement host); VALIDATION_SITE = unnamed commercial farmer (collaborating environment); TRANSFER_PARTNER = MVCRI (post-MSCA route).",
+  "role_token_convention": "FELLOW = the applicant researcher; HOST = HUN-REN ATK (beneficiary/recruiting organisation); SUPERVISOR = Prof. Janda (ATK, from 2026-09-02; previously Dr. Hollós); CO_SUPERVISOR = Prof. Jung (ELTE); EO_PARTNER = ELTE (associated partner; named ML team member Dr. Hollós from 2026-09-02); DATA_PARTNER = MATE; SOFTWARE_PARTNER = Krumatic; VALIDATION_PARTNER = AgroVIR (placement host); VALIDATION_SITE = unnamed commercial farmer (collaborating environment; backup ladder: Farmer 2 then Skanzen); TRANSFER_PARTNER = MVCRI (post-MSCA route).",
   "spine_identity": [
     {
       "id": "FELLOW",
@@ -31,7 +31,7 @@
       "id": "HOST",
       "role": "Beneficiary, recruiting organisation and host (sole beneficiary)",
       "status": "Confirmed",
-      "confirmed_value": "HUN-REN Agrartudomanyi Kutatokozpont (HUN-REN Centre for Agricultural Research, ATK), Brunszvik u. 2, 2462 Martonvásár, Hungary (HU). PIC 866599553 (active on CORDIS). Hosting environment: Agricultural Institute; supervisor's unit Department of Crop Production. Prior funded MSCA hosting: yes (LANDRACES, 752453, 2017-2019).",
+      "confirmed_value": "HUN-REN Agrartudomanyi Kutatokozpont (HUN-REN Centre for Agricultural Research, ATK), Brunszvik u. 2, 2462 Martonvásár, Hungary (HU). PIC 866599553 (active on CORDIS). Hosting environment: Agricultural Institute; supervisor's unit (from 2026-09-02) the Plant Physiology and Metabolomics Department; modelling/data-integration collaboration continues with the Department of Crop Production. Prior funded MSCA hosting: yes (LANDRACES, 752453, 2017-2019).",
       "confirmation_source": "Host-switch decision of 2026-08-26; Pack A/§3.2; CORDIS consultations of 2026-08-28 (identity, PIC, LANDRACES).",
       "lands_in": ["consortium/roles.json", "consortium/partners.json", "call_binding/selected_call.json host_country", "consortium/capabilities.json participant_capacity"],
       "assumed_declarations": ["atk_agreement_to_host", "atk_contact_person"],
@@ -41,12 +41,13 @@
       "id": "SUPERVISOR",
       "role": "Primary supervisor at the recruiting organisation",
       "status": "Confirmed",
-      "confirmed_value": "Dr. Roland Hollós, research associate, Department of Crop Production, HUN-REN ATK; HUN-REN AI Ambassador. ORCID 0000-0001-5137-7471. AI-based agricultural modelling, heterogeneous data integration.",
-      "confirmation_source": "ATK staff page (consulted 2026-08-28); DI lines 1-16; Pack §1.3.",
+      "confirmed_value": "Prof. Tibor Janda, Head of the Plant Physiology and Metabolomics Department, Agricultural Institute, HUN-REN ATK. Plant physiology, abiotic-stress (including drought) physiology and stress metabolomics.",
+      "confirmation_source": "CV committed at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf; Google Scholar profile DaAV-MYAAAAJ; department headship already Confirmed on the ATK capabilities record (Pack §3.2); operator instruction of 2026-09-02.",
       "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json participant_capacity"],
-      "assumed_declarations": ["hollos_supervisor_acceptance", "person_months_ATK_supervisor"],
-      "open_check": "CLOSED-BY-REVERSAL 2026-08-28: the 2026-08-14 record 'ELTE is his primary employment, supervision only at the beneficiary' is reversed — the beneficiary is now ATK and his ATK employment carries the supervision, evidenced by the ATK staff page. Position grade and start date arrive with ATK's written confirmation. See decision_log/fieldwise-hollos-employment-reversal_2026-08-28.json.",
-      "open_check_status": "Closed"
+      "assumed_declarations": ["janda_supervisor_acceptance", "person_months_ATK_supervisor"],
+      "supersession_note": "SUPERVISOR CHANGE 2026-09-02 (fieldwise-run-03, decision_log/fieldwise-run03-instantiation_2026-09-02.json): this row's prior Confirmed value — Dr. Roland Hollós, research associate, Department of Crop Production, ORCID 0000-0001-5137-7471, with the CLOSED-BY-REVERSAL employment check of 2026-08-28 — is superseded, not erased; Dr. Hollós moves to the ELTE side as named ML team member (EO_PARTNER row, key hollos_elte_ml_role). What is Confirmed here is Prof. Janda's identity and department headship; his acceptance of the supervisor seat is Assumed until ATK's written confirmation, which also brings his ORCID and position details.",
+      "open_check": "Prof. Janda's written acceptance of the supervisor role (with position details and ORCID) is outstanding; requested with ATK's hosting confirmation.",
+      "open_check_status": "Open"
     },
     {
       "id": "CO_SUPERVISOR",
@@ -56,7 +57,7 @@
       "confirmation_source": "Pack A/§1.3; DI lines 17-19; corroborated staff-listing record of 2026-08-11.",
       "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json participant_capacity"],
       "assumed_declarations": ["jung_co_supervision_acceptance", "person_months_ELTE_co_supervisor"],
-      "note": "Role swap under the host switch. phase_06_gate g07_p08 resolves him to EO_PARTNER, present in partners.json. His acceptance of the co-supervisor seat (a demotion) is declared per the 2026-08-26 evidence-grade ruling."
+      "note": "Role swap under the host switch. phase_06_gate g07_p08 resolves him to EO_PARTNER, present in partners.json. His acceptance of the co-supervisor seat (a demotion) is declared per the 2026-08-26 evidence-grade ruling. UNCHANGED by the 2026-09-02 supervisor change: Jung continues as co-supervisor alongside the new ELTE-side ML team member (Dr. Hollós)."
     },
     {
       "id": "EO_PARTNER",
@@ -65,8 +66,8 @@
       "confirmed_value": "Eötvös Loránd University (ELTE), Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest, Hungary. Instruments: DJI Matrice 350 RTK + Zenmuse L1/P1/H20T, Ultris S5, Cubert CUVIS. Support: Dr. Zsófia Varga (UAV operations). PIC: not required to submit for an associated partner.",
       "confirmation_source": "Pack §3.2 (ELTE); DI lines 36-44; PIC ruling of 2026-08-26 (Tier 2A-sourced).",
       "lands_in": ["consortium/roles.json", "consortium/partners.json", "consortium/capabilities.json participant_capacity"],
-      "assumed_declarations": ["elte_associated_partner_agreement", "elte_instrument_access", "elte_previous_msca_hosting"],
-      "note": "ELTE's written agreement is evidence-grade only per the 2026-08-26 operator ruling; its facts run as declared Assumed (the AgroVIR pattern)."
+      "assumed_declarations": ["elte_associated_partner_agreement", "elte_instrument_access", "elte_previous_msca_hosting", "hollos_elte_ml_role"],
+      "note": "ELTE's written agreement is evidence-grade only per the 2026-08-26 operator ruling; its facts run as declared Assumed (the AgroVIR pattern). From 2026-09-02 the ELTE side also carries Dr. Hollós as named predictive-modelling/ML team member (key hollos_elte_ml_role)."
     },
     {
       "id": "DATA_PARTNER",
@@ -210,8 +211,8 @@
       "reanchored_on": "2026-08-28",
       "gate": "phase_06_gate predicates g07_p07 (governance body with composition and decision scope) and g07_p08 (every management role names a partner present in partners.json).",
       "decision": {
-        "supervision_cadence": "Weekly one-to-one meeting between FELLOW and SUPERVISOR (Dr. Hollós). Technical sessions with the CO_SUPERVISOR (Prof. Jung) through the EO-harmonisation strand, tapering outside it. Monthly written progress record held by the fellow. Quarterly review against the Career Development Plan, attended by both supervisors. During M25-M30, the monthly face-to-face placement reviews (T5.3) join the cadence.",
-        "governance_body": "Project Steering Group, chaired by SUPERVISOR (Dr. Hollós, ATK), with FELLOW, CO_SUPERVISOR (Prof. Jung, ELTE — the named associated-partner seat) and one named contact each from DATA_PARTNER (Dr. Takács), SOFTWARE_PARTNER (L. Krumov) and VALIDATION_PARTNER (Zs. Balázs). It meets at M6, M14, M18, M24 and M27 and issues a go/no-go verdict on milestones MS1-MS5.",
+        "supervision_cadence": "Weekly one-to-one meeting between FELLOW and SUPERVISOR (Prof. Janda). Technical sessions with the CO_SUPERVISOR (Prof. Jung) through the EO-harmonisation strand and with the ELTE-side ML team member (Dr. Hollós) through the modelling-intensive window, tapering outside them. Monthly written progress record held by the fellow. Quarterly review against the Career Development Plan, attended by both supervisors. During M25-M30, the monthly face-to-face placement reviews join the cadence.",
+        "governance_body": "Project Steering Group, chaired by SUPERVISOR (Prof. Janda, ATK), with FELLOW, CO_SUPERVISOR (Prof. Jung, ELTE — the named associated-partner seat), the ELTE-side ML team member (Dr. Hollós) and one named contact each from DATA_PARTNER (Dr. Takács), SOFTWARE_PARTNER (L. Krumov) and VALIDATION_PARTNER (Zs. Balázs). It meets at M6, M14, M18, M24 and M27 and issues a go/no-go verdict on milestones MS1-MS5.",
         "calendar_note": "Re-anchored 2026-08-28: the steering points track the Pack's milestone months (M6/M14/M18/M24) plus the retained M27 mid-placement review. MVCRI's former seat lapses with its in-action role; Krumatic takes a seat as an in-action associated partner.",
         "decision_rights": [
           {"decision": "Scientific method, day-to-day research choices", "owner": "FELLOW", "escalation": "SUPERVISOR"},
@@ -253,7 +254,7 @@
         "components": "Research objectives (O1-O4); training and career needs (the ATK and ELTE training strands of Pack §1.3, delivered as supervised practice); transferable skills (research integrity, open science and FAIR practice, generative-AI literacy, grant writing, IP and exploitation, project management, science communication); teaching (MATE + AU Plovdiv guest-session route); publications planning (P1-P2 targeted, a third methods/application paper if the independent dataset supports it); open-science engagement ('as open as possible, as closed as necessary'; methods, metadata and publications reusable where possible).",
         "agreed_by_month": 3,
         "review_points": [6, 14, 18, 24, 27],
-        "deliverable": "D1.3 Career Development Plan, due M3, owned by FELLOW and SUPERVISOR (Dr. Hollós).",
+        "deliverable": "D1.3 Career Development Plan, due M3, owned by FELLOW and SUPERVISOR (Prof. Janda).",
         "signature": "Established jointly per CC-13; with a co-supervisor in place, signed by both supervisors and the fellow."
       },
       "checklist_ref_resolved": "CDP_DELIVERABLE",
@@ -266,7 +267,7 @@
       "status": "Confirmed",
       "decided_on": "2026-08-28",
       "gate": "None directly; Part B-1 §3.1 is scored on appropriateness of effort.",
-      "decision": "Fellow (ratified science-weighted split): WP1 3.0, WP2 6.0, WP3 6.6, WP4 6.0, WP5 5.4, cross-cutting 3.0, total 30.0. Partner in-kind, all Assumed: ATK supervisor 2.5, ELTE co-supervisor 2.0, AgroVIR 3.0, MATE 2.4, Krumatic 1.5, total 11.4. MVCRI removed.",
+      "decision": "Fellow (ratified science-weighted split, WP rows merged 2026-09-02 under OD-1): merged WP1 9.0 (former WP1 3.0 + WP2 6.0), WP3 6.6, WP4 6.0, WP5 5.4, cross-cutting 3.0, total 30.0 unchanged. Partner in-kind, all Assumed: ATK supervisor 2.5 (Prof. Janda seat), ELTE co-supervisor 2.0, AgroVIR 3.0, MATE 2.4, Krumatic 1.5, total 11.4. MVCRI removed. ELTE-side ML team member effort (Hollós): not yet quantified — open input, not invented.",
       "lands_in": ["architecture_inputs/workpackage_seed.json", "working_assumptions.json"],
       "assumed_declarations": ["person_months_ATK_supervisor", "person_months_ELTE_co_supervisor", "person_months_AgroVIR", "person_months_MATE", "person_months_Krumatic"],
       "decision_record": "docs/tier4_orchestration_state/decision_log/fieldwise-run-02-baseline_2026-08-28.json"

@@ -15,7 +15,7 @@
     "why_this_file_exists": "phase_03_gate predicate g04_p07 (all_partners_in_tier3) requires every partner assigned as a lead or contributor in wp_structure.json to exist in this file. The registry is derived from roles.json and introduces no entity, name, country or role that is not already in roles.json.",
     "instrument_note": "MSCA-PF is a single-fellow, single-beneficiary action, not a consortium. 'Partner' here means an identifier the work-package structure references, not a consortium beneficiary. Only HOST is a beneficiary legal entity. VALIDATION_SITE is a collaborating validation environment, deliberately not a beneficiary or associated partner (Pack §3.2).",
     "evidence_regime": "Operator ruling of 2026-08-28 (baseline record): registry-verifiable and partner-authored factual content is Confirmed against the committed sources; forward-looking commitments not yet in partner writing are operator-declared Assumed with declarations in working_assumptions.json. Nothing is Unresolved.",
-    "token_coverage": "Pack §3.1 WP lines name: WP1 'HUN-REN + MATE + ELTE' (HOST, DATA_PARTNER, EO_PARTNER); WP2 'HUN-REN + ELTE + MATE'; WP3 'Fellow + farmer + MATE + ELTE + HUN-REN' (VALIDATION_SITE added); WP4 'Fellow + Krumatic + AgroVIR consultation + HUN-REN' (SOFTWARE_PARTNER, VALIDATION_PARTNER); WP5 'Fellow + AgroVIR'. TRANSFER_PARTNER (MVCRI) sits on no WP line — it is a post-MSCA route kept for narrative traceability (Pack §3.2, Appendix B)."
+    "token_coverage": "Pack §3.1 WP lines name: WP1 'HUN-REN + MATE + ELTE' (HOST, DATA_PARTNER, EO_PARTNER); WP2 'HUN-REN + ELTE + MATE'; WP3 'Fellow + farmer + MATE + ELTE + HUN-REN' (VALIDATION_SITE added); WP4 'Fellow + Krumatic + AgroVIR consultation + HUN-REN' (SOFTWARE_PARTNER, VALIDATION_PARTNER); WP5 'Fellow + AgroVIR'. TRANSFER_PARTNER (MVCRI) sits on no WP line — it is a post-MSCA route kept for narrative traceability (Pack §3.2, Appendix B). OD-1 MERGE (2026-09-02): the Pack's WP1 and WP2 containers are merged into WP1 (identical participant set); WP3-WP5 keep their ids — see workpackage_seed.json _provenance.od1_merge_2026_09_02 for the id-stability rule and display mapping."
   },
   "spine_status": "confirmed_real",
   "partners": [
@@ -24,10 +24,10 @@
       "short_name": "ATK",
       "legal_name": "HUN-REN Agrartudomanyi Kutatokozpont",
       "legal_name_english": "HUN-REN Centre for Agricultural Research (HUN-REN ATK)",
-      "organisational_unit": "Agricultural Institute, Martonvásár. The supervisor sits in the Department of Crop Production; the Plant Physiology and Metabolomics Department (head: Prof. Tibor Janda) provides the physiological-validation environment.",
+      "organisational_unit": "Agricultural Institute, Martonvásár. From 2026-09-02 the supervisor heads the Plant Physiology and Metabolomics Department (Prof. Tibor Janda), which is also the physiological-validation environment; modelling/data-integration collaboration continues with the Department of Crop Production.",
       "entity_type": "Public research organisation of the HUN-REN Hungarian Research Network. Not a higher education institution.",
       "role": "Beneficiary, recruiting organisation and host (sole beneficiary)",
-      "role_in_action": "Primary supervision, modelling and data-integration environment. Named on the WP1, WP2, WP3 and WP4 month lines (Pack §3.1).",
+      "role_in_action": "Primary supervision, modelling and data-integration environment. Named on the WP1, WP2, WP3 and WP4 month lines (Pack §3.1; the former WP1+WP2 are merged into WP1 per OD-1, 2026-09-02).",
       "country": "Hungary",
       "country_code": "HU",
       "pic": "866599553",
@@ -42,7 +42,7 @@
       "contact_person": "Dr. Roland Hollós",
       "contact_email": "hollos.roland@atk.hun-ren.hu",
       "contact_person_status": "Assumed",
-      "contact_person_note": "Interim project contact: the supervisor, until ATK names its administrative or grants-office contact. Declared in working_assumptions.json under key atk_contact_person. His identity and email are Confirmed from the ATK staff page (consulted 2026-08-28); what is Assumed is that he is the organisation's application contact.",
+      "contact_person_note": "Interim project contact until ATK names its administrative or grants-office contact. Declared in working_assumptions.json under key atk_contact_person. His identity and email are Confirmed from the ATK staff page (consulted 2026-08-28); what is Assumed is that he is the organisation's application contact. NOTE 2026-09-02: Dr. Hollós is no longer the supervisor (seat re-targets to Prof. Janda) but remains the only evidenced ATK contact channel; replace when ATK's written confirmation names its contact.",
       "agreement_to_host_status": "Assumed",
       "agreement_to_host_note": "ATK's hosting of the fellowship is the operator's decision of 2026-08-26, consolidated in Pack A ('proposed/decided internally; exact legal identity, PIC and hosting unit require institutional confirmation'). Declared in working_assumptions.json under key atk_agreement_to_host; converts to Confirmed on ATK's written confirmation naming the Part A signatory.",
       "prior_msca_hosting": "Yes. ATK coordinated and hosted the funded MSCA Individual Fellowship LANDRACES (H2020 grant 752453, MSCA-IF-EF-ST Standard European Fellowship, 2017-10-01 to 2019-09-30, EUR 146,239.20).",
@@ -74,19 +74,18 @@
     {
       "partner_id": "SUPERVISOR",
       "short_name": "SUPERVISOR",
-      "legal_name": "Dr. Roland Hollós",
+      "legal_name": "Prof. Tibor Janda",
       "entity_type": "natural_person",
       "role": "Primary supervisor at the recruiting organisation (HUN-REN ATK)",
-      "role_in_action": "Central training environment for heterogeneous agricultural-data integration, AI/ML-supported modelling, feature engineering, validation design, uncertainty analysis, model interpretation and scientific integration (Pack §1.3). Chairs the Steering Group.",
-      "affiliation": "HUN-REN Centre for Agricultural Research, Agricultural Institute, Department of Crop Production, Martonvásár. Research associate. HUN-REN AI Ambassador for the Centre for Agricultural Research.",
-      "orcid": "0000-0001-5137-7471",
+      "role_in_action": "Primary supervision anchored in plant stress physiology: physiological water-stress target guidance, physiological validity of model outputs, the physiological measurement programme, and institutional integration of the fellow at ATK. Chairs the Steering Group. Heads the Plant Physiology and Metabolomics Department — the physiological-validation environment the ATK record already names.",
+      "affiliation": "HUN-REN Centre for Agricultural Research, Agricultural Institute, Plant Physiology and Metabolomics Department (head), Martonvásár.",
       "country_code": "HU",
       "beneficiary": false,
       "validation_status": "Confirmed",
       "roles_ref": "roles.json role_token SUPERVISOR",
       "checklist_ref": "SUPERVISOR",
-      "source_ref": "ATK staff page https://atk.hun-ren.hu/en/munkatarsak/hollos-roland-en/ (consulted 2026-08-28: research associate, Department of Crop Production, hollos.roland@atk.hun-ren.hu); DI lines 1-16 (role text); Pack A, §1.3, §3.2; ORCID from the 2026-08-11 record",
-      "note": "SUPERVISION AT THE BENEFICIARY: his ATK employment carries the supervision. The 2026-08-14 Confirmed record 'ELTE is his primary employment, supervision only at the beneficiary' is REVERSED by decision_log/fieldwise-hollos-employment-reversal_2026-08-28.json — under the host switch the beneficiary is ATK and the ATK staff page evidences the ATK employment. Position grade and start date remain for ATK's written confirmation; acceptance of the supervisor role and the 2.5 person-month effort are operator-declared Assumed (working_assumptions.json keys hollos_supervisor_acceptance, person_months_ATK_supervisor)."
+      "source_ref": "CV committed at source_materials/cv/JT_CV-HUN-2025-MGI-Janda-Tibor.pdf; Google Scholar profile DaAV-MYAAAAJ; department headship and drought/abiotic-stress profile Confirmed on the ATK capabilities record (Pack §3.2); operator instruction of 2026-09-02 (plans/reports/fieldwise-run-03_inputs.md)",
+      "note": "SUPERVISOR CHANGE 2026-09-02 (fieldwise-run-03, decision_log/fieldwise-run03-instantiation_2026-09-02.json): Prof. Janda replaces Dr. Hollós in this seat; Dr. Hollós moves to the ELTE side as named predictive-modelling/ML team member (see EO_PARTNER and key hollos_elte_ml_role). Identity and department headship are Confirmed; acceptance of the supervisor role and the 2.5 person-month effort are operator-declared Assumed (keys janda_supervisor_acceptance, person_months_ATK_supervisor). ORCID and position-grade details are collected with ATK's written confirmation — not fabricated here."
     },
     {
       "partner_id": "CO_SUPERVISOR",
@@ -102,7 +101,7 @@
       "roles_ref": "roles.json role_token CO_SUPERVISOR",
       "checklist_ref": "CO_SUPERVISOR",
       "source_ref": "Pack A, §1.3, §3.2; DI lines 17-19 (role text); identity carried forward from the 2026-08-11 corroborated record (ELTE Faculty of Informatics staff listing)",
-      "note": "The supervisor and co-supervisor roles SWAP under the host switch: Jung moves from supervisor (ELTE-hosted configuration) to co-supervisor at the associated partner. His acceptance and the 2.0 person-month effort are operator-declared Assumed (working_assumptions.json keys jung_co_supervision_acceptance, person_months_ELTE_co_supervisor). He resolves to EO_PARTNER (ELTE), present in this registry, so phase_06_gate predicate g07_p08 can resolve the token."
+      "note": "The supervisor and co-supervisor roles SWAP under the host switch: Jung moves from supervisor (ELTE-hosted configuration) to co-supervisor at the associated partner. His acceptance and the 2.0 person-month effort are operator-declared Assumed (working_assumptions.json keys jung_co_supervision_acceptance, person_months_ELTE_co_supervisor). He resolves to EO_PARTNER (ELTE), present in this registry, so phase_06_gate predicate g07_p08 can resolve the token. UNCHANGED by the 2026-09-02 supervisor change (Janda seat; Hollós to the ELTE side): Jung continues as co-supervisor, continuation pending the same written confirmation."
     },
     {
       "partner_id": "EO_PARTNER",
@@ -111,7 +110,7 @@
       "organisational_unit": "Faculty of Informatics, Institute of Cartography and Geoinformatics, Budapest; Multisensor-Drone-Image Fusion research environment (Pack §3.2)",
       "entity_type": "Higher education institution, public",
       "role": "Associated partner: remote-sensing, UAV/hyperspectral and geoinformatics environment",
-      "role_in_action": "Named on the WP1, WP2 and WP3 month lines (Pack §3.1). Provides the principal UAV, hyperspectral and geoinformatics capability, the spatial-sensing training environment, and the instruments the hyperspectral-to-Sentinel work relies on.",
+      "role_in_action": "Named on the WP1, WP2 and WP3 month lines (Pack §3.1; the former WP1+WP2 are merged into WP1 per OD-1, 2026-09-02). Provides the principal UAV, hyperspectral and geoinformatics capability, the spatial-sensing training environment, and the instruments the hyperspectral-to-Sentinel work relies on. From 2026-09-02, Dr. Roland Hollós is the ELTE-side named team member responsible for the predictive-modelling/machine-learning component (operator-declared Assumed, key hollos_elte_ml_role: his evidenced employment is at ATK; the ELTE representation basis awaits written confirmation).",
       "country": "Hungary",
       "country_code": "HU",
       "pic": null,
@@ -141,7 +140,7 @@
       "pic_status": "Confirmed",
       "entity_type": "Higher or Secondary Education Establishment, non-profit. Public-benefit (közhasznú) private non-profit since the 2021 model change, maintained by Magyar Agrár- és Élettudományi Egyetemért Alapítvány; legal successor of Szent István Egyetem from 2021-02-01.",
       "role": "Source scientific environment: the 2022-2026 processing-tomato archive and the experimental/validation instrument base",
-      "role_in_action": "Named on the WP1, WP2 and WP3 month lines (Pack §3.1). Provides the approximately five-season historical archive (soil moisture, stomatal resistance/conductance, SPAD, VIS-NIR and VIS-NIR-SWIR reflectance, meteorology, leaf temperature, CWSI in later seasons, UAV imagery 2025-2026, irrigation treatments incl. unirrigated/50/75/100%) that makes processing tomato the development crop, plus tomato plant material, trials, irrigation treatments and agronomic information for primary validation.",
+      "role_in_action": "Named on the WP1, WP2 and WP3 month lines (Pack §3.1; the former WP1+WP2 are merged into WP1 per OD-1, 2026-09-02). Provides the approximately five-season historical archive (soil moisture, stomatal resistance/conductance, SPAD, VIS-NIR and VIS-NIR-SWIR reflectance, meteorology, leaf temperature, CWSI in later seasons, UAV imagery 2025-2026, irrigation treatments incl. unirrigated/50/75/100%) that makes processing tomato the development crop, plus tomato plant material, trials, irrigation treatments and agronomic information for primary validation.",
       "country": "Hungary",
       "country_code": "HU",
       "registered_address": {
@@ -214,7 +213,7 @@
       "pic_note": "Confirmed absent by the operator on 2026-08-11: AgroVIR holds no PIC. Unchanged by the host switch. It blocks submission, not a phase gate — AgroVIR hosts the non-academic placement, so it appears in Part A Section 2, where every participant needs a PIC. Registration is free and needs the legal name, address and tax number, all recorded here.",
       "entity_type": "Private for-profit company, limited liability (Kft.). SME. Founded 2007. Main activity NACE 7020, business and management consulting (registered founding activity; the current business is agricultural software).",
       "role": "Operational evaluator and non-academic placement host; requirements consultation from project start",
-      "role_in_action": "Named on the WP4 (consultation) and WP5 month lines (Pack §3.1). Structured requirements consultation on farm-management inputs, usability and interoperability from M1; formal operational evaluation during the M25-M30 placement.",
+      "role_in_action": "Named on the WP4 (consultation) and WP5 month lines (Pack §3.1; the former WP1+WP2 are merged into WP1 per OD-1, 2026-09-02). Structured requirements consultation on farm-management inputs, usability and interoperability from M1; formal operational evaluation during the M25-M30 placement.",
       "country": "Hungary",
       "country_code": "HU",
       "registered_address": {
@@ -304,7 +303,7 @@
       "country": "Hungary",
       "country_code": "HU",
       "field_access_status": "Assumed",
-      "field_access_note": "A written field-access and measurement arrangement will be obtained before the campaign (Pack Stage 3, T3.1). Until then the access, the sensor-installation permission and the treatment-implementation responsibilities are operator-declared Assumed under key farmer_field_access. Contingency if primary access fails: the Szentendre Skanzen model Bulgarian garden route, contingency-only, subject to formal agreement and scientific suitability (Pack Stage 4, T3.6, risk R04).",
+      "field_access_note": "A written field-access and measurement arrangement will be obtained before the campaign (Pack Stage 3, T3.1). Until then the access, the sensor-installation permission and the treatment-implementation responsibilities are operator-declared Assumed under key farmer_field_access. Contingency ladder if primary access fails (2026-09-02): first the identified second commercial producer (Farmer 2, key farmer2_backup_site, claim-preserving); then the Szentendre Skanzen model Bulgarian garden route — measurement backup only, subject to formal agreement and scientific suitability, with the commercial-transferability claim downgraded and reported as such (Pack Stage 4, T3.6, risk R04; review issue 7).",
       "beneficiary": false,
       "validation_status": "Confirmed",
       "roles_ref": "roles.json role_token VALIDATION_SITE",
