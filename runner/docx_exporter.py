@@ -155,16 +155,23 @@ def _resolve_section_paths(repo_root: Path) -> list[Path]:
     return paths
 
 
+def split_content_blocks(content: str) -> list[str]:
+    """Split section *content* into its paragraph blocks (blank-line split).
+
+    This split defines the draft ¶-numbering scheme: consumers that anchor
+    to rendered paragraphs (``tools/annotate_part_b_draft.py``) share this
+    function so their ¶ indices can never drift from the rendered output.
+    """
+    return [b for b in re.split(r"\n\s*\n", content.strip()) if b.strip()]
+
+
 def _add_content_paragraphs(doc: Any, content: str) -> None:
     """Render *content* verbatim as one or more paragraphs.
 
     Splits on blank lines into paragraphs and preserves intra-paragraph line
     breaks — no text is added, removed, or reordered.
     """
-    blocks = re.split(r"\n\s*\n", content.strip())
-    for block in blocks:
-        if not block.strip():
-            continue
+    for block in split_content_blocks(content):
         para = doc.add_paragraph()
         lines = block.split("\n")
         for i, line in enumerate(lines):

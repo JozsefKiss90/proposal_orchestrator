@@ -1,0 +1,140 @@
+{
+  "schema_id": "plans.partb_draft_anchor_map.v1",
+  "date": "2026-09-03",
+  "run_id": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
+  "comment_timestamp": "2026-09-03T00:00:00Z",
+  "purpose": "Hand-authored anchor map for Stage 1 of plans/partb_final_drafting_strategy_2026-09-03.md. Maps each unresolved revision action of drafting_review_status.json (run 7860a89a) to exact paragraph anchors in the run-03 section artifacts, and declares the three draft-resolvable insertions. Consumed by tools/annotate_part_b_draft.py; keeping this map as data makes the annotation re-runnable when the draft regenerates. Anchors use the established draft ¶-numbering scheme (paragraph = 1-based index over blank-line-separated blocks of the sub-section content, identical to the docx exporter's block split). Every anchor carries a `match` substring that must be present in the target paragraph — the annotator fails closed on any mismatch, so a regenerated draft can never be silently mis-annotated.",
+  "actions": [
+    {
+      "action_id": "A-1",
+      "kind": "needs_input",
+      "owner": "supervisor + fellow",
+      "anchors": [
+        {"sub_section_id": "1.1", "paragraph": 4, "match": "frozen and its model card registered (D2.1)"},
+        {"sub_section_id": "1.2", "paragraph": 6, "match": "primary model frozen and its model card registered"}
+      ],
+      "question": "Choose the reconciliation of the month-3 freeze vs the month-14 D1.1/D1.2 delivery: (a) state that a provisional stress-target and validation protocol are fixed and documented before the month-3 D2.1 freeze, with D1.1/D1.2 as their month-14 formalisation, or (b) shift the D1.1/D1.2 due months so the defining protocol and harmonised base precede D2.1 (touches the work plan and Gantt).",
+      "fallback": "Keep the current due months and add no reconciliation claim; the sequencing tension stays flagged in the deliverable (§13.8)."
+    },
+    {
+      "action_id": "A-2",
+      "kind": "needs_input",
+      "owner": "fellow + supervisor",
+      "anchors": [
+        {"sub_section_id": "1.1", "paragraph": 6, "match": "Beyond the state of the art"}
+      ],
+      "question": "State the new, citable scientific knowledge the validation framework yields and what is currently not achievable — a scientific claim only the fellow/supervisor can commit to.",
+      "fallback": "Retain the current framing (advance located in the validation framework and parsimony) without a sharpened beyond-state-of-the-art claim."
+    },
+    {
+      "action_id": "A-3",
+      "kind": "needs_input",
+      "owner": "operator + host",
+      "anchors": [
+        {"sub_section_id": "1.3", "paragraph": 8, "match": "stated transparently"}
+      ],
+      "question": "Can evidence be cited that the ELTE associated-partner and co-supervision confirmations are secured or imminent, and what host-side continuity safeguard protects the modelling/EO training strand if the ELTE arrangement changes?",
+      "fallback": "Keep the transparent operator-declared Assumed status of the forward-looking commitments as drafted in 1.3, with no safeguard claim added."
+    },
+    {
+      "action_id": "A-4",
+      "kind": "needs_input",
+      "owner": "fellow + supervisor",
+      "anchors": [
+        {"sub_section_id": "2.3", "paragraph": 4, "match": "8–30% range"}
+      ],
+      "question": "Provide conditional, method-anchored expected-effect ranges (detection lead-time; the water-productivity improvement envelope the design is powered to show) that the fellow and supervisor will commit to as a defensible expectation.",
+      "fallback": "Keep the bounded literature ranges (~8–30%) only, as currently drafted — 2.3 deliberately declines project-specific quantified targets (prior operator decision)."
+    },
+    {
+      "action_id": "A-5",
+      "kind": "split",
+      "owner": "draft + partners confirm",
+      "anchors": [
+        {"sub_section_id": "3.1", "paragraph": 16, "match": "contributed in kind"}
+      ],
+      "resolution_note": "Resolved in draft (table half): a month-by-month task-loading table at the WP1/WP3/WP4 overlap is inserted after this paragraph, derived strictly from phase4 gantt.json task month-assignments — derived from Tier 4, no new fact. No per-month person-month split is asserted: gantt.json carries no per-task effort, so a per-month PM allocation would be an invented fact (§13.3); the table shows concurrent task activity, cross-referenced to the aggregate per-WP person-months already stated in 3.1.",
+      "question": "Confirm the in-kind offload framing at the M4–M14 peak: do the partners' stated in-kind contributions (host supervisor 2.5 PM, ELTE co-supervisor 2.0 PM, AgroVIR 3.0 PM, MATE 2.4 PM, КРУМАТИК ЕООД 1.5 PM — all operator-declared pending written confirmation) offload the fellow at the WP1/WP3/WP4 overlap, and may the prose say so?",
+      "fallback": "The task-loading table stands as a Tier 4 derivation; the offload framing stays an operator-declared commitment pending each partner's written confirmation, exactly as 3.1 already states."
+    },
+    {
+      "action_id": "A-6",
+      "kind": "needs_input",
+      "owner": "operator + fellow",
+      "anchors": [
+        {"sub_section_id": "3.1", "paragraph": 5, "match": "lead: the independent commercial-farmer validation site"}
+      ],
+      "question": "Approve reassigning WP3 scientific leadership to the fellow/beneficiary, with the farmer site as a hosting environment, citing the T3.1 access agreement and the contingency ladder as the mitigating controls? This changes a recorded WP-lead fact: it requires the paired Tier 3 edit (roles.json / workpackage_seed.json, reusing existing ids per the id-stability rule) before the prose changes.",
+      "fallback": "The WP3 lead attribution remains as recorded in Tier 3/4 (the independent commercial-farmer validation site), unchanged."
+    },
+    {
+      "action_id": "A-8",
+      "kind": "split",
+      "owner": "fellow",
+      "anchors": [
+        {"sub_section_id": "2.1", "paragraph": 2, "match": "measured by the project's own career KPI"}
+      ],
+      "resolution_note": "Resolved in draft (KPI half): the career KPI exists in the Tier 4 KPI set as K11 (phase5 impact_architecture.json) and is named in an inserted sentence at this anchor — derived from Tier 4, no new fact.",
+      "question": "Anchor the employability breadth in one or two concrete post-fellowship trajectories (for example the recorded Maritsa/MVCRI post-MSCA replication-and-transfer route already in 3.2, plus one other destination the fellow will commit to).",
+      "fallback": "Keep the named career KPI (K11) and the existing breadth framing, without additional trajectory claims."
+    },
+    {
+      "action_id": "A-9",
+      "kind": "needs_input",
+      "owner": "fellow + operator",
+      "anchors": [
+        {"sub_section_id": "2.2", "paragraph": 5, "match": "one public field demonstration with farmers and one public-facing article per year"}
+      ],
+      "question": "Confirm a small set of measurable dissemination/uptake indicators with numbers (audiences reached, farmer participants, MVP evaluation users) tied to the named channels, proportionate to a single-researcher action — the numbers need owner confirmation and cannot be invented (§13.2/§13.3).",
+      "fallback": "Retain the output-count success measures as drafted (papers; one public field demonstration and one public-facing article per year)."
+    },
+    {
+      "action_id": "A-10",
+      "kind": "needs_input",
+      "owner": "fellow (source) + operator",
+      "anchors": [
+        {"sub_section_id": "2.3", "paragraph": 6, "match": "Eurostat reports fresh vegetables"}
+      ],
+      "question": "Provide a citable source and figure quantifying the near-term reachable processing-tomato segment in the target countries (e.g. processing-tomato area in Hungary and Bulgaria), so the scale claim graduates from what the action touches to the wider EU potential.",
+      "fallback": "Keep the EU-domain figures and the qualitative Bulgarian vegetable/tomato context without a reachable-segment number."
+    },
+    {
+      "action_id": "A-11",
+      "kind": "resolved_in_draft",
+      "owner": null,
+      "anchors": [
+        {"sub_section_id": "3.1", "paragraph": 5, "match": "WP5 — AgroVIR Non-Academic Placement"}
+      ],
+      "resolution_note": "Resolved in draft: a one-line numbering-gap note is inserted after the WP list, grounded in the OD-1 merge recorded in the assembled draft's consistency log (CC-02: 'no WP2; merged into WP1 per OD-1') and the id-stability rule of the run-03 instantiation record. Verify wording, then veto or accept.",
+      "question": null,
+      "fallback": null
+    }
+  ],
+  "insertions": [
+    {
+      "action_id": "A-11",
+      "type": "paragraph_after",
+      "sub_section_id": "3.1",
+      "paragraph": 5,
+      "text": "Note on numbering: the work packages are numbered WP1, WP3, WP4, WP5 because the former WP2 (model development) was merged into WP1 — now the single Data Harmonisation, Stress Definition and Model Development package — during work-plan consolidation (OD-1); the original identifiers are retained for identifier stability, so the gap is deliberate, not an omission.",
+      "grounding": "part_b_assembled_draft.json consistency_log CC-02 (no WP2; merged into WP1 per OD-1); 3.1 ¶15 'merged data-harmonisation and model-development package'; id-stability rule (fieldwise-run03-instantiation_2026-09-02)."
+    },
+    {
+      "action_id": "A-8",
+      "type": "sentence_after_match",
+      "sub_section_id": "2.1",
+      "paragraph": 2,
+      "match": "measured by the project's own career KPI",
+      "text": " That career KPI is K11: the Career Development Plan agreed by M3 (deliverable D1.3) and reviewed at all five steering points (M6, M14, M18, M24, M27), verified against the signed/agreed CDP document and the recorded steering-point review entries.",
+      "grounding": "phase5_impact_architecture/impact_architecture.json kpis K11 (target, measurement_method, traceable_to_deliverable D1.3)."
+    },
+    {
+      "action_id": "A-5",
+      "type": "effort_loading_table_after",
+      "sub_section_id": "3.1",
+      "paragraph": 16,
+      "caption": "Month-by-month task loading at the WP1/WP3/WP4 overlap, derived from the Tier 4 Gantt (phase4_gantt_milestones/gantt.json) task month-assignments — derived from Tier 4, no new fact. Cells give the number of concurrently active tasks per work package and month; the aggregate per-WP person-months are as stated in the two paragraphs above. No per-month person-month split is asserted (the Gantt carries no per-task effort).",
+      "grounding": "phase4_gantt_milestones/gantt.json tasks[] start_month/end_month; aggregate per-WP PM from 3.1 ¶15–¶16."
+    }
+  ]
+}
