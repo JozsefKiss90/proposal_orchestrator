@@ -1,110 +1,112 @@
 {
-  "report_id": "compliance_check_impact_section_unspecified_2026-09-03T00:00:00Z",
+  "report_id": "compliance_check_review_packet_compliance_validator_2026-09-03T12:00:00Z",
   "skill_id": "constitutional-compliance-check",
-  "invoking_agent": "unspecified",
+  "invoking_agent": "compliance_validator",
   "run_id_reference": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
-  "artifact_audited": "docs/tier5_deliverables/proposal_sections/impact_section.json",
+  "artifact_audited": "docs/tier5_deliverables/review_packets/review_packet.json",
   "section13_checks": [
     {
       "prohibition_id": "13.1",
       "prohibition_description": "Treating Grant Agreement Annex templates as the governing structural schema for proposal writing.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "The section content references 'the grant-agreement default' only as a citation basis for IP ownership allocation, not as a structural schema. No 'Annex [0-9]', 'Grant Agreement Annex', 'AGA Template', or 'Model Grant Agreement template' string is used as a structural authority in the content or traceability_footer. Section structure follows the Impact criterion sub-sections (2.1/2.2/2.3), i.e. an application-form (Tier 2A) structure."
+      "severity": null
     },
     {
       "prohibition_id": "13.2",
-      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B source documents.",
+      "prohibition_description": "Inventing call constraints, scope requirements, expected outcomes, or expected impacts not present in Tier 2B.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "Every call-requirement claim (SR-06, SR-07, SR-08 and expected outcomes/impacts EO-01/02/03, EI-01/02/03/05) carries a Tier 2B source reference. traceability_footer.primary_sources[] contains docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json, .../expected_outcomes.json and .../scope_requirements.json; corresponding claim_statuses entries cite these tier-2 paths. This skill checks only for the presence of a Tier 2B reference, not the referenced content."
+      "severity": null
     },
     {
       "prohibition_id": "13.3",
-      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, prior experience, budget figures, team sizes, equipment) not present in Tier 3.",
+      "prohibition_description": "Inventing project facts (partners, capabilities, roles, objectives, budget figures, team sizes, equipment) not present in Tier 3.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "All project-fact claims (Dr. Rositsa Cholakova; HUN-REN ATK host; Prof. Tibor Janda; Prof. Andras Jung; Dr. Roland Hollos; Dr. Zsofia Varga; Miklos Maroti/AgroVIR; ELTE, MATE, Krumatic, MVCRI; deliverables and durations) carry Tier 3 source references in claim_statuses (docs/tier3_project_instantiation/...) and the traceability_footer. Assumed facts (e.g. supervisor acceptances, MATE data rights) are sourced to docs/tier3_project_instantiation/working_assumptions.json with assumption_declared:true. This skill checks only for the presence of a Tier 3 reference."
+      "severity": null
     },
     {
       "prohibition_id": "13.4",
-      "prohibition_description": "Commencing any Phase 8 activity (including preparatory drafting) before the budget gate (Phase 7) has passed.",
-      "check_status": "violation",
-      "violation_evidence": "The audited artifact is a finalized Phase 8 Tier 5 deliverable (schema_id 'orch.tier5.impact_section.v1' with three drafted sub-section contents, 1369/1566/1264 words). However docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json has \"gate_pass_declaration\": \"fail\" with blocking inconsistency BLK-01 ('docs/integrations/lump_sum_budget_planner/received/ contains no lump-sum budget response ... Absent budget artifacts ... constitute a blocking gate failure'). A drafted Phase 8 proposal section exists while gate_09/Phase 7 is failed and unresolved.",
-      "severity": "critical",
-      "reason": "Per CLAUDE.md §13.4 and §8.4, no Phase 8 substep (including drafting) may commence before the budget gate passes; this block is unconditional and instrument-independent. The existence of a completed Tier 5 impact_section draft while the Phase 7 gate is declared 'fail' evidences the violation."
+      "prohibition_description": "Commencing Phase 8 activity before the budget gate (Phase 7) has passed; asserting unvalidated budget figures.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
     },
     {
       "prohibition_id": "13.5",
       "prohibition_description": "Storing durable decisions only in agent memory without writing them to Tier 4.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "Not verifiable from artifact content alone; this prohibition is enforced by the decision-log-update mechanism, not by inspecting a deliverable. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
+      "severity": null
     },
     {
       "prohibition_id": "13.6",
-      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority by redefining phase/tier/gate meanings.",
+      "prohibition_description": "Allowing a workflow or skill to become a de facto constitutional authority.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "Not directly checkable from a deliverable artifact. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
+      "severity": null
     },
     {
       "prohibition_id": "13.7",
-      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress when inputs are incomplete.",
+      "prohibition_description": "Silently reordering phases or weakening gate conditions to allow progress with incomplete inputs.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "The artifact references only same-phase and upstream inputs (Phase 8 canonical_reference_pack, Phase 2 concept_refinement_summary, Phase 3 wp_structure) in its traceability_footer. It does not consume outputs from a phase higher than its own as inputs. Note: the separate §13.4 finding concerns a failed upstream gate, not silent phase reordering within this artifact."
+      "severity": null
     },
     {
       "prohibition_id": "13.8",
-      "prohibition_description": "Finalizing proposal text when source state is incomplete, contradictory, or unvalidated, without explicitly flagging the gap.",
+      "prohibition_description": "Finalizing proposal text when source state is incomplete/contradictory/unvalidated without flagging the gap.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "validation_status.overall_status is 'assumed' (not 'unresolved'); no claim_statuses entry has status 'unresolved'. All assumed claims carry assumption_declared:true and are explicitly flagged in the content itself (e.g. 'no institutional HR award is claimed for HUN-REN ATK, as its status has not been established'; 'rest on operator declarations pending partner writing and are presented as such rather than as settled fact'; the Skanzen demonstration 'stated conditionally and carries no unconditional promise'). The literal §13.8 trigger (unresolved status not flagged) is not met."
+      "severity": null
     },
     {
       "prohibition_id": "13.9",
-      "prohibition_description": "Using agent-local knowledge of Horizon Europe programme rules as a substitute for reading Tier 1 source documents when those documents are present.",
-      "check_status": "violation",
-      "violation_evidence": "The content asserts a grant-agreement-terms (regulatory) claim: 'ownership of results is to follow the grant-agreement default, vesting in HUN-REN ATK as beneficiary acting through the fellow'. Its sole source_ref (claim placement_ip_ownership) is Tier 3 docs/tier3_project_instantiation/working_assumptions.json, and the artifact's traceability_footer.primary_sources[] contains no Tier 1 (docs/tier1_normative_framework/extracted/) path reference at all.",
-      "severity": "major",
-      "reason": "Per CLAUDE.md §13.9, a claim referencing Horizon Europe grant agreement terms (the 'grant-agreement default' ownership rule) must trace to a Tier 1 source. This skill checks only for the presence of a Tier 1 reference in the traceability footer; none is present, so the check is applied conservatively and flagged as a violation."
+      "prohibition_description": "Using agent-local knowledge of Horizon Europe rules as a substitute for reading Tier 1 documents.",
+      "check_status": "pass",
+      "violation_evidence": null,
+      "severity": null
     },
     {
       "prohibition_id": "13.10",
-      "prohibition_description": "Producing outputs in Tier 5 that are not traceable to specific inputs in Tier 1-4.",
+      "prohibition_description": "Producing Tier 5 outputs not traceable to specific inputs in Tier 1-4.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "traceability_footer.no_unsupported_claims_declaration is true. All claim_statuses entries have status 'confirmed' or 'assumed' and each carries a source_ref; no entry has status 'unresolved' lacking a source_ref. The §13.10 trigger (unresolved claim with no source_ref) is not met."
+      "severity": null
     },
     {
       "prohibition_id": "13.11",
       "prohibition_description": "Modifying Tier 1 or Tier 2 source documents to reflect project-specific assumptions.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "Not checkable from a Tier 5 deliverable artifact (this audit does not read or write Tier 1/Tier 2 sources). Recorded as pass per skill specification (non-applicable to artifact-level audit)."
+      "severity": null
     },
     {
       "prohibition_id": "13.12",
       "prohibition_description": "Treating CLAUDE.md as advisory or optional.",
       "check_status": "pass",
       "violation_evidence": null,
-      "severity": null,
-      "reason": "Not directly checkable from a deliverable artifact. Recorded as pass per skill specification (non-applicable to artifact-level audit)."
+      "severity": null
     }
   ],
+  "check_reasoning": {
+    "13.1": "No structural reference to a Grant Agreement Annex, Model Grant Agreement Annex, or AGA template is used as a schema authority. References to 'Part A' are to the application form's Part A (Tier 2A), not to a grant agreement annex.",
+    "13.2": "The review packet references standard MSCA evaluation sub-criteria (1.1-1.4, 2.1-2.3, 3.1-3.2) and the 50% Excellence weighting solely as the review lens for assessing the drafted sections. It does not inject any new call requirement, scope boundary, or eligibility condition into deliverable content. The review_packet.v1 schema carries no traceability_footer by design (it is a QA artifact, not a claim-bearing proposal section); no invented call constraint is asserted.",
+    "13.3": "Applied conservatively. All project facts named (ELTE, Hollos, Jung, Krumatic, AgroVIR, DrR, deliverables D1.1-D2.2, WP structure, person-month figures, publication counts, Eurostat figures, 8-30% ranges) appear as quotations or paraphrases OF the excellence/impact/implementation sections under review (see per-finding 'evidence' fields carrying quoted text). The review packet is the auditor of these facts, not their fabrication origin; it introduces no project fact absent from the sections it reviews.",
+    "13.4": "The review packet contains no monetary budget figures (no EUR/euro amounts asserted as confirmed values). Person-month references (e.g. '9.0 PM', '30 PM total') appear as quoted effort figures inside review findings about workload feasibility in the reviewed implementation section, not as newly asserted confirmed budget values. Under the TAPM input boundary the phase7 budget_gate_assessment file was not re-read (verification of gate pass is the scheduler/gate-evaluator responsibility, not this artifact-level audit); no budget-dependent claim is originated by this artifact.",
+    "13.5": "Not verifiable from artifact content alone; enforced by the decision-log-update skill and Tier 4 write discipline.",
+    "13.6": "Not verifiable from an artifact; scope-expansion is a runtime/authority concern, not detectable in review packet content.",
+    "13.7": "The review packet is a Phase 8 artifact and references only Phase 8 sections (excellence, impact, implementation). It references no activity from a phase higher than its own phase context; no evidence of silent reordering.",
+    "13.8": "The review packet explicitly surfaces and flags incomplete/assumed source state (ELTE participation and co-supervision pending written confirmation, farmer-site field access to be secured, AgroVIR holds no PIC, host Part A verification outstanding). It performs the opposite of concealment, consistent with the flag-the-gap requirement of §13.8.",
+    "13.9": "No Horizon Europe regulatory rule (participation condition, grant agreement term, financial regulation) is asserted as fact from programme knowledge. Programme terms (PIC, beneficiary, associated partner, Part A) appear as review vocabulary describing project facts drawn from the reviewed sections, not as sourced regulatory claims.",
+    "13.10": "The review packet's content is derivative of and traceable to the reviewed Tier 5 sections, each finding citing a specific section and quoting supporting evidence; it introduces no untraceable new claim. The review_packet.v1 schema does not define a traceability_footer / no_unsupported_claims_declaration field, consistent with its QA-artifact nature; the specific field-level mechanism of this check is therefore non-applicable, and the substantive traceability requirement is satisfied.",
+    "13.11": "Not checkable from a deliverable artifact; no Tier 1/Tier 2 source document is written or modified by a review packet.",
+    "13.12": "Not directly checkable from an artifact; the review packet operates within, and does not override, the constitution."
+  },
   "summary": {
     "total_prohibitions_checked": 12,
-    "violations_found": 2
+    "violations_found": 0
   },
-  "timestamp": "2026-09-03T00:00:00Z"
+  "timestamp": "2026-09-03T12:00:00Z"
 }

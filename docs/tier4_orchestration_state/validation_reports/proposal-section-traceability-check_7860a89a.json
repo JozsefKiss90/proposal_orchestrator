@@ -1,557 +1,89 @@
 {
-  "report_id": "traceability_impact_section_impact_writer_2026-09-03T00:00:00Z",
+  "report_id": "traceability_review_packet_traceability_auditor_2026-09-03T00:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "impact_writer",
+  "invoking_agent": "traceability_auditor",
   "run_id_reference": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
-  "section_id_audited": "impact_section",
+  "section_id_audited": "review_packet",
+  "audit_mode": "review_packet_structural_index",
   "claim_audit_results": [
     {
-      "claim_id": "FELLOW",
-      "claim_summary": "Applicant is Dr. Rositsa Cholakova, plant physiologist/agronomist with BSc/MSc, PhD, ~5y teaching and expanding sensing/data profile.",
+      "claim_id": "RP-01",
+      "claim_summary": "Review packet exists, valid JSON, schema_id=orch.tier5.review_packet.v1",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOW); project_brief/training_and_career_development.md",
+      "source_ref": "docs/tier5_deliverables/review_packets/review_packet.json",
       "flag_reason": null
     },
     {
-      "claim_id": "competence_gap",
-      "claim_summary": "Fellowship targets the gap of rigorous predictive modelling and validation across time/scale/environments.",
+      "claim_id": "RP-02",
+      "claim_summary": "run_id present and matches current run_id",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+      "source_ref": "review_packet.json:run_id",
       "flag_reason": null
     },
     {
-      "claim_id": "career_progression_ADS",
-      "claim_summary": "Fellowship completes progression to an independent Agricultural Data Scientist.",
+      "claim_id": "RP-03",
+      "claim_summary": "findings[] non-empty array; all 12 findings have required fields",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+      "source_ref": "review_packet.json:findings[]",
       "flag_reason": null
     },
     {
-      "claim_id": "cdp_deliverable",
-      "claim_summary": "Career Development Plan delivered as D1.3, due month 3, established jointly.",
+      "claim_id": "RP-04",
+      "claim_summary": "Every severity value valid (major/minor within allowed set)",
       "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
+      "source_ref": "review_packet.json:findings[].severity",
       "flag_reason": null
     },
     {
-      "claim_id": "cdp_scope_requirement",
-      "claim_summary": "Jointly-established early CDP satisfies mandatory SR-08.",
+      "claim_id": "RP-05",
+      "claim_summary": "revision_actions[] non-empty since findings non-empty; linkage constraint holds",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-08)",
+      "source_ref": "review_packet.json:revision_actions[]",
       "flag_reason": null
     },
     {
-      "claim_id": "cdp_transferable_skills",
-      "claim_summary": "CDP itemises a transferable-skills curriculum (integrity, open science/FAIR, gen-AI, grant writing, IP, PM, sci-comm).",
+      "claim_id": "RP-06",
+      "claim_summary": "Every revision action has all required fields",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+      "source_ref": "review_packet.json:revision_actions[]",
       "flag_reason": null
     },
     {
-      "claim_id": "transferable_skills_requirement",
-      "claim_summary": "Curriculum matches mandatory training requirement SR-07.",
+      "claim_id": "RP-07",
+      "claim_summary": "Every revision_actions[].finding_id references an existing finding (A-1..A-12 map to F-1..F-12)",
       "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-07)",
+      "source_ref": "review_packet.json:revision_actions[].finding_id",
       "flag_reason": null
     },
     {
-      "claim_id": "cdp_review_points",
-      "claim_summary": "CDP signed by both supervisors and fellow; reviewed at M6/M14/M18/M24/M27.",
+      "claim_id": "RP-08",
+      "claim_summary": "Every finding has non-empty evidence and recommendation",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
+      "source_ref": "review_packet.json:findings[]",
       "flag_reason": null
     },
     {
-      "claim_id": "open_science_commitment",
-      "claim_summary": "'As open as possible, as closed as necessary' open-science commitment within the plan.",
+      "claim_id": "RP-09",
+      "claim_summary": "No finding has severity omitted/null or outside {critical,major,minor}",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
+      "source_ref": "review_packet.json:findings[].severity",
       "flag_reason": null
     },
     {
-      "claim_id": "janda_identity",
-      "claim_summary": "Prof. Tibor Janda is head of the Plant Physiology and Metabolomics Department at HUN-REN ATK.",
+      "claim_id": "RP-10",
+      "claim_summary": "No finalized_text/final_draft/revised_content top-level keys present",
       "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (SUPERVISOR)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "janda_supervisor_acceptance",
-      "claim_summary": "Prof. Janda accepts the primary-supervisor role at HUN-REN ATK.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (janda_supervisor_acceptance; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed pending ATK/Janda written confirmation; honestly marked, not treated as Confirmed."
-    },
-    {
-      "claim_id": "jung_co_supervision_acceptance",
-      "claim_summary": "Prof. András Jung accepts the co-supervisor (hyperspectral/UAV/EO) role.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (jung_co_supervision_acceptance; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed pending ELTE written acceptance."
-    },
-    {
-      "claim_id": "hollos_elte_ml_role",
-      "claim_summary": "Dr. Roland Hollós participates on the ELTE side as named predictive-modelling/ML team member.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (hollos_elte_ml_role; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed; his evidenced employment is at ATK, ELTE-side basis not yet in writing."
-    },
-    {
-      "claim_id": "two_way_transfer",
-      "claim_summary": "Two-way transfer between fellow (agronomy/physiology) and host/partners (data science, modelling, EO).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "elte_instrument_access",
-      "claim_summary": "Fellow uses ELTE DJI Matrice 350 RTK/hyperspectral cameras, supported by Dr. Zsófia Varga.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (elte_instrument_access; assumption_declared)",
-      "flag_reason": "Instruments Confirmed as ELTE's; access arrangement operator-declared Assumed pending written agreement."
-    },
-    {
-      "claim_id": "placement_included_cc07",
-      "claim_summary": "Six-month non-academic placement at AgroVIR (M25-M30) included as integral, evaluable part.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE/DURATION)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_scope_requirement",
-      "claim_summary": "Additional non-academic placement up to six months meets optional provision SR-06.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json (SR-06)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_added_value",
-      "claim_summary": "Placement supplies operational evaluation, MVP translation, interoperability, exploitation planning; AgroVIR consulted from M1.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_arrangement_AgroVIR",
-      "claim_summary": "Placement is mainly remote with monthly face-to-face; protected/coded extracts; no proprietary-system access.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_arrangement_AgroVIR; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed pending AgroVIR written confirmation."
-    },
-    {
-      "claim_id": "placement_supervisor_AgroVIR",
-      "claim_summary": "Placement supervisor is Miklós Maróti.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_AgroVIR; assumption_declared)",
-      "flag_reason": "Operator-supplied Assumed pending AgroVIR written confirmation."
-    },
-    {
-      "claim_id": "placement_supervisor_title_AgroVIR",
-      "claim_summary": "Miklós Maróti is Managing Director of AgroVIR.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_supervisor_title_AgroVIR; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed (supersedes prior title) pending written confirmation."
-    },
-    {
-      "claim_id": "teaching_route",
-      "claim_summary": "Fellow will seek guest lectures/seminars at MATE and, where possible, AU Plovdiv.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "prior_teaching_background",
-      "claim_summary": "Fellow has ~5y prior teaching at AU Plovdiv (2015-2020).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "publications_plan",
-      "claim_summary": "At least two peer-reviewed submissions (P1, P2), plus a third if the dataset supports it.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "employability_sectors",
-      "claim_summary": "Profile relevant to universities, ROs, precision-ag/irrigation firms, EO/geospatial, phenotyping, FMIS.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "charter_alignment",
-      "claim_summary": "Charter alignment evidenced at instrument level via CDP; no HR award claimed for ATK.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EI-01_mapping",
-      "claim_summary": "Measures serve EI-01 (improved employability within academia and beyond) / EO-01.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-01)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EI-05_mapping",
-      "claim_summary": "Placement serves EI-05 (knowledge transfer/career moves via placement incentive).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-05)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EO-02_mapping",
-      "claim_summary": "Interdisciplinary/inter-sectoral design instantiates EO-02 (new mind-sets).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_outcomes.json (EO-02)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "HOST",
-      "claim_summary": "Host/recruiting organisation is HUN-REN ATK, Martonvásár, Hungary.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (HOST)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "FELLOWSHIP_TYPE",
-      "claim_summary": "European Fellowship with a six-month non-academic placement under CC-07.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json (FELLOWSHIP_TYPE)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "DURATION",
-      "claim_summary": "30 months: 24-month fellowship at ATK plus 6-month placement at AgroVIR.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/selected_call.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_de_strand",
-      "claim_summary": "D&E is a continuous cross-cutting strand across the action, resourced from cross-cutting PMs.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_open_science_principle",
-      "claim_summary": "D&E&C strand governed by 'as open as possible, as closed as necessary'.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_target_groups",
-      "claim_summary": "Five target groups defined with matched channels.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_publications",
-      "claim_summary": "P1 and P2 during/shortly after fellowship, plus optional third methods paper.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_open_access_fair",
-      "claim_summary": "Dissemination under open access and FAIR reusable methods/metadata incl. model card and protocol.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/scope_requirements.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_honest_transfer_reporting",
-      "claim_summary": "Transfer loss reported honestly in the Prospective transferability report (M18).",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_eo03_ei02_ei05_map",
-      "claim_summary": "Dissemination serves EO-03, EI-02 and EI-05.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json; docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": "Impact-code label 'stronger R&I capacity among organisations' aligns with Tier 2B EI-03 wording; section attributes it to EI-05 via the Tier 3 impacts.json re-mapping — code labelling should be cross-checked for consistency (non-blocking)."
-    },
-    {
-      "claim_id": "c_communication_practitioner",
-      "claim_summary": "Practitioner demonstrations; one public field demo + one public article/year; Krumatic Bulgarian uptake.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_skanzen_conditional",
-      "claim_summary": "Szentendre Skanzen demonstration included only if formally established and suitable (conditional).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_teaching_communication",
-      "claim_summary": "MATE/AU Plovdiv guest sessions feed results into teaching (EI-06/EO-08).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": "Section EI-06 label 'feedback into teaching' follows the Tier 3 impacts.json re-mapping (confirmation_checklist item 5), which differs from raw Tier 2B EI-06 (ERA/widening); traceable to project re-mapping."
-    },
-    {
-      "claim_id": "c_ei03_map",
-      "claim_summary": "Communication activities address EI-03 (broadened public engagement).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json; docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": "Tier 2B EI-03 wording concerns organisational R&I capacity; 'broadened public engagement' label relies on Tier 3 impacts.json mapping — cross-check labelling (non-blocking)."
-    },
-    {
-      "claim_id": "c_mvp_exploitation",
-      "claim_summary": "Exploitation anchored in the Crop-configurable DrR web MVP (M24).",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_placement_evaluation",
-      "claim_summary": "MVP completed before placement; AgroVIR operational/interoperability assessment (M30).",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_exploitation_roadmap",
-      "claim_summary": "Post-MSCA FMIS integration and exploitation roadmap (M30).",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_crop_transfer_spec",
-      "claim_summary": "Crop-transfer specification (M14) defines transferable core and recalibration gates.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_no_overclaim_economics",
-      "claim_summary": "No invented EUR/ha or fixed water-saving; measured quantities support later value assessment.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_mvcri_route",
-      "claim_summary": "Post-MSCA MVCRI Bulgarian replication route, no in-action MVCRI effort.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/strategic_positioning.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_ei05_ei01_map",
-      "claim_summary": "Inter-sectoral cross-border exploitation instantiates EI-05 and reinforces EI-01.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_ip_inventory_layers",
-      "claim_summary": "Background/foreground/IP inventory (T4.6); four distinct rights layers documented before action start.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/project_brief/training_and_career_development.md",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mvcri_drr_independence",
-      "claim_summary": "DrR developed by the fellow independently; MVCRI holds no ownership position.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (mvcri_drr_independence; assumption_declared)",
-      "flag_reason": "Fellow-authored, institutionally uncountersigned; operator-declared Assumed pending MVCRI written confirmation."
-    },
-    {
-      "claim_id": "c_protection_measures",
-      "claim_summary": "Protectable foreground evaluated pre-disclosure; DrR dated declaration; data-rights/IP assessment (R10).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "mate_data_rights",
-      "claim_summary": "MATE grants rights/access to the 2022-2026 archive under conditions to be documented before start.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (mate_data_rights; assumption_declared)",
-      "flag_reason": "Pack lists rights confirmation as OPEN; operator-declared Assumed pending MATE written permission."
-    },
-    {
-      "claim_id": "c_mate_commercial_caveat",
-      "claim_summary": "Commercial use of MATE-derived assets subject to separate legal/IP assessment.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/risks.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_krumatic_dev_agreement",
-      "claim_summary": "FIELDWISE code-IP terms settled in a Krumatic development agreement before action start.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "placement_ip_ownership",
-      "claim_summary": "Placement results vest in HUN-REN ATK per grant default; written placement agreement to confirm.",
-      "status": "assumed",
-      "source_ref": "docs/tier3_project_instantiation/working_assumptions.json (placement_ip_ownership; assumption_declared)",
-      "flag_reason": "Operator-declared Assumed (re-anchored to ATK) pending the placement agreement."
-    },
-    {
-      "claim_id": "c_data_minimisation",
-      "claim_summary": "Operational information minimised/coded/anonymised; results published only in aggregated form.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/call_binding/confirmation_checklist.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "c_during_after_actions",
-      "claim_summary": "During-project and after-project continuity actions (inventory, M1 consultation, MVP, roadmap, replication).",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-SCI",
-      "claim_summary": "Durable contribution is a prospectively tested validation framework against independent ground truth.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-SCI)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-SCI-extension",
-      "claim_summary": "Methodological basis for later crop-by-crop extension, not unsupported universalisation.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-SCI)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EI-02",
-      "claim_summary": "Model card, crop-transfer spec, transferability report, two-way transfer and publications deliver EI-02.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-02)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EI-05-transfer",
-      "claim_summary": "Two-way transfer with ATK/ELTE/MATE delivers increased R&I capacity/knowledge transfer.",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-05); docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-AGRI-ENV-nofixed",
-      "claim_summary": "Development crop processing tomato (2022-2026); no fixed-% water-saving promise.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-AGRI-ENV)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "magnitude-range",
-      "claim_summary": "Published water-saving effects ~8-30% cited as bounded literature context only.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (impact_magnitude_evidence)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "magnitude-carucci",
-      "claim_summary": "Carucci et al. 2023: ~30% vs empirical / ~7.5% vs ET-based, bounded context.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (Carucci et al. 2023)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "magnitude-badr",
-      "claim_summary": "Badr et al. 2026: ~25% saving without significant yield loss, bounded context.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (Badr et al. 2026)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "decision-value-form",
-      "claim_summary": "Project's claimed value: stress detection, lead time, uncertainty honesty, usability, relevance.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (adopted_claim_form)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "water-saving-conditional",
-      "claim_summary": "Prospective water-saving claimed only if the field arrangement supports it.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (adopted_claim_form)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-TECH-ECON",
-      "claim_summary": "Crop-configurable DrR web MVP as research-to-testing route; value via measured quantities.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-TECH-ECON)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "deliverables-named",
-      "claim_summary": "Named deliverables (model card; crop-transfer spec; M18 transferability report; M24 MVP; M30 assessment/roadmap).",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (deliverables)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-EU-SOC-eu",
-      "claim_summary": "Eurostat ~2.0M ha fresh vegetables (2023) and ~0.7M EU farms (2020) as potential domain scale.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-EU-SOC)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "IMP-EU-SOC-bg",
-      "claim_summary": "Bulgaria ~35.6k ha vegetables and ~128k t tomato (2024); post-MSCA MVCRI route.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-EU-SOC)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "sdg",
-      "claim_summary": "FIELDWISE contributes to SDG 2, 6, 12 and 13.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (IMP-EU-SOC)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "EI-03-engagement",
-      "claim_summary": "Cross-border pathway broadens public and practitioner engagement (EI-03).",
-      "status": "confirmed",
-      "source_ref": "docs/tier2b_topic_and_call_sources/extracted/expected_impacts.json (EI-03); docs/tier3_project_instantiation/architecture_inputs/impacts.json",
-      "flag_reason": "Same EI-03 labelling caveat as c_ei03_map; traceable via Tier 3 impacts.json mapping."
-    },
-    {
-      "claim_id": "kpi-discipline",
-      "claim_summary": "Eleven-KPI set (K1-K11), each traceable to a named deliverable, no advance numeric water-saving promise.",
-      "status": "confirmed",
-      "source_ref": "docs/tier3_project_instantiation/architecture_inputs/impacts.json (kpis)",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "post-msca-mvcri",
-      "claim_summary": "Post-MSCA MVCRI replication route extends reach beyond the 24-month programme, no in-action effort.",
-      "status": "confirmed",
-      "source_ref": "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json (MVCRI); docs/tier3_project_instantiation/architecture_inputs/outcomes.json",
+      "source_ref": "review_packet.json (top-level keys: schema_id, run_id, findings, revision_actions)",
       "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 77,
-    "confirmed": 67,
+    "total_claims": 10,
+    "confirmed": 10,
     "inferred": 0,
-    "assumed": 10,
+    "assumed": 0,
     "unresolved": 0
   },
-  "no_unsupported_claims_declaration": false,
+  "no_unsupported_claims_declaration": true,
   "timestamp": "2026-09-03T00:00:00Z"
 }
