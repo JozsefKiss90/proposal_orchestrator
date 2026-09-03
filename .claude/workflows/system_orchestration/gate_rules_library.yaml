@@ -2035,7 +2035,14 @@ gate_rules:
           may be invented. Violations per CLAUDE.md §13.3.
         prose_condition: "No invented project facts in Tier 5 — CLAUDE.md §13.3"
 
+      # Instrument-conditional on source (C1, §8.1/§8.4), mirroring the
+      # g11_p07/g11_uc01 split: the lump-sum contradiction check judges
+      # against the validated external response recorded in
+      # budget_gate_assessment.json; the unit-cost variant judges against
+      # the §8.1 deterministic derivation in unit_cost_budget.json.
       - predicate_id: g11_p10
+        applies_when:
+          budget_regime: lump_sum
         type: semantic
         function: no_budget_gate_contradiction
         args:
@@ -2047,6 +2054,24 @@ gate_rules:
           validated budget response. No budget-dependent content may be
           finalised before and without the budget gate. Violations per
           CLAUDE.md §8.4, §13.4.
+        prose_condition: "No budget-dependent finalisation before gate pass — CLAUDE.md §8.4, §13.4"
+
+      - predicate_id: g11_uc02
+        applies_when:
+          budget_regime: unit_cost
+        type: semantic
+        function: no_budget_gate_contradiction_unit_cost
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          phase7_path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          One or more Tier 5 sections reference a specific budget figure,
+          effort allocation, or resource commitment that contradicts the
+          deterministic unit-cost budget derivation (§8.1) in
+          unit_cost_budget.json — its gate_pass_declaration, total,
+          line-item amounts, monthly rates, or confirmed months. No
+          budget-dependent content may be finalised before and without
+          the budget gate. Violations per CLAUDE.md §8.4, §13.4.
         prose_condition: "No budget-dependent finalisation before gate pass — CLAUDE.md §8.4, §13.4"
 
       - predicate_id: g11_p11

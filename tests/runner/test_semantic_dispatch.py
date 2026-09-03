@@ -285,12 +285,13 @@ class TestValidateSemanticResultInvalid:
 
 
 class TestSemanticRegistry:
-    def test_registry_contains_all_seven_predicates(self) -> None:
+    def test_registry_contains_all_eight_predicates(self) -> None:
         expected = {
             "no_unresolved_scope_conflicts",
             "no_cross_tier_contradictions",
             "no_unsupported_tier5_claims",
             "no_budget_gate_contradiction",
+            "no_budget_gate_contradiction_unit_cost",
             "no_higher_tier_contradiction",
             "no_forbidden_schema_authority",
             "no_gap_masked_as_confirmed",

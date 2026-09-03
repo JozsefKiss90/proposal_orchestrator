@@ -163,6 +163,25 @@ SEMANTIC_REGISTRY: dict[str, SemanticPredicateConfig] = {
             "validated budget response."
         ),
     ),
+    "no_budget_gate_contradiction_unit_cost": SemanticPredicateConfig(
+        function="no_budget_gate_contradiction_unit_cost",
+        agent="constitutional_compliance_check",
+        constitutional_rule="CLAUDE.md §8.4, §13.4",
+        description=(
+            "No Tier 5 section references a specific budget figure, effort "
+            "allocation, or resource commitment that contradicts the "
+            "deterministic unit-cost budget derivation (CLAUDE.md §8.1) in "
+            "unit_cost_budget.json: its gate_pass_declaration, total, "
+            "line-item amounts, monthly rates, or confirmed months. For a "
+            "unit-cost instrument this derivation IS the validated budget; "
+            "no external budget response exists or is required, and its "
+            "absence is not a violation. Person-month distributions across "
+            "work packages and in-kind partner contributions are not "
+            "unit-cost budget lines; they violate this predicate only if "
+            "they contradict the derivation (for example a researcher "
+            "effort total inconsistent with confirmed_months)."
+        ),
+    ),
     "no_higher_tier_contradiction": SemanticPredicateConfig(
         function="no_higher_tier_contradiction",
         agent="constitutional_compliance_check",

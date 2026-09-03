@@ -8,58 +8,58 @@
   "claim_audit_results": [
     {
       "claim_id": "ASSEMBLY-01",
-      "claim_summary": "Assembled draft has correct schema_id and a non-empty sections[] index (3 sections).",
+      "claim_summary": "Assembled draft has schema_id orch.tier5.part_b_assembled_draft.v1 and non-empty sections[] (3 sections).",
       "status": "confirmed",
       "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-02",
-      "claim_summary": "sections[] references exactly excellence, impact and implementation; all three artifact_paths exist on disk.",
+      "claim_summary": "sections[] references exactly three section_ids (excellence, impact, implementation) and each artifact_path exists on disk.",
       "status": "confirmed",
-      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json, impact_section.json, implementation_section.json}",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json,impact_section.json,implementation_section.json}",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-03",
-      "claim_summary": "Section order is correct: excellence=1, impact=2, implementation=3.",
+      "claim_summary": "Section order correct: excellence=1, impact=2, implementation=3.",
       "status": "confirmed",
       "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-04",
-      "claim_summary": "All three referenced sections expose a non-empty traceability_footer.primary_sources array.",
+      "claim_summary": "All three referenced sections expose non-empty traceability_footer.primary_sources (excellence 16, impact 17, implementation 11).",
       "status": "confirmed",
-      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (traceability_footer.primary_sources)",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json,impact_section.json,implementation_section.json}",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-05",
-      "claim_summary": "All three referenced sections declare traceability_footer.no_unsupported_claims_declaration = true.",
+      "claim_summary": "All three sections declare traceability_footer.no_unsupported_claims_declaration=true.",
       "status": "confirmed",
-      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (traceability_footer.no_unsupported_claims_declaration)",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json,impact_section.json,implementation_section.json}",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-06",
-      "claim_summary": "All three referenced sections have validation_status.overall_status = 'assumed' (not 'unresolved') with non-empty claim_statuses[].",
+      "claim_summary": "All three sections have validation_status.overall_status='assumed' (not unresolved) with non-empty claim_statuses.",
       "status": "confirmed",
-      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (validation_status)",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json,impact_section.json,implementation_section.json}",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-07",
-      "claim_summary": "consistency_log[] present and non-empty (CC-01..CC-12); every entry status = 'consistent'; no 'unresolved' or 'inconsistency_flagged' entry.",
+      "claim_summary": "consistency_log present with 12 entries (CC-01..CC-12); every entry status='consistent'; no inconsistency_flagged or unresolved entry.",
       "status": "confirmed",
-      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json (consistency_log)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
       "claim_id": "ASSEMBLY-08",
-      "claim_summary": "Assembled draft carries its own traceability_footer with non-empty primary_sources and no_unsupported_claims_declaration = true, consistent with the section-level declarations.",
+      "claim_summary": "Assembled draft carries a traceability_footer with non-empty primary_sources (7) and no_unsupported_claims_declaration=true, consistent with the section-level declarations.",
       "status": "confirmed",
-      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json (traceability_footer)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     }
   ],
