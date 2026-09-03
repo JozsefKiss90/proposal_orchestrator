@@ -1962,7 +1962,13 @@ gate_rules:
           runner before gate_12 can pass.
         prose_condition: "Phase 8 checkpoint published"
 
+      # Instrument-conditional on source (C1, §8.1/§8.4): the lump-sum
+      # confirmation lives in budget_gate_assessment.json; the unit-cost
+      # confirmation lives in unit_cost_budget.json (the §8.1 deterministic
+      # derivation).  Mirrors the gate_09 applies_when split.
       - predicate_id: g11_p07
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: budget_gate_confirmation_present
         args:
@@ -1972,6 +1978,21 @@ gate_rules:
           absent or does not equal "pass". The budget gate confirmation must
           be positively present in the Phase 7 assessment artifact at the
           time of final gate evaluation.
+        prose_condition: "Budget gate confirmation present"
+
+      - predicate_id: g11_uc01
+        applies_when:
+          budget_regime: unit_cost
+        type: schema
+        function: unit_cost_budget_resolved
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          The unit-cost budget derivation is not positively confirmed at final
+          gate evaluation: unit_cost_budget.json is absent, one or more budget
+          components (including host-dependent lines) are Unresolved, or
+          gate_pass_declaration is not "pass". The §8.1 deterministic
+          derivation must be fully resolved before gate_12 can pass.
         prose_condition: "Budget gate confirmation present"
 
       # --- coverage predicates ---

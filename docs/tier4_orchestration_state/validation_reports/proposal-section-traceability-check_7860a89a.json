@@ -1,85 +1,71 @@
 {
-  "report_id": "traceability_review_packet_traceability_auditor_2026-09-03T00:00:00Z",
+  "report_id": "traceability_part_b_assembled_draft_proposal_integrator_2026-09-03T00:00:00Z",
   "skill_id": "proposal-section-traceability-check",
-  "invoking_agent": "traceability_auditor",
+  "invoking_agent": "proposal_integrator",
   "run_id_reference": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
-  "section_id_audited": "review_packet",
-  "audit_mode": "review_packet_structural_index",
+  "section_id_audited": "part_b_assembled_draft",
+  "audit_mode": "assembled_structural_index",
   "claim_audit_results": [
     {
-      "claim_id": "RP-01",
-      "claim_summary": "Review packet exists, valid JSON, schema_id=orch.tier5.review_packet.v1",
+      "claim_id": "ASSEMBLY-01",
+      "claim_summary": "Assembled draft has correct schema_id and a non-empty sections[] index (3 sections).",
       "status": "confirmed",
-      "source_ref": "docs/tier5_deliverables/review_packets/review_packet.json",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-02",
-      "claim_summary": "run_id present and matches current run_id",
+      "claim_id": "ASSEMBLY-02",
+      "claim_summary": "sections[] references exactly excellence, impact and implementation; all three artifact_paths exist on disk.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:run_id",
+      "source_ref": "docs/tier5_deliverables/proposal_sections/{excellence_section.json, impact_section.json, implementation_section.json}",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-03",
-      "claim_summary": "findings[] non-empty array; all 12 findings have required fields",
+      "claim_id": "ASSEMBLY-03",
+      "claim_summary": "Section order is correct: excellence=1, impact=2, implementation=3.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:findings[]",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-04",
-      "claim_summary": "Every severity value valid (major/minor within allowed set)",
+      "claim_id": "ASSEMBLY-04",
+      "claim_summary": "All three referenced sections expose a non-empty traceability_footer.primary_sources array.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:findings[].severity",
+      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (traceability_footer.primary_sources)",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-05",
-      "claim_summary": "revision_actions[] non-empty since findings non-empty; linkage constraint holds",
+      "claim_id": "ASSEMBLY-05",
+      "claim_summary": "All three referenced sections declare traceability_footer.no_unsupported_claims_declaration = true.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:revision_actions[]",
+      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (traceability_footer.no_unsupported_claims_declaration)",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-06",
-      "claim_summary": "Every revision action has all required fields",
+      "claim_id": "ASSEMBLY-06",
+      "claim_summary": "All three referenced sections have validation_status.overall_status = 'assumed' (not 'unresolved') with non-empty claim_statuses[].",
       "status": "confirmed",
-      "source_ref": "review_packet.json:revision_actions[]",
+      "source_ref": "excellence_section.json, impact_section.json, implementation_section.json (validation_status)",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-07",
-      "claim_summary": "Every revision_actions[].finding_id references an existing finding (A-1..A-12 map to F-1..F-12)",
+      "claim_id": "ASSEMBLY-07",
+      "claim_summary": "consistency_log[] present and non-empty (CC-01..CC-12); every entry status = 'consistent'; no 'unresolved' or 'inconsistency_flagged' entry.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:revision_actions[].finding_id",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json (consistency_log)",
       "flag_reason": null
     },
     {
-      "claim_id": "RP-08",
-      "claim_summary": "Every finding has non-empty evidence and recommendation",
+      "claim_id": "ASSEMBLY-08",
+      "claim_summary": "Assembled draft carries its own traceability_footer with non-empty primary_sources and no_unsupported_claims_declaration = true, consistent with the section-level declarations.",
       "status": "confirmed",
-      "source_ref": "review_packet.json:findings[]",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "RP-09",
-      "claim_summary": "No finding has severity omitted/null or outside {critical,major,minor}",
-      "status": "confirmed",
-      "source_ref": "review_packet.json:findings[].severity",
-      "flag_reason": null
-    },
-    {
-      "claim_id": "RP-10",
-      "claim_summary": "No finalized_text/final_draft/revised_content top-level keys present",
-      "status": "confirmed",
-      "source_ref": "review_packet.json (top-level keys: schema_id, run_id, findings, revision_actions)",
+      "source_ref": "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json (traceability_footer)",
       "flag_reason": null
     }
   ],
   "summary": {
-    "total_claims": 10,
-    "confirmed": 10,
+    "total_claims": 8,
+    "confirmed": 8,
     "inferred": 0,
     "assumed": 0,
     "unresolved": 0

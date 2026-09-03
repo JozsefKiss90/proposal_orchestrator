@@ -2,17 +2,17 @@
   "schema_id": "orch.gate_result.v1",
   "gate_id": "gate_12_constitutional_compliance",
   "gate_kind": "exit",
-  "run_id": "fieldwise-run-02",
+  "run_id": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
   "manifest_version": "1.1",
   "library_version": "1.0",
   "constitution_version": "21430b0",
-  "input_fingerprint": "sha256:9ee20af2cc4f0c06d15dee558717efbfdd91a999623fc447ddaae375a59cd5bc",
+  "input_fingerprint": "sha256:c440ae83b4c26918888c2a653aea5d29ac138a521fdc62c13b1be2c242ebcbe6",
   "input_artifact_fingerprints": {
-    "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json": "sha256:a7cb65f7fea2d8a5cd797d6a9fb340554cab2b8880faadb054491dcfa1379bac",
-    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:ba8e622fc714b60d60e55fcce013e50a9c2bac7ebdae2c0b78ac61af85201ec8",
-    "docs/tier5_deliverables/final_exports/final_export.json": "sha256:25f2ccd372ecae7f52ca76bb032dc57016b1a4663a42a23eb1181867a84fc973"
+    "docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json": "sha256:2984ebc8e54887a450217e8c07d4e4dc02a579ce4c30ce60b4a588a5e47fb94d",
+    "docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json": "sha256:86205c5413699efd522c527112da80dd397aba00aa0cee4a2a12617cb769f603",
+    "docs/tier5_deliverables/final_exports/final_export.json": "sha256:19056c9ed9ce825d5d542e0f3c5c7c603ea8a89e6c924fd7903d8376fc6adf21"
   },
-  "evaluated_at": "2026-08-29T16:30:36.910616+00:00",
+  "evaluated_at": "2026-09-03T10:24:48.384088+00:00",
   "repo_root": "C:\\Code\\proposal_demo\\proposal_orchestrator",
   "status": "fail",
   "deterministic_predicates": {
@@ -23,72 +23,33 @@
       "g11_p01",
       "g11_p04",
       "g11_p06",
-      "g11_p07",
       "g11_p02"
-    ],
-    "failed": []
-  },
-  "semantic_predicates": {
-    "passed": [
-      "g11_p10",
-      "g11_p08",
-      "g11_p09",
-      "g11_p12"
     ],
     "failed": [
       {
-        "predicate_id": "g11_p11",
-        "function": "no_higher_tier_contradiction",
-        "failure_reason": "semantic_fail",
-        "constitutional_rule": "CLAUDE.md \u00a713.2, \u00a711.3",
-        "findings": [
-          {
-            "claim": "In sub-section 2.2, the impact section asserts the fellowship's measures serve expected impact EI-05: 'to strengthen knowledge transfer and R&I capacity among participating organisations (EI-05, EI-06)' and again in the fit summary 'dissemination through the model card, crop-transfer specification, publications and teaching route serves EI-05 and EI-06'. However, Tier 2B expected_impacts.json defines EI-05 solely as 'Enhanced nuclear expertise and excellence and strengthened synergies between Programmes through Euratom-supported fellowships in nuclear research areas.' FIELDWISE is a non-Euratom agricultural water-stress fellowship (instrument_registry: MSCA-PF, not a nuclear-research area), so the asserted contribution to the Euratom nuclear-expertise impact is not traceable to Tier 2B for the selected topic; the substantive knowledge-transfer/R&I-capacity claim is supported only by EI-06.",
-            "violated_rule": "CLAUDE.md \u00a711.3",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
-            "severity": "major"
-          }
-        ],
-        "fail_message": "The impact section (sub-section 2.2) claims the project contributes to expected impact EI-05, which Tier 2B defines exclusively as a Euratom nuclear-research impact inapplicable to this agricultural MSCA-PF fellowship, so the asserted impact is not traceable to Tier 2B for the selected topic.",
-        "artifacts_inspected": [
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\implementation_section.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2a_instrument_schemas\\extracted\\evaluator_expectation_registry.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2a_instrument_schemas\\extracted\\instrument_registry.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2a_instrument_schemas\\extracted\\section_schema_registry.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2a_instrument_schemas\\extracted\\template_adapter_map.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\call_constraints.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\eligibility_conditions.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\evaluation_priority_weights.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\expected_impacts.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\expected_outcomes.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\scope_requirements.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier2b_topic_and_call_sources\\extracted\\unit_cost_rates.json"
-        ]
-      },
-      {
-        "predicate_id": "g11_p13",
-        "function": "no_gap_masked_as_confirmed",
-        "failure_reason": "semantic_fail",
-        "constitutional_rule": "CLAUDE.md \u00a712.2",
-        "findings": [
-          {
-            "claim": "excellence_section.json claim 'agrovir_production_footprint' ('AgroVIR operates an FMIS in production use across more than 745,000 hectares in eight countries, including Hungary and Bulgaria') is marked status 'confirmed' and sourced to consortium/capabilities.json, yet the identical fact is carried as claim 'agrovir_relevant_track_record' with status 'assumed' (assumption_declared: true, sourced to working_assumptions.json) in both impact_section.json and implementation_section.json, where the prose states it is 'the operator's declared position pending the company's written confirmation.' The Confirmed labelling in the Excellence section masks an underlying Assumed status.",
-            "violated_rule": "CLAUDE.md \u00a712.2",
-            "evidence_path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-            "severity": "major"
-          }
-        ],
-        "fail_message": "The Excellence section marks AgroVIR's 745,000-hectare production footprint as 'Confirmed' while the same fact is an operator-declared 'Assumed' claim (pending written confirmation) in the Impact and Implementation sections, masking a gap as confirmed in violation of CLAUDE.md \u00a712.2.",
-        "artifacts_inspected": [
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\excellence_section.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\impact_section.json",
-          "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier5_deliverables\\proposal_sections\\implementation_section.json"
-        ]
+        "predicate_id": "g11_p07",
+        "type": "schema",
+        "function": "budget_gate_confirmation_present",
+        "args": {
+          "path": "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/budget_gate_assessment.json"
+        },
+        "failure_category": "POLICY_VIOLATION",
+        "reason": "Budget gate declaration is 'fail' (expected 'pass') in C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json.  Phase 8 is blocked until the budget gate passes.",
+        "details": {
+          "path": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase7_budget_gate\\budget_gate_assessment.json",
+          "gate_pass_declaration": "fail",
+          "expected": "pass"
+        },
+        "fail_message": "The gate_pass_declaration field in budget_gate_assessment.json is absent or does not equal \"pass\". The budget gate confirmation must be positively present in the Phase 7 assessment artifact at the time of final gate evaluation.\n",
+        "prose_condition": "Budget gate confirmation present"
       }
     ]
   },
-  "skipped_semantic": false,
+  "semantic_predicates": {
+    "passed": [],
+    "failed": [],
+    "skipped": true
+  },
+  "skipped_semantic": true,
   "report_written_to": "C:\\Code\\proposal_demo\\proposal_orchestrator\\docs\\tier4_orchestration_state\\phase_outputs\\phase8_drafting_review\\gate_12_result.json"
 }
