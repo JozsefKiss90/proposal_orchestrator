@@ -3,6 +3,7 @@
   "date": "2026-09-03",
   "run_id": "7860a89a-9285-4b08-a8d1-1c42777eae2c",
   "comment_timestamp": "2026-09-03T00:00:00Z",
+  "stage3_note": "STAGE 3 (2026-09-04): every action now carries a `resolution` block (answer summary + where it was applied), sourced from plans/reports/FIELDWISE_open_decisions_round3_2026-09-04_reply.md and recorded in decision_log/od-round3-resolutions_2026-09-04.json. The annotator renders resolved actions with a green marker and a RESOLVED comment prefix (question/fallback retained for audit). Match strings were re-verified against the Stage-3-edited section artifacts; A-6's match follows the rewritten WP3 lead line.",
   "purpose": "Hand-authored anchor map for Stage 1 of plans/partb_final_drafting_strategy_2026-09-03.md. Maps each unresolved revision action of drafting_review_status.json (run 7860a89a) to exact paragraph anchors in the run-03 section artifacts, and declares the three draft-resolvable insertions. Consumed by tools/annotate_part_b_draft.py; keeping this map as data makes the annotation re-runnable when the draft regenerates. Anchors use the established draft ¶-numbering scheme (paragraph = 1-based index over blank-line-separated blocks of the sub-section content, identical to the docx exporter's block split). Every anchor carries a `match` substring that must be present in the target paragraph — the annotator fails closed on any mismatch, so a regenerated draft can never be silently mis-annotated.",
   "actions": [
     {
@@ -14,7 +15,8 @@
         {"sub_section_id": "1.2", "paragraph": 6, "match": "primary model frozen and its model card registered"}
       ],
       "question": "Choose the reconciliation of the month-3 freeze vs the month-14 D1.1/D1.2 delivery: (a) state that a provisional stress-target and validation protocol are fixed and documented before the month-3 D2.1 freeze, with D1.1/D1.2 as their month-14 formalisation, or (b) shift the D1.1/D1.2 due months so the defining protocol and harmonised base precede D2.1 (touches the work plan and Gantt).",
-      "fallback": "Keep the current due months and add no reconciliation claim; the sequencing tension stays flagged in the deliverable (§13.8)."
+      "fallback": "Keep the current due months and add no reconciliation claim; the sequencing tension stays flagged in the deliverable (§13.8).",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Option (b): move the defining deliverables forward so they precede the Model v1 freeze; D1.1 due M2, D1.2 due M3; freeze at the end of M3; sequencing reflected consistently in the Gantt and deliverable table.", "applied": "Paired edits to workpackage_seed.json (explicit due months + notes) and wp_structure.json (due_month 14 -> 2/3); task months unchanged (T1.1-T1.5 already at M1-M3). Prose: 1.1 ¶4 months corrected, 1.2 ¶6 front-loading sentences added, 3.1 WP1 timeline bullet updated, claim ledgers updated."}
     },
     {
       "action_id": "A-2",
@@ -24,7 +26,8 @@
         {"sub_section_id": "1.1", "paragraph": 6, "match": "Beyond the state of the art"}
       ],
       "question": "State the new, citable scientific knowledge the validation framework yields and what is currently not achievable — a scientific claim only the fellow/supervisor can commit to.",
-      "fallback": "Retain the current framing (advance located in the validation framework and parsimony) without a sharpened beyond-state-of-the-art claim."
+      "fallback": "Retain the current framing (advance located in the validation framework and parsimony) without a sharpened beyond-state-of-the-art claim.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Confirmed: three citable outputs (model D2.1; prospectively quantified research-to-commercial-field transfer gap D3.2; crop-transfer specification D2.2); the principal new knowledge is the quantified transfer-validity evidence — the transfer gap is currently asserted or assumed in the literature, not prospectively measured.", "applied": "1.1 ¶6 extended with the three outputs and the not-currently-achievable statement; declaration transfer_gap_novelty_claim in working_assumptions.json."}
     },
     {
       "action_id": "A-3",
@@ -34,7 +37,8 @@
         {"sub_section_id": "1.3", "paragraph": 8, "match": "stated transparently"}
       ],
       "question": "Can evidence be cited that the ELTE associated-partner and co-supervision confirmations are secured or imminent, and what host-side continuity safeguard protects the modelling/EO training strand if the ELTE arrangement changes?",
-      "fallback": "Keep the transparent operator-declared Assumed status of the forward-looking commitments as drafted in 1.3, with no safeguard claim added."
+      "fallback": "Keep the transparent operator-declared Assumed status of the forward-looking commitments as drafted in 1.3, with no safeguard claim added.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Declined: neither written confirmation nor a submission is required for the call; ELTE is a trusted partner, the contribution is confidential, and the arrangement won't change. No securing-evidence or safeguard text is added.", "applied": "Fallback-plus resolution: 1.3 ¶8 unchanged (transparent Assumed statement stands); declaration elte_confirmation_policy records the no-letters position and the Tier 2B consistency check; ELTE keys stay Assumed, conversion expected at grant preparation."}
     },
     {
       "action_id": "A-4",
@@ -44,7 +48,8 @@
         {"sub_section_id": "2.3", "paragraph": 4, "match": "8–30% range"}
       ],
       "question": "Provide conditional, method-anchored expected-effect ranges (detection lead-time; the water-productivity improvement envelope the design is powered to show) that the fellow and supervisor will commit to as a defensible expectation.",
-      "fallback": "Keep the bounded literature ranges (~8–30%) only, as currently drafted — 2.3 deliberately declines project-specific quantified targets (prior operator decision)."
+      "fallback": "Keep the bounded literature ranges (~8–30%) only, as currently drafted — 2.3 deliberately declines project-specific quantified targets (prior operator decision).",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Committed formulation without numbers: lead time is quantified prospectively via the pre-registered metric, no fixed numerical lead-time benefit pre-validation; published water-saving ranges are contextual benchmarks only; the project's quantified contribution is measured validity, transfer performance, uncertainty and decision value.", "applied": "2.3 ¶4 extended with the numberless method-anchored formulation; the handout's bracketed lead-time envelope is struck; the prior operator decision (no numeric targets) is preserved."}
     },
     {
       "action_id": "A-5",
@@ -55,17 +60,19 @@
       ],
       "resolution_note": "Resolved in draft (table half): a month-by-month task-loading table at the WP1/WP3/WP4 overlap is inserted after this paragraph, derived strictly from phase4 gantt.json task month-assignments — derived from Tier 4, no new fact. No per-month person-month split is asserted: gantt.json carries no per-task effort, so a per-month PM allocation would be an invented fact (§13.3); the table shows concurrent task activity, cross-referenced to the aggregate per-WP person-months already stated in 3.1.",
       "question": "Confirm the in-kind offload framing at the M4–M14 peak: do the partners' stated in-kind contributions (host supervisor 2.5 PM, ELTE co-supervisor 2.0 PM, AgroVIR 3.0 PM, MATE 2.4 PM, КРУМАТИК ЕООД 1.5 PM — all operator-declared pending written confirmation) offload the fellow at the WP1/WP3/WP4 overlap, and may the prose say so?",
-      "fallback": "The task-loading table stands as a Tier 4 derivation; the offload framing stays an operator-declared commitment pending each partner's written confirmation, exactly as 3.1 already states."
+      "fallback": "The task-loading table stands as a Tier 4 derivation; the offload framing stays an operator-declared commitment pending each partner's written confirmation, exactly as 3.1 already states.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Confirmed ('Yes'): the in-kind contributions are deliberately structured to reduce the fellow's peak workload in the overlapping period — ATK supervision, MATE data support, ELTE EO work, Krumatic software engineering. Person-month figures remain identified as Assumed until written confirmation.", "applied": "Offload sentences added at 3.1 ¶16; declaration inkind_offload_framing; per-partner PM keys unchanged (stay Assumed). The table half was already resolved in draft."}
     },
     {
       "action_id": "A-6",
       "kind": "needs_input",
       "owner": "operator + fellow",
       "anchors": [
-        {"sub_section_id": "3.1", "paragraph": 5, "match": "lead: the independent commercial-farmer validation site"}
+        {"sub_section_id": "3.1", "paragraph": 5, "match": "scientific lead: the fellow at the beneficiary"}
       ],
       "question": "Approve reassigning WP3 scientific leadership to the fellow/beneficiary, with the farmer site as a hosting environment, citing the T3.1 access agreement and the contingency ladder as the mitigating controls? This changes a recorded WP-lead fact: it requires the paired Tier 3 edit (roles.json / workpackage_seed.json, reusing existing ids per the id-stability rule) before the prose changes.",
-      "fallback": "The WP3 lead attribution remains as recorded in Tier 3/4 (the independent commercial-farmer validation site), unchanged."
+      "fallback": "The WP3 lead attribution remains as recorded in Tier 3/4 (the independent commercial-farmer validation site), unchanged.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Confirmed ('absolutely yes'): WP3 scientific leadership is assigned to Dr. Rositsa Cholakova at the beneficiary HUN-REN ATK, under Prof. Tibor Janda's supervision; the commercial farmer provides the independent production-scale hosting and measurement environment and does not lead the scientific work package.", "applied": "Paired edits first: roles.json (FELLOW executes + VALIDATION_SITE note), workpackage_seed.json (WP3 scientific_lead_note; Pack month-line string kept verbatim), wp_structure.json (lead_partner VALIDATION_SITE -> HOST, matrix + task/deliverable responsibility), gantt.json (T3.x responsible_partner). Then 3.1 ¶5 WP3 bullet rewritten (this anchor's match string follows the new text). Ids unchanged."}
     },
     {
       "action_id": "A-8",
@@ -76,7 +83,8 @@
       ],
       "resolution_note": "Resolved in draft (KPI half): the career KPI exists in the Tier 4 KPI set as K11 (phase5 impact_architecture.json) and is named in an inserted sentence at this anchor — derived from Tier 4, no new fact.",
       "question": "Anchor the employability breadth in one or two concrete post-fellowship trajectories (for example the recorded Maritsa/MVCRI post-MSCA replication-and-transfer route already in 3.2, plus one other destination the fellow will commit to).",
-      "fallback": "Keep the named career KPI (K11) and the existing breadth framing, without additional trajectory claims."
+      "fallback": "Keep the named career KPI (K11) and the existing breadth framing, without additional trajectory claims.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Owner named two trajectories: (1) an independent Agricultural Data Scientist/researcher role at the plant-science / Earth-observation / agtech interface, building on the FIELDWISE modelling and AgroVIR experience; (2) an independent research and innovation line in Bulgaria applying the validated FIELDWISE methodology and DrR concept to other irrigated high-value horticultural crops.", "applied": "2.1 ¶2 extended with the owner's wording (the handout's inferred Maritsa/MVCRI naming is dropped — the answer supersedes the draft answer); declaration post_fellowship_trajectories. The KPI half (K11) was already resolved in draft."}
     },
     {
       "action_id": "A-9",
@@ -86,7 +94,8 @@
         {"sub_section_id": "2.2", "paragraph": 5, "match": "one public field demonstration with farmers and one public-facing article per year"}
       ],
       "question": "Confirm a small set of measurable dissemination/uptake indicators with numbers (audiences reached, farmer participants, MVP evaluation users) tied to the named channels, proportionate to a single-researcher action — the numbers need owner confirmation and cannot be invented (§13.2/§13.3).",
-      "fallback": "Retain the output-count success measures as drafted (papers; one public field demonstration and one public-facing article per year)."
+      "fallback": "Retain the output-count success measures as drafted (papers; one public field demonstration and one public-facing article per year).",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Numbers committed: >=15 practitioners/growers per field demonstration; >=300 views/readers per article where analytics exist; all six AgroVIR evaluation dimensions completed; repository downloads/citations monitored rather than promised. The reply's supplementary block (labelled A-12 there) adds EGU + ECPA as the two conference targets and an output list including >=2 manuscripts submitted with >=1 targeted for in-fellowship publication.", "applied": "2.2 ¶5 extended with the indicator set and the named events; declaration dissemination_uptake_indicators. The review's A-12 stays resolved and untouched."}
     },
     {
       "action_id": "A-10",
@@ -96,7 +105,8 @@
         {"sub_section_id": "2.3", "paragraph": 6, "match": "Eurostat reports fresh vegetables"}
       ],
       "question": "Provide a citable source and figure quantifying the near-term reachable processing-tomato segment in the target countries (e.g. processing-tomato area in Hungary and Bulgaria), so the scale claim graduates from what the action touches to the wider EU potential.",
-      "fallback": "Keep the EU-domain figures and the qualitative Bulgarian vegetable/tomato context without a reachable-segment number."
+      "fallback": "Keep the EU-domain figures and the qualitative Bulgarian vegetable/tomato context without a reachable-segment number.",
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Wording supplied: near-term segment = processing-tomato sectors of HU + BG; Univer network ~1,500 ha / ~100 farmers / 70-80% of national production (no source named); WPTC ~1,100 ha contracted/harvested by the three main BG operations in 2024 (700 Balkan Foods + ~400 two others); ~2,600 ha total.", "applied": "2.3 ¶6 extended; the Hungarian figures carry an in-text 'citation pending, flagged' marker (§13.8) until the operator supplies the source — the one open sub-item of this round; declaration near_term_segment_processing_tomato records the source-pending status."}
     },
     {
       "action_id": "A-11",
@@ -107,7 +117,8 @@
       ],
       "resolution_note": "Resolved in draft: a one-line numbering-gap note is inserted after the WP list, grounded in the OD-1 merge recorded in the assembled draft's consistency log (CC-02: 'no WP2; merged into WP1 per OD-1') and the id-stability rule of the run-03 instantiation record. Verify wording, then veto or accept.",
       "question": null,
-      "fallback": null
+      "fallback": null,
+      "resolution": {"resolved_on": "2026-09-04", "answer_summary": "Verified by the owner ('A-11 verifed' in the reply) — no veto; the numbering-gap note stands as drafted.", "applied": "No change needed; the draft-resolved insertion is confirmed."}
     }
   ],
   "insertions": [

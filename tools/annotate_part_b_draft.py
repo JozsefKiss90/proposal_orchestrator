@@ -413,6 +413,14 @@ def _comment_text(
     action: dict[str, Any], description: str
 ) -> str:
     parts = [f"{action['action_id']} ({action['kind']}): {description}"]
+    resolution = action.get("resolution")
+    if resolution:
+        parts.insert(
+            0,
+            f"RESOLVED ({resolution['resolved_on']}, OD round-3 answer): "
+            f"{resolution['answer_summary']}",
+        )
+        parts.insert(1, f"Applied: {resolution['applied']}")
     if action.get("resolution_note"):
         parts.append(f"Resolution note: {action['resolution_note']}")
     if action.get("question"):
@@ -495,7 +503,13 @@ def build_annotated_draft(
 
     def add_marker(paragraph: Any, action: dict[str, Any]) -> None:
         run = paragraph.add_run(f" [{action['action_id']}]")
-        run.font.highlight_color = WD_COLOR_INDEX.YELLOW
+        # a resolved action (Stage 3, OD round-3 answer applied) turns its
+        # marker green; an open question stays yellow
+        run.font.highlight_color = (
+            WD_COLOR_INDEX.BRIGHT_GREEN
+            if action.get("resolution")
+            else WD_COLOR_INDEX.YELLOW
+        )
         run.bold = True
         text = _comment_text(action, descriptions[action["action_id"]])
         doc.add_comment(
@@ -737,6 +751,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         default=DEFAULT_OUTPUT_NAME,
         help=f"File name under final_exports/ (default: {DEFAULT_OUTPUT_NAME})",
     )
+    parser.add_argument(
+        "--verification-report",
+        default=None,
+        help=(
+            "Repo-relative path for the verification report (default: "
+            f"{VERIFICATION_REPORT_REL})"
+        ),
+    )
     args = parser.parse_args(argv)
 
     repo_root = (
@@ -746,6 +768,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         result = build_annotated_draft(
             repo_root,
             output_path=repo_root / FINAL_EXPORTS_REL / args.output_name,
+            verification_report_path=(
+                repo_root / args.verification_report
+                if args.verification_report
+                else None
+            ),
         )
     except AnnotationError as exc:
         print(f"[ERROR] {exc}")

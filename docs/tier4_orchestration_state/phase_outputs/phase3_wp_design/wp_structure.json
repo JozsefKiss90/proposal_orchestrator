@@ -87,14 +87,14 @@
           "deliverable_id": "D1.1",
           "title": "Harmonised database/metadata and variable-availability map",
           "type": "dataset",
-          "due_month": 14,
+          "due_month": 2,
           "responsible_partner": "HOST"
         },
         {
           "deliverable_id": "D1.2",
           "title": "Stress-target, feature-selection and validation protocol",
           "type": "report",
-          "due_month": 14,
+          "due_month": 3,
           "responsible_partner": "HOST"
         },
         {
@@ -127,48 +127,60 @@
       "objectives": [
         "Validate the frozen primary model prospectively at an independent commercial farm"
       ],
-      "lead_partner": "VALIDATION_SITE",
+      "lead_partner": "HOST",
       "contributing_partners": [
         "DATA_PARTNER",
         "EO_PARTNER",
-        "HOST"
+        "VALIDATION_SITE"
       ],
       "tasks": [
         {
           "task_id": "T3.1",
           "title": "Secure written field access and finalise crop/measurement protocol with the farmer collaborator",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         },
         {
           "task_id": "T3.2",
           "title": "Install meteorological station and soil sensors; establish data-quality and irrigation-recording procedures",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         },
         {
           "task_id": "T3.3",
           "title": "Conduct coordinated physiological, proximal spectral and thermal measurement campaigns",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         },
         {
           "task_id": "T3.4",
           "title": "Conduct UAV campaigns and acquire/synchronise Sentinel-2 observations where spatially valid",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         },
         {
           "task_id": "T3.5",
           "title": "Apply the frozen primary model prospectively, quantify the transfer gap and recalibrate post-season",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         },
         {
           "task_id": "T3.6",
           "title": "Activate the site-contingency ladder if primary-site access fails",
-          "responsible_partner": "VALIDATION_SITE",
-          "contributing_partners": []
+          "responsible_partner": "HOST",
+          "contributing_partners": [
+            "VALIDATION_SITE"
+          ]
         }
       ],
       "deliverables": [
@@ -177,14 +189,14 @@
           "title": "Independent commercial-field validation dataset",
           "type": "dataset",
           "due_month": 18,
-          "responsible_partner": "VALIDATION_SITE"
+          "responsible_partner": "HOST"
         },
         {
           "deliverable_id": "D3.2",
           "title": "Prospective transferability, uncertainty and limited-recalibration report",
           "type": "report",
           "due_month": 18,
-          "responsible_partner": "VALIDATION_SITE"
+          "responsible_partner": "HOST"
         }
       ],
       "dependencies": [
@@ -426,10 +438,10 @@
     {
       "partner_id": "HOST",
       "wps_as_lead": [
-        "WP1"
+        "WP1",
+        "WP3"
       ],
       "wps_as_contributor": [
-        "WP3",
         "WP4"
       ]
     },
@@ -451,10 +463,10 @@
     },
     {
       "partner_id": "VALIDATION_SITE",
-      "wps_as_lead": [
+      "wps_as_lead": [],
+      "wps_as_contributor": [
         "WP3"
-      ],
-      "wps_as_contributor": []
+      ]
     },
     {
       "partner_id": "SOFTWARE_PARTNER",
@@ -487,7 +499,12 @@
     {
       "severity": "advisory",
       "scope": "deliverables lacking a seed due_month",
-      "issue": "due_month synthesized to the WP end_month for D1.1, D1.2, D2.2, D3.1, D3.2, D4.1, D4.2, D5.1, D5.2; project_duration_months is null in section_schema_registry for MSCA-PF so no duration bound is violated"
+      "issue": "due_month synthesized to the WP end_month for D2.2, D3.1, D3.2, D4.1, D4.2, D5.1, D5.2; project_duration_months is null in section_schema_registry for MSCA-PF so no duration bound is violated. D1.1 (M2) and D1.2 (M3) are no longer synthesized: their due months are explicit in the Tier 3 seed per the OD round-3 A-1 answer (2026-09-04, option b)"
+    },
+    {
+      "severity": "advisory",
+      "scope": "WP3, D1.1, D1.2",
+      "issue": "OD round-3 amendment (2026-09-04, decision_log/od-round3-resolutions_2026-09-04.json): (A-1) D1.1/D1.2 due months moved M14 -> M2/M3 to precede the MS6 freeze, per the Tier 3 seed; (A-6) WP3 lead_partner reassigned VALIDATION_SITE -> HOST (scientific leadership with the fellow at the beneficiary; the farmer site is the hosting environment, now listed as contributor), task/deliverable responsible_partner updated per the same normalization rule. Ids unchanged (id-stability rule)"
     },
     {
       "severity": "advisory",
