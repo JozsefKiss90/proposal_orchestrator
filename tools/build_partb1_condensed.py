@@ -97,7 +97,7 @@ P(lead="Pertinence.", text=(
     "close three focused gaps: the physiological grounding of water-stress indicators, "
     "transferability across unseen conditions, scales and crops, and irrigation decision relevance. "
     "Spectral and environmental variables are too often treated as stress proxies without evidence "
-    "that they track an actual plant response. In instrument terms, "
+    "that they track an actual plant response [1]. In instrument terms, "
     "the same objectives carry the fellow's documented transition from plant physiologist and "
     "agronomist toward an independent Agricultural Data Scientist. These are the interdisciplinary "
     "and inter-sectoral competences the call's expected outcomes seek, so the scientific and career "
@@ -125,10 +125,10 @@ P(text=(
 
 P(text=(
     "Measurability is reinforced by two design choices. First, blocked, leakage-safe unseen-year "
-    "validation against a pre-specified physiological stress target. The metrics are "
+    "validation against a pre-specified physiological stress target [2]. The metrics are "
     "pre-registered: balanced accuracy, F1 and ROC-AUC (detection); RMSE, MAE and R² (prediction); "
     "reliability, Brier score and interval coverage (calibration); lead time and false-alarm rate "
-    "(operational value). Acceptance thresholds are literature-derived and fixed "
+    "(operational value) [3]. Acceptance thresholds are literature-derived and fixed "
     "in D1.2 before the prospective season. Second, the primary model is frozen and its model card "
     "registered (D1.4, MS6) before the first field season. This converts every objective into a "
     "falsifiable, auditable claim."))
@@ -182,7 +182,7 @@ H(2, "1.2 Soundness of the proposed methodology (including interdisciplinary app
 
 P(lead="Overall methodology: concepts, models and assumptions.", text=(
     "FIELDWISE rests on one conviction: a water-stress model is only useful for irrigation if "
-    "judged against four linked criteria at once rather than retrospective accuracy alone. The "
+    "judged against four linked criteria at once rather than retrospective accuracy alone [4]. The "
     "criteria are physiological validity, predictive performance, transferability to unseen "
     "conditions and management relevance. Concretely, the model learns the relationship between "
     "operationally obtainable predictors (soil-water, meteorological and spectral/Earth-observation "
@@ -506,7 +506,7 @@ T(header=["Dimension", "Contribution (mechanism)", "Magnitude and importance"],
      "Physiology- and plant-stage-aware irrigation timing; the project reports its own measured "
      "water, yield, quality and uncertainty results from prospective validation.",
      "Literature-bounded context, not a promise: published processing-tomato strategies report ≈8–30% "
-     "water savings (Carucci et al. 2023; Badr et al. 2026). Serves SDG 2, 6, 12, 13; makes "
+     "water savings (Carucci et al. 2023 [5]; Badr et al. 2026 [6]). Serves SDG 2, 6, 12, 13; makes "
      "water–yield trade-offs visible earlier."],
     ["Technological & economic",
      "Crop-configurable DrR web MVP (validated tomato module); AgroVIR requirements, assessment and "
@@ -731,6 +731,30 @@ P(text=(
     "Global Fellowship two-host requirement does not apply, and the placement is an integral "
     "extension, not an outgoing phase."))
 
+# References: the six load-bearing citations selected from the 2026-08-30
+# master's footnote apparatus (operator instruction 2026-09-04: top 6-7 only,
+# space-limited). [5]/[6] are mandatory - named in-text in the 2.3 table.
+# Entries copied verbatim from the 08-30 footnotes; rendered compact at 8.5pt.
+C["blocks"].append({"kind": "refs", "title": "References", "entries": [
+    "Velazquez-Chavez, L.J., Daccache, A., Mohamed, A.Z., Centritto, M. (2024). Plant-based and "
+    "Remote Sensing for Water Status Monitoring of Orchard Crops: Systematic Review and "
+    "Meta-analysis. Agricultural Water Management 298, 109051. doi:10.1016/j.agwat.2024.109051",
+    "Roberts, D.R., et al. (2017). Cross-validation Strategies for Data with Temporal, Spatial, "
+    "Hierarchical, or Phylogenetic Structure. Ecography 40(8), 913–929. doi:10.1111/ecog.02881",
+    "Gneiting, T., Balabdaoui, F., Raftery, A.E. (2007). Probabilistic Forecasts, Calibration and "
+    "Sharpness. Journal of the Royal Statistical Society: Series B 69(2), 243–268. "
+    "doi:10.1111/j.1467-9868.2007.00587.x",
+    "Murphy, A.H. (1993). What Is a Good Forecast? An Essay on the Nature of Goodness in Weather "
+    "Forecasting. Weather and Forecasting 8(2), 281–293. "
+    "doi:10.1175/1520-0434(1993)008<0281:WIAGFA>2.0.CO;2",
+    "Carucci, F., Gagliardi, A., Giuliani, M.M., Gatta, G. (2023). Irrigation Scheduling in "
+    "Processing Tomato to Save Water: A Smart Approach Combining Plant and Soil Monitoring. "
+    "Applied Sciences 13, 7625. doi:10.3390/app13137625",
+    "Badr, M.A., Ali, E., Salman, S.R. (2026). Effect of Regulated and Controlled Deficit "
+    "Irrigation on Yield and Yield Response Factor of Processing Tomato. BMC Plant Biology 26, "
+    "169. doi:10.1186/s12870-025-08065-6",
+]})
+
 
 # ---------------------------------------------------------------------------
 # Gantt figure (deterministic, from Tier 4 gantt.json + display mapping)
@@ -879,6 +903,22 @@ def render() -> None:
         r.font.name = "Times New Roman"
         r.font.size = Pt(9)
 
+    def add_refs(title: str, entries: list) -> None:
+        p = doc.add_paragraph()
+        r = p.add_run(title)
+        r.bold = True
+        r.font.name = "Times New Roman"
+        r.font.size = Pt(11)
+        p.paragraph_format.space_before = Pt(6)
+        for i, entry in enumerate(entries, start=1):
+            p = doc.add_paragraph()
+            p.paragraph_format.space_after = Pt(1)
+            p.paragraph_format.left_indent = Cm(0.5)
+            p.paragraph_format.first_line_indent = Cm(-0.5)
+            r = p.add_run(f"[{i}] {entry}")
+            r.font.name = "Times New Roman"
+            r.font.size = Pt(8.5)
+
     for b in C["blocks"]:
         if b["kind"] == "h":
             add_heading(b["level"], b["text"])
@@ -888,6 +928,8 @@ def render() -> None:
             add_table(b["header"], b["rows"], b["widths"])
         elif b["kind"] == "img":
             add_image(b["path"], b["caption"])
+        elif b["kind"] == "refs":
+            add_refs(b["title"], b["entries"])
 
     doc.save(OUT_DOCX)
 
@@ -960,11 +1002,37 @@ def self_check() -> list[str]:
     if pend < 5:
         errors.append(f"only {pend} 'pending' transparency flags; expected >=5 (flag 5)")
 
-    words = len(text.split())
+    # citation markers [n] are pointers, not prose; they are excluded from the
+    # word cap (their page cost is the References block, reported below)
+    words = len(re.sub(r"\s?\[\d+\]", "", text).split())
     if words > 5450:
         errors.append(f"word budget exceeded: {words} words (cap 5450 for the 10-page limit; the "
                       "run-02 master's measured density is 5069 words = 9 pages)")
     print(f"[info] condensed content: {words} words")
+
+    # references block: entry count, doi presence, marker<->entry consistency,
+    # and the two in-text named citations must have entries
+    refs = [b for b in C["blocks"] if b["kind"] == "refs"]
+    if len(refs) != 1:
+        errors.append(f"expected exactly one references block, found {len(refs)}")
+    else:
+        entries = refs[0]["entries"]
+        if not 6 <= len(entries) <= 7:
+            errors.append(f"{len(entries)} reference entries; operator instruction is 6-7")
+        for i, e in enumerate(entries, start=1):
+            if "doi:" not in e:
+                errors.append(f"reference [{i}] has no doi: {e[:60]!r}")
+        markers = {int(m) for m in re.findall(r"\[(\d+)\]", text)}
+        expected = set(range(1, len(entries) + 1))
+        if markers != expected:
+            errors.append(f"citation markers {sorted(markers)} do not match reference "
+                          f"entries 1..{len(entries)}")
+        for named in ("Carucci", "Badr"):
+            if not any(named in e for e in entries):
+                errors.append(f"in-text named citation {named!r} has no reference entry")
+        ref_words = sum(len(e.split()) for e in entries)
+        print(f"[info] references: {len(entries)} entries, {ref_words} words "
+              "(outside the 5450 prose cap; page cost checked by the operator in Word)")
 
     # prose-profile guards (docs/style/proposal-prose-profile.md, execution aid
     # under CLAUDE.md §10.2): em-dash budget over the whole content, and a hard
@@ -983,7 +1051,7 @@ def self_check() -> list[str]:
             prose = b["caption"]
         else:
             continue
-        guarded = prose
+        guarded = re.sub(r"\s?\[\d+\]", "", prose)  # citation markers are not words
         for a in abbrev:
             guarded = guarded.replace(a, a.replace(".", "\x00"))
         guarded = re.sub(r"(\d)\.(\d)", "\\1\x00\\2", guarded)
