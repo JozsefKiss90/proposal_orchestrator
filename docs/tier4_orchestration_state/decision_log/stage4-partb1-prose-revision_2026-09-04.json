@@ -1,0 +1,30 @@
+{
+  "decision_id": "stage4-partb1-prose-revision_2026-09-04",
+  "date": "2026-09-04",
+  "phase_context": "Style-only revision of the Stage-4 Part B-1 condensed submission form under docs/style/proposal-prose-profile.md (execution aid, CLAUDE.md §10.2), before the T10 freeze",
+  "authority": "Explicit operator instruction 2026-09-04: implement prose-quality options that need no Phase 8 run and directly author the condensed Part B document; the 'Proposal prose' output style activated the same day",
+  "decision": "The condensed content in tools/build_partb1_condensed.py was revised in the profile's two-pass method (detect, then edit) and re-rendered to the same canonical path. The revision is style-only: sentences split at clause boundaries, em-dash asides promoted or demoted, inventories carried in shorter sentences, duplicated statements and unevidenced intensifiers cut to hold the word cap. No fact, figure, KPI, status flag, pending marker or claim was added, removed or strengthened; all builder require() needles pass unchanged.",
+  "artifact": {
+    "path": "docs/tier5_deliverables/final_exports/FIELDWISE_Part_B1_manual-condensed_2026-09-06.docx",
+    "sha256_after_prose_revision": "C86D71FA34883A08AD16A82E00CCC6971810672435EBC2D1ED82EF6BAC1439FF",
+    "supersedes_sha256": "5DE3FEB347D3E730CC23F04E002C581C7366BA45FF3D17806E0B2DA37A76BCEE",
+    "word_count": 5450,
+    "note": "Same canonical path re-rendered by the builder per the established fix workflow (never hand-edit the docx). The T10 freeze hash remains the operator's sign-off action on 2026-09-06; operator re-read plus a Word print-layout <=10-page check are owed because paragraph breaks changed."
+  },
+  "measured_change": {
+    "detect_report": "plans/reports/partb1_prose_detect_2026-09-04.md (pass-1 findings, judged rulings, pass-2 result table)",
+    "mean_sentence_words": {"before": 26.7, "after": 17.2},
+    "sentences_over_25_words": {"before": "67 (48%)", "after": "31 (14%)"},
+    "sentences_over_35_words": {"before": "38, longest 81", "after": "5 declared enumeration exceptions, longest 45"},
+    "em_dashes": {"before": 64, "after": 0},
+    "clause_joining_semicolons": {"before": "~27", "after": "0 (10 list-punctuation semicolons remain)"},
+    "word_total": {"before": 5443, "after": 5450, "cap": 5450}
+  },
+  "declared_exceptions": "Five enumeration sentences of 36-45 words remain (four refused assumptions, committed output set, training triad, CV evidence list, KPI carrier); splitting each would change meaning, per the profile §5 ceiling clause. Itemised in the detect report.",
+  "tooling_added": [
+    "tools/prose_detect.py - repeatable pass-1 measurement over the builder content (--builder) or any Tier 5 JSON's text fields; detection only, never edits",
+    "build_partb1_condensed.py self_check() now enforces the em-dash budget (<=6 total) and a 45-word hard sentence guard permanently"
+  ],
+  "out_of_scope_noted": "The run-03 Tier 5 section JSONs remain non-compliant with the profile (implementation_section.json: mean 36.5 words/sentence, 63% over 25, 46 em-dashes). Revising them is deferred past the 09-06 freeze; for a future run-04 the profile should be baked into the Phase 8 drafting skill specifications instead.",
+  "constitutional_basis": "§11.1 (evaluator orientation at sentence level), §11.4/§13.3/§13.8 (no new or strengthened claims; flags preserved), §9.4 (this record). The prose profile is subordinate per §10.2 and was applied as an execution aid only."
+}
