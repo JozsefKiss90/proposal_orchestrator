@@ -93,11 +93,11 @@ P(lead="Problem and overarching aim.", text=(
     "exposure runs through an integral end-of-project non-academic placement."))
 
 P(lead="Pertinence.", text=(
-    "The objectives are pertinent on both axes the Excellence criterion weighs. Scientifically, they "
+    "The objectives are pertinent in two linked senses. Scientifically, they "
     "close three focused gaps: the physiological grounding of water-stress indicators, "
     "transferability across unseen conditions, scales and crops, and irrigation decision relevance. "
     "Spectral and environmental variables are too often treated as stress proxies without evidence "
-    "that they track an actual plant response [1]. In instrument terms, "
+    "that they track an actual plant response [1]. In career terms, "
     "the same objectives carry the fellow's documented transition from plant physiologist and "
     "agronomist toward an independent Agricultural Data Scientist. These are the interdisciplinary "
     "and inter-sectoral competences the call's expected outcomes seek, so the scientific and career "
@@ -348,7 +348,7 @@ P(lead="Rationale and added value of the non-academic placement.", text=(
 P(text=(
     "The status of forward-looking commitments is stated transparently. The supervisors' formal "
     "acceptances and efforts, the ELTE-side modelling representation and instrument access, the "
-    "data-partner contact and the placement arrangement are operator-declared working assumptions, "
+    "data-partner contact and the placement arrangement are declared working assumptions, "
     "to be confirmed in partner writing before the action starts. The identities, roles and "
     "infrastructure they rest on are confirmed on public and partner-authored evidence."))
 
@@ -358,7 +358,7 @@ P(lead="A profile matched to the project's interdisciplinary chain.", text=(
     "Dr. Rositsa Cholakova (publishing before 2020 as Rositsa Cholakova-Bimbalova) is strong where "
     "the science demands it. She holds a BSc/MSc in Plant Protection and a PhD in Plant Physiology "
     "(2020, Agricultural University of Plovdiv). She was Assistant Professor in Plant Physiology "
-    "and Plant Stress Physiology in Plovdiv 2015–2020, and since 2024 has been Chief Assistant "
+    "and Plant Stress Physiology in Plovdiv 2015–2020 [5], and since 2024 has been Chief Assistant "
     "Professor at the Maritsa Vegetable Crops Research Institute, with current abiotic-stress work "
     "in Solanum lycopersicum. This is the competence that lets her judge whether a model-derived or "
     "remotely sensed signal tracks a real plant response. The validation chain rests on that "
@@ -382,7 +382,7 @@ P(lead="Honest appraisal of fit.", text=(
     "environments. This is the principal methodological competence gap the fellowship closes "
     "through supervised practice (section 1.3). She is a returning researcher: after a documented "
     "34-month full-time-parenting career break (2021–2024) she has re-entered research with clear "
-    "momentum. The break does not count against the MSCA research-experience window."))
+    "momentum."))
 
 # ============================ 2. IMPACT ============================
 H(1, "2. Impact")
@@ -506,7 +506,7 @@ T(header=["Dimension", "Contribution (mechanism)", "Magnitude and importance"],
      "Physiology- and plant-stage-aware irrigation timing; the project reports its own measured "
      "water, yield, quality and uncertainty results from prospective validation.",
      "Literature-bounded context, not a promise: published processing-tomato strategies report ≈8–30% "
-     "water savings (Carucci et al. 2023 [5]; Badr et al. 2026 [6]). Serves SDG 2, 6, 12, 13; makes "
+     "water savings (Carucci et al. 2023 [6]; Badr et al. 2026 [7]). Serves SDG 2, 6, 12, 13; makes "
      "water–yield trade-offs visible earlier."],
     ["Technological & economic",
      "Crop-configurable DrR web MVP (validated tomato module); AgroVIR requirements, assessment and "
@@ -618,7 +618,7 @@ P(lead="Effort.", text=(
     "5.4, plus 3.0 cross-cutting (training, dissemination, open science, management). WP1 carries "
     "the largest share because it holds the scientific core. WP2 is campaign-intensive, WP3 is "
     "spread thinly but continuously, and WP4 concentrates on the placement. Partner effort is in "
-    "kind and operator-declared pending each partner's written confirmation: host supervisor 2.5 "
+    "kind and declared pending each partner's written confirmation: host supervisor 2.5 "
     "PM, ELTE co-supervisor 2.0 PM, AgroVIR 3.0 PM, MATE 2.4 PM, Krumatic 1.5 PM. These "
     "contributions are structured to reduce the fellow's peak workload in the overlapping field, "
     "modelling and software period (months 4–14). ATK supervision, MATE data support, ELTE "
@@ -717,7 +717,7 @@ T(header=["Organisation (role)", "Capacity and arrangements"],
      "the web MVP, later Bulgarian farmer-facing uptake. Independence from other partners declared; "
      "code-IP terms settled in a pre-grant development agreement."],
     ["Commercial farmer site – collaborating validation environment",
-     "Independent Hungarian production field, deliberately unnamed (recorded operator decision); the "
+     "Independent Hungarian production field, deliberately unnamed at this stage; the "
      "project installs an automated meteorological station and soil sensors and performs all "
      "specialised measurements; written field-access and treatment arrangement obtained before the "
      "campaign; ladder: second producer first (claim-preserving), Skanzen route measurement-only."],
@@ -731,11 +731,13 @@ P(text=(
     "Global Fellowship two-host requirement does not apply, and the placement is an integral "
     "extension, not an outgoing phase."))
 
-# References: the six load-bearing citations selected from the 2026-08-30
-# master's footnote apparatus (operator instruction 2026-09-04: top 6-7 only,
-# space-limited). [5]/[6] are mandatory - named in-text in the 2.3 table.
-# Entries copied verbatim from the 08-30 footnotes; rendered compact at 8.5pt.
-C["blocks"].append({"kind": "refs", "title": "References", "entries": [
+# References: seven citations selected from the 2026-08-30 master's footnote
+# apparatus (operator instructions 2026-09-04: 6-7 only, space-limited;
+# rendered as Word footnotes at the [n] anchors, not an end section; at least
+# one article by the applicant researcher). [6]/[7] are mandatory - named
+# in-text in the 2.3 table. [5] is the applicant's own article (08-30 FN16).
+# Entries copied verbatim from the 08-30 footnotes; list order = anchor order.
+REFS = [
     "Velazquez-Chavez, L.J., Daccache, A., Mohamed, A.Z., Centritto, M. (2024). Plant-based and "
     "Remote Sensing for Water Status Monitoring of Orchard Crops: Systematic Review and "
     "Meta-analysis. Agricultural Water Management 298, 109051. doi:10.1016/j.agwat.2024.109051",
@@ -747,13 +749,16 @@ C["blocks"].append({"kind": "refs", "title": "References", "entries": [
     "Murphy, A.H. (1993). What Is a Good Forecast? An Essay on the Nature of Goodness in Weather "
     "Forecasting. Weather and Forecasting 8(2), 281–293. "
     "doi:10.1175/1520-0434(1993)008<0281:WIAGFA>2.0.CO;2",
+    "Cholakova-Bimbalova, R., Petrov, V., Vassilev, A. (2019). Photosynthetic Performance of "
+    "Young Maize (Zea mays L.) Plants Exposed to Chilling Stress Can Be Improved by the "
+    "Application of Protein Hydrolysates. Acta Agrobotanica 72(2), 1769. doi:10.5586/aa.1769",
     "Carucci, F., Gagliardi, A., Giuliani, M.M., Gatta, G. (2023). Irrigation Scheduling in "
     "Processing Tomato to Save Water: A Smart Approach Combining Plant and Soil Monitoring. "
     "Applied Sciences 13, 7625. doi:10.3390/app13137625",
     "Badr, M.A., Ali, E., Salman, S.R. (2026). Effect of Regulated and Controlled Deficit "
     "Irrigation on Yield and Yield Response Factor of Processing Tomato. BMC Plant Biology 26, "
     "169. doi:10.1186/s12870-025-08065-6",
-]})
+]
 
 
 # ---------------------------------------------------------------------------
@@ -834,6 +839,8 @@ def build_gantt() -> None:
 def render() -> None:
     from docx import Document
     from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
     from docx.shared import Cm, Pt
 
     doc = Document()
@@ -862,6 +869,42 @@ def render() -> None:
             run.font.size = Pt(11)
             p.paragraph_format.space_before = Pt(6)
 
+    def append_footnote_ref(p, n: int, size) -> None:
+        # a real Word footnote anchor: superscript run carrying w:footnoteReference
+        r = OxmlElement("w:r")
+        rpr = OxmlElement("w:rPr")
+        rf = OxmlElement("w:rFonts")
+        rf.set(qn("w:ascii"), "Times New Roman")
+        rf.set(qn("w:hAnsi"), "Times New Roman")
+        rpr.append(rf)
+        sz = OxmlElement("w:sz")
+        sz.set(qn("w:val"), str(int(size.pt * 2)))
+        rpr.append(sz)
+        va = OxmlElement("w:vertAlign")
+        va.set(qn("w:val"), "superscript")
+        rpr.append(va)
+        r.append(rpr)
+        fr = OxmlElement("w:footnoteReference")
+        fr.set(qn("w:id"), str(n))
+        r.append(fr)
+        p._p.append(r)
+
+    def add_runs_with_refs(p, text: str, size, bold: bool = False) -> None:
+        # [n] authoring markers become footnote anchors attached to the
+        # preceding word (the space before a marker is dropped)
+        text = re.sub(r"\s+\[(\d+)\]", r"[\1]", text)
+        for part in re.split(r"(\[\d+\])", text):
+            if not part:
+                continue
+            m = re.fullmatch(r"\[(\d+)\]", part)
+            if m:
+                append_footnote_ref(p, int(m.group(1)), size)
+            else:
+                r = p.add_run(part)
+                r.font.name = "Times New Roman"
+                r.font.size = size
+                r.bold = bold
+
     def add_para(lead: str, text: str) -> None:
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -870,9 +913,7 @@ def render() -> None:
             r.bold = True
             r.font.name = "Times New Roman"
             r.font.size = Pt(11)
-        r = p.add_run(text)
-        r.font.name = "Times New Roman"
-        r.font.size = Pt(11)
+        add_runs_with_refs(p, text, Pt(11))
 
     def add_table(header: list, rows: list, widths: list | None) -> None:
         tbl = doc.add_table(rows=1 + len(rows), cols=len(header))
@@ -883,10 +924,7 @@ def render() -> None:
                 cell = tbl.rows[i].cells[j]
                 cell.text = ""
                 para = cell.paragraphs[0]
-                run = para.add_run(cell_text)
-                run.font.name = "Times New Roman"
-                run.font.size = Pt(9)
-                run.bold = i == 0
+                add_runs_with_refs(para, cell_text, Pt(9), bold=i == 0)
                 para.paragraph_format.space_after = Pt(1)
         if widths:
             for j, w in enumerate(widths):
@@ -903,22 +941,6 @@ def render() -> None:
         r.font.name = "Times New Roman"
         r.font.size = Pt(9)
 
-    def add_refs(title: str, entries: list) -> None:
-        p = doc.add_paragraph()
-        r = p.add_run(title)
-        r.bold = True
-        r.font.name = "Times New Roman"
-        r.font.size = Pt(11)
-        p.paragraph_format.space_before = Pt(6)
-        for i, entry in enumerate(entries, start=1):
-            p = doc.add_paragraph()
-            p.paragraph_format.space_after = Pt(1)
-            p.paragraph_format.left_indent = Cm(0.5)
-            p.paragraph_format.first_line_indent = Cm(-0.5)
-            r = p.add_run(f"[{i}] {entry}")
-            r.font.name = "Times New Roman"
-            r.font.size = Pt(8.5)
-
     for b in C["blocks"]:
         if b["kind"] == "h":
             add_heading(b["level"], b["text"])
@@ -928,10 +950,59 @@ def render() -> None:
             add_table(b["header"], b["rows"], b["widths"])
         elif b["kind"] == "img":
             add_image(b["path"], b["caption"])
-        elif b["kind"] == "refs":
-            add_refs(b["title"], b["entries"])
 
     doc.save(OUT_DOCX)
+    inject_footnotes(REFS)
+
+
+def inject_footnotes(entries: list) -> None:
+    """Add word/footnotes.xml (plus content-type and relationship) to the
+    saved docx. python-docx has no footnote API; the anchors are already in
+    document.xml, written by append_footnote_ref(). Footnote text is 8.5pt."""
+    import zipfile
+    from xml.sax.saxutils import escape
+
+    ct_override = ('<Override PartName="/word/footnotes.xml" ContentType="application/vnd.'
+                   'openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>')
+    rel_type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
+    rpr = ('<w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman"/>'
+           '<w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr>')
+    parts = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+             '<w:footnotes xmlns:w='
+             '"http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
+             '<w:footnote w:type="separator" w:id="-1"><w:p><w:pPr>'
+             '<w:spacing w:after="0"/></w:pPr><w:r><w:separator/></w:r></w:p></w:footnote>',
+             '<w:footnote w:type="continuationSeparator" w:id="0"><w:p><w:pPr>'
+             '<w:spacing w:after="0"/></w:pPr><w:r><w:continuationSeparator/></w:r></w:p>'
+             '</w:footnote>']
+    for i, e in enumerate(entries, start=1):
+        parts.append(
+            f'<w:footnote w:id="{i}"><w:p><w:pPr><w:spacing w:after="20"/></w:pPr>'
+            f'<w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman"/>'
+            f'<w:sz w:val="17"/><w:vertAlign w:val="superscript"/></w:rPr>'
+            f'<w:footnoteRef/></w:r>'
+            f'<w:r>{rpr}<w:t xml:space="preserve"> {escape(e)}</w:t></w:r></w:p></w:footnote>')
+    parts.append("</w:footnotes>")
+    footnotes_xml = "".join(parts).encode("utf-8")
+
+    with zipfile.ZipFile(OUT_DOCX) as zin:
+        items = {n: zin.read(n) for n in zin.namelist()}
+    ct = items["[Content_Types].xml"].decode("utf-8")
+    if "/word/footnotes.xml" not in ct:
+        ct = ct.replace("</Types>", ct_override + "</Types>")
+    items["[Content_Types].xml"] = ct.encode("utf-8")
+    rels = items["word/_rels/document.xml.rels"].decode("utf-8")
+    if rel_type not in rels:
+        next_rid = max(int(m) for m in re.findall(r'Id="rId(\d+)"', rels)) + 1
+        rels = rels.replace(
+            "</Relationships>",
+            f'<Relationship Id="rId{next_rid}" Type="{rel_type}" '
+            f'Target="footnotes.xml"/></Relationships>')
+    items["word/_rels/document.xml.rels"] = rels.encode("utf-8")
+    items["word/footnotes.xml"] = footnotes_xml
+    with zipfile.ZipFile(OUT_DOCX, "w", zipfile.ZIP_DEFLATED) as zout:
+        for name, data in items.items():
+            zout.writestr(name, data)
 
 
 # ---------------------------------------------------------------------------
@@ -971,6 +1042,11 @@ def self_check() -> list[str]:
     forbid("¶", "anchor markup must be stripped")
     forbid("WP5", "display mapping: only WP1–WP4 exist")
     forbid("proves water savings", "T5 decision-value discipline")
+    forbid("operator", "no orchestration vocabulary in the submission text")
+    forbid("orchestrat", "no orchestration vocabulary in the submission text")
+    forbid("Excellence criterion", "no self-reference to the evaluation criteria")
+    forbid("award criteri", "no self-reference to the evaluation criteria")
+    forbid("research-experience window", "no self-reference to eligibility rules")
 
     if re.search(r"\bT\d+\.\d+\b", text):
         errors.append("task ids present — condensed form must describe tasks verbally")
@@ -1010,29 +1086,34 @@ def self_check() -> list[str]:
                       "run-02 master's measured density is 5069 words = 9 pages)")
     print(f"[info] condensed content: {words} words")
 
-    # references block: entry count, doi presence, marker<->entry consistency,
-    # and the two in-text named citations must have entries
-    refs = [b for b in C["blocks"] if b["kind"] == "refs"]
-    if len(refs) != 1:
-        errors.append(f"expected exactly one references block, found {len(refs)}")
-    else:
-        entries = refs[0]["entries"]
-        if not 6 <= len(entries) <= 7:
-            errors.append(f"{len(entries)} reference entries; operator instruction is 6-7")
-        for i, e in enumerate(entries, start=1):
-            if "doi:" not in e:
-                errors.append(f"reference [{i}] has no doi: {e[:60]!r}")
-        markers = {int(m) for m in re.findall(r"\[(\d+)\]", text)}
-        expected = set(range(1, len(entries) + 1))
-        if markers != expected:
-            errors.append(f"citation markers {sorted(markers)} do not match reference "
-                          f"entries 1..{len(entries)}")
-        for named in ("Carucci", "Badr"):
-            if not any(named in e for e in entries):
-                errors.append(f"in-text named citation {named!r} has no reference entry")
-        ref_words = sum(len(e.split()) for e in entries)
-        print(f"[info] references: {len(entries)} entries, {ref_words} words "
-              "(outside the 5450 prose cap; page cost checked by the operator in Word)")
+    # reference apparatus: rendered as Word footnotes at the [n] anchors, so
+    # the anchor set must be exactly 1..len(REFS), anchors must appear in
+    # document order (footnote ids equal displayed numbers), every entry
+    # carries a doi, the two in-text named citations have entries, and at
+    # least one entry is by the applicant researcher
+    if not 6 <= len(REFS) <= 7:
+        errors.append(f"{len(REFS)} reference entries; instruction is 6-7")
+    for i, e in enumerate(REFS, start=1):
+        if "doi:" not in e:
+            errors.append(f"reference [{i}] has no doi: {e[:60]!r}")
+    seq = [int(m) for m in re.findall(r"\[(\d+)\]", text)]
+    if set(seq) != set(range(1, len(REFS) + 1)):
+        errors.append(f"footnote anchors {sorted(set(seq))} do not match reference "
+                      f"entries 1..{len(REFS)}")
+    firsts: list[int] = []
+    for n in seq:
+        if n not in firsts:
+            firsts.append(n)
+    if firsts != sorted(firsts):
+        errors.append(f"footnote anchors out of document order: {firsts}")
+    for named in ("Carucci", "Badr"):
+        if not any(named in e for e in REFS):
+            errors.append(f"in-text named citation {named!r} has no reference entry")
+    if not any("Cholakova" in e for e in REFS):
+        errors.append("no article by the applicant researcher among the references")
+    ref_words = sum(len(e.split()) for e in REFS)
+    print(f"[info] references: {len(REFS)} entries, {ref_words} words, rendered as "
+          "Word footnotes (outside the 5450 prose cap; page cost checked in Word)")
 
     # prose-profile guards (docs/style/proposal-prose-profile.md, execution aid
     # under CLAUDE.md §10.2): em-dash budget over the whole content, and a hard
