@@ -1,0 +1,2954 @@
+{
+ "schema_id": "orch.tier5.esr_review_packet.round2.v1",
+ "schema_status": "local_extension",
+ "schema_note": "Local round-two extension of orch.tier5.esr_review_packet.v1; not validated against a repository schema; the round-one schema is unchanged.",
+ "proposal_id": "101373105",
+ "acronym": "FIELDWISE",
+ "round": 2,
+ "assessment_scope": "B1_only",
+ "simulated": true,
+ "generated_at": "2026-09-09T07:37:51+00:00",
+ "evaluated_version": {
+  "pdf_path": "docs/tier5_deliverables/final_exports/FIELDWISE_Part_B1_refactored_2026-09-08.pdf",
+  "sha256_measured": "6fb56e517df9eef5bd5de3258d414b67e0781f44c90a095aad4d0fefcc643371",
+  "bytes": 446718,
+  "physical_pages": 10,
+  "repository_commit": "e8e8d23895d0f223a70cccbf986d62ba86b8ad1a",
+  "branch": "ESR",
+  "portal_submission_verified": false,
+  "portal_submission_id": null,
+  "sealed_at": null,
+  "seal_hash": null,
+  "assessed_content": "Part B1 Sections 1–3, physical pages 1–10",
+  "note": "Refactored export; the original submission receipt SEP-211392861 belongs to a different file (sha256 c3bfb51f93b4c0c36221d0bd83dab77efaa619eee4f3dd937e58d728c3f81dbe)."
+ },
+ "sources": [
+  {
+   "id": "S1",
+   "path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+   "version": "V2.2, 17 December 2025",
+   "role": "normative",
+   "read_stage": "first_pass"
+  },
+  {
+   "id": "S2",
+   "path": "docs/tier2b_topic_and_call_sources/work_programmes/msca/wp-2-marie-sklodowska-curie-actions_horizon-2026-2027_en.pdf",
+   "version": "WP 2026–2027 part 2; PDF created 2025-12-08; DRAFT watermark",
+   "role": "normative",
+   "read_stage": "first_pass",
+   "pages_used": "22–29, 78–87, 106–108 (viewer)"
+  },
+  {
+   "id": "S3",
+   "path": "docs/tier2a_instrument_schemas/application_forms/msca/Tpl_Application Form (Part B) (HE MSCA PF).rtf",
+   "version": "V5.0, 27 March 2026",
+   "role": "normative",
+   "read_stage": "first_pass"
+  },
+  {
+   "id": "S4",
+   "path": "docs/tier5_deliverables/final_exports/FIELDWISE_Part_B1_refactored_2026-09-08.pdf",
+   "version": "6fb56e517df9eef5bd5de3258d414b67e0781f44c90a095aad4d0fefcc643371",
+   "role": "scoring_evidence",
+   "read_stage": "first_pass"
+  },
+  {
+   "id": "S5",
+   "path": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-MSCA-2026-PF-01-01",
+   "version": "fetched 2026-09-09; JavaScript shell, no readable content",
+   "role": "normative",
+   "read_stage": "first_pass_attempt"
+  },
+  {
+   "id": "S6",
+   "path": "plans/prompts/FIELDWISE_ESR_evaluation_prompt_2026-09-08.md",
+   "version": "2026-09-08",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S7",
+   "path": "plans/reports/FIELDWISE_ESR_2026-09-08.md",
+   "version": "2026-09-08",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S8",
+   "path": "plans/reports/FIELDWISE_ESR_2026-09-08.json",
+   "version": "orch.tier5.esr_review_packet.v1, generated 2026-09-08T14:10:00+02:00",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S9",
+   "path": "plans/reports/FIELDWISE_Part_B1_Scoring_Improvement_Brief_2026-09-08.md",
+   "version": "2026-09-08",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S10",
+   "path": "plans/reports/FIELDWISE_Part_B1_refactoring_report_2026-09-08.md",
+   "version": "2026-09-08",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S11",
+   "path": "docs/tier5_deliverables/submitted/FIELDWISE_101373105_submitted_2026-09-07.pdf",
+   "version": "sha256 c3bfb51f93b4c0c36221d0bd83dab77efaa619eee4f3dd937e58d728c3f81dbe (verified); pp. 24–33 only",
+   "role": "post_score_context",
+   "read_stage": "post_freeze"
+  },
+  {
+   "id": "S12",
+   "path": "docs/tier5_deliverables/final_exports/FIELDWISE_Part_B1_refactored_2026-09-08.docx",
+   "version": "as exported 2026-09-08",
+   "role": "post_score_context",
+   "read_stage": "post_freeze",
+   "use": "layout diagnostics only"
+  }
+ ],
+ "assessment_method": {
+  "evaluator_isolation": "three fresh agent contexts (E1, E2, E3) with access to S1–S4 only; no access to each other's output, the coordinator's notes or the watchlist",
+  "prior_exposure": "coordinator and evaluators saw a project memory index whose headings name the existence of a round-one ESR, a brief and a refactoring; none opened; no round-one file read before the freeze",
+  "freeze_sequence": [
+   "Step 0 identity and presentation",
+   "official sources read",
+   "Step 1 fact sheet and consistency scan",
+   "Step 2 isolated lens evaluations",
+   "Step 3 consensus",
+   "freeze sealed 2026-09-09T07:00:10Z with sha256 of lens reports and notes",
+   "post-freeze: S6–S12 opened"
+  ],
+  "freeze_timestamp_utc": "2026-09-09T07:00:10Z",
+  "post_freeze_correction_log": [
+   {
+    "id": "PF-C1",
+    "item": "FC-04 right margin",
+    "original": "fail (13.9–14.1 mm)",
+    "new_evidence": "span boxes include the trailing-space advance (0.97 mm at 11 pt); DOCX margins 15.01 mm; 14.05 + 0.97 = 15.02 mm",
+    "revised": "pass for body text; FC-04b fail (minor) for table rules protruding ≤ 1.4 mm",
+    "score_effect": "none"
+   },
+   {
+    "id": "PF-C2",
+    "item": "FC-09 character spacing",
+    "original": "pass (provisional)",
+    "new_evidence": "no character-spacing attributes in the DOCX",
+    "revised": "pass",
+    "score_effect": "none"
+   },
+   {
+    "id": "PF-C3",
+    "item": "FC-06/FC-07 origin",
+    "original": "fail",
+    "new_evidence": "refactoring report §12: sealed tables 11 pt; Gantt height reduced 8.26→6.43 cm",
+    "revised": "fail, classified as regressions",
+    "score_effect": "none"
+   },
+   {
+    "id": "PF-C4",
+    "item": "R2-F-19 wording",
+    "original": "'slippage is not in the risk table'",
+    "new_evidence": "R1 covers 'pipeline not reproducible by M3'",
+    "revised": "'covers non-reproducibility but not calendar slippage'",
+    "score_effect": "none"
+   }
+  ],
+  "scores_changed_after_freeze": false
+ },
+ "scores": {
+  "consensus": {
+   "excellence": 4.1,
+   "impact": 4.1,
+   "implementation": 3.7
+  },
+  "weights": {
+   "excellence": 0.5,
+   "impact": 0.3,
+   "implementation": 0.2
+  },
+  "formula": "total = 10*excellence + 6*impact + 4*implementation",
+  "total": 80.4,
+  "thresholds": {
+   "per_criterion": 3.0,
+   "overall": 70,
+   "seal_of_excellence_score_condition": 85,
+   "source": "WP 2026–2027 pp. 84, 86 (repository copy, DRAFT watermark); EF V2.2 p. 2"
+  },
+  "threshold_results": {
+   "excellence_ge_3": true,
+   "impact_ge_3": true,
+   "implementation_ge_3": true,
+   "total_ge_70": true,
+   "total_ge_85": false
+  },
+  "official_award_status": "not_determined",
+  "seal_statement": "Conditional: the B1-only diagnostic total is below the 85 score condition; a Seal depends on a complete-application evaluation and the budget outcome; no Seal is claimed or predicted.",
+  "legacy_benchmark_92": {
+   "distance": 11.6,
+   "note": "legacy internal benchmark from round one; not an official threshold or demonstrated funding line"
+  },
+  "b1_only_qualification": "Part A and Part B2 not assessed; not an official or complete-application evaluation."
+ },
+ "lens_scores": {
+  "E1": {
+   "excellence": 4.1,
+   "impact": 4.2,
+   "implementation": 3.8,
+   "total": 81.4
+  },
+  "E2": {
+   "excellence": 3.9,
+   "impact": 4.0,
+   "implementation": 3.6,
+   "total": 77.4
+  },
+  "E3": {
+   "excellence": 4.3,
+   "impact": 4.2,
+   "implementation": 3.8,
+   "total": 83.4
+  },
+  "spread": {
+   "excellence": 0.4,
+   "impact": 0.2,
+   "implementation": 0.2
+  }
+ },
+ "aspect_assessments": {
+  "status": "non_official_diagnostic; not used to compute criterion scores",
+  "exc-obj": {
+   "E1": 4.5,
+   "E2": 4.2,
+   "E3": 4.5,
+   "consensus": 4.4
+  },
+  "exc-method": {
+   "E1": 4.0,
+   "E2": 3.7,
+   "E3": 4.7,
+   "consensus": 4.0
+  },
+  "exc-supervision": {
+   "E1": 3.8,
+   "E2": 3.9,
+   "E3": 3.7,
+   "consensus": 3.8
+  },
+  "exc-researcher": {
+   "E1": 4.2,
+   "E2": 4.0,
+   "E3": 3.9,
+   "consensus": 4.0
+  },
+  "imp-career": {
+   "E1": 4.5,
+   "E2": 4.3,
+   "E3": 4.4,
+   "consensus": 4.4
+  },
+  "imp-dissemination": {
+   "E1": 4.2,
+   "E2": 4.1,
+   "E3": 4.2,
+   "consensus": 4.2
+  },
+  "imp-magnitude": {
+   "E1": 3.8,
+   "E2": 3.6,
+   "E3": 3.6,
+   "consensus": 3.7
+  },
+  "impl-workplan": {
+   "E1": 3.7,
+   "E2": 3.6,
+   "E3": 3.7,
+   "consensus": 3.7
+  },
+  "impl-host": {
+   "E1": 3.9,
+   "E2": 3.6,
+   "E3": 3.7,
+   "consensus": 3.7
+  }
+ },
+ "consensus_resolution": {
+  "method": "reasoned reconciliation on evidence; no averaging; no tariff; no caps",
+  "excellence": "E3 4.3 vs E2 3.9: E2's textual findings (undefined screen comparator, undisclosed archive spectra, unaligned pixel geometry, no precision statement) accepted as verifiable; E3's view of the architecture accepted; four major findings retained; lower half of 'very good' -> 4.1",
+  "impact": "all lenses: magnitude unquantified (major) plus minors; E2 additionally weighs research-only collapse -> 4.1",
+  "implementation": "all lenses: unidentified field and M1–M3 compression major; E2 adds start window and M20–M21 -> upper 'good' 3.7",
+  "rejected_at_consensus": [
+   {
+    "id": "E3-W13",
+    "reason": "manuscript timing follows deliverable months; two papers proportionate to a 24-month EF"
+   }
+  ],
+  "dissents": [
+   {
+    "finding": "R2-F-07",
+    "lens": "E3",
+    "lens_severity": "major",
+    "consensus_severity": "minor"
+   },
+   {
+    "finding": "R2-F-08",
+    "lens": "E3",
+    "lens_severity": "major",
+    "consensus_severity": "minor"
+   }
+  ],
+  "disposition_table": "Annex A.4 of the Markdown report"
+ },
+ "formal_checks": [
+  {
+   "id": "FC-01",
+   "rule": "artefact identity (prompt table)",
+   "measured": "sha256 and size match; HEAD e8e8d23",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-02",
+   "rule": "Sections 1–3 ≤ 10 pages incl. tables/figures/references (template; WP p. 80)",
+   "measured": "10 physical pages; no cover or TOC",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-03",
+   "rule": "A4 (template)",
+   "measured": "210.0 × 297.0 mm all pages",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-04",
+   "rule": "margins ≥ 15 mm excl. header/footer (template)",
+   "measured": "body ink left 15.0 mm, right 15.0 mm (span boxes 14.0 mm due to trailing space); top body 25.7–26.4 mm; bottom ≥ 20 mm; DOCX 15.01 mm",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high",
+   "correction": "PF-C1"
+  },
+  {
+   "id": "FC-04b",
+   "rule": "margins ≥ 15 mm applied to table rules",
+   "measured": "borders at 13.6 mm right (pp. 5,6,7,10) and 14.5 mm left (p. 9); table text ≥ 15.5 mm",
+   "pages": "5,6,7,9,10",
+   "status": "fail",
+   "consequence": "≤ 1.4 mm protrusion; repair costs no space",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-05",
+   "rule": "reference body font TNR (template)",
+   "measured": "body TNR 11.04 pt",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-06",
+   "rule": "min 11 pt body text including text in tables (template)",
+   "measured": "all six tables at 9.96 pt (~11,700 chars, ~25% of body content)",
+   "pages": "5,6,7,9,10",
+   "status": "fail",
+   "consequence": "formatting condition not met; regression from sealed 11 pt; repair ≈ +30 lines",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-07",
+   "rule": "non-body elements legible and ≥ 8 pt (template)",
+   "measured": "footnotes 9.0 pt pass; header 8.04/footer 8.52 pass; Gantt raster labels ≈ 6–7 pt",
+   "pages": "1,4,9",
+   "status": "fail",
+   "consequence": "Gantt text below 8 pt; regression from ≈ 8.5 pt; repair by re-render, no space",
+   "distinct_from_scoring": true,
+   "confidence": "medium"
+  },
+  {
+   "id": "FC-08",
+   "rule": "≥ single line spacing (template)",
+   "measured": "12.6–12.8 pt at 11 pt; 11.5 pt at 10 pt",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-09",
+   "rule": "standard character spacing (template)",
+   "measured": "no Tz/Tw; Tc −0.13…+0.06 pt kerning; DOCX no spacing attributes",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high",
+   "correction": "PF-C2"
+  },
+  {
+   "id": "FC-10",
+   "rule": "template headings/structure B1",
+   "measured": "1, 1.1–1.4, 2, 2.1–2.3, 3, 3.1–3.2 in order; B2 pointers correct",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-11",
+   "rule": "Gantt content and elapsed months (template)",
+   "measured": "WPs, deliverables, milestones, secondments, placement; months 1–30; consistent with text",
+   "pages": "9",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-12",
+   "rule": "no clipped/hidden content, placeholders, comments, tracked changes, blank pages",
+   "measured": "renders and content-stream scan: none",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-13",
+   "rule": "PDF with embedded fonts (template)",
+   "measured": "11/11 embedded; PDF 1.7; unencrypted",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-14",
+   "rule": "header/footer and page numbering",
+   "measured": "template header; 'Part B - Page N of 10' correct",
+   "pages": "all",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-15",
+   "rule": "no hyperlinks designed to expand the proposal (template)",
+   "measured": "9 footnote URLs/DOIs",
+   "pages": "1,4",
+   "status": "pass",
+   "consequence": "none",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  },
+  {
+   "id": "FC-16",
+   "rule": "portal submission evidence",
+   "measured": "not a portal export",
+   "pages": null,
+   "status": "not_applicable",
+   "consequence": "portal_submission_verified=false",
+   "distinct_from_scoring": true,
+   "confidence": "high"
+  }
+ ],
+ "findings": [
+  {
+   "finding_id": "R2-F-01",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "major",
+   "description": "The five-season MATE archive on which O1 and O2 depend is not characterised: plot numbers and sizes, treatments, cultivars, physiological variables per season, sampling frequency and the spectral range of the instruments are not stated.",
+   "evidence": "\"unusually rich five-season (2022–2026) archive of physiological, soil, meteorological and proximal-spectral observations\" (p. 1); \"bands outside the instrument's range are dropped, not reconstructed\" (p. 2)",
+   "location": {
+    "pdf_pages": [
+     1,
+     2,
+     10
+    ],
+    "section": "1.1; 1.2 Stage 1; 3.2 MATE row",
+    "anchor_kind": "prose",
+    "anchor": "§1.1 O1; §1.2 ¶Stage 1 (WP1); §3.2 table row MATE"
+   },
+   "rationale": "Adequacy of the training base for leave-one-year-out validation and for a control-relative reference cannot be judged; SWIR synthesis unknown.",
+   "affected_lenses": [
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-01",
+    "F-02",
+    "W12",
+    "W13",
+    "E2-b",
+    "OD-E5"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-02",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "major",
+   "description": "The D1.2 engineering screen does not state what the median absolute index discrepancy is measured against; with no plot-level Sentinel-2 counterpart for historical plots it cannot test proximal-to-satellite transfer before the freeze; its thresholds are unjustified; the canopy-cover confound is not named among the diagnostics.",
+   "evidence": "\"A predictor is retained only if it passes the D1.2 engineering screen (median absolute index discrepancy ≤0.25 historical standard deviations, ≤10% change in stress classifications on a locked sensitivity set)\" (p. 2)",
+   "location": {
+    "pdf_pages": [
+     2
+    ],
+    "section": "1.2 Stage 1",
+    "anchor_kind": "prose",
+    "anchor": "§1.2 ¶Stage 1 (WP1), screen sentence"
+   },
+   "rationale": "Predictor retention rests on an undefined comparison; if the stress classifications are model outputs the screen is a selection step outside the outer folds.",
+   "affected_lenses": [
+    "E2"
+   ],
+   "consensus_disposition": "retained (single lens, textually verified)",
+   "linked_old_ids": [
+    "F-01",
+    "R01"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-03",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "major",
+   "description": "Sentinel-2 sampling geometry and matching are under-specified: a 40 × 40 m core holds four whole 20 m pixels only if grid-aligned and no alignment rule is stated; the physiology-to-acquisition matching window is absent; the 30% attrition assumption is asserted while R3 rates 'too few matched dates' as high likelihood.",
+   "evidence": "\"a 20 m inward buffer leaving a 40 × 40 m interior core\"; \"≥4 valid pixels per area and date\" (pp. 2–3); \"R3 | WP2 | H/M\" (p. 9)",
+   "location": {
+    "pdf_pages": [
+     2,
+     3,
+     9
+    ],
+    "section": "1.2 Stage 2; 3.1 risk table",
+    "anchor_kind": "prose/table",
+    "anchor": "§1.2 ¶Stage 2 (WP2) s2; §3.1 risk table row R3"
+   },
+   "rationale": "The 202 area-date basis may be smaller than presented or rely on buffer pixels.",
+   "affected_lenses": [
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained (merged)",
+   "linked_old_ids": [
+    "E2-f",
+    "W12"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-04",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "major",
+   "description": "No precision, minimum detectable advantage or power statement accompanies the decision criteria for a test with 12 experimental units per season and about 202 clustered area-dates; the locked agronomic comparator and the frozen reference model are not identified; the lead-time metric has no reference event.",
+   "evidence": "\"balanced accuracy ≥0.70 with a demonstrated advantage over a locked agronomic comparator, positive Brier skill against a frozen reference model\" (p. 3); K6 \"with uncertainty or non-estimability explained\" (p. 8)",
+   "location": {
+    "pdf_pages": [
+     3,
+     8
+    ],
+    "section": "1.2 decision criteria; 3.1 K6",
+    "anchor_kind": "prose",
+    "anchor": "§1.2 ¶Stage 1 decision-criteria sentence; §3.1 WP2 K6"
+   },
+   "rationale": "MS3 decisions may rest on estimates whose uncertainty spans the thresholds.",
+   "affected_lenses": [
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained (merged)",
+   "linked_old_ids": [
+    "F-02",
+    "R02",
+    "R03"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-05",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "minor",
+   "description": "Declared fallbacks change the evidence type without corresponding updates: a continuous primary endpoint leaves the classification criteria unmapped; a failed spectral screen removes the hyperspectral-to-Sentinel result family relied on in §2.2 and §2.3; rephasing alters K5, K6 and the MS3 evidential basis.",
+   "evidence": "\"one continuous physiological endpoint becomes the primary reference\" (p. 2); \"the hyperspectral-to-Sentinel transfer methodology\" (p. 7); \"formally rephased or the evidence claim narrowed\" (p. 9)",
+   "location": {
+    "pdf_pages": [
+     2,
+     6,
+     7,
+     9
+    ],
+    "section": "1.2; 2.2; 2.3; 3.1",
+    "anchor_kind": "prose/table",
+    "anchor": "§1.2 ¶Overall methodology fallback; §2.2 Exploitation pathway; §3.1 ¶Critical path"
+   },
+   "rationale": "Coherence gap between fallbacks and the criteria, KPIs and result families.",
+   "affected_lenses": [
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-01",
+    "F-02",
+    "R01",
+    "R02"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-06",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-supervision",
+   "severity": "major",
+   "description": "Supervisors' experience is thinly evidenced: one co-supervised doctorate (2023) for the primary supervisor, no postdoctoral supervision or topic-specific record, the co-supervisor evidenced by one 2010 publication, an unnamed deputy and an undescribed conflict-resolution route.",
+   "evidence": "\"co-supervisor of a 2023 doctoral dissertation at Széchenyi István University\"; \"a documented continuity arrangement designates a deputy for prolonged absence\" (p. 4)",
+   "location": {
+    "pdf_pages": [
+     4
+    ],
+    "section": "1.3",
+    "anchor_kind": "prose",
+    "anchor": "§1.3 ¶Supervisory architecture; ¶Planned training activities"
+   },
+   "rationale": "Template asks for supervision experience at PhD and postdoctoral level; met only partly.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-06",
+    "W16",
+    "OD-E4"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-07",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-supervision",
+   "severity": "minor",
+   "description": "The 12-month ELTE secondment is at the permitted maximum, its added value is described functionally rather than argued, and ATK-located practicals are scheduled inside the M1–M3 and M10–M12 secondment blocks while K11 counts 12 secondment months.",
+   "evidence": "\"M1–M3 at ATK (Prof. Janda, Dr Takács)\"; \"M1–M3 and M10–M12 at ATK (Dr Hollós)\" (p. 4); \"12 secondment months evidenced\" (p. 8)",
+   "location": {
+    "pdf_pages": [
+     4,
+     5,
+     8,
+     10
+    ],
+    "section": "1.3; 2.1; 3.1 K11; 3.2 ELTE row",
+    "anchor_kind": "prose/table",
+    "anchor": "§1.3 ¶Planned training activities s2; §3.1 K11"
+   },
+   "rationale": "Content of the secondment months is unclear; E3 rates this major.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained; E3 dissent (major) recorded",
+   "linked_old_ids": [
+    "F-07",
+    "W17"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-08",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-researcher",
+   "severity": "minor",
+   "description": "The researcher's modelling and Earth-observation competence for O2 is evidenced by short training stays, a traineeship and an undescribed prototype; the publication record is described qualitatively.",
+   "evidence": "\"with working use of Python, R and EO tools\"; \"a pre-existing desktop research prototype\" (p. 5)",
+   "location": {
+    "pdf_pages": [
+     5
+    ],
+    "section": "1.4",
+    "anchor_kind": "prose",
+    "anchor": "§1.4 ¶A profile matched"
+   },
+   "rationale": "Feasibility of the M3 freeze rests on supervision intensity; E3 rates this major.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained; E3 dissent (major) recorded",
+   "linked_old_ids": [
+    "F-08",
+    "W18",
+    "OD-E18"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-09",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-obj",
+   "severity": "minor",
+   "description": "State-of-the-art positioning rests on five references and does not review satellite-scale crop water-stress detection; the categorical novelty statement is asserted more than demonstrated.",
+   "evidence": "\"none has been tested as a model frozen before deployment and carried, with its uncertainty, across years, an independent field and the proximal-to-satellite scale\" (p. 1)",
+   "location": {
+    "pdf_pages": [
+     1,
+     2
+    ],
+    "section": "1.1",
+    "anchor_kind": "prose",
+    "anchor": "§1.1 ¶Pertinence"
+   },
+   "rationale": "Ambition is real but its location relative to satellite-based work is not shown.",
+   "affected_lenses": [
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-05",
+    "W14",
+    "OD-E17"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-10",
+   "origin": "residual",
+   "criterion": "excellence",
+   "aspect_id": "exc-method",
+   "severity": "minor",
+   "description": "Campaign logistics that protect the control-relative stomatal-conductance reference over a multi-hour campaign on about 7.7 ha are not stated (measurement window, block order, personnel).",
+   "evidence": "\"sample five spatially distributed plants per area\" (p. 3)",
+   "location": {
+    "pdf_pages": [
+     3
+    ],
+    "section": "1.2 Stage 2",
+    "anchor_kind": "prose",
+    "anchor": "§1.2 ¶Stage 2 (WP2) s2"
+   },
+   "rationale": "Within-campaign drift can bias the relative reference; staffing unknown (cross-consequence in impl-workplan).",
+   "affected_lenses": [
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "E1-own-3",
+    "R02"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-11",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-supervision",
+   "severity": "minor",
+   "description": "The fellow-to-host transfer overlaps the host's own declared expertise; the fellow's distinctive assets are not linked to what the hosts gain.",
+   "evidence": "\"The fellow contributes drought-stress physiology, remotely monitored plant-stress responses, field physiological phenotyping\" (p. 4)",
+   "location": {
+    "pdf_pages": [
+     4
+    ],
+    "section": "1.3",
+    "anchor_kind": "prose",
+    "anchor": "§1.3 ¶Two-way transfer s2"
+   },
+   "rationale": "Two-way transfer is asymmetric in substance.",
+   "affected_lenses": [
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-12",
+   "origin": "new",
+   "criterion": "excellence",
+   "aspect_id": "exc-supervision",
+   "severity": "minor",
+   "description": "Transferable-skills training is entirely embedded with no named course or provider, and innovation/entrepreneurship training is absent although spin-off exploration is foreseen.",
+   "evidence": "\"grant-writing clinic and FMIS evaluation\" (p. 4); \"researcher-led start-up/spin-off exploration\" (p. 6)",
+   "location": {
+    "pdf_pages": [
+     4,
+     6
+    ],
+    "section": "1.3; 2.1; 2.2",
+    "anchor_kind": "prose/table",
+    "anchor": "§1.3 ¶Planned training activities; §2.2 Exploitation row"
+   },
+   "rationale": "Work programme expects innovation and entrepreneurship training where applicable.",
+   "affected_lenses": [
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-13",
+   "origin": "residual",
+   "criterion": "impact",
+   "aspect_id": "imp-magnitude",
+   "severity": "major",
+   "description": "No quantified indication of magnitude or importance for agricultural, economic or societal impacts; the eligible-uptake denominator is deferred to the placement.",
+   "evidence": "\"no numerical water-saving benefit is claimed in advance\"; \"quantified during the placement (denominator, date, definition)\" (p. 7)",
+   "location": {
+    "pdf_pages": [
+     7
+    ],
+    "section": "2.3",
+    "anchor_kind": "prose/table",
+    "anchor": "§2.3 table Agricultural & environmental row; ¶Impact is measured"
+   },
+   "rationale": "Template asks for credible quantified estimates where possible; contribution beyond science cannot be sized.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-11",
+    "W21",
+    "OD-E8"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-14",
+   "origin": "residual",
+   "criterion": "impact",
+   "aspect_id": "imp-dissemination",
+   "severity": "minor",
+   "description": "Tools and channels for the wider public are not identified; public engagement is one-way.",
+   "evidence": "\"three illustrated explainers (M3, M12, M24)\" with \"views and downloads\" but no platform (p. 6)",
+   "location": {
+    "pdf_pages": [
+     6
+    ],
+    "section": "2.2",
+    "anchor_kind": "table",
+    "anchor": "§2.2 table Communication row"
+   },
+   "rationale": "Template requires tools and channels per target group.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-12",
+    "W20",
+    "OD-E9"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-15",
+   "origin": "new",
+   "criterion": "impact",
+   "aspect_id": "imp-dissemination",
+   "severity": "minor",
+   "description": "Post-MSCA exploitation is a list of options without owners or decision points and depends on agreements still to be concluded.",
+   "evidence": "\"Post-MSCA routes include FMIS integration, MVCRI crop extension and HUN-REN/HUNRENTECH-supported licensing or researcher-led start-up/spin-off exploration\" (p. 6)",
+   "location": {
+    "pdf_pages": [
+     6,
+     7
+    ],
+    "section": "2.2",
+    "anchor_kind": "table",
+    "anchor": "§2.2 table Exploitation row; ¶Exploitation pathway"
+   },
+   "rationale": "Exploitation after the project is undetermined in B1 (K10 defers to D4.2).",
+   "affected_lenses": [
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-16",
+   "origin": "new",
+   "criterion": "impact",
+   "aspect_id": "imp-career",
+   "severity": "minor",
+   "description": "Post-fellowship positioning relies on acquired skills; no concrete positioning measure; the MVCRI route is explicitly uncommitted.",
+   "evidence": "\"it is not a guaranteed position, funded activity or multi-crop validation programme\" (p. 10)",
+   "location": {
+    "pdf_pages": [
+     5,
+     10
+    ],
+    "section": "2.1; 3.2",
+    "anchor_kind": "prose/table",
+    "anchor": "§2.1 ¶Two realistic trajectories; §3.2 MVCRI row"
+   },
+   "rationale": "Credibility of the post-fellowship step rests on skills rather than positioning.",
+   "affected_lenses": [
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-13",
+    "OD-E16"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-17",
+   "origin": "new",
+   "criterion": "impact",
+   "aspect_id": "imp-dissemination",
+   "severity": "minor",
+   "description": "End-user engagement is concentrated in M25–M30 and depends on the placement host; before M25 only a practitioner brief and requirements feedback exist.",
+   "evidence": "\"two demonstrations at the AgroVIR evaluation (M25–M29), one workshop of about 20 participants (M29–M30)\" (p. 6)",
+   "location": {
+    "pdf_pages": [
+     6,
+     7,
+     8
+    ],
+    "section": "2.2; 3.1",
+    "anchor_kind": "table/prose",
+    "anchor": "§2.2 Communication row; §3.1 WP4"
+   },
+   "rationale": "User needs enter the MVP late; no independent venue if the placement changes.",
+   "affected_lenses": [
+    "E3"
+   ],
+   "consensus_disposition": "retained (single lens)",
+   "linked_old_ids": [],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-18",
+   "origin": "residual",
+   "criterion": "implementation",
+   "aspect_id": "impl-workplan",
+   "severity": "major",
+   "description": "The commercial field for the prospective validation is unidentified; requirements are demanding (12 independently irrigated areas incl. unirrigated and deficit regimes on about 7.7 ha, ready at M4, two consecutive seasons on one field); no incentive, compensation or agronomic acceptability is described; the backup is unidentified; a first season missed at M4 cannot be recovered; the start window is narrow; the contingency narrows O3.",
+   "evidence": "\"no site is described as secured\" (p. 10); \"activate an identified comparable site only if genuinely available; otherwise rephase or narrow the evidence claim before planting\" (p. 9)",
+   "location": {
+    "pdf_pages": [
+     3,
+     9,
+     10
+    ],
+    "section": "1.2 Stage 2; 3.1 critical path and R2; 3.2 farmer row",
+    "anchor_kind": "prose/table",
+    "anchor": "§1.2 ¶Stage 2 (WP2); §3.1 ¶Critical path; §3.1 risk table row R2; §3.2 table row Commercial farmer/producer"
+   },
+   "rationale": "Critical dependency of O3 and 9.0 PM; honest wording does not remove the delivery weakness; cross-consequence in impl-host and exc-method.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained (merged; E1 rotation point as aggravating sub-point, medium confidence)",
+   "linked_old_ids": [
+    "F-16",
+    "F-18",
+    "W9",
+    "W24",
+    "E1-own-3",
+    "OD-E7",
+    "OD-E11"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-19",
+   "origin": "residual",
+   "criterion": "implementation",
+   "aspect_id": "impl-workplan",
+   "severity": "major",
+   "description": "Months 1–3 carry the archive audit and harmonisation, protocol lock, pipeline, validation, benchmark and the irreversible freeze (2.2 PM), plus site, contractor and placement agreements, the CDP, training at two institutions, induction and the first secondment block; the risk table covers non-reproducibility by M3 but not calendar slippage of the freeze relative to planting.",
+   "evidence": "\"Pre-freeze WP1 effort is 2.2 PM of the 3.0 PM in M1–M3\" (p. 9); R1 \"pipeline not reproducible by M3: … freeze the specified baseline\" (p. 9)",
+   "location": {
+    "pdf_pages": [
+     4,
+     8,
+     9
+    ],
+    "section": "1.3; 3.1",
+    "anchor_kind": "prose",
+    "anchor": "§3.1 ¶Critical path effort sentences; §1.3 ¶Planned training activities"
+   },
+   "rationale": "The freeze is the least resourced point of the plan; a rushed freeze weakens the tested model, a late freeze breaks the pre-registration logic.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-17",
+    "W10",
+    "OD-E7"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-20",
+   "origin": "residual",
+   "criterion": "implementation",
+   "aspect_id": "impl-workplan",
+   "severity": "minor",
+   "description": "Effort is tilted toward software and operational work (WP3 6.0 PM against WP1 5.0 PM, 2.2 PM pre-freeze; 38% on WP3 and WP4) without justification.",
+   "evidence": "\"WP3 — DrR web MVP and readiness | M1–M24 | 6.0 PM\" (p. 8)",
+   "location": {
+    "pdf_pages": [
+     8
+    ],
+    "section": "3.1",
+    "anchor_kind": "prose",
+    "anchor": "§3.1 WP headers"
+   },
+   "rationale": "Balance between research training and software oversight not explained.",
+   "affected_lenses": [
+    "E1",
+    "E3"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "W11"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-21",
+   "origin": "new",
+   "criterion": "implementation",
+   "aspect_id": "impl-workplan",
+   "severity": "minor",
+   "description": "The risk register omits agronomic risks (wet season removing stress contrast, heat, pests), calendar slippage of the freeze and the M4 launch, mid-season producer withdrawal, resourcing and the M20–M21 analysis compression; contingencies for provider or placement loss name no alternative.",
+   "evidence": "R1–R6 (p. 9); \"replacement provider only if secured; placement change resolved with the host\" (p. 9)",
+   "location": {
+    "pdf_pages": [
+     9
+    ],
+    "section": "3.1 risk table",
+    "anchor_kind": "table",
+    "anchor": "§3.1 risk table rows R1–R6"
+   },
+   "rationale": "Mitigation weakest for the risks most likely to determine whether two seasons are achieved.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained (merged)",
+   "linked_old_ids": [
+    "F-21",
+    "W22"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-22",
+   "origin": "new",
+   "criterion": "implementation",
+   "aspect_id": "impl-workplan",
+   "severity": "minor",
+   "description": "The Gantt shows work-package bars only, with unlabeled milestones and abbreviated deliverables; the field-readiness gate invoked in §1.2 and §3.2 is not an explicit milestone.",
+   "evidence": "Gantt rows 'Milestones', 'Deliverables A/B' (p. 9); MS1 definition (p. 9)",
+   "location": {
+    "pdf_pages": [
+     9
+    ],
+    "section": "3.1 Gantt; decision gates",
+    "anchor_kind": "gantt",
+    "anchor": "§3.1 Gantt; ¶Decision gates MS1"
+   },
+   "rationale": "The single most important go/no-go decision is not separately visible.",
+   "affected_lenses": [
+    "E3",
+    "E1",
+    "E2"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-23",
+    "OD-E20"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-23",
+   "origin": "residual",
+   "criterion": "implementation",
+   "aspect_id": "impl-host",
+   "severity": "minor",
+   "description": "Access rights to the MATE archive are fixed only by an M1 audit; the R1 fallback 'redesign O1–O2' is not a specified plan.",
+   "evidence": "\"redesign O1–O2 if the core archive is absent\" (p. 9); \"An M1 archive and rights audit fixes the accessible years, variables and permitted analysis\" (p. 10)",
+   "location": {
+    "pdf_pages": [
+     9,
+     10
+    ],
+    "section": "3.1 R1; 3.2 MATE row",
+    "anchor_kind": "table",
+    "anchor": "§3.1 risk table row R1; §3.2 table row MATE"
+   },
+   "rationale": "Second principal input unsettled at submission; contingency unspecified.",
+   "affected_lenses": [
+    "E1"
+   ],
+   "consensus_disposition": "retained",
+   "linked_old_ids": [
+    "F-16",
+    "F-22",
+    "OD-E11"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-24",
+   "origin": "residual",
+   "criterion": "implementation",
+   "aspect_id": "impl-host",
+   "severity": "minor",
+   "description": "Capacity for the field programme, placement supervision and engineering is asserted: no AgroVIR supervisor named, Krumatic's capacity not outlined, field-campaign staffing and instrumentation unquantified, season-2 campaigns run from the ELTE block.",
+   "evidence": "\"AgroVIR operational supervision\" (p. 8); \"The project installs soil-water and meteorological monitoring and conducts all specialised observations\" (p. 10)",
+   "location": {
+    "pdf_pages": [
+     4,
+     8,
+     10
+    ],
+    "section": "1.3; 3.1; 3.2",
+    "anchor_kind": "table/prose",
+    "anchor": "§3.2 table rows AgroVIR, Krumatic, Commercial farmer; §3.1 WP4 lead"
+   },
+   "rationale": "Quality and capacity of two participating organisations and field logistics asserted rather than outlined.",
+   "affected_lenses": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "consensus_disposition": "retained (merged)",
+   "linked_old_ids": [
+    "F-16",
+    "F-22",
+    "E1-own-3",
+    "OD-E12",
+    "OD-E13"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-25",
+   "origin": "regressed",
+   "criterion": "formal",
+   "aspect_id": "none",
+   "severity": "major_formal",
+   "description": "All table text is set at 9.96 pt; the template requires 11 pt for body text including text in tables; the sealed submission used 11 pt tables.",
+   "evidence": "PyMuPDF spans in six tables: 9.96 pt (about 11,700 characters); template V5.0: \"The minimum font size allowed is 11 points … This applies to the body text, including text in tables.\"",
+   "location": {
+    "pdf_pages": [
+     5,
+     6,
+     7,
+     9,
+     10
+    ],
+    "section": "2.1; 2.2; 2.3; 3.1 risk; 3.2",
+    "anchor_kind": "table",
+    "anchor": "all tables"
+   },
+   "rationale": "Formatting condition not met; not a score deduction; repair costs about 30 lines.",
+   "affected_lenses": [
+    "coordinator"
+   ],
+   "consensus_disposition": "formal check FC-06",
+   "linked_old_ids": [
+    "S0-2 (sealed OK)",
+    "refactoring report §12 PASS label"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-26",
+   "origin": "regressed",
+   "criterion": "formal",
+   "aspect_id": "none",
+   "severity": "minor_formal",
+   "description": "Gantt labels are about 6–7 pt effective after the image height was reduced from 8.26 cm to 6.43 cm; figure text must be legible and not less than 8 pt; the sealed Gantt labels were about 8.5 pt.",
+   "evidence": "Raster measurement: WP labels 17–19 px at 0.36 pt/px = 6.1–6.8 pt extents; axis digits about 6 pt",
+   "location": {
+    "pdf_pages": [
+     9
+    ],
+    "section": "3.1 Gantt",
+    "anchor_kind": "gantt",
+    "anchor": "§3.1 Gantt image"
+   },
+   "rationale": "Below the 8 pt floor; repair by re-rendering costs no space.",
+   "affected_lenses": [
+    "coordinator"
+   ],
+   "consensus_disposition": "formal check FC-07",
+   "linked_old_ids": [
+    "S0-2 (sealed ≈ 8.5 pt)",
+    "refactoring report §12 PASS label"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  },
+  {
+   "finding_id": "R2-F-27",
+   "origin": "new",
+   "criterion": "formal",
+   "aspect_id": "none",
+   "severity": "minor_formal",
+   "description": "Table border lines protrude up to 1.4 mm into the right margin (pp. 5, 6, 7, 10) and 0.5 mm into the left margin (p. 9); table text stays inside the margins.",
+   "evidence": "Vector drawings x1 = 556.4 pt (13.6 mm from the edge); DOCX tblInd 150 and 57 twips",
+   "location": {
+    "pdf_pages": [
+     5,
+     6,
+     7,
+     9,
+     10
+    ],
+    "section": "tables",
+    "anchor_kind": "table",
+    "anchor": "table borders"
+   },
+   "rationale": "Marginal infraction of the 15 mm rule; repair costs no space.",
+   "affected_lenses": [
+    "coordinator"
+   ],
+   "consensus_disposition": "formal check FC-04b",
+   "linked_old_ids": [
+    "refactoring report §11 R 14.0 (artefact)"
+   ],
+   "score_effect": "reflected in the holistic criterion score; no tariff"
+  }
+ ],
+ "round1_comparison": {
+  "prior_sources": [
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10",
+   "S11"
+  ],
+  "prior_scores": {
+   "excellence": 3.6,
+   "impact": 3.7,
+   "implementation": 3.5,
+   "total": 72.2,
+   "scope": "full application (Part A, B1, B2)",
+   "calibration": "5.0 minus per-finding deductions; 4.4 cap per major finding; 92-point fundable zone"
+  },
+  "current_scores": {
+   "excellence": 4.1,
+   "impact": 4.1,
+   "implementation": 3.7,
+   "total": 80.4,
+   "scope": "B1 only",
+   "calibration": "holistic official descriptors; no caps; no tariff"
+  },
+  "arithmetic_difference": {
+   "excellence": 0.5,
+   "impact": 0.4,
+   "implementation": 0.2,
+   "total": 8.2,
+   "is_like_for_like": false
+  },
+  "like_for_like_delta": null,
+  "scope_and_calibration_differences": "Round one covered Part A/B2 findings (F-09, F-19, F-24…F-29) and applied caps and tariffs; round two excludes them and scores holistically; no baseline-B1 assessment under the current method was performed.",
+  "qualitative_attribution": {
+   "improved": [
+    "F-01…F-04 narrowed (transfer chain, design, reference, model, validation, open science)",
+    "F-05 narrowed (comparators)",
+    "F-07, F-14 resolved (training, continuity, CDP)",
+    "F-12 narrowed (communication)",
+    "F-13 resolved",
+    "F-15 resolved",
+    "F-16 narrowed (dependency statements)",
+    "F-20 resolved",
+    "F-21 resolved",
+    "F-23 resolved"
+   ],
+   "unchanged": [
+    "archive characterisation",
+    "supervision record",
+    "magnitude quantification",
+    "field-site identity and terms",
+    "M1–M3 load",
+    "start-window narrowness"
+   ],
+   "regressed": [
+    "table typography 11→10 pt (formal)",
+    "Gantt label size (formal)",
+    "ATK/ELTE month clash (minor, new)"
+   ]
+  },
+  "closure_rows": [
+   {
+    "old_ids": [
+     "F-01",
+     "W12",
+     "E2-f"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 2 §1.2 Stage 1",
+    "round2_ids": [
+     "R2-F-01",
+     "R2-F-02",
+     "R2-F-03"
+    ],
+    "note": "chain specified; screen comparator and archive range missing"
+   },
+   {
+    "old_ids": [
+     "F-02",
+     "W13",
+     "E1-own-1",
+     "E2-b"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "pp. 2–3 §1.2",
+    "round2_ids": [
+     "R2-F-01",
+     "R2-F-03",
+     "R2-F-04"
+    ],
+    "note": "dimensioned; precision and geometry not shown"
+   },
+   {
+    "old_ids": [
+     "F-03",
+     "E2-a",
+     "E2-c"
+    ],
+    "status": "resolved",
+    "current_anchor": "pp. 2–3 §1.2",
+    "round2_ids": [
+     "R2-F-04"
+    ],
+    "note": "model named; paired spectra; comparator identity residual"
+   },
+   {
+    "old_ids": [
+     "F-04",
+     "W15",
+     "E2-d"
+    ],
+    "status": "resolved",
+    "current_anchor": "pp. 3–4 §1.2; p. 6",
+    "round2_ids": [],
+    "note": "registration, Zenodo, BSD-3, preprints"
+   },
+   {
+    "old_ids": [
+     "F-05",
+     "W14"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "pp. 1–2 §1.1",
+    "round2_ids": [
+     "R2-F-09"
+    ],
+    "note": "comparators cited; satellite-scale literature absent"
+   },
+   {
+    "old_ids": [
+     "F-06",
+     "W16"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 4 §1.3",
+    "round2_ids": [
+     "R2-F-06"
+    ],
+    "note": "documentary examples; no totals"
+   },
+   {
+    "old_ids": [
+     "F-07",
+     "W17"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 4 §1.3",
+    "round2_ids": [
+     "R2-F-07",
+     "R2-F-12"
+    ],
+    "note": "timed schedule; new location clash"
+   },
+   {
+    "old_ids": [
+     "F-08",
+     "W18"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 5 §1.4",
+    "round2_ids": [
+     "R2-F-08"
+    ],
+    "note": "links added; DrR functions undescribed"
+   },
+   {
+    "old_ids": [
+     "F-09",
+     "W2",
+     "F-29"
+    ],
+    "status": "out_of_scope",
+    "current_anchor": "Part B2",
+    "round2_ids": [],
+    "note": "CV"
+   },
+   {
+    "old_ids": [
+     "F-10",
+     "W4"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 5 §1.4",
+    "round2_ids": [],
+    "note": "disputed credential omitted (B1 component)"
+   },
+   {
+    "old_ids": [
+     "F-11",
+     "W21"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 7 §2.3",
+    "round2_ids": [
+     "R2-F-13"
+    ],
+    "note": "three scales and links; no quantified estimate"
+   },
+   {
+    "old_ids": [
+     "F-12",
+     "W20"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 6 §2.2",
+    "round2_ids": [
+     "R2-F-14"
+    ],
+    "note": "messages/timing; public channels unnamed"
+   },
+   {
+    "old_ids": [
+     "F-13",
+     "W19"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 6 §2.1",
+    "round2_ids": [
+     "R2-F-16"
+    ],
+    "note": "dated measures; new angle on positioning"
+   },
+   {
+    "old_ids": [
+     "F-14",
+     "E3-own-CDP"
+    ],
+    "status": "resolved",
+    "current_anchor": "pp. 4, 5, 8",
+    "round2_ids": [],
+    "note": "cadence consistent"
+   },
+   {
+    "old_ids": [
+     "F-15",
+     "E1-own-2"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 6 §2.2",
+    "round2_ids": [],
+    "note": "release assets; irrigation venue"
+   },
+   {
+    "old_ids": [
+     "F-16 (field)",
+     "W24",
+     "E1-own-3"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 3; p. 9 R2; p. 10 farmer row",
+    "round2_ids": [
+     "R2-F-18"
+    ],
+    "note": "requirements and gate; site unidentified; compensation absent"
+   },
+   {
+    "old_ids": [
+     "F-16 (archive, contractor)",
+     "F-22",
+     "W8"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 10 §3.2",
+    "round2_ids": [
+     "R2-F-23",
+     "R2-F-24"
+    ],
+    "note": "dependency statement; sources and capacities unstated"
+   },
+   {
+    "old_ids": [
+     "F-17",
+     "W10"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "pp. 8–9 §3.1",
+    "round2_ids": [
+     "R2-F-19"
+    ],
+    "note": "split explained; load unchanged"
+   },
+   {
+    "old_ids": [
+     "W11"
+    ],
+    "status": "unresolved",
+    "current_anchor": "p. 8",
+    "round2_ids": [
+     "R2-F-20"
+    ],
+    "note": "folded in round one; never addressed"
+   },
+   {
+    "old_ids": [
+     "F-18",
+     "W9"
+    ],
+    "status": "partially_resolved",
+    "current_anchor": "p. 9 critical path",
+    "round2_ids": [
+     "R2-F-18",
+     "R2-F-05"
+    ],
+    "note": "February start; narrow window; contingency narrows O3"
+   },
+   {
+    "old_ids": [
+     "F-19",
+     "W1"
+    ],
+    "status": "out_of_scope",
+    "current_anchor": "Part A",
+    "round2_ids": [],
+    "note": "secondment host registration"
+   },
+   {
+    "old_ids": [
+     "F-20",
+     "W23",
+     "E2-e"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 10 ATK row",
+    "round2_ids": [],
+    "note": "hosting plan"
+   },
+   {
+    "old_ids": [
+     "F-21",
+     "W22"
+    ],
+    "status": "resolved",
+    "current_anchor": "p. 9",
+    "round2_ids": [
+     "R2-F-21"
+    ],
+    "note": "old omissions covered; new gaps"
+   },
+   {
+    "old_ids": [
+     "F-23",
+     "W5",
+     "OD-E20"
+    ],
+    "status": "resolved",
+    "current_anchor": "pp. 1, 8, 9",
+    "round2_ids": [
+     "R2-F-22"
+    ],
+    "note": "renumbered; Gantt readability new"
+   },
+   {
+    "old_ids": [
+     "F-24",
+     "W7",
+     "F-28"
+    ],
+    "status": "out_of_scope",
+    "current_anchor": "Part A",
+    "round2_ids": [],
+    "note": "ethics table; AI pointer"
+   },
+   {
+    "old_ids": [
+     "F-25",
+     "W3",
+     "F-26",
+     "W6",
+     "F-27",
+     "E3-own-declaration"
+    ],
+    "status": "out_of_scope",
+    "current_anchor": "Part A / B2",
+    "round2_ids": [],
+    "note": "cosmetics; B2 declaration"
+   },
+   {
+    "old_ids": [
+     "E1-own-4"
+    ],
+    "status": "unresolved",
+    "current_anchor": "p. 1",
+    "round2_ids": [],
+    "note": "2026 season completeness not stated; note only, not scored"
+   },
+   {
+    "old_ids": [
+     "W25"
+    ],
+    "status": "not_a_weakness",
+    "current_anchor": "pp. 4, 5, 8, 10",
+    "round2_ids": [],
+    "note": "placement and secondment compliant on recheck"
+   },
+   {
+    "old_ids": [
+     "E3-own-co-creation"
+    ],
+    "status": "retained_strength",
+    "current_anchor": "pp. 6–7, 10",
+    "round2_ids": [],
+    "note": "end-user evaluation present"
+   },
+   {
+    "old_ids": [
+     "S0-2 (sealed typography OK)"
+    ],
+    "status": "regressed",
+    "current_anchor": "pp. 5–10",
+    "round2_ids": [
+     "R2-F-25",
+     "R2-F-26"
+    ],
+    "note": "tables 10 pt; Gantt ≈ 6–7 pt"
+   }
+  ],
+  "watchlist_verdicts": "Part II.7.2 of the Markdown report (12 items)"
+ },
+ "revision_actions": [
+  {
+   "action_id": "R2-A-01",
+   "priority": "P0",
+   "finding_ids": [
+    "R2-F-25"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "formatting",
+   "anchor": "all tables (DOCX style FW Table 10 pt)",
+   "instruction": "Set every table run and paragraph to 11 pt; keep single spacing; do not shrink any other element.",
+   "rationale": "Template applies the 11 pt minimum to text in tables; the sealed version complied.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [
+    "R2-CUT-01",
+    "R2-CUT-02",
+    "R2-CUT-03",
+    "R2-CUT-04",
+    "R2-CUT-05",
+    "R2-CUT-06",
+    "R2-CUT-07",
+    "R2-CUT-09",
+    "R2-CUT-10",
+    "R2-CUT-12",
+    "R2-CUT-13"
+   ],
+   "gross_lines_added": 29.5,
+   "gross_lines_removed": 0,
+   "cut_ids": [
+    "R2-CUT-01",
+    "R2-CUT-02",
+    "R2-CUT-03",
+    "R2-CUT-04",
+    "R2-CUT-07",
+    "R2-CUT-08",
+    "R2-CUT-09",
+    "R2-CUT-10",
+    "R2-CUT-12",
+    "R2-CUT-13"
+   ],
+   "verification": "PyMuPDF: min non-superscript span size in every table bbox ≥ 10.95 pt; page count 10; Gantt on p. 9; §2.1 rows intact across pp. 5–6",
+   "effort": "medium",
+   "regression_risk": "high",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-02",
+   "priority": "P0",
+   "finding_ids": [
+    "R2-F-26"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "formatting",
+   "anchor": "p. 9 Gantt image (source figure in tools/build_partb1_refactored.py)",
+   "instruction": "Re-render at the same 17.99 × 6.43 cm frame with label and tick fonts scaled to ≥ 8 pt effective (row pitch 18 pt allows 9 pt); export ≥ 300 ppi; content unchanged.",
+   "rationale": "Figure text must be ≥ 8 pt.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Raster extents ≥ 9 pt; labels legible at 100%",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-03",
+   "priority": "P0",
+   "finding_ids": [
+    "R2-F-27"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "formatting",
+   "anchor": "DOCX tables tblInd 150 (five tables) and 57 (risk table)",
+   "instruction": "Set table indent to 0 and keep table width within the text width so borders sit inside 15 mm.",
+   "rationale": "All margins ≥ 15 mm.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Drawings bbox x0 ≥ 42.5 pt and x1 ≤ 552.8 pt on every page",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-04",
+   "priority": "P1",
+   "finding_ids": [
+    "R2-F-07"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 4 §1.3 ¶Planned training activities s2",
+   "instruction": "Relabel the two ATK-provider practicals in M1–M3 and M10–M12 as delivered through the fortnightly joint sessions already stated; move no month.",
+   "rationale": "Removes the location clash with the ELTE blocks and keeps K11 consistent.",
+   "owner": "operator",
+   "safe_response": "Wording W1 uses only facts already in the text.",
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "No 'at ATK' inside a month range equal to an ELTE block; K11 unchanged",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": "M1–M3 (Prof. Janda, Dr Takács, through the fortnightly joint sessions), physiological-reference and irrigation-design practical; M1–M3 and M10–M12 (Dr Hollós, joint sessions), blocked validation, calibration and uncertainty practical"
+  },
+  {
+   "action_id": "R2-A-05",
+   "priority": "P1",
+   "finding_ids": [
+    "R2-F-02"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 2 §1.2 ¶Stage 1 screen sentence",
+   "instruction": "State what the screen compares (archive cross-instrument and cross-season consistency of synthetic indices), that the stress classes it uses are reference-defined, and that the prospective paired spectra apply the same tolerance diagnostically.",
+   "rationale": "Implements brief R01 steps 5–6 as accepted; removes an undefined comparison and a possible selection outside folds.",
+   "owner": "operator",
+   "safe_response": "Wording W2.",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [
+    "R2-CUT-06"
+   ],
+   "verification": "Both quantities of the discrepancy identifiable; no model output enters predictor selection outside folds",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "high",
+   "proposed_wording": "; the screen compares synthetic indices across archive instruments and seasons, and the stress classes it uses are reference-defined, not model outputs; the prospective paired spectra apply the same tolerance as a diagnostic without altering the frozen model"
+  },
+  {
+   "action_id": "R2-A-06",
+   "priority": "P1",
+   "finding_ids": [
+    "R2-F-05"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 2 §1.2 fallback sentences (continuous endpoint; failed spectral transfer)",
+   "instruction": "Add the consequence mapping for both fallbacks: criteria restated as regression/calibration criteria in D1.2 with classification KPIs secondary; negative transfer result reported and MVP limited to baseline functions.",
+   "rationale": "The brief's alternatives are accepted; their consequences for criteria, KPIs and result families were not carried into the text.",
+   "owner": "operator",
+   "safe_response": "Wording W3.",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [
+    "R2-CUT-05"
+   ],
+   "verification": "Every fallback names its effect on criteria, KPIs and result families",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": "…becomes the primary reference, D1.2 restates the decision criteria as pre-specified regression and calibration criteria, and the classification KPIs are reported as secondary. … failed spectral transfer is reported as a negative transfer result, the transfer methodology is delivered as that report, and the MVP is limited to the baseline functions."
+  },
+  {
+   "action_id": "R2-A-07",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-03"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 3 §1.2 Stage 2 s2 end; p. 10 farmer row",
+   "instruction": "Add the grid-alignment requirement and the matching-window rule (value fixed in D1.2 if not decided).",
+   "rationale": "Makes the ≥ 4-pixel rule attainable by construction or its non-attainment handled.",
+   "owner": "operator; fellow for the window value",
+   "safe_response": "aligned to the Sentinel-2 20 m grid where the field permits; matched within a window fixed in D1.2",
+   "dependencies": [
+    "R2-A-01"
+   ],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Alignment and window statements present",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-08",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-04"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 3 §1.2 decision-criteria sentence",
+   "instruction": "Name the locked comparator (pre-specified AquaCrop/soil-water rule) and the reference model (soil-water/meteorological baseline); state that D1.2 fixes the required interval precision and that criteria are judged on interval bounds where estimable.",
+   "rationale": "Brief R03 already prescribes agreeing precision before fitting; both comparators are mentioned elsewhere in the text.",
+   "owner": "operator",
+   "safe_response": "Wording W4.",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Comparator, reference model and precision rule identifiable in one sentence",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "high",
+   "proposed_wording": "…over the locked agronomic comparator (the pre-specified AquaCrop/soil-water rule), positive Brier skill against the frozen soil-water/meteorological baseline … D1.2 fixes the interval precision required for each criterion, which is judged on interval bounds where estimable."
+  },
+  {
+   "action_id": "R2-A-09",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-18"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 10 §3.2 farmer row after 'no site is described as secured.'",
+   "instruction": "Add the field-use terms procedure: irrigation-control responsibilities and compensation for yield loss in deficit and unirrigated areas agreed before planting under the host-approved arrangement.",
+   "rationale": "Brief R12/R15 accepted; names the producer's burden with owner and deadline without claiming a site or payment.",
+   "owner": "operator",
+   "safe_response": "Wording W5.",
+   "dependencies": [
+    "R2-A-01"
+   ],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Producer burden named with owner and deadline; no site or payment claimed",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": "Field-use terms, including irrigation-control responsibilities and compensation for yield loss in deficit and unirrigated areas, are agreed with the producer before planting under the host-approved arrangement."
+  },
+  {
+   "action_id": "R2-A-10",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-18"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 9 ¶Critical path 'a feasible start is chosen within the permitted grant window before launch'",
+   "instruction": "Insert the start window that fits the design: 'between February and March'.",
+   "rationale": "Brief R13 calendar option.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0.5,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Sentence still reads as a plan",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-11",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-23"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 9 risk table R1 'redesign O1–O2 if the core archive is absent'",
+   "instruction": "Replace with the accepted re-scope rule: O1–O2 re-scoped to the accessible seasons and variables, recorded in D1.1 and D1.2.",
+   "rationale": "Brief R12 fallback; a decision and a record instead of an open redesign.",
+   "owner": "operator",
+   "safe_response": "Wording W6.",
+   "dependencies": [
+    "R2-A-01"
+   ],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "R1 names a decision and a record",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": "if the accessible subset lacks the common variables, O1–O2 are re-scoped to the accessible seasons and variables and the reduced scope is recorded in D1.1 and D1.2"
+  },
+  {
+   "action_id": "R2-A-12",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-21"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 9 risk table R2 and R3",
+   "instruction": "Add 'producer withdrawal within a season' to R2 with the existing rephase/narrow response; add 'weak stress contrast in a wet season' to R3 with the response 'reported as reduced power under K6'.",
+   "rationale": "K6 non-estimability and the R2 procedure are accepted design.",
+   "owner": "operator",
+   "safe_response": "Wording W7.",
+   "dependencies": [
+    "R2-A-01"
+   ],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Two most likely delivery risks have triggers and responses",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-13",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-22"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 9 ¶Decision gates MS1",
+   "instruction": "Insert 'field-readiness gate decided;' into the MS1 definition.",
+   "rationale": "The gate invoked in §1.2 and §3.2 becomes a milestone element.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "'field-readiness gate' appears in MS1",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-14",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-14"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 6 §2.2 Communication row, public sub-item",
+   "instruction": "Name the channel under project control: a fellow-maintained project page, with host and AgroVIR channels where the hosts agree.",
+   "rationale": "Brief R09 fallback; supplies a tool and channel for the wider-public target group.",
+   "owner": "operator",
+   "safe_response": "Wording W8.",
+   "dependencies": [
+    "R2-A-01"
+   ],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "A tool and channel exists for the public target group",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": ", published on a fellow-maintained project page and, where the hosts agree, through HUN-REN ATK, ELTE and AgroVIR channels"
+  },
+  {
+   "action_id": "R2-A-15",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-15"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 6 §2.2 Exploitation row 'Post-MSCA routes include …'",
+   "instruction": "Append 'each route assigned an owner and a decision gate in the D4.2 roadmap (K10)'.",
+   "rationale": "K10 already states it.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0.5,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Options tied to an owner and decision point",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-16",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-07"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 4 §1.3 'The 12-month ELTE secondment (…) hosts the EO strands.'",
+   "instruction": "Add: the secondment provides instrument, laboratory and supervision access for the EO strands that HUN-REN ATK does not hold.",
+   "rationale": "Facts in the §3.2 ELTE row; answers the template's secondment rationale.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Secondment added value stated in one sentence",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-17",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-11"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 4 §1.3 ¶Two-way transfer s2",
+   "instruction": "Name the fellow's distinctive assets already in §1.4 (vegetable-crop field phenotyping in Bulgarian production systems, UAV qualification, the DrR prototype) and what the hosts gain.",
+   "rationale": "Facts already in §1.4.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Both directions name distinct content",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-18",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-10"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "accepted_design_consistency",
+   "anchor": "p. 3 §1.2 Stage 2 'sample five spatially distributed plants per area.'",
+   "instruction": "Add the campaign protocol clause: fixed morning window, blocks in rotating order, controls interleaved with treatments, time of day logged.",
+   "rationale": "Brief R02 records time of day and VPD; protects the relative reference.",
+   "owner": "operator",
+   "safe_response": "Wording W9.",
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Reference protected against within-campaign drift",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium",
+   "proposed_wording": ", measured within a fixed morning window with blocks in rotating order and controls interleaved with treatments, time of day logged"
+  },
+  {
+   "action_id": "R2-A-19",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-20"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 9 effort paragraph after 'Training within scientific tasks is counted once.'",
+   "instruction": "Add: WP3 fellow effort covers specification, acceptance tests and scientific-consistency testing (T3.1–T3.4); engineering is contracted.",
+   "rationale": "Explains the WP3 share without changing PM.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "WP3 share explained",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-20",
+   "priority": "P2",
+   "finding_ids": [
+    "R2-F-12"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 4 §1.3 'grant-writing clinic and FMIS evaluation'",
+   "instruction": "Rename to 'grant-writing, valorisation and entrepreneurship clinic'.",
+   "rationale": "Exploitation already foresees spin-off exploration; no new provider claimed.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Training list covers innovation and entrepreneurship",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-21",
+   "priority": "P4",
+   "finding_ids": [],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "editorial",
+   "anchor": "p. 10 farmer row 'An independent Hungarian farmer/producer, irrespective of gender,'",
+   "instruction": "Delete 'irrespective of gender,'.",
+   "rationale": "Stray phrase.",
+   "owner": "operator",
+   "safe_response": null,
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Phrase absent",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-22",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-01"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 1 O1; p. 2 Stage 1; p. 10 MATE row",
+   "instruction": "State instrument, spectral range, plots per season, treatments, variables and dates once MATE supplies them (OD-E5).",
+   "rationale": "Archive is the sole training base.",
+   "owner": "MATE / Dr Takács",
+   "safe_response": "Keep conditional wording; add 'the M1 audit (D1.1) fixes the instrument range and per-season variable coverage; SWIR coverage is not assumed'",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Dimensions appear or their absence is explicit",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-23",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-06"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 4 §1.3 ¶Supervisory architecture",
+   "instruction": "Add verified supervision totals, one or two named current collaborations and the deputy's role if supplied (OD-E4).",
+   "rationale": "Template asks for supervision experience.",
+   "owner": "Prof. Janda; Prof. Jung; Dr Hollós",
+   "safe_response": "Keep documentary examples; never state totals",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Totals and collaborations sourced",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-24",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-13"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 7 §2.3 three-scale sentence",
+   "instruction": "Insert the eligible-uptake subset (farms, hectares, definition, date) and a sourced irrigated processing-tomato area if supplied (OD-E8).",
+   "rationale": "Template asks for quantified estimates.",
+   "owner": "AgroVIR; host",
+   "safe_response": "Keep the bounded statement; no national figure established",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Every number has a source and denominator",
+   "effort": "low",
+   "regression_risk": "medium",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-25",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-08"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 5 §1.4 DrR clause",
+   "instruction": "Add prototype version or dated declaration, implemented functions, one reproducible demonstration; name training certificates (OD-E18).",
+   "rationale": "Evidence of modelling competence.",
+   "owner": "fellow",
+   "safe_response": "Keep current wording",
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Functions named; no mature-software claim",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-26",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-24"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 10 AgroVIR, Krumatic and farmer rows; p. 4 §1.3",
+   "instruction": "Name the AgroVIR operational supervisor, outline Krumatic's team and track record, state campaign staffing and instruments (OD-E12, OD-E13).",
+   "rationale": "Capacity of participating organisations.",
+   "owner": "AgroVIR; Krumatic; ATK",
+   "safe_response": "Keep procedural wording; do not claim allocation",
+   "dependencies": [],
+   "gross_lines_added": 2,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Each capacity claim has an owner",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-27",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-09"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "pp. 1–2 §1.1 ¶Pertinence; footnotes",
+   "instruction": "Add one satellite-scale crop water-stress reference and a positioning clause (OD-E17).",
+   "rationale": "Novelty proportionality.",
+   "owner": "fellow",
+   "safe_response": "Keep current comparators",
+   "dependencies": [
+    "page-count check"
+   ],
+   "gross_lines_added": 3,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Reference resolvable; claim proportionate",
+   "effort": "low",
+   "regression_risk": "medium",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-28",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-17"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_decision",
+   "anchor": "p. 6 §2.2 Communication row (M12 brief)",
+   "instruction": "Decide whether the M12 brief opens a structured feedback round with growers recruited through AgroVIR.",
+   "rationale": "Earlier user input; independence from the placement.",
+   "owner": "host; AgroVIR",
+   "safe_response": "Keep the M25–M30 concentration",
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Feedback before M25 has owner and month",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-29",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-16"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_decision",
+   "anchor": "p. 5 §2.1 ¶Two realistic trajectories",
+   "instruction": "Name one positioning measure (scheme or position type and month) if the fellow decides it; no scheme without eligibility.",
+   "rationale": "Career credibility.",
+   "owner": "fellow",
+   "safe_response": "Keep current trajectories",
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Measure is a decision, not a promised award",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  },
+  {
+   "action_id": "R2-A-30",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-04"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 3 §1.2 decision criteria",
+   "instruction": "Replace the precision rule with simulated interval precision from archive counts when supplied (brief R02).",
+   "rationale": "Statistical resolution of the central test.",
+   "owner": "MATE; fellow; Dr Hollós",
+   "safe_response": "R2-A-08 rule statement",
+   "dependencies": [
+    "R2-A-22"
+   ],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Precision figures traceable to counts",
+   "effort": "medium",
+   "regression_risk": "low",
+   "leverage": "high"
+  },
+  {
+   "action_id": "R2-A-31",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-24",
+    "R2-F-21"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_fact",
+   "anchor": "p. 10 Krumatic row; §3.2 intro",
+   "instruction": "State the funding source of the engineering and instrumentation (OD-E13).",
+   "rationale": "Resource credibility.",
+   "owner": "host",
+   "safe_response": "Keep the priority order",
+   "dependencies": [],
+   "gross_lines_added": 1,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Source named without a Part A change",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "medium"
+  },
+  {
+   "action_id": "R2-A-32",
+   "priority": "P3",
+   "finding_ids": [
+    "R2-F-07"
+   ],
+   "target_document": "PART_B1_DOCX",
+   "action_class": "needs_decision",
+   "anchor": "p. 4 §1.3; p. 10 ELTE row",
+   "instruction": "Confirm with ELTE the content of each secondment block beyond the module and the clinic (OD-E15 residual).",
+   "rationale": "E3 dissent on secondment value.",
+   "owner": "Prof. Jung",
+   "safe_response": "R2-A-04 and R2-A-16",
+   "dependencies": [],
+   "gross_lines_added": 0,
+   "gross_lines_removed": 0,
+   "cut_ids": [],
+   "verification": "Block content matches K11",
+   "effort": "low",
+   "regression_risk": "low",
+   "leverage": "low"
+  }
+ ],
+ "do_not_touch": [
+  {
+   "location": "p. 2 §1.1 Beyond the state of the art",
+   "reason": "clearest statement of ambition; credited by all lenses"
+  },
+  {
+   "location": "pp. 1–2 §1.1 Measurability and verifiability",
+   "reason": "metrics, M3 freeze, falsifiable hypothesis"
+  },
+  {
+   "location": "p. 3 §1.2 Stage 2 s1, s4–s6",
+   "reason": "frozen-model logic"
+  },
+  {
+   "location": "p. 3 §1.2 Methodological challenges (i)–(vi)",
+   "reason": "mitigation list credited by E1/E2"
+  },
+  {
+   "location": "p. 3 §1.2 Gender dimension",
+   "reason": "accepted justified statement"
+  },
+  {
+   "location": "p. 4 §1.3 Structured supervision and governance",
+   "reason": "governance credited"
+  },
+  {
+   "location": "p. 4 §1.3 Two-way transfer s2–s4",
+   "reason": "concrete transfer (R2-A-17 appends only)"
+  },
+  {
+   "location": "p. 5 §1.3 Placement rationale s1–s5",
+   "reason": "compliance-critical placement wording"
+  },
+  {
+   "location": "pp. 6–7 §2.2 Exploitation row, IP row, Exploitation pathway",
+   "reason": "strongest Impact strand (R2-A-15 appends inside the row)"
+  },
+  {
+   "location": "p. 7 §2.3 'no numerical water-saving benefit is claimed in advance'",
+   "reason": "honest bounding"
+  },
+  {
+   "location": "pp. 8–9 §3.1 WP headers, task months, PM, deliverable months, K1–K14, MS1–MS6",
+   "reason": "reconciles with the Gantt"
+  },
+  {
+   "location": "p. 9 §3.1 Decision gates; Risk control integrity rule",
+   "reason": "named approvers; integrity rule"
+  },
+  {
+   "location": "p. 9 Gantt",
+   "reason": "re-render only for fonts (R2-A-02)"
+  },
+  {
+   "location": "pp. 5–6 §2.1 table split",
+   "reason": "row-break sensitive"
+  },
+  {
+   "location": "pp. 1, 4 footnotes 1–9",
+   "reason": "page fill non-linear"
+  },
+  {
+   "location": "p. 7 three-scale magnitude sentence; p. 10 dependency statement and priority order; p. 9 R1–R6 triggers; p. 4 timed training; p. 6 Communication row",
+   "reason": "new credited strengths; appends only"
+  }
+ ],
+ "regression_checks": [
+  "protected passages verbatim after edits (whitespace-normalised)",
+  "WP totals 5.0/9.0/6.0/5.4/4.6 = 30.0; 24.0 in M1–M24; 6.0 in M25–M30; WP1 2.2 + 2.8",
+  "deliverable months and Gantt labels unchanged; MS1–MS6 at 3/12/21/24/27/30",
+  "ELTE blocks M1–M3, M10–M12, M16–M21 (12 months) and placement M25–M30 unchanged incl. K11",
+  "CDP cadence identical in §1.3, §2.1 table, §3.1",
+  "no new fact about access, allocation, agreements, supervision totals, deputies, providers, budgets or results",
+  "Section 3 starts p. 8; Gantt ends p. 9; §3.2 on p. 10"
+ ],
+ "open_decisions": [
+  {
+   "id": "R2-OD-01",
+   "owner": "MATE / Dr Takács",
+   "fact": "archive instrument, spectral range, plots, treatments, variables, dates, permissions",
+   "needed_by": "before M1 audit (D1.1) and M3 freeze",
+   "safe_response": "conditional conversion; accessible subset; M1 rights audit",
+   "residual": "R2-F-01, R2-F-23",
+   "links": [
+    "OD-E5",
+    "OD-E11",
+    "R2-A-22"
+   ]
+  },
+  {
+   "id": "R2-OD-02",
+   "owner": "producer + ATK",
+   "fact": "site identity/description, polygons, irrigation control, two-season availability, compensation, backup",
+   "needed_by": "field-readiness gate before planting (M3–M4)",
+   "safe_response": "adopted requirements; 'no site is described as secured'",
+   "residual": "R2-F-18",
+   "links": [
+    "OD-E11",
+    "R2-A-09"
+   ]
+  },
+  {
+   "id": "R2-OD-03",
+   "owner": "Prof. Janda, Prof. Jung, Dr Hollós",
+   "fact": "supervision totals; current collaborations; deputy identity; committed time",
+   "needed_by": "before text is finalised",
+   "safe_response": "documentary examples; deputy arrangement without identity",
+   "residual": "R2-F-06",
+   "links": [
+    "OD-E4",
+    "R2-A-23"
+   ]
+  },
+  {
+   "id": "R2-OD-04",
+   "owner": "AgroVIR; host",
+   "fact": "eligible-uptake subset; sourced crop area; recruitment capacity",
+   "needed_by": "before text is finalised (denominator otherwise during placement)",
+   "safe_response": "dated public footprint as context; targets not commitments",
+   "residual": "R2-F-13",
+   "links": [
+    "OD-E8",
+    "R2-A-24"
+   ]
+  },
+  {
+   "id": "R2-OD-05",
+   "owner": "fellow",
+   "fact": "DrR version/functions; certificates; manuscript status",
+   "needed_by": "before text is finalised",
+   "safe_response": "prototype wording; 'under review'",
+   "residual": "R2-F-08",
+   "links": [
+    "OD-E18",
+    "R2-A-25"
+   ]
+  },
+  {
+   "id": "R2-OD-06",
+   "owner": "ELTE / Prof. Jung",
+   "fact": "paired-spectrum access; instrument/operator time; block content",
+   "needed_by": "before each block (M1, M10, M16)",
+   "safe_response": "access arranged before each block; no allocation claimed",
+   "residual": "R2-F-07",
+   "links": [
+    "OD-E15",
+    "R2-A-32"
+   ]
+  },
+  {
+   "id": "R2-OD-07",
+   "owner": "host (ATK)",
+   "fact": "funding source for engineering and instrumentation; campaign staffing; AgroVIR supervisor; Krumatic capacity",
+   "needed_by": "before paid development (M1–M3) and before season 1",
+   "safe_response": "resource-priority order; procedural wording",
+   "residual": "R2-F-24, R2-F-21",
+   "links": [
+    "OD-E12",
+    "OD-E13",
+    "R2-A-26",
+    "R2-A-31"
+   ]
+  },
+  {
+   "id": "R2-OD-08",
+   "owner": "fellow + supervisors",
+   "fact": "matching window; precision requirement; satellite-scale reference; positioning measure; earlier feedback round",
+   "needed_by": "before D1.2 (M3); text items before submission",
+   "safe_response": "D1.2 records the decisions",
+   "residual": "R2-F-03, R2-F-04, R2-F-09, R2-F-16, R2-F-17",
+   "links": [
+    "R2-A-07",
+    "R2-A-08",
+    "R2-A-27",
+    "R2-A-28",
+    "R2-A-29",
+    "R2-A-30"
+   ]
+  },
+  {
+   "id": "R2-OD-09",
+   "owner": "operator",
+   "fact": "confirmation of the adopted work programme text (repository copy is a DRAFT)",
+   "needed_by": "before external reliance on thresholds",
+   "safe_response": "values consistent with the final evaluation form",
+   "residual": "none for scoring",
+   "links": []
+  }
+ ],
+ "cut_pool": [
+  {
+   "cut_id": "R2-CUT-01",
+   "location": "p. 5 §2.1 table row 'ATK modelling training and 12-month ELTE secondment', mechanism cell",
+   "text": "compress to two lines",
+   "lines": 3,
+   "region": "A",
+   "why_safe": "duplicates §1.3 timed schedule",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-02",
+   "location": "p. 7 §2.3 table Scientific row, contribution cell",
+   "text": "compress to one line",
+   "lines": 2,
+   "region": "A",
+   "why_safe": "duplicates §1.1–§1.2",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-03",
+   "location": "p. 10 §3.2 ATK row s2 (supervisor sentence)",
+   "text": "remove",
+   "lines": 1.5,
+   "region": "C",
+   "why_safe": "stated in §1.3",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-04",
+   "location": "p. 10 §3.2 ELTE row per-block task list",
+   "text": "remove the list; keep 'access arranged before each block'",
+   "lines": 1,
+   "region": "C",
+   "why_safe": "stated in §1.3",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-05",
+   "location": "p. 6 §2.1 'By completion, the fellow will have taken …'",
+   "text": "compress to two lines",
+   "lines": 2,
+   "region": "A",
+   "why_safe": "trajectory stated in §1.4 and §2.1 opener",
+   "allocated_to": "R2-A-06"
+  },
+  {
+   "cut_id": "R2-CUT-06",
+   "location": "p. 3 §1.2 Integration of methods, last sentence",
+   "text": "compress to one clause",
+   "lines": 1,
+   "region": "A",
+   "why_safe": "generic closer",
+   "allocated_to": "R2-A-05"
+  },
+  {
+   "cut_id": "R2-CUT-07",
+   "location": "p. 7 §2.2 Reach and uptake, repeated counts",
+   "text": "remove repeated counts",
+   "lines": 1.5,
+   "region": "A",
+   "why_safe": "counts in the Communication row",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-08",
+   "location": "p. 5 §1.4 'The fellowship addresses the next step in her progression …'",
+   "text": "compress to one line",
+   "lines": 1.5,
+   "region": "A",
+   "why_safe": "duplicates §2.1 opener",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-09",
+   "location": "p. 8 §3.1 opening paragraph s2 (ELTE blocks sentence)",
+   "text": "remove",
+   "lines": 1,
+   "region": "B",
+   "why_safe": "duplicate of §1.3, §3.2, Gantt, K11",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-10",
+   "location": "p. 8 §3.1 WP5 'Lead: …' line",
+   "text": "merge into T5.1",
+   "lines": 0.5,
+   "region": "B",
+   "why_safe": "no content lost",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-11",
+   "location": "p. 7 §2.3 intro bounding sentence",
+   "text": "not offered",
+   "lines": 0,
+   "region": "A",
+   "why_safe": "credited strength",
+   "allocated_to": null
+  },
+  {
+   "cut_id": "R2-CUT-12",
+   "location": "p. 5 §1.4 clause '… deepened through the distributed ELTE secondment and specialist supervision at HUN-REN ATK.'",
+   "text": "remove clause",
+   "lines": 1.5,
+   "region": "A",
+   "why_safe": "described in §1.3",
+   "allocated_to": "R2-A-01"
+  },
+  {
+   "cut_id": "R2-CUT-13",
+   "location": "p. 9 risk table R4 and R6 response cells",
+   "text": "shorten to one line each",
+   "lines": 1.5,
+   "region": "B",
+   "why_safe": "integrity rule carries the principle",
+   "allocated_to": "R2-A-01"
+  }
+ ],
+ "cut_ledger": [
+  {
+   "cut_id": "R2-CUT-01",
+   "consumer": "R2-A-01",
+   "lines": 3,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-02",
+   "consumer": "R2-A-01",
+   "lines": 2,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-03",
+   "consumer": "R2-A-01",
+   "lines": 1.5,
+   "region": "C"
+  },
+  {
+   "cut_id": "R2-CUT-04",
+   "consumer": "R2-A-01",
+   "lines": 1,
+   "region": "C"
+  },
+  {
+   "cut_id": "R2-CUT-05",
+   "consumer": "R2-A-06",
+   "lines": 2,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-06",
+   "consumer": "R2-A-05",
+   "lines": 1,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-07",
+   "consumer": "R2-A-01",
+   "lines": 1.5,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-08",
+   "consumer": "R2-A-01",
+   "lines": 1.5,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-09",
+   "consumer": "R2-A-01",
+   "lines": 1,
+   "region": "B"
+  },
+  {
+   "cut_id": "R2-CUT-10",
+   "consumer": "R2-A-01",
+   "lines": 0.5,
+   "region": "B"
+  },
+  {
+   "cut_id": "R2-CUT-12",
+   "consumer": "R2-A-01",
+   "lines": 1.5,
+   "region": "A"
+  },
+  {
+   "cut_id": "R2-CUT-13",
+   "consumer": "R2-A-01",
+   "lines": 1.5,
+   "region": "B"
+  }
+ ],
+ "minimum_revision_set": {
+  "action_ids": [
+   "R2-A-01",
+   "R2-A-02",
+   "R2-A-03",
+   "R2-A-04",
+   "R2-A-05",
+   "R2-A-06",
+   "R2-A-10",
+   "R2-A-13",
+   "R2-A-15",
+   "R2-A-20",
+   "R2-A-21"
+  ],
+  "ordering": [
+   "apply all cuts R2-CUT-01…13 except none withheld",
+   "R2-A-01",
+   "R2-A-02",
+   "R2-A-03",
+   "R2-A-04",
+   "R2-A-05",
+   "R2-A-06",
+   "R2-A-10",
+   "R2-A-13",
+   "R2-A-15",
+   "R2-A-20",
+   "R2-A-21",
+   "re-export and measure (II.6)"
+  ],
+  "page_budget_assumptions": {
+   "table_growth_factor_10_to_11pt": 1.21,
+   "table_growth_lines": 29.5,
+   "region_A": {
+    "additions": 21.4,
+    "slack": 11.4,
+    "cuts": 12.5,
+    "margin": 2.5
+   },
+   "region_B": {
+    "additions": 4.7,
+    "slack": 3.3,
+    "cuts": 3.0,
+    "margin": 1.6,
+    "condition": "risk-table growth must not push the Gantt off p. 9"
+   },
+   "region_C": {
+    "additions": 8.5,
+    "slack": 6.4,
+    "cuts": 2.5,
+    "margin": 0.4
+   },
+   "formal_repair_costs_included": true,
+   "b1_to_b2_moves": "none permitted"
+  },
+  "residual_weaknesses": [
+   "R2-F-01",
+   "R2-F-03",
+   "R2-F-04",
+   "R2-F-06",
+   "R2-F-08",
+   "R2-F-09",
+   "R2-F-10",
+   "R2-F-11",
+   "R2-F-13",
+   "R2-F-14",
+   "R2-F-15",
+   "R2-F-16",
+   "R2-F-17",
+   "R2-F-18",
+   "R2-F-19",
+   "R2-F-20",
+   "R2-F-21",
+   "R2-F-23",
+   "R2-F-24"
+  ],
+  "removed_or_narrowed": [
+   "R2-F-02",
+   "R2-F-05",
+   "R2-F-07 (location clash)",
+   "R2-F-12 (naming)",
+   "R2-F-15 (narrowed)",
+   "R2-F-22 (gate)",
+   "R2-F-25",
+   "R2-F-26",
+   "R2-F-27"
+  ],
+  "second_wave_conditional": [
+   "R2-A-08",
+   "R2-A-09",
+   "R2-A-07",
+   "R2-A-11",
+   "R2-A-12",
+   "R2-A-14",
+   "R2-A-16",
+   "R2-A-18",
+   "R2-A-17",
+   "R2-A-19"
+  ],
+  "leverage": "compliance and design coherence; no numerical gain projected",
+  "final_pagination_verified": false
+ },
+ "limitations": [
+  "Part B1 only; Part A and Part B2 not assessed; not an official or complete-application evaluation",
+  "simulated evaluators; genuine isolation between lenses but not blind to the existence of an earlier round (memory-index headings)",
+  "work programme thresholds read from a DRAFT-watermarked repository copy; portal topic page not readable",
+  "raster text sizes measured with ±0.5 pt tolerance; table growth at 11 pt estimated with a 1.21 factor",
+  "no baseline-B1 assessment under the current method; like_for_like_delta null",
+  "no owner facts became available; safe responses remain",
+  "final pagination of any revised export unverified"
+ ],
+ "validation_results": {
+  "json_parses": true,
+  "ids_unique": true,
+  "references_resolve": true,
+  "cuts_single_use": true,
+  "scores_match_markdown": true,
+  "errors": [],
+  "schema_validation": "not performed (local extension)"
+ }
+}
