@@ -75,7 +75,7 @@ From `gate_rules_library.yaml` (gates `gate_10a/b/c` completeness, `gate_10d` co
 |---|---|---|
 | Project | **MAESTRO** — multi-agent AI orchestration (fictional) | Crop water-stress monitoring & irrigation decision support (real, "MSCA-style") |
 | Instrument | **RIA** (`selected_call.json → HORIZON-CL4-2026-05`, `instrument_type: RIA`) | **"MSCA-style"** (the vault's own word). PF is the likeliest of *five* MSCA forms on disk (`pf/dn/se/cofund/cofund-ce`) but is itself an **inference**, not a vault statement — to be confirmed in Stage 2, not assumed |
-| Spine / consortium | 8 partners (ATU, BIIS, CERIA, …) with legal names, roles | Researcher-at-a-host spine is *definitional* for a fellowship, yet **all three of researcher, host, supervisor are unconfirmed or absent**. **The assumed host is refuted, not merely unconfirmed** — the vault host-role node: "host not mentioned in any source; do not invent a role." AgroVIR appears only as "AgroVIR-*like*"; PI inferred from authorship |
+| Spine / consortium | 8 partners (ATU, BIIS, CERIA, …) with legal names, roles | Researcher-at-a-host spine is *definitional* for a fellowship, yet **all three of researcher, host, supervisor are unconfirmed or absent**. **The assumed host is refuted, not merely unconfirmed** — the vault host-role node: "host not mentioned in any source; do not invent a role." the associated partner appears only as "<partner>-*like*"; PI inferred from authorship |
 | Part B length | 40 pp (45 lump-sum) | MSCA-PF B1 is materially shorter (~10 pp) with a different section set |
 | Budget | Lump-sum planner integration (placeholder response present) | MSCA is **unit-cost** (living/mobility/family + institutional unit costs) — handled by **C1** (instrument-conditional gate) |
 
