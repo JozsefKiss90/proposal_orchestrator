@@ -1,7 +1,7 @@
 # Handoff — Phase 1 hangs forever at `skill INVOKE`; the 1200 s timeout never fires
 
 **Status:** MECHANISM RESOLVED 2026-08-13; trigger unattributed. The child stalls pre-`main()` and the timeout was structurally unreachable. Fixes landed in `runner/claude_transport.py` make any recurrence a diagnosable 1200 s failure. See §0.
-**Date:** 2026-08-12 · **Branch:** `fieldwise-run-01` · **Blocks:** ticket 8 (Run Phases 1–2) — unblocked; Phase 1 passed its gate on run `11d4fcae`.
+**Date:** 2026-08-12 · **Branch:** the instance-#1 run branch · **Blocks:** ticket 8 (Run Phases 1–2) — unblocked; Phase 1 passed its gate on run `11d4fcae`.
 
 ---
 

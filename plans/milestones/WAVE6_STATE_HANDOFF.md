@@ -50,7 +50,7 @@ invent variants).
 - FELLOW = Dr. Mariya Petrova [SYNTHETIC], Plovdiv University (BG)
 - HOST = Eötvös Loránd University (ELTE), Budapest — **HU** (drives the unit-cost country coefficient)
 - SUPERVISOR = Prof. Dr. Gábor Nagy [SYNTHETIC], ELTE
-- VALIDATION_PARTNER = AgroVIR Kft. [SYNTHETIC ARRANGEMENT]
+- VALIDATION_PARTNER = <associated-partner> [SYNTHETIC ARRANGEMENT]
 - FELLOWSHIP_TYPE = European Fellowship, 24 months (**derived**, not invented: BG → HU is intra-EU)
 
 **Ticket-13 build** — decomposed drafting, deterministic assembler, assumption-applier, unit-cost budget

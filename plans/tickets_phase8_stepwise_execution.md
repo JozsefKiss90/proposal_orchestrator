@@ -7,7 +7,7 @@ manifest already defines the six nodes, gates and edges. What changes is invocat
 
 Work the **frontier**: any ticket whose blockers are all done. Tickets 1 and 2 can start now.
 
-## State verified at ticket creation (2026-08-13, tree `fieldwise-run-01`)
+## State verified at ticket creation (2026-08-13, instance-#1 run branch)
 
 - Run `9468e1cf-2c71-49e8-91fb-57f6e7192126`: `n01`–`n07` released, `n08a`–`n08f` pending,
   `gate_09` passed under `budget_regime: unit_cost`. Phase 8 has never run on this instantiation.
