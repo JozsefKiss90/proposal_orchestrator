@@ -108,8 +108,8 @@ _OUTCOME_KEYS: tuple[str, ...] = (
 #: The canonical pack contract read by the Phase-8 preservation predicates is
 #: ``id`` / ``title`` / ``measurable_target`` (see
 #: ``runner/predicates/phase8_section_predicates.py`` — ``obj.get("id")``,
-#: ``obj.get("measurable_target")``, ``outcome.get("id")``).  The FIELDWISE
-#: hand-lift authored the Tier-3 sources with entity-scoped id keys
+#: ``obj.get("measurable_target")``, ``outcome.get("id")``).  An operator
+#: hand-lift may author the Tier-3 sources with entity-scoped id keys
 #: (``objective_id``, ``outcome_id``) and its own column-derived value names
 #: (``measurable_output``, named after the draft's "Verification" column;
 #: ``statement`` for an outcome's text).  Without this map every record fails
@@ -120,7 +120,7 @@ _OUTCOME_KEYS: tuple[str, ...] = (
 #: and inference-free (§17.5.3).  An alias is consulted only when the canonical
 #: key is absent, so a source already speaking the pack contract is untouched.
 #:
-#: Deliberately **not** mapped: the FIELDWISE ``involved_partners`` array does
+#: Deliberately **not** mapped: a hand-lifted ``involved_partners`` array does
 #: not distinguish a responsible partner from contributing ones, so folding it
 #: into ``responsible_partner`` / ``contributing_partners`` would be inference
 #: about project facts (§13.3).  It is dropped, like any unrecognised field.
@@ -193,7 +193,7 @@ def _lift(
 def _extract_objectives(data: dict) -> list[dict[str, Any]]:
     """Extract objectives preserving id, title, measurable_target, responsible_partner.
 
-    Accepts the FIELDWISE Tier-3 spelling (``objective_id`` /
+    Accepts the hand-lift Tier-3 spelling (``objective_id`` /
     ``measurable_output``) via :data:`_OBJECTIVE_ALIASES`.
     """
     result: list[dict[str, Any]] = []
@@ -209,7 +209,7 @@ def _extract_objectives(data: dict) -> list[dict[str, Any]]:
 def _extract_outcomes(data: dict) -> list[dict[str, Any]]:
     """Extract outcomes preserving id, title, linked_objectives, linked_wp_ids.
 
-    Accepts the FIELDWISE Tier-3 spelling (``outcome_id`` / ``statement``) via
+    Accepts the hand-lift Tier-3 spelling (``outcome_id`` / ``statement``) via
     :data:`_OUTCOME_ALIASES`.
     """
     result: list[dict[str, Any]] = []

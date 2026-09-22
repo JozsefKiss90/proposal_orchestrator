@@ -423,7 +423,7 @@ class TestProductionDrafterPromptHardening:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Run 5dd0e971 (g09b_p13): the drafter derived seniority from the
-        declared title placement_supervisor_title_AgroVIR, marked the
+        declared title placement_supervisor_title_<partner>, marked the
         derivation 'inferred' and invented its own claim_id, defeating the
         assumption-applier's key match.  The W2 instruction must state that a
         derivation from a declared (assumed) premise is routed exactly like

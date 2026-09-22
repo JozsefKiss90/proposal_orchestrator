@@ -158,9 +158,9 @@ def _resolve_section_paths(repo_root: Path) -> list[Path]:
 def split_content_blocks(content: str) -> list[str]:
     """Split section *content* into its paragraph blocks (blank-line split).
 
-    This split defines the draft ¶-numbering scheme: consumers that anchor
-    to rendered paragraphs (``tools/annotate_part_b_draft.py``) share this
-    function so their ¶ indices can never drift from the rendered output.
+    This split defines the draft ¶-numbering scheme: any consumer that
+    anchors to rendered paragraphs must share this function so its ¶
+    indices can never drift from the rendered output.
     """
     return [b for b in re.split(r"\n\s*\n", content.strip()) if b.strip()]
 

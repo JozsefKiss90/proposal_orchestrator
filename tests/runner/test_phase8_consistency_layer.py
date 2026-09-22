@@ -285,17 +285,17 @@ class TestCanonicalPackGeneration:
 
 
 class TestCanonicalPackSourceFieldAliases:
-    """Tier-3 records are admitted under their FIELDWISE source field names.
+    """Tier-3 records are admitted under their hand-lift source field names.
 
     The pack contract read by the Phase-8 preservation predicates is ``id`` /
-    ``title`` / ``measurable_target``; the FIELDWISE hand-lift authored the
+    ``title`` / ``measurable_target``; an operator hand-lift may author the
     Tier-3 sources with ``objective_id`` / ``measurable_output`` and
     ``outcome_id`` / ``statement``.  Unaliased, every record failed the
     ``entry.get("id")`` admission test and was dropped — emptying ``objectives``
     (a hard §12.4 block) and ``outcomes`` (silently, pre-fix).
     """
 
-    def test_fieldwise_objective_and_outcome_keys_are_lifted(
+    def test_hand_lift_objective_and_outcome_keys_are_lifted(
         self, tmp_path: Path,
     ) -> None:
         from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
@@ -366,7 +366,7 @@ class TestCanonicalPackSourceFieldAliases:
     ) -> None:
         """``involved_partners`` is dropped, never folded into a role field (§13.3).
 
-        The FIELDWISE array does not distinguish a responsible partner from
+        A hand-lifted array does not distinguish a responsible partner from
         contributing ones, so mapping it either way would be inference about a
         project fact — which this deterministic component may not perform.
         """

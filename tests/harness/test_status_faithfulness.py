@@ -161,10 +161,10 @@ class TestResolveClaimSourceText:
         self._write(
             tmp_path,
             "docs/spine.json",
-            {"spine_identity": [{"id": "FELLOW", "confirmed_value": "Dr. Cholakova"}]},
+            {"spine_identity": [{"id": "FELLOW", "confirmed_value": "Dr. Example"}]},
         )
         txt = sf.resolve_claim_source_text("docs/spine.json#FELLOW", tmp_path)
-        assert "Dr. Cholakova" in txt
+        assert "Dr. Example" in txt
         assert "FELLOW" in txt  # id string leaf is rendered too
 
     def test_fragment_not_found_falls_back_to_whole_file(self, tmp_path):

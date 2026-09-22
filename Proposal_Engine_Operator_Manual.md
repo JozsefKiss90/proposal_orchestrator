@@ -252,10 +252,10 @@ edit vault node  →  compile  →  review diff  →  promote  →  re-gate
 ```bash
 # 1. edit the relevant vault node(s) in Obsidian  (see 5.2 for what you can change)
 # 2. compile — deterministic, writes only to a staging area, touches nothing live:
-python -m runner --run-id <id> --from-graph MSCA/graph.config.yaml
+python -m runner --run-id <id> --from-graph <vault>/graph.config.yaml
 # 3. review the diff it produced (diff_report.json / part_b_report.json) — confirm only what you intended changed
 # 4. promote — the deliberate, backed-up, reversible cutover to docs/:
-python tools/promote_graph_staging.py --config MSCA/graph.config.yaml --apply
+python tools/promote_graph_staging.py --config <vault>/graph.config.yaml --apply
 # 5. re-gate — run the scheduler with drafting skipped so the gates re-check your edit:
 python -m runner --run-id <fresh-id> --preseed-phase8-sections
 ```
@@ -340,7 +340,7 @@ docs/tier3_project_instantiation/
   architecture_inputs/  objectives, outcomes, impacts, workpackage_seed, milestones_seed, risks, budget
   working_assumptions.json          ← your uncertainty ledger
 
-MSCA/methodology_graph/  (the vault)
+<vault>/  (your per-project vault, scaffolded from templates/obsidian_graph_vault/)
   00–10  methodology (you author)      11–17 architecture (compiles to Tier-3)
   18     gate-state mirror (auto)      19    proposal sections / Part B
   90 dashboards   99 governance

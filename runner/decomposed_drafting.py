@@ -381,7 +381,7 @@ def _default_claude_drafter(
             "docs/tier3_project_instantiation/working_assumptions.json, set its "
             "status to 'unresolved' and set claim_id to that declaration's "
             "'key' field exactly as written (for example "
-            "'placement_supervisor_title_AgroVIR', not the upper-case "
+            "'placement_supervisor_title_<partner>', not the upper-case "
             "checklist_ref). NEVER mark such a fact "
             "'inferred': 'inferred' asserts the fact was derived from confirmed "
             "evidence, whereas an operator declaration is adopted precisely "
