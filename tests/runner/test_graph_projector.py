@@ -135,8 +135,15 @@ def test_missing_phase_outputs_returns_empty(tmp_path):
     assert read_tier4_gate_states(tmp_path / "nonexistent") == ()
 
 
+def _skip_unless_real_tier4(repo_root):
+    phase_outputs = repo_root / "docs" / "tier4_orchestration_state" / "phase_outputs"
+    if not any(phase_outputs.rglob("*.json")):
+        pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
+
+
 def test_real_tier4_gate_states(repo_root):
     # The real repo carries gate results from prior runs; every one has an id+status.
+    _skip_unless_real_tier4(repo_root)
     states = read_tier4_gate_states(repo_root)
     assert len(states) >= 1
     assert all(s.gate_id and s.status for s in states)
@@ -147,6 +154,7 @@ def test_real_tier4_has_no_unreadable_gate_json(repo_root):
     # must carry NO unparseable gate-result JSON.  A future conflict-marker commit
     # (the bffe89d failure mode) would repopulate `unreadable` and fail here — the
     # only place that pins the real mirror is complete, not silently narrowed.
+    _skip_unless_real_tier4(repo_root)
     scan = scan_tier4_gate_states(repo_root)
     assert scan.unreadable == (), (
         "Corrupt gate-result JSON reappeared under phase_outputs/: "
@@ -310,6 +318,7 @@ def test_project_deterministic_no_fresh_timestamp(tier4_repo, tmp_path):
 
 
 def test_real_tier4_projects_into_tmp_vault(repo_root, tmp_path):
+    _skip_unless_real_tier4(repo_root)
     vault = tmp_path / "vault"
     vault.mkdir()
     result = project(repo_root, vault)

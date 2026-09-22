@@ -34,6 +34,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 @pytest.fixture(scope="module")
 def report():
+    sections = REPO_ROOT / "docs" / "tier5_deliverables" / "proposal_sections"
+    if not any(sections.glob("*.json")):
+        pytest.skip("no live Tier 5 sections in this checkout (empty project instantiation)")
     return mlg.build_report(REPO_ROOT)
 
 

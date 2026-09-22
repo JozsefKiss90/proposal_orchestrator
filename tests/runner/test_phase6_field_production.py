@@ -1139,6 +1139,8 @@ class TestGenderDimensionTraceability:
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
+        if not artifact_path.is_file():
+            pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         stmt = artifact["ethics_assessment"]["self_assessment_statement"].lower()
 
@@ -1209,6 +1211,8 @@ class TestComplianceProfileDerivativeLabeling:
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
+        if not artifact_path.is_file():
+            pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         sources = artifact.get("traceability_footer", {}).get("primary_sources", [])
         tier2b_sources = [
@@ -1234,6 +1238,8 @@ class TestComplianceProfileDerivativeLabeling:
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
+        if not artifact_path.is_file():
+            pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         wp9_role = next(
             (r for r in artifact["management_roles"]
@@ -1260,6 +1266,8 @@ class TestComplianceProfileDerivativeLabeling:
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
+        if not artifact_path.is_file():
+            pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         issues = artifact["ethics_assessment"]["issues"]
 
@@ -1283,6 +1291,8 @@ class TestComplianceProfileDerivativeLabeling:
             _REPO_ROOT / "docs" / "tier4_orchestration_state" / "phase_outputs"
             / "phase6_implementation_architecture" / "implementation_architecture.json"
         )
+        if not artifact_path.is_file():
+            pytest.skip("no Tier 4 phase outputs in this checkout (empty project instantiation)")
         artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
         stmt = artifact["ethics_assessment"]["self_assessment_statement"]
 
