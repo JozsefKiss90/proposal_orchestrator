@@ -367,7 +367,7 @@ Legend: T = tracked by git (`git rm`), U = untracked or ignored (plain delete).
 
 421 files, 218 tracked, 19.6 MB.
 
-**G-note (migration check).** `templates/obsidian_graph_vault/` has all 21 folders (00–18, 90, 99), a noun-free `graph.config.yaml`, a meta node and two dashboards. Three things exist only in `MSCA/`, and none is a migration: (1) the `smart-connections` Obsidian plugin (tracked, 3 files) is an editor convenience, not an engine dependency; (2) the `19_proposal_sections/` folder holds 12 FIELDWISE section nodes, and the template binds `proposal_section` by node type, not by folder, so no folder is required (adding an empty `19_proposal_sections/.gitkeep` to the template is an optional nicety); (3) the three `99_governance/` nodes carry `domain: crop_water_stress / irrigation_decision_support` front matter and 4–6 project-noun hits each, so they are instance content, not generic prose. The generic template is complete as it stands.
+**G-note (migration check).** `templates/obsidian_graph_vault/` has all 21 folders (00–18, 90, 99), a noun-free `graph.config.yaml`, a meta node and two dashboards. Three things exist only in `MSCA/`, and none is a migration. First, the `smart-connections` Obsidian plugin (tracked, 3 files) is an editor convenience, not an engine dependency. Second, the `19_proposal_sections/` folder holds 12 FIELDWISE section nodes. The template binds `proposal_section` by node type, not by folder, so no folder is required; an empty `19_proposal_sections/.gitkeep` in the template is an optional nicety. Third, the three `99_governance/` nodes carry `domain: crop_water_stress / irrigation_decision_support` front matter and 4–6 project-noun hits each, so they are instance content, not generic prose. The generic template is complete as it stands.
 
 | Path | T/U | Size | Reason |
 |---|:-:|---:|---|
@@ -865,7 +865,7 @@ Directory totals; every file inside is untracked or ignored. Plain delete.
 | `.claude/settings.json, .mcp.json, manifest.compile.yaml, README.md, CLAUDE.md, AGENTS.md, Proposal_Engine_Operator_Manual.md, .claude/agents/*.md, .agents/skills/**` | 0 hits. No prose scrub needed beyond CONTEXT.md |
 ## Simulated purge — test impact (evidence for decision 1)
 
-The 524 tracked paths in groups A–E and G (plus the tracked harness data listed under Ambiguous) were `git rm`'d in a throwaway worktree (`../purge_sim`, detached from `ESR`), and the full suite was run there and on unmodified `ESR`.
+The 524 tracked paths in groups A–E and G, plus the tracked harness data listed under Ambiguous, were `git rm`'d in a throwaway worktree (`../purge_sim`, detached from `ESR`). The full suite was then run there and on unmodified `ESR`.
 
 | Run | Passed | Failed | Errors | Skipped |
 |---|---:|---:|---:|---:|
