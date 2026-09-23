@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "mcpvault": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@bitbonsai/mcpvault@latest",
+        "C:\\Code\\proposal_demo\\proposal_orchestrator"
+      ],
+      "env": {}
+    },
+    "smart-connections": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@yejianye/smart-connections-mcp"
+      ],
+      "env": {
+        "OBSIDIAN_VAULT": "C:\\Code\\proposal_demo\\proposal_orchestrator" 
+      }
+    },
+   "filesystem": {
+  "command": "npx.cmd",
+  "args": [
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    "C:\\Code\\proposal_demo\\proposal_orchestrator"
+  ]
+}
+  }
+}

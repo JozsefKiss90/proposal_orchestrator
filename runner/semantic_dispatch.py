@@ -24,8 +24,9 @@ For each semantic predicate the dispatcher:
 3. Builds a system prompt that states the agent's role, the predicate
    description, the constitutional rule, and the mandatory JSON response
    schema (§4.9).
-4. Invokes ``claude-sonnet-4-6`` via the runtime transport with the
-   system prompt and a user message containing the artifact content.
+4. Invokes the model named by :data:`AGENT_MODEL` via the runtime
+   transport with the system prompt and a user message containing the
+   artifact content.
 5. Parses the agent's JSON response and validates it with
    :func:`validate_semantic_result`.
 
@@ -48,17 +49,18 @@ with an empty ``findings`` list.  The gate evaluator detects the
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
+from runner.benchmark.transport_hook import InstrumentedBackend, instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     ClaudeCLITimeoutError,
     ClaudeTransportError,
 )
+from runner.json_extract import extract_first_json_object
 from runner.paths import resolve_repo_path
+from runner.transport.config import resolve_provider_config, ProviderConfig
 
 # ---------------------------------------------------------------------------
 # Schema constants  (§4.9)
@@ -89,7 +91,11 @@ REQUIRED_FINDING_FIELDS: frozenset[str] = frozenset(
 VALID_SEVERITIES: frozenset[str] = frozenset({"critical", "major"})
 
 #: Claude model used for semantic predicate evaluation.
-AGENT_MODEL: str = "claude-sonnet-4-6"
+#: Switched from ``claude-sonnet-4-6`` on 2026-08-13, in step with
+#: ``skill_runtime.SKILL_MODEL``.  Read by
+#: ``harness.judge.drafter_models()``: the out-of-band judge may never be
+#: this model, since it reviews what this model produced.
+AGENT_MODEL: str = "claude-opus-4-8"
 
 #: Maximum tokens the agent may use in its response.
 AGENT_MAX_TOKENS: int = 2048
@@ -155,6 +161,25 @@ SEMANTIC_REGISTRY: dict[str, SemanticPredicateConfig] = {
             "No Tier 5 section references a specific budget figure, effort "
             "allocation, or resource commitment that is not present in the "
             "validated budget response."
+        ),
+    ),
+    "no_budget_gate_contradiction_unit_cost": SemanticPredicateConfig(
+        function="no_budget_gate_contradiction_unit_cost",
+        agent="constitutional_compliance_check",
+        constitutional_rule="CLAUDE.md §8.4, §13.4",
+        description=(
+            "No Tier 5 section references a specific budget figure, effort "
+            "allocation, or resource commitment that contradicts the "
+            "deterministic unit-cost budget derivation (CLAUDE.md §8.1) in "
+            "unit_cost_budget.json: its gate_pass_declaration, total, "
+            "line-item amounts, monthly rates, or confirmed months. For a "
+            "unit-cost instrument this derivation IS the validated budget; "
+            "no external budget response exists or is required, and its "
+            "absence is not a violation. Person-month distributions across "
+            "work packages and in-kind partner contributions are not "
+            "unit-cost budget lines; they violate this predicate only if "
+            "they contradict the derivation (for example a researcher "
+            "effort total inconsistent with confirmed_months)."
         ),
     ),
     "no_higher_tier_contradiction": SemanticPredicateConfig(
@@ -343,11 +368,20 @@ def _write_semantic_diagnostics(
         return None
 
     prefix = f"{func_name}_{run_id[:8]}"
+
+    # -- Persistence policy --
+    from runner.persistence_policy import (
+        allows_content_persistence,
+        sanitize_error_message,
+    )
+
+    _content_allowed = allows_content_persistence()
+
     meta: dict[str, Any] = {
         "function": func_name,
         "run_id": run_id,
         "category": category,
-        "reason": reason,
+        "reason": sanitize_error_message(reason),
         "system_prompt_size": len(system_prompt) if system_prompt else 0,
         "user_prompt_size": len(user_prompt) if user_prompt else 0,
     }
@@ -364,16 +398,19 @@ def _write_semantic_diagnostics(
     file_map: dict[str, tuple[str, str | None]] = {
         "meta": (f"{prefix}_dispatch_meta.json", None),
     }
-    if system_prompt is not None:
-        file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
-    if user_prompt is not None:
-        file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
-    if response_text is not None:
-        file_map["response"] = (f"{prefix}_response.txt", response_text)
-    if exc is not None and hasattr(exc, "stderr") and exc.stderr:
-        file_map["stderr"] = (f"{prefix}_stderr.txt", exc.stderr)
-    if exc is not None and hasattr(exc, "stdout") and exc.stdout:
-        file_map["stdout"] = (f"{prefix}_stdout.txt", exc.stdout)
+
+    # Content companion files only under full diagnostic level.
+    if _content_allowed:
+        if system_prompt is not None:
+            file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
+        if user_prompt is not None:
+            file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
+        if response_text is not None:
+            file_map["response"] = (f"{prefix}_response.txt", response_text)
+        if exc is not None and hasattr(exc, "stderr") and exc.stderr:
+            file_map["stderr"] = (f"{prefix}_stderr.txt", exc.stderr)
+        if exc is not None and hasattr(exc, "stdout") and exc.stdout:
+            file_map["stdout"] = (f"{prefix}_stdout.txt", exc.stdout)
 
     meta["diagnostic_files"] = {
         k: f".claude/semantic_diag/{fname}" for k, (fname, _) in file_map.items()
@@ -385,13 +422,15 @@ def _write_semantic_diagnostics(
     except OSError:
         return None
 
-    for key, (fname, content) in file_map.items():
-        if key == "meta" or content is None:
-            continue
-        try:
-            (diag_dir / fname).write_text(content, encoding="utf-8")
-        except OSError:
-            pass
+    # Write content companion files only under full policy.
+    if _content_allowed:
+        for key, (fname, content) in file_map.items():
+            if key == "meta" or content is None:
+                continue
+            try:
+                (diag_dir / fname).write_text(content, encoding="utf-8")
+            except OSError:
+                pass
 
     return f".claude/semantic_diag/{file_map['meta'][0]}"
 
@@ -538,44 +577,110 @@ def _extract_json(text: str) -> Optional[dict]:
     """
     Extract the first JSON object from *text*.
 
-    Handles bare JSON, JSON inside a markdown code block, and JSON
-    preceded or followed by prose.  Returns ``None`` if no valid JSON
-    object can be found.
+    Thin wrapper over :func:`runner.json_extract.extract_first_json_object` (the
+    shared house helper) — see it for the extraction order.  Retained as a
+    module-local name because :func:`invoke_agent` and the dispatch tests
+    reference it.
     """
-    stripped = text.strip()
+    return extract_first_json_object(text)
 
-    # 1. Try parsing the whole response as JSON.
-    # If it parses but is not a dict (e.g. a list), stop — don't extract
-    # a nested dict from inside a top-level array.
-    try:
-        data = json.loads(stripped)
-        return data if isinstance(data, dict) else None
-    except json.JSONDecodeError:
-        pass
 
-    # 2. Try extracting from a markdown code fence
-    code_match = re.search(
-        r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL
+# ---------------------------------------------------------------------------
+# Backend resolution for semantic dispatch
+# ---------------------------------------------------------------------------
+
+_semantic_provider_cache: ProviderConfig | None = None
+_semantic_provider_resolved: bool = False
+
+
+def _resolve_semantic_backend() -> ProviderConfig:
+    """Resolve the transport backend for semantic predicate evaluation.
+
+    Shares the same ``resolve_provider_config()`` resolution as the skill
+    runtime, ensuring that production-mode enforcement applies equally to
+    semantic predicates.  The result is cached for the lifetime of the
+    process.
+    """
+    global _semantic_provider_cache, _semantic_provider_resolved
+    if _semantic_provider_resolved:
+        assert _semantic_provider_cache is not None
+        return _semantic_provider_cache
+    _semantic_provider_cache = resolve_provider_config()
+    _semantic_provider_resolved = True
+    return _semantic_provider_cache
+
+
+def _invoke_via_backend(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    run_id: str,
+    pred_id: str,
+    provider_config: ProviderConfig,
+) -> str:
+    """Invoke the LLM via the resolved backend.
+
+    For ``claude_cli``, delegates to the existing benchmark-instrumented
+    ``invoke_claude_text()``.  For ``bedrock_converse``, uses the native
+    Bedrock Converse backend.  For other OpenAI-compatible backends, uses
+    ``build_openai_backend()``.
+
+    Returns the raw response text.  Raises on transport failure.
+    """
+    if provider_config.backend_name == "claude_cli":
+        return invoke_claude_text(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            model=AGENT_MODEL,
+            max_tokens=AGENT_MAX_TOKENS,
+            _bench_run_id=run_id,
+            _bench_predicate_id=pred_id,
+            _bench_invocation_type="semantic_predicate",
+        )
+
+    if provider_config.backend_name == "bedrock_converse":
+        from runner.transport.config import build_converse_backend
+
+        backend = build_converse_backend(
+            provider_config,
+            temperature=0.0,
+            max_tokens=AGENT_MAX_TOKENS,
+        )
+        backend = InstrumentedBackend(
+            backend,
+            model=provider_config.model or "",
+            timeout_seconds=300,
+            bench_run_id=run_id,
+            bench_predicate_id=pred_id,
+            bench_invocation_type="semantic_predicate",
+        )
+        result = backend(messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ])
+        return result.get("content", "")
+
+    # OpenAI-compatible path (bedrock-mantle, together_ai, ollama, etc.)
+    from runner.transport.config import build_openai_backend
+
+    backend = build_openai_backend(
+        provider_config,
+        temperature=0.0,
+        max_tokens=AGENT_MAX_TOKENS,
     )
-    if code_match:
-        try:
-            data = json.loads(code_match.group(1))
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-
-    # 3. Try finding any JSON object anywhere in the text
-    obj_match = re.search(r"\{.*\}", stripped, re.DOTALL)
-    if obj_match:
-        try:
-            data = json.loads(obj_match.group())
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-
-    return None
+    backend = InstrumentedBackend(
+        backend,
+        model=provider_config.model or "",
+        timeout_seconds=300,
+        bench_run_id=run_id,
+        bench_predicate_id=pred_id,
+        bench_invocation_type="semantic_predicate",
+    )
+    result = backend(messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ])
+    return result.get("content", "")
 
 
 # ---------------------------------------------------------------------------
@@ -589,11 +694,12 @@ def invoke_agent(
     repo_root: Path,
 ) -> dict:
     """
-    Invoke the designated agent via the Claude runtime transport.
+    Invoke the designated agent via the configured runtime transport.
 
-    Reads artifact content, builds prompts, invokes ``claude-sonnet-4-6``
-    through the local ``claude`` CLI, and returns the raw result dict for
-    validation by :func:`validate_semantic_result`.
+    Reads artifact content, builds prompts, invokes the model named by
+    :data:`AGENT_MODEL` through the resolved transport backend (Claude CLI,
+    Bedrock Converse, or OpenAI-compatible), and returns the raw result dict
+    for validation by :func:`validate_semantic_result`.
 
     Parameters
     ----------
@@ -641,18 +747,29 @@ def invoke_agent(
     system_prompt = _build_system_prompt(config)
     user_prompt = _build_user_prompt(config, artifact_contents, resolved_args)
 
-    # Invoke the agent via the Claude runtime transport
+    # Resolve backend and invoke the agent
     try:
-        response_text: str = invoke_claude_text(
+        provider_config = _resolve_semantic_backend()
+    except ValueError as exc:
+        return _dispatch_error_result(
+            pred_id,
+            func_name,
+            f"Transport backend resolution failed: {exc}",
+            agent=config.agent,
+            constitutional_rule=config.constitutional_rule,
+            artifacts_inspected=inspected_paths,
+            failure_category="TRANSPORT_FAILURE",
+        )
+
+    try:
+        response_text: str = _invoke_via_backend(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
-            model=AGENT_MODEL,
-            max_tokens=AGENT_MAX_TOKENS,
-            _bench_run_id=run_id,
-            _bench_predicate_id=pred_id,
-            _bench_invocation_type="semantic_predicate",
+            run_id=run_id,
+            pred_id=pred_id,
+            provider_config=provider_config,
         )
-    except ClaudeTransportError as exc:
+    except (ClaudeTransportError, Exception) as exc:
         diag_path = _write_semantic_diagnostics(
             func_name=func_name,
             run_id=run_id,

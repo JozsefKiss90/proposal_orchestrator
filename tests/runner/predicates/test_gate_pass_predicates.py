@@ -1,7 +1,8 @@
 """
 Unit tests for gate_pass_recorded.
 
-Nine test cases covering the predicate's verification contract:
+Test cases covering the predicate's verification contract:
+  0. Missing / wrong schema_id → MALFORMED_ARTIFACT.
   1. Pass: valid gate result, matching run, fresh timestamp.
   2. Gate result file absent → MISSING_MANDATORY_INPUT.
   3. Unknown gate_id → MISSING_MANDATORY_INPUT.
@@ -27,6 +28,7 @@ from typing import Any, Optional
 
 import pytest
 
+from runner.gate_result_registry import GATE_RESULT_SCHEMA_ID
 from runner.predicates.gate_pass_predicates import gate_pass_recorded
 from runner.predicates.types import (
     MALFORMED_ARTIFACT,
@@ -66,10 +68,12 @@ def _make_gate_result(
     constitution_version: str = CONSTITUTION_VERSION,
     input_fingerprint: str = "abc123def456",
     evaluated_at: str = _FUTURE_TS,
+    schema_id: str = GATE_RESULT_SCHEMA_ID,
     **extra: Any,
 ) -> dict[str, Any]:
     """Return a minimal valid GateResult dict with optional field overrides."""
     return {
+        "schema_id": schema_id,
         "gate_id": gate_id,
         "run_id": run_id,
         "status": status,
@@ -100,6 +104,41 @@ def _write_gate_result(
 
 
 class TestGatePassRecorded:
+
+    # 0a — Missing schema_id → MALFORMED_ARTIFACT.
+    # artifact_schema_specification.yaml §gate_result_schema.fields.schema_id
+    # marks it required; a legacy result written before the evaluator emitted
+    # it must not be waved through.
+    def test_missing_schema_id(self, tmp_path: Path) -> None:
+        tier4 = tmp_path / "tier4"
+        data = _make_gate_result()
+        del data["schema_id"]
+        _write_gate_result(tier4, SAMPLE_RESULT_SUBPATH, data)
+
+        result = gate_pass_recorded(SAMPLE_GATE_ID, SAMPLE_RUN_ID, tier4)
+
+        assert result.passed is False
+        assert result.failure_category == MALFORMED_ARTIFACT
+        assert "schema_id" in (result.reason or "")
+
+    # 0b — Wrong schema_id → MALFORMED_ARTIFACT (never silently repaired).
+    # The spec: "A gate_pass_recorded predicate that reads a gate result file
+    # and finds a different schema_id must fail with failure_category:
+    # MALFORMED_ARTIFACT."  CLAUDE.md §17.6.5 forbids auto-correction.
+    def test_wrong_schema_id(self, tmp_path: Path) -> None:
+        tier4 = tmp_path / "tier4"
+        _write_gate_result(
+            tier4,
+            SAMPLE_RESULT_SUBPATH,
+            _make_gate_result(schema_id="orch.gate_result.v0"),
+        )
+
+        result = gate_pass_recorded(SAMPLE_GATE_ID, SAMPLE_RUN_ID, tier4)
+
+        assert result.passed is False
+        assert result.failure_category == MALFORMED_ARTIFACT
+        assert result.details["recorded_schema_id"] == "orch.gate_result.v0"
+        assert result.details["expected_schema_id"] == GATE_RESULT_SCHEMA_ID
 
     # 1 — Pass: valid gate result with matching run_id, fresh evaluated_at.
     def test_pass_valid_gate_result(self, tmp_path: Path) -> None:

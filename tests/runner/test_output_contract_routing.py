@@ -218,6 +218,69 @@ class TestGateEnforcementPayloadValidation:
         assert result.payload["gate_id"] == "phase_03_gate"
         assert result.payload["overall_status"] == "pass"
 
+    def test_skillresult_shaped_success_envelope_unwrapped(
+        self, gate_env: Path
+    ) -> None:
+        """The model sometimes wraps the real gate payload in a
+        SkillResult-shaped success envelope:
+            {"status": "success", "outputs_written": [], "payload": {...}}
+        This is a shape ambiguity, not a data fault — every required field
+        is present, nested one level under ``payload`` (Phase D.6).  The
+        runtime must unwrap it and accept the gate payload, discarding the
+        model's self-asserted ``status``/``outputs_written``.  Observed live
+        at Phase 5 (impact architecture) after Phases 3/4 emitted the flat
+        shape — same skill, nondeterministic envelope.
+        """
+        payload = {
+            "gate_id": "phase_03_gate",
+            "run_id": "run-001",
+            "overall_status": "pass",
+            "hard_block": False,
+            "evaluated_at": "2026-04-20T12:00:00Z",
+            "deterministic_predicates": {"passed": ["schema_id_match"], "failed": []},
+            "semantic_predicates": {"passed": [], "failed": []},
+        }
+        wrapped = {
+            "schema_id": "orch.gate_enforcement.skill_result.v1",
+            "run_id": "run-001",
+            "status": "success",
+            "outputs_written": [],
+            "payload": payload,
+        }
+        with _claude_returns(wrapped):
+            result = run_skill("gate-enforcement", "run-001", gate_env)
+
+        assert result.status == "success"
+        assert result.payload is not None
+        assert result.payload["gate_id"] == "phase_03_gate"
+        assert result.payload["overall_status"] == "pass"
+
+    def test_wrapped_envelope_with_incomplete_payload_still_fails(
+        self, gate_env: Path
+    ) -> None:
+        """Unwrapping must NOT mask a genuinely incomplete payload.  A
+        SkillResult-shaped success envelope whose nested payload is missing
+        a required field (``gate_id``) still fails closed after unwrap —
+        the fix normalizes shape, it does not fabricate missing data
+        (§17.6.5)."""
+        wrapped = {
+            "status": "success",
+            "outputs_written": [],
+            "payload": {
+                # gate_id deliberately absent
+                "run_id": "run-001",
+                "overall_status": "pass",
+                "evaluated_at": "2026-04-20T12:00:00Z",
+                "deterministic_predicates": {"passed": [], "failed": []},
+                "semantic_predicates": {"passed": [], "failed": []},
+            },
+        }
+        with _claude_returns(wrapped):
+            result = run_skill("gate-enforcement", "run-001", gate_env)
+
+        assert result.status == "failure"
+        assert "gate_id" in result.failure_reason
+
     def test_valid_gate_fail_response_accepted(self, gate_env: Path) -> None:
         """Gate failure is a valid and correct output — SkillResult.status
         is still "success" because the skill executed correctly."""

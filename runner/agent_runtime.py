@@ -29,13 +29,31 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 import yaml
 
+from runner.deterministic_components import invoke_component
 from runner.node_resolver import NodeResolver, NodeResolverError
-from runner.runtime_models import AgentResult, SkillInvocationRecord
+from runner.phase8_skip_binding import (
+    PHASE8_DRAFTING_SKILL_BY_NODE,
+    SkipBindingError,
+    validate_skip_binding,
+)
+from runner.runtime_models import (
+    AgentResult,
+    ComponentInvocationRecord,
+    SkillInvocationRecord,
+)
 from runner.skill_runtime import run_skill
+from runner.decomposed_drafting import (
+    DecomposedDraftingError,
+    draft_section_decomposed,
+)
+from runner.section_assembler import (
+    SECTION_DRAFTS_ROOT_REL,
+    SPINE_FILENAME,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +99,12 @@ _TIER5_DELIVERABLE_DIRS: tuple[str, ...] = (
     "docs/tier5_deliverables/assembled_drafts",
 )
 
+#: Character budget for the "subsequent failures" tail appended to a
+#: node's reported failure_reason.  The cause is reported in full; the
+#: failures that followed it are summarised, since they are usually
+#: consequences of the cause and the manifest field must stay readable.
+_SUBSEQUENT_FAILURE_CHARS: int = 600
+
 #: Phase 8 primary drafting skills.  If any of these fail, the agent
 #: body halts immediately (stale-artifact guard) to prevent audit
 #: skills from running against stale artifacts from a prior run.
@@ -104,6 +128,76 @@ _PHASE8_SKILL_EXPECTED_ARTIFACT: dict[str, str] = {
         "docs/tier5_deliverables/proposal_sections/implementation_section.json"
     ),
 }
+
+#: Maps a bound section-assembler deterministic component to the monolithic
+#: drafting skill it SUPERSEDES (ticket 13, decomposed-drafting capture-replay).
+#:
+#: When a Phase-8 drafting node binds a ``*_section_assembler`` component, the
+#: section is produced by array-append composition of the captured
+#: per-sub-section drafts (``section_drafts/<slug>/``, the non-deterministic
+#: live capture retained per §9.5/W2), NOT by the monolithic single-call
+#: drafting skill.  The two are mutually-exclusive producers of the same
+#: canonical section artifact, so when the assembler is bound the monolithic
+#: drafting skill is skipped (recorded as ``superseded_by_decomposed_assembler``).
+#: The skill stays declared in the manifest so reuse/preseed references remain
+#: valid; only its runtime execution is suppressed.
+_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL: dict[str, str] = {
+    "excellence_section_assembler": "excellence-section-drafting",
+    "impact_section_assembler": "impact-section-drafting",
+    "implementation_section_assembler": "implementation-section-drafting",
+}
+
+#: Load-time invariant: every drafting skill an assembler supersedes must be one
+#: the single authoritative skip binding recognises.  Keeps this fourth naming
+#: of "the drafting skill" from drifting away from the preseed/reuse binding
+#: (PRE-2/PRE-3, ticket 3); the assembler→node mapping stays local because the
+#: supersession is keyed by component, not node.
+_unbound_supersessions = sorted(
+    set(_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL.values())
+    - set(PHASE8_DRAFTING_SKILL_BY_NODE.values())
+)
+if _unbound_supersessions:  # pragma: no cover — import-time invariant
+    raise SkipBindingError(
+        "_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL names drafting skills absent from "
+        f"the authoritative Phase-8 skip binding: {_unbound_supersessions}"
+    )
+
+#: Maps a bound section-assembler component to the section slug whose
+#: per-sub-section drafts it composes.  Used to invoke the live decomposed
+#: drafter — the producer of ``section_drafts/<slug>/`` — BEFORE the Phase-B+
+#: component loop runs the assumption-applier and assembler that consume those
+#: drafts.  Without this producer the assembler has nothing to compose and the
+#: node yields an empty/absent section (ticket 13A: the length fix's live wire).
+_ASSEMBLER_SECTION_SLUG: dict[str, str] = {
+    "excellence_section_assembler": "excellence",
+    "impact_section_assembler": "impact",
+    "implementation_section_assembler": "implementation",
+}
+
+
+def drafting_skills_superseded_by(
+    component_ids: Iterable[str] | None,
+) -> frozenset[str]:
+    """Return the monolithic drafting skills that *component_ids* supersede.
+
+    The supersession is derived from the node's **manifest binding** — bind the
+    assembler and the drafting skill it replaces is suppressed — which is the
+    only reason a Phase-8 node does not redraft over its own canonical section.
+
+    The scheduler needs this on the *pre-suppression* binding: when preseed or
+    reuse drops the draft-consuming components (``dag_scheduler._dispatch_node``,
+    Step 3), the assemblers never reach :func:`run_agent`, so the supersession
+    they carry would evaporate exactly when an authoritative artifact is on disk
+    and must not be redrafted over.  Without carrying it forward, the only thing
+    standing between Claude and the operator's prose is the hardcoded skill id in
+    ``PRESEED_NODE_CONFIG`` / ``REUSE_SKIP_SKILLS`` — a second, unchecked source
+    of truth for "which skill drafts this node".
+    """
+    return frozenset(
+        _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL[cid]
+        for cid in (component_ids or [])
+        if cid in _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -382,6 +476,40 @@ def _resolve_skill_sequence(
 # ---------------------------------------------------------------------------
 
 
+#: Artifact paths produced by the budget-gate node (n07) ONLY under the
+#: lump-sum budget regime — the external Lump Sum Budget Planner request and its
+#: validation directory.  Under a unit-cost instrument (e.g. MSCA) these are
+#: never written (C1: the budget is derived internally), so requiring them in
+#: the artifact-readiness check would wrongly fail an otherwise-resolved
+#: unit-cost budget gate.  gate_09's *predicates* already carry
+#: ``applies_when: {budget_regime: lump_sum}`` (C1); the manifest
+#: artifact_registry carries no such tag, so the same instrument-conditional is
+#: expressed here, by path.
+_LUMP_SUM_ONLY_ARTIFACT_MARKERS: tuple[str, ...] = (
+    "lump_sum_budget_planner/",
+    "integration/budget_request.json",
+)
+
+
+def _resolve_budget_regime_safe(repo_root: Path) -> Optional[str]:
+    """Return the instrument budget regime, or ``None`` if unresolvable.
+
+    Mirrors the gate evaluator's resolution (via
+    :func:`runner.instrument_profile.resolve_instrument_profile`) so the agent
+    runtime's artifact-readiness check and the exit gate agree on which
+    instrument-conditional artifacts apply.  Imported locally to preserve the
+    module's import isolation (the agent runtime imports no scheduler/gate
+    module).  Fails closed to ``None`` — the caller then keeps the artifact
+    required, so an unresolvable regime never silently drops a check.
+    """
+    try:
+        from runner.instrument_profile import resolve_instrument_profile
+
+        return resolve_instrument_profile(repo_root).budget_regime
+    except Exception:  # noqa: BLE001 — unresolvable regime → keep artifact required
+        return None
+
+
 def _get_artifacts_produced_by_node(
     node_id: str,
     repo_root: Path,
@@ -395,6 +523,9 @@ def _get_artifacts_produced_by_node(
     """
     registry = _load_artifact_registry(repo_root, manifest_path=manifest_path)
     paths: list[str] = []
+    # Resolve the budget regime once for the lump-sum-only filter below.
+    # ``None`` (unresolvable) keeps every artifact required (fail-closed).
+    _budget_regime = _resolve_budget_regime_safe(repo_root)
     for entry in registry:
         if not isinstance(entry, dict):
             continue
@@ -418,6 +549,18 @@ def _get_artifacts_produced_by_node(
 
         path = entry.get("path", "")
         tier = entry.get("tier", "")
+
+        # Instrument-conditional relevance (mirrors gate_09's applies_when, C1):
+        # skip the lump-sum-only budget artifacts unless the resolved regime is
+        # lump-sum.  For a unit-cost instrument they are never produced, so
+        # requiring them would wrongly fail the unit-cost budget gate's
+        # readiness check even when the internal derivation resolved cleanly.
+        if any(m in path for m in _LUMP_SUM_ONLY_ARTIFACT_MARKERS):
+            # Skip ONLY when the regime is resolved AND is not lump-sum.  An
+            # unresolvable regime (None) keeps the artifact required — the
+            # check is never silently dropped on uncertainty (fail-closed).
+            if _budget_regime is not None and _budget_regime != "lump_sum":
+                continue
 
         # Only check artifacts relevant to gate evaluation:
         # - tier4_phase_output artifacts (these have gate_dependency)
@@ -632,6 +775,56 @@ _SKILL_CONTEXT_SOURCES: dict[str, tuple[str, ...]] = {
     ),
 }
 
+#: Skill-catalog field declaring a skill's caller-context sources.
+#:
+#: New bindings go in ``skill_catalog.yaml`` beside the skill's other
+#: declarations, NOT in the dict above.  Two reasons.  A skill's context
+#: need is a property of the skill, so it belongs with its ``reads_from``
+#: and ``writes_to``; and ``agent_runtime`` is required to stay
+#: skill-name-agnostic in executable code (see
+#: ``test_no_hardcoded_skill_name_trigger_in_source``), so a name added
+#: here would couple the runtime to a specific skill.  The dict above is
+#: retained only for ``topic-scope-check``, which predates the field.
+_CATALOG_CONTEXT_FIELD: str = "caller_context_from"
+
+
+def _context_sources_for(skill_id: str, repo_root: Path) -> tuple[str, ...]:
+    """Resolve a skill's declared caller-context sources.
+
+    Merges the catalog's ``caller_context_from`` list with any built-in
+    entry in :data:`_SKILL_CONTEXT_SOURCES`, preserving order and dropping
+    duplicates.  A catalog that cannot be read yields the built-in entry
+    alone: context resolution must not turn a catalog problem into a
+    silent loss of context, and ``run_skill`` reports the catalog fault
+    itself.
+    """
+    sources: list[str] = []
+
+    try:
+        from runner.skill_runtime import _get_skill_entry
+
+        entry = _get_skill_entry(skill_id, repo_root)
+    except Exception:  # noqa: BLE001 — catalog faults reported by run_skill
+        entry = None
+
+    if isinstance(entry, dict):
+        declared = entry.get(_CATALOG_CONTEXT_FIELD)
+        if isinstance(declared, list):
+            for item in declared:
+                if isinstance(item, str) and item.strip():
+                    sources.append(item.strip())
+
+    for item in _SKILL_CONTEXT_SOURCES.get(skill_id, ()):
+        sources.append(item)
+
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for item in sources:
+        if item not in seen:
+            seen.add(item)
+            ordered.append(item)
+    return tuple(ordered)
+
 
 def _build_caller_context(
     skill_id: str,
@@ -652,8 +845,8 @@ def _build_caller_context(
     skill's own input validation (e.g. Step 1.4 of ``topic-scope-check``)
     will produce the appropriate ``MISSING_INPUT`` failure.
     """
-    source_paths = _SKILL_CONTEXT_SOURCES.get(skill_id)
-    if source_paths is None:
+    source_paths = _context_sources_for(skill_id, repo_root)
+    if not source_paths:
         return {}
 
     context: dict[str, Any] = {}
@@ -678,6 +871,22 @@ def _build_caller_context(
                 pass  # absent/unreadable — skip; fail-closed downstream
 
     return context
+
+
+def _missing_context_sources(
+    skill_id: str,
+    caller_context: dict[str, Any],
+    repo_root: Path,
+) -> list[str]:
+    """Declared context sources for *skill_id* that produced no content.
+
+    Returns an empty list for a skill that declares no context sources —
+    such a skill has no context need, so nothing is missing.
+    """
+    source_paths = _context_sources_for(skill_id, repo_root)
+    if not source_paths:
+        return []
+    return [p for p in source_paths if p not in caller_context]
 
 
 # ---------------------------------------------------------------------------
@@ -851,6 +1060,7 @@ def run_agent(
     sub_agent_id: Optional[str] = None,
     pre_gate_agent_id: Optional[str] = None,
     skip_skills: list[str] | None = None,
+    deterministic_components: list[str] | None = None,
 ) -> AgentResult:
     """Execute an agent's body for a node and return an AgentResult.
 
@@ -887,6 +1097,13 @@ def run_agent(
         Skill IDs to skip during execution (recorded as
         ``"reuse_skipped"``).  Used by Phase 8 reuse to skip
         expensive drafting skills while still running audit skills.
+    deterministic_components:
+        Ordered list of deterministic-component ids bound to this node in
+        the manifest (§16.5 / C3).  Invoked as pure-Python, Claude-free
+        node-body passes before skill sequencing; each is recorded in
+        ``AgentResult.invoked_components`` (C2).  A component fault fails
+        the agent body with ``failure_category="AGENT_EXECUTION_ERROR"``
+        and ``can_evaluate_exit_gate=False``.
 
     Returns
     -------
@@ -897,6 +1114,7 @@ def run_agent(
     """
 
     all_invocations: list[SkillInvocationRecord] = []
+    all_invoked_components: list[ComponentInvocationRecord] = []
     all_outputs: list[str] = []
     all_validation_reports: list[str] = []
     all_decision_log_writes: list[str] = []
@@ -952,42 +1170,201 @@ def run_agent(
             failure_category="MISSING_INPUT",
         )
 
-    # ── Phase B+: Deterministic dependency normalization (n04 only) ────
+    # ── Phase B0-guard: decomposed-drafting supersession fail-closed ─────
     #
-    # The dependency normalizer is a pure-Python preprocessor that reads
-    # wp_structure.json + workpackage_seed.json + selected_call.json and
-    # produces scheduling_constraints.json before the gantt_designer agent
-    # body executes.  This follows the same architectural pattern as the
-    # sub-agent injection for n03 (lines 996-1048): manifest-derived,
-    # node-specific preprocessing within the agent runtime.
-
-    if node_id == "n04_gantt_milestones":
-        try:
-            from runner.dependency_normalizer import (
-                normalize_dependencies,
-                DependencyNormalizerError,
-            )
-            sc_path = normalize_dependencies(run_id, repo_root)
-            logger.info(
-                "Dependency normalization completed: %s",
-                sc_path.relative_to(repo_root),
-            )
-            _refresh_inputs_from_outputs(
-                resolved_inputs,
-                [str(sc_path.relative_to(repo_root))],
-                repo_root,
-            )
-        except Exception as exc:
-            # DependencyNormalizerError or any unexpected error → fail closed
+    # (PRE-4, ticket 9) When a ``*_section_assembler`` component is bound, the
+    # monolithic drafting skill it SUPERSEDES is skipped purely by name
+    # membership against the hardcoded ``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL``
+    # map (Phase B0 below and the skill loop's ``drafting_skills_superseded_by``
+    # in Phase D).  Neither cross-checks that name against the node's
+    # manifest-resolved ``skill_ids``.  A manifest rename of the drafting skill
+    # that is not mirrored into the map would silently no-op the supersession —
+    # the renamed monolithic drafter would then run in the skill loop alongside
+    # the assembler and race/overwrite the assembler-composed section (the same
+    # PRE-2 defect class ticket 3 closed for the preseed/reuse skip, on this
+    # sibling default path).  Resolve the superseded skill id against the node's
+    # manifest ``skill_ids`` and fail closed on any drift — reusing ticket 3's
+    # ``validate_skip_binding`` so the default and preseed/reuse paths share one
+    # authoritative check.  Computed once here and reused in Phase D.
+    #
+    # On the preseed/reuse path the scheduler has already partitioned the
+    # assembler out of ``deterministic_components`` (``partition_draft_consuming``)
+    # and validated its own skip binding, so this set is empty and the guard is
+    # inert there — it fires only on the default (no preseed/reuse) path.
+    _superseded_drafting_skills = drafting_skills_superseded_by(
+        deterministic_components
+    )
+    if _superseded_drafting_skills:
+        _supersession_binding_err = validate_skip_binding(
+            node_id, _superseded_drafting_skills, skill_ids
+        )
+        if _supersession_binding_err is not None:
+            # Pre-invocation failure: nothing has been drafted, no component or
+            # skill has run, so every accumulator is still empty — omit them,
+            # matching the sibling pre-invocation returns (spec load, input
+            # validation) rather than the post-invocation idiom below.
             return AgentResult(
                 status="failure",
                 can_evaluate_exit_gate=False,
-                failure_reason=f"Dependency normalization failed: {exc}",
-                failure_category="MISSING_INPUT",
+                failure_reason=(
+                    f"Decomposed-drafting supersession binding invalid for "
+                    f"{node_id!r}: {_supersession_binding_err}"
+                ),
+                failure_category="CONSTRAINT_VIOLATION",
+            )
+
+    # ── Phase B0: Live decomposed drafting — producer of section_drafts/ ──
+    #
+    # (ticket 13A) When a ``*_section_assembler`` component is bound, the
+    # section is composed by array-append from per-sub-section drafts in
+    # ``section_drafts/<slug>/``, and the monolithic drafting skill is
+    # superseded (skipped) in the skill loop below.  Those drafts must be
+    # PRODUCED first — otherwise the Phase-B+ assumption-applier and assembler
+    # that consume them have nothing to work on and the node yields an empty
+    # section.  Decomposed drafting is Claude-invoking (bounded per-sub-section
+    # calls with sequential context), so it is a skill-class pass: recorded in
+    # ``invoked_skills`` (NOT ``invoked_components`` — those are Claude-free,
+    # §17.5.3) and fail-closed (§17.5.4).  It defaults to the live Claude
+    # drafter, which is instructed to emit only Confirmed/Inferred/Unresolved
+    # and to never self-declare ``Assumed`` — so the β/W1 honesty contract is
+    # preserved (an operator declaration applied by the Phase-B+ applier is the
+    # only path to an ``Assumed`` claim).
+    _drafting_skip_set = frozenset(skip_skills) if skip_skills else frozenset()
+    for _cid in deterministic_components or []:
+        _slug = _ASSEMBLER_SECTION_SLUG.get(_cid)
+        if _slug is None:
+            continue  # not a section-assembler; nothing to draft here
+        _monolithic_skill = _ASSEMBLER_SUPERSEDES_DRAFTING_SKILL.get(_cid)
+        if _monolithic_skill in _drafting_skip_set:
+            # Reuse path: the section is reused from a prior run; do not redraft.
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="reuse_skipped",
+                    failure_reason=(
+                        "Decomposed drafting skipped (section reused from a "
+                        "prior run)"
+                    ),
+                )
+            )
+            continue
+        # Idempotent reuse: if the section spine already exists, every
+        # sub-section draft was produced by a prior run (the spine is written
+        # LAST, after all drafts).  Skip re-drafting — the assembler composes
+        # the existing drafts — so a re-run after a downstream fix (e.g. an
+        # assembler correction) costs no drafting quota.  Delete
+        # section_drafts/<slug>/ to force a fresh draft.
+        _spine_path = (
+            repo_root / SECTION_DRAFTS_ROOT_REL / _slug / SPINE_FILENAME
+        )
+        # Reuse the existing drafts ONLY if they belong to the CURRENT run.  A
+        # spine from a different run_id is stale (e.g. left over from a prior
+        # run on other data); reusing it makes the assembler reject it as stale.
+        # Stale or unreadable → fall through and re-draft (overwriting it).
+        _spine_fresh = False
+        if _spine_path.is_file():
+            try:
+                _spine_fresh = json.loads(
+                    _spine_path.read_text(encoding="utf-8-sig")
+                ).get("run_id") == run_id
+            except (OSError, json.JSONDecodeError, ValueError):
+                _spine_fresh = False
+        if _spine_fresh:
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="reuse_skipped",
+                    failure_reason=(
+                        "Decomposed drafting reused (current-run section_spine "
+                        "present; delete section_drafts/<slug>/ to re-draft)"
+                    ),
+                )
+            )
+            continue
+        # ticket 9: draft_section_decomposed sources the section-specific
+        # extra_fields the assembler requires (Impact: impact_pathway_refs,
+        # dec_coverage; Implementation: wp_table_refs, gantt_ref, milestone_refs,
+        # risk_register_ref) from the upstream phase outputs, failing closed
+        # BEFORE any drafting call if a required upstream artifact is missing.
+        # No separate node-body guard is needed.
+        try:
+            _draft_paths = draft_section_decomposed(run_id, repo_root, _slug)
+        except Exception as exc:  # noqa: BLE001 — honor the no-raise contract
+            # draft_section_decomposed raises DecomposedDraftingError on a
+            # malformed draft; the underlying live drafter may also surface a
+            # transport error.  Either way run_agent must return an AgentResult,
+            # never propagate (§17.5.4: no silent repair, fail closed).
+            _reason = (
+                f"Decomposed drafting failed for {_slug!r}: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            all_invocations.append(
+                SkillInvocationRecord(
+                    skill_id=f"decomposed-drafting:{_slug}",
+                    status="failure",
+                    failure_reason=_reason,
+                    failure_category="SKILL_FAILURE",
+                )
+            )
+            return AgentResult(
+                status="failure",
+                can_evaluate_exit_gate=False,
+                failure_reason=_reason,
+                failure_category="SKILL_FAILURE",
                 outputs_written=all_outputs,
                 validation_reports=all_validation_reports,
                 decision_log_writes=all_decision_log_writes,
                 invoked_skills=all_invocations,
+                invoked_components=all_invoked_components,
+            )
+        all_invocations.append(
+            SkillInvocationRecord(
+                skill_id=f"decomposed-drafting:{_slug}",
+                status="success",
+            )
+        )
+        logger.info(
+            "Decomposed drafting produced %d artifact(s) for %s "
+            "(section_drafts/); the bound assembler will compose the section",
+            len(_draft_paths),
+            _slug,
+        )
+
+    # ── Phase B+: Deterministic components (manifest-bound, §17.5.3/C2) ─
+    #
+    # Deterministic components are pure-Python, Claude-free node-body passes
+    # bound to the node via the manifest ``deterministic_components`` key
+    # (§16.5 / C3).  They read declared inputs and write canonical artifacts
+    # before skill sequencing.  This generic path replaced the former
+    # hardcoded n04 dependency-normalizer branch: the normalizer now binds
+    # and logs through this same mechanism, with byte-identical output.
+    #
+    # A component fault fails the agent body with AGENT_EXECUTION_ERROR and
+    # can_evaluate_exit_gate=False (the scheduler then skips the exit gate,
+    # §17.3.1).  Components cannot evaluate gates and are never invoked by
+    # skills (§17.6.2, §17.6.4); Python owns every write.
+    for component_id in deterministic_components or []:
+        record = invoke_component(component_id, run_id, repo_root)
+        all_invoked_components.append(record)
+        if record.status == "success":
+            # Make component outputs available to subsequent skills.
+            _refresh_inputs_from_outputs(
+                resolved_inputs, record.outputs_written, repo_root
+            )
+        else:
+            return AgentResult(
+                status="failure",
+                can_evaluate_exit_gate=False,
+                failure_reason=(
+                    f"Deterministic component {component_id!r} failed: "
+                    f"{record.failure_reason}"
+                ),
+                failure_category="AGENT_EXECUTION_ERROR",
+                outputs_written=all_outputs,
+                validation_reports=all_validation_reports,
+                decision_log_writes=all_decision_log_writes,
+                invoked_skills=all_invocations,
+                invoked_components=all_invoked_components,
             )
 
     # ── Phase C: Pre-gate agent (n07 special case) ─────────────────────
@@ -1050,6 +1427,7 @@ def run_agent(
                         validation_reports=all_validation_reports,
                         decision_log_writes=all_decision_log_writes,
                         invoked_skills=all_invocations,
+                        invoked_components=all_invoked_components,
                     )
                 # Non-halt pre-gate failure: log and continue to primary
                 # agent — it may still be able to produce required outputs
@@ -1094,11 +1472,55 @@ def run_agent(
     had_failure = False
     failure_reason_accumulator: str | None = None
     failure_category_accumulator: str | None = None
+    # Every non-halt failure, in invocation order.  The accumulators above
+    # report the FIRST entry, never the last.  A skill that fails takes its
+    # consumers down with it, and overwriting the accumulator made the run
+    # manifest name the last consumer instead of the cause: run 0395b136
+    # reported concept-call-binding-derivation's MISSING_INPUT, when the
+    # input it was missing was the artifact concept-alignment-check had
+    # failed to produce two skills earlier.  The later failures are kept
+    # and reported after the cause, not in place of it.
+    failure_chain: list[str] = []
+
+    def _record_failure(reason: str, category: str) -> None:
+        """Record a non-halt failure; the first one recorded is the cause."""
+        nonlocal had_failure
+        nonlocal failure_reason_accumulator
+        nonlocal failure_category_accumulator
+        had_failure = True
+        failure_chain.append(reason)
+        if failure_reason_accumulator is None:
+            failure_reason_accumulator = reason
+            failure_category_accumulator = category
 
     _skip_set = frozenset(skip_skills) if skip_skills else frozenset()
 
+    # ── Decomposed-drafting supersession (ticket 13) ───────────────────
+    # When a section-assembler deterministic component is bound on this
+    # node, the section is composed from the captured per-sub-section drafts
+    # by the assembler — the monolithic drafting skill is superseded and
+    # must not run (it would race the assembler on the same canonical path).
+    # ``_superseded_drafting_skills`` was computed and validated fail-closed
+    # against the manifest ``skill_ids`` at the Phase B0-guard above (PRE-4,
+    # ticket 9): every id in it is guaranteed to be a real manifest skill for
+    # this node, so a match here can never be a silent no-op over a rename.
     for sid in ordered_skills:
-        # ── Reuse skip: skip drafting skills when artifact is reused ──
+        # ── Reuse / supersession skip ────────────────────────────────
+        if sid in _superseded_drafting_skills:
+            record = SkillInvocationRecord(
+                skill_id=sid,
+                status="superseded_by_decomposed_assembler",
+                failure_reason=(
+                    "Monolithic drafting skill superseded by the bound "
+                    "section-assembler component (decomposed capture-replay, "
+                    "ticket 13); the section is composed from section_drafts/"
+                ),
+            )
+            all_invocations.append(record)
+            logger.info(
+                "Skill %s superseded by decomposed-drafting assembler", sid
+            )
+            continue
         if sid in _skip_set:
             record = SkillInvocationRecord(
                 skill_id=sid,
@@ -1132,6 +1554,54 @@ def run_agent(
         caller_context = _build_caller_context(
             sid, resolved_inputs, repo_root
         )
+
+        # Fail closed when a registered skill received NO context at all.
+        #
+        # _build_caller_context returns {} both for a skill that declares no
+        # context need and for one whose declared sources are all absent.
+        # The two were indistinguishable, and the fail-closed guarantee was
+        # delegated to the skill spec — "the skill's own input validation
+        # will produce the appropriate MISSING_INPUT failure".  A skill spec
+        # is a prompt, and in run 4caa2586 the model did not halt: it
+        # invented the context it was missing.  The guarantee belongs here,
+        # where it is deterministic.
+        #
+        # Deliberately scoped to "no source resolved" rather than "any
+        # source missing": a partially-available context is warned about but
+        # still passed through, so this cannot newly break a skill whose
+        # registered sources are legitimately optional in some project.
+        # Tightening to any-missing is a one-line change if that is wanted.
+        _missing_ctx = _missing_context_sources(sid, caller_context, repo_root)
+        if _missing_ctx:
+            _declared = _context_sources_for(sid, repo_root)
+            if len(_missing_ctx) == len(_declared):
+                _fail_reason = (
+                    f"Declared caller context for skill {sid!r} is "
+                    f"unavailable: none of its declared context sources "
+                    f"could be read ({', '.join(_missing_ctx)}). The skill "
+                    f"requires this content and must not synthesise it from "
+                    f"its other inputs"
+                )
+                record = SkillInvocationRecord(
+                    skill_id=sid,
+                    status="failure",
+                    failure_reason=_fail_reason,
+                    failure_category="MISSING_INPUT",
+                )
+                all_invocations.append(record)
+                _record_failure(
+                    f"Skill {sid!r} failed: {_fail_reason}",
+                    "SKILL_FAILURE",
+                )
+                logger.warning(
+                    "Skill %s not invoked (caller context unavailable): %s",
+                    sid, _fail_reason,
+                )
+                continue
+            logger.warning(
+                "Skill %s invoked with partial caller context; missing: %s",
+                sid, ", ".join(_missing_ctx),
+            )
 
         # Inject invocation_mode for budget-interface-validation.
         # When invoked by the primary agent body the skill operates in
@@ -1179,11 +1649,10 @@ def run_agent(
                     failure_category="MISSING_INPUT",
                 )
                 all_invocations.append(record)
-                had_failure = True
-                failure_reason_accumulator = (
-                    f"Skill {sid!r} failed: {_fail_reason}"
+                _record_failure(
+                    f"Skill {sid!r} failed: {_fail_reason}",
+                    "SKILL_FAILURE",
                 )
-                failure_category_accumulator = "SKILL_FAILURE"
                 logger.warning(
                     "Skill %s skipped (instrument type unresolvable): %s",
                     sid, _fail_reason,
@@ -1261,11 +1730,10 @@ def run_agent(
                     failure_category="MISSING_INPUT",
                 )
                 all_invocations.append(record)
-                had_failure = True
-                failure_reason_accumulator = (
-                    f"Skill {sid!r} skipped: {_fail_reason}"
+                _record_failure(
+                    f"Skill {sid!r} skipped: {_fail_reason}",
+                    "SKILL_FAILURE",
                 )
-                failure_category_accumulator = "SKILL_FAILURE"
                 logger.warning(
                     "Skill %s skipped (no auditable artifact): %s",
                     sid, _fail_reason,
@@ -1351,6 +1819,7 @@ def run_agent(
                         validation_reports=all_validation_reports,
                         decision_log_writes=all_decision_log_writes,
                         invoked_skills=all_invocations,
+                        invoked_components=all_invoked_components,
                     )
 
             # Manifest-driven sub-agent injection: after each
@@ -1402,13 +1871,13 @@ def run_agent(
                                     validation_reports=all_validation_reports,
                                     decision_log_writes=all_decision_log_writes,
                                     invoked_skills=all_invocations,
+                                    invoked_components=all_invoked_components,
                                 )
-                            had_failure = True
-                            failure_reason_accumulator = (
+                            _record_failure(
                                 f"Sub-agent skill {sub_sid!r} failed: "
-                                f"{sub_result.failure_reason}"
+                                f"{sub_result.failure_reason}",
+                                "SKILL_FAILURE",
                             )
-                            failure_category_accumulator = "SKILL_FAILURE"
 
                     # Mark sub-agent skills as consumed
                     sub_agent_skills = []
@@ -1429,6 +1898,7 @@ def run_agent(
                     validation_reports=all_validation_reports,
                     decision_log_writes=all_decision_log_writes,
                     invoked_skills=all_invocations,
+                    invoked_components=all_invoked_components,
                 )
 
             # Phase 8 stale-artifact guard: if the primary drafting
@@ -1457,6 +1927,7 @@ def run_agent(
                     validation_reports=all_validation_reports,
                     decision_log_writes=all_decision_log_writes,
                     invoked_skills=all_invocations,
+                    invoked_components=all_invoked_components,
                 )
 
             # Non-halt failure: record and continue.
@@ -1465,11 +1936,10 @@ def run_agent(
             #   from other inputs
             # - can_evaluate_exit_gate is determined from disk state
             #   at the end, not from individual skill success
-            had_failure = True
-            failure_reason_accumulator = (
-                f"Skill {sid!r} failed: {result.failure_reason}"
+            _record_failure(
+                f"Skill {sid!r} failed: {result.failure_reason}",
+                "SKILL_FAILURE",
             )
-            failure_category_accumulator = "SKILL_FAILURE"
 
     # Invoke any remaining sub-agent skills that weren't triggered
     # during the primary skill loop.  Check artifact readiness first:
@@ -1513,25 +1983,24 @@ def run_agent(
                             validation_reports=all_validation_reports,
                             decision_log_writes=all_decision_log_writes,
                             invoked_skills=all_invocations,
+                            invoked_components=all_invoked_components,
                         )
-                    had_failure = True
-                    failure_reason_accumulator = (
+                    _record_failure(
                         f"Sub-agent skill {sub_sid!r} failed: "
-                        f"{sub_result.failure_reason}"
+                        f"{sub_result.failure_reason}",
+                        "SKILL_FAILURE",
                     )
-                    failure_category_accumulator = "SKILL_FAILURE"
         else:
             # Sub-agent's declared inputs are not on disk — the
             # parent agent did not produce the required artifacts.
             # Fail closed per CLAUDE.md §6.5.
-            had_failure = True
-            failure_reason_accumulator = (
+            _record_failure(
                 f"Declared sub-agent {sub_agent_id!r} cannot run: "
                 f"its required inputs (from agent_catalog.yaml "
                 f"reads_from) are not present on disk; the parent "
-                f"agent did not produce the required artifacts"
+                f"agent did not produce the required artifacts",
+                "INCOMPLETE_OUTPUT",
             )
-            failure_category_accumulator = "INCOMPLETE_OUTPUT"
             logger.warning(
                 "Sub-agent %s inputs not ready at fallback; "
                 "failing closed",
@@ -1557,15 +2026,32 @@ def run_agent(
     # to proceed to gate evaluation when status="failure".
 
     if had_failure:
+        # The cause first, then the failures that followed it.  Later
+        # entries are usually consequences (a consumer skill reporting the
+        # input its failed producer never wrote), so they are labelled as
+        # subsequent rather than presented as the fault.
+        _reported_reason = failure_reason_accumulator
+        if len(failure_chain) > 1:
+            _subsequent = "; ".join(failure_chain[1:])
+            if len(_subsequent) > _SUBSEQUENT_FAILURE_CHARS:
+                _subsequent = (
+                    _subsequent[:_SUBSEQUENT_FAILURE_CHARS] + " ..."
+                )
+            _reported_reason = (
+                f"{failure_reason_accumulator} "
+                f"[+{len(failure_chain) - 1} subsequent failure(s) in the "
+                f"same node, likely consequences: {_subsequent}]"
+            )
         return AgentResult(
             status="failure",
             can_evaluate_exit_gate=can_evaluate,
-            failure_reason=failure_reason_accumulator,
+            failure_reason=_reported_reason,
             failure_category=failure_category_accumulator,
             outputs_written=all_outputs,
             validation_reports=all_validation_reports,
             decision_log_writes=all_decision_log_writes,
             invoked_skills=all_invocations,
+            invoked_components=all_invoked_components,
         )
 
     if not can_evaluate:
@@ -1585,6 +2071,7 @@ def run_agent(
             validation_reports=all_validation_reports,
             decision_log_writes=all_decision_log_writes,
             invoked_skills=all_invocations,
+            invoked_components=all_invoked_components,
         )
 
     # Happy path: all skills succeeded and gate artifacts are on disk.
@@ -1595,6 +2082,7 @@ def run_agent(
         validation_reports=all_validation_reports,
         decision_log_writes=all_decision_log_writes,
         invoked_skills=all_invocations,
+        invoked_components=all_invoked_components,
     )
 
 

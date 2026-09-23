@@ -1001,9 +1001,17 @@ gate_rules:
     mandatory: true
     bypass_prohibited: true
     hard_block_on_missing_received_dir: true
+    # Instrument-conditional on source (C1, §8.1/§8.4).  Predicates tagged
+    # ``applies_when: {budget_regime: lump_sum}`` are evaluated only for
+    # lump-sum instruments (external Lump Sum Budget Planner response in
+    # received/); those tagged ``unit_cost`` only for unit-cost instruments
+    # (internal deterministic derivation, unit_cost_budget.json).  g08_p01 is
+    # unconditional.  The categorical HARD_BLOCK on Phase 8 is preserved
+    # verbatim and instrument-independent (the scheduler blocks on ANY gate_09
+    # exit failure; the gate evaluator annotates hard_block for either source).
     predicates:
 
-      # --- gate_pass predicates ---
+      # --- gate_pass predicates (instrument-independent) ---
       - predicate_id: g08_p01
         type: gate_pass
         function: gate_pass_recorded
@@ -1022,6 +1030,8 @@ gate_rules:
       # and must emit a HARD_BLOCK result code on g08_p02 failure in addition
       # to the standard fail status. All downstream Phase 8 nodes are frozen.
       - predicate_id: g08_p02
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: dir_non_empty
         args:
@@ -1036,6 +1046,8 @@ gate_rules:
         prose_condition: "Non-empty budget response artifact present in integrations/received/"
 
       - predicate_id: g08_p03
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: dir_non_empty
         args:
@@ -1048,6 +1060,8 @@ gate_rules:
         prose_condition: "Validation artifact present in integrations/validation/"
 
       - predicate_id: g08_p08
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: non_empty_json
         args:
@@ -1060,6 +1074,8 @@ gate_rules:
         prose_condition: "Budget gate assessment written to Tier 4"
 
       - predicate_id: g08_p09
+        applies_when:
+          budget_regime: lump_sum
         type: file
         function: artifact_owned_by_run
         args:
@@ -1073,6 +1089,8 @@ gate_rules:
 
       # --- schema predicates ---
       - predicate_id: g08_p04
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: interface_contract_conforms
         args:
@@ -1086,6 +1104,8 @@ gate_rules:
         prose_condition: "Interface contract conformance confirmed"
 
       - predicate_id: g08_p07
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: no_blocking_inconsistencies
         args:
@@ -1099,6 +1119,8 @@ gate_rules:
 
       # --- coverage predicates ---
       - predicate_id: g08_p05
+        applies_when:
+          budget_regime: lump_sum
         type: coverage
         function: wp_budget_coverage_match
         args:
@@ -1111,6 +1133,8 @@ gate_rules:
         prose_condition: "All Phase 3 WPs have corresponding budget entries"
 
       - predicate_id: g08_p06
+        applies_when:
+          budget_regime: lump_sum
         type: coverage
         function: partner_budget_coverage_match
         args:
@@ -1121,6 +1145,55 @@ gate_rules:
           a corresponding effort or cost allocation in the budget response.
           Every partner must have a budget allocation.
         prose_condition: "All consortium partners have corresponding budget allocations"
+
+      # --- unit-cost predicates (C1) ---
+      # For unit-cost instruments (e.g. MSCA-PF) the budget source is the
+      # internal deterministic derivation (unit_cost_budget.json), not the
+      # external lump-sum received/ response.  These predicates apply only when
+      # the resolved budget_regime is unit_cost; the lump-sum predicates above
+      # are skipped as not-applicable.  A missing/blocked derivation is the same
+      # categorical HARD_BLOCK as a missing lump-sum response (§8.4).
+      - predicate_id: g08_uc01
+        applies_when:
+          budget_regime: unit_cost
+        type: file
+        function: non_empty_json
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          unit_cost_budget.json is absent or empty in
+          docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/.
+          The unit-cost budget deriver (§8.1) must write its canonical
+          derivation artifact before this gate can pass.
+        prose_condition: "Unit-cost budget derivation written to Tier 4"
+
+      - predicate_id: g08_uc02
+        applies_when:
+          budget_regime: unit_cost
+        type: file
+        function: artifact_owned_by_run
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+          run_id: "${run_id}"
+        fail_message: >
+          unit_cost_budget.json exists but its run_id does not match the
+          current run. Re-run Phase 7 to regenerate the derivation.
+        prose_condition: "Unit-cost budget derivation owned by current run"
+
+      - predicate_id: g08_uc03
+        applies_when:
+          budget_regime: unit_cost
+        type: schema
+        function: unit_cost_budget_resolved
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          The unit-cost budget derivation is not fully resolved: one or more
+          budget components (including host-dependent lines) are Unresolved,
+          or gate_pass_declaration is not "pass". Every component must resolve
+          to Confirmed or operator-declared Assumed before the budget gate can
+          pass. An unresolved host coefficient blocks (§8.4).
+        prose_condition: "Unit-cost budget fully resolved (no Unresolved components)"
 
 
   # ===========================================================================
@@ -1254,6 +1327,45 @@ gate_rules:
           Excellence section references objectives but drops quantitative
           metric components from their measurable_target values.
         prose_condition: "All quantitative metric components from measurable_target preserved"
+
+      # W1 — β honesty layer (ticket 9).  Every 'assumed' claim must map by
+      # claim_id to a manually_placed operator declaration in
+      # working_assumptions.json whose declared value equals the claim_summary.
+      # The declaration reader parses only the manually_placed operator file, so
+      # a run_produced value can never back an Assumed (CLAUDE.md §13.3).  Inert
+      # unless a green was bought by declaration (no 'assumed' claim ⇒ passes).
+      - predicate_id: g09a_p11
+        type: coverage
+        function: assumed_claims_are_operator_declared
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+        fail_message: >
+          Excellence section contains an 'assumed' claim not backed by an
+          operator declaration in working_assumptions.json (W1). Every assumed
+          claim must map by claim_id to a manually_placed declaration whose
+          declared value equals the claim_summary (CLAUDE.md §13.3; ticket 9).
+        prose_condition: "Every assumed claim is operator-declared (W1)"
+
+      # W2 — the other half of the β honesty layer.  W1 audits claims already
+      # marked 'assumed' and is silent about one that should be assumed but is
+      # not: a drafter that labels an operator declaration 'inferred' passes W1
+      # vacuously (nothing to audit) and no_unresolved_material_claims too, and
+      # the honesty apparatus goes inert.  Under §12.2 Inferred is derived from
+      # confirmed evidence while Assumed is adopted in its absence, so a claim
+      # citing working_assumptions.json cannot be Inferred.  Judges only claims
+      # that name the file themselves — it never infers that a claim ought to
+      # have cited a declaration.
+      - predicate_id: g09a_p12
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/excellence_section.json"
+        fail_message: >
+          Excellence section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
 
 
   # ===========================================================================
@@ -1396,6 +1508,39 @@ gate_rules:
           metric components from their measurable_target values.
         prose_condition: "All quantitative metric components from measurable_target preserved"
 
+      # W1 — β honesty layer (ticket 11 extends ticket 9 to Impact).  Every
+      # 'assumed' claim must map by claim_id to a manually_placed operator
+      # declaration in working_assumptions.json whose declared value equals the
+      # claim_summary.  The declaration reader parses only the manually_placed
+      # operator file, so a run_produced value can never back an Assumed
+      # (CLAUDE.md §13.3).  Inert unless a green was bought by declaration
+      # (no 'assumed' claim ⇒ passes).
+      - predicate_id: g09b_p12
+        type: coverage
+        function: assumed_claims_are_operator_declared
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          Impact section contains an 'assumed' claim not backed by an
+          operator declaration in working_assumptions.json (W1). Every assumed
+          claim must map by claim_id to a manually_placed declaration whose
+          declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
+        prose_condition: "Every assumed claim is operator-declared (W1)"
+
+      # W2 — see the g09a_p12 note.  A claim citing working_assumptions.json
+      # cannot be Inferred: a declaration is adopted without evidence (§12.2).
+      - predicate_id: g09b_p13
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/impact_section.json"
+        fail_message: >
+          Impact section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
+
 
   # ===========================================================================
   # GATE 09c — gate_10c_implementation_completeness
@@ -1526,6 +1671,39 @@ gate_rules:
           Implementation section shortens or paraphrases canonical
           objective or WP titles from the reference pack.
         prose_condition: "Canonical objective and WP titles preserved"
+
+      # W1 — β honesty layer (ticket 11 extends ticket 9 to Implementation).
+      # Every 'assumed' claim must map by claim_id to a manually_placed operator
+      # declaration in working_assumptions.json whose declared value equals the
+      # claim_summary.  The declaration reader parses only the manually_placed
+      # operator file, so a run_produced value can never back an Assumed
+      # (CLAUDE.md §13.3).  Inert unless a green was bought by declaration
+      # (no 'assumed' claim ⇒ passes).
+      - predicate_id: g09c_p11
+        type: coverage
+        function: assumed_claims_are_operator_declared
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          Implementation section contains an 'assumed' claim not backed by an
+          operator declaration in working_assumptions.json (W1). Every assumed
+          claim must map by claim_id to a manually_placed declaration whose
+          declared value equals the claim_summary (CLAUDE.md §13.3; ticket 11).
+        prose_condition: "Every assumed claim is operator-declared (W1)"
+
+      # W2 — see the g09a_p12 note.  A claim citing working_assumptions.json
+      # cannot be Inferred: a declaration is adopted without evidence (§12.2).
+      - predicate_id: g09c_p12
+        type: coverage
+        function: declared_facts_are_not_inferred
+        args:
+          path: "docs/tier5_deliverables/proposal_sections/implementation_section.json"
+        fail_message: >
+          Implementation section marks a claim 'inferred' while citing
+          working_assumptions.json as its source. An operator declaration is
+          adopted in the absence of evidence and is therefore 'assumed', not
+          derived from confirmed evidence (CLAUDE.md §12.2).
+        prose_condition: "No declaration-sourced claim is marked inferred (W2)"
 
 
   # ===========================================================================
@@ -1784,7 +1962,13 @@ gate_rules:
           runner before gate_12 can pass.
         prose_condition: "Phase 8 checkpoint published"
 
+      # Instrument-conditional on source (C1, §8.1/§8.4): the lump-sum
+      # confirmation lives in budget_gate_assessment.json; the unit-cost
+      # confirmation lives in unit_cost_budget.json (the §8.1 deterministic
+      # derivation).  Mirrors the gate_09 applies_when split.
       - predicate_id: g11_p07
+        applies_when:
+          budget_regime: lump_sum
         type: schema
         function: budget_gate_confirmation_present
         args:
@@ -1794,6 +1978,21 @@ gate_rules:
           absent or does not equal "pass". The budget gate confirmation must
           be positively present in the Phase 7 assessment artifact at the
           time of final gate evaluation.
+        prose_condition: "Budget gate confirmation present"
+
+      - predicate_id: g11_uc01
+        applies_when:
+          budget_regime: unit_cost
+        type: schema
+        function: unit_cost_budget_resolved
+        args:
+          path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          The unit-cost budget derivation is not positively confirmed at final
+          gate evaluation: unit_cost_budget.json is absent, one or more budget
+          components (including host-dependent lines) are Unresolved, or
+          gate_pass_declaration is not "pass". The §8.1 deterministic
+          derivation must be fully resolved before gate_12 can pass.
         prose_condition: "Budget gate confirmation present"
 
       # --- coverage predicates ---
@@ -1836,7 +2035,14 @@ gate_rules:
           may be invented. Violations per CLAUDE.md §13.3.
         prose_condition: "No invented project facts in Tier 5 — CLAUDE.md §13.3"
 
+      # Instrument-conditional on source (C1, §8.1/§8.4), mirroring the
+      # g11_p07/g11_uc01 split: the lump-sum contradiction check judges
+      # against the validated external response recorded in
+      # budget_gate_assessment.json; the unit-cost variant judges against
+      # the §8.1 deterministic derivation in unit_cost_budget.json.
       - predicate_id: g11_p10
+        applies_when:
+          budget_regime: lump_sum
         type: semantic
         function: no_budget_gate_contradiction
         args:
@@ -1848,6 +2054,24 @@ gate_rules:
           validated budget response. No budget-dependent content may be
           finalised before and without the budget gate. Violations per
           CLAUDE.md §8.4, §13.4.
+        prose_condition: "No budget-dependent finalisation before gate pass — CLAUDE.md §8.4, §13.4"
+
+      - predicate_id: g11_uc02
+        applies_when:
+          budget_regime: unit_cost
+        type: semantic
+        function: no_budget_gate_contradiction_unit_cost
+        args:
+          sections_path: "docs/tier5_deliverables/proposal_sections/"
+          phase7_path: "docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/unit_cost_budget.json"
+        fail_message: >
+          One or more Tier 5 sections reference a specific budget figure,
+          effort allocation, or resource commitment that contradicts the
+          deterministic unit-cost budget derivation (§8.1) in
+          unit_cost_budget.json — its gate_pass_declaration, total,
+          line-item amounts, monthly rates, or confirmed months. No
+          budget-dependent content may be finalised before and without
+          the budget gate. Violations per CLAUDE.md §8.4, §13.4.
         prose_condition: "No budget-dependent finalisation before gate pass — CLAUDE.md §8.4, §13.4"
 
       - predicate_id: g11_p11

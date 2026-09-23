@@ -1,0 +1,62 @@
+# Credentials and secrets
+.env
+*_accessKeys.csv
+
+# Runtime and diagnostic state
+# NOTE: .claude/agents/, .claude/skills/, .claude/workflows/ are constitutional
+#       configuration and are intentionally tracked. Only runtime-generated
+#       directories are excluded here.
+# graph_compiler.py --from-graph staging + diff report: regenerable, deterministic
+# preview/compile output (milestone 2, ticket 3). Non-destructive; not source truth.
+docs/tier4_orchestration_state/graph_compile/
+# graph_projector.py phase-gate mirror nodes (milestone 2, ticket 4): derived,
+# regenerable Tier-4 state projected into any vault. The owned folder skeleton is
+# tracked; the generated PGS-*.md mirror nodes are not.
+**/18_phase_gate_state/PGS-*.md
+.claude/skill_diag/
+.claude/semantic_diag/
+.claude/runs/
+.claude/logs/
+.claude/cache/
+.claude/benchmark/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+orchestrator-image.tar
+orchestrator-deploy.tar.gz
+# E5f run-local checkpoint (pickle scratch; durable records are the report,
+# the baseline, and the provenance JSONL)
+harness/rubric_reports/rubric_run_checkpoint.pkl
+harness/rubric_reports/rubric_run_checkpoint.pkl.tmp

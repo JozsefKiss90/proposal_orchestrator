@@ -1,0 +1,125 @@
+Control Group 10 — Compliance
+
+  Controls
+
+  DC-39  GDPR DPA executed via AWS Artifact
+
+  Context
+
+  This is a legal/compliance control, not a technical implementation.
+  It verifies that the AWS Data Processing Addendum (DPA) has been
+  executed, which is required when processing personal data or when
+  institutional policy mandates a DPA with cloud service providers.
+
+  The DPA is a pre-signed agreement available through AWS Artifact.
+  It does not require negotiation — it is accepted as-is through the
+  AWS console.
+
+  ============================================================================
+  Step 1: Determine Applicability
+  ============================================================================
+
+  DC-39 is applicable if ANY of the following are true:
+
+  a) The proposal orchestrator will process personal data of EU residents
+     (e.g., researcher names, CVs, partner contact details in Tier 3)
+  b) Your institution's IT security or data protection policy requires a
+     DPA with all cloud service providers
+  c) Your institution is an EU public body or receives EU public funding
+     (Horizon Europe) and must demonstrate GDPR compliance for all
+     data processing activities
+
+  DC-39 is NOT_APPLICABLE if:
+  - No personal data of any kind is processed through the system
+  - Your institution has already executed the AWS DPA at the
+    organizational level (check with your DPO or IT governance)
+
+  If your institution already has an AWS DPA in place at the
+  organizational/enterprise level, you do not need a second one.
+  Capture evidence of the existing DPA and mark DC-39 as VERIFIED_PASS.
+
+  ============================================================================
+  Step 2: Check for Existing DPA via AWS Artifact
+  ============================================================================
+
+  1. Sign in to the AWS Management Console (account 232538551827)
+  2. Navigate to: AWS Artifact (search "Artifact" in the console)
+  3. Select "Agreements" in the left navigation
+  4. Look for:
+     - "AWS GDPR Data Processing Addendum" under Account Agreements
+     - OR an Organization-level agreement if the account were in an Org
+
+  If the DPA is already accepted:
+  - Status will show "Accepted" or "Active"
+  - Screenshot this page
+
+  If the DPA is not yet accepted:
+  - You will see an option to review and accept it
+  - The DPA is a standard AWS document — no negotiation required
+  - Review it with your Data Protection Officer (DPO) or legal team
+    before accepting if institutional policy requires legal review
+
+  ============================================================================
+  Step 3: Accept the DPA (if needed and approved)
+  ============================================================================
+
+  In AWS Artifact > Agreements:
+
+  1. Click on "AWS GDPR Data Processing Addendum"
+  2. Review the agreement terms
+  3. Check the acceptance box
+  4. Click "Accept"
+
+  IMPORTANT: Only accept the DPA if you have authorization to do so.
+  Some institutions require legal/DPO approval before accepting
+  cloud provider agreements. Check your institutional process.
+
+  ============================================================================
+  Step 4: Collect Evidence
+  ============================================================================
+
+  Option A — DPA accepted in this account:
+  - Screenshot of AWS Artifact > Agreements showing the GDPR DPA
+    with "Accepted" status and acceptance date
+  - Save to: docs/infrastructure_security/evidence/10_compliance/
+    COMP-E01-gdpr-dpa.png
+
+  Option B — Institutional DPA already in place:
+  - Reference to the institutional DPA (document number, date, or
+    confirmation from DPO/legal)
+  - Save a text file with the reference information to:
+    docs/infrastructure_security/evidence/10_compliance/
+    COMP-E01-institutional-dpa-reference.txt
+
+  Option C — Not applicable:
+  - Brief justification stating why no DPA is required
+  - Save to: docs/infrastructure_security/evidence/10_compliance/
+    COMP-E01-dpa-not-applicable.txt
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +--------+-----------------------+---------------------------------------------------------+----------------------------------------------+
+  |   #    |       Criterion       |                          PASS                           |                     FAIL                     |
+  +--------+-----------------------+---------------------------------------------------------+----------------------------------------------+
+  | COMP-1 | GDPR DPA              | DPA accepted in AWS Artifact                            | Personal data processed without DPA in       |
+  |        |                       | OR institutional DPA already covers this account        | place and no institutional exemption         |
+  |        |                       | OR NOT_APPLICABLE (no personal data processed)          |                                              |
+  +--------+-----------------------+---------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  Final Status After CG10
+  ============================================================================
+
+  CG10 is the last control group. After CG10 review, the full hardening
+  implementation is complete (pending DC-38 DEFERRED).
+
+  Final expected status:
+  - 37-38 controls VERIFIED_PASS
+  - 2 NOT_APPLICABLE (DC-22 rotation, DC-40 SCP)
+  - 1 DEFERRED (DC-38 full DAG run)
+  - DC-39 either VERIFIED_PASS, NOT_APPLICABLE, or DEFERRED
+
+  Please complete Steps 1-4 above, save the evidence, and confirm when
+  ready for final review.

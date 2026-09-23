@@ -1,0 +1,183 @@
+Control Group 7 — CloudWatch
+
+  Controls
+
+  DC-28  Bedrock model invocation logging DISABLED (no prompt/response data stored)
+  DC-29  No Bedrock invocation log groups in CloudWatch
+  DC-30  Operational log groups encrypted with CMK and retention set (if any exist)
+
+  Infrastructure Reference (from CG1-CG6)
+
+  Account:       232538551827
+  Region:        us-east-1
+  KMS key:       887638e8-358b-4664-9270-368aec0ea1f1 (alias/proposal-orchestrator)
+  KMS key ARN:   arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1
+
+  Context
+
+  CG7 is primarily a verification group. Bedrock model invocation logging is
+  DISABLED by default. The critical check is confirming it hasn't been enabled.
+
+  DC-28 and DC-29 protect against prompt/response data being stored in AWS
+  CloudWatch infrastructure. This is the most sensitive data protection
+  control — if invocation logging is enabled, every prompt and model
+  completion would be persisted in CloudWatch Logs or S3.
+
+  DC-30 applies only if operational log groups exist (e.g., VPC flow logs
+  delivered to CloudWatch, application operational logs). If no operational
+  log groups exist yet, DC-30 is NOT_APPLICABLE until they are created.
+
+  ============================================================================
+  Step 1: Verify Bedrock Invocation Logging is DISABLED (DC-28)
+  ============================================================================
+
+  Run from CloudShell or local CLI:
+
+  aws bedrock get-model-invocation-logging-configuration \
+    --region us-east-1 \
+    --output json
+
+  Expected output (one of):
+
+    { "loggingConfig": null }
+
+  OR:
+
+    An error indicating no logging configuration exists.
+
+  FAIL condition: If the output contains "cloudWatchConfig" or "s3Config"
+  with defined destinations, invocation logging is ENABLED and must be
+  disabled immediately:
+
+    aws bedrock delete-model-invocation-logging-configuration \
+      --region us-east-1
+
+  ============================================================================
+  Step 2: Verify No Bedrock Invocation Log Groups Exist (DC-29)
+  ============================================================================
+
+  aws logs describe-log-groups \
+    --log-group-name-prefix "/aws/bedrock" \
+    --region us-east-1 \
+    --output json
+
+  Expected: { "logGroups": [] }
+
+  If any log groups are found under /aws/bedrock, they contain or previously
+  contained invocation data and should be investigated and deleted:
+
+    aws logs delete-log-group \
+      --log-group-name <LOG_GROUP_NAME> \
+      --region us-east-1
+
+  ============================================================================
+  Step 3: Check for Existing Operational Log Groups (DC-30)
+  ============================================================================
+
+  List all log groups in the account to identify any operational groups:
+
+  aws logs describe-log-groups \
+    --region us-east-1 \
+    --output json
+
+  If log groups exist under /proposal-orchestrator/* or any other
+  project-related prefix:
+  - Verify retention is set (max 90 days)
+  - Verify KMS encryption with the CMK
+
+  If no operational log groups exist yet, DC-30 is NOT_APPLICABLE.
+  Operational log groups may be created later in CG8 (VPC flow logs)
+  or CG9 (application logs). When created, they must be configured with:
+
+    # Set retention
+    aws logs put-retention-policy \
+      --log-group-name /proposal-orchestrator/operational \
+      --retention-in-days 90 \
+      --region us-east-1
+
+    # Set KMS encryption
+    aws logs associate-kms-key \
+      --log-group-name /proposal-orchestrator/operational \
+      --kms-key-id alias/proposal-orchestrator \
+      --region us-east-1
+
+  The KMS key policy (CG4) already includes AllowCloudWatchLogsEncryption
+  for logs.us-east-1.amazonaws.com, scoped to /proposal-orchestrator/*.
+
+  ============================================================================
+  Step 4: Collect Evidence
+  ============================================================================
+
+  {
+    echo "=== CG7: CloudWatch Evidence Collection ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "=== CW-E01: Bedrock Invocation Logging Configuration ==="
+    aws bedrock get-model-invocation-logging-configuration \
+      --region us-east-1 \
+      --output json 2>&1
+    echo ""
+
+    echo "=== CW-E03: Bedrock Log Groups (expected empty) ==="
+    aws logs describe-log-groups \
+      --log-group-name-prefix "/aws/bedrock" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CW-E04: All Log Groups in Account ==="
+    aws logs describe-log-groups \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== CW-E05: Log Group Encryption (if any groups exist) ==="
+    aws logs describe-log-groups \
+      --query "logGroups[].{name:logGroupName,kmsKeyId:kmsKeyId,retention:retentionInDays}" \
+      --region us-east-1 \
+      --output json
+  } 2>&1 | tee CG7_logs.txt
+
+  Save output to:
+  - docs/infrastructure_security/evidence/07_cloudwatch/CG7_logs.txt
+
+  Note on CW-E02 (console screenshot): The hardening plan requests a console
+  screenshot of Bedrock > Settings > Model invocation logging showing
+  "Disabled". This is optional if CW-E01 CLI output already confirms
+  loggingConfig is null. If you want to capture it, take a screenshot and
+  save to docs/infrastructure_security/evidence/07_cloudwatch/CW-E02-console-screenshot.png
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  |   #   |         Criterion         |                           PASS                           |                     FAIL                     |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CW-1  | Invocation logging        | get-model-invocation-logging-configuration returns        | loggingConfig contains cloudWatchConfig or   |
+  |       | disabled                  | null/empty config                                        | s3Config with defined destinations           |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CW-2  | No Bedrock log groups     | describe-log-groups with prefix /aws/bedrock returns     | Log groups with Bedrock invocation data      |
+  |       |                           | empty logGroups array                                    | exist                                        |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CW-3  | Operational log retention | Retention <= 90 days on all operational log groups        | Indefinite retention on any operational log   |
+  |       | (if groups exist)         | OR no operational log groups (NOT_APPLICABLE)            | group                                        |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | CW-4  | Operational log           | All operational log groups encrypted with CMK             | Unencrypted operational log groups            |
+  |       | encryption (if groups     | OR no operational log groups (NOT_APPLICABLE)            |                                              |
+  |       | exist)                    |                                                          |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  What Happens After CG7
+  ============================================================================
+
+  CG7 completion confirms no prompt/response data is stored in CloudWatch.
+  Proceed to:
+  - CG8 (Data Egress Prevention) — host SG outbound, VPC flow logs,
+    no Claude CLI on host, internet egress blocked
+
+  Once CG7 evidence is collected and reviewed, proceed to CG8.
+
+  Please run Steps 1-4 above, save the evidence, and confirm when ready for review.

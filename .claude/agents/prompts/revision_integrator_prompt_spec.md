@@ -77,8 +77,8 @@ c. After applying all possible revisions, invoke the `proposal-section-traceabil
 
 d. Record each revision in `revision_log`: `log_entry_id`, `action_id`, `change_description`, `section_affected`, `performed_at` (ISO 8601).
 
-**Step 6 — Invoke evaluator-criteria-review skill.**
-Apply the `evaluator-criteria-review` skill to verify that critical and major weaknesses from the review packet have been resolved (or are documented as unresolvable). Confirm residual weakness assessment is acceptable for gate evaluation.
+**Step 6 — Invoke drafting-review-status skill.**
+Apply the `drafting-review-status` skill to disposition every revision action from the review packet against the current draft: `resolved` only when the draft already substantively addresses the action; otherwise `unresolved` with a specific non-empty `reason` for critical severity. This skill writes `drafting_review_status.json` (Step 8's artifact) and must NOT rewrite `review_packet.json` — the former re-run of `evaluator-criteria-review` here overwrote the packet gate_11 was evaluated on, which the ST-1 content-based staleness check correctly failed (`g11_p01` STALE_UPSTREAM_MISMATCH).
 
 **Step 7 — Invoke constitutional-compliance-check skill.**
 Apply the `constitutional-compliance-check` skill to the complete revised draft before declaring `gate_12_constitutional_compliance` pass. This is the final constitutional check. Any violation found must be flagged — not silently resolved. Write results to `docs/tier4_orchestration_state/validation_reports/`. Constitutional violations block `gate_12`.
@@ -106,14 +106,15 @@ If any condition cannot be met: do not write final export; do not write checkpoi
 **Step 10 — Write final export (only if gate_12 conditions met).**
 If all `gate_12` conditions are met, write `docs/tier5_deliverables/final_exports/final_export.json` with all required fields. `artifact_status` must be absent at write time.
 
-**Step 11 — Publish checkpoint (only if gate_12 conditions met and final export written).**
-Invoke the `checkpoint-publish` skill. Write `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`:
-- `schema_id: "orch.checkpoints.phase8_checkpoint.v1"` (exact)
-- `run_id`: propagated
-- `status: "published"`
-- `published_at`: ISO 8601 timestamp
-- `gate_results_confirmed`: must include all four: `gate_09_budget_consistency`, `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency`, `gate_11_review_closure`, `gate_12_constitutional_compliance`
-`artifact_status` must be absent at write time (runner-stamped). Once written with `status: "published"`, this checkpoint is immutable.
+**Step 11 — Checkpoint publication (handled by the runtime, not this agent).**
+You do NOT write `phase8_checkpoint.json`. It is produced by the `checkpoint_publisher` deterministic component (CHK-1, `runner/checkpoint_publisher.py`), bound in `manifest.compile.yaml` under `n08f_revision`'s `deterministic_components` and run by the agent runtime in the node body **before** your skills. It writes `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` with:
+- `schema_id: "orch.checkpoints.phase8_checkpoint.v1"` (exact; unchanged v1)
+- `run_id`: the current run
+- `status: "published"`, `published_at`: ISO 8601 timestamp
+- `gate_results_confirmed`: the six confirmed gates `gate_09_budget_consistency`, `gate_10a_excellence_completeness`, `gate_10b_impact_completeness`, `gate_10c_implementation_completeness`, `gate_10d_cross_section_consistency`, `gate_11_review_closure` (NOT `gate_12`, which is n08f's exit gate, evaluated after)
+- `inherited_gate_provenance`: an authorized cross-run provenance quad for any bootstrapped gate (omitted when all gates are current-run)
+
+The component fails closed before writing if any gate result is invalid or a cross-run gate is unauthorized, and raises rather than overwriting a checkpoint already published with `status: "published"` (immutability).
 
 **Step 12 — Write decision log entries.**
 Invoke `decision-log-update` for all revision decisions, unresolvable actions, constitutional violations, and the gate result.
@@ -193,7 +194,7 @@ Verified transitively via `gate_11` and directly via `gate_12` conditions `g11_p
 If `phase8_checkpoint.json` already exists with `status: "published"`: halt immediately. Constitutional halt. The checkpoint is immutable (CLAUDE.md §9.4). Do not overwrite under any circumstances.
 
 ### Exit gate
-`gate_12_constitutional_compliance` — evaluated after all canonical outputs are written. This agent does not invoke `gate-enforcement` directly (check against agent contract — the checkpoint-publish skill writes the checkpoint, and the runner evaluates `gate_12`).
+`gate_12_constitutional_compliance` — evaluated after all canonical outputs are written. This agent does not invoke `gate-enforcement` directly (check against agent contract — the `checkpoint_publisher` deterministic component writes the checkpoint in the node body, and the runner evaluates `gate_12`).
 
 Gate conditions: see Step 9 (conditions `g11_p01` through `g11_p13`).
 

@@ -1,0 +1,85 @@
+sh-5.2$ {
+  echo "=== REG-E03: Negative Region Test ==="
+  echo "Date: $(date -u)"
+  echo ""
+
+  echo "--- Attempt: us.anthropic.claude-sonnet-4-6 in ap-southeast-1 ---"
+  timeout 20 aws bedrock-runtime converse \
+    --model-id us.anthropic.claude-sonnet-4-6 \
+    --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+    --inference-config '{"maxTokens":10}' \
+    --region ap-southeast-1
+  echo "ap_southeast_1_converse_exit_code=$?"
+
+  echo ""
+  echo "--- Control: same call in us-east-1 should succeed ---"
+  aws bedrock-runtime converse \
+    --model-id us.anthropic.claude-sonnet-4-6 \
+    --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+    --inference-config '{"maxTokens":10}' \
+    --region us-east-1
+  echo "us_east_1_converse_exit_code=$?"
+} 2>&1 | tee /tmp/REG-E03-negative-region-test.txt
+=== REG-E03: Negative Region Test ===
+Date: Mon Jun  1 10:05:30 UTC 2026
+
+--- Attempt: us.anthropic.claude-sonnet-4-6 in ap-southeast-1 ---
+ap_southeast_1_converse_exit_code=124
+
+--- Control: same call in us-east-1 should succeed ---
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "OK"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 9,
+        "outputTokens": 4,
+        "totalTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1537
+    }
+}
+us_east_1_converse_exit_code=0
+sh-5.2$ cat /tmp/REG-E03-negative-region-test.txt
+=== REG-E03: Negative Region Test ===
+Date: Mon Jun  1 10:05:30 UTC 2026
+
+--- Attempt: us.anthropic.claude-sonnet-4-6 in ap-southeast-1 ---
+ap_southeast_1_converse_exit_code=124
+
+--- Control: same call in us-east-1 should succeed ---
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "OK"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 9,
+        "outputTokens": 4,
+        "totalTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1537
+    }
+}
+us_east_1_converse_exit_code=0

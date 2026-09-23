@@ -1191,6 +1191,106 @@ def no_blocking_inconsistencies(
     )
 
 
+def unit_cost_budget_resolved(
+    path: PathLike,
+    *,
+    repo_root: Optional[Path] = None,
+) -> PredicateResult:
+    """
+    Pass iff the **unit-cost** budget derivation at *path* is fully resolved.
+
+    This is the unit-cost branch of the budget gate (CLAUDE.md §8.1 / §8.4,
+    C1): for a unit-cost instrument the budget source is the internal
+    deterministic derivation (``unit_cost_budget.json``), not the external
+    lump-sum ``received/`` response.  The gate passes only when **every**
+    budget component — including the host-dependent living-allowance line —
+    resolves to Confirmed or operator-declared Assumed.  An unresolved
+    confirmed-months figure or host coefficient blocks (the categorical
+    Phase-8 block, §8.4, is preserved verbatim by the scheduler and the
+    HARD_BLOCK annotation).
+
+    Pass condition:
+        * valid JSON object with ``gate_pass_declaration == "pass"``,
+        * ``unresolved_components`` absent or empty.
+
+    Failure categories
+    ------------------
+    ``MISSING_MANDATORY_INPUT``
+        Path does not exist — the deriver did not write the artifact.
+    ``MALFORMED_ARTIFACT``
+        Invalid JSON, non-object JSON, or ``unresolved_components`` is not an
+        array.
+    ``POLICY_VIOLATION``
+        Structurally valid but ``gate_pass_declaration != "pass"`` or one or
+        more budget components are unresolved (the honest budget block).
+
+    Parameters
+    ----------
+    path:
+        Path to the canonical ``unit_cost_budget.json`` file.
+    repo_root:
+        Repository root for relative path resolution.
+    """
+    resolved = resolve_repo_path(path, repo_root)
+    parsed, err = _read_json_object(resolved)
+    if err is not None:
+        return err
+
+    unresolved = parsed.get("unresolved_components", [])
+    if not isinstance(unresolved, list):
+        return PredicateResult(
+            passed=False,
+            failure_category=MALFORMED_ARTIFACT,
+            reason=(
+                f"'unresolved_components' must be an array; "
+                f"got {type(unresolved).__name__} in {resolved}"
+            ),
+            details={"path": str(resolved)},
+        )
+
+    declaration = parsed.get("gate_pass_declaration")
+    if declaration != "pass":
+        return PredicateResult(
+            passed=False,
+            failure_category=POLICY_VIOLATION,
+            reason=(
+                f"Unit-cost budget is not resolved: gate_pass_declaration="
+                f"{declaration!r} with {len(unresolved)} unresolved "
+                f"component(s) {unresolved} in {resolved}.  Every budget "
+                f"component must resolve to Confirmed or operator-declared "
+                f"Assumed before the budget gate can pass (§8.4)."
+            ),
+            details={
+                "path": str(resolved),
+                "gate_pass_declaration": declaration,
+                "unresolved_components": unresolved,
+            },
+        )
+
+    if unresolved:
+        return PredicateResult(
+            passed=False,
+            failure_category=POLICY_VIOLATION,
+            reason=(
+                f"Unit-cost budget declares 'pass' but has {len(unresolved)} "
+                f"unresolved component(s) {unresolved} in {resolved} "
+                f"(inconsistent derivation)."
+            ),
+            details={
+                "path": str(resolved),
+                "unresolved_components": unresolved,
+            },
+        )
+
+    return PredicateResult(
+        passed=True,
+        details={
+            "path": str(resolved),
+            "total_eur": parsed.get("total_eur"),
+        },
+    )
+
+
 def budget_gate_confirmation_present(
     path: PathLike,
     *,
@@ -1588,21 +1688,199 @@ def all_critical_revisions_resolved(
     )
 
 
+def _read_gate_result_json(path: Path) -> Optional[dict]:
+    """Leniently read a gate result JSON object; ``None`` on any absence/error.
+
+    Unlike :func:`_read_json_object`, an absent or malformed durable gate result
+    is not itself a checkpoint failure here — gate-result presence/passing is
+    enforced by the upstream nodes' own ``gate_pass_recorded`` predicates.  This
+    reader is used only for the CHK-1 *provenance-consistency* cross-check.
+    """
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _validate_checkpoint_provenance(
+    resolved: Path,
+    parsed: dict,
+    repo_root: Optional[Path] = None,
+) -> tuple[Optional[PredicateResult], dict]:
+    """Consistency-only validation of the CHK-1 cross-run provenance quad (D4).
+
+    Returns ``(failure_or_None, details)``.  ``failure_or_None`` is a failing
+    :class:`PredicateResult` on any drift, else ``None``.  ``details`` carries
+    the fingerprints checked, recorded durably in the gate_12 result so ST-1
+    (content-freshness) can build on them.
+
+    The predicate re-validates the declared quad against durable Tier-4 gate
+    results; it does **not** recompute ``input_fingerprint`` from current inputs
+    (that content-freshness step is ST-1's, kept separate per D4).  Two checks,
+    both fail-closed:
+
+    1. **Quad faithfulness** — for each declared ``inherited_gate_provenance``
+       entry, the gate result at its ``evidence_path`` must exist, be a passing
+       gate result, and match the entry's ``original_run_id``,
+       ``input_fingerprint``, and ``versions`` exactly.
+    2. **No hidden inheritance** — every confirmed gate whose *durable* run_id
+       differs from the checkpoint's run_id must have a matching quad entry
+       (whose ``original_run_id`` equals that durable run_id).
+
+    Everything is derived from the checkpoint path's own parents, so the check
+    is self-contained and needs no repo_root argument:
+    ``…/docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json`` →
+    ``tier4_root = parents[1]``, ``repo_root = parents[3]``.  A durable gate
+    result that is simply absent is skipped (its presence is enforced by the
+    upstream gate predicates), which keeps an all-current-run checkpoint passing.
+    """
+    from runner.gate_result_registry import (
+        GATE_RESULT_PATHS,
+        GATE_RESULT_SCHEMA_ID,
+        GATE_RESULT_VERSION_FIELDS,
+    )
+
+    checkpoint_run_id = parsed.get("run_id")
+    confirmed = parsed.get("gate_results_confirmed")
+    provenance = parsed.get("inherited_gate_provenance") or []
+
+    # tier4_root is derived from the checkpoint's own location (it lives inside
+    # tier4). A relative ``evidence_path`` is resolved against the caller's
+    # ``repo_root`` when supplied (the module convention), falling back to the
+    # checkpoint path's parents so the predicate stays self-contained in tests.
+    parents = resolved.parents
+    tier4_root = parents[1] if len(parents) > 1 else resolved.parent
+    if repo_root is not None:
+        evidence_base = repo_root
+    elif len(parents) > 3:
+        evidence_base = parents[3]
+    else:
+        evidence_base = tier4_root
+
+    prov_by_gate: dict[str, dict] = {}
+    for entry in provenance:
+        if isinstance(entry, dict) and entry.get("gate_id"):
+            prov_by_gate[entry["gate_id"]] = entry
+
+    def _fail(category: str, reason: str) -> PredicateResult:
+        return PredicateResult(
+            passed=False,
+            failure_category=category,
+            reason=reason,
+            details={"path": str(resolved), "status": "published"},
+        )
+
+    # 1. Quad faithfulness — validate each declared entry against evidence_path.
+    checked_fingerprints: dict[str, Optional[str]] = {}
+    for gate_id, entry in prov_by_gate.items():
+        evidence_path = entry.get("evidence_path")
+        if not isinstance(evidence_path, str) or not evidence_path:
+            return _fail(
+                MALFORMED_ARTIFACT,
+                f"inherited_gate_provenance entry for {gate_id!r} has no "
+                f"evidence_path",
+            ), {}
+        ev_abs = Path(evidence_path)
+        if not ev_abs.is_absolute():
+            ev_abs = evidence_base / evidence_path
+        ev = _read_gate_result_json(ev_abs)
+        if ev is None:
+            return _fail(
+                MALFORMED_ARTIFACT,
+                f"inherited_gate_provenance for {gate_id!r}: evidence_path "
+                f"{evidence_path!r} is absent or not a readable gate result",
+            ), {}
+        if ev.get("schema_id") != GATE_RESULT_SCHEMA_ID or ev.get("status") != "pass":
+            return _fail(
+                POLICY_VIOLATION,
+                f"inherited_gate_provenance for {gate_id!r}: evidence at "
+                f"{evidence_path!r} is not a passing gate result",
+            ), {}
+        if ev.get("run_id") != entry.get("original_run_id"):
+            return _fail(
+                POLICY_VIOLATION,
+                f"inherited_gate_provenance for {gate_id!r}: original_run_id "
+                f"{entry.get('original_run_id')!r} != evidence run_id "
+                f"{ev.get('run_id')!r}",
+            ), {}
+        if ev.get("input_fingerprint") != entry.get("input_fingerprint"):
+            return _fail(
+                POLICY_VIOLATION,
+                f"inherited_gate_provenance for {gate_id!r}: input_fingerprint "
+                f"drift against durable evidence",
+            ), {}
+        ev_versions = {k: ev.get(k) for k in GATE_RESULT_VERSION_FIELDS}
+        if entry.get("versions") != ev_versions:
+            return _fail(
+                POLICY_VIOLATION,
+                f"inherited_gate_provenance for {gate_id!r}: versions drift "
+                f"against durable evidence",
+            ), {}
+        checked_fingerprints[gate_id] = ev.get("input_fingerprint")
+
+    # 2. No hidden inheritance — a cross-run confirmed gate must be declared.
+    if isinstance(confirmed, list):
+        for gate_id in confirmed:
+            rel = GATE_RESULT_PATHS.get(gate_id)
+            if rel is None:
+                continue
+            durable = _read_gate_result_json(tier4_root / rel)
+            if durable is None:
+                continue  # presence enforced by the upstream gate predicates
+            durable_run_id = durable.get("run_id")
+            if durable_run_id == checkpoint_run_id:
+                continue
+            entry = prov_by_gate.get(gate_id)
+            if entry is None:
+                return _fail(
+                    POLICY_VIOLATION,
+                    f"checkpoint confirms {gate_id!r} whose durable gate result "
+                    f"carries run_id {durable_run_id!r} (!= checkpoint run_id "
+                    f"{checkpoint_run_id!r}) but declares no "
+                    f"inherited_gate_provenance for it (hidden inheritance)",
+                ), {}
+            if entry.get("original_run_id") != durable_run_id:
+                return _fail(
+                    POLICY_VIOLATION,
+                    f"inherited_gate_provenance for {gate_id!r}: original_run_id "
+                    f"{entry.get('original_run_id')!r} != durable gate result "
+                    f"run_id {durable_run_id!r}",
+                ), {}
+
+    return None, {
+        "inherited_gate_provenance_checked": sorted(checked_fingerprints),
+        "input_fingerprints": checked_fingerprints,
+    }
+
+
 def checkpoint_published(
     path: PathLike,
     *,
     repo_root: Optional[Path] = None,
 ) -> PredicateResult:
     """
-    Pass iff the checkpoint artifact at *path* exists, is valid JSON, and
-    contains ``status == "published"``.
+    Pass iff the checkpoint artifact at *path* exists, is valid JSON,
+    contains ``status == "published"``, and its cross-run provenance quad is
+    internally consistent with durable Tier-4 gate evidence (CHK-1).
 
-    Contract (gate_rules_library_plan.md §4.8)
-    -------------------------------------------
+    Contract (gate_rules_library_plan.md §4.8; CHK-1 decision D4)
+    ------------------------------------------------------------
     Pass condition:
         * file exists
         * valid JSON object
         * ``status == "published"``
+        * every confirmed gate whose *durable* run_id differs from the
+          checkpoint's run_id is declared in ``inherited_gate_provenance``, and
+          every declared entry faithfully copies a passing durable gate result
+          (``original_run_id`` / ``input_fingerprint`` / ``versions`` match).
+
+    An all-current-run checkpoint (no ``inherited_gate_provenance``) passes
+    unchanged — the provenance check is a no-op when nothing was inherited.  A
+    durable gate result that is simply absent is skipped (presence is enforced by
+    the upstream nodes' own ``gate_pass_recorded`` predicates).
 
     Canonical artifact
     ------------------
@@ -1614,9 +1892,11 @@ def checkpoint_published(
     ``MISSING_MANDATORY_INPUT``
         Path does not exist.
     ``MALFORMED_ARTIFACT``
-        Invalid JSON, non-object JSON, or ``status`` field absent or null.
+        Invalid JSON, non-object JSON, ``status`` absent or null, or a
+        structurally broken provenance entry (missing/unreadable evidence).
     ``POLICY_VIOLATION``
-        Field ``status`` is present but not ``"published"``.
+        ``status`` present but not ``"published"``; or a provenance-consistency
+        violation (hidden inheritance, or quad drift against durable evidence).
 
     Parameters
     ----------
@@ -1662,7 +1942,16 @@ def checkpoint_published(
             },
         )
 
-    return PredicateResult(
-        passed=True,
-        details={"path": str(resolved), "status": "published"},
+    # CHK-1 (decision D4): consistency-only re-validation of the cross-run
+    # provenance quad against durable Tier-4 gate evidence. Fails closed on
+    # hidden inheritance or any quad drift; records the checked fingerprints
+    # durably so ST-1 (content-freshness) can build on them.
+    provenance_failure, provenance_details = _validate_checkpoint_provenance(
+        resolved, parsed, repo_root
     )
+    if provenance_failure is not None:
+        return provenance_failure
+
+    details = {"path": str(resolved), "status": "published"}
+    details.update(provenance_details)
+    return PredicateResult(passed=True, details=details)

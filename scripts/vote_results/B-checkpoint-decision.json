@@ -1,0 +1,37 @@
+{
+  "lane": "B-checkpoint-decision",
+  "decision": "REFUTED \u2014 majority found blocking defects",
+  "holds": 1,
+  "refute": 2,
+  "unparsed": 0,
+  "errored": 0,
+  "verdicts": [
+    {
+      "lens": "provenance-integrity",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "high",
+        "top_defect": "Option 1 validates against ephemeral .claude/runs state and publishes a checkpoint schema with no field for cross-run inheritance, so the durable Tier-4 artifact silently asserts the current run produced gates it inherited \u2014 the same provenance falsification option 3 was rejected for, moved one artifact downstream.",
+        "lens": "provenance-integrity"
+      }
+    },
+    {
+      "lens": "operational-what-breaks",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "high",
+        "top_defect": "Option 1 relaxes only the input check, so the write-once phase8_checkpoint.json still asserts bootstrapped gates under the current run_id with no field recording the difference \u2014 relocating option 3's provenance falsification into the durable close artifact, unrecoverably, while the authorizing record lives only in clearable .claude/runs/ state.",
+        "lens": "operational-what-breaks"
+      }
+    },
+    {
+      "lens": "cost-vs-option-2-full-fresh-run",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "As worded, option 1 validates against `.claude/runs/` \u2014 \u00a79.2 disposable runtime memory \u2014 so the durable Tier-4 checkpoint asserts a provenance chain that becomes unverifiable once the run dir is cleared; the contract must also record {original_run_id, evidence_path, input_fingerprint, versions} into the checkpoint itself.",
+        "lens": "cost-vs-option-2-full-fresh-run"
+      }
+    }
+  ]
+}

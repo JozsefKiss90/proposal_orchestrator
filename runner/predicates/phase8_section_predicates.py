@@ -159,6 +159,51 @@ def _find_appositives(id_str: str, content: str) -> list[str]:
     return [m.group(1).strip() for m in pattern.finditer(content)]
 
 
+def _appositive_is_other_entity(
+    appos: str,
+    pack_data: dict,
+    exclude_id: str,
+) -> bool:
+    """True when *appos* is a legitimate cross-reference to a DIFFERENT
+    canonical entity rather than a botched title for the entity being checked.
+
+    A drafter that writes ``WP2 (D2-01: Decision engine and demonstrator
+    software)`` is citing WP2's deliverable D2-01 by its exact id and canonical
+    title — not mis-stating WP2's own title — so the appositive must not be
+    flagged as a WP-title violation.  Recognised when the appositive either
+    (a) begins with another entity's canonical id (e.g. ``D2-01: ...``), or
+    (b) verbatim-contains another entity's full canonical title.
+
+    Deliberately tight: a genuine shortening/paraphrase of the checked entity's
+    own title (e.g. ``WP2 (decision engine)``) carries no other entity's id and
+    contains no other entity's full title, so it is still flagged.  A wrong
+    title *inside* an explicit deliverable reference (``D2-01: <wrong>``) is the
+    deliverable-title predicate's concern, not the WP/objective/outcome loop's.
+    """
+    a = appos.strip()
+    a_low = a.lower()
+    for key in ("objectives", "outcomes", "wps", "deliverables"):
+        for ent in pack_data.get(key, []):
+            if not isinstance(ent, dict):
+                continue
+            eid = (
+                ent.get("id")
+                or ent.get("wp_id")
+                or ent.get("deliverable_id")
+                or ""
+            )
+            if not eid or eid == exclude_id:
+                continue
+            # (a) appositive explicitly carries another entity's id: "D2-01: ..."
+            if re.match(r'\s*' + re.escape(eid) + r'\b', a):
+                return True
+            # (b) appositive verbatim-contains another entity's full title
+            etitle = ent.get("title", "")
+            if len(etitle) >= 8 and etitle.lower() in a_low:
+                return True
+    return False
+
+
 def _find_truncated_legal_name(legal_name: str, content: str) -> Optional[str]:
     """Return the truncated form if *legal_name* appears truncated in *content*, else None.
 
@@ -634,7 +679,11 @@ def canonical_terms_preserved(
         if not oid or not title or len(title) < 8 or oid not in content:
             continue
         for appos in _find_appositives(oid, content):
-            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+            if (
+                _is_title_attempt(title, appos)
+                and not _title_matches(title, appos)
+                and not _appositive_is_other_entity(appos, pack_data, oid)
+            ):
                 issues.append({
                     "term_type": "objective_title",
                     "id": oid,
@@ -656,7 +705,11 @@ def canonical_terms_preserved(
         if not out_id or not title or len(title) < 8 or out_id not in content:
             continue
         for appos in _find_appositives(out_id, content):
-            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+            if (
+                _is_title_attempt(title, appos)
+                and not _title_matches(title, appos)
+                and not _appositive_is_other_entity(appos, pack_data, out_id)
+            ):
                 issues.append({
                     "term_type": "outcome_title",
                     "id": out_id,
@@ -678,7 +731,11 @@ def canonical_terms_preserved(
         if not wid or not title or len(title) < 8 or wid not in content:
             continue
         for appos in _find_appositives(wid, content):
-            if _is_title_attempt(title, appos) and not _title_matches(title, appos):
+            if (
+                _is_title_attempt(title, appos)
+                and not _title_matches(title, appos)
+                and not _appositive_is_other_entity(appos, pack_data, wid)
+            ):
                 issues.append({
                     "term_type": "wp_title",
                     "id": wid,

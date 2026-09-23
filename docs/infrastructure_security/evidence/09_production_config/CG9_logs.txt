@@ -1,0 +1,44 @@
+ 
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\08_data_egress> aws secretsmanager get-secret-value --secret-id "proposal-orchestrator/env-config" --query "SecretString" --region us-east-1 --output text
+{ORCHESTRATOR_TRANSPORT_PRESET:BEDROCK_CONVERSE_US,ORCHESTRATOR_PRODUCTION_MODE:true,ORCHESTRATOR_DIAGNOSTIC_LEVEL:metadata,AWS_DEFAULT_REGION:us-east-1,SKILL_MODEL:us.anthropic.claude-sonnet-4-6}
+sh-5.2$ {
+  echo "=== PC-E02: Model Availability Test ==="
+  echo "Date: $(date -u)"
+  echo ""
+
+  aws bedrock-runtime converse \
+    --model-id us.anthropic.claude-sonnet-4-6 \
+    --messages '[{"role":"user","content":[{"text":"Respond with exactly: MODEL_AVAILABLE"}]}]' \
+    --inference-config '{"maxTokens":20}' \
+    --region us-east-1 \
+    --output json
+
+  echo ""
+  echo "converse_exit_code=$?"
+} 2>&1 | tee /tmp/PC-E02-model-availability.txt
+=== PC-E02: Model Availability Test ===
+Date: Mon Jun  1 15:42:06 UTC 2026
+
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "MODEL_AVAILABLE"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 16,
+        "outputTokens": 7,
+        "totalTokens": 23,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1618
+    }
+}

@@ -26,7 +26,10 @@ import pytest
 import yaml
 
 from runner.runtime_models import AgentResult, SkillInvocationRecord, SkillResult
+import runner.agent_runtime as ar
 from runner.agent_runtime import run_agent, AgentRuntimeError
+from runner.deterministic_components import COMPONENT_REGISTRY
+from runner.paths import find_repo_root
 
 
 # ---------------------------------------------------------------------------
@@ -34,6 +37,7 @@ from runner.agent_runtime import run_agent, AgentRuntimeError
 # ---------------------------------------------------------------------------
 
 _RUN_SKILL_TARGET = "runner.agent_runtime.run_skill"
+_DRAFT_TARGET = "runner.agent_runtime.draft_section_decomposed"
 
 
 def _write_yaml(path: Path, data: Any) -> None:
@@ -1753,3 +1757,867 @@ class TestWindowsPathNormalization:
         # When joined with repo_root via Path(), it should resolve
         abs_path = tmp_path / paths[0]
         assert isinstance(abs_path, Path)
+
+
+# ---------------------------------------------------------------------------
+# Deterministic-component invocation (C2 / C3 substrate)
+# ---------------------------------------------------------------------------
+
+
+class TestDeterministicComponentInvocation:
+    """The agent runtime invokes manifest-bound deterministic components
+    within the node body (before skills), records each in
+    ``invoked_components``, and fails closed on a component fault."""
+
+    def test_bound_component_runs_before_skills_and_is_recorded(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        order: list[str] = []
+
+        def _fake_component(run_id: str, repo_root: Path) -> list[Path]:
+            order.append("component")
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "component"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            order.append(skill_id)
+            return _success_skill()
+
+        with patch.dict(COMPONENT_REGISTRY, {"fake_writer": _fake_component}), \
+             patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(
+                **kwargs, deterministic_components=["fake_writer"]
+            )
+
+        assert result.status == "success"
+        assert result.can_evaluate_exit_gate is True
+        # Component ran before any skill.
+        assert order[0] == "component"
+        assert "skill-a" in order
+        # Recorded in invoked_components.
+        assert len(result.invoked_components) == 1
+        rec = result.invoked_components[0]
+        assert rec.component_id == "fake_writer"
+        assert rec.status == "success"
+        assert "docs/tier4/phase1/output.json" in rec.outputs_written
+
+    def test_component_fault_blocks_agent_body(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+
+        def _boom(run_id: str, repo_root: Path):
+            raise RuntimeError("component broke")
+
+        skill_mock = MagicMock(return_value=_success_skill())
+        with patch.dict(COMPONENT_REGISTRY, {"fake_fail": _boom}), \
+             patch(_RUN_SKILL_TARGET, skill_mock):
+            result = run_agent(
+                **kwargs, deterministic_components=["fake_fail"]
+            )
+
+        assert result.status == "failure"
+        assert result.failure_category == "AGENT_EXECUTION_ERROR"
+        assert result.can_evaluate_exit_gate is False
+        assert result.failure_origin == "agent_body"
+        # A faulting component halts before skill sequencing.
+        skill_mock.assert_not_called()
+        assert len(result.invoked_components) == 1
+        assert result.invoked_components[0].status == "failure"
+
+    def test_unknown_component_id_blocks(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        skill_mock = MagicMock(return_value=_success_skill())
+        with patch(_RUN_SKILL_TARGET, skill_mock):
+            result = run_agent(
+                **kwargs, deterministic_components=["nope"]
+            )
+        assert result.status == "failure"
+        assert result.failure_category == "AGENT_EXECUTION_ERROR"
+        assert result.can_evaluate_exit_gate is False
+        skill_mock.assert_not_called()
+
+    def test_no_components_leaves_invoked_components_empty(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(**kwargs)  # no deterministic_components
+
+        assert result.status == "success"
+        assert result.invoked_components == []
+
+
+class TestDecomposedDraftingSupersession:
+    """Ticket 13: when a section-assembler component is bound, the monolithic
+    drafting skill is superseded (skipped) — the section is composed from the
+    captured per-sub-section drafts, not the single-call drafting skill.  Audit
+    skills still run over the assembled section."""
+
+    def test_bound_assembler_supersedes_monolithic_drafting_skill(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+        called_skills: list[str] = []
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            # Stand in for the real assembler: write the node's expected
+            # gate-relevant artifact so can_evaluate_exit_gate passes.
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            return _success_skill()
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _assembler},
+        ), patch(
+            _DRAFT_TARGET,
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ],
+        ) as _draft_mock, patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        # The bound assembler now first triggers live decomposed drafting
+        # (ticket 13A, Phase B0) — the producer of section_drafts/ — then
+        # supersedes the monolithic drafting skill.
+        _draft_mock.assert_called_once()
+        # The monolithic drafting skill was superseded (never run) ...
+        assert "excellence-section-drafting" not in called_skills
+        # ... while the audit skill still ran.
+        assert "skill-audit" in called_skills
+        # It is recorded with the explicit supersession status.
+        drafting_rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "excellence-section-drafting"
+        )
+        assert drafting_rec.status == "superseded_by_decomposed_assembler"
+
+    def test_drafting_skill_runs_normally_when_no_assembler_bound(
+        self, tmp_path: Path
+    ) -> None:
+        # Without an assembler component the monolithic drafting skill is NOT
+        # superseded — the supersession is strictly conditional on the binding.
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json",
+            {"result": "done"},
+        )
+        called_skills: list[str] = []
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            if skill_id == "excellence-section-drafting":
+                # The monolithic skill writes its section (its Phase-8
+                # freshness guard verifies this on disk with the run_id).
+                sec = (
+                    tmp_path / "docs" / "tier5_deliverables"
+                    / "proposal_sections" / "excellence_section.json"
+                )
+                sec.parent.mkdir(parents=True, exist_ok=True)
+                sec.write_text(
+                    json.dumps({"run_id": "run-test-001"}), encoding="utf-8"
+                )
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_track_skill):
+            result = run_agent(**kwargs)  # no deterministic_components
+
+        assert result.status == "success"
+        assert "excellence-section-drafting" in called_skills
+
+    def test_manifest_drift_hard_blocks_default_path_fail_closed(
+        self, tmp_path: Path
+    ) -> None:
+        # PRE-4 (ticket 9): on the default decomposed-drafting path (no preseed,
+        # no reuse) the monolithic drafting skill the assembler supersedes is
+        # skipped purely by name-membership against the hardcoded
+        # ``_ASSEMBLER_SUPERSEDES_DRAFTING_SKILL`` map.  If the manifest renames
+        # the drafting skill so it no longer matches that map, the supersession
+        # silently no-ops and the renamed monolithic drafter would run alongside
+        # the assembler and race/overwrite the assembler-composed section (the
+        # PRE-2 defect class ticket 3 closed for preseed/reuse, on this sibling
+        # path).  The node must fail closed (CONSTRAINT_VIOLATION) BEFORE either
+        # producer runs — not run both.
+        kwargs = _make_agent_env(
+            tmp_path,
+            # The manifest drafting skill is renamed; the map still supersedes
+            # "excellence-section-drafting", which is now absent from skill_ids.
+            skill_ids=["excellence-section-drafting-v2", "skill-audit"],
+        )
+        called_skills: list[str] = []
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        def _track_skill(skill_id, *a, **kw):
+            called_skills.append(skill_id)
+            return _success_skill()
+
+        assembler = MagicMock(side_effect=_assembler)
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": assembler},
+        ), patch(_DRAFT_TARGET) as _draft_mock, patch(
+            _RUN_SKILL_TARGET, side_effect=_track_skill
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        # Fail closed — the same category the preseed/reuse guard uses.
+        assert result.status == "failure"
+        assert result.failure_category == "CONSTRAINT_VIOLATION"
+        assert result.can_evaluate_exit_gate is False
+        # The reason is the unmatched-branch failure (not the empty-skip
+        # branch) and names the map's superseded id — asserted on the stable
+        # human-readable phrase and a quote-delimited id token, not the exact
+        # list formatting emitted by validate_skip_binding.
+        _reason = result.failure_reason or ""
+        assert "match no manifest-resolved skill" in _reason
+        assert "excellence-section-drafting'" in _reason  # map id, not '…-v2'
+        # Neither producer ran: not the live drafter, not the assembler, and
+        # not the renamed monolithic drafting skill.  Both were suppressed by
+        # the fail-closed block, so the section is never double-written.
+        _draft_mock.assert_not_called()
+        assembler.assert_not_called()
+        assert "excellence-section-drafting-v2" not in called_skills
+
+    def test_matching_binding_supersedes_without_false_positive(
+        self, tmp_path: Path
+    ) -> None:
+        # The fail-closed guard must not false-positive on the normal binding:
+        # when the manifest drafting skill matches the map, the supersession
+        # proceeds (skill skipped, assembler composes) — no CONSTRAINT_VIOLATION.
+        kwargs = _make_agent_env(
+            tmp_path,
+            skill_ids=["excellence-section-drafting", "skill-audit"],
+        )
+
+        def _assembler(run_id: str, repo_root: Path) -> list[Path]:
+            out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+            return [out]
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _assembler},
+        ), patch(
+            _DRAFT_TARGET,
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ],
+        ), patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        drafting_rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "excellence-section-drafting"
+        )
+        assert drafting_rec.status == "superseded_by_decomposed_assembler"
+
+
+class TestDecomposedDraftingLiveWiring:
+    """Ticket 13A — the live decomposed drafter (producer of section_drafts/)
+    is invoked in the node body when a ``*_section_assembler`` component is
+    bound, BEFORE the Phase-B+ component loop that consumes the drafts.  This
+    is the wire that makes the length fix reach the live governed DAG (the
+    driver was previously exercised only in tests)."""
+
+    @staticmethod
+    def _fake_assembler(run_id: str, repo_root: Path) -> list[Path]:
+        # Stand in for the real assembler: write the node's gate-relevant
+        # artifact so can_evaluate_exit_gate passes.
+        out = repo_root / "docs" / "tier4" / "phase1" / "output.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps({"by": "assembler"}), encoding="utf-8")
+        return [out]
+
+    def test_live_drafter_invoked_for_bound_assembler(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock(
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ]
+        )
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_called_once()
+        # Invoked positionally as (run_id, repo_root, slug).
+        assert draft_mock.call_args.args[2] == "excellence"
+        # Recorded as a skill-class invocation (Claude work), not a component.
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:excellence"
+        )
+        assert rec.status == "success"
+
+    def test_drafting_runs_before_assembler_component(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        order: list[str] = []
+
+        def _ordered_assembler(run_id: str, repo_root: Path) -> list[Path]:
+            order.append("assembler")
+            return self._fake_assembler(run_id, repo_root)
+
+        def _ordered_draft(run_id, repo_root, slug, **_kw):
+            order.append("draft")
+            return [repo_root / "section_drafts" / slug / "s.draft.json"]
+
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": _ordered_assembler},
+        ), patch(_DRAFT_TARGET, side_effect=_ordered_draft), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        # The producer must run before the consumer.
+        assert order == ["draft", "assembler"]
+
+    def test_drafting_failure_fails_agent_body_closed(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.decomposed_drafting import DecomposedDraftingError
+
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+
+        def _boom(*_a, **_kw):
+            raise DecomposedDraftingError("malformed draft")
+
+        assembler = MagicMock(side_effect=self._fake_assembler)
+        with patch.dict(
+            COMPONENT_REGISTRY, {"excellence_section_assembler": assembler}
+        ), patch(_DRAFT_TARGET, side_effect=_boom), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "failure"
+        assert result.failure_category == "SKILL_FAILURE"
+        assert result.can_evaluate_exit_gate is False
+        # Fail-closed: drafting failed, so the assembler never ran on the
+        # missing drafts.
+        assembler.assert_not_called()
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:excellence"
+        )
+        assert rec.status == "failure"
+
+    def test_no_drafter_without_assembler(self, tmp_path: Path) -> None:
+        # A node with no section-assembler bound never invokes the drafter —
+        # the wiring is strictly conditional on the assembler binding.
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a", "skill-b"])
+        _write_json(
+            tmp_path / "docs" / "tier4" / "phase1" / "output.json", {"ok": True}
+        )
+        draft_mock = MagicMock()
+        with patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            run_agent(**kwargs)  # no deterministic_components
+
+        draft_mock.assert_not_called()
+
+    def test_impact_now_drafts_extra_fields_sourced_internally(
+        self, tmp_path: Path
+    ) -> None:
+        # Ticket 9: the fail-fast guard is removed.  Impact now DRAFTS —
+        # draft_section_decomposed sources the section-specific extra_fields
+        # from the upstream phase outputs itself, so Phase B0 simply invokes it,
+        # exactly as it does for Excellence.
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["impact-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock(
+            return_value=[tmp_path / "section_drafts" / "impact" / "s.draft.json"]
+        )
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"impact_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["impact_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_called_once()
+        assert draft_mock.call_args.args[2] == "impact"
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:impact"
+        )
+        assert rec.status == "success"
+
+    def test_drafting_reused_when_spine_exists(self, tmp_path: Path) -> None:
+        # Idempotent reuse: an existing section_spine.json means the drafts were
+        # produced by a prior run, so drafting is skipped (no quota) and the
+        # assembler composes the existing drafts.  Protects a re-run after a
+        # downstream fix from re-spending the whole section's drafting.
+        from runner.section_assembler import (
+            SECTION_DRAFTS_ROOT_REL,
+            SPINE_FILENAME,
+        )
+        spine = (
+            tmp_path / SECTION_DRAFTS_ROOT_REL / "excellence" / SPINE_FILENAME
+        )
+        spine.parent.mkdir(parents=True, exist_ok=True)
+        # Reuse requires the spine to belong to the CURRENT run.
+        spine.write_text(
+            json.dumps({"run_id": "run-test-001"}), encoding="utf-8"
+        )
+
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock()
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_not_called()  # reused, not re-drafted
+        rec = next(
+            r for r in result.invoked_skills
+            if r.skill_id == "decomposed-drafting:excellence"
+        )
+        assert rec.status == "reuse_skipped"
+
+    def test_stale_run_spine_forces_redraft(self, tmp_path: Path) -> None:
+        # A spine from a DIFFERENT run_id is stale — it must NOT be reused
+        # (reusing it makes the assembler reject stale drafts).  Regression for
+        # the msca-pf-syn-01 → msca-pf-real-01 stale-draft failure.
+        from runner.section_assembler import (
+            SECTION_DRAFTS_ROOT_REL,
+            SPINE_FILENAME,
+        )
+        spine = (
+            tmp_path / SECTION_DRAFTS_ROOT_REL / "excellence" / SPINE_FILENAME
+        )
+        spine.parent.mkdir(parents=True, exist_ok=True)
+        spine.write_text(
+            json.dumps({"run_id": "some-prior-run"}), encoding="utf-8"
+        )
+
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["excellence-section-drafting", "skill-audit"]
+        )
+        draft_mock = MagicMock(
+            return_value=[
+                tmp_path / "section_drafts" / "excellence" / "s.draft.json"
+            ]
+        )
+        with patch.dict(
+            COMPONENT_REGISTRY,
+            {"excellence_section_assembler": self._fake_assembler},
+        ), patch(_DRAFT_TARGET, draft_mock), patch(
+            _RUN_SKILL_TARGET, return_value=_success_skill()
+        ):
+            result = run_agent(
+                **kwargs,
+                deterministic_components=["excellence_section_assembler"],
+            )
+
+        assert result.status == "success"
+        draft_mock.assert_called_once()  # stale spine → re-drafted, not reused
+
+
+class TestBudgetGateArtifactReadinessInstrumentConditional:
+    """C1 — n07's artifact-readiness check must be instrument-conditional: the
+    lump-sum Planner artifacts (request + validation dir) are produced only for
+    lump-sum instruments and must NOT be required for a unit-cost run, whose
+    budget is derived internally.  Regression for the MSCA Phase-7 block where a
+    fully-resolved unit-cost budget still failed because the absent lump-sum
+    artifacts were treated as gate-relevant."""
+
+    _N07_REGISTRY = [
+        {
+            "path": "docs/tier4_orchestration_state/phase_outputs/"
+                    "phase7_budget_gate/",
+            "produced_by": "n07_budget_gate",
+            "tier": "tier4_phase_output",
+        },
+        {
+            "path": "docs/tier3_project_instantiation/integration/"
+                    "budget_request.json",
+            "produced_by": "n07_budget_gate",
+            "tier": "integration_validation",
+        },
+        {
+            "path": "docs/integrations/lump_sum_budget_planner/validation/",
+            "produced_by": "n07_budget_gate",
+            "tier": "integration_validation",
+        },
+    ]
+
+    def test_unit_cost_excludes_lump_sum_artifacts(self, tmp_path: Path) -> None:
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value="unit_cost"
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        # The unit-cost budget output stays required ...
+        assert any("phase7_budget_gate" in p for p in paths)
+        # ... but the lump-sum-only artifacts are dropped.
+        assert not any("lump_sum_budget_planner" in p for p in paths)
+        assert not any("budget_request.json" in p for p in paths)
+
+    def test_lump_sum_includes_lump_sum_artifacts(self, tmp_path: Path) -> None:
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value="lump_sum"
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        assert any("lump_sum_budget_planner" in p for p in paths)
+        assert any("budget_request.json" in p for p in paths)
+
+    def test_unresolvable_regime_keeps_artifacts_required(
+        self, tmp_path: Path
+    ) -> None:
+        # Fail-closed: an unresolvable regime must NOT silently drop the check.
+        import runner.agent_runtime as ar
+        with patch.object(
+            ar, "_load_artifact_registry", return_value=self._N07_REGISTRY
+        ), patch.object(
+            ar, "_resolve_budget_regime_safe", return_value=None
+        ):
+            paths = ar._get_artifacts_produced_by_node(
+                "n07_budget_gate", tmp_path
+            )
+        assert any("budget_request.json" in p for p in paths)
+
+
+# ---------------------------------------------------------------------------
+# Failure attribution — the cause, not the last consequence
+# ---------------------------------------------------------------------------
+
+
+class TestFirstFailureIsReported:
+    """A failed skill takes its consumers down with it.
+
+    The agent body continues past a non-halt skill failure by design, so a
+    node that loses its producer skill then collects one MISSING_INPUT per
+    consumer.  The accumulator used to be overwritten by each of those, so
+    the run manifest named the last consumer as the fault: run 0395b136
+    reported ``concept-call-binding-derivation`` missing
+    ``concept_refinement_summary.json`` — the artifact
+    ``concept-alignment-check`` had failed to write one skill earlier.  The
+    first failure is the cause and must be what the node reports.
+    """
+
+    def test_reported_reason_is_the_first_failure(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill(
+                "INCOMPLETE_OUTPUT", "unparseable response"
+            ),
+            "consumer-skill": _failure_skill(
+                "MISSING_INPUT", "summary.json not found"
+            ),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert reason.startswith("Skill 'producer-skill' failed")
+        assert "unparseable response" in reason
+
+    def test_subsequent_failures_are_kept_and_labelled(
+        self, tmp_path: Path
+    ) -> None:
+        """The consequences are not discarded — they are reported after the
+        cause, marked as subsequent, so the manifest still shows the full
+        blast radius."""
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill(
+                "INCOMPLETE_OUTPUT", "unparseable response"
+            ),
+            "consumer-skill": _failure_skill(
+                "MISSING_INPUT", "summary.json not found"
+            ),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert "+1 subsequent failure(s)" in reason
+        assert "summary.json not found" in reason
+        assert reason.index("unparseable response") < reason.index(
+            "summary.json not found"
+        )
+
+    def test_single_failure_reports_no_subsequent_tail(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            if skill_id == "producer-skill":
+                return _failure_skill("INCOMPLETE_OUTPUT", "only failure")
+            return _success_skill()
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        reason = result.failure_reason or ""
+        assert "subsequent failure" not in reason
+        assert "only failure" in reason
+
+    def test_category_comes_from_the_first_failure(self, tmp_path: Path) -> None:
+        kwargs = _make_agent_env(
+            tmp_path, skill_ids=["producer-skill", "consumer-skill"]
+        )
+        results = {
+            "producer-skill": _failure_skill("INCOMPLETE_OUTPUT", "cause"),
+            "consumer-skill": _failure_skill("MISSING_INPUT", "consequence"),
+        }
+
+        def _dispatch(skill_id: str, *args: Any, **kwargs_: Any) -> SkillResult:
+            return results.get(skill_id, _success_skill())
+
+        with patch(_RUN_SKILL_TARGET, side_effect=_dispatch):
+            result = run_agent(**kwargs)
+
+        assert result.failure_category == "SKILL_FAILURE"
+        assert (result.failure_reason or "").startswith(
+            "Skill 'producer-skill' failed"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Caller-context bindings and the fail-closed guard
+# ---------------------------------------------------------------------------
+
+
+class TestCallerContextBindings:
+    """A skill's caller-context sources are declared in the skill catalog.
+
+    `work-package-normalization` had no binding anywhere, so its Step 1.5
+    MISSING_INPUT halt could never fire on real input — the skill was
+    invoked with no context at all on every Phase 3 run (4caa2586).
+
+    The binding lives in `skill_catalog.yaml`, not in a dict keyed by skill
+    name in `agent_runtime.py`: the runtime must stay skill-name-agnostic in
+    executable code (see `test_no_hardcoded_skill_name_trigger_in_source`).
+    """
+
+    def test_real_catalog_binds_work_package_normalization(self) -> None:
+        repo_root = find_repo_root()
+        sources = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        assert sources, "work-package-normalization has no context binding"
+        assert any("consortium/partners.json" in s for s in sources)
+
+    def test_binding_is_declared_in_the_catalog_not_the_runtime(self) -> None:
+        assert (
+            "work-package-normalization" not in ar._SKILL_CONTEXT_SOURCES
+        ), "binding belongs in skill_catalog.yaml, not the runtime dict"
+
+    def test_catalog_sources_are_within_the_agent_read_scope(self) -> None:
+        """A declared context source must be readable by the invoking agent."""
+        repo_root = find_repo_root()
+        sources = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        for src in sources:
+            assert src.startswith("docs/tier3_project_instantiation/"), src
+
+    def test_skill_with_no_declaration_has_no_sources(
+        self, tmp_path: Path
+    ) -> None:
+        _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        assert ar._context_sources_for("skill-a", tmp_path) == ()
+
+
+class TestMissingContextSources:
+    def test_undeclared_skill_reports_nothing_missing(
+        self, tmp_path: Path
+    ) -> None:
+        _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        assert ar._missing_context_sources("skill-a", {}, tmp_path) == []
+
+    def test_declared_skill_with_no_content_reports_all(self) -> None:
+        repo_root = find_repo_root()
+        declared = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )
+        missing = ar._missing_context_sources(
+            "work-package-normalization", {}, repo_root
+        )
+        assert missing == list(declared)
+
+    def test_present_source_is_not_reported(self) -> None:
+        repo_root = find_repo_root()
+        src = ar._context_sources_for(
+            "work-package-normalization", repo_root
+        )[0]
+        assert ar._missing_context_sources(
+            "work-package-normalization", {src: {"partners": []}}, repo_root
+        ) == []
+
+
+class TestCallerContextFailsClosed:
+    """The fail-closed guarantee used to live in the skill spec, i.e. in a
+    prompt. Run 4caa2586 shows why that is not a guarantee: the model did
+    not halt on absent context, it synthesised the context instead. The
+    runtime now refuses to invoke the skill.
+    """
+
+    _CTX_SKILL = "ctx-bound-skill"
+    _CTX_SOURCE = "docs/tier3/partners.json"
+
+    def _env(self, tmp_path: Path) -> dict:
+        kwargs = _make_agent_env(tmp_path, skill_ids=[self._CTX_SKILL])
+        # Declare the context binding in this environment's skill catalog.
+        catalog_path = (
+            tmp_path
+            / ".claude/workflows/system_orchestration/skill_catalog.yaml"
+        )
+        data = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        for entry in data.get("skill_catalog", []):
+            if entry.get("id") == self._CTX_SKILL:
+                entry["caller_context_from"] = [self._CTX_SOURCE]
+        catalog_path.write_text(yaml.safe_dump(data), encoding="utf-8")
+        import runner.skill_runtime as _sr
+        _sr._catalog_cache.clear()
+        return kwargs
+
+    def test_skill_not_invoked_when_context_absent(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = self._env(tmp_path)
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            result = run_agent(**kwargs)
+
+        assert run.call_count == 0, "skill was invoked without its context"
+        assert result.status == "failure"
+        reason = result.failure_reason or ""
+        assert "caller context" in reason
+        assert self._CTX_SKILL in reason
+
+    def test_failure_is_recorded_as_missing_input(
+        self, tmp_path: Path
+    ) -> None:
+        kwargs = self._env(tmp_path)
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()):
+            result = run_agent(**kwargs)
+
+        records = [
+            r for r in result.invoked_skills if r.skill_id == self._CTX_SKILL
+        ]
+        assert records, "no invocation record for the skipped skill"
+        assert records[0].status == "failure"
+        assert records[0].failure_category == "MISSING_INPUT"
+
+    def test_skill_runs_when_context_is_present(self, tmp_path: Path) -> None:
+        kwargs = self._env(tmp_path)
+        target = tmp_path / self._CTX_SOURCE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps({"partners": [{"partner_id": "HOST"}]}),
+            encoding="utf-8",
+        )
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            run_agent(**kwargs)
+
+        assert run.call_count == 1
+        passed_context = run.call_args.kwargs.get("caller_context") or {}
+        assert self._CTX_SOURCE in passed_context
+
+    def test_undeclared_skill_is_unaffected(self, tmp_path: Path) -> None:
+        """A skill that declares no context need must still be invoked."""
+        kwargs = _make_agent_env(tmp_path, skill_ids=["skill-a"])
+        with patch(_RUN_SKILL_TARGET, return_value=_success_skill()) as run:
+            run_agent(**kwargs)
+        assert run.call_count == 1
+

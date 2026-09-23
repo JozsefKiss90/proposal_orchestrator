@@ -22,6 +22,7 @@ All tests use synthetic skill catalogs and mock the Claude runtime transport.
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -29,12 +30,17 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from runner.claude_transport import ClaudeCLITimeoutError, ClaudeTransportError
+from runner.claude_transport import (
+    ClaudeCLIRateLimitError,
+    ClaudeCLITimeoutError,
+    ClaudeTransportError,
+)
 from runner.runtime_models import SkillResult
 from runner.skill_runtime import (
     _assemble_skill_prompt,
     _atomic_write,
     _extract_json_response,
+    _json_break_point,
     _validate_skill_inputs,
     _validate_skill_output,
     run_skill,
@@ -474,6 +480,27 @@ class TestTransportFailureDiagnostics:
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         assert meta["failure_class"] == "EMPTY_OUTPUT"
 
+    def test_rate_limit_classified_correctly(self, skill_env: Path) -> None:
+        """A ClaudeCLIRateLimitError is classified as RATE_LIMITED, not NONZERO_EXIT."""
+        with patch(
+            _TRANSPORT_TARGET,
+            side_effect=ClaudeCLIRateLimitError(
+                "Claude CLI refused the call: Claude Code subscription usage "
+                "limit reached (You've hit your limit · resets 9:20pm).",
+                stdout="You've hit your limit · resets 9:20pm (Europe/Budapest)",
+                reset_notice="You've hit your limit · resets 9:20pm (Europe/Budapest)",
+            ),
+        ):
+            run_skill("test-skill", "run-001", skill_env)
+
+        meta_path = (
+            skill_env / ".claude" / "skill_diag"
+            / "test-skill_run-001_transport_diag.json"
+        )
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        assert meta["failure_class"] == "RATE_LIMITED"
+        assert meta["had_partial_stdout"] is True
+
     # -- C. Skill failure semantics unchanged --
 
     def test_failure_semantics_preserved(self, skill_env: Path) -> None:
@@ -760,6 +787,42 @@ class TestExtractJsonResponse:
         assert _extract_json_response('{unterminated') is None
         assert _extract_json_response('') is None
 
+    def test_fenced_decoy_then_larger_bare_object(self) -> None:
+        """A fenced throwaway object must not shadow the larger real payload.
+
+        Run 23ce21a0 (n08a, sub-section '1.1'): the stream-json transport
+        reassembles all assistant turns, so an intermediate turn's fenced
+        decoy ({"placeholder":"see final"}) landed ahead of the final turn's
+        complete draft object.  Fence-first extraction returned the decoy and
+        the node failed on a missing 'content' key."""
+        draft = (
+            '{"content": "## 1.1 Quality and pertinence of the objectives — '
+            + "x" * 200
+            + '", "claim_statuses": [], "source_refs": []}'
+        )
+        text = (
+            "I have sufficient grounding. Here is the drafted sub-section.\n\n"
+            '```\n{"placeholder":"see final"}\n```\n\n'
+            "Wait — producing final output now.\n\n" + draft
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert "content" in result
+        assert "placeholder" not in result
+
+    def test_larger_fenced_object_beats_smaller_bare_object(self) -> None:
+        """Span competition is symmetric: when the fenced object IS the
+        artifact and a smaller bare object appears in surrounding prose,
+        the fenced one still wins."""
+        text = (
+            'A quick note {"aside": 1} first.\n'
+            '```json\n{"content": "the real artifact ' + "y" * 100
+            + '", "claim_statuses": []}\n```\n'
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert "content" in result
+
     def test_gate_enforcement_real_payload(self) -> None:
         """The exact gate-enforcement response shape that caused run 2ec96048 failure."""
         import json as _json
@@ -787,6 +850,41 @@ class TestExtractJsonResponse:
         assert result["overall_status"] == "pass"
         assert result["gate_id"] == "phase_06_gate"
         assert result["decision_log_entry_written"] is False
+
+    def test_front_truncated_tail_fails_closed(self) -> None:
+        """Front-truncated response whose tail holds only interior member
+        objects must return None, not a salvaged fragment.
+
+        The exact failure mode observed in run 511325a3 (n08a): the transport
+        returned only the tail of an over-long drafter generation, the text
+        did not begin with '{' (so the step-1b guard never ran), and the
+        salvage scan returned a lone source_refs entry — surfacing downstream
+        as a misleading "produced no 'content' prose (returned keys:
+        ['source_path', 'tier'])" error."""
+        truncated_tail = (
+            'evaluation criteria and beyond the state of the art."},\n'
+            '    {"claim_id": "C-17", "claim_summary": "Host lab", '
+            '"status": "unresolved", "source_ref": null}\n  ],\n'
+            '  "source_refs": [\n'
+            '    {"tier": 3, "source_path": "docs/tier3_project_instantiation/'
+            'project_brief/concept_note.md"},\n'
+            '    {"tier": 2, "source_path": "docs/tier2b_topic_and_call_sources/'
+            'extracted/expected_outcomes.json"}\n  ]\n}'
+        )
+        assert _extract_json_response(truncated_tail) is None
+
+    def test_prose_wrapped_json_object_still_salvaged(self) -> None:
+        """The interior-fragment guard must not reject a genuine root object
+        that is preceded AND followed by prose (remainder opens with prose,
+        not with a structural continuation character)."""
+        text = (
+            "Here is the artifact you requested:\n"
+            '{"content": "full prose", "claim_statuses": [], "source_refs": []}\n'
+            "Let me know if anything else is needed."
+        )
+        result = _extract_json_response(text)
+        assert result is not None
+        assert result["content"] == "full prose"
 
 
 class TestAtomicWrite:
@@ -1330,16 +1428,33 @@ class TestOptionalReadsFrom:
         assert mock_claude.called
 
     def test_no_optional_field_means_empty_list(self, tmp_path: Path) -> None:
-        """Skills without optional_reads_from behave exactly as before."""
+        """Skills without optional_reads_from behave exactly as before.
+
+        ``test-skill`` declares no ``optional_reads_from`` field; with its
+        required input present, the absent-optional handling must default to an
+        empty list (no spurious validation failure) and the skill must run to
+        success.  The transport is mocked so the test is hermetic — the previous
+        version left ``invoke_claude_text`` unmocked and called the real
+        ``claude`` CLI, which hangs indefinitely on Windows when the CLI stalls
+        (the TR-1 process-tree-timeout defect) and asserted nothing.
+        """
         repo_root = _make_skill_env(tmp_path)
 
-        # test-skill has no optional_reads_from — missing required input fails
-        result = run_skill("test-skill", "run-opt-004", repo_root, {
-            "docs/tier3/input.json": {"topic": "test"},
-        })
-        # Should succeed since input is provided
-        # (Claude is not mocked here, so we'd get a transport error,
-        #  but the point is: no validation failure from optional paths)
+        response = {
+            "schema_id": "test_output_v1",
+            "run_id": "run-opt-004",
+            "result": "ok",
+        }
+        # test-skill has no optional_reads_from; the required input is present.
+        with _claude_returns(response):
+            result = run_skill("test-skill", "run-opt-004", repo_root, {
+                "docs/tier3/input.json": {"topic": "test"},
+            })
+
+        # No optional_reads_from field must not cause a validation failure, and
+        # with the required input provided the skill runs to success.
+        assert result.failure_category != "MISSING_INPUT"
+        assert result.status == "success"
 
     def test_tapm_prompt_includes_optional_paths(self, tmp_path: Path) -> None:
         """TAPM prompt assembly includes optional paths annotated as OPTIONAL."""
@@ -1611,3 +1726,116 @@ class TestModuleIsolation:
         import runner.skill_runtime as mod
         source = Path(mod.__file__).read_text(encoding="utf-8")
         assert "import anthropic" not in source
+
+
+# ---------------------------------------------------------------------------
+# Parse-failure diagnosis
+# ---------------------------------------------------------------------------
+
+
+class TestJsonBreakPoint:
+    """A response that breaks 30k characters in has a perfect-looking head.
+
+    Reporting only "non-JSON response" plus the first 300 characters reads
+    as if the model ignored the output contract, when in fact one interior
+    character is wrong — the run 0395b136 failure, where a fenced
+    continuation restart put a raw newline inside a JSON string at char
+    30723.  The break point names the real fault.
+    """
+
+    def test_reports_position_and_context_of_the_break(self) -> None:
+        text = '{"a": "ok", "b": "cut' + '```json\n"b": "resumed"}'
+        message = _json_break_point(text)
+        assert "invalid JSON" in message
+        assert "char " in message
+        assert "```json" in message
+
+    def test_fenced_valid_json_is_not_reported_as_broken(self) -> None:
+        message = _json_break_point('```json\n{"a": 1}\n```')
+        assert "invalid JSON" not in message
+
+    def test_prose_response_is_named_as_such(self) -> None:
+        assert "does not open with a JSON object" in _json_break_point(
+            "I was unable to complete this."
+        )
+
+    def test_front_truncated_fragment_is_named_as_such(self) -> None:
+        """A response whose opening was lost decodes an interior object and
+        then hits the rest of the payload.  The message must say so, not
+        just "invalid JSON"."""
+        message = _json_break_point('{"b": 2}, "c": 3}')
+        assert "front-truncated" in message
+        assert "more characters follow" in message
+
+    def test_diagnosis_never_raises(self) -> None:
+        for probe in ("", "   ", "{", "```", "```json", "null", "[1, 2]"):
+            assert isinstance(_json_break_point(probe), str)
+
+
+# ---------------------------------------------------------------------------
+# Multi-artifact observability
+# ---------------------------------------------------------------------------
+
+
+class TestMultiArtifactLogging:
+    """The multi-artifact branch used to return silently on every path.
+
+    A skill on this contract therefore vanished from the console between its
+    INVOKE line and the next skill's START line — concept-call-binding-
+    derivation did exactly that in runs 0395b136 and 7acc143b, once while
+    failing and once while succeeding, and the two were indistinguishable.
+    """
+
+    def test_success_logs_an_ok_line(self, multi_env: Path, caplog) -> None:
+        response = {
+            "constraints": [{"id": "c1"}],
+            "outcomes": [{"id": "o1"}],
+        }
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns(response):
+                result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "success"
+        lines = [r.getMessage() for r in caplog.records]
+        ok = [m for m in lines if "skill OK" in m and "multi-skill" in m]
+        assert ok, f"no skill OK line emitted; got {lines}"
+        assert "contract=multi_artifact" in ok[0]
+        assert "outputs=2" in ok[0]
+
+    def test_validation_failure_logs_a_fail_line(
+        self, multi_env: Path, caplog
+    ) -> None:
+        """A sub-artifact missing its required field must be visible."""
+        response = {
+            "constraints": [{"id": "c1"}],
+            "outcomes": "not-a-list-but-present",
+            "call_constraints.json": {"wrong_field": 1},
+        }
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns({"unrelated_field": 1}):
+                result = run_skill("multi-skill", "run-001", multi_env)
+
+        assert result.status == "failure"
+        lines = [r.getMessage() for r in caplog.records]
+        fail = [m for m in lines if "skill FAIL" in m and "multi-skill" in m]
+        assert fail, f"no skill FAIL line emitted; got {lines}"
+        assert "contract=multi_artifact" in fail[0]
+
+    def test_no_path_returns_without_logging(
+        self, multi_env: Path, caplog
+    ) -> None:
+        """Every multi-artifact outcome — success or failure — is logged."""
+        with caplog.at_level(logging.INFO, logger="runner.skill_runtime"):
+            with _claude_returns({"constraints": [{"id": "c1"}],
+                                  "outcomes": [{"id": "o1"}]}):
+                run_skill("multi-skill", "run-001", multi_env)
+            with _claude_returns({"unrelated_field": 1}):
+                run_skill("multi-skill", "run-002", multi_env)
+
+        lines = [r.getMessage() for r in caplog.records]
+        outcomes = [
+            m for m in lines
+            if ("skill OK" in m or "skill FAIL" in m) and "multi-skill" in m
+        ]
+        assert len(outcomes) == 2, f"expected 2 outcome lines, got {outcomes}"
+

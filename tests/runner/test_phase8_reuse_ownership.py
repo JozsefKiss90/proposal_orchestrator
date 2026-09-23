@@ -647,6 +647,112 @@ class TestReuseFailClosed:
         assert valid is False
         assert reason == "claim_status_assumed"
 
+    def test_fails_when_validation_status_titlecase_unresolved(
+        self, tmp_path: Path
+    ) -> None:
+        """§12.2 title-case ``Unresolved`` overall status also blocks (PRE-1)."""
+        node_id = "n08c_implementation_drafting"
+        source_run = "source-run-001"
+        current_run = "current-run-002"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        _make_fingerprint_inputs(tmp_path, node_id)
+        content = {
+            "schema_id": cfg["schema_id"],
+            "run_id": source_run,
+            "validation_status": {
+                "overall_status": "Unresolved",
+                "claim_statuses": [],
+            },
+            "traceability_footer": {
+                "primary_sources": [],
+                "no_unsupported_claims_declaration": True,
+            },
+        }
+        _write_json(tmp_path / cfg["artifact_path"], content)
+        _make_gate_result(tmp_path, cfg["gate_id"], "pass", run_id=source_run)
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+        write_reuse_metadata(
+            node_id=node_id, repo_root=tmp_path,
+            source_run_id=source_run, artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"], gate_id=cfg["gate_id"],
+            input_fingerprint=fp, artifact_hash=art_hash,
+        )
+        _make_audit_reports(tmp_path, current_run)
+        _make_run_manifest(tmp_path, current_run, reuse_decisions={
+            node_id: {
+                "status": "reused",
+                "mode": "drafting_skipped_audit_executed",
+                "source_run_id": source_run,
+                "artifact_path": cfg["artifact_path"],
+                "input_fingerprint": fp,
+                "gate_id": cfg["gate_id"],
+            }
+        })
+
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id, cfg["artifact_path"], content, current_run, tmp_path,
+        )
+        assert valid is False
+        assert reason == "validation_status_unresolved"
+
+    def test_fails_when_titlecase_assumed_claim(self, tmp_path: Path) -> None:
+        """§12.2 title-case ``Assumed`` claim also blocks reuse (PRE-1).
+
+        The reason string reports the normalised (lowercase) status so the
+        audit record is casing-independent.
+        """
+        node_id = "n08b_impact_drafting"
+        source_run = "source-run-001"
+        current_run = "current-run-002"
+        cfg = REUSE_ELIGIBLE_NODES[node_id]
+
+        _make_fingerprint_inputs(tmp_path, node_id)
+        content = {
+            "schema_id": cfg["schema_id"],
+            "run_id": source_run,
+            "validation_status": {
+                "overall_status": "confirmed",
+                "claim_statuses": [
+                    {"claim_id": "C-01", "status": "Assumed"},
+                ],
+            },
+            "traceability_footer": {
+                "primary_sources": [],
+                "no_unsupported_claims_declaration": True,
+            },
+        }
+        _write_json(tmp_path / cfg["artifact_path"], content)
+        _make_gate_result(tmp_path, cfg["gate_id"], "pass", run_id=source_run)
+
+        fp = compute_input_fingerprint(node_id, tmp_path)
+        art_hash = artifact_sha256(tmp_path / cfg["artifact_path"])
+        write_reuse_metadata(
+            node_id=node_id, repo_root=tmp_path,
+            source_run_id=source_run, artifact_path=cfg["artifact_path"],
+            schema_id=cfg["schema_id"], gate_id=cfg["gate_id"],
+            input_fingerprint=fp, artifact_hash=art_hash,
+        )
+        _make_audit_reports(tmp_path, current_run)
+        _make_run_manifest(tmp_path, current_run, reuse_decisions={
+            node_id: {
+                "status": "reused",
+                "mode": "drafting_skipped_audit_executed",
+                "source_run_id": source_run,
+                "artifact_path": cfg["artifact_path"],
+                "input_fingerprint": fp,
+                "gate_id": cfg["gate_id"],
+            }
+        })
+
+        valid, reason = is_reuse_owned_artifact_valid(
+            node_id, cfg["artifact_path"], content, current_run, tmp_path,
+        )
+        assert valid is False
+        assert reason == "claim_status_assumed"
+
     def test_fails_when_no_unsupported_claims_false(
         self, tmp_path: Path
     ) -> None:

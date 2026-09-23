@@ -1,0 +1,45 @@
+{
+  "record_type": "decision",
+  "id": "project-purge-clean-engine-base",
+  "date": "2026-09-22",
+  "branch": "engine-base",
+  "base_commit": "e56ede2 (branch ESR)",
+
+  "authority": "Operator instruction of 2026-09-22 (plans/purge/PURGE_SPEC_2026-09-22.md), executed against the approved manifest plans/purge/PURGE_MANIFEST_2026-09-22.md. Durable recording per CLAUDE.md §9.4 of a state transition later readers cannot reconstruct from the tree. Applies §9.1 (docs/ is authoritative), §9.2 (runtime memory is not constitutional truth) and §5 Tier 3 (an empty Tier 3 leaves the engine generic). NOT a constitutional amendment; no §14.5 question is raised.",
+
+  "why": "The FIELDWISE proposal (MSCA-PF, submitted 2026-09-07, ESR round two 2026-09-09) is closed. The operator wants a clean, reusable engine to instantiate a new project. Every artifact that exists only because FIELDWISE existed is removed; every call- or instrument-level source, the engine, the constitutional configuration and the directory skeleton stay.",
+
+  "preserved_record": {
+    "tag": "fieldwise-final-2026-09-22 (annotated, on ESR e56ede2)",
+    "bundle": "../fieldwise-archive.bundle (224 MB; refs ESR, fieldwise-run-01, fieldwise-run-02, fieldwise-run-03, the tag; git bundle verify: complete history)",
+    "branches": "ESR and fieldwise-run-01/02/03 are NOT deleted; that is a separate operator step."
+  },
+
+  "removed": {
+    "A_tier3": "All of docs/tier3_project_instantiation/ except .gitkeep and working_assumptions.example.json; plus the FIELDWISE-filled Part B form copy misfiled in Tier 2A (§13.11).",
+    "B_tier4": "phase_outputs/, checkpoints/, reuse/, validation_reports/, reinstantiation_provenance.json and the whole decision_log/ including archive/demo-run and the 30 engine-governing rulings of the 2026-08-11 split (the operator placed them in scope; two code comments cite dod-1c and chk-1 by id, no code reads them).",
+    "C_tier5": "All drafted sections, assembled draft, review packet, final exports and the sealed submission.",
+    "D_plans": "All FIELDWISE plans, tickets, prompts and reports, incl. the 2026-08-11 partial-purge precedent (plans/fieldwise_tickets.md ticket 1, plans/fieldwise_reinstantiation_plan.md §2.1; both recoverable from the tag).",
+    "E_root": "Claude outputs/, n08f_chat.md, two loose images, MSCA-preabsorb-b4d9e57.bundle, run-02 runner logs.",
+    "F_runtime_and_harness": ".claude/runs|logs|benchmark|skill_diag, caches; tracked harness data frozen from instance text (E4 goldens, E3 ledgers, E1.5 gold sets, labelling drafts, expectation provenance, E5f budget).",
+    "G_vault": "MSCA/ (instance-#1 Obsidian vault) in full; templates/obsidian_graph_vault/ was verified complete, no migration needed.",
+    "H_code": "FIELDWISE-only tools (Part B-1 builders, annotator, open-decisions exporter, vault authoring seed) and their tests; the five test_fieldwise_* modules; prose scrub of CONTEXT.md, the operator manual, one skill example and three runner docstrings."
+  },
+
+  "kept_on_purpose": {
+    "agnosticism_lint_denylist": "runner/agnosticism_lint.py and tests/runner/test_agnosticism_lint.py, tests/runner/test_vault_scaffold.py keep instance-#1 nouns as the standing proof that the generic layer is noun-free (operator decision 2).",
+    "engine_history": "plans/milestones/, plans/harness_plan/, phase-refactor tickets and engine handoffs; five of them had one incidental instance reference each, now reworded.",
+    "aws_telemetry": "costs/, bedrock-*.json, screenshots/, docs/benchmark_json: deployment telemetry, not project data.",
+    "live_worktree": ".claude/worktrees/e5f-implementation-status-f7651c is a dirty git worktree of main (583 changed paths); not removed because that would discard uncommitted work the operator did not authorise deleting."
+  },
+
+  "test_consequences": "Seven test modules that read live Tier 4/5 artifacts or the deleted goldens now skip with a reason when the substrate is absent (no engine logic changed). Full suite on engine-base: 4523 passed, 58 failed, 22 errors, 108 skipped; zero failures that were not already failing on ESR before the purge.",
+
+  "verification": "See plans/purge/PURGE_REPORT_2026-09-22.md.",
+
+  "commits": [
+    "9af07fe purge(A)", "9a9deb1 purge(A) skeleton", "da9f846 purge(B)", "c6a6da0 purge(C)",
+    "9d8c46b purge(D)", "1a60008 purge(E)", "73ff469 purge(G)", "fd38b0a purge(F)",
+    "4943bf8 purge(H) tools", "ca21334 purge(H) prose", "closing commit: this record + report"
+  ]
+}

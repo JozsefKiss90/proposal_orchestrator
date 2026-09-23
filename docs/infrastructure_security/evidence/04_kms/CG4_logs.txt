@@ -1,0 +1,43 @@
+﻿
+    Write-Output "=== CG4: KMS Evidence Collection ==="
+    Get-Date -Format o
+    ""
+
+    "=== KMS-E01: Key Description ==="
+    aws kms describe-key `
+      --key-id alias/proposal-orchestrator `
+      --region us-east-1 `
+      --output json
+
+    ""
+
+    "=== KMS-E02: Key Rotation Status ==="
+    aws kms get-key-rotation-status `
+      --key-id 887638e8-358b-4664-9270-368aec0ea1f1 `
+      --region us-east-1 `
+      --output json
+
+    ""
+
+    "=== KMS-E03: Key Policy ==="
+    aws kms get-key-policy `
+      --key-id 887638e8-358b-4664-9270-368aec0ea1f1 `
+      --policy-name default `
+      --region us-east-1 `
+      --output text
+
+    ""
+
+    "=== KMS-E04: Key Aliases ==="
+    aws kms list-aliases `
+      --key-id 887638e8-358b-4664-9270-368aec0ea1f1 `
+      --region us-east-1 `
+      --output json
+
+    ""
+
+    "=== Caller Identity ==="
+    aws sts get-caller-identity `
+      --output json
+
+

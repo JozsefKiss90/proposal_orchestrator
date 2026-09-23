@@ -1,0 +1,107 @@
+Control Group 3 — Region Enforcement                                                                                                                                 
+                                                                                                                                                                       
+  Evidence Already Available from CG2                                                                                                                                  
+                                                                                                                                                                       
+  ┌──────────────────┬───────────────────────────────┬───────────────────────────────────────────────────────────────────────────────┬────────────────────────────┐
+  │     Control      │       Plan Requirement        │                               Existing Evidence                               │            Gap             │
+  ├──────────────────┼───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┼────────────────────────────┤
+  │ DC-16 IAM region │ aws:RequestedRegion in policy │ EV-IAM-003-policy-proposal-orchestrator-bedrock-invoke.json shows             │                            │
+  │  condition       │  limits to eu-west-1,         │ StringEquals: aws:RequestedRegion: [eu-west-1, us-east-1]                     │ None — fully evidenced     │
+  │                  │ us-east-1                     │                                                                               │                            │
+  ├──────────────────┼───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┼────────────────────────────┤
+  │ DC-17 Negative   │ Bedrock call to unapproved    │ CG2 simulation: ap-southeast-1 → implicitDeny (logs line 577). But plan also  │ Need actual invoke-model   │
+  │ region test      │ region fails                  │ wants an actual CLI call from the host that fails.                            │ attempt to unapproved      │
+  │                  │                               │                                                                               │ region from host           │
+  ├──────────────────┼───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┼────────────────────────────┤
+  │ DC-40 SCP (if    │ SCP denying Bedrock in        │ Unknown — need to check if account is in an Organization                      │ Need to determine          │
+  │ Organization)    │ non-approved regions          │                                                                               │ applicability              │
+  └──────────────────┴───────────────────────────────┴───────────────────────────────────────────────────────────────────────────────┴────────────────────────────┘
+
+  Additional Evidence Needed (REG-E series)
+
+  ┌─────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────┐
+  │ Evidence ID │                What                │                                    Status                                     │
+  ├─────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ REG-E01     │ IAM policy with region condition   │ Already have (EV-IAM-003-policy-*-bedrock-invoke.json) — cross-reference      │
+  ├─────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ REG-E02     │ Successful call in approved region │ Already have (CG2 functional test, us-east-1, logs 802-862) — cross-reference │
+  ├─────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ REG-E03     │ Failed call in unapproved region   │ Need actual CLI test from host                                                │
+  ├─────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ REG-E04     │ SCP (if applicable)                │ Need to check                                                                 │
+  ├─────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ REG-E05     │ Application AWS_REGION setting     │ Deferred to CG9 (Production Config)                                           │
+  └─────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────┘
+
+  Steps to Complete CG3
+
+  Only 2 things need to be done:
+
+  Step 1: Actual negative region test from deployment host
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  # REG-E03: Attempt Bedrock call to unapproved region (should fail)
+  {
+    echo "=== REG-E03: Negative Region Test ==="
+    echo "Date: $(date -u)"
+    echo ""
+    echo "--- Attempt: us.anthropic.claude-sonnet-4-6 in ap-southeast-1 ---"
+    aws bedrock-runtime converse \
+      --model-id us.anthropic.claude-sonnet-4-6 \
+      --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+      --inference-config '{"maxTokens":10}' \
+      --region ap-southeast-1 2>&1
+    echo ""
+    echo "--- Attempt: direct model ID in ap-southeast-1 ---"
+    aws bedrock-runtime invoke-model \
+      --model-id anthropic.claude-sonnet-4-20250514-v1:0 \
+      --content-type application/json \
+      --body '{"anthropic_version":"bedrock-2023-05-31","max_tokens":10,"messages":[{"role":"user","content":"test"}]}' \
+      --region ap-southeast-1 \
+      /dev/null 2>&1
+    echo ""
+    echo "--- Control: same call in us-east-1 (should succeed) ---"
+    aws bedrock-runtime converse \
+      --model-id us.anthropic.claude-sonnet-4-6 \
+      --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+      --inference-config '{"maxTokens":10}' \
+      --region us-east-1 2>&1
+  } 2>&1 | tee /tmp/REG-E03-negative-region-test.txt
+
+  Expected output:
+  - ap-southeast-1 calls: AccessDeniedException or connection failure (no VPC endpoint for that region)
+  - us-east-1 call: success with model response
+
+  Step 2: Check if account is in an AWS Organization
+
+  Run from CloudShell or local CLI:
+
+  # Check if account is in an Organization
+  aws organizations describe-organization --output json 2>&1
+
+  # If the above succeeds, list SCPs
+  aws organizations list-policies --filter SERVICE_CONTROL_POLICY --output json 2>&1
+
+  If the account is not in an Organization, DC-40 is NOT_APPLICABLE. If it is, we need to check for region-restriction SCPs.
+
+  Save evidence to:
+
+  - docs/infrastructure_security/evidence/03_region_enforcement/REG-E03-negative-region-test.txt
+  - docs/infrastructure_security/evidence/03_region_enforcement/REG-E04-organization-check.txt
+
+  PASS / FAIL Criteria
+
+  ┌───────┬──────────────────────┬─────────────────────────────────────────────────────────────────────────────────────┬────────────────────────────────────┐
+  │   #   │      Criterion       │                                        PASS                                         │                FAIL                │
+  ├───────┼──────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+  │ REG-1 │ IAM region lock      │ aws:RequestedRegion condition present with only eu-west-1 and us-east-1             │ No condition or unapproved regions │
+  ├───────┼──────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+  │ REG-2 │ Positive region test │ Bedrock call succeeds in us-east-1                                                  │ Call fails in approved region      │
+  ├───────┼──────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+  │ REG-3 │ Negative region test │ Bedrock call to ap-southeast-1 fails with AccessDeniedException or connection error │ Call to unapproved region succeeds │
+  ├───────┼──────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+  │ REG-4 │ SCP (if Org)         │ SCP applied OR account not in Organization (N/A)                                    │ Account in Org but no region SCP   │
+  └───────┴──────────────────────┴─────────────────────────────────────────────────────────────────────────────────────┴────────────────────────────────────┘
+
+  Please run the two steps above, save the evidence, and confirm when ready for review.

@@ -1,0 +1,34 @@
+{
+  "id": "e3.1-materiality-calibration",
+  "ticket": "E3.1",
+  "date": "<YYYY-MM-DD>",
+  "summary": "First human-labelled calibration of the E3 materiality classifier. Records precision (false-alarm rate), escape-recall (miss rate on out-of-ledger material claims), and the advisory-vs-gating decision.",
+  "judge": {
+    "model": "<local-model-id>",
+    "version": "<pinned-tag>"
+  },
+  "gold_sets": {
+    "negatives_labelled": 0,
+    "escapes_labelled": 0,
+    "ledger_positives": 393,
+    "labels": "human ground truth (independence rule; no AI labelling)"
+  },
+  "metrics": {
+    "precision": null,
+    "recall_escapes": null,
+    "recall_in_ledger": null
+  },
+  "threshold": {
+    "min_precision": 0.85,
+    "min_recall_escapes": 0.80,
+    "note": "operator policy — tune; a conservative starting bar, not an endorsement"
+  },
+  "decision": "advisory",
+  "rationale": "<one line: why advisory-stays or promote-to-gating, given the numbers above>",
+  "provenance": {
+    "runner": "harness/materiality_calibration.py",
+    "prompt_hash": "<from the provenance log>",
+    "keyed_to_judge": "<model>@<version>",
+    "note": "Decision is keyed to this exact judge model+version; a repin re-opens advisory (mirrors E1.5)."
+  }
+}

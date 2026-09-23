@@ -17,13 +17,18 @@ Arguments
 --library-path  Path to gate_rules_library.yaml (default: repo_root / LIBRARY_REL_PATH).
 --manifest-path Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).
 --phase         Execute only the specified phase (e.g. 1, phase1, phase_01).
+--node          Execute exactly one node, by canonical manifest node_id
+                (e.g. n08b_impact_drafting) or phase+substep shorthand
+                (e.g. 8b).  Mutually exclusive with --phase.
 --dry-run       Print ready nodes and exit without evaluating gates.
 --json          Emit progress as JSON lines to stdout.
 --verbose       Enable detailed scheduler logging to stderr.
 """
 
 from __future__ import annotations
+from dotenv import load_dotenv
 
+load_dotenv()
 import argparse
 import json
 import logging
@@ -39,6 +44,8 @@ from runner.dag_scheduler import (
     ManifestGraph,
     RunAbortedError,
     bootstrap_phase_prerequisites,
+    format_evidence_violation,
+    format_unsatisfied_condition,
 )
 from runner.gate_library import LIBRARY_REL_PATH
 from runner.manifest_reader import MANIFEST_REL_PATH
@@ -57,7 +64,17 @@ def _ts() -> str:
 
 
 def _parse_phase(raw: str) -> int:
-    """Parse a phase argument like ``1``, ``phase1``, ``phase_01``, ``phase_01_call_analysis``."""
+    """Parse a phase argument like ``1``, ``phase1``, ``phase_01``, ``phase_01_call_analysis``.
+
+    A phase+substep shorthand (e.g. ``8a``) is rejected rather than silently
+    collapsed to its phase number: sub-phases are single-node scopes and must
+    be requested via ``--node``.
+    """
+    if re.fullmatch(r"(?:phase[_-]?)?0*\d+[a-z]", raw.lower().strip()):
+        raise argparse.ArgumentTypeError(
+            f"{raw!r} names a sub-phase, not a phase.  "
+            "Use --node for single-node scope (e.g. --node 8a)."
+        )
     m = re.match(r"^(?:phase[_-]?)?0*(\d+)", raw.lower())
     if not m:
         raise argparse.ArgumentTypeError(
@@ -99,14 +116,42 @@ def main(argv: Optional[list[str]] = None) -> int:
         default=None,
         help="Path to manifest.compile.yaml (default: repo_root / MANIFEST_REL_PATH).",
     )
-    parser.add_argument(
+    scope_group = parser.add_mutually_exclusive_group()
+    scope_group.add_argument(
         "--phase",
         type=_parse_phase,
         default=None,
         help=(
             "Execute only the specified phase (e.g. 1, phase1, phase_01).  "
             "All prerequisite gates and artifacts must already be satisfied.  "
-            "No downstream phases are dispatched."
+            "No downstream phases are dispatched.  "
+            "Mutually exclusive with --node."
+        ),
+    )
+    scope_group.add_argument(
+        "--node",
+        default=None,
+        metavar="NODE",
+        help=(
+            "Execute exactly one node, named by canonical manifest node_id "
+            "(e.g. n08b_impact_drafting) or phase+substep shorthand "
+            "(e.g. 8b, resolved via the manifest 'substep' field).  "
+            "Predecessors must already be released in the loaded run "
+            "context; otherwise the run fails closed without dispatching.  "
+            "Mutually exclusive with --phase."
+        ),
+    )
+    parser.add_argument(
+        "--from-graph",
+        dest="from_graph",
+        default=None,
+        metavar="CONFIG",
+        help=(
+            "Compile Tier 3 architecture_inputs from a per-project vault "
+            "(graph.config.yaml at CONFIG) to a non-destructive staging location "
+            "and print a diff against the hand-lift, then exit.  A Step-0-style "
+            "pre-dispatch pass (milestone 2, ticket 3): it does not construct or "
+            "run the scheduler, evaluate gates, or overwrite any Tier 3 source."
         ),
     )
     parser.add_argument(
@@ -132,6 +177,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         ),
     )
     parser.add_argument(
+        "--export-docx",
+        action="store_true",
+        default=False,
+        help=(
+            "After the run, render the assembled Part B (or whatever section "
+            "artifacts exist) to a .docx in docs/tier5_deliverables/final_exports/. "
+            "Best-effort: an export failure does not change the run exit code."
+        ),
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="Enable detailed scheduler logging to stderr.",
@@ -144,6 +199,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
     sched_logger = logging.getLogger("runner.scheduler")
     skill_logger = logging.getLogger("runner.skill_runtime")
+    # The transport announces which `claude` executable it resolved, once per
+    # run.  Without a handler here that line is dropped, and the run record
+    # again fails to say *which* installed CLI build served the invocations.
+    transport_logger = logging.getLogger("runner.claude_transport")
     if args.verbose:
         handler = logging.StreamHandler(sys.stderr)
         handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
@@ -151,11 +210,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         sched_logger.addHandler(handler)
         skill_logger.setLevel(logging.INFO)
         skill_logger.addHandler(handler)
+        transport_logger.setLevel(logging.INFO)
+        transport_logger.addHandler(handler)
     else:
         # INFO level so phase-scoped messages appear, but only with a handler
         # when --verbose is set; without a handler, messages are silently dropped.
         sched_logger.setLevel(logging.WARNING)
         skill_logger.setLevel(logging.WARNING)
+        transport_logger.setLevel(logging.WARNING)
 
     # ------------------------------------------------------------------
     # Output helpers (text vs JSON-lines)
@@ -189,6 +251,53 @@ def main(argv: Optional[list[str]] = None) -> int:
             if args.repo_root
             else find_repo_root()
         )
+    except Exception as exc:
+        _err(str(exc))
+        return 3
+
+    # ------------------------------------------------------------------
+    # --from-graph: deterministic Tier-3 compile-and-diff (Step-0-style).
+    #
+    # Runs BEFORE any scheduler construction or node dispatch and returns —
+    # it never touches the DAG scheduler, gate evaluation, or §17 contracts,
+    # and it is non-destructive (writes only staging under Tier 4).  Absent
+    # this flag, the scheduler path below is entirely unchanged.
+    # ------------------------------------------------------------------
+    if args.from_graph:
+        from runner.graph_compiler import (
+            GraphCompileError,
+            compile_and_diff,
+            compile_part_b_and_report,
+        )
+        from runner.graph_config import GraphConfigError
+        from runner.vault_reader import VaultReadError
+
+        try:
+            result, report = compile_and_diff(Path(args.from_graph), repo_root)
+            part_b_result, part_b = compile_part_b_and_report(
+                Path(args.from_graph), repo_root
+            )
+        except (GraphConfigError, VaultReadError, GraphCompileError) as exc:
+            _err(f"graph compile fail-closed: {exc}")
+            return 1
+        except Exception as exc:  # noqa: BLE001 — CLI boundary
+            _err(str(exc))
+            return 3
+        _out(
+            f"[FROM-GRAPH] project={result.project_id} "
+            f"artifacts={len(result.artifacts)} "
+            f"converged={report['converged']} residual={report['residual_total']} "
+            f"part_b_sections={part_b['section_count']}",
+            "from_graph",
+            project_id=result.project_id,
+            artifacts=len(result.artifacts),
+            converged=report["converged"],
+            residual_total=report["residual_total"],
+            part_b_sections=part_b["section_count"],
+        )
+        return 0
+
+    try:
         library_path: Path = (
             Path(args.library_path)
             if args.library_path
@@ -206,6 +315,42 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 3
 
     # ------------------------------------------------------------------
+    # Single-node scope resolution (manifest-only, §16.5)
+    # ------------------------------------------------------------------
+    # Resolved before anything else runs so that an unknown id/substep is
+    # a distinct configuration error, never a silent empty run.
+    node_scope_id: Optional[str] = None
+    if args.node is not None:
+        try:
+            node_scope_id = graph.resolve_node_scope(args.node)
+        except DAGSchedulerError as exc:
+            _err(str(exc))
+            return 3
+
+    # ------------------------------------------------------------------
+    # Backend resolution and startup logging
+    # ------------------------------------------------------------------
+    try:
+        from runner.transport.config import resolve_provider_config, is_production_mode
+
+        _pc = resolve_provider_config()
+        _prod = is_production_mode()
+        _out(
+            f"[BACKEND] transport={_pc.backend_name}  "
+            f"model={_pc.model or '(default)'}  "
+            f"preset={_pc.preset_name or '(none)'}  "
+            f"production_mode={_prod}",
+            "backend_info",
+            backend=_pc.backend_name,
+            model=_pc.model,
+            preset=_pc.preset_name,
+            production_mode=_prod,
+        )
+    except ValueError as exc:
+        _err(f"Transport configuration error: {exc}")
+        return 3
+
+    # ------------------------------------------------------------------
     # Phase-scoped continuation bootstrap
     # ------------------------------------------------------------------
     # When --phase is specified, seed upstream prerequisite nodes as
@@ -213,10 +358,19 @@ def main(argv: Optional[list[str]] = None) -> int:
     # phase-by-phase execution with new run-ids (each invocation reads
     # prior-run evidence) and also works with existing run-ids (already-
     # loaded states are preserved; only "pending" nodes are candidates).
-    if args.phase is not None:
+    #
+    # A node scope reuses the same channel with the node's own phase
+    # number: upstream *phases* may be seeded from durable evidence, but
+    # nodes inside that phase never are (bootstrap_phase_prerequisites
+    # excludes them) — same-run-id resume is the only in-phase evidence
+    # carrier.
+    bootstrap_phase: Optional[int] = args.phase
+    if bootstrap_phase is None and node_scope_id is not None:
+        bootstrap_phase = graph.node_phase_number(node_scope_id)
+    if bootstrap_phase is not None:
         try:
             bootstrapped = bootstrap_phase_prerequisites(
-                ctx, graph, repo_root, args.phase
+                ctx, graph, repo_root, bootstrap_phase
             )
             if bootstrapped:
                 _out(
@@ -232,11 +386,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             sched_logger.warning("Bootstrap failed (non-blocking): %s", exc)
 
     phase_label = f"  phase={args.phase}" if args.phase else ""
+    node_label = f"  node={node_scope_id}" if node_scope_id else ""
     run_start_fields: dict[str, object] = {"run_id": args.run_id}
     if args.phase is not None:
         run_start_fields["phase"] = args.phase
+    if node_scope_id is not None:
+        run_start_fields["node"] = node_scope_id
     _out(
-        f"[RUN]   run_id={args.run_id}{phase_label}",
+        f"[RUN]   run_id={args.run_id}{phase_label}{node_label}",
         "run_start",
         **run_start_fields,
     )
@@ -251,7 +408,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     # ------------------------------------------------------------------
 
     if args.dry_run:
-        scope = set(graph.nodes_for_phase(args.phase)) if args.phase else None
+        if node_scope_id is not None:
+            scope: Optional[set[str]] = {node_scope_id}
+        elif args.phase:
+            scope = set(graph.nodes_for_phase(args.phase))
+        else:
+            scope = None
         ready = [
             nid for nid in graph.node_ids()
             if graph.is_ready(nid, ctx)
@@ -272,6 +434,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         library_path=library_path,
         manifest_path=manifest_path,
         phase=args.phase,
+        node=node_scope_id,
         preseed_phase8_sections=args.preseed_phase8_sections,
     )
 
@@ -289,6 +452,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     ps = getattr(summary, "phase_scope", None)
     has_phase = isinstance(ps, int)
     phase_info = f"  phase={ps}" if has_phase else ""
+    ns = getattr(summary, "node_scope", None)
+    has_node = isinstance(ns, str)
+    node_info = f"  node={ns}" if has_node else ""
     summary_fields: dict[str, object] = {
         "overall_status": summary.overall_status,
         "nodes_released": released_count,
@@ -299,15 +465,76 @@ def main(argv: Optional[list[str]] = None) -> int:
         summary_fields["phase_scope"] = ps
         psn = getattr(summary, "phase_scope_nodes", None)
         summary_fields["phase_scope_nodes"] = list(psn) if isinstance(psn, list) else []
+    if has_node:
+        summary_fields["node_scope"] = ns
+
+    # Fail-closed visibility for a node-scoped run (§13.7): when the scoped
+    # node was never dispatched, name the unmet predecessors and any
+    # predecessor durable-evidence violations (§6.3/§9.4) on the console
+    # so the operator does not have to open run_summary.json.
+    if has_node:
+        for entry in summary.stalled_nodes:
+            unmet = entry.get("unsatisfied_conditions", [])
+            violations = entry.get("predecessor_evidence_violations", [])
+            if not unmet and not violations:
+                continue
+            detail_parts = []
+            if unmet:
+                detail_parts.append(
+                    "unmet predecessors: "
+                    + "; ".join(format_unsatisfied_condition(c) for c in unmet)
+                )
+            if violations:
+                detail_parts.append(
+                    "predecessor evidence violations: "
+                    + "; ".join(
+                        format_evidence_violation(v) for v in violations
+                    )
+                )
+            _out(
+                f"[BLOCKED] {entry['node_id']} not dispatched — "
+                + "  ".join(detail_parts),
+                "node_scope_blocked",
+                node_id=entry["node_id"],
+                unsatisfied_conditions=unmet,
+                predecessor_evidence_violations=violations,
+            )
+
     _out(
         f"[SUMMARY] overall_status={summary.overall_status}"
         f"  nodes_released={released_count}"
         f"  stalled={len(summary.stalled_nodes)}"
         f"  hard_blocked={len(summary.hard_blocked_nodes)}"
-        f"{phase_info}",
+        f"{phase_info}{node_info}",
         "summary",
         **summary_fields,
     )
+
+    # ------------------------------------------------------------------
+    # Optional Part B .docx export (best-effort; never changes exit code)
+    # ------------------------------------------------------------------
+    if args.export_docx:
+        try:
+            from runner.docx_exporter import export_part_b_docx
+
+            out = export_part_b_docx(repo_root)
+            if out is None:
+                _out(
+                    "[EXPORT] No section content to export to .docx",
+                    "export_docx",
+                    exported=False,
+                )
+            else:
+                rel = str(out.relative_to(repo_root)).replace("\\", "/")
+                _out(
+                    f"[EXPORT] Part B exported to {rel}",
+                    "export_docx",
+                    exported=True,
+                    path=rel,
+                )
+        except Exception as exc:  # noqa: BLE001 — export is best-effort
+            _err(f"Part B .docx export failed (non-blocking): {exc}")
+
     return exit_code
 
 

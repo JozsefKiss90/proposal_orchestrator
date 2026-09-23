@@ -305,6 +305,28 @@ class TestReuseEligibility:
         assert decision.reusable is False
         assert decision.reason == "unresolved_validation_status"
 
+    def test_reject_titlecase_unresolved_validation(self, tmp_path: Path) -> None:
+        """§12.2 title-case ``Unresolved`` must also block reuse (PRE-1).
+
+        The reuse path admits a finished section without re-deriving its roll-up,
+        so — like gate_10a — its unresolved check must normalise case or an
+        operator-spelled ``Unresolved`` would be carried forward as reusable.
+        """
+        _make_fingerprint_inputs(tmp_path, "n08b_impact_drafting")
+        cfg = REUSE_ELIGIBLE_NODES["n08b_impact_drafting"]
+        _write_json(repo_root_path(tmp_path, cfg["artifact_path"]), {
+            "schema_id": cfg["schema_id"],
+            "validation_status": {"overall_status": "Unresolved"},
+            "traceability_footer": {
+                "no_unsupported_claims_declaration": True,
+            },
+        })
+        decision = validate_reuse_candidate(
+            "n08b_impact_drafting", tmp_path,
+        )
+        assert decision.reusable is False
+        assert decision.reason == "unresolved_validation_status"
+
     def test_reject_unsupported_claims(self, tmp_path: Path) -> None:
         """no_unsupported_claims_declaration=false → not reusable."""
         _make_fingerprint_inputs(tmp_path, "n08c_implementation_drafting")

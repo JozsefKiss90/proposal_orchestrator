@@ -1,0 +1,941 @@
+~ $ VPCE_SG_ID=$(aws ec2 create-security-group \
+>       --group-name "proposal-orchestrator-vpce-sg" \
+>       --description "Security group for Bedrock VPC endpoints - TCP 443 only" \
+>       --vpc-id vpc-050a09774560fd774 \
+>       --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=proposal-orchestrator-vpce-sg},{Key=project,Value=proposal-orchestrator}]' \
+>       --query 'GroupId' \
+>       --output text \
+>       --region us-east-1)
+
+~ $   echo "Created VPC Endpoint SG: $VPCE_SG_ID"
+Created VPC Endpoint SG: sg-013d5e4d4eb55dfd9
+~ $ aws ec2 authorize-security-group-ingress \
+>   --group-id sg-013d5e4d4eb55dfd9 \
+>   --protocol tcp \
+>   --port 443 \
+>   --cidr 172.31.0.0/16 \
+>   --region us-east-1
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-0393f53b39cf51a71",
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "GroupOwnerId": "232538551827",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIpv4": "172.31.0.0/16",
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:232538551827:security-group-rule/sgr-0393f53b39cf51a71"
+        }
+    ]
+}
+~ $ aws ec2 revoke-security-group-egress \
+>   --group-id sg-013d5e4d4eb55dfd9 \
+>   --protocol all \
+>   --port all \
+>   --cidr 0.0.0.0/0 \
+>   --region us-east-1
+{
+    "Return": true,
+    "RevokedSecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-0b86ce8e434d164d6",
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IsEgress": true,
+            "IpProtocol": "-1",
+            "FromPort": -1,
+            "ToPort": -1,
+            "CidrIpv4": "0.0.0.0/0"
+        }
+    ]
+}
+~ $ aws ec2 describe-security-groups \
+>   --group-ids sg-013d5e4d4eb55dfd9 \
+>   --region us-east-1 \
+>   --output json
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+            "GroupName": "proposal-orchestrator-vpce-sg",
+            "Description": "Security group for Bedrock VPC endpoints - TCP 443 only",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "172.31.0.0/16"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}
+
+~ $ aws ec2 describe-subnets \
+>   --filters "Name=vpc-id,Values=vpc-050a09774560fd774" \
+>   --region us-east-1 \
+>   --query "Subnets[].{SubnetId:SubnetId,AZ:AvailabilityZone,Cidr:CidrBlock}" \
+>   --output table
+--------------------------------------------------------------
+|                       DescribeSubnets                      |
++------------+------------------+----------------------------+
+|     AZ     |      Cidr        |         SubnetId           |
++------------+------------------+----------------------------+
+|  us-east-1f|  172.31.64.0/20  |  subnet-05ee819369b8170e3  |
+|  us-east-1e|  172.31.48.0/20  |  subnet-029c9c995e5cc83ca  |
+|  us-east-1d|  172.31.0.0/20   |  subnet-0da2f26eb7dddf337  |
+|  us-east-1c|  172.31.32.0/20  |  subnet-05865e6499df951aa  |
+|  us-east-1a|  172.31.80.0/20  |  subnet-023c6e3ea5451ea47  |
+|  us-east-1b|  172.31.16.0/20  |  subnet-01d969bb1421a3042  |
++------------+------------------+----------------------------+
+~ $ aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.bedrock-runtime \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-bedrock-runtime},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-0843d225c5b1ef6d5",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.bedrock-runtime",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-02fc82df7f843ceca",
+            "eni-0d50353eb22bcee15"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1b.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1a.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-02fc82df7f843ceca",
+            "eni-0d50353eb22bcee15"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1b.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1a.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-02fc82df7f843ceca",
+            "eni-0d50353eb22bcee15"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1b.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1a.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "bedrock-runtime.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T14:50:13.104000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-bedrock-runtime"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+}
+
+~ $ aws ec2 describe-vpc-endpoints \
+>   --vpc-endpoint-ids vpce-0843d225c5b1ef6d5 \
+>   --region us-east-1 \
+>   --query "VpcEndpoints[].{ID:VpcEndpointId,State:State,Service:ServiceName,PrivateDns:PrivateDnsEnabled,Subnets:SubnetIds,Groups:Groups}" \
+>   --output table
+--------------------------------------------------------------------------------------------------
+|                                      DescribeVpcEndpoints                                      |
++-------------------------+-------------+-------------------------------------------+------------+
+|           ID            | PrivateDns  |                  Service                  |   State    |
++-------------------------+-------------+-------------------------------------------+------------+
+|  vpce-0843d225c5b1ef6d5 |  True       |  com.amazonaws.us-east-1.bedrock-runtime  |  available |
++-------------------------+-------------+-------------------------------------------+------------+
+||                                            Groups                                            ||
+|+--------------------------------------+-------------------------------------------------------+|
+||                GroupId               |                       GroupName                       ||
+|+--------------------------------------+-------------------------------------------------------+|
+||  sg-013d5e4d4eb55dfd9                |  proposal-orchestrator-vpce-sg                        ||
+|+--------------------------------------+-------------------------------------------------------+|
+||                                            Subnets                                           ||
+|+----------------------------------------------------------------------------------------------+|
+||  subnet-023c6e3ea5451ea47                                                                    ||
+||  subnet-01d969bb1421a3042                                                                    ||
+|+----------------------------------------------------------------------------------------------+|
+
+ $ aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.secretsmanager \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-secretsmanager},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-08ba482a3b11f7d64",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.secretsmanager",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-022087a3f0ce6bfe6",
+            "eni-098866bda8e4a0f40"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v.secretsmanager.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v-us-east-1a.secretsmanager.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v-us-east-1b.secretsmanager.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            },
+            },
+            {
+                "DnsName": "secretsmanager.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T14:55:50.129000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-secretsmanager"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+
+     $ aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.sts \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-sts},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-067abd500c89e2bc4",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.sts",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-0df1675a035313729",
+            "eni-09114ad2ef5b269f5"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-067abd500c89e2bc4-k51i23h5.sts.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-067abd500c89e2bc4-k51i23h5-us-east-1a.sts.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-067abd500c89e2bc4-k51i23h5-us-east-1b.sts.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "sts.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            },
+            {
+                "DnsName": "sts.us-east-1.api.aws",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T14:58:29.216000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-sts"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+}
+
+~ $ aws ec2 describe-route-tables \
+>   --filters "Name=association.subnet-id,Values=subnet-023c6e3ea5451ea47" \
+>   --query "RouteTables[0].RouteTableId" \
+>   --output text \
+>   --region us-east-1
+None
+~ $ aws ec2 describe-route-tables \
+>   --filters "Name=vpc-id,Values=vpc-050a09774560fd774" "Name=association.main,Values=true" \
+>   --query "RouteTables[0].RouteTableId" \
+>   --output text \
+>   --region us-east-1
+rtb-0489f348b8d34d95b
+~ $ aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Gateway \
+>   --service-name com.amazonaws.us-east-1.s3 \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --route-table-ids rtb-0489f348b8d34d95b \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-s3},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-0ee5648ce182bf85a",
+        "VpcEndpointType": "Gateway",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.s3",
+        "State": "available",
+        "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+        "RouteTableIds": [
+            "rtb-0489f348b8d34d95b"
+        ],
+        "SubnetIds": [],
+        "Groups": [],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "service-defined"
+        },
+        "PrivateDnsEnabled": false,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [],
+        "DnsEntries": [],
+        "CreationTimestamp": "2026-05-29T14:59:48+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-s3"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827"
+    }
+}
+
+~ $ aws ec2 describe-vpc-endpoints \
+>   --filters "Name=vpc-id,Values=vpc-050a09774560fd774" \
+>   --region us-east-1 \
+>   --query "VpcEndpoints[].{ID:VpcEndpointId,Type:VpcEndpointType,Service:ServiceName,State:State,PrivateDns:PrivateDnsEnabled}" \
+>   --output table
+---------------------------------------------------------------------------------------------------------------
+|                                            DescribeVpcEndpoints                                             |
++------------------------+-------------+-------------------------------------------+------------+-------------+
+|           ID           | PrivateDns  |                  Service                  |   State    |    Type     |
++------------------------+-------------+-------------------------------------------+------------+-------------+
+|  vpce-0843d225c5b1ef6d5|  True       |  com.amazonaws.us-east-1.bedrock-runtime  |  available |  Interface  |
+|  vpce-08ba482a3b11f7d64|  True       |  com.amazonaws.us-east-1.secretsmanager   |  available |  Interface  |
+|  vpce-067abd500c89e2bc4|  True       |  com.amazonaws.us-east-1.sts              |  available |  Interface  |
+|  vpce-0ee5648ce182bf85a|  False      |  com.amazonaws.us-east-1.s3               |  available |  Gateway    |
++------------------------+-------------+-------------------------------------------+------------+-------------+
+
+$ aws ec2 create-route-table \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=proposal-orchestrator-private-rt},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "RouteTable": {
+        "Associations": [],
+        "PropagatingVgws": [],
+        "RouteTableId": "rtb-085481996de5e3ed9",
+        "Routes": [
+            {
+                "DestinationCidrBlock": "172.31.0.0/16",
+                "GatewayId": "local",
+                "Origin": "CreateRouteTable",
+                "State": "active"
+            }
+        ],
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            },
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-private-rt"
+            }
+        ],
+        "VpcId": "vpc-050a09774560fd774",
+        "OwnerId": "232538551827"
+    },
+    "ClientToken": "1c74216d-c8f1-4add-a575-4a40460b4495"
+}
+
+ aws ec2 associate-route-table \
+>   --route-table-id rtb-085481996de5e3ed9 \
+>   --subnet-id subnet-023c6e3ea5451ea47 \
+>   --region us-east-1
+{
+    "AssociationId": "rtbassoc-050eb1dbff08aaa28",
+    "AssociationState": {
+        "State": "associated"
+    }
+}
+~ $ aws ec2 associate-route-table \
+>   --route-table-id rtb-085481996de5e3ed9 \
+>   --subnet-id subnet-01d969bb1421a3042 \
+>   --region us-east-1
+{
+    "AssociationId": "rtbassoc-04dcb962965e43e42",
+    "AssociationState": {
+        "State": "associated"
+    }
+}
+~ $ aws ec2 modify-vpc-endpoint \
+>   --vpc-endpoint-id vpce-0ee5648ce182bf85a \
+>   --add-route-table-ids rtb-085481996de5e3ed9 \
+>   --region us-east-1
+{
+    "Return": true
+}
+
+~ $ aws ec2 describe-route-tables \
+>   --route-table-ids rtb-085481996de5e3ed9 \
+>   --query "RouteTables[].Routes[]" \
+>   --output table \
+>   --region us-east-1
+-------------------------------------------------------------------------------------------------------------
+|                                            DescribeRouteTables                                            |
++----------------------+---------------------------+-------------------------+-------------------+----------+
+| DestinationCidrBlock |  DestinationPrefixListId  |        GatewayId        |      Origin       |  State   |
++----------------------+---------------------------+-------------------------+-------------------+----------+
+|  172.31.0.0/16       |                           |  local                  |  CreateRouteTable |  active  |
+|                      |  pl-63a5400a              |  vpce-0ee5648ce182bf85a |  CreateRoute      |  active  |
++----------------------+---------------------------+-------------------------+-------------------+----------+
+
+ $ aws ec2 describe-vpc-endpoints \
+>   --filters "Name=vpc-id,Values=vpc-050a09774560fd774" \
+>   --output json \
+>   --region us-east-1
+{
+    "VpcEndpoints": [
+        {
+            "VpcEndpointId": "vpce-0843d225c5b1ef6d5",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-050a09774560fd774",
+            "ServiceName": "com.amazonaws.us-east-1.bedrock-runtime",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-023c6e3ea5451ea47",
+                "subnet-01d969bb1421a3042"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-013d5e4d4eb55dfd9",
+                    "GroupName": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-02fc82df7f843ceca",
+                "eni-0d50353eb22bcee15"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1b.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-0843d225c5b1ef6d5-enapnyah-us-east-1a.bedrock-runtime.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "bedrock-runtime.us-east-1.amazonaws.com",
+                    "HostedZoneId": "Z02497652TWWZCKLF3X1M"
+                }
+            ],
+            "CreationTimestamp": "2026-05-29T14:50:13.104000+00:00",
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-bedrock-runtime"
+                }
+            ],
+            "OwnerId": "232538551827",
+            "ServiceRegion": "us-east-1"
+        },
+        {
+            "VpcEndpointId": "vpce-08ba482a3b11f7d64",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-050a09774560fd774",
+            "ServiceName": "com.amazonaws.us-east-1.secretsmanager",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-023c6e3ea5451ea47",
+                "subnet-01d969bb1421a3042"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-013d5e4d4eb55dfd9",
+                    "GroupName": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-022087a3f0ce6bfe6",
+                "eni-098866bda8e4a0f40"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v.secretsmanager.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v-us-east-1a.secretsmanager.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-08ba482a3b11f7d64-5drtb57v-us-east-1b.secretsmanager.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "secretsmanager.us-east-1.amazonaws.com",
+                    "HostedZoneId": "Z04457021LDIX24HYVBV2"
+                }
+            ],
+            "CreationTimestamp": "2026-05-29T14:55:50.129000+00:00",
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-secretsmanager"
+                }
+            ],
+            "OwnerId": "232538551827",
+            "ServiceRegion": "us-east-1"
+        },
+        {
+            "VpcEndpointId": "vpce-067abd500c89e2bc4",
+            "VpcEndpointType": "Interface",
+            "VpcId": "vpc-050a09774560fd774",
+            "ServiceName": "com.amazonaws.us-east-1.sts",
+            "State": "available",
+            "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\",\n      \"Effect\": \"Allow\",\n      \"Principal\": \"*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+            "RouteTableIds": [],
+            "SubnetIds": [
+                "subnet-023c6e3ea5451ea47",
+                "subnet-01d969bb1421a3042"
+            ],
+            "Groups": [
+                {
+                    "GroupId": "sg-013d5e4d4eb55dfd9",
+                    "GroupName": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "ipv4"
+            },
+            "PrivateDnsEnabled": true,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [
+                "eni-0df1675a035313729",
+                "eni-09114ad2ef5b269f5"
+            ],
+            "DnsEntries": [
+                {
+                    "DnsName": "vpce-067abd500c89e2bc4-k51i23h5.sts.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-067abd500c89e2bc4-k51i23h5-us-east-1a.sts.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "vpce-067abd500c89e2bc4-k51i23h5-us-east-1b.sts.us-east-1.vpce.amazonaws.com",
+                    "HostedZoneId": "Z7HUB22UULQXV"
+                },
+                {
+                    "DnsName": "sts.us-east-1.amazonaws.com",
+                    "HostedZoneId": "Z01906523D3V4ZLM9451O"
+                },
+                {
+                    "DnsName": "sts.us-east-1.api.aws",
+                    "HostedZoneId": "Z0445625DVDMPDB7WXZK"
+                }
+            ],
+            "CreationTimestamp": "2026-05-29T14:58:29.216000+00:00",
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-sts"
+                }
+            ],
+            "OwnerId": "232538551827",
+            "ServiceRegion": "us-east-1"
+        },
+        {
+            "VpcEndpointId": "vpce-0ee5648ce182bf85a",
+            "VpcEndpointType": "Gateway",
+            "VpcId": "vpc-050a09774560fd774",
+            "ServiceName": "com.amazonaws.us-east-1.s3",
+            "State": "available",
+            "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+            "RouteTableIds": [
+                "rtb-0489f348b8d34d95b",
+                "rtb-085481996de5e3ed9"
+            ],
+            "SubnetIds": [],
+            "Groups": [],
+            "IpAddressType": "ipv4",
+            "DnsOptions": {
+                "DnsRecordIpType": "service-defined"
+            },
+            "PrivateDnsEnabled": false,
+            "RequesterManaged": false,
+            "NetworkInterfaceIds": [],
+            "DnsEntries": [],
+            "CreationTimestamp": "2026-05-29T14:59:48+00:00",
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-s3"
+                }
+            ],
+            "OwnerId": "232538551827",
+            "ServiceRegion": "us-east-1"
+        }
+    ]
+}
+
+ $ aws ec2 describe-vpc-attribute \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --attribute enableDnsHostnames \
+>   --region us-east-1
+{
+    "EnableDnsHostnames": {
+        "Value": true
+    },
+    "VpcId": "vpc-050a09774560fd774"
+}
+~ $ aws ec2 describe-vpc-attribute \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --attribute enableDnsSupport \
+>   --region us-east-1
+{
+    "EnableDnsSupport": {
+        "Value": true
+    },
+    "VpcId": "vpc-050a09774560fd774"
+}

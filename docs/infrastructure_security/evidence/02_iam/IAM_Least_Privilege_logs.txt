@@ -1,0 +1,901 @@
+
+~ $ aws sts get-caller-identity
+{
+    "UserId": "232538551827",
+    "Account": "232538551827",
+    "Arn": "arn:aws:iam::232538551827:root"
+}
+~ $ aws iam get-account-summary
+{
+    "SummaryMap": {
+        "GroupPolicySizeQuota": 5120,
+        "InstanceProfilesQuota": 1000,
+        "Policies": 1,
+        "GroupsPerUserQuota": 10,
+        "InstanceProfiles": 1,
+        "AttachedPoliciesPerUserQuota": 10,
+        "Users": 2,
+        "PoliciesQuota": 1500,
+        "Providers": 0,
+        "AccountMFAEnabled": 1,
+        "AccessKeysPerUserQuota": 2,
+        "AssumeRolePolicySizeQuota": 2048,
+        "PolicyVersionsInUseQuota": 10000,
+        "GlobalEndpointTokenVersion": 1,
+        "VersionsPerPolicyQuota": 5,
+        "AttachedPoliciesPerGroupQuota": 10,
+        "PolicySizeQuota": 6144,
+        "Groups": 0,
+        "AccountSigningCertificatesPresent": 0,
+        "UsersQuota": 5000,
+        "ServerCertificatesQuota": 20,
+        "MFADevices": 2,
+        "UserPolicySizeQuota": 2048,
+        "PolicyVersionsInUse": 12,
+        "ServerCertificates": 0,
+        "Roles": 6,
+        "RolesQuota": 1000,
+        "SigningCertificatesPerUserQuota": 2,
+        "MFADevicesInUse": 2,
+        "RolePolicySizeQuota": 10240,
+        "AttachedPoliciesPerRoleQuota": 10,
+        "AccountAccessKeysPresent": 0,
+        "AccountPasswordPresent": 1,
+        "GroupsQuota": 300
+    }
+}
+
+                                                                                                                                                                                        
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "AllowBedrockConverse",
+>>       "Effect": "Allow",
+>>       "Action": [
+>>         "bedrock:InvokeModel",
+>>         "bedrock:InvokeModelWithResponseStream"
+>>       ],
+>>       "Resource": [
+>>         "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+>>         "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*"
+>>       ],
+>>       "Condition": {
+>>         "StringEquals": {
+>>           "aws:RequestedRegion": [
+>>             "eu-west-1",
+>>             "us-east-1"
+>>           ]
+>>         }
+>>       }
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii bedrock-invoke-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam create-policy `
+>>   --policy-name proposal-orchestrator-bedrock-invoke `
+>>   --description "Allow Bedrock Converse on Claude models in approved regions only" `
+>>   --policy-document file://bedrock-invoke-policy.json `
+>>   --tags Key=project,Value=proposal-orchestrator
+{                                                                                                                                                                                       
+    "Policy": {
+        "PolicyName": "proposal-orchestrator-bedrock-invoke",
+        "PolicyId": "ANPATMJDAWYJ5VWLDO7F5",
+        "Arn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-bedrock-invoke",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-05-29T17:42:06+00:00",
+        "UpdateDate": "2026-05-29T17:42:06+00:00",
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ]
+    }
+}                                  
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "AllowSecretsRetrieval",
+>>       "Effect": "Allow",
+>>       "Action": [
+>>         "secretsmanager:GetSecretValue"
+>>       ],
+>>       "Resource": [
+>>         "arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/*"
+>>       ]
+>>     },
+>>     {
+>>       "Sid": "AllowKMSDecrypt",
+>>       "Effect": "Allow",
+>>       "Action": [
+>>         "kms:Decrypt",
+>>         "kms:DescribeKey"
+>>       ],
+>>       "Resource": "*"
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii supporting-services-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam create-policy `
+>>   --policy-name proposal-orchestrator-supporting-services `
+>>   --description "Allow Secrets Manager retrieval and KMS decrypt for Proposal Orchestrator" `
+>>   --policy-document file://supporting-services-policy.json `
+>>   --tags Key=project,Value=proposal-orchestrator
+{                                                                                                                                                                                       
+    "Policy": {
+        "PolicyName": "proposal-orchestrator-supporting-services",
+        "PolicyId": "ANPATMJDAWYJ5V5NTE3OJ",
+        "Arn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-supporting-services",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-05-29T17:46:27+00:00",
+        "UpdateDate": "2026-05-29T17:46:27+00:00",
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ]
+    }
+}                                                                                                                                                                                       
+                          
+                          PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "DenyBedrockAdministration",
+>>       "Effect": "Deny",
+>>       "Action": [
+>>         "bedrock:CreateModelCustomizationJob",
+>>         "bedrock:CreateProvisionedModelThroughput",
+>>         "bedrock:DeleteModelInvocationLoggingConfiguration",
+>>         "bedrock:PutModelInvocationLoggingConfiguration",
+>>         "bedrock:CreateGuardrail",
+>>         "bedrock:DeleteGuardrail",
+>>         "bedrock:TagResource",
+>>         "bedrock:UntagResource"
+>>       ],
+>>       "Resource": "*"
+>>     },
+>>     {
+>>       "Sid": "DenyNonBedrockServices",
+>>       "Effect": "Deny",
+>>       "Action": [
+>>         "ec2:*",
+>>         "s3:*",
+>>         "iam:*",
+>>         "lambda:*",
+>>         "sqs:*",
+>>         "sns:*",
+>>         "dynamodb:*"
+>>       ],
+>>       "Resource": "*"
+>>     },
+>>     {
+>>       "Sid": "DenyNonClaudeModels",
+>>       "Effect": "Deny",
+>>       "Action": [
+>>         "bedrock:InvokeModel",
+>>         "bedrock:InvokeModelWithResponseStream"
+>>       ],
+>>       "NotResource": [
+>>         "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+>>         "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*"
+>>       ]
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii explicit-deny-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam create-policy `
+>>   --policy-name proposal-orchestrator-explicit-deny `
+>>   --description "Explicit deny for Bedrock admin, non-Bedrock services, and non-Claude models" `
+>>   --policy-document file://explicit-deny-policy.json `
+>>   --tags Key=project,Value=proposal-orchestrator
+{                                                                                                                                                                                       
+    "Policy": {
+        "PolicyName": "proposal-orchestrator-explicit-deny",
+        "PolicyId": "ANPATMJDAWYJTNISF6Y6D",
+        "Arn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-explicit-deny",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-05-29T17:47:33+00:00",
+        "UpdateDate": "2026-05-29T17:47:33+00:00",
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ]
+    }
+}                       
+
+                                                                                                                                                                                      
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Effect": "Allow",
+>>       "Principal": {
+>>         "Service": "ec2.amazonaws.com"
+>>       },
+>>       "Action": "sts:AssumeRole"
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii bedrock-role-trust-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam create-role `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --assume-role-policy-document file://bedrock-role-trust-policy.json `
+>>   --permissions-boundary arn:aws:iam::232538551827:policy/proposal-orchestrator-boundary `
+>>   --tags Key=project,Value=proposal-orchestrator
+{                                                                                                                                                                                       
+    "Role": {
+        "Path": "/",
+        "RoleName": "proposal-orchestrator-bedrock-role",
+        "RoleId": "AROATMJDAWYJ4O7EVU3VG",
+        "Arn": "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role",
+        "CreateDate": "2026-05-29T17:48:18+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ec2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "PermissionsBoundary": {                                                                                                                                                        
+            "PermissionsBoundaryType": "Policy",                                                                                                                                        
+            "PermissionsBoundaryArn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-boundary"                                                                                 
+        },                                                                                                                                                                              
+        "Tags": [                                                                                                                                                                       
+            {                                                                                                                                                                           
+                "Key": "project",                                                                                                                                                       
+                "Value": "proposal-orchestrator"                                                                                                                                        
+            }                                                                                                                                                                           
+        ]                                                                                                                                                                               
+    }                                                                                                                                                                                   
+}                                                                                                                                                                                       
+        PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-bedrock-invoke
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-supporting-services
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-explicit-deny
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam list-attached-role-policies `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --output table
+-------------------------------------------------------------------------------------------------------------------------------                                                         
+|                                                  ListAttachedRolePolicies                                                   |
++-----------------------------------------------------------------------------------------------------------------------------+
+||                                                     AttachedPolicies                                                      ||
+|+-----------------------------------------------------------------------------+---------------------------------------------+|
+||                                  PolicyArn                                  |                 PolicyName                  ||
+|+-----------------------------------------------------------------------------+---------------------------------------------+|
+||  arn:aws:iam::232538551827:policy/proposal-orchestrator-bedrock-invoke      |  proposal-orchestrator-bedrock-invoke       ||
+||  arn:aws:iam::232538551827:policy/proposal-orchestrator-explicit-deny       |  proposal-orchestrator-explicit-deny        ||
+||  arn:aws:iam::232538551827:policy/proposal-orchestrator-supporting-services |  proposal-orchestrator-supporting-services  ||
+|+-----------------------------------------------------------------------------+---------------------------------------------+|
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names bedrock:InvokeModel `
+>>   --resource-arns "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0" `
+>>   --context-entries "ContextKeyName=aws:RequestedRegion,ContextKeyValues=us-east-1,ContextKeyType=string" `
+>>   --output table
+---------------------------------------------------------------------------------------------------------------------                                                                   
+|                                              SimulatePrincipalPolicy                                              |
++-------------------------------------------------------------------------------------------------------------------+
+||                                                EvaluationResults                                                ||
+|+-------------------+---------------------------------------------------------------------------------------------+|
+||  EvalActionName   |  bedrock:InvokeModel                                                                        ||
+||  EvalDecision     |  allowed                                                                                    ||
+||  EvalResourceName |  arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0        ||
+|+-------------------+---------------------------------------------------------------------------------------------+|
+|||                                               MatchedStatements                                               |||
+||+------------------------------------+--------------------------------------------------------------------------+||
+|||  SourcePolicyId                    |  proposal-orchestrator-bedrock-invoke                                    |||
+|||  SourcePolicyType                  |  IAM Policy                                                              |||
+||+------------------------------------+--------------------------------------------------------------------------+||
+||||                                                 EndPosition                                                 ||||
+|                                                                                                                                                                                       
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+|                                                                                                                                                                                       
+|                                                                                                                                                                                       
+|                                                                                                                                                                                       
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+|                                                                                                                                                                                       
+|||                                       PermissionsBoundaryDecisionDetail                                       |||                                                                   
+||+----------------------------------------------------------------------------------------+----------------------+||                                                                   
+|                                                                                                                                                                                       
+||+----------------------------------------------------------------------------------------+----------------------+||                                                                   
+|||                                            ResourceSpecificResults                                            |||                                                                   
+||+----------------------+----------------------------------------------------------------------------------------+||                                                                   
+|                                                                                                                                                                                       
+|                                                                                                                                                                                       
+||+----------------------+----------------------------------------------------------------------------------------+||                                                                   
+|                                                                                                                                                                                       
+|                                                                                                                                                                                       
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+|                                                                                                                                                                                       
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+     |||||                                                                                                                                                                              
+     |||||                                                                                                                                                                              
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+33m|||                                                                                                                                                                                  
+     |||||                                                                                                                                                                              
+     |||||                                                                                                                                                                              
+33m|||                                                                                                                                                                                  
+|                                                                                                                                                                                       
+|                                                                                                                                                                                       
+33m|||                                                                                                                                                                                  
+|                                                                                                                                                                                       
+                        PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names bedrock:PutModelInvocationLoggingConfiguration `
+>>   --resource-arns "*" `
+>>   --output table
+--------------------------------------------------------------------------                                                                                                              
+|                         SimulatePrincipalPolicy                        |
++------------------------------------------------------------------------+
+||                           EvaluationResults                          ||
+|+-------------------+--------------------------------------------------+|
+||  EvalActionName   |  bedrock:PutModelInvocationLoggingConfiguration  ||
+||  EvalDecision     |  explicitDeny                                    ||
+||  EvalResourceName |  *                                               ||
+|+-------------------+--------------------------------------------------+|
+|||                          MatchedStatements                         |||
+||+----------------------+---------------------------------------------+||
+|||  SourcePolicyId      |  proposal-orchestrator-explicit-deny        |||
+|||  SourcePolicyType    |  IAM Policy                                 |||
+||+----------------------+---------------------------------------------+||
+||||                            EndPosition                           ||||
+|||+----------------------------------------+-------------------------+|||
+||||  Column                                |  6                      ||||
+||||  Line                                  |  18                     ||||
+|||+----------------------------------------+-------------------------+|||
+||||                           StartPosition                          ||||                                                                                                              
+|||+----------------------------------------+-------------------------+|||                                                                                                              
+||||  Column                                |  17                     ||||                                                                                                              
+||||  Line                                  |  3                      ||||                                                                                                              
+|||+----------------------------------------+-------------------------+|||                                                                                                              
+|||                  PermissionsBoundaryDecisionDetail                 |||                                                                                                              
+||+-----------------------------------------------------+--------------+||                                                                                                              
+|||  AllowedByPermissionsBoundary                       |  False       |||                                                                                                              
+||+-----------------------------------------------------+--------------+||                                                                                                              
+                                                                                
+                                                                                PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names s3:ListBuckets `
+>>   --resource-arns "*" `
+>>   --output table
+-----------------------------------------------------------------                                                                                                                       
+|                    SimulatePrincipalPolicy                    |
++---------------------------------------------------------------+
+||                      EvaluationResults                      ||
+|+-------------------+------------------+----------------------+|
+||  EvalActionName   |  EvalDecision    |  EvalResourceName    ||
+|+-------------------+------------------+----------------------+|
+||  s3:ListBuckets   |  explicitDeny    |  *                   ||
+|+-------------------+------------------+----------------------+|
+|||                     MatchedStatements                     |||
+||+--------------------------------------+--------------------+||
+|||            SourcePolicyId            | SourcePolicyType   |||
+||+--------------------------------------+--------------------+||
+|||  proposal-orchestrator-explicit-deny |  IAM Policy        |||
+||+--------------------------------------+--------------------+||
+||||                       EndPosition                       ||||
+|||+-------------------------------+-------------------------+|||
+||||            Column             |          Line           ||||
+|||+-------------------------------+-------------------------+|||
+||||  6                            |  32                     ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||                      StartPosition                      ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||            Column             |          Line           ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||  6                            |  18                     ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+|||             PermissionsBoundaryDecisionDetail             |||                                                                                                                       
+||+----------------------------------------------+------------+||                                                                                                                       
+|||  AllowedByPermissionsBoundary                |  False     |||                                                                                                                       
+||+----------------------------------------------+------------+||    
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names bedrock:InvokeModel `
+>>   --resource-arns "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-1-70b-instruct-v1:0" `
+>>   --context-entries "ContextKeyName=aws:RequestedRegion,ContextKeyValues=us-east-1,ContextKeyType=string" `
+>>   --output table
+-------------------------------------------------------------------------------------------------------------                                                                           
+|                                          SimulatePrincipalPolicy                                          |
++-----------------------------------------------------------------------------------------------------------+
+||                                            EvaluationResults                                            ||
+|+--------------------+------------------------------------------------------------------------------------+|
+||  EvalActionName    |  bedrock:InvokeModel                                                               ||
+||  EvalDecision      |  explicitDeny                                                                      ||
+||  EvalResourceName  |  arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-1-70b-instruct-v1:0       ||
+|+--------------------+------------------------------------------------------------------------------------+|
+|||                                           MatchedStatements                                           |||
+||+----------------------------------+--------------------------------------------------------------------+||
+|||  SourcePolicyId                  |  proposal-orchestrator-explicit-deny                               |||
+|||  SourcePolicyType                |  IAM Policy                                                        |||
+||+----------------------------------+--------------------------------------------------------------------+||
+||||                                             EndPosition                                             ||||
+0m                                                                                                                                                                                      
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+|||                                   PermissionsBoundaryDecisionDetail                                   |||                                                                           
+||+----------------------------------------------------------------------------------+--------------------+||                                                                           
+0m                                                                                                                                                                                      
+||+----------------------------------------------------------------------------------+--------------------+||                                                                           
+|||                                        ResourceSpecificResults                                        |||                                                                           
+||+----------------------+--------------------------------------------------------------------------------+||                                                                           
+0m                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+||+----------------------+--------------------------------------------------------------------------------+||                                                                           
+0m                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+2m||||                                                                                                                                                                                  
+2m||||                                                                                                                                                                                  
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+||                                                                                                                                                                                      
+2m||||                                                                                                                                                                                  
+2m||||                                                                                                                                                                                  
+||                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+0m                                                                                                                                                                                      
+||                                                                                                                                                                                      
+0m 
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names ec2:DescribeInstances `
+>>   --resource-arns "*" `
+>>   --output table
+-----------------------------------------------------------------                                                                                                                       
+|                    SimulatePrincipalPolicy                    |
++---------------------------------------------------------------+
+||                      EvaluationResults                      ||
+|+-----------------------+----------------+--------------------+|
+||    EvalActionName     | EvalDecision   | EvalResourceName   ||
+|+-----------------------+----------------+--------------------+|
+||  ec2:DescribeInstances|  explicitDeny  |  *                 ||
+|+-----------------------+----------------+--------------------+|
+|||                     MatchedStatements                     |||
+||+--------------------------------------+--------------------+||
+|||            SourcePolicyId            | SourcePolicyType   |||
+||+--------------------------------------+--------------------+||
+|||  proposal-orchestrator-explicit-deny |  IAM Policy        |||
+||+--------------------------------------+--------------------+||
+||||                       EndPosition                       ||||
+|||+-------------------------------+-------------------------+|||
+||||            Column             |          Line           ||||
+|||+-------------------------------+-------------------------+|||
+||||  6                            |  32                     ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||                      StartPosition                      ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||            Column             |          Line           ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+||||  6                            |  18                     ||||                                                                                                                       
+|||+-------------------------------+-------------------------+|||                                                                                                                       
+|||             PermissionsBoundaryDecisionDetail             |||                                                                                                                       
+||+----------------------------------------------+------------+||                                                                                                                       
+|||  AllowedByPermissionsBoundary                |  False     |||                                                                                                                       
+||+----------------------------------------------+------------+||                                                                                                                       
+                                                                                                                                                                                        
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> 
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> 
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names iam:ListRoles `
+>>   --resource-arns "*" `
+>>   --output table
+-------------------------------------------------------------------------                                                                                                               
+|                        SimulatePrincipalPolicy                        |
++-----------------------------------------------------------------------+
+||                          EvaluationResults                          ||
+|+-----------------+---------------+-----------------------------------+|
+|| EvalActionName  | EvalDecision  |         EvalResourceName          ||
+|+-----------------+---------------+-----------------------------------+|
+||  iam:ListRoles  |  explicitDeny |  arn:aws:iam::232538551827:role/  ||
+|+-----------------+---------------+-----------------------------------+|
+|||                         MatchedStatements                         |||
+||+--------------------------------------------+----------------------+||
+|||               SourcePolicyId               |  SourcePolicyType    |||
+||+--------------------------------------------+----------------------+||
+|||  proposal-orchestrator-explicit-deny       |  IAM Policy          |||
+||+--------------------------------------------+----------------------+||
+||||                           EndPosition                           ||||
+|||+-----------------------------------+-----------------------------+|||
+||||              Column               |            Line             ||||
+|||+-----------------------------------+-----------------------------+|||
+||||  6                                |  32                         ||||                                                                                                               
+|||+-----------------------------------+-----------------------------+|||                                                                                                               
+||||                          StartPosition                          ||||                                                                                                               
+|||+-----------------------------------+-----------------------------+|||                                                                                                               
+||||              Column               |            Line             ||||                                                                                                               
+|||+-----------------------------------+-----------------------------+|||                                                                                                               
+||||  6                                |  18                         ||||                                                                                                               
+|||+-----------------------------------+-----------------------------+|||                                                                                                               
+|||                 PermissionsBoundaryDecisionDetail                 |||                                                                                                               
+||+----------------------------------------------------+--------------+||                                                                                                               
+|||  AllowedByPermissionsBoundary                      |  False       |||                                                                                                               
+||+----------------------------------------------------+--------------+||                                                                                                               
+                                                                                                                                                                                        
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> 
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam simulate-principal-policy `
+>>   --policy-source-arn arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role `
+>>   --action-names bedrock:InvokeModel `
+>>   --resource-arns "arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0" `
+>>   --context-entries "ContextKeyName=aws:RequestedRegion,ContextKeyValues=ap-southeast-1,ContextKeyType=string" `
+>>   --output table
+--------------------------------------------------------------------------------------------------------------------------                                                              
+|                                                 SimulatePrincipalPolicy                                                |
++------------------------------------------------------------------------------------------------------------------------+
+||                                                   EvaluationResults                                                  ||
+|+-------------------+--------------------------------------------------------------------------------------------------+|
+||  EvalActionName   |  bedrock:InvokeModel                                                                             ||
+||  EvalDecision     |  implicitDeny                                                                                    ||
+||  EvalResourceName |  arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0        ||
+|+-------------------+--------------------------------------------------------------------------------------------------+|
+|||                                          PermissionsBoundaryDecisionDetail                                         |||
+||+--------------------------------------------------------------------------------------------+-----------------------+||
+|||  AllowedByPermissionsBoundary                                                              |  True                 |||
+||+--------------------------------------------------------------------------------------------+-----------------------+||
+|||                                               ResourceSpecificResults                                              |||
+||+----------------------+---------------------------------------------------------------------------------------------+||
+|||  EvalResourceDecision|  implicitDeny                                                                               |||
+m|                                                                                                                                                                                      
+||+----------------------+---------------------------------------------------------------------------------------------+||                                                              
+m|                                                                                                                                                                                      
+m|                                                                                                                                                                                      
+[2m|||                                                                                                                                                                                  
+m|                                                                                                                                                                                      
+                                                                                                        
+                                                                                                        PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> $POLICIES = @(
+>>   "arn:aws:iam::232538551827:policy/proposal-orchestrator-bedrock-invoke",
+>>   "arn:aws:iam::232538551827:policy/proposal-orchestrator-supporting-services",
+>>   "arn:aws:iam::232538551827:policy/proposal-orchestrator-explicit-deny",
+>>   "arn:aws:iam::232538551827:policy/proposal-orchestrator-boundary"
+>> )
+>> 
+>> foreach ($POLICY_ARN in $POLICIES) {
+>>   $POLICY_NAME = ($POLICY_ARN -split "/")[-1]
+>>   $VERSION = aws iam get-policy `
+>>     --policy-arn $POLICY_ARN `
+>>     --query "Policy.DefaultVersionId" `
+>>     --output text
+>> 
+>>   aws iam get-policy-version `
+>>     --policy-arn $POLICY_ARN `
+>>     --version-id $VERSION `
+>>     --output json `
+>>     > "EV-IAM-003-policy-$POLICY_NAME.json"
+>> }
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam get-role `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --query "Role.AssumeRolePolicyDocument" `
+>>   --output json `
+>>   > EV-IAM-010-trust-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-bedrock-role `
+>>   --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws ec2 describe-iam-instance-profile-associations `
+>>   --filters Name=instance-id,Values=i-0045af36dbf5f1272 `
+>>   --region us-east-1                                               
+{                                                                                                                                                                                       
+    "IamInstanceProfileAssociations": [
+        {
+            "AssociationId": "iip-assoc-096cb279fffc818de",
+            "InstanceId": "i-0045af36dbf5f1272",
+            "IamInstanceProfile": {
+                "Arn": "arn:aws:iam::232538551827:instance-profile/proposal-orchestrator-bedrock-profile",
+                "Id": "AIPATMJDAWYJZFS2TDUN2"
+            },
+            "State": "associated"
+        }
+    ]
+}
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws ec2 replace-iam-instance-profile-association `
+>>   --association-id iip-assoc-096cb279fffc818de `
+>>   --iam-instance-profile Name=proposal-orchestrator-ec2-ssm-profile `
+>>   --region us-east-1
+{                                                                                                                                                                                       
+    "IamInstanceProfileAssociation": {
+        "AssociationId": "iip-assoc-099906e996975ee91",
+        "InstanceId": "i-0045af36dbf5f1272",
+        "IamInstanceProfile": {
+            "Arn": "arn:aws:iam::232538551827:instance-profile/proposal-orchestrator-ec2-ssm-profile",
+            "Id": "AIPATMJDAWYJ4TU65VK55"
+        },
+        "State": "associating"
+    }
+}
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-ec2-ssm-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-bedrock-invoke
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "AllowValidationClaudeSonnet46USEast2ResolvedModel",
+>>       "Effect": "Allow",
+>>       "Action": [
+>>         "bedrock:InvokeModel",
+>>         "bedrock:InvokeModelWithResponseStream"
+>>       ],
+>>       "Resource": [
+>>         "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6"
+>>       ]
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii validation-bedrock-us-east-2-policy.json
+>> 
+>> aws iam create-policy `
+>>   --policy-name proposal-orchestrator-validation-bedrock-us-east-2 `
+>>   --description "Temporary validation policy for Claude Sonnet 4.6 resolved Bedrock ARN" `
+>>   --policy-document file://validation-bedrock-us-east-2-policy.json `
+>>   --tags Key=project,Value=proposal-orchestrator
+>> 
+>> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-ec2-ssm-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-validation-bedrock-us-east-2
+{                                                                                                                                                                                       
+    "Policy": {
+        "PolicyName": "proposal-orchestrator-validation-bedrock-us-east-2",
+        "PolicyId": "ANPATMJDAWYJX3JHB4ODL",
+        "Arn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-validation-bedrock-us-east-2",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-05-29T18:54:40+00:00",
+        "UpdateDate": "2026-05-29T18:54:40+00:00",
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ]
+    }
+}                                                                    
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "AllowValidationClaudeSonnet46ProfileAndRoutedModels",
+>>       "Effect": "Allow",
+>>       "Action": [
+>>         "bedrock:InvokeModel",
+>>         "bedrock:InvokeModelWithResponseStream"
+>>       ],
+>>       "Resource": [
+>>         "arn:aws:bedrock:us-east-1:232538551827:inference-profile/us.anthropic.claude-sonnet-4-6",
+>>         "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-6",
+>>         "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6",
+>>         "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6"
+>>       ]
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii validation-bedrock-sonnet46-full-policy.json
+>> 
+>> aws iam create-policy `
+>>   --policy-name proposal-orchestrator-validation-sonnet46-full `
+>>   --description "Temporary validation policy for Claude Sonnet 4.6 inference profile and routed models" `
+>>   --policy-document file://validation-bedrock-sonnet46-full-policy.json `
+>>   --tags Key=project,Value=proposal-orchestrator
+>> 
+>> aws iam attach-role-policy `
+>>   --role-name proposal-orchestrator-ec2-ssm-role `
+>>   --policy-arn arn:aws:iam::232538551827:policy/proposal-orchestrator-validation-sonnet46-full
+{                                                                                                                                                                                       
+    "Policy": {
+        "PolicyName": "proposal-orchestrator-validation-sonnet46-full",
+        "PolicyId": "ANPATMJDAWYJ76NMTLYJF",
+        "Arn": "arn:aws:iam::232538551827:policy/proposal-orchestrator-validation-sonnet46-full",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-05-29T19:08:22+00:00",
+        "UpdateDate": "2026-05-29T19:08:22+00:00",
+        "Tags": [
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ]
+    }
+}                 
+
+aws bedrock-runtime converse \
+  --model-id us.anthropic.claude-sonnet-4-6 \
+  --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+  --inference-config '{"maxTokens":10}' \
+  --region us-east-1
+  sh-5.2$ aws bedrock-runtime converse \
+  --model-id us.anthropic.claude-sonnet-4-6 \
+  --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+  --inference-config '{"maxTokens":10}' \
+  --region us-east-1
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "OK"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 9,
+        "outputTokens": 4,
+        "totalTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1812
+    }
+}
+sh-5.2$ {
+  echo "=== EV-PL-006 / DC-37 Functional Bedrock Converse Test ==="
+  date -u
+  aws sts get-caller-identity --output json
+  aws bedrock-runtime converse \
+    --model-id us.anthropic.claude-sonnet-4-6 \
+    --messages '[{"role":"user","content":[{"text":"Say OK"}]}]' \
+    --inference-config '{"maxTokens":10}' \
+    --region us-east-1
+} 2>&1 | tee /tmp/EV-PL-006-functional-test.txt
+=== EV-PL-006 / DC-37 Functional Bedrock Converse Test ===
+Fri May 29 19:15:12 UTC 2026
+{
+    "UserId": "AROATMJDAWYJXA3K7TPEV:i-0045af36dbf5f1272",
+    "Account": "232538551827",
+    "Arn": "arn:aws:sts::232538551827:assumed-role/proposal-orchestrator-ec2-ssm-role/i-0045af36dbf5f1272"
+}
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "OK"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 9,
+        "outputTokens": 4,
+        "totalTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1460
+    }
+}
+sh-5.2$ {   echo "=== EV-PL-006 / DC-37 Functional Bedrock Converse Test ===";   date -u;   aws sts get-caller-identity --output json;   aws bedrock-runtime converse     --model-id us.anthropic.claude-sonnet-4-6     --messages '[{"role":"user","content":[{"text":"Say OK"}]}]'     --inference-config '{"maxTokens":10}'     --region us-east-1; } 2>&1 | tee /tmp/EV-PL-006-functional-test.txt
+=== EV-PL-006 / DC-37 Functional Bedrock Converse Test ===
+Fri May 29 19:16:03 UTC 2026
+{
+    "UserId": "AROATMJDAWYJXA3K7TPEV:i-0045af36dbf5f1272",
+    "Account": "232538551827",
+    "Arn": "arn:aws:sts::232538551827:assumed-role/proposal-orchestrator-ec2-ssm-role/i-0045af36dbf5f1272"
+}
+{
+    "output": {
+        "message": {
+            "role": "assistant",
+            "content": [
+                {
+                    "text": "OK"
+                }
+            ]
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 9,
+        "outputTokens": 4,
+        "totalTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+    },
+    "metrics": {
+        "latencyMs": 1402
+    }
+}
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> @'
+>> {
+>>   "Version": "2012-10-17",
+>>   "Statement": [
+>>     {
+>>       "Sid": "AllowBedrockConverseOnly",
+>>       "Effect": "Allow",
+>>       "Principal": {
+>>         "AWS": [
+>>           "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role",
+>>           "arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role"
+>>         ]
+>>       },
+>>       "Action": [
+>>         "bedrock:InvokeModel",
+>>         "bedrock:InvokeModelWithResponseStream"
+>>       ],
+>>       "Resource": [
+>>         "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+>>         "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*"
+>>       ]
+>>     }
+>>   ]
+>> }
+>> '@ | Set-Content -Encoding ascii bedrock-vpce-policy.json
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws ec2 modify-vpc-endpoint `
+>>   --vpc-endpoint-id vpce-0843d225c5b1ef6d5 `
+>>   --policy-document file://bedrock-vpce-policy.json `
+>>   --region us-east-1
+{                                                                                                                                                                     
+    "Return": true
+}
+
+PS C:\Code\proposal_demo\proposal_orchestrator\docs\infrastructure_security\evidence\02_iam> aws ec2 describe-vpc-endpoints `
+>>   --vpc-endpoint-ids vpce-0843d225c5b1ef6d5 `
+>>   --query "VpcEndpoints[].PolicyDocument" `
+>>   --output json `
+>>   --region us-east-1 `
+>>   > EV-VPC-004-bedrock-endpoint-policy.json

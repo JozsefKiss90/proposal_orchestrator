@@ -156,6 +156,15 @@ skill_catalog:
     reads_from:
       - docs/tier3_project_instantiation/architecture_inputs/workpackage_seed.json
       - docs/tier2a_instrument_schemas/extracted/section_schema_registry.json
+    caller_context_from:
+      # Step 1.5 requires the valid_partner_ids set and halts MISSING_INPUT
+      # without it. The binding was missing until 2026-08-13, so the skill
+      # was invoked with no context on every Phase 3 run; in run 4caa2586 it
+      # did not halt but synthesised valid_partner_ids from the seed's
+      # organisation names, making the Step 2.4 anti-fabrication check
+      # vacuous and failing g04_p07. Inside wp_designer's reads_from
+      # (consortium/), so the binding is legal.
+      - docs/tier3_project_instantiation/consortium/partners.json
     writes_to:
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
     notes: >
@@ -273,10 +282,11 @@ skill_catalog:
     enrichment_base_artifact: "docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/impact_architecture.json"
     purpose: >
       Enrich the existing impact_architecture.json by populating dissemination_plan,
-      exploitation_plan, and sustainability_mechanism fields. Emits only the three
-      DEC fields as a compact JSON patch; the runtime merges them into the existing
-      base artifact produced by impact-pathway-core-builder. Does NOT emit or modify
-      impact_pathways or kpis — those are preserved by the runtime merge.
+      exploitation_plan, communication_plan, and sustainability_mechanism fields.
+      Emits only these four DEC fields as a compact JSON patch; the runtime merges
+      them into the existing base artifact produced by impact-pathway-core-builder.
+      Does NOT emit or modify impact_pathways or kpis — those are preserved by the
+      runtime merge.
     used_by_agents:
       - impact_architect
     reads_from:
@@ -412,6 +422,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase2_concept_refinement/
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/excellence_section.json
     constitutional_constraints:
@@ -435,6 +447,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
       - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/impact_section.json
     constitutional_constraints:
@@ -459,6 +473,8 @@ skill_catalog:
       - docs/tier4_orchestration_state/phase_outputs/phase4_gantt_milestones/
       - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
       - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/canonical_reference_pack.json
     writes_to:
       - docs/tier5_deliverables/proposal_sections/implementation_section.json
     constitutional_constraints:
@@ -480,6 +496,11 @@ skill_catalog:
       - docs/tier5_deliverables/proposal_sections/
       - docs/tier3_project_instantiation/
       - docs/tier2a_instrument_schemas/application_forms/
+    optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/phase3_wp_design/
+      - docs/tier4_orchestration_state/phase_outputs/phase5_impact_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase6_implementation_architecture/
+      - docs/tier4_orchestration_state/phase_outputs/phase7_budget_gate/
     writes_to:
       - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
     constitutional_constraints:
@@ -504,6 +525,11 @@ skill_catalog:
       - docs/tier5_deliverables/proposal_sections/
     optional_reads_from:
       - docs/tier5_deliverables/assembled_drafts/
+      - docs/tier5_deliverables/review_packets/
+      - docs/tier1_normative_framework/extracted/
+      - docs/tier2a_instrument_schemas/extracted/
+      - docs/tier2b_topic_and_call_sources/extracted/
+      - docs/tier3_project_instantiation/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
     notes: >
@@ -526,7 +552,6 @@ skill_catalog:
       criterion section artifact).
     used_by_agents:
       - evaluator_reviewer
-      - revision_integrator
     reads_from:
       - docs/tier2a_instrument_schemas/evaluation_forms/
       - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/
@@ -538,6 +563,39 @@ skill_catalog:
       - "Evaluation must apply the active instrument evaluation criteria only"
       - "Must not evaluate against grant agreement annex requirements"
       - "Weakness severity (critical/major/minor) must be assigned to each finding"
+
+  # drafting-review-status — replaces the former n08f re-run of
+  # evaluator-criteria-review. That re-run rewrote review_packet.json — the very
+  # artifact gate_11 was evaluated on — so the ST-1 content-based staleness check
+  # correctly failed gate_12's g11_p01 (STALE_UPSTREAM_MISMATCH) on every run
+  # that reached it (first observed: run 531ec9f0). This skill dispositions the
+  # packet's revision actions against the current draft WITHOUT touching the
+  # packet or any prose, and produces the drafting_review_status.json artifact
+  # that g11_p04 (all_critical_revisions_resolved) evaluates — which previously
+  # had no producer at all.
+  - id: drafting-review-status
+    execution_mode: "tapm"
+    purpose: >
+      Disposition every revision action from the Phase-8e review packet against
+      the current assembled draft, without modifying any prose or the review
+      packet. Mark actions resolved only when the current draft already
+      substantively addresses them; otherwise unresolved, with a specific
+      non-empty reason required for critical severity. Produce
+      drafting_review_status.json (orch.phase8.drafting_review_status.v1) with
+      the section completion log and the disposition revision log.
+    used_by_agents:
+      - revision_integrator
+    reads_from:
+      - docs/tier5_deliverables/review_packets/review_packet.json
+      - docs/tier5_deliverables/assembled_drafts/part_b_assembled_draft.json
+      - docs/tier5_deliverables/proposal_sections/
+    writes_to:
+      - docs/tier4_orchestration_state/phase_outputs/phase8_drafting_review/drafting_review_status.json
+    constitutional_constraints:
+      - "Must not modify, rewrite, or overwrite any proposal prose or the review packet"
+      - "Must not mark an action resolved unless the current draft substantively addresses it"
+      - "Critical unresolved actions require a specific, non-empty reason (§12.4)"
+      - "Must not fabricate resolutions or content to satisfy gate predicates (§13.8)"
 
   - id: constitutional-compliance-check
     execution_mode: "tapm"
@@ -560,6 +618,7 @@ skill_catalog:
     reads_from:
       - CLAUDE.md
     optional_reads_from:
+      - docs/tier4_orchestration_state/phase_outputs/
       - docs/tier5_deliverables/
     writes_to:
       - docs/tier4_orchestration_state/validation_reports/
@@ -644,20 +703,9 @@ skill_catalog:
       - "Every resolved tier conflict must produce a decision log entry"
       - "Decision log entries must identify the tier authority applied"
 
-  - id: checkpoint-publish
-    execution_mode: "tapm"
-    purpose: >
-      Write a formal checkpoint artifact to Tier 4 checkpoints/ confirming that a
-      phase or phase group has completed with a known validated state. Preserves a
-      reproducible snapshot of the state at the checkpoint.
-    used_by_agents:
-      - revision_integrator
-      - state_recorder
-    reads_from:
-      - docs/tier4_orchestration_state/phase_outputs/
-      - docs/tier3_project_instantiation/
-    writes_to:
-      - docs/tier4_orchestration_state/checkpoints/
-    constitutional_constraints:
-      - "Validated checkpoints must not be overwritten by subsequent reruns"
-      - "A checkpoint must not be published before all gate conditions for the phase are met"
+  # checkpoint-publish — RETIRED (CHK-1, 2026-07-24). Checkpoint publication was
+  # found to be 100% mechanical and moved to the `checkpoint_publisher`
+  # deterministic component (runner/checkpoint_publisher.py), bound in
+  # manifest.compile.yaml n08f_revision under `deterministic_components`
+  # (§17.5.3/C2, §16.5/C3). See decision_log/chk-1-checkpoint-provenance-quad_2026-07-24.json.
+  # It is no longer a skill: not Claude-invoked, not in this catalog.

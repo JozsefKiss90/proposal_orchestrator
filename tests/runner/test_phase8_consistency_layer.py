@@ -257,8 +257,21 @@ class TestCanonicalPackGeneration:
         assert data["outcomes"][0]["id"] == "OUT-1"
         assert data["outcomes"][0]["title"] == "Neuro-symbolic planning framework"
 
-    def test_missing_outcomes_file_produces_empty_list(self, tmp_path: Path) -> None:
-        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+    def test_missing_outcomes_file_blocks(self, tmp_path: Path) -> None:
+        """An absent outcomes source is a §12.4 block, not a silently empty array.
+
+        Supersedes ``test_missing_outcomes_file_produces_empty_list``.  Emitting
+        an empty ``outcomes`` array is not a safe degradation: the outcome-title
+        loop in ``canonical_terminology_preserved`` and the
+        ``outcomes[].linked_objectives`` metric-propagation path in
+        ``measurable_targets_preserved`` both iterate the array, so an empty one
+        makes those checks *vacuously* pass over unchecked prose.  ``outcomes``
+        therefore joins :data:`_REQUIRED_NONEMPTY` and fails closed here.
+        """
+        from runner.phase8_canonical_pack import (
+            CanonicalPackError,
+            build_phase8_canonical_reference_pack,
+        )
 
         _populate_tier3_and_tier4(tmp_path)
         outcomes_path = (
@@ -266,9 +279,443 @@ class TestCanonicalPackGeneration:
             / "architecture_inputs" / "outcomes.json"
         )
         outcomes_path.unlink()
+        with pytest.raises(CanonicalPackError) as exc:
+            build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        assert "outcomes" in str(exc.value)
+
+
+class TestCanonicalPackSourceFieldAliases:
+    """Tier-3 records are admitted under their hand-lift source field names.
+
+    The pack contract read by the Phase-8 preservation predicates is ``id`` /
+    ``title`` / ``measurable_target``; an operator hand-lift may author the
+    Tier-3 sources with ``objective_id`` / ``measurable_output`` and
+    ``outcome_id`` / ``statement``.  Unaliased, every record failed the
+    ``entry.get("id")`` admission test and was dropped — emptying ``objectives``
+    (a hard §12.4 block) and ``outcomes`` (silently, pre-fix).
+    """
+
+    def test_hand_lift_objective_and_outcome_keys_are_lifted(
+        self, tmp_path: Path,
+    ) -> None:
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        arch = (
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs"
+        )
+        _write_json(arch / "objectives.json", {
+            "objectives": [{
+                "objective_id": "O1",
+                "title": "Construct a harmonised dataset",
+                "measurable_output": "QC-controlled historical database",
+            }],
+        })
+        _write_json(arch / "outcomes.json", {
+            "outcomes": [{
+                "outcome_id": "OC1",
+                "statement": "A physiologically defined water-stress target",
+                "linked_objectives": ["O1"],
+            }],
+        })
+
         out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
         data = json.loads(out.read_text(encoding="utf-8"))
-        assert data["outcomes"] == []
+
+        assert [o["id"] for o in data["objectives"]] == ["O1"]
+        assert data["objectives"][0]["measurable_target"] == (
+            "QC-controlled historical database"
+        )
+        assert [o["id"] for o in data["outcomes"]] == ["OC1"]
+        assert data["outcomes"][0]["title"] == (
+            "A physiologically defined water-stress target"
+        )
+        # The metric-propagation path depends on this link surviving the lift.
+        assert data["outcomes"][0]["linked_objectives"] == ["O1"]
+        # Renamed source keys must not leak alongside their pack-key twins.
+        assert "objective_id" not in data["objectives"][0]
+        assert "measurable_output" not in data["objectives"][0]
+        assert "outcome_id" not in data["outcomes"][0]
+        assert "statement" not in data["outcomes"][0]
+
+    def test_canonical_keys_win_over_aliases(self, tmp_path: Path) -> None:
+        """A source already speaking the pack contract round-trips unchanged."""
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "objectives.json",
+            {"objectives": [{
+                "id": "OBJ-1",
+                "objective_id": "IGNORED",
+                "title": "Canonical wins",
+                "measurable_target": "≥5 sites",
+                "measurable_output": "IGNORED",
+            }]},
+        )
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        assert data["objectives"][0]["id"] == "OBJ-1"
+        assert data["objectives"][0]["measurable_target"] == "≥5 sites"
+
+    def test_involved_partners_is_not_inferred_into_partner_roles(
+        self, tmp_path: Path,
+    ) -> None:
+        """``involved_partners`` is dropped, never folded into a role field (§13.3).
+
+        A hand-lifted array does not distinguish a responsible partner from
+        contributing ones, so mapping it either way would be inference about a
+        project fact — which this deterministic component may not perform.
+        """
+        from runner.phase8_canonical_pack import build_phase8_canonical_reference_pack
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "objectives.json",
+            {"objectives": [{
+                "objective_id": "O1",
+                "title": "Objective with undifferentiated partners",
+                "involved_partners": ["DATA_PARTNER", "HOST"],
+            }]},
+        )
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        obj = json.loads(out.read_text(encoding="utf-8"))["objectives"][0]
+
+        assert obj["id"] == "O1"
+        assert "responsible_partner" not in obj
+        assert "contributing_partners" not in obj
+        assert "involved_partners" not in obj
+
+
+# ===========================================================================
+# 1b. Canonical pack provenance (ticket 10)
+# ===========================================================================
+
+
+def _write_working_assumptions(repo: Path, declarations: list[dict]) -> None:
+    """Write a Tier 3 working_assumptions.json with operator declarations."""
+    from runner.working_assumptions import WORKING_ASSUMPTIONS_REL
+
+    _write_json(
+        repo / WORKING_ASSUMPTIONS_REL,
+        {"provenance_class": "manually_placed", "declarations": declarations},
+    )
+
+
+class TestCanonicalPackProvenance:
+    """Every confirmed pack entry carries provenance == 'confirmed' (ticket 10)."""
+
+    def test_confirmed_entries_carry_confirmed_provenance(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        for array_key in ("objectives", "outcomes", "wps", "deliverables",
+                          "partners"):
+            entries = data[array_key]
+            assert entries, f"{array_key} unexpectedly empty"
+            for entry in entries:
+                assert entry.get("provenance") == "confirmed", (
+                    f"{array_key} entry {entry!r} lacks confirmed provenance"
+                )
+
+    def test_confirmed_provenance_does_not_disturb_existing_fields(
+        self, tmp_path: Path
+    ) -> None:
+        """Adding provenance leaves the canonical identity fields intact."""
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        obj = next(o for o in data["objectives"] if o["id"] == "OBJ-1")
+        assert obj["title"] == "Neuro-symbolic planning engine"
+        deliv = next(d for d in data["deliverables"] if d["deliverable_id"] == "D1-01")
+        assert deliv["title"] == "Quality Management Plan"
+        assert deliv["parent_wp"] == "WP1"
+
+
+class TestCanonicalPackDeclaredAssumptions:
+    """The deriver reads working_assumptions.json and quarantines declared
+    values into declared_assumptions[] with provenance == 'assumed' (ticket 10)."""
+
+    def test_absent_working_assumptions_yields_empty_declared(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+        assert data["declared_assumptions"] == []
+
+    def test_declared_assumption_emitted_with_assumed_provenance(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_working_assumptions(tmp_path, [
+            {
+                "key": "host_country",
+                "value": "HU",
+                "declared_by": "operator",
+                "declared_on": "2026-07-14",
+                "checklist_ref": "HOST",
+            },
+        ])
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        assert len(data["declared_assumptions"]) == 1
+        entry = data["declared_assumptions"][0]
+        assert entry["key"] == "host_country"
+        assert entry["declared_value"] == "HU"
+        assert entry["checklist_ref"] == "HOST"
+        assert entry["provenance"] == "assumed"
+
+    def test_assumed_value_never_appears_as_confirmed(
+        self, tmp_path: Path
+    ) -> None:
+        """A declared value must not leak into any confirmed pack array."""
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_working_assumptions(tmp_path, [
+            {
+                "key": "HOST_IDENTITY",
+                "value": "University of Debrecen",
+                "declared_by": "operator",
+                "declared_on": "2026-07-14",
+                "checklist_ref": "HOST",
+            },
+        ])
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        # No confirmed entry may carry the declared value or provenance=assumed.
+        for array_key in ("objectives", "outcomes", "wps", "deliverables",
+                          "partners"):
+            for entry in data[array_key]:
+                assert entry.get("provenance") != "assumed"
+                assert "University of Debrecen" not in json.dumps(entry)
+        # It appears only in declared_assumptions, provenance=assumed.
+        assert data["declared_assumptions"][0]["declared_value"] == (
+            "University of Debrecen"
+        )
+        assert data["declared_assumptions"][0]["provenance"] == "assumed"
+
+    def test_declaration_without_checklist_ref_omits_it(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_working_assumptions(tmp_path, [
+            {
+                "key": "duration_months",
+                "value": 24,
+                "declared_by": "operator",
+                "declared_on": "2026-07-14",
+            },
+        ])
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+
+        entry = data["declared_assumptions"][0]
+        assert entry["key"] == "duration_months"
+        assert entry["declared_value"] == 24
+        assert "checklist_ref" not in entry
+        assert entry["provenance"] == "assumed"
+
+    def test_malformed_working_assumptions_fails_closed(
+        self, tmp_path: Path
+    ) -> None:
+        """A present-but-malformed declaration file blocks the build."""
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+        from runner.working_assumptions import (
+            WORKING_ASSUMPTIONS_REL,
+            WorkingAssumptionsError,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        # Real declarations but missing the mandatory provenance_class.
+        _write_json(
+            tmp_path / WORKING_ASSUMPTIONS_REL,
+            {"declarations": [
+                {"key": "k", "value": "v", "declared_by": "o",
+                 "declared_on": "2026-07-14"},
+            ]},
+        )
+        with pytest.raises(WorkingAssumptionsError):
+            build_phase8_canonical_reference_pack(tmp_path, "run-1")
+
+    def test_pack_with_declarations_is_deterministic(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        _write_working_assumptions(tmp_path, [
+            {"key": "host_country", "value": "HU", "declared_by": "o",
+             "declared_on": "2026-07-14", "checklist_ref": "HOST"},
+        ])
+        out1 = build_phase8_canonical_reference_pack(tmp_path, "run-x")
+        content1 = out1.read_text(encoding="utf-8")
+        out2 = build_phase8_canonical_reference_pack(tmp_path, "run-x")
+        content2 = out2.read_text(encoding="utf-8")
+        assert content1 == content2
+
+
+class TestCanonicalPackFailClosed:
+    """The deriver fails closed on an empty *required* array (§12.4), but does
+    not require the RIA-shaped ``partners`` array (ticket 10 / ticket 2)."""
+
+    def test_empty_required_array_fails_closed(self, tmp_path: Path) -> None:
+        from runner.phase8_canonical_pack import (
+            CanonicalPackError,
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        # Remove objectives.json → objectives array is empty → block.
+        (tmp_path / "docs" / "tier3_project_instantiation"
+         / "architecture_inputs" / "objectives.json").unlink()
+        with pytest.raises(CanonicalPackError) as exc:
+            build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        assert "objectives" in str(exc.value)
+
+    def test_empty_wp_structure_fails_closed(self, tmp_path: Path) -> None:
+        from runner.phase8_canonical_pack import (
+            CanonicalPackError,
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        (tmp_path / "docs" / "tier4_orchestration_state" / "phase_outputs"
+         / "phase3_wp_design" / "wp_structure.json").unlink()
+        with pytest.raises(CanonicalPackError) as exc:
+            build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        # Both wps and deliverables come from wp_structure.
+        assert "wps" in str(exc.value) or "deliverables" in str(exc.value)
+
+    def test_absent_partners_still_builds(self, tmp_path: Path) -> None:
+        """MSCA-PF has no consortium partners.json — the pack still builds with
+        partners == [] (no RIA-shaped block)."""
+        from runner.phase8_canonical_pack import (
+            build_phase8_canonical_reference_pack,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        (tmp_path / "docs" / "tier3_project_instantiation"
+         / "consortium" / "partners.json").unlink()
+        out = build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        data = json.loads(out.read_text(encoding="utf-8"))
+        assert data["partners"] == []
+        assert data["objectives"]  # required arrays still present
+
+
+class TestPreservationGatesAgainstRegeneratedPack:
+    """AC4: the canonical-preservation gates still pass against a pack that was
+    regenerated by the deriver (the added per-entry provenance and the new
+    declared_assumptions array must not disturb the contradiction detectors)."""
+
+    def _excellence_section(self) -> dict:
+        # References the confirmed partners / deliverables / objectives from
+        # the fixtures exactly, with no contradictory identity.
+        return _make_section("run-1", [
+            "ATU (Alpenstadt Technical University) leads WP1. "
+            "ELI (EuroLog International AG) and BAL (Boreal AI Labs Oy) "
+            "contribute. D1-01 Quality Management Plan (WP1, month 3). "
+            "D2-01 Planning Engine Prototype v1 (WP2, month 18). "
+            "OBJ-1 Neuro-symbolic planning engine."
+        ])
+
+    def test_preservation_predicates_pass_on_regenerated_pack(
+        self, tmp_path: Path
+    ) -> None:
+        from runner.phase8_canonical_pack import (
+            CANONICAL_PACK_REL,
+            build_phase8_canonical_reference_pack,
+        )
+        from runner.predicates.phase8_section_predicates import (
+            canonical_terms_preserved,
+            deliverable_identity_preserved,
+            partner_names_preserved,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        # Include an operator declaration so declared_assumptions is non-empty.
+        _write_working_assumptions(tmp_path, [
+            {"key": "host_country", "value": "HU", "declared_by": "o",
+             "declared_on": "2026-07-14", "checklist_ref": "HOST"},
+        ])
+        build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        _write_json(tmp_path / "section.json", self._excellence_section())
+
+        for predicate in (
+            partner_names_preserved,
+            deliverable_identity_preserved,
+            canonical_terms_preserved,
+        ):
+            result = predicate(
+                "section.json", CANONICAL_PACK_REL, repo_root=tmp_path,
+            )
+            assert result.passed, (
+                f"{predicate.__name__} failed on regenerated pack: "
+                f"{result.reason}"
+            )
+
+    def test_deliverable_contradiction_still_detected_on_regenerated_pack(
+        self, tmp_path: Path
+    ) -> None:
+        """Provenance does not blunt the detector: an unknown deliverable ID
+        (not in the confirmed pack) is still caught against the regenerated
+        pack — the assumed values quarantined in declared_assumptions do not
+        widen what counts as a known confirmed deliverable."""
+        from runner.phase8_canonical_pack import (
+            CANONICAL_PACK_REL,
+            build_phase8_canonical_reference_pack,
+        )
+        from runner.predicates.phase8_section_predicates import (
+            deliverable_identity_preserved,
+        )
+
+        _populate_tier3_and_tier4(tmp_path)
+        build_phase8_canonical_reference_pack(tmp_path, "run-1")
+        # D9-99 is not a confirmed deliverable in the pack.
+        _write_json(tmp_path / "section.json", _make_section("run-1", [
+            "D9-99 is referenced but does not exist in the canonical pack."
+        ]))
+        result = deliverable_identity_preserved(
+            "section.json", CANONICAL_PACK_REL, repo_root=tmp_path,
+        )
+        assert not result.passed
 
 
 # ===========================================================================
@@ -990,6 +1437,13 @@ class TestMeasurableTargetPreservation:
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
         )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
+        )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))
 
@@ -1019,6 +1473,13 @@ class TestMeasurableTargetPreservation:
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
         )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
+        )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))
         assert data["objectives"][0]["measurable_target"] == target
@@ -1042,6 +1503,13 @@ class TestMeasurableTargetPreservation:
             tmp_path / "docs" / "tier3_project_instantiation"
             / "consortium" / "partners.json",
             {"partners": [{"short_name": "P", "legal_name": "Partner One"}]},
+        )
+        # ``outcomes`` is a required non-empty array; these tests assert on
+        # measurable_target only, so a single minimal outcome suffices.
+        _write_json(
+            tmp_path / "docs" / "tier3_project_instantiation"
+            / "architecture_inputs" / "outcomes.json",
+            {"outcomes": [{"id": "OUT-1", "title": "Minimal outcome"}]},
         )
         out = build_phase8_canonical_reference_pack(tmp_path, "r1")
         data = json.loads(out.read_text(encoding="utf-8"))

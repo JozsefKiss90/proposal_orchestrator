@@ -16,9 +16,9 @@ system_orchestration/
 ├── meta.yaml                         # Package identity, constitutional authority, instrument scope, source manifest
 ├── global_rules.yaml                 # Global execution rules and forbidden patterns
 ├── tier_bindings.yaml                # Tier model: paths, roles, read/write constraints
-├── quality_gates.yaml                # All 12 quality gates
-├── agent_catalog.yaml                # 16 agent definitions with scope and must_not constraints
-├── skill_catalog.yaml                # 19 skill definitions with constitutional constraints
+├── quality_gates.yaml                # All 14 quality gates
+├── agent_catalog.yaml                # 20 agent definitions with scope and must_not constraints
+├── skill_catalog.yaml                # 27 skill definitions with constitutional constraints
 ├── state_rules.yaml                  # State durability, checkpoint, decision logging rules
 ├── integration_rules.yaml            # Lump Sum Budget Planner integration rules (v1.1 corrected)
 ├── design_notes.yaml                 # Design rationale and architectural decisions
@@ -33,7 +33,7 @@ system_orchestration/
 │   └── phase_08_drafting_review.yaml # Contains substeps 08a–08d
 ├── manifest.compile.yaml             # Compiled DAG manifest (DAG-runner entry point)
 ├── artifact_schema_specification.yaml  # Field-level schemas for all 13 canonical artifact types
-├── gate_rules_library.yaml           # Gate rules library: all 11 gates, 97 predicates
+├── gate_rules_library.yaml           # Gate rules library: all 14 gates, 138 predicates
 ├── gate_rules_library_plan.md        # Implementation plan (reference only — complete)
 ├── dag_scheduler_plan.md             # DAG scheduler implementation plan (Steps 1–6 complete)
 ├── dag_scheduler_guide.md            # Operator/developer guide: CLI invocation, artifacts, exit codes
@@ -44,7 +44,7 @@ system_orchestration/
 The agent layer lives at `.claude/agents/` (not inside this package directory):
 
 ```
-.claude/agents/                       # Agent execution layer (16 agents + contract + prompts + checklist)
+.claude/agents/                       # Agent execution layer (20 agents + contract + prompts + checklist)
 ├── node_body_contract.md             # Shared contract: all agents must conform
 ├── validation_checklist.md           # Step 10 checklist: 16 agents × 9 columns + cross-agent handoffs
 ├── call_analyzer.md                  # Phase 1 — call analysis
@@ -85,7 +85,7 @@ The agent layer lives at `.claude/agents/` (not inside this package directory):
 The skill layer lives at `.claude/skills/` (not inside this package directory):
 
 ```
-.claude/skills/                       # Skill execution layer (19 skills + contract + checklist)
+.claude/skills/                       # Skill execution layer (27 skills + contract + checklist)
 ├── skill_runtime_contract.md         # Shared contract: all skills must conform
 ├── validation_checklist.md           # Step 10 checklist: 19 skills × 10 columns, all pass
 ├── call-requirements-extraction.md   # Phase 1 — extract call requirements from Tier 2B
@@ -486,7 +486,7 @@ When the manifest is absent or raises `ManifestReaderError`, `evaluate_gate()` s
 
 ### Predicate ID namespace
 
-All 97 predicates across 11 gates follow the `g<gate_number>_p<sequence>` scheme (e.g., `g01_p01` through `g11_p13`). Predicate IDs in `predicate_refs` must match the `predicate_id` fields in `gate_rules_library.yaml` exactly.
+All 138 predicates across 14 gates follow the `g<gate_number>_p<sequence>` scheme (e.g., `g01_p01` through `g11_p13`). Predicate IDs in `predicate_refs` must match the `predicate_id` fields in `gate_rules_library.yaml` exactly.
 
 ### Evaluation order
 

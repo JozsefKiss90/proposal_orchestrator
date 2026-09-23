@@ -8,7 +8,6 @@ purpose_summary: >
   cross-section consistency (already performed by gates 10a–10d).
 used_by_agents:
   - evaluator_reviewer
-  - revision_integrator
 reads_from:
   - docs/tier2a_instrument_schemas/evaluation_forms/
   - docs/tier4_orchestration_state/phase_outputs/phase1_call_analysis/

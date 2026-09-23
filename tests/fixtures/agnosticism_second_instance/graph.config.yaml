@@ -1,0 +1,35 @@
+# graph.config.yaml — THROWAWAY SECOND INSTANCE (milestone 2, ticket 9)
+#
+# The agnosticism test-of-done (§2.7 / D15): a second, unrelated toy project that
+# compiles to valid docs/** artifacts through the SAME generic compiler as the
+# MSCA-PF reference instance — with ONLY THIS FILE (and the authored vault) as the
+# per-project layer. No runner code is edited to support it.
+#
+# The toy project ("BorrowBrella", a community umbrella-lending network) is
+# deliberately unrelated to the reference instance's domain (remote-sensing crop
+# water-stress diagnosis): if any instance-#1 noun had leaked into the generic
+# layer, this instance could not compile cleanly on its own terms.
+#
+# NOTE — folder names differ from the generic template on purpose. Instance #1
+# uses numbered binding folders (11_objectives, 19_proposal_sections); this
+# instance uses `objectives/` and `sections/`. The compiler learns the structure
+# from THIS config, never from hard-coded folder names — so a differently-shaped
+# vault compiles with no code change, which is the whole point of the proof.
+
+project_id: borrowbrella-toy-instance
+vault_path: vault
+
+bindings:
+  # ── Part B prose (Tier 5): one proposal_section node per sub-section ──────────
+  - match:
+      node_type: proposal_section
+    tier: tier5
+    artifact_path: docs/tier5_deliverables/proposal_sections
+
+  # ── Tier 3 architecture_inputs: objectives (toy) ─────────────────────────────
+  - match:
+      folder: "objectives"
+      node_type: objective
+    tier: tier3
+    artifact_path: docs/tier3_project_instantiation/architecture_inputs/objectives.json
+    collection_key: objectives

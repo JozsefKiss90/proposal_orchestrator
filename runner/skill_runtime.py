@@ -41,13 +41,16 @@ from typing import Any, Optional
 
 import yaml
 
-from runner.benchmark.transport_hook import instrumented_invoke as invoke_claude_text
+from runner.benchmark.transport_hook import InstrumentedBackend, instrumented_invoke as invoke_claude_text
 from runner.claude_transport import (
     DEFAULT_TIMEOUT_SECONDS,
     ClaudeCLITimeoutError,
     ClaudeTransportError,
 )
 from runner.runtime_models import SkillResult
+from runner.transport.config import ProviderConfig, resolve_provider_config
+from runner.transport.tool_executor import GLOB_TOOL_SCHEMA, READ_TOOL_SCHEMA
+from runner.transport.tool_loop import ToolLoopResponse, run_tool_loop
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +72,14 @@ ARTIFACT_SCHEMA_REL_PATH: str = (
 SKILL_SPECS_REL_DIR: str = ".claude/skills"
 
 #: Claude model used for skill execution.
-SKILL_MODEL: str = "claude-sonnet-4-6"
+#:
+#: Switched from ``claude-sonnet-4-6`` on 2026-08-13.  Kept as a separate
+#: constant from ``semantic_dispatch.AGENT_MODEL`` and
+#: ``decomposed_drafting._DRAFTER_MODEL`` so the three runtime roles (skill
+#: execution, in-run semantic review, per-sub-section drafting) can diverge
+#: again without a refactor.  ``harness.judge.drafter_models()`` reads this
+#: constant directly, so the grader-independence guard tracks it.
+SKILL_MODEL: str = "claude-opus-4-8"
 
 #: Maximum tokens for skill execution responses.
 #: NOTE: This value is passed to invoke_claude_text() for interface
@@ -78,7 +88,7 @@ SKILL_MODEL: str = "claude-sonnet-4-6"
 #: (output minimization rules in skill specs), not by this constant.
 #: Retained for forward compatibility if the transport gains token
 #: control in a future backend migration.
-SKILL_MAX_TOKENS: int = 16384
+SKILL_MAX_TOKENS: int = 32768
 
 #: Timeout for TAPM invocations (tool-augmented mode).
 #: TAPM invocations involve multiple Read/Glob tool round-trips,
@@ -88,6 +98,64 @@ SKILL_MAX_TOKENS: int = 16384
 #: skills.  600s proved insufficient in live runs (bcfe33d6); raised
 #: to 1200s to accommodate the full read-reason-produce cycle.
 TAPM_TIMEOUT_SECONDS: int = 1200
+
+
+def _run_id_echo_directive(run_id: str) -> str:
+    """Instruction block telling Claude to *copy* ``run_id``, not retype it.
+
+    ``run_id`` is a 36-character random UUID that the model must reproduce
+    byte-exactly.  It carries no meaning the model can reconstruct, so a
+    model that regenerates it from memory rather than copying it produces a
+    plausible-looking but wrong token.  That is a whole-node failure: run
+    ``9e27694f`` (2026-08-14) lost n07 after every skill had succeeded,
+    because the final payload echoed ``9e27694f-9443-4436-…`` in place of
+    ``9e27694f-e13b-4449-…``.
+
+    This hardens the *request*.  It deliberately does not touch validation:
+    a mismatched ``run_id`` remains a hard failure, never auto-corrected,
+    per §17.6.5.
+    """
+    return (
+        f'- "run_id": "{run_id}"\n'
+        "  Copy this run_id character-for-character from the line above. "
+        "It is a random identifier with no derivable structure — do not "
+        "retype it from memory, reformat it, or generate a new UUID. "
+        "A single wrong character fails the entire node.\n"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Transport backend resolution
+# ---------------------------------------------------------------------------
+
+#: Cached provider config (resolved once per process from env vars).
+_provider_config_cache: ProviderConfig | None = None
+_provider_config_resolved: bool = False
+
+
+def _resolve_transport_backend() -> ProviderConfig:
+    """Resolve the active transport backend from environment variables.
+
+    Returns a :class:`ProviderConfig` describing the active backend.
+    The result is cached for the lifetime of the process.
+
+    When ``ORCHESTRATOR_TRANSPORT_BACKEND`` is unset (or set to
+    ``"claude_cli"``), returns a config with ``backend_name="claude_cli"``.
+    """
+    global _provider_config_cache, _provider_config_resolved
+    if _provider_config_resolved:
+        assert _provider_config_cache is not None
+        return _provider_config_cache
+    _provider_config_cache = resolve_provider_config()
+    _provider_config_resolved = True
+    return _provider_config_cache
+
+
+def _reset_transport_backend_cache() -> None:
+    """Reset the cached provider config.  Test-only."""
+    global _provider_config_cache, _provider_config_resolved
+    _provider_config_cache = None
+    _provider_config_resolved = False
 
 
 # ---------------------------------------------------------------------------
@@ -474,8 +542,8 @@ def _assemble_skill_prompt(
     if any_schema_requires_run_id:
         system_prompt += (
             "\nYou MUST include these fields in every output artifact:\n"
-            f'- "run_id": "{run_id}"\n'
-            "- The appropriate schema_id as defined in the skill "
+            + _run_id_echo_directive(run_id)
+            + "- The appropriate schema_id as defined in the skill "
             "specification\n"
             "- Do NOT include an artifact_status field\n"
         )
@@ -617,8 +685,8 @@ def _assemble_tapm_prompt(
     if any_schema_requires_run_id:
         system_prompt += (
             "You MUST include these fields in every output artifact:\n"
-            f'- "run_id": "{run_id}"\n'
-            "- The appropriate schema_id as defined in the skill "
+            + _run_id_echo_directive(run_id)
+            + "- The appropriate schema_id as defined in the skill "
             "specification\n"
             "- Do NOT include an artifact_status field\n"
         )
@@ -734,6 +802,19 @@ def _assemble_tapm_prompt(
                 "flat structure shown above.\n"
             )
 
+    if output_contract == "payload":
+        # Payload-contract skills return an in-memory payload rather than a
+        # written artifact, so the "output artifact" framing of the system
+        # prompt does not visibly cover them.  Restate the run_id echo
+        # requirement against the payload itself — this is the exact field
+        # that lost run 9e27694f's n07 (see _run_id_echo_directive).
+        user_prompt += (
+            "\n## CRITICAL: run_id in the returned payload\n\n"
+            "This skill returns a payload, not a written artifact. The "
+            "payload MUST carry the run_id:\n\n"
+            + _run_id_echo_directive(run_id)
+        )
+
     user_prompt += (
         "\nReturn a single JSON object conforming to the output schema "
         "defined in the skill specification above. Do not wrap in markdown. "
@@ -779,15 +860,21 @@ _FAILURE_CLASS_TIMEOUT = "TIMEOUT"
 _FAILURE_CLASS_NONZERO_EXIT = "NONZERO_EXIT"
 _FAILURE_CLASS_EMPTY_OUTPUT = "EMPTY_OUTPUT"
 _FAILURE_CLASS_CLI_UNAVAILABLE = "CLI_UNAVAILABLE"
+_FAILURE_CLASS_RATE_LIMITED = "RATE_LIMITED"
 _FAILURE_CLASS_OTHER = "OTHER"
 
 
 def _classify_transport_failure(exc: ClaudeTransportError) -> str:
     """Classify a transport exception into a diagnostic failure class."""
-    from runner.claude_transport import ClaudeCLIUnavailableError
+    from runner.claude_transport import (
+        ClaudeCLIRateLimitError,
+        ClaudeCLIUnavailableError,
+    )
 
     if isinstance(exc, ClaudeCLITimeoutError):
         return _FAILURE_CLASS_TIMEOUT
+    if isinstance(exc, ClaudeCLIRateLimitError):
+        return _FAILURE_CLASS_RATE_LIMITED
     if isinstance(exc, ClaudeCLIUnavailableError):
         return _FAILURE_CLASS_CLI_UNAVAILABLE
     msg = str(exc).lower()
@@ -846,6 +933,14 @@ def _write_transport_failure_diagnostics(
         if elapsed_seconds is None:
             elapsed_seconds = exc.elapsed_seconds
 
+    # -- Persistence policy --
+    from runner.persistence_policy import (
+        allows_content_persistence,
+        sanitize_error_message,
+    )
+
+    _content_allowed = allows_content_persistence()
+
     # -- transport_diag.json --
     meta: dict[str, Any] = {
         "skill_id": skill_id,
@@ -862,7 +957,7 @@ def _write_transport_failure_diagnostics(
         "system_prompt_chars": len(system_prompt),
         "user_prompt_chars": len(user_prompt),
         "exception_class": type(exc).__name__,
-        "exception_message": str(exc),
+        "exception_message": sanitize_error_message(str(exc)),
         "command": command,
         "had_partial_stdout": bool(partial_stdout.strip()),
         "had_stderr": bool(partial_stderr.strip()),
@@ -872,11 +967,14 @@ def _write_transport_failure_diagnostics(
 
     file_map: dict[str, tuple[str, str | None]] = {
         "meta": (f"{prefix}_transport_diag.json", None),
-        "system_prompt": (f"{prefix}_system_prompt.txt", system_prompt),
-        "user_prompt": (f"{prefix}_user_prompt.txt", user_prompt),
-        "stdout": (f"{prefix}_stdout.txt", partial_stdout),
-        "stderr": (f"{prefix}_stderr.txt", partial_stderr),
     }
+
+    # Content companion files are only included under full diagnostic level.
+    if _content_allowed:
+        file_map["system_prompt"] = (f"{prefix}_system_prompt.txt", system_prompt)
+        file_map["user_prompt"] = (f"{prefix}_user_prompt.txt", user_prompt)
+        file_map["stdout"] = (f"{prefix}_stdout.txt", partial_stdout)
+        file_map["stderr"] = (f"{prefix}_stderr.txt", partial_stderr)
 
     # Populate diagnostic_files in meta before writing.
     meta["diagnostic_files"] = {
@@ -891,14 +989,15 @@ def _write_transport_failure_diagnostics(
     except OSError:
         pass
 
-    # Write companion files (prompts, stdout, stderr).
-    for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
-        fname, content = file_map[key]
-        try:
-            (diag_dir / fname).write_text(content or "", encoding="utf-8")
-            written[key] = f".claude/skill_diag/{fname}"
-        except OSError:
-            pass
+    # Write companion files (prompts, stdout, stderr) — only under full policy.
+    if _content_allowed:
+        for key in ("system_prompt", "user_prompt", "stdout", "stderr"):
+            fname, content = file_map[key]
+            try:
+                (diag_dir / fname).write_text(content or "", encoding="utf-8")
+                written[key] = f".claude/skill_diag/{fname}"
+            except OSError:
+                pass
 
     return written
 
@@ -914,21 +1013,87 @@ _write_timeout_diagnostics = _write_transport_failure_diagnostics
 # ---------------------------------------------------------------------------
 
 
+def _json_break_point(text: str) -> str:
+    """Describe, in one clause, where a response stopped being valid JSON.
+
+    A bare "returned non-JSON response" plus the first 300 characters is
+    unactionable when the break is 30k characters in: the head looks
+    perfect, so the message reads as if the model ignored the contract when
+    in fact one interior character is wrong.  This renders the decoder's own
+    position and a short window around it, which names the real fault
+    (truncation, a stray fence, an unescaped control character) at a glance.
+
+    Purely descriptive: nothing is parsed, repaired, or returned to the
+    caller as data.
+    """
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        newline = stripped.find("\n")
+        if newline != -1:
+            stripped = stripped[newline + 1:]
+        if stripped.rstrip().endswith("```"):
+            stripped = stripped.rstrip()[: -len("```")]
+    if not stripped.lstrip().startswith("{"):
+        return "response does not open with a JSON object"
+    try:
+        json.loads(stripped)
+    except json.JSONDecodeError as exc:
+        if exc.msg == "Extra data":
+            return (
+                f"a complete JSON value ends at char {exc.pos} but "
+                f"{len(stripped) - exc.pos} more characters follow — the "
+                f"response carries an interior fragment (front-truncated) "
+                f"or more than one object; next: "
+                f"{stripped[exc.pos: exc.pos + 80]!r}"
+            )
+        window = stripped[max(0, exc.pos - 60): exc.pos + 60]
+        return (
+            f"invalid JSON at line {exc.lineno} col {exc.colno} "
+            f"(char {exc.pos} of {len(stripped)}): {exc.msg}; "
+            f"near {window!r}"
+        )
+    except ValueError:  # pragma: no cover — defensive
+        return "response could not be decoded as JSON"
+    return (
+        "response decodes as valid JSON — the rejection came from the "
+        "artifact contract (a non-object value), not the decoder"
+    )
+
+
 def _extract_json_response(text: str) -> dict | None:
-    """Extract the first JSON object from Claude's response text.
+    """Extract the artifact JSON object from Claude's response text.
 
     Handles bare JSON, JSON inside markdown code fences, and JSON
-    preceded or followed by prose.  Returns ``None`` if no valid JSON
-    dict can be found.
+    preceded or followed by prose.  When several parseable objects are
+    present (e.g. a throwaway fenced decoy from an intermediate assistant
+    turn followed by the real payload — run 23ce21a0), the largest by
+    character span wins; a fence carries no positional priority.  Returns
+    ``None`` if no valid JSON dict can be found.
 
     Uses ``json.JSONDecoder.raw_decode()`` as an early fallback when
     the response starts with ``{`` but ``json.loads()`` fails.  This
     handles the case where Claude emits a valid JSON object followed by
-    trailing characters (e.g. an extra closing brace) — ``raw_decode``
-    parses the first complete JSON value and ignores the remainder.
-    This is fail-closed: ``raw_decode`` will still reject structurally
-    malformed JSON; it only tolerates *trailing* noise after a complete
-    valid object.
+    trivial trailing noise (e.g. an extra closing brace) — ``raw_decode``
+    parses the first complete JSON value and the remainder is discarded
+    only if it is insubstantial.
+
+    Front-truncation is detected and failed closed.  When the transport
+    returns only the tail of an over-long generation, the text begins
+    mid-object; ``raw_decode`` then happily parses the first *interior*
+    fragment it finds.  Accepting that fragment would discard the real
+    payload and surface downstream as a misleading "required field
+    missing" schema error, pointing at the wrong fault.  The tell is the
+    remainder: if what follows the decoded object opens with ``,`` or
+    ``:``, the object was a member of a larger structure whose opening was
+    lost, and ``None`` is returned so the caller reports an incomplete
+    response (§17.6.5 — no silent repair).  Trailing prose or a stray
+    brace is benign and the leading object is returned as normal.
+
+    A response that opens with ``{`` but does not decode at all is broken
+    JSON and also returns ``None``.  The step-3 salvage scan is reserved
+    for prose-then-JSON replies (which do not start with ``{``); running it
+    over broken JSON would return an arbitrary *interior* object rather
+    than the artifact.
     """
     stripped = text.strip()
 
@@ -943,38 +1108,112 @@ def _extract_json_response(text: str) -> dict | None:
     # start of the string, tolerating trailing characters (e.g. an extra
     # closing brace emitted by Claude).  This is strictly more permissive
     # than json.loads() but still fail-closed for structurally invalid JSON.
+    #
+    # CRITICAL: raw_decode() cannot distinguish "a complete object followed by
+    # a stray brace" from "a complete object followed by 15KB of the real
+    # payload".  The latter occurs when the transport returns a FRONT-TRUNCATED
+    # response (the CLI emitted only the tail of an over-long generation, so the
+    # text begins mid-object).  Accepting the leading fragment there silently
+    # discards the actual payload and surfaces downstream as a misleading
+    # "required field missing" validation error, when the true fault is a
+    # truncated response.  We therefore accept the raw_decode result ONLY when
+    # what follows is trivial noise, and otherwise fail closed (§17.6.5: the
+    # runtime must not silently repair a malformed response).
     if stripped.startswith("{"):
         try:
             decoder = json.JSONDecoder()
             data, _end = decoder.raw_decode(stripped)
             if isinstance(data, dict):
+                remainder = stripped[_end:].lstrip()
+                # A remainder that opens with ',' or ':' means the parsed object
+                # was a *member* of a larger structure whose opening was lost —
+                # i.e. the response is front-truncated and what we decoded is an
+                # interior fragment, not the artifact.  Accepting it would
+                # discard the real payload and surface downstream as a
+                # misleading "required field missing" error.  Fail closed
+                # (§17.6.5: no silent repair of malformed responses).
+                if remainder[:1] in (",", ":"):
+                    return None
+                # Otherwise the remainder is trailing noise — a stray closing
+                # brace, code-fence backticks, or a closing remark in prose.
+                # That is benign: the leading object is the complete artifact.
                 return data
         except (json.JSONDecodeError, ValueError):
-            pass
+            # The response opens with '{' but does not decode as a single JSON
+            # value: it is structurally broken (e.g. '},{"key":' — an object
+            # value with no key, the malformation seen in run c4d3d0a6).  Do
+            # NOT fall through to the step-3 salvage scan: that scan would
+            # return whichever *interior* object happens to be largest, which
+            # is not the artifact and is precisely the silent repair §17.6.5
+            # forbids.  The salvage scan exists for prose-then-JSON replies,
+            # which do not start with '{'.  Fail closed.
+            return None
 
-    # 2. Try markdown code fence
-    code_match = re.search(
+    # 2+3. Candidate competition: every parseable JSON object in the text —
+    #    fenced or bare — competes by character span, and the largest wins.
+    #
+    #    Fenced blocks are NOT given positional priority.  The transport
+    #    reassembles ALL assistant turns into one text (stream-json fix), so
+    #    an intermediate turn's throwaway fenced object can precede the final
+    #    turn's real artifact.  Observed live in run 23ce21a0 (n08a, '1.1'):
+    #    the reply carried a fenced 27-char decoy ({"placeholder":"see final"})
+    #    followed by the complete ~15KB draft object; fence-first extraction
+    #    returned the decoy and failed the node on a missing 'content' key.
+    #    Span competition returns the artifact regardless of decoration order.
+    #
+    #    LLMs often emit narrative reasoning before the JSON payload.  A greedy
+    #    forward regex (r"\{.*\}") would match from the first '{' in the prose
+    #    to the last '}' in the JSON, producing an invalid blob.  Instead, we
+    #    try raw_decode from every '{' position and return the largest valid
+    #    dict found by character span (end - start).  Character span is a better
+    #    heuristic than key count because the root skill output object may have
+    #    few top-level keys (e.g. {"instruments": [...]}) while deeply nested
+    #    child objects may have many keys.
+    best: dict | None = None
+    best_span: int = 0
+    for code_match in re.finditer(
         r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL
-    )
-    if code_match:
+    ):
         try:
             data = json.loads(code_match.group(1))
-            if isinstance(data, dict):
-                return data
         except json.JSONDecodeError:
-            pass
+            continue
+        span = len(code_match.group(1))
+        if isinstance(data, dict) and span > best_span:
+            best = data
+            best_span = span
 
-    # 3. Try any JSON object in the text
-    obj_match = re.search(r"\{.*\}", stripped, re.DOTALL)
-    if obj_match:
+    decoder = json.JSONDecoder()
+    for i, ch in enumerate(stripped):
+        if ch != "{":
+            continue
         try:
-            data = json.loads(obj_match.group())
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
+            data, end = decoder.raw_decode(stripped, i)
+            span = end - i
+            if isinstance(data, dict) and span > best_span:
+                # Interior-fragment guard (front-truncation, salvage path).
+                # The step-1b guard only covers responses that BEGIN with '{'.
+                # A front-truncated response that begins mid-string or
+                # mid-array does not, so it lands here — and its surviving
+                # tail is full of small *complete* member objects (e.g. the
+                # trailing source_refs entries of a cut-off draft).  A
+                # genuine root object embedded in prose is followed by
+                # prose, whitespace, or EOF — never by ',' ':' ']' or '}',
+                # which mark membership in an enclosing structure whose
+                # opening was lost.  Skip such candidates so a truncated
+                # response fails closed as unparseable instead of being
+                # silently repaired into a misleading fragment (§17.6.5;
+                # observed in run 511325a3 as a drafter "no 'content'
+                # prose" error whose parsed keys were a single source_refs
+                # entry).
+                if stripped[end:].lstrip()[:1] in (",", ":", "]", "}"):
+                    continue
+                best = data
+                best_span = span
+        except (json.JSONDecodeError, ValueError):
+            continue
 
-    return None
+    return best
 
 
 def _validate_skill_output(
@@ -1213,12 +1452,37 @@ def run_skill(
         skill_id, mode, node_id or "-", run_id[:8],
     )
 
+    # ── Resolve transport backend ────────────────────────────────────
+    try:
+        provider_config = _resolve_transport_backend()
+    except ValueError as exc:
+        return SkillResult(
+            status="failure",
+            failure_reason=f"Transport backend resolution failed: {exc}",
+            failure_category="MISSING_INPUT",
+        )
+    _use_claude_cli = provider_config.backend_name == "claude_cli"
+    _use_converse = provider_config.backend_name == "bedrock_converse"
+
     if mode == "tapm":
         # ── TAPM Path: Phases A'-C' ──────────────────────────────────
         #
-        # Skip _resolve_inputs() and _validate_skill_inputs(): Claude
-        # reads declared inputs from disk via the Read tool.
+        # Skip _resolve_inputs() and _validate_skill_inputs(): the LLM
+        # reads declared inputs from disk via the Read/Glob tools.
         # Skip _assemble_skill_prompt(): use _assemble_tapm_prompt().
+
+        # F.4 Capability gating: non-Claude backends must support
+        # tool calling to execute TAPM skills.
+        if not _use_claude_cli and not provider_config.capabilities.tool_calling:
+            return SkillResult(
+                status="failure",
+                failure_reason=(
+                    f"Skill {skill_id!r}: backend "
+                    f"{provider_config.backend_name!r} does not support "
+                    f"tool calling; cannot execute TAPM skill"
+                ),
+                failure_category="MISSING_INPUT",
+            )
 
         system_prompt, user_prompt = _assemble_tapm_prompt(
             skill_spec=skill_spec,
@@ -1234,55 +1498,227 @@ def run_skill(
             output_contract=output_contract,
         )
         logger.info(
-            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds  backend=%s",
             skill_id, len(system_prompt), len(user_prompt),
-            TAPM_TIMEOUT_SECONDS,
+            TAPM_TIMEOUT_SECONDS, provider_config.backend_name,
         )
 
-        try:
-            response_text = invoke_claude_text(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model=SKILL_MODEL,
-                max_tokens=SKILL_MAX_TOKENS,
-                tools=["Read", "Glob"],
+        if _use_claude_cli:
+            # ── Claude CLI TAPM path (existing) ──────────────────────
+            try:
+                response_text = invoke_claude_text(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    model=SKILL_MODEL,
+                    max_tokens=SKILL_MAX_TOKENS,
+                    tools=["Read", "Glob"],
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    _bench_run_id=run_id,
+                    _bench_skill_id=skill_id,
+                    _bench_node_id=node_id,
+                    _bench_invocation_type="skill_tapm",
+                )
+            except ClaudeTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                diag_paths = _write_transport_failure_diagnostics(
+                    skill_id=skill_id,
+                    run_id=run_id,
+                    node_id=node_id,
+                    mode=mode,
+                    reads_from=reads_from,
+                    writes_to=writes_to,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    exc=exc,
+                    repo_root=repo_root,
+                    elapsed_seconds=_elapsed,
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    tools=["Read", "Glob"],
+                )
+                meta_rel = diag_paths.get("meta", "")
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  diag=%s",
+                    skill_id, _elapsed, meta_rel,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Claude transport failed: "
+                        f"{exc}. Diagnostics written to {meta_rel}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+        elif _use_converse:
+            # ── Native Bedrock Converse TAPM path ─────────────────
+            from runner.transport.config import build_converse_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_converse_backend(
+                    provider_config,
+                    tools=[READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA],
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"Bedrock Converse backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
                 timeout_seconds=TAPM_TIMEOUT_SECONDS,
-                _bench_run_id=run_id,
-                _bench_skill_id=skill_id,
-                _bench_node_id=node_id,
-                _bench_invocation_type="skill_tapm",
+                tool_names=["Read", "Glob"],
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_tapm",
             )
-        except ClaudeTransportError as exc:
-            _elapsed = time.monotonic() - _skill_t0
-            diag_paths = _write_transport_failure_diagnostics(
-                skill_id=skill_id,
-                run_id=run_id,
-                node_id=node_id,
-                mode=mode,
-                reads_from=reads_from,
-                writes_to=writes_to,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                exc=exc,
-                repo_root=repo_root,
-                elapsed_seconds=_elapsed,
+
+            allowed_prefixes: list[str] = []
+            for rf in reads_from + (optional_reads_from or []):
+                if _is_contextual_descriptor(rf):
+                    continue
+                allowed_prefixes.append(rf)
+
+            try:
+                loop_result: ToolLoopResponse = run_tool_loop(
+                    backend=backend,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    repo_root=repo_root,
+                    allowed_prefixes=allowed_prefixes or None,
+                    timeout_seconds=float(TAPM_TIMEOUT_SECONDS),
+                )
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            response_text = loop_result.text
+            if loop_result.exhausted_rounds:
+                logger.warning(
+                    "  skill WARN   id=%s  tool loop exhausted after "
+                    "%d rounds (files_read=%d)",
+                    skill_id, loop_result.rounds,
+                    len(loop_result.files_read),
+                )
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: tool loop returned "
+                        f"empty response after {loop_result.rounds} "
+                        f"rounds (exhausted={loop_result.exhausted_rounds})"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+        else:
+            # ── OpenAI-compatible TAPM path (Phase F tool emulation) ─
+            from runner.transport.config import build_openai_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_openai_backend(
+                    provider_config,
+                    tools=[READ_TOOL_SCHEMA, GLOB_TOOL_SCHEMA],
+                    timeout_seconds=TAPM_TIMEOUT_SECONDS,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"OpenAI-compatible backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
                 timeout_seconds=TAPM_TIMEOUT_SECONDS,
-                tools=["Read", "Glob"],
+                tool_names=["Read", "Glob"],
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_tapm",
             )
-            meta_rel = diag_paths.get("meta", "")
-            logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
-                "elapsed=%.1fs  diag=%s",
-                skill_id, _elapsed, meta_rel,
-            )
-            return SkillResult(
-                status="failure",
-                failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
-                    f"Diagnostics written to {meta_rel}"
-                ),
-                failure_category="INCOMPLETE_OUTPUT",
-            )
+
+            allowed_prefixes_oai: list[str] = []
+            for rf in reads_from + (optional_reads_from or []):
+                if _is_contextual_descriptor(rf):
+                    continue
+                allowed_prefixes_oai.append(rf)
+
+            try:
+                loop_result: ToolLoopResponse = run_tool_loop(
+                    backend=backend,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    repo_root=repo_root,
+                    allowed_prefixes=allowed_prefixes_oai or None,
+                    timeout_seconds=float(TAPM_TIMEOUT_SECONDS),
+                )
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            response_text = loop_result.text
+            if loop_result.exhausted_rounds:
+                logger.warning(
+                    "  skill WARN   id=%s  tool loop exhausted after "
+                    "%d rounds (files_read=%d)",
+                    skill_id, loop_result.rounds,
+                    len(loop_result.files_read),
+                )
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: tool loop returned "
+                        f"empty response after {loop_result.rounds} "
+                        f"rounds (exhausted={loop_result.exhausted_rounds})"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
 
     elif mode == "cli-prompt":
         # ── CLI-Prompt Path: Phases A-C (unchanged) ──────────────────
@@ -1320,53 +1756,185 @@ def run_skill(
             repo_root=repo_root,
         )
         logger.info(
-            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds",
+            "  skill INVOKE id=%s  sys=%d  user=%d  timeout=%ds  backend=%s",
             skill_id, len(system_prompt), len(user_prompt),
-            DEFAULT_TIMEOUT_SECONDS,
+            DEFAULT_TIMEOUT_SECONDS, provider_config.backend_name,
         )
 
-        # Phase C: Claude invocation via runtime transport
-        try:
-            response_text = invoke_claude_text(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model=SKILL_MODEL,
-                max_tokens=SKILL_MAX_TOKENS,
-                _bench_run_id=run_id,
-                _bench_skill_id=skill_id,
-                _bench_node_id=node_id,
-                _bench_invocation_type="skill_cli_prompt",
-            )
-        except ClaudeTransportError as exc:
-            _elapsed = time.monotonic() - _skill_t0
-            diag_paths = _write_transport_failure_diagnostics(
-                skill_id=skill_id,
-                run_id=run_id,
-                node_id=node_id,
-                mode=mode,
-                reads_from=reads_from,
-                writes_to=writes_to,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                exc=exc,
-                repo_root=repo_root,
-                elapsed_seconds=_elapsed,
+        if _use_claude_cli:
+            # ── Claude CLI cli-prompt path (existing) ────────────────
+            try:
+                response_text = invoke_claude_text(
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    model=SKILL_MODEL,
+                    max_tokens=SKILL_MAX_TOKENS,
+                    _bench_run_id=run_id,
+                    _bench_skill_id=skill_id,
+                    _bench_node_id=node_id,
+                    _bench_invocation_type="skill_cli_prompt",
+                )
+            except ClaudeTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                diag_paths = _write_transport_failure_diagnostics(
+                    skill_id=skill_id,
+                    run_id=run_id,
+                    node_id=node_id,
+                    mode=mode,
+                    reads_from=reads_from,
+                    writes_to=writes_to,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    exc=exc,
+                    repo_root=repo_root,
+                    elapsed_seconds=_elapsed,
+                    timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                )
+                meta_rel = diag_paths.get("meta", "")
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  diag=%s",
+                    skill_id, _elapsed, meta_rel,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Claude transport failed: "
+                        f"{exc}. Diagnostics written to {meta_rel}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+        elif _use_converse:
+            # ── Native Bedrock Converse cli-prompt path ───────────────
+            from runner.transport.config import build_converse_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_converse_backend(
+                    provider_config,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"Bedrock Converse backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
                 timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_cli_prompt",
             )
-            meta_rel = diag_paths.get("meta", "")
-            logger.info(
-                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
-                "elapsed=%.1fs  diag=%s",
-                skill_id, _elapsed, meta_rel,
+
+            try:
+                result = backend([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ])
+                response_text = result.get("content") or ""
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: Bedrock Converse "
+                        f"backend returned empty response"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+        else:
+            # ── OpenAI-compatible cli-prompt path ────────────────────
+            # No tools — single-round completion with serialized inputs.
+            from runner.transport.config import build_openai_backend
+            from runner.transport.errors import OpenAICompatTransportError
+
+            try:
+                backend = build_openai_backend(
+                    provider_config,
+                    timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                    temperature=0.0,
+                    max_tokens=SKILL_MAX_TOKENS,
+                )
+            except (ValueError, ImportError) as exc:
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: failed to build "
+                        f"OpenAI-compatible backend: {exc}"
+                    ),
+                    failure_category="MISSING_INPUT",
+                )
+
+            backend = InstrumentedBackend(
+                backend,
+                model=provider_config.model or "",
+                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                bench_run_id=run_id,
+                bench_skill_id=skill_id,
+                bench_node_id=node_id,
+                bench_invocation_type="skill_cli_prompt",
             )
-            return SkillResult(
-                status="failure",
-                failure_reason=(
-                    f"Skill {skill_id!r}: Claude transport failed: {exc}. "
-                    f"Diagnostics written to {meta_rel}"
-                ),
-                failure_category="INCOMPLETE_OUTPUT",
-            )
+
+            try:
+                result = backend([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ])
+                response_text = result.get("content") or ""
+            except OpenAICompatTransportError as exc:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "elapsed=%.1fs  backend=%s  error=%s",
+                    skill_id, _elapsed,
+                    provider_config.backend_name, exc,
+                )
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"transport failed: {exc}"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
+
+            if not response_text or not response_text.strip():
+                _elapsed = time.monotonic() - _skill_t0
+                return SkillResult(
+                    status="failure",
+                    failure_reason=(
+                        f"Skill {skill_id!r}: OpenAI-compatible "
+                        f"backend returned empty response"
+                    ),
+                    failure_category="INCOMPLETE_OUTPUT",
+                )
 
     else:
         return SkillResult(
@@ -1382,53 +1950,76 @@ def run_skill(
 
     assert response_text is not None  # guaranteed by api_error check
 
-    # ── Diagnostic capture (temporary) ──────────────────────────────
+    # ── Diagnostic capture (policy-controlled) ─────────────────────
     _diag_dir = repo_root / ".claude" / "skill_diag"
     _diag_dir.mkdir(parents=True, exist_ok=True)
-    _diag_path = _diag_dir / f"{skill_id}_{run_id[:8]}_response.txt"
-    try:
-        _diag_path.write_text(
-            f"=== skill_id: {skill_id} ===\n"
-            f"=== mode: {mode} ===\n"
-            f"=== response_text length: {len(response_text)} ===\n"
-            f"=== response_text (full) ===\n{response_text}\n"
-            f"=== END ===\n",
-            encoding="utf-8",
-        )
-    except OSError:
-        pass  # Best-effort diagnostic
+
+    from runner.persistence_policy import allows_content_persistence
+
+    if allows_content_persistence():
+        _diag_path = _diag_dir / f"{skill_id}_{run_id[:8]}_response.txt"
+        try:
+            _diag_path.write_text(
+                f"=== skill_id: {skill_id} ===\n"
+                f"=== mode: {mode} ===\n"
+                f"=== response_text length: {len(response_text)} ===\n"
+                f"=== response_text (full) ===\n{response_text}\n"
+                f"=== END ===\n",
+                encoding="utf-8",
+            )
+        except OSError:
+            pass  # Best-effort diagnostic
 
     parsed = _extract_json_response(response_text)
 
-    # Diagnostic: log parse result
-    try:
-        _diag_parse_path = _diag_dir / f"{skill_id}_{run_id[:8]}_parsed.txt"
-        if parsed is not None:
-            _diag_parse_path.write_text(
-                f"=== parsed OK ===\n"
-                f"=== top-level keys: {list(parsed.keys())} ===\n"
-                f"=== parsed content ===\n"
-                f"{json.dumps(parsed, indent=2)[:5000]}\n"
-                f"=== END ===\n",
-                encoding="utf-8",
-            )
-        else:
-            _diag_parse_path.write_text(
-                f"=== parsed FAILED (None) ===\n"
-                f"=== response_text first 1000 chars ===\n"
-                f"{response_text[:1000]}\n"
-                f"=== END ===\n",
-                encoding="utf-8",
-            )
-    except OSError:
-        pass
+    # Diagnostic: log parse result (content-level, policy-controlled)
+    if allows_content_persistence():
+        try:
+            _diag_parse_path = _diag_dir / f"{skill_id}_{run_id[:8]}_parsed.txt"
+            if parsed is not None:
+                _diag_parse_path.write_text(
+                    f"=== parsed OK ===\n"
+                    f"=== top-level keys: {list(parsed.keys())} ===\n"
+                    f"=== parsed content ===\n"
+                    f"{json.dumps(parsed, indent=2)[:5000]}\n"
+                    f"=== END ===\n",
+                    encoding="utf-8",
+                )
+            else:
+                _diag_parse_path.write_text(
+                    f"=== parsed FAILED (None) ===\n"
+                    f"=== response_text first 1000 chars ===\n"
+                    f"{response_text[:1000]}\n"
+                    f"=== END ===\n",
+                    encoding="utf-8",
+                )
+        except OSError:
+            pass
 
     if parsed is None:
+        # The parse-failure path used to return silently: no ``skill FAIL``
+        # line was emitted, so a skill that failed here vanished from the
+        # console between its INVOKE line and the next skill's START line
+        # (run 0395b136 concept-alignment-check).  The console then showed
+        # only the *downstream* skill's MISSING_INPUT failure, which points
+        # at the wrong fault.  Log the failure and say where the response
+        # broke.
+        _elapsed = time.monotonic() - _skill_t0
+        _where = _json_break_point(response_text)
+        _diag_rel = (
+            f".claude/skill_diag/{skill_id}_{run_id[:8]}_response.txt"
+        )
+        logger.info(
+            "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  elapsed=%.1fs"
+            "  (unparseable response: %s)  diag=%s",
+            skill_id, _elapsed, _where, _diag_rel,
+        )
         return SkillResult(
             status="failure",
             failure_reason=(
-                f"Skill {skill_id!r}: Claude returned non-JSON response: "
-                f"{response_text[:300]!r}"
+                f"Skill {skill_id!r}: Claude returned non-JSON response "
+                f"({len(response_text)} chars; {_where}). Full response: "
+                f"{_diag_rel}. Head: {response_text[:300]!r}"
             ),
             failure_category="INCOMPLETE_OUTPUT",
         )
@@ -1478,6 +2069,40 @@ def run_skill(
             ),
             failure_category=model_failure_category,
         )
+
+    # ── Phase D.6: Normalize SkillResult-shaped SUCCESS envelope ──────
+    #
+    # The symmetric counterpart of Phase D.5.  The model sometimes wraps
+    # the real artifact/payload in a SkillResult-shaped success envelope
+    # instead of returning the payload directly:
+    #   {"status": "success", "outputs_written": [...],
+    #    "payload": { <the real gate_id / overall_status / ... fields> }}
+    #
+    # This is a shape ambiguity, not a data fault: every required field is
+    # present with its true value, nested one level under ``payload``.  It
+    # is provoked by skill specs that instruct the model to "return a
+    # SkillResult with the following payload" (e.g. gate-enforcement).  The
+    # model's self-asserted ``status``/``outputs_written`` are NOT trusted
+    # — they are discarded; only the nested payload is unwrapped, and it is
+    # then validated normally against the declared contract below.  No
+    # field is invented, altered, or masked, so this is normalization (the
+    # runtime's parse responsibility, §17.5.2), not the silent repair
+    # forbidden by §17.6.5.  Unwrapping is deliberately narrow: it fires
+    # only when the top level carries the SkillResult envelope signature
+    # (``status == "success"`` plus a dict ``payload``), which a flat
+    # artifact never does (artifacts use ``validation_status``, never a
+    # top-level ``status``).
+    if (
+        parsed.get("status") == "success"
+        and isinstance(parsed.get("payload"), dict)
+        and parsed["payload"]
+    ):
+        logger.info(
+            "  skill NOTE   id=%s  unwrapped SkillResult-shaped success "
+            "envelope (payload -> top level)",
+            skill_id,
+        )
+        parsed = parsed["payload"]
 
     # ── Phase E: Path-aware canonical write ────────────────────────────
     #
@@ -1881,7 +2506,20 @@ def run_skill(
             else:
                 pending_writes.append((canonical_rel, sub_artifact))
 
+        # Every return below logs its outcome.  The whole multi-artifact
+        # branch used to return silently — success and failure alike — so a
+        # skill on this contract vanished from the console between its
+        # INVOKE line and the next skill's START line (observed for
+        # concept-call-binding-derivation in runs 0395b136 and 7acc143b).
+        # A genuine failure here looked identical to the skill never having
+        # run.
         if all_errors:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=MALFORMED_ARTIFACT  "
+                "contract=multi_artifact  elapsed=%.1fs  errors=%d",
+                skill_id, _elapsed, len(all_errors),
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1892,6 +2530,13 @@ def run_skill(
             )
 
         if not pending_writes:
+            _elapsed = time.monotonic() - _skill_t0
+            logger.info(
+                "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                "contract=multi_artifact  elapsed=%.1fs  "
+                "(no sub-artifact matched; parsed keys=%s)",
+                skill_id, _elapsed, list(parsed.keys()),
+            )
             return SkillResult(
                 status="failure",
                 failure_reason=(
@@ -1904,6 +2549,13 @@ def run_skill(
         for canonical_rel, content in pending_writes:
             write_error = _atomic_write(content, repo_root / canonical_rel)
             if write_error is not None:
+                _elapsed = time.monotonic() - _skill_t0
+                logger.info(
+                    "  skill FAIL   id=%s  category=INCOMPLETE_OUTPUT  "
+                    "contract=multi_artifact  elapsed=%.1fs  "
+                    "(atomic write to %s failed)",
+                    skill_id, _elapsed, canonical_rel,
+                )
                 return SkillResult(
                     status="failure",
                     failure_reason=(
@@ -1914,6 +2566,12 @@ def run_skill(
                 )
             outputs_written.append(canonical_rel)
 
+        _elapsed = time.monotonic() - _skill_t0
+        logger.info(
+            "  skill OK     id=%s  contract=multi_artifact  outputs=%d  "
+            "elapsed=%.1fs",
+            skill_id, len(outputs_written), _elapsed,
+        )
         return SkillResult(
             status="success",
             outputs_written=outputs_written,

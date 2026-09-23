@@ -32,10 +32,11 @@ Approach B predicate resolution (step 4):
 
 Semantic predicates are invoked via ``runner.semantic_dispatch.invoke_agent``,
 which reads artifact files from disk, constructs system/user prompts embedding
-artifact content and the applicable constitutional rule, and invokes
-``claude-sonnet-4-6`` through the Claude runtime transport.  Unknown function
-names and non-parseable responses produce a ``_dispatch_error`` sentinel that
-intentionally fails ``validate_semantic_result()``, surfacing as
+artifact content and the applicable constitutional rule, and invokes the model
+named by ``semantic_dispatch.AGENT_MODEL`` through the Claude runtime
+transport.  Unknown function names and non-parseable responses produce a
+``_dispatch_error`` sentinel that intentionally fails
+``validate_semantic_result()``, surfacing as
 ``failure_reason: "semantic_result_malformed"`` in the GateResult.
 
 See gate_rules_library_plan.md §6 for the full specification.
@@ -43,7 +44,6 @@ See gate_rules_library_plan.md §6 for the full specification.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,7 +55,13 @@ from runner.gate_library import (
     LIBRARY_REL_PATH,
 )
 from runner.manifest_reader import ManifestReader, ManifestReaderError
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import (
+    GATE_RESULT_FALLBACK_SUBDIR,
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+    TIER4_ROOT_REL,
+)
+from runner.fingerprints import compute_fingerprints
 from runner.paths import find_repo_root, resolve_repo_path
 from runner.predicates.scope_coverage_predicates import all_mandatory_scope_covered
 from runner.predicates.coverage_predicates import (
@@ -72,7 +78,9 @@ from runner.predicates.coverage_predicates import (
     wp_budget_coverage_match,
 )
 from runner.predicates.criterion_predicates import (
+    assumed_claims_are_operator_declared,
     cross_section_consistency,
+    declared_facts_are_not_inferred,
     impact_pathways_covered,
     implementation_coverage_complete,
     no_unresolved_material_claims,
@@ -108,6 +116,7 @@ from runner.predicates.schema_predicates import (
     no_blocking_inconsistencies,
     revision_action_list_present,
     risk_register_populated,
+    unit_cost_budget_resolved,
 )
 from runner.predicates.source_ref_predicates import (
     all_mappings_have_source_refs,
@@ -150,11 +159,14 @@ DETERMINISTIC_TYPES: frozenset[str] = frozenset(
 #: Gate that triggers HARD_BLOCK on budget-received-dir failure.
 HARD_BLOCK_GATE: str = "gate_09_budget_consistency"
 
-#: Tier-4 root relative to repo root.
-TIER4_ROOT_REL: str = "docs/tier4_orchestration_state"
-
-#: Fallback gate result sub-path for gate_ids not in GATE_RESULT_PATHS.
-_FALLBACK_RESULT_SUB: str = "gate_results"
+#: Tier-4 root and fallback gate-result subdir are sourced from
+#: ``gate_result_registry`` (the authoritative path module, imported above) so
+#: this write-path resolver and the schema_id backfill discovery tool read one
+#: source instead of re-hardcoding the literals.  (Other path-computers —
+#: ``dag_scheduler`` etc. — still keep local mirrors; converging them is out of
+#: scope here.)  ``TIER4_ROOT_REL`` is re-exported via the import;
+#: ``_FALLBACK_RESULT_SUB`` keeps its historical local name.
+_FALLBACK_RESULT_SUB: str = GATE_RESULT_FALLBACK_SUBDIR
 
 # ---------------------------------------------------------------------------
 # Predicate dispatch registry
@@ -182,6 +194,7 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     "ethics_assessment_explicit": ethics_assessment_explicit,
     "governance_matrix_present": governance_matrix_present,
     "no_blocking_inconsistencies": no_blocking_inconsistencies,
+    "unit_cost_budget_resolved": unit_cost_budget_resolved,
     "budget_gate_confirmation_present": budget_gate_confirmation_present,
     "findings_categorised_by_severity": findings_categorised_by_severity,
     "revision_action_list_present": revision_action_list_present,
@@ -215,6 +228,8 @@ PREDICATE_REGISTRY: dict[str, Callable[..., PredicateResult]] = {
     # --- criterion-aligned predicates (Phase 8 refactor) ---
     "schema_id_matches": schema_id_matches,
     "no_unresolved_material_claims": no_unresolved_material_claims,
+    "assumed_claims_are_operator_declared": assumed_claims_are_operator_declared,
+    "declared_facts_are_not_inferred": declared_facts_are_not_inferred,
     "impact_pathways_covered": impact_pathways_covered,
     "implementation_coverage_complete": implementation_coverage_complete,
     "cross_section_consistency": cross_section_consistency,
@@ -263,59 +278,6 @@ def _extract_node_id(evaluated_at: str) -> str:
     """
     parts = (evaluated_at or "").strip().split()
     return parts[0] if parts else "unknown"
-
-
-def _fingerprint_path(path: Path) -> str:
-    """
-    Compute a deterministic SHA-256 fingerprint of *path*.
-
-    * **File**: SHA-256 of raw file bytes.
-    * **Directory**: SHA-256 of a JSON-encoded sorted list of direct-child
-      names (non-recursive).  This detects additions and removals of direct
-      children but not changes inside subdirectories.
-    * **Missing**: returns the sentinel string ``"sha256:MISSING"`` rather
-      than raising, so fingerprinting never blocks gate evaluation.
-    """
-    if not path.exists():
-        return "sha256:MISSING"
-    if path.is_dir():
-        entries = sorted(p.name for p in path.iterdir())
-        content = json.dumps(entries).encode("utf-8")
-    else:
-        content = path.read_bytes()
-    return "sha256:" + hashlib.sha256(content).hexdigest()
-
-
-def _compute_fingerprints(
-    artifact_paths: list[str],
-    repo_root: Path,
-) -> tuple[dict[str, str], str]:
-    """
-    Compute per-artifact fingerprints and a combined fingerprint.
-
-    Parameters
-    ----------
-    artifact_paths:
-        List of repo-relative (or absolute) path strings.
-    repo_root:
-        Repository root for resolving relative paths.
-
-    Returns
-    -------
-    per_artifact:
-        ``{path_string: "sha256:<hex>"}`` mapping, stable-sorted by path.
-    combined:
-        A single SHA-256 fingerprint derived from the stable JSON encoding
-        of *per_artifact*.  Used for the ``input_fingerprint`` field.
-    """
-    per_artifact: dict[str, str] = {}
-    for p in sorted(artifact_paths):  # sort for stability
-        resolved = resolve_repo_path(p, repo_root)
-        per_artifact[p] = _fingerprint_path(resolved)
-
-    combined_bytes = json.dumps(per_artifact, sort_keys=True).encode("utf-8")
-    combined = "sha256:" + hashlib.sha256(combined_bytes).hexdigest()
-    return per_artifact, combined
 
 
 def _gate_result_path(gate_id: str, repo_root: Path) -> Path:
@@ -401,11 +363,111 @@ def _is_hard_block_failure(
     if not gate_entry.get("hard_block_on_missing_received_dir"):
         return False
     for fp in failed_predicates:
+        # Lump-sum branch: the external ``received/`` response is absent.
         if fp.get("function") == "dir_non_empty":
             path_arg = (fp.get("args") or {}).get("path", "")
             if "received" in str(path_arg):
                 return True
+        # Unit-cost branch (C1): the internal deterministic derivation is
+        # unresolved (missing/blocked ``unit_cost_budget.json``), or the
+        # instrument budget regime could not be resolved to select a source.
+        # Both are an absent/unresolved budget source — the same categorical
+        # Phase-8 block as a missing lump-sum response (§8.4).
+        if fp.get("function") in (
+            "unit_cost_budget_resolved",
+            _INSTRUMENT_UNRESOLVED_FUNC,
+        ):
+            return True
     return False
+
+
+#: Synthetic predicate ``function`` used to record an instrument-resolution
+#: fail-closed on a gate carrying ``applies_when`` predicates.  It is not a
+#: real predicate — it is the fail-closed marker the evaluator emits when a
+#: gate's applicable-predicate set cannot be selected because the instrument
+#: budget regime is unresolvable (§12.4, fail closed).
+_INSTRUMENT_UNRESOLVED_FUNC: str = "instrument_budget_regime_resolvable"
+
+
+def _resolve_budget_regime(repo_root: Path) -> Optional[str]:
+    """Resolve the selected call's budget regime, or ``None`` if unresolvable.
+
+    Thin wrapper over :func:`runner.instrument_profile.resolve_instrument_profile`
+    that never raises: any failure to resolve the instrument profile (absent
+    call binding, unknown instrument, malformed registry) returns ``None`` so
+    the caller can fail the gate closed with a clear reason rather than crash.
+    """
+    try:
+        from runner.instrument_profile import resolve_instrument_profile
+
+        return resolve_instrument_profile(repo_root).budget_regime
+    except Exception:  # noqa: BLE001 — any resolution failure ⇒ None (fail closed upstream)
+        return None
+
+
+def _partition_predicates_by_instrument(
+    all_predicates: list[dict],
+    repo_root: Path,
+) -> tuple[list[dict], list[dict], Optional[str]]:
+    """Filter instrument-conditional predicates by the resolved budget regime.
+
+    A predicate may carry an ``applies_when: {budget_regime: <regime>}`` tag
+    (C1): it is evaluated only when the selected call's budget regime matches.
+    This is how ``gate_09`` is **instrument-conditional on source** — the
+    lump-sum ``received/`` predicates apply only to lump-sum instruments; the
+    unit-cost derivation predicates apply only to unit-cost instruments — with
+    the lump-sum predicates preserved verbatim (RIA reachable, D1) and no
+    instrument literal on the gate path (§2, programme-agnostic).
+
+    Predicates with **no** ``applies_when`` always apply (the common case;
+    unchanged behaviour for every existing gate and synthetic-library test).
+
+    Returns
+    -------
+    (applicable, skipped, resolution_error)
+        *applicable* — predicates to evaluate.
+        *skipped* — records of predicates skipped as not-applicable for the
+        resolved regime (informational; recorded in the gate result).
+        *resolution_error* — a human-readable reason when the gate has
+        ``applies_when`` predicates but the budget regime is unresolvable, in
+        which case the gate must **fail closed** (§12.4); ``None`` otherwise.
+    """
+    if not any(p.get("applies_when") for p in all_predicates):
+        return all_predicates, [], None
+
+    regime = _resolve_budget_regime(repo_root)
+    applicable: list[dict] = []
+    skipped: list[dict] = []
+
+    for pred in all_predicates:
+        applies_when = pred.get("applies_when")
+        if not applies_when:
+            applicable.append(pred)
+            continue
+        want_regime = applies_when.get("budget_regime")
+        if regime is not None and want_regime == regime:
+            applicable.append(pred)
+        else:
+            skipped.append({
+                "predicate_id": pred.get("predicate_id", "<unknown>"),
+                "applies_when": applies_when,
+                "resolved_budget_regime": regime,
+                "reason": (
+                    "not applicable for resolved budget_regime"
+                    if regime is not None
+                    else "budget_regime unresolvable"
+                ),
+            })
+
+    resolution_error: Optional[str] = None
+    if regime is None:
+        resolution_error = (
+            "gate has instrument-conditional predicates (applies_when) but "
+            "the selected call's budget_regime could not be resolved from "
+            "selected_call.json / the instrument registries; failing closed "
+            "(§12.4) — the budget source cannot be selected."
+        )
+    return applicable, skipped, resolution_error
 
 
 # ---------------------------------------------------------------------------
@@ -528,6 +590,16 @@ def evaluate_gate(
         # Approach A fallback: library gate entry provides the predicates list
         all_predicates = gate_entry.get("predicates") or []
 
+    # Instrument-conditional predicate filtering (C1): a predicate carrying
+    # ``applies_when: {budget_regime: ...}`` is evaluated only when it matches
+    # the selected call's regime.  This is how gate_09 branches on source
+    # (lump-sum ``received/`` vs unit-cost internal derivation) with the
+    # lump-sum predicates preserved verbatim.  Predicates with no applies_when
+    # are unaffected (every other gate, and every synthetic-library test).
+    all_predicates, skipped_predicates, applies_when_error = (
+        _partition_predicates_by_instrument(all_predicates, repo_root)
+    )
+
     deterministic_preds = [
         p for p in all_predicates if p.get("type") in DETERMINISTIC_TYPES
     ]
@@ -544,7 +616,7 @@ def evaluate_gate(
     # 5. Compute input fingerprints
     # ------------------------------------------------------------------
     upstream_paths: list[str] = UPSTREAM_REQUIRED_INPUTS.get(gate_id, [])
-    per_artifact_fps, combined_fp = _compute_fingerprints(
+    per_artifact_fps, combined_fp = compute_fingerprints(
         upstream_paths, repo_root
     )
 
@@ -580,6 +652,25 @@ def evaluate_gate(
                     "prose_condition": pred.get("prose_condition", ""),
                 }
             )
+
+    # Instrument-conditional fail-closed: the gate declared ``applies_when``
+    # predicates but the budget regime was unresolvable, so the applicable
+    # predicate set could not be selected.  Record a deterministic failure so
+    # the gate blocks (§12.4) rather than passing on a subset.
+    if applies_when_error is not None:
+        failed_det_entries.append(
+            {
+                "predicate_id": "instrument_conditional_gate",
+                "type": "schema",
+                "function": _INSTRUMENT_UNRESOLVED_FUNC,
+                "args": {},
+                "failure_category": "MISSING_MANDATORY_INPUT",
+                "reason": applies_when_error,
+                "details": {},
+                "fail_message": applies_when_error,
+                "prose_condition": "Instrument budget_regime resolvable",
+            }
+        )
 
     # ------------------------------------------------------------------
     # 7. Decide overall status
@@ -698,6 +789,13 @@ def evaluate_gate(
     # 10. Build GateResult dict (§6.2)
     # ------------------------------------------------------------------
     gate_result: dict[str, Any] = {
+        # Required by artifact_schema_specification.yaml (gate_result_schema):
+        # every gate result file MUST carry this schema_id, and a consumer that
+        # finds a different/absent value fails with MALFORMED_ARTIFACT (e.g.
+        # checkpoint-publish at n08f).  Historically omitted; added here so the
+        # evaluator's output conforms to its own declared schema.  This is the
+        # sole gate-result write path in the runtime (§17.6.3).
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "gate_kind": gate_kind,
         "run_id": run_id,
@@ -717,6 +815,11 @@ def evaluate_gate(
         "skipped_semantic": skipped_semantic,
         "report_written_to": str(result_path),
     }
+
+    # Record instrument-conditional predicates skipped as not-applicable for
+    # the resolved budget regime (C1) — informational, for auditability.
+    if skipped_predicates:
+        gate_result["skipped_not_applicable_predicates"] = skipped_predicates
 
     if hard_block:
         gate_result["hard_block"] = True

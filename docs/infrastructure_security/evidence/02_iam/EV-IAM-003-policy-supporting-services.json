@@ -1,0 +1,32 @@
+﻿{
+    "PolicyVersion": {
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "AllowSecretsRetrieval",
+                    "Effect": "Allow",
+                    "Action": [
+                        "secretsmanager:GetSecretValue"
+                    ],
+                    "Resource": [
+                        "arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/*"
+                    ]
+                },
+                {
+                    "Sid": "AllowKMSDecrypt",
+                    "Effect": "Allow",
+                    "Action": [
+                        "kms:Decrypt",
+                        "kms:DescribeKey"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        },
+        "VersionId": "v1",
+        "IsDefaultVersion": true,
+        "CreateDate": "2026-05-29T17:46:27+00:00"
+    }
+}
+

@@ -1,0 +1,37 @@
+{
+  "lane": "B-review-schemaid",
+  "decision": "HOLDS UP \u2014 majority",
+  "holds": 3,
+  "refute": 0,
+  "unparsed": 0,
+  "errored": 0,
+  "verdicts": [
+    {
+      "lens": "every-write-path-covered",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "Backfill globs only phase_outputs/**/*result*.json, missing the evaluator's own fallback dir docs/tier4_orchestration_state/gate_results/ (gate_evaluator.py:337) and the gate-result-shaped alpha_honest_block/phase2_gate_result_HONEST_BLOCK.json \u2014 latent scope gap, no live miss",
+        "lens": "every-write-path-covered"
+      }
+    },
+    {
+      "lens": "backfill-idempotency-and-safety",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "backfill silently reports APPLIED/exit-0 when --repo-root is wrong (rglob on a missing dir yields nothing, root never validated), making 'scanned nothing' indistinguishable from 'all conforming'",
+        "lens": "backfill-idempotency-and-safety"
+      }
+    },
+    {
+      "lens": "schema-contract-match",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "medium",
+        "top_defect": "Backfill discovers files by glob+duck-type rather than GATE_RESULT_PATHS, so a gate result at the evaluator's fallback path is skipped while the tool exits 0 \u2014 silent under-coverage, unreachable today",
+        "lens": "schema-contract-match"
+      }
+    }
+  ]
+}

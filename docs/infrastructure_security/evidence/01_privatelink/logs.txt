@@ -1,0 +1,428 @@
+~ $ HOST_SG_ID=$(aws ec2 create-security-group \
+>   --group-name "proposal-orchestrator-host-sg" \
+>   --description "Security group for Proposal Orchestrator deployment host" \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=proposal-orchestrator-host-sg},{Key=project,Value=proposal-orchestrator}]' \
+>   --query 'GroupId' \
+>   --output text \
+>   --region us-east-1)
+
+~ $ 
+~ $ echo "Created Host SG: $HOST_SG_ID"
+Created Host SG: sg-076f724aed2429771
+~ $ aws ec2 authorize-security-group-egress \
+>   --group-id $HOST_SG_ID \
+>   --protocol tcp \
+>   --port 443 \
+>   --source-group sg-013d5e4d4eb55dfd9 \
+>   --region us-east-1
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-0f62cfe31fcebefad",
+            "GroupId": "sg-076f724aed2429771",
+            "GroupOwnerId": "232538551827",
+            "IsEgress": true,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "ReferencedGroupInfo": {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "UserId": "232538551827"
+            },
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:232538551827:security-group-rule/sgr-0f62cfe31fcebefad"
+        }
+    ]
+}
+~ $ aws ec2 revoke-security-group-egress \
+>   --group-id $HOST_SG_ID \
+>   --protocol all \
+>   --port all \
+>   --cidr 0.0.0.0/0 \
+>   --region us-east-1
+{
+    "Return": true,
+    "RevokedSecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-099082ca1935a6165",
+            "GroupId": "sg-076f724aed2429771",
+            "IsEgress": true,
+            "IpProtocol": "-1",
+            "FromPort": -1,
+            "ToPort": -1,
+            "CidrIpv4": "0.0.0.0/0"
+        }
+    ]
+
+    ~ $ aws ec2 revoke-security-group-ingress \
+>   --group-id sg-013d5e4d4eb55dfd9 \
+>   --protocol tcp \
+>   --port 443 \
+>   --cidr 172.31.0.0/16 \
+>   --region us-east-1
+{
+    "Return": true,
+    "RevokedSecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-0393f53b39cf51a71",
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIpv4": "172.31.0.0/16"
+        }
+    ]
+}
+~ $ aws ec2 authorize-security-group-ingress \
+>   --group-id sg-013d5e4d4eb55dfd9 \
+>   --protocol tcp \
+>   --port 443 \
+>   --source-group sg-076f724aed2429771 \
+>   --region us-east-1
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-022243558c39ebe0f",
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "GroupOwnerId": "232538551827",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "ReferencedGroupInfo": {
+                "GroupId": "sg-076f724aed2429771",
+                "UserId": "232538551827"
+            },
+            "SecurityGroupRuleArn": "arn:aws:ec2:us-east-1:232538551827:security-group-rule/sgr-022243558c39ebe0f"
+        }
+    ]
+}
+~ $ aws ec2 describe-security-groups \
+>   --group-ids sg-013d5e4d4eb55dfd9 sg-076f724aed2429771 \
+>   --region us-east-1 \
+>   --query "SecurityGroups[].{GroupId:GroupId,GroupName:GroupName,Ingress:IpPermissions,Egress:IpPermissionsEgress}" \
+>   --output json
+[
+    {
+        "GroupId": "sg-076f724aed2429771",
+        "GroupName": "proposal-orchestrator-host-sg",
+        "Ingress": [],
+        "Egress": [
+            {
+                "IpProtocol": "tcp",
+                "FromPort": 443,
+                "ToPort": 443,
+                "UserIdGroupPairs": [
+                    {
+                        "UserId": "232538551827",
+                        "GroupId": "sg-013d5e4d4eb55dfd9"
+                    }
+                ],
+                "IpRanges": [],
+                "Ipv6Ranges": [],
+                "PrefixListIds": []
+            }
+        ]
+    },
+    {
+        "GroupId": "sg-013d5e4d4eb55dfd9",
+        "GroupName": "proposal-orchestrator-vpce-sg",
+        "Ingress": [
+            {
+                "IpProtocol": "tcp",
+                "FromPort": 443,
+                "ToPort": 443,
+                "UserIdGroupPairs": [
+                    {
+                        "UserId": "232538551827",
+                        "GroupId": "sg-076f724aed2429771"
+                    }
+                ],
+                "IpRanges": [],
+                "Ipv6Ranges": [],
+                "PrefixListIds": []
+            }
+        ],
+        "Egress": []
+    }
+]
+
+~ $ aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.ssm \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-ssm},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-06a268f54ecc1f754",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.ssm",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-0f91bd65b5713ca72",
+            "eni-0aa200b8cbecb1a54"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-06a268f54ecc1f754-mvuwh1gr.ssm.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-06a268f54ecc1f754-mvuwh1gr-us-east-1a.ssm.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-06a268f54ecc1f754-mvuwh1gr-us-east-1b.ssm.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "ssm.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            },
+            {
+                "DnsName": "ssm.us-east-1.api.aws",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T15:26:31.487000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-ssm"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+}
+aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.ssmmessages \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-ssmmessages},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-0824e9fbb2f099e37",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.ssmmessages",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-00697bca3d98ae9c8",
+            "eni-0e164c55019b7b6b3"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-0824e9fbb2f099e37-3g8kwvr7.ssmmessages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0824e9fbb2f099e37-3g8kwvr7-us-east-1a.ssmmessages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0824e9fbb2f099e37-3g8kwvr7-us-east-1b.ssmmessages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "ssmmessages.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            },
+            {
+                "DnsName": "ssmmessages.us-east-1.api.aws",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T15:27:19.729000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-ssmmessages"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+}
+aws ec2 create-vpc-endpoint \
+>   --vpc-endpoint-type Interface \
+>   --service-name com.amazonaws.us-east-1.ec2messages \
+>   --vpc-id vpc-050a09774560fd774 \
+>   --subnet-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 \
+>   --security-group-ids sg-013d5e4d4eb55dfd9 \
+>   --private-dns-enabled \
+>   --tag-specifications 'ResourceType=vpc-endpoint,Tags=[{Key=Name,Value=proposal-orchestrator-ec2messages},{Key=project,Value=proposal-orchestrator}]' \
+>   --region us-east-1
+{
+    "VpcEndpoint": {
+        "VpcEndpointId": "vpce-0ec79b44974bfd85b",
+        "VpcEndpointType": "Interface",
+        "VpcId": "vpc-050a09774560fd774",
+        "ServiceName": "com.amazonaws.us-east-1.ec2messages",
+        "State": "pending",
+        "RouteTableIds": [],
+        "SubnetIds": [
+            "subnet-023c6e3ea5451ea47",
+            "subnet-01d969bb1421a3042"
+        ],
+        "Groups": [
+            {
+                "GroupId": "sg-013d5e4d4eb55dfd9",
+                "GroupName": "proposal-orchestrator-vpce-sg"
+            }
+        ],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+            "DnsRecordIpType": "ipv4"
+        },
+        "PrivateDnsEnabled": true,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [
+            "eni-04f24a929f1563923",
+            "eni-07bc5e0ea38e6941b"
+        ],
+        "DnsEntries": [
+            {
+                "DnsName": "vpce-0ec79b44974bfd85b-gwu79e1w.ec2messages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0ec79b44974bfd85b-gwu79e1w-us-east-1b.ec2messages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "vpce-0ec79b44974bfd85b-gwu79e1w-us-east-1a.ec2messages.us-east-1.vpce.amazonaws.com",
+                "HostedZoneId": "Z7HUB22UULQXV"
+            },
+            {
+                "DnsName": "ec2messages.us-east-1.amazonaws.com",
+                "HostedZoneId": "ZONEIDPENDING"
+            }
+        ],
+        "CreationTimestamp": "2026-05-29T15:27:47.220000+00:00",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "proposal-orchestrator-ec2messages"
+            },
+            {
+                "Key": "project",
+                "Value": "proposal-orchestrator"
+            }
+        ],
+        "OwnerId": "232538551827",
+        "ServiceRegion": "us-east-1"
+    }
+}
+
+ $ aws ec2 describe-vpc-endpoints \
+>   --vpc-endpoint-ids vpce-06a268f54ecc1f754 vpce-0824e9fbb2f099e37 vpce-0ec79b44974bfd85b \
+>   --region us-east-1 \
+>   --query "VpcEndpoints[].{ID:VpcEndpointId,Service:ServiceName,State:State,PrivateDns:PrivateDnsEnabled}" \
+>   --output table
+----------------------------------------------------------------------------------------------
+|                                    DescribeVpcEndpoints                                    |
++-------------------------+-------------+---------------------------------------+------------+
+|           ID            | PrivateDns  |                Service                |   State    |
++-------------------------+-------------+---------------------------------------+------------+
+|  vpce-06a268f54ecc1f754 |  True       |  com.amazonaws.us-east-1.ssm          |  available |
+|  vpce-0824e9fbb2f099e37 |  True       |  com.amazonaws.us-east-1.ssmmessages  |  available |
+|  vpce-0ec79b44974bfd85b |  True       |  com.amazonaws.us-east-1.ec2messages  |  available |
++-------------------------+-------------+---------------------------------------+------------+
+
+PS C:\Code\proposal_demo\proposal_orchestrator> aws iam create-role >> --role-name proposal-orchestrator-ec2-ssm-role >> --assume-role-policy-document file://ec2-trust-policy.json { "Role": { "Path": "/", "RoleName": "proposal-orchestrator-ec2-ssm-role", "RoleId": "AROATMJDAWYJXA3K7TPEV", "Arn": "arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role", "CreateDate": "2026-05-29T15:32:08+00:00", "AssumeRolePolicyDocument": { "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Principal": { "Service": "ec2.amazonaws.com" }, "Action": "sts:AssumeRole" } ] } } } PS C:\Code\proposal_demo\proposal_orchestrator> aws iam attach-role-policy --role-name proposal-orchestrator-ec2-ssm-role --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore PS C:\Code\proposal_demo\proposal_orchestrator> aws iam create-instance-profile --instance-profile-name proposal-orchestrator-ec2-ssm-profile { "InstanceProfile": { "Path": "/", "InstanceProfileName": "proposal-orchestrator-ec2-ssm-profile", "InstanceProfileId": "AIPATMJDAWYJ4TU65VK55", "Arn": "arn:aws:iam::232538551827:instance-profile/proposal-orchestrator-ec2-ssm-profile", "CreateDate": "2026-05-29T15:33:24+00:00", "Roles": [] } } PS C:\Code\proposal_demo\proposal_orchestrator> aws iam add-role-to-instance-profile --instance-profile-name proposal-orchestrator-ec2-ssm-profile --role-name proposal-orchestrator-ec2-ssm-role PS C:\Code\proposal_demo\proposal_orchestrator> aws iam get-instance-profile --instance-profile-name proposal-orchestrator-ec2-ssm-profile { "InstanceProfile": { "Path": "/", "InstanceProfileName": "proposal-orchestrator-ec2-ssm-profile", "InstanceProfileId": "AIPATMJDAWYJ4TU65VK55", "Arn": "arn:aws:iam::232538551827:instance-profile/proposal-orchestrator-ec2-ssm-profile", "CreateDate": "2026-05-29T15:33:24+00:00", "Roles": [ { "Path": "/", "RoleName": "proposal-orchestrator-ec2-ssm-role", "RoleId": "AROATMJDAWYJXA3K7TPEV", "Arn": "arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role", "CreateDate": "2026-05-29T15:32:08+00:00", "AssumeRolePolicyDocument": { "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Principal": { "Service": "ec2.amazonaws.com" }, "Action": "sts:AssumeRole" } ] } } ], "Tags": [] } }
+PS C:\Code\proposal_demo\proposal_orchestrator> $AMI_ID = aws ssm get-parameter `
+>>   --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 `
+>>   --query "Parameter.Value" `
+>>   --output text `
+>>   --region us-east-1
+>> 
+>> echo "AMI: $AMI_ID"
+AMI: ami-00e801948462f718a
+PS C:\Code\proposal_demo\proposal_orchestrator> $INSTANCE_ID = aws ec2 run-instances `
+>>   --image-id $AMI_ID `
+>>   --instance-type t3.micro `
+>>   --subnet-id subnet-023c6e3ea5451ea47 `
+>>   --security-group-ids sg-076f724aed2429771 `
+>>   --iam-instance-profile Name=proposal-orchestrator-ec2-ssm-profile `
+>>   --no-associate-public-ip-address `
+>>   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=proposal-orchestrator-validation-host},{Key=project,Value=proposal-orchestrator}]' `
+>>   --query "Instances[0].InstanceId" `
+>>   --output text `
+>>   --region us-east-1
+>> 
+>> echo "Instance: $INSTANCE_ID"
+Instance: i-0045af36dbf5f1272
+PS C:\Code\proposal_demo\proposal_orchestrator> aws ec2 wait instance-running `
+>>   --instance-ids $INSTANCE_ID `
+>>   --region us-east-1
+>> 
+>> echo "Instance is running"
+Instance is running
+
+sh-5.2$ getent hosts bedrock-runtime.us-east-1.amazonaws.com
+172.31.80.15    bedrock-runtime.us-east-1.amazonaws.com
+172.31.27.207   bedrock-runtime.us-east-1.amazonaws.com
+sh-5.2$ nslookup bedrock-runtime.us-east-1.amazonaws.com
+Server:         172.31.0.2
+Address:        172.31.0.2#53
+
+Non-authoritative answer:
+Name:   bedrock-runtime.us-east-1.amazonaws.com
+Address: 172.31.27.207
+Name:   bedrock-runtime.us-east-1.amazonaws.com
+Address: 172.31.80.15

@@ -47,6 +47,10 @@ GROUPED_JSON_MAP: dict[str, str] = {
     "cluster_security": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_security/cluster_CL3.grouped.json",
     "cluster_food": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_food/cluster_CL5.grouped.json",
     "cluster_climate": "docs/tier2b_topic_and_call_sources/work_programmes/cluster_climate/cluster_CL6.grouped.json",
+    # MSCA (ticket 13): the MSCA work programme is already in the grouped
+    # destinations[].calls[] shape the slicer scans; registering it here lets
+    # Step 0 bound the MSCA-PF call for Phase 1, the same as the clusters.
+    "msca": "docs/tier2b_topic_and_call_sources/work_programmes/msca/HORIZON-MSCA.json",
 }
 
 MAX_SLICE_BYTES: int = 20_480  # 20 KB hard limit

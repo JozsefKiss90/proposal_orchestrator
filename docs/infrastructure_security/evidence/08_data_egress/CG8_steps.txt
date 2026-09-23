@@ -1,0 +1,336 @@
+Control Group 8 — Data Egress Prevention
+
+  Controls
+
+  DC-07  Deployment host SG restricts outbound to VPC endpoints only
+  DC-08  VPC flow logs enabled on deployment subnet
+  DC-31  No Claude CLI binary on deployment host
+  DC-32  Internet egress blocked from deployment host
+
+  Infrastructure Reference (from CG1-CG7)
+
+  Account:           232538551827
+  Region:            us-east-1
+  VPC:               vpc-050a09774560fd774
+  Deployment subnet: subnet-023c6e3ea5451ea47 (us-east-1a)
+                     subnet-01d969bb1421a3042 (us-east-1b)
+  Host SG:           sg-076f724aed2429771
+  VPCE SG:           sg-013d5e4d4eb55dfd9
+  Route table:       rtb-085481996de5e3ed9 (local + S3 only, no IGW/NAT)
+  Instance host:     i-0045af36dbf5f1272
+  KMS key ARN:       arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1
+
+  Cross-References from Prior CGs
+
+  - DC-06 (no internet route): VERIFIED_PASS in CG1 — route table has only
+    local (172.31.0.0/16) + S3 prefix list. No IGW/NAT routes.
+  - DC-11 (IAM deny statements): VERIFIED_PASS in CG2 — explicit deny for
+    non-Bedrock services (ec2, s3, iam, lambda, sqs, sns, dynamodb).
+  - DC-28/DC-29 (invocation logging disabled): VERIFIED_PASS in CG7.
+
+  ============================================================================
+  Step 1: Verify Host Security Group Outbound Rules (DC-07)
+  ============================================================================
+
+  The host SG sg-076f724aed2429771 was configured in CG1 with TCP 443
+  egress to the VPCE SG. Verify current state:
+
+  aws ec2 describe-security-groups 
+    --group-ids sg-076f724aed2429771 
+    --query "SecurityGroups[0].{GroupId:GroupId,GroupName:GroupName,IngressRules:IpPermissions,EgressRules:IpPermissionsEgress}" 
+    --region us-east-1 
+    --output json
+
+  Expected outbound (IpPermissionsEgress):
+  - ONLY TCP 443 to sg-013d5e4d4eb55dfd9 (VPCE SG)
+  - NO 0.0.0.0/0 rules
+  - NO other destination CIDRs or security groups
+
+  FAIL condition: Any outbound rule allowing 0.0.0.0/0 or destinations
+  other than the VPCE SG. If found, remove the offending rule:
+
+    aws ec2 revoke-security-group-egress 
+      --group-id sg-076f724aed2429771 
+      --ip-permissions <RULE_TO_REMOVE>
+
+  ============================================================================
+  Step 2: Enable VPC Flow Logs (DC-08)
+  ============================================================================
+
+  Flow logs require: a CloudWatch Logs log group and an IAM role that
+  allows the flow logs service to write to it.
+
+  --- 2a. Create the log group ---
+
+  aws logs create-log-group 
+    --log-group-name "/proposal-orchestrator/vpc-flow-logs" 
+    --region us-east-1
+
+  # Set retention (90 days)
+  aws logs put-retention-policy 
+    --log-group-name "/proposal-orchestrator/vpc-flow-logs" 
+    --retention-in-days 90 
+    --region us-east-1
+
+  # Set KMS encryption (CG4 key policy already allows this log group prefix)
+  aws logs associate-kms-key 
+    --log-group-name "/proposal-orchestrator/vpc-flow-logs" 
+    --kms-key-id "arn:aws:kms:us-east-1:232538551827:key/887638e8-358b-4664-9270-368aec0ea1f1" 
+    --region us-east-1
+
+  Note: The KMS key policy from CG4 includes AllowCloudWatchLogsEncryption
+  scoped to arn:aws:logs:us-east-1:232538551827:log-group:/proposal-orchestrator/*
+  so this log group name is within scope.
+
+  --- 2b. Create the IAM role for flow logs delivery ---
+
+  Save trust policy to flow_logs_trust_policy.json:
+
+  ---- BEGIN flow_logs_trust_policy.json ----
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "AllowFlowLogsAssume",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "vpc-flow-logs.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+          }
+      ]
+  }
+  ---- END flow_logs_trust_policy.json ----
+
+  aws iam create-role 
+    --role-name "proposal-orchestrator-flow-logs-role" 
+    --assume-role-policy-document file://flow_logs_trust_policy.json 
+    --description "VPC flow logs delivery to CloudWatch Logs" 
+    --tags '[{"Key":"project","Value":"proposal-orchestrator"},{"Key":"environment","Value":"production"}]' 
+    --output json
+
+  Save permissions policy to flow_logs_permissions_policy.json:
+
+  ---- BEGIN flow_logs_permissions_policy.json ----
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "AllowFlowLogsWrite",
+              "Effect": "Allow",
+              "Action": [
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents",
+                  "logs:DescribeLogGroups",
+                  "logs:DescribeLogStreams"
+              ],
+              "Resource": "arn:aws:logs:us-east-1:232538551827:log-group:/proposal-orchestrator/vpc-flow-logs:*"
+          }
+      ]
+  }
+  ---- END flow_logs_permissions_policy.json ----
+
+  aws iam put-role-policy 
+    --role-name "proposal-orchestrator-flow-logs-role" 
+    --policy-name "flow-logs-cloudwatch-write" 
+    --policy-document file://flow_logs_permissions_policy.json
+
+  --- 2c. Create the flow logs ---
+
+  Enable flow logs on both deployment subnets:
+
+  aws ec2 create-flow-logs 
+    --resource-type Subnet 
+    --resource-ids subnet-023c6e3ea5451ea47 subnet-01d969bb1421a3042 
+    --traffic-type ALL 
+    --log-destination-type cloud-watch-logs 
+    --log-group-name "/proposal-orchestrator/vpc-flow-logs" 
+    --deliver-logs-permission-arn "arn:aws:iam::232538551827:role/proposal-orchestrator-flow-logs-role" 
+    --region us-east-1 
+    --output json
+
+  Wait 2-3 minutes for flow logs to become active, then verify:
+
+  aws ec2 describe-flow-logs 
+    --filter "Name=resource-id,Values=subnet-023c6e3ea5451ea47,subnet-01d969bb1421a3042" 
+    --region us-east-1 
+    --output json
+
+  Expected: FlowLogStatus "ACTIVE" for both subnets.
+
+  ============================================================================
+  Step 3: Verify No Claude CLI on Deployment Host (DC-31)
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  {
+    echo "=== DEP-E04: Claude CLI Check ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "--- which claude ---"
+    which claude 2>&1
+    echo "which_exit_code=$?"
+    echo ""
+
+    echo "--- claude --version ---"
+    claude --version 2>&1
+    echo "version_exit_code=$?"
+    echo ""
+
+    echo "--- find claude binary ---"
+    find / -name "claude" -type f 2>/dev/null | head -5
+    echo "find_exit_code=$?"
+    echo ""
+
+    echo "--- npm global list (if npm exists) ---"
+    npm list -g 2>/dev/null | grep -i claude || echo "No npm claude packages"
+    echo ""
+
+    echo "--- pip list (if pip exists) ---"
+    pip list 2>/dev/null | grep -i claude || echo "No pip claude packages"
+  } 2>&1 | tee /tmp/DEP-E04-no-claude-cli.txt
+
+  Expected:
+  - which claude: not found (exit code 1)
+  - claude --version: command not found (exit code 127)
+  - find: no results
+  - No claude packages in npm or pip
+
+  ============================================================================
+  Step 4: Test Internet Egress is Blocked (DC-32)
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  {
+    echo "=== DEP-E05: Internet Egress Test ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "--- Test 1: curl api.anthropic.com (should fail) ---"
+    timeout 10 curl -sv --connect-timeout 5 https://api.anthropic.com 2>&1
+    echo ""
+    echo "curl_anthropic_exit_code=$?"
+
+    echo ""
+    echo "--- Test 2: curl api.together.ai (should fail) ---"
+    timeout 10 curl -sv --connect-timeout 5 https://api.together.ai 2>&1
+    echo ""
+    echo "curl_together_exit_code=$?"
+
+    echo ""
+    echo "--- Test 3: curl google.com (should fail) ---"
+    timeout 10 curl -sv --connect-timeout 5 https://www.google.com 2>&1
+    echo ""
+    echo "curl_google_exit_code=$?"
+
+    echo ""
+    echo "--- Test 4: DNS resolution check (may or may not resolve) ---"
+    nslookup api.anthropic.com 2>&1 || echo "DNS resolution failed"
+  } 2>&1 | tee /tmp/DEP-E05-internet-egress-test.txt
+
+  Expected:
+  - All curl commands: timeout or connection refused (exit code 7, 28, or 124)
+  - DNS may or may not resolve (VPC DNS can resolve public names even
+    without internet connectivity — this is normal and not a security issue;
+    the SG blocks the actual TCP connection)
+
+  ============================================================================
+  Step 5: Collect Evidence
+  ============================================================================
+
+  --- From CloudShell or local CLI: ---
+
+  {
+    echo "=== CG8: Data Egress Evidence Collection ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "=== DEP-E01: Route Table (cross-ref CG1) ==="
+    aws ec2 describe-route-tables 
+      --route-table-ids rtb-085481996de5e3ed9 
+      --query "RouteTables[0].Routes" 
+      --region us-east-1 
+      --output json
+    echo ""
+
+    echo "=== DEP-E02: Host Security Group ==="
+    aws ec2 describe-security-groups 
+      --group-ids sg-076f724aed2429771 
+      --region us-east-1 
+      --output json
+    echo ""
+
+    echo "=== DEP-E03: VPC Flow Logs ==="
+    aws ec2 describe-flow-logs 
+      --filter "Name=resource-id,Values=subnet-023c6e3ea5451ea47,subnet-01d969bb1421a3042" 
+      --region us-east-1 
+      --output json
+    echo ""
+
+    echo "=== Flow Logs Log Group Config ==="
+    aws logs describe-log-groups 
+      --log-group-name-prefix "/proposal-orchestrator/vpc-flow-logs" 
+      --region us-east-1 
+      --output json
+  } 2>&1 | tee CG8_logs.txt
+
+  --- From deployment host via SSM: ---
+
+  Run Steps 3 and 4 above, then copy evidence files:
+  - /tmp/DEP-E04-no-claude-cli.txt
+  - /tmp/DEP-E05-internet-egress-test.txt
+
+  Save all to:
+  - docs/infrastructure_security/evidence/08_data_egress/CG8_logs.txt
+  - docs/infrastructure_security/evidence/08_data_egress/DEP-E04-no-claude-cli.txt
+  - docs/infrastructure_security/evidence/08_data_egress/DEP-E05-internet-egress-test.txt
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  |   #   |         Criterion         |                           PASS                           |                     FAIL                     |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | DEP-1 | Host SG outbound          | ONLY TCP 443 to VPCE SG sg-013d5e4d4eb55dfd9.           | Any 0.0.0.0/0 rule, or destinations beyond   |
+  |       |                           | No 0.0.0.0/0. No other destinations.                    | the VPCE SG                                  |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | DEP-2 | VPC flow logs             | Flow logs ACTIVE on both deployment subnets,             | Flow logs not enabled, or not active          |
+  |       |                           | delivering to CloudWatch Logs                            |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | DEP-3 | Flow logs log group       | /proposal-orchestrator/vpc-flow-logs exists with         | Log group missing, or no retention/encryption |
+  |       |                           | retention 90d and KMS encryption                         |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | DEP-4 | No Claude CLI             | which claude: not found, claude --version: not found,    | claude binary found on host                  |
+  |       |                           | find: no results                                         |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | DEP-5 | Internet egress blocked   | curl to api.anthropic.com, api.together.ai,              | Any external endpoint reachable              |
+  |       |                           | google.com all timeout or connection refused              |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  DC-30 Revisit Note
+  ============================================================================
+
+  CG7 marked DC-30 as NOT_APPLICABLE because no log groups existed.
+  After creating /proposal-orchestrator/vpc-flow-logs in Step 2, DC-30
+  must be updated to VERIFIED_PASS if the log group has:
+  - retentionInDays: 90
+  - kmsKeyId: arn:aws:kms:us-east-1:232538551827:key/887638e8-...
+
+  This will be verified during CG8 evidence review.
+
+  ============================================================================
+  What Happens After CG8
+  ============================================================================
+
+  CG8 is the final infrastructure security group. After CG8:
+  - CG9 (Production Config) — application environment variables
+  - CG10 (Compliance) — GDPR DPA check
+
+  Once CG8 evidence is collected and reviewed, proceed to CG9.
+
+  Please run Steps 1-5 above, save the evidence, and confirm when ready for review.

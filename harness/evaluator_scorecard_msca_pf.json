@@ -1,0 +1,123 @@
+{
+  "scorecard_id": "msca_pf_evaluation_scorecard",
+  "instrument": "MSCA Postdoctoral Fellowships (European Fellowship)",
+  "provenance": {
+    "source_form": "Horizon Europe Evaluation Form (HE MSCA)",
+    "version": "2.2",
+    "version_date": "2025-12-17",
+    "work_programme": "WP2026/7",
+    "source_path": "docs/tier2a_instrument_schemas/evaluation_forms/msca/ef_he-msca_en.pdf",
+    "criteria_pages": "4-6",
+    "scoring_page": 2,
+    "derived_from": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+    "verified_by": "Jozsef Kiss (extracted criteria matched verbatim to the official form)",
+    "verified_on": "2026-08-07",
+    "pf_scope_rule": "Keep only aspects tagged [OPTION for MSCA Postdoctoral fellowships] plus PF-inclusive 'all MSCA except ...' aspects. Exclude Doctoral-networks / Staff-exchanges / COFUND / Special-needs variants. Notably the Implementation aspect 'Quality and capacity of the recruiting institutions ... HRS4R ... Agreement on Reforming Research Assessment' is [OPTION for MSCA COFUND Choose Europe] -> EXCLUDED for PF."
+  },
+  "scoring": {
+    "scale": "0-5, one decimal place",
+    "levels": {
+      "0": "Fails to address the criterion or cannot be assessed",
+      "1": "Poor",
+      "2": "Fair",
+      "3": "Good",
+      "4": "Very Good",
+      "5": "Excellent"
+    },
+    "overall_threshold": 70,
+    "overall_max": 100,
+    "weighting_note": "Each of the 3 criteria is scored 0-5, then weighted into a total out of 100; overall pass threshold is 70/100. Weighting is used for ranking. Specific calls/topics may set different thresholds or weighting (form p.2)."
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "name": "Excellence",
+      "weight_pct": 50,
+      "score_field": "Score 1",
+      "source_page": "4-5",
+      "aspects": [
+        {
+          "id": "exc-obj",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships",
+          "text": "Quality and pertinence of the project's research and innovation objectives (and the extent to which they are ambitious, and go beyond the state of the art)."
+        },
+        {
+          "id": "exc-method",
+          "source_page": 4,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships",
+          "text": "Soundness of the proposed methodology (including interdisciplinary approaches, consideration of the gender dimension and other diversity aspects if relevant for the research project, and the quality and appropriateness of open science practices)."
+        },
+        {
+          "id": "exc-supervision",
+          "source_page": 4,
+          "option_tag": "MSCA Postdoctoral fellowships",
+          "text": "Quality of the supervision, training and of the two-way transfer of knowledge between the researcher and the host."
+        },
+        {
+          "id": "exc-researcher",
+          "source_page": 4,
+          "option_tag": "MSCA Postdoctoral fellowships",
+          "text": "Quality and appropriateness of the researcher's professional experience, competences and skills."
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "name": "Impact",
+      "weight_pct": 30,
+      "score_field": "Score 2",
+      "source_page": "5-6",
+      "aspects": [
+        {
+          "id": "imp-career",
+          "source_page": 5,
+          "option_tag": "MSCA Postdoctoral fellowships",
+          "text": "Credibility of the measures to enhance the career perspectives and employability of the researcher and contribution to his/her skills development."
+        },
+        {
+          "id": "imp-dissemination",
+          "source_page": 6,
+          "option_tag": "all MSCA except Special needs allowances and COFUND Choose Europe",
+          "text": "Suitability and quality of the measures to maximise expected outcomes and impacts, as set out in the dissemination and exploitation plan, including communication activities."
+        },
+        {
+          "id": "imp-magnitude",
+          "source_page": 6,
+          "option_tag": "MSCA Doctoral networks, Postdoctoral fellowships and Staff exchanges",
+          "text": "The magnitude and importance of the project's contribution to the expected scientific, societal and economic impacts."
+        }
+      ]
+    },
+    {
+      "id": "implementation",
+      "name": "Quality and efficiency of the implementation",
+      "weight_pct": 20,
+      "score_field": "Score 3",
+      "source_page": 6,
+      "aspects": [
+        {
+          "id": "impl-workplan",
+          "source_page": 6,
+          "option_tag": "all MSCA except Special needs allowances and COFUND Choose Europe",
+          "text": "Quality and effectiveness of the work plan, assessment of risks and appropriateness of the effort assigned to work packages."
+        },
+        {
+          "id": "impl-host",
+          "source_page": 6,
+          "option_tag": "MSCA Postdoctoral fellowships",
+          "text": "Quality and capacity of the host institutions and participating organisations, including hosting arrangements."
+        }
+      ]
+    }
+  ],
+  "excluded_for_pf": [
+    {
+      "criterion": "implementation",
+      "source_page": 6,
+      "option_tag": "MSCA COFUND Choose Europe",
+      "text": "Quality and capacity of the recruiting institutions, including hosting arrangements and institutional procedures' alignment with the European Charter for Researchers (institutions with the HRS4R label are exempted...) and the Agreement on Reforming Research Assessment.",
+      "reason": "COFUND Choose Europe variant, not Postdoctoral Fellowships. Present in the raw registry; must not be graded for a PF proposal."
+    }
+  ]
+}

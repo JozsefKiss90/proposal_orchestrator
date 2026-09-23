@@ -1,0 +1,197 @@
+Control Group 9 — Production Application Configuration
+
+  Controls
+
+  DC-33  ORCHESTRATOR_PRODUCTION_MODE=true
+  DC-34  ORCHESTRATOR_TRANSPORT_PRESET=BEDROCK_CONVERSE_US
+  DC-35  ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata
+  DC-36  Model availability confirmed in target region (us.anthropic.claude-sonnet-4-6)
+  DC-38  Full DAG run (Phase 1-8) succeeds with production configuration
+
+  Infrastructure Reference (from CG1-CG8)
+
+  Account:           232538551827
+  Region:            us-east-1
+  Instance host:     i-0045af36dbf5f1272
+  Secret:            proposal-orchestrator/env-config
+  Bedrock endpoint:  vpce-0843d225c5b1ef6d5
+
+  Context
+
+  DC-33/34/35 verify that the application configuration enforces production
+  security constraints:
+  - PRODUCTION_MODE=true: rejects non-Bedrock backends at startup
+  - TRANSPORT_PRESET=BEDROCK_CONVERSE_US: selects the IAM-authenticated
+    Bedrock Converse backend (no API keys needed)
+  - DIAGNOSTIC_LEVEL=metadata: prevents prompt/response content from being
+    written to disk (only metadata like timing, token counts, status)
+
+  These values were already stored in the Secrets Manager secret (CG5).
+  CG9 verifies they are correctly set and readable by the application.
+
+  DC-36 confirms the target model is available via Bedrock in us-east-1.
+
+  DC-38 is the end-to-end integration test: a full DAG run proving the
+  entire orchestration pipeline works under production configuration.
+
+  ============================================================================
+  Step 1: Verify Secret Contains Correct Configuration (DC-33/34/35)
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  {
+    echo "=== PC-E01: Production Configuration Verification ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "--- Caller Identity ---"
+    aws sts get-caller-identity --output json
+    echo ""
+
+    echo "--- Retrieve env-config secret (keys only, not raw dump) ---"
+    aws secretsmanager get-secret-value \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "SecretString" \
+      --region us-east-1 \
+      --output text | python3 -c "
+import sys, json
+config = json.load(sys.stdin)
+for k, v in sorted(config.items()):
+    print(f'{k}={v}')
+"
+    echo ""
+    echo "get_secret_exit_code=$?"
+  } 2>&1 | tee /tmp/PC-E01-production-config.txt
+
+  Expected output:
+    AWS_DEFAULT_REGION=us-east-1
+    ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata
+    ORCHESTRATOR_PRODUCTION_MODE=true
+    ORCHESTRATOR_TRANSPORT_PRESET=BEDROCK_CONVERSE_US
+    SKILL_MODEL=us.anthropic.claude-sonnet-4-6
+    get_secret_exit_code=0
+
+  Verify each required value:
+  - ORCHESTRATOR_PRODUCTION_MODE=true         (DC-33)
+  - ORCHESTRATOR_TRANSPORT_PRESET=BEDROCK_CONVERSE_US  (DC-34)
+  - ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata    (DC-35)
+
+  Note: This reads the secret value and prints key=value pairs. The secret
+  content is non-sensitive (configuration, not credentials), but avoid
+  capturing it in shared logs if there is any concern.
+
+  ============================================================================
+  Step 2: Confirm Model Availability (DC-36)
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  {
+    echo "=== PC-E02: Model Availability Test ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "--- Converse test with us.anthropic.claude-sonnet-4-6 ---"
+    aws bedrock-runtime converse \
+      --model-id us.anthropic.claude-sonnet-4-6 \
+      --messages '[{"role":"user","content":[{"text":"Respond with exactly: MODEL_AVAILABLE"}]}]' \
+      --inference-config '{"maxTokens":20}' \
+      --region us-east-1 \
+      --output json
+    echo ""
+    echo "converse_exit_code=$?"
+  } 2>&1 | tee /tmp/PC-E02-model-availability.txt
+
+  Expected: Model responds successfully (exit code 0) with output containing
+  "MODEL_AVAILABLE". This confirms:
+  - Model us.anthropic.claude-sonnet-4-6 is available in us-east-1
+  - The full path works: host -> SG -> VPC endpoint -> Bedrock -> model
+
+  Note: This is functionally equivalent to the CG2 DC-37 test, but
+  performed in the CG9 context as a fresh confirmation.
+
+  ============================================================================
+  Step 3: Full DAG Run (DC-38)
+  ============================================================================
+
+  DC-38 requires the full orchestration application to be deployed on the
+  host and configured to use the production Bedrock backend. This is the
+  ultimate integration test.
+
+  Prerequisites for DC-38:
+  - Application code deployed to the host
+  - Application reads config from Secrets Manager (or env vars set from it)
+  - All CG1-CG8 controls verified
+  - Tier 1-3 source data populated for a test proposal
+
+  If the application is deployed and ready:
+
+    # Set environment from secret, then run
+    export $(aws secretsmanager get-secret-value \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "SecretString" \
+      --region us-east-1 \
+      --output text | python3 -c "
+    import sys, json
+    config = json.load(sys.stdin)
+    for k, v in config.items():
+        print(f'{k}={v}')
+    ")
+
+    # Run the DAG
+    cd /path/to/proposal_orchestrator
+    python -m runner --run-all 2>&1 | tee /tmp/PC-E03-dag-run.txt
+
+  Expected: run_summary.json shows all phases completed, all gates passed.
+
+  If the application is NOT yet deployed to the host:
+    DC-38 should be marked DEFERRED with justification:
+    "Application not yet deployed to production host. All infrastructure
+    controls (CG1-CG8) verified. DC-38 will be executed when the
+    application deployment is complete."
+
+  ============================================================================
+  Step 4: Collect Evidence
+  ============================================================================
+
+  Save outputs from the deployment host to:
+  - docs/infrastructure_security/evidence/09_production_config/PC-E01-production-config.txt
+  - docs/infrastructure_security/evidence/09_production_config/PC-E02-model-availability.txt
+  - docs/infrastructure_security/evidence/09_production_config/PC-E03-dag-run.txt
+    (if DC-38 was executed)
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  |   #   |         Criterion         |                           PASS                           |                     FAIL                     |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | PC-1  | PRODUCTION_MODE           | Secret contains                                          | Value missing, false, or not set             |
+  |       |                           | ORCHESTRATOR_PRODUCTION_MODE=true                        |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | PC-2  | TRANSPORT_PRESET          | Secret contains                                          | Value missing, or set to a non-Bedrock       |
+  |       |                           | ORCHESTRATOR_TRANSPORT_PRESET=BEDROCK_CONVERSE_US        | transport                                    |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | PC-3  | DIAGNOSTIC_LEVEL          | Secret contains                                          | Value missing, or set to "full" or           |
+  |       |                           | ORCHESTRATOR_DIAGNOSTIC_LEVEL=metadata                   | "content" (which would persist prompts)      |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | PC-4  | Model availability        | Converse call to us.anthropic.claude-sonnet-4-6          | Call fails or model not available             |
+  |       |                           | succeeds from host (exit code 0)                         |                                              |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+  | PC-5  | Full DAG run              | run_summary.json shows all phases completed,             | Any phase fails, any gate blocked            |
+  |       |                           | all gates passed                                         | OR DEFERRED (app not yet deployed)           |
+  +-------+---------------------------+----------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  What Happens After CG9
+  ============================================================================
+
+  After CG9, only CG10 remains (DC-39 — GDPR DPA check).
+  CG10 is a compliance/legal control, not a technical implementation.
+
+  Once CG9 evidence is collected and reviewed, proceed to CG10.
+
+  Please run Steps 1-3 (or 1-2 if DC-38 is deferred), save the evidence,
+  and confirm when ready for review.

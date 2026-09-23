@@ -14,7 +14,7 @@ state_rules:
       gate has been formally validated must not be overwritten. If a phase is rerun
       after a checkpoint has been published, the rerun must produce a new checkpoint
       artifact; it must not modify the prior validated artifact.
-    enforcement: checkpoint-publish skill
+    enforcement: checkpoint_publisher deterministic component (CHK-1; raises rather than overwriting a published checkpoint)
 
   decision_logging:
     rule: >

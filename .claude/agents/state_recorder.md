@@ -15,7 +15,9 @@ writes_to:
   - docs/tier4_orchestration_state/validation_reports/
 invoked_skills:
   - decision-log-update
-  - checkpoint-publish
+# checkpoint-publish was RETIRED (CHK-1). The Phase-8 checkpoint is now written
+# by the `checkpoint_publisher` deterministic component in the n08f_revision node
+# body (§17.5.3/C2), not by a skill this agent invokes.
 entry_gate: null
 exit_gate: null
 ---
@@ -28,15 +30,16 @@ Cross-phase agent. Not bound to any specific node in `manifest.compile.yaml`. In
 
 Implements CLAUDE.md §9.4: "Every decision that affects future interpretation, traceability, or reproducibility must be written to `docs/tier4_orchestration_state/decision_log/` or to the relevant phase output. Decisions held only in agent memory do not constitute durable decisions."
 
-Three invocation contexts:
+Two invocation contexts:
 1. **Decision logging** — any agent invokes `state_recorder` to write a decision log entry
-2. **Checkpoint publishing** — `revision_integrator` invokes it to publish the Phase 8 checkpoint
-3. **Validation summaries** — invoked after `compliance_validator` or `traceability_auditor` to persist findings
+2. **Validation summaries** — invoked after `compliance_validator` or `traceability_auditor` to persist findings
+
+> **Checkpoint publishing (retired, CHK-1):** this agent no longer publishes the Phase-8 checkpoint. That was found 100% mechanical and moved to the `checkpoint_publisher` deterministic component (`runner/checkpoint_publisher.py`, §17.5.3/C2), which runs in the `n08f_revision` node body. `state_recorder` retains latent checkpoint write authority for cross-phase use but no longer invokes a `checkpoint-publish` skill.
 
 ## Outputs
 
 - `docs/tier4_orchestration_state/decision_log/` — decision log entry
-- `docs/tier4_orchestration_state/checkpoints/` — checkpoint artifact (when checkpoint-publish is invoked)
+- `docs/tier4_orchestration_state/checkpoints/` — checkpoint artifact (latent cross-phase authority; the Phase-8 checkpoint is written by the `checkpoint_publisher` component, not this agent)
 - `docs/tier4_orchestration_state/validation_reports/` — validation summary (when invoked after a validator)
 
 ## Skill Bindings
@@ -50,12 +53,9 @@ Three invocation contexts:
 - Every resolved tier conflict must produce a decision log entry.
 - Decision log entries must identify the tier authority applied.
 
-### `checkpoint-publish`
-**Purpose:** Write a formal checkpoint artifact to Tier 4 confirming that a phase or phase group has completed with a known validated state.
-**Trigger:** Invocation context 2 (checkpoint publishing): `revision_integrator` invokes `state_recorder` to publish the Phase 8 checkpoint after gate_12 passes.
-**Output / side-effect:** `docs/tier4_orchestration_state/checkpoints/phase8_checkpoint.json` written.
-**Constitutional constraints:**
-- Validated checkpoints must not be overwritten by subsequent reruns.
+### `checkpoint-publish` — RETIRED (CHK-1)
+The Phase-8 checkpoint is no longer published by a skill. It is written by the `checkpoint_publisher` deterministic component (`runner/checkpoint_publisher.py`, §17.5.3/C2) in the `n08f_revision` node body, which also records the cross-run provenance quad. The constitutional constraints below still hold and are enforced by the component:
+- Validated checkpoints must not be overwritten by subsequent reruns (the component raises rather than overwriting a `status: published` checkpoint).
 - A checkpoint must not be published before all gate conditions for the phase are met.
 
 ## Canonical Inputs
@@ -202,7 +202,7 @@ This agent has no node binding (`node_ids: []`). It is a cross-phase auxiliary w
 
 - **§9.4 — Decisions held only in memory:** This agent is the implementation mechanism for §9.4. Its purpose is to convert in-memory decisions into durable Tier 4 records. Must_not includes "substitute in-memory notes for written Tier 4 artifacts." Risk: low.
 - **§9.4 / checkpoint immutability:** Must_not includes "overwrite a checkpoint that has been formally validated." Failure Protocol Case 2 halts and writes a constitutional_halt entry on any overwrite attempt. Risk: low.
-- **Checkpoint before gate (§9.4 / §6.4):** Failure Protocol Case 1 prohibits publishing the checkpoint before all Phase 8 gates are passed. The checkpoint-publish skill constraint states "A checkpoint must not be published before all gate conditions for the phase are met." Risk: low.
+- **Checkpoint before gate (§9.4 / §6.4):** Failure Protocol Case 1 prohibits publishing the checkpoint before all Phase 8 gates are passed. The checkpoint constraint (now enforced by the `checkpoint_publisher` component) states "A checkpoint must not be published before all gate conditions for the phase are met." Risk: low.
 - **§13.5 — Durable decisions in memory:** This agent is the anti-§13.5 mechanism. Its function is the solution, not a risk. Risk: none.
 - **§13.6 — Agent as de facto authority:** This agent writes but does not decide. It is a recording mechanism, not an authority. Risk: none.
 - **No Tier 5 content production:** Not applicable.

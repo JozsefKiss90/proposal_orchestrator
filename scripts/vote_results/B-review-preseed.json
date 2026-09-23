@@ -1,0 +1,37 @@
+{
+  "lane": "B-review-preseed",
+  "decision": "HOLDS UP \u2014 majority",
+  "holds": 2,
+  "refute": 1,
+  "unparsed": 0,
+  "errored": 0,
+  "verdicts": [
+    {
+      "lens": "skip-id-resolves-against-manifest-or-fails-closed",
+      "verdict": {
+        "holds_up": false,
+        "confidence": "medium",
+        "top_defect": "drafting_skills_superseded_by() skip in run_agent is applied by bare ordered_skills membership with no validate_skip_binding/resolve_skill_ids cross-check, so a manifest\u2194PHASE8_DRAFTING_SKILL_BY_NODE drift silently no-ops on the default decomposed-drafting path and lets the monolithic drafter overwrite the assembler-composed section",
+        "lens": "skip-id-resolves-against-manifest-or-fails-closed"
+      }
+    },
+    {
+      "lens": "tier4-audit-only-when-suppression-in-force",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "medium",
+        "top_defect": "single source is manifest-validated only lazily on preseed/reuse paths; the plain decomposed path still supersedes off a hardcoded map (no audit, out of ticket-3 scope)",
+        "lens": "tier4-audit-only-when-suppression-in-force"
+      }
+    },
+    {
+      "lens": "canonical_pack-vs-unapplied-assumptions",
+      "verdict": {
+        "holds_up": true,
+        "confidence": "high",
+        "top_defect": "retained canonical_pack_deriver re-emits declared_assumptions unapplied to the suppressed section, but that field is read by no gate, is provenance=assumed, and reuse is fingerprint-guarded on working_assumptions.json \u2014 inert, not exploitable",
+        "lens": "canonical_pack-vs-unapplied-assumptions"
+      }
+    }
+  ]
+}

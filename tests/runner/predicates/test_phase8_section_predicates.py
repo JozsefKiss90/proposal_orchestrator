@@ -348,6 +348,34 @@ class TestCanonicalTermsPreserved:
             for i in result.details["issues"]
         )
 
+    def test_wp_id_deliverable_cross_reference_passes(self, tmp_path, pack):
+        """WP ID + its deliverable's exact id and title is a legitimate
+        cross-reference, not a botched WP title.
+
+        Regression for the gate_10b false positive on
+        'WP2 (D2-01: <deliverable title>)': the appositive explicitly carries
+        another canonical entity's id, so it must not be read as WP2's own
+        title even though it shares words with it.
+        """
+        section = _make_section(
+            tmp_path,
+            "Original scientific additions come from WP2 (D2-01: Neuro-symbolic "
+            "planning architecture specification) and the validation work.",
+        )
+        result = canonical_terms_preserved(section, pack, repo_root=tmp_path)
+        assert result.passed
+
+    def test_wp_id_unlabelled_other_full_title_passes(self, tmp_path, pack):
+        """A WP appositive that verbatim-reproduces a *different* entity's full
+        canonical title (here deliverable D2-02) is a cross-reference, not a
+        WP-title violation."""
+        section = _make_section(
+            tmp_path,
+            "WP2 (Planning engine software prototype) feeds the demonstrator.",
+        )
+        result = canonical_terms_preserved(section, pack, repo_root=tmp_path)
+        assert result.passed
+
     def test_obj_id_alone_passes(self, tmp_path, pack):
         """Objective ID without title passes."""
         section = _make_section(

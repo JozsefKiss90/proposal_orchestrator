@@ -1,0 +1,55 @@
+﻿{
+    "RouteTables": [
+        {
+            "Associations": [
+                {
+                    "Main": false,
+                    "RouteTableAssociationId": "rtbassoc-050eb1dbff08aaa28",
+                    "RouteTableId": "rtb-085481996de5e3ed9",
+                    "SubnetId": "subnet-023c6e3ea5451ea47",
+                    "AssociationState": {
+                        "State": "associated"
+                    }
+                },
+                {
+                    "Main": false,
+                    "RouteTableAssociationId": "rtbassoc-04dcb962965e43e42",
+                    "RouteTableId": "rtb-085481996de5e3ed9",
+                    "SubnetId": "subnet-01d969bb1421a3042",
+                    "AssociationState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "PropagatingVgws": [],
+            "RouteTableId": "rtb-085481996de5e3ed9",
+            "Routes": [
+                {
+                    "DestinationCidrBlock": "172.31.0.0/16",
+                    "GatewayId": "local",
+                    "Origin": "CreateRouteTable",
+                    "State": "active"
+                },
+                {
+                    "DestinationPrefixListId": "pl-63a5400a",
+                    "GatewayId": "vpce-0ee5648ce182bf85a",
+                    "Origin": "CreateRoute",
+                    "State": "active"
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-private-rt"
+                },
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "OwnerId": "232538551827"
+        }
+    ]
+}
+

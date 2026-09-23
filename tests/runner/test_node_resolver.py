@@ -269,3 +269,90 @@ class TestNodeResolverError:
                 manifest_path=tmp_path / "does_not_exist.yaml",
                 repo_root=tmp_path,
             )
+
+
+# ---------------------------------------------------------------------------
+# Deterministic-component binding resolution (C3 / §16.5)
+# ---------------------------------------------------------------------------
+
+
+class TestDeterministicComponentResolution:
+    """The manifest ``deterministic_components`` binding is resolved per node."""
+
+    def test_n04_binds_dependency_normalizer(self, resolver: NodeResolver) -> None:
+        assert resolver.resolve_deterministic_components(
+            "n04_gantt_milestones"
+        ) == ["dependency_normalizer"]
+
+    def test_n07_binds_unit_cost_budget_deriver(
+        self, resolver: NodeResolver
+    ) -> None:
+        # C1 (ticket 8): the unit-cost budget deriver runs in the n07 node body.
+        assert resolver.resolve_deterministic_components(
+            "n07_budget_gate"
+        ) == ["unit_cost_budget_deriver"]
+
+    def test_n08f_binds_export_writer_then_checkpoint_publisher(
+        self, resolver: NodeResolver
+    ) -> None:
+        # CHK-1 bound the checkpoint publisher (replacing the retired
+        # checkpoint-publish skill); the final-export writer joins it to close
+        # the g11_p05 gap. Order matters: the export writer is
+        # idempotent-overwrite and MUST precede the write-once checkpoint
+        # publisher, so a failed export can never strand a freshly published
+        # checkpoint that would block re-publication on rerun.
+        assert resolver.resolve_deterministic_components(
+            "n08f_revision"
+        ) == ["final_export_writer", "checkpoint_publisher"]
+
+    def test_n08f_no_longer_binds_checkpoint_publish_skill(
+        self, resolver: NodeResolver
+    ) -> None:
+        # The retired skill must not linger in the node's resolved skill ids.
+        assert "checkpoint-publish" not in resolver.resolve_skill_ids(
+            "n08f_revision"
+        )
+
+    def test_n08f_binds_drafting_review_status_not_review_rerun(
+        self, resolver: NodeResolver
+    ) -> None:
+        # Run 531ec9f0 root cause: n08f's re-run of evaluator-criteria-review
+        # rewrote review_packet.json — gate_11's fingerprinted input — so ST-1
+        # staleness correctly failed gate_12's g11_p01 on every run reaching
+        # it. drafting-review-status replaces it: same disposition purpose,
+        # but writes drafting_review_status.json (the g11_p04 artifact, which
+        # previously had NO producer) and never touches the packet.
+        skills = resolver.resolve_skill_ids("n08f_revision")
+        assert "drafting-review-status" in skills
+        assert "evaluator-criteria-review" not in skills
+
+    @pytest.mark.parametrize("node_id,slug", [
+        ("n08a_excellence_drafting", "excellence"),
+        ("n08b_impact_drafting", "impact"),
+        ("n08c_implementation_drafting", "implementation"),
+    ])
+    def test_phase8_drafting_nodes_bind_decomposed_replay_components(
+        self, resolver: NodeResolver, node_id: str, slug: str
+    ) -> None:
+        # Ticket 10 binds the canonical pack deriver; ticket 13 adds the
+        # decomposed-drafting replay components in order — the applier MUST
+        # precede the assembler so the Unresolved->Assumed flip is composed in.
+        assert resolver.resolve_deterministic_components(node_id) == [
+            "canonical_pack_deriver",
+            f"{slug}_assumption_applier",
+            f"{slug}_section_assembler",
+        ]
+
+    @pytest.mark.parametrize("node_id", [
+        "n01_call_analysis",
+        "n03_wp_design",
+        "n08d_assembly",
+    ])
+    def test_nodes_without_binding_return_empty(
+        self, resolver: NodeResolver, node_id: str
+    ) -> None:
+        assert resolver.resolve_deterministic_components(node_id) == []
+
+    def test_unknown_node_raises(self, resolver: NodeResolver) -> None:
+        with pytest.raises(NodeResolverError):
+            resolver.resolve_deterministic_components("n99_nonexistent")

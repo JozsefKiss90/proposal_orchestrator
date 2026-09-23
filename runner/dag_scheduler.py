@@ -14,7 +14,7 @@ Node ID convention
 ------------------
 All node IDs are **canonical manifest node IDs** as defined in
 ``manifest.compile.yaml`` ``node_registry`` (e.g. ``n01_call_analysis``,
-``n08a_section_drafting``).  Short-form IDs (e.g. ``n01``, ``n08a``) are
+``n08a_excellence_drafting``).  Short-form IDs (e.g. ``n01``, ``n08a``) are
 never used.
 
 Node state machine
@@ -59,6 +59,13 @@ resume logic.  ``ManifestGraph.is_ready()`` continues to rely on current
 ``RunContext`` node states; the bootstrap ensures those states are correctly
 initialized from prior evidence.
 
+For single-node scope, same-run-id resume is the in-phase evidence carrier:
+:func:`verify_released_predecessors` re-proves every predecessor the loaded
+``RunContext`` claims ``released`` against its durable exit-gate result
+(present, schema-valid, ``status: pass``, content-fresh) before the scoped
+node may dispatch.  An unproven claim fails the step closed (§6.3/§9.4);
+the check is read-only (§17.6.3).
+
 Scope boundaries
 ----------------
 This module implements gate-evaluation dispatch with integrated node body
@@ -74,6 +81,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -87,12 +95,14 @@ log = logging.getLogger("runner.scheduler")
 
 from runner.agent_runtime import run_agent
 from runner.call_slicer import CallSlicerError, generate_call_slice
+from runner.deterministic_components import partition_draft_consuming
 from runner.gate_evaluator import evaluate_gate
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import GATE_RESULT_PATHS, GATE_RESULT_SCHEMA_ID
 from runner.manifest_reader import MANIFEST_REL_PATH
 from runner.node_resolver import NodeResolver
 from runner.paths import find_repo_root
 from runner.phase8_preseed import (
+    PRESEED_AUDIT_DIR,
     PRESEED_NODE_CONFIG,
     Phase8PreseedResult,
     maybe_apply_phase8_preseed,
@@ -107,7 +117,11 @@ from runner.phase8_reuse import (
     validate_reuse_candidate,
     write_reuse_metadata,
 )
-from runner.predicates.gate_pass_predicates import is_gate_fresh
+from runner.phase8_skip_binding import validate_skip_binding
+from runner.predicates.gate_pass_predicates import (
+    GATE_RESULT_MANDATORY_FIELDS,
+    is_gate_fresh,
+)
 from runner.run_context import RunContext
 from runner.runtime_models import AgentResult, NodeExecutionResult
 from runner.versions import CONSTITUTION_VERSION, LIBRARY_VERSION, MANIFEST_VERSION
@@ -128,6 +142,10 @@ _FALLBACK_GATE_RESULT_SUB: str = "gate_results"
 #: Filename of the run summary artifact written by RunSummary.write().
 RUN_SUMMARY_FILENAME: str = "run_summary.json"
 
+#: Phase+substep shorthand for single-node scope, e.g. ``8b`` -> phase 8,
+#: substep "b".  Resolved against the manifest ``substep`` field only.
+_SUBSTEP_SHORTHAND_RE = re.compile(r"^0*(\d+)([a-z])$")
+
 
 # ---------------------------------------------------------------------------
 # Module-level helpers
@@ -145,6 +163,218 @@ def _gate_result_repo_path(gate_id: str) -> str:
     if gate_id in GATE_RESULT_PATHS:
         return f"{_TIER4_ROOT_REL}/{GATE_RESULT_PATHS[gate_id]}"
     return f"{_TIER4_ROOT_REL}/{_FALLBACK_GATE_RESULT_SUB}/{gate_id}.json"
+
+
+def format_unsatisfied_condition(cond: dict) -> str:
+    """
+    Render one stall-report unsatisfied-condition entry for operator output.
+
+    Shared by the scheduler's abort message and the CLI's ``[BLOCKED]``
+    report so the two name unmet predecessors identically.
+    """
+    return (
+        f"{cond['source_node_id']}={cond['source_node_state']} "
+        f"(requires {cond['gate_id']})"
+    )
+
+
+def format_evidence_violation(violation: dict) -> str:
+    """
+    Render one predecessor durable-evidence violation for operator output.
+
+    Shared by the scheduler's abort message and the CLI's ``[BLOCKED]``
+    report so the two name evidence violations identically.
+    """
+    return (
+        f"{violation['node_id']} [{violation['reason_code']}] "
+        f"{violation['gate_id']} @ {violation['evidence_path']}: "
+        f"{violation.get('detail')}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Durable-evidence verification of released predecessors (scoped resume)
+# ---------------------------------------------------------------------------
+
+
+def verify_released_predecessors(
+    ctx: RunContext,
+    graph: "ManifestGraph",
+    repo_root: Path,
+    node_id: str,
+) -> list[dict]:
+    """Re-verify every ``released`` predecessor of *node_id* against its
+    durable Tier 4 gate result.
+
+    Same-run-id resume makes the loaded ``RunContext`` the in-phase evidence
+    carrier for stepped execution — but a persisted ``released`` state string
+    in ``.claude/runs/`` is runtime execution memory, not source truth
+    (§9.2).  Before a scoped step counts a predecessor as released, that
+    claim must be backed by the predecessor's durable exit-gate result at
+    its canonical ``gate_result_registry`` path: present, schema-valid,
+    ``status: pass``, and content-fresh per :func:`is_gate_fresh` (§6.3,
+    §9.4).
+
+    The check is **read-only and scheduler-side**: no gate result is
+    written, re-stamped, or repaired (§17.6.3), and no node state is
+    modified.  All transitive upstream predecessors are examined — a step
+    that cannot prove its predecessors passed fails closed (§13.7).
+
+    Returns
+    -------
+    list[dict]
+        One violation dict per unproven claim, in manifest registry order;
+        empty when every released predecessor is proven.  Each violation
+        carries ``node_id``, ``gate_id``, ``evidence_path``, a distinct
+        ``reason_code`` (``missing_evidence``, ``unreadable_evidence``,
+        ``malformed_evidence``, ``non_pass_status``, ``stale_evidence``,
+        ``unverifiable_no_exit_gate``) and a human-readable ``detail``
+        (plus ``stale_inputs`` for stale evidence).
+    """
+    upstream: set[str] = set()
+    _collect_upstream_nodes(graph, {node_id}, upstream)
+    upstream.discard(node_id)
+
+    violations: list[dict] = []
+    for nid in graph.node_ids():  # preserve manifest registry order
+        if nid not in upstream:
+            continue
+        if ctx.get_node_state(nid) != "released":
+            continue  # non-released predecessors are the ready-check's concern
+
+        exit_gate_id = graph.exit_gate(nid)
+        if exit_gate_id is None:
+            violations.append(
+                {
+                    "node_id": nid,
+                    "gate_id": None,
+                    "evidence_path": None,
+                    "reason_code": "unverifiable_no_exit_gate",
+                    "detail": (
+                        "node is released in the RunContext but declares no "
+                        "exit gate in the manifest, so no durable gate result "
+                        "can prove the release (§6.3)"
+                    ),
+                }
+            )
+            continue
+
+        evidence_rel = _gate_result_repo_path(exit_gate_id)
+        base = {
+            "node_id": nid,
+            "gate_id": exit_gate_id,
+            "evidence_path": evidence_rel,
+        }
+        evidence_abs = repo_root / evidence_rel
+
+        if not evidence_abs.exists():
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "missing_evidence",
+                    "detail": "no durable gate result artifact on disk",
+                }
+            )
+            continue
+
+        try:
+            data = json.loads(evidence_abs.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "unreadable_evidence",
+                    "detail": f"cannot read/parse gate result: {exc}",
+                }
+            )
+            continue
+
+        if not isinstance(data, dict):
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": "gate result root is not a JSON object",
+                }
+            )
+            continue
+
+        missing_fields = sorted(
+            f for f in GATE_RESULT_MANDATORY_FIELDS if data.get(f) is None
+        )
+        if missing_fields:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"mandatory gate result fields missing or null: "
+                        f"{missing_fields}"
+                    ),
+                }
+            )
+            continue
+        if data.get("schema_id") != GATE_RESULT_SCHEMA_ID:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"schema_id {data.get('schema_id')!r} != "
+                        f"{GATE_RESULT_SCHEMA_ID!r}"
+                    ),
+                }
+            )
+            continue
+        if data.get("gate_id") != exit_gate_id:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "malformed_evidence",
+                    "detail": (
+                        f"gate result claims gate_id {data.get('gate_id')!r}, "
+                        f"expected {exit_gate_id!r}"
+                    ),
+                }
+            )
+            continue
+
+        if data.get("status") != "pass":
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "non_pass_status",
+                    "detail": f"recorded status is {data.get('status')!r}",
+                }
+            )
+            continue
+
+        try:
+            fresh, stale_reason, stale_inputs = is_gate_fresh(
+                exit_gate_id, data, repo_root
+            )
+        except (OSError, TypeError, ValueError) as exc:
+            # A freshness check that cannot run proves nothing — that is an
+            # unverifiable claim, not a demonstrated fingerprint mismatch.
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "unreadable_evidence",
+                    "detail": f"freshness check failed: {exc}",
+                }
+            )
+            continue
+        if not fresh:
+            violations.append(
+                {
+                    **base,
+                    "reason_code": "stale_evidence",
+                    "detail": stale_reason,
+                    "stale_inputs": stale_inputs,
+                }
+            )
+
+    return violations
 
 
 # ---------------------------------------------------------------------------
@@ -395,6 +625,7 @@ class RunSummary:
     dispatched_nodes: list[str]
     phase_scope: int | None = None
     phase_scope_nodes: list[str] = field(default_factory=list)
+    node_scope: str | None = None
     reuse_decisions: dict[str, dict] = field(default_factory=dict)
 
     # ------------------------------------------------------------------
@@ -414,6 +645,7 @@ class RunSummary:
         completed_at: str,
         phase_scope: int | None = None,
         phase_scope_nodes: list[str] | None = None,
+        node_scope: str | None = None,
         reuse_decisions: dict[str, dict] | None = None,
     ) -> RunSummary:
         """
@@ -466,16 +698,27 @@ class RunSummary:
         # ------------------------------------------------------------------
         _phase_nodes = phase_scope_nodes or []
 
-        if phase_scope is not None and _phase_nodes:
-            # Phase-scoped: status is based on the phase's own nodes only.
-            phase_st = {n: node_states.get(n, "pending") for n in _phase_nodes}
-            p_pending = [n for n, s in phase_st.items() if s == "pending"]
-            p_released = [n for n, s in phase_st.items() if s == "released"]
-            if p_pending:
+        # Scoped runs (phase or single node): status is based on the
+        # in-scope nodes only.  Node scope takes precedence — the two are
+        # mutually exclusive at the scheduler constructor.
+        if node_scope is not None:
+            _scope_status_nodes: list[str] = [node_scope]
+        elif phase_scope is not None and _phase_nodes:
+            _scope_status_nodes = list(_phase_nodes)
+        else:
+            _scope_status_nodes = []
+
+        if _scope_status_nodes:
+            scope_st = {
+                n: node_states.get(n, "pending") for n in _scope_status_nodes
+            }
+            scope_pending = [n for n, s in scope_st.items() if s == "pending"]
+            scope_released = [n for n, s in scope_st.items() if s == "released"]
+            if scope_pending:
                 overall_status = "aborted"
-            elif len(p_released) == len(_phase_nodes):
+            elif len(scope_released) == len(_scope_status_nodes):
                 overall_status = "pass"
-            elif p_released:
+            elif scope_released:
                 overall_status = "partial_pass"
             else:
                 overall_status = "fail"
@@ -571,6 +814,7 @@ class RunSummary:
             dispatched_nodes=list(dispatched_nodes),
             phase_scope=phase_scope,
             phase_scope_nodes=list(_phase_nodes),
+            node_scope=node_scope,
             reuse_decisions=reuse_decisions or {},
         )
 
@@ -619,6 +863,7 @@ class RunSummary:
             "dispatched_nodes": list(self.dispatched_nodes),
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": list(self.phase_scope_nodes),
+            "node_scope": self.node_scope,
             "reuse_decisions": dict(self.reuse_decisions),
             # --- Backward-compat derived fields ---
             "released_nodes": [
@@ -664,6 +909,7 @@ class RunSummary:
             "dispatched_nodes": self.dispatched_nodes,
             "phase_scope": self.phase_scope,
             "phase_scope_nodes": self.phase_scope_nodes,
+            "node_scope": self.node_scope,
             "reuse_decisions": self.reuse_decisions,
         }
         path.write_text(json.dumps(schema_dict, indent=2), encoding="utf-8")
@@ -765,7 +1011,7 @@ class ManifestGraph:
     Invariants
     ----------
     * All node IDs are the canonical ``node_id`` values from the manifest
-      ``node_registry`` (e.g. ``n01_call_analysis``, ``n08a_section_drafting``).
+      ``node_registry`` (e.g. ``n01_call_analysis``, ``n08a_excellence_drafting``).
     * ``node_ids()`` returns IDs in registry insertion order.
     * ``incoming_conditions(n)`` returns one ``IncomingCondition`` per
       incoming edge to ``n``, plus one per ``additional_condition`` present
@@ -1086,6 +1332,70 @@ class ManifestGraph:
         """Return sorted list of all distinct ``phase_number`` values."""
         return sorted(self._phase_map.keys())
 
+    def node_phase_number(self, node_id: str) -> Optional[int]:
+        """Return the ``phase_number`` of *node_id*, or ``None`` when absent.
+
+        Raises
+        ------
+        DAGSchedulerError
+            If *node_id* is not in the graph.
+        """
+        self._require_known(node_id)
+        pn = self._nodes[node_id].get("phase_number")
+        return int(pn) if pn is not None else None
+
+    def resolve_node_scope(self, spec: str) -> str:
+        """Resolve a single-node scope *spec* to a canonical node ID.
+
+        Accepts either a canonical ``node_id`` (e.g. ``n08b_impact_drafting``)
+        or a phase+substep shorthand (e.g. ``8b``), resolved through the
+        manifest ``phase_number`` and ``substep`` fields.  The manifest is
+        the only binding source (§16.5); nothing is inferred from naming
+        conventions.
+
+        Raises
+        ------
+        DAGSchedulerError
+            When *spec* matches no manifest node (a distinct error — never
+            a silent empty scope) or a substep shorthand is ambiguous.
+        """
+        raw = spec.strip()
+        if raw in self._nodes:
+            return raw
+
+        m = _SUBSTEP_SHORTHAND_RE.match(raw.lower())
+        if m:
+            phase, sub = int(m.group(1)), m.group(2)
+            matches = [
+                nid
+                for nid in self._phase_map.get(phase, [])
+                if str(self._nodes[nid].get("substep") or "").lower() == sub
+            ]
+            if len(matches) == 1:
+                return matches[0]
+            if len(matches) > 1:
+                raise DAGSchedulerError(
+                    f"Ambiguous node scope {spec!r}: substep {sub!r} of "
+                    f"phase {phase} matches multiple manifest nodes: "
+                    f"{sorted(matches)!r}"
+                )
+            known_substeps = sorted(
+                f"{phase}{str(self._nodes[nid].get('substep')).lower()}"
+                for nid in self._phase_map.get(phase, [])
+                if self._nodes[nid].get("substep")
+            )
+            raise DAGSchedulerError(
+                f"Unknown node scope {spec!r}: no node of phase {phase} "
+                f"declares substep {sub!r} in the manifest.  "
+                f"Known substeps for phase {phase}: {known_substeps!r}"
+            )
+
+        raise DAGSchedulerError(
+            f"Unknown node scope {spec!r}.  Expected a manifest node_id "
+            f"(known: {sorted(self._nodes)!r}) or a phase+substep "
+            f"shorthand such as '8b' matching a manifest 'substep' field."
+        )
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -1155,8 +1465,14 @@ class DAGScheduler:
         library_path: Optional[Path] = None,
         manifest_path: Optional[Path] = None,
         phase: Optional[int] = None,
+        node: Optional[str] = None,
         preseed_phase8_sections: bool = False,
     ) -> None:
+        if phase is not None and node is not None:
+            raise DAGSchedulerError(
+                "Phase scope and node scope are mutually exclusive: "
+                f"got phase={phase!r} and node={node!r}.  Pass one or neither."
+            )
         self.graph: ManifestGraph = graph
         self.ctx: RunContext = ctx
         self.repo_root: Path = Path(repo_root)
@@ -1164,6 +1480,9 @@ class DAGScheduler:
         self.manifest_path: Optional[Path] = manifest_path
         #: Phase scope: when set, only nodes with this phase_number are dispatched.
         self._phase_scope: Optional[int] = phase
+        #: Node scope: when set, exactly one node (resolved via the manifest —
+        #: canonical node_id or phase+substep shorthand) is dispatchable.
+        self._node_scope_spec: Optional[str] = node
         #: When True, manually prepared preseed artifacts take precedence
         #: over both reuse and LLM drafting for n08a/n08b/n08c.
         self._preseed_phase8_sections: bool = preseed_phase8_sections
@@ -1198,10 +1517,15 @@ class DAGScheduler:
         Execute nodes in dependency order until no node is ready.
 
         When ``phase`` was passed to the constructor, only nodes belonging
-        to that phase are eligible for dispatch.  All prerequisite checks
+        to that phase are eligible for dispatch.  When ``node`` was passed,
+        exactly that node (resolved via the manifest — canonical node_id or
+        phase+substep shorthand) is eligible.  All prerequisite checks
         (dependency state, incoming conditions, entry gates, artifacts)
-        still use the full DAG — the phase filter restricts *which* nodes
-        may be dispatched, not *which rules apply*.
+        still use the full DAG — the scope filter restricts *which* nodes
+        may be dispatched, not *which rules apply*.  A scoped node whose
+        predecessors are not ``released`` in the loaded ``RunContext`` is
+        never dispatched; the run aborts naming the unmet predecessors
+        (fail-closed, §13.7).
 
         Each iteration recomputes the ready set from the current
         ``RunContext`` state.  Nodes are dispatched in manifest registry
@@ -1224,8 +1548,9 @@ class DAGScheduler:
         RunAbortedError
             When in-scope nodes remain ``pending`` after the loop exits.
         DAGSchedulerError
-            If the requested phase has no nodes, or a dispatched node has
-            no exit gate defined.
+            If the requested phase has no nodes, the requested node scope
+            matches no manifest node, or a dispatched node has no exit
+            gate defined.
         """
         started_at: str = datetime.now(timezone.utc).isoformat()
         _run_t0 = time.monotonic()
@@ -1260,10 +1585,19 @@ class DAGScheduler:
                 log.warning("Call slicer skipped (non-blocking): %s", exc)
 
             # ------------------------------------------------------------------
-            # Phase scope resolution
+            # Scope resolution (single node, phase, or full DAG)
             # ------------------------------------------------------------------
             scope_node_ids: set[str] | None = None
-            if self._phase_scope is not None:
+            node_scope_id: str | None = None
+            if self._node_scope_spec is not None:
+                # Raises DAGSchedulerError on an unknown id/substep — a
+                # distinct configuration error, never a silent empty run.
+                node_scope_id = self.graph.resolve_node_scope(
+                    self._node_scope_spec
+                )
+                scope_node_ids = {node_scope_id}
+                log.info("Node-scoped execution: node=%s", node_scope_id)
+            elif self._phase_scope is not None:
                 phase_nodes = self.graph.nodes_for_phase(self._phase_scope)
                 if not phase_nodes:
                     raise DAGSchedulerError(
@@ -1280,9 +1614,40 @@ class DAGScheduler:
                 log.info("Full DAG execution mode")
 
             # ------------------------------------------------------------------
+            # Durable-evidence verification of released predecessors
+            # ------------------------------------------------------------------
+            # Same-run-id resume carries predecessor release claims in the
+            # loaded RunContext — runtime memory, not source truth (§9.2).
+            # Before a scoped step is dispatched, every predecessor it counts
+            # as released must be proven by its durable Tier 4 gate result
+            # (present, schema-valid, status: pass, content-fresh).  A claim
+            # without durable, fresh evidence fails the step closed
+            # (§6.3/§9.4): the scoped node is never dispatched and no gate is
+            # evaluated.  Read-only — no gate result is written (§17.6.3).
+            # Only a step that would actually dispatch is verified; re-running
+            # an already-settled node is the rerun policy's concern.
+            predecessor_violations: list[dict] = []
+            if (
+                node_scope_id is not None
+                and self.ctx.get_node_state(node_scope_id) == "pending"
+            ):
+                predecessor_violations = verify_released_predecessors(
+                    self.ctx, self.graph, self.repo_root, node_scope_id
+                )
+                for v in predecessor_violations:
+                    log.error(
+                        "  [%s] predecessor evidence violation: %s",
+                        node_scope_id,
+                        format_evidence_violation(v),
+                    )
+
+            # ------------------------------------------------------------------
             # Dispatch loop
             # ------------------------------------------------------------------
-            while True:
+            # Skipped entirely when predecessor evidence verification failed:
+            # the scoped node must never be dispatched on an unproven release
+            # claim (§13.7 fail-closed).
+            while not predecessor_violations:
                 ready = [
                     nid
                     for nid in self.graph.node_ids()
@@ -1333,6 +1698,28 @@ class DAGScheduler:
             stall_report = self._settle_stalled_nodes(
                 scope_node_ids=scope_node_ids
             )
+
+            # Attach evidence violations to the scoped node's stall entry so
+            # the refusal survives the console in run_summary.json (an
+            # account of the run, not Tier 4 evidence — §9.2), rather than
+            # living only in the log stream.
+            if predecessor_violations:
+                for entry in stall_report:
+                    if entry["node_id"] == node_scope_id:
+                        entry["predecessor_evidence_violations"] = (
+                            predecessor_violations
+                        )
+                        break
+                else:
+                    stall_report.append(
+                        {
+                            "node_id": node_scope_id,
+                            "unsatisfied_conditions": [],
+                            "predecessor_evidence_violations": (
+                                predecessor_violations
+                            ),
+                        }
+                    )
 
             # ------------------------------------------------------------------
             # Benchmark: finalize and write artifacts
@@ -1416,7 +1803,12 @@ class DAGScheduler:
                 started_at=started_at,
                 completed_at=completed_at,
                 phase_scope=self._phase_scope,
-                phase_scope_nodes=sorted(scope_node_ids) if scope_node_ids else [],
+                phase_scope_nodes=(
+                    sorted(scope_node_ids)
+                    if scope_node_ids and self._phase_scope is not None
+                    else []
+                ),
+                node_scope=node_scope_id,
                 reuse_decisions=self._reuse_decisions,
             )
             summary.write(self.ctx.run_dir)
@@ -1430,11 +1822,34 @@ class DAGScheduler:
 
             if summary.overall_status == "aborted":
                 stalled_ids = [e["node_id"] for e in stall_report]
+                unmet_detail = ""
+                if node_scope_id is not None:
+                    # Fail-closed report (§13.7): name the unmet predecessors
+                    # that kept the scoped node from ever being dispatched.
+                    unmet_bits = [
+                        format_unsatisfied_condition(c)
+                        for e in stall_report
+                        for c in e.get("unsatisfied_conditions", [])
+                    ]
+                    if unmet_bits:
+                        unmet_detail = (
+                            "  Unmet predecessors: " + "; ".join(unmet_bits)
+                        )
+                    viol_bits = [
+                        format_evidence_violation(v)
+                        for e in stall_report
+                        for v in e.get("predecessor_evidence_violations", [])
+                    ]
+                    if viol_bits:
+                        unmet_detail += (
+                            "  Predecessor durable-evidence violations "
+                            "(§6.3/§9.4, fail-closed): " + "; ".join(viol_bits)
+                        )
                 raise RunAbortedError(
                     f"Run {self.ctx.run_id!r} aborted: "
                     f"{len(summary.pending_nodes)} node(s) remain pending with "
                     f"no further progress possible.  "
-                    f"Stalled nodes: {stalled_ids!r}",
+                    f"Stalled nodes: {stalled_ids!r}{unmet_detail}",
                     summary,
                 )
 
@@ -1600,81 +2015,42 @@ class DAGScheduler:
                 "All production nodes must have an exit gate."
             )
 
-        # ── Step 2.4: Phase 8 canonical reference pack (n08a/b/c) ────
+        # ── Step 2.4: Phase 8 canonical reference pack ───────────────
         #
-        # Before dispatching any Phase 8 drafting node, ensure the
-        # canonical reference pack is current.  This is deterministic
-        # and cheap (no LLM call).  Drafting skills use this pack to
-        # copy objective titles, WP titles, deliverable identities,
-        # and partner names exactly from source artifacts.
+        # MIGRATED (ticket 10, §17.5.3 / C2): the canonical reference pack
+        # is no longer built here.  It is now generated by the manifest-bound
+        # ``canonical_pack_deriver`` deterministic component in the agent
+        # runtime's node body (before skill sequencing, so it precedes the
+        # drafting skill exactly as this preseed did), and each invocation is
+        # recorded in ``AgentResult.invoked_components``.  A build fault now
+        # fails the agent body with ``failure_origin="agent_body"`` /
+        # ``failure_category="AGENT_EXECUTION_ERROR"`` and
+        # ``can_evaluate_exit_gate=False`` — the same blocking outcome this
+        # scheduler branch produced, via the component contract rather than a
+        # hardcoded scheduler branch.  The former non-empty-arrays pre-check is
+        # preserved inside the deriver (fail-closed on an empty required array,
+        # §12.4), scoped to objectives/wps/deliverables — ``partners`` is dropped
+        # from it because MSCA-PF is single-researcher (no consortium
+        # partners.json), so requiring it was a RIA-shaped assumption.
+
+        # ── Skip-binding resolution (PRE-2/PRE-3, ticket 3) ───────────
         #
-        # BLOCKING: if the pack cannot be built or is invalid, the
-        # node is blocked immediately.  Drafting without the pack
-        # produces preventable gate_10d failures.
-        if node_id in REUSE_ELIGIBLE_NODES:
-            try:
-                from runner.phase8_canonical_pack import (
-                    CANONICAL_PACK_REL,
-                    SCHEMA_ID as _PACK_SCHEMA_ID,
-                    build_phase8_canonical_reference_pack,
-                )
-                _pack_path = build_phase8_canonical_reference_pack(
-                    self.repo_root, self.ctx.run_id,
-                )
-                # Validate: file must exist, parse as JSON, have correct
-                # schema_id and current run_id.
-                import json as _json
-                _pack_text = _pack_path.read_text(encoding="utf-8")
-                _pack_data = _json.loads(_pack_text)
-                if (
-                    _pack_data.get("schema_id") != _PACK_SCHEMA_ID
-                    or _pack_data.get("run_id") != self.ctx.run_id
-                ):
-                    raise ValueError(
-                        f"canonical_reference_pack.json has "
-                        f"schema_id={_pack_data.get('schema_id')!r}, "
-                        f"run_id={_pack_data.get('run_id')!r}; "
-                        f"expected schema_id={_PACK_SCHEMA_ID!r}, "
-                        f"run_id={self.ctx.run_id!r}"
-                    )
-                # Required arrays must be non-empty.  Empty arrays
-                # indicate missing Tier 3/4 sources — drafting without
-                # them produces metric-loss and identity failures.
-                _required = ("objectives", "wps", "deliverables", "partners")
-                _empty = [
-                    k for k in _required
-                    if not _pack_data.get(k)
-                ]
-                if _empty:
-                    raise ValueError(
-                        f"canonical_reference_pack.json has empty "
-                        f"required arrays: {_empty}"
-                    )
-            except Exception as _pack_exc:
-                _fail_reason = (
-                    f"Canonical reference pack build/validation failed "
-                    f"for {node_id!r}: {_pack_exc}"
-                )
-                log.error("  [%s] %s", node_id, _fail_reason)
-                self.ctx.set_node_state(
-                    node_id,
-                    "blocked_at_exit",
-                    failure_origin="agent_body",
-                    exit_gate_evaluated=False,
-                    failure_reason=_fail_reason,
-                    failure_category="MISSING_INPUT",
-                )
-                self.ctx.save()
-                return NodeExecutionResult(
-                    node_id=node_id,
-                    final_state="blocked_at_exit",
-                    exit_gate_evaluated=False,
-                    failure_origin="agent_body",
-                    gate_result=None,
-                    agent_result=None,
-                    failure_reason=_fail_reason,
-                    failure_category="MISSING_INPUT",
-                )
+        # When preseed or reuse supersedes a Phase-8 drafting skill, the id it
+        # skips must be a real manifest-resolved skill for the node — otherwise
+        # a rename is a silent no-op that lets the drafter overwrite the
+        # authoritative section while the audit falsely records a skip.  Resolve
+        # the node's manifest skills once, up front, so both the preseed and the
+        # reuse branch can fail closed against them (via ``validate_skip_binding``)
+        # before they write anything.  Only Phase-8 supersession-eligible nodes
+        # need it; every other node skips the resolver call.
+        _supersession_eligible = (
+            self._preseed_phase8_sections and node_id in PRESEED_NODE_CONFIG
+        ) or node_id in REUSE_ELIGIBLE_NODES
+        _resolved_skill_ids: frozenset[str] = (
+            frozenset(self._node_resolver.resolve_skill_ids(node_id))
+            if _supersession_eligible
+            else frozenset()
+        )
 
         # ── Step 2.45: Phase 8 manual preseed (n08a/n08b/n08c only) ──
         #
@@ -1684,6 +2060,25 @@ class DAGScheduler:
         # If the preseed file exists but is invalid, block the node.
         _preseed_skip_skills: list[str] | None = None
         if self._preseed_phase8_sections and node_id in PRESEED_NODE_CONFIG:
+            # Fail-closed skip binding (PRE-2): validate BEFORE applying, so an
+            # invalid binding writes neither the section artifact nor its skip
+            # audit (PRE-3 — no audit unless the suppression is in force).
+            _binding_err = validate_skip_binding(
+                node_id,
+                [PRESEED_NODE_CONFIG[node_id]["skipped_skill"]],
+                _resolved_skill_ids,
+            )
+            if _binding_err is not None:
+                _fail_reason = (
+                    f"Preseed skip binding invalid for {node_id!r}: {_binding_err}"
+                )
+                log.error("  [%s] %s", node_id, _fail_reason)
+                return self._block_before_dispatch(
+                    node_id,
+                    failure_origin="preseed",
+                    failure_reason=_fail_reason,
+                    failure_category="CONSTRAINT_VIOLATION",
+                )
             preseed_result = maybe_apply_phase8_preseed(
                 self.repo_root, self.ctx.run_id, node_id,
             )
@@ -1694,24 +2089,12 @@ class DAGScheduler:
                     f"{preseed_result.reason}"
                 )
                 log.error("  [%s] %s", node_id, _fail_reason)
-                self.ctx.set_node_state(
+                return self._block_before_dispatch(
                     node_id,
-                    "blocked_at_exit",
                     failure_origin="preseed",
-                    exit_gate_evaluated=False,
                     failure_reason=_fail_reason,
-                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
-                )
-                self.ctx.save()
-                return NodeExecutionResult(
-                    node_id=node_id,
-                    final_state="blocked_at_exit",
-                    exit_gate_evaluated=False,
-                    failure_origin="preseed",
-                    gate_result=None,
-                    agent_result=None,
-                    failure_reason=_fail_reason,
-                    failure_category=preseed_result.failure_category or "MALFORMED_ARTIFACT",
+                    failure_category=preseed_result.failure_category
+                    or "MALFORMED_ARTIFACT",
                 )
             if preseed_result.applied:
                 log.info(
@@ -1734,6 +2117,40 @@ class DAGScheduler:
                 node_id, self.repo_root, current_fingerprint=fp,
             )
             if decision.reusable:
+                # Fail-closed skip binding (PRE-2/PRE-3): the drafting skill
+                # reuse will skip must be a real manifest skill for this node,
+                # and must be validated BEFORE the reuse decision is persisted —
+                # so the Tier-4 record that claims "drafting_skipped_audit_
+                # executed" is written only when the suppression it describes is
+                # actually in force.  An eligible node with no bound skip skill
+                # (eligibility/skip drift) yields an empty skip set and blocks
+                # here instead of recording a false skip over an unsuppressed
+                # drafter.
+                drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
+                _binding_err = validate_skip_binding(
+                    node_id,
+                    [drafting_skill] if drafting_skill is not None else [],
+                    _resolved_skill_ids,
+                )
+                if _binding_err is not None:
+                    _fail_reason = (
+                        f"Reuse skip binding invalid for {node_id!r}: "
+                        f"{_binding_err}"
+                    )
+                    log.error("  [%s] %s", node_id, _fail_reason)
+                    # Record the refusal, not a skip — the audit must not claim a
+                    # suppression that never happened.
+                    self._reuse_decisions[node_id] = {
+                        "status": "not_reused",
+                        "reason": _fail_reason,
+                    }
+                    return self._block_before_dispatch(
+                        node_id,
+                        failure_origin="reuse",
+                        failure_reason=_fail_reason,
+                        failure_category="CONSTRAINT_VIOLATION",
+                    )
+
                 # Read the actual artifact run_id from disk (authoritative).
                 # The metadata's source_run_id may be stale from v1 format;
                 # always prefer the artifact file's own run_id field.
@@ -1765,14 +2182,14 @@ class DAGScheduler:
                     "input_fingerprint": decision.input_fingerprint,
                     "gate_id": decision.gate_id,
                 }
+                # Persist the decision and set the skip together, now that the
+                # binding is confirmed in force (PRE-3).
                 self._reuse_decisions[node_id] = reuse_dec
                 # Persist to RunContext so gate predicates can verify
                 self.ctx.record_reuse_decision(node_id, reuse_dec)
                 self.ctx.save()
                 # Skip only the drafting skill; audit skills still run.
-                drafting_skill = REUSE_SKIP_SKILLS.get(node_id)
-                if drafting_skill:
-                    _reuse_skip_skills = [drafting_skill]
+                _reuse_skip_skills = [drafting_skill]
             else:
                 log.info(
                     "  [%s] REUSE: not reusable (%s)",
@@ -1790,6 +2207,76 @@ class DAGScheduler:
         pre_gate_agent_id = resolver.resolve_pre_gate_agent_id(node_id)
         skill_ids = resolver.resolve_skill_ids(node_id)
         phase_id = resolver.resolve_phase_id(node_id)
+        deterministic_components = resolver.resolve_deterministic_components(
+            node_id
+        )
+
+        # ── Draft-consuming component suppression ────────────────────
+        #
+        # The invariant is *not* "a preseed was applied" — it is "an
+        # authoritative section artifact already exists and the drafting skill
+        # is not running this run".  Both supersession modes satisfy it:
+        #
+        #   * preseed — the operator's artifact was just copied to the canonical
+        #     Tier 5 path, and
+        #   * reuse   — a validated prior-run artifact is being carried forward.
+        #
+        # In both cases the ``section_drafts/`` on disk are not this run's
+        # product, so the draft-consuming components (assumption-applier,
+        # section-assembler) must NOT run: they would either recompose stale
+        # drafts over the authoritative prose or fail the node on the
+        # assembler's stale-spine run_id guard.  This mirrors the drafting-skill
+        # supersession that both modes already perform.
+        #
+        # The canonical_pack_deriver is retained: it derives the reference pack
+        # the preservation gates check against, from Tier 3 (not from drafts).
+        #
+        # The suppressed set is the explicit DRAFT_CONSUMING_COMPONENTS
+        # declaration, not a name-suffix match — a rename or a new
+        # draft-consuming component must not silently escape suppression.
+        #
+        # The drafting skill itself is suppressed by the ``_skip_skills`` set
+        # below, whose sole member (the preseed/reuse skip id) was already
+        # validated against the node's manifest ``skill_ids`` before this point
+        # (PRE-2/PRE-3): if it drifted from the manifest the node has already
+        # hard-blocked, so no unvalidated skip id reaches ``run_agent``.  A
+        # matching id is guaranteed to be in the node's ``ordered_skills`` there
+        # and is therefore skipped — the b5eb816 "carry the manifest-derived
+        # supersession into the skip set" workaround is subsumed by the
+        # fail-closed guard and no longer needed.
+        _skip_skills: list[str] = list(
+            _preseed_skip_skills or _reuse_skip_skills or []
+        )
+        _suppressed_components: list[str] = []
+        _supersession_mode = (
+            "preseed" if _preseed_skip_skills is not None
+            else "reuse" if _reuse_skip_skills is not None
+            else None
+        )
+        if _supersession_mode is not None and deterministic_components:
+            deterministic_components, _suppressed_components = (
+                partition_draft_consuming(deterministic_components)
+            )
+            if _suppressed_components:
+                log.info(
+                    "  [%s] %s: draft-consuming components suppressed: %s "
+                    "(retained: %s)",
+                    node_id,
+                    _supersession_mode.upper(),
+                    ", ".join(_suppressed_components),
+                    ", ".join(deterministic_components) or "none",
+                )
+
+        # Durable audit of the suppression (§9.4): a component that did not run
+        # must be recoverable from Tier 4, not only from the log stream.
+        if _suppressed_components:
+            self._record_component_suppression(
+                node_id=node_id,
+                mode=_supersession_mode or "unknown",
+                suppressed=_suppressed_components,
+                retained=list(deterministic_components or []),
+                skipped_skills=list(_skip_skills),
+            )
 
         log.info("  [%s] agent dispatch: agent=%s", node_id, agent_id)
         agent_result = run_agent(
@@ -1802,7 +2289,8 @@ class DAGScheduler:
             phase_id=phase_id,
             sub_agent_id=sub_agent_id,
             pre_gate_agent_id=pre_gate_agent_id,
-            skip_skills=_preseed_skip_skills or _reuse_skip_skills,
+            skip_skills=_skip_skills or None,
+            deterministic_components=deterministic_components,
         )
         log.info(
             "  [%s] agent result: status=%s  can_evaluate_exit=%s",
@@ -1952,6 +2440,92 @@ class DAGScheduler:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _block_before_dispatch(
+        self,
+        node_id: str,
+        *,
+        failure_origin: str,
+        failure_reason: str,
+        failure_category: str,
+    ) -> NodeExecutionResult:
+        """Persist and return a block that happens before the agent body runs.
+
+        Shared by the preseed and reuse pre-dispatch guards (invalid preseed
+        artifact, drifted skip binding): the node is blocked before any agent
+        dispatch, so there is no gate result or agent result and the exit gate
+        is never evaluated.  Persists the block state to ``RunContext`` and
+        returns the matching :class:`NodeExecutionResult`.
+        """
+        self.ctx.set_node_state(
+            node_id,
+            "blocked_at_exit",
+            failure_origin=failure_origin,
+            exit_gate_evaluated=False,
+            failure_reason=failure_reason,
+            failure_category=failure_category,
+        )
+        self.ctx.save()
+        return NodeExecutionResult(
+            node_id=node_id,
+            final_state="blocked_at_exit",
+            exit_gate_evaluated=False,
+            failure_origin=failure_origin,
+            gate_result=None,
+            agent_result=None,
+            failure_reason=failure_reason,
+            failure_category=failure_category,
+        )
+
+    def _record_component_suppression(
+        self,
+        *,
+        node_id: str,
+        mode: str,
+        suppressed: list[str],
+        retained: list[str],
+        skipped_skills: list[str],
+    ) -> Path:
+        """Write a Tier 4 audit record for suppressed deterministic components.
+
+        A manifest-bound component that did not run is a durable orchestration
+        decision (§9.4): it must be recoverable from Tier 4, not only from the
+        log stream.  Best-effort — an audit-write fault must not fail a node
+        that is otherwise sound, so it is logged and swallowed.
+        """
+        audit = {
+            "mode": mode,
+            "node_id": node_id,
+            "run_id": self.ctx.run_id,
+            "reason": (
+                "drafting skill superseded; section_drafts/ are not this "
+                "run's product, so draft-consuming components were not invoked"
+            ),
+            "suppressed_components": suppressed,
+            "retained_components": retained,
+            # The skills that did not run alongside them — including any drafting
+            # skill carried in from the suppressed assembler binding, so the
+            # audit shows the whole supersession, not half of it.
+            "skipped_skills": skipped_skills,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        audit_path = (
+            self.repo_root
+            / PRESEED_AUDIT_DIR
+            / f"component_suppression_{node_id}.json"
+        )
+        try:
+            audit_path.parent.mkdir(parents=True, exist_ok=True)
+            audit_path.write_text(
+                json.dumps(audit, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+        except OSError as exc:
+            log.warning(
+                "  [%s] could not write component-suppression audit: %s",
+                node_id, exc,
+            )
+        return audit_path
 
     def _reload_ctx(self) -> None:
         """

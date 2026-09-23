@@ -7,6 +7,12 @@ purpose: >
   project duration, and verify the critical path is consistent with the Phase 3
   dependency map.
 agent: gantt_designer
+# Deterministic components (CLAUDE.md §16.5/C3): pure-Python, Claude-free
+# node-body passes invoked by the agent runtime before skill sequencing
+# (§17.5.3/C2).  The dependency normalizer produces scheduling_constraints.json
+# and is bound here rather than hardcoded in agent_runtime.py.
+deterministic_components:
+  - dependency_normalizer
 skills:
   - gantt-schedule-builder
   - milestone-consistency-check

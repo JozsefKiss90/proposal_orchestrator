@@ -1,0 +1,288 @@
+Control Group 5 — Secrets Manager
+
+  Controls
+
+  DC-20  Secrets created and encrypted with CMK (alias/proposal-orchestrator)
+  DC-21  Secret resource policy scoped to Bedrock role (and root for admin)
+  DC-22  API key rotation configured (90-day) — IF transport-api-key secret is needed
+
+  Infrastructure Reference (from CG1-CG4)
+
+  Account:       232538551827
+  Region:        us-east-1
+  Bedrock role:  proposal-orchestrator-bedrock-role
+  KMS key:       887638e8-358b-4664-9270-368aec0ea1f1 (alias/proposal-orchestrator)
+  SM endpoint:   vpce-08ba482a3b11f7d64 (available)
+  Instance host: i-0045af36dbf5f1272
+
+  Prerequisites Confirmed
+
+  - IAM supporting-services policy already allows:
+      secretsmanager:GetSecretValue on arn:aws:secretsmanager:us-east-1:232538551827:secret:proposal-orchestrator/*
+      kms:Decrypt + kms:DescribeKey on *
+  - KMS key policy (CG4) allows proposal-orchestrator-bedrock-role to Decrypt + DescribeKey
+  - Secrets Manager VPC endpoint (CG1) is available for host access
+
+  ============================================================================
+  Decision: Which Secrets Are Needed?
+  ============================================================================
+
+  The hardening plan defines two possible secrets:
+
+  1. proposal-orchestrator/env-config
+     Non-sensitive environment configuration (transport preset, model, region).
+     Always needed.
+
+  2. proposal-orchestrator/transport-api-key
+     Bedrock API key for the bedrock-mantle backend.
+     Only needed if using the "bedrock" (mantle) transport preset.
+     NOT needed when using "bedrock_converse" (IAM-based auth via instance profile).
+
+  Since the approved production transport is BEDROCK_CONVERSE_US (IAM auth),
+  only the env-config secret is required. DC-22 (rotation) becomes
+  NOT_APPLICABLE because there are no long-lived API key credentials to rotate.
+
+  ============================================================================
+  Step 1: Define the Secret Value
+  ============================================================================
+
+  The env-config secret stores non-sensitive environment configuration that
+  the application reads at startup. Prepare a JSON value:
+
+  {
+    "ORCHESTRATOR_TRANSPORT_PRESET": "BEDROCK_CONVERSE_US",
+    "ORCHESTRATOR_PRODUCTION_MODE": "true",
+    "ORCHESTRATOR_DIAGNOSTIC_LEVEL": "metadata",
+    "AWS_DEFAULT_REGION": "us-east-1",
+    "SKILL_MODEL": "us.anthropic.claude-sonnet-4-6"
+  }
+
+  Note: These values will be finalized in CG9 (Production Config). For now,
+  creating the secret with placeholder values is sufficient to verify the
+  Secrets Manager controls.
+
+  ============================================================================
+  Step 2: Create the Secret Encrypted with CMK
+  ============================================================================
+
+  Run from CloudShell or local CLI (with admin permissions):
+
+  aws secretsmanager create-secret \
+    --name "proposal-orchestrator/env-config" \
+    --description "Proposal Orchestrator environment configuration" \
+    --kms-key-id "alias/proposal-orchestrator" \
+    --secret-string '{"ORCHESTRATOR_TRANSPORT_PRESET":"BEDROCK_CONVERSE_US","ORCHESTRATOR_PRODUCTION_MODE":"true","ORCHESTRATOR_DIAGNOSTIC_LEVEL":"metadata","AWS_DEFAULT_REGION":"us-east-1","SKILL_MODEL":"us.anthropic.claude-sonnet-4-6"}' \
+    --tags '[{"Key":"project","Value":"proposal-orchestrator"},{"Key":"environment","Value":"production"}]' \
+    --region us-east-1 \
+    --output json
+
+  ============================================================================
+  Step 3: Attach Resource Policy
+  ============================================================================
+
+  Save the following policy to a file called secret_resource_policy.json:
+
+  ---- BEGIN secret_resource_policy.json ----
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "AllowBedrockRoleAccess",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role"
+              },
+              "Action": "secretsmanager:GetSecretValue",
+              "Resource": "*"
+          },
+          {
+              "Sid": "DenyAllOtherGetSecretValue",
+              "Effect": "Deny",
+              "NotPrincipal": {
+                  "AWS": [
+                      "arn:aws:iam::232538551827:root",
+                      "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role"
+                  ]
+              },
+              "Action": "secretsmanager:GetSecretValue",
+              "Resource": "*"
+          }
+      ]
+  }
+  ---- END secret_resource_policy.json ----
+
+  Notes on the policy:
+  - AllowBedrockRoleAccess: Grants GetSecretValue to the Bedrock execution role.
+  - DenyAllOtherGetSecretValue: Denies GetSecretValue to ALL principals except
+    root and the Bedrock role. This prevents any other IAM user/role from
+    reading the secret value, even if they have broad IAM permissions.
+    Root is included in NotPrincipal so that account administrators retain
+    the ability to read the secret for debugging/maintenance.
+
+  Apply the resource policy:
+
+  aws secretsmanager put-resource-policy \
+    --secret-id "proposal-orchestrator/env-config" \
+    --resource-policy file://secret_resource_policy.json \
+    --region us-east-1 \
+    --output json
+
+  ============================================================================
+  Step 4: Test Retrieval from Deployment Host
+  ============================================================================
+
+  Connect to instance i-0045af36dbf5f1272 via SSM and run:
+
+  # SM-E06: Retrieval test from deployment host
+  {
+    echo "=== SM-E06: Secret Retrieval Test ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "--- Caller Identity ---"
+    aws sts get-caller-identity --output json
+    echo ""
+
+    echo "--- Retrieve secret (name only, not value) ---"
+    aws secretsmanager get-secret-value \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "Name" \
+      --region us-east-1 \
+      --output text
+    echo ""
+    echo "get_secret_exit_code=$?"
+
+    echo ""
+    echo "--- Verify KMS key association ---"
+    aws secretsmanager describe-secret \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "KmsKeyId" \
+      --region us-east-1 \
+      --output text
+  } 2>&1 | tee /tmp/SM-E06-retrieval-test.txt
+
+  Expected:
+  - Caller identity shows assumed-role/proposal-orchestrator-ec2-ssm-role
+  - get-secret-value returns "proposal-orchestrator/env-config" (exit code 0)
+  - KmsKeyId shows the CMK ARN (887638e8-358b-4664-9270-368aec0ea1f1)
+
+  IMPORTANT: Do NOT capture the secret value itself in evidence files.
+  Use --query "Name" to only return the secret name, confirming access
+  without exposing the secret content.
+
+  ============================================================================
+  Step 5: Collect Evidence (from CloudShell or local CLI)
+  ============================================================================
+
+  {
+    echo "=== CG5: Secrets Manager Evidence Collection ==="
+    echo "Date: $(date -u)"
+    echo ""
+
+    echo "=== SM-E01: Secrets List ==="
+    aws secretsmanager list-secrets \
+      --filters Key=name,Values=proposal-orchestrator \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== SM-E02: Secret Description ==="
+    aws secretsmanager describe-secret \
+      --secret-id "proposal-orchestrator/env-config" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== SM-E03: KMS Key Association ==="
+    aws secretsmanager describe-secret \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "KmsKeyId" \
+      --region us-east-1 \
+      --output text
+    echo ""
+
+    echo "=== SM-E04: Resource Policy ==="
+    aws secretsmanager get-resource-policy \
+      --secret-id "proposal-orchestrator/env-config" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== SM-E05: Rotation Configuration ==="
+    aws secretsmanager describe-secret \
+      --secret-id "proposal-orchestrator/env-config" \
+      --query "{RotationEnabled:RotationEnabled,RotationRules:RotationRules}" \
+      --region us-east-1 \
+      --output json
+    echo ""
+
+    echo "=== No Plaintext Credentials Check ==="
+    echo "(Run this on the deployment host via SSM)"
+    echo "Commands to run on host:"
+    echo "  ls -la ~/.aws/credentials 2>&1"
+    echo "  env | grep -i 'AWS_ACCESS_KEY\|AWS_SECRET' 2>&1"
+    echo "  find / -name '.env' -path '*/proposal*' 2>/dev/null"
+  } 2>&1 | tee CG5_logs.txt
+
+  Save outputs to:
+  - docs/infrastructure_security/evidence/05_secrets_manager/CG5_logs.txt
+  - docs/infrastructure_security/evidence/05_secrets_manager/SM-E06-retrieval-test.txt
+    (from Step 4, run on the deployment host)
+
+  ============================================================================
+  PASS / FAIL Criteria
+  ============================================================================
+
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  |   #   |       Criterion       |                           PASS                           |                     FAIL                     |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-1  | Secret exists         | proposal-orchestrator/env-config exists in                | No secret, or secret with wrong prefix       |
+  |       |                       | Secrets Manager                                          |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-2  | CMK encryption        | KmsKeyId matches CMK 887638e8-358b-4664-9270-            | Default AWS-managed key (aws/secretsmanager) |
+  |       |                       | 368aec0ea1f1 or alias/proposal-orchestrator              | or no encryption                             |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-3  | Resource policy       | AllowBedrockRoleAccess scoped to                         | No resource policy, or wildcard principal    |
+  |       |                       | proposal-orchestrator-bedrock-role;                      |                                              |
+  |       |                       | DenyAllOtherGetSecretValue with NotPrincipal             |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-4  | Host retrieval        | get-secret-value succeeds from deployment host           | Access denied from deployment host           |
+  |       |                       | (exit code 0, caller = ec2-ssm-role)                     |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-5  | Rotation (if          | RotationEnabled: true, RotationRules <=90 days           | API key secret exists without rotation       |
+  |       | API key secret)       | OR no API key secret needed (NOT_APPLICABLE)             |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-6  | No plaintext secrets  | No .env file, no AWS_ACCESS_KEY_ID/                      | Plaintext credentials found on host          |
+  |       |                       | AWS_SECRET_ACCESS_KEY in environment or files             |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+  | SM-7  | Tags                  | project:proposal-orchestrator and                        | Missing tags                                 |
+  |       |                       | environment:production tags present                      |                                              |
+  +-------+-----------------------+----------------------------------------------------------+----------------------------------------------+
+
+  ============================================================================
+  DC-22 (Rotation) — Expected Disposition
+  ============================================================================
+
+  Since the production transport is BEDROCK_CONVERSE_US (IAM-based auth via
+  instance profile), no transport-api-key secret is needed. DC-22 should be
+  marked NOT_APPLICABLE with the justification:
+
+    "Production transport uses IAM instance profile authentication
+     (BEDROCK_CONVERSE_US). No long-lived API key credentials are stored.
+     The env-config secret contains only non-sensitive configuration
+     values that do not require automatic rotation."
+
+  If a transport-api-key secret is later added, DC-22 must be revisited
+  and 90-day Lambda rotation must be configured.
+
+  ============================================================================
+  What Happens After CG5
+  ============================================================================
+
+  CG5 completion unlocks:
+  - CG6 (CloudTrail) — no direct dependency, but follows sequence
+  - CG9 (Production Config) — will finalize the secret values
+
+  Once CG5 evidence is collected and reviewed, proceed to CG6.
+
+  Please run Steps 1-5 above, save the evidence, and confirm when ready for review.

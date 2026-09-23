@@ -1,0 +1,23 @@
+{
+  "Rules": [
+    {
+      "ID": "proposal-orchestrator-cloudtrail-lifecycle",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "cloudtrail/proposal-orchestrator/"
+      },
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "GLACIER_IR"
+        }
+      ],
+      "Expiration": {
+        "Days": 365
+      },
+      "NoncurrentVersionExpiration": {
+        "NoncurrentDays": 30
+      }
+    }
+  ]
+}

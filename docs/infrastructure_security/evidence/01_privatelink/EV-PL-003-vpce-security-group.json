@@ -1,0 +1,40 @@
+﻿{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-013d5e4d4eb55dfd9",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "project",
+                    "Value": "proposal-orchestrator"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "proposal-orchestrator-vpce-sg"
+                }
+            ],
+            "VpcId": "vpc-050a09774560fd774",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:232538551827:security-group/sg-013d5e4d4eb55dfd9",
+            "OwnerId": "232538551827",
+            "GroupName": "proposal-orchestrator-vpce-sg",
+            "Description": "Security group for Bedrock VPC endpoints - TCP 443 only",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "232538551827",
+                            "GroupId": "sg-076f724aed2429771"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}
+

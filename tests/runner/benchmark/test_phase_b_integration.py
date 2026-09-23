@@ -27,7 +27,19 @@ EXPECTED_TOTAL_WALL_CLOCK = 922.203
 
 @pytest.fixture
 def phase_a_fixture(tmp_path):
-    """Copy real Phase A fixtures to a temp directory."""
+    """Copy real Phase A fixtures to a temp directory.
+
+    Skips when the fixture benchmark data is not present on disk.
+    Benchmark data lives in .claude/benchmark/ which is gitignored —
+    these fixtures are only available on machines that have run the
+    corresponding DAG execution.
+    """
+    if not (FIXTURE_BENCH_DIR / "invocation_ledger.jsonl").exists():
+        pytest.skip(
+            f"Fixture benchmark data not found: {FIXTURE_BENCH_DIR}. "
+            "Benchmark data is gitignored and only available after local DAG runs."
+        )
+
     bench_dir = tmp_path / ".claude" / "benchmark" / FIXTURE_RUN_ID
     bench_dir.mkdir(parents=True, exist_ok=True)
 

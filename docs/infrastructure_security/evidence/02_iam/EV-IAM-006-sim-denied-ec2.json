@@ -1,0 +1,28 @@
+﻿{
+    "EvaluationResults": [
+        {
+            "EvalActionName": "ec2:DescribeInstances",
+            "EvalResourceName": "*",
+            "EvalDecision": "explicitDeny",
+            "MatchedStatements": [
+                {
+                    "SourcePolicyId": "proposal-orchestrator-explicit-deny",
+                    "SourcePolicyType": "IAM Policy",
+                    "StartPosition": {
+                        "Line": 18,
+                        "Column": 6
+                    },
+                    "EndPosition": {
+                        "Line": 32,
+                        "Column": 6
+                    }
+                }
+            ],
+            "MissingContextValues": [],
+            "PermissionsBoundaryDecisionDetail": {
+                "AllowedByPermissionsBoundary": false
+            }
+        }
+    ]
+}
+

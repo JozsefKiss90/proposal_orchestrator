@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowBedrockConverseOnly",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::232538551827:role/proposal-orchestrator-bedrock-role",
+          "arn:aws:iam::232538551827:role/proposal-orchestrator-ec2-ssm-role"
+        ]
+      },
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+        "arn:aws:bedrock:*:*:inference-profile/us.anthropic.claude-*"
+      ]
+    }
+  ]
+}

@@ -28,6 +28,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from runner.claim_status import normalize_status, rollup_inconsistency
+from runner.phase8_skip_binding import (
+    PHASE8_DRAFTING_SKILL_BY_NODE,
+    assert_nodes_match_source,
+)
+
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -43,11 +49,10 @@ REUSE_METADATA_DIR: str = "docs/tier4_orchestration_state/reuse/phase8"
 #: Node-specific drafting skills to skip during reuse.
 #: Only the expensive drafting skill is skipped; audit skills
 #: (traceability-check, compliance-check) always execute.
-REUSE_SKIP_SKILLS: dict[str, str] = {
-    "n08a_excellence_drafting": "excellence-section-drafting",
-    "n08b_impact_drafting": "impact-section-drafting",
-    "n08c_implementation_drafting": "implementation-section-drafting",
-}
+#: This *is* the single authoritative skip binding — not a second copy of it —
+#: so the reuse skip and the preseed skip can never name different skills for
+#: the same node (PRE-2/PRE-3, ticket 3).
+REUSE_SKIP_SKILLS: dict[str, str] = dict(PHASE8_DRAFTING_SKILL_BY_NODE)
 
 #: Nodes eligible for reuse, mapped to their canonical artifact and gate.
 REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
@@ -67,6 +72,12 @@ REUSE_ELIGIBLE_NODES: dict[str, dict[str, str]] = {
         "gate_id": "gate_10c_implementation_completeness",
     },
 }
+
+#: Load-time invariant: eligibility and the skip binding cover exactly the same
+#: nodes.  A node eligible for reuse but absent from the skip binding (or vice
+#: versa) is the PRE-3 latent defect — a false "drafting skipped" audit over an
+#: unsuppressed drafter — so the divergence is caught at import, not at runtime.
+assert_nodes_match_source("REUSE_ELIGIBLE_NODES", REUSE_ELIGIBLE_NODES.keys())
 
 #: Node-specific minimum fingerprint input paths.
 #: All files under directory paths are included in the hash.
@@ -427,16 +438,34 @@ def validate_reuse_candidate(
             input_fingerprint=current_fingerprint,
         )
 
-    # 4. validation_status.overall_status must not be "unresolved"
+    # 4. validation_status.overall_status must not be "unresolved" (any casing —
+    #    §12.2 title-case, so normalise before comparing, as gate_10a does; PRE-1)
     vs = artifact_data.get("validation_status")
     if not isinstance(vs, dict):
         return ReuseDecision(
             reusable=False, reason="missing_validation_status",
             input_fingerprint=current_fingerprint,
         )
-    if vs.get("overall_status") == "unresolved":
+    if normalize_status(vs.get("overall_status")) == "unresolved":
         return ReuseDecision(
             reusable=False, reason="unresolved_validation_status",
+            input_fingerprint=current_fingerprint,
+        )
+
+    # 4b. The roll-up must not over-state its claims (§12.2 worst-wins).
+    #
+    # Reuse carries a finished section artifact forward *and* — like preseed —
+    # suppresses the draft-consuming components, so nothing in the current run
+    # re-derives ``overall_status`` from ``claim_statuses``.  Step 4 only rejects
+    # an overall ``unresolved``: an ``unresolved`` claim sitting under a
+    # ``confirmed`` roll-up passes it, and the retained ``canonical_pack_deriver``
+    # then republishes that declaration under the current run_id while
+    # ``gate_10a`` (which reads only the roll-up) goes green.  Same defect,
+    # same check as preseed — shared so the two paths cannot drift.
+    _rollup_reason = rollup_inconsistency(artifact_data, prefix="reuse")
+    if _rollup_reason is not None:
+        return ReuseDecision(
+            reusable=False, reason=_rollup_reason,
             input_fingerprint=current_fingerprint,
         )
 
@@ -692,14 +721,20 @@ def is_reuse_owned_artifact_valid(
     vs = artifact.get("validation_status")
     if not isinstance(vs, dict):
         return False, "missing_validation_status"
-    if vs.get("overall_status") == "unresolved":
+    # Normalise casing before comparing: §12.2 title-case must not slip a reused
+    # section past this ownership check that gate_10a would block (PRE-1).
+    if normalize_status(vs.get("overall_status")) == "unresolved":
         return False, "validation_status_unresolved"
 
     # Check for assumed/unresolved claims
     claim_statuses = vs.get("claim_statuses", [])
     for cs in claim_statuses:
-        if isinstance(cs, dict) and cs.get("status") in ("assumed", "unresolved"):
-            return False, f"claim_status_{cs.get('status')}"
+        if not isinstance(cs, dict):
+            continue
+        claim_status = normalize_status(cs.get("status"))
+        if claim_status in ("assumed", "unresolved"):
+            # Report the normalised status so the reason is casing-independent.
+            return False, f"claim_status_{claim_status}"
 
     tf = artifact.get("traceability_footer")
     if not isinstance(tf, dict):

@@ -28,7 +28,10 @@ from runner.dag_scheduler import (
     ManifestGraph,
     bootstrap_phase_prerequisites,
 )
-from runner.gate_result_registry import GATE_RESULT_PATHS
+from runner.gate_result_registry import (
+    GATE_RESULT_PATHS,
+    GATE_RESULT_SCHEMA_ID,
+)
 from runner.predicates.gate_pass_predicates import (
     _check_continuation_acceptance,
     gate_pass_recorded,
@@ -73,6 +76,7 @@ def _write_gate_result(
     abs_path = repo_root / _TIER4_ROOT_REL / rel_path
     abs_path.parent.mkdir(parents=True, exist_ok=True)
     result = {
+        "schema_id": GATE_RESULT_SCHEMA_ID,
         "gate_id": gate_id,
         "status": status,
         "run_id": run_id,
@@ -216,6 +220,7 @@ class TestExistingRunPreservation:
         """When the gate artifact has the same run_id, it passes normally."""
         tier4 = tmp_path / "tier4"
         gate_data = {
+            "schema_id": GATE_RESULT_SCHEMA_ID,
             "gate_id": "phase_01_gate",
             "status": "pass",
             "run_id": _CURRENT_RUN_ID,
@@ -415,6 +420,7 @@ class TestSameRunBehaviorUnchanged:
     def test_same_run_pass(self, tmp_path: Path):
         tier4 = tmp_path / "tier4"
         gate_data = {
+            "schema_id": GATE_RESULT_SCHEMA_ID,
             "gate_id": "phase_01_gate",
             "status": "pass",
             "run_id": "same-run",
@@ -434,6 +440,7 @@ class TestSameRunBehaviorUnchanged:
     def test_same_run_status_fail(self, tmp_path: Path):
         tier4 = tmp_path / "tier4"
         gate_data = {
+            "schema_id": GATE_RESULT_SCHEMA_ID,
             "gate_id": "phase_01_gate",
             "status": "fail",
             "run_id": "same-run",
@@ -456,6 +463,7 @@ class TestSameRunBehaviorUnchanged:
         """Plain run_id mismatch (no continuation context) still fails."""
         tier4 = tmp_path / "tier4"
         gate_data = {
+            "schema_id": GATE_RESULT_SCHEMA_ID,
             "gate_id": "phase_01_gate",
             "status": "pass",
             "run_id": "old-run",

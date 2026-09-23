@@ -6,7 +6,7 @@ import pytest
 
 from runner.benchmark.context import get_ledger, set_ledger
 from runner.benchmark.ledger import BenchmarkLedger
-from runner.benchmark.transport_hook import instrumented_invoke
+from runner.benchmark.transport_hook import InstrumentedBackend, instrumented_invoke
 from runner.claude_transport import ClaudeCLITimeoutError, ClaudeTransportError
 
 
@@ -292,3 +292,247 @@ class TestInstrumentedInvokeBenchmarkFailureIsolation:
                 max_tokens=100,
             )
             assert result == "ok"
+
+
+# ===========================================================================
+# InstrumentedBackend tests
+# ===========================================================================
+
+
+class _FakeBackend:
+    """Minimal ToolLoopBackend stub for testing."""
+
+    def __init__(self, response=None, usage=None, error=None):
+        self._response = response or {"content": "ok", "tool_calls": None}
+        self._usage = usage
+        self._error = error
+        self.call_count = 0
+        self.last_messages = None
+
+    def __call__(self, messages):
+        self.call_count += 1
+        self.last_messages = messages
+        if self._error:
+            raise self._error
+        self._last_usage = self._usage
+        return self._response
+
+    @property
+    def last_usage(self):
+        return getattr(self, "_last_usage", None)
+
+    @property
+    def model(self):
+        return "test-model"
+
+    @property
+    def url(self):
+        return "https://test.example.com/v1/chat/completions"
+
+
+class TestInstrumentedBackendDisabled:
+    """InstrumentedBackend when benchmarking is disabled."""
+
+    def setup_method(self):
+        set_ledger(None)
+
+    def teardown_method(self):
+        set_ledger(None)
+
+    def test_passthrough_success(self):
+        fake = _FakeBackend()
+        wrapped = InstrumentedBackend(fake, model="m")
+        result = wrapped([{"role": "user", "content": "hi"}])
+        assert result == {"content": "ok", "tool_calls": None}
+        assert fake.call_count == 1
+
+    def test_passthrough_exception(self):
+        fake = _FakeBackend(error=RuntimeError("boom"))
+        wrapped = InstrumentedBackend(fake, model="m")
+        with pytest.raises(RuntimeError, match="boom"):
+            wrapped([{"role": "user", "content": "hi"}])
+
+    def test_property_proxies(self):
+        fake = _FakeBackend()
+        wrapped = InstrumentedBackend(fake, model="fallback-model")
+        assert wrapped.model == "test-model"
+        assert wrapped.url == "https://test.example.com/v1/chat/completions"
+
+
+class TestInstrumentedBackendEnabled:
+    """InstrumentedBackend when benchmarking is enabled."""
+
+    def setup_method(self):
+        self.ledger = BenchmarkLedger()
+        set_ledger(self.ledger)
+
+    def teardown_method(self):
+        set_ledger(None)
+
+    def test_success_records_telemetry(self):
+        fake = _FakeBackend(response={"content": "response text", "tool_calls": None})
+        wrapped = InstrumentedBackend(
+            fake,
+            model="anthropic.claude-sonnet-4-6-v1",
+            timeout_seconds=1200,
+            tool_names=["Read", "Glob"],
+            bench_run_id="run-100",
+            bench_skill_id="call-analysis",
+            bench_node_id="n01",
+            bench_invocation_type="skill_tapm",
+        )
+        result = wrapped([
+            {"role": "system", "content": "system prompt"},
+            {"role": "user", "content": "user prompt"},
+        ])
+        assert result["content"] == "response text"
+        assert len(self.ledger.records) == 1
+
+        rec = self.ledger.records[0]
+        assert rec.run_id == "run-100"
+        assert rec.skill_id == "call-analysis"
+        assert rec.node_id == "n01"
+        assert rec.invocation_type == "skill_tapm"
+        assert rec.execution_mode == "openai_compat_tapm"
+        assert rec.model == "anthropic.claude-sonnet-4-6-v1"
+        assert rec.timeout_seconds == 1200
+        assert rec.tools_enabled == ["Read", "Glob"]
+        assert rec.system_prompt_chars == len("system prompt")
+        assert rec.user_prompt_chars == len("user prompt")
+        assert rec.response_chars == len("response text")
+        assert rec.response_status == "success"
+        assert rec.error_class is None
+        assert rec.wall_clock_seconds >= 0
+
+    def test_cli_prompt_mode_no_tools(self):
+        fake = _FakeBackend(response={"content": "ok", "tool_calls": None})
+        wrapped = InstrumentedBackend(
+            fake,
+            model="m",
+            bench_invocation_type="skill_cli_prompt",
+        )
+        wrapped([{"role": "user", "content": "hi"}])
+        rec = self.ledger.records[0]
+        assert rec.execution_mode == "openai_compat"
+        assert rec.tools_enabled == []
+
+    def test_exception_records_error(self):
+        fake = _FakeBackend(error=RuntimeError("transport fail"))
+        wrapped = InstrumentedBackend(
+            fake,
+            model="m",
+            bench_run_id="run-200",
+        )
+        with pytest.raises(RuntimeError, match="transport fail"):
+            wrapped([{"role": "user", "content": "hi"}])
+
+        assert len(self.ledger.records) == 1
+        rec = self.ledger.records[0]
+        assert rec.response_status == "error"
+        assert rec.error_class == "RuntimeError"
+        assert "transport fail" in rec.error_message
+        assert rec.response_chars is None
+
+    def test_timeout_records_timeout_status(self):
+        class FakeTimeoutError(Exception):
+            pass
+
+        FakeTimeoutError.__name__ = "TimeoutError"
+        fake = _FakeBackend(error=FakeTimeoutError("timed out"))
+        wrapped = InstrumentedBackend(fake, model="m")
+        with pytest.raises(FakeTimeoutError):
+            wrapped([{"role": "user", "content": "hi"}])
+
+        rec = self.ledger.records[0]
+        assert rec.response_status == "timeout"
+
+    def test_uses_actual_usage_when_available(self):
+        usage = {"prompt_tokens": 500, "completion_tokens": 200, "total_tokens": 700}
+        fake = _FakeBackend(
+            response={"content": "ok", "tool_calls": None},
+            usage=usage,
+        )
+        wrapped = InstrumentedBackend(fake, model="m")
+        wrapped([{"role": "user", "content": "hi"}])
+
+        rec = self.ledger.records[0]
+        assert rec.estimated_input_tokens == 500
+        assert rec.estimated_output_tokens == 200
+
+    def test_falls_back_to_char_estimates(self):
+        fake = _FakeBackend(response={"content": "x" * 350, "tool_calls": None})
+        wrapped = InstrumentedBackend(fake, model="claude-sonnet-4-6")
+        wrapped([
+            {"role": "system", "content": "a" * 1750},
+            {"role": "user", "content": "b" * 1750},
+        ])
+
+        rec = self.ledger.records[0]
+        # Input: 3500 chars / 3.5 = 1000 tokens
+        assert rec.estimated_input_tokens == 1000
+        # Output: 350 chars / 3.5 = 100 tokens
+        assert rec.estimated_output_tokens == 100
+
+    def test_multiple_rounds_each_recorded(self):
+        fake = _FakeBackend(response={"content": "ok", "tool_calls": None})
+        wrapped = InstrumentedBackend(
+            fake,
+            model="m",
+            bench_run_id="run-300",
+            bench_skill_id="test-skill",
+        )
+        # Simulate 3 rounds (as tool_loop would call)
+        for _ in range(3):
+            wrapped([{"role": "user", "content": "round"}])
+
+        assert len(self.ledger.records) == 3
+        ids = {r.invocation_id for r in self.ledger.records}
+        assert len(ids) == 3  # each round gets a unique ID
+
+    def test_semantic_predicate_metadata(self):
+        fake = _FakeBackend(response={"content": '{"status":"pass"}', "tool_calls": None})
+        wrapped = InstrumentedBackend(
+            fake,
+            model="m",
+            bench_run_id="run-400",
+            bench_predicate_id="scope_check",
+            bench_invocation_type="semantic_predicate",
+        )
+        wrapped([{"role": "user", "content": "test"}])
+
+        rec = self.ledger.records[0]
+        assert rec.predicate_id == "scope_check"
+        assert rec.invocation_type == "semantic_predicate"
+        assert rec.skill_id is None
+
+    def test_no_prompt_content_stored(self):
+        secret = "CONFIDENTIAL_PROJECT_DATA_12345"
+        fake = _FakeBackend(response={"content": "ok", "tool_calls": None})
+        wrapped = InstrumentedBackend(fake, model="m")
+        wrapped([
+            {"role": "system", "content": f"system {secret}"},
+            {"role": "user", "content": f"user {secret}"},
+        ])
+
+        rec = self.ledger.records[0]
+        assert secret not in str(rec.invocation_id)
+        assert secret not in str(rec.run_id)
+        assert not hasattr(rec, "system_prompt")
+        assert not hasattr(rec, "user_prompt")
+        assert not hasattr(rec, "response_text")
+
+
+class TestInstrumentedBackendFailureIsolation:
+    """Benchmark failures never affect backend operation."""
+
+    def teardown_method(self):
+        set_ledger(None)
+
+    def test_ledger_append_failure_swallowed(self):
+        fake = _FakeBackend(response={"content": "ok", "tool_calls": None})
+        ledger = BenchmarkLedger()
+        with mock.patch.object(ledger, "append", side_effect=RuntimeError("boom")):
+            set_ledger(ledger)
+            wrapped = InstrumentedBackend(fake, model="m")
+            result = wrapped([{"role": "user", "content": "hi"}])
+            assert result["content"] == "ok"
