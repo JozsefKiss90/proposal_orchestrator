@@ -66,13 +66,13 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Dev-graph schema and snapshot builder on a synthetic fixture.
 
-- [ ] Recording a new version of T03 with assignment moved from B to C keeps the old version retrievable and the change set lists the changed `assigned_to` edge, including the removal.
-- [ ] The plan for the T03 change lists the task description, the responsibility table passage, the affected proposal passages and the schedule and resource checks, each with a non-empty reason path.
-- [ ] With one dependency edge removed from the fixture, the artifact whose coverage became unknown gets action rerun.
-- [ ] A source absent from the old package but relevant to the new version is flagged.
-- [ ] A malformed or missing snapshot makes the planner refuse rather than produce a narrower plan.
-- [ ] The advisory artifact is written under Tier 4 and byte-equal replay passes.
-- [ ] No file under the reuse metadata location and no run manifest reuse decision is touched.
+- [x] Recording a new version of T03 with assignment moved from B to C keeps the old version retrievable and the change set lists the changed `assigned_to` edge, including the removal.
+- [x] The plan for the T03 change lists the task description, the responsibility table passage, the affected proposal passages and the schedule and resource checks, each with a non-empty reason path.
+- [x] With one dependency edge removed from the fixture, the artifact whose coverage became unknown gets action rerun.
+- [x] A source absent from the old package but relevant to the new version is flagged.
+- [x] A malformed or missing snapshot makes the planner refuse rather than produce a narrower plan.
+- [x] The advisory artifact is written under Tier 4 and byte-equal replay passes.
+- [x] No file under the reuse metadata location and no run manifest reuse decision is touched.
 
 ## Shadow comparison and gate invariant pins
 

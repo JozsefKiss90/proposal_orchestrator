@@ -1,0 +1,38 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-impact-planner",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Approved change recording and the shadow impact planner'",
+  "authority": "CLAUDE.md §9.4 (durable decisions), §12.1 (reviewable outputs), §13.7 (no weakened gate), §17.5.3 (deterministic components). Not a constitutional amendment. The planner is advisory; the shadow-mode rule itself is recorded by the shadow comparison ticket.",
+  "decision": "An approved change to a Tier 3 record is recorded once, with the old version kept. The impact planner reads the before and after snapshots and the durable run records and writes an advisory plan. Every entry carries a reason path and one action from rerun, reuse-under-policy, reconsider. Unknown dependency coverage yields rerun. The planner never writes reuse metadata and never touches the scheduler.",
+  "change_recording": {
+    "entry_point": "runner.dev_graph.changes.record_change(repo_root, record_rel, new_content, change_id=). The record path must be one of the five Tier 3 records the builder indexes.",
+    "old_version_kept": "the replaced content is archived content-addressed under docs/tier4_orchestration_state/dev_graph/record_versions/<version hex>.json and read back with read_record_version. The before and after snapshots are stored under dev_graph/snapshots/<snapshot id hex>.json. Tier 3 stays the single writer of the fact; the archive is a copy for retrieval, never a second authority.",
+    "change_record": "dev_graph/changes/<change_id>.json, written once; an existing change id is refused (immutable_record). Nothing under Tier 4 is written until the new version builds; a new version the builder rejects restores the record file byte for byte.",
+    "change_set": "nodes by id and version, edges by label. A removed edge is a change in its own right. A node whose version moved only because a nested record changed (a work package holding a changed task) is reported as contained, not direct, and is not an origin."
+  },
+  "planner": {
+    "entry_point": "runner.dev_graph.impact.plan_impact(before, after, run_records, change_id=).",
+    "origins": "nodes whose own content changed, was added or was removed, plus the endpoints of an added or removed edge when neither endpoint is one already.",
+    "reach": "breadth-first from the origins over the union of the before and after edges under the change_impact_planning view policy (permitted types, traversals, forbidden types and tags, depth), applied before expansion as the package builder applies it. The walk enters a document container (artifact_version) and does not continue out of it unless the container is an origin: the document is affected as a whole, its unrelated passages are not affected through it. Every other node expands, so a passage addressing the changed task's work package is listed with that route.",
+    "reason_path": "changed:<origin>, then the edge labels traversed, then input_of:<record> for a run record; a run record with unknown coverage carries coverage_unknown:<record>. Never empty.",
+    "hit_and_action": {
+      "origin": "reconsider (the record that changed).",
+      "direct": "an endpoint of an added or removed edge, or a run record with such an input: reconsider for passages, evidence and artifact versions; rerun for run records.",
+      "transitive": "reached over unchanged edges only: reconsider for passages, evidence and artifact versions; reuse-under-policy for run records, so an unchanged check result is retained only when an explicit policy says it may be.",
+      "coverage_unknown": "a run record with null inputs, an input absent from the after snapshot, or a declared dependency edge absent from the after snapshot: rerun. A missing edge never justifies skipping work."
+    },
+    "newly_relevant_sources": "a source reached from an origin that no run record lists among its inputs or its package. A source that was always relevant but never packaged is flagged too: the flag says the old packages did not carry it, not that it is new.",
+    "refusals": "a missing stored snapshot (missing_snapshot), a stored snapshot whose content does not hash to its id or does not validate (malformed_snapshot), malformed run records (malformed_record). A refusal is the whole answer; the planner never narrows a plan."
+  },
+  "run_records": "docs/tier4_orchestration_state/dev_graph/run_records.json is placed by the operator or engineer for this milestone: artifacts and checks with declared inputs, dependency edges and package. Deriving it from phase outputs and per-invocation consumption records is a later stage (PRD out-of-scope list). Absent run records are a refusal, not an empty plan.",
+  "writer": "dev_graph_impact_plan_writer is a registered deterministic component. It reads dev_graph/impact_request.json ({change_id}), loads the change record, both stored snapshots and the run records, and writes dev_graph/impact_plans/<first sixteen hex of plan id>/plan.json. No run id and no wall-clock field; byte-equal replay. Like the snapshot and package writers it is registered but unbound to a manifest node (§16.5); nothing dispatches it inside a run.",
+  "shadow_mode": "the plan carries advisory true and mode shadow. The planner modules name no scheduler, gate evaluator, reuse layer or transport module, and a test pins that reuse metadata and run manifests are untouched by recording a change and writing a plan. The whole-Tier-3 reuse fingerprint remains the sole authority over what executes.",
+  "not_done_here": [
+    "the shadow comparison against the scheduler's recorded reuse decision and its decision log entry (next ticket).",
+    "revision contracts, candidate versioning and assessment applicability (their own ticket).",
+    "deriving run records from phase outputs or consumption records."
+  ],
+  "verification": "tests/runner/test_dev_graph_impact.py: old version retrievable and the change set lists the assigned_to edge including the removal; the T03 plan lists the task, the responsibility passage, its claim and commitment, the work-package passages by route, and the schedule, resource and deliverable checks, each with a non-empty reason path; unknown coverage and a removed dependency edge yield rerun; a source entering scope with a change is flagged; the walk honours a narrowed planning policy; missing, tampered and malformed inputs refuse and write nothing; byte-equal replay through the registry; reuse metadata and run manifests untouched; the lint covers the new modules."
+}

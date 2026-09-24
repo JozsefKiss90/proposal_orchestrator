@@ -222,6 +222,11 @@ ERROR_KINDS: frozenset[str] = frozenset(
         "stale_snapshot",
         "stale_policy",
         "policy_forbidden",
+        # Change records and the impact planner (runner.dev_graph.changes,
+        # runner.dev_graph.impact)
+        "immutable_record",
+        "missing_snapshot",
+        "malformed_snapshot",
     }
 )
 

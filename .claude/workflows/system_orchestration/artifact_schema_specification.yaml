@@ -2971,6 +2971,190 @@ operational_artifact_schemas:
           version: {type: string, required: true}
           content: {type: object, required: true}
 
+  # ---------------------------------------------------------------------------
+  # 5.7 Dev-graph change record
+  # Path: docs/tier4_orchestration_state/dev_graph/changes/<change_id>.json
+  # Written by: runner.dev_graph.changes.record_change, once per change id
+  #   (an existing id is refused). The before and after snapshots are stored
+  #   content-addressed under dev_graph/snapshots/<snapshot id hex>.json and
+  #   the replaced record content under dev_graph/record_versions/<version
+  #   hex>.json (schema orch.dev_graph.record_version.v1: path,
+  #   content_version, content). The old version stays retrievable.
+  # Consumed by: the impact planner. Never a gate input. No run_id and no
+  #   wall-clock field.
+  # ---------------------------------------------------------------------------
+  dev_graph_change_record:
+    schema_id_value: "orch.dev_graph.change_record.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/changes/<change_id>.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.change_record.v1".}
+      change_id: {type: string, required: true, description: Plain identifier; the file name.}
+      approval: {type: string, required: true, enum: [approved]}
+      record_path:
+        type: string
+        required: true
+        description: One of the five Tier 3 record paths the snapshot builder indexes.
+      before:
+        type: object
+        required: true
+        fields:
+          snapshot_id: {type: string, required: true}
+          record_version: {type: string, required: true, description: Content hash of the replaced record content.}
+      after:
+        type: object
+        required: true
+        fields:
+          snapshot_id: {type: string, required: true}
+          record_version: {type: string, required: true}
+      change_set:
+        type: object
+        required: true
+        description: >
+          Pure diff of the two snapshots. nodes.added and nodes.removed are id
+          lists; nodes.changed items carry id, type, before_version,
+          after_version and kind (direct: own content changed; contained:
+          only a nested record changed). edges.added and edges.removed items
+          carry label, predicate, source and target, so a removed link is a
+          change in its own right.
+
+  # ---------------------------------------------------------------------------
+  # 5.7a Dev-graph record version (archive)
+  # Path: docs/tier4_orchestration_state/dev_graph/record_versions/<version hex>.json
+  # Written by: record_change, once per content version. The old version of a
+  #   replaced Tier 3 record stays retrievable here; Tier 3 remains the single
+  #   writer of the fact.
+  # ---------------------------------------------------------------------------
+  dev_graph_record_version:
+    schema_id_value: "orch.dev_graph.record_version.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/record_versions/<version hex>.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.record_version.v1".}
+      path: {type: string, required: true, description: The Tier 3 record path this content came from.}
+      content_version: {type: string, required: true, description: Content hash of content; the file name.}
+      content: {type: object, required: true, nullable: true, description: The record content; null when the record did not exist before.}
+
+  # ---------------------------------------------------------------------------
+  # 5.8 Dev-graph run records
+  # Path: docs/tier4_orchestration_state/dev_graph/run_records.json
+  # Placed by: the operator or engineer (manually_placed). The durable run
+  #   records the impact planner reads: artifacts and checks with their
+  #   declared inputs. Per-invocation consumption records are a later stage.
+  # ---------------------------------------------------------------------------
+  dev_graph_run_records:
+    schema_id_value: "orch.dev_graph.run_records.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/run_records.json"
+    provenance_class: manually_placed
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.run_records.v1".}
+      records:
+        type: array
+        required: true
+        item_schema:
+          record_id: {type: string, required: true, description: Plain identifier, unique.}
+          kind: {type: string, required: true, enum: [artifact, check]}
+          path: {type: string, required: true, description: Repo-relative path of the artifact or check result.}
+          inputs:
+            type: array
+            required: true
+            nullable: true
+            item_type: string
+            description: >
+              Node ids the record was produced from. null means unknown
+              dependency coverage, which the planner reports as rerun.
+          dependency_edges:
+            type: array
+            required: false
+            item_type: string
+            description: >
+              Edge labels ("<source> -<predicate>-> <target>") the record
+              relied on. One absent after the change makes coverage unknown.
+          package:
+            type: object
+            required: false
+            nullable: true
+            fields:
+              package_id: {type: string, required: true}
+              included: {type: array, required: true, item_type: string}
+
+  # ---------------------------------------------------------------------------
+  # 5.9 Dev-graph impact plan (shadow, advisory)
+  # Path: docs/tier4_orchestration_state/dev_graph/impact_plans/<first sixteen hex of plan id>/plan.json
+  # Written by: the dev_graph_impact_plan_writer deterministic component
+  #   (runner/dev_graph/impact.py), on demand from the operator request at
+  #   docs/tier4_orchestration_state/dev_graph/impact_request.json
+  #   ({"change_id": ...}). Not bound to a manifest node.
+  # Consumed by: the shadow comparison (later ticket) and the operator. Never
+  #   a gate input, never read by the scheduler or the Phase 8 reuse layer.
+  #   No run_id and no wall-clock field.
+  # ---------------------------------------------------------------------------
+  dev_graph_impact_plan:
+    schema_id_value: "orch.dev_graph.impact_plan.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/impact_plans/<first sixteen hex of plan id>/plan.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.impact_plan.v1".}
+      plan_id:
+        type: string
+        required: true
+        description: >
+          sha256, prefixed "sha256:", over canonical JSON of change_id, both
+          snapshot ids, run_records_hash, policy_version, entries and
+          newly_relevant_sources.
+      advisory: {type: boolean, required: true, description: Always true.}
+      mode: {type: string, required: true, enum: [shadow]}
+      change_id: {type: string, required: true}
+      before_snapshot_id: {type: string, required: true}
+      after_snapshot_id: {type: string, required: true}
+      run_records_hash: {type: string, required: true, description: Content hash of the normalised run records.}
+      policy_version: {type: string, required: true}
+      max_depth: {type: integer, required: true, description: The change_impact_planning view's depth.}
+      nothing_changed: {type: boolean, required: true}
+      change_set: {type: object, required: true, description: As in the change record.}
+      origins:
+        type: array
+        required: true
+        item_type: string
+        description: >
+          Nodes whose own content changed, was added or removed, plus the
+          endpoints of a changed edge when neither endpoint is one already.
+      entries:
+        type: array
+        required: true
+        description: Sorted by (kind, id).
+        item_schema:
+          kind: {type: string, required: true, enum: [record, passage, evidence, artifact, check]}
+          id: {type: string, required: true}
+          hit: {type: string, required: true, enum: [origin, direct, transitive, coverage_unknown]}
+          action: {type: string, required: true, enum: [rerun, reuse-under-policy, reconsider]}
+          reason_path:
+            type: array
+            required: true
+            item_type: string
+            description: >
+              Never empty. "changed:<origin>" then the edge labels traversed,
+              then "input_of:<record>" for a run record; a run record with
+              unknown coverage carries "coverage_unknown:<record>".
+          detail: {type: string, required: true}
+          type: {type: string, required: false, description: Node type (graph entries only).}
+          version: {type: string, required: false, description: Node version (graph entries only).}
+          path: {type: string, required: false, description: Record path (run-record entries only).}
+      newly_relevant_sources:
+        type: array
+        required: true
+        description: >
+          Sources reached from an origin that no run record lists among its
+          inputs or its package.
+        item_schema:
+          id: {type: string, required: true}
+          version: {type: string, required: true}
+          reason_path: {type: array, required: true, item_type: string}
+
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS
 # =============================================================================

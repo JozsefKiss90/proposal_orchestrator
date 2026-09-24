@@ -61,7 +61,7 @@
       "artifact": "snapshot.json",
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/snapshot.json",
       "provenance_class": "derived",
-      "description": "Dev-graph snapshot: rebuildable index over Tier 3 records, source materials and document snapshots with content-derived identity"
+      "description": "Dev-graph snapshot: rebuildable index over Tier 3 records, source materials and document snapshots with content-derived identity; the before and after snapshot of every recorded change is also stored content-addressed under docs/tier4_orchestration_state/dev_graph/snapshots/<snapshot id hex>.json"
     },
     {
       "schema_id": "orch.dev_graph.document_snapshot.v1",
@@ -83,6 +83,34 @@
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/packages/",
       "provenance_class": "derived",
       "description": "Immutable evidence package items written beside their manifest by dev_graph_package_manifest_writer"
+    },
+    {
+      "schema_id": "orch.dev_graph.change_record.v1",
+      "artifact": "<change_id>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/changes/",
+      "provenance_class": "derived",
+      "description": "Approved change record: record path, before and after snapshot ids and record versions, and the change set (nodes by id and version, edges by label including removals); written once by record_change"
+    },
+    {
+      "schema_id": "orch.dev_graph.record_version.v1",
+      "artifact": "<content version hex>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/record_versions/",
+      "provenance_class": "derived",
+      "description": "Content-addressed archive of a Tier 3 record version replaced by an approved change; the old version stays retrievable"
+    },
+    {
+      "schema_id": "orch.dev_graph.run_records.v1",
+      "artifact": "run_records.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/run_records.json",
+      "provenance_class": "manually_placed",
+      "description": "Durable run records the impact planner reads: artifacts and checks with declared inputs, dependency edges and package; null inputs mean unknown coverage"
+    },
+    {
+      "schema_id": "orch.dev_graph.impact_plan.v1",
+      "artifact": "<plan id hex>/plan.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/impact_plans/",
+      "provenance_class": "derived",
+      "description": "Shadow impact planner advisory: affected records, passages, evidence, artifacts and checks with reason paths and one action each (rerun, reuse-under-policy, reconsider); newly relevant sources flagged; never consumed at runtime"
     }
   ]
 }

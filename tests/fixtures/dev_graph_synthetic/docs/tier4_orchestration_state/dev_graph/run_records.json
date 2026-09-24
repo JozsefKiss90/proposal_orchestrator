@@ -1,0 +1,33 @@
+{
+  "schema_id": "orch.dev_graph.run_records.v1",
+  "records": [
+    {
+      "record_id": "CHK-SCHEDULE",
+      "kind": "check",
+      "path": "docs/tier4_orchestration_state/validation_reports/synthetic_schedule_check.json",
+      "inputs": ["T01", "T02", "T03"],
+      "dependency_edges": ["T02 -consumes-> T01", "T03 -consumes-> T02"]
+    },
+    {
+      "record_id": "CHK-RESOURCE",
+      "kind": "check",
+      "path": "docs/tier4_orchestration_state/validation_reports/synthetic_resource_check.json",
+      "inputs": ["P-A", "P-B", "P-C"],
+      "dependency_edges": []
+    },
+    {
+      "record_id": "CHK-DELIVERABLE",
+      "kind": "check",
+      "path": "docs/tier4_orchestration_state/validation_reports/synthetic_deliverable_check.json",
+      "inputs": ["D1.1", "MS1"],
+      "dependency_edges": ["D1.1 -validated_by-> MS1"],
+      "package": {"package_id": "sha256:synthetic-package", "included": ["D1.1", "MS1", "WP1", "SRC-2"]}
+    },
+    {
+      "record_id": "ART-SECTION-2",
+      "kind": "artifact",
+      "path": "docs/tier5_deliverables/proposal_sections/synthetic_section_two.json",
+      "inputs": null
+    }
+  ]
+}

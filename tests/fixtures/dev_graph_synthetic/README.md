@@ -22,3 +22,10 @@ The package tests ask for evidence around `T03` under each view policy. They tag
 source with `historical_feedback` on their copy to exercise the blind view, and add
 assessment and artifact-version nodes to a built snapshot through `Snapshot.from_graph`
 because no fixture record produces those types yet.
+
+`docs/tier4_orchestration_state/dev_graph/run_records.json` holds four synthetic run
+records for the impact planner: a schedule check over T01 to T03 that declares the two
+`consumes` edges, a resource check over the three participants, a deliverable check over
+D1.1 and MS1 whose package included SRC-2, and a section artifact with no declared inputs
+(unknown coverage). The impact tests record the T03 responsibility move through
+`record_change` on their copy and plan it from the stored snapshots.

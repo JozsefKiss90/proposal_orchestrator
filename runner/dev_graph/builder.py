@@ -142,6 +142,37 @@ class Snapshot:
         """The on-disk serialisation (same options as ``atomic_write_json``)."""
         return json.dumps(self.to_dict(), indent=2, ensure_ascii=False).encode("utf-8")
 
+    @classmethod
+    def from_dict(cls, doc: Any, where: str) -> "Snapshot":
+        """Rebuild a snapshot from its on-disk form, or refuse it.
+
+        The stored id must equal the id recomputed from the stored nodes and
+        edges, and the graph must validate. A snapshot that fails either test
+        is refused with kind ``malformed_snapshot`` naming *where*; a consumer
+        never reasons over a tampered or truncated index.
+        """
+
+        def _bad(message: str) -> DevGraphError:
+            return DevGraphError("malformed_snapshot", where, message)
+
+        if not isinstance(doc, dict):
+            raise _bad("snapshot is not a JSON object")
+        if doc.get("schema_id") != SCHEMA_ID:
+            raise _bad(f"schema_id {doc.get('schema_id')!r} is not {SCHEMA_ID}")
+        nodes, edges, inputs = doc.get("nodes"), doc.get("edges"), doc.get("inputs", [])
+        if not isinstance(nodes, list) or not isinstance(edges, list) or not isinstance(inputs, list):
+            raise _bad("nodes, edges and inputs must be lists")
+        try:
+            snap = cls.from_graph(nodes, edges, inputs)
+        except (DevGraphError, KeyError, TypeError) as exc:
+            raise _bad(f"graph does not validate: {exc}") from exc
+        if snap.snapshot_id != doc.get("snapshot_id"):
+            raise _bad(
+                f"stored snapshot_id {doc.get('snapshot_id')!r} does not match the content "
+                f"({snap.snapshot_id})"
+            )
+        return snap
+
 
 # ---------------------------------------------------------------------------
 # Record reading
