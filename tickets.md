@@ -106,10 +106,10 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** None — can start immediately.
 
-- [ ] A profile that reproduces the current defaults leaves every existing harness test green.
-- [ ] A second synthetic profile with different criteria names, a different scale and a different threshold runs the rubric grading path with no Python change and produces different verdicts on the same candidate.
-- [ ] A grep of the harness package finds no instrument name literal outside the profile loader and the default profile file.
-- [ ] Profile version changes when any bundled component changes.
+- [x] A profile that reproduces the current defaults leaves every existing harness test green.
+- [x] A second synthetic profile with different criteria names, a different scale and a different threshold runs the rubric grading path with no Python change and produces different verdicts on the same candidate.
+- [x] A grep of the harness package finds no instrument name literal outside the profile loader and the default profile file.
+- [x] Profile version changes when any bundled component changes.
 
 ## Candidate-bound blind assessment as a harness module command
 

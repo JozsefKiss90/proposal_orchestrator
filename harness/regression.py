@@ -1045,6 +1045,8 @@ def freeze_rubric_baseline(
         "rubric_set_id": str(report.get("rubric_set_id", "")),
         "rubric_set_version": str(report.get("rubric_set_version", "")),
         "rubric_set_fingerprint": str(report.get("rubric_set_fingerprint", "")),
+        "profile_id": str(report.get("profile_id", "")),
+        "profile_version": str(report.get("profile_version", "")),
         "budget_record": dict(budget_record) if budget_record is not None else None,
         "report": dict(report),
     }

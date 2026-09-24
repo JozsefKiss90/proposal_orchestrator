@@ -1,0 +1,49 @@
+{
+  "profile_id": "msca_pf_default",
+  "label": "MSCA Postdoctoral Fellowships (European Fellowship) — default pre-evaluation profile",
+  "instrument": {
+    "registry_instrument_type": "MSCA-PF",
+    "name": "MSCA Postdoctoral Fellowships",
+    "form_name": "HE MSCA Evaluation Form"
+  },
+  "option_tag_grammar": {
+    "applicable_variant": "Postdoctoral fellowships",
+    "known_variants": [
+      "Doctoral networks",
+      "Postdoctoral fellowships",
+      "Staff exchanges",
+      "COFUND Choose Europe",
+      "Special needs allowances"
+    ],
+    "variant_prefix": "MSCA ",
+    "all_except_prefix": "all MSCA except "
+  },
+  "criteria": [
+    {
+      "id": "excellence",
+      "registry_criterion_id": "Excellence",
+      "section_ids": ["excellence_section"]
+    },
+    {
+      "id": "impact",
+      "registry_criterion_id": "Impact",
+      "section_ids": ["impact_section"]
+    },
+    {
+      "id": "implementation",
+      "registry_criterion_id": "Implementation",
+      "section_ids": ["implementation_section"]
+    }
+  ],
+  "registry_path": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+  "scorecard": {
+    "path": "harness/evaluator_scorecard_msca_pf.json",
+    "scorecard_id": "msca_pf_evaluation_scorecard",
+    "version": "2.2"
+  },
+  "rubric_set": {
+    "path": "harness/rubrics_msca_pf.json",
+    "rubric_set_id": "msca_pf_rubrics",
+    "version": "1.0.0"
+  }
+}

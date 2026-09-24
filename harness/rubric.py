@@ -46,7 +46,7 @@ What this module enforces, in code:
   run cannot be constructed, and nothing in ``runner`` imports this module
   (the standing boundary test).  The CLI's non-zero exit advises a human.
 
-CLI: ``py -3.10 -m harness.rubric grade`` runs the 9 PF expectations over
+CLI: ``py -3.10 -m harness.rubric grade`` runs the profile's expectations over
 their mapped frozen sections under the pinned judge (E5f owns pacing/budget);
 ``py -3.10 -m harness.rubric report`` re-renders a persisted report offline.
 Exit codes mirror ``harness.regression``: ``0`` clean, ``1`` contradiction(s)
@@ -96,7 +96,8 @@ from harness.expectation_grounding import (
 from harness.expectations import ExpectationError, section_paths_for
 from harness.judge import Judge, JudgeError, resolve_judge_config
 from harness.provenance import ProvenanceLog
-from harness.rubrics import RubricError, RubricSet, load_rubric_set
+from harness.profile import PreEvaluationProfile
+from harness.rubrics import ProfileBundle, RubricError, RubricSet, load_profile_bundle
 from harness.status_faithfulness import SEVERITY_NONE, STATUS_CONFIRMED
 from harness.verdict import MIN_MAJORITY_SAMPLES
 
@@ -687,6 +688,8 @@ class RubricReport:
     rubric_set_fingerprint: str = ""
     scorecard_id: str = ""
     scorecard_version: str = ""
+    profile_id: str = ""
+    profile_version: str = ""
     judge_model: str | None = None
     judge_version: str | None = None
     spine_source: str = ""
@@ -739,6 +742,8 @@ class RubricReport:
             "rubric_set_fingerprint": self.rubric_set_fingerprint,
             "scorecard_id": self.scorecard_id,
             "scorecard_version": self.scorecard_version,
+            "profile_id": self.profile_id,
+            "profile_version": self.profile_version,
             "judge_model": self.judge_model,
             "judge_version": self.judge_version,
             "spine_source": self.spine_source,
@@ -760,12 +765,13 @@ def build_rubric_report(
     cells: Iterable[ExpectationCell],
     *,
     rubric_set: RubricSet | None = None,
+    profile: ProfileBundle | None = None,
     judge_model: str | None = None,
     judge_version: str | None = None,
     spine_source: str = "",
     notes: str = _ADVISORY_NOTE,
 ) -> RubricReport:
-    """Assemble the :class:`RubricReport`, pinned to its rubric set and judge."""
+    """Assemble the :class:`RubricReport`, pinned to its rubric set, profile and judge."""
     return RubricReport(
         cells=tuple(cells),
         rubric_set_id=rubric_set.rubric_set_id if rubric_set else "",
@@ -773,6 +779,8 @@ def build_rubric_report(
         rubric_set_fingerprint=rubric_set.fingerprint if rubric_set else "",
         scorecard_id=rubric_set.scorecard_id if rubric_set else "",
         scorecard_version=rubric_set.scorecard_version if rubric_set else "",
+        profile_id=profile.profile_id if profile else "",
+        profile_version=profile.version if profile else "",
         judge_model=judge_model,
         judge_version=judge_version,
         spine_source=spine_source,
@@ -835,6 +843,8 @@ def render_report(report: Mapping[str, Any]) -> str:
         f"v{report.get('rubric_set_version', '')} "
         f"[{fingerprint}]  "
         f"judge: {report.get('judge_model')}/{report.get('judge_version')}\n"
+        f"profile: {report.get('profile_id', '') or '-'} "
+        f"[{str(report.get('profile_version') or '')[:19]}]\n"
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
 
@@ -903,14 +913,16 @@ def grade_all(
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     n: int = MIN_MAJORITY_SAMPLES,
     verdict_cache: VerdictCache | None = None,
+    profile: PreEvaluationProfile | None = None,
 ) -> tuple[ExpectationCell, ...]:
     """Grade every rubric over its mapped section(s) and combine the axes.
 
     One shared :data:`~harness.expectation_grounding.VerdictCache` spans the
     whole run, so the same ``(claim, source_ref)`` pair is never judged twice
     across the nine expectations (the E5d budget discipline).  Section
-    resolution goes through the E5a criterion↔section map — the grader never
-    guesses which artifact answers which expectation.
+    resolution goes through the profile's criterion↔section map (the default
+    profile when *profile* is ``None``) — the grader never guesses which
+    artifact answers which expectation.
     """
     root = Path(repo_root)
     wa = (
@@ -919,7 +931,7 @@ def grade_all(
         else load_working_assumptions(root)
     )
     cache: VerdictCache = verdict_cache if verdict_cache is not None else {}
-    section_kwargs: dict[str, Any] = {"repo_root": root}
+    section_kwargs: dict[str, Any] = {"repo_root": root, "profile": profile}
     if sections_dir is not None:
         section_kwargs["sections_dir"] = sections_dir
 
@@ -976,7 +988,7 @@ _CLI_ERRORS = (
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """``python -m harness.rubric`` — grade the 9×2 grid or re-render a report.
+    """``python -m harness.rubric`` — grade the expectation grid or re-render a report.
 
     Exit codes: ``0`` clean; ``1`` contradiction(s) found (**advisory** — a
     human decides what to do about a high-coverage / weak-grounding or
@@ -987,7 +999,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         prog="harness.rubric",
         description=(
             "E5e rubric grid: combine the coverage (E5c) and grounding (E5d) "
-            "axes per MSCA-PF evaluator expectation, detect high-coverage/"
+            "axes per profile evaluator expectation, detect high-coverage/"
             "weak-grounding and unconfirmed-spine contradictions, and render "
             "both axes side by side. Advisory to a human; never a runtime gate."
         ),
@@ -995,9 +1007,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_grade = sub.add_parser(
-        "grade", help="grade the 9 PF expectations over their mapped sections"
+        "grade", help="grade the profile's expectations over their mapped sections"
     )
     p_grade.add_argument("--repo-root", default=".")
+    p_grade.add_argument(
+        "--profile",
+        default=None,
+        help="pre-evaluation profile JSON (default: the harness default profile)",
+    )
     p_grade.add_argument("--sections", default=None, help="override the sections dir")
     p_grade.add_argument("--out", default=str(DEFAULT_REPORT_PATH))
     p_grade.add_argument("--provenance", default=str(DEFAULT_PROVENANCE_PATH))
@@ -1011,12 +1028,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "grade":
             root = Path(args.repo_root)
-            rubric_set = load_rubric_set(
-                root / "harness/rubrics_msca_pf.json",
-                registry_path=root
-                / "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
-                scorecard_path=root / "harness/evaluator_scorecard_msca_pf.json",
-            )
+            bundle = load_profile_bundle(args.profile, repo_root=root)
+            rubric_set = bundle.rubric_set
             wa = load_working_assumptions(root)
             spine = load_spine_registry(root, working_assumptions=wa)
             judge = _build_judge(Path(args.provenance))
@@ -1029,10 +1042,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 working_assumptions=wa,
                 token_budget=args.budget,
                 n=args.n,
+                profile=bundle.profile,
             )
             report = build_rubric_report(
                 cells,
                 rubric_set=rubric_set,
+                profile=bundle,
                 judge_model=judge.config.model,
                 judge_version=judge.config.version,
                 spine_source=spine.source_path,

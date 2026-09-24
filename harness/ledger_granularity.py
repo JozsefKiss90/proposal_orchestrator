@@ -5,7 +5,7 @@ Deterministic measurement of the claim-ledger granularity gap between the two
 generations of the same three Part B sections:
 
 * **graph-sourced** (current ``docs/tier5_deliverables/proposal_sections/*.json``,
-  ``run_id=msca-pf-graph-01``) — the milestone-2 compiler emits one node-level
+  the milestone-2 graph run) — the milestone-2 compiler emits one node-level
   ``proposal_section`` claim per sub-section (a "table of contents" ledger); and
 * **drafter-era** — the granular per-assertion ledger the monolithic drafter
   produced, preserved byte-for-byte in the E4 regression golden baselines

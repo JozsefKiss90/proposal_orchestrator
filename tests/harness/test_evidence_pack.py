@@ -19,9 +19,11 @@ import pytest
 import harness.evidence_pack as ep
 from harness.expectations import section_paths_for
 from harness.judge import DEFAULT_JUDGE_MAX_TOKENS
+from harness.profile import default_profile
 from harness.rubrics import build_pack_for, load_rubric_set
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+PROFILE = default_profile(REPO_ROOT)
 
 
 # --------------------------------------------------------------------------- #
@@ -294,23 +296,21 @@ class TestRenderAndRecord:
 
 
 # --------------------------------------------------------------------------- #
-# Real artifacts — the 9 PF rubrics against the committed sections
+# Real artifacts — the default profile's rubrics against the committed sections
 # --------------------------------------------------------------------------- #
 
 
 class TestRealSections:
     @pytest.fixture(scope="class")
     def rubric_set(self):
-        return load_rubric_set(
-            REPO_ROOT / "harness/rubrics_msca_pf.json",
-            registry_path=REPO_ROOT
-            / "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
-            scorecard_path=REPO_ROOT / "harness/evaluator_scorecard_msca_pf.json",
-        )
+        live = REPO_ROOT / "docs/tier5_deliverables/proposal_sections"
+        if not any(live.glob("*.json")):
+            pytest.skip("no live Tier 5 sections in this checkout (empty project instantiation)")
+        return load_rubric_set(profile=PROFILE, repo_root=REPO_ROOT)
 
     def test_every_rubric_yields_a_bounded_consistent_pack(self, rubric_set):
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT)
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
             pack = build_pack_for(rubric, path)
             assert pack.status in (ep.PACK_COMPLETE, ep.PACK_INSUFFICIENT_CONTEXT)
             assert not pack.is_empty, rubric.expectation_key
@@ -325,7 +325,7 @@ class TestRealSections:
         from harness.rubrics import build_rubric_prompts
 
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT)
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
             pack = build_pack_for(rubric, path)
             system, user = build_rubric_prompts(rubric, pack)
             call_estimate = (
@@ -342,7 +342,7 @@ class TestRealSections:
         from harness.rubrics import build_rubric_prompts
 
         for rubric in rubric_set.rubrics:
-            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT)
+            (path,) = section_paths_for(rubric.criterion_id, repo_root=REPO_ROOT, profile=PROFILE)
             pack = build_pack_for(rubric, path)
             system, user = build_rubric_prompts(rubric, pack)
             question = user[len(pack.render()):]

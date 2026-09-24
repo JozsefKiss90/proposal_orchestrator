@@ -1,29 +1,33 @@
 """
 Rubric set — versioned, scorecard-traceable rubrics + prompt rendering (E5b).
 
-The E5 grader asks, per MSCA-PF evaluator expectation, one integrity-framed
+The E5 grader asks, per profile evaluator expectation, one integrity-framed
 question: *does the section address AND ground this expectation* — never "is
 this good prose".  This module owns the rubric side of that contract:
 
-* **Rubrics are versioned data, not inline strings** —
-  ``harness/rubrics_msca_pf.json`` carries, per expectation, the rubric text,
-  evaluation steps, pass threshold, and the deterministic selection basis
-  (``selection_terms`` + ``anchor_sub_section_ids``) the evidence-pack builder
-  uses.  A rubric change is a data-file diff with a fingerprint change, not a
-  silent prompt edit.
+* **Rubrics are versioned data, not inline strings** — the profile's rubric-set
+  file carries, per expectation, the rubric text, evaluation steps, pass
+  threshold, and the deterministic selection basis (``selection_terms`` +
+  ``anchor_sub_section_ids``) the evidence-pack builder uses.  A rubric change
+  is a data-file diff with a fingerprint change, not a silent prompt edit.
 * **Rubric wording traces to the scorecard.**  Each rubric's
   ``expectation_text`` must be byte-identical to the matching aspect ``text``
-  in ``harness/evaluator_scorecard_msca_pf.json`` (the human-verified verbatim
-  freeze of the official *HE MSCA Evaluation Form V2.2*, pp.4-6), and
-  ``expectation_key`` equals the scorecard aspect ``id`` — so any rubric is
-  auditable to a page of the official form.  The loader cross-checks the
-  rubric set against the E5a substrate and **fails closed** on any divergence:
-  a missing/extra rubric, a paraphrased expectation text, a criterion
-  mismatch, or a rubric set built against a different scorecard version.
+  in the profile's scorecard file (the human-verified verbatim freeze of the
+  official evaluation form), and ``expectation_key`` equals the scorecard
+  aspect ``id`` — so any rubric is auditable to a page of the official form.
+  The loader cross-checks the rubric set against the E5a substrate and
+  **fails closed** on any divergence: a missing/extra rubric, a paraphrased
+  expectation text, a criterion mismatch, or a rubric set built against a
+  different scorecard version.
 * **Prompt pinning.**  The rendered (system, user) prompt pair is hashed with
   the house :func:`~harness.provenance.prompt_hash` (recorded on every judge
   verdict's provenance); :func:`rubric_fingerprint` additionally pins the
   rubric *data* so a report can state exactly which rubric version scored.
+* **The profile bundle.**  :func:`load_profile_bundle` loads a pre-evaluation
+  profile (:mod:`harness.profile`) together with its substrate, rubric set and
+  scoring, checks the profile's scorecard and rubric-set pins against the
+  loaded files (the ID + version bijection), and computes the profile version
+  that moves when any bundled component changes.
 
 The pack side of the contract lives in :mod:`harness.evidence_pack`; this
 module renders prompts *over* a pack and never selects evidence itself.
@@ -56,30 +60,38 @@ from harness.evidence_pack import (
     normalize_terms,
 )
 from harness.expectations import (
-    DEFAULT_REGISTRY_PATH,
-    DEFAULT_SCORECARD_PATH,
+    ExpectationError,
     ExpectationSubstrate,
     load_expectation_substrate,
+)
+from harness.profile import (
+    DEFAULT_PROFILE_PATH,
+    PreEvaluationProfile,
+    ProfileError,
+    Scoring,
+    canonical_hash,
+    default_profile,
+    load_profile,
+    parse_scoring,
+    profile_version,
 )
 from harness.provenance import prompt_hash
 
 __all__ = [
-    "DEFAULT_RUBRIC_SET_PATH",
     "RUBRIC_INDEPENDENCE_PREAMBLE",
     "RubricError",
     "Rubric",
     "RubricSet",
+    "ProfileBundle",
     "rubric_fingerprint",
     "load_rubric_set",
+    "load_profile_bundle",
     "build_pack_for",
     "build_rubric_system_prompt",
     "build_rubric_user_prompt",
     "build_rubric_prompts",
     "rubric_prompt_hash",
 ]
-
-#: The versioned rubric data file (repo-relative; harness-owned).
-DEFAULT_RUBRIC_SET_PATH: Path = Path("harness/rubrics_msca_pf.json")
 
 #: The grader/generator-independence framing every rubric system prompt opens
 #: with — the expectation-judge sibling of E1.5's faithfulness preamble.
@@ -89,6 +101,9 @@ RUBRIC_INDEPENDENCE_PREAMBLE: str = (
     "that drafted the text, and you judge ONLY from the evidence pack provided "
     "— never from prior knowledge or plausibility.\n\n"
 )
+
+#: The form a rubric cites when no profile stamped a form name on it.
+_GENERIC_FORM_NAME: str = "evaluation form"
 
 
 class RubricError(Exception):
@@ -102,13 +117,15 @@ class RubricError(Exception):
 
 @dataclass(frozen=True)
 class Rubric:
-    """One integrity-framed rubric for one PF evaluator expectation.
+    """One integrity-framed rubric for one evaluator expectation.
 
     ``expectation_key`` is the scorecard aspect ``id``; ``expectation_text`` is
     the scorecard's verbatim form text (loader-enforced, auditable to
     ``source_page`` of the official form).  ``selection_terms`` and
     ``anchor_sub_section_ids`` are the deterministic evidence-selection basis
     handed to :func:`~harness.evidence_pack.build_evidence_pack`.
+    ``form_name`` is stamped from the profile at load time (like
+    ``source_page``) and names the form the system prompt cites.
     """
 
     expectation_key: str
@@ -120,6 +137,7 @@ class Rubric:
     selection_terms: tuple[str, ...]
     anchor_sub_section_ids: tuple[str, ...]
     source_page: int | str | None
+    form_name: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """The rubric's canonical JSON-serializable form (fingerprint input)."""
@@ -133,6 +151,7 @@ class Rubric:
             "selection_terms": list(self.selection_terms),
             "anchor_sub_section_ids": list(self.anchor_sub_section_ids),
             "source_page": self.source_page,
+            "form_name": self.form_name,
         }
 
 
@@ -142,12 +161,14 @@ def rubric_fingerprint(rubric: Rubric) -> str:
     Pins the rubric *content* the way :func:`~harness.provenance.prompt_hash`
     pins the rendered prompts: a report carrying this fingerprint states
     exactly which rubric version produced a score, and any edit to the data
-    file is visible as a fingerprint change.  ``source_page`` is excluded — it
-    is stamped from the substrate at load time, not authored in the rubric
-    file, and must not shift the fingerprint without a data-file diff.
+    file is visible as a fingerprint change.  ``source_page`` and
+    ``form_name`` are excluded — they are stamped from the substrate and the
+    profile at load time, not authored in the rubric file, and must not shift
+    the fingerprint without a data-file diff.
     """
     data = rubric.to_dict()
     del data["source_page"]
+    del data["form_name"]
     canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
@@ -237,12 +258,23 @@ def _parse_rubric(raw: Any, index: int) -> Rubric:
     )
 
 
+def _resolve_profile(profile: PreEvaluationProfile | None) -> PreEvaluationProfile:
+    if profile is not None:
+        return profile
+    try:
+        return default_profile()
+    except ProfileError as exc:
+        raise RubricError(str(exc)) from exc
+
+
 def load_rubric_set(
-    rubric_path: Path | str = DEFAULT_RUBRIC_SET_PATH,
+    rubric_path: Path | str | None = None,
     *,
     substrate: ExpectationSubstrate | None = None,
-    registry_path: Path | str = DEFAULT_REGISTRY_PATH,
-    scorecard_path: Path | str = DEFAULT_SCORECARD_PATH,
+    registry_path: Path | str | None = None,
+    scorecard_path: Path | str | None = None,
+    profile: PreEvaluationProfile | None = None,
+    repo_root: Path | str | None = None,
 ) -> RubricSet:
     """Load the rubric set and cross-check it against the E5a substrate, fail-closed.
 
@@ -253,20 +285,29 @@ def load_rubric_set(
     2. ``scorecard_id`` / ``scorecard_version`` match the substrate's — a
        rubric set authored against an older form version must not silently
        grade against a newer scorecard.
-    3. The rubric keys are in **bijection** with the substrate's 9
+    3. The rubric keys are in **bijection** with the substrate's
        ``expectation_key``\\ s (no missing, no extra, no duplicate).
     4. Each rubric's ``expectation_text`` is **byte-identical** to the
        substrate expectation's scorecard text (verbatim, never paraphrased)
        and its ``criterion_id`` matches.
 
-    Rubrics are returned in substrate (scorecard) order, each stamped with the
-    substrate's ``source_page`` so a rendered prompt is auditable to a page of
-    the official form.
+    Paths default to the profile's declared files (anchored on *repo_root*
+    when given).  Rubrics are returned in substrate (scorecard) order, each
+    stamped with the substrate's ``source_page`` and the profile's form name
+    so a rendered prompt is auditable to a page of the official form.
     """
+    prof = _resolve_profile(profile)
     sub = substrate or load_expectation_substrate(
-        registry_path=registry_path, scorecard_path=scorecard_path
+        registry_path=registry_path,
+        scorecard_path=scorecard_path,
+        profile=prof,
+        repo_root=repo_root,
     )
-    path = Path(rubric_path)
+    path = (
+        Path(rubric_path)
+        if rubric_path is not None
+        else prof.resolve(prof.rubric_set.path, repo_root)
+    )
     if not path.is_file():
         raise RubricError(f"rubric set not found: {path}")
     try:
@@ -308,9 +349,9 @@ def load_rubric_set(
     extra = sorted(set(parsed) - set(expected))
     if missing or extra:
         raise RubricError(
-            f"rubric set {path} is not in bijection with the {len(expected)} PF "
-            f"expectations: missing {missing or 'none'}, extra {extra or 'none'} "
-            "— every expectation needs exactly one rubric."
+            f"rubric set {path} is not in bijection with the {len(expected)} "
+            f"applicable expectations: missing {missing or 'none'}, extra "
+            f"{extra or 'none'} — every expectation needs exactly one rubric."
         )
 
     ordered: list[Rubric] = []
@@ -328,7 +369,13 @@ def load_rubric_set(
                 f"rubric {key!r}: criterion_id {rubric.criterion_id!r} does not "
                 f"match the expectation's {expectation.criterion_id!r}."
             )
-        ordered.append(dataclasses.replace(rubric, source_page=expectation.source_page))
+        ordered.append(
+            dataclasses.replace(
+                rubric,
+                source_page=expectation.source_page,
+                form_name=prof.instrument.form_name,
+            )
+        )
 
     return RubricSet(
         rubric_set_id=set_id,
@@ -336,6 +383,96 @@ def load_rubric_set(
         scorecard_id=sc_id,
         scorecard_version=sc_version,
         rubrics=tuple(ordered),
+    )
+
+
+# --------------------------------------------------------------------------- #
+# The profile bundle — profile + substrate + rubric set + scoring, versioned
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class ProfileBundle:
+    """A loaded pre-evaluation profile with every bundled component.
+
+    ``version`` moves when the profile document, the scorecard file, or the
+    rubric set changes (:func:`harness.profile.profile_version`).
+    """
+
+    profile: PreEvaluationProfile
+    substrate: ExpectationSubstrate
+    rubric_set: RubricSet
+    scoring: Scoring
+    scorecard_hash: str
+    version: str
+
+    @property
+    def profile_id(self) -> str:
+        return self.profile.profile_id
+
+
+def load_profile_bundle(
+    profile_path: Path | str | None = None,
+    *,
+    repo_root: Path | str | None = None,
+) -> ProfileBundle:
+    """Load a profile and its bundled components, fail-closed on every pin.
+
+    The profile's scorecard pin (ID + version) must equal what the loaded
+    scorecard carries, and its rubric-set pin must equal what the loaded
+    rubric set carries — the bijection check that stops a profile from
+    silently re-binding to a different component.  *profile_path* defaults
+    to :data:`~harness.profile.DEFAULT_PROFILE_PATH`; repo-relative paths are
+    anchored on *repo_root* when given.
+    """
+    if profile_path is None:
+        profile_path = DEFAULT_PROFILE_PATH if repo_root is None else Path(repo_root) / DEFAULT_PROFILE_PATH
+    try:
+        profile = load_profile(profile_path)
+    except ProfileError as exc:
+        raise RubricError(str(exc)) from exc
+    try:
+        substrate = load_expectation_substrate(profile=profile, repo_root=repo_root)
+    except ExpectationError as exc:
+        raise RubricError(str(exc)) from exc
+    pin = profile.scorecard
+    if (substrate.scorecard_id, substrate.scorecard_version) != (pin.component_id, pin.version):
+        raise RubricError(
+            f"profile {profile.profile_id!r} pins scorecard {pin.component_id!r} "
+            f"v{pin.version!r}, but the loaded scorecard carries "
+            f"{substrate.scorecard_id!r} v{substrate.scorecard_version!r}."
+        )
+    rubric_set = load_rubric_set(substrate=substrate, profile=profile, repo_root=repo_root)
+    pin = profile.rubric_set
+    if (rubric_set.rubric_set_id, rubric_set.version) != (pin.component_id, pin.version):
+        raise RubricError(
+            f"profile {profile.profile_id!r} pins rubric set {pin.component_id!r} "
+            f"v{pin.version!r}, but the loaded rubric set carries "
+            f"{rubric_set.rubric_set_id!r} v{rubric_set.version!r}."
+        )
+    scorecard_path = profile.resolve(profile.scorecard.path, repo_root)
+    try:
+        scorecard_data = json.loads(scorecard_path.read_text(encoding="utf-8-sig"))
+    except OSError as exc:
+        raise RubricError(f"scorecard {scorecard_path} could not be read: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise RubricError(f"scorecard {scorecard_path} is not valid JSON: {exc}") from exc
+    try:
+        scoring = parse_scoring(scorecard_data, profile.criterion_ids)
+    except ProfileError as exc:
+        raise RubricError(str(exc)) from exc
+    scorecard_hash = canonical_hash(scorecard_data)
+    return ProfileBundle(
+        profile=profile,
+        substrate=substrate,
+        rubric_set=rubric_set,
+        scoring=scoring,
+        scorecard_hash=scorecard_hash,
+        version=profile_version(
+            profile,
+            scorecard_hash=scorecard_hash,
+            rubric_set_fingerprint=rubric_set.fingerprint,
+        ),
     )
 
 
@@ -377,17 +514,18 @@ def build_pack_for(
 def build_rubric_system_prompt(rubric: Rubric) -> str:
     """Render the rubric into the judge's system prompt.
 
-    Carries the verbatim expectation text (labelled with its form page), the
-    integrity-framed rubric, the numbered evaluation steps, the JSON output
-    schema, and the truncation rule: a pack whose ``pack_status`` is
-    ``insufficient_context`` must not yield a clean pass.
+    Carries the verbatim expectation text (labelled with the profile's form
+    name and page), the integrity-framed rubric, the numbered evaluation
+    steps, the JSON output schema, and the truncation rule: a pack whose
+    ``pack_status`` is ``insufficient_context`` must not yield a clean pass.
     """
     steps = "\n".join(f"{i}. {s}" for i, s in enumerate(rubric.evaluation_steps, 1))
     page = f" (form p.{rubric.source_page})" if rubric.source_page is not None else ""
+    form = rubric.form_name or _GENERIC_FORM_NAME
     return (
         RUBRIC_INDEPENDENCE_PREAMBLE
-        + "EXPECTATION UNDER ASSESSMENT — verbatim from the HE MSCA Evaluation "
-        f"Form{page}:\n{rubric.expectation_text}\n\n"
+        + f"EXPECTATION UNDER ASSESSMENT — verbatim from the {form}{page}:\n"
+        f"{rubric.expectation_text}\n\n"
         f"RUBRIC:\n{rubric.rubric}\n\n"
         f"EVALUATION STEPS:\n{steps}\n\n"
         "You are judging whether the section ADDRESSES and GROUNDS this "

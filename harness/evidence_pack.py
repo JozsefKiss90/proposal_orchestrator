@@ -1,7 +1,7 @@
 """
 Deterministic evidence-pack builder — the judge-budget contract (E5b).
 
-The E5 rubric grader judges each MSCA-PF evaluator expectation against a
+The E5 rubric grader judges each profile evaluator expectation against a
 Tier-5 section, but the judge budget (Groq free tier: **6k tokens/minute**,
 100k/day) makes "send the section" impossible by construction — Excellence
 alone is ~120KB of prose plus a 146-entry claim ledger.  This module owns the
@@ -15,10 +15,10 @@ exactly the false negative an integrity harness must not manufacture.
 Selection is deterministic and versioned, no judge involved:
 
 * **Term matching.**  Each expectation carries an authored ``selection_terms``
-  list (versioned data in ``harness/rubrics_msca_pf.json``, E5b).  A paragraph
+  list (versioned data in the profile's rubric-set file, E5b).  A paragraph
   or claim is a candidate iff it matches at least one term (case-insensitive,
   word-boundary, phrases allowed).
-* **Anchor sub-sections.**  The MSCA-PF Part B mirrors the evaluation form:
+* **Anchor sub-sections.**  The proposal's Part B mirrors the evaluation form:
   each aspect has a dedicated sub-section (``1.1``…``3.2``).  A rubric may
   declare its anchor sub-section(s); their paragraphs get a fixed score bonus
   (:data:`ANCHOR_SCORE_BONUS`) so the section's *dedicated answer* to the

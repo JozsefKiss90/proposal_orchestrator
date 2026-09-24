@@ -88,7 +88,8 @@ from harness.rubric import (
     load_spine_registry,
     render_report,
 )
-from harness.rubrics import RubricSet, build_pack_for, load_rubric_set
+from harness.profile import PreEvaluationProfile
+from harness.rubrics import RubricSet, build_pack_for, load_profile_bundle
 from harness.verdict import MIN_MAJORITY_SAMPLES
 
 #: Where the pre-run budget accounting is written (harness-owned).
@@ -166,6 +167,7 @@ def compute_budget_plan(
     judge_model: str | None = None,
     judge_version: str | None = None,
     judge_max_tokens: int = DEFAULT_JUDGE_MAX_TOKENS,
+    profile: PreEvaluationProfile | None = None,
 ) -> dict[str, Any]:
     """The deterministic pre-run call/token plan — no judge, no network.
 
@@ -177,7 +179,7 @@ def compute_budget_plan(
     a multi-day resume plan; the plan records that instead of shrinking
     anything.
     """
-    section_kwargs: dict[str, Any] = {"repo_root": repo_root}
+    section_kwargs: dict[str, Any] = {"repo_root": repo_root, "profile": profile}
     if sections_dir is not None:
         section_kwargs["sections_dir"] = sections_dir
 
@@ -384,6 +386,7 @@ def run_grading(
     tokens_spent: Callable[[], int] | None = None,
     tpd_stop: int = 0,
     log: Callable[[str], None] = print,
+    profile: PreEvaluationProfile | None = None,
 ) -> tuple[ExpectationCell, ...]:
     """Grade every (expectation, section) cell, checkpointing after each.
 
@@ -410,7 +413,7 @@ def run_grading(
     )
     cells, cache = load_checkpoint(checkpoint_path, meta, log=log)
 
-    section_kwargs: dict[str, Any] = {"repo_root": repo_root}
+    section_kwargs: dict[str, Any] = {"repo_root": repo_root, "profile": profile}
     if sections_dir is not None:
         section_kwargs["sections_dir"] = sections_dir
 
@@ -514,6 +517,8 @@ def main(argv=None) -> int:
     ap.add_argument("--tpd-stop", type=int, default=_env_int("HARNESS_TPD_STOP", 96_000),
                     help="pause cleanly once this many measured tokens are spent "
                          "in this invocation (0 disables; resume next day)")
+    ap.add_argument("--profile", default=None,
+                    help="pre-evaluation profile JSON (default: the harness default profile)")
     ap.add_argument("--plan-only", action="store_true",
                     help="record the budget math and stop before any judge call")
     ap.add_argument("--fresh", action="store_true",
@@ -536,12 +541,8 @@ def main(argv=None) -> int:
     repo_root = Path(args.repo_root).resolve()
     cfg = resolve_judge_config()  # fail-closed if the judge pin is unset
 
-    rubric_set = load_rubric_set(
-        repo_root / "harness/rubrics_msca_pf.json",
-        registry_path=repo_root
-        / "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
-        scorecard_path=repo_root / "harness/evaluator_scorecard_msca_pf.json",
-    )
+    bundle = load_profile_bundle(args.profile, repo_root=repo_root)
+    rubric_set = bundle.rubric_set
     wa = load_working_assumptions(repo_root)
     spine = load_spine_registry(repo_root, working_assumptions=wa)
 
@@ -561,7 +562,9 @@ def main(argv=None) -> int:
         judge_model=cfg.model,
         judge_version=cfg.version,
         judge_max_tokens=cfg.max_tokens,
+        profile=bundle.profile,
     )
+    plan["profile"] = {"profile_id": bundle.profile_id, "profile_version": bundle.version}
     plan["pacing"] = {
         "tpm": args.tpm,
         "rpm": args.rpm,
@@ -580,6 +583,7 @@ def main(argv=None) -> int:
     atomic_write_json(plan, budget_path, prefix="rubric_run_budget_")
     t, a = plan["totals"], plan["assessment"]
     print(f"judge : {cfg.model}@{cfg.version}")
+    print(f"profile: {bundle.profile_id} [{bundle.version[:19]}]")
     print(
         f"plan  : {t['cells']} cells, {t['unique_claims']} unique claims -> "
         f"~{t['calls_est']} calls / ~{t['tokens_est']:,} tokens "
@@ -627,6 +631,7 @@ def main(argv=None) -> int:
             checkpoint_path=checkpoint_path,
             tokens_spent=lambda: wrapper.total_tokens,
             tpd_stop=args.tpd_stop,
+            profile=bundle.profile,
         )
     except BudgetStop as exc:
         print(f"\nPAUSED: {exc}")
@@ -650,6 +655,7 @@ def main(argv=None) -> int:
     report = build_rubric_report(
         cells,
         rubric_set=rubric_set,
+        profile=bundle,
         judge_model=cfg.model,
         judge_version=cfg.version,
         spine_source=spine.source_path,

@@ -1,7 +1,7 @@
 """
 Grounding-axis grader — E2 aggregation per evaluator expectation (E5d).
 
-The second of E5's two axes.  Per MSCA-PF evaluator expectation, this module
+The second of E5's two axes.  Per profile evaluator expectation, this module
 answers "is what the section says *traceable to grounded claims*?" — and it
 deliberately contributes **no faithfulness judgment of its own**.  E2
 (:mod:`harness.status_faithfulness`) stays the single system-of-record for

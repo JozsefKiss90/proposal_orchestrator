@@ -1,7 +1,7 @@
 """
 Coverage-axis grader — "does the section substantively address this expectation?" (E5c).
 
-The first of E5's two axes.  Per MSCA-PF evaluator expectation, the judge is
+The first of E5's two axes.  Per profile evaluator expectation, the judge is
 asked one question over the E5b evidence pack: *does the section, as evidenced
 by this pack, substantively address (and ground) the expectation* — the
 semantic residue the deterministic ``instrument_sections_addressed`` predicate

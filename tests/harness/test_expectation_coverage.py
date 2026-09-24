@@ -34,13 +34,13 @@ from harness.routing import (
 from harness.rubrics import build_pack_for, load_rubric_set, rubric_prompt_hash
 from harness.verdict import EVIDENCE_TYPE_INFERRED
 
+from harness.profile import default_profile
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
-RUBRIC_PATH = REPO_ROOT / "harness/rubrics_msca_pf.json"
-REGISTRY_PATH = (
-    REPO_ROOT
-    / "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
-)
-SCORECARD_PATH = REPO_ROOT / "harness/evaluator_scorecard_msca_pf.json"
+PROFILE = default_profile(REPO_ROOT)
+RUBRIC_PATH = REPO_ROOT / PROFILE.rubric_set.path
+REGISTRY_PATH = REPO_ROOT / PROFILE.registry_path
+SCORECARD_PATH = REPO_ROOT / PROFILE.scorecard.path
 
 #: The in-run reviewer skill the E5c ticket names — the thing the grader must
 #: provably NOT be a second hat of.
@@ -79,7 +79,10 @@ def _fixture_section(tmp_path: Path) -> Path:
 def exc_obj_rubric():
     return (
         load_rubric_set(
-            RUBRIC_PATH, registry_path=REGISTRY_PATH, scorecard_path=SCORECARD_PATH
+            RUBRIC_PATH,
+            registry_path=REGISTRY_PATH,
+            scorecard_path=SCORECARD_PATH,
+            profile=PROFILE,
         )
         .by_key()["exc-obj"]
     )

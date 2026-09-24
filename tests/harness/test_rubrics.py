@@ -20,16 +20,15 @@ import pytest
 import harness.rubrics as rb
 from harness.evidence_pack import PACK_INSUFFICIENT_CONTEXT, build_evidence_pack
 from harness.judge import Judge, JudgeConfig
+from harness.profile import default_profile
 from harness.provenance import ProvenanceLog, prompt_hash
 from harness.verdict import EVIDENCE_TYPE_INFERRED
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-RUBRIC_PATH = REPO_ROOT / rb.DEFAULT_RUBRIC_SET_PATH
-REGISTRY_PATH = (
-    REPO_ROOT
-    / "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json"
-)
-SCORECARD_PATH = REPO_ROOT / "harness/evaluator_scorecard_msca_pf.json"
+PROFILE = default_profile(REPO_ROOT)
+RUBRIC_PATH = REPO_ROOT / PROFILE.rubric_set.path
+REGISTRY_PATH = REPO_ROOT / PROFILE.registry_path
+SCORECARD_PATH = REPO_ROOT / PROFILE.scorecard.path
 
 #: The 9 scorecard aspect ids in scorecard order (the E5a pin, reused).
 EXPECTED_KEYS = (
@@ -50,6 +49,7 @@ def _load(rubric_path: Path | None = None):
         rubric_path or RUBRIC_PATH,
         registry_path=REGISTRY_PATH,
         scorecard_path=SCORECARD_PATH,
+        profile=PROFILE,
     )
 
 
@@ -77,7 +77,7 @@ class TestRealRubricSet:
         from harness.expectations import load_expectation_substrate
 
         substrate = load_expectation_substrate(
-            registry_path=REGISTRY_PATH, scorecard_path=SCORECARD_PATH
+            registry_path=REGISTRY_PATH, scorecard_path=SCORECARD_PATH, profile=PROFILE
         )
         expected = substrate.by_key()
         for rubric in _load().rubrics:
@@ -112,7 +112,7 @@ class TestRealRubricSet:
         import dataclasses
 
         rubric = _load().rubrics[0]
-        restamped = dataclasses.replace(rubric, source_page="99")
+        restamped = dataclasses.replace(rubric, source_page="99", form_name="Other Form")
         assert rb.rubric_fingerprint(restamped) == rb.rubric_fingerprint(rubric)
 
 
@@ -252,6 +252,9 @@ class TestPromptRendering:
         assert str(exc_obj_rubric.pass_threshold) in system
         assert '"passed"' in system and '"score"' in system and '"rationale"' in system
         assert "ADDRESSES and GROUNDS" in system
+        # The form the prompt cites comes from the profile, not from Python.
+        assert PROFILE.instrument.form_name in system
+        assert exc_obj_rubric.form_name == PROFILE.instrument.form_name
 
     def test_user_prompt_embeds_the_pack_verbatim(self, exc_obj_rubric, fixture_pack):
         user = rb.build_rubric_user_prompt(exc_obj_rubric, fixture_pack)

@@ -12,6 +12,7 @@ the bottom.
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 import re
 from pathlib import Path
 
@@ -734,7 +735,13 @@ class TestCLI:
         )
         judge = make_judge(tmp_path, PASS_3)
         monkeypatch.setattr(hr, "_build_judge", lambda path: judge)
-        monkeypatch.setattr(hr, "load_rubric_set", lambda *a, **k: _rubric_set(rubric))
+        bundle = SimpleNamespace(
+            rubric_set=_rubric_set(rubric),
+            profile=None,
+            profile_id="test_profile",
+            version="sha256:test-profile-version",
+        )
+        monkeypatch.setattr(hr, "load_profile_bundle", lambda *a, **k: bundle)
         monkeypatch.setattr(hr, "grade_all", lambda *a, **k: (cell,))
 
         out_path = tmp_path / "out" / "report.json"
@@ -753,6 +760,8 @@ class TestCLI:
         written = json.loads(out_path.read_text(encoding="utf-8"))
         assert written["record_type"] == hr.RUBRIC_REPORT_RECORD_TYPE
         assert written["rubric_set_id"] == "test_set"
+        assert written["profile_id"] == "test_profile"
+        assert written["profile_version"] == "sha256:test-profile-version"
         assert written["judge_model"] == "fake-judge"
         assert written["spine_source"].endswith("confirmation_checklist.json")
         assert "EXPECTATION RUBRIC GRID" in capsys.readouterr().out

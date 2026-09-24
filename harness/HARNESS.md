@@ -287,6 +287,34 @@ same PR if the change is intentional, investigate if not. `RegressionReport`
 enforces `advisory=True, blocking=False` structurally, and nothing in `runner`
 reads any of it.
 
+## Pre-evaluation profile (`profile.py` + `profiles/`)
+
+The rubric lane (E5) grades under a **pre-evaluation profile**: one versioned
+configuration bundle that names the instrument, the option-tag grammar, the
+criterion-to-section mapping, the scorecard file (scale, weights, thresholds)
+and the rubric-set file. Every call-specific literal that used to live in
+harness Python is a profile field. `harness/profiles/msca_pf_default.json`
+reproduces the original defaults; `tests/harness/test_profile.py` pins that
+`harness/**/*.py` carries no instrument-name literal outside `profile.py`.
+
+| Piece | Where |
+|---|---|
+| Profile document (pure configuration) | `harness/profile.py` — `load_profile`, `default_profile`, `parse_scoring`, `profile_version` |
+| Bundle loader (profile + substrate + rubric set + scoring) | `harness/rubrics.py` — `load_profile_bundle` → `ProfileBundle` |
+| Consumers | `expectations.py` (grammar, instrument type, criterion map), `rubrics.py` (form name in the assessor system prompt), `rubric.py` and `commands/rubric_grading_run.py` (`--profile`) |
+
+**Versioning.** The profile version is a hash over three pins: the profile
+document's canonical hash, the scorecard file's canonical hash, and the
+rubric-set fingerprint. Any bundled component change moves it. The document
+must also carry the scorecard ID + version and the rubric-set ID + version
+the loaded files hold (the same bijection rule the rubric set applies to the
+scorecard). A mismatch refuses to load. Reports and the E4 rubric baseline
+carry `profile_id` and `profile_version`.
+
+**Scorecard exclusions.** A scorecard `excluded_aspects` entry the registry
+no longer carries is recorded as absent (`present_in_registry=False`), not
+graded, and not an error: the scorecard is still reproduced.
+
 ## What the harness does *not* do (through E4)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware
