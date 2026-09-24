@@ -315,6 +315,43 @@ carry `profile_id` and `profile_version`.
 no longer carries is recorded as absent (`present_in_registry=False`), not
 graded, and not an error: the scorecard is still reproduced.
 
+## Blind assessment (`blind_assessment.py` + `commands/blind_assessment.py`)
+
+The blind pre-evaluation lane assesses one specified candidate against a
+pre-evaluation profile with the injectable assessor, without running the
+production pipeline. A candidate is a directory of section artifacts, one
+`<section_id>.json` per section the profile's criterion-to-section map names.
+
+| Piece | Where |
+|---|---|
+| Candidate loader, content hash, bound report, writer, loader | `harness/blind_assessment.py` |
+| Module command (`assess`, `verify`) | `py -3.10 -m harness.commands.blind_assessment` |
+| Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
+| Provenance | `harness/provenance/blind_assessment.jsonl` |
+
+**Binding.** The report and every cell carry the candidate hash (the
+formatting-invariant canonical hash over the parsed section artifacts), the
+profile version and the assessor pin (`model@version`). `load_report` and the
+`verify` sub-command recompute the candidate hash from disk and reject a
+report whose hash differs, naming both hashes. A cell bound to another
+candidate cannot be placed in a report.
+
+**Scope.** A candidate missing a required section is assessed over what it
+holds; the report is labelled `partial` and lists the missing sections by
+criterion and section id. A candidate holding none of the required sections
+is refused. `assess` exits `1` on a partial report so the operator sees it.
+
+**Assessor.** Each cell is one coverage grade (`grade_expectation`): the
+rubric's versioned pack, an N≥3 majority panel, provenance per sample. A
+malformed assessor response fails the run through the judge's no-repair rule
+and no report is written. Grounding (E5d) is not part of the blind lane: an
+evaluator sees the candidate, not the Tier-3 sources behind it.
+
+**Immutability.** The writer never overwrites: a rerun writes the next
+sequence number for the same candidate hash and earlier reports stay
+byte-identical. `BlindAssessmentReport` enforces `advisory=True,
+blocking=False` at construction and on load.
+
 ## What the harness does *not* do (through E4)
 
 - It computes only the metrics built so far (E1.5 calibration, E2 status-aware

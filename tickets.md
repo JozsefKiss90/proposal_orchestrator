@@ -117,13 +117,13 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Fix the harness import boundary; Versioned pre-evaluation profile in the harness.
 
-- [ ] With a fake backend, a frozen clock and a temporary provenance log, the report carries candidate hash, profile version and assessor pin.
-- [ ] Editing the candidate on disk and reloading the report raises a rejection naming the hash mismatch.
-- [ ] A candidate with one of three required sub-sections missing yields a partial label and a coverage list naming the missing sub-section.
-- [ ] A scripted malformed response fails the run and no report is written.
-- [ ] A rerun over the same candidate writes a new report and leaves the earlier report byte-identical.
-- [ ] The report cannot be constructed with blocking true.
-- [ ] The boundary test passes with the module command in place.
+- [x] With a fake backend, a frozen clock and a temporary provenance log, the report carries candidate hash, profile version and assessor pin.
+- [x] Editing the candidate on disk and reloading the report raises a rejection naming the hash mismatch.
+- [x] A candidate with one of three required sub-sections missing yields a partial label and a coverage list naming the missing sub-section.
+- [x] A scripted malformed response fails the run and no report is written.
+- [x] A rerun over the same candidate writes a new report and leaves the earlier report byte-identical.
+- [x] The report cannot be constructed with blocking true.
+- [x] The boundary test passes with the module command in place.
 
 ## ESR intake record and leakage guard
 
