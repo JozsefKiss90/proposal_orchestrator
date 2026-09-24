@@ -1,0 +1,40 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-shadow-mode-rule",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Shadow comparison and gate invariant pins'",
+  "authority": "CLAUDE.md §6 (gates are mandatory), §8.4 and §13.4 (budget-before-Phase-8 block), §13.7 (no weakened gate), §17.1.4 and §17.6.2 (gate evaluation is the scheduler's alone), §17.5.3 (deterministic components), §9.4 (durable decisions). Not a constitutional amendment.",
+  "decision": "The dev-graph planner and its comparison run in shadow mode for the whole of milestone 1. The planner's advisory and the shadow comparison are diagnostics written under Tier 4. Nothing consumes them at runtime. The whole-Tier-3 reuse fingerprint stays the sole authority over what a Phase 8 node reuses, and the scheduler stays the sole caller of the gate evaluator.",
+  "shadow_mode_rule": {
+    "what_shadow_means": "The planner reads the before and after snapshots and the run records. The comparison reads the stored plan and the run manifest's reuse_decisions. Neither writes reuse metadata, a run manifest, a gate result or a checkpoint. No scheduler code path, gate predicate or agent reads a plan or a comparison.",
+    "why": "The milestone must not weaken any gate (§13.7). A planner that fed the reuse decision would be a second, unpinned reuse authority next to the fingerprint. Running it beside the scheduler and recording where the two differ gives the evidence for a later promotion decision without changing what executes.",
+    "how_it_ends": "Promotion out of shadow mode is a separate decision with its own decision log entry, after the comparison has been read on real runs. It is not a milestone 1 deliverable.",
+    "runtime_memory_read": "The comparison is the first dev-graph component whose Tier 4 output derives from runtime execution memory: it reads reuse_decisions from .claude/runs/<run id>/run_manifest.json (§9.2). That is the point of the comparison, which records what the scheduler decided next to what the planner advised. The manifest is read as data and never written. A comparison whose run manifest is gone cannot be rebuilt; that is accepted for a diagnostic."
+  },
+  "comparison": {
+    "entry_point": "runner.dev_graph.shadow.compare_shadow(plan, reuse_decisions, run_id=, artifact_paths=). Pure over its inputs; the writer supplies the plan from dev_graph/impact_plans and the decisions from .claude/runs/<run id>/run_manifest.json.",
+    "scheduler_verdict": "a recorded decision with status reused is reuse; not_reused is rerun.",
+    "planner_verdict": "when the plan says nothing changed, reuse for every node. Otherwise the run records whose path equals the node's artifact path are looked up in the plan entries: any rerun action is rerun; reuse-under-policy alone is reuse; no run record at all is rerun, because the planner cannot vouch for an artifact it holds no dependency record for.",
+    "diagnostics": {
+      "agreed": "planner and scheduler reach the same verdict on every compared node.",
+      "planner_narrower": "the planner would retain something the scheduler reran (planner reuse, scheduler rerun).",
+      "planner_broader": "the planner would rerun something the scheduler retained (planner rerun, scheduler reuse). This is the finding that bears on the fingerprint's safety, so it outranks planner_narrower when both occur. Every row is kept in the artifact."
+    },
+    "binding": "a node is compared through its artifact path: the path the reused decision carries, else the caller's artifact_paths, else the reuse layer's eligibility table read as data. A node with no binding is a refusal (malformed_request), never a silent skip.",
+    "refusals": "an empty decision set, a decision without a closed status, a bad run id, a missing plan or run manifest, a stored plan that does not hash to its id or whose nothing_changed contradicts its change set. A refusal writes nothing.",
+    "writer": "dev_graph_shadow_comparison_writer is a registered deterministic component. It reads dev_graph/shadow_request.json ({plan_id, run_id}) and writes dev_graph/shadow_comparisons/<first sixteen hex of comparison id>/comparison.json with advisory true, mode shadow, consumed_at_runtime false. No wall-clock field; the component's run id does not enter the artifact; byte-equal replay. Registered but unbound to a manifest node (§16.5).",
+    "registration": "Registered as artifact 5.10 in artifact_schema_specification.yaml and in docs/index/schema_registry.json (§9.6). The plan id is checked with plan_identity from the planner module, the one definition of the hash."
+  },
+  "gate_invariant_pins": {
+    "evaluate_gate_call_sites": "tests/runner/test_dev_graph_gate_invariants.py walks the AST of every Python file in the repository outside tests, worktrees and vendored trees, resolves aliases bound from runner.gate_evaluator, and pins exactly two evaluate_gate call sites, both in runner/dag_scheduler.py (entry gate and exit gate of _dispatch_node). No file under runner/dev_graph names evaluate_gate or gate_evaluator.",
+    "reuse_decision_unchanged": "for each reuse-eligible node, validate_reuse_candidate and compute_input_fingerprint return identical results before and after an advisory plan saying rerun and a comparison saying planner_broader are placed on disk. The reusable and the not-reusable case are both pinned. FINGERPRINT_INPUTS names no dev_graph path. The pin sits at the decision function, where the decision is made; the scheduler only persists it. Driving the scheduler's reuse branch end to end is not done by any test in the suite.",
+    "budget_hard_block_unchanged": "with a reuse-eligible environment, the advisory artifacts and a prior manifest recording a reuse all on disk, a gate_09_budget_consistency failure leaves n07 blocked_at_exit, freezes all six Phase 8 nodes to hard_block_upstream, evaluates no Phase 8 gate, records no reuse decision, and leaves reuse metadata and the advisory artifacts byte-identical. A companion run without the advisory artifacts yields the same node states, hard-block fields, reuse decisions and failure details."
+  },
+  "not_done_here": [
+    "promotion of the planner out of shadow mode (its own decision).",
+    "deriving run records from phase outputs or consumption records.",
+    "the end-to-end T03 scenario test (milestone closure ticket)."
+  ],
+  "verification": "tests/runner/test_dev_graph_shadow.py: a not-reused decision against a nothing-changed advisory is planner_narrower and no reuse metadata is written; not-reused against rerun is agreed; reused against rerun is planner_broader; an artifact without a run record cannot be vouched for; broader outranks narrower with every row kept; the comparison is content-addressed and advisory; refusals for an empty decision set, a bad status, a missing binding, a malformed plan and a bad run id; byte-equal replay through the registry; a missing plan or manifest refuses and writes nothing; a tampered stored plan is refused; the lint covers shadow.py. tests/runner/test_dev_graph_gate_invariants.py: the three pins above."
+}

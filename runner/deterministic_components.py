@@ -247,6 +247,27 @@ def _run_dev_graph_impact_plan_writer(run_id: str, repo_root: Path) -> list[Path
     return run_impact_plan_writer(run_id, repo_root)
 
 
+def _run_dev_graph_shadow_comparison_writer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the dev-graph shadow comparison (advisory only).
+
+    Reads the operator request at
+    ``docs/tier4_orchestration_state/dev_graph/shadow_request.json`` naming
+    a stored advisory plan and a run, reads that run's manifest
+    ``reuse_decisions`` (a plain read), and writes ``comparison.json`` under
+    ``docs/tier4_orchestration_state/dev_graph/shadow_comparisons/<id>/``:
+    one diagnostic from agreed, planner_narrower, planner_broader with a
+    row per compared node. The component's run id does not enter the
+    artifact, so it is closed by byte-equal replay. Fails closed (raises)
+    on a missing or malformed plan, a plan that does not hash to its id, a
+    missing run manifest or an absent reuse decision. Shadow mode: nothing
+    consumes the diagnostic at runtime; it writes no reuse metadata and no
+    run manifest, evaluates no gate.
+    """
+    from runner.dev_graph.shadow import run_shadow_comparison_writer
+
+    return run_shadow_comparison_writer(run_id, repo_root)
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -284,6 +305,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dev_graph_snapshot_writer": _run_dev_graph_snapshot_writer,
     "dev_graph_package_manifest_writer": _run_dev_graph_package_manifest_writer,
     "dev_graph_impact_plan_writer": _run_dev_graph_impact_plan_writer,
+    "dev_graph_shadow_comparison_writer": _run_dev_graph_shadow_comparison_writer,
 }
 
 

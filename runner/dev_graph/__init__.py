@@ -20,6 +20,10 @@ Public API (the one entry point plus its vocabulary and writers):
 * :func:`plan_impact`, :data:`ACTIONS` — the shadow impact planner over two
   snapshots and the durable run records; :func:`write_impact_plan` — the
   deterministic advisory-plan writer.
+* :func:`compare_shadow`, :data:`DIAGNOSTICS` — the planner's advisory
+  against the scheduler's recorded reuse decision (agreed, planner
+  narrower, planner broader); :func:`write_shadow_comparison` — the
+  deterministic comparison writer. Nothing consumes it at runtime.
 
 The graph owns nothing. Tier 3 JSON owns project facts; the graph indexes
 them with stable ids, content-hash versions and typed edges. Nothing here
@@ -92,6 +96,18 @@ from runner.dev_graph.policies import (
     VIEWS,
     ViewPolicy,
 )
+from runner.dev_graph.shadow import (
+    DIAGNOSTICS,
+    SHADOW_COMPARISONS_REL,
+    SHADOW_REQUEST_REL,
+    SHADOW_SCHEMA_ID,
+    VERDICTS,
+    ShadowComparison,
+    compare_shadow,
+    read_plan,
+    read_reuse_decisions,
+    write_shadow_comparison,
+)
 from runner.dev_graph.schema import (
     APPROVALS,
     CURRENT_DOCUMENT_STATES,
@@ -117,6 +133,7 @@ __all__ = [
     "COMPLETENESS",
     "CURRENT_DOCUMENT_STATES",
     "DECLARED_STATUSES",
+    "DIAGNOSTICS",
     "DOCUMENTS_REL",
     "DOCUMENT_SCHEMA_ID",
     "DOCUMENT_STATES",
@@ -144,9 +161,13 @@ __all__ = [
     "RUN_RECORDS_SCHEMA_ID",
     "SCHEMA_ID",
     "SELECTION_REASONS",
+    "SHADOW_COMPARISONS_REL",
+    "SHADOW_REQUEST_REL",
+    "SHADOW_SCHEMA_ID",
     "SNAPSHOTS_REL",
     "SNAPSHOT_REL",
     "VIEWS",
+    "VERDICTS",
     "VIEW_POLICIES",
     "ChangeRecord",
     "DevGraphError",
@@ -154,12 +175,14 @@ __all__ = [
     "ImpactPlan",
     "Package",
     "RelationshipSpec",
+    "ShadowComparison",
     "Snapshot",
     "ViewPolicy",
     "build_package",
     "build_snapshot",
     "canonical_json",
     "change_set",
+    "compare_shadow",
     "content_hash",
     "current_commitments",
     "edge_label",
@@ -168,12 +191,15 @@ __all__ = [
     "normalise_run_records",
     "plan_impact",
     "read_change_record",
+    "read_plan",
     "read_record_version",
+    "read_reuse_decisions",
     "read_run_records",
     "record_change",
     "store_snapshot",
     "validate_graph",
     "write_impact_plan",
     "write_package",
+    "write_shadow_comparison",
     "write_snapshot",
 ]

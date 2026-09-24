@@ -80,12 +80,12 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Approved change recording and the shadow impact planner.
 
-- [ ] Seeding a run manifest with a not-reused decision and an advisory that says nothing changed yields planner narrower, and no reuse metadata is written.
-- [ ] Agreed and planner broader are each produced by their own seeded case.
-- [ ] A test pins that the gate evaluator has exactly two call sites, both in the scheduler.
-- [ ] A test proves the reuse decision is identical with and without a planner advisory present.
-- [ ] A test proves the budget-before-Phase-8 hard block behaviour is unchanged.
-- [ ] Decision log entry for the shadow-mode rule exists.
+- [x] Seeding a run manifest with a not-reused decision and an advisory that says nothing changed yields planner narrower, and no reuse metadata is written.
+- [x] Agreed and planner broader are each produced by their own seeded case.
+- [x] A test pins that the gate evaluator has exactly two call sites, both in the scheduler.
+- [x] A test proves the reuse decision is identical with and without a planner advisory present.
+- [x] A test proves the budget-before-Phase-8 hard block behaviour is unchanged.
+- [x] Decision log entry for the shadow-mode rule exists.
 
 ## Revision contracts, candidate versioning and assessment applicability
 

@@ -3155,6 +3155,56 @@ operational_artifact_schemas:
           version: {type: string, required: true}
           reason_path: {type: array, required: true, item_type: string}
 
+  # ---------------------------------------------------------------------------
+  # 5.10 Dev-graph shadow comparison (shadow, advisory)
+  # Path: docs/tier4_orchestration_state/dev_graph/shadow_comparisons/<first sixteen hex of comparison id>/comparison.json
+  # Written by: the dev_graph_shadow_comparison_writer deterministic component
+  #   (runner/dev_graph/shadow.py), on demand from the operator request at
+  #   docs/tier4_orchestration_state/dev_graph/shadow_request.json
+  #   ({"plan_id": ..., "run_id": ...}). Not bound to a manifest node.
+  # Reads: the stored advisory plan (5.9) and the reuse_decisions map of
+  #   .claude/runs/<run id>/run_manifest.json (a plain read of runtime memory;
+  #   the manifest is never written from here).
+  # Consumed by: the operator only. Never a gate input, never read by the
+  #   scheduler or the Phase 8 reuse layer. No wall-clock field; the
+  #   component's run id does not enter the artifact.
+  # ---------------------------------------------------------------------------
+  dev_graph_shadow_comparison:
+    schema_id_value: "orch.dev_graph.shadow_comparison.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/<first sixteen hex of comparison id>/comparison.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.shadow_comparison.v1".}
+      comparison_id:
+        type: string
+        required: true
+        description: sha256, prefixed "sha256:", over canonical JSON of plan_id, run_id, diagnostic and rows.
+      advisory: {type: boolean, required: true, description: Always true.}
+      mode: {type: string, required: true, enum: [shadow]}
+      consumed_at_runtime: {type: boolean, required: true, description: Always false.}
+      plan_id: {type: string, required: true, description: The compared advisory plan (5.9).}
+      run_id: {type: string, required: true, description: The run whose manifest reuse_decisions were compared.}
+      diagnostic:
+        type: string
+        required: true
+        enum: [agreed, planner_narrower, planner_broader]
+        description: The worst row diagnostic; planner_broader outranks planner_narrower outranks agreed.
+      rows:
+        type: array
+        required: true
+        description: One row per node in the run manifest's reuse_decisions, sorted by node_id.
+        item_schema:
+          node_id: {type: string, required: true}
+          artifact_path: {type: string, required: true, description: The artifact the node is compared through.}
+          scheduler_status: {type: string, required: true, enum: [reused, not_reused]}
+          scheduler: {type: string, required: true, enum: [rerun, reuse]}
+          planner: {type: string, required: true, enum: [rerun, reuse]}
+          planner_actions: {type: array, required: true, item_type: string, description: Sorted plan actions of the matching run records.}
+          record_ids: {type: array, required: true, item_type: string, description: Sorted run record ids whose path is the artifact path.}
+          diagnostic: {type: string, required: true, enum: [agreed, planner_narrower, planner_broader]}
+          detail: {type: string, required: true}
+
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS
 # =============================================================================

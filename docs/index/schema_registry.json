@@ -111,6 +111,13 @@
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/impact_plans/",
       "provenance_class": "derived",
       "description": "Shadow impact planner advisory: affected records, passages, evidence, artifacts and checks with reason paths and one action each (rerun, reuse-under-policy, reconsider); newly relevant sources flagged; never consumed at runtime"
+    },
+    {
+      "schema_id": "orch.dev_graph.shadow_comparison.v1",
+      "artifact": "<comparison id hex>/comparison.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/",
+      "provenance_class": "derived",
+      "description": "Shadow comparison of a planner advisory against the reuse decision a run manifest recorded: one diagnostic (agreed, planner_narrower, planner_broader) with a row per node; never consumed at runtime"
     }
   ]
 }

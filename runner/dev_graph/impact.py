@@ -125,8 +125,7 @@ class ImpactPlan:
 
     @property
     def nothing_changed(self) -> bool:
-        cs = self.change_set
-        return not self.origins and not cs["edges"]["added"] and not cs["edges"]["removed"]
+        return plan_nothing_changed(self.change_set, self.origins)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -283,6 +282,36 @@ def _reach(
 
 
 # ---------------------------------------------------------------------------
+# Plan identity (shared with the shadow comparison's reader)
+# ---------------------------------------------------------------------------
+
+#: The plan fields the plan id hashes, in order. ``nothing_changed``,
+#: ``max_depth`` and the change set are derived and stay out of the hash.
+PLAN_IDENTITY_FIELDS: tuple[str, ...] = (
+    "change_id",
+    "before_snapshot_id",
+    "after_snapshot_id",
+    "run_records_hash",
+    "policy_version",
+    "entries",
+    "newly_relevant_sources",
+)
+
+
+def plan_identity(doc: Mapping[str, Any]) -> str:
+    """The content-derived plan id of a plan document (or of the fields a
+    plan is built from). The one definition, so a stored plan is checked
+    against its id by the same rule that minted it."""
+    return content_hash({k: doc.get(k) for k in PLAN_IDENTITY_FIELDS})
+
+
+def plan_nothing_changed(change_set: Mapping[str, Any], origins: list[str]) -> bool:
+    """Whether a change set with these origins is empty."""
+    edges = change_set.get("edges", {})
+    return not origins and not edges.get("added") and not edges.get("removed")
+
+
+# ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
 
@@ -421,7 +450,7 @@ def plan_impact(
     entries.sort(key=lambda e: (e["kind"], e["id"]))
 
     run_records_hash = content_hash(records)
-    plan_id = content_hash(
+    plan_id = plan_identity(
         {
             "change_id": change_id,
             "before_snapshot_id": before.snapshot_id,
