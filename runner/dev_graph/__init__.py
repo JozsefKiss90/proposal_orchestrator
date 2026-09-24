@@ -31,6 +31,10 @@ Public API (the one entry point plus its vocabulary and writers):
   against the scheduler's recorded reuse decision (agreed, planner
   narrower, planner broader); :func:`write_shadow_comparison` — the
   deterministic comparison writer. Nothing consumes it at runtime.
+* :func:`record_esr_intake`, :func:`read_esr_intake`, :data:`ESR_AVAILABILITY`,
+  :data:`PERMITTED_PURPOSES` — the ESR intake record: availability declared
+  from a closed set and never inferred, bound submission and call ids, and
+  the permitted purpose.
 
 The graph owns nothing. Tier 3 JSON owns project facts; the graph indexes
 them with stable ids, content-hash versions and typed edges. Nothing here
@@ -82,6 +86,16 @@ from runner.dev_graph.impact import (
     plan_impact,
     read_run_records,
     write_impact_plan,
+)
+from runner.dev_graph.intake import (
+    ESR_AVAILABILITY,
+    INTAKE_REL,
+    INTAKE_SCHEMA_ID,
+    PERMITTED_PURPOSES,
+    EsrIntake,
+    normalise_intake,
+    read_esr_intake,
+    record_esr_intake,
 )
 from runner.dev_graph.packages import (
     COMPLETENESS,
@@ -170,18 +184,22 @@ __all__ = [
     "DOCUMENT_STATES",
     "DOMAIN_LINK",
     "ENTRY_KINDS",
+    "ESR_AVAILABILITY",
     "EXCLUSION_REASONS",
     "EXECUTION_DEPENDENCY",
     "HISTORICAL_FEEDBACK_TAGS",
     "HITS",
     "IMPACT_PLANS_REL",
     "IMPACT_REQUEST_REL",
+    "INTAKE_REL",
+    "INTAKE_SCHEMA_ID",
     "MANDATORY_PREDICATES",
     "MANIFEST_SCHEMA_ID",
     "NODE_TYPES",
     "PACKAGES_REL",
     "PACKAGE_REQUEST_REL",
     "PACKAGE_SCHEMA_ID",
+    "PERMITTED_PURPOSES",
     "PLAN_SCHEMA_ID",
     "POLICY_VERSION",
     "RECORD_KINDS",
@@ -208,6 +226,7 @@ __all__ = [
     "ContractCheck",
     "DevGraphError",
     "DocumentRef",
+    "EsrIntake",
     "ImpactPlan",
     "Package",
     "RelationshipSpec",
@@ -233,15 +252,18 @@ __all__ = [
     "import_document",
     "load_snapshot",
     "normalise_contract",
+    "normalise_intake",
     "normalise_run_records",
     "plan_impact",
     "read_change_record",
+    "read_esr_intake",
     "read_plan",
     "read_record_version",
     "read_reuse_decisions",
     "read_revision_record",
     "read_run_records",
     "record_change",
+    "record_esr_intake",
     "store_snapshot",
     "validate_graph",
     "write_impact_plan",

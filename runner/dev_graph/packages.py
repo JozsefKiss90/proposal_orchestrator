@@ -31,7 +31,8 @@ Selection, in order, all deterministic:
    always in the package.
 6. **Record exclusions** for every node adjacent to an included node that is
    not itself included: ``policy_forbidden`` (with the refusal detail) or
-   ``not_relevant`` (beyond the depth).
+   ``not_relevant`` (beyond the depth). Every exclusion names the record
+   path the node came from, so an operator can find what was kept out.
 7. **List unresolved items** from the whole snapshot: claims whose declared
    status is Unresolved, and two rule-based contradictions (two current
    versions of one document; an approved claim that is Unresolved).
@@ -345,6 +346,7 @@ def build_package(
                     "id": nid,
                     "type": node["type"],
                     "version": node["version"],
+                    "path": node["path"],
                     "reason": "over_budget",
                     "required": reason == "mandatory",
                     "detail": f"cost {cost} exceeds remaining budget {budget - spent}",
@@ -393,6 +395,7 @@ def build_package(
                     "id": other,
                     "type": nodes[other]["type"],
                     "version": nodes[other]["version"],
+                    "path": nodes[other]["path"],
                     "reason": reason,
                     "required": False,
                     "detail": detail,

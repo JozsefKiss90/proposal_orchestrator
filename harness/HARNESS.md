@@ -328,6 +328,9 @@ production pipeline. A candidate is a directory of section artifacts, one
 | Module command (`assess`, `verify`) | `py -3.10 -m harness.commands.blind_assessment` |
 | Reports | `harness/blind_reports/blind_<hash12>_<NNNN>.json` (default `--out-dir`) |
 | Provenance | `harness/provenance/blind_assessment.jsonl` |
+| Document route (`--document`) | evidence via `runner.dev_graph.build_package` under the `blind_pre_evaluation` view; materialised under `<out-dir>/candidates/<document node id>/` |
+| Leakage guard | `assert_no_leakage` → `LeakageError`, before any assessor call |
+| ESR intake | `runner.dev_graph.record_esr_intake` / `read_esr_intake`; `--intake <id>` stamps availability |
 
 **Binding.** The report and every cell carry the candidate hash (the
 formatting-invariant canonical hash over the parsed section artifacts), the
@@ -340,6 +343,27 @@ candidate cannot be placed in a report.
 holds; the report is labelled `partial` and lists the missing sections by
 criterion and section id. A candidate holding none of the required sections
 is refused. `assess` exits `1` on a partial report so the operator sees it.
+
+**Evidence and leakage.** With `--document`, the command builds the dev-graph
+snapshot, asks the package builder for the evidence around the document under
+the blind pre-evaluation view policy, and then asserts that no included item is
+an assessment, finding or change request or carries a historical-feedback tag
+(`historical_feedback`, `historical_score`, `target_score`, `repair_plan`). The
+policy is the first check; the guard is the second. A violation raises
+`LeakageError`: exit `2`, no assessor call, nothing written. The package's
+passages and claims are materialised as section artifacts, so the candidate
+hash and `verify` work unchanged. An incomplete package is refused. The
+`--candidate <dir>` route grades operator-supplied section artifacts with no
+package and no guard; its report carries `evidence_source: candidate_directory`
+and cannot stamp an intake.
+
+**ESR intake.** ESR availability is intake state (`unknown`, `unavailable`,
+`not_applicable`, `available`), recorded once per intake id and never derived:
+a prior submission without a declaration stays `unknown`. `--intake` stamps the
+availability and intake id on the report. An intake whose permitted purpose is
+`esr_informed_review` is refused: that is a separately labelled task, and a
+report's `task_label` can only be `blind_pre_evaluation`. Availability never
+changes the blind package.
 
 **Assessor.** Each cell is one coverage grade (`grade_expectation`): the
 rubric's versioned pack, an N≥3 majority panel, provenance per sample. A

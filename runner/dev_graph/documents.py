@@ -24,8 +24,16 @@ Candidate shape (all keys are the candidate's own declarations):
       "claims":      [{"claim_id", "section_id", "text", "evidence_strength",
                        "verified_span": {"source_id", "start", "end", "version"?} | absent,
                        "approval", "declared_status"?}],
-      "commitments": [{"commitment_id", "section_id", "text", "addresses": [ids]}]
+      "commitments": [{"commitment_id", "section_id", "text", "addresses": [ids]}],
+      "tags":        [plain strings] | absent
     }
+
+``tags`` is optional and is the document's own declaration of what it is
+(``historical_feedback``, ``historical_score`` ... for an evaluation summary
+report). The builder stamps a document's tags on its document node and on
+every passage, claim and commitment derived from it, so a view policy that
+forbids a tag refuses every node of the document. An untagged candidate
+carries no ``tags`` key anywhere, so its versions are unchanged.
 
 The three claim evidence fields stay separate. ``declared_status`` is fed by
 the evidence-strength lookup only (``runner.graph_schema.EVIDENCE_TO_STATUS``);
@@ -240,13 +248,27 @@ def normalise_candidate(raw: Any, where: str) -> dict[str, Any]:
     dup = next((i for i in seen if seen.count(i) > 1), None)
     if dup is not None:
         raise _malformed(where, f"{where}: commitment_id {dup!r} declared more than once")
-    return {
+    content = {
         "document_id": document_id,
         "title": _str(raw, "title", where, required=False) or document_id,
         "sections": sections,
         "claims": claims,
         "commitments": commitments,
     }
+    tags = _tags(raw, where)
+    if tags:
+        content["tags"] = tags
+    return content
+
+
+def _tags(raw: dict[str, Any], where: str) -> list[str]:
+    """The document's declared tags, sorted and deduplicated; ``[]`` when absent."""
+    value = raw.get("tags")
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(t, str) and _ID_RE.match(t) for t in value):
+        raise _malformed(where, f"{where}: 'tags' must be a list of plain identifiers")
+    return sorted(set(value))
 
 
 # ---------------------------------------------------------------------------
@@ -292,6 +314,8 @@ def node_content(record: dict[str, Any]) -> dict[str, Any]:
     }
     if record.get("provenance") is not None:
         content["provenance"] = record["provenance"]
+    if record.get("tags"):
+        content["tags"] = list(record["tags"])
     return content
 
 
@@ -353,6 +377,8 @@ def import_document(
         "state": state,
         **{k: content[k] for k in ("title", "sections", "claims", "commitments")},
     }
+    if content.get("tags"):
+        record["tags"] = content["tags"]
     if provenance is not None:
         record["provenance"] = provenance
     node_id = document_node_id(record["document_id"], content_version)

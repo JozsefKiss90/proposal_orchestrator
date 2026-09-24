@@ -29,6 +29,27 @@ What this module enforces, in code:
   enforces ``advisory=True, blocking=False`` like every harness report; the
   writer never overwrites — each run lands in a new file and historical
   reports stay byte-identical.
+* **Evidence through the dev-graph, blind view only.**  The document route
+  (:func:`build_blind_evidence`) builds the snapshot, asks the dev-graph
+  package builder for the evidence around the document under the
+  ``blind_pre_evaluation`` view policy, and materialises the package's
+  passages and claims as the section artifacts the grader consumes.  Nothing
+  else reaches the assessor.  The older directory route (``--candidate``)
+  grades whatever section artifacts the operator supplies; it is kept for
+  offline profile work, carries no package, cannot stamp an intake, and its
+  report says so (``evidence_source``).
+* **Leakage guard, hard failure.**  Before any assessor call,
+  :func:`assert_no_leakage` walks every included item and raises
+  :class:`LeakageError` on a forbidden type (assessment, finding, change
+  request) or a historical-feedback tag (``historical_feedback``,
+  ``historical_score``, ``target_score``, ``repair_plan``).  The view policy
+  is the first check; this is the second.  A violation stops the command
+  with nothing written.
+* **ESR is intake state, never inferred.**  The report stamps the ESR
+  availability from the intake record it was given (``unknown`` without
+  one).  An intake whose permitted purpose is ``esr_informed_review`` is
+  refused: that is a separately labelled task (:class:`ReviewTask`) and the
+  report's ``task_label`` can only ever be :data:`BLIND_TASK_LABEL`.
 
 Grounding (E5d) is deliberately not part of the blind lane: an evaluator sees
 the candidate, not the Tier-3 sources behind it.
@@ -49,6 +70,19 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from runner.atomic_write import atomic_write_json
+from runner.dev_graph import (
+    ESR_AVAILABILITY,
+    HISTORICAL_FEEDBACK_TAGS,
+    PERMITTED_PURPOSES,
+    POLICY_VERSION,
+    DevGraphError,
+    EsrIntake,
+    Package,
+    Snapshot,
+    build_package,
+    build_snapshot,
+)
+from runner.dev_graph.schema import CURRENT_DOCUMENT_STATES
 from harness.evidence_pack import DEFAULT_PACK_TOKEN_BUDGET, DEFAULT_SPAN_BUDGET_FRACTION
 from harness.expectation_coverage import CoverageGrade, grade_expectation
 from harness.judge import Judge
@@ -63,8 +97,23 @@ __all__ = [
     "SCOPE_PARTIAL",
     "DEFAULT_REPORTS_DIR",
     "DEFAULT_PROVENANCE_PATH",
+    "BLIND_VIEW",
+    "BLIND_TASK_LABEL",
+    "ESR_INFORMED_TASK_LABEL",
+    "TASK_LABELS",
+    "LEAKAGE_FORBIDDEN_TYPES",
+    "DEFAULT_PACKAGE_BUDGET",
+    "EVIDENCE_SOURCE_DEV_GRAPH",
+    "EVIDENCE_SOURCE_DIRECTORY",
     "BlindAssessmentError",
     "CandidateHashMismatch",
+    "LeakageError",
+    "ReviewTask",
+    "BlindEvidence",
+    "resolve_document",
+    "assert_no_leakage",
+    "materialise_candidate",
+    "build_blind_evidence",
     "MissingSection",
     "Candidate",
     "required_sections",
@@ -98,6 +147,33 @@ DEFAULT_PROVENANCE_PATH: Path = Path("harness/provenance/blind_assessment.jsonl"
 #: Report file name: ``blind_<12 hex of the candidate hash>_<NNNN>.json``.
 _REPORT_NAME_RE = re.compile(r"^blind_(?P<hash>[0-9a-f]{12})_(?P<seq>\d{4})\.json$")
 
+#: The only dev-graph view the blind lane builds evidence under.
+BLIND_VIEW: str = "blind_pre_evaluation"
+
+#: Task labels.  A blind assessment and an ESR-informed review are two tasks
+#: with two labels; the labels are the intake record's permitted purposes.
+BLIND_TASK_LABEL: str = "blind_pre_evaluation"
+ESR_INFORMED_TASK_LABEL: str = "esr_informed_review"
+TASK_LABELS: frozenset[str] = frozenset({BLIND_TASK_LABEL, ESR_INFORMED_TASK_LABEL})
+if TASK_LABELS != PERMITTED_PURPOSES:  # pragma: no cover - guards a vocabulary drift
+    raise RuntimeError("harness task labels must equal runner.dev_graph.PERMITTED_PURPOSES")
+
+#: Where the assessed sections came from: the dev-graph blind view (guarded)
+#: or a candidate directory the operator supplied (not guarded by this module).
+EVIDENCE_SOURCE_DEV_GRAPH: str = "dev_graph_blind_view"
+EVIDENCE_SOURCE_DIRECTORY: str = "candidate_directory"
+
+#: Node types the leakage guard refuses in a blind package, whatever the
+#: view policy said.
+LEAKAGE_FORBIDDEN_TYPES: frozenset[str] = frozenset({"assessment", "finding", "change_request"})
+
+#: Default size budget for the dev-graph package (its own deterministic
+#: unit, see ``runner.dev_graph.packages.estimate_cost``).
+DEFAULT_PACKAGE_BUDGET: int = 200_000
+
+#: Where the document route materialises candidates, under the reports dir.
+_CANDIDATES_SUBDIR: str = "candidates"
+
 Clock = Callable[[], str]
 
 
@@ -111,6 +187,224 @@ class BlindAssessmentError(Exception):
 
 class CandidateHashMismatch(BlindAssessmentError):
     """The report was produced over a different candidate than the one on disk."""
+
+
+class LeakageError(BlindAssessmentError):
+    """Historical feedback reached the blind package.  Hard failure: nothing
+    is assessed and nothing is written."""
+
+
+@dataclass(frozen=True)
+class ReviewTask:
+    """A labelled review task over one document.
+
+    The label is one of :data:`TASK_LABELS`.  An ESR-informed review carries
+    :data:`ESR_INFORMED_TASK_LABEL` and is never blind; only a task whose
+    label is :data:`BLIND_TASK_LABEL` may be reported by this module.
+    """
+
+    label: str
+    document: str
+
+    def __post_init__(self) -> None:
+        if self.label not in TASK_LABELS:
+            raise ValueError(f"unknown task label {self.label!r}; one of {sorted(TASK_LABELS)}.")
+
+    @property
+    def is_blind(self) -> bool:
+        return self.label == BLIND_TASK_LABEL
+
+
+# --------------------------------------------------------------------------- #
+# Evidence through the dev-graph — blind view, leakage guard, materialisation
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class BlindEvidence:
+    """The evidence the document route hands to the assessor.
+
+    ``document`` is the document snapshot node id and ``document_id`` the
+    document's own id; ``package`` the dev-graph package built under
+    :data:`BLIND_VIEW` that passed :func:`assert_no_leakage`;
+    ``candidate_dir`` the materialised section artifacts (the hash input).
+    """
+
+    document: str
+    document_id: str
+    snapshot_id: str
+    package: Package
+    candidate_dir: Path
+
+
+def resolve_document(snapshot: Snapshot, document: str) -> dict[str, Any]:
+    """The current document snapshot node *document* names, fail-closed.
+
+    *document* is a node id (``<document_id>@<hex>``) or a document id.  A
+    document id resolves only when exactly one current version exists: state
+    ``imported`` or ``draft`` and not superseded.  A submitted or superseded
+    snapshot is history, never a candidate.
+    """
+    nodes = {n["id"]: n for n in snapshot.nodes if n["type"] == "artifact_version"}
+    superseded = {e["target"]["id"] for e in snapshot.edges if e["predicate"] == "supersedes"}
+
+    def _current(node: Mapping[str, Any]) -> bool:
+        return node["content"].get("state") in CURRENT_DOCUMENT_STATES and node["id"] not in superseded
+
+    if document in nodes:
+        node = nodes[document]
+        if not _current(node):
+            raise BlindAssessmentError(
+                f"document snapshot {document} is {node['content'].get('state')!r}"
+                f"{' and superseded' if document in superseded else ''}; not a current candidate."
+            )
+        return node
+    matches = [n for n in nodes.values() if n["content"].get("document_id") == document]
+    current = [n for n in matches if _current(n)]
+    if len(current) == 1:
+        return current[0]
+    if not matches:
+        raise BlindAssessmentError(f"no document snapshot named {document!r} in the current build.")
+    if not current:
+        raise BlindAssessmentError(
+            f"document {document!r} has no current version ({len(matches)} historical: "
+            f"{', '.join(sorted(n['id'] for n in matches))})."
+        )
+    raise BlindAssessmentError(
+        f"document {document!r} has {len(current)} current versions "
+        f"({', '.join(sorted(n['id'] for n in current))}); name the node id."
+    )
+
+
+def _item_tags(item: Mapping[str, Any]) -> frozenset[str]:
+    tags = (item.get("content") or {}).get("tags", [])
+    return frozenset(t for t in tags if isinstance(t, str)) if isinstance(tags, list) else frozenset()
+
+
+def assert_no_leakage(package: Package) -> None:
+    """Raise :class:`LeakageError` unless *package* is clean for a blind assessor.
+
+    The package must have been built under :data:`BLIND_VIEW`, and no
+    included item may be of a type in :data:`LEAKAGE_FORBIDDEN_TYPES` or
+    carry a tag in ``HISTORICAL_FEEDBACK_TAGS``.  Every item is checked; the
+    first violation is named.
+    """
+    view = package.manifest.get("view")
+    if view != BLIND_VIEW:
+        raise LeakageError(
+            f"package {package.package_id} was built under view {view!r}, not {BLIND_VIEW!r}; "
+            "a blind assessment takes evidence from the blind view only."
+        )
+    for item in package.items:
+        if item.get("type") in LEAKAGE_FORBIDDEN_TYPES:
+            raise LeakageError(
+                f"leakage: item {item.get('id')} of type {item.get('type')!r} is in the blind "
+                "package; assessment, finding and change_request never reach the assessor."
+            )
+        leaked = _item_tags(item) & HISTORICAL_FEEDBACK_TAGS
+        if leaked:
+            raise LeakageError(
+                f"leakage: item {item.get('id')} carries {', '.join(sorted(leaked))}; "
+                "historical feedback never reaches the blind assessor."
+            )
+
+
+def materialise_candidate(package: Package, document: str, target_dir: Path) -> Path:
+    """Write the package's passages and claims of *document* as section artifacts.
+
+    One ``<section_id>.json`` per passage: the passage as the single
+    sub-section, the document's claims of that section as the claim ledger
+    (declared status lowercased, the verified span id as ``source_ref``).
+    Derived from the package alone, so the same package lands the same bytes.
+    """
+    passages = [
+        i for i in package.items
+        if i["type"] == "passage" and i["content"].get("document") == document
+    ]
+    if not passages:
+        raise BlindAssessmentError(f"package {package.package_id} holds no passage of {document}.")
+    claims = [
+        i for i in package.items
+        if i["type"] == "claim" and i["content"].get("document") == document
+    ]
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for p in sorted(passages, key=lambda i: i["id"]):
+        c = p["content"]
+        sid = str(c["section_id"])
+        ledger = []
+        for cl in sorted(claims, key=lambda i: i["id"]):
+            cc = cl["content"]
+            if cc.get("section_id") != sid:
+                continue
+            span = cc.get("verified_span")
+            ledger.append(
+                {
+                    "claim_id": str(cc.get("claim_id")),
+                    "claim_summary": str(cc.get("text", "")),
+                    "status": str(cc.get("declared_status", "")).lower(),
+                    "source_ref": str(span["id"]) if isinstance(span, Mapping) and span.get("id") else "",
+                    "approval": cc.get("approval"),
+                }
+            )
+        artifact = {
+            "section_id": sid,
+            "document": document,
+            "passage": {"id": p["id"], "version": p["version"]},
+            "sub_sections": [
+                {"sub_section_id": sid, "title": str(c.get("title", "")), "content": str(c.get("content", ""))}
+            ],
+            "validation_status": {"claim_statuses": ledger},
+        }
+        atomic_write_json(artifact, target_dir / f"{sid}.json", prefix="blind_candidate_")
+    return target_dir
+
+
+def build_blind_evidence(
+    graph_root: Path | str,
+    document: str,
+    *,
+    profile_version: str,
+    out_dir: Path | str,
+    budget: int = DEFAULT_PACKAGE_BUDGET,
+    project: str | None = None,
+) -> BlindEvidence:
+    """Snapshot, blind-view package, leakage guard, materialised candidate.
+
+    Order matters: the guard runs on the package before a single byte is
+    materialised or any assessor exists.  An incomplete package (something
+    the view permitted did not fit the budget) is refused, so a missing
+    section is always the candidate's, never the budget's.
+    """
+    root = Path(graph_root)
+    snapshot = build_snapshot(root)
+    node = resolve_document(snapshot, document)
+    doc_id = node["id"]
+    package = build_package(
+        snapshot,
+        task=doc_id,
+        view=BLIND_VIEW,
+        budget=budget,
+        policy_version=POLICY_VERSION,
+        expected_snapshot_id=snapshot.snapshot_id,
+        project=project or str(node["content"].get("document_id")),
+        profile_version=profile_version,
+    )
+    assert_no_leakage(package)
+    if package.manifest.get("completeness") != "complete":
+        raise BlindAssessmentError(
+            f"package {package.package_id} is incomplete under budget {budget}; raise the "
+            "package budget so nothing the blind view permits is dropped."
+        )
+    candidate_dir = materialise_candidate(
+        package, doc_id, Path(out_dir) / _CANDIDATES_SUBDIR / doc_id
+    )
+    return BlindEvidence(
+        document=doc_id,
+        document_id=str(node["content"].get("document_id")),
+        snapshot_id=snapshot.snapshot_id,
+        package=package,
+        candidate_dir=candidate_dir,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -273,11 +567,33 @@ class BlindAssessmentReport:
     rubric_set_fingerprint: str = ""
     scorecard_id: str = ""
     scorecard_version: str = ""
+    task_label: str = BLIND_TASK_LABEL
+    esr_availability: str = "unknown"
+    intake_id: str = ""
+    snapshot_id: str = ""
+    package_id: str = ""
+    policy_version: str = ""
+    evidence_view: str = ""
+    evidence_source: str = EVIDENCE_SOURCE_DIRECTORY
     notes: str = _ADVISORY_NOTE
     advisory: bool = True
     blocking: bool = False
 
     def __post_init__(self) -> None:
+        if self.task_label != BLIND_TASK_LABEL:
+            raise ValueError(
+                f"BlindAssessmentReport.task_label must be {BLIND_TASK_LABEL!r}, got "
+                f"{self.task_label!r} — an ESR-informed review is a separately labelled "
+                "task and never shares the blind label."
+            )
+        if self.evidence_source not in (EVIDENCE_SOURCE_DEV_GRAPH, EVIDENCE_SOURCE_DIRECTORY):
+            raise ValueError(f"unknown evidence_source {self.evidence_source!r}.")
+        if self.evidence_source == EVIDENCE_SOURCE_DEV_GRAPH and not self.package_id:
+            raise ValueError("a dev-graph evidence source needs a package_id.")
+        if self.esr_availability not in ESR_AVAILABILITY:
+            raise ValueError(
+                f"unknown esr_availability {self.esr_availability!r}; one of {sorted(ESR_AVAILABILITY)}."
+            )
         if self.advisory is not True:
             raise ValueError(
                 "BlindAssessmentReport.advisory must be True — the blind assessment "
@@ -357,6 +673,14 @@ class BlindAssessmentReport:
             "rubric_set_fingerprint": self.rubric_set_fingerprint,
             "scorecard_id": self.scorecard_id,
             "scorecard_version": self.scorecard_version,
+            "task_label": self.task_label,
+            "esr_availability": self.esr_availability,
+            "intake_id": self.intake_id,
+            "snapshot_id": self.snapshot_id,
+            "package_id": self.package_id,
+            "policy_version": self.policy_version,
+            "evidence_view": self.evidence_view,
+            "evidence_source": self.evidence_source,
             "notes": self.notes,
             "summary": self.summary,
             "cells": [c.to_dict() for c in self.cells],
@@ -368,11 +692,33 @@ class BlindAssessmentReport:
 # --------------------------------------------------------------------------- #
 
 
+def _check_intake(intake: EsrIntake | None, evidence: BlindEvidence | None) -> None:
+    if intake is None:
+        return
+    if intake.permitted_purpose != BLIND_TASK_LABEL:
+        raise BlindAssessmentError(
+            f"intake {intake.intake_id} permits {intake.permitted_purpose!r}, not "
+            f"{BLIND_TASK_LABEL!r}; that is a separately labelled task, never a blind assessment."
+        )
+    if evidence is None:
+        raise BlindAssessmentError(
+            f"intake {intake.intake_id} binds document {intake.document_id!r}, but a candidate "
+            "directory names no document; assess through the document route to stamp an intake."
+        )
+    if intake.document_id != evidence.document_id:
+        raise BlindAssessmentError(
+            f"intake {intake.intake_id} concerns document {intake.document_id!r}, "
+            f"the assessed document is {evidence.document_id!r}."
+        )
+
+
 def assess_candidate(
     judge: Judge,
     bundle: ProfileBundle,
-    candidate_dir: Path | str,
+    candidate_dir: Path | str | None = None,
     *,
+    evidence: BlindEvidence | None = None,
+    intake: EsrIntake | None = None,
     token_budget: int = DEFAULT_PACK_TOKEN_BUDGET,
     span_budget_fraction: float = DEFAULT_SPAN_BUDGET_FRACTION,
     n: int = MIN_MAJORITY_SAMPLES,
@@ -380,17 +726,33 @@ def assess_candidate(
 ) -> BlindAssessmentReport:
     """Assess one candidate against *bundle* with *judge*; return the bound report.
 
+    The candidate is either a directory of section artifacts
+    (*candidate_dir*) or the materialised evidence of the document route
+    (*evidence*, from :func:`build_blind_evidence`); exactly one is given.
     Every rubric is graded over each present section its criterion maps to
     (:func:`~harness.expectation_coverage.grade_expectation`: versioned pack,
     N≥3 majority, provenance).  Missing sections are skipped and reported as
     partial coverage.  A malformed assessor response propagates as a
     :class:`~harness.judge.JudgeResponseError`; nothing is written here.
+
+    *intake*, when given, must permit a blind assessment and concern the
+    assessed document; its ESR availability is stamped on the report.
     """
     if n < MIN_MAJORITY_SAMPLES:
         raise BlindAssessmentError(
             f"n must be at least {MIN_MAJORITY_SAMPLES} (the majority rule); got {n}."
         )
-    candidate = load_candidate(candidate_dir, bundle.profile)
+    if (candidate_dir is None) == (evidence is None):
+        raise BlindAssessmentError("give exactly one of candidate_dir or evidence.")
+    _check_intake(intake, evidence)
+    if evidence is not None:
+        assert_no_leakage(evidence.package)
+        source: Path | str = evidence.candidate_dir
+    elif candidate_dir is not None:
+        source = candidate_dir
+    else:  # pragma: no cover - excluded by the check above
+        raise BlindAssessmentError("give exactly one of candidate_dir or evidence.")
+    candidate = load_candidate(source, bundle.profile)
     digest = candidate_hash(candidate)
     pin = assessor_pin(judge)
     cells: list[BlindCell] = []
@@ -436,6 +798,14 @@ def assess_candidate(
         rubric_set_fingerprint=rubric_set.fingerprint,
         scorecard_id=rubric_set.scorecard_id,
         scorecard_version=rubric_set.scorecard_version,
+        task_label=BLIND_TASK_LABEL,
+        esr_availability=intake.esr_availability if intake is not None else "unknown",
+        intake_id=intake.intake_id if intake is not None else "",
+        snapshot_id=evidence.snapshot_id if evidence is not None else "",
+        package_id=evidence.package.package_id if evidence is not None else "",
+        policy_version=str(evidence.package.manifest["policy_version"]) if evidence is not None else "",
+        evidence_view=str(evidence.package.manifest["view"]) if evidence is not None else "",
+        evidence_source=EVIDENCE_SOURCE_DEV_GRAPH if evidence is not None else EVIDENCE_SOURCE_DIRECTORY,
     )
 
 
@@ -505,6 +875,11 @@ def load_report(
             f"report {p} must carry advisory=true and blocking=false; got "
             f"advisory={data.get('advisory')!r}, blocking={data.get('blocking')!r}."
         )
+    if data.get("task_label", BLIND_TASK_LABEL) != BLIND_TASK_LABEL:
+        raise BlindAssessmentError(
+            f"report {p} carries task_label {data.get('task_label')!r}; only a "
+            f"{BLIND_TASK_LABEL!r} report is a blind assessment."
+        )
     recorded = str(data.get("candidate_hash", ""))
     current = candidate_hash(load_candidate(candidate_dir, profile))
     if recorded != current:
@@ -563,6 +938,20 @@ def render_report(report: Mapping[str, Any]) -> str:
         f"advisory={report.get('advisory')} blocking={report.get('blocking')}\n"
     )
     lines = [header]
+    if report.get("package_id"):
+        lines.append(
+            f"evidence:  source={report.get('evidence_source', '-')} view={report.get('evidence_view', '-')} "
+            f"package={str(report.get('package_id') or '')[:19]} "
+            f"snapshot={str(report.get('snapshot_id') or '')[:19]} "
+            f"esr={report.get('esr_availability', 'unknown')}"
+            + (f" intake={report['intake_id']}" if report.get("intake_id") else "")
+            + "\n"
+        )
+    else:
+        lines.append(
+            f"evidence:  source={report.get('evidence_source', EVIDENCE_SOURCE_DIRECTORY)} "
+            "(no dev-graph package; the leakage guard did not run)\n"
+        )
     missing = report.get("partial_coverage") or []
     if missing:
         lines.append("PARTIAL COVERAGE - required sections missing from the candidate:")

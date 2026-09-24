@@ -39,7 +39,9 @@ by :func:`runner.dev_graph.documents.import_document`) add:
   verified span, approval), ``claim expressed_in passage`` and, when a span
   is verified, one ``source_span`` node plus ``claim supported_by source_span``
   and ``claim supported_by source`` (the span names its source);
-* one ``commitment`` per commitment, ``commitment expressed_in passage``.
+* one ``commitment`` per commitment, ``commitment expressed_in passage``;
+* the document's declared ``tags``, when any, on the document node and on
+  every passage, claim and commitment derived from it.
 
 Sources (``source_materials/sources.json``) become ``source`` nodes.
 
@@ -409,6 +411,7 @@ def _add_document(
     if content_hash(content) != rec.get("content_version"):
         raise _malformed(rel, "content_version does not match the record content")
     record = {**content, "state": rec["state"], "content_version": rec["content_version"]}
+    tag_field: dict[str, list[str]] = {"tags": list(content["tags"])} if content.get("tags") else {}
     provenance = rec.get("provenance")
     if provenance is not None:
         if not isinstance(provenance, dict) or not isinstance(provenance.get("supersedes"), dict):
@@ -427,7 +430,7 @@ def _add_document(
         pid = f"{doc_id}#{sec['section_id']}"
         passage_ids[sec["section_id"]] = pid
         span = spans[sec["section_id"]]
-        g.node(pid, "passage", rel, {**sec, "document": doc_id, "span": span})
+        g.node(pid, "passage", rel, {**sec, "document": doc_id, "span": span, **tag_field})
         g.edge(pid, "expressed_in", doc_id, span=span)
         for target in sec["addresses"]:
             g.edge(pid, "addresses", target)
@@ -441,6 +444,7 @@ def _add_document(
                 g, claim_ref, rel, claim["verified_span"], sources
             )
         stored["document"] = doc_id
+        stored.update(tag_field)
         g.node(cid, "claim", rel, stored, title_key="text")
         g.edge(cid, "expressed_in", passage_ids[claim["section_id"]])
         if stored["verified_span"] is not None:
@@ -450,7 +454,7 @@ def _add_document(
     for m in record["commitments"]:
         mid = f"{doc_id}#{m['commitment_id']}"
         g.node(
-            mid, "commitment", rel, {**m, "document": doc_id, "state": record["state"]},
+            mid, "commitment", rel, {**m, "document": doc_id, "state": record["state"], **tag_field},
             title_key="text",
         )
         g.edge(mid, "expressed_in", passage_ids[m["section_id"]])

@@ -125,6 +125,13 @@
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/revisions/",
       "provenance_class": "derived",
       "description": "Revision record: the contract, the check verdict (accepted, rejected naming the protected node, flagged_for_review) with change classes and unresolved items carried unresolved, and on acceptance the created candidate version with provenance (supersedes, change_id, evidence); written once by dev_graph_revision_record_writer"
+    },
+    {
+      "schema_id": "orch.dev_graph.esr_intake.v1",
+      "artifact": "<intake_id>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/intake/",
+      "provenance_class": "manually_placed",
+      "description": "ESR intake record: availability declared from the closed set unknown, unavailable, not_applicable, available (never derived; a prior submission stays unknown), the bound submission and call identifiers, the document concerned, and the permitted purpose (blind_pre_evaluation or esr_informed_review); written once by record_esr_intake, read by the blind assessment lane"
     }
   ]
 }

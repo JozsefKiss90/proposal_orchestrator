@@ -2758,6 +2758,18 @@ operational_artifact_schemas:
         description: >
           Present only on a record created by create_candidate_version:
           {supersedes: {id, version}, change_id, evidence: [{id, version}]}.
+
+      tags:
+        type: array
+        required: false
+        item_type: string
+        description: >
+          The candidate's own declaration of what it is (plain identifiers,
+          sorted, deduplicated), e.g. historical_feedback and historical_score
+          on an evaluation summary report. Present only when non-empty. The
+          builder stamps it on the document node and on every passage, claim
+          and commitment derived from the document, so a view policy that
+          forbids a tag refuses every node of the document.
           The builder emits artifact_version supersedes artifact_version from
           it; a superseded snapshot is never returned as a current
           commitment. Stored as given; a re-import of the same content under
@@ -3288,6 +3300,32 @@ operational_artifact_schemas:
               version: {type: string, required: true}
               path: {type: string, required: true, description: The 5.4 record written.}
               provenance: {type: object, required: true, description: "{supersedes: {id, version}, change_id, evidence: [{id, version}]}."}
+
+  # ---------------------------------------------------------------------------
+  # 5.12 Dev-graph ESR intake record
+  # Path: docs/tier4_orchestration_state/dev_graph/intake/<intake_id>.json
+  # Written by: runner.dev_graph.intake.record_esr_intake, at intake, on
+  #   operator instruction. Not a component and not bound to a manifest node.
+  # Provenance: manually_placed (every field is the operator's declaration).
+  #   Write-once per intake id; no wall-clock field. Read by the blind
+  #   assessment lane (harness) to stamp ESR availability on its report and
+  #   to refuse a purpose it does not serve. Availability is never derived.
+  # ---------------------------------------------------------------------------
+  dev_graph_esr_intake:
+    schema_id_value: "orch.dev_graph.esr_intake.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/intake/<intake_id>.json"
+    provenance_class: manually_placed
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.esr_intake.v1".}
+      intake_id: {type: string, required: true, description: Plain identifier; the file name.}
+      document_id: {type: string, required: true, description: The candidate document the intake concerns (a 5.4 document_id).}
+      submission_id: {type: string, required: true, description: The bound submission identifier.}
+      call_id: {type: string, required: true, description: The bound call identifier.}
+      prior_submission: {type: boolean, required: true, description: Whether a prior submission exists. Never implies an available ESR.}
+      esr_availability: {type: string, required: true, enum: [unknown, unavailable, not_applicable, available], description: Declared by the operator; unknown when not declared.}
+      permitted_purpose: {type: string, required: true, enum: [blind_pre_evaluation, esr_informed_review], description: The task the intake permits. The blind lane refuses esr_informed_review.}
+      esr_reference: {type: string, required: false, description: Required exactly when esr_availability is available; null otherwise.}
 
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS

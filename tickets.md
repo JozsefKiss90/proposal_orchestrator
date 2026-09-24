@@ -131,11 +131,11 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Bounded evidence package builder with view policies; Candidate-bound blind assessment as a harness module command.
 
-- [ ] An intake record with a prior submission and no ESR stores availability unknown, never available.
-- [ ] With a planted ESR-shaped document in the fixture, the rendered package contains no ESR token, the ESR path appears in exclusions with reason policy-forbidden, and the prompt hash inputs contain no ESR text.
-- [ ] Forcing a historical-feedback item into the package makes the command fail before any assessor call.
-- [ ] An ESR-informed task carries its own label and cannot be reported as blind.
-- [ ] Decision log entry for the ESR intake contract exists.
+- [x] An intake record with a prior submission and no ESR stores availability unknown, never available.
+- [x] With a planted ESR-shaped document in the fixture, the rendered package contains no ESR token, the ESR path appears in exclusions with reason policy-forbidden, and the prompt hash inputs contain no ESR text.
+- [x] Forcing a historical-feedback item into the package makes the command fail before any assessor call.
+- [x] An ESR-informed task carries its own label and cannot be reported as blind.
+- [x] Decision log entry for the ESR intake contract exists.
 
 ## Milestone closure: the T03 scenario end to end
 

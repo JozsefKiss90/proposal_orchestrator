@@ -18,6 +18,12 @@ The candidate is not imported in the fixture. Tests call `import_document` on
 their copy, which writes the immutable record under
 `docs/tier4_orchestration_state/dev_graph/documents/`, and then build.
 
+`synthetic_esr.json` beside it is a planted ESR-shaped document (`ESR-1`): two
+sections with ESR score and repair-plan tokens addressing T03, WP1 and OBJ-1, one
+claim, tagged `historical_feedback` and `historical_score`. The intake and leakage
+tests import it with state `submitted` and check that the blind view keeps every
+node of it out of a package while the audit view sees it.
+
 The package tests ask for evidence around `T03` under each view policy. They tag a
 source with `historical_feedback` on their copy to exercise the blind view, and add
 assessment and artifact-version nodes to a built snapshot through `Snapshot.from_graph`

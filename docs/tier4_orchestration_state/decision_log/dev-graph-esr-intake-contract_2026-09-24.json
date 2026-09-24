@@ -1,0 +1,42 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-esr-intake-contract",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'ESR intake record and leakage guard'",
+  "authority": "CLAUDE.md §9.4, §10.5 (traceable inputs), §12.4 (a gap is a gate failure, never papered over), §13.8. Not a constitutional amendment. The intake record is data under Tier 4 dev_graph/intake; the leakage guard lives in the harness and is never a runtime gate (harness/HARNESS.md).",
+  "decision": "ESR availability is intake state. The operator records it from the closed set unknown, unavailable, not_applicable, available, together with the bound submission and call identifiers, the document the intake concerns, whether a prior submission exists, and the permitted purpose. Nothing derives availability: an intake with a prior submission and no declaration stores unknown, never available. The blind assessment lane takes its evidence from the dev-graph package builder under the blind pre-evaluation view policy and, before any assessor call, asserts that no included item is a forbidden type or carries a historical-feedback tag. A violation is a hard failure. An ESR-informed review is a separately labelled task and never shares the blind label.",
+  "intake_record": {
+    "schema_id": "orch.dev_graph.esr_intake.v1",
+    "path": "docs/tier4_orchestration_state/dev_graph/intake/<intake_id>.json",
+    "fields": "intake_id, document_id, submission_id, call_id (plain identifiers); prior_submission (boolean, default false); esr_availability (closed set, default unknown); permitted_purpose (blind_pre_evaluation or esr_informed_review); esr_reference (string or null).",
+    "available_means_bound": "available requires an esr_reference. A reference without a declaration of available is refused rather than read as one.",
+    "immutable": "one record per intake id, written once by record_esr_intake. The same content again is a no-op; different content under the same id is refused (immutable_record). A later change in what is known is a new intake id. No wall-clock field.",
+    "reader": "read_esr_intake(repo_root, intake_id). The blind command reads the record named by --intake, stamps esr_availability and intake_id on the report, refuses an intake whose permitted_purpose is esr_informed_review, and refuses an intake that concerns another document."
+  },
+  "esr_shaped_document": {
+    "fixture": "tests/fixtures/dev_graph_synthetic/docs/tier5_deliverables/candidates/synthetic_esr.json, document ESR-1, tagged historical_feedback and historical_score, sections addressing T03, WP1 and OBJ-1 with ESR score and repair-plan tokens. Tests import it with state submitted.",
+    "tags": "a candidate may declare a top-level tags list of plain identifiers. import_document stores it on the record; the builder stamps it on the document node and on every passage, claim and commitment derived from the document, so a policy that forbids a tag refuses every node of the document. An untagged candidate carries no tags key anywhere and its versions are unchanged.",
+    "exclusions_carry_path": "every package exclusion now names the record path of the excluded node, so the ESR record path is visible in the manifest with reason policy_forbidden and detail tag_forbidden:<tags>."
+  },
+  "leakage_guard": {
+    "where": "harness/blind_assessment.py: assert_no_leakage(package) raises LeakageError; build_blind_evidence runs it on the package before anything is materialised and before the assessor is constructed; assess_candidate runs it again on the evidence it is handed.",
+    "checks": "the package was built under view blind_pre_evaluation; no included item is of type assessment, finding or change_request; no included item carries historical_feedback, historical_score, target_score or repair_plan (runner.dev_graph.policies.HISTORICAL_FEEDBACK_TAGS). Every item is checked; the first violation is named.",
+    "two_checks": "the view policy refuses tagged and forbidden nodes before expansion (first check, dev-graph). The guard walks the built package (second check, harness). A forced item that passes the first is caught by the second; the command exits 2 with nothing written and zero assessor calls.",
+    "availability_does_not_change_policy": "an intake recording an available ESR leaves the blind package identical. Availability is stamped on the report; it never widens or narrows the view."
+  },
+  "document_route": {
+    "command": "py -3.10 -m harness.commands.blind_assessment assess --document <node id or document id> [--graph-root <repo>] [--intake <id>] [--package-budget N]",
+    "resolution": "a node id resolves directly; a document id resolves only when exactly one current version exists (state imported or draft, not superseded). A submitted or superseded snapshot is history, never a candidate.",
+    "evidence": "build_snapshot, then build_package(task=<document node>, view=blind_pre_evaluation, budget, POLICY_VERSION, snapshot id, project, profile version). An incomplete package is refused so a missing section is always the candidate's, never the budget's.",
+    "materialisation": "the package's passages of the document become <out-dir>/candidates/<document node id>/<section_id>.json: the passage as the single sub-section, the document's claims of that section as the claim ledger (declared status lowercased, verified span id as source_ref). Derived from the package alone, so the same package lands the same bytes; the candidate hash, and verify, work unchanged over this directory.",
+    "report_stamps": "task_label (always blind_pre_evaluation), esr_availability, intake_id, snapshot_id, package_id, policy_version, evidence_view. A report constructed or loaded with another task label is refused."
+  },
+  "task_labels": "harness.blind_assessment.TASK_LABELS equals runner.dev_graph.PERMITTED_PURPOSES: blind_pre_evaluation and esr_informed_review. ReviewTask(label, document) carries one; is_blind is true only for the first. No ESR-informed review is implemented here; the label exists so it can never be confused with a blind report.",
+  "not_done_here": [
+    "the ESR-informed review task itself (historical feedback analysis view); only its label and the refusal of its intake on the blind lane.",
+    "scoring from bundle.scoring; the blind lane still reports the coverage axis only.",
+    "a live run; every test uses a fake backend, a frozen clock and a temporary provenance log."
+  ],
+  "verification": "tests/runner/test_dev_graph_intake.py: prior submission without an ESR stores unknown; available needs a reference and a reference needs the declaration; bad values are refused naming the field; the record is immutable; the planted ESR is tagged on every derived node; the blind package around the candidate holds no ESR token and lists the ESR record path as policy_forbidden; the audit view sees it. tests/harness/test_blind_leakage.py: the report carries snapshot, package, policy, blind label and unknown availability; prompts, package and report hold no ESR text; materialisation is deterministic and verify accepts it; each forbidden tag and a forbidden type raise LeakageError; a forced item fails the command before any assessor call; an ESR-informed label cannot be constructed or loaded as blind; an esr_informed_review intake is refused; an available ESR leaves the package id unchanged."
+}

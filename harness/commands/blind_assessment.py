@@ -11,7 +11,17 @@ report to the candidate on disk and rejects it when the candidate changed.
 Usage (assessor config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
     py -3.10 -m harness.commands.blind_assessment assess --candidate <dir>
+    py -3.10 -m harness.commands.blind_assessment assess --document <id> [--graph-root <repo>] [--intake <id>]
     py -3.10 -m harness.commands.blind_assessment verify --report <file> --candidate <dir>
+
+``--document`` names a document snapshot in the dev-graph (a node id or a
+document id with one current version).  The evidence is then built by the
+dev-graph package builder under the blind pre-evaluation view policy,
+checked by the leakage guard, and materialised under ``<out-dir>/candidates/``
+before the assessor is even constructed.  A leaked item is a hard failure
+(exit 2, nothing written).  ``--intake`` names an ESR intake record; its
+availability is stamped on the report and a purpose other than a blind
+assessment is refused.
 
 Exit codes: ``0`` complete assessment written (or report verified); ``1``
 partial assessment written — the candidate lacks profile-required sections,
@@ -31,11 +41,13 @@ from pathlib import Path
 from typing import Callable, Sequence
 
 from harness.blind_assessment import (
+    DEFAULT_PACKAGE_BUDGET,
     DEFAULT_PROVENANCE_PATH,
     DEFAULT_REPORTS_DIR,
     SCOPE_PARTIAL,
     BlindAssessmentError,
     assess_candidate,
+    build_blind_evidence,
     load_report,
     render_report,
     write_report,
@@ -52,10 +64,12 @@ from harness.profile import ProfileError
 from harness.routing import DeterministicCoverageError
 from harness.rubrics import RubricError, load_profile_bundle
 from harness.verdict import MIN_MAJORITY_SAMPLES
+from runner.dev_graph import DevGraphError, read_esr_intake
 
 #: Every fail-closed error the command converts to exit code 2.
 _CLI_ERRORS = (
     BlindAssessmentError,
+    DevGraphError,
     RubricError,
     ProfileError,
     ExpectationError,
@@ -102,8 +116,17 @@ def _parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest="command", required=True)
 
     p_assess = sub.add_parser("assess", help="assess one candidate and write a bound report")
-    p_assess.add_argument("--candidate", required=True,
-                          help="directory holding <section_id>.json artifacts")
+    what = p_assess.add_mutually_exclusive_group(required=True)
+    what.add_argument("--candidate", help="directory holding <section_id>.json artifacts")
+    what.add_argument("--document",
+                      help="dev-graph document snapshot (node id, or a document id with one current version)")
+    p_assess.add_argument("--graph-root", default=None,
+                          help="repository root holding the dev-graph records (default: --repo-root)")
+    p_assess.add_argument("--intake", default=None, help="ESR intake record id to stamp on the report")
+    p_assess.add_argument("--project", default=None,
+                          help="project label for the package request (default: the document id)")
+    p_assess.add_argument("--package-budget", type=int, default=DEFAULT_PACKAGE_BUDGET,
+                          help="dev-graph package size budget for the document route")
     p_assess.add_argument("--repo-root", default=os.environ.get("HARNESS_REPO_ROOT", "."))
     p_assess.add_argument("--profile", default=None,
                           help="pre-evaluation profile JSON (default: the harness default profile)")
@@ -147,19 +170,35 @@ def main(
             print(f"\nverified: report is bound to the candidate at {args.candidate}")
             return 0
 
+        out_dir = Path(args.out_dir)
+        if not out_dir.is_absolute():
+            out_dir = repo_root / out_dir
+        graph_root = Path(args.graph_root).resolve() if args.graph_root else repo_root
+        intake = read_esr_intake(graph_root, args.intake) if args.intake else None
+        evidence = None
+        if args.document:
+            # Snapshot, blind-view package, leakage guard, materialisation —
+            # all before the assessor exists.  A leak stops here.
+            evidence = build_blind_evidence(
+                graph_root,
+                args.document,
+                profile_version=bundle.version,
+                out_dir=out_dir,
+                budget=args.package_budget,
+                project=args.project,
+            )
         assessor = judge if judge is not None else _live_judge(args, repo_root)
         report = assess_candidate(
             assessor,
             bundle,
             args.candidate,
+            evidence=evidence,
+            intake=intake,
             token_budget=args.budget,
             span_budget_fraction=args.span_fraction,
             n=args.n,
             clock=clock,
         )
-        out_dir = Path(args.out_dir)
-        if not out_dir.is_absolute():
-            out_dir = repo_root / out_dir
         path = write_report(report, out_dir)
         data = report.to_dict()
         print(render_report(data))
