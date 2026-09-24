@@ -350,8 +350,9 @@ def plan_impact(
     nodes = {**b_nodes, **a_nodes}
 
     origins: dict[str, list[str]] = {}
-    for nid in cs["nodes"]["added"] + cs["nodes"]["removed"]:
-        origins[nid] = [f"changed:{nid}"]
+    removed_ids = {n["id"] for n in cs["nodes"]["removed"]}
+    for n in cs["nodes"]["added"] + cs["nodes"]["removed"]:
+        origins[n["id"]] = [f"changed:{n['id']}"]
     for c in cs["nodes"]["changed"]:
         if c["kind"] == "direct":
             origins[c["id"]] = [f"changed:{c['id']}"]
@@ -393,7 +394,7 @@ def plan_impact(
                 "hit": _hit(nid),
                 "action": "reconsider",
                 "reason_path": list(path),
-                "detail": "removed" if nid in cs["nodes"]["removed"] else "",
+                "detail": "removed" if nid in removed_ids else "",
             }
         )
 

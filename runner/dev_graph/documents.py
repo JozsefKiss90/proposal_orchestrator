@@ -275,10 +275,13 @@ def node_content(record: dict[str, Any]) -> dict[str, Any]:
     """The content the builder indexes for the ``artifact_version`` node.
 
     Derived from the record alone: the rendered text is included so a span
-    can be resolved from the snapshot without the record.
+    can be resolved from the snapshot without the record. Provenance, when
+    the record carries it, is part of the node content, so a re-versioned
+    candidate is a different node version from a plain import of the same
+    text.
     """
     text, _ = render_document(record["sections"])
-    return {
+    content = {
         "kind": DOCUMENT_KIND,
         "document_id": record["document_id"],
         "title": record["title"],
@@ -287,6 +290,9 @@ def node_content(record: dict[str, Any]) -> dict[str, Any]:
         "sections": record["sections"],
         "text": text,
     }
+    if record.get("provenance") is not None:
+        content["provenance"] = record["provenance"]
+    return content
 
 
 def document_node_id(document_id: str, content_version: str) -> str:
@@ -298,47 +304,68 @@ def document_node_id(document_id: str, content_version: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def import_document(
-    repo_root: Path, candidate_rel: Path | str, *, state: str = "imported"
-) -> DocumentRef:
-    """Import the candidate at *candidate_rel* as an immutable document record.
-
-    Returns the :class:`DocumentRef` of the record, writing it only when it
-    does not already exist. Raises :class:`DevGraphError` (kind
-    ``malformed_record``) on an unreadable or malformed candidate, an unknown
-    *state*, or an existing record of the same content under another state.
-    """
-    root = Path(repo_root)
+def read_candidate(repo_root: Path, candidate_rel: Path | str) -> dict[str, Any]:
+    """The canonical content of the candidate file at *candidate_rel*, or refuse."""
     rel = Path(candidate_rel)
     where = rel.as_posix()
-    if state not in DOCUMENT_STATES:
-        raise _malformed(where, f"state {state!r} is not in {sorted(DOCUMENT_STATES)}")
-    path = root / rel
+    path = Path(repo_root) / rel
     if not path.is_file():
         raise _malformed(where, "candidate file not found")
     try:
         raw = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, ValueError) as exc:
         raise _malformed(where, f"unreadable JSON: {exc}") from exc
-    content = normalise_candidate(raw, where)
+    return normalise_candidate(raw, where)
+
+
+def import_document(
+    repo_root: Path,
+    candidate_rel: Path | str,
+    *,
+    state: str = "imported",
+    provenance: dict[str, Any] | None = None,
+) -> DocumentRef:
+    """Import the candidate at *candidate_rel* as an immutable document record.
+
+    Returns the :class:`DocumentRef` of the record, writing it only when it
+    does not already exist. Raises :class:`DevGraphError` on an unreadable or
+    malformed candidate or an unknown *state* (``malformed_record``), and on
+    an existing record of the same content under another state or another
+    provenance (``immutable_record``): neither is a re-import.
+
+    *provenance* is stored as given and never derived here. The revision
+    module (``runner.dev_graph.revisions.create_candidate_version``)
+    validates it against the change record and the current snapshot before
+    calling this function; the builder turns its ``supersedes`` reference
+    into the edge.
+    """
+    root = Path(repo_root)
+    rel = Path(candidate_rel)
+    where = rel.as_posix()
+    if state not in DOCUMENT_STATES:
+        raise _malformed(where, f"state {state!r} is not in {sorted(DOCUMENT_STATES)}")
+    content = read_candidate(root, rel)
     content_version = content_hash(content)
-    record = {
+    record: dict[str, Any] = {
         "schema_id": DOCUMENT_SCHEMA_ID,
         "document_id": content["document_id"],
         "content_version": content_version,
         "state": state,
         **{k: content[k] for k in ("title", "sections", "claims", "commitments")},
     }
+    if provenance is not None:
+        record["provenance"] = provenance
     node_id = document_node_id(record["document_id"], content_version)
     target_rel = Path(DOCUMENTS_REL) / record["document_id"] / f"{content_version[len(HASH_PREFIX):]}.json"
     target = root / target_rel
     if target.is_file():
         existing = json.loads(target.read_text(encoding="utf-8-sig"))
         if existing != record:
-            raise _malformed(
+            raise DevGraphError(
+                "immutable_record",
                 target_rel.as_posix(),
                 f"document snapshot {node_id} already exists with state "
-                f"{existing.get('state')!r}; a state change is not a re-import",
+                f"{existing.get('state')!r}; a state or provenance change is not a re-import",
             )
     else:
         atomic_write_json(record, target)

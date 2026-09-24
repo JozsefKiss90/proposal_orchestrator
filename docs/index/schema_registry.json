@@ -118,6 +118,13 @@
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/shadow_comparisons/",
       "provenance_class": "derived",
       "description": "Shadow comparison of a planner advisory against the reuse decision a run manifest recorded: one diagnostic (agreed, planner_narrower, planner_broader) with a row per node; never consumed at runtime"
+    },
+    {
+      "schema_id": "orch.dev_graph.revision_record.v1",
+      "artifact": "<revision_id>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/revisions/",
+      "provenance_class": "derived",
+      "description": "Revision record: the contract, the check verdict (accepted, rejected naming the protected node, flagged_for_review) with change classes and unresolved items carried unresolved, and on acceptance the created candidate version with provenance (supersedes, change_id, evidence); written once by dev_graph_revision_record_writer"
     }
   ]
 }

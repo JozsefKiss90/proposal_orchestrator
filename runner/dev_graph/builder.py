@@ -409,8 +409,17 @@ def _add_document(
     if content_hash(content) != rec.get("content_version"):
         raise _malformed(rel, "content_version does not match the record content")
     record = {**content, "state": rec["state"], "content_version": rec["content_version"]}
+    provenance = rec.get("provenance")
+    if provenance is not None:
+        if not isinstance(provenance, dict) or not isinstance(provenance.get("supersedes"), dict):
+            raise _malformed(rel, "provenance must be an object naming the superseded snapshot")
+        record["provenance"] = provenance
     doc_id = document_node_id(record["document_id"], record["content_version"])
     g.node(doc_id, "artifact_version", rel, node_content(record))
+    if provenance is not None:
+        # The predecessor is referenced by id; validate_graph reports a
+        # dangling reference. The version is checked at creation time.
+        g.edge(doc_id, "supersedes", str(provenance["supersedes"].get("id")))
 
     _, spans = render_document(record["sections"])
     passage_ids: dict[str, str] = {}
@@ -462,9 +471,22 @@ def _assemble(repo_root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any
     for src in _read_records(repo_root, SOURCES_REL, "sources", inputs):
         _add_source(g, src)
         sources[src["source_id"]] = src.get("text", "")
+    provenances: list[tuple[str, dict[str, Any]]] = []
     for rel, rec in read_document_records(repo_root):
         inputs.append(rel)
         _add_document(g, rel, rec, sources)
+        if rec.get("provenance") is not None:
+            provenances.append((rel, rec["provenance"]["supersedes"]))
+    # The declared predecessor version must be the predecessor's version in
+    # this build; checked once every document is indexed, since record
+    # order is by path, not by version.
+    for rel, prev in provenances:
+        declared, actual = prev.get("version"), g.version_of(str(prev.get("id")))
+        if actual is not None and declared != actual:
+            raise _malformed(
+                Path(rel),
+                f"provenance names {prev.get('id')} at version {declared} but this build has {actual}",
+            )
     nodes, edges = g.finish()
     return nodes, edges, sorted(set(inputs))
 
@@ -494,16 +516,21 @@ def current_commitments(snapshot: Snapshot) -> list[dict[str, Any]]:
     """The commitment nodes whose document snapshot is current.
 
     A commitment expressed in a ``submitted`` or ``superseded`` snapshot is
-    history: indexed, retrievable, and never returned here. Pure.
+    history: indexed, retrievable, and never returned here. So is a
+    commitment in a snapshot that a later version ``supersedes``: the old
+    record is left byte for byte as it was, and the edge carries the fact.
+    Pure.
     """
     states = {
         n["id"]: n["content"].get("state")
         for n in snapshot.nodes
         if n["type"] == "artifact_version"
     }
+    superseded = {e["target"]["id"] for e in snapshot.edges if e["predicate"] == "supersedes"}
     return [
         n
         for n in snapshot.nodes
         if n["type"] == "commitment"
         and states.get(n["content"].get("document")) in CURRENT_DOCUMENT_STATES
+        and n["content"].get("document") not in superseded
     ]

@@ -20,8 +20,9 @@ What "kept" means here:
 The change set is a pure diff of the two snapshots. Nodes are compared by id
 and version; a node whose own content is unchanged and whose version moved
 only because a nested record changed (a work package holding a changed task)
-is reported as ``contained``, not ``direct``. Edges are compared by label, so
-a removed link is a change in its own right.
+is reported as ``contained``, not ``direct``. A direct change also lists the
+top-level fields that differ. Edges are compared by label, so a removed link
+is a change in its own right.
 
 Fail-closed: an unknown record path, a malformed change id, an existing
 change id, or a new record the builder rejects all refuse. When the after
@@ -209,7 +210,11 @@ def _edge_entry(e: dict[str, Any]) -> dict[str, Any]:
 
 
 def change_set(before: Snapshot, after: Snapshot) -> dict[str, Any]:
-    """The pure diff of two snapshots: nodes by id and version, edges by label."""
+    """The pure diff of two snapshots: nodes by id and version, edges by label.
+
+    ``nodes.added`` and ``nodes.removed`` items carry ``id`` and ``type``;
+    ``nodes.changed`` items add both versions, the kind and the changed fields.
+    """
     b_nodes = {n["id"]: n for n in before.nodes}
     a_nodes = {n["id"]: n for n in after.nodes}
     changed: list[dict[str, Any]] = []
@@ -217,21 +222,28 @@ def change_set(before: Snapshot, after: Snapshot) -> dict[str, Any]:
         b, a = b_nodes[nid], a_nodes[nid]
         if b["version"] == a["version"]:
             continue
+        own_b, own_a = _own_content(b), _own_content(a)
         changed.append(
             {
                 "id": nid,
                 "type": a["type"],
                 "before_version": b["version"],
                 "after_version": a["version"],
-                "kind": "contained" if _own_content(b) == _own_content(a) else "direct",
+                "kind": "contained" if own_b == own_a else "direct",
+                # The top-level keys of the node's own content that differ:
+                # the revision contract checker classifies a direct change by
+                # field. Empty for a contained change.
+                "changed_fields": sorted(
+                    k for k in own_b.keys() | own_a.keys() if own_b.get(k) != own_a.get(k)
+                ),
             }
         )
     b_edges = {label_of(e): e for e in before.edges}
     a_edges = {label_of(e): e for e in after.edges}
     return {
         "nodes": {
-            "added": sorted(a_nodes.keys() - b_nodes.keys()),
-            "removed": sorted(b_nodes.keys() - a_nodes.keys()),
+            "added": [{"id": i, "type": a_nodes[i]["type"]} for i in sorted(a_nodes.keys() - b_nodes.keys())],
+            "removed": [{"id": i, "type": b_nodes[i]["type"]} for i in sorted(b_nodes.keys() - a_nodes.keys())],
             "changed": changed,
         },
         "edges": {

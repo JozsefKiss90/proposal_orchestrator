@@ -2752,6 +2752,17 @@ operational_artifact_schemas:
           Lifecycle state. Only imported and draft are current; a submitted or
           superseded snapshot is never returned as a current commitment.
 
+      provenance:
+        type: object
+        required: false
+        description: >
+          Present only on a record created by create_candidate_version:
+          {supersedes: {id, version}, change_id, evidence: [{id, version}]}.
+          The builder emits artifact_version supersedes artifact_version from
+          it; a superseded snapshot is never returned as a current
+          commitment. Stored as given; a re-import of the same content under
+          other provenance is refused.
+
       title:
         type: string
         required: true
@@ -3012,12 +3023,13 @@ operational_artifact_schemas:
         type: object
         required: true
         description: >
-          Pure diff of the two snapshots. nodes.added and nodes.removed are id
-          lists; nodes.changed items carry id, type, before_version,
-          after_version and kind (direct: own content changed; contained:
-          only a nested record changed). edges.added and edges.removed items
-          carry label, predicate, source and target, so a removed link is a
-          change in its own right.
+          Pure diff of the two snapshots. nodes.added and nodes.removed items
+          carry id and type; nodes.changed items carry id, type,
+          before_version, after_version, kind (direct: own content changed;
+          contained: only a nested record changed) and changed_fields (the
+          top-level own-content keys that differ; empty for contained).
+          edges.added and edges.removed items carry label, predicate, source
+          and target, so a removed link is a change in its own right.
 
   # ---------------------------------------------------------------------------
   # 5.7a Dev-graph record version (archive)
@@ -3204,6 +3216,78 @@ operational_artifact_schemas:
           record_ids: {type: array, required: true, item_type: string, description: Sorted run record ids whose path is the artifact path.}
           diagnostic: {type: string, required: true, enum: [agreed, planner_narrower, planner_broader]}
           detail: {type: string, required: true}
+
+  # ---------------------------------------------------------------------------
+  # 5.11 Dev-graph revision record
+  # Path: docs/tier4_orchestration_state/dev_graph/revisions/<revision_id>.json
+  # Written by: the dev_graph_revision_record_writer deterministic component
+  #   (runner/dev_graph/revisions.py), on demand. Not bound to a manifest node.
+  # Provenance: derived. Write-once per revision id; no run id and no
+  #   wall-clock field, so replay is byte-equal. The candidate version it
+  #   names is a 5.4 record carrying provenance.
+  # ---------------------------------------------------------------------------
+  dev_graph_revision_record:
+    schema_id_value: "orch.dev_graph.revision_record.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/revisions/<revision_id>.json"
+    provenance_class: derived
+
+    fields:
+      schema_id: {type: string, required: true, description: Must equal "orch.dev_graph.revision_record.v1".}
+      revision_id: {type: string, required: true, description: Plain identifier; the file name.}
+      change_id: {type: string, required: true, description: The recorded change (5.7) the check ran over.}
+      contract:
+        type: object
+        required: true
+        fields:
+          contract_id: {type: string, required: true}
+          permitted_change_classes: {type: array, required: true, item_type: string, description: Sorted; each in runner.dev_graph.revisions.CHANGE_CLASSES.}
+          protected_node_ids: {type: array, required: true, item_type: string}
+          unresolved_items:
+            type: array
+            required: true
+            item_schema:
+              item_id: {type: string, required: true}
+              description: {type: string, required: true}
+              node_ids: {type: array, required: true, item_type: string, description: Empty means the item bears on every change.}
+              status: {type: string, required: true, enum: [unresolved]}
+      check:
+        type: object
+        required: true
+        fields:
+          contract_id: {type: string, required: true}
+          verdict: {type: string, required: true, enum: [accepted, rejected, flagged_for_review], description: rejected outranks flagged_for_review.}
+          change_classes: {type: array, required: true, item_type: string, description: Sorted classes of the change set by closed lookup.}
+          protected_hits:
+            type: array
+            required: true
+            description: Non-empty exactly when the verdict is rejected.
+            item_schema:
+              node_id: {type: string, required: true}
+              via: {type: array, required: true, item_type: string, description: "changed:<id> or changed edge labels."}
+          unpermitted_classes: {type: array, required: true, item_type: string}
+          unresolved:
+            type: array
+            required: true
+            description: The contract's items, status unchanged; never approved here.
+            item_schema:
+              item_id: {type: string, required: true}
+              status: {type: string, required: true, enum: [unresolved]}
+              bears_on_change: {type: boolean, required: true}
+              via: {type: array, required: true, item_type: string}
+      candidate_version:
+        type: object
+        required: true
+        description: null unless the verdict is accepted.
+        fields:
+          previous: {type: object, required: true, description: "{id, version} of the superseded document snapshot node."}
+          created:
+            type: object
+            required: true
+            fields:
+              id: {type: string, required: true}
+              version: {type: string, required: true}
+              path: {type: string, required: true, description: The 5.4 record written.}
+              provenance: {type: object, required: true, description: "{supersedes: {id, version}, change_id, evidence: [{id, version}]}."}
 
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS

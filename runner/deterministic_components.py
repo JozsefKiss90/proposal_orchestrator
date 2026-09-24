@@ -268,6 +268,29 @@ def _run_dev_graph_shadow_comparison_writer(run_id: str, repo_root: Path) -> lis
     return run_shadow_comparison_writer(run_id, repo_root)
 
 
+def _run_dev_graph_revision_record_writer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the dev-graph revision record writer.
+
+    Reads the operator request at
+    ``docs/tier4_orchestration_state/dev_graph/revision_request.json``
+    (revision id, change id, revision contract, candidate path, superseded
+    snapshot id, evidence ids), loads the recorded change, checks its change
+    set against the contract (accepted, rejected naming the protected node,
+    or flagged for review), creates the new candidate version with
+    provenance only on ``accepted``, and writes
+    ``docs/tier4_orchestration_state/dev_graph/revisions/<revision id>.json``.
+    No run id and no wall-clock field, so it is closed by byte-equal replay;
+    a revision id is write-once.  Fails closed (raises) on a missing change
+    record, a malformed request or contract, an unknown predecessor or
+    evidence node, or a re-run that would write other content.  Never
+    approves an unresolved item, never mutates an assessment, reads no
+    scheduler state and evaluates no gate.
+    """
+    from runner.dev_graph.revisions import run_revision_record_writer
+
+    return run_revision_record_writer(run_id, repo_root)
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -306,6 +329,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "dev_graph_package_manifest_writer": _run_dev_graph_package_manifest_writer,
     "dev_graph_impact_plan_writer": _run_dev_graph_impact_plan_writer,
     "dev_graph_shadow_comparison_writer": _run_dev_graph_shadow_comparison_writer,
+    "dev_graph_revision_record_writer": _run_dev_graph_revision_record_writer,
 }
 
 

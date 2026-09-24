@@ -93,12 +93,12 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Document snapshots and separated claim evidence fields.
 
-- [ ] A responsibility change on T03 under a contract permitting responsibility changes is accepted.
-- [ ] A change set that also alters the protected objective is rejected and the response names the objective node.
-- [ ] A contract with unresolved participant capacity keeps that item flagged in the result. It never becomes approved.
-- [ ] Creating a new candidate version yields a second document snapshot with a `supersedes` edge to the first and provenance to the change request. The first snapshot is unchanged.
-- [ ] An assessment bound to candidate version 1 reports not applicable against version 2 with reason candidate version changed. Profile and policy version changes each produce their own reason.
-- [ ] Byte-equal replay passes for the revision record writer.
+- [x] A responsibility change on T03 under a contract permitting responsibility changes is accepted.
+- [x] A change set that also alters the protected objective is rejected and the response names the objective node.
+- [x] A contract with unresolved participant capacity keeps that item flagged in the result. It never becomes approved.
+- [x] Creating a new candidate version yields a second document snapshot with a `supersedes` edge to the first and provenance to the change request. The first snapshot is unchanged.
+- [x] An assessment bound to candidate version 1 reports not applicable against version 2 with reason candidate version changed. Profile and policy version changes each produce their own reason.
+- [x] Byte-equal replay passes for the revision record writer.
 
 ## Versioned pre-evaluation profile in the harness
 

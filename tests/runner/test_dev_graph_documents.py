@@ -163,7 +163,7 @@ class TestImport:
         import_document(world, CANDIDATE, state="draft")
         with pytest.raises(DevGraphError) as ei:
             import_document(world, CANDIDATE, state="submitted")
-        assert ei.value.kind == "malformed_record"
+        assert ei.value.kind == "immutable_record"
         assert "draft" in str(ei.value)
 
     @pytest.mark.parametrize("state", ["", "final", "Imported"])
