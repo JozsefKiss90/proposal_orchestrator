@@ -116,7 +116,8 @@ class TestFixtureBuild:
         assert by_type["task"] == {"T01", "T02", "T03"}
         assert by_type["deliverable"] == {"D1.1"}
         assert by_type["milestone"] == {"MS1"}
-        assert "source" not in by_type  # Tier 2A is not indexed by this ticket
+        assert by_type["source"] == {"SRC-1", "SRC-2"}  # Tier 3 source materials
+        assert "SYN-A" not in {n["id"] for n in snap.nodes}  # Tier 2A is not indexed
         assert not snap.empty
 
     def test_identity_is_separate_from_path_and_title(self, world: Path):

@@ -40,11 +40,11 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Dev-graph schema and snapshot builder on a synthetic fixture.
 
-- [ ] Building the fixture with the candidate yields one document snapshot node with state imported and passage nodes linked to it by span.
-- [ ] Importing the same candidate twice yields the same document snapshot version. A changed candidate yields a new version and the old one remains.
-- [ ] A claim with declared status Confirmed and no verified span is representable and the two fields are reported separately.
-- [ ] A submitted document snapshot is never returned as a current commitment.
-- [ ] Snapshot ID stability and rejection tests from the previous ticket still pass with the extended fixture.
+- [x] Building the fixture with the candidate yields one document snapshot node with state imported and passage nodes linked to it by span.
+- [x] Importing the same candidate twice yields the same document snapshot version. A changed candidate yields a new version and the old one remains.
+- [x] A claim with declared status Confirmed and no verified span is representable and the two fields are reported separately.
+- [x] A submitted document snapshot is never returned as a current commitment.
+- [x] Snapshot ID stability and rejection tests from the previous ticket still pass with the extended fixture.
 
 ## Bounded evidence package builder with view policies
 

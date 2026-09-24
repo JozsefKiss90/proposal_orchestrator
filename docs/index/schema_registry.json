@@ -61,7 +61,14 @@
       "artifact": "snapshot.json",
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/snapshot.json",
       "provenance_class": "derived",
-      "description": "Dev-graph snapshot: rebuildable index over Tier 3 records with content-derived identity"
+      "description": "Dev-graph snapshot: rebuildable index over Tier 3 records, source materials and document snapshots with content-derived identity"
+    },
+    {
+      "schema_id": "orch.dev_graph.document_snapshot.v1",
+      "artifact": "<document_id>/<content version hex>.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/documents/",
+      "provenance_class": "manually_placed",
+      "description": "Immutable document snapshot record written once by import_document; lifecycle state imported, draft, submitted or superseded"
     }
   ]
 }

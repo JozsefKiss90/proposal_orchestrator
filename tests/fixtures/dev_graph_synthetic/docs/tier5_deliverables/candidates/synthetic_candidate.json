@@ -1,0 +1,63 @@
+{
+  "document_id": "CAND-1",
+  "title": "Synthetic candidate",
+  "sections": [
+    {
+      "section_id": "S1",
+      "title": "Section one",
+      "content": "The project pursues objective one and objective two through work package one.",
+      "addresses": ["OBJ-1", "OBJ-2", "WP1"]
+    },
+    {
+      "section_id": "S2",
+      "title": "Section two",
+      "content": "Task three is led by Participant B with Participant C contributing. It starts in month ten.",
+      "addresses": ["T03"]
+    },
+    {
+      "section_id": "S3",
+      "title": "Section three",
+      "content": "Deliverable one is due in month eighteen and validated by milestone one.",
+      "addresses": ["WP1"]
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CL-1",
+      "section_id": "S2",
+      "text": "Participant B holds the capability that Task three requires.",
+      "evidence_strength": "source_grounded",
+      "verified_span": {"source_id": "SRC-1", "start": 0, "end": 60},
+      "approval": "approved"
+    },
+    {
+      "claim_id": "CL-2",
+      "section_id": "S2",
+      "text": "Task three starts in month ten.",
+      "evidence_strength": "source_grounded",
+      "approval": "pending"
+    },
+    {
+      "claim_id": "CL-3",
+      "section_id": "S1",
+      "text": "Objective one is measured by target one.",
+      "evidence_strength": "inference",
+      "approval": "not_applicable"
+    },
+    {
+      "claim_id": "CL-4",
+      "section_id": "S3",
+      "text": "Deliverable one is due in month eighteen.",
+      "evidence_strength": "unconfirmed",
+      "approval": "pending"
+    }
+  ],
+  "commitments": [
+    {
+      "commitment_id": "CM-1",
+      "section_id": "S2",
+      "text": "Participant B leads Task three.",
+      "addresses": ["T03"]
+    }
+  ]
+}

@@ -122,7 +122,11 @@ RELATIONSHIPS: Mapping[str, RelationshipSpec] = {
         ),
         RelationshipSpec(
             "expressed_in",
-            (("claim", "passage"), ("commitment", "passage")),
+            (
+                ("claim", "passage"),
+                ("commitment", "passage"),
+                ("passage", "artifact_version"),
+            ),
             "many_to_many",
             DOMAIN_LINK,
         ),
@@ -168,6 +172,35 @@ RELATIONSHIPS: Mapping[str, RelationshipSpec] = {
         ),
     )
 }
+
+
+# ---------------------------------------------------------------------------
+# Document snapshots and claim evidence fields
+# ---------------------------------------------------------------------------
+
+#: Lifecycle states of a document snapshot (an ``artifact_version`` node of
+#: kind ``document_snapshot``). Closed; a state outside it is rejected at
+#: import.
+DOCUMENT_STATES: frozenset[str] = frozenset(
+    {"imported", "draft", "submitted", "superseded"}
+)
+
+#: The states whose wording is a *current* commitment. A submitted or
+#: superseded snapshot is history: it is indexed, and it is never returned as
+#: a current commitment.
+CURRENT_DOCUMENT_STATES: frozenset[str] = frozenset({"imported", "draft"})
+
+#: A claim's declared status: the CLAUDE.md §12.2 vocabulary. Fed by the
+#: evidence-strength lookup (``runner.graph_schema.EVIDENCE_TO_STATUS``) and,
+#: for ``Assumed``, by an explicit declaration over an ``Unresolved`` lookup.
+DECLARED_STATUSES: frozenset[str] = frozenset(
+    {"Confirmed", "Inferred", "Assumed", "Unresolved"}
+)
+
+#: A claim's current approval. Independent of declared status and of the
+#: verified span: a label never stands in for proof, and neither stands in
+#: for a decision.
+APPROVALS: frozenset[str] = frozenset({"approved", "pending", "not_applicable"})
 
 
 # ---------------------------------------------------------------------------

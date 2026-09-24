@@ -26,6 +26,21 @@ Derived relationships (from record structure, no inference):
 * ``deliverable.produced_by[]``             -> ``task produces deliverable``
 * ``milestone.deliverables[]``              -> ``deliverable validated_by milestone``
 
+Document snapshots (immutable records under ``dev_graph/documents``, written
+by :func:`runner.dev_graph.documents.import_document`) add:
+
+* one ``artifact_version`` node of kind ``document_snapshot`` per record,
+  carrying the lifecycle state;
+* one ``passage`` per section, ``passage expressed_in artifact_version`` with
+  the section's span in the rendered text, and ``passage addresses <id>`` for
+  every id the section names;
+* one ``claim`` per claim with three separate fields (declared status,
+  verified span, approval), ``claim expressed_in passage`` and, when a span
+  is verified, one ``source_span`` node plus ``claim supported_by source_span``;
+* one ``commitment`` per commitment, ``commitment expressed_in passage``.
+
+Sources (``source_materials/sources.json``) become ``source`` nodes.
+
 Tier 3 declares no edges of its own: the edge set is recomputed on every
 build from the fields above, so Tier 3 stays the single writer of each fact.
 
@@ -44,8 +59,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterator
 
+from runner.dev_graph.documents import (
+    document_node_id,
+    node_content,
+    normalise_candidate,
+    read_document_records,
+    render_document,
+)
 from runner.dev_graph.identity import content_hash, snapshot_id
-from runner.dev_graph.schema import DevGraphError, validate_graph
+from runner.dev_graph.schema import (
+    CURRENT_DOCUMENT_STATES,
+    DevGraphError,
+    validate_graph,
+)
 
 SCHEMA_ID = "orch.dev_graph.snapshot.v1"
 
@@ -55,6 +81,7 @@ PARTNERS_REL = _TIER3 / "consortium" / "partners.json"
 OBJECTIVES_REL = _TIER3 / "architecture_inputs" / "objectives.json"
 WP_SEED_REL = _TIER3 / "architecture_inputs" / "workpackage_seed.json"
 MILESTONES_REL = _TIER3 / "architecture_inputs" / "milestones_seed.json"
+SOURCES_REL = _TIER3 / "source_materials" / "sources.json"
 
 
 # ---------------------------------------------------------------------------
@@ -163,8 +190,9 @@ class _Assembler:
 
     def __init__(self) -> None:
         self.nodes: list[dict[str, Any]] = []
-        self.edges: list[tuple[str, str, str]] = []
+        self.edges: list[tuple[str, str, str, dict[str, int] | None]] = []
         self._versions: dict[str, str] = {}
+        self._contents: dict[str, dict[str, Any]] = {}
 
     def node(
         self,
@@ -176,6 +204,11 @@ class _Assembler:
         title_key: str = "title",
     ) -> None:
         version = content_hash(content)
+        # The same node declared twice with the same content (a source span
+        # two claims share) is one node; validate_graph reports a true
+        # duplicate.
+        if nid in self._contents and self._contents[nid] == content:
+            return
         title = content.get(title_key)
         self.nodes.append(
             {
@@ -190,20 +223,28 @@ class _Assembler:
         # First declaration wins for the version map; validate_graph reports
         # the duplicate itself.
         self._versions.setdefault(nid, version)
+        self._contents.setdefault(nid, content)
 
-    def edge(self, src: str, predicate: str, dst: str) -> None:
-        self.edges.append((src, predicate, dst))
+    def version_of(self, nid: str) -> str | None:
+        return self._versions.get(nid)
+
+    def edge(
+        self, src: str, predicate: str, dst: str, *, span: dict[str, int] | None = None
+    ) -> None:
+        self.edges.append((src, predicate, dst, span))
 
     def finish(self) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         nodes = sorted(self.nodes, key=lambda n: n["id"])
-        edges: list[dict[str, Any]] = [
-            {
+        edges: list[dict[str, Any]] = []
+        for s, p, t, span in self.edges:
+            e: dict[str, Any] = {
                 "predicate": p,
                 "source": {"id": s, "version": self._versions.get(s, "")},
                 "target": {"id": t, "version": self._versions.get(t, "")},
             }
-            for s, p, t in self.edges
-        ]
+            if span is not None:
+                e["span"] = dict(span)
+            edges.append(e)
         validate_graph(nodes, edges)
         edges.sort(key=lambda e: (e["predicate"], e["source"]["id"], e["target"]["id"]))
         return nodes, edges
@@ -256,6 +297,92 @@ def _add_milestone(g: _Assembler, m: dict[str, Any]) -> None:
         g.edge(did, "validated_by", mid)
 
 
+def _add_source(g: _Assembler, src: dict[str, Any]) -> None:
+    sid = _key(src, "source_id", SOURCES_REL, "source")
+    text = src.get("text", "")
+    if not isinstance(text, str):
+        raise _malformed(SOURCES_REL, f"source {sid}: text must be a string")
+    g.node(sid, "source", SOURCES_REL, src)
+
+
+def _source_span_id(source_id: str, start: int, end: int) -> str:
+    return f"{source_id}#{start}-{end}"
+
+
+def _add_verified_span(
+    g: _Assembler, claim_ref: str, rel: Path, span: dict[str, Any], sources: dict[str, str]
+) -> dict[str, Any]:
+    """Resolve a claim's declared span against the source record; return the
+    stored field ``{id, version, source: {id, version}, start, end}``."""
+    source_id = span["source_id"]
+    version = g.version_of(source_id)
+    if source_id not in sources or version is None:
+        raise _malformed(rel, f"{claim_ref}: verified_span names unknown source {source_id!r}")
+    declared_version = span.get("version")
+    if declared_version is not None and declared_version != version:
+        raise _malformed(
+            rel,
+            f"{claim_ref}: verified_span names source version {declared_version} "
+            f"but {source_id} is {version}",
+        )
+    start, end = span["start"], span["end"]
+    if end > len(sources[source_id]):
+        raise _malformed(
+            rel,
+            f"{claim_ref}: verified_span offset range {start}-{end} exceeds "
+            f"{source_id} text length {len(sources[source_id])}",
+        )
+    span_id = _source_span_id(source_id, start, end)
+    content = {"source": {"id": source_id, "version": version}, "start": start, "end": end}
+    g.node(span_id, "source_span", rel, content, title_key="_")
+    return {"id": span_id, "version": content_hash(content), **content}
+
+
+def _add_document(
+    g: _Assembler, rel_str: str, rec: dict[str, Any], sources: dict[str, str]
+) -> None:
+    rel = Path(rel_str)
+    content = normalise_candidate(rec, rel_str)
+    if content_hash(content) != rec.get("content_version"):
+        raise _malformed(rel, "content_version does not match the record content")
+    record = {**content, "state": rec["state"], "content_version": rec["content_version"]}
+    doc_id = document_node_id(record["document_id"], record["content_version"])
+    g.node(doc_id, "artifact_version", rel, node_content(record))
+
+    _, spans = render_document(record["sections"])
+    passage_ids: dict[str, str] = {}
+    for sec in record["sections"]:
+        pid = f"{doc_id}#{sec['section_id']}"
+        passage_ids[sec["section_id"]] = pid
+        span = spans[sec["section_id"]]
+        g.node(pid, "passage", rel, {**sec, "document": doc_id, "span": span})
+        g.edge(pid, "expressed_in", doc_id, span=span)
+        for target in sec["addresses"]:
+            g.edge(pid, "addresses", target)
+
+    for claim in record["claims"]:
+        cid = f"{doc_id}#{claim['claim_id']}"
+        claim_ref = f"claim {claim['claim_id']}"
+        stored = dict(claim)
+        if claim["verified_span"] is not None:
+            stored["verified_span"] = _add_verified_span(
+                g, claim_ref, rel, claim["verified_span"], sources
+            )
+        stored["document"] = doc_id
+        g.node(cid, "claim", rel, stored, title_key="text")
+        g.edge(cid, "expressed_in", passage_ids[claim["section_id"]])
+        if stored["verified_span"] is not None:
+            g.edge(cid, "supported_by", stored["verified_span"]["id"])
+
+    for m in record["commitments"]:
+        mid = f"{doc_id}#{m['commitment_id']}"
+        g.node(
+            mid, "commitment", rel, {**m, "document": doc_id, "state": record["state"]},
+            title_key="text",
+        )
+        g.edge(mid, "expressed_in", passage_ids[m["section_id"]])
+
+
 def _assemble(repo_root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
     inputs: list[str] = []
     g = _Assembler()
@@ -267,6 +394,13 @@ def _assemble(repo_root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any
         _add_work_package(g, wp)
     for m in _read_records(repo_root, MILESTONES_REL, "milestones", inputs):
         _add_milestone(g, m)
+    sources: dict[str, str] = {}
+    for src in _read_records(repo_root, SOURCES_REL, "sources", inputs):
+        _add_source(g, src)
+        sources[src["source_id"]] = src.get("text", "")
+    for rel, rec in read_document_records(repo_root):
+        inputs.append(rel)
+        _add_document(g, rel, rec, sources)
     nodes, edges = g.finish()
     return nodes, edges, sorted(set(inputs))
 
@@ -290,3 +424,22 @@ def build_snapshot(repo_root: Path) -> Snapshot:
         edges=tuple(edges),
         inputs=tuple(inputs),
     )
+
+
+def current_commitments(snapshot: Snapshot) -> list[dict[str, Any]]:
+    """The commitment nodes whose document snapshot is current.
+
+    A commitment expressed in a ``submitted`` or ``superseded`` snapshot is
+    history: indexed, retrievable, and never returned here. Pure.
+    """
+    states = {
+        n["id"]: n["content"].get("state")
+        for n in snapshot.nodes
+        if n["type"] == "artifact_version"
+    }
+    return [
+        n
+        for n in snapshot.nodes
+        if n["type"] == "commitment"
+        and states.get(n["content"].get("document")) in CURRENT_DOCUMENT_STATES
+    ]

@@ -1,0 +1,61 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-document-snapshots-and-claim-fields",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Document snapshots and separated claim evidence fields'",
+  "authority": "CLAUDE.md §9.4, §12.2 (status vocabulary), §13.3 (no invented facts). Not a constitutional amendment. Extends the ownership table in dev-graph-field-ownership and the endpoint set in dev-graph-type-and-relationship-set, both of which reserved these rows for this ticket.",
+  "decision": "An imported candidate becomes one immutable document snapshot record with a lifecycle state. The graph indexes it as an artifact_version node of kind document_snapshot, one passage per section linked to it by span, and claim nodes that carry declared status, verified source span and current approval as three separate fields. No new node type is added.",
+  "document_snapshot": {
+    "node_type": "artifact_version with content.kind = document_snapshot. The closed type set is unchanged; a document snapshot is a version of an artifact, which is what supersedes and validated_by already accept.",
+    "record": "docs/tier4_orchestration_state/dev_graph/documents/<document_id>/<content version hex>.json, schema orch.dev_graph.document_snapshot.v1, written once by runner.dev_graph.documents.import_document.",
+    "identity": "node id is <document_id>@<first sixteen hex of content_version>. The same content imports to the same path and the same node; changed content is a new path beside the old one. Nothing is rewritten.",
+    "lifecycle_states": ["imported", "draft", "submitted", "superseded"],
+    "state_is_not_content": "content_version hashes document_id, title, sections, claims and commitments. State is metadata on the record. Importing the same content under a different state is refused, naming the existing record: a state transition is a supersession, which the revision ticket adds through the supersedes edge.",
+    "no_wall_clock": "The record carries no import time. Two imports of the same candidate into two roots produce byte-identical records and snapshots."
+  },
+  "passages": {
+    "identity": "<document node id>#<section_id>. A passage belongs to one document version; the same section in a later version is a new passage. This keeps two versions in one snapshot without a duplicate id.",
+    "span": "The document text is rendered in a fixed layout (## <id> <title>, blank line, content, blank line). Each passage's span is its character range in that text, stored in the passage content and on the passage -expressed_in-> artifact_version edge. The rendered text is stored on the document node so a span resolves from the snapshot alone.",
+    "relationship_added": "expressed_in gains the endpoint pair passage -> artifact_version. No other predicate changes. Edges gain an optional span field, present only on that pair."
+  },
+  "claim_fields": {
+    "declared_status": {
+      "vocabulary": ["Confirmed", "Inferred", "Assumed", "Unresolved"],
+      "writer": "runner.graph_schema.EVIDENCE_TO_STATUS applied to the claim's evidence_strength, at import. This is the only feed. The one permitted declaration is Assumed over an Unresolved lookup, the same flip the assumption applier makes; any other declared value is rejected naming the claim."
+    },
+    "verified_span": {
+      "shape": "{id, version, source: {id, version}, start, end} or null",
+      "writer": "declared by the candidate as {source_id, start, end, version?}; resolved at snapshot time against the Tier 3 source record (docs/tier3_project_instantiation/source_materials/sources.json). An unknown source, an offset past the source text, or a declared version that differs from the source's current version fails the build naming the claim. The span becomes a source_span node, shared by every claim that names the same range, with claim -supported_by-> source_span."
+    },
+    "approval": {
+      "vocabulary": ["approved", "pending", "not_applicable"],
+      "writer": "declared by the candidate. Never derived from declared status or from the span."
+    },
+    "separation": "A Confirmed claim with no verified span is representable and reported as such. An Unresolved claim can carry an approved span. The three fields never move together; a label is not proof, and neither is a decision."
+  },
+  "commitments": {
+    "identity": "<document node id>#<commitment_id>, commitment -expressed_in-> passage.",
+    "current_rule": "runner.dev_graph.current_commitments returns commitments of snapshots in state imported or draft only. A submitted or superseded snapshot stays indexed and is never returned as current. This is the graph's answer to 'historical wording is never mistaken for a current commitment'."
+  },
+  "ownership_rows_added": {
+    "document snapshot records": {
+      "owner": "the import operation, on the operator's instruction. One write per content version, never rewritten.",
+      "graph_role": "index only. The builder re-validates each record's shape and checks its content_version against its content before indexing it."
+    },
+    "passages, claims, commitments, source spans": {
+      "owner": "the candidate document as imported. The builder derives the nodes and edges from the record on every build.",
+      "graph_role": "index only. Nothing flows back into the record or into Tier 3."
+    },
+    "source materials": {
+      "owner": "docs/tier3_project_instantiation/source_materials/sources.json",
+      "graph_role": "index only, as source nodes. Tier 2A stays unindexed."
+    }
+  },
+  "not_done_here": [
+    "supersedes edges between document versions and the superseded state transition (revision ticket).",
+    "assessment and finding nodes on a document version (revision and pre-evaluation tickets).",
+    "a deterministic component for the import: the component contract is (run_id, repo_root) and the import needs a candidate path and a state. The snapshot writer, which is a component, indexes whatever records exist."
+  ],
+  "verification": "tests/runner/test_dev_graph_documents.py: one document node with state imported; passages tile the rendered text and address the named records; same import twice is one version; changed candidate is a second version beside the first; Confirmed with no span; span carries id, version and offsets; declared status equals the lookup for every claim; submitted and superseded never current; two roots byte-identical; the previous ticket's rejection and replay tests pass on the extended fixture."
+}
