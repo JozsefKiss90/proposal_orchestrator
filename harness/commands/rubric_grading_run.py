@@ -36,8 +36,8 @@ retryable errors — plus what E5f adds on top:
 
 Usage (judge config auto-loads from ``.env.harness``; run FROM THE REPO ROOT):
 
-    py -3.10 scripts/rubric_grading_run.py --plan-only   # record the math
-    py -3.10 scripts/rubric_grading_run.py               # grade (resumable)
+    py -3.10 -m harness.commands.rubric_grading_run --plan-only   # record the math
+    py -3.10 -m harness.commands.rubric_grading_run               # grade (resumable)
 
 Advisory artifact; never a runtime gate (``harness/HARNESS.md``).
 """
@@ -48,51 +48,37 @@ import json
 import math
 import os
 import pickle
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
-
-def _find_repo_root() -> Path:
-    here = Path(__file__).resolve()
-    for cand in (here.parent, *here.parents):
-        if (cand / "harness").is_dir() and (cand / "runner").is_dir():
-            return cand
-    return here.parents[1] if len(here.parents) >= 2 else here.parent
-
-
-_REPO_ROOT = _find_repo_root()
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
 # Offline imports only at module scope: the budget plan and the grading loop
 # are unit-tested with a fake judge, and importing this module must not load
-# .env.harness or touch the transport.  The live path (main) imports the
-# freeze-runner module lazily, which does both.
-from runner.atomic_write import atomic_write_json  # noqa: E402
-from runner.working_assumptions import (  # noqa: E402
+# .env.harness or touch the transport.  The live path (main) loads
+# .env.harness explicitly and borrows the paced judge from the freeze runner.
+from runner.atomic_write import atomic_write_json
+from runner.working_assumptions import (
     WorkingAssumptions,
     load_working_assumptions,
 )
-from harness.evidence_pack import (  # noqa: E402
+from harness.evidence_pack import (
     DEFAULT_PACK_TOKEN_BUDGET,
     DEFAULT_SPAN_BUDGET_FRACTION,
     RUBRIC_PROMPT_ALLOWANCE,
 )
-from harness.expectation_coverage import grade_expectation  # noqa: E402
-from harness.expectation_grounding import (  # noqa: E402
+from harness.expectation_coverage import grade_expectation
+from harness.expectation_grounding import (
     claim_content_key,
     derive_expectation_grounding,
 )
-from harness.expectations import section_paths_for  # noqa: E402
-from harness.judge import DEFAULT_JUDGE_MAX_TOKENS, Judge  # noqa: E402
-from harness.regression import (  # noqa: E402
+from harness.expectations import section_paths_for
+from harness.judge import DEFAULT_JUDGE_MAX_TOKENS, Judge
+from harness.regression import (
     DEFAULT_RUBRIC_BASELINE_PATH,
     freeze_rubric_baseline,
 )
-from harness.rubric import (  # noqa: E402
+from harness.rubric import (
     DEFAULT_PROVENANCE_PATH,
     DEFAULT_REPORT_PATH,
     ExpectationCell,
@@ -102,8 +88,8 @@ from harness.rubric import (  # noqa: E402
     load_spine_registry,
     render_report,
 )
-from harness.rubrics import RubricSet, build_pack_for, load_rubric_set  # noqa: E402
-from harness.verdict import MIN_MAJORITY_SAMPLES  # noqa: E402
+from harness.rubrics import RubricSet, build_pack_for, load_rubric_set
+from harness.verdict import MIN_MAJORITY_SAMPLES
 
 #: Where the pre-run budget accounting is written (harness-owned).
 DEFAULT_BUDGET_PATH = Path("harness/rubric_reports/rubric_run_budget.json")
@@ -539,12 +525,14 @@ def main(argv=None) -> int:
     ap.add_argument("--provenance", default=str(DEFAULT_PROVENANCE_PATH))
     args = ap.parse_args(argv)
 
-    # The live-judge bootstrap: importing the freeze runner loads .env.harness
-    # (override=True) before any transport/judge resolution, and provides the
-    # paced/retrying backend wrapper.
-    from scripts.freeze_grounding_baselines import build_paced_judge
+    # The live-judge bootstrap: load .env.harness (override=True) before any
+    # transport/judge resolution, and take the paced/retrying backend wrapper
+    # from the freeze runner.
+    from harness.commands._common import load_harness_env
+    from harness.commands.freeze_grounding_baselines import build_paced_judge
     from harness.judge import resolve_judge_config
 
+    load_harness_env()
     repo_root = Path(args.repo_root).resolve()
     cfg = resolve_judge_config()  # fail-closed if the judge pin is unset
 

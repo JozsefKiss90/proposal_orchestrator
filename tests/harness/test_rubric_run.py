@@ -1,5 +1,5 @@
 """
-E5f — the paced/checkpointed grading runner (``scripts/rubric_grading_run.py``)
+E5f — the paced/checkpointed grading runner (``harness.commands.rubric_grading_run``)
 and the E4 rubric-lane baseline (``harness.regression``).
 
 Everything runs offline with the injectable fake backend: the budget plan is
@@ -19,7 +19,7 @@ import pytest
 
 import harness.regression as reg
 import harness.rubric as hr
-import scripts.rubric_grading_run as run
+import harness.commands.rubric_grading_run as run
 from harness.judge import Judge, JudgeConfig
 from harness.provenance import ProvenanceLog
 from harness.rubrics import Rubric, RubricSet

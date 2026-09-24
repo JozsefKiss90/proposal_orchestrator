@@ -92,3 +92,23 @@ class TestPackageSurface:
     def test_harness_md_exists(self):
         repo = find_repo_root()
         assert (repo / "harness" / "HARNESS.md").is_file()
+
+
+class TestHarnessCommands:
+    """The former ``scripts/`` harness runners live behind harness module commands
+    (``py -3.10 -m harness.commands.<name>``) so the runtime surfaces never
+    depend on the eval layer."""
+
+    from harness.commands import __all__ as COMMANDS
+
+    @pytest.mark.parametrize("name", COMMANDS)
+    def test_command_module_exposes_main(self, name):
+        import importlib
+
+        mod = importlib.import_module(f"harness.commands.{name}")
+        assert callable(getattr(mod, "main", None)), name
+
+    @pytest.mark.parametrize("name", COMMANDS)
+    def test_command_not_left_under_scripts(self, name):
+        repo = find_repo_root()
+        assert not (repo / "scripts" / f"{name}.py").exists(), name

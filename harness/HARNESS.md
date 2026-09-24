@@ -48,7 +48,7 @@ unbiased grader of its own pipeline).
 |---|---|
 | Judge output is `Inferred`, never `Confirmed` | `verdict.py` — `Verdict` / `MajorityVerdict` reject any other `evidence_type`; `provenance.py` and the judge carry it through |
 | Never a runtime gate / advisory-to-human | `report.py` — `HarnessReport(advisory=True, blocking=False)` cannot be constructed otherwise; no method returns a scheduler-consumable gate result |
-| `harness` never becomes a runtime dependency | one-way import: `harness → runner` only; `tests/harness/test_boundary.py` asserts `runner` never imports `harness` |
+| `harness` never becomes a runtime dependency | one-way import: `harness → runner` only; `tests/harness/test_boundary.py` asserts `runner`, `tools/` and `scripts/` never import `harness`. The judge runners (E1.5 calibration, E4 grounding freeze, E5f rubric grading) therefore live in `harness/commands/` and run as `py -3.10 -m harness.commands.<name>` |
 | Deterministic-first routing | `routing.py` — a property named by a deterministic `PREDICATE_REGISTRY` function is refused for judging (`assert_judgeable` raises `DeterministicCoverageError`) |
 | Grader–generator independence | `judge.py` — `JudgeConfig` rejects any drafter/in-run model; the default backend rejects the `claude_cli` transport, forcing the OpenAI-compatible path |
 | Pin + determinism | `judge.py` — model + version pinned, temperature forced to 0; both recorded on every provenance record |

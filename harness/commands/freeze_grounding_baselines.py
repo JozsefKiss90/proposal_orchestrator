@@ -42,16 +42,16 @@ Usage (Groq free tier, run FROM THE REPO ROOT)
     ORCHESTRATOR_TRANSPORT_MODEL=llama-3.3-70b-versatile \
     HARNESS_JUDGE_MODEL=llama-3.3-70b-versatile \
     HARNESS_JUDGE_VERSION=groq-llama-3.3-70b@2026-08-03 \
-    py -3.10 scripts/freeze_grounding_baselines.py
+    py -3.10 -m harness.commands.freeze_grounding_baselines
 
     # MEASURE FIRST (recommended): freeze the smallest section alone, read the
     # measured tokens/call it prints, confirm the full ~406-claim run fits caps:
-    py -3.10 scripts/freeze_grounding_baselines.py --only implementation
+    py -3.10 -m harness.commands.freeze_grounding_baselines --only implementation
 
 Local judge alternative (no limits, no pacing needed — the cost-policy path):
     ORCHESTRATOR_TRANSPORT_PRESET=OLLAMA_LOCAL ORCHESTRATOR_TRANSPORT_MODEL=<id> \
     HARNESS_JUDGE_MODEL=<id> HARNESS_JUDGE_VERSION=<pin> \
-    py -3.10 scripts/freeze_grounding_baselines.py --tpm 1000000 --rpm 100000 --n 3
+    py -3.10 -m harness.commands.freeze_grounding_baselines --tpm 1000000 --rpm 100000 --n 3
 
 All flags have env fallbacks: --n, --tpm, --rpm, --max-retries, --only,
 --repo-root, --sections, --out, --refreeze.
@@ -67,49 +67,7 @@ import time
 from collections import deque
 from pathlib import Path
 
-
-def _find_repo_root() -> Path:
-    """Return the repo root — the nearest ancestor holding both ``harness/`` and
-    ``runner/``.  Falls back to the parent of this script's dir."""
-    here = Path(__file__).resolve()
-    for cand in (here.parent, *here.parents):
-        if (cand / "harness").is_dir() and (cand / "runner").is_dir():
-            return cand
-    return here.parents[1] if len(here.parents) >= 2 else here.parent
-
-
-#: The repo root, put on ``sys.path`` so ``harness`` / ``runner`` import however
-#: the script is launched (``py scripts/...`` otherwise only sees *scripts/*).
-_REPO_ROOT = _find_repo_root()
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-
-def _load_harness_env() -> None:
-    """Load a dedicated ``.env.harness`` (if present), overriding the pipeline's
-    ``.env`` for judge/transport keys only.
-
-    ``HARNESS_COST_POLICY.md`` intends the judge config to live apart from the
-    pipeline's ``.env`` (which points at the Bedrock/Claude drafter transport).
-    ``runner.transport.config`` loads ``.env`` at import with ``override=False``;
-    loading ``.env.harness`` here with ``override=True`` *before* that import
-    makes the harness file win, so ``HARNESS_JUDGE_*`` and the Groq
-    ``ORCHESTRATOR_TRANSPORT_*`` need never be exported by hand.  Absent file or
-    absent python-dotenv: harmless no-op (fall back to real env vars).
-    """
-    try:
-        from dotenv import load_dotenv
-    except Exception:
-        return
-    for name in (".env.harness", ".env.judge"):
-        p = _REPO_ROOT / name
-        if p.is_file():
-            load_dotenv(p, override=True)
-            return
-
-
-_load_harness_env()
-
+from harness.commands._common import load_harness_env
 from harness.judge import Judge, resolve_judge_config
 from harness.provenance import ProvenanceLog
 from harness.regression import (
@@ -281,6 +239,7 @@ def _env_int(name: str, default: int) -> int:
 
 
 def main(argv=None) -> int:
+    load_harness_env()
     ap = argparse.ArgumentParser(
         description="Freeze E4 judge-lane grounding baselines (resilient / rate-limit-safe)."
     )

@@ -24,44 +24,28 @@ on the last pair):
 Run FROM THE REPO ROOT, on a fresh Groq daily quota (~42 calls ≈ 86k of 100k/day;
 if it stops on the daily cap, re-run to resume):
 
-    py -3.10 scripts/faithfulness_calibration.py
+    py -3.10 -m harness.commands.faithfulness_calibration
 
 Judge config comes from `.env.harness` (auto-loaded). Advisory; never a runtime gate.
 """
 from __future__ import annotations
 
-import sys
+import dataclasses
+import datetime
+import json
+import os
+import re
 from pathlib import Path
 
-
-def _find_repo_root() -> Path:
-    here = Path(__file__).resolve()
-    for cand in (here.parent, *here.parents):
-        if (cand / "harness").is_dir() and (cand / "runner").is_dir():
-            return cand
-    return here.parents[1] if len(here.parents) >= 2 else here.parent
-
-
-_ROOT = _find_repo_root()
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
-
-# Importing the freeze runner puts the repo root on sys.path, auto-loads
-# .env.harness (override=True), and gives us the paced/retry backend wrapper.
-from scripts.freeze_grounding_baselines import PacedRetryingBackend  # noqa: E402
-
-import dataclasses  # noqa: E402
-import datetime  # noqa: E402
-import json  # noqa: E402
-import os  # noqa: E402
-import re  # noqa: E402
-
-from runner.transport.config import build_openai_backend, resolve_provider_config  # noqa: E402
-from harness.faithfulness import judge_pair_supported  # noqa: E402
-from harness.gold_set import load_gold_set, gold_set_hash, GoldSet  # noqa: E402
-from harness.judge import resolve_judge_config, Judge, JudgeResponseError  # noqa: E402
-from harness.provenance import ProvenanceLog  # noqa: E402
-from harness.calibration import calibrate, graduation_for  # noqa: E402
+from harness.calibration import calibrate, graduation_for
+from harness.commands._common import REPO_ROOT as _ROOT
+from harness.commands._common import load_harness_env
+from harness.commands.freeze_grounding_baselines import PacedRetryingBackend
+from harness.faithfulness import judge_pair_supported
+from harness.gold_set import GoldSet, gold_set_hash, load_gold_set
+from harness.judge import Judge, JudgeResponseError, resolve_judge_config
+from harness.provenance import ProvenanceLog
+from runner.transport.config import build_openai_backend, resolve_provider_config
 
 GOLD = "harness/gold_sets/faithfulness_gold_excellence.jsonl"
 CKPT = "harness/gold_sets/faithfulness_calibration_checkpoint.json"
@@ -151,6 +135,7 @@ def _run(gs, judge, ckpt_path: Path, prov: ProvenanceLog, retries: int):
 
 
 def main() -> int:
+    load_harness_env()
     gold_path = _ROOT / GOLD
     ckpt_path = _ROOT / CKPT
     cfg = resolve_judge_config()
@@ -202,7 +187,7 @@ def main() -> int:
     draft = {
         "decision_id": f"e1.5_faithfulness_calibration_{stamp}",
         "decision_type": "eval_harness_e1.5_faithfulness_calibration_run",
-        "invoking_agent": "scripts/faithfulness_calibration.py (E1.5)",
+        "invoking_agent": "harness.commands.faithfulness_calibration (E1.5)",
         "phase_context": (
             "Out-of-band QA/CI track (harness/). First judge-reliability calibration of the "
             "status-aware faithfulness judge against a human-labelled gold set: 30 supported "
