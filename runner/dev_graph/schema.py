@@ -216,6 +216,12 @@ ERROR_KINDS: frozenset[str] = frozenset(
         "unknown_predicate",
         "cardinality",
         "malformed_record",
+        # Package requests (runner.dev_graph.packages)
+        "malformed_request",
+        "unknown_view",
+        "stale_snapshot",
+        "stale_policy",
+        "policy_forbidden",
     }
 )
 

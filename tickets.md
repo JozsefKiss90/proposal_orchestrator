@@ -52,13 +52,13 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** Document snapshots and separated claim evidence fields.
 
-- [ ] Mandatory constraints and cross-section dependencies appear in the package regardless of ranking.
-- [ ] A node of a forbidden type reachable only through graph expansion is excluded with reason policy-forbidden.
-- [ ] A required item that exceeds the budget yields completeness status incomplete. Nothing required is silently dropped.
-- [ ] A package requested from a snapshot whose ID does not match the current build is refused.
-- [ ] Unresolved claims and contradictions in the snapshot appear in the manifest's unresolved list.
-- [ ] Two builds with identical inputs produce the same package hash. Byte-equal replay passes through the registry.
-- [ ] Decision log entry for the view policies exists.
+- [x] Mandatory constraints and cross-section dependencies appear in the package regardless of ranking.
+- [x] A node of a forbidden type reachable only through graph expansion is excluded with reason policy-forbidden.
+- [x] A required item that exceeds the budget yields completeness status incomplete. Nothing required is silently dropped.
+- [x] A package requested from a snapshot whose ID does not match the current build is refused.
+- [x] Unresolved claims and contradictions in the snapshot appear in the manifest's unresolved list.
+- [x] Two builds with identical inputs produce the same package hash. Byte-equal replay passes through the registry.
+- [x] Decision log entry for the view policies exists.
 
 ## Approved change recording and the shadow impact planner
 

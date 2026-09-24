@@ -69,6 +69,20 @@
       "canonical_path": "docs/tier4_orchestration_state/dev_graph/documents/",
       "provenance_class": "manually_placed",
       "description": "Immutable document snapshot record written once by import_document; lifecycle state imported, draft, submitted or superseded"
+    },
+    {
+      "schema_id": "orch.dev_graph.package_manifest.v1",
+      "artifact": "<package id hex>/manifest.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/packages/",
+      "provenance_class": "derived",
+      "description": "Evidence package manifest: inclusions with reasons, mandatory dependencies, exclusions with reasons, unresolved items, completeness and package hash, under one view policy and budget"
+    },
+    {
+      "schema_id": "orch.dev_graph.evidence_package.v1",
+      "artifact": "<package id hex>/package.json",
+      "canonical_path": "docs/tier4_orchestration_state/dev_graph/packages/",
+      "provenance_class": "derived",
+      "description": "Immutable evidence package items written beside their manifest by dev_graph_package_manifest_writer"
     }
   ]
 }

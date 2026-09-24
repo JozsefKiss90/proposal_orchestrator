@@ -1,0 +1,44 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-view-policies",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Bounded evidence package builder with view policies'",
+  "authority": "CLAUDE.md §9.4, §10.5 (traceable inputs), §11.5 and §13.8 (a gap is flagged, never filled). Not a constitutional amendment. The policies are data in runner/dev_graph/policies.py; changing one changes the policy version and needs a test.",
+  "decision": "An evidence package is built for one task under one view policy and one budget. The policy is applied before graph expansion. Six views exist, one policy each. The manifest records every inclusion with its reason, every exclusion with its reason, every unresolved item, and a completeness status. Over-budget required evidence yields incomplete, never a silent drop.",
+  "policy_version": "sha256:61b1c31497b998d7a46069636089d368482633b862068be26180a9ad39de807c",
+  "views": {
+    "engineering": "all types, all traversals, depth 3, nothing forbidden.",
+    "controlled_revision": "project, evidence and change types; no validated_by traversal; depth 2; assessment and finding forbidden.",
+    "integrity_audit": "all types, all traversals, depth 3, nothing forbidden.",
+    "blind_pre_evaluation": "project and evidence types; no validated_by or supersedes traversal; depth 3; assessment, finding and change_request forbidden; any node tagged historical_feedback, historical_score, target_score or repair_plan forbidden.",
+    "historical_feedback_analysis": "project, evidence, assessment and finding types; all traversals; depth 2; change_request and revision_contract forbidden.",
+    "change_impact_planning": "all types, all traversals, depth 4, nothing forbidden."
+  },
+  "policy_before_expansion": "Every node is classified once against the view before any traversal. A refused node is never a step, and an edge whose predicate the view does not permit is never followed. A permitted node that is reachable only through a refused node is therefore never reached, and does not appear even as an exclusion. Refused nodes adjacent to an included node are recorded as exclusions with reason policy_forbidden and a detail naming the cause (type_forbidden, tag_forbidden:<tags>, type_not_permitted, traversal_not_permitted:<predicate>).",
+  "tags": "A node's tags are the tags list in its content, declared by the owning record. The graph never adds a tag. The blind policy forbids the four feedback tags together so the harness leakage guard is a second check rather than the only one.",
+  "mandatory": "From the seed task, the nodes reached through assigned_to, consumes, constrained_by and validated_by are required regardless of ranking: the responsible participant, the tasks it consumes (transitively), its constraints and its validators. addresses is followed only towards the addressed node, so every passage that addresses the task or its work package is required (cross-section dependencies) and a passage never pulls in everything else it names. The walk also steps from a task up to its work package (contributes_to, task to work package only) so the work package's constraints are required too; it never descends to sibling tasks or objectives. A required item's recorded path is the mandatory walk, in both the included and the mandatory_dependencies lists.",
+  "budget": {
+    "unit": "a deterministic size estimate, ceil(length of canonical JSON / 4) per item, minimum 1. A heuristic that is uniform and reproducible, which is what a bounded package needs.",
+    "fill": "the seed, then mandatory items, then the rest, each group in (depth, id) order. An item that does not fit is excluded with reason over_budget; a required one is also listed under unresolved as required_over_budget.",
+    "seed": "always in the package. A package that cannot hold its own task still says what it is for; a seed larger than the budget is listed under unresolved as seed_over_budget and makes the package incomplete.",
+    "completeness": "complete only when nothing was excluded over budget and the seed fits. Any over_budget exclusion, required or not, makes the package incomplete. A consumer that needs a full rulebook refuses an incomplete package."
+  },
+  "unresolved": "Listed from the whole snapshot, not only the included items: every claim with declared status Unresolved, and two rule-based contradictions: two current versions of one document, and an approved claim whose declared status is Unresolved. Both rules are lookups over declared fields. Nothing is inferred.",
+  "severity_table": "runner.claim_status.STATUS_SEVERITY and worst_status are the shared §12.2 ordering; the manifest's worst_declared_status uses them and is written in the title-case spelling the claims carry. The compiler's private copy in runner/graph_compiler.py is not imported.",
+  "identity": {
+    "package_hash": "content hash of the included items.",
+    "package_id": "content hash of the request (project, task, view, profile version, snapshot id, policy version, budget) plus the package hash. Two builds with identical inputs share both.",
+    "refusals": "a request whose snapshot id does not match the current build is refused (stale_snapshot); a request under another policy version is refused (stale_policy); an unknown view, an unknown task, or a non-positive budget is refused (unknown_view, malformed_request).",
+    "no_wall_clock": "no field in the manifest or the package carries a time."
+  },
+  "writer": "dev_graph_package_manifest_writer is a registered deterministic component. It reads the operator request at docs/tier4_orchestration_state/dev_graph/package_request.json, builds the snapshot, and writes manifest.json and package.json under docs/tier4_orchestration_state/dev_graph/packages/<first sixteen hex of package id>/. Same request over the same records lands on the same path with the same bytes.",
+  "builder_change": "The snapshot builder now also emits claim -supported_by-> source when a claim's span is verified, and work_package -constrained_by-> source from a work package's constraints list. The span already named its source; without the edge the source node was an island and no package could reach it. Both predicates already permitted the pairs. Every snapshot id over a candidate with a verified span changes as a result; no snapshot had been persisted outside tests.",
+  "not_done_here": [
+    "a package for a view without a seed task (every request names one node id).",
+    "the harness leakage guard and the ESR intake record (ESR ticket).",
+    "assessment, finding and change_request nodes from records: the builder does not produce them yet, so the tests add them to a built snapshot through Snapshot.from_graph.",
+    "binding the writer to a manifest node (§16.5). Like dev_graph_snapshot_writer it is registered but unbound; nothing dispatches it inside a run yet."
+  ],
+  "verification": "tests/runner/test_dev_graph_packages.py: mandatory items survive a budget that excludes ranked items; a forbidden type reachable only by expansion is excluded policy_forbidden and a permitted node behind it is never reached; a tagged source is forbidden for the blind view and visible to the audit view; required over budget yields incomplete and a listed item; stale snapshot and stale policy are refused; unresolved claims and both contradictions appear; identical inputs share hash and id; byte-equal replay through the registry; the lint covers the new modules."
+}

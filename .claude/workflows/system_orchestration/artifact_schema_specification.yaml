@@ -2810,6 +2810,167 @@ operational_artifact_schemas:
           text: {type: string, required: true}
           addresses: {type: array, required: true, item_type: string}
 
+  # ---------------------------------------------------------------------------
+  # 5.5 Dev-graph evidence package manifest
+  # Path: docs/tier4_orchestration_state/dev_graph/packages/<package id hex>/manifest.json
+  # Written by: the dev_graph_package_manifest_writer deterministic component
+  #   (runner/dev_graph/packages.py), on demand from the operator request at
+  #   docs/tier4_orchestration_state/dev_graph/package_request.json. Not bound
+  #   to a manifest node.
+  # Consumed by: the blind pre-evaluation lane and drafting agents (later
+  #   tickets). Never a gate input. Policy (runner/dev_graph/policies.py) is
+  #   applied before graph expansion. No run_id and no wall-clock field.
+  # ---------------------------------------------------------------------------
+  dev_graph_package_manifest:
+    schema_id_value: "orch.dev_graph.package_manifest.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/packages/<package id hex>/manifest.json"
+    provenance_class: derived
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.dev_graph.package_manifest.v1".
+
+      package_id:
+        type: string
+        required: true
+        description: >
+          sha256, prefixed "sha256:", over canonical JSON of the request
+          (project, task, view, profile_version, snapshot_id, policy_version,
+          budget) plus package_hash.
+
+      project: {type: string, required: true}
+      task:
+        type: string
+        required: true
+        description: The seed node id. Always included in the package.
+      view:
+        type: string
+        required: true
+        enum: [engineering, controlled_revision, integrity_audit, blind_pre_evaluation, historical_feedback_analysis, change_impact_planning]
+      profile_version: {type: string, required: true}
+      snapshot_id:
+        type: string
+        required: true
+        description: Must equal the snapshot_id of the current build; a mismatch is refused.
+      policy_version:
+        type: string
+        required: true
+        description: Content hash of the view policies; a mismatch is refused.
+      budget:
+        type: integer
+        required: true
+        description: Positive. Unit is ceil(len(canonical JSON of content) / 4) per item.
+
+      included:
+        type: array
+        required: true
+        description: Selected items in fill order.
+        item_schema:
+          id: {type: string, required: true}
+          type: {type: string, required: true}
+          version: {type: string, required: true}
+          reason: {type: string, required: true, enum: [seed, mandatory, expansion]}
+          path:
+            type: array
+            required: true
+            item_type: string
+            description: Edge labels traversed from the seed. Empty for the seed.
+          depth: {type: integer, required: true}
+          cost: {type: integer, required: true}
+          span:
+            type: object
+            required: false
+            description: "{start, end} on passages and source spans."
+          declared_status:
+            type: string
+            required: false
+            description: On claims only.
+
+      mandatory_dependencies:
+        type: array
+        required: true
+        description: >
+          Nodes reached from the seed through assigned_to, consumes,
+          constrained_by, validated_by or addresses. Required regardless of
+          ranking.
+        item_schema:
+          id: {type: string, required: true}
+          type: {type: string, required: true}
+          version: {type: string, required: true}
+          path: {type: array, required: true, item_type: string}
+
+      exclusions:
+        type: array
+        required: true
+        item_schema:
+          id: {type: string, required: true}
+          type: {type: string, required: true}
+          version: {type: string, required: true}
+          reason: {type: string, required: true, enum: [policy_forbidden, over_budget, not_relevant]}
+          required:
+            type: boolean
+            required: true
+            description: True when a mandatory item was excluded over budget.
+          detail: {type: string, required: true}
+
+      unresolved:
+        type: array
+        required: true
+        description: >
+          Items with kind unresolved_claim, contradiction (rule
+          two_current_versions or approved_but_unresolved),
+          required_over_budget or seed_over_budget. Drawn from the whole
+          snapshot, not only the included items.
+
+      worst_declared_status:
+        type: string
+        required: true
+        description: worst_status over the included claims (runner.claim_status).
+
+      completeness:
+        type: string
+        required: true
+        enum: [complete, incomplete]
+        description: incomplete whenever any item was excluded over budget.
+
+      package_hash:
+        type: string
+        required: true
+        description: Content hash of the items in package.json.
+
+  # ---------------------------------------------------------------------------
+  # 5.6 Dev-graph evidence package
+  # Path: docs/tier4_orchestration_state/dev_graph/packages/<package id hex>/package.json
+  # Written by: the dev_graph_package_manifest_writer deterministic component,
+  #   beside its manifest. Immutable; the items carry the node contents the
+  #   manifest's included list names, in the same order.
+  # ---------------------------------------------------------------------------
+  dev_graph_evidence_package:
+    schema_id_value: "orch.dev_graph.evidence_package.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/packages/<package id hex>/package.json"
+    provenance_class: derived
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.dev_graph.evidence_package.v1".
+      package_id: {type: string, required: true}
+      package_hash:
+        type: string
+        required: true
+        description: sha256 over canonical JSON of items.
+      items:
+        type: array
+        required: true
+        item_schema:
+          id: {type: string, required: true}
+          type: {type: string, required: true}
+          version: {type: string, required: true}
+          content: {type: object, required: true}
+
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS
 # =============================================================================

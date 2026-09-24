@@ -25,6 +25,7 @@ Derived relationships (from record structure, no inference):
 * deliverable membership in a work package  -> ``work_package produces deliverable``
 * ``deliverable.produced_by[]``             -> ``task produces deliverable``
 * ``milestone.deliverables[]``              -> ``deliverable validated_by milestone``
+* ``work_package.constraints[]``            -> ``work_package constrained_by source``
 
 Document snapshots (immutable records under ``dev_graph/documents``, written
 by :func:`runner.dev_graph.documents.import_document`) add:
@@ -36,7 +37,8 @@ by :func:`runner.dev_graph.documents.import_document`) add:
   every id the section names;
 * one ``claim`` per claim with three separate fields (declared status,
   verified span, approval), ``claim expressed_in passage`` and, when a span
-  is verified, one ``source_span`` node plus ``claim supported_by source_span``;
+  is verified, one ``source_span`` node plus ``claim supported_by source_span``
+  and ``claim supported_by source`` (the span names its source);
 * one ``commitment`` per commitment, ``commitment expressed_in passage``.
 
 Sources (``source_materials/sources.json``) become ``source`` nodes.
@@ -57,7 +59,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Iterator, Sequence
 
 from runner.dev_graph.documents import (
     document_node_id,
@@ -99,6 +101,27 @@ class Snapshot:
     inputs: tuple[str, ...]
     """Repo-relative POSIX paths of every record file read, sorted."""
 
+    @classmethod
+    def from_graph(
+        cls,
+        nodes: list[dict[str, Any]],
+        edges: list[dict[str, Any]],
+        inputs: Sequence[str] = (),
+    ) -> "Snapshot":
+        """A snapshot over already-assembled nodes and edges.
+
+        Validates against the closed schema, sorts canonically and derives the
+        id, exactly as :func:`build_snapshot` does after reading records.
+        For callers that extend a built snapshot (tests, later tickets).
+        """
+        sorted_nodes, sorted_edges = canonical_graph(nodes, edges)
+        return cls(
+            snapshot_id=snapshot_id(sorted_nodes, sorted_edges),
+            nodes=tuple(sorted_nodes),
+            edges=tuple(sorted_edges),
+            inputs=tuple(sorted(set(inputs))),
+        )
+
     @property
     def empty(self) -> bool:
         return not self.nodes
@@ -123,6 +146,16 @@ class Snapshot:
 # ---------------------------------------------------------------------------
 # Record reading
 # ---------------------------------------------------------------------------
+
+
+def canonical_graph(
+    nodes: list[dict[str, Any]], edges: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Sort nodes by id, validate, sort edges by (predicate, source, target)."""
+    sorted_nodes = sorted(nodes, key=lambda n: n["id"])
+    validate_graph(sorted_nodes, list(edges))
+    sorted_edges = sorted(edges, key=lambda e: (e["predicate"], e["source"]["id"], e["target"]["id"]))
+    return sorted_nodes, sorted_edges
 
 
 def _malformed(rel: Path, message: str) -> DevGraphError:
@@ -234,7 +267,6 @@ class _Assembler:
         self.edges.append((src, predicate, dst, span))
 
     def finish(self) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        nodes = sorted(self.nodes, key=lambda n: n["id"])
         edges: list[dict[str, Any]] = []
         for s, p, t, span in self.edges:
             e: dict[str, Any] = {
@@ -245,9 +277,7 @@ class _Assembler:
             if span is not None:
                 e["span"] = dict(span)
             edges.append(e)
-        validate_graph(nodes, edges)
-        edges.sort(key=lambda e: (e["predicate"], e["source"]["id"], e["target"]["id"]))
-        return nodes, edges
+        return canonical_graph(self.nodes, edges)
 
 
 def _add_partner(g: _Assembler, p: dict[str, Any]) -> None:
@@ -269,6 +299,8 @@ def _add_work_package(g: _Assembler, wp: dict[str, Any]) -> None:
         g.edge(wp_id, "assigned_to", lead)
     for obj in _ids(wp, "objectives", rel, wp_id):
         g.edge(wp_id, "contributes_to", obj)
+    for src in _ids(wp, "constraints", rel, wp_id):
+        g.edge(wp_id, "constrained_by", src)
 
     for t in _objects(wp, "tasks", rel, wp_id):
         tid = _key(t, "task_id", rel, f"task in {wp_id}")
@@ -373,6 +405,7 @@ def _add_document(
         g.edge(cid, "expressed_in", passage_ids[claim["section_id"]])
         if stored["verified_span"] is not None:
             g.edge(cid, "supported_by", stored["verified_span"]["id"])
+            g.edge(cid, "supported_by", stored["verified_span"]["source"]["id"])
 
     for m in record["commitments"]:
         mid = f"{doc_id}#{m['commitment_id']}"

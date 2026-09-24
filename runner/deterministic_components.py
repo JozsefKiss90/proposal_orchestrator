@@ -207,6 +207,25 @@ def _run_dev_graph_snapshot_writer(run_id: str, repo_root: Path) -> list[Path]:
     return run_snapshot_writer(run_id, repo_root)
 
 
+def _run_dev_graph_package_manifest_writer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the dev-graph evidence-package manifest writer.
+
+    Reads the operator request at
+    ``docs/tier4_orchestration_state/dev_graph/package_request.json``, builds
+    the snapshot, selects the evidence for the named task under the named
+    view policy and budget, and writes ``manifest.json`` and ``package.json``
+    under ``docs/tier4_orchestration_state/dev_graph/packages/<package id>/``.
+    Policy is applied before graph expansion; over-budget required evidence
+    yields an explicit ``incomplete`` status.  No run id and no wall-clock
+    field, so it is closed by byte-equal replay.  Fails closed (raises) on a
+    stale snapshot id, a stale policy version, an unknown view or a malformed
+    request.  Reads no scheduler state and evaluates no gate.
+    """
+    from runner.dev_graph.packages import run_package_manifest_writer
+
+    return run_package_manifest_writer(run_id, repo_root)
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -242,6 +261,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "checkpoint_publisher": _run_checkpoint_publisher,
     "final_export_writer": _run_final_export_writer,
     "dev_graph_snapshot_writer": _run_dev_graph_snapshot_writer,
+    "dev_graph_package_manifest_writer": _run_dev_graph_package_manifest_writer,
 }
 
 
