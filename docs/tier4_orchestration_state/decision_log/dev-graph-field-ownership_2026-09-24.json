@@ -1,0 +1,50 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-field-ownership",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "base_commit": "9baa176 (branch engine-base, 2026-09-23)",
+  "milestone": "Dev Graph milestone 1, ticket 'Dev-graph schema and snapshot builder on a synthetic fixture' (tickets.md and .scratch/dev-graph-milestone-1/PRD.md)",
+  "authority": "CLAUDE.md §9.4 (durable recording of a decision that affects future interpretation), §5 Tier 3 (project facts have one authoritative source), §17.5.3 (deterministic components). Not a constitutional amendment.",
+  "decision": "Every field the dev graph indexes has exactly one writer, and the graph is never that writer. The graph is a rebuildable index over authoritative records. It can be deleted and rebuilt at any time without loss.",
+  "ownership_table": {
+    "project facts (participants, objectives, work packages, tasks, deliverables, milestones)": {
+      "owner": "Tier 3 JSON under docs/tier3_project_instantiation/ (partners.json, objectives.json, workpackage_seed.json, milestones_seed.json)",
+      "graph_role": "index only. Node id comes from the record's declared key and version from the record's content hash."
+    },
+    "typed relationships": {
+      "owner": "derived by the builder from record structure (lead_partner, responsible_partner, contributing_partners, dependencies, objectives, produced_by, task and deliverable membership, milestone deliverables)",
+      "graph_role": "the edge set is the only thing the graph adds. It is recomputed on every build and never stored back into Tier 3. Tier 3 declares no predicate of its own, so it stays the single writer of each fact."
+    },
+    "node identity": {
+      "owner": "the record's declared key field (partner_id, objective_id, wp_id, task_id, deliverable_id, milestone_id)",
+      "graph_role": "id is separate from file path and title. Renaming a file or a title changes the version, never the id."
+    },
+    "node version": {
+      "owner": "computed by the builder as sha256 over canonical JSON of the record",
+      "graph_role": "a node reference is always id plus version"
+    },
+    "snapshot id": {
+      "owner": "computed by the builder as sha256 over canonical JSON of the sorted nodes and edges, recursively, with no wall-clock field",
+      "graph_role": "the identity a package or an assessment names when it says which graph it used"
+    },
+    "generated wording (Tier 5 sections)": {
+      "owner": "Tier 5 section artifacts (unchanged by this ticket)",
+      "graph_role": "not indexed yet. Passage nodes arrive with the document-snapshot ticket."
+    },
+    "run and gate outcomes (Tier 4)": {
+      "owner": "scheduler and gate evaluator (unchanged)",
+      "graph_role": "not indexed yet. Execution nodes arrive with the impact planner ticket."
+    },
+    "instrument constraints (Tier 2A)": {
+      "owner": "docs/tier2a_instrument_schemas/extracted/instrument_registry.json, selected through Tier 3 call_binding/selected_call.json",
+      "graph_role": "not indexed by this ticket. The fixture holds a synthetic entry for the profile and policy tickets."
+    }
+  },
+  "consequences": [
+    "The snapshot writer (deterministic component dev_graph_snapshot_writer) writes only docs/tier4_orchestration_state/dev_graph/snapshot.json. It writes nothing under Tier 3.",
+    "No Tier 3 file is modified by the builder. A build is a pure read.",
+    "The existing whole-Tier-3 reuse fingerprint, the scheduler, the gate evaluator and the gate library are untouched."
+  ],
+  "verification": "tests/runner/test_dev_graph_snapshot.py: identity separate from path and title, edges reference id plus version, byte-equal replay through the component registry, and an explicit empty snapshot for an empty Tier 3."
+}

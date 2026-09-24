@@ -1,0 +1,129 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-type-and-relationship-set",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Dev-graph schema and snapshot builder on a synthetic fixture'",
+  "authority": "CLAUDE.md §9.4. Not a constitutional amendment. The sets are data in runner/dev_graph/schema.py. Changing either is a schema change and needs a test.",
+  "decision": "The dev graph uses a closed node-type set of seventeen types and a closed relationship set of ten predicates. Any other type or predicate is rejected at build time, naming the offending node or edge. related_to is not in the set: an untyped link has no defined traversal meaning.",
+  "node_types": [
+    "participant",
+    "objective",
+    "work_package",
+    "task",
+    "deliverable",
+    "milestone",
+    "claim",
+    "commitment",
+    "passage",
+    "source",
+    "source_span",
+    "artifact_version",
+    "execution",
+    "assessment",
+    "finding",
+    "change_request",
+    "revision_contract"
+  ],
+  "relationships": {
+    "assigned_to": {
+      "endpoints": [
+        "task -> participant",
+        "work_package -> participant"
+      ],
+      "cardinality": "many_to_one",
+      "effect": "domain_link"
+    },
+    "contributes_to": {
+      "endpoints": [
+        "task -> work_package",
+        "work_package -> objective",
+        "participant -> task"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "produces": {
+      "endpoints": [
+        "work_package -> deliverable",
+        "task -> deliverable"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "supported_by": {
+      "endpoints": [
+        "claim -> source_span",
+        "claim -> source"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "expressed_in": {
+      "endpoints": [
+        "claim -> passage",
+        "commitment -> passage"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "consumes": {
+      "endpoints": [
+        "task -> task",
+        "execution -> artifact_version"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "execution_dependency"
+    },
+    "addresses": {
+      "endpoints": [
+        "passage -> objective",
+        "passage -> work_package",
+        "passage -> task",
+        "finding -> passage",
+        "change_request -> task"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "supersedes": {
+      "endpoints": [
+        "artifact_version -> artifact_version"
+      ],
+      "cardinality": "one_to_one",
+      "effect": "domain_link"
+    },
+    "constrained_by": {
+      "endpoints": [
+        "work_package -> source",
+        "change_request -> revision_contract"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "domain_link"
+    },
+    "validated_by": {
+      "endpoints": [
+        "deliverable -> milestone",
+        "artifact_version -> assessment",
+        "claim -> assessment"
+      ],
+      "cardinality": "many_to_many",
+      "effect": "execution_dependency"
+    }
+  },
+  "direction": "Every predicate reads source to target. The direction is declared on the spec and is not inferred from names.",
+  "effect_flag": "A domain link says what a fact means (who does the work, what a package contributes to). An execution dependency says what must exist or hold first (a task consumes its predecessor, a deliverable is validated by its milestone). The impact planner will treat only execution dependencies as invalidation paths. The flag exists so assigned_to is never mistaken for a dependency.",
+  "derived_edges": "The builder derives edges from record structure only: lead_partner, responsible_partner, contributing_partners, dependencies, objectives, task and deliverable membership, produced_by and milestone deliverables. Tier 3 declares no predicate of its own. Every derived edge passes validate_graph, which is public so a caller can check a candidate edge set without a build.",
+  "rejections": {
+    "duplicate_id": "the same declared key twice, within a file or across files. Names the id.",
+    "dangling_edge": "an endpoint id that no node declares. Names the edge.",
+    "endpoint_type": "an endpoint pair the predicate does not permit. Names the edge and the offending type.",
+    "unknown_predicate": "a predicate outside the closed set, including related_to. Names the edge.",
+    "malformed_record": "unreadable JSON, a record without its declared key, or a wrong shape. Names the file.",
+    "cardinality": "a second target where the predicate allows one. Names the edge."
+  },
+  "extension_rule": "Adding a type or a predicate means editing the table in runner/dev_graph/schema.py and the test that pins the sets in tests/runner/test_dev_graph_snapshot.py. The document-snapshot ticket adds passage linkage and the impact planner ticket adds execution nodes. Each adds its own record.",
+  "verification": "tests/runner/test_dev_graph_snapshot.py TestClosedSets and TestRejection.",
+  "cardinality": "Declared per predicate and enforced by the validator for the single-target cardinalities: one_to_one and many_to_one allow at most one target per source and predicate. A second target is rejected with kind cardinality, naming the edge.",
+  "endpoint_scope": "Endpoint pairs are the ones this milestone's tickets name. The builder produces the Tier 3 pairs today. The pairs on claim, passage, artifact_version, assessment, finding, change_request and revision_contract are reserved for the document-snapshot, package, planner and revision tickets, which add builder paths and tests without reopening this record."
+}

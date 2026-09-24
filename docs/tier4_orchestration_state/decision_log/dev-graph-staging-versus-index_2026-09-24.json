@@ -1,0 +1,28 @@
+{
+  "record_type": "decision",
+  "id": "dev-graph-staging-versus-index",
+  "date": "2026-09-24",
+  "branch": "dev_graph",
+  "milestone": "Dev Graph milestone 1, ticket 'Dev-graph schema and snapshot builder on a synthetic fixture'",
+  "authority": "CLAUDE.md §9.4. Not a constitutional amendment. The prior decision on graph staging (milestone 2 open question 4, 'parallel plus explicit promote') stands.",
+  "decision": "The compiler staging path and the new graph index are two different things and stay separate. The staging path is retained unchanged. The index is a new, derived artifact at a new location.",
+  "retained_compiler_path": {
+    "what": "The vault-to-docs compiler (runner/graph_compiler.py), the Tier 4 to vault projector, the vault reader and the promote tool (tools/promote_graph_staging.py).",
+    "writes_to": "docs/tier4_orchestration_state/graph_compile/staging (STAGING_REL in runner/graph_compiler.py). Promotion into canonical Tier 3 or Tier 5 paths is an explicit operator step.",
+    "direction": "authored vault content flows into candidate canonical artifacts. The operator decides what becomes authoritative.",
+    "status": "unchanged by this ticket. Its tests pass unmodified."
+  },
+  "new_index": {
+    "what": "runner/dev_graph: build_snapshot(repo_root) plus the dev_graph_snapshot_writer deterministic component.",
+    "writes_to": "docs/tier4_orchestration_state/dev_graph/snapshot.json (SNAPSHOT_REL in runner/dev_graph/writer.py).",
+    "direction": "authoritative records flow into a derived index. Nothing flows back.",
+    "reads": "Tier 3 partners, objectives, workpackage seed and milestones seed. Whether the builder also ingests vault nodes is a per-binding configuration choice, not a default. No such binding exists yet.",
+    "registered_as": "operational artifact 5.3 in .claude/workflows/system_orchestration/artifact_schema_specification.yaml (schema_id orch.dev_graph.snapshot.v1) and a row in docs/index/schema_registry.json. Not bound to any manifest node yet: nothing dispatches the writer inside a run."
+  },
+  "why_not_one_path": [
+    "The staging path carries candidate content that may become authoritative. The index carries no content of its own and must never become authoritative. Mixing them would give the index a writer role it must not have.",
+    "The staging artifacts float a compiled_at stamp that the determinism check normalises. The index carries no wall-clock field at all, so its id is content-derived without normalisation.",
+    "The existing directory fingerprint helper hashes direct child names only. The index needs a recursive content hash, so it has its own identity module (runner/dev_graph/identity.py) rather than a changed helper."
+  ],
+  "verification": "Existing compiler, projector, vault reader, promote and determinism check tests pass unchanged. tests/runner/test_dev_graph_snapshot.py proves two builds with opposite wall-clock stamps are byte-identical."
+}

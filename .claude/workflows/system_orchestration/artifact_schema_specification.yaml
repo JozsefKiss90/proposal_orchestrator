@@ -2611,6 +2611,101 @@ operational_artifact_schemas:
               entry is not active and artifact_owned_by_run must fail.
 
 
+  # ---------------------------------------------------------------------------
+  # 5.3 Dev-graph snapshot
+  # Path: docs/tier4_orchestration_state/dev_graph/snapshot.json
+  # Written by: the dev_graph_snapshot_writer deterministic component
+  #   (runner/dev_graph/writer.py), on demand. Not bound to a manifest node.
+  # Consumed by: nothing at runtime. A rebuildable index over Tier 3 records
+  #   for the evidence-package, impact-planner and pre-evaluation lanes.
+  #   Never a gate input. Carries no run_id and no wall-clock field, so a
+  #   replay from the same records is byte-equal.
+  # ---------------------------------------------------------------------------
+  dev_graph_snapshot:
+    schema_id_value: "orch.dev_graph.snapshot.v1"
+    canonical_path: "docs/tier4_orchestration_state/dev_graph/snapshot.json"
+    provenance_class: derived
+
+    fields:
+      schema_id:
+        type: string
+        required: true
+        description: Must equal "orch.dev_graph.snapshot.v1".
+
+      snapshot_id:
+        type: string
+        required: true
+        description: >
+          sha256 hex digest, prefixed "sha256:", over canonical JSON (sorted
+          keys, compact, ASCII) of {nodes, edges}, hashed recursively.
+          Excludes inputs and counts.
+
+      empty:
+        type: boolean
+        required: true
+        description: True when Tier 3 declared no record. An explicit result, not an error.
+
+      node_count:
+        type: integer
+        required: true
+
+      edge_count:
+        type: integer
+        required: true
+
+      inputs:
+        type: array
+        required: true
+        item_type: string
+        description: Repo-relative POSIX paths of every record file read, sorted.
+
+      nodes:
+        type: array
+        required: true
+        description: Sorted by id.
+        item_schema:
+          id:
+            type: string
+            required: true
+            description: The record's declared key. Independent of path and title.
+          type:
+            type: string
+            required: true
+            description: One of the closed node types in runner/dev_graph/schema.py.
+          version:
+            type: string
+            required: true
+            description: sha256 hex digest, prefixed "sha256:", over canonical JSON of content.
+          title:
+            type: string
+            required: true
+          path:
+            type: string
+            required: true
+            description: Repo-relative POSIX path of the owning record file.
+          content:
+            type: object
+            required: true
+            description: The record, verbatim.
+
+      edges:
+        type: array
+        required: true
+        description: Sorted by (predicate, source id, target id).
+        item_schema:
+          predicate:
+            type: string
+            required: true
+            description: One of the closed relationship set in runner/dev_graph/schema.py.
+          source:
+            type: object
+            required: true
+            description: "{id, version} node reference."
+          target:
+            type: object
+            required: true
+            description: "{id, version} node reference."
+
 # =============================================================================
 # SECTION 6 — TIER 3 SOURCE ARTIFACT SCHEMAS
 # =============================================================================
@@ -3260,3 +3355,6 @@ schema_id_registry:
   - schema_id: "orch.operational.run_manifest.v1"
     artifact: "<run_id>.json (run_manifests/)"
     section: "5.1"
+  - schema_id: "orch.dev_graph.snapshot.v1"
+    artifact: snapshot.json (dev_graph/)
+    section: "5.3"

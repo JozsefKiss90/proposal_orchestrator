@@ -83,6 +83,7 @@ from typing import Iterable, Optional
 GENERIC_LAYER_GLOBS: tuple[str, ...] = (
     "runner/graph_*.py",  # schema, config, compiler, pack deriver, projector
     "runner/vault_*.py",  # reader, scaffolder
+    "runner/dev_graph/**/*.py",  # dev-graph index: schema, identity, builder, writer
     "templates/obsidian_graph_vault/graph.config.yaml",
     "templates/obsidian_graph_vault/README.md",
     "templates/obsidian_graph_vault/vault/**/*.md",

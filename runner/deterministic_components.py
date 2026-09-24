@@ -191,6 +191,22 @@ def _run_checkpoint_publisher(run_id: str, repo_root: Path) -> list[Path]:
     return [publish_checkpoint(run_id, repo_root)]
 
 
+def _run_dev_graph_snapshot_writer(run_id: str, repo_root: Path) -> list[Path]:
+    """Adapter for the dev-graph snapshot writer (Dev Graph milestone 1).
+
+    Builds the rebuildable graph index over the Tier 3 records (stable ids,
+    content-hash versions, closed typed relationships) and writes
+    ``docs/tier4_orchestration_state/dev_graph/snapshot.json``.  The snapshot
+    carries no run id and no wall-clock field, so it is closed by byte-equal
+    replay.  Fails closed (raises) on a dangling edge, a wrong endpoint type,
+    an unknown predicate, a duplicate id or a malformed record, naming the
+    offender.  Reads no scheduler state and evaluates no gate.
+    """
+    from runner.dev_graph.writer import run_snapshot_writer
+
+    return run_snapshot_writer(run_id, repo_root)
+
+
 #: The authoritative registry of deterministic components, keyed by the
 #: component id used in the manifest ``deterministic_components`` binding.
 #: The section assemblers (one per Phase-8 criterion node) compose the
@@ -225,6 +241,7 @@ COMPONENT_REGISTRY: dict[str, ComponentCallable] = {
     "canonical_pack_deriver": _run_canonical_pack_deriver,
     "checkpoint_publisher": _run_checkpoint_publisher,
     "final_export_writer": _run_final_export_writer,
+    "dev_graph_snapshot_writer": _run_dev_graph_snapshot_writer,
 }
 
 

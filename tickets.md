@@ -26,13 +26,13 @@ The snapshot writer is registered as a deterministic component in the existing r
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Two builds of the fixture with maximally different wall-clock stamps produce byte-identical snapshots and the same snapshot ID.
-- [ ] A dangling edge, a wrong endpoint type, an unknown predicate (including `related_to`) and a duplicate ID each fail closed with an error naming the offending node or edge.
-- [ ] An empty Tier 3 returns an explicit empty snapshot, not an error and not fabricated nodes.
-- [ ] Byte-equal replay test for the snapshot writer passes through the component registry.
-- [ ] The agnosticism lint covers the new package and passes.
-- [ ] The existing graph compiler, projector, vault reader and determinism check tests still pass.
-- [ ] Decision log entries exist for field ownership (one writer per field), the retained compiler staging path versus the new index, and the type and relationship set. The first entry records the engine-base commit SHA.
+- [x] Two builds of the fixture with maximally different wall-clock stamps produce byte-identical snapshots and the same snapshot ID.
+- [x] A dangling edge, a wrong endpoint type, an unknown predicate (including `related_to`) and a duplicate ID each fail closed with an error naming the offending node or edge.
+- [x] An empty Tier 3 returns an explicit empty snapshot, not an error and not fabricated nodes.
+- [x] Byte-equal replay test for the snapshot writer passes through the component registry.
+- [x] The agnosticism lint covers the new package and passes.
+- [x] The existing graph compiler, projector, vault reader and determinism check tests still pass.
+- [x] Decision log entries exist for field ownership (one writer per field), the retained compiler staging path versus the new index, and the type and relationship set. The first entry records the engine-base commit SHA.
 
 ## Document snapshots and separated claim evidence fields
 
