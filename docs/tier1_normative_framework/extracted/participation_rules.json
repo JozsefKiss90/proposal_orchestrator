@@ -1,1 +1,361 @@
-{}
+{
+  "schema_id": "tier1.participation_rules.v1",
+  "artifact_purpose": "Tier 1 participation and eligibility rules for a Horizon Europe Research and Innovation Action, extracted from the 2026-2027 General Annexes. Populated by the 'Tier 1 and Tier 2A coverage check for an RIA' ticket in plans/dev_graph_demo_tickets.md, which found this file empty. The consortium-composition condition is the rule the consortium ticket evaluates its country slots against. Every rule carries the verbatim span it is read from, so no rule here rests on programme knowledge (CLAUDE.md §10.6).",
+  "instrument_scope": "RIA. The consortium-composition condition and the funding-eligibility country limbs are type-of-action-neutral and are recorded as such. The China restriction is type-of-action-specific and is recorded per type of action.",
+  "source_documents": [
+    {
+      "document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "title": "Horizon Europe Work Programme 2026-2027, General Annexes (Part 15)",
+      "tier": "1",
+      "path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "total_pages": 46,
+      "pages_read": [5, 6, 7, 11, 12, 13, 14],
+      "pagination_note": "The printed page number in the running header equals the PDF page index, so 'page 13' is unambiguous.",
+      "notes": "Annex B (Eligibility) supplies every rule in this artifact."
+    }
+  ],
+  "consortium_composition": {
+    "rule": "A consortium is eligible only if it includes, as beneficiaries, three legal entities independent from each other, each established in a different country, of which at least one is established in a Member State and at least two others are established in different Member States or Associated Countries.",
+    "minimum_independent_beneficiaries": 3,
+    "minimum_distinct_countries": 3,
+    "minimum_in_a_member_state": 1,
+    "minimum_others_in_member_or_associated_countries": 2,
+    "overridable_by_call_conditions": true,
+    "overridable_source_span": {
+      "quote": "Unless otherwise provided for in the specific call/topic conditions, only legal entities forming a consortium are eligible to participate in actions",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 13,
+      "source_section": "Annex B - Eligibility, 'Consortium composition'"
+    },
+    "lead_in_source_span": {
+      "quote": "the consortium includes, as beneficiaries, three legal entities independent from each other and each established in a different country as follows:",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 13,
+      "source_section": "Annex B - Eligibility, 'Consortium composition'"
+    },
+    "member_state_limb_source_span": {
+      "quote": "at least one independent legal entity established in a Member State; and",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 14,
+      "source_section": "Annex B - Eligibility, 'Consortium composition'"
+    },
+    "other_countries_limb_source_span": {
+      "quote": "at least two other independent legal entities, each established in different Member States or Associated Countries.",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 14,
+      "source_section": "Annex B - Eligibility, 'Consortium composition'"
+    },
+    "affiliated_entities_count_towards_the_minimum": false,
+    "affiliated_entities_source_span": {
+      "quote": "As affiliated entities do not sign the grant agreement, they do not count towards the minimum eligibility criteria for consortium composition (if any).",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 14,
+      "source_section": "Annex B - Eligibility, 'Consortium composition'"
+    },
+    "deemed_established_in_a_different_member_state": {
+      "entities": [
+        "Joint Research Centre",
+        "international European research organisations",
+        "legal entities created under EU law"
+      ],
+      "effect": "Each is deemed established in a Member State other than those of the other participants, so each adds a country to the count without the project naming that country.",
+      "source_span": {
+        "quote": "The Joint Research Centre, international European research organisations and legal entities created under EU law are deemed to be established in a Member State other than those in which the other legal entities participating in the action are established.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Consortium composition'"
+      }
+    },
+    "span_note": "The condition straddles a page break. Its lead-in sits at the foot of page 13 and its two limbs open page 14, so the rule cannot be cited to a single page.",
+    "ticket_page_reference_correction": "The ticket cites the condition at pages 12-13. It is on pages 13-14. Page 12 carries the Member State and Associated Country lists, not the composition condition."
+  },
+  "entities_eligible_to_participate": {
+    "general_rule": "Any legal entity is eligible to participate regardless of place of establishment, provided the Horizon Europe Regulation conditions and any call or topic conditions are met. Eligibility to participate is separate from eligibility for funding.",
+    "general_rule_source_span": {
+      "quote": "Any legal entity, regardless of its place of establishment, including legal entities from",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 5,
+      "source_section": "Annex B - Eligibility, 'Entities eligible to participate'",
+      "quote_stops_here_because": "The sentence continues 'non-associated third countries or international organisations', and the source line-breaks the word as 'non-' plus 'associated'. The quote stops before the break rather than transcribing the hyphenation as though the source read 'non- associated'."
+    },
+    "participation_is_not_funding_source_span": {
+      "quote": "is eligible to participate (whether it is eligible for funding or not)",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 5,
+      "source_section": "Annex B - Eligibility, 'Entities eligible to participate'"
+    },
+    "affiliated_entities": {
+      "allowed": true,
+      "condition": "Allowed if eligible for participation and funding. They do not sign the grant agreement and do not become beneficiaries.",
+      "source_span": {
+        "quote": "which do not sign the grant agreement and therefore do not become beneficiaries themselves) are allowed, if they are eligible for participation and funding.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 5,
+        "source_section": "Annex B - Eligibility, 'Specific cases: Affiliated entities'"
+      }
+    },
+    "associated_partners": {
+      "allowed": true,
+      "condition": "Participate without signing the grant agreement and without the right to charge costs or claim contributions, subject to call or topic conditions.",
+      "source_span": {
+        "quote": "Associated partners (i.e. entities which participate in the action without signing the grant agreement, and without the right to charge costs or claim contributions) are allowed, subject to any specific call/topic conditions.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 5,
+        "source_section": "Annex B - Eligibility, 'Specific cases: Associated partners'"
+      }
+    },
+    "joint_research_centre": {
+      "requires_call_provision": true,
+      "does_not_join_the_proposal": true,
+      "post_evaluation_routes": [
+        "accede to the grant agreement as a beneficiary requesting zero funding",
+        "participate as an associated partner"
+      ],
+      "source_span": {
+        "quote": "Where provided for in the specific call/topic conditions, applicants may include in their proposals the possible contribution of the JRC, but the JRC will not participate in the preparation and submission of the proposal.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 6,
+        "source_section": "Annex B - Eligibility, 'Specific cases: Joint Research Centre'"
+      },
+      "accession_source_span": {
+        "quote": "the JRC may accede to the grant agreement as beneficiary requesting zero funding or participate as an associated partner, and would accede to the consortium as a member.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 6,
+        "source_section": "Annex B - Eligibility, 'Specific cases: Joint Research Centre'"
+      }
+    }
+  },
+  "entities_eligible_for_funding": {
+    "rule": "To become a beneficiary a legal entity must be eligible for funding, which requires establishment in one of four listed country limbs, or a call or topic provision, or a granting-authority finding that its participation is essential.",
+    "rule_source_span": {
+      "quote": "To be eligible for funding, applicants must be established in one of the following countries:",
+      "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "source_page": 11,
+      "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+    },
+    "member_states": {
+      "count": 27,
+      "countries": [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece",
+        "Hungary", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
+        "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Slovakia",
+        "Slovenia", "Spain", "Sweden"
+      ],
+      "source_span": {
+        "quote": "Austria, Belgium, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 12,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      }
+    },
+    "overseas_countries_and_territories": {
+      "count": 13,
+      "countries": [
+        "Aruba (NL)", "Bonaire (NL)", "Curação (NL)", "French Polynesia (FR)",
+        "French Southern and Antarctic Territories (FR)", "Greenland (DK)",
+        "New Caledonia (FR)", "Saba (NL)", "Saint Barthélemy (FR)",
+        "Sint Eustatius (NL)", "Sint Maarten (NL)",
+        "St. Pierre and Miquelon (FR)", "Wallis and Futuna Islands (FR)"
+      ],
+      "spelling_note": "Curação is transcribed as the General Annexes spell it on page 12, not as the territory's own spelling Curaçao. A Tier 1 source is quoted, not corrected (CLAUDE.md §13.11).",
+      "source_span": {
+        "quote": "the Overseas Countries and Territories (OCTs) linked to the Member States",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 12,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      }
+    },
+    "associated_countries": {
+      "count": 22,
+      "countries": [
+        "Albania", "Arab Republic of Egypt", "Armenia",
+        "Bosnia and Herzegovina", "Canada", "Faroe Islands", "Georgia",
+        "Iceland", "Israel", "Kosovo", "Moldova", "Montenegro", "New Zealand",
+        "North Macedonia", "Norway", "Republic of Korea", "Serbia",
+        "Switzerland", "Tunisia", "Türkiye", "Ukraine", "United Kingdom"
+      ],
+      "stability_note": "The list is correct at the time of adoption of the work programme. Other third countries may become associated during the programme, and an applicant in a country negotiating association is treated as established in an Associated Country if the association agreement applies at grant signature.",
+      "source_span": {
+        "quote": "Albania, Arab Republic of Egypt, Armenia, Bosnia and Herzegovina, Canada, Faroe Islands, Georgia, Iceland, Israel, Kosovo",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 12,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      },
+      "stability_source_span": {
+        "quote": "Other third countries may become associated to Horizon Europe during the programme.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 12,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      }
+    },
+    "low_and_middle_income_countries": {
+      "enumerated": false,
+      "reason": "The limb runs from page 12 to page 13 and lists over one hundred countries. It is recorded as a limb with its span rather than enumerated, because no artifact on this branch resolves a country against it: the consortium ticket places every partner in a Member State or an Associated Country slot. A part-enumeration would answer 'not eligible' for a country that is in fact listed, which is worse than declining to answer.",
+      "pages": [12, 13],
+      "source_span": {
+        "quote": "the following low- and middle-income countries",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 12,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      }
+    },
+    "other_countries": {
+      "rule": "An entity established in a country outside the four limbs is eligible for funding only if the call or topic conditions provide for it, or if the granting authority considers its participation essential for implementing the action.",
+      "source_span": {
+        "quote": "Legal entities which are established in countries not listed above will be eligible for funding if provided for in the specific call/topic conditions, or if their participation is considered essential for implementing the action by the granting authority.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 13,
+        "source_section": "Annex B - Eligibility, 'Entities eligible for funding'"
+      }
+    },
+    "affiliated_entities": {
+      "rule": "Affiliated entities are eligible for funding on the same country basis as beneficiaries, or on a basis the call or topic identifies.",
+      "source_span": {
+        "quote": "Affiliated entities are eligible for funding if they are established in one of the countries listed above, or in a country identified in the specific call/topic conditions.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 13,
+        "source_section": "Annex B - Eligibility, 'Specific cases: Affiliated entities'"
+      }
+    },
+    "international_european_research_organisations": {
+      "eligible_for_funding": true,
+      "source_span": {
+        "quote": "International European research organisations are eligible to receive funding.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 13,
+        "source_section": "Annex B - Eligibility, 'Specific cases: International organisations'"
+      }
+    }
+  },
+  "country_restrictions": {
+    "china": {
+      "basis": "Article 22(6) of the Horizon Europe Regulation, applied by the General Annexes to innovation-related activities.",
+      "heading_source_span": {
+        "quote": "Restrictions on the participation of legal entities established in China",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 6,
+        "source_section": "Annex B - Eligibility, 'Specific cases'"
+      },
+      "innovation_actions": {
+        "default": "not_eligible",
+        "exempt_destinations": [],
+        "source_span": {
+          "quote": "(1) Innovation Actions: Legal entities established in China are not eligible to participate in any Horizon Europe Innovation Action;",
+          "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "source_page": 7,
+          "source_section": "Annex B - Eligibility, 'Restrictions on the participation of legal entities established in China'"
+        }
+      },
+      "research_and_innovation_actions": {
+        "default": "not_eligible",
+        "exemption_rule": "Entities established in China are eligible to participate in an RIA when the RIA falls within one of the work programme part destinations the General Annexes list.",
+        "exempt_destinations": [
+          "Innovative Research on Democracy and Governance",
+          "Innovative research on European cultural heritage and cultural and creative industries",
+          "Innovative research on social and economic transformations",
+          "Climate sciences and responses for the transformation towards climate neutrality",
+          "Biodiversity and ecosystem services",
+          "Fair, healthy and environment-friendly food systems from primary production to consumption",
+          "Clean environment and zero pollution",
+          "Land, ocean and water for climate action",
+          "Resilient, inclusive, healthy and green rural, coastal and urban",
+          "Innovative governance, environmental observations and digital solutions in support of the Green Deal"
+        ],
+        "exempt_destinations_note": "The ten destinations recorded are those under Cluster 2, Cluster 5 and Cluster 6. The General Annexes list continues with Missions, Widening participation and the New European Bauhaus Facility. Those are scoped out here because no cluster destination of this project sits in them, and the artifact says so rather than presenting the ten as the whole list.",
+        "source_span": {
+          "quote": "(2) Research and Innovation Actions: Unless otherwise stated, legal entities established in China are not eligible to participate in any Horizon Europe Research and Innovation Action (RIA).",
+          "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "source_page": 7,
+          "source_section": "Annex B - Eligibility, 'Restrictions on the participation of legal entities established in China'"
+        },
+        "exemption_source_span": {
+          "quote": "legal entities established in China are to be considered eligible to participate in Research and Innovation Actions within the following work programme part destinations:",
+          "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "source_page": 7,
+          "source_section": "Annex B - Eligibility, 'Restrictions on the participation of legal entities established in China'"
+        },
+        "cluster_6_destination_source_span": {
+          "quote": "Cluster 6 - Food, Bioeconomy, Natural Resources, Agriculture and Environment o Destination - Biodiversity and ecosystem services",
+          "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+          "source_page": 7,
+          "source_section": "Annex B - Eligibility, 'Restrictions on the participation of legal entities established in China'"
+        }
+      }
+    },
+    "russia_belarus_and_occupied_ukraine": {
+      "eligible_in_any_capacity": false,
+      "capacities_covered": [
+        "beneficiaries",
+        "affiliated entities",
+        "associated partners",
+        "third parties giving in-kind contributions",
+        "subcontractors",
+        "recipients of financial support to third parties"
+      ],
+      "exception": "Exceptions may be granted on a case-by-case basis for justified reasons.",
+      "ownership_extension": "An entity established outside Russia whose proprietary rights are owned, directly or indirectly, for more than 50% by a person, entity or body established in Russia is also not eligible in any capacity.",
+      "source_span": {
+        "quote": "such legal entities are not eligible to participate in any capacity. This includes participation as beneficiaries, affiliated entities, associated partners, third parties giving in-kind contributions, subcontractors or recipients of financial support to third parties (if any). Exceptions may be granted on a case-by-case basis for justified reasons.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 11,
+        "source_section": "Annex B - Eligibility, 'Legal entities established in Russia, Belarus, or in non-government controlled territories of Ukraine'"
+      },
+      "ownership_source_span": {
+        "quote": "legal entities established outside Russia whose proprietary rights are directly or indirectly owned for more than 50% by a legal person, entity or body established in Russia are also not eligible to participate in any capacity.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 11,
+        "source_section": "Annex B - Eligibility, 'Legal entities established in Russia, Belarus, or in non-government controlled territories of Ukraine'"
+      }
+    },
+    "hungarian_public_interest_trusts": {
+      "eligible_in_a_funded_role": false,
+      "may_participate_as_associated_partner": true,
+      "scope": "Hungarian public interest trusts established under the Hungarian Act IX of 2021, and any entity they maintain.",
+      "consequence_for_a_consortium": "In a multi-beneficiary call, applicants are invited to remove or replace an affected entity in any funded role, or to change its status to associated partner, with tasks and budget redistributed.",
+      "source_span": {
+        "quote": "no legal commitments can be entered into with Hungarian public interest trusts established under the Hungarian Act IX of 2021 or any entity they maintain.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 11,
+        "source_section": "Annex B - Eligibility, 'Measures for the protection of the Union budget against breaches of the principles of the rule of law in Hungary'"
+      }
+    }
+  },
+  "eligible_activities": {
+    "topic_correspondence": {
+      "rule": "An application is eligible only if its content corresponds, wholly or in part, to the topic description it is submitted against.",
+      "source_span": {
+        "quote": "Applications will only be considered eligible if their content corresponds, wholly or in part, to the topic description for which it is submitted.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Eligible activities'"
+      }
+    },
+    "civil_applications_only": {
+      "rule": "Projects must focus exclusively on civil applications.",
+      "source_span": {
+        "quote": "Projects must focus exclusively on civil applications",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 14,
+        "source_section": "Annex B - Eligibility, 'Eligible activities'"
+      }
+    }
+  },
+  "usage_rules": [
+    "The consortium-composition condition is the Tier 1 rule the consortium ticket evaluates its country slots against. It counts beneficiaries, not partners: an affiliated entity adds no country.",
+    "Eligibility to participate and eligibility for funding are separate tests. A partner may be eligible to participate and ineligible for funding, and a consortium that meets composition on participation alone does not meet it on beneficiary status.",
+    "The China restriction must be resolved against the destination of the specific topic, not against the type of action alone. This project's destination is on the exempt list, so the restriction does not bind it.",
+    "Where a call or topic condition is stricter than a rule here, the call condition governs for that call. Tier 2B carries the topic's own eligibility conditions.",
+    "A country list here is correct at the time the work programme was adopted. It is not a live register, and the General Annexes say so."
+  ],
+  "field_status": {
+    "consortium_composition": "Confirmed",
+    "entities_eligible_to_participate": "Confirmed",
+    "entities_eligible_for_funding": "Confirmed",
+    "country_restrictions": "Confirmed",
+    "eligible_activities": "Confirmed"
+  },
+  "field_status_note": "Every block is Confirmed because every rule in it is a verbatim span of a named page of a stored Tier 1 source (CLAUDE.md §12.2). The one non-enumerated limb, low_and_middle_income_countries, is Confirmed as a limb and declares that it is not enumerated. It is not Confirmed as a country list.",
+  "authored_by": "Ticket 'Tier 1 and Tier 2A coverage check for an RIA', plans/dev_graph_demo_tickets.md, branch dev_graph_demo, 2026-09-29.",
+  "note": "Read, not inferred. No rule in this file comes from programme knowledge. The verification that every span is verbatim on the page it names is tests/test_tier1_tier2a_ria_coverage.py."
+}

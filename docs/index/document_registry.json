@@ -1,6 +1,6 @@
 {
-  "registry_scope": "Partially populated. The Tier 2B intake ticket (plans/dev_graph_demo_tickets.md, branch dev_graph_demo) registers the three sources for topic HORIZON-CL6-2027-01-BIODIV-01, which is what that ticket adds and cites. Tier 1, Tier 2A and the remaining Tier 2B work programmes are unregistered and are the scope of their own tickets. CLAUDE.md §9.6 requires the registry to reflect repository state; this entry records how far it does, so a reader is not misled into treating an absent path as an absent document.",
-  "entry_schema": "Required on every entry: document_id, path (repo-relative POSIX), tier, media_type, bytes, sha256, digest_basis, title, role, retrieved_on, registered_by. Optional: retrieved_from (absent when the document predates this branch and its retrieval is unrecorded), pages (paginated documents only). bytes and sha256 are measured on the digest_basis, not on the raw file: raw_bytes for a binary document, lf_normalised_bytes for a text one. Text documents are normalised because core.autocrlf is true in this repository, so a text file checks out CRLF on Windows and LF elsewhere, and a raw digest would identify the platform rather than the content.",
+  "registry_scope": "Partially populated. The Tier 2B intake ticket (plans/dev_graph_demo_tickets.md, branch dev_graph_demo) registered the three sources for topic HORIZON-CL6-2027-01-BIODIV-01. The Tier 1 and Tier 2A RIA coverage-check ticket adds the three call-neutral sources it cites: the 2026-2027 General Annexes and the RIA/IA application and evaluation forms. Still unregistered: the remaining Tier 1 legislation, programme guidance and grant-architecture documents, the non-RIA Tier 2A forms, and the other Tier 2B work programmes. Each is the scope of its own ticket. CLAUDE.md §9.6 requires the registry to reflect repository state; this entry records how far it does, so a reader is not misled into treating an absent path as an absent document.",
+  "entry_schema": "Required on every entry: document_id, path (repo-relative POSIX), tier, media_type, bytes, sha256, digest_basis, title, role, retrieved_on, registered_by. Optional: retrieved_from (absent when the document predates this branch and its retrieval is unrecorded), retrieval_note (why retrieved_from is absent and what basis retrieved_on rests on, required whenever retrieved_from is absent), pages (paginated documents only). bytes and sha256 are measured on the digest_basis, not on the raw file: raw_bytes for a binary document, lf_normalised_bytes for a text one. Text documents are normalised because core.autocrlf is true in this repository, so a text file checks out CRLF on Windows and LF elsewhere, and a raw digest would identify the platform rather than the content.",
   "document_registry": [
     {
       "document_id": "tier2b.wp9.horizon-2026-2027",
@@ -41,8 +41,54 @@
       "title": "Cluster 6 grouped work programme JSON",
       "role": "Input to runner/call_slicer.py, which slices the topic entry into call_extracts/HORIZON-CL6-2027-01-BIODIV-01.slice.json. Registered as a derived aggregation, not as a prevailing source: six of the topic's condition fields are empty, including legal_and_financial_setup and eligibility_conditions, so the grant type and the Copernicus condition cannot be read from it. See finding I2 of validation_reports/tier2b-biodiv-intake_2026-09-29.json.",
       "retrieved_on": "unknown, present in the repository before this branch",
+      "retrieval_note": "retrieved_from is absent: this file is a derived aggregation held in the repository, not a document downloaded from a publisher, so it has no retrieval URL. Its retrieved_on is recorded as unknown rather than guessed, because the commit that introduced it predates this branch and the Tier 2B intake ticket did not establish a date for it.",
       "registered_by": "Tier 2B intake ticket",
       "digest_basis": "lf_normalised_bytes"
+    },
+    {
+      "document_id": "tier1.general-annexes.horizon-2026-2027",
+      "path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "tier": "1",
+      "media_type": "application/pdf",
+      "bytes": 557134,
+      "sha256": "ea3180318de7041569dc0dd5adf4ff5db0540f5bc99f0fac4942f3d05026f9d8",
+      "title": "Horizon Europe Work Programme 2026-2027, General Annexes (Part 15)",
+      "role": "Prevailing source for every rule in docs/tier1_normative_framework/extracted/participation_rules.json. Annex B (Eligibility) occupies pages 5 to 14: the consortium-composition condition straddles pages 13 and 14, the China restriction pages 6 and 7, and the funding-eligibility country limbs pages 11 to 13. Annex D (Award criteria) is on pages 24 to 27 and supplies the RIA award criteria, the 0-5 scale, the individual threshold of 3 and the overall threshold of 10.",
+      "retrieved_on": "2026-03-31",
+      "retrieval_note": "retrieved_from is absent: the document predates this branch and its download URL is unrecorded. retrieved_on is the date the document entered the repository, commit 237d229, which is the earliest verifiable date for it.",
+      "pages": 46,
+      "registered_by": "Tier 1 and Tier 2A RIA coverage-check ticket",
+      "digest_basis": "raw_bytes"
+    },
+    {
+      "document_id": "tier2a.af.he-ria-ia",
+      "path": "docs/tier2a_instrument_schemas/application_forms/ria_ia/af_he-ria-ia_en.pdf",
+      "tier": "2A",
+      "media_type": "application/pdf",
+      "bytes": 5757439,
+      "sha256": "3ca0d61a2fbc620e105be6ad3c0e8ede810fdf74aa8b1bbb2984a803360fa8c4",
+      "title": "EU Grants: Application form (HE RIA and IA), Part A v3.0 and Part B v5.1",
+      "role": "Structural authority for the RIA entry of docs/tier2a_instrument_schemas/extracted/section_schema_registry.json. The Part B page limit is on PDF page 30, printed 'Part B - Page 3 of 23', which states 40 pages and 45 pages for topics using lump sum funding.",
+      "retrieved_on": "2026-03-31",
+      "retrieval_note": "retrieved_from is absent: the document predates this branch and its download URL is unrecorded. retrieved_on is the date the document entered the repository, commit 237d229, which is the earliest verifiable date for it.",
+      "pages": 54,
+      "registered_by": "Tier 1 and Tier 2A RIA coverage-check ticket",
+      "digest_basis": "raw_bytes"
+    },
+    {
+      "document_id": "tier2a.ef.he-ria-ia",
+      "path": "docs/tier2a_instrument_schemas/evaluation_forms/ria_ia/ef_he-ria-ia_en.pdf",
+      "tier": "2A",
+      "media_type": "application/pdf",
+      "bytes": 213727,
+      "sha256": "6c54b877884af10d306bf71a1e604a2f137da81c481ab8433268c4f39b61efda",
+      "title": "EU Grants: Evaluation form (HE RIA and IA) V4.0, 12.11.2025",
+      "role": "Prevailing source for the RIA entry of docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json. The scoring notice and thresholds are on page 2; the three award criteria and their aspects are on pages 4 and 5. Registering it also resolves the RIA evaluation_form_ref, which was Assumed from a filename convention.",
+      "retrieved_on": "2026-03-31",
+      "retrieval_note": "retrieved_from is absent: the document predates this branch and its download URL is unrecorded. retrieved_on is the date the document entered the repository, commit 237d229, which is the earliest verifiable date for it.",
+      "pages": 9,
+      "registered_by": "Tier 1 and Tier 2A RIA coverage-check ticket",
+      "digest_basis": "raw_bytes"
     }
   ]
 }

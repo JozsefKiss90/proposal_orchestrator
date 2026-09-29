@@ -70,14 +70,24 @@ def _load(registry_path: Path | None = None, scorecard_path: Path | None = None)
     )
 
 
-def _pf_criteria(registry: dict) -> list[dict]:
-    """The mutable criterion dicts of the profile's instrument, in registry order."""
+def _pf_instrument(registry: dict) -> dict:
+    """The mutable entry of the profile's instrument, found by identity.
+
+    Never by position. The registry holds one entry per instrument type and
+    gains entries as instruments are added, so an index would silently start
+    pointing at a different instrument.
+    """
     (instrument,) = [
         i
         for i in registry["instruments"]
         if i["instrument_type"] == PROFILE.instrument.registry_instrument_type
     ]
-    return instrument["criteria"]
+    return instrument
+
+
+def _pf_criteria(registry: dict) -> list[dict]:
+    """The mutable criterion dicts of the profile's instrument, in registry order."""
+    return _pf_instrument(registry)["criteria"]
 
 
 #: The scorecard tag of the first Excellence aspect (exc-obj), as an inline
@@ -279,10 +289,29 @@ class TestFailClosedDrift:
 
     def test_missing_instrument_raises(self, tmp_path):
         registry = _real_registry()
-        registry["instruments"][0]["instrument_type"] = "MSCA-DN"
+        _pf_instrument(registry)["instrument_type"] = "MSCA-DN"
         path = _write(tmp_path, "registry.json", registry)
         with pytest.raises(exp.ExpectationError, match="MSCA-PF"):
             _load(registry_path=path)
+
+    def test_the_registry_holds_more_than_the_profiles_instrument(self) -> None:
+        """Why the test above must find its entry by identity, not by index.
+
+        The registry gained an RIA entry ahead of MSCA-PF when the Tier 1 and
+        Tier 2A RIA coverage-check ticket filled it. Renaming instruments[0]
+        then renamed RIA, left MSCA-PF in place, and the fail-closed check above
+        passed a registry that was not missing its instrument at all.
+        """
+        registry = _real_registry()
+        types = [i["instrument_type"] for i in registry["instruments"]]
+        assert len(types) == len(set(types)), "duplicate instrument_type: " + str(types)
+        assert PROFILE.instrument.registry_instrument_type in types
+        assert len(types) > 1, (
+            "the registry holds one instrument again, so an index-based mutation "
+            "would once more be indistinguishable from an identity-based one. "
+            "Keep the lookup by identity regardless: this file's fail-closed "
+            "checks are only meaningful while they mutate the entry they name."
+        )
 
     def test_missing_registry_file_raises(self, tmp_path):
         with pytest.raises(exp.ExpectationError):

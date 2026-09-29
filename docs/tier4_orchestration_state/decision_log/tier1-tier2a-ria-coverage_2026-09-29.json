@@ -1,0 +1,92 @@
+{
+  "record_type": "decision",
+  "id": "tier1-tier2a-ria-coverage",
+  "date": "2026-09-29",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Tier 1 and Tier 2A coverage check for an RIA' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §9.4 (a decision affecting future interpretation is written to Tier 4, not held in agent memory), §10.6 (programme knowledge is not substituted for source documents), §12.2 (the four status categories) and §16.3 (no agent introduces an artifact schema the specification does not define). Not a constitutional amendment; §14.5 is not engaged.",
+  "instrument_type": "RIA",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "report": "docs/tier4_orchestration_state/validation_reports/tier1-tier2a-ria-coverage_2026-09-29.json",
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "Tier 1 extracted/participation_rules.json was empty. What goes in it, and on what authority?",
+      "decision": "Populated from the 2026-2027 General Annexes, Annex B, pages 5 to 14. Every rule carries the verbatim span of the page it is read from. The consortium-composition condition is recorded twice: as prose and as four integers, so the consortium ticket reads numbers rather than re-parsing a sentence.",
+      "reasoning": "The consortium ticket depends on the composition condition and cannot proceed on a remembered version of it. §10.6 makes programme knowledge a fallback of last resort, and the source is present, so it governs.",
+      "status": "Confirmed",
+      "affects": [
+        "Anonymised consortium with fictional gap partners",
+        "Project concept for operator approval"
+      ]
+    },
+    {
+      "id": "D2",
+      "question": "evaluator_expectation_registry.json had no RIA entry. Should the entry also carry the scoring scale, the overall threshold and the weighting rule?",
+      "decision": "No. The RIA entry uses only the four fields the artifact schema declares: criterion_id, criterion_name, threshold_score and evaluator_expectations. The scale, the overall threshold of 10 of 15 and the no-weighting rule are recorded in the validation report's element_status with their source spans instead.",
+      "reasoning": "Extending the registry with new fields would introduce a schema artifact_schema_specification.yaml does not declare, which §16.3 forbids. Putting RIA weights under section_schema_registry's criteria_weights would be worse: MSCA-PF's values there are shares of a weighted total summing to 1, and an RIA's are ranking multipliers, so one key would carry two incompatible scales. The facts still need a durable home, and a Tier 4 report with verified spans is one (§9.4).",
+      "status": "Confirmed as a decision; the underlying facts are Confirmed; the registry-shape question is Unresolved",
+      "affects": [
+        "RIA pre-evaluation profile in the harness"
+      ],
+      "scope": "This refusal is about evaluator_expectation_registry, whose one pre-existing entry uses exactly the declared fields. section_schema_registry already carries a dozen undeclared fields, so replacing its assumption note with a verified note follows its own convention. See finding F11."
+    },
+    {
+      "id": "D3",
+      "question": "template_adapter_map.json is an empty object. Fill it or leave it?",
+      "decision": "Left empty. Recorded as Unresolved in the validation report, finding F1, with a recommended owner.",
+      "reasoning": "Nothing in the repository defines its schema or reads it. artifact_schema_specification.yaml declares no schema for it, no gate predicate names it, and no module or specification reads it. Any shape written here would be invented structure (§16.3) that the first real consumer would have to break. §15 prefers a declared gap to a fabricated completion.",
+      "consequence_for_the_ticket": "The acceptance criterion 'any missing RIA entry is filled from the Tier 2A PDF with page references' is met for the registries that have a schema and is not met for this one. The criterion is left unticked. An earlier draft ticked it and relied on this decision as the qualification, which put the ticket and the decision log in direct contradiction.",
+      "status": "Unresolved",
+      "affects": [
+        "Demo report, as a candidate Milestone 2 ticket"
+      ]
+    },
+    {
+      "id": "D4",
+      "question": "The RIA evaluation_form_ref was Assumed from the af_ to ef_ filename convention, with a note requiring verification. Promote it?",
+      "decision": "Promoted to Confirmed for RIA only. evaluation_form_ref_assumption_note is replaced by evaluation_form_ref_note recording what was read, and evaluation_form_version is added. The MSCA-PF entry's equivalent assumption is left as it stands.",
+      "reasoning": "The stored form's page 3 heading reads 'EVALUATION FORM (RIA IA)', so the assumption is verified for RIA. Promoting MSCA-PF's assumption without reading its form would repeat the error this decision corrects, and this ticket is scoped to RIA.",
+      "status": "Confirmed",
+      "affects": [
+        "RIA pre-evaluation profile in the harness"
+      ]
+    },
+    {
+      "id": "D5",
+      "question": "General Annexes page 7 restricts entities established in China from participating in an RIA. Does it bind this project?",
+      "decision": "No. The restriction is recorded per type of action with the list of destinations it exempts, and the usage rules of participation_rules.json state that it must be resolved against the topic's destination rather than its type of action.",
+      "reasoning": "Page 7 clause (2) restricts RIAs by default and then lists the work programme part destinations where entities established in China are eligible. The list includes Cluster 6's 'Destination - Biodiversity and ecosystem services', and the Tier 2B call extract records this topic's destination as exactly that string. Applying the restriction from the type of action alone would exclude a partner on a rule that does not apply.",
+      "status": "Confirmed",
+      "affects": [
+        "Anonymised consortium with fictional gap partners"
+      ]
+    },
+    {
+      "id": "D6",
+      "question": "The ticket's page references do not match the source. Follow the ticket or the document?",
+      "decision": "The document. The artifacts cite pages 13 and 14 for the composition condition, 6 and 7 for the China restriction, and 11 to 13 for the funding-eligibility country limbs. The discrepancy is recorded in participation_rules.json and as finding F4.",
+      "reasoning": "The ticket's own constraint is that these facts be resolved against the downloaded sources and not against memory. A page reference in a plan is not an authority; the Tier 1 document is (§3).",
+      "status": "Confirmed",
+      "affects": []
+    }
+  ],
+  "defects_recorded_unfixed": [
+    {
+      "finding": "F2",
+      "summary": "The stored RIA Part B page limit is 40. This topic is lump sum, where the form sets 45. runner/instrument_profile.py has no topic-conditional branch.",
+      "why_unfixed": "Setting the stored value to 45 would make the registry wrong for a non-lump-sum RIA. The limit belongs to the topic's funding form, not the instrument, so the fix is in the profile resolver, and the branch constraint holds the engine unmodified."
+    },
+    {
+      "finding": "F3",
+      "summary": "gate_02's g02_p15 is a file-level non_empty_json check on the evaluator registry, so it would have passed for an RIA run while the file held only an MSCA-PF entry. g02_p14 has the same shape.",
+      "why_unfixed": "The branch constraint holds the gate library and gate evaluator unmodified. Same class as finding I1 of the Tier 2B intake report."
+    },
+    {
+      "finding": "F9",
+      "summary": "The agnosticism-lint denylist contains Bulgaria, Hungary and Hungarian, so a naive leakage scan over Tier 4 would go red on the General Annexes' own Member State list.",
+      "why_unfixed": "The leakage test belongs to the consortium ticket. This ticket pins the hit set and records the recommended split of the denylist instead of building the scan."
+    }
+  ],
+  "verification": "tests/test_tier1_tier2a_ria_coverage.py, 45 checks, all passing. Every span in participation_rules.json, in the RIA evaluator expectation entry and in the validation report is re-read from the stored PDF and matched against the page it names. Mutating one word of one quote turns the check red, which was tried. The full suite reports 27 failed and 5001 passed. The baseline for the branch, measured on a clean worktree at commit 095e4b6, reports 27 failed and 4957 passed, and the two failure sets are identical name for name, so none of the 27 is caused by this change. Establishing that baseline took two attempts: the first worktree reported 26 failures because .env is gitignored and git worktree add does not copy it, so the transport tests that read ORCHESTRATOR_CLAUDE_CLI_PATH behaved differently there. A worktree baseline is only like for like once the machine-local .env is copied into it."
+}

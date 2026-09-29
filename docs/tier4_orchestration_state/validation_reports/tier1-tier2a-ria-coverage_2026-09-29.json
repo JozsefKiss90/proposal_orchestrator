@@ -1,0 +1,317 @@
+{
+  "report_id": "tier1_tier2a_ria_coverage_2026-09-29",
+  "report_kind": "tier coverage validation",
+  "branch": "dev_graph_demo",
+  "milestone": "Dev Graph demo (instance two), ticket 'Tier 1 and Tier 2A coverage check for an RIA' in plans/dev_graph_demo_tickets.md",
+  "authority": "CLAUDE.md §12.1 (a phase output is reviewable: it names its inputs by tier and file, states its inferences and flags its assumptions) and §12.2 (the four status categories). This is a ticket-authored report, not a skill-produced one. No gate reads it.",
+  "instrument_type": "RIA",
+  "topic_code": "HORIZON-CL6-2027-01-BIODIV-01",
+  "question_asked": "Do the call-neutral tiers already cover an RIA, and what is missing if they do not?",
+  "answer": "Four of the five registries cover an RIA. Two gaps were found and filled from the forms: Tier 1 participation_rules.json was empty, and evaluator_expectation_registry.json had no RIA entry. One gap is left open on purpose: template_adapter_map.json has no schema and no consumer, so any shape written into it would be invented. Two defects were found in artifacts this ticket does not own and are recorded unfixed.",
+  "inputs": [
+    {
+      "tier": "1",
+      "path": "docs/tier1_normative_framework/programme_guidance/wp-15-general-annexes_horizon-2026-2027_en.pdf",
+      "role": "prevailing source for participation, eligibility and award criteria",
+      "pages_read": [
+        5,
+        6,
+        7,
+        11,
+        12,
+        13,
+        14,
+        24,
+        25,
+        27
+      ]
+    },
+    {
+      "tier": "2A",
+      "path": "docs/tier2a_instrument_schemas/application_forms/ria_ia/af_he-ria-ia_en.pdf",
+      "role": "structural authority; read to verify the recorded Part B page limit",
+      "pages_read": [
+        30
+      ]
+    },
+    {
+      "tier": "2A",
+      "path": "docs/tier2a_instrument_schemas/evaluation_forms/ria_ia/ef_he-ria-ia_en.pdf",
+      "role": "prevailing source for the RIA evaluator expectations, scale and thresholds",
+      "pages_read": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "tier": "2B",
+      "path": "docs/tier2b_topic_and_call_sources/call_extracts/HORIZON-CL6-2027-01-BIODIV-01.json",
+      "role": "supplies the destination the China restriction is resolved against, and the budget regime cross-checked against the instrument registry"
+    }
+  ],
+  "outputs": [
+    "docs/tier1_normative_framework/extracted/participation_rules.json",
+    "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+    "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+    "docs/index/document_registry.json",
+    "docs/tier4_orchestration_state/decision_log/tier1-tier2a-ria-coverage_2026-09-29.json",
+    "tests/test_tier1_tier2a_ria_coverage.py"
+  ],
+  "registry_coverage": [
+    {
+      "artifact": "docs/tier2a_instrument_schemas/extracted/instrument_registry.json",
+      "ria_entry_status": "Confirmed",
+      "state_before": "present",
+      "action_taken": "none",
+      "evidence": "The RIA entry carries budget_regime lump_sum, phases_in_scope 1 to 8, and refs to the section and evaluator registries. budget_regime agrees with the Tier 2B call extract for this topic, which resolved lump sum from Part 9 pages 73 to 74. runner/instrument_profile.py resolves an RIA profile from it.",
+      "gap": null
+    },
+    {
+      "artifact": "docs/tier2a_instrument_schemas/extracted/section_schema_registry.json",
+      "ria_entry_status": "Confirmed",
+      "state_before": "present, with one Assumed field",
+      "action_taken": "evaluation_form_ref promoted from Assumed to Confirmed; evaluation_form_version added",
+      "evidence": "Eighteen sections from A.1 to B.annexes, each with section_name, mandatory, section_type, field_requirements and a source_document. Sections B.1, B.2 and B.3 are the three award criteria. part_b_page_limit_hard is 40, quoted from the form. evaluation_form_ref was Assumed from the af_ to ef_ filename convention and is now read: the stored form's page 3 heading is 'EVALUATION FORM (RIA IA)'.",
+      "gap": "See finding F2. The single instrument-level page limit cannot express the form's lump-sum alternative."
+    },
+    {
+      "artifact": "docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json",
+      "ria_entry_status": "Confirmed",
+      "state_before": "missing; the file held only an MSCA-PF entry",
+      "action_taken": "RIA entry written from the evaluation form",
+      "evidence": "Three criteria with the form's own names, threshold_score 3 on each, and six evaluator expectations transcribed verbatim from evaluation form pages 4 and 5. The entry uses only the four fields the artifact schema declares, so no field was introduced (CLAUDE.md §16.3). The MSCA-PF entry is unchanged.",
+      "gap": "See finding F7. The declared schema has no field for the scale, the overall threshold or the weighting rule, so those three facts are recorded in this report instead."
+    },
+    {
+      "artifact": "docs/tier2a_instrument_schemas/extracted/template_adapter_map.json",
+      "ria_entry_status": "Unresolved",
+      "state_before": "empty object",
+      "action_taken": "none, deliberately",
+      "evidence": "The file holds {}. Nothing in the repository defines its schema or reads it: artifact_schema_specification.yaml does not declare it, no gate predicate names it, and a search of runner/, .claude/agents/, .claude/skills/ and .claude/workflows/ finds no reader. Only README.md's directory tree mentions it.",
+      "gap": "See finding F1. Left empty because a shape invented here would have to be broken by the first real consumer."
+    },
+    {
+      "artifact": "docs/tier1_normative_framework/extracted/participation_rules.json",
+      "ria_entry_status": "Confirmed",
+      "state_before": "empty object",
+      "action_taken": "populated from the General Annexes",
+      "evidence": "Consortium composition, entities eligible to participate, entities eligible for funding, three country restrictions and two eligible-activity rules, each carrying the verbatim span of the General Annexes page it is read from. The composition condition is recorded both as prose and as four integers, so the consortium ticket reads numbers rather than re-parsing a sentence.",
+      "gap": "One limb, low_and_middle_income_countries, is recorded without enumerating its hundred-plus countries, and says so in the artifact."
+    }
+  ],
+  "element_status": [
+    {
+      "element": "consortium composition condition",
+      "value": "three independent beneficiaries, three distinct countries, at least one in a Member State, at least two others in different Member States or Associated Countries",
+      "status": "Confirmed",
+      "evidence": "General Annexes pages 13 and 14, Annex B 'Consortium composition'. The lead-in is at the foot of page 13 and the two limbs open page 14."
+    },
+    {
+      "element": "affiliated entities and the minimum",
+      "value": "do not count",
+      "status": "Confirmed",
+      "evidence": "General Annexes page 14: affiliated entities do not sign the grant agreement, so they do not count towards the minimum eligibility criteria for consortium composition."
+    },
+    {
+      "element": "JRC, international European research organisations and EU-law entities",
+      "value": "deemed established in a Member State other than the other participants'",
+      "status": "Confirmed",
+      "evidence": "General Annexes page 14."
+    },
+    {
+      "element": "China restriction as it applies to this project",
+      "value": "does not bind",
+      "status": "Confirmed",
+      "evidence": "General Annexes page 7 clause (2) restricts RIAs by default, then lists the destinations where entities established in China are eligible. 'Cluster 6 - Food, Bioeconomy, Natural Resources, Agriculture and Environment / Destination - Biodiversity and ecosystem services' is on that list, and the Tier 2B call extract records this topic's destination as 'Biodiversity and ecosystem services'."
+    },
+    {
+      "element": "countries eligible for funding",
+      "value": "four limbs: Member States, Overseas Countries and Territories, Associated Countries, low- and middle-income countries",
+      "status": "Confirmed",
+      "evidence": "General Annexes pages 11 to 13. The 27 Member States, 13 OCTs and 22 Associated Countries are enumerated; the fourth limb is recorded without enumeration and declares that."
+    },
+    {
+      "element": "RIA award criteria",
+      "value": "Excellence; Impact; Quality and efficiency of the implementation",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "If admissible and eligible, the proposals will be evaluated and ranked against the following award criteria",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 24
+      },
+      "note": "The RIA and IA row of the Annex D table spans pages 24 and 25. The evaluation form repeats the same three criteria and the same aspects on pages 4 and 5, which is what the evaluator registry entry is transcribed from."
+    },
+    {
+      "element": "scoring scale",
+      "value": "0 to 5, half-marks allowed",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "Scoring must be in the range from 0-5. Half-marks may be given.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      }
+    },
+    {
+      "element": "individual and overall thresholds",
+      "value": "3 per criterion; 10 of a possible 15 overall",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "The threshold for the individual criteria is 3. The overall threshold, applying to the sum of the 3 individual scores, is 10 points.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      },
+      "corroborating_span": {
+        "quote": "For full applications, each criterion will be scored out of 5. The threshold for individual criteria will be 3. The overall threshold, applying to the sum of the three individual scores, will be 10.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 27
+      }
+    },
+    {
+      "element": "weighting for an RIA",
+      "value": "none; the three scores are summed unweighted",
+      "status": "Confirmed",
+      "evidence_span": {
+        "quote": "Scores are normally NOT weighted.",
+        "source_document": "ef_he-ria-ia_en.pdf",
+        "source_page": 2
+      },
+      "corroborating_span": {
+        "quote": "To determine the ranking for ‘Innovation actions’, the score for ‘Impact’ will be given a weight of 1.5.",
+        "source_document": "wp-15-general-annexes_horizon-2026-2027_en.pdf",
+        "source_page": 27
+      },
+      "note": "The 1.5 weight on Impact is named for Innovation Actions only. An RIA therefore carries no weighting, and the weight is recorded here so the RIA pre-evaluation profile does not inherit the IA multiplier."
+    },
+    {
+      "element": "Part B page limit for this topic",
+      "value": "45, not the 40 the registry stores",
+      "status": "Unresolved",
+      "evidence": "Application form PDF page 30, printed 'Part B - Page 3 of 23': 'The title, list of participants and sections 1, 2 and 3, together, should not be longer than 40 pages. For topics using lump sum funding, the limit is 45 pages.' This topic uses lump sum funding. See finding F2."
+    },
+    {
+      "element": "two-stage procedure",
+      "value": "not applicable to this topic",
+      "status": "Inferred",
+      "evidence": "The General Annexes set a stage-1 threshold of 4 per criterion for two-stage calls (page 27), and the evaluation form repeats it (page 2). The Tier 2B call extract records a single-stage deadline model for this topic, so the stage-1 rules are recorded as out of scope rather than carried into the registry. Inferred, because the inference is from the extract's deadline model rather than from a topic condition naming the procedure."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "finding": "template_adapter_map.json is an empty, unclaimed registry. It was not filled.",
+      "evidence": "The file holds {}. artifact_schema_specification.yaml declares no schema for it, no gate predicate in gate_rules_library.yaml names it, and no module under runner/ or specification under .claude/ reads it. The only mention outside the ticket is README.md's directory tree.",
+      "consequence": "The ticket's acceptance criterion 'any missing RIA entry is filled from the Tier 2A PDF with page references' cannot be met for this file without first inventing its shape. §16.3 forbids an agent introducing artifact schemas the specification does not define, and a shape guessed here would have to be broken by the first real consumer. That criterion is therefore left unticked in the ticket. An earlier draft ticked it and carried this finding as the qualification, which made the ticket and this report contradict each other. Tier 4 outranks a plan (§3), so the box now follows the finding.",
+      "not_fixed_here": "Filling it needs a consumer to define what a template adapter maps. The honest reading of the criterion is that it applies to registries that have a schema. That reading is recorded here so the criterion is not ticked for more than it is.",
+      "recommended_owner": "The first ticket that needs a template adapter. If none does, Milestone 2 should delete the file rather than leave an empty registry implying missing content.",
+      "status": "Unresolved"
+    },
+    {
+      "id": "F2",
+      "severity": "blocking for a Phase 8 page-limit check, unfixed here",
+      "finding": "The stored RIA Part B page limit is 40. This topic uses lump sum funding, where the same form sets the limit at 45.",
+      "evidence": "section_schema_registry.json records part_b_page_limit_hard 40, with a note quoting both figures from application form PDF page 30. runner/instrument_profile.py reads part_b_page_limit_hard from the instrument entry and requires an integer; it has no lump-sum branch and no access to the topic's budget regime at that point. The Tier 2B call extract records budget_regime lump_sum for this topic.",
+      "consequence": "Any check that trims or flags Part B against the profile's hard_page_limit would apply 40 pages to a proposal allowed 45, costing five pages of evaluator-facing content. The error is in the safe direction, which is why it can go unnoticed.",
+      "not_fixed_here": "Changing the stored value to 45 would make the registry wrong for a non-lump-sum RIA, because the limit is a property of the topic's funding form and not of the instrument. The fix is a topic-conditional resolution in the profile resolver, which is an engine change; the branch constraint holds the engine unmodified.",
+      "recommended_owner": "Milestone 2 candidate ticket: resolve the Part B page limit from the instrument entry and the budget regime together.",
+      "status": "Unresolved"
+    },
+    {
+      "id": "F3",
+      "finding": "gate_02's predicate g02_p15 cannot detect a missing RIA entry. It is a non_empty_json check on the whole evaluator expectation registry.",
+      "evidence": "gate_rules_library.yaml defines g02_p15 as function non_empty_json on docs/tier2a_instrument_schemas/extracted/evaluator_expectation_registry.json, with the fail message 'The Tier 2A evaluator expectation registry must be populated for Phase 1 to complete.' Before this ticket the file held an MSCA-PF entry and no RIA entry, so the predicate would have passed for an RIA run. g02_p14 has the same shape over section_schema_registry.json.",
+      "consequence": "Phase 1 could resolve an instrument with no evaluator expectations and the gate would still release the node, which is a fail-open gate of the same class as finding I1 of the Tier 2B intake report. It is moot for RIA now that the entry exists, and it is not moot for the next instrument added.",
+      "not_fixed_here": "The branch constraint holds the gate library and gate evaluator unmodified. The fix is a predicate that resolves the instrument type and asserts an entry for it, not a file-level emptiness check.",
+      "recommended_owner": "Milestone 2 candidate ticket, alongside intake finding I1. Both are instrument- or topic-blind predicates over Tier 2 extracted content.",
+      "status": "Confirmed as a fail-open predicate"
+    },
+    {
+      "id": "F4",
+      "finding": "Three of the ticket's page references are wrong. They were resolved against the source, as the ticket's own constraint requires.",
+      "evidence": "The ticket cites the consortium-composition condition at General Annexes pages 12 to 13; it is on pages 13 and 14. It cites the eligible-country and China-restriction rules for RIAs at pages 5 to 6; the China restriction's heading and lead-in are on page 6 and its operative RIA clause is on page 7, while the funding-eligibility country limbs run from page 11 to page 13. Page 5 carries 'Entities eligible to participate', which is the participation test rather than the funding test.",
+      "consequence": "None for the artifacts, which cite what they were read from. Recorded because a reader comparing the ticket's page numbers against participation_rules.json would otherwise suspect the artifact.",
+      "status": "Confirmed, corrected in the artifact"
+    },
+    {
+      "id": "F5",
+      "finding": "The China restriction on RIAs does not bind this project, and that had to be resolved against the destination rather than the type of action.",
+      "evidence": "General Annexes page 7: entities established in China are not eligible in any RIA unless otherwise stated, and the list of work programme part destinations that follows includes Cluster 6's 'Destination - Biodiversity and ecosystem services'. The Tier 2B call extract records this topic's destination as exactly that string.",
+      "consequence": "A consortium design that excluded an entity established in China on the strength of 'this is an RIA' would be excluding it on a rule that does not apply. The rule is recorded per type of action with its exempt-destination list, and the usage rules of participation_rules.json state that it must be resolved against the destination.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F6",
+      "finding": "The RIA evaluation_form_ref was an unverified assumption for as long as the registry has existed. It is now verified.",
+      "evidence": "The field carried evaluation_form_ref_assumption_note: 'Assumed from application form filename naming convention (af_ to ef_); evaluation_forms/ directory is not in the declared inputs for this skill invocation. Must be verified against actual evaluation_forms/ directory contents.' The directory contains ef_he-ria-ia_en.pdf, whose page 3 heading reads 'EVALUATION FORM (RIA IA)' and whose running header reads 'EU Grants: Evaluation form (HE RIA and IA): V4.0 - 12.11.2025'.",
+      "consequence": "The assumption happened to be correct. The note is replaced by evaluation_form_ref_note recording the verification, and evaluation_form_version is added, so a later reader is not told to re-verify something already verified.",
+      "residual": "The MSCA-PF entry's own evaluation_form_ref carries the same kind of assumption note and is left as it stands. This ticket is scoped to RIA, and silently promoting another instrument's assumption without reading its form would be the error this finding records.",
+      "status": "Confirmed, resolved"
+    },
+    {
+      "id": "F7",
+      "finding": "No Tier 2A registry field can hold the RIA scoring scale, overall threshold or weighting rule. The facts are recorded in this report instead.",
+      "evidence": "The declared schema of evaluator_expectation_registry in artifact_schema_specification.yaml admits instrument_type and criteria, and per criterion only criterion_id, criterion_name, threshold_score and evaluator_expectations. section_schema_registry.json carries criteria_weights for MSCA-PF as fractions summing to 1, which is a share of a weighted total. An RIA's weighting is a ranking multiplier, 1.0 on each criterion, with 1.5 on Impact reserved for Innovation Actions. No module reads criteria_weights.",
+      "consequence": "Writing RIA weights under criteria_weights would put two incompatible scales behind one key, and a consumer reading both instruments would have no way to tell a share from a multiplier. Extending the evaluator registry with new fields would introduce a schema the specification does not declare (§16.3).",
+      "not_fixed_here": "The facts the RIA pre-evaluation profile ticket needs are the scale, the thresholds, the criteria and the weighting rule. All four are in element_status above with their source spans, so that ticket can build its profile from this report without re-reading the forms. Deciding where they should live in a registry is a schema question and belongs to a ticket that amends the specification.",
+      "recommended_owner": "RIA pre-evaluation profile in the harness, for the immediate need. Milestone 2 candidate ticket for the registry-shape question.",
+      "status": "Unresolved as a registry shape; the underlying facts are Confirmed"
+    },
+    {
+      "id": "F8",
+      "finding": "The document registry gained an optional field. Three of its six rows have no retrieval URL.",
+      "evidence": "The General Annexes and both RIA forms entered the repository in commit 237d229 on 2026-03-31, before this branch, and their download URLs are unrecorded. entry_schema declared retrieved_from optional for exactly that case but gave no place to say why it was absent. It now declares retrieval_note, required whenever retrieved_from is absent, and the pre-existing grouped-JSON row gained one too.",
+      "consequence": "The schema check in tests/test_tier2b_biodiv_intake.py rejected the new rows until the field was declared, which is the check working. A test in that file now enforces the new clause, so the word 'required' in the schema binds something.",
+      "status": "Confirmed"
+    },
+    {
+      "id": "F9",
+      "finding": "The agnosticism-lint denylist cannot be applied as a leakage scan over Tier 1-derived content. It produces false positives on the General Annexes' own Member State list.",
+      "evidence": "runner/agnosticism_lint.PROJECT_NOUNS contains Bulgaria, Hungary and Hungarian, because instance one was a Hungary and Bulgaria project. The General Annexes enumerate all 27 Member States on page 12, so participation_rules.json quotes Bulgaria and Hungary verbatim, and page 11 carries the rule on Hungarian public interest trusts. Scanning this ticket's six artifacts with scan_text returns exactly five distinct nouns: Bulgaria, Hungary, Hungarian, MSCA and msca. None is a reference to instance one. The lint's own GENERIC_LAYER_GLOBS covers runner/graph_*.py, runner/vault_*.py, runner/dev_graph/ and the vault templates, and no path under docs/, so none of these hits is a lint failure today.",
+      "consequence": "The consortium ticket's acceptance criterion says a leakage test 'scans Tier 3, Tier 4, Tier 5 and the vault for instance-one proper nouns' and 'reuses the agnosticism-lint denylist'. Written naively it would go red on a Tier 1 quotation, and the tempting repair would be to edit the quotation, which §13.11 forbids. The dangerous direction is the other one: a scan tuned until it stops complaining also stops detecting.",
+      "recommendation": "The leakage scan should split the denylist into two classes. The first is nouns that can only be instance one: organisation names, personal names and city or river names. Those fail on any hit. The second is nouns a Tier 1 or Tier 2 source may legitimately contain: country and nationality names, and instrument names. Those fail only outside a span quoted from a registered source. The two classes are not enumerated here, because naming the first class in a Tier 4 artifact is the leak the scan exists to prevent. runner/agnosticism_lint.PROJECT_NOUNS is the one place on this branch that holds them, and the scan should read them from there.",
+      "not_fixed_here": "The leakage test belongs to the consortium ticket. tests/test_tier1_tier2a_ria_coverage.py pins the exact hit set and its reason for these six artifacts, and asserts that no other denylist noun appears in any of them, deriving the forbidden set from PROJECT_NOUNS rather than restating it. A new noun turns red rather than being absorbed into an allowlist later.",
+      "recommended_owner": "Anonymised consortium with fictional gap partners.",
+      "status": "Confirmed as a scan-design constraint",
+      "observed_while_writing_this_finding": "A first draft of this finding listed the instance-one organisations and places as examples of the first class. The check described above turned red on this report, which is how the draft was caught. Recorded rather than deleted, because it is the clearest evidence that the scan is worth building: the leak arrived in an artifact whose subject was preventing leaks."
+    },
+    {
+      "id": "F10",
+      "finding": "The RIA evaluator expectation entry carries no page references inside the artifact. They live in this report and in the document index instead.",
+      "evidence": "The declared schema of evaluator_expectation_registry admits, per criterion, only criterion_id, criterion_name, threshold_score and evaluator_expectations, the last an array of plain strings. There is no field for a source page and no span object. The MSCA-PF entry carries none either.",
+      "consequence": "Read literally, the second half of the ticket's criterion is unmet for this artifact. The entry is filled from the Tier 2A PDF, but without page references in the entry. The references exist and are checked: they sit in element_status above and in the document registry row for ef_he-ria-ia_en.pdf, which names pages 2, 4 and 5.",
+      "not_fixed_here": "Adding a span field would introduce a schema the specification does not declare (§16.3), the same objection that decides F7 and D2. Recorded so the criterion is read for what it is rather than assumed complete.",
+      "recommended_owner": "Milestone 2 candidate ticket, with F7: whether the evaluator registry should carry provenance at all.",
+      "status": "Confirmed as a schema limitation"
+    },
+    {
+      "id": "F11",
+      "finding": "Two Tier 2A registries were treated differently on whether a new field may be added. The difference is deliberate, and is recorded so it does not read as arbitrary.",
+      "evidence": "evaluator_expectation_registry's declared schema is closed in practice: its one pre-existing entry uses exactly the four declared per-criterion fields and nothing else. section_schema_registry's RIA entry already carries around a dozen fields the specification does not declare, among them part_b_page_limit_hard, form_version_part_a and max_deliverable_count_note.",
+      "consequence": "Writing the RIA evaluator entry inside the four declared fields follows that artifact's convention. Replacing an assumption note with a verified note in section_schema_registry follows the other's. An earlier draft also added evaluation_form_version there. It was removed: the version is already in the note, so the field bought nothing while making the pair of decisions look inconsistent.",
+      "status": "Confirmed"
+    }
+  ],
+  "boundaries_respected": {
+    "tier_1_and_tier_2_sources": "Not modified (§13.11). The three PDFs are read only; their sha256 and byte counts are recorded in the document registry and re-verified by the test.",
+    "tier_1_and_tier_2a_extracted": "participation_rules.json and the RIA entry of evaluator_expectation_registry.json are written from the sources. Both are derived artifacts with provenance_class manually_placed, not source documents. Tier 2B extracted/ is untouched: Phase 1 owns it (§7 Phase 1).",
+    "programme_knowledge": "No rule, criterion, threshold or country in any output is written from programme knowledge (§10.6). Every one is a verbatim span of a named page, and the test re-reads the PDFs to prove it.",
+    "engine": "No change to runner/, the gate rules library, the gate evaluator, the manifest or the DAG scheduler. Findings F2 and F3 are engine defects and are recorded unfixed.",
+    "budget": "No budget figure is computed, estimated or substituted (§8.3). The instrument's lump-sum regime is read and cross-checked, not acted on.",
+    "read_only_intent": "The ticket describes a read-only check. It is read-only over the source documents and write-only over the two extracted registries the ticket instructs it to fill, plus the index and this report."
+  },
+  "verification": "tests/test_tier1_tier2a_ria_coverage.py, 45 checks. Every span in participation_rules.json is re-read from the stored General Annexes and matched against the page it names; mutating one word of one quote turns the check red, which was tried. Each of the six RIA evaluator expectations is matched against the evaluation form's body text with the running header removed, because one aspect straddles the page 4 and 5 break. The 27 Member States, 13 OCTs and 22 Associated Countries are each matched individually against the page they are read from, so a count check alone could not pass on a fabricated list. The consortium-composition prose summary is checked against the spans beside it, because a correct span next to a wrong summary is the failure a reader misses. runner/instrument_profile.py is called to confirm an RIA profile still resolves after the registry edits. The §13.11 check asks git whether any file under the Tier 1 or Tier 2 source trees differs from HEAD, rather than comparing a PDF to the digest this ticket wrote beside it, which would have proved nothing. The reader is a hard import, not an importorskip, so an environment without pymupdf fails rather than reporting green on checks that never ran. The denylist hit set over this ticket's six artifacts is pinned to five accounted-for nouns, and a separate check asserts that no instance-one organisation, person or place appears in any of them. The full suite reports 27 failed and 5001 passed. The baseline for the branch, measured on a clean worktree at commit 095e4b6, reports 27 failed and 4957 passed, and the two failure sets are identical name for name, so none of the 27 is caused by this change. Establishing that baseline took two attempts: the first worktree reported 26 failures because .env is gitignored and git worktree add does not copy it, so the transport tests that read ORCHESTRATOR_CLAUDE_CLI_PATH behaved differently there. A worktree baseline is only like for like once the machine-local .env is copied into it.",
+  "scope_beyond_the_ticket": {
+    "note": "The ticket names the composition condition and the eligible-country and China-restriction rules as a minimum. Four further Annex B rules are recorded.",
+    "additions": [
+      "the Russia, Belarus and non-government-controlled Ukraine restriction, and the Hungarian public interest trust measure, both on page 11, because they are eligibility restrictions that can disqualify a beneficiary and the consortium ticket needs them alongside the China rule",
+      "the affiliated entity and associated partner rules on pages 5 and 13, because the composition condition turns on who signs the grant agreement and the distinction is only usable with those definitions",
+      "the JRC rules on page 6, because the topic allows optional JRC participation and page 14 lets the JRC add a country to the composition count",
+      "the two eligible-activity rules on page 14, topic correspondence and civil applications only, because both bind the concept ticket",
+      "the award criteria, scale, thresholds and weighting in element_status, because finding F7 leaves them with no registry field and the RIA pre-evaluation profile ticket depends on them"
+    ],
+    "index_change": "docs/index/document_registry.json gains the three sources this ticket cites, and its entry_schema gains retrieval_note. §9.6 requires the registry to reflect repository state, and citing a document as authoritative while leaving it unregistered would defeat that.",
+    "sibling_test_change": "tests/test_tier2b_biodiv_intake.py gains retrieval_note to its declared-optional set and one check that a row without a retrieval URL carries a note. No existing assertion was weakened."
+  },
+  "report_size_note": "This report runs to roughly 4,000 words against the 1,500-word budget the internal-docs profile sets for a validation report (§5), where the precedent report is 1,745. The profile governs docs/**/*.md outside the tier directories, so a JSON artifact inside Tier 4 is out of its declared scope, and the ticket extends the profile to decision log entries and plans rather than to reports. The length is still a judgement rather than an oversight. The profile's own remedy is to split, not compress, and splitting was rejected: the findings are the gap list the ticket asks for, and element_status carries the facts the pre-evaluation profile ticket is told to read from here. Separating them would leave two artifacts that must be read together."
+}

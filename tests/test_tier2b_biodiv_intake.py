@@ -17,7 +17,6 @@ The checks that matter most are the ones a reader cannot do by eye:
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from pathlib import Path
@@ -27,6 +26,12 @@ import pytest
 from runner.agnosticism_lint import _PROPER_NOUNS
 from runner.call_slicer import GROUPED_JSON_MAP, generate_call_slice
 from runner.paths import find_repo_root
+from tests._tier_sources import (
+    STATUSES,
+    digest as _digest,
+    iter_spans as _iter_spans,
+    norm as _norm,
+)
 
 REPO = find_repo_root()
 
@@ -74,13 +79,6 @@ CROSS_CUTTING_KEYS = (
     "research_infrastructures",
 )
 
-STATUSES = frozenset({"Confirmed", "Inferred", "Assumed", "Unresolved"})
-
-
-def _norm(text: str) -> str:
-    """Collapse the PDF's line breaks and runs of spaces to one space each."""
-    return re.sub(r"\s+", " ", text).strip()
-
 
 def _assert_all_verbatim(strings: list, pdf_pages: dict, where: str) -> None:
     """Each string must occur verbatim on one of the topic's pages."""
@@ -103,29 +101,6 @@ def _assert_statuses(field_status: dict, present_in: tuple, where: str) -> None:
         assert any(field in mapping for mapping in present_in), (
             where + "." + field + " names no field of the artifact"
         )
-
-
-def _digest(path: Path, basis: str) -> str:
-    """The registry's digest of a source, on the basis the entry declares."""
-    raw = path.read_bytes()
-    if basis == "lf_normalised_bytes":
-        raw = raw.replace(b"\r\n", b"\n")
-    elif basis != "raw_bytes":
-        raise AssertionError("unknown digest_basis: " + basis)
-    return hashlib.sha256(raw).hexdigest()
-
-
-def _iter_spans(node: object, where: str = "$"):
-    """Yield every source-span object in the tree, with the path that found it."""
-    if isinstance(node, dict):
-        if {"quote", "source_document", "source_page"} <= set(node):
-            yield where, node
-            return
-        for key, value in node.items():
-            yield from _iter_spans(value, where + "." + str(key))
-    elif isinstance(node, list):
-        for index, value in enumerate(node):
-            yield from _iter_spans(value, where + "[" + str(index) + "]")
 
 
 @pytest.fixture(scope="module")
@@ -208,12 +183,25 @@ class TestStoredSources:
             "retrieved_on",
             "registered_by",
         }
-        optional = {"retrieved_from", "pages"}
+        optional = {"retrieved_from", "retrieval_note", "pages"}
         for name in required | optional:
             assert name in schema, name + " is not declared in entry_schema"
         for entry in registry["document_registry"]:
             assert required <= set(entry), entry["document_id"]
             assert set(entry) <= required | optional, entry["document_id"]
+
+    def test_a_row_without_a_retrieval_url_explains_why(self) -> None:
+        """The schema makes retrieval_note required whenever retrieved_from is absent.
+
+        Added by the Tier 1 and Tier 2A RIA coverage-check ticket, which
+        registers three documents that predate this branch and whose download
+        URLs are unrecorded. Without this check the schema's word 'required'
+        would bind nothing.
+        """
+        registry = json.loads(DOCUMENT_REGISTRY.read_text(encoding="utf-8"))
+        for entry in registry["document_registry"]:
+            if "retrieved_from" not in entry:
+                assert entry.get("retrieval_note"), entry["document_id"]
 
     def test_the_recorded_byte_count_matches_the_digest_basis(self) -> None:
         registry = json.loads(DOCUMENT_REGISTRY.read_text(encoding="utf-8"))

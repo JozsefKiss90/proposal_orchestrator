@@ -49,10 +49,16 @@ Three facts need resolving against the downloaded sources, not against memory:
 
 **Blocked by:** None — can start immediately.
 
-- [ ] A validation report lists each registry and states Confirmed, Unresolved or missing for the RIA entry.
+- [x] A validation report lists each registry and states Confirmed, Unresolved or missing for the RIA entry.
 - [ ] Any missing RIA entry is filled from the Tier 2A PDF with page references. No entry is written from programme knowledge (§10.6).
-- [ ] `participation_rules.json` carries the consortium-composition condition with its source span: at least three independent legal entities as beneficiaries, each established in a different country, at least one in a Member State and at least two others in different Member States or Associated Countries. Affiliated entities do not count. The JRC and international European research organisations are deemed established in a Member State other than the other participants'.
-- [ ] No Tier 1 or Tier 2 source document is modified (§13.11).
+- [x] `participation_rules.json` carries the consortium-composition condition with its source span: at least three independent legal entities as beneficiaries, each established in a different country, at least one in a Member State and at least two others in different Member States or Associated Countries. Affiliated entities do not count. The JRC and international European research organisations are deemed established in a Member State other than the other participants'.
+- [x] No Tier 1 or Tier 2 source document is modified (§13.11).
+
+**Why one box is unticked.** Two artifacts were filled: the RIA entry of `evaluator_expectation_registry.json`, and Tier 1 `participation_rules.json`. `template_adapter_map.json` was left empty, because it has no schema and no consumer, so any shape written into it would be invented (§16.3). The evaluator entry also carries no page references, because its declared schema has no field for one. Both gaps are recorded as findings F1 and F10 and decision D3.
+
+**Findings carried forward.** The China restriction does not bind this project. Cluster 6's "Biodiversity and ecosystem services" is on the exempt-destination list (F5). The stored RIA Part B page limit is 40, and this lump-sum topic is allowed 45 (F2). The composition condition is on pages 13 and 14, not 12 and 13 as this ticket said (F4). `g02_p15` would have passed for an RIA run while the evaluator registry held only an MSCA-PF entry (F3).
+
+**One more for the consortium ticket.** The agnosticism-lint denylist cannot be reused as it stands. It contains Member State names that the General Annexes enumerate verbatim (F9). The award criteria, scale and thresholds have no registry field, so the report carries them for the profile ticket (F7).
 
 ## Anonymised consortium with fictional gap partners
 
